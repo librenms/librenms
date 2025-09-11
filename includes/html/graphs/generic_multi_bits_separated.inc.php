@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,6 +17,11 @@
 require 'includes/html/graphs/common.inc.php';
 
 $stacked = generate_stacked_graphs();
+$multiplier ??= '8';
+$stack ??= '';
+$rrd_optionsb ??= '';
+$aggr_in ??= '';
+$aggr_out ??= '';
 
 $i = 0;
 if ($width > '1500') {
@@ -49,25 +55,18 @@ if (! $noagg || ! $nodetails) {
     }
 }
 
-if (! isset($multiplier)) {
-    $multiplier = '8';
-}
-
+$iter = 0;
 foreach ($rrd_list as $rrd) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours_in.$iter") || ! \LibreNMS\Config::get("graph_colours.$colours_out.$iter")) {
+    if (! \App\Facades\LibrenmsConfig::get("graph_colours.$colours_in.$iter") || ! \App\Facades\LibrenmsConfig::get("graph_colours.$colours_out.$iter")) {
         $iter = 0;
     }
 
-    $colour_in = \LibreNMS\Config::get("graph_colours.$colours_in.$iter");
-    $colour_out = \LibreNMS\Config::get("graph_colours.$colours_out.$iter");
+    $colour_in = \App\Facades\LibrenmsConfig::get("graph_colours.$colours_in.$iter");
+    $colour_out = \App\Facades\LibrenmsConfig::get("graph_colours.$colours_out.$iter");
 
     if (! $nodetails) {
-        if (isset($rrd['descr_in'])) {
-            $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr_in'], $descr_len) . '  In';
-        } else {
-            $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr'], $descr_len) . '  In';
-        }
-        $descr_out = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr_out'], $descr_len) . ' Out';
+        $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr_in'] ?? $rrd['descr'] ?? '', $descr_len) . '  In';
+        $descr_out = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr_out'] ?? '', $descr_len) . ' Out';
     }
 
     $rrd_options .= ' DEF:' . $in . $i . '=' . $rrd['filename'] . ':' . $ds_in . ':AVERAGE ';
@@ -160,7 +159,7 @@ if (! $noagg) {
     $rrd_options .= '\\n';
 }
 
-if ($custom_graph) {
+if (isset($custom_graph)) {
     $rrd_options .= $custom_graph;
 }
 

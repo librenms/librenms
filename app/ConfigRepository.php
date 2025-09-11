@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Config.php
  *
@@ -74,7 +75,7 @@ class ConfigRepository
      */
     public function getDefinitions(): array
     {
-        return json_decode(file_get_contents($this->get('install_dir') . '/misc/config_definitions.json'), true)['config'];
+        return json_decode(file_get_contents($this->get('install_dir') . '/resources/definitions/config_definitions.json'), true)['config'];
     }
 
     /**
@@ -149,7 +150,7 @@ class ConfigRepository
     /**
      * Get a setting from the $config['os'] array using the os of the given device
      *
-     * @param  string  $os  The os name
+     * @param  string|null  $os  The os name
      * @param  string  $key  period separated config variable name
      * @param  mixed  $default  optional value to return if the setting is not set
      * @return mixed
@@ -220,13 +221,13 @@ class ConfigRepository
                 return false;  // can't save it if there is no DB
             }
 
-            \App\Models\Config::updateOrCreate(['config_name' => $key], [
+            Models\Config::updateOrCreate(['config_name' => $key], [
                 'config_name' => $key,
                 'config_value' => $value,
             ]);
 
             // delete any children (there should not be any unless it is legacy)
-            \App\Models\Config::query()->where('config_name', 'like', "$key.%")->delete();
+            Models\Config::query()->where('config_name', 'like', "$key.%")->delete();
 
             $this->invalidateCache(); // config has been changed, it will need to be reloaded
 
@@ -239,7 +240,7 @@ class ConfigRepository
                 echo $e;
             }
 
-            if ($e instanceof \Illuminate\Database\QueryException && $e->getCode() !== '42S02') {
+            if ($e instanceof QueryException && $e->getCode() !== '42S02') {
                 // re-throw, else Config service provider get stuck in a loop
                 // if there is an error (database not connected)
                 // unless it is table not found (migrations have not been run yet)
@@ -262,7 +263,7 @@ class ConfigRepository
     {
         $this->forget($key);
         try {
-            return \App\Models\Config::withChildren($key)->delete();
+            return Models\Config::withChildren($key)->delete();
         } catch (Exception $e) {
             return false;
         }
@@ -328,7 +329,7 @@ class ConfigRepository
         }
 
         try {
-            \App\Models\Config::get(['config_name', 'config_value'])
+            Models\Config::get(['config_name', 'config_value'])
                 ->each(function ($item) {
                     Arr::set($this->config, $item->config_name, $item->config_value);
                 });
@@ -381,7 +382,7 @@ class ConfigRepository
         }
 
         // load macros from json
-        $macros = json_decode(file_get_contents($this->get('install_dir') . '/misc/macros.json'), true);
+        $macros = json_decode(file_get_contents($this->get('install_dir') . '/resources/definitions/macros.json'), true);
         Arr::set($this->config, 'alert.macros.rule', $macros);
 
         Arr::set($this->config, 'log_dir', $this->get('install_dir') . '/logs');
@@ -549,7 +550,9 @@ class ConfigRepository
         $this->set('time.twelvehour', $now - 43200); // time() - (12 * 60 * 60);
         $this->set('time.day', $now - 86400); // time() - (24 * 60 * 60);
         $this->set('time.twoday', $now - 172800); // time() - (2 * 24 * 60 * 60);
+        $this->set('time.threeday', $now - 259200); // time() - (3 * 24 * 60 * 60);
         $this->set('time.week', $now - 604800); // time() - (7 * 24 * 60 * 60);
+        $this->set('time.tenday', $now - 864000); // time() - (10 * 24 * 60 * 60);
         $this->set('time.twoweek', $now - 1209600); // time() - (2 * 7 * 24 * 60 * 60);
         $this->set('time.month', $now - 2678400); // time() - (31 * 24 * 60 * 60);
         $this->set('time.twomonth', $now - 5356800); // time() - (2 * 31 * 24 * 60 * 60);
@@ -580,7 +583,7 @@ class ConfigRepository
      */
     private function loadAllOsDefinitions(): void
     {
-        $os_list = glob($this->get('install_dir') . '/includes/definitions/*.yaml');
+        $os_list = glob($this->get('install_dir') . '/resources/definitions/os_detection/*.yaml');
 
         foreach ($os_list as $yaml_file) {
             $os = basename($yaml_file, '.yaml');

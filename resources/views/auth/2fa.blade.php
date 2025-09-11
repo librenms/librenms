@@ -10,7 +10,11 @@
     <div class="col-md-6 col-md-offset-3">
         <x-panel>
             <x-slot name="title">
+<<<<<<< HEAD
                 <img class="logon-logo img-responsive" src="{{ asset(\LibreNMS\Config::get('title_image', 'images/telequill_navbar.svg')) }}">
+=======
+                <x-logo class="logon-logo tw:h-auto tw:w-full" />
+>>>>>>> upstream/master
             </x-slot>
 
             <div class="container-fluid">

@@ -32,9 +32,9 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('openfiles', 'GAUGE', 0, 125000000000);
 
 $fields = [
-    'cpu' => (float) $icecast['CPU Load'],
-    'kbyte' => (int) $icecast['Used Memory'],
-    'openfiles' => (int) $icecast['Open files'],
+    'cpu' => isset($icecast['CPU Load']) ? (float) $icecast['CPU Load'] : null,
+    'kbyte' => isset($icecast['Used Memory']) ? (int) $icecast['Used Memory'] : null,
+    'openfiles' => isset($icecast['Open files']) ? (int) $icecast['Open files'] : null,
 ];
 
 $tags = [
@@ -44,6 +44,6 @@ $tags = [
     'rrd_def' => $rrd_def,
 ];
 
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 update_application($app, $rawdata, $fields);

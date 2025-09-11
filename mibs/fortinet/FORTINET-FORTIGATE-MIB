@@ -11,7 +11,7 @@
 FORTINET-FORTIGATE-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    FnBoolState, FnIndex, fnAdminEntry, fnSysSerial, fortinet
+    FnBoolState, FnIndex, fnAdminEntry, fnSysSerial, fnGenTrapMsg, fortinet
         FROM FORTINET-CORE-MIB
     ifEntry, ifName, ifIndex
         FROM IF-MIB
@@ -32,7 +32,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 fnFortiGateMib MODULE-IDENTITY
-    LAST-UPDATED "202307210000Z"
+    LAST-UPDATED "202504040000Z"
     ORGANIZATION
         "Fortinet Technologies, Inc."
     CONTACT-INFO
@@ -42,6 +42,40 @@ fnFortiGateMib MODULE-IDENTITY
          http://www.fortinet.com"
     DESCRIPTION
         "MIB module for Fortinet FortiGate devices."
+    REVISION    "202504040000Z"
+    DESCRIPTION
+        "Add fgTrapInterface for interface event"
+    REVISION    "202412170000Z"
+    DESCRIPTION
+        "Added fgChassisSensors fnFortiGateMib.fgSystem."
+
+    REVISION    "202409200000Z"
+    DESCRIPTION
+        "Added OID fgDataSecurityLevel."
+    REVISION    "202409190000Z"
+    DESCRIPTION
+        "Added fgInternal5GModemsInfo under fnFortiGateMib"
+    REVISION    "202407160000Z"
+    DESCRIPTION
+        "Added trap and OIDs for fgDigitalIO."
+    REVISION    "202405140000Z"
+    DESCRIPTION
+        "Added fgProcessorFnNP7LITE for soc5 platforms."
+    REVISION    "202403080000Z"
+    DESCRIPTION
+        "Added fgWcWlanCPAuth in fgWcWlanEntry and fgWcStaCPAuth in fgWcStaEntry."
+    REVISION    "202309210000Z"
+    DESCRIPTION
+        "Added fgSysFreeMemUsage, fgSysFreeableMemUsage in fgSystemInfo."
+    REVISION    "202309130000Z"
+    DESCRIPTION
+        "Added fgLicAlContracts in fgSIAdvLicenseDetails."
+    REVISION    "202309050000Z"
+    DESCRIPTION
+        "Add fgEms OIDs for ems connection feature."
+    REVISION    "202308300000Z"
+    DESCRIPTION
+        "Add filesystem mount and partitions information in fgDiskFsMountsEntry and fgDiskPartitionsEntry."
     REVISION    "202307210000Z"
     DESCRIPTION
         "Add fgTrapFaz for FortiAnalyzer event."
@@ -575,15 +609,30 @@ fgModel OBJECT IDENTIFIER ::= { fnFortiGateMib 1 }
 
 ffvmbb           OBJECT IDENTIFIER ::= { fgModel 80025 }
 ffvmev           OBJECT IDENTIFIER ::= { fgModel 80000 }
+ffw1801F         OBJECT IDENTIFIER ::= { fgModel 15004 }
+ffw2600F         OBJECT IDENTIFIER ::= { fgModel 26002 }
+ffw3001F         OBJECT IDENTIFIER ::= { fgModel 30005 }
+ffw3501F         OBJECT IDENTIFIER ::= { fgModel 35012 }
 ffw3980E         OBJECT IDENTIFIER ::= { fgModel 39804 }
+ffw4200F         OBJECT IDENTIFIER ::= { fgModel 38006 }
+ffw4400F         OBJECT IDENTIFIER ::= { fgModel 39007 }
+ffw4401F         OBJECT IDENTIFIER ::= { fgModel 44002 }
+ffw4801F         OBJECT IDENTIFIER ::= { fgModel 48003 }
 ffwVM64          OBJECT IDENTIFIER ::= { fgModel 90070 }
 ffwVM64KVm       OBJECT IDENTIFIER ::= { fgModel 90071 }
 fg40FI           OBJECT IDENTIFIER ::= { fgModel 443 }
 fg41FI           OBJECT IDENTIFIER ::= { fgModel 444 }
+fg50G5           OBJECT IDENTIFIER ::= { fgModel 451 }
+fg50GD           OBJECT IDENTIFIER ::= { fgModel 452 }
+fg50GP           OBJECT IDENTIFIER ::= { fgModel 460 }
+fg50GS           OBJECT IDENTIFIER ::= { fgModel 463 }
+fg51G5           OBJECT IDENTIFIER ::= { fgModel 453 }
 fg900D           OBJECT IDENTIFIER ::= { fgModel 900 }
 fgr60F           OBJECT IDENTIFIER ::= { fgModel 643 }
 fgr60FI          OBJECT IDENTIFIER ::= { fgModel 648 }
 fgt1000D         OBJECT IDENTIFIER ::= { fgModel 10005 }
+fgt1000F         OBJECT IDENTIFIER ::= { fgModel 10008 }
+fgt1001F         OBJECT IDENTIFIER ::= { fgModel 10009 }
 fgt100E          OBJECT IDENTIFIER ::= { fgModel 1041 }
 fgt100EF         OBJECT IDENTIFIER ::= { fgModel 1042 }
 fgt100F          OBJECT IDENTIFIER ::= { fgModel 1000 }
@@ -592,6 +641,8 @@ fgt101F          OBJECT IDENTIFIER ::= { fgModel 1001 }
 fgt1100E         OBJECT IDENTIFIER ::= { fgModel 10006 }
 fgt1101E         OBJECT IDENTIFIER ::= { fgModel 10007 }
 fgt1200D         OBJECT IDENTIFIER ::= { fgModel 12000 }
+fgt120g          OBJECT IDENTIFIER ::= { fgModel 1201 }
+fgt121g          OBJECT IDENTIFIER ::= { fgModel 1202 }
 fgt140E          OBJECT IDENTIFIER ::= { fgModel 1005 }
 fgt140EP         OBJECT IDENTIFIER ::= { fgModel 1006 }
 fgt1500D         OBJECT IDENTIFIER ::= { fgModel 15000 }
@@ -601,8 +652,10 @@ fgt1801F         OBJECT IDENTIFIER ::= { fgModel 15002 }
 fgt2000E         OBJECT IDENTIFIER ::= { fgModel 20000 }
 fgt200E          OBJECT IDENTIFIER ::= { fgModel 2009 }
 fgt200F          OBJECT IDENTIFIER ::= { fgModel 2011 }
+fgt200G          OBJECT IDENTIFIER ::= { fgModel 2013 }
 fgt201E          OBJECT IDENTIFIER ::= { fgModel 2010 }
 fgt201F          OBJECT IDENTIFIER ::= { fgModel 2012 }
+fgt201G          OBJECT IDENTIFIER ::= { fgModel 2014 }
 fgt2200E         OBJECT IDENTIFIER ::= { fgModel 18000 }
 fgt2201E         OBJECT IDENTIFIER ::= { fgModel 18001 }
 fgt2500E         OBJECT IDENTIFIER ::= { fgModel 25000 }
@@ -615,6 +668,8 @@ fgt300E          OBJECT IDENTIFIER ::= { fgModel 3007 }
 fgt301E          OBJECT IDENTIFIER ::= { fgModel 3008 }
 fgt3100D         OBJECT IDENTIFIER ::= { fgModel 31000 }
 fgt3200D         OBJECT IDENTIFIER ::= { fgModel 32000 }
+fgt3200F         OBJECT IDENTIFIER ::= { fgModel 32010 }
+fgt3201F         OBJECT IDENTIFIER ::= { fgModel 32011 }
 fgt3300E         OBJECT IDENTIFIER ::= { fgModel 30001 }
 fgt3301E         OBJECT IDENTIFIER ::= { fgModel 30002 }
 fgt3400E         OBJECT IDENTIFIER ::= { fgModel 34001 }
@@ -624,6 +679,8 @@ fgt3501F         OBJECT IDENTIFIER ::= { fgModel 35011 }
 fgt3600E         OBJECT IDENTIFIER ::= { fgModel 36001 }
 fgt3601E         OBJECT IDENTIFIER ::= { fgModel 36011 }
 fgt3700D         OBJECT IDENTIFIER ::= { fgModel 37000 }
+fgt3700F         OBJECT IDENTIFIER ::= { fgModel 37001 }
+fgt3701F         OBJECT IDENTIFIER ::= { fgModel 37011 }
 fgt3800D         OBJECT IDENTIFIER ::= { fgModel 38001 }
 fgt3810D         OBJECT IDENTIFIER ::= { fgModel 38101 }
 fgt3815D         OBJECT IDENTIFIER ::= { fgModel 38150 }
@@ -642,12 +699,17 @@ fgt4200F         OBJECT IDENTIFIER ::= { fgModel 38002 }
 fgt4201F         OBJECT IDENTIFIER ::= { fgModel 42002 }
 fgt4400F         OBJECT IDENTIFIER ::= { fgModel 39001 }
 fgt4401F         OBJECT IDENTIFIER ::= { fgModel 44001 }
+fgt4800F         OBJECT IDENTIFIER ::= { fgModel 48000 }
+fgt4801F         OBJECT IDENTIFIER ::= { fgModel 48001 }
 fgt5001D         OBJECT IDENTIFIER ::= { fgModel 50015 }
 fgt5001E         OBJECT IDENTIFIER ::= { fgModel 50016 }
 fgt5001E1        OBJECT IDENTIFIER ::= { fgModel 50017 }
 fgt500D          OBJECT IDENTIFIER ::= { fgModel 5004 }
 fgt500E          OBJECT IDENTIFIER ::= { fgModel 5005 }
 fgt501E          OBJECT IDENTIFIER ::= { fgModel 5006 }
+fgt50G           OBJECT IDENTIFIER ::= { fgModel 450 }
+fgt51G           OBJECT IDENTIFIER ::= { fgModel 459 }
+fgt51GP          OBJECT IDENTIFIER ::= { fgModel 461 }
 fgt6000F         OBJECT IDENTIFIER ::= { fgModel 60001 }
 fgt600D          OBJECT IDENTIFIER ::= { fgModel 6004 }
 fgt600E          OBJECT IDENTIFIER ::= { fgModel 6005 }
@@ -670,13 +732,18 @@ fgt80E           OBJECT IDENTIFIER ::= { fgModel 842 }
 fgt80EPOE        OBJECT IDENTIFIER ::= { fgModel 841 }
 fgt80F           OBJECT IDENTIFIER ::= { fgModel 845 }
 fgt80FBP         OBJECT IDENTIFIER ::= { fgModel 847 }
+fgt80FDSL        OBJECT IDENTIFIER ::= { fgModel 854 }
 fgt80FPOE        OBJECT IDENTIFIER ::= { fgModel 850 }
 fgt81E           OBJECT IDENTIFIER ::= { fgModel 843 }
 fgt81EPOE        OBJECT IDENTIFIER ::= { fgModel 844 }
 fgt81F           OBJECT IDENTIFIER ::= { fgModel 846 }
 fgt81FPOE        OBJECT IDENTIFIER ::= { fgModel 851 }
+fgt900G          OBJECT IDENTIFIER ::= { fgModel 9001 }
+fgt901G          OBJECT IDENTIFIER ::= { fgModel 9002 }
 fgt90E           OBJECT IDENTIFIER ::= { fgModel 940 }
+fgt90g           OBJECT IDENTIFIER ::= { fgModel 942 }
 fgt91E           OBJECT IDENTIFIER ::= { fgModel 941 }
+fgt91g           OBJECT IDENTIFIER ::= { fgModel 943 }
 fgtARM64AWS      OBJECT IDENTIFIER ::= { fgModel 90007 }
 fgtARM64AZURE    OBJECT IDENTIFIER ::= { fgModel 90027 }
 fgtARM64GCP      OBJECT IDENTIFIER ::= { fgModel 90026 }
@@ -723,10 +790,18 @@ fr70FB           OBJECT IDENTIFIER ::= { fgModel 704 }
 fr70FM           OBJECT IDENTIFIER ::= { fgModel 705 }
 fw40FI           OBJECT IDENTIFIER ::= { fgModel 447 }
 fw41FI           OBJECT IDENTIFIER ::= { fgModel 448 }
+fw50G5           OBJECT IDENTIFIER ::= { fgModel 454 }
+fw50GS           OBJECT IDENTIFIER ::= { fgModel 462 }
+fw51G5           OBJECT IDENTIFIER ::= { fgModel 458 }
+fw80FS           OBJECT IDENTIFIER ::= { fgModel 826 }
 fw81FD           OBJECT IDENTIFIER ::= { fgModel 852 }
 fw81FP           OBJECT IDENTIFIER ::= { fgModel 853 }
+fw81FS           OBJECT IDENTIFIER ::= { fgModel 827 }
 fwf40F           OBJECT IDENTIFIER ::= { fgModel 445 }
 fwf41F           OBJECT IDENTIFIER ::= { fgModel 446 }
+fwf50G           OBJECT IDENTIFIER ::= { fgModel 455 }
+fwf50GD          OBJECT IDENTIFIER ::= { fgModel 457 }
+fwf51G           OBJECT IDENTIFIER ::= { fgModel 456 }
 fwf60E           OBJECT IDENTIFIER ::= { fgModel 639 }
 fwf60EJ          OBJECT IDENTIFIER ::= { fgModel 662 }
 fwf60EV          OBJECT IDENTIFIER ::= { fgModel 664 }
@@ -735,6 +810,8 @@ fwf61E           OBJECT IDENTIFIER ::= { fgModel 649 }
 fwf61F           OBJECT IDENTIFIER ::= { fgModel 647 }
 fwf80F           OBJECT IDENTIFIER ::= { fgModel 848 }
 fwf81F           OBJECT IDENTIFIER ::= { fgModel 849 }
+fwf90G           OBJECT IDENTIFIER ::= { fgModel 944 }
+fwf91G           OBJECT IDENTIFIER ::= { fgModel 945 }
 
 -- fgModel end
 
@@ -1269,6 +1346,30 @@ fgDataMemUsage OBJECT-TYPE
         "Current Data Plane memory utilization (percentage)"
     ::= { fgSystemInfo 35 }
 
+fgSysFreeMemUsage OBJECT-TYPE
+    SYNTAX      Gauge32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current free memory utilization (percentage)."
+    ::= { fgSystemInfo 36 }
+
+fgSysFreeableMemUsage OBJECT-TYPE
+    SYNTAX      Gauge32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current freeable memory utilization (percentage)."
+    ::= { fgSystemInfo 37 }
+
+fgDataSecurityLevel OBJECT-TYPE
+    SYNTAX      INTEGER {low(1), high(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current BIOS Security Level"
+    ::= { fgSystemInfo 38 }
+
 --
 -- fortinet.fnFortiGateMib.fgSystem.fgSoftware
 --
@@ -1603,6 +1704,12 @@ fgProcessorFnNP6XLITE OBJECT-IDENTITY
     DESCRIPTION
         "The processor type identifier used for Fortinet NP6XLITE security processor."
     ::= { fgProcessorTypes 11 }
+
+fgProcessorFnNP7LITE OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The processor type identifier used for Fortinet NP7LITE security processor."
+    ::= { fgProcessorTypes 12 }
 
 --
 -- fortinet.fnFortiGateMib.fgSystem.fgProcessors.fgProcessorsTrapObjects
@@ -2080,6 +2187,60 @@ fgLicVersionTryResult OBJECT-TYPE
     DESCRIPTION 
         "The version's last attempt result."
     ::= { fgLicVersionEntry 7 }
+
+--
+-- fortinet.fnFortiGateMib.fgSystem.fgSystemInfoAdvanced.fgSIAdvLicenseDetails.fgLicAlContracts
+--
+
+fgLicAlContracts OBJECT IDENTIFIER
+    ::= { fgSIAdvLicenseDetails 3 }
+
+fgLicAlContractCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of entries in fgLicAlContractTable."
+    ::= { fgLicAlContracts 1 }
+
+fgLicAlContractTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FgLicAlContractEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that lists information for each account level contract."
+    ::= { fgLicAlContracts 2 }
+
+fgLicAlContractEntry OBJECT-TYPE
+    SYNTAX      FgLicAlContractEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing information for a particular contract."
+    INDEX       { fgVdEntIndex }
+    ::= { fgLicAlContractTable 1 }
+
+FgLicAlContractEntry ::= SEQUENCE {
+    fgLicAlContractDesc      DisplayString,
+    fgLicAlContractExpiry    DisplayString
+}
+
+fgLicAlContractDesc OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The contract's description."
+    ::= { fgLicAlContractEntry 1 }
+
+fgLicAlContractExpiry OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The contract's expiry time."
+    ::= { fgLicAlContractEntry 2 }
+
 
 --
 -- fortinet.fnFortiGateMib.fgSystem.fgUsbports
@@ -2638,6 +2799,163 @@ fgDiskName OBJECT-TYPE
         "The name of the storage."
     ::= { fgDiskEntry 2 }
 
+fgDiskFsMountsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FgDiskFsMountsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of file system mounts."
+    ::= { fgDisks 3 }
+
+fgDiskFsMountsEntry OBJECT-TYPE
+    SYNTAX      FgDiskFsMountsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A file system mount entry containing stats about each one."
+    INDEX       { fgDiskFsMountDevIdx }
+    ::= { fgDiskFsMountsTable 1 }
+
+FgDiskFsMountsEntry ::= SEQUENCE {
+    fgDiskFsMountDevIdx         FnIndex,
+    fgDiskFsMountName           DisplayString,
+    fgDiskFsMountMountPoint     DisplayString,
+    fgDiskFsMountType           DisplayString,
+    fgDiskFsMountOptions        DisplayString,
+    fgDiskFsMountFreq           Integer32,
+    fgDiskFsMountPassNo         Integer32,
+    fgDiskFsMountOptionsVal     Unsigned32
+}
+
+fgDiskFsMountDevIdx OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "File system mount entry unique index."
+    ::= { fgDiskFsMountsEntry 1 }
+
+fgDiskFsMountName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "File system mount entry name."
+    ::= { fgDiskFsMountsEntry 2 }
+
+fgDiskFsMountMountPoint OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "File system mount entry mount point location."
+    ::= { fgDiskFsMountsEntry 3 }
+
+fgDiskFsMountType OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "File system mount entry type."
+    ::= { fgDiskFsMountsEntry 4 }
+
+fgDiskFsMountOptions OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "File system mount entry options, displayed as a comma seperated string."
+    ::= { fgDiskFsMountsEntry 5 }
+
+fgDiskFsMountFreq OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "File system mount entry dump freq in days, currently unused."
+    ::= { fgDiskFsMountsEntry 6 }
+
+fgDiskFsMountPassNo OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "File system mount entry pass number, currently unused."
+    ::= { fgDiskFsMountsEntry 7 }
+
+fgDiskFsMountOptionsVal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "File system mount entry options displayed as unsigned int, currently only supporting 0th bit for rw=1/ro=0."
+    ::= { fgDiskFsMountsEntry 8 }
+
+fgDiskPartitionsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FgDiskPartitionsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of device partitions."
+    ::= { fgDisks 4 }
+
+fgDiskPartitionsEntry OBJECT-TYPE
+    SYNTAX      FgDiskPartitionsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry containing stats about each partition."
+    INDEX       { fgDiskPartitionIdx }
+    ::= { fgDiskPartitionsTable 1 }
+
+FgDiskPartitionsEntry ::= SEQUENCE {
+    fgDiskPartitionIdx         FnIndex,
+    fgDiskPartitionsMajor      Integer32,
+    fgDiskPartitionsMinor      Integer32,
+    fgDiskPartitionsBlockNum   Integer32,
+    fgDiskPartitionsName       DisplayString
+}
+
+fgDiskPartitionIdx OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Devices partition entry index."
+    ::= { fgDiskPartitionsEntry 1 }
+
+fgDiskPartitionsMajor OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number to identify the devices type or driver."
+    ::= { fgDiskPartitionsEntry 2 }
+
+fgDiskPartitionsMinor OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unique identification for the specific device type (major)."
+    ::= { fgDiskPartitionsEntry 3 }
+
+fgDiskPartitionsBlockNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of phys disk blocks for this partition."
+    ::= { fgDiskPartitionsEntry 4 }
+
+fgDiskPartitionsName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Name of partition."
+    ::= { fgDiskPartitionsEntry 5 }
+
 --
 -- fortinet.fnFortiGateMib.fgSystem.fgSlaProbeClient
 --
@@ -3020,6 +3338,155 @@ fgDpdkEngToCpu OBJECT-TYPE
         "Dpdk eng index to Cpu Mapping"
     ::= { fgDpdkEngEntry 7 }
 
+--
+-- fortinet.fnFortiGateMib.fgSystem.fgDigitalIO
+--
+
+fgDigitalIO OBJECT IDENTIFIER
+    ::= { fgSystem 13 }
+fgDioInfo OBJECT IDENTIFIER
+    ::= { fgDigitalIO 1 }
+fgDioTables OBJECT IDENTIFIER
+    ::= { fgDigitalIO 2 }
+
+--
+-- fortinet.fnFortiGateMib.fgSystem.fgDigitalIO.fgDioTables.fgDioTable
+--
+
+fgDioTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FgDioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that lists information for digital io"
+    ::= { fgDioTables 1 }
+
+fgDioEntry OBJECT-TYPE
+    SYNTAX      FgDioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing information for a particular digital io"
+    INDEX       { fgDioEntIndex }
+    ::= { fgDioTable 1 }
+
+FgDioEntry ::= SEQUENCE {
+    fgDioEntIndex     FnIndex,
+    fgDioEntName      DisplayString,
+    fgDioEntStatusMsg DisplayString
+}
+
+fgDioEntIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A unique identifier within the fgDioTable"
+    ::= { fgDioEntry 1 }
+
+fgDioEntName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Name of a digital io."
+    ::= { fgDioEntry 2 }
+
+fgDioEntStatusMsg OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Status message for a digital io."
+    ::= { fgDioEntry 3 }
+
+--
+-- fortinet.fnFortiGateMib.fgSystem.fgDigitalIO.fgDioTrapObjects
+--
+
+fgDioTrapObjects OBJECT IDENTIFIER
+    ::= { fgDigitalIO 3 }
+
+fgDioTrapType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  stateChanged(1)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Digital io trap type, there are 1 different values as below:
+           stateChanged(1)    - Input/Output State Changed."
+    ::= { fgDioTrapObjects 1 }
+
+-- fortinet.fnFortiGateMib.fgSystem.fgChassisSensors
+--
+
+fgChassisSensors OBJECT IDENTIFIER
+    ::= { fgSystem 14 }
+
+fgChassisSensorCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of entries in fgChassisSensorTable"
+    ::= { fgChassisSensors 1 }
+
+fgChassisSensorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FgChassisSensorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of device specific chassis smc sensors and values. Because different devices have different hardware sensor capabilities, this table may or may not contain any values."
+    ::= { fgChassisSensors 2 }
+
+fgChassisSensorEntry OBJECT-TYPE
+    SYNTAX      FgChassisSensorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing the name, value, and alarm status of a given chassis sensor"
+    INDEX       { fgChassisSensorEntIndex }
+    ::= { fgChassisSensorTable 1 }
+
+FgChassisSensorEntry ::= SEQUENCE {
+    fgChassisSensorEntIndex          FnIndex,
+    fgChassisSensorEntName           DisplayString,
+    fgChassisSensorEntValue          DisplayString,
+    fgChassisSensorEntAlarmStatus    INTEGER
+}
+
+fgChassisSensorEntIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique identifier within the fgChassisSensorTable"
+    ::= { fgChassisSensorEntry 1 }
+
+fgChassisSensorEntName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A string identifying the sensor by name"
+    ::= { fgChassisSensorEntry 2 }
+
+fgChassisSensorEntValue OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A string representation of the value of the sensor. Because sensors can present data in different formats, string representation is most general format. Interpretation of the value (units of measure, for example) is dependent on the individual sensor."
+    ::= { fgChassisSensorEntry 3 }
+
+fgChassisSensorEntAlarmStatus OBJECT-TYPE
+    SYNTAX      INTEGER { false(0), true(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If the sensor has an alarm threshold and has exceeded it, this will indicate its status. Not all sensors have alarms."
+    ::= { fgChassisSensorEntry 4 }
 
 --
 -- fortinet.fnFortiGateMib.fgFirewall
@@ -3049,7 +3516,7 @@ fgFwPolStatsTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF FgFwPolStatsEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Firewall policy statistics table.  This table has a dependent expansion relationship with fgVdTable.
          Only virtual domains with enabled policies are present in this table."
     ::= { fgFwPolTables 1 }
@@ -3058,7 +3525,7 @@ fgFwPolStatsEntry OBJECT-TYPE
     SYNTAX      FgFwPolStatsEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Firewall policy statistics on a virtual domain"
     INDEX       { fgVdEntIndex, fgFwPolID }
     ::= { fgFwPolStatsTable 1 }
@@ -3076,7 +3543,7 @@ fgFwPolID OBJECT-TYPE
     SYNTAX      FnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Firewall policy ID. Only enabled policies are present in this table. Policy IDs are only unique within a virtual domain."
     ::= { fgFwPolStatsEntry 1 }
 
@@ -3084,7 +3551,7 @@ fgFwPolPktCount OBJECT-TYPE
     SYNTAX      Counter32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Number of packets matched to policy (passed or blocked, depending on policy action). Count is from the time the policy became active."
     ::= { fgFwPolStatsEntry 2 }
 
@@ -3092,7 +3559,7 @@ fgFwPolByteCount OBJECT-TYPE
     SYNTAX      Counter32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Number of bytes in packets matching the policy. See fgFwPolPktCount."
     ::= { fgFwPolStatsEntry 3 }
 
@@ -5209,6 +5676,24 @@ fgIntfBcCfgSpolClassName OBJECT-TYPE
     DESCRIPTION 
         "Class name of a given shaping policy."
     ::= { fgIntfBcCfgSpolEntry 6 }
+
+--
+--fortinet.fnFortiGateMib.fgIntf.fgIntfTrapObjects
+--
+
+fgIntfTrapObjects OBJECT IDENTIFIER
+    ::={ fgIntf 6 }
+
+fgIntfTrapType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  ipConflict(1)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Interface trap type, there is 1 value as below:
+         ipConflict(1)"
+    ::={ fgIntfTrapObjects 1 }
 
 --
 -- fortinet.fnFortiGateMib.fgAntivirus
@@ -9270,7 +9755,8 @@ FgWcWlanEntry ::= SEQUENCE {
       fgWcWlanVlanId                 Integer32,
       fgWcWlanMeshBackhaul           FnBoolState,
       fgWcWlanStationCapacity        Unsigned32,
-      fgWcWlanStationCount           Gauge32
+      fgWcWlanStationCount           Gauge32,
+      fgWcWlanCPAuth                 FnBoolState
     }
 
 fgWcWlanSsid OBJECT-TYPE
@@ -9368,6 +9854,14 @@ fgWcWlanStationCount OBJECT-TYPE
     DESCRIPTION
         "Represents the number of clients currently connected to this WLAN profile."
     ::= { fgWcWlanEntry 12 }
+
+fgWcWlanCPAuth OBJECT-TYPE
+    SYNTAX      FnBoolState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Whether captive portal is enabled on this WLAN profile."
+    ::= { fgWcWlanEntry 13 }
 
 --
 -- fortinet.fnFortiGateMib.fgWc.fgWcWtpTables
@@ -10294,7 +10788,8 @@ FgWcStaEntry ::= SEQUENCE {
       fgWcStaRadioType              FgWcWtpRadioType,
       fgWcStaSecurity               FgWcWlanSecurityType,
       fgWcStaEncrypt                FgWcWlanEncryptionType,
-      fgWcStaOnline                 INTEGER
+      fgWcStaOnline                 INTEGER,
+      fgWcStaCPAuth                 FnBoolState
     }
 
 fgWcStaMacAddress OBJECT-TYPE
@@ -10465,6 +10960,14 @@ fgWcStaOnline OBJECT-TYPE
     DESCRIPTION
         "Represent online status of a wireless station."
     ::= { fgWcStaEntry 21 }
+
+fgWcStaCPAuth OBJECT-TYPE
+    SYNTAX      FnBoolState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Whether captive portal is enabled on this wireless station."
+    ::= { fgWcStaEntry 22 }
 
 --
 -- fortinet.fnFortiGateMib.fgFc
@@ -12507,7 +13010,7 @@ FgSwPortEntry ::= SEQUENCE {
     fgSwPortPOE                INTEGER,
     fgSwPortPOEStatus          INTEGER,
     fgSwPortPOEState           DisplayString,
-    fgSwPortPOEPower           DisplayString 
+    fgSwPortPOEPower           DisplayString
 }
 
 fgSwPortSwitchPlatform OBJECT-TYPE
@@ -12851,6 +13354,1210 @@ fgSgWbMgmtHb OBJECT-TYPE
             "Status of management heartbeat from this worker blade."
     ::= { fgSgWorkerBladeEntry 16 }
 
+---
+-- fortinet.fnFortiGateMib.fgEms
+--
+
+fgEms OBJECT IDENTIFIER
+    ::= { fnFortiGateMib 27 }
+
+--
+-- fortinet.fnFortiGateMib.fgEms.fgEmsTables
+--
+
+fgEmsTables OBJECT IDENTIFIER
+    ::= { fgEms 2 }
+
+--
+-- fortinet.fnFortiGateMib.fgEms.fgEmsTables.fgEmsGlobalTable
+--
+
+fgEmsGlobalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FgEmsGlobalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Global EMS table."
+    ::= { fgEmsTables 1 }
+
+fgEmsGlobalEntry OBJECT-TYPE
+    SYNTAX      FgEmsGlobalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Global EMS entry."
+    INDEX       { fgEmsGlobalEntIndex }
+    ::= { fgEmsGlobalTable 1 }
+
+FgEmsGlobalEntry ::= SEQUENCE {
+    fgEmsGlobalEntIndex               FnIndex,
+    fgEmsGlobalEntStatus              FnBoolState,
+    fgEmsGlobalEntConnectionName      DisplayString,
+    fgEmsGlobalEntConnectionStatus    INTEGER,
+    fgEmsGlobalEntLastCloseReason     Integer32,
+    fgEmsGlobalEntLastCloseReasonDesc DisplayString,
+    fgEmsGlobalEntLastCloseTime       TimeTicks
+}
+
+fgEmsGlobalEntIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index value that uniquely identifies a global EMS connection."
+    ::= { fgEmsGlobalEntry 1 }
+
+fgEmsGlobalEntStatus OBJECT-TYPE
+    SYNTAX      FnBoolState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether the global EMS connection is enabled."
+    ::= { fgEmsGlobalEntry 2 }
+
+fgEmsGlobalEntConnectionName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Global EMS connection name."
+    ::= { fgEmsGlobalEntry 3 }
+
+fgEmsGlobalEntConnectionStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  disconnected(0),
+                  connecting(1),
+                  connected(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "State of global EMS connection."
+    ::= { fgEmsGlobalEntry 4 }
+
+fgEmsGlobalEntLastCloseReason OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reason code for the last global EMS connection close."
+    ::= { fgEmsGlobalEntry 5 }
+
+fgEmsGlobalEntLastCloseReasonDesc OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reason for the last global EMS connection close."
+    ::= { fgEmsGlobalEntry 6 }
+
+fgEmsGlobalEntLastCloseTime  OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time since last global EMS connection close."
+    ::= { fgEmsGlobalEntry 7 }
+
+--
+-- fortinet.fnFortiGateMib.fgEms.fgEmsTables.fgEmsVdTable
+--
+
+fgEmsVdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FgEmsVdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Vdom EMS table."
+    ::= { fgEmsTables 2 }
+
+fgEmsVdEntry OBJECT-TYPE
+    SYNTAX      FgEmsVdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Vdom EMS entry."
+    INDEX       { fgVdEntIndex, fgEmsVdEntIndex }
+    ::= { fgEmsVdTable 1 }
+
+FgEmsVdEntry ::= SEQUENCE {
+    fgEmsVdEntIndex               FnIndex,
+    fgEmsVdEntStatus              FnBoolState,
+    fgEmsVdEntConnectionName      DisplayString,
+    fgEmsVdEntConnectionStatus    INTEGER,
+    fgEmsVdEntLastCloseReason     Integer32,
+    fgEmsVdEntLastCloseReasonDesc DisplayString,
+    fgEmsVdEntLastCloseTime       TimeTicks
+}
+
+fgEmsVdEntIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index value that uniquely identifies an EMS connection."
+    ::= { fgEmsVdEntry 1 }
+
+fgEmsVdEntStatus OBJECT-TYPE
+    SYNTAX      FnBoolState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether the EMS connection is enabled."
+    ::= { fgEmsVdEntry 2 }
+
+fgEmsVdEntConnectionName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "EMS connection name."
+    ::= { fgEmsVdEntry 3 }
+
+fgEmsVdEntConnectionStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  disconnected(0),
+                  connecting(1),
+                  connected(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "State of EMS connection."
+    ::= { fgEmsVdEntry 4 }
+
+fgEmsVdEntLastCloseReason OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reason code for the last EMS connection close."
+    ::= { fgEmsVdEntry 5 }
+
+fgEmsVdEntLastCloseReasonDesc OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reason for the last EMS connection close."
+    ::= { fgEmsVdEntry 6 }
+
+fgEmsVdEntLastCloseTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time since last EMS connection close."
+    ::= { fgEmsVdEntry 7 }
+
+--
+-- fortinet.fnFortiGateMib.fgInternal5GModemsInfo
+--
+
+fgInternal5GModemsInfo OBJECT IDENTIFIER
+    ::= { fnFortiGateMib 28 }
+
+--
+-- fortinet.fnFortiGateMib.fgInternal5GModemsInfo.fg5gMdmInfo
+--
+
+fg5gMdmInfo OBJECT IDENTIFIER
+    ::= { fgInternal5GModemsInfo 1 }
+
+fg5gModemNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of internal Modems"
+    ::= { fg5gMdmInfo 1 }
+
+--
+-- fortinet.fnFortiGateMib.fgInternal5GModemsInfo.fg5gMdmInfoTable
+--
+
+fg5gMdmInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Fg5gMdmInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing information applicable
+         to internal 5G modems."
+    ::= { fgInternal5GModemsInfo 2 }
+
+--
+-- fortinet.fnFortiGateMib.fgInternal5GModemsInfo.fg5gMdmInfoTable.fg5gMdmInfoEntry
+--
+
+fg5gMdmInfoEntry OBJECT-TYPE
+    SYNTAX      Fg5gMdmInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing information applicable
+         to a particular 5G modem. OIDs from fgMdmVendor are
+	 not displayed if a modem is not detected."
+    INDEX       { fg5gMdmEntIndex }
+    ::= { fg5gMdmInfoTable 1 }
+
+Fg5gMdmInfoEntry ::= SEQUENCE {
+    fg5gMdmEntIndex       FnIndex,
+    fg5gMdmDetected       INTEGER,
+    fg5gMdmVendor         DisplayString,
+    fg5gMdmModel          DisplayString,
+    fg5gMdmRevision       DisplayString,
+    fg5gMdmImei           DisplayString,
+    fg5gMdmHwRevision     DisplayString,
+    fg5gMdmMeid           DisplayString,
+    fg5gMdmSwRev          DisplayString,
+    fg5gMdmPriFwVer       DisplayString,
+    fg5gMdmFwName         DisplayString,
+    fg5gMdmOpMode         INTEGER,
+    fg5gMdmTemperature    Integer32,
+    fg5gNetworkMode       DisplayString
+}
+
+fg5gMdmEntIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index used to identify the instance of an internal 5G modem."
+    ::= { fg5gMdmInfoEntry 1 }
+
+fg5gMdmDetected OBJECT-TYPE
+    SYNTAX      INTEGER { no(0), yes(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Internal Modem Detected."
+    ::= { fg5gMdmInfoEntry 2 }
+
+fg5gMdmVendor OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Vendor Name."
+    ::= { fg5gMdmInfoEntry 3 }
+
+fg5gMdmModel OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Model Name."
+    ::= { fg5gMdmInfoEntry 4 }
+
+fg5gMdmRevision OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Modem Firmware Revision."
+    ::= { fg5gMdmInfoEntry 5 }
+
+fg5gMdmImei OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IMEI."
+    ::= { fg5gMdmInfoEntry 6 }
+
+fg5gMdmHwRevision OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Hardware Revision."
+    ::= { fg5gMdmInfoEntry 7 }
+
+fg5gMdmMeid OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MEID."
+    ::= { fg5gMdmInfoEntry 8 }
+
+fg5gMdmSwRev OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Software Revision."
+    ::= { fg5gMdmInfoEntry 9 }
+
+fg5gMdmPriFwVer OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PRI Firmware Version."
+    ::= { fg5gMdmInfoEntry 10 }
+
+fg5gMdmFwName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Modem Firmware Name."
+    ::= { fg5gMdmInfoEntry 11 }
+
+fg5gMdmOpMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+			online(0),
+			lowPower(1),
+			factoryTest(2),
+			offLine(3),
+			reset(4),
+			shuttingDown(5),
+			persistentLowPower(6),
+			modeOnlyLowPower(7),
+			unknown(255)
+		}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Modem Operation Mode.
+         The following enumerated values are supported:
+			online(0)              - Device can acquire a system and make calls.
+			lowPower(1)            - Device has temporarily disabled RF.
+			factoryTest(2)         - Special mode for manufacturer tests.
+			offLine(3)             - Device has deactivated RF and is partially shutdown.
+			reset(4)               - Device is in the process of power cycling.
+			shuttingDown(5)        - Device is in the process of shutting down.
+			persistentLowPower(6)  - Device has disabled RF and state persists even after a reset.
+			modeOnlyLowPower(7)    - Mode-only Low Power.
+			unknown(255)           - Unknown. "
+    ::= { fg5gMdmInfoEntry 12 }
+
+fg5gMdmTemperature OBJECT-TYPE
+    SYNTAX      Integer32(-128..127)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "RSSI for CDMA."
+    ::= { fg5gMdmInfoEntry 13 }
+
+fg5gNetworkMode OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Modem Firmware Name."
+    ::= { fg5gMdmInfoEntry 14 }
+
+--
+-- fortinet.fnFortiGateMib.fgInternal5GModemsInfo.fg5gSimInfoTable
+--
+
+fg5gSimInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Fg5gSimInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing information applicable
+         to SIM cards on internal 5G modems."
+    ::= { fgInternal5GModemsInfo 3 }
+
+--
+-- fortinet.fnFortiGateMib.fgInternal5GModemsInfo.fg5gSimInfoTable.fg5gSimInfoEntry
+--
+
+fg5gSimInfoEntry OBJECT-TYPE
+    SYNTAX      Fg5gSimInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing information applicable
+         to a particular 5G modem active/idle sim information."
+    INDEX       { fg5gSimMdmEntIndex }
+    ::= { fg5gSimInfoTable 1 }
+
+Fg5gSimInfoEntry ::= SEQUENCE {
+    fg5gSimMdmEntIndex        FnIndex,
+    fg5gIdleSimState          DisplayString,
+    fg5gIdleSimIccid          DisplayString,
+    fg5gActiveSimState        DisplayString,
+    fg5gActiveSimIccid        DisplayString,
+    fg5gActiveSimMsisdn       DisplayString,
+    fg5gActiveSimImsi         DisplayString,
+    fg5gActiveSimCountry      DisplayString,
+    fg5gActiveSimNetwork      DisplayString,
+    fg5gActiveSimPinState     DisplayString
+}
+
+fg5gSimMdmEntIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index used to identify the instance of an internal 5G modem."
+    ::= { fg5gSimInfoEntry 1 }
+
+fg5gIdleSimState OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Idle SIM status."
+    ::= { fg5gSimInfoEntry 2 }
+
+fg5gIdleSimIccid OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Idle SIM ICCID."
+    ::= { fg5gSimInfoEntry 3 }
+
+fg5gActiveSimState OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Active SIM status."
+    ::= { fg5gSimInfoEntry 4 }
+
+fg5gActiveSimIccid OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Active SIM ICCID."
+    ::= { fg5gSimInfoEntry 5 }
+
+fg5gActiveSimMsisdn OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Active SIM MSISDN."
+    ::= { fg5gSimInfoEntry 6 }
+
+fg5gActiveSimImsi OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Active SIM IMSI."
+    ::= { fg5gSimInfoEntry 7 }
+
+fg5gActiveSimCountry OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Active SIM Carrier Country."
+    ::= { fg5gSimInfoEntry 8 }
+
+fg5gActiveSimNetwork OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Active SIM Carrier Network."
+    ::= { fg5gSimInfoEntry 9 }
+
+fg5gActiveSimPinState OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Active SIM PIN status."
+    ::= { fg5gSimInfoEntry 10 }
+
+--
+-- fortinet.fnFortiGateMib.fgInternal5GModemsInfo.fg5gSignalInfoTable
+--
+
+fg5gSignalInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Fg5gSignalInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing information applicable
+         to signal strength on an internal 5G modems."
+    ::= { fgInternal5GModemsInfo 4 }
+
+--
+-- fortinet.fnFortiGateMib.fgInternal5GModemsInfo.fg5gSignalInfoTable.fg5gSignalInfoEntry
+--
+
+fg5gSignalInfoEntry OBJECT-TYPE
+    SYNTAX      Fg5gSignalInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing information applicable
+         to signal strength on an internal 5G modem. If the modem with the modem index
+	 is not present, it shows nothing. If the specific type of signal is not present,
+	 the OID shows nothing either."
+    INDEX       { fg5gSigMdmEntIndex }
+    ::= { fg5gSignalInfoTable 1 }
+
+Fg5gSignalInfoEntry ::= SEQUENCE {
+    fg5gSigMdmEntIndex       FnIndex,
+    fg5gSigWcdmaRssi         Integer32,
+    fg5gSigWcdmaEcio         Integer32,
+    fg5gSigLteRssi           Integer32,
+    fg5gSigLteRsrq           Integer32,
+    fg5gSigLteRsrp           Integer32,
+    fg5gSigLteSnr            Integer32,
+    fg5gSig5gRsrp            Integer32,
+    fg5gSig5gSnr             Integer32
+}
+
+fg5gSigMdmEntIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index used to identify the instance of an internal 5G modem."
+    ::= { fg5gSignalInfoEntry 1 }
+
+fg5gSigWcdmaRssi OBJECT-TYPE
+    SYNTAX      Integer32(-128..127)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "RSSI for WCDMA."
+    ::= { fg5gSignalInfoEntry 2 }
+
+fg5gSigWcdmaEcio OBJECT-TYPE
+    SYNTAX      Integer32(-65536..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ECIO for WCDMA."
+    ::= { fg5gSignalInfoEntry 3 }
+
+fg5gSigLteRssi OBJECT-TYPE
+    SYNTAX      Integer32(-128..127)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "RSSI for LTE."
+    ::= { fg5gSignalInfoEntry 4 }
+
+fg5gSigLteRsrq OBJECT-TYPE
+    SYNTAX      Integer32(-128..127)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "RSRQ for LTE."
+    ::= { fg5gSignalInfoEntry 5 }
+
+fg5gSigLteRsrp OBJECT-TYPE
+    SYNTAX      Integer32(-65536..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "RSRP for LTE."
+    ::= { fg5gSignalInfoEntry 6 }
+
+fg5gSigLteSnr OBJECT-TYPE
+    SYNTAX      Integer32(-65536..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "SNR for LTE."
+    ::= { fg5gSignalInfoEntry 7 }
+
+fg5gSig5gRsrp OBJECT-TYPE
+    SYNTAX      Integer32(-65536..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "RSRP for 5G."
+    ::= { fg5gSignalInfoEntry 8 }
+
+fg5gSig5gSnr OBJECT-TYPE
+    SYNTAX      Integer32(-65536..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "SNR for 5G."
+    ::= { fg5gSignalInfoEntry 9 }
+
+--
+-- fortinet.fnFortiGateMib.fgInternal5GModemsInfo.fg5gTrafficInfoTable
+--
+
+fg5gTrafficInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Fg5gTrafficInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing information applicable
+         to data traffic information on an internal 5G modems."
+    ::= { fgInternal5GModemsInfo 5 }
+
+--
+-- fortinet.fnFortiGateMib.fgInternal5GModemsInfo.fg5gTrafficInfoTable.fg5gTrafficInfoEntry
+--
+
+fg5gTrafficInfoEntry OBJECT-TYPE
+    SYNTAX      Fg5gTrafficInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing information applicable
+         to data traffic information on an internal 5G modem. If the modem with the modem index
+	 is not present, it shows nothing."
+    INDEX       { fg5gTrafMdmEntIndex }
+    ::= { fg5gTrafficInfoTable 1 }
+
+Fg5gTrafficInfoEntry ::= SEQUENCE {
+    fg5gTrafMdmEntIndex         FnIndex,
+    fg5gIpv4TxPacksOK           Counter32,
+    fg5gIpv4RxPacksOK           Counter32,
+    fg5gIpv4TxPacksErr          Counter32,
+    fg5gIpv4RxPacksErr          Counter32,
+    fg5gIpv4TxPacksOverflow     Counter32,
+    fg5gIpv4RxPacksOverflow     Counter32,
+    fg5gIpv4TxBytesOK           Counter64,
+    fg5gIpv4RxBytesOK           Counter64,
+    fg5gIpv4TxPacksDrop         Counter32,
+    fg5gIpv4RxPacksDrop         Counter32,
+    fg5gIpv6TxPacksOK           Counter32,
+    fg5gIpv6RxPacksOK           Counter32,
+    fg5gIpv6TxPacksErr          Counter32,
+    fg5gIpv6RxPacksErr          Counter32,
+    fg5gIpv6TxPacksOverflow     Counter32,
+    fg5gIpv6RxPacksOverflow     Counter32,
+    fg5gIpv6TxBytesOK           Counter64,
+    fg5gIpv6RxBytesOK           Counter64,
+    fg5gIpv6TxPacksDrop         Counter32,
+    fg5gIpv6RxPacksDrop         Counter32
+}
+
+fg5gTrafMdmEntIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index used to identify the instance of an internal 5G modem."
+    ::= { fg5gTrafficInfoEntry 1 }
+
+fg5gIpv4TxPacksOK OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx Packets OK."
+    ::= { fg5gTrafficInfoEntry 2 }
+
+fg5gIpv4RxPacksOK OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Packets OK."
+    ::= { fg5gTrafficInfoEntry 3 }
+
+fg5gIpv4TxPacksErr OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx Packets Error."
+    ::= { fg5gTrafficInfoEntry 4 }
+
+fg5gIpv4RxPacksErr OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Packets Error."
+    ::= { fg5gTrafficInfoEntry 5 }
+
+fg5gIpv4TxPacksOverflow OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx Packets Overflow."
+    ::= { fg5gTrafficInfoEntry 6 }
+
+fg5gIpv4RxPacksOverflow OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Packets Olverflow."
+    ::= { fg5gTrafficInfoEntry 7 }
+
+fg5gIpv4TxBytesOK OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx Bytes OK."
+    ::= { fg5gTrafficInfoEntry 8 }
+
+fg5gIpv4RxBytesOK OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Bytes OK."
+    ::= { fg5gTrafficInfoEntry 9 }
+
+fg5gIpv4TxPacksDrop OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx Packets Dropped."
+    ::= { fg5gTrafficInfoEntry 10 }
+
+fg5gIpv4RxPacksDrop OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Packets Dropped."
+    ::= { fg5gTrafficInfoEntry 11 }
+
+fg5gIpv6TxPacksOK OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx Packets OK."
+    ::= { fg5gTrafficInfoEntry 12 }
+
+fg5gIpv6RxPacksOK OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Packets OK."
+    ::= { fg5gTrafficInfoEntry 13 }
+
+fg5gIpv6TxPacksErr OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx Packets Error."
+    ::= { fg5gTrafficInfoEntry 14 }
+
+fg5gIpv6RxPacksErr OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Packets Error."
+    ::= { fg5gTrafficInfoEntry 15 }
+
+fg5gIpv6TxPacksOverflow OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx Packets Overflow."
+    ::= { fg5gTrafficInfoEntry 16 }
+
+fg5gIpv6RxPacksOverflow OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Packets Olverflow."
+    ::= { fg5gTrafficInfoEntry 17 }
+
+fg5gIpv6TxBytesOK OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx Bytes OK."
+    ::= { fg5gTrafficInfoEntry 18 }
+
+fg5gIpv6RxBytesOK OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Bytes OK."
+    ::= { fg5gTrafficInfoEntry 19 }
+
+fg5gIpv6TxPacksDrop OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx Packets Dropped."
+    ::= { fg5gTrafficInfoEntry 20 }
+
+fg5gIpv6RxPacksDrop OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Packets Dropped."
+    ::= { fg5gTrafficInfoEntry 21 }
+
+--
+-- fortinet.fnFortiGateMib.fgInternal5GModemsInfo.fg5gSessInfoTable
+--
+
+fg5gSessInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Fg5gSessInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing information applicable
+         to data session information on an internal 5G modems."
+    ::= { fgInternal5GModemsInfo 6 }
+
+--
+-- fortinet.fnFortiGateMib.fgInternal5GModemsInfo.fg5gSessInfoTable.fg5gSessInfoEntry
+--
+
+fg5gSessInfoEntry OBJECT-TYPE
+    SYNTAX      Fg5gSessInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing information applicable
+         to data session information on an internal 5G modem. In QMI stack, each modem can have 2
+	 sessions at the same time, IPv4 and IPv6. It shows nothing if the modem is not present."
+    INDEX       { fg5gSessMdmEntIndex }
+    ::= { fg5gSessInfoTable 1 }
+
+Fg5gSessInfoEntry ::= SEQUENCE {
+    fg5gSessMdmEntIndex        FnIndex,
+    fg5gIfName                 DisplayString,
+    fg5gMtu                    Integer32,
+    fg5gProfId                 Integer32,
+    fg5gProfName               DisplayString,
+    fg5gPdpType                INTEGER,
+    fg5gProfApn                DisplayString,
+    fg5gIpv4SessionStatus      INTEGER,
+    fg5gIpv4Addr               IpAddress,
+    fg5gIpv4GwAddr             IpAddress,
+    fg5gIpv4NetMask            IpAddress,
+    fg5gIpv4PriDns             IpAddress,
+    fg5gIpv4SecDns             IpAddress,
+    fg5gIpv6SessionStatus      INTEGER,
+    fg5gIpv6Addr               Ipv6Address,
+    fg5gIpv6PrefLen            Integer32,
+    fg5gIpv6GwAddr             Ipv6Address,
+    fg5gIpv6GwPrefLen          Integer32,
+    fg5gIpv6PriDns             Ipv6Address,
+    fg5gIpv6SecDns             Ipv6Address
+}
+
+fg5gSessMdmEntIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index used to identify the instance of an internal 5G modem."
+    ::= { fg5gSessInfoEntry 1 }
+
+fg5gIfName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Interface Name of an internal 5G modem."
+    ::= { fg5gSessInfoEntry 2 }
+
+fg5gMtu OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wireless profile MTU of a data session on an internal 5G modem.
+	It shows nothing if a data session does not exist."
+    ::= { fg5gSessInfoEntry 3 }
+
+fg5gProfId OBJECT-TYPE
+    SYNTAX      Integer32(0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wireless profile index of a data session on an internal 5G modem."
+    ::= { fg5gSessInfoEntry 4 }
+
+fg5gProfName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wireless profile name of a data session on an internal 5G modem."
+    ::= { fg5gSessInfoEntry 5 }
+
+fg5gPdpType OBJECT-TYPE
+    SYNTAX      INTEGER {
+			ipv4(0),
+			ppp(1),
+			ipv6(2),
+			ipv4v6(3)
+		}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wireless profile PDP context type of a data session on an internal 5G modem.
+         The following enumerated values are supported:
+			ipv4(0)   - IPv4.
+			ppp(1)    - PPP.
+			ipv6(2)   - IPv6.
+			ipv4v6(3) - IPv4 and IPv6. "
+    ::= { fg5gSessInfoEntry 6 }
+
+fg5gProfApn OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wireless profile APN name of a data session on an internal 5G modem."
+    ::= { fg5gSessInfoEntry 7 }
+
+fg5gIpv4SessionStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+			unknown(0),
+			disconnected(1),
+			connected(2),
+			suspended(3),
+			authenticating(4)
+		}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IPv4 Connection Status of a data session on an Internal 5G modem.
+         The following enumerated values are supported:
+			unknown(0)            - Unknown status.
+			disconnected(1)       - Network is disconnected.
+			connected(2)          - Network is connected.
+			suspended(3)          - Network connection is suspended.
+			authenticating(4)     - Network authentication is ongoing."
+    ::= { fg5gSessInfoEntry 8 }
+
+fg5gIpv4Addr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wireless profile IPv4 Address of a data session on an internal 5G modem.
+	It shows nothing if a data session does not exist or the data session is not
+	of IP Family IPv4."
+    ::= { fg5gSessInfoEntry 9 }
+
+fg5gIpv4GwAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wireless profile IPv4 Gateway Address of a data session on an internal 5G modem.
+	It shows nothing if a data session does not exist or the data session is not
+	of IP Family IPv4."
+    ::= { fg5gSessInfoEntry 10 }
+
+fg5gIpv4NetMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wireless profile IPv4 Net Mask of a data session on an internal 5G modem.
+	It shows nothing if a data session does not exist or the data session is not
+	of IP Family IPv4."
+    ::= { fg5gSessInfoEntry 11 }
+
+fg5gIpv4PriDns OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wireless profile IPv4 Primary DNS Server Address of a data session on an internal 5G modem.
+	It shows nothing if a data session does not exist or the data session is not
+	of IP Family IPv4."
+    ::= { fg5gSessInfoEntry 12 }
+
+fg5gIpv4SecDns OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wireless profile IPv4 Secondary DNS Server Address of a data session on an internal 5G modem.
+	It shows nothing if a data session does not exist or the data session is not
+	of IP Family IPv4."
+    ::= { fg5gSessInfoEntry 13 }
+
+fg5gIpv6SessionStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+			unknown(0),
+			disconnected(1),
+			connected(2),
+			suspended(3),
+			authenticating(4)
+		}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IPv6 Connection Status of a data session on an Internal 5G modem.
+         The following enumerated values are supported:
+			unknown(0)            - Unknown status.
+			disconnected(1)       - Network is disconnected.
+			connected(2)          - Network is connected.
+			suspended(3)          - Network connection is suspended.
+			authenticating(4)     - Network authentication is ongoing."
+    ::= { fg5gSessInfoEntry 14 }
+
+fg5gIpv6Addr OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wireless profile IPv6 Address of a data session on an internal 5G modem.
+	It shows nothing if a data session does not exist or the data session is not
+	of IP Family IPv6."
+    ::= { fg5gSessInfoEntry 15 }
+
+fg5gIpv6PrefLen OBJECT-TYPE
+    SYNTAX      Integer32(0..127)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wireless profile IPv6 Address Prefix of a data session on an internal 5G modem.
+	It shows nothing if a data session does not exist or the data session is not
+	of IP Family IPv6."
+    ::= { fg5gSessInfoEntry 16 }
+
+fg5gIpv6GwAddr OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wireless profile IPv6 Gateway Address of a data session on an internal 5G modem.
+	It shows nothing if a data session does not exist or the data session is not
+	of IP Family IPv6."
+    ::= { fg5gSessInfoEntry 17 }
+
+fg5gIpv6GwPrefLen OBJECT-TYPE
+    SYNTAX      Integer32(0..127)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wireless profile IPv6 Gateway Address Prefix of a data session on an internal 5G modem.
+	It shows nothing if a data session does not exist or the data session is not
+	of IP Family IPv6."
+    ::= { fg5gSessInfoEntry 18 }
+
+fg5gIpv6PriDns OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wireless profile Primary DNS IPv6 Address of a data session on an internal 5G modem.
+	It shows nothing if a data session does not exist or the data session is not
+	of IP Family IPv6."
+    ::= { fg5gSessInfoEntry 19 }
+
+fg5gIpv6SecDns OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wireless profile Secondary DNS IPv6 Address of a data session on an internal 5G modem.
+	It shows nothing if a data session does not exist or the data session is not
+	of IP Family IPv6."
+    ::= { fg5gSessInfoEntry 20 }
+
+--
+-- fortinet.fnFortiGateMib.fgInternal5GModemsInfo.fg5gGpsInfoTable
+--
+
+fg5gGpsInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Fg5gGpsInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing information applicable
+         to GPS information on an internal 5G modems."
+    ::= { fgInternal5GModemsInfo 7 }
+
+--
+-- fortinet.fnFortiGateMib.fgInternal5GModemsInfo.fg5gGpsInfoTable.fg5gGpsInfoEntry
+--
+
+fg5gGpsInfoEntry OBJECT-TYPE
+    SYNTAX      Fg5gGpsInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing information applicable
+         to GPS information on an internal 5G modem. If the modem with the modem index
+	 is not present, GPS deamon is not enabled, or a GPS location is not acquired successfully,
+	 it shows nothing. Also since no matter how many modems we have in a device, the location
+	 information is the same, here the index is always 1."
+    INDEX       { fg5gGpsMdmEntIndex }
+    ::= { fg5gGpsInfoTable 1 }
+
+Fg5gGpsInfoEntry ::= SEQUENCE {
+    fg5gGpsMdmEntIndex     FnIndex,
+    fg5gGpsEnabled         INTEGER,
+    fg5gLatitude           DisplayString,
+    fg5gLongitude          DisplayString,
+    fg5gUtcTime            DisplayString,
+    fg5gLocalTime          DisplayString
+}
+
+fg5gGpsMdmEntIndex OBJECT-TYPE
+    SYNTAX      FnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index used to identify the instance of an internal 5G modem."
+    ::= { fg5gGpsInfoEntry 1 }
+
+fg5gGpsEnabled OBJECT-TYPE
+    SYNTAX      INTEGER { no(0), yes(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Is GPS enabled."
+    ::= { fg5gGpsInfoEntry 2 }
+
+fg5gLatitude OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Latitude."
+    ::= { fg5gGpsInfoEntry 3 }
+
+fg5gLongitude OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Longitude."
+    ::= { fg5gGpsInfoEntry 4 }
+
+fg5gUtcTime OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "UTC Time."
+    ::= { fg5gGpsInfoEntry 5 }
+
+fg5gLocalTime OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Local Time."
+    ::= { fg5gGpsInfoEntry 6 }
+
+
 --
 -- fortinet.fnFortiGateMib.fgMibConformance
 --
@@ -12863,32 +14570,32 @@ fgMibConformance OBJECT IDENTIFIER
 --
 
 fgTrapVpnTunUp NOTIFICATION-TYPE
-    OBJECTS     { fnSysSerial, sysName, fgVpnTrapLocalGateway, 
+    OBJECTS     { fnSysSerial, sysName, fgVpnTrapLocalGateway,
                   fgVpnTrapRemoteGateway, fgVpnTrapPhase1Name }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Indicates that the specified VPN tunnel has been brought up."
     ::= { fgTrapPrefix 301 }
 
 fgTrapVpnTunDown NOTIFICATION-TYPE
-    OBJECTS     { fnSysSerial, sysName, fgVpnTrapLocalGateway, 
+    OBJECTS     { fnSysSerial, sysName, fgVpnTrapLocalGateway,
                   fgVpnTrapRemoteGateway, fgVpnTrapPhase1Name }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "The specified VPN tunnel has been brought down."
     ::= { fgTrapPrefix 302 }
 
 fgTrapHaSwitch NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial, sysName }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "The specified cluster member has transitioned from a secondary role to a primary role."
     ::= { fgTrapPrefix 401 }
 
 fgTrapHaStateChange NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial }
     STATUS      deprecated
-    DESCRIPTION 
+    DESCRIPTION
         "Trap being sent when the HA cluster
          member changes its state"
     ::= { fgTrapPrefix 402 }
@@ -12896,42 +14603,42 @@ fgTrapHaStateChange NOTIFICATION-TYPE
 fgTrapHaHBFail NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "The heartbeat device failure count has exceeded the configured threshold."
     ::= { fgTrapPrefix 403 }
 
 fgTrapHaMemberDown NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "The specified device (by serial number) is moving to a down state."
     ::= { fgTrapPrefix 404 }
 
 fgTrapHaMemberUp NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "A new cluster member has joined the cluster."
     ::= { fgTrapPrefix 405 }
 
 fgTrapIpsSignature NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial, sysName, fgIpsTrapSigId, fgIpsTrapSrcIp, fgIpsTrapSigMsg }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "An IPS signature has been triggered"
     ::= { fgTrapPrefix 503 }
 
 fgTrapIpsAnomaly NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial, sysName, fgIpsTrapSigId, fgIpsTrapSrcIp, fgIpsTrapSigMsg }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "An IPS anomaly has been detected"
     ::= { fgTrapPrefix 504 }
 
 fgTrapIpsPkgUpdate NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial, sysName }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "The IPS signature database has been updated"
     ::= { fgTrapPrefix 505 }
 
@@ -12945,49 +14652,49 @@ fgTrapIpsFailOpen NOTIFICATION-TYPE
 fgTrapAvVirus NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial, sysName, fgAvTrapVirName }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "A virus has been detected by the anti-virus engine"
     ::= { fgTrapPrefix 601 }
 
 fgTrapAvOversize NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial, sysName }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "An over-sized file has been detected by the anti-virus engine"
     ::= { fgTrapPrefix 602 }
 
 fgTrapAvPattern NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial, sysName }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "The anti-virus engine has blocked a file because it matched a configured pattern"
     ::= { fgTrapPrefix 603 }
 
 fgTrapAvFragmented NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial, sysName }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "The anti-virus engine has detected a fragmented file"
     ::= { fgTrapPrefix 604 }
 
 fgTrapAvEnterConserve NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial, sysName }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "The anti-virus engine has entered conservation mode due to low memory conditions"
     ::= { fgTrapPrefix 605 }
 
 fgTrapAvBypass NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial, sysName }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "The anti-virus engine has been bypassed due to conservation mode"
     ::= { fgTrapPrefix 606 }
 
 fgTrapAvOversizePass NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial, sysName }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "An over-sized file has been detected,
          but has been passed due to configuration"
     ::= { fgTrapPrefix 607 }
@@ -12995,7 +14702,7 @@ fgTrapAvOversizePass NOTIFICATION-TYPE
 fgTrapAvOversizeBlock NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial, sysName }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "An over-sized file has been detected
          and has been blocked"
     ::= { fgTrapPrefix 608 }
@@ -13003,10 +14710,10 @@ fgTrapAvOversizeBlock NOTIFICATION-TYPE
 fgTrapFazDisconnect NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "The device has been disconnected from the FortiAnalyzer."
     ::= { fgTrapPrefix 701 }
-    
+
 fgTrapFaz NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial, sysName, fgFazTrapType }
     STATUS      current
@@ -13017,21 +14724,21 @@ fgTrapFaz NOTIFICATION-TYPE
 fgTrapWcApUp NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial, sysName, fgWcApVdom, fgWcApSerial, fgWcApName }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Indicates that the specified AP is up."
     ::= { fgTrapPrefix 801 }
-    
+
 fgTrapWcApDown NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial, sysName, fgWcApVdom, fgWcApSerial, fgWcApName }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Indicates that the specified AP is down."
     ::= { fgTrapPrefix 802 }
 
 fgTrapFcSwUp NOTIFICATION-TYPE
     OBJECTS     { fnSysSerial, sysName, fgFcSwVdom, fgFcSwSerial, fgFcSwName }
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Indicates that the specified switch controller session is up."
     ::= { fgTrapPrefix 901 }
     
@@ -13112,6 +14819,20 @@ fgTrapSlbc NOTIFICATION-TYPE
         "A trap for SLBC event."
     ::= { fgTrapPrefix 1501 }
 
+fgTrapInterface NOTIFICATION-TYPE
+    OBJECTS      { fnSysSerial, sysName, fgIntfTrapType, ifName, fnGenTrapMsg }
+    STATUS      current
+    DESCRIPTION
+        "A trap for interface event."
+    ::= { fgTrapPrefix 1601 }
+
+fgTrapDio NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, fgDioTrapType, fgDioEntName, fnGenTrapMsg }
+    STATUS      current
+    DESCRIPTION
+        "A trap for Digital IO event."
+    ::= { fgTrapPrefix 1701 }
+
 --
 -- fortinet.fnFortiGateMib.fgMibConformance
 --
@@ -13141,6 +14862,7 @@ fgAdminObjectGroup OBJECT-GROUP
 fgSystemObjectGroup OBJECT-GROUP
     OBJECTS     { fgSysVersion, fgSysCpuUsage,
                   fgSysMemUsage, fgSysMemCapacity,
+                  fgSysFreeMemUsage, fgSysFreeableMemUsage,
                   fgSysDiskUsage, fgSysDiskCapacity,
                   fgSysSesCount, fgSysLowMemUsage,
                   fgSysLowMemCapacity, fgSysSesRate1,
@@ -13149,6 +14871,7 @@ fgSystemObjectGroup OBJECT-GROUP
                   fgSysSes6Count, fgSysSes6Rate1,
                   fgSysSes6Rate10, fgSysSes6Rate30,
                   fgSysSes6Rate60, fgSysUpTime,
+                  fgDataSecurityLevel,
                   fgSysNeedLogPartitionScan, fgSysUpTimeDetail,
                   fgSysNpuSesCount, fgSysNpuSesRate1,
                   fgSysNpuSesRate10, fgSysNpuSesRate30,
@@ -13404,7 +15127,8 @@ fgIntfObjectGroup OBJECT-GROUP
                   fgIntfBcCurrentBandwidth, fgIntfBcBytes, fgIntfBcDrops,
                   fgIntfBcInAllocatedBandwidth, fgIntfBcInGuaranteedBandwidth, fgIntfBcInMaxBandwidth,
                   fgIntfBcInCurrentBandwidth, fgIntfBcInBytes, fgIntfBcInDrops,
-                  fgIntfBcQPackets, fgIntfBcQBytes, fgIntfBcQPDrops, fgIntfBcQBDrops }
+                  fgIntfBcQPackets, fgIntfBcQBytes, fgIntfBcQPDrops, fgIntfBcQBDrops,
+                  fgIntfTrapType }
     STATUS      current
     DESCRIPTION 
         "Objects pertaining to the interface table of FortiGate device."
@@ -13434,7 +15158,7 @@ fgNotificationGroup NOTIFICATION-GROUP
                   fgTrapAvEnterConserve, fgTrapAvBypass, 
                   fgTrapAvOversizePass, fgTrapAvOversizeBlock, 
                   fgTrapFazDisconnect, fgTrapFaz, fgTrapWcApUp, fgTrapWcApDown, fgTrapDeviceNew, 
-                  fgTrapPerCpuHigh, fgTrapDhcp, fgTrapPoolUsage,
+                  fgTrapPerCpuHigh, fgTrapDhcp, fgTrapPoolUsage, fgTrapInterface, fgTrapDio,
                   fgTrapFcSwUp, fgTrapFcSwDown, fgTrapServerLoadBalanceRealServerDown,
                   fgTrapSlbc }
     STATUS      current
@@ -13519,7 +15243,8 @@ fgSystemAdvancedObjectGroup OBJECT-GROUP
                   fgLicVersionDesc, fgLicVersionExpiry,
                   fgLicVersionNumber, fgLicVersionUpdTime,
                   fgLicVersionUpdMethod, fgLicVersionTryTime,
-                  fgLicVersionTryResult
+                  fgLicVersionTryResult, fgLicAlContractCount,
+                  fgLicAlContractDesc, fgLicAlContractExpiry
                 }
     STATUS      current
     DESCRIPTION
@@ -13533,7 +15258,7 @@ fgWcObjectGroup OBJECT-GROUP
                   fgWcWlanSsid, fgWcWlanBroadcastSsid, fgWcWlanSecurity, fgWcWlanEncryption,
                   fgWcWlanAuthentication, fgWcWlanRadiusServer, fgWcWlanUserGroup,
                   fgWcWlanLocalBridging, fgWcWlanVlanId, fgWcWlanMeshBackhaul,
-                  fgWcWlanStationCapacity, fgWcWlanStationCount,
+                  fgWcWlanStationCapacity, fgWcWlanStationCount, fgWcWlanCPAuth,
                   fgWcWtpProfilePlatform, fgWcWtpProfileDataChannelDtlsPolicy,
                   fgWcWtpProfileCountryString,
                   fgWcWtpProfileRadioMode, fgWcWtpProfileRadioApScan, fgWcWtpProfileRadioWidsProfile,
@@ -13568,7 +15293,7 @@ fgWcObjectGroup OBJECT-GROUP
                   fgWcStaWlan, fgWcStaWtpId, fgWcStaRadioId, fgWcStaVlanId, fgWcStaIpAddressType, fgWcStaIpAddress,
                   fgWcStaVci, fgWcStaHost, fgWcStaUser, fgWcStaGroup, fgWcStaSignal, fgWcStaNoise,
                   fgWcStaIdle, fgWcStaBandwidthTx, fgWcStaBandwidthRx, fgWcStaChannel,
-                  fgWcStaRadioType, fgWcStaSecurity, fgWcStaEncrypt, fgWcStaOnline
+                  fgWcStaRadioType, fgWcStaSecurity, fgWcStaEncrypt, fgWcStaOnline, fgWcStaCPAuth
                 }
     STATUS      current
     DESCRIPTION 
@@ -13708,7 +15433,10 @@ fgVWLHealthCheckLinkGroup OBJECT-GROUP
     ::= { fgMibConformance 39 }
 
 fgDisksObjectGroup OBJECT-GROUP
-    OBJECTS     { fgDiskCount, fgDiskName }
+    OBJECTS     { fgDiskCount, fgDiskName, fgDiskFsMountName, fgDiskFsMountMountPoint, fgDiskFsMountType, fgDiskFsMountOptions, fgDiskFsMountFreq,
+                  fgDiskFsMountPassNo, fgDiskFsMountOptionsVal, fgDiskPartitionsMajor, fgDiskPartitionsMinor, fgDiskPartitionsBlockNum,
+                  fgDiskPartitionsName
+                }
     STATUS      current
     DESCRIPTION 
         "Objects pertaining to disks name list."
@@ -13820,6 +15548,61 @@ fgServiceGroupWorkerBladesGroup OBJECT-GROUP
     DESCRIPTION
         "Objects pertaining to Service Group Worker Blades group."
     ::= {fgMibConformance 51 }
+
+fgEmsObjectGroup OBJECT-GROUP
+    OBJECTS     { fgEmsGlobalEntStatus, fgEmsGlobalEntConnectionName, fgEmsGlobalEntConnectionStatus,
+                  fgEmsGlobalEntLastCloseReason, fgEmsGlobalEntLastCloseReasonDesc, fgEmsGlobalEntLastCloseTime,
+                  fgEmsVdEntStatus, fgEmsVdEntConnectionName, fgEmsVdEntConnectionStatus, fgEmsVdEntLastCloseReason,
+                  fgEmsVdEntLastCloseReasonDesc, fgEmsVdEntLastCloseTime
+                }
+    STATUS      current
+    DESCRIPTION
+        "Objects pertaining to EMS connections."
+    ::= { fgMibConformance 52 }
+
+fgDioObjectGroup OBJECT-GROUP
+    OBJECTS     { fgDioEntName, fgDioEntStatusMsg, fgDioTrapType
+                }
+    STATUS      current
+    DESCRIPTION
+        "Objects pertaining to Digital IO on FortiGate devices."
+    ::= { fgMibConformance 53 }
+
+fgInternal5GModemsInfoObjectGroup OBJECT-GROUP
+    OBJECTS     { fg5gModemNumber,
+                  fg5gMdmDetected, fg5gMdmVendor, fg5gMdmModel, fg5gMdmRevision,
+                  fg5gMdmImei, fg5gMdmHwRevision, fg5gMdmMeid, fg5gMdmSwRev,
+                  fg5gMdmPriFwVer, fg5gMdmFwName, fg5gMdmOpMode, fg5gMdmTemperature,
+                  fg5gNetworkMode,
+                  fg5gIdleSimState, fg5gIdleSimIccid, fg5gActiveSimState, fg5gActiveSimIccid,
+                  fg5gActiveSimMsisdn, fg5gActiveSimImsi, fg5gActiveSimCountry, fg5gActiveSimNetwork,
+                  fg5gActiveSimPinState,
+                  fg5gSigWcdmaRssi, fg5gSigWcdmaEcio, fg5gSigLteRssi, fg5gSigLteRsrq,
+                  fg5gSigLteRsrp, fg5gSigLteSnr, fg5gSig5gRsrp, fg5gSig5gSnr,
+                  fg5gIpv4TxPacksOK, fg5gIpv4RxPacksOK, fg5gIpv4TxPacksErr, fg5gIpv4RxPacksErr,
+                  fg5gIpv4TxPacksOverflow, fg5gIpv4RxPacksOverflow, fg5gIpv4TxBytesOK, fg5gIpv4RxBytesOK,
+                  fg5gIpv4TxPacksDrop, fg5gIpv4RxPacksDrop, fg5gIpv6TxPacksOK, fg5gIpv6RxPacksOK,
+                  fg5gIpv6TxPacksErr, fg5gIpv6RxPacksErr, fg5gIpv6TxPacksOverflow, fg5gIpv6RxPacksOverflow,
+                  fg5gIpv6TxBytesOK, fg5gIpv6RxBytesOK, fg5gIpv6TxPacksDrop, fg5gIpv6RxPacksDrop,
+                  fg5gIfName, fg5gMtu, fg5gProfId, fg5gProfName,
+                  fg5gPdpType, fg5gProfApn, fg5gIpv4SessionStatus, fg5gIpv4Addr,
+                  fg5gIpv4GwAddr, fg5gIpv4NetMask, fg5gIpv4PriDns, fg5gIpv4SecDns,
+                  fg5gIpv6SessionStatus, fg5gIpv6Addr, fg5gIpv6PrefLen, fg5gIpv6GwAddr,
+                  fg5gIpv6GwPrefLen, fg5gIpv6PriDns, fg5gIpv6SecDns,
+                  fg5gGpsEnabled, fg5gLatitude, fg5gLongitude, fg5gUtcTime,
+                  fg5gLocalTime }
+    STATUS      current
+   DESCRIPTION
+        "Objects pertaining to Internal 5G Modem Data."
+    ::= { fgMibConformance 54 }
+
+fgChassisSensorsObjectGroup OBJECT-GROUP
+    OBJECTS     { fgChassisSensorCount, fgChassisSensorEntName,
+                  fgChassisSensorEntValue, fgChassisSensorEntAlarmStatus }
+    STATUS      current
+    DESCRIPTION
+        "Object pertaining to hardware sensors on the device."
+    ::= { fgMibConformance 55 }
 
 fgMIBCompliance MODULE-COMPLIANCE
     STATUS      current
@@ -14009,6 +15792,10 @@ fgMIBCompliance MODULE-COMPLIANCE
         DESCRIPTION
               "Model and feature specific."
 
+        GROUP   fgChassisSensorsObjectGroup
+        DESCRIPTION
+              "Model and feature specific."
+
         GROUP   fgSwitchDeviceObjectGroup
         DESCRIPTION
               "Model and feature specific."
@@ -14022,6 +15809,18 @@ fgMIBCompliance MODULE-COMPLIANCE
               "Model and feature specific."
 
         GROUP  fgServiceGroupWorkerBladesGroup 
+        DESCRIPTION
+              "Model and feature specific."
+
+        GROUP   fgEmsObjectGroup
+        DESCRIPTION
+              "Model and feature specific."
+
+        GROUP  fgDioObjectGroup
+        DESCRIPTION
+              "Model and feature specific."
+
+        GROUP   fgInternal5GModemsInfoObjectGroup
         DESCRIPTION
               "Model and feature specific."
 

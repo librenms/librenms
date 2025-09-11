@@ -1,4 +1,5 @@
 <?php
+
 /**
  * firebrick.inc.php
  *
@@ -23,14 +24,19 @@
  * @author     Chris Malton (@cjsoftuk)
  */
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\IP;
 
 $bgpPeersCache = snmpwalk_cache_multi_oid($device, 'fbBgpPeerTable', [], 'FIREBRICK-BGP-MIB', 'firebrick');
 foreach ($bgpPeersCache as $key => $value) {
     $oid = explode('.', $key);
     $protocol = $oid[0];
-    $address = str_replace($oid[0] . '.', '', $key);
+
+    // We have test-data that looks like 'fbBgpPeerEntry.14.ipv4."90.155.53.63"', filter away when protocol doesn't start with "ipv"
+    if (! str_starts_with($protocol, 'ipv')) {
+        continue;
+    }
+    $address = str_replace($protocol . '.', '', $key);
     if (strlen($address) > 15) {
         $address = IP::fromHexString($address)->compressed();
     }
@@ -43,7 +49,7 @@ foreach ($bgpPeersCache as $key => $value) {
 unset($bgpPeersCache);
 
 $bgpLocalAs = null;
-foreach ($bgpPeers as $vrfId => $vrf) {
+foreach ($bgpPeers ?? [] as $vrfId => $vrf) {
     if (empty($vrfId)) {
         $checkVrf = ' AND `vrf_id` IS NULL ';
         // Force to null to avoid 0s going to the DB instead of Nulls
@@ -83,7 +89,7 @@ foreach ($bgpPeers as $vrfId => $vrf) {
 
             DeviceCache::getPrimary()->bgppeers()->create($peers);
 
-            if (Config::get('autodiscovery.bgp')) {
+            if (LibrenmsConfig::get('autodiscovery.bgp')) {
                 $name = gethostbyaddr($address);
                 discover_new_device($name, $device, 'BGP');
             }

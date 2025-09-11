@@ -66,8 +66,8 @@ if ($device['os_group'] == 'cisco') {
             'webvpn' => $data['crasWebvpnNumSessions'],
         ];
 
-        $tags = compact('rrd_def');
-        data_update($device, 'cras_sessions', $tags, $fields);
+        $tags = ['rrd_def' => $rrd_def];
+        app('Datastore')->put($device, 'cras_sessions', $tags, $fields);
 
         $os->enableGraph('cras_sessions');
     }

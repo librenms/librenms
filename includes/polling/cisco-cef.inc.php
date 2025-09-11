@@ -83,8 +83,8 @@ if ($device['os_group'] == 'cisco') {
                         'hostpunt' => $cef_stat['cefSwitchingPunt2Host'],
                     ];
 
-                    $tags = compact('entity', 'afi', 'index', 'rrd_name', 'rrd_def');
-                    data_update($device, 'cefswitching', $tags, $fields);
+                    $tags = ['entity' => $entity, 'afi' => $afi, 'index' => $index, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
+                    app('Datastore')->put($device, 'cefswitching', $tags, $fields);
 
                     echo "\n";
                 }//end foreach

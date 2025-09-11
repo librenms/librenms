@@ -27,7 +27,7 @@ $fields = $supervisord_data['total'];
 
 $metrics['total'] = $fields;
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 $rrd_def = RrdDefinition::make()
     ->addDataset('state', 'GAUGE', 0)
@@ -45,7 +45,7 @@ foreach ($supervisord_data['processes'] as $data) {
 
     $metrics['process_' . $process] = $fields;
     $tags = ['name' => $process, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-    data_update($device, 'app', $tags, $fields);
+    app('Datastore')->put($device, 'app', $tags, $fields);
 }
 
 update_application($app, $output, $metrics);

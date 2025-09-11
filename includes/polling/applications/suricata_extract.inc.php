@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Eventlog;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -48,7 +50,7 @@ $fields = [
 ];
 
 if (isset($data['last_errors']) && isset($data['last_errors'][0])) {
-    log_event('suricata_extract_submit errors found: ' . json_encode($data['last_errors']), $device, 'application', 5);
+    Eventlog::log('suricata_extract_submit errors found: ' . json_encode($data['last_errors']), $device['device_id'], 'application', Severity::Error);
 }
 
 $tags = [
@@ -57,5 +59,5 @@ $tags = [
     'rrd_name' => ['app', $name, $app->app_id],
     'rrd_def' => $rrd_def,
 ];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 update_application($app, 'OK', $fields);

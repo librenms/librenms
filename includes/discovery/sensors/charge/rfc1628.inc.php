@@ -19,7 +19,7 @@ if (is_numeric($value)) {
         15,
         50,
         null,
-        101,
+        null,
         $value
     );
 }

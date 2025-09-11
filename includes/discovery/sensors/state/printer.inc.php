@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Util\StringHelpers;
+
 echo 'Printer Status and Error State ';
 $state = snmp_get($device, 'hrDeviceStatus.1', '-Ovqe', 'HOST-RESOURCES-MIB');
 if (is_numeric($state)) {
@@ -34,8 +37,6 @@ if (is_numeric($state)) {
         'snmp',
         0
     );
-    //Create Sensor To State Index
-    create_sensor_to_state_index($device, $state_name, $sensor_index);
 }
 
 $state = snmp_get($device, 'hrPrinterDetectedErrorState.1', '-Ovqe', 'HOST-RESOURCES-MIB');
@@ -56,7 +57,7 @@ if ($state) {
             ['value' => 9, 'generic' => 1, 'graph' => 0, 'descr' => 'Warning, multiple issues'],
             ['value' => 10, 'generic' => 2, 'graph' => 0, 'descr' => 'Critical, multiple issues'],
         ];
-    $bit_flags = q_bridge_bits2indices($state);
+    $bit_flags = StringHelpers::bitsToIndices($state);
     $is_critical = false;
     if (count($bit_flags) == 0) {
         $state = 0;
@@ -81,7 +82,7 @@ if ($state) {
     $state_name = 'hrPrinterDetectedErrorState';
     create_state_index($state_name, $printer_states);
 
-    d_echo('Printer error state: ' . $state_name . ': ' . $state);
+    Log::debug('Printer error state: ' . $state_name . ': ' . $state);
     $sensor_index = 0;
     discover_sensor(
         null,
@@ -101,7 +102,4 @@ if ($state) {
         'snmp',
         0
     );
-
-    //Create Sensor To State Index
-    create_sensor_to_state_index($device, $state_name, $sensor_index);
 }

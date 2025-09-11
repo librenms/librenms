@@ -1,4 +1,5 @@
 <?php
+
 /**
  * InventoryController.php
  *
@@ -26,9 +27,9 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Http\Request;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class InventoryController implements DeviceTab
@@ -37,7 +38,7 @@ class InventoryController implements DeviceTab
 
     public function __construct()
     {
-        if (Config::get('enable_inventory')) {
+        if (LibrenmsConfig::get('enable_inventory')) {
             $device = DeviceCache::getPrimary();
 
             if ($device->entityPhysical()->exists()) {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Riverbed.php
  *
@@ -75,7 +76,7 @@ class Riverbed extends OS implements OSPolling
                 'total' => $conn_total,
             ];
 
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
 
             $datastore->put($this->getDeviceArray(), 'riverbed_connections', $tags, $fields);
             $this->enableGraph('riverbed_connections');
@@ -106,7 +107,7 @@ class Riverbed extends OS implements OSPolling
                 'datastore_miss' => $datastore_miss,
             ];
 
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
 
             $datastore->put($this->getDeviceArray(), 'riverbed_datastore', $tags, $fields);
             $this->enableGraph('riverbed_datastore');
@@ -138,7 +139,7 @@ class Riverbed extends OS implements OSPolling
                 'conn_passthrough' => $conn_passthrough,
             ];
 
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
 
             $datastore->put($this->getDeviceArray(), 'riverbed_optimization', $tags, $fields);
             $this->enableGraph('riverbed_optimization');
@@ -176,7 +177,7 @@ class Riverbed extends OS implements OSPolling
                 'bw_total' => $bw_total,
             ];
 
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
 
             $datastore->put($this->getDeviceArray(), 'riverbed_passthrough', $tags, $fields);
             $this->enableGraph('riverbed_passthrough');

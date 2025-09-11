@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Dispatcher.php
  *
@@ -25,9 +26,9 @@
 
 namespace LibreNMS\Snmptrap;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use LibreNMS\Alert\AlertRules;
-use LibreNMS\Config;
 use LibreNMS\Snmptrap\Handlers\Fallback;
 use Log;
 
@@ -60,8 +61,8 @@ class Dispatcher
 
         // log an event if appropriate
         $fallback = $handler instanceof Fallback;
-        $logging = Config::get('snmptraps.eventlog', 'unhandled');
-        $detailed = Config::get('snmptraps.eventlog_detailed', false);
+        $logging = LibrenmsConfig::get('snmptraps.eventlog', 'unhandled');
+        $detailed = LibrenmsConfig::get('snmptraps.eventlog_detailed', false);
         if ($logging == 'all' || ($fallback && $logging == 'unhandled')) {
             $trap->log($trap->toString($detailed));
         } else {

@@ -1,7 +1,7 @@
 <?php
 
 $oids = snmpwalk_group($device, 'slotModelTable', 'L-AM3440-A-Private');
-$current = $entry['sensorValue'];
+
 if (! empty($oids)) {
     //Create State Index
     $state_name = 'ccCardState';
@@ -99,8 +99,6 @@ if (! empty($oids)) {
         }
 
         discover_sensor(null, 'state', $device, $num_oid . $num_index, $index, $state_name, $description, '1', '1', null, null, null, null, $currentValue, 'snmp', null, null, null, 'Line cards');
-        //Create Sensor To State Index
-        create_sensor_to_state_index($device, $state_name, $index);
         $num_index = $num_index + 1;
     }
 }

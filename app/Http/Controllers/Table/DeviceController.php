@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DeviceController.php
  *
@@ -25,13 +26,13 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Location;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
-use LibreNMS\Config;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
@@ -67,7 +68,7 @@ class DeviceController extends TableController
 
     protected function searchFields($request)
     {
-        return ['sysName', 'hostname', 'display', 'hardware', 'os', 'locations.location'];
+        return ['sysName', 'hostname', 'display', 'hardware', 'os', 'locations.location', 'purpose', 'notes'];
     }
 
     protected function sortFields($request)
@@ -88,7 +89,7 @@ class DeviceController extends TableController
      * Defines the base query for this resource
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
+     * @return Builder|\Illuminate\Database\Query\Builder
      */
     protected function baseQuery($request)
     {
@@ -127,7 +128,7 @@ class DeviceController extends TableController
         }
 
         if ($field == 'state' && ! is_numeric($value)) {
-            return str_replace(['up', 'down'], [1, 0], $value);
+            return str_replace(['up', 'down'], ['1', '0'], $value);
         }
 
         return $value;
@@ -148,16 +149,18 @@ class DeviceController extends TableController
      */
     public function formatItem($device)
     {
+        $status = $this->getStatus($device);
+
         return [
             'extra' => $this->getLabel($device),
-            'status' => $this->getStatus($device),
+            'status' => $status,
             'maintenance' => $device->isUnderMaintenance(),
             'icon' => '<img src="' . asset($device->icon) . '" title="' . pathinfo($device->icon, PATHINFO_FILENAME) . '">',
-            'hostname' => $this->getHostname($device),
+            'hostname' => $this->getHostname($device, $status),
             'metrics' => $this->getMetrics($device),
             'hardware' => htmlspecialchars(Rewrite::ciscoHardware($device)),
             'os' => $this->getOsText($device),
-            'uptime' => (! $device->status && ! $device->last_polled) ? __('Never polled') : Time::formatInterval($device->status ? $device->uptime : $device->downSince()->diffInSeconds(), true),
+            'uptime' => (! $device->status && ! $device->last_polled) ? __('Never polled') : Time::formatInterval($device->status ? $device->uptime : (int) $device->downSince()->diffInSeconds(null, true), true),
             'location' => htmlspecialchars($this->getLocation($device)),
             'actions' => view('device.actions', ['actions' => $this->getActions($device)])->__toString(),
             'device_id' => $device->device_id,
@@ -165,20 +168,15 @@ class DeviceController extends TableController
     }
 
     /**
-     * Get the device up/down status
-     *
-     * @param  Device  $device
-     * @return string
+     * Get the device up/down/disabled status
      */
-    private function getStatus($device)
+    private function getStatus(Device $device): string
     {
-        if ($device->disabled == 1) {
+        if ($device->disabled) {
             return 'disabled';
-        } elseif ($device->status == 0) {
-            return 'down';
         }
 
-        return 'up';
+        return $device->status ? 'up' : ($device->ignore ? 'disabled' : 'down');
     }
 
     /**
@@ -198,7 +196,7 @@ class DeviceController extends TableController
         } elseif ($device->status == 0) {
             return 'label-danger';
         } else {
-            $warning_time = \LibreNMS\Config::get('uptime_warning', 86400);
+            $warning_time = LibrenmsConfig::get('uptime_warning', 86400);
             if ($device->uptime < $warning_time && $device->uptime != 0) {
                 return 'label-warning';
             }
@@ -211,11 +209,12 @@ class DeviceController extends TableController
      * @param  Device  $device
      * @return string
      */
-    private function getHostname($device)
+    private function getHostname(Device $device, string $status): string
     {
         return (string) view('device.list.hostname', [
             'device' => $device,
-            'detailed' => $this->isDetailed(),
+            'extra' => $this->isDetailed() ? $device->name() : '',
+            'class' => 'device-link-' . $status,
         ]);
     }
 
@@ -225,7 +224,7 @@ class DeviceController extends TableController
      */
     private function getOsText($device)
     {
-        $os_text = htmlspecialchars(Config::getOsSetting($device->os, 'text'));
+        $os_text = htmlspecialchars(LibrenmsConfig::getOsSetting($device->os, 'text'));
 
         if ($this->isDetailed()) {
             $os_text .= '<br />' . htmlspecialchars($device->version . ($device->features ? " ($device->features)" : ''));
@@ -328,8 +327,8 @@ class DeviceController extends TableController
         ];
 
         $ssh_href = 'ssh://' . $device->hostname;
-        if ($server = Config::get('gateone.server')) {
-            $ssh_href = Config::get('gateone.use_librenms_user')
+        if ($server = LibrenmsConfig::get('gateone.server')) {
+            $ssh_href = LibrenmsConfig::get('gateone.use_librenms_user')
                 ? $server . '?ssh=ssh://' . Auth::user()->username . '@' . $device->hostname . '&location=' . $device->hostname
                 : $server . '?ssh=ssh://' . $device->hostname . '&location=' . $device->hostname;
         }
@@ -354,7 +353,7 @@ class DeviceController extends TableController
             'style' => 'color:red',
         ];
 
-        foreach (array_values(Arr::wrap(Config::get('html.device.links'))) as $index => $custom) {
+        foreach (array_values(Arr::wrap(LibrenmsConfig::get('html.device.links'))) as $index => $custom) {
             if ($custom['action'] ?? false) {
                 $row = $this->isDetailed() ? $index % 2 : 0;
                 $custom['href'] = Blade::render($custom['url'], ['device' => $device]);
@@ -363,5 +362,61 @@ class DeviceController extends TableController
         }
 
         return $actions;
+    }
+
+    /**
+     * Get headers for CSV export
+     *
+     * @return array
+     */
+    protected function getExportHeaders()
+    {
+        return [
+            'Device ID',
+            'Hostname',
+            'IP Address',
+            'Hardware',
+            'OS',
+            'Version',
+            'Features',
+            'Location',
+            'Uptime',
+            'Status',
+            'Type',
+            'Last Polled',
+        ];
+    }
+
+    /**
+     * Format a row for CSV export
+     *
+     * @param  Device  $device
+     * @return array
+     */
+    protected function formatExportRow($device)
+    {
+        $status = $device->status ? 'Up' : 'Down';
+        if ($device->disabled) {
+            $status = 'Disabled';
+        } elseif ($device->ignore) {
+            $status = 'Ignored';
+        }
+
+        $location = $device->location ? $device->location->location : '';
+
+        return [
+            'device_id' => $device->device_id,
+            'hostname' => $device->displayName(),
+            'ip' => $device->ip,
+            'hardware' => Rewrite::ciscoHardware($device),
+            'os' => LibrenmsConfig::getOsSetting($device->os, 'text', $device->os),
+            'version' => $device->version,
+            'features' => $device->features,
+            'location' => $location,
+            'uptime' => $device->status ? Time::formatInterval($device->uptime, true) : 'Down',
+            'status' => $status,
+            'type' => $device->type,
+            'last_polled' => $device->last_polled,
+        ];
     }
 }

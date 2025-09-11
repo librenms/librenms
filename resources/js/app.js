@@ -4,11 +4,22 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
+import "../css/app.css";
+import "./bootstrap";
 
-require('./bootstrap');
-
-window.Vue = require('vue').default;
+import Vue from "vue";
 import { i18n } from "./plugins/i18n.js"; // translation
+import ToggleButton from "vue-js-toggle-button";
+import VTooltip from "v-tooltip";
+import vSelect from "vue-select";
+import Multiselect from "vue-multiselect";
+import VueTabs from "vue-nav-tabs";
+import VModal from "vue-js-modal";
+// // Alpine Components
+import Alpine from "alpinejs";
+// import popup from './components/alpine/popup.js'
+import popup from "./components/alpine/oldpopup.js";
+import deviceLink from "./components/alpine/deviceLink.js";
 
 /**
  * The following block of code may be used to automatically register your
@@ -17,26 +28,22 @@ import { i18n } from "./plugins/i18n.js"; // translation
  *
  * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
  */
+const components = import.meta.glob('./components/*.vue', { eager: true });
+Object.entries(components).forEach(([path, component]) => {
+    const name = path.split('/').pop().replace(/\.\w+$/, '');
+    Vue.component(name, component.default);
+});
 
-const files = require.context('./', true, /\.vue$/i);
-files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default));
-
-import ToggleButton from 'vue-js-toggle-button'
 Vue.use(ToggleButton);
 
-import VTooltip from 'v-tooltip'
 Vue.use(VTooltip);
 
-import vSelect from 'vue-select'
 Vue.component('v-select', vSelect);
 
-import Multiselect from 'vue-multiselect'
 Vue.component('multiselect', Multiselect)
 
-import VueTabs from 'vue-nav-tabs'
 Vue.use(VueTabs)
 
-import VModal from 'vue-js-modal'
 Vue.use(VModal)
 
 // Vue.mixin({
@@ -61,3 +68,9 @@ const app = new Vue({
     el: '#app',
     i18n,
 });
+
+Alpine.data('popup', popup);
+Alpine.data('deviceLink', deviceLink);
+
+Alpine.start();
+window.Alpine = Alpine;

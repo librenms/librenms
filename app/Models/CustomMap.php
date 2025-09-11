@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CustomMap.php
  *
@@ -35,13 +36,6 @@ class CustomMap extends BaseModel
 {
     use HasFactory;
     protected $primaryKey = 'custom_map_id';
-    protected $casts = [
-        'options' => 'array',
-        'legend_colours' => 'array',
-        'newnodeconfig' => 'array',
-        'newedgeconfig' => 'array',
-        'background_data' => 'array',
-    ];
     protected $fillable = [
         'name',
         'menu_group',
@@ -61,15 +55,28 @@ class CustomMap extends BaseModel
     ];
 
     /**
+     * @return array{options: 'array', legend_colours: 'array', newnodeconfig: 'array', newedgeconfig: 'array', background_data: 'array'}
+     */
+    protected function casts(): array
+    {
+        return [
+            'options' => 'array',
+            'legend_colours' => 'array',
+            'newnodeconfig' => 'array',
+            'newedgeconfig' => 'array',
+            'background_data' => 'array',
+        ];
+    }
+
+    /**
      * Get background data intended to be passed to javascript to configure the background
      */
     public function getBackgroundConfig(): array
     {
         $config = $this->background_data ?? [];
-        $config['engine'] = \LibreNMS\Config::get('geoloc.engine');
-        $config['api_key'] = \LibreNMS\Config::get('geoloc.api_key');
-        $config['tile_url'] = \LibreNMS\Config::get('leaflet.tile_url');
-        /* @phpstan-ignore-next-line seems to think version is not in array 100% of the time... which is wrong */
+        $config['engine'] = \App\Facades\LibrenmsConfig::get('geoloc.engine');
+        $config['api_key'] = \App\Facades\LibrenmsConfig::get('geoloc.api_key');
+        $config['tile_url'] = \App\Facades\LibrenmsConfig::get('leaflet.tile_url');
         $config['image_url'] = route('maps.custom.background', ['map' => $this->custom_map_id]) . '?version=' . ($config['version'] ?? 0);
 
         return $config;
@@ -113,16 +120,25 @@ class CustomMap extends BaseModel
             ->having('device_nodes_count', '>', 0);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\CustomMapNode, $this>
+     */
     public function nodes(): HasMany
     {
         return $this->hasMany(CustomMapNode::class, 'custom_map_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\CustomMapEdge, $this>
+     */
     public function edges(): HasMany
     {
         return $this->hasMany(CustomMapEdge::class, 'custom_map_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\CustomMapBackground, $this>
+     */
     public function background(): HasOne
     {
         return $this->hasOne(CustomMapBackground::class, 'custom_map_id');

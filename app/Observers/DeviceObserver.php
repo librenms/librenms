@@ -4,11 +4,13 @@ namespace App\Observers;
 
 use App;
 use App\ApiClients\Oxidized;
+use App\Facades\LibrenmsConfig;
+use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\Eventlog;
 use File;
-use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Exceptions\HostRenameException;
 use Log;
 
 class DeviceObserver
@@ -16,7 +18,7 @@ class DeviceObserver
     /**
      * Handle the device "created" event.
      *
-     * @param  \App\Models\Device  $device
+     * @param  Device  $device
      * @return void
      */
     public function created(Device $device): void
@@ -28,7 +30,7 @@ class DeviceObserver
     /**
      * Handle the device "updated" event.
      *
-     * @param  \App\Models\Device  $device
+     * @param  Device  $device
      * @return void
      */
     public function updated(Device $device): void
@@ -37,7 +39,7 @@ class DeviceObserver
         if ($device->isDirty(['status', 'status_reason'])) {
             $type = $device->status ? 'up' : 'down';
             $reason = $device->status ? $device->getOriginal('status_reason') : $device->status_reason;
-            $polled_by = Config::get('distributed_poller') ? (' by ' . \config('librenms.node_id')) : '';
+            $polled_by = LibrenmsConfig::get('distributed_poller') ? (' by ' . \config('librenms.node_id')) : '';
 
             Eventlog::log(sprintf('Device status changed to %s from %s check%s.', ucfirst($type), $reason, $polled_by), $device, $type);
         }
@@ -53,13 +55,42 @@ class DeviceObserver
         }
     }
 
+    public function updating(Device $device): void
+    {
+        // handle device renames
+        if ($device->isDirty('hostname')) {
+            $new_name = $device->hostname;
+
+            $old_name = $device->getOriginal('hostname');
+            $new_rrd_dir = Rrd::dirFromHost($new_name);
+            $old_rrd_dir = Rrd::dirFromHost($old_name);
+
+            if (is_dir($new_rrd_dir)) {
+                $device->hostname = $old_name;
+                Eventlog::log("Renaming of $old_name failed due to existing RRD folder for $new_name", $device, 'system', Severity::Error);
+
+                throw new HostRenameException("Renaming of $old_name failed due to existing RRD folder for $new_name");
+            }
+
+            if (rename($old_rrd_dir, $new_rrd_dir)) {
+                $device->ip = null;
+                $source = auth()->user()?->username ?: 'console';
+                Eventlog::log("Hostname changed -> $new_name ($source)", $device, 'system', Severity::Notice);
+            } else {
+                $device->hostname = $old_name;
+                Eventlog::log("Renaming of $old_name failed", $device, 'system', Severity::Error);
+                throw new HostRenameException("Renaming of $old_name failed");
+            }
+        }
+    }
+
     /**
      * Handle the device "deleted" event.
      */
     public function deleted(Device $device): void
     {
         // delete rrd files
-        $host_dir = \Rrd::dirFromHost($device->hostname);
+        $host_dir = Rrd::dirFromHost($device->hostname);
         try {
             $result = File::deleteDirectory($host_dir);
 
@@ -78,7 +109,7 @@ class DeviceObserver
     /**
      * Handle the device "deleting" event.
      *
-     * @param  \App\Models\Device  $device
+     * @param  Device  $device
      * @return void
      */
     public function deleting(Device $device): void
@@ -100,7 +131,6 @@ class DeviceObserver
         $device->bgppeers()->delete();
         \DB::table('bgpPeers_cbgp')->where('device_id', $device->device_id)->delete();
         $device->cefSwitching()->delete();
-        \DB::table('ciscoASA')->where('device_id', $device->device_id)->delete();
         $device->components()->delete();
         \DB::table('customoids')->where('device_id', $device->device_id)->delete();
         \DB::table('devices_perms')->where('device_id', $device->device_id)->delete();
@@ -116,7 +146,6 @@ class DeviceObserver
         $device->ipsecTunnels()->delete();
         $device->ipv4()->delete();
         $device->ipv6()->delete();
-        $device->isisAdjacencies()->delete();
         $device->isisAdjacencies()->delete();
         $device->macs()->delete();
         $device->mefInfo()->delete();
@@ -135,6 +164,10 @@ class DeviceObserver
         $device->ospfInstances()->delete();
         $device->ospfNbrs()->delete();
         $device->ospfPorts()->delete();
+        $device->ospfv3Areas()->delete();
+        $device->ospfv3Instances()->delete();
+        $device->ospfv3Nbrs()->delete();
+        $device->ospfv3Ports()->delete();
         $device->outages()->delete();
         $device->packages()->delete();
         $device->portsFdb()->delete();
@@ -177,7 +210,7 @@ class DeviceObserver
     /**
      * Handle the device "Pivot Attached" event.
      *
-     * @param  \App\Models\Device  $device
+     * @param  Device  $device
      * @param  string  $relationName  parents or children
      * @param  array  $pivotIds  list of pivot ids
      * @param  array  $pivotIdsAttributes  additional pivot attributes

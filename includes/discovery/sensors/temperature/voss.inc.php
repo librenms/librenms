@@ -1,4 +1,5 @@
 <?php
+
 /**
  * voss.inc.php
  *
@@ -53,7 +54,7 @@ $index = 'rcSingleCpSystemPhy2Temperature.0';
 $oid = '.1.3.6.1.4.1.2272.1.212.4.0';
 $descr = 'VOSS PHY2 temperature';
 $value = snmp_get($device, $index, '-OvqU', 'RAPID-CITY');
-d_echo("VOSS $var1: $value\n");
+d_echo("VOSS $descr: $value\n");
 if (is_numeric($value) && $value != 0) {
     discover_sensor(null, 'temperature', $device, $oid, $index, 'avaya-vsp', $descr, '1', '1', null, null, null, null, $value);
 }
@@ -62,7 +63,7 @@ $index = 'rcSingleCpSystemMac2Temperature.0';
 $oid = '.1.3.6.1.4.1.2272.1.212.5.0';
 $descr = 'VOSS MAC2 temperature';
 $value = snmp_get($device, $index, '-OvqU', 'RAPID-CITY');
-d_echo("VOSS $var1: $value\n");
+d_echo("VOSS $descr: $value\n");
 if (is_numeric($value) && $value != 0) {
     discover_sensor(null, 'temperature', $device, $oid, $index, 'avaya-vsp', $descr, '1', '1', null, null, null, null, $value);
 }

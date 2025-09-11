@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Programs.php
  *
@@ -25,8 +26,8 @@
 
 namespace LibreNMS\Validations;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Validator;
 
 class Programs extends BaseValidation
@@ -120,11 +121,11 @@ class Programs extends BaseValidation
 
     public function findExecutable($bin)
     {
-        if (is_executable(Config::get($bin))) {
-            return Config::get($bin);
+        if (is_executable(LibrenmsConfig::get($bin))) {
+            return LibrenmsConfig::get($bin);
         }
 
-        $located = Config::locateBinary($bin);
+        $located = LibrenmsConfig::locateBinary($bin);
         if (is_executable($located)) {
             return $located;
         }

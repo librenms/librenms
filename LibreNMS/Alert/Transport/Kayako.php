@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS
  *
@@ -12,8 +13,8 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Alert\Transport;
-use LibreNMS\Config;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
@@ -24,7 +25,7 @@ class Kayako extends Transport
         $url = $this->config['kayako-url'] . '/Tickets/Ticket';
         $key = $this->config['kayako-key'];
         $secret = $this->config['kayako-secret'];
-        $user = Config::get('email_from');
+        $user = LibrenmsConfig::get('email_from');
         $department = $this->config['kayako-department'];
         $ticket_type = 1;
         $ticket_status = 1;

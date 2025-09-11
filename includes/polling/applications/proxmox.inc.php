@@ -47,9 +47,9 @@ if (! function_exists('proxmox_vm_exists')) {
     }
 }
 
-if (\LibreNMS\Config::get('enable_proxmox') && ! empty($agent_data['app'][$name])) {
+if (\App\Facades\LibrenmsConfig::get('enable_proxmox') && ! empty($agent_data['app'][$name])) {
     $proxmox = $agent_data['app'][$name];
-} elseif (\LibreNMS\Config::get('enable_proxmox')) {
+} elseif (\App\Facades\LibrenmsConfig::get('enable_proxmox')) {
     $options = '-Oqv';
     $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.7.112.114.111.120.109.111.120';
     $proxmox = snmp_get($device, $oid, $options);
@@ -57,7 +57,7 @@ if (\LibreNMS\Config::get('enable_proxmox') && ! empty($agent_data['app'][$name]
     $proxmox = str_replace("<<<app-proxmox>>>\n", '', $proxmox);
 }
 
-if ($proxmox) {
+if (! empty($proxmox)) {
     $pmxlines = explode("\n", $proxmox);
     $pmxcluster = array_shift($pmxlines);
     dbUpdate(
@@ -99,7 +99,7 @@ if ($proxmox) {
                 ],
                 'rrd_def' => $rrd_def,
             ];
-            data_update($device, 'app', $tags, $fields);
+            app('Datastore')->put($device, 'app', $tags, $fields);
 
             if (proxmox_vm_exists($vmid, $pmxcluster, $pmxcache) === true) {
                 dbUpdate([

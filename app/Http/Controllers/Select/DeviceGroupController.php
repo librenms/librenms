@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DeviceGroupController.php
  *
@@ -29,6 +30,13 @@ use App\Models\DeviceGroup;
 
 class DeviceGroupController extends SelectController
 {
+    protected function rules()
+    {
+        return [
+            'type' => 'nullable|in:static,dynamic',
+        ];
+    }
+
     protected function searchFields($request)
     {
         return ['name'];
@@ -36,7 +44,9 @@ class DeviceGroupController extends SelectController
 
     protected function baseQuery($request)
     {
-        return DeviceGroup::hasAccess($request->user())->select('id', 'name');
+        return DeviceGroup::hasAccess($request->user())
+            ->when($request->get('type'), fn ($query, $type) => $query->where('type', $type))
+            ->select(['id', 'name']);
     }
 
     /**

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * transport-groups.inc.php
  *
@@ -61,4 +62,4 @@ $groups = array_map(function ($group) {
 
 $data = [['text' => 'Transport Groups', 'children' => $groups], $transports[0]];
 
-return[$data, $more || $c_more];
+return[$data, $more || $t_more];

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Smokeping.php
  *
@@ -25,9 +26,9 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 
 class Smokeping
 {
@@ -46,7 +47,7 @@ class Smokeping
 
     public function getFiles()
     {
-        if (is_null($this->files) && Config::has('smokeping.dir')) {
+        if (is_null($this->files) && LibrenmsConfig::has('smokeping.dir')) {
             $dir = $this->generateFileName();
             if (is_dir($dir) && is_readable($dir)) {
                 foreach (array_diff(scandir($dir), ['.', '..']) as $file) {
@@ -57,8 +58,8 @@ class Smokeping
                             $this->files['out'][$slave][$target] = $file;
                         } else {
                             $target = $this->filenameToHostname($file);
-                            $this->files['in'][$target][Config::get('own_hostname')] = $file;
-                            $this->files['out'][Config::get('own_hostname')][$target] = $file;
+                            $this->files['in'][$target][LibrenmsConfig::get('own_hostname')] = $file;
+                            $this->files['out'][LibrenmsConfig::get('own_hostname')][$target] = $file;
                         }
                     }
                 }
@@ -77,10 +78,10 @@ class Smokeping
 
     public function generateFileName($file = '')
     {
-        if (Config::get('smokeping.integration') === true) {
-            return Config::get('smokeping.dir') . '/' . ($this->device->type ?: 'Ungrouped') . '/' . $file;
+        if (LibrenmsConfig::get('smokeping.integration') === true) {
+            return LibrenmsConfig::get('smokeping.dir') . '/' . ($this->device->type ?: 'Ungrouped') . '/' . $file;
         } else {
-            return Config::get('smokeping.dir') . '/' . $file;
+            return LibrenmsConfig::get('smokeping.dir') . '/' . $file;
         }
     }
 
@@ -127,7 +128,7 @@ class Smokeping
 
     private function filenameToHostname($name)
     {
-        if (Config::get('smokeping.integration') === true) {
+        if (LibrenmsConfig::get('smokeping.integration') === true) {
             $name = str_replace('_', '.', $name);
         }
 

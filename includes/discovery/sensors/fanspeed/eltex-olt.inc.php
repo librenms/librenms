@@ -1,4 +1,5 @@
 <?php
+
 /**
  * eltex-olt.inc.php
  *
@@ -24,10 +25,10 @@
  */
 $tmp_eltex = snmp_get_multi_oid($device, 'ltp8xFan0Active.0 ltp8xFan0RPM.0 ltp8xFan1Active.0 ltp8xFan1RPM.0 ltp8xFanMinRPM.0 ltp8xFanMaxRPM.0', '-OUQn', 'ELTEX-LTP8X-STANDALONE');
 
-$min_eltex = $tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.20.0'] ?: null;
-$max_eltex = $tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.21.0'] ?: null;
+$min_eltex = $tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.20.0'] ?? null;
+$max_eltex = $tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.21.0'] ?? null;
 
-if ($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.6.0']) {
+if (isset($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.6.0'])) {
     if (is_numeric($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.7.0'])) {
         $oid = '.1.3.6.1.4.1.35265.1.22.1.10.7.0';
         $index = 0;
@@ -39,7 +40,7 @@ if ($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.6.0']) {
     }
 }
 
-if ($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.8.0']) {
+if (isset($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.8.0'])) {
     if (is_numeric($tmp_eltex['.1.3.6.1.4.1.35265.1.22.1.10.9.0'])) {
         $oid = '.1.3.6.1.4.1.35265.1.22.1.10.9.0';
         $index = 1;

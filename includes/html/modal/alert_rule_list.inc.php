@@ -52,9 +52,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
                         <?php
                         $alert_rules = dbFetchRows('SELECT * FROM alert_rules order by name');
                         foreach ($alert_rules as $rule) {
-                            if (empty($rule['builder'])) {
-                                $rule_display = $rule['rule'];
-                            } elseif ($rule_extra['options']['override_query'] === 'on') {
+                            if (isset($rule_extra['options']['override_query']) && $rule_extra['options']['override_query'] === 'on') {
                                 $rule_display = 'Custom SQL Query';
                             } else {
                                 $rule_display = QueryBuilderParser::fromJson($rule['builder'])->toSql(false);
@@ -86,9 +84,8 @@ if (! Auth::user()->hasGlobalAdmin()) {
                             alert_grid.find(".alert_rule_from_list").on("click", function(e) {
                                 var alert_rule_id = $(this).data("rule_id");
                                 $.ajax({
-                                    type: "POST",
-                                    url: "ajax_form.php",
-                                    data: {type: 'sql-from-alert-rules', rule_id: alert_rule_id},
+                                    type: "GET",
+                                    url: "<?php echo route('alert-rule-template.rule', ':rule_id') ?>".replace(':rule_id', alert_rule_id),
                                     dataType: "json",
                                     success: function (data) {
                                         if (data.status == 'ok') {

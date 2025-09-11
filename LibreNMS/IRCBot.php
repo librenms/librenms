@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2014  <singh@devilcode.org>
  * Modified and Relicensed by <f0o@devilcode.org> under the expressed
@@ -100,7 +101,7 @@ class IRCBot
     {
         $this->log('Setting up IRC-Bot..');
 
-        $this->config = Config::getAll();
+        $this->config = LibrenmsConfig::getAll();
         $this->debug = $this->config['irc_debug'];
         $this->config['irc_authtime'] = $this->config['irc_authtime'] ? $this->config['irc_authtime'] : 3;
         $this->max_retry = $this->config['irc_maxretry'];

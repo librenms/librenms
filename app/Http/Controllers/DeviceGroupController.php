@@ -7,7 +7,6 @@ use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use LibreNMS\Alerting\QueryBuilderFilter;
-use LibreNMS\Alerting\QueryBuilderFluentParser;
 
 class DeviceGroupController extends Controller
 {
@@ -46,7 +45,7 @@ class DeviceGroupController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request, ToastInterface $toast)
@@ -75,7 +74,7 @@ class DeviceGroupController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\DeviceGroup  $deviceGroup
+     * @param  DeviceGroup  $deviceGroup
      * @return \Illuminate\Http\RedirectResponse
      */
     public function show(DeviceGroup $deviceGroup)
@@ -86,17 +85,11 @@ class DeviceGroupController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\DeviceGroup  $deviceGroup
+     * @param  DeviceGroup  $deviceGroup
      * @return \Illuminate\View\View
      */
     public function edit(DeviceGroup $deviceGroup)
     {
-        // convert old rules on edit
-        if (is_null($deviceGroup->rules)) {
-            $query_builder = QueryBuilderFluentParser::fromOld($deviceGroup->pattern);
-            $deviceGroup->rules = $query_builder->toArray();
-        }
-
         return view('device-group.edit', [
             'device_group' => $deviceGroup,
             'filters' => json_encode(new QueryBuilderFilter('group')),
@@ -106,8 +99,8 @@ class DeviceGroupController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\DeviceGroup  $deviceGroup
+     * @param  Request  $request
+     * @param  DeviceGroup  $deviceGroup
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, DeviceGroup $deviceGroup, ToastInterface $toast)
@@ -164,7 +157,7 @@ class DeviceGroupController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\DeviceGroup  $deviceGroup
+     * @param  DeviceGroup  $deviceGroup
      * @return \Illuminate\Http\Response
      */
     public function destroy(DeviceGroup $deviceGroup)

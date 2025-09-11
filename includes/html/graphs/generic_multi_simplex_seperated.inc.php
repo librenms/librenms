@@ -1,12 +1,17 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
+use App\Facades\Rrd;
+
 require 'includes/html/graphs/common.inc.php';
 
-$unitlen = $unitlen ?? 0;
-$descr_len = $descr_len ?? 12;
-$multiplier = $multiplier ?? false;
+$unitlen ??= 0;
+$descr_len ??= 12;
+$multiplier ??= null;
+$divider ??= null;
 $previous = $graph_params->visible('previous');
-$stack = $stack ?? '';
+$stack ??= '';
+$total_units ??= '';
 
 $seperatorX = '';
 $thingX = '';
@@ -18,7 +23,7 @@ if ($nototal) {
     $unitlen += 2;
 }
 
-$rrd_options .= " COMMENT:'" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr($unit_text, $descr_len) . "        Now       Min       Max     Avg\l'";
+$rrd_options .= " COMMENT:'" . Rrd::fixedSafeDescr($unit_text, $descr_len) . "        Now       Min       Max     Avg\l'";
 
 $unitlen = 10;
 if ($nototal) {
@@ -26,22 +31,22 @@ if ($nototal) {
     $unitlen += 2;
 }
 
-$unit_text = str_pad(truncate($unit_text, $unitlen), $unitlen);
+$unit_text = Rrd::fixedSafeDescr($unit_text, $unitlen);
 
 $colour_iter = 0;
-foreach ($rrd_list as $i => $rrd) {
+foreach ($rrd_list ?? [] as $i => $rrd) {
     if (isset($rrd['colour'])) {
         $colour = $rrd['colour'];
     } else {
-        if (! \LibreNMS\Config::get("graph_colours.$colours.$colour_iter")) {
+        if (! LibrenmsConfig::get("graph_colours.$colours.$colour_iter")) {
             $colour_iter = 0;
         }
 
-        $colour = \LibreNMS\Config::get("graph_colours.$colours.$colour_iter");
+        $colour = LibrenmsConfig::get("graph_colours.$colours.$colour_iter");
         $colour_iter++;
     }
 
-    $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr'], $descr_len);
+    $descr = Rrd::fixedSafeDescr($rrd['descr'], $descr_len);
 
     $rrd_options .= ' DEF:' . $rrd['ds'] . $i . '=' . $rrd['filename'] . ':' . $rrd['ds'] . ':AVERAGE ';
 
@@ -80,7 +85,7 @@ foreach ($rrd_list as $i => $rrd) {
         $rrd_options .= ' CDEF:' . $g_defname . $i . 'min=' . $rrd['ds'] . $i . 'min,' . $multiplier . ',*';
         $rrd_options .= ' CDEF:' . $g_defname . $i . 'max=' . $rrd['ds'] . $i . 'max,' . $multiplier . ',*';
 
-    // If we've been passed a divider (divisor!) we make a CDEF for it.
+        // If we've been passed a divider (divisor!) we make a CDEF for it.
     } elseif (is_numeric($divider)) {
         $g_defname = $rrd['ds'] . '_cdef';
         $rrd_options .= ' CDEF:' . $g_defname . $i . '=' . $rrd['ds'] . $i . ',' . $divider . ',/';

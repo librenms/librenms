@@ -1,6 +1,15 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
+use App\Facades\Rrd;
+
 require 'includes/html/graphs/common.inc.php';
+
+$multiplier ??= null;
+$divider ??= null;
+$dostack ??= null;
+$printtotal ??= 0;
+$total_units ??= '';
 
 if ($width > '500') {
     $descr_len = $bigdescrlen;
@@ -13,7 +22,7 @@ if ($printtotal === 1) {
     $unitlen += '2';
 }
 
-$unit_text = str_pad(truncate($unit_text, $unitlen), $unitlen);
+$unit_text = Rrd::fixedSafeDescr($unit_text, $unitlen);
 
 if ($width > '500') {
     $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, $descr_len + 10), 0, $descr_len + 10) . "Now         Min         Max        Avg\l'";
@@ -25,27 +34,30 @@ if ($width > '500') {
     $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, $descr_len + 10), 0, $descr_len + 10) . "Now         Min         Max        Avg\l'";
 }
 
+$colour_iter = 0;
+$i = 0;
+
 foreach ($rrd_list as $rrd) {
-    if ($rrd['colour']) {
+    if (! empty($rrd['colour'])) {
         $colour = $rrd['colour'];
     } else {
-        if (! \LibreNMS\Config::get("graph_colours.$colours.$colour_iter")) {
+        if (! LibrenmsConfig::get("graph_colours.$colours.$colour_iter")) {
             $colour_iter = 0;
         }
 
-        $colour = \LibreNMS\Config::get("graph_colours.$colours.$colour_iter");
+        $colour = LibrenmsConfig::get("graph_colours.$colours.$colour_iter");
         $colour_iter++;
     }
     $i++;
     $ds = $rrd['ds'];
     $filename = $rrd['filename'];
 
-    $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr'], $descr_len);
+    $descr = Rrd::fixedSafeDescr($rrd['descr'], $descr_len);
     $id = 'ds' . $i;
 
     $rrd_options .= ' DEF:' . $rrd['ds'] . $i . '=' . $rrd['filename'] . ':' . $rrd['ds'] . ':AVERAGE ';
 
-    if ($simple_rrd) {
+    if (! empty($simple_rrd)) {
         $rrd_options .= ' CDEF:' . $rrd['ds'] . $i . 'min=' . $rrd['ds'] . $i . ' ';
         $rrd_options .= ' CDEF:' . $rrd['ds'] . $i . 'max=' . $rrd['ds'] . $i . ' ';
     } else {
@@ -85,9 +97,7 @@ foreach ($rrd_list as $rrd) {
         $t_defname = $g_defname;
     }
 
-    if ($i && ($dostack === 1)) {
-        $stack = ':STACK';
-    }
+    $stack = $i && ($dostack === 1) ? ':STACK' : '';
 
     $rrd_options .= ' LINE2:' . $g_defname . $i . '#' . $colour . ":'" . $descr . "'$stack";
     $rrd_options .= ' GPRINT:' . $t_defname . $i . ':LAST:%8.0lf%s GPRINT:' . $t_defname . $i . 'min:MIN:%8.0lf%s';

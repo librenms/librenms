@@ -2,46 +2,14 @@
 
 namespace App\View\Components;
 
+use App\Models\Device;
+use App\Models\Port;
 use Illuminate\View\Component;
 
 class GraphRow extends Component
 {
-    /**
-     * @var string
-     */
-    public $type;
-    /**
-     * @var string
-     */
-    public $loading;
-    /**
-     * @var null
-     */
-    public $device;
-    /**
-     * @var null
-     */
-    public $port;
-    /**
-     * @var array|string[][]
-     */
-    public $graphs;
-    /**
-     * @var string|null
-     */
-    public $title;
-    /**
-     * @var float|int
-     */
-    public $rowWidth;
-    /**
-     * @var bool
-     */
-    public $responsive;
-    /**
-     * @var string
-     */
-    public $aspect;
+    public bool $responsive;
+    public ?int $rowWidth;
 
     /**
      * Create a new component instance.
@@ -52,18 +20,19 @@ class GraphRow extends Component
      * @param  string  $aspect
      * @param  int|string  $columns  Either a number or 'responsive' aka auto columns
      * @param  array  $graphs
-     * @param  \App\Models\Device|int|null  $device
-     * @param  \App\Models\Port|int|null  $port
+     * @param  Device|int|null  $device
+     * @param  Port|int|null  $port
      */
-    public function __construct(string $type = '', string $title = null, string $loading = 'eager', string $aspect = 'normal', $columns = 2, array $graphs = [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']], $device = null, $port = null)
+    public function __construct(
+        public string $type = '',
+        public ?string $title = null,
+        public string $loading = 'eager',
+        public string $aspect = 'normal',
+        public int|string $columns = 2,
+        public array $graphs = [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']],
+        public int|Device|null $device = null,
+        public int|Port|null $port = null)
     {
-        $this->type = $type;
-        $this->aspect = $aspect;
-        $this->loading = $loading;
-        $this->device = $device;
-        $this->port = $port;
-        $this->graphs = $graphs;
-        $this->title = $title;
         $this->responsive = $columns == 'responsive';
         $this->rowWidth = $this->calculateRowWidth((int) $columns);
     }

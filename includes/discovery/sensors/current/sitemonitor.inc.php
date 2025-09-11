@@ -1,4 +1,5 @@
 <?php
+
 /**
  * sitemonitor.inc.php
  *

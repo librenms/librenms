@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Updates.php
  *
@@ -25,11 +26,11 @@
 
 namespace LibreNMS\Validations;
 
+use App\Facades\LibrenmsConfig;
 use DateTime;
 use DateTimeZone;
 use Exception;
 use LibreNMS\ComposerHelper;
-use LibreNMS\Config;
 use LibreNMS\Util\EnvHelper;
 use LibreNMS\Util\Git;
 use LibreNMS\ValidationResult;
@@ -60,7 +61,7 @@ class Updates extends BaseValidation
         }
 
         // check if users on master update channel are up to date
-        if (Config::get('update_channel') == 'master') {
+        if (LibrenmsConfig::get('update_channel') == 'master') {
             $git = Git::make();
             if ($git->commitHash() != $git->remoteHash()) {
                 if (! $git->commitDate()) {

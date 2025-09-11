@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AuthHTTP.php
  *
@@ -25,8 +26,8 @@
 
 namespace LibreNMS\Tests;
 
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Authentication\LegacyAuth;
-use LibreNMS\Config;
 
 use function strip_tags;
 use function strip_tags as strip_tags1;
@@ -40,14 +41,14 @@ class AuthHTTPTest extends TestCase
     {
         parent::setUp();
 
-        $this->original_auth_mech = Config::get('auth_mechanism');
-        Config::set('auth_mechanism', 'http-auth');
+        $this->original_auth_mech = LibrenmsConfig::get('auth_mechanism');
+        LibrenmsConfig::set('auth_mechanism', 'http-auth');
         $this->server = $_SERVER;
     }
 
     protected function tearDown(): void
     {
-        Config::set('auth_mechanism', $this->original_auth_mech);
+        LibrenmsConfig::set('auth_mechanism', $this->original_auth_mech);
         $_SERVER = $this->server;
         parent::tearDown();
     }
@@ -80,7 +81,7 @@ class AuthHTTPTest extends TestCase
                 // Old Behaviour
                 if (isset($_SERVER['REMOTE_USER'])) {
                     $old_username = strip_tags1($_SERVER['REMOTE_USER']);
-                } elseif (isset($_SERVER['PHP_AUTH_USER']) && Config::get('auth_mechanism') === 'http-auth') {
+                } elseif (isset($_SERVER['PHP_AUTH_USER']) && LibrenmsConfig::get('auth_mechanism') === 'http-auth') {
                     $old_username = strip_tags($_SERVER['PHP_AUTH_USER']);
                 }
 

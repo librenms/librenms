@@ -1,4 +1,5 @@
 <?php
+
 /*
  * AuthenticateGraph.php
  *
@@ -25,11 +26,12 @@
 
 namespace App\Http\Middleware;
 
+use App\Facades\LibrenmsConfig;
 use Closure;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 
@@ -37,20 +39,20 @@ class AuthenticateGraph
 {
     /** @var string[] */
     protected $auth = [
-        \App\Http\Middleware\LegacyExternalAuth::class,
-        \App\Http\Middleware\Authenticate::class,
-        \App\Http\Middleware\VerifyTwoFactor::class,
-        \App\Http\Middleware\LoadUserPreferences::class,
+        LegacyExternalAuth::class,
+        Authenticate::class,
+        VerifyTwoFactor::class,
+        LoadUserPreferences::class,
     ];
 
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param  Request  $request
+     * @param  Closure  $next
      * @param  string|null  $relative
      *
-     * @throws \Illuminate\Auth\AuthenticationException
+     * @throws AuthenticationException
      */
     public function handle(Request $request, Closure $next, $relative = null): Response
     {
@@ -75,7 +77,7 @@ class AuthenticateGraph
 
     protected function isAllowed(Request $request): bool
     {
-        if (Config::get('allow_unauth_graphs', false)) {
+        if (LibrenmsConfig::get('allow_unauth_graphs', false)) {
             d_echo("Unauthorized graphs allowed\n");
 
             return true;
@@ -84,7 +86,7 @@ class AuthenticateGraph
         $ip = $request->getClientIp();
         try {
             $client_ip = IP::parse($ip);
-            foreach (Config::get('allow_unauth_graphs_cidr', []) as $range) {
+            foreach (LibrenmsConfig::get('allow_unauth_graphs_cidr', []) as $range) {
                 if ($client_ip->inNetwork($range)) {
                     d_echo("Unauthorized graphs allowed from $range\n");
 

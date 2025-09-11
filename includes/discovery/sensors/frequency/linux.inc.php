@@ -1,4 +1,5 @@
 <?php
+
 /*
  * raspberry pi frequencies
  * requires snmp extend agent script from librenms-agent

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ict-psu.inc.php
  *
@@ -26,7 +27,7 @@
 // Input Voltage
 // SNMPv2-SMI::enterprises.39145.11.6.0 = STRING: "120" -- inputVoltage
 
-$inputVoltage = trim(snmp_get($device, 'inputVoltage.0', '-Oqv', 'ICT-DIGITAL-SERIES-MIB'), '" ');
+$inputVoltage = trim(snmp_get($device, 'inputVoltage.0', '-Oqv', 'ICT-PLATINUM-MIB'), '" ');
 if (! empty($inputVoltage)) {
     $divisor = 1;
     $index = 0;
@@ -41,7 +42,7 @@ if (! empty($inputVoltage)) {
 // Output Voltage
 // SNMPv2-SMI::enterprises.39145.11.7.0 = STRING: "55.2" -- outputVoltage
 
-$outputVoltage = trim(snmp_get($device, 'outputVoltage.0', '-Oqv', 'ICT-DIGITAL-SERIES-MIB'), '" ');
+$outputVoltage = trim(snmp_get($device, 'outputVoltage.0', '-Oqv', 'ICT-PLATINUM-MIB'), '" ');
 if (! empty($outputVoltage)) {
     $divisor = 1;
     $index = 1;

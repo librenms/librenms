@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Graph.php
  *
@@ -26,10 +27,10 @@
 namespace LibreNMS\Util;
 
 use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use LibreNMS\Config;
 use LibreNMS\Data\Graphing\GraphImage;
 use LibreNMS\Data\Graphing\GraphParameters;
 use LibreNMS\Enum\ImageFormat;
@@ -97,7 +98,7 @@ class Graph
      * @param  array|string  $vars
      * @return GraphImage
      *
-     * @throws \LibreNMS\Exceptions\RrdGraphException
+     * @throws RrdGraphException
      */
     public static function get($vars): GraphImage
     {
@@ -157,6 +158,8 @@ class Graph
             require base_path('/includes/html/graphs/customoid/customoid.inc.php');
         } elseif (is_file(base_path("/includes/html/graphs/$type/$subtype.inc.php"))) {
             require base_path("/includes/html/graphs/$type/$subtype.inc.php");
+        } elseif (is_file(base_path("/includes/html/graphs/$type/generic.inc.php"))) {
+            require base_path("/includes/html/graphs/$type/generic.inc.php");
         } else {
             throw new RrdGraphException("{$type}_$subtype template missing", "{$type}_$subtype missing", $width, $height);
         }
@@ -214,7 +217,7 @@ class Graph
             // find the MIB subtypes
             $graphs = $device->graphs->pluck('graph');
 
-            foreach (Config::get('graph_types') as $type => $type_data) {
+            foreach (LibrenmsConfig::get('graph_types') as $type => $type_data) {
                 foreach (array_keys($type_data) as $subtype) {
                     if ($graphs->contains($subtype) && self::isMibGraph($type, $subtype)) {
                         $types[] = $subtype;
@@ -237,22 +240,22 @@ class Graph
      */
     public static function isMibGraph($type, $subtype): bool
     {
-        return Config::get("graph_types.$type.$subtype.section") == 'mib';
+        return LibrenmsConfig::get("graph_types.$type.$subtype.section") == 'mib';
     }
 
     public static function getOverviewGraphsForDevice(Device $device): array
     {
         if ($device->snmp_disable) {
-            return Arr::wrap(Config::getOsSetting('ping', 'over'));
+            return Arr::wrap(LibrenmsConfig::getOsSetting('ping', 'over'));
         }
 
-        if ($graphs = Config::getOsSetting($device->os, 'over')) {
+        if ($graphs = LibrenmsConfig::getOsSetting($device->os, 'over')) {
             return Arr::wrap($graphs);
         }
 
-        $os_group = Config::getOsSetting($device->os, 'group');
+        $os_group = LibrenmsConfig::getOsSetting($device->os, 'group');
 
-        return Arr::wrap(Config::get("os_group.$os_group.over", Config::get('os.default.over')));
+        return Arr::wrap(LibrenmsConfig::get("os_group.$os_group.over", LibrenmsConfig::get('os.default.over')));
     }
 
     /**
@@ -267,7 +270,7 @@ class Graph
      */
     public static function error(string $text, ?string $short_text, int $width = 300, ?int $height = null, array $color = [128, 0, 0]): string
     {
-        $type = Config::get('webui.graph_type');
+        $type = LibrenmsConfig::get('webui.graph_type');
         $height = $height ?? $width / 3;
 
         if ($short_text !== null && $width < 200) {

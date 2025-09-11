@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS Network Management and Monitoring System
  * Copyright (C) 2006-2011, Observium Developers - http://www.observium.org
@@ -11,12 +12,12 @@
  * See COPYING for more details.
  */
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
 $query = 'SELECT `sensor_class` FROM `sensors` WHERE `device_id` = ?';
 $params = [$device['device_id']];
 
-$submodules = Config::get('poller_submodules.sensors', []);
+$submodules = LibrenmsConfig::get('poller_submodules.sensors', []);
 if (! empty($submodules)) {
     $query .= ' AND `sensor_class` IN ' . dbGenPlaceholders(count($submodules));
     $params = array_merge($params, $submodules);

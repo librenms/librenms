@@ -24,17 +24,17 @@
  * @author     LibreNMS Contributors
  */
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\IP;
 
 if ($device['os'] == 'timos') {
-    $bgpPeersCache = snmpwalk_cache_multi_oid($device, 'tBgpPeerNgTable', [], 'TIMETRA-BGP-MIB', 'nokia');
+    $bgpPeersCache = SnmpQuery::numericIndex()->walk('TIMETRA-BGP-MIB::tBgpPeerNgTable')->valuesByIndex();
     foreach ($bgpPeersCache as $key => $value) {
         $oid = explode('.', $key);
         $vrfInstance = $oid[0];
-        $address = str_replace($oid[0] . '.' . $oid[1] . '.', '', $key);
+        $address = implode('.', array_slice($oid, 3));
         if (strlen($address) > 15) {
-            $address = IP::fromHexString($address)->compressed();
+            $address = IP::fromSnmpString($address)->compressed();
         }
         $bgpPeers[$vrfInstance][$address] = $value;
     }
@@ -46,19 +46,19 @@ if ($device['os'] == 'timos') {
         $map_vrf['byOid'][$vrf['vrf_oid']]['vrf_id'] = $vrf['vrf_id'];
     }
 
-    foreach ($bgpPeers as $vrfOid => $vrf) {
+    foreach ($bgpPeers ?? [] as $vrfOid => $vrf) {
         $vrfId = $map_vrf['byOid'][$vrfOid]['vrf_id'] ?? null;
 
         d_echo($vrfId);
 
         foreach ($vrf as $address => $value) {
-            $astext = \LibreNMS\Util\AutonomousSystem::get($value['tBgpPeerNgPeerAS4Byte'])->name();
+            $astext = \LibreNMS\Util\AutonomousSystem::get($value['TIMETRA-BGP-MIB::tBgpPeerNgPeerAS4Byte'])->name();
             if (! DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->exists()) {
                 $peers = [
                     'device_id' => $device['device_id'],
                     'vrf_id' => $vrfId,
                     'bgpPeerIdentifier' => $address,
-                    'bgpPeerRemoteAs' => $value['tBgpPeerNgPeerAS4Byte'],
+                    'bgpPeerRemoteAs' => $value['TIMETRA-BGP-MIB::tBgpPeerNgPeerAS4Byte'],
                     'bgpPeerState' => 'idle',
                     'bgpPeerAdminStatus' => 'stop',
                     'bgpLocalAddr' => '0.0.0.0',
@@ -77,14 +77,14 @@ if ($device['os'] == 'timos') {
 
                 $seenPeerID[] = DeviceCache::getPrimary()->bgppeers()->create($peers)->bgpPeer_id;
 
-                if (Config::get('autodiscovery.bgp')) {
+                if (LibrenmsConfig::get('autodiscovery.bgp')) {
                     $name = gethostbyaddr($address);
                     discover_new_device($name, $device, 'BGP');
                 }
                 echo '+';
             } else {
                 $peers = [
-                    'bgpPeerRemoteAs' => $value['tBgpPeerNgPeerAS4Byte'],
+                    'bgpPeerRemoteAs' => $value['TIMETRA-BGP-MIB::tBgpPeerNgPeerAS4Byte'],
                     'astext' => $astext,
                 ];
                 $affected = DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->update($peers);
@@ -95,7 +95,7 @@ if ($device['os'] == 'timos') {
     }
 
     // clean up peers
-    if (! is_null($seenPeerID)) {
+    if (isset($seenPeerID) && ! is_null($seenPeerID)) {
         $deleted = DeviceCache::getPrimary()->bgppeers()->whereNotIn('bgpPeer_id', $seenPeerID)->delete();
         echo str_repeat('-', $deleted);
     }

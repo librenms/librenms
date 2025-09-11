@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ShowConfigController.php
  *
@@ -26,10 +27,10 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use App\Models\Device;
 use Illuminate\Http\Request;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class ShowConfigController extends Controller implements DeviceTab
@@ -71,11 +72,11 @@ class ShowConfigController extends Controller implements DeviceTab
 
     private function oxidizedEnabled(Device $device)
     {
-        return Config::get('oxidized.enabled') === true
-                && Config::has('oxidized.url')
+        return LibrenmsConfig::get('oxidized.enabled') === true
+                && LibrenmsConfig::has('oxidized.url')
                 && $device->getAttrib('override_Oxidized_disable') !== 'true'
-                && ! in_array($device->type, Config::get('oxidized.ignore_types', []))
-                && ! in_array($device->os, Config::get('oxidized.ignore_os', []));
+                && ! in_array($device->type, LibrenmsConfig::get('oxidized.ignore_types', []))
+                && ! in_array($device->os, LibrenmsConfig::get('oxidized.ignore_os', []));
     }
 
     private function getRancidPath()
@@ -98,13 +99,13 @@ class ShowConfigController extends Controller implements DeviceTab
 
     private function findRancidConfigFile()
     {
-        if (Config::has('rancid_configs') && ! is_array(Config::get('rancid_configs'))) {
-            Config::set('rancid_configs', (array) Config::get('rancid_configs', []));
+        if (LibrenmsConfig::has('rancid_configs') && ! is_array(LibrenmsConfig::get('rancid_configs'))) {
+            LibrenmsConfig::set('rancid_configs', (array) LibrenmsConfig::get('rancid_configs', []));
         }
 
-        if (Config::has('rancid_configs.0')) {
+        if (LibrenmsConfig::has('rancid_configs.0')) {
             $device = DeviceCache::getPrimary();
-            foreach (Config::get('rancid_configs') as $configs) {
+            foreach (LibrenmsConfig::get('rancid_configs') as $configs) {
                 if ($configs[strlen($configs) - 1] != '/') {
                     $configs .= '/';
                 }
@@ -118,11 +119,11 @@ class ShowConfigController extends Controller implements DeviceTab
 
                     return $configs . strtok($device['hostname'], '.');
                 } else {
-                    if (! empty(Config::get('mydomain'))) { // Try with domain name if set
-                        if (is_file($configs . $device['hostname'] . '.' . Config::get('mydomain'))) {
+                    if (! empty(LibrenmsConfig::get('mydomain'))) { // Try with domain name if set
+                        if (is_file($configs . $device['hostname'] . '.' . LibrenmsConfig::get('mydomain'))) {
                             $this->rancidPath = $configs;
 
-                            return $configs . $device['hostname'] . '.' . Config::get('mydomain');
+                            return $configs . $device['hostname'] . '.' . LibrenmsConfig::get('mydomain');
                         }
                     }
                 }

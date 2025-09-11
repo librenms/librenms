@@ -52,6 +52,7 @@ return [
             'distributed' => ['name' => '分散式輪詢器'],
             'graphite' => ['name' => '資料存放區: Graphite'],
             'influxdb' => ['name' => '資料存放區: InfluxDB'],
+            'kafka' => ['name' => '資料存放區: Kafka'],
             'opentsdb' => ['name' => '資料存放區: OpenTSDB'],
             'ping' => ['name' => 'Ping'],
             'prometheus' => ['name' => '資料存放區: Prometheus'],
@@ -639,7 +640,7 @@ return [
         'nfsen_top_default' => [
             'description' => 'Default Top N',
         ],
-        'nfsen_stat_default' => [
+        'nfsen_stats_default' => [
             'description' => 'Default Stat',
         ],
         'nfsen_order_default' => [

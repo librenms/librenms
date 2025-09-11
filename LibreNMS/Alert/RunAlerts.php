@@ -1,4 +1,5 @@
 <?php
+
 /*
  * RunAlerts.php
  *
@@ -31,11 +32,13 @@
 namespace LibreNMS\Alert;
 
 use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Models\AlertTransport;
 use App\Models\Eventlog;
-use LibreNMS\Config;
+use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Polling\ConnectivityHelper;
@@ -134,13 +137,15 @@ class RunAlerts
         $template = $tpl->getTemplate($obj);
 
         if ($alert['state'] >= AlertState::ACTIVE) {
-            $obj['title'] = $template->title ?: 'Alert for device ' . $obj['display'] . ' - ' . ($alert['name'] ?: $alert['rule']);
+            $obj['title'] = $template->title ?: 'Alert for device ' . $obj['display'] . ' - ' . $alert['name'];
             if ($alert['state'] == AlertState::ACKNOWLEDGED) {
                 $obj['title'] .= ' Has been acknowledged';
             } elseif ($alert['state'] == AlertState::WORSE) {
                 $obj['title'] .= ' Has worsened';
             } elseif ($alert['state'] == AlertState::BETTER) {
                 $obj['title'] .= ' Has improved';
+            } elseif ($alert['state'] == AlertState::CHANGED) {
+                $obj['title'] .= ' changed';
             }
 
             foreach ($extra['rule'] as $incident) {
@@ -193,7 +198,7 @@ class RunAlerts
         $obj['uid'] = $alert['id'];
         $obj['alert_id'] = $alert['alert_id'];
         $obj['severity'] = $alert['severity'];
-        $obj['rule'] = $alert['rule'] ?: json_encode($alert['builder']);
+        $obj['rule'] = $alert['builder']; //Backwards compatibility for old rule
         $obj['name'] = $alert['name'];
         $obj['timestamp'] = $alert['time_logged'];
         $obj['contacts'] = $extra['contacts'];
@@ -246,9 +251,9 @@ class RunAlerts
      */
     public function issueAlert($alert)
     {
-        if (Config::get('alert.fixed-contacts') == false) {
+        if (LibrenmsConfig::get('alert.fixed-contacts') == false) {
             if (empty($alert['query'])) {
-                $alert['query'] = AlertDB::genSQL($alert['rule'], $alert['builder']);
+                $alert['query'] = QueryBuilderParser::fromJson($alert['builder'])->toSql();
             }
             $sql = $alert['query'];
             $qry = dbFetchRows($sql, [$alert['device_id']]);
@@ -258,7 +263,7 @@ class RunAlerts
         $obj = $this->describeAlert($alert);
         if (is_array($obj)) {
             echo 'Issuing Alert-UID #' . $alert['id'] . '/' . $alert['state'] . ':' . PHP_EOL;
-            if ($alert['state'] != AlertState::ACKNOWLEDGED || Config::get('alert.acknowledged') === true) {
+            if ($alert['state'] != AlertState::ACKNOWLEDGED || LibrenmsConfig::get('alert.acknowledged') === true) {
                 $this->extTransports($obj);
             }
             echo "\r\n";
@@ -304,32 +309,49 @@ class RunAlerts
                 }
 
                 if (empty($alert['query'])) {
-                    $alert['query'] = AlertDB::genSQL($alert['rule'], $alert['builder']);
+                    $alert['query'] = QueryBuilderParser::fromJson($alert['builder'])->toSql();
                 }
                 $chk = dbFetchRows($alert['query'], [$alert['device_id']]);
                 //make sure we can json_encode all the datas later
-                $cnt = count($chk);
-                for ($i = 0; $i < $cnt; $i++) {
+                $current_alert_count = count($chk);
+                for ($i = 0; $i < $current_alert_count; $i++) {
                     if (isset($chk[$i]['ip'])) {
                         $chk[$i]['ip'] = inet6_ntop($chk[$i]['ip']);
                     }
                 }
                 $alert['details']['rule'] ??= []; // if details.rule is missing, set it to an empty array
-                $o = count($alert['details']['rule']);
-                $n = count($chk);
                 $ret = 'Alert #' . $alert['id'];
                 $state = AlertState::CLEAR;
-                if ($n > $o) {
-                    $ret .= ' Worsens';
+
+                // Get the added and resolved items
+                [$added_diff, $resolved_diff] = $this->diffBetweenFaults($alert['details']['rule'], $chk);
+                $previous_alert_count = count($alert['details']['rule']);
+
+                if (! empty($added_diff) && ! empty($resolved_diff)) {
+                    $ret .= ' Changed';
+                    $state = AlertState::CHANGED;
+                    $alert['details']['diff'] = ['added' => $added_diff, 'resolved' => $resolved_diff];
+                } elseif (! empty($added_diff)) {
+                    $ret .= ' Worse';
                     $state = AlertState::WORSE;
-                    $alert['details']['diff'] = array_diff($chk, $alert['details']['rule']);
-                } elseif ($n < $o) {
-                    $ret .= ' Betters';
+                    $alert['details']['diff'] = ['added' => $added_diff];
+                } elseif (! empty($resolved_diff)) {
+                    $ret .= ' Better';
                     $state = AlertState::BETTER;
-                    $alert['details']['diff'] = array_diff($alert['details']['rule'], $chk);
+                    $alert['details']['diff'] = ['resolved' => $resolved_diff];
+                    // Failsafe if the diff didn't return any results
+                } elseif ($current_alert_count > $previous_alert_count) {
+                    $ret .= ' Worse';
+                    $state = AlertState::WORSE;
+                    Eventlog::log('Alert got worse but the diff was not, ensure that a "id" or "_id" field is available for rule ' . $alert['name'], $alert['device_id'], 'alert', Severity::Warning);
+                    // Failsafe if the diff didn't return any results
+                } elseif ($current_alert_count < $previous_alert_count) {
+                    $ret .= ' Better';
+                    $state = AlertState::BETTER;
+                    Eventlog::log('Alert got better but the diff was not, ensure that a "id" or "_id" field is available for rule ' . $alert['name'], $alert['device_id'], 'alert', Severity::Warning);
                 }
 
-                if ($state > AlertState::CLEAR && $n > 0) {
+                if ($state > AlertState::CLEAR && $current_alert_count > 0) {
                     $alert['details']['rule'] = $chk;
                     if (dbInsert([
                         'state' => $state,
@@ -340,10 +362,81 @@ class RunAlerts
                         dbUpdate(['state' => $state, 'open' => 1, 'alerted' => 1], 'alerts', 'rule_id = ? && device_id = ?', [$alert['rule_id'], $alert['device_id']]);
                     }
 
-                    echo $ret . ' (' . $o . '/' . $n . ")\r\n";
+                    echo $ret . ' (' . $previous_alert_count . '/' . $current_alert_count . ")\r\n";
                 }
             }
         }
+    }
+
+    /**
+     * Extract the fields that are used to identify the elements in the array of a "fault"
+     *
+     * @param  array  $element
+     * @return array
+     */
+    private function extractIdFieldsForFault($element)
+    {
+        return array_filter(array_keys($element), function ($key) {
+            // Exclude location_id as it is not relevant for the comparison
+            return ($key === 'id' || strpos($key, '_id')) !== false && $key !== 'location_id';
+        });
+    }
+
+    /**
+     * Generate a comparison key for an element based on the fields that identify it for a "fault"
+     *
+     * @param  array  $element
+     * @param  array  $idFields
+     * @return string
+     */
+    private function generateComparisonKeyForFault($element, $idFields)
+    {
+        $keyParts = [];
+        foreach ($idFields as $field) {
+            $keyParts[] = isset($element[$field]) ? $element[$field] : '';
+        }
+
+        return implode('|', $keyParts);
+    }
+
+    /**
+     * Find new elements in the array for faults
+     * PHP array_diff is not working well for it
+     *
+     * @param  array  $array1
+     * @param  array  $array2
+     * @return array [$added, $removed]
+     */
+    private function diffBetweenFaults($array1, $array2)
+    {
+        $array1_keys = [];
+        $added_elements = [];
+        $removed_elements = [];
+
+        // Create associative array for quick lookup of $array1 elements
+        foreach ($array1 as $element1) {
+            $element1_ids = $this->extractIdFieldsForFault($element1);
+            $element1_key = $this->generateComparisonKeyForFault($element1, $element1_ids);
+            $array1_keys[$element1_key] = $element1;
+        }
+
+        // Iterate through $array2 and determine added elements
+        foreach ($array2 as $element2) {
+            $element2_ids = $this->extractIdFieldsForFault($element2);
+            $element2_key = $this->generateComparisonKeyForFault($element2, $element2_ids);
+
+            if (! isset($array1_keys[$element2_key])) {
+                $added_elements[] = $element2;
+            } else {
+                // Remove matched elements
+                unset($array1_keys[$element2_key]);
+            }
+        }
+
+        // Remaining elements in $array1_keys are the removed elements
+        $removed_elements = array_values($array1_keys);
+
+        return [$added_elements, $removed_elements];
     }
 
     public function loadAlerts($where)
@@ -351,16 +444,17 @@ class RunAlerts
         $alerts = [];
         foreach (dbFetchRows("SELECT alerts.id, alerts.alerted, alerts.device_id, alerts.rule_id, alerts.state, alerts.note, alerts.info FROM alerts WHERE $where") as $alert_status) {
             $alert = dbFetchRow(
-                'SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name,alert_rules.query,alert_rules.builder,alert_rules.proc FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1',
+                'SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.severity,alert_rules.extra,alert_rules.name,alert_rules.query,alert_rules.builder,alert_rules.proc FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1',
                 [$alert_status['device_id'], $alert_status['rule_id']]
             );
+
+            $alert['alert_id'] = $alert_status['id'];
 
             if (empty($alert['rule_id']) || ! $this->isRuleValid($alert_status['device_id'], $alert_status['rule_id'])) {
                 echo 'Stale-Rule: #' . $alert_status['rule_id'] . '/' . $alert_status['device_id'] . "\r\n";
                 // Alert-Rule does not exist anymore, let's remove the alert-state.
                 dbDelete('alerts', 'rule_id = ? && device_id = ?', [$alert_status['rule_id'], $alert_status['device_id']]);
             } else {
-                $alert['alert_id'] = $alert_status['id'];
                 $alert['state'] = $alert_status['state'];
                 $alert['alerted'] = $alert_status['alerted'];
                 $alert['note'] = $alert_status['note'];
@@ -403,7 +497,7 @@ class RunAlerts
                 $noiss = true;
             }
 
-            $tolerence_window = Config::get('alert.tolerance_window');
+            $tolerence_window = LibrenmsConfig::get('alert.tolerance_window');
             if (! empty($rextra['count']) && empty($rextra['interval'])) {
                 // This check below is for compat-reasons
                 if (! empty($rextra['delay']) && $alert['state'] != AlertState::RECOVERED) {
@@ -439,7 +533,7 @@ class RunAlerts
                     }
                 }
 
-                if (in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER]) && ! empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
+                if (in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED]) && ! empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
                     // We don't want -1 alert rule count alarms to get muted because of the current alert count
                     if ($alert['details']['count'] < $rextra['count'] || $rextra['count'] == -1) {
                         $noacc = true;
@@ -455,7 +549,15 @@ class RunAlerts
                 $noacc = false;
             }
 
-            if (AlertUtil::isMaintenance($alert['device_id'])) {
+            $maintenance_status = AlertUtil::getMaintenanceStatus($alert['device_id']);
+            // Do not send alert notifications for these types of scheduled maintenance
+            if ($maintenance_status == MaintenanceStatus::MUTE_ALERTS) {
+                $noiss = true;
+            }
+
+            // If alert rule checks are to be skipped, ensure that this alert is
+            // not to be handled again by this method again (by changing open to 0 later)
+            if ($maintenance_status == MaintenanceStatus::SKIP_ALERTS) {
                 $noiss = true;
                 $noacc = true;
             }
@@ -508,10 +610,11 @@ class RunAlerts
         }
 
         // alerting for default contacts, etc
-        if (Config::get('alert.transports.mail') === true && ! empty($obj['contacts'])) {
+        if (LibrenmsConfig::get('alert.transports.mail') === true && ! empty($obj['contacts'])) {
             $transport_maps[] = [
                 'transport_id' => null,
                 'transport_type' => 'mail',
+                'transport_name' => 'Default Mail',
             ];
         }
 
@@ -556,6 +659,7 @@ class RunAlerts
             AlertState::ACKNOWLEDGED => 'acknowledgment',
             AlertState::WORSE => 'worsened',
             AlertState::BETTER => 'improved',
+            AlertState::CHANGED => 'changed',
         ];
 
         $severity = match ($obj['state']) {

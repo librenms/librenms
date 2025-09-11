@@ -67989,749 +67989,605 @@
                     "vlan_domain": 1,
                     "vlan_name": "GESTION_V1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2,
                     "vlan_domain": 1,
                     "vlan_name": "Servers",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3,
                     "vlan_domain": 1,
                     "vlan_name": "Data",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4,
                     "vlan_domain": 1,
                     "vlan_name": "Data",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 5,
                     "vlan_domain": 1,
                     "vlan_name": "BB\\\\D&D + PROD\\\\rox-lugoj-11",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 6,
                     "vlan_domain": 1,
                     "vlan_name": "WB & NB\\\\PROD\\\\rox-lugoj-12 & 20",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 7,
                     "vlan_domain": 1,
                     "vlan_name": "WB\\\\ADMIN + PROD\\\\rox-lugoj-13",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 8,
                     "vlan_domain": 1,
                     "vlan_name": "WB\\\\ADMIN + PROD\\\\rox-lugoj-14",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 9,
                     "vlan_domain": 1,
                     "vlan_name": "BB\\\\PROD + AP\\\\rox-lugoj-15",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 10,
                     "vlan_domain": 1,
                     "vlan_name": "BB\\\\LOGISTICS + PROD\\\\rox-lugoj-16",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 11,
                     "vlan_domain": 1,
                     "vlan_name": "BB\\\\SMT\\\\rox-lugoj-17",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 12,
                     "vlan_domain": 1,
                     "vlan_name": "BB\\\\AOI\\\\rox-lugoj-18",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 14,
                     "vlan_domain": 1,
                     "vlan_name": "NB\\\\PROD\\\\rox-lugoj-21",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 15,
                     "vlan_domain": 1,
                     "vlan_name": "NB\\\\PROD\\\\rox-lugoj-22",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 16,
                     "vlan_domain": 1,
                     "vlan_name": "NB3",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 17,
                     "vlan_domain": 1,
                     "vlan_name": "Data iTAC Injection",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 30,
                     "vlan_domain": 1,
                     "vlan_name": "Prod Data",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 41,
                     "vlan_domain": 1,
                     "vlan_name": "SISTEMAS",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 81,
                     "vlan_domain": 1,
                     "vlan_name": "ETSIAMN",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 101,
                     "vlan_domain": 1,
                     "vlan_name": "ASIC_CAU",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 102,
                     "vlan_domain": 1,
                     "vlan_name": "DCAN",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 103,
                     "vlan_domain": 1,
                     "vlan_name": "VOICE\\\\rox-lugoj-10",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 104,
                     "vlan_domain": 1,
                     "vlan_name": "VOICE\\\\rox-lugoj-11 & 23",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 106,
                     "vlan_domain": 1,
                     "vlan_name": "VOICE\\\\rox-lugoj-12 & 19",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 107,
                     "vlan_domain": 1,
                     "vlan_name": "VOICE\\\\rox-lugoj-13",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 108,
                     "vlan_domain": 1,
                     "vlan_name": "VOICE\\\\rox-lugoj-14",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 109,
                     "vlan_domain": 1,
                     "vlan_name": "VOICE\\\\rox-lugoj-15",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 110,
                     "vlan_domain": 1,
                     "vlan_name": "VOICE\\\\rox-lugoj-16",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 116,
                     "vlan_domain": 1,
                     "vlan_name": "NB3-VoIP",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 135,
                     "vlan_domain": 1,
                     "vlan_name": "Aulas_Carbonell",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 148,
                     "vlan_domain": 1,
                     "vlan_name": "Aulas_Gandia",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 175,
                     "vlan_domain": 1,
                     "vlan_name": "AULAS_CASA_ALUMNO",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 190,
                     "vlan_domain": 1,
                     "vlan_name": "CONCESIONES",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 200,
                     "vlan_domain": 1,
                     "vlan_name": "P2P SWITCHES",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 220,
                     "vlan_domain": 1,
                     "vlan_name": "Crosslink WAN Routers",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 223,
                     "vlan_domain": 1,
                     "vlan_name": "AULAS_BIB",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 225,
                     "vlan_domain": 1,
                     "vlan_name": "RECTORADO",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 233,
                     "vlan_domain": 1,
                     "vlan_name": "PBX-Int_Hella",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 234,
                     "vlan_domain": 1,
                     "vlan_name": "SERVICIOS_CENTRO",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 245,
                     "vlan_domain": 1,
                     "vlan_name": "OSAG PtP",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 248,
                     "vlan_domain": 1,
                     "vlan_name": "WAN-Primary",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 249,
                     "vlan_domain": 1,
                     "vlan_name": "Firewall-LAN",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 252,
                     "vlan_domain": 1,
                     "vlan_name": "ASIC",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 301,
                     "vlan_domain": 1,
                     "vlan_name": "EXT-RECT",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 310,
                     "vlan_domain": 1,
                     "vlan_name": "PUERTAS",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 317,
                     "vlan_domain": 1,
                     "vlan_name": "Barreras",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 318,
                     "vlan_domain": 1,
                     "vlan_name": "CTRL-REMOTO",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 320,
                     "vlan_domain": 1,
                     "vlan_name": "ALARMAS",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 322,
                     "vlan_domain": 1,
                     "vlan_name": "CTRL-PERIMETRAL",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 324,
                     "vlan_domain": 1,
                     "vlan_name": "Segurvera",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 327,
                     "vlan_domain": 1,
                     "vlan_name": "GAS",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 328,
                     "vlan_domain": 1,
                     "vlan_name": "FICHAJE",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 333,
                     "vlan_domain": 1,
                     "vlan_name": "VoIP-Phones",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 351,
                     "vlan_domain": 1,
                     "vlan_name": "GABM",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 360,
                     "vlan_domain": 1,
                     "vlan_name": "PBX-SIP_Provider",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 410,
                     "vlan_domain": 1,
                     "vlan_name": "ONO-SIG",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 420,
                     "vlan_domain": 1,
                     "vlan_name": "RTUPV",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 444,
                     "vlan_domain": 1,
                     "vlan_name": "INCUBADORA",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 450,
                     "vlan_domain": 1,
                     "vlan_name": "Videoapuntes",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 451,
                     "vlan_domain": 1,
                     "vlan_name": "Apple_TV",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 478,
                     "vlan_domain": 1,
                     "vlan_name": "TV_ASIC",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 600,
                     "vlan_domain": 1,
                     "vlan_name": "Firewall-DMZ",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 700,
                     "vlan_domain": 1,
                     "vlan_name": "WLAN-Office",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 730,
                     "vlan_domain": 1,
                     "vlan_name": "WLAN-Production",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 750,
                     "vlan_domain": 1,
                     "vlan_name": "WLAN-Mobile",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 770,
                     "vlan_domain": 1,
                     "vlan_name": "WLAN-Guest",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 809,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 809",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 827,
                     "vlan_domain": 1,
                     "vlan_name": "BIB-PORT",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 830,
                     "vlan_domain": 1,
                     "vlan_name": "GUIFINET_Valencia_2",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 845,
                     "vlan_domain": 1,
                     "vlan_name": "VIDEOCONFERENCIAS",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 900,
                     "vlan_domain": 1,
                     "vlan_name": "Video_1_Gate",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 901,
                     "vlan_domain": 1,
                     "vlan_name": "Pruebas",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 990,
                     "vlan_domain": 1,
                     "vlan_name": "APS_CENTRO",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 998,
                     "vlan_domain": 1,
                     "vlan_name": "ISP Ariesul Inet",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 999,
                     "vlan_domain": 1,
                     "vlan_name": "GESTION",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1225,
                     "vlan_domain": 1,
                     "vlan_name": "Prueba_Telefonia",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1234,
                     "vlan_domain": 1,
                     "vlan_name": "FWSIPSL",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2000,
                     "vlan_domain": 1,
                     "vlan_name": "OXE",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2001,
                     "vlan_domain": 1,
                     "vlan_name": "TIP-VERA",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2030,
                     "vlan_domain": 1,
                     "vlan_name": "TIP-REC1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2043,
                     "vlan_domain": 1,
                     "vlan_name": "TIP-SERCEN",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2044,
                     "vlan_domain": 1,
                     "vlan_name": "TIP_ASIC",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2433,
                     "vlan_domain": 1,
                     "vlan_name": "KIOSCO",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2450,
                     "vlan_domain": 1,
                     "vlan_name": "Transparent OSAG PtP",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2480,
                     "vlan_domain": 1,
                     "vlan_name": "Transparent TSI MPLS",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4094,
                     "vlan_domain": 1,
                     "vlan_name": "VCM IPC",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
                 {
                     "vlan": 1,
                     "baseport": 1,
@@ -75943,7 +75799,7 @@
                     "designatedRoot": "2cfaa24ab00b",
                     "designatedCost": 1900,
                     "designatedBridge": "2cfaa2495c25",
-                    "designatedPort": 11,
+                    "designatedPort": 0,
                     "forwardTransitions": 1,
                     "ifIndex": 1001
                 },
@@ -75957,7 +75813,7 @@
                     "designatedRoot": "2cfaa24ab00b",
                     "designatedCost": 1900,
                     "designatedBridge": "2cfaa2495c25",
-                    "designatedPort": 12,
+                    "designatedPort": 0,
                     "forwardTransitions": 1,
                     "ifIndex": 1002
                 },
@@ -75971,7 +75827,7 @@
                     "designatedRoot": "2cfaa24ab00b",
                     "designatedCost": 1900,
                     "designatedBridge": "2cfaa2495c25",
-                    "designatedPort": 14,
+                    "designatedPort": 0,
                     "forwardTransitions": 1,
                     "ifIndex": 1004
                 },
@@ -78187,6 +78043,457 @@
                     "ifAlias": "Alcatel-Lucent OS6900 XNI 2/2/12",
                     "ifDescr": "Alcatel-Lucent OS6900 XNI 2/2/12",
                     "ifName": "2/2/12"
+                }
+            ]
+        }
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "2001:0720:101c:0234:0000:0000:0000:0000",
+                    "ipv6_compressed": "2001:720:101c:234::",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": "2001:720:101c:234::/64",
+                    "ifIndex": 38900234
+                },
+                {
+                    "ipv6_address": "2001:0720:101c:0234:1111:0000:0000:0228",
+                    "ipv6_compressed": "2001:720:101c:234:1111::228",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": "2001:720:101c:234::/64",
+                    "ifIndex": 38900234
+                },
+                {
+                    "ipv6_address": "2001:0720:101c:0252:0000:0000:0000:0000",
+                    "ipv6_compressed": "2001:720:101c:252::",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": "2001:720:101c:252::/64",
+                    "ifIndex": 38900252
+                },
+                {
+                    "ipv6_address": "2001:0720:101c:0252:1111:0000:0000:0028",
+                    "ipv6_compressed": "2001:720:101c:252:1111::28",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": "2001:720:101c:252::/64",
+                    "ifIndex": 38900252
+                },
+                {
+                    "ipv6_address": "2001:0720:101c:e809:0000:0000:0000:0000",
+                    "ipv6_compressed": "2001:720:101c:e809::",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": "2001:720:101c:e809::/64",
+                    "ifIndex": 38900809
+                },
+                {
+                    "ipv6_address": "2001:0720:101c:e809:0000:0000:0000:0228",
+                    "ipv6_compressed": "2001:720:101c:e809::228",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": "2001:720:101c:e809::/64",
+                    "ifIndex": 38900809
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.169.132.110",
+                    "ipv4_prefixlen": 26,
+                    "context_name": "",
+                    "ipv4_network": "10.169.132.64/26",
+                    "ifIndex": 13600007
+                },
+                {
+                    "ipv4_address": "10.169.132.50",
+                    "ipv4_prefixlen": 26,
+                    "context_name": "",
+                    "ipv4_network": "10.169.132.0/26",
+                    "ifIndex": 13600004
+                },
+                {
+                    "ipv4_address": "10.169.133.110",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.169.133.0/25",
+                    "ifIndex": 13600006
+                },
+                {
+                    "ipv4_address": "10.169.133.240",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.169.133.128/25",
+                    "ifIndex": 13600003
+                },
+                {
+                    "ipv4_address": "10.169.134.240",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.169.134.0/24",
+                    "ifIndex": 13600001
+                },
+                {
+                    "ipv4_address": "10.169.135.240",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.169.135.0/24",
+                    "ifIndex": 13600002
+                },
+                {
+                    "ipv4_address": "10.169.137.240",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.169.137.0/24",
+                    "ifIndex": 13600013
+                },
+                {
+                    "ipv4_address": "10.169.248.115",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "10.169.248.112/29",
+                    "ifIndex": 13600005
+                },
+                {
+                    "ipv4_address": "10.169.248.123",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "10.169.248.120/29",
+                    "ifIndex": 13600008
+                },
+                {
+                    "ipv4_address": "10.169.248.44",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "10.169.248.40/29",
+                    "ifIndex": 13600001
+                },
+                {
+                    "ipv4_address": "10.169.253.17",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "10.169.253.16/30",
+                    "ifIndex": 13600003
+                },
+                {
+                    "ipv4_address": "10.169.254.16",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 13604126
+                },
+                {
+                    "ipv4_address": "10.169.254.7",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 13604120
+                },
+                {
+                    "ipv4_address": "10.169.48.110",
+                    "ipv4_prefixlen": 26,
+                    "context_name": "",
+                    "ipv4_network": "10.169.48.64/26",
+                    "ifIndex": 13600005
+                },
+                {
+                    "ipv4_address": "10.169.48.20",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "10.169.48.16/29",
+                    "ifIndex": 13600025
+                },
+                {
+                    "ipv4_address": "10.169.48.240",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.169.48.128/25",
+                    "ifIndex": 13600002
+                },
+                {
+                    "ipv4_address": "10.169.49.240",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.169.49.0/24",
+                    "ifIndex": 13600007
+                },
+                {
+                    "ipv4_address": "10.169.50.240",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.169.50.0/24",
+                    "ifIndex": 13600008
+                },
+                {
+                    "ipv4_address": "10.169.51.110",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.169.51.0/25",
+                    "ifIndex": 13600011
+                },
+                {
+                    "ipv4_address": "10.169.51.240",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.169.51.128/25",
+                    "ifIndex": 13600013
+                },
+                {
+                    "ipv4_address": "10.169.52.240",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.169.52.0/24",
+                    "ifIndex": 13600012
+                },
+                {
+                    "ipv4_address": "10.169.53.110",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.169.53.0/25",
+                    "ifIndex": 13600006
+                },
+                {
+                    "ipv4_address": "10.169.53.240",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.169.53.128/25",
+                    "ifIndex": 13600004
+                },
+                {
+                    "ipv4_address": "10.169.54.110",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.169.54.0/25",
+                    "ifIndex": 13600010
+                },
+                {
+                    "ipv4_address": "10.169.54.240",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.169.54.128/25",
+                    "ifIndex": 13600009
+                },
+                {
+                    "ipv4_address": "10.169.55.110",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.169.55.0/25",
+                    "ifIndex": 13600017
+                },
+                {
+                    "ipv4_address": "10.169.55.240",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.169.55.128/25",
+                    "ifIndex": 13600016
+                },
+                {
+                    "ipv4_address": "10.169.56.240",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.169.56.128/25",
+                    "ifIndex": 13600019
+                },
+                {
+                    "ipv4_address": "10.169.57.110",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.169.57.0/25",
+                    "ifIndex": 13600023
+                },
+                {
+                    "ipv4_address": "10.169.57.240",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.169.57.128/25",
+                    "ifIndex": 13600018
+                },
+                {
+                    "ipv4_address": "10.169.58.110",
+                    "ipv4_prefixlen": 26,
+                    "context_name": "",
+                    "ipv4_network": "10.169.58.64/26",
+                    "ifIndex": 13600021
+                },
+                {
+                    "ipv4_address": "10.169.58.240",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.169.58.128/25",
+                    "ifIndex": 13600014
+                },
+                {
+                    "ipv4_address": "10.169.58.50",
+                    "ipv4_prefixlen": 26,
+                    "context_name": "",
+                    "ipv4_network": "10.169.58.0/26",
+                    "ifIndex": 13600022
+                },
+                {
+                    "ipv4_address": "10.169.59.50",
+                    "ipv4_prefixlen": 26,
+                    "context_name": "",
+                    "ipv4_network": "10.169.59.0/26",
+                    "ifIndex": 13600015
+                },
+                {
+                    "ipv4_address": "10.169.61.240",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.169.61.0/24",
+                    "ifIndex": 13600031
+                },
+                {
+                    "ipv4_address": "10.169.62.240",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.169.62.0/24",
+                    "ifIndex": 13600020
+                },
+                {
+                    "ipv4_address": "10.169.63.110",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.169.63.0/25",
+                    "ifIndex": 13600032
+                },
+                {
+                    "ipv4_address": "10.169.63.240",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.169.63.128/25",
+                    "ifIndex": 13600027
+                },
+                {
+                    "ipv4_address": "10.169.64.240",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.169.64.0/24",
+                    "ifIndex": 13600034
+                },
+                {
+                    "ipv4_address": "10.169.65.110",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.169.65.0/25",
+                    "ifIndex": 13600035
+                },
+                {
+                    "ipv4_address": "10.248.3.36",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "10.248.3.32/29",
+                    "ifIndex": 13600033
+                },
+                {
+                    "ipv4_address": "10.248.3.52",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "10.248.3.48/29",
+                    "ifIndex": 13600012
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 13604125
+                },
+                {
+                    "ipv4_address": "158.42.190.250",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "158.42.190.0/24",
+                    "ifIndex": 13600005
+                },
+                {
+                    "ipv4_address": "158.42.223.250",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "158.42.223.0/24",
+                    "ifIndex": 13600006
+                },
+                {
+                    "ipv4_address": "158.42.234.250",
+                    "ipv4_prefixlen": 23,
+                    "context_name": "",
+                    "ipv4_network": "158.42.234.0/23",
+                    "ifIndex": 13600007
+                },
+                {
+                    "ipv4_address": "158.42.252.250",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "158.42.252.0/24",
+                    "ifIndex": 13600008
+                },
+                {
+                    "ipv4_address": "158.42.253.228",
+                    "ipv4_prefixlen": 26,
+                    "context_name": "",
+                    "ipv4_network": "158.42.253.192/26",
+                    "ifIndex": 13600001
+                },
+                {
+                    "ipv4_address": "158.42.255.65",
+                    "ipv4_prefixlen": 27,
+                    "context_name": "",
+                    "ipv4_network": "158.42.255.64/27",
+                    "ifIndex": 13600009
+                },
+                {
+                    "ipv4_address": "172.16.132.1",
+                    "ipv4_prefixlen": 22,
+                    "context_name": "",
+                    "ipv4_network": "172.16.132.0/22",
+                    "ifIndex": 13600010
+                },
+                {
+                    "ipv4_address": "172.18.128.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "172.18.128.0/24",
+                    "ifIndex": 13600011
+                },
+                {
+                    "ipv4_address": "172.22.1.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "172.22.1.0/24",
+                    "ifIndex": 13600012
+                },
+                {
+                    "ipv4_address": "172.22.44.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "172.22.44.0/24",
+                    "ifIndex": 13600003
+                },
+                {
+                    "ipv4_address": "172.31.100.228",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 13604126
+                },
+                {
+                    "ipv4_address": "172.31.128.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "172.31.128.0/24",
+                    "ifIndex": 13600004
                 }
             ]
         }

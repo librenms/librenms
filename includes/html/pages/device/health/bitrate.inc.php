@@ -1,4 +1,5 @@
 <?php
+
 /**
  * bitrate.inc.php
  *
@@ -23,7 +24,5 @@
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 $class = 'bitrate';
-$unit = 'bps';
-$graph_type = 'sensor_bitrate';
 
 require 'sensors.inc.php';

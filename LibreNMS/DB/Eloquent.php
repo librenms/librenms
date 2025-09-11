@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Eloquent.php
  *
@@ -68,7 +69,7 @@ class Eloquent
      * Access the Database Manager for Fluent style queries. Like the Laravel DB facade.
      *
      * @param  string|null  $name
-     * @return \Illuminate\Database\Connection|null
+     * @return Connection|null
      */
     public static function DB(?string $name = null): ?Connection
     {

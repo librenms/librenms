@@ -1,4 +1,5 @@
 <?php
+
 /**
  * InventoryController.php
  *
@@ -28,10 +29,12 @@ namespace App\Http\Controllers\Table;
 use App\Models\EntPhysical;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
-use LibreNMS\Util\Url;
+use Illuminate\Support\Facades\Blade;
 
 class InventoryController extends TableController
 {
+    protected $model = EntPhysical::class;
+
     public function rules()
     {
         return [
@@ -86,11 +89,44 @@ class InventoryController extends TableController
     public function formatItem($entPhysical)
     {
         return [
-            'device' => Url::deviceLink($entPhysical->device),
+            'device' => Blade::render('<x-device-link :device="$device"/>', ['device' => $entPhysical->device]),
             'descr' => htmlspecialchars($entPhysical->entPhysicalDescr),
             'name' => htmlspecialchars($entPhysical->entPhysicalName),
             'model' => htmlspecialchars($entPhysical->entPhysicalModelName),
             'serial' => htmlspecialchars($entPhysical->entPhysicalSerialNum),
+        ];
+    }
+
+    /**
+     * Get headers for CSV export
+     *
+     * @return array
+     */
+    protected function getExportHeaders()
+    {
+        return [
+            'Device',
+            'Description',
+            'Name',
+            'Model',
+            'Serial Number',
+        ];
+    }
+
+    /**
+     * Format a row for CSV export
+     *
+     * @param  EntPhysical  $entPhysical
+     * @return array
+     */
+    protected function formatExportRow($entPhysical)
+    {
+        return [
+            $entPhysical->device ? $entPhysical->device->displayName() : '',
+            $entPhysical->entPhysicalDescr,
+            $entPhysical->entPhysicalName,
+            $entPhysical->entPhysicalModelName,
+            $entPhysical->entPhysicalSerialNum,
         ];
     }
 }

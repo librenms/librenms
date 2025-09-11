@@ -13,8 +13,8 @@ if (empty($ports)) {
 $i = 0;
 foreach ($ports as $port) {
     $ignore = 0;
-    if (is_array(\LibreNMS\Config::get('device_traffic_iftype'))) {
-        foreach (\LibreNMS\Config::get('device_traffic_iftype') as $iftype) {
+    if (is_array(\App\Facades\LibrenmsConfig::get('device_traffic_iftype'))) {
+        foreach (\App\Facades\LibrenmsConfig::get('device_traffic_iftype') as $iftype) {
             if (in_array($iftype, ['/virtual/', '/l2vlan/']) && $device['os'] == 'asa') {
                 // ASA (at least in multicontext) reports interfaces as l2vlan even if they are l3
                 // or propVirtual in 9.16 (like etherchannels) but without the physical ones.
@@ -28,8 +28,8 @@ foreach ($ports as $port) {
         }
     }
 
-    if (is_array(\LibreNMS\Config::get('device_traffic_descr'))) {
-        foreach (\LibreNMS\Config::get('device_traffic_descr') as $ifdescr) {
+    if (is_array(\App\Facades\LibrenmsConfig::get('device_traffic_descr'))) {
+        foreach (\App\Facades\LibrenmsConfig::get('device_traffic_descr') as $ifdescr) {
             if (preg_match($ifdescr . 'i', $port['ifDescr']) || preg_match($ifdescr . 'i', $port['ifName'])) {
                 $ignore = 1;
             }
@@ -42,7 +42,7 @@ foreach ($ports as $port) {
         // Fix Labels! ARGH. This needs to be in the bloody database!
         $rrd_filenames[] = $rrd_filename;
         $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr'] = \LibreNMS\Util\Rewrite::shortenIfType($port['label']);
+        $rrd_list[$i]['descr'] = \LibreNMS\Util\Rewrite::shortenIfName($port['label']);
         $rrd_list[$i]['descr_in'] = $port['label'];
         $rrd_list[$i]['descr_out'] = \LibreNMS\Util\Clean::html($port['ifAlias'], []);
         $rrd_list[$i]['ds_in'] = $ds_in;

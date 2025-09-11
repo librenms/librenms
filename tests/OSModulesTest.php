@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OSModulesTest.php
  *
@@ -25,17 +26,18 @@
 
 namespace LibreNMS\Tests;
 
+use App\Facades\LibrenmsConfig;
 use DeviceCache;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Arr;
-use LibreNMS\Config;
 use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Source\FpingResponse;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
-use LibreNMS\Util\Debug;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Number;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Util\Color;
 
 class OSModulesTest extends DBTestCase
@@ -50,26 +52,24 @@ class OSModulesTest extends DBTestCase
         parent::setUp();
 
         // backup modules
-        $this->discoveryModules = Config::get('discovery_modules');
-        $this->pollerModules = Config::get('poller_modules');
+        $this->discoveryModules = LibrenmsConfig::get('discovery_modules');
+        $this->pollerModules = LibrenmsConfig::get('poller_modules');
     }
 
     protected function tearDown(): void
     {
         // restore modules
-        Config::set('discovery_modules', $this->discoveryModules);
-        Config::set('poller_modules', $this->pollerModules);
+        LibrenmsConfig::set('discovery_modules', $this->discoveryModules);
+        LibrenmsConfig::set('poller_modules', $this->pollerModules);
 
         parent::tearDown();
     }
 
     /**
      * Test all modules for a particular OS
-     *
-     * @group os
-     *
-     * @dataProvider dumpedDataProvider
      */
+    #[Group('os')]
+    #[DataProvider('dumpedDataProvider')]
     public function testDataIsValid($os, $variant, $modules): void
     {
         // special case if data provider throws exception
@@ -83,14 +83,12 @@ class OSModulesTest extends DBTestCase
     /**
      * Test all modules for a particular OS
      *
-     * @group os
-     *
-     * @dataProvider dumpedDataProvider
-     *
      * @param  string  $os  base os
      * @param  string  $variant  optional variant
      * @param  array  $modules  modules to test for this os
      */
+    #[Group('os')]
+    #[DataProvider('dumpedDataProvider')]
     public function testOS($os, $variant, $modules): void
     {
         // Lock testing time
@@ -100,13 +98,12 @@ class OSModulesTest extends DBTestCase
         $this->stubClasses();
 
         try {
-            Debug::set(false); // avoid all undefined index errors in the legacy code
             $helper = new ModuleTestHelper($modules, $os, $variant);
             $helper->setQuiet();
 
             $filename = $helper->getJsonFilepath(true);
             $expected_data = $helper->getTestData();
-            $results = $helper->generateTestData($this->getSnmpsim(), true);
+            $results = $helper->generateTestData($this->getSnmpsimIp(), $this->getSnmpsimPort(), true);
         } catch (FileNotFoundException|InvalidModuleException $e) {
             $this->fail($e->getMessage());
         }
@@ -128,20 +125,27 @@ class OSModulesTest extends DBTestCase
                 continue;
             }
 
-            if ($expected_data[$module]['poller'] !== 'matches discovery') {
-                $expected = $expected_data[$module]['poller'] ?? null;
+            if (isset($expected_data[$module]['poller'])) {
+                if ($expected_data[$module]['poller'] !== 'matches discovery') {
+                    $expected = $expected_data[$module]['poller']; // we have specific poller data, update expected
+                }
+                // pass through discovery expected data
+            } else {
+                $expected = null; // no poller data, clear discovery's expected
             }
+
             $actual = $results[$module]['poller'] ?? null;
             $this->checkTestData($expected, $actual, 'Polled', $os, $module, $filename, $helper, $phpunit_debug);
         }
 
+        /** @phpstan-ignore method.alreadyNarrowedType */
         $this->assertTrue(true, "Tested $os successfully"); // avoid no asserts error
 
         DeviceCache::flush(); // clear cached devices
         $this->travelBack();
     }
 
-    public function dumpedDataProvider()
+    public static function dumpedDataProvider(): array
     {
         $modules = [];
 
@@ -167,7 +171,7 @@ class OSModulesTest extends DBTestCase
         });
 
         $this->app->bind(Fping::class, function ($app) {
-            $mock = \Mockery::mock(\LibreNMS\Data\Source\Fping::class);
+            $mock = \Mockery::mock(Fping::class);
             $mock->shouldReceive('ping')->andReturn(FpingResponse::artificialUp());
 
             return $mock;

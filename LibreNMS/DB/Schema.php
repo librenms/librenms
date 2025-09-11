@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Schema.php
  *
@@ -25,9 +26,9 @@
 
 namespace LibreNMS\DB;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Util\Version;
 use Schema as LaravelSchema;
 use Symfony\Component\Yaml\Yaml;
@@ -105,7 +106,7 @@ class Schema
     public function getSchema()
     {
         if (! isset($this->schema)) {
-            $file = Config::get('install_dir') . '/misc/db_schema.yaml';
+            $file = resource_path('definitions/schema/db_schema.yaml');
             $this->schema = Yaml::parse(file_get_contents($file));
         }
 
@@ -146,7 +147,7 @@ class Schema
     {
         $update_cache = true;
         $cache = [];
-        $cache_file = Config::get('install_dir') . "/cache/{$base}_relationships.cache";
+        $cache_file = LibrenmsConfig::get('install_dir') . "/cache/{$base}_relationships.cache";
         $db_version = Version::get()->databaseMigrationCount();
 
         if (is_file($cache_file)) {

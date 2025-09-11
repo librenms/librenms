@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Str;
 use LibreNMS\Util\Number;
 
 $graph_type = 'storage_usage';
@@ -21,7 +22,7 @@ if (count($drives)) {
         $skipdrive = 0;
 
         if ($device['os'] == 'junos') {
-            foreach (\LibreNMS\Config::get('ignore_junos_os_drives', []) as $jdrive) {
+            foreach (\App\Facades\LibrenmsConfig::get('ignore_junos_os_drives', []) as $jdrive) {
                 if (preg_match($jdrive, $drive['storage_descr'])) {
                     $skipdrive = 1;
                 }
@@ -31,7 +32,7 @@ if (count($drives)) {
         }
 
         if ($device['os'] == 'freebsd') {
-            foreach (\LibreNMS\Config::get('ignore_bsd_os_drives', []) as $jdrive) {
+            foreach (\App\Facades\LibrenmsConfig::get('ignore_bsd_os_drives', []) as $jdrive) {
                 if (preg_match($jdrive, $drive['storage_descr'])) {
                     $skipdrive = 1;
                 }
@@ -51,10 +52,10 @@ if (count($drives)) {
         $graph_array = [];
         $graph_array['height'] = '100';
         $graph_array['width'] = '210';
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
         $graph_array['id'] = $drive['storage_id'];
         $graph_array['type'] = $graph_type;
-        $graph_array['from'] = \LibreNMS\Config::get('time.day');
+        $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
         $graph_array['legend'] = 'no';
 
         $link_array = $graph_array;
@@ -62,7 +63,7 @@ if (count($drives)) {
         unset($link_array['height'], $link_array['width'], $link_array['legend']);
         $link = \LibreNMS\Util\Url::generate($link_array);
 
-        $drive['storage_descr'] = \LibreNMS\Util\StringHelpers::shortenText($drive['storage_descr'], 50);
+        $drive['storage_descr'] = Str::limit($drive['storage_descr'], 50);
 
         $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . ' - ' . $drive['storage_descr']);
 
@@ -75,7 +76,7 @@ if (count($drives)) {
         echo '<tr>
            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $drive['storage_descr'], $overlib_content) . '</td>
            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</td>
-           <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']), $overlib_content) . '
+           <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, print_percentage_bar(400, 20, $percent, "$used / $total ($percent%)", 'ffffff', $background['left'], $free, 'ffffff', $background['right']), $overlib_content) . '
            </a></td>
          </tr>';
     }//end foreach

@@ -14,24 +14,35 @@ class Link extends Model
     public $timestamps = false;
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Device, $this>
+     */
     public function device(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Device::class, 'local_device_id', 'device_id');
+        return $this->belongsTo(Device::class, 'local_device_id', 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Port, $this>
+     */
     public function port(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Port::class, 'local_port_id', 'port_id');
+        return $this->belongsTo(Port::class, 'local_port_id', 'port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\Device, $this>
+     */
     public function remoteDevice(): HasOne
     {
-        return $this->hasOne(\App\Models\Device::class, 'device_id', 'remote_device_id');
+        return $this->hasOne(Device::class, 'device_id', 'remote_device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\Port, $this>
+     */
     public function remotePort(): HasOne
     {
-        return $this->hasOne(\App\Models\Port::class, 'port_id', 'remote_port_id');
+        return $this->hasOne(Port::class, 'port_id', 'remote_port_id');
     }
 }

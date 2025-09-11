@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Oxidized.php
  *
@@ -25,7 +26,7 @@
 
 namespace App\ApiClients;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
 class Oxidized extends BaseApi
 {
@@ -34,8 +35,8 @@ class Oxidized extends BaseApi
     public function __construct()
     {
         $this->timeout = 90;
-        $this->base_uri = Config::get('oxidized.url') ?? '';
-        $this->enabled = Config::get('oxidized.enabled') === true && $this->base_uri;
+        $this->base_uri = LibrenmsConfig::get('oxidized.url') ?? '';
+        $this->enabled = LibrenmsConfig::get('oxidized.enabled') === true && $this->base_uri;
     }
 
     /**
@@ -43,7 +44,7 @@ class Oxidized extends BaseApi
      */
     public function reloadNodes(): void
     {
-        if ($this->enabled && Config::get('oxidized.reload_nodes') === true) {
+        if ($this->enabled && LibrenmsConfig::get('oxidized.reload_nodes') === true) {
             $this->getClient()->get('/reload.json');
         }
     }

@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+
 /**
  * rrdstep.php
  *
@@ -24,7 +25,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
 $init_modules = [];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
@@ -51,12 +52,12 @@ if (empty($hostname)) {
     exit;
 }
 
-$system_step = Config::get('rrd.step', 300);
-$icmp_step = Config::get('ping_rrd_step', $system_step);
-$system_heartbeat = Config::get('rrd.heartbeat', $system_step * 2);
-$rrdtool = Config::get('rrdtool', 'rrdtool');
-$tmp_path = Config::get('temp_dir', '/tmp');
-$rrd_dir = Config::get('rrd_dir', Config::get('install_dir') . '/rrd');
+$system_step = LibrenmsConfig::get('rrd.step', 300);
+$icmp_step = LibrenmsConfig::get('ping_rrd_step', $system_step);
+$system_heartbeat = LibrenmsConfig::get('rrd.heartbeat', $system_step * 2);
+$rrdtool = LibrenmsConfig::get('rrdtool', 'rrdtool');
+$tmp_path = LibrenmsConfig::get('temp_dir', '/tmp');
+$rrd_dir = LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd');
 
 $files = [];
 if ($hostname === 'all') {

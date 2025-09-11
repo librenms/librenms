@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -43,12 +44,12 @@ if (! isset($multiplier)) {
 }
 
 foreach ($rrd_list as $rrd) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours_in.$iter") || ! \LibreNMS\Config::get("graph_colours.$colours_out.$iter")) {
+    if (! \App\Facades\LibrenmsConfig::get("graph_colours.$colours_in.$iter") || ! \App\Facades\LibrenmsConfig::get("graph_colours.$colours_out.$iter")) {
         $iter = 0;
     }
 
-    $colour_in = \LibreNMS\Config::get("graph_colours.$colours_in.$iter");
-    $colour_out = \LibreNMS\Config::get("graph_colours.$colours_out.$iter");
+    $colour_in = \App\Facades\LibrenmsConfig::get("graph_colours.$colours_in.$iter");
+    $colour_out = \App\Facades\LibrenmsConfig::get("graph_colours.$colours_out.$iter");
 
     if (isset($rrd['descr_in'])) {
         $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr_in'], $descr_len) . '  In';
@@ -117,9 +118,9 @@ if (! $nototal) {
     $rrd_options .= ' CDEF:inbits=inoctets,8,*';
     $rrd_options .= ' CDEF:outbits=outoctets,8,*';
     $rrd_options .= ' CDEF:doutbits=doutoctets,8,*';
-    $rrd_options .= ' VDEF:percentile_in=inbits,' . \LibreNMS\Config::get('percentile_value') . ',PERCENT';
-    $rrd_options .= ' VDEF:percentile_out=outbits,' . \LibreNMS\Config::get('percentile_value') . ',PERCENT';
-    $rrd_options .= ' CDEF:dpercentile_outn=doutbits,' . $stacked['stacked'] . ',* VDEF:dpercentile_outnp=dpercentile_outn,' . \LibreNMS\Config::get('percentile_value') . ',PERCENT CDEF:dpercentile_outnpn=doutbits,doutbits,-,dpercentile_outnp,' . $stacked['stacked'] . ',*,+ VDEF:dpercentile_out=dpercentile_outnpn,FIRST';
+    $rrd_options .= ' VDEF:percentile_in=inbits,' . \App\Facades\LibrenmsConfig::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_out=outbits,' . \App\Facades\LibrenmsConfig::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' CDEF:dpercentile_outn=doutbits,' . $stacked['stacked'] . ',* VDEF:dpercentile_outnp=dpercentile_outn,' . \App\Facades\LibrenmsConfig::get('percentile_value') . ',PERCENT CDEF:dpercentile_outnpn=doutbits,doutbits,-,dpercentile_outnp,' . $stacked['stacked'] . ',*,+ VDEF:dpercentile_out=dpercentile_outnpn,FIRST';
     $rrd_options .= ' VDEF:totin=inoctets,TOTAL';
     $rrd_options .= ' VDEF:totout=outoctets,TOTAL';
     $rrd_options .= ' VDEF:tot=octets,TOTAL';

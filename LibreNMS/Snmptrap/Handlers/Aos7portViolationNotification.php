@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Aos7portViolationNotification.php
  *
@@ -48,7 +49,6 @@ class Aos7portViolationNotification implements SnmptrapHandler
     public function handle(Device $device, Trap $trap)
     {
         $reason = $trap->getOidData($trap->findOid('ALCATEL-IND1-PORT-MIB::portViolationRecoveryReason.1.0'));
-        $ifDescr = $trap->getOidData($trap->findOid('IF-MIB::ifDescr'));
         $ifIndex = $trap->getOidData($trap->findOid('IF-MIB::ifIndex'));
         $port = $device->ports()->where('ifIndex', $ifIndex)->first();
         $trap->log("There has been a loop detected on the port $port->ifDescr. The current status code is: $reason.", Severity::Error);

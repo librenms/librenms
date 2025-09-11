@@ -58,8 +58,8 @@ if ($device['os_group'] == 'cisco') {
         }
 
         if (isset($serverfarms[$farm_id])) {
-            $tags = compact('farm_id', 'rrd_name', 'rrd_def');
-            data_update($device, 'rservers', $tags, $fields);
+            $tags = ['farm_id' => $farm_id, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
+            app('Datastore')->put($device, 'rservers', $tags, $fields);
         }
     }//end foreach
 

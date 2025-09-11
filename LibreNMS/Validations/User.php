@@ -1,4 +1,5 @@
 <?php
+
 /**
  * User.php
  *
@@ -25,9 +26,9 @@
 
 namespace LibreNMS\Validations;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Util\EnvHelper;
 use LibreNMS\Util\Git;
 use LibreNMS\ValidationResult;
@@ -80,9 +81,9 @@ class User extends BaseValidation
 
         // Let's test the user configured if we have it
         if ($lnms_username) {
-            $dir = Config::get('install_dir');
-            $log_dir = Config::get('log_dir', "$dir/logs");
-            $rrd_dir = Config::get('rrd_dir', "$dir/rrd");
+            $dir = LibrenmsConfig::get('install_dir');
+            $log_dir = LibrenmsConfig::get('log_dir', "$dir/logs");
+            $rrd_dir = LibrenmsConfig::get('rrd_dir', "$dir/rrd");
 
             // generic fix
             $fix = [
@@ -91,8 +92,9 @@ class User extends BaseValidation
                 "sudo chmod -R ug=rwX $rrd_dir $log_dir $dir/bootstrap/cache/ $dir/storage/",
             ];
 
-            if (! Config::get('installed_from_package')) {
-                $find_result = rtrim(`find $dir \! -user $lnms_username -o \! -group $lnms_groupname 2> /dev/null`);
+            if (! LibrenmsConfig::get('installed_from_package')) {
+                $find_output = shell_exec("find $dir \! -user $lnms_username -o \! -group $lnms_groupname 2> /dev/null");
+                $find_result = rtrim($find_output ?: '');
                 if (! empty($find_result)) {
                     // Ignore files created by the webserver
                     $ignore_files = [

@@ -1037,8 +1037,8 @@
                     "ifName": "enc0",
                     "portName": null,
                     "ifIndex": 4,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -1137,8 +1137,8 @@
                     "ifName": "lo0",
                     "portName": null,
                     "ifIndex": 5,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "dormant",
                     "ifOperStatus_prev": "dormant",
@@ -1237,8 +1237,8 @@
                     "ifName": "pflog0",
                     "portName": null,
                     "ifIndex": 6,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -1337,8 +1337,8 @@
                     "ifName": "pfsync0",
                     "portName": null,
                     "ifIndex": 7,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -1510,112 +1510,78 @@
         "discovery": {
             "storage": [
                 {
-                    "storage_mib": "ucd-dsktable",
-                    "storage_index": "1",
-                    "storage_type": "dsk",
-                    "storage_descr": "/",
-                    "storage_size": 7890923520,
-                    "storage_units": 1024,
-                    "storage_used": 1497051136,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "ucd-dsktable",
-                    "storage_index": "3",
-                    "storage_type": "dsk",
-                    "storage_descr": "/var/run",
-                    "storage_size": 3567616,
-                    "storage_units": 1024,
-                    "storage_used": 385024,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "3",
                     "storage_type": "hrFSBerkeleyFFS",
                     "storage_descr": "/, type: ufs, dev: /dev/ufsid/5be59cf2bcc03dca",
                     "storage_size": 7890923520,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 865779712,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.3",
+                    "storage_free": 7025143808,
+                    "storage_free_oid": null,
+                    "storage_perc": 11,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "5",
                     "storage_type": "hrFSBerkeleyFFS",
                     "storage_descr": "/var/run, type: ufs, dev: /dev/md0",
                     "storage_size": 3567616,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 102400,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.5",
+                    "storage_free": 3465216,
+                    "storage_free_oid": null,
+                    "storage_perc": 3,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 }
             ]
         },
-        "poller": {
-            "storage": [
+        "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
                 {
-                    "storage_mib": "ucd-dsktable",
-                    "storage_index": "1",
-                    "storage_type": "dsk",
-                    "storage_descr": "/",
-                    "storage_size": 7890923520,
-                    "storage_units": 1024,
-                    "storage_used": 1497051136,
-                    "storage_free": 6393872384,
-                    "storage_perc": 19,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "ipv4_address": "10.1.0.156",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "10.1.0.152/29",
+                    "ifIndex": 2
                 },
                 {
-                    "storage_mib": "ucd-dsktable",
-                    "storage_index": "3",
-                    "storage_type": "dsk",
-                    "storage_descr": "/var/run",
-                    "storage_size": 3567616,
-                    "storage_units": 1024,
-                    "storage_used": 385024,
-                    "storage_free": 3182592,
-                    "storage_perc": 11,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "ipv4_address": "10.1.0.8",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 5
                 },
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "3",
-                    "storage_type": "hrFSBerkeleyFFS",
-                    "storage_descr": "/, type: ufs, dev: /dev/ufsid/5be59cf2bcc03dca",
-                    "storage_size": 7890923520,
-                    "storage_units": 4096,
-                    "storage_used": 865779712,
-                    "storage_free": 7025143808,
-                    "storage_perc": 11,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 5
                 },
                 {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "5",
-                    "storage_type": "hrFSBerkeleyFFS",
-                    "storage_descr": "/var/run, type: ufs, dev: /dev/md0",
-                    "storage_size": 3567616,
-                    "storage_units": 4096,
-                    "storage_used": 102400,
-                    "storage_free": 3465216,
-                    "storage_perc": 3,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "ipv4_address": "192.168.80.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.80.0/24",
+                    "ifIndex": 3
+                },
+                {
+                    "ipv4_address": "192.168.80.2",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 3
                 }
             ]
         }

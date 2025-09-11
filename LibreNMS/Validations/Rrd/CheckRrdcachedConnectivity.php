@@ -1,4 +1,5 @@
 <?php
+
 /*
  * CheckRrdcachedConnectivity.php
  *
@@ -25,7 +26,7 @@
 
 namespace LibreNMS\Validations\Rrd;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Interfaces\Validation;
 use LibreNMS\ValidationResult;
 
@@ -36,7 +37,7 @@ class CheckRrdcachedConnectivity implements Validation
      */
     public function validate(): ValidationResult
     {
-        [$host,$port] = explode(':', Config::get('rrdcached'));
+        [$host,$port] = explode(':', LibrenmsConfig::get('rrdcached'));
         if ($host == 'unix') {
             // Using socket, check that file exists
             if (! file_exists($port)) {
@@ -59,6 +60,6 @@ class CheckRrdcachedConnectivity implements Validation
      */
     public function enabled(): bool
     {
-        return (bool) Config::get('rrdcached');
+        return (bool) LibrenmsConfig::get('rrdcached');
     }
 }

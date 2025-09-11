@@ -55,7 +55,7 @@ if (! Auth::user()->hasGlobalRead()) {
     $param[] = Auth::id();
 }
 
-if (sizeof($wheres) > 0) {
+if (count($wheres) > 0) {
     $query .= 'WHERE ' . implode(' AND ', $wheres) . "\n";
 }
 $orderby = 'ORDER BY bills.bill_name';
@@ -143,7 +143,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
     $left_background = $background['left'];
     $overuse_formatted = (($overuse <= 0) ? '-' : "<span style='color: #{$background['left']}; font-weight: bold;'>$overuse_formatted</span>");
 
-    $bill_name = "<a href='$url'><span style='font-weight: bold;' class='interface'>" . htmlentities($bill['bill_name']) . '</span></a><br />' .
+    $bill_name = "<a href='$url'><span class='tw:font-bold tw:text-blue-900 tw:visited:textc-blue-900 tw:dark:text-dark-white-100 tw:dark:visited:text-dark-white-100'>" . htmlentities($bill['bill_name']) . '</span></a><br />' .
                     date('Y-m-d', strtotime($datefrom)) . ' to ' . date('Y-m-d', strtotime($dateto));
     $bar = print_percentage_bar(250, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']);
     $actions = '';

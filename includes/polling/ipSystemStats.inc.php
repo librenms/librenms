@@ -102,14 +102,14 @@ if ($data) {
         foreach ($oids as $oid) {
             $oid_ds = str_replace('ipSystemStats', '', $oid);
             $rrd_def->addDataset($oid_ds, 'COUNTER');
-            if (strstr($stats[$oid], 'No') || strstr($stats[$oid], 'd') || strstr($stats[$oid], 's')) {
+            if (! isset($stats[$oid]) || (strstr($stats[$oid], 'No') || strstr($stats[$oid], 'd') || strstr($stats[$oid], 's'))) {
                 $stats[$oid] = '0';
             }
             $fields[$oid_ds] = $stats[$oid];
         }
 
-        $tags = compact('af', 'rrd_name', 'rrd_def');
-        data_update($device, 'ipSystemStats', $tags, $fields);
+        $tags = ['af' => $af, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
+        app('Datastore')->put($device, 'ipSystemStats', $tags, $fields);
 
         // FIXME per-AF?
         $os->enableGraph("ipsystemstats_$af");

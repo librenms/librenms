@@ -51,7 +51,7 @@
 </template>
 
 <script>
-    import BaseSetting from "./BaseSetting";
+    import BaseSetting from "./BaseSetting.vue";
     import draggable from 'vuedraggable'
 
     export default {

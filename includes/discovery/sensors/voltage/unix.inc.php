@@ -1,4 +1,5 @@
 <?php
+
 /**
  * unix.inc.php
  *
@@ -30,6 +31,11 @@ if (! empty($snmpData)) {
     foreach ($snmpData as $lmData) {
         $type = 'lmVoltSensors';
         $divisor = 1000;
+
+        if (! isset($lmData[$type . 'Index'])) {
+            continue;
+        }
+
         $index = $lmData[$type . 'Index'];
         $descr = $lmData[$type . 'Device'];
         $value = intval($lmData[$type . 'Value']) / $divisor;
@@ -51,7 +57,7 @@ if (! empty($snmpData)) {
         7 => ['descr' => 'Input Voltage', 'LL' => 200, 'LW' => 0, 'W' => null, 'H' => 280],
     ];
     foreach ($snmpData as $index => $upsData) {
-        if ($upsnut[$index]) {
+        if (isset($upsnut[$index])) {
             $value = $upsData['nsExtendOutLine'];
             if (is_numeric($value)) {
                 $oid = Oid::of('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut".' . $index)->toNumeric();

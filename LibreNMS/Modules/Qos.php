@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Qos.php
  *
@@ -55,7 +56,7 @@ class Qos implements Module
      * Discover this module. Heavier processes can be run here
      * Run infrequently (default 4 times a day)
      *
-     * @param  \LibreNMS\OS  $os
+     * @param  OS  $os
      */
     public function discover(OS $os): void
     {
@@ -77,7 +78,7 @@ class Qos implements Module
      * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
      * Run frequently (default every 5 minutes)
      *
-     * @param  \LibreNMS\OS  $os
+     * @param  OS  $os
      */
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
@@ -199,7 +200,7 @@ class Qos implements Module
     public function dump(Device $device, string $type): ?array
     {
         return [
-            'qos' => $device->qos()->orderBy('title')
+            'qos' => $device->qos()->orderBy('title')->orderBy('snmp_idx')
                 ->get()->map->makeHidden(['qos_id', 'created_at', 'updated_at', 'device_id', 'port_id', 'parent_id', 'last_polled']),
         ];
     }

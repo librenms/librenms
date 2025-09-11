@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -13,21 +14,19 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\Number;
 
 require 'includes/html/graphs/common.inc.php';
 
-$stacked = generate_stacked_graphs(! empty($port['ifSpeed']) && ($vars['port_speed_zoom'] ?? Config::get('graphs.port_speed_zoom')));
+$stacked = generate_stacked_graphs(! empty($port['ifSpeed']) && ($vars['port_speed_zoom'] ?? LibrenmsConfig::get('graphs.port_speed_zoom')));
 $inverse = $inverse ?? false;
 $multiplier = $multiplier ?? false;
 $format = $format ?? '';
 $previous = $graph_params->visible('previous');
 
-if ($rrd_filename) {
-    $rrd_filename_out = $rrd_filename;
-    $rrd_filename_in = $rrd_filename;
-}
+$rrd_filename_out ??= $rrd_filename ?? '';
+$rrd_filename_in ??= $rrd_filename ?? '';
 
 if ($inverse) {
     $in = 'out';
@@ -87,7 +86,7 @@ if ($previous) {
     $rrd_options .= ' VDEF:totoutX=outoctetsX,TOTAL';
     $rrd_options .= ' VDEF:totX=octetsX,TOTAL';
     $rrd_options .= ' CDEF:dpercentile_outnX=doutbitsX,' . $stacked['stacked'] . ',*';
-    $rrd_options .= ' VDEF:dpercentile_outnpX=dpercentile_outnX,' . Config::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:dpercentile_outnpX=dpercentile_outnX,' . LibrenmsConfig::get('percentile_value') . ',PERCENT';
     $rrd_options .= ' CDEF:dpercentile_outnpnX=doutbitsX,doutbitsX,-,dpercentile_outnpX,' . $stacked['stacked'] . ',*,+';
     $rrd_options .= ' VDEF:dpercentile_outX=dpercentile_outnpnX,FIRST';
 }
@@ -102,12 +101,12 @@ $rrd_options .= ' CDEF:doutbits_max=doutoctets_max,8,*';
 $rrd_options .= ' CDEF:inbits=inoctets,8,*';
 $rrd_options .= ' CDEF:inbits_max=inoctets_max,8,*';
 
-if (Config::get('rrdgraph_real_percentile')) {
+if (LibrenmsConfig::get('rrdgraph_real_percentile')) {
     $rrd_options .= ' CDEF:highbits=inoctets,outoctets,MAX,8,*';
-    $rrd_options .= ' VDEF:percentilehigh=highbits,' . Config::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:percentilehigh=highbits,' . LibrenmsConfig::get('percentile_value') . ',PERCENT';
     if ($previous) {
         $rrd_options .= ' CDEF:highbitsX=inoctetsX,outoctetsX,MAX,8,*';
-        $rrd_options .= ' VDEF:percentilehighX=highbitsX,' . Config::get('percentile_value') . ',PERCENT';
+        $rrd_options .= ' VDEF:percentilehighX=highbitsX,' . LibrenmsConfig::get('percentile_value') . ',PERCENT';
     }
 }
 
@@ -115,31 +114,31 @@ $rrd_options .= ' VDEF:totin=inoctets,TOTAL';
 $rrd_options .= ' VDEF:totout=outoctets,TOTAL';
 $rrd_options .= ' VDEF:tot=octets,TOTAL';
 $rrd_options .= ' CDEF:dpercentile_outn=doutbits,' . $stacked['stacked'] . ',*';
-$rrd_options .= ' VDEF:dpercentile_outnp=dpercentile_outn,' . Config::get('percentile_value') . ',PERCENT';
+$rrd_options .= ' VDEF:dpercentile_outnp=dpercentile_outn,' . LibrenmsConfig::get('percentile_value') . ',PERCENT';
 $rrd_options .= ' CDEF:dpercentile_outnpn=doutbits,doutbits,-,dpercentile_outnp,' . $stacked['stacked'] . ',*,+';
 $rrd_options .= ' VDEF:dpercentile_out=dpercentile_outnpn,FIRST';
 
 if ($format == 'octets' || $format == 'bytes') {
-    $rrd_options .= ' VDEF:percentile_in=inoctets,' . Config::get('percentile_value') . ',PERCENT';
-    $rrd_options .= ' VDEF:percentile_out=outoctets,' . Config::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_in=inoctets,' . LibrenmsConfig::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_out=outoctets,' . LibrenmsConfig::get('percentile_value') . ',PERCENT';
     if ($previous) {
-        $rrd_options .= ' VDEF:percentile_inX=inoctetsX,' . Config::get('percentile_value') . ',PERCENT';
-        $rrd_options .= ' VDEF:percentile_outX=outoctetsX,' . Config::get('percentile_value') . ',PERCENT';
+        $rrd_options .= ' VDEF:percentile_inX=inoctetsX,' . LibrenmsConfig::get('percentile_value') . ',PERCENT';
+        $rrd_options .= ' VDEF:percentile_outX=outoctetsX,' . LibrenmsConfig::get('percentile_value') . ',PERCENT';
     }
     $units = 'Bps';
     $format = 'octets';
 } else {
-    $rrd_options .= ' VDEF:percentile_in=inbits,' . Config::get('percentile_value') . ',PERCENT';
-    $rrd_options .= ' VDEF:percentile_out=outbits,' . Config::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_in=inbits,' . LibrenmsConfig::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_out=outbits,' . LibrenmsConfig::get('percentile_value') . ',PERCENT';
     if ($previous) {
-        $rrd_options .= ' VDEF:percentile_inX=inbitsX,' . Config::get('percentile_value') . ',PERCENT';
-        $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . Config::get('percentile_value') . ',PERCENT';
+        $rrd_options .= ' VDEF:percentile_inX=inbitsX,' . LibrenmsConfig::get('percentile_value') . ',PERCENT';
+        $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . LibrenmsConfig::get('percentile_value') . ',PERCENT';
     }
     $units = 'bps';
     $format = 'bits';
 }
 
-$rrd_options .= " COMMENT:'bps      Now       Ave      Max      " . Config::get('percentile_value') . "th %\\n'";
+$rrd_options .= " COMMENT:'bps      Now       Ave      Max      " . LibrenmsConfig::get('percentile_value') . "th %\\n'";
 
 $rrd_options .= ' AREA:in' . $format . '_max#D7FFC7' . $stacked['transparency'] . ':';
 $rrd_options .= ' AREA:in' . $format . '#90B040' . $stacked['transparency'] . ':';
@@ -157,7 +156,7 @@ $rrd_options .= ' GPRINT:out' . $format . ':AVERAGE:%6.' . $float_precision . 'l
 $rrd_options .= ' GPRINT:out' . $format . '_max:MAX:%6.' . $float_precision . 'lf%s';
 $rrd_options .= ' GPRINT:percentile_out:%6.' . $float_precision . 'lf%s\\n';
 
-if (Config::get('rrdgraph_real_percentile')) {
+if (LibrenmsConfig::get('rrdgraph_real_percentile')) {
     $rrd_options .= ' HRULE:percentilehigh#FF0000:"Highest"';
     $rrd_options .= ' GPRINT:percentilehigh:"%30.' . $float_precision . 'lf%s\\n"';
 }
@@ -169,7 +168,7 @@ $rrd_options .= ' LINE1:percentile_in#aa0000';
 $rrd_options .= ' LINE1:dpercentile_out#aa0000';
 
 if (! empty($port['ifSpeed'])) {
-    $speed_line_type = ($vars['port_speed_zoom'] ?? Config::get('graphs.port_speed_zoom')) ? 'LINE2' : 'HRULE';
+    $speed_line_type = ($vars['port_speed_zoom'] ?? LibrenmsConfig::get('graphs.port_speed_zoom')) ? 'LINE2' : 'HRULE';
     $rrd_options .= " $speed_line_type:{$port['ifSpeed']}#000000:'Port Speed " . Number::formatSi($port['ifSpeed'], 2, 0, 'bps') . "\\n'";
 }
 

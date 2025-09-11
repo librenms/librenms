@@ -12,20 +12,21 @@
  * the source code distribution for details.
  */
 
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Alerting\QueryBuilderFilter;
-use LibreNMS\Config;
 
-$default_severity = Config::get('alert_rule.severity');
-$default_max_alerts = Config::get('alert_rule.max_alerts');
-$default_delay = Config::get('alert_rule.delay') . 'm';
-$default_interval = Config::get('alert_rule.interval') . 'm';
-$default_mute_alerts = Config::get('alert_rule.mute_alerts');
-$default_invert_rule_match = Config::get('alert_rule.invert_rule_match');
-$default_recovery_alerts = Config::get('alert_rule.recovery_alerts');
-$default_acknowledgement_alerts = Config::get('alert_rule.acknowledgement_alerts');
-$default_invert_map = Config::get('alert_rule.invert_map');
+$default_severity = LibrenmsConfig::get('alert_rule.severity');
+$default_max_alerts = LibrenmsConfig::get('alert_rule.max_alerts');
+$default_delay = LibrenmsConfig::get('alert_rule.delay') . 'm';
+$default_interval = LibrenmsConfig::get('alert_rule.interval') . 'm';
+$default_mute_alerts = LibrenmsConfig::get('alert_rule.mute_alerts');
+$default_invert_rule_match = LibrenmsConfig::get('alert_rule.invert_rule_match');
+$default_recovery_alerts = LibrenmsConfig::get('alert_rule.recovery_alerts');
+$default_acknowledgement_alerts = LibrenmsConfig::get('alert_rule.acknowledgement_alerts');
+$default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
 
 if (Auth::user()->hasGlobalAdmin()) {
+    $device_id = isset($device['device_id']) ? $device['device_id'] : -1;
     $filters = json_encode(new QueryBuilderFilter('alert')); ?>
 
     <div class="modal fade" id="create-alert" tabindex="-1" role="dialog"
@@ -44,11 +45,9 @@ if (Auth::user()->hasGlobalAdmin()) {
                     <br />
                     <form method="post" role="form" id="rules" class="form-horizontal alerts-form">
                         <?php echo csrf_field() ?>
-                        <input type="hidden" name="device_id" id="device_id" value="<?php echo isset($device['device_id']) ? $device['device_id'] : -1; ?>">
-                        <input type="hidden" name="device_name" id="device_name" value="<?php echo htmlentities(format_hostname($device)); ?>">
+                        <input type="hidden" name="device_id" id="device_id" value="<?php echo $device_id; ?>">
+                        <input type="hidden" name="device_name" id="device_name" value="<?php echo htmlentities(DeviceCache::get($device_id)->displayName()); ?>">
                         <input type="hidden" name="rule_id" id="rule_id" value="">
-                        <input type="hidden" name="type" id="type" value="alert-rules">
-                        <input type="hidden" name="template_id" id="template_id" value="">
                         <input type="hidden" name="builder_json" id="builder_json" value="">
                         <div class="tab-content">
                             <div role="tabpanel" class="tab-pane active" id="main">
@@ -235,12 +234,21 @@ if (Auth::user()->hasGlobalAdmin()) {
 
         $('#btn-save').on('click', function (e) {
             e.preventDefault();
+
+            var url = '<?php echo route('alert-rule.store') ?>';
+            var method = 'POST';
+            var rule_id = $('#rule_id').val();
+            if  (rule_id) {
+                url = '<?php echo route('alert-rule.update', ':alert_id') ?>'.replace(':alert_id', rule_id);
+                method = 'PUT';
+            }
             var result_json = $('#builder').queryBuilder('getRules');
+
             if (result_json !== null && result_json.valid) {
                 $('#builder_json').val(JSON.stringify(result_json));
                 $.ajax({
-                    type: "POST",
-                    url: "ajax_form.php",
+                    type: method,
+                    url: url,
                     data: $('form.alerts-form').serializeArray(),
                     dataType: "json",
                     success: function (data) {
@@ -252,8 +260,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                             toastr.error(data.message);
                         }
                     },
-                    error: function () {
-                        toastr.error('Failed to process rule');
+                    error: function (data) {
+                        toastr.error(data.responseJSON.message);
                     }
                 });
             }
@@ -305,10 +313,8 @@ if (Auth::user()->hasGlobalAdmin()) {
 
             if (rule_id >= 0) {
                 $.ajax({
-                    type: "POST",
-                    url: "ajax_form.php",
-                    data: { type: "parse-alert-rule", alert_id: rule_id },
-                    dataType: "json",
+                    type: "GET",
+                    url: "<?php echo route('alert-rule.show', ':alert_id') ?>".replace(':alert_id', rule_id),
                     success: function (data) {
                         loadRule(data);
                     }

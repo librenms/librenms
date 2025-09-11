@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ModuleTester.php
  *
@@ -26,13 +27,14 @@
 namespace LibreNMS\Util;
 
 use App\Actions\Device\ValidateDeviceAndCreate;
+use App\Facades\LibrenmsConfig;
 use App\Jobs\PollDevice;
 use App\Models\Device;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
@@ -74,7 +76,7 @@ class ModuleTestHelper
         if ($variant) {
             $variant = '_' . $this->variant;
         }
-        $install_dir = Config::get('install_dir');
+        $install_dir = LibrenmsConfig::get('install_dir');
         $this->file_name = $os . $variant;
         $this->snmprec_dir = "$install_dir/tests/snmpsim/";
         $this->snmprec_file = $this->snmprec_dir . $this->file_name . '.snmprec';
@@ -82,21 +84,27 @@ class ModuleTestHelper
         $this->json_file = $this->json_dir . $this->file_name . '.json';
 
         // never store time series data
-        Config::set('rrd.enable', false);
-        Config::set('hide_rrd_disabled', true);
-        Config::set('influxdb.enable', false);
-        Config::set('influxdbv2.enable', false);
-        Config::set('graphite.enable', false);
-        Config::set('prometheus.enable', false);
+        LibrenmsConfig::set('rrd.enable', false);
+        LibrenmsConfig::set('hide_rrd_disabled', true);
+        LibrenmsConfig::set('influxdb.enable', false);
+        LibrenmsConfig::set('influxdbv2.enable', false);
+        LibrenmsConfig::set('graphite.enable', false);
+        LibrenmsConfig::set('prometheus.enable', false);
+        LibrenmsConfig::set('kafka.enable', false);
     }
 
-    private static function compareOid($a, $b)
+    private static function compareOid($a, $b): int
     {
         $a_oid = explode('.', $a);
         $b_oid = explode('.', $b);
 
         foreach ($a_oid as $index => $a_part) {
+            if (! isset($b_oid[$index])) {
+                return 1; // a is higher (b doesn't exist)
+            }
+
             $b_part = $b_oid[$index];
+
             if ($a_part > $b_part) {
                 return 1; // a is higher
             } elseif ($a_part < $b_part) {
@@ -155,7 +163,7 @@ class ModuleTestHelper
                     $data = \SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'] ?? null)->next($oid_data['oid']);
                 }
 
-                if (isset($data) && $data->isValid()) {
+                if (isset($data) && $data->getExitCode() === 0) {
                     $snmprec_data[] = $this->convertSnmpToSnmprec($data);
                 }
             }
@@ -239,11 +247,11 @@ class ModuleTestHelper
      *
      * @throws InvalidModuleException
      */
-    public static function findOsWithData($modules = [], string $os_filter = null)
+    public static function findOsWithData($modules = [], ?string $os_filter = null)
     {
         $os_list = [];
 
-        foreach (glob(Config::get('install_dir') . '/tests/data/*.json') as $file) {
+        foreach (glob(LibrenmsConfig::get('install_dir') . '/tests/data/*.json') as $file) {
             $base_name = basename($file, '.json');
             [$os, $variant] = self::extractVariant($file);
 
@@ -297,7 +305,7 @@ class ModuleTestHelper
 
         if (! Str::contains($full_name, '_')) {
             return [$full_name, ''];
-        } elseif (is_file(Config::get('install_dir') . "/includes/definitions/$full_name.yaml")) {
+        } elseif (is_file(resource_path("definitions/os_detection/$full_name.yaml"))) {
             return [$full_name, ''];
         } else {
             [$rvar, $ros] = explode('_', strrev($full_name), 2);
@@ -362,7 +370,7 @@ class ModuleTestHelper
     private function convertSnmpToSnmprec(SnmpResponse $snmp_data): array
     {
         $result = [];
-        foreach (explode(PHP_EOL, $snmp_data->raw) as $line) {
+        foreach (explode(PHP_EOL, $snmp_data->getRawWithoutBadLines()) as $line) {
             if (empty($line)) {
                 continue;
             }
@@ -375,13 +383,18 @@ class ModuleTestHelper
                 if (empty($raw_data) || $raw_data == '""') {
                     $result[] = "$oid|4|"; // empty data, we don't know type, put string
                 } else {
-                    [$raw_type, $data] = explode(':', $raw_data, 2);
+                    [$raw_type, $data] = array_pad(explode(':', $raw_data, 2), 2, '');
                     if (Str::startsWith($raw_type, 'Wrong Type (should be ')) {
                         // device returned the wrong type, save the wrong type to emulate the device behavior
                         [$raw_type, $data] = explode(':', ltrim($data), 2);
                     }
 
                     $type = $this->getSnmprecType($raw_type);
+
+                    if ($type === null) {
+                        Log::debug('Skipped line, bad type: ' . $line);
+                        continue;
+                    }
 
                     $data = ltrim($data, ' ');
                     if (Str::startsWith($data, '"') && Str::endsWith($data, '"')) {
@@ -419,28 +432,22 @@ class ModuleTestHelper
         return $result;
     }
 
-    private function getSnmprecType($text)
+    private function getSnmprecType($text): ?string
     {
-        $snmpTypes = [
-            'STRING' => '4',
-            'OID' => '6',
+        return match ($text) {
+            'STRING', 'OCTET STRING', 'BITS', 'Network Address' => '4',
+            'OID', 'OBJECT IDENTIFIER' => '6',
             'Hex-STRING' => '4x',
             'Timeticks' => '67',
-            'INTEGER' => '2',
-            'OCTET STRING' => '4',
-            'BITS' => '4', // not sure if this is right
-            'Integer32' => '2',
+            'INTEGER', 'Integer32' => '2',
             'NULL' => '5',
-            'OBJECT IDENTIFIER' => '6',
             'IpAddress' => '64',
             'Counter32' => '65',
             'Gauge32' => '66',
             'Opaque' => '68',
             'Counter64' => '70',
-            'Network Address' => '4',
-        ];
-
-        return $snmpTypes[$text];
+            default => null
+        };
     }
 
     private function saveSnmprec(array $data, ?string $context = null, bool $write = true, bool $prefer_new = false): string
@@ -536,22 +543,18 @@ class ModuleTestHelper
      * Run discovery and polling against snmpsim data and create a database dump
      * Save the dumped data to tests/data/<os>.json
      *
-     * @param  Snmpsim  $snmpsim
-     * @param  bool  $no_save
-     * @return array|null
-     *
      * @throws FileNotFoundException
      */
-    public function generateTestData(Snmpsim $snmpsim, $no_save = false)
+    public function generateTestData(string $snmpSimIp, int $snmpSimPort, bool $noSave = false): ?array
     {
         global $device;
-        Config::set('rrd.enable', false); // disable rrd
-        Config::set('rrdtool_version', '1.7.2'); // don't detect rrdtool version, rrdtool is not install on ci
+        LibrenmsConfig::set('rrd.enable', false); // disable rrd
+        LibrenmsConfig::set('rrdtool_version', '1.7.2'); // don't detect rrdtool version, rrdtool is not install on ci
 
         // don't allow external DNS queries that could fail
-        app()->bind(\LibreNMS\Util\AutonomousSystem::class, function ($app, $parameters) {
+        app()->bind(AutonomousSystem::class, function ($app, $parameters) {
             $asn = $parameters['asn'] ?? '?';
-            $mock = \Mockery::mock(\LibreNMS\Util\AutonomousSystem::class);
+            $mock = \Mockery::mock(AutonomousSystem::class);
             $mock->shouldReceive('name')->withAnyArgs()->zeroOrMoreTimes()->andReturnUsing(function () use ($asn) {
                 return "AS$asn-MOCK-TEXT";
             });
@@ -563,18 +566,18 @@ class ModuleTestHelper
             throw new FileNotFoundException("$this->snmprec_file does not exist!");
         }
 
-        // Remove existing device in case it didn't get removed previously
-        if (($existing_device = device_by_name($snmpsim->ip)) && isset($existing_device['device_id'])) {
+        // Remove existing device in case it didn't get removed previously, if we're not running in CI
+        if (! getenv('CI') && ($existing_device = device_by_name($snmpSimIp)) && isset($existing_device['device_id'])) {
             delete_device($existing_device['device_id']);
         }
 
         // Add the test device
         try {
             $new_device = new Device([
-                'hostname' => $snmpsim->ip,
+                'hostname' => $snmpSimIp,
                 'snmpver' => 'v2c',
                 'community' => $this->file_name,
-                'port' => $snmpsim->port,
+                'port' => $snmpSimPort,
                 'disabled' => 1, // disable to block normal pollers
             ]);
             (new ValidateDeviceAndCreate($new_device, true))->execute();
@@ -649,17 +652,20 @@ class ModuleTestHelper
         // Dump polled data
         $data = array_merge_recursive($data, $this->dumpDb($device_id, $polled_modules, 'poller'));
 
-        // Remove the test device, we don't need the debug from this
-        if ($device['hostname'] == $snmpsim->ip) {
+        // Remove the test device, if we're not running in CI
+        if (! getenv('CI') && $device['hostname'] == $snmpSimIp) {
+            // we don't need the debug from this
             Debug::set(false);
             delete_device($device_id);
         }
 
-        if (! $no_save) {
+        if (! $noSave) {
             d_echo($data);
 
             // Save the data to the default test data location (or elsewhere if specified)
-            $existing_data = json_decode(file_get_contents($this->json_file), true);
+            $existing_data = is_readable($this->json_file)
+                ? json_decode(file_get_contents($this->json_file), true)
+                : [];
 
             // insert new data, don't store duplicate data
             foreach ($data as $module => $module_data) {
@@ -809,7 +815,7 @@ class ModuleTestHelper
     public function getJsonFilepath($short = false)
     {
         if ($short) {
-            return ltrim(str_replace(Config::get('install_dir'), '', $this->json_file), '/');
+            return ltrim(str_replace(LibrenmsConfig::get('install_dir'), '', $this->json_file), '/');
         }
 
         return $this->json_file;

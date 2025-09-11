@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Windows.php
  *
@@ -110,6 +111,7 @@ class Windows extends \LibreNMS\OS
     private function getServerVersion(string $build): ?string
     {
         $builds = [
+            '26100' => 'Server 2025 (24H2)',
             '20348' => 'Server 2022 (21H2)',
             '17763' => 'Server 2019 (1809)',
             '16299' => 'Server 2016 (1709)',
@@ -133,6 +135,7 @@ class Windows extends \LibreNMS\OS
     private function getDatacenterVersion(string $build): ?string
     {
         $builds = [
+            '26100' => 'Server 2025 Datacenter (24H2)',
             '20348' => 'Server 2022 Datacenter (21H2)',
             '17763' => 'Server 2019 Datacenter (1809)',
             '16299' => 'Server 2016 Datacenter (1709)',

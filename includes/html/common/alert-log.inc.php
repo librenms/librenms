@@ -1,4 +1,5 @@
 <?php
+
 /*
 * This program is free software: you can redistribute it and/or modify it
 * under the terms of the GNU General Public License as published by the
@@ -25,6 +26,7 @@ $alert_states = [
     //    'Acknowledged' => 2,
     'Worse' => 3,
     'Better' => 4,
+    'Changed' => 5,
 ];
 
 $alert_severities = [
@@ -41,6 +43,8 @@ if (Auth::user()->hasGlobalAdmin()) {
     $admin_verbose_details = '<th data-column-id="verbose_details" data-sortable="false">Details</th>';
 }
 
+$device_id ??= (int) ($vars['device'] ?? 0);
+
 $common_output[] = '<div class="panel panel-default panel-condensed">
                 <div class="panel-heading">
                     <div class="row">
@@ -54,7 +58,7 @@ $common_output[] = '<div class="panel panel-default panel-condensed">
                 </div>
             ';
 
-$device = DeviceCache::get((int) $vars['device_id']);
+$device = DeviceCache::get($device_id);
 $device_selected = json_encode($device->exists ? ['id' => $device->device_id, 'text' => $device->displayName()] : '');
 
 if (isset($_POST['state'])) {
@@ -124,6 +128,7 @@ $common_output[] = '<div class="form-group"> \
                <option value="1">Alert</option> \
                <option value="3">Worse</option> \
                <option value="4">Better</option> \
+               <option value="5">Changed</option> \
                </select> \
                </div> \
                <div class="form-group"> \
@@ -147,7 +152,7 @@ $common_output[] = '<div class="form-group"> \
         post: function () {
             return {
                 id: "alertlog",
-                device_id: \'' . htmlspecialchars($_POST['device_id'] ?? $device_id) . '\',
+                device_id: \'' . htmlspecialchars($device_id ?: '') . '\',
                 state: \'' . htmlspecialchars($_POST['state']) . '\',
                 min_severity: \'' . htmlspecialchars($_POST['min_severity']) . '\'
             };
@@ -161,7 +166,7 @@ $common_output[] = '<div class="form-group"> \
         max = high - low;
         search = $(\'.search-field\').val();
 
-        $(".pdf-export").html("<a href=\'pdf.php?report=alert-log&device_id=' . htmlspecialchars($_POST['device_id']) . '&string=" + search + "&results=" + max + "&start=" + low + "\'><i class=\'fa fa-file-pdf-o fa-lg icon-theme\' aria-hidden=\'true\'></i> Export to PDF</a>");
+        $(".pdf-export").html("<a href=\'pdf.php?report=alert-log&device_id=' . htmlspecialchars($device_id) . '&string=" + search + "&results=" + max + "&start=" + low + "\'><i class=\'fa fa-file-pdf-o fa-lg icon-theme\' aria-hidden=\'true\'></i> Export to PDF</a>");
 
         grid.find(".incident-toggle").each(function () {
             $(this).parent().addClass(\'incident-toggle-td\');
@@ -170,7 +175,7 @@ $common_output[] = '<div class="form-group"> \
             $(target).collapse(\'toggle\');
             $(this).toggleClass(\'fa-plus fa-minus\');
         });
-        grid.find(".command-alert-details").on("click", function(e) {
+        grid.find(".verbose-alert-details").on("click", function(e) {
             e.preventDefault();
             var alert_log_id = $(this).data(\'alert_log_id\');
             $(\'#alert_log_id\').val(alert_log_id);
@@ -178,6 +183,9 @@ $common_output[] = '<div class="form-group"> \
         });
         grid.find(".incident").each(function () {
             $(this).parent().addClass(\'col-lg-4 col-md-4 col-sm-4 col-xs-4\');
+            if ($(this).parent().parent().find(".alert-status").hasClass(\'label-danger\')){
+                $(this).parent().parent().find(".verbose-alert-details").fadeIn(0);
+            }
             $(this).parent().parent().on("mouseenter", function () {
                 $(this).find(".incident-toggle").fadeIn(200);
                 if ($(this).find(".alert-status").hasClass(\'label-danger\')){

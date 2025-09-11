@@ -1,6 +1,7 @@
 <?php
+
 /*
- * LibreNMS discovery module for Eltex-MES21xx SFP current
+ * LibreNMS discovery module for Eltex-mes21xx SFP current
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,32 +19,43 @@
  * @package    LibreNMS
  * @link       https://www.librenms.org
  *
+ * @copyright  2025 Peca Nesovanovic
+ *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
-$low_limit = $low_warn_limit = 15;
-$high_warn_limit = $high_limit = 0;
 $divisor = 1000000;
+$multiplier = 1;
 
-$oids = $pre_cache['eltex-mes21xx_rlPhyTestGetResult'];
-if ($oids) {
-    d_echo('Eltex-MES SFP txBias');
-    foreach (explode("\n", $oids) as $data) {
-        if ($data) {
-            $split = trim(explode(' ', $data)[0]);
-            $value = trim(explode(' ', $data)[1]);
-            $ifIndex = explode('.', $split)[13];
-            $type = explode('.', $split)[14];
+$oids = SnmpQuery::cache()->hideMib()->walk('RADLAN-PHY-MIB::rlPhyTestGetResult')->table(1);
 
-            //type 7 = bias
-            if ($type == 7) {
-                $value = $value / $divisor;
-                $tmp = get_port_by_index_cache($device['device_id'], $ifIndex);
-                $descr = $tmp['ifName'];
-                discover_sensor(
-                    null, 'current', $device, $split, 'txbias' . $ifIndex, 'rlPhyTestTableTxBias', 'SfpTxBias-' . $descr, $divisor, '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value
-                );
-            }
-        }
+foreach ($oids as $ifIndex => $data) {
+    if (isset($data['rlPhyTestGetResult']['rlPhyTestTableTxBias'])) {
+        $value = $data['rlPhyTestGetResult']['rlPhyTestTableTxBias'] / $divisor;
+        $low_limit = $low_warn_limit = 15;
+        $high_warn_limit = $high_limit = 0;
+        $port = PortCache::getByIfIndex($ifIndex, $device['device_id']);
+        $descr = $port?->ifName;
+        $oid = '.1.3.6.1.4.1.89.90.1.2.1.3.' . $ifIndex . '.7';
+
+        app('sensor-discovery')->discover(new \App\Models\Sensor([
+            'poller_type' => 'snmp',
+            'sensor_class' => 'current',
+            'sensor_oid' => $oid,
+            'sensor_index' => 'txbias' . $ifIndex,
+            'sensor_type' => 'rlPhyTestTableTxBias',
+            'sensor_descr' => 'SfpTxBias-' . $descr,
+            'sensor_divisor' => $divisor,
+            'sensor_multiplier' => $multiplier,
+            'sensor_limit_low' => $low_limit,
+            'sensor_limit_low_warn' => $low_warn_limit,
+            'sensor_limit_warn' => $high_warn_limit,
+            'sensor_limit' => $high_limit,
+            'sensor_current' => $value,
+            'entPhysicalIndex' => $ifIndex,
+            'entPhysicalIndex_measured' => 'port',
+            'user_func' => null,
+            'group' => 'transceiver',
+        ]));
     }
 }

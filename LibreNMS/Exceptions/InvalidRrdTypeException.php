@@ -1,4 +1,5 @@
 <?php
+
 /**
  * InvalidRrdTypeException.php
  *
@@ -25,6 +26,6 @@
 
 namespace LibreNMS\Exceptions;
 
-class InvalidRrdTypeException extends \Exception
+class InvalidRrdTypeException extends RrdException
 {
 }

@@ -16,7 +16,7 @@ class SettingsController extends Controller
      * @param  string  $section
      * @return \Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function index(DynamicConfig $dynamicConfig, $tab = 'global', $section = '')
+    public function index(DynamicConfig $dynamicConfig, $tab = 'alerting', $section = '')
     {
         $data = [
             'active_tab' => $tab,
@@ -33,9 +33,9 @@ class SettingsController extends Controller
      * Update the specified resource in storage.
      *
      * @param  DynamicConfig  $config
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  string  $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function update(DynamicConfig $config, Request $request, $id)
     {
@@ -45,14 +45,14 @@ class SettingsController extends Controller
             return $this->jsonResponse($id, ':id is not a valid setting', null, 400);
         }
 
-        $current = \LibreNMS\Config::get($id);
+        $current = \App\Facades\LibrenmsConfig::get($id);
         $config_item = $config->get($id);
 
         if (! $config_item->checkValue($value)) {
             return $this->jsonResponse($id, $config_item->getValidationMessage($value), $current, 400);
         }
 
-        if (\LibreNMS\Config::persist($id, $value)) {
+        if (\App\Facades\LibrenmsConfig::persist($id, $value)) {
             return $this->jsonResponse($id, "Successfully set $id", $value);
         }
 
@@ -64,7 +64,7 @@ class SettingsController extends Controller
      *
      * @param  DynamicConfig  $config
      * @param  string  $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function destroy(DynamicConfig $config, $id)
     {
@@ -98,7 +98,7 @@ class SettingsController extends Controller
      * @param  string  $message
      * @param  mixed  $value
      * @param  int  $status
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     protected function jsonResponse($id, $message, $value = null, $status = 200)
     {

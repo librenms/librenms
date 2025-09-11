@@ -1,4 +1,5 @@
 <?php
+
 /**
  * WorldMapController.php
  *
@@ -25,47 +26,43 @@
 
 namespace App\Http\Controllers\Widgets;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Http\Request;
-use LibreNMS\Config;
+use Illuminate\View\View;
 
 class WorldMapController extends WidgetController
 {
-    protected $title = 'World Map';
+    protected string $name = 'world-map';
 
     public function __construct()
     {
         $this->defaults = [
             'title' => null,
-            'init_lat' => Config::get('leaflet.default_lat'),
-            'init_lng' => Config::get('leaflet.default_lng'),
-            'init_zoom' => Config::get('leaflet.default_zoom'),
-            'init_layer' => Config::get('geoloc.layer'),
-            'group_radius' => Config::get('leaflet.group_radius'),
+            'init_lat' => LibrenmsConfig::get('leaflet.default_lat'),
+            'init_lng' => LibrenmsConfig::get('leaflet.default_lng'),
+            'init_zoom' => LibrenmsConfig::get('leaflet.default_zoom'),
+            'init_layer' => LibrenmsConfig::get('geoloc.layer'),
+            'group_radius' => LibrenmsConfig::get('leaflet.group_radius'),
             'status' => '0,1',
             'device_group' => null,
         ];
     }
 
-    public function getView(Request $request)
+    public function getView(Request $request): string|View
     {
         $settings = $this->getSettings();
         $settings['dimensions'] = $request->get('dimensions');
         $settings['status'] = array_map('intval', explode(',', $settings['status']));
         $settings['map_config'] = [
-            'engine' => Config::get('geoloc.engine'),
-            'api_key' => Config::get('geoloc.api_key'),
-            'tile_url' => Config::get('leaflet.tile_url'),
+            'engine' => LibrenmsConfig::get('geoloc.engine'),
+            'api_key' => LibrenmsConfig::get('geoloc.api_key'),
+            'tile_url' => LibrenmsConfig::get('leaflet.tile_url'),
             'lat' => $settings['init_lat'],
             'lng' => $settings['init_lng'],
             'zoom' => $settings['init_zoom'],
             'layer' => $settings['init_layer'],
         ];
 
-        return view('widgets.worldmap', $settings);
-    }
-
-    public function getSettingsView(Request $request)
-    {
-        return view('widgets.settings.worldmap', $this->getSettings(true));
+        return view('widgets.world-map', $settings);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OpenTSDB.php
  *
@@ -26,9 +27,9 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Facades\LibrenmsConfig;
 use App\Polling\Measure\Measurement;
 use Carbon\Carbon;
-use LibreNMS\Config;
 use Log;
 
 class OpenTSDB extends BaseDatastore
@@ -39,8 +40,8 @@ class OpenTSDB extends BaseDatastore
     public function __construct(\Socket\Raw\Factory $socketFactory)
     {
         parent::__construct();
-        $host = Config::get('opentsdb.host');
-        $port = Config::get('opentsdb.port', 2181);
+        $host = LibrenmsConfig::get('opentsdb.host');
+        $port = LibrenmsConfig::get('opentsdb.port', 2181);
         try {
             if (self::isEnabled() && $host && $port) {
                 $this->connection = $socketFactory->createClient("$host:$port");
@@ -56,27 +57,15 @@ class OpenTSDB extends BaseDatastore
         }
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'OpenTSDB';
     }
 
     /**
-     * Datastore-independent function which should be used for all polled metrics.
-     *
-     * RRD Tags:
-     *   rrd_def     RrdDefinition
-     *   rrd_name    array|string: the rrd filename, will be processed with rrd_name()
-     *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
-     *   rrd_step             int: rrd step, defaults to 300
-     *
-     * @param  array  $device
-     * @param  string  $measurement  Name of this measurement
-     * @param  array  $tags  tags for the data (or to control rrdtool)
-     * @param  array|mixed  $fields  The data to update in an associative array, the order must be consistent with rrd_def,
-     *                               single values are allowed and will be paired with $measurement
+     * @inheritDoc
      */
-    public function put($device, $measurement, $tags, $fields)
+    public function write(string $measurement, array $fields, array $tags = [], array $meta = []): void
     {
         if (! $this->connection) {
             Log::error("OpenTSDB Error: not connected\n");
@@ -84,9 +73,8 @@ class OpenTSDB extends BaseDatastore
             return;
         }
 
-        $flag = Config::get('opentsdb.co');
         $timestamp = Carbon::now()->timestamp;
-        $tmp_tags = 'hostname=' . $device['hostname'];
+        $tmp_tags = 'hostname=' . $this->getDevice($meta)->hostname;
 
         foreach ($tags as $k => $v) {
             $v = str_replace([' ', ',', '='], '_', $v);
@@ -98,17 +86,10 @@ class OpenTSDB extends BaseDatastore
         if ($measurement == 'ports') {
             foreach ($fields as $k => $v) {
                 $measurement = $k;
-                if ($flag == true) {
-                    $measurement = $measurement . '.' . $device['co'];
-                }
 
                 $this->putData('port.' . $measurement, $timestamp, $v, $tmp_tags);
             }
         } else {
-            if ($flag == true) {
-                $measurement = $measurement . '.' . $device['co'];
-            }
-
             foreach ($fields as $k => $v) {
                 $tmp_tags_key = $tmp_tags . ' ' . 'key' . '=' . $k;
                 $this->putData($measurement, $timestamp, $v, $tmp_tags_key);
@@ -131,18 +112,8 @@ class OpenTSDB extends BaseDatastore
         }
     }
 
-    public static function isEnabled()
+    public static function isEnabled(): bool
     {
-        return Config::get('opentsdb.enable', false);
-    }
-
-    /**
-     * Checks if the datastore wants rrdtags to be sent when issuing put()
-     *
-     * @return bool
-     */
-    public function wantsRrdTags()
-    {
-        return false;
+        return LibrenmsConfig::get('opentsdb.enable', false);
     }
 }

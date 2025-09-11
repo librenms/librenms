@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SafCfml4.php
  *
@@ -50,7 +51,6 @@ class SafCfm extends OS implements
 
         // all scalar values, so remove the .0
         $data = $response->table(1)[0] ?? [];
-        $entIndex = 1;
 
         $inventory->push(new EntPhysical([
             'entPhysicalIndex' => 1,

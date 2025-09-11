@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -47,10 +48,10 @@ foreach ($rrd_list as $rrd) {
     if (isset($rrd['colour'])) {
         $colour = $rrd['colour'];
     } else {
-        if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+        if (! \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter")) {
             $iter = 0;
         }
-        $colour = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+        $colour = \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter");
         $iter++;
     }
 

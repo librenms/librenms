@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EventlogController.php
  *
@@ -30,7 +31,7 @@ use Illuminate\Http\Request;
 
 class EventlogController extends WidgetController
 {
-    protected $title = 'Eventlog';
+    protected string $name = 'eventlog';
     protected $defaults = [
         'title' => null,
         'device' => null,
@@ -39,17 +40,12 @@ class EventlogController extends WidgetController
         'hidenavigation' => 0,
     ];
 
-    public function getSettingsView(Request $request)
+    public function getSettingsView(Request $request): \Illuminate\View\View
     {
         $data = $this->getSettings(true);
 
         $data['device'] = Device::hasAccess($request->user())->find($data['device']);
 
         return view('widgets.settings.eventlog', $data);
-    }
-
-    public function getView(Request $request)
-    {
-        return view('widgets.eventlog', $this->getSettings());
     }
 }

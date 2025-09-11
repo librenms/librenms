@@ -1,10 +1,11 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
+use LibreNMS\Util\Rewrite;
 
 // Generate a list of ports and then call the multi_bits grapher to generate from the list
 
-$cust_descrs = (array) Config::get('customers_descr', ['cust']);
+$cust_descrs = (array) LibrenmsConfig::get('customers_descr', ['cust']);
 
 $sql = 'SELECT * FROM `ports` AS I, `devices` AS D WHERE `port_descr_descr` = ? AND D.device_id = I.device_id AND `port_descr_type` IN ' . dbGenPlaceholders(count($cust_descrs));
 $param = $cust_descrs;
@@ -18,7 +19,7 @@ foreach (dbFetchRows($sql, $param) as $port) {
             'filename' => $rrd_filename,
             'descr' => $port['hostname'] . '-' . $port['ifDescr'],
             'descr_in' => shorthost($port['hostname']),
-            'descr_out' => makeshortif($port['ifDescr']),
+            'descr_out' => Rewrite::shortenIfName($port['ifDescr']),
         ];
     }
 }

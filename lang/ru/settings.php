@@ -1023,9 +1023,21 @@ return [
                 'description' => 'Имя пользователя',
                 'help' => 'Имя пользователя для подключения к InfluxDB, если требуется',
             ],
+            'batch_size' => [
+                'description' => 'Batch Size',
+                'help' => 'Number of metrics to send in a single batch, 0 means no batching',
+            ],
+            'measurements' => [
+                'description' => 'Measurements',
+                'help' => 'List of measurements to send to InfluxDB, leave empty to send all',
+            ],
             'verifySSL' => [
                 'description' => 'Проверка SSL',
                 'help' => 'Проверяет, что SSL-сертификат действителен и доверен',
+            ],
+            'debug' => [
+                'description' => 'Debug',
+                'help' => 'To enable or disable verbose output to CLI',
             ],
         ],
         'influxdbv2' => [
@@ -1134,7 +1146,7 @@ return [
         'nfsen_top_default' => [
             'description' => 'Топ N по умолчанию',
         ],
-        'nfsen_stat_default' => [
+        'nfsen_stats_default' => [
             'description' => 'Статистика по умолчанию',
         ],
         'nfsen_order_default' => [
@@ -1317,6 +1329,9 @@ return [
             'ospf' => [
                 'description' => 'OSPF',
             ],
+            'ospfv3' => [
+                'description' => 'OSPFv3',
+            ],
             'isis' => [
                 'description' => 'ISIS',
             ],
@@ -1343,9 +1358,6 @@ return [
             ],
             'cisco-ace-serverfarms' => [
                 'description' => 'Серверные фермы Cisco ACE',
-            ],
-            'cisco-asa-firewall' => [
-                'description' => 'Firewall Cisco ASA',
             ],
             'cisco-cbqos' => [
                 'description' => 'Cisco CBQOS',

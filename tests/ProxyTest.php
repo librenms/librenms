@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ProxyTest.php
  *
@@ -22,7 +23,7 @@
 
 namespace LibreNMS\Tests;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\Http;
 use LibreNMS\Util\Version;
 
@@ -35,9 +36,9 @@ class ProxyTest extends TestCase
 
     public function testProxyIsNotSet(): void
     {
-        Config::set('http_proxy', '');
-        Config::set('https_proxy', '');
-        Config::set('no_proxy', '');
+        LibrenmsConfig::set('http_proxy', '');
+        LibrenmsConfig::set('https_proxy', '');
+        LibrenmsConfig::set('no_proxy', '');
         $client_options = Http::client()->getOptions();
         $this->assertEmpty($client_options['proxy']['http']);
         $this->assertEmpty($client_options['proxy']['https']);
@@ -46,9 +47,9 @@ class ProxyTest extends TestCase
 
     public function testProxyIsSet(): void
     {
-        Config::set('http_proxy', 'http://proxy:5000');
-        Config::set('https_proxy', 'tcp://proxy:5183');
-        Config::set('no_proxy', 'localhost,127.0.0.1,::1,.domain.com');
+        LibrenmsConfig::set('http_proxy', 'http://proxy:5000');
+        LibrenmsConfig::set('https_proxy', 'tcp://proxy:5183');
+        LibrenmsConfig::set('no_proxy', 'localhost,127.0.0.1,::1,.domain.com');
         $client_options = Http::client()->getOptions();
         $this->assertEquals('http://proxy:5000', $client_options['proxy']['http']);
         $this->assertEquals('tcp://proxy:5183', $client_options['proxy']['https']);
@@ -62,9 +63,9 @@ class ProxyTest extends TestCase
 
     public function testProxyIsSetFromEnv(): void
     {
-        Config::set('http_proxy', '');
-        Config::set('https_proxy', '');
-        Config::set('no_proxy', '');
+        LibrenmsConfig::set('http_proxy', '');
+        LibrenmsConfig::set('https_proxy', '');
+        LibrenmsConfig::set('no_proxy', '');
 
         putenv('HTTP_PROXY=someproxy:3182');
         putenv('HTTPS_PROXY=https://someproxy:3182');

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * PortsController.php
  *
@@ -25,6 +26,7 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Link;
 use App\Models\Port;
@@ -36,7 +38,6 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class PortsController implements DeviceTab
@@ -107,7 +108,7 @@ class PortsController implements DeviceTab
                 $this->getTabs($device),
                 __('Graphs') => $this->getGraphLinks(),
             ],
-            'page_links' => $this->pageLinks($request),
+            'dropdownLinks' => $this->pageLinks($request),
             'perPage' => $this->settings['perPage'],
             'sort' => $this->settings['sort'],
             'next_order' => $this->settings['order'] == 'asc' ? 'desc' : 'asc',
@@ -289,6 +290,10 @@ class PortsController implements DeviceTab
             $tabs[] = ['name' => __('port.tabs.arp'), 'url' => 'arp'];
         }
 
+        if ($device->nd()->exists()) {
+            $tabs[] = ['name' => __('port.tabs.nd'), 'url' => 'nd'];
+        }
+
         if ($device->portsFdb()->exists()) {
             $tabs[] = ['name' => __('port.tabs.fdb'), 'url' => 'fdb'];
         }
@@ -340,7 +345,7 @@ class PortsController implements DeviceTab
             ],
         ];
 
-        if (Config::get('enable_ports_etherlike')) {
+        if (LibrenmsConfig::get('enable_ports_etherlike')) {
             $graph_links[] = [
                 'name' => __('port.graphs.etherlike'),
                 'url' => 'graphs?type=etherlike',

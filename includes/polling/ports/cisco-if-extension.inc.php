@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -47,6 +48,6 @@ if (isset($this_port['cieIfInRuntsErrs'])) {
      * Generate/update RRD
      */
     $ifName = $port['ifName'];
-    $tags = compact('ifName', 'rrd_name', 'rrd_def');
-    data_update($device, 'drops', $tags, $rrd_data);
+    $tags = ['ifName' => $ifName, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
+    app('Datastore')->put($device, 'drops', $tags, $rrd_data);
 }

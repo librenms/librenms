@@ -24,8 +24,4 @@ foreach ($log_files as $index => $log_file) {
     ];
 }
 
-if (sizeof($rrd_list)) {
-    d_echo('No relevant log file RRDs found');
-}
-
 require 'includes/html/graphs/generic_multi_line.inc.php';

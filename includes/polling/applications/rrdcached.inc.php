@@ -1,4 +1,5 @@
 <?php
+
 /**
  * rrdcached.inc.php
  *
@@ -46,7 +47,7 @@ if ($agent_data['app'][$name]) {
         $data = str_replace("<<<rrdcached>>>\n", '', $data);
     }
     if (strlen($data) < 100) {
-        $socket = \LibreNMS\Config::get('rrdcached');
+        $socket = \App\Facades\LibrenmsConfig::get('rrdcached');
         if (substr($socket, 0, 6) == 'unix:/') {
             $socket_file = substr($socket, 5);
             if (file_exists($socket_file)) {
@@ -99,7 +100,7 @@ $tags = [
     'rrd_name' => ['app', $name, $app->app_id],
     'rrd_def' => $rrd_def,
 ];
-data_update($device, 'app', $tags, $fields);
+app('Datastore')->put($device, 'app', $tags, $fields);
 update_application($app, $data, $fields);
 
 unset($data, $rrd_def, $fields, $tags);

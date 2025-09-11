@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS module to display Cisco Class-Based QoS Details
  *
@@ -36,7 +37,7 @@ foreach ($components as $id => $array) {
             }
 
             // Grab a color from the array.
-            $color = \LibreNMS\Config::get("graph_colours.mixed.$count", \LibreNMS\Config::get('graph_colours.oranges.' . ($count - 7)));
+            $color = \App\Facades\LibrenmsConfig::get("graph_colours.mixed.$count", \App\Facades\LibrenmsConfig::get('graph_colours.oranges.' . ($count - 7)));
 
             $rrd_additions .= ' DEF:DS' . $count . '=' . $rrd_filename . ':count:AVERAGE ';
             $rrd_additions .= ' AREA:DS' . $count . '#' . $color . ":'" . str_pad(substr($components[$id]['label'], 0, 15), 15) . "'" . $stack;

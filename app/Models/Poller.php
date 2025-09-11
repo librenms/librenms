@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Widget.php
  *
@@ -38,14 +39,14 @@ class Poller extends Model
 
     public function scopeIsInactive(Builder $query): Builder
     {
-        $default = (int) \LibreNMS\Config::get('rrd.step');
+        $default = (int) \App\Facades\LibrenmsConfig::get('rrd.step');
 
         return $query->where('last_polled', '<', \DB::raw("DATE_SUB(NOW(),INTERVAL $default SECOND)"));
     }
 
     public function scopeIsActive(Builder $query): Builder
     {
-        $default = (int) \LibreNMS\Config::get('rrd.step');
+        $default = (int) \App\Facades\LibrenmsConfig::get('rrd.step');
 
         return $query->where('last_polled', '>=', \DB::raw("DATE_SUB(NOW(),INTERVAL $default SECOND)"));
     }

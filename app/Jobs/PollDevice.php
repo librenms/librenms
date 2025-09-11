@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Events\DevicePolled;
 use App\Events\PollingDevice;
+use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
 use App\Polling\Measure\MeasurementManager;
@@ -14,7 +15,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 use LibreNMS\OS;
 use LibreNMS\Polling\ConnectivityHelper;
@@ -30,7 +30,7 @@ class PollDevice implements ShouldQueue
     private ?\App\Models\Device $device = null;
     private ?array $deviceArray = null;
     /**
-     * @var \LibreNMS\OS|\LibreNMS\OS\Generic
+     * @var OS|OS\Generic
      */
     private $os;
 
@@ -47,7 +47,7 @@ class PollDevice implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle()
+    public function handle(): void
     {
         $this->initDevice();
         PollingDevice::dispatch($this->device);
@@ -90,14 +90,14 @@ class PollDevice implements ShouldQueue
             $measurement->getDuration()));
 
         // add log file line, this is used by the simple python dispatcher watchdog
-        Log::channel('single')->alert(sprintf('INFO: device:poll %s (%s) polled in %0.3fs',
+        Log::channel('log_file')->alert(sprintf('INFO: device:poll %s (%s) polled in %0.3fs',
             $this->device->hostname,
             $this->device->device_id,
             $measurement->getDuration()));
 
         // check if the poll took too long and log an event
-        if ($measurement->getDuration() > Config::get('rrd.step')) {
-            Eventlog::log('Polling took longer than ' . round(Config::get('rrd.step') / 60, 2) .
+        if ($measurement->getDuration() > LibrenmsConfig::get('rrd.step')) {
+            Eventlog::log('Polling took longer than ' . round(LibrenmsConfig::get('rrd.step') / 60, 2) .
                 ' minutes!  This will cause gaps in graphs.', $this->device, 'system', Severity::Error);
         }
 
@@ -133,14 +133,18 @@ class PollDevice implements ShouldQueue
                     Log::debug($module_status);
 
                     if (is_array($status)) {
-                        Config::set('poller_submodules.' . $module, $status);
+                        LibrenmsConfig::set('poller_submodules.' . $module, $status);
                     }
 
                     $instance->poll($this->os, $datastore);
                 }
             } catch (Throwable $e) {
+                // Re-throw exception if we're in running tests
+                if (defined('PHPUNIT_RUNNING')) {
+                    throw $e;
+                }
+
                 // isolate module exceptions so they don't disrupt the polling process
-                Log::error("%rError polling $module module for {$this->device->hostname}.%n $e", ['color' => true]);
                 Eventlog::log("Error polling $module module. Check log file for more details.", $this->device, 'poller', Severity::Error);
                 report($e);
             }
@@ -178,7 +182,7 @@ class PollDevice implements ShouldQueue
         $this->device->ip = $this->device->overwrite_ip ?: Dns::lookupIp($this->device) ?: $this->device->ip;
 
         $this->deviceArray = $this->device->toArray();
-        if ($os_group = Config::get("os.{$this->device->os}.group")) {
+        if ($os_group = LibrenmsConfig::get("os.{$this->device->os}.group")) {
             $this->deviceArray['os_group'] = $os_group;
         }
 
@@ -189,7 +193,7 @@ class PollDevice implements ShouldQueue
     private function initRrdDirectory(): void
     {
         $host_rrd = \Rrd::name($this->device->hostname, '', '');
-        if (Config::get('rrd.enable', true) && ! is_dir($host_rrd)) {
+        if (LibrenmsConfig::get('rrd.enable', true) && ! is_dir($host_rrd)) {
             try {
                 mkdir($host_rrd);
                 Log::info("Created directory : $host_rrd");
@@ -203,12 +207,12 @@ class PollDevice implements ShouldQueue
     private function printDeviceInfo(?string $group): void
     {
         Log::info(sprintf(<<<'EOH'
-Hostname:  %s %s
+Hostname:  %s %s %s
 ID:        %s
 OS:        %s
 IP:        %s
 
-EOH, $this->device->hostname, $group ? " ($group)" : '', $this->device->device_id, $this->device->os, $this->device->ip));
+EOH, $this->device->hostname, $group ? "($group)" : '', $this->device->status ? '' : '%RDOWN%n', $this->device->device_id, $this->device->os, $this->device->ip), ['color' => true]);
     }
 
     private function recordPerformance(Measurement $measurement): void
@@ -229,11 +233,21 @@ EOH, $this->device->hostname, $group ? " ($group)" : '', $this->device->device_i
 
     private function getModules(): array
     {
-        if (! empty($this->module_overrides)) {
-            return $this->module_overrides;
+        $default_modules = LibrenmsConfig::get('poller_modules', []);
+
+        if (empty($this->module_overrides)) {
+            return $default_modules;
         }
 
-        return \LibreNMS\Config::get('poller_modules', []);
+        // ensure order of modules, preserve submodules
+        $ordered_modules = [];
+        foreach ($default_modules as $module => $enabled) {
+            if (isset($this->module_overrides[$module])) {
+                $ordered_modules[$module] = $this->module_overrides[$module];
+            }
+        }
+
+        return $ordered_modules;
     }
 
     private function isModuleManuallyEnabled(string $module): ?bool

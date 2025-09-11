@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ServicesController.php
  *
@@ -33,7 +34,7 @@ class ServicesController implements DeviceTab
 {
     public function visible(Device $device): bool
     {
-        return (bool) \LibreNMS\Config::get('show_services') && $device->services()->exists();
+        return (bool) \App\Facades\LibrenmsConfig::get('show_services') && $device->services()->exists();
     }
 
     public function slug(): string

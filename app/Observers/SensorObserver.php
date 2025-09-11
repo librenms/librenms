@@ -2,25 +2,25 @@
 
 namespace App\Observers;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use App\Models\Sensor;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 
 class SensorObserver
 {
-    private bool $runningInConsole;
+    private bool $consoleOutputEnabled;
 
     public function __construct(Application $app)
     {
-        $this->runningInConsole = $app->runningInConsole();
+        $this->consoleOutputEnabled = $app->runningInConsole() && ! $app->runningUnitTests();
     }
 
     public function saving(Sensor $sensor): void
     {
-        if ($this->runningInConsole && ! $sensor->isDirty()) {
+        if ($this->consoleOutputEnabled && ! $sensor->isDirty()) {
             echo '.';
         }
     }
@@ -35,7 +35,7 @@ class SensorObserver
             [$sensor->sensor_limit_warn, $sensor->sensor_limit_low_warn] = [$sensor->sensor_limit_low_warn, $sensor->sensor_limit_warn];
         }
 
-        if (Config::get('sensors.guess_limits') && $sensor->sensor_current !== null) {
+        if (LibrenmsConfig::get('sensors.guess_limits') && $sensor->sensor_current !== null) {
             $sensor->guessLimits($sensor->sensor_limit === null, $sensor->sensor_limit_low === null);
         }
 
@@ -55,10 +55,10 @@ class SensorObserver
      */
     public function created(Sensor $sensor): void
     {
-        EventLog::log('Sensor Added: ' . $sensor->sensor_class . ' ' . $sensor->sensor_type . ' ' . $sensor->sensor_index . ' ' . $sensor->sensor_descr, $sensor->device_id, 'sensor', Severity::Notice, $sensor->sensor_id);
+        Eventlog::log('Sensor Added: ' . $sensor->sensor_class . ' ' . $sensor->sensor_type . ' ' . $sensor->sensor_index . ' ' . $sensor->sensor_descr, $sensor->device_id, 'sensor', Severity::Notice, $sensor->sensor_id);
         Log::info("$sensor->sensor_descr: Cur $sensor->sensor_current, Low: $sensor->sensor_limit_low, Low Warn: $sensor->sensor_limit_low_warn, Warn: $sensor->sensor_limit_warn, High: $sensor->sensor_limit");
 
-        if ($this->runningInConsole) {
+        if ($this->consoleOutputEnabled) {
             echo '+';
         }
     }
@@ -66,7 +66,7 @@ class SensorObserver
     /**
      * Handle the Stp "updating" event.
      *
-     * @param  \App\Models\Sensor  $sensor
+     * @param  Sensor  $sensor
      * @return void
      */
     public function updating(Sensor $sensor)
@@ -100,51 +100,51 @@ class SensorObserver
         // log limit changes
         if ($sensor->sensor_custom == 'No') {
             if ($sensor->isDirty('sensor_limit')) {
-                EventLog::log('Sensor High Limit Updated: ' . $sensor->sensor_class . ' ' . $sensor->sensor_type . ' ' . $sensor->sensor_index . ' ' . $sensor->sensor_descr . ' (' . $sensor->sensor_limit . ')', $sensor->device_id, 'sensor', Severity::Notice, $sensor->sensor_id);
+                Eventlog::log('Sensor High Limit Updated: ' . $sensor->sensor_class . ' ' . $sensor->sensor_type . ' ' . $sensor->sensor_index . ' ' . $sensor->sensor_descr . ' (' . $sensor->sensor_limit . ')', $sensor->device_id, 'sensor', Severity::Notice, $sensor->sensor_id);
 
-                if ($this->runningInConsole) {
+                if ($this->consoleOutputEnabled) {
                     echo 'H';
                 }
             }
 
             if ($sensor->isDirty('sensor_limit_low')) {
-                EventLog::log('Sensor Low Limit Updated: ' . $sensor->sensor_class . ' ' . $sensor->sensor_type . ' ' . $sensor->sensor_index . ' ' . $sensor->sensor_descr . ' (' . $sensor->sensor_limit_low . ')', $sensor->device_id, 'sensor', Severity::Notice, $sensor->sensor_id);
+                Eventlog::log('Sensor Low Limit Updated: ' . $sensor->sensor_class . ' ' . $sensor->sensor_type . ' ' . $sensor->sensor_index . ' ' . $sensor->sensor_descr . ' (' . $sensor->sensor_limit_low . ')', $sensor->device_id, 'sensor', Severity::Notice, $sensor->sensor_id);
 
-                if ($this->runningInConsole) {
+                if ($this->consoleOutputEnabled) {
                     echo 'L';
                 }
             }
 
             if ($sensor->isDirty('sensor_limit_warn')) {
-                EventLog::log('Sensor Warn High Limit Updated: ' . $sensor->sensor_class . ' ' . $sensor->sensor_type . ' ' . $sensor->sensor_index . ' ' . $sensor->sensor_descr . ' (' . $sensor->sensor_limit_warn . ')', $sensor->device_id, 'sensor', Severity::Notice, $sensor->sensor_id);
+                Eventlog::log('Sensor Warn High Limit Updated: ' . $sensor->sensor_class . ' ' . $sensor->sensor_type . ' ' . $sensor->sensor_index . ' ' . $sensor->sensor_descr . ' (' . $sensor->sensor_limit_warn . ')', $sensor->device_id, 'sensor', Severity::Notice, $sensor->sensor_id);
 
-                if ($this->runningInConsole) {
+                if ($this->consoleOutputEnabled) {
                     echo 'WH';
                 }
             }
 
             if ($sensor->isDirty('sensor_limit_low_warn')) {
-                EventLog::log('Sensor Warn Low Limit Updated: ' . $sensor->sensor_class . ' ' . $sensor->sensor_type . ' ' . $sensor->sensor_index . ' ' . $sensor->sensor_descr . ' (' . $sensor->sensor_limit_low_warn . ')', $sensor->device_id, 'sensor', Severity::Notice, $sensor->sensor_id);
+                Eventlog::log('Sensor Warn Low Limit Updated: ' . $sensor->sensor_class . ' ' . $sensor->sensor_type . ' ' . $sensor->sensor_index . ' ' . $sensor->sensor_descr . ' (' . $sensor->sensor_limit_low_warn . ')', $sensor->device_id, 'sensor', Severity::Notice, $sensor->sensor_id);
 
-                if ($this->runningInConsole) {
+                if ($this->consoleOutputEnabled) {
                     echo 'WL';
                 }
             }
         }
 
-        if ($this->runningInConsole) {
+        if ($this->consoleOutputEnabled) {
             echo 'U';
         }
 
         // only post eventlog when relevant columns change
         if ($sensor->isDirty(['sensor_class', 'sensor_oid', 'sensor_index', 'sensor_type', 'sensor_descr', 'group', 'sensor_divisor', 'sensor_multiplier', 'entPhysicalIndex', 'entPhysicalIndex_measured', 'user_func'])) {
-            EventLog::log('Sensor Updated: ' . $sensor->sensor_class . ' ' . $sensor->sensor_type . ' ' . $sensor->sensor_index . ' ' . $sensor->sensor_descr, $sensor->device_id, 'sensor', Severity::Notice, $sensor->sensor_id);
+            Eventlog::log('Sensor Updated: ' . $sensor->sensor_class . ' ' . $sensor->sensor_type . ' ' . $sensor->sensor_index . ' ' . $sensor->sensor_descr, $sensor->device_id, 'sensor', Severity::Notice, $sensor->sensor_id);
         }
     }
 
     public function deleted(): void
     {
-        if ($this->runningInConsole) {
+        if ($this->consoleOutputEnabled) {
             echo '-';
         }
     }

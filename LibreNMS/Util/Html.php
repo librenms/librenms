@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Html.php
  *
@@ -25,8 +26,9 @@
 
 namespace LibreNMS\Util;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\PowerState;
+use LibreNMS\Enum\Severity;
 
 class Html
 {
@@ -87,7 +89,7 @@ class Html
                 $graph_array['width'] = '215';
             }
 
-            $periods = Config::get('graphs.mini.widescreen');
+            $periods = LibrenmsConfig::get('graphs.mini.widescreen');
         } else {
             if (! array_key_exists('height', $graph_array)) {
                 $graph_array['height'] = '100';
@@ -97,7 +99,7 @@ class Html
                 $graph_array['width'] = '215';
             }
 
-            $periods = Config::get('graphs.mini.normal');
+            $periods = LibrenmsConfig::get('graphs.mini.normal');
         }
 
         $screen_width = session('screen_width');
@@ -115,7 +117,7 @@ class Html
 
         $graph_data = [];
         foreach ($periods as $period => $period_text) {
-            $graph_array['from'] = Config::get("time.$period");
+            $graph_array['from'] = LibrenmsConfig::get("time.$period");
             $graph_array_zoom = $graph_array;
             $graph_array_zoom['height'] = '150';
             $graph_array_zoom['width'] = '400';
@@ -183,5 +185,19 @@ class Html
             default:
                 return ['UNKNOWN', 'label-default'];
         }
+    }
+
+    public static function severityToLabel(Severity $severity, string $text): string
+    {
+        $state_label = match ($severity) {
+            Severity::Ok => 'label-success',
+            Severity::Info => 'label-info',
+            Severity::Notice => 'label-primary',
+            Severity::Warning => 'label-warning',
+            Severity::Error => 'label-danger',
+            default => 'label-default',
+        };
+
+        return "<span class=\"label $state_label\">$text</span>";
     }
 }

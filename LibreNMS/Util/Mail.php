@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Mail.php
  *
@@ -25,7 +26,7 @@
 
 namespace LibreNMS\Util;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\RrdGraphException;
 use PHPMailer\PHPMailer\PHPMailer;
 
@@ -48,7 +49,7 @@ class Mail
                     $result[$out[2][0]] = $out[1][0];
                 } else {
                     if (strpos($email, '@')) {
-                        $from_name = Config::get('email_user');
+                        $from_name = LibrenmsConfig::get('email_user');
                         $result[$email] = $from_name;
                     }
                 }
@@ -81,43 +82,49 @@ class Mail
             $mail = new PHPMailer(true);
             $mail->Hostname = php_uname('n');
 
-            foreach (self::parseEmails(Config::get('email_from')) as $from => $from_name) {
+            foreach (self::parseEmails(LibrenmsConfig::get('email_from')) as $from => $from_name) {
                 $mail->setFrom($from, $from_name);
             }
 
             // add addresses
-            $addMethod = $bcc ? 'addBcc' : 'addAddress';
+            $addMethod = $bcc ? 'addBCC' : 'addAddress';
             foreach ($emails as $email => $email_name) {
                 $mail->$addMethod($email, $email_name);
             }
 
             $mail->Subject = $subject;
-            $mail->XMailer = Config::get('project_name');
+            $mail->XMailer = LibrenmsConfig::get('project_name');
             $mail->CharSet = 'utf-8';
             $mail->WordWrap = 76;
             $mail->Body = $message;
-            if ($embedGraphs ?? Config::get('email_attach_graphs')) {
+            if ($embedGraphs ?? LibrenmsConfig::get('email_attach_graphs')) {
                 self::embedGraphs($mail, $html);
             }
             if ($html) {
                 $mail->isHTML();
             }
-            switch (strtolower(trim(Config::get('email_backend')))) {
+            switch (strtolower(trim(LibrenmsConfig::get('email_backend')))) {
                 case 'sendmail':
                     $mail->Mailer = 'sendmail';
-                    $mail->Sendmail = Config::get('email_sendmail_path');
+                    $mail->Sendmail = LibrenmsConfig::get('email_sendmail_path');
                     break;
                 case 'smtp':
                     $mail->isSMTP();
-                    $mail->Host = Config::get('email_smtp_host');
-                    $mail->Timeout = Config::get('email_smtp_timeout');
-                    $mail->SMTPAuth = Config::get('email_smtp_auth');
-                    $mail->SMTPSecure = Config::get('email_smtp_secure');
-                    $mail->Port = Config::get('email_smtp_port');
-                    $mail->Username = Config::get('email_smtp_username');
-                    $mail->Password = Config::get('email_smtp_password');
-                    $mail->SMTPAutoTLS = Config::get('email_auto_tls');
+                    $mail->Host = LibrenmsConfig::get('email_smtp_host');
+                    $mail->Timeout = LibrenmsConfig::get('email_smtp_timeout');
+                    $mail->SMTPAuth = LibrenmsConfig::get('email_smtp_auth');
+                    $mail->SMTPSecure = LibrenmsConfig::get('email_smtp_secure');
+                    $mail->Port = LibrenmsConfig::get('email_smtp_port');
+                    $mail->Username = LibrenmsConfig::get('email_smtp_username');
+                    $mail->Password = LibrenmsConfig::get('email_smtp_password');
+                    $mail->SMTPAutoTLS = LibrenmsConfig::get('email_auto_tls');
                     $mail->SMTPDebug = 0;
+                    $mail->SMTPOptions = [
+                        'ssl' => [
+                            'verify_peer' => LibrenmsConfig::get('email_smtp_verifypeer', true),
+                            'allow_self_signed' => LibrenmsConfig::get('email_smtp_allowselfsigned', false),
+                        ],
+                    ];
                     break;
                 default:
                     $mail->Mailer = 'mail';

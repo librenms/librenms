@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Pulse.php
  *
@@ -28,12 +29,13 @@ namespace LibreNMS\OS;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
+use SnmpQuery;
 
 class Pulse extends \LibreNMS\OS implements OSPolling
 {
     public function pollOS(DataStorageInterface $datastore): void
     {
-        $users = snmp_get($this->getDeviceArray(), 'iveConcurrentUsers.0', '-OQv', 'PULSESECURE-PSG-MIB');
+        $users = SnmpQuery::get('PULSESECURE-PSG-MIB::iveConcurrentUsers.0')->value();
 
         if (is_numeric($users)) {
             $rrd_def = RrdDefinition::make()->addDataset('users', 'GAUGE', 0);
@@ -42,7 +44,7 @@ class Pulse extends \LibreNMS\OS implements OSPolling
                 'users' => $users,
             ];
 
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'pulse_users', $tags, $fields);
             $this->enableGraph('pulse_users');
         }

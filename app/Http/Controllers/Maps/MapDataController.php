@@ -1,4 +1,5 @@
 <?php
+
 /**
  * MapDataController.php
  *
@@ -26,6 +27,7 @@
 
 namespace App\Http\Controllers\Maps;
 
+use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use App\Models\AlertSchedule;
 use App\Models\Device;
@@ -36,7 +38,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Config;
 
 class MapDataController extends Controller
 {
@@ -359,7 +360,7 @@ class MapDataController extends Controller
         }
     }
 
-    protected function linkSpeedWidth(int|null $speed): int
+    protected function linkSpeedWidth(?int $speed): int
     {
         $speed /= 10000000;
         if (is_nan($speed)) {
@@ -382,7 +383,7 @@ class MapDataController extends Controller
             $link_pct = 0;
         }
 
-        return Config::get("network_map_legend.$link_pct", '#000000');
+        return LibrenmsConfig::get("network_map_legend.$link_pct", '#000000');
     }
 
     protected function nodeDisabledStyle(): array
@@ -390,10 +391,10 @@ class MapDataController extends Controller
         return [
             'color' => [
                 'highlight' => [
-                    'background' => Config::get('network_map_legend.di.node'),
+                    'background' => LibrenmsConfig::get('network_map_legend.di.node'),
                 ],
-                'border' => Config::get('network_map_legend.di.border'),
-                'background' => Config::get('network_map_legend.di.node'),
+                'border' => LibrenmsConfig::get('network_map_legend.di.border'),
+                'background' => LibrenmsConfig::get('network_map_legend.di.node'),
             ],
             'borderWidth' => null,
         ];
@@ -404,11 +405,11 @@ class MapDataController extends Controller
         return [
             'color' => [
                 'highlight' => [
-                    'border' => Config::get('network_map_legend.highlight.border'),
+                    'border' => LibrenmsConfig::get('network_map_legend.highlight.border'),
                 ],
-                'border' => Config::get('network_map_legend.highlight.border'),
+                'border' => LibrenmsConfig::get('network_map_legend.highlight.border'),
             ],
-            'borderWidth' => Config::get('network_map_legend.highlight.borderWidth'),
+            'borderWidth' => LibrenmsConfig::get('network_map_legend.highlight.borderWidth'),
         ];
     }
 
@@ -417,11 +418,11 @@ class MapDataController extends Controller
         return [
             'color' => [
                 'highlight' => [
-                    'background' => Config::get('network_map_legend.dn.node'),
-                    'border' => Config::get('network_map_legend.dn.border'),
+                    'background' => LibrenmsConfig::get('network_map_legend.dn.node'),
+                    'border' => LibrenmsConfig::get('network_map_legend.dn.border'),
                 ],
-                'border' => Config::get('network_map_legend.dn.border'),
-                'background' => Config::get('network_map_legend.dn.node'),
+                'border' => LibrenmsConfig::get('network_map_legend.dn.border'),
+                'background' => LibrenmsConfig::get('network_map_legend.dn.node'),
             ],
             'borderWidth' => null,
         ];
@@ -674,9 +675,9 @@ class MapDataController extends Controller
                             'dashes' => [8, 12],
                             'width' => $width,
                             'color' => [
-                                'border' => Config::get('network_map_legend.dn.border'),
-                                'highlight' => Config::get('network_map_legend.dn.edge'),
-                                'color' => Config::get('network_map_legend.dn.edge'),
+                                'border' => LibrenmsConfig::get('network_map_legend.dn.border'),
+                                'highlight' => LibrenmsConfig::get('network_map_legend.dn.edge'),
+                                'color' => LibrenmsConfig::get('network_map_legend.dn.edge'),
                             ],
                         ];
                     } elseif ($port->ifOperStatus == 'down' || $remote_port->ifOperStatus == 'down') {
@@ -685,9 +686,9 @@ class MapDataController extends Controller
                             'dashes' => [8, 12],
                             'width' => $width,
                             'color' => [
-                                'border' => Config::get('network_map_legend.dn.border'),
-                                'highlight' => Config::get('network_map_legend.dn.edge'),
-                                'color' => Config::get('network_map_legend.dn.edge'),
+                                'border' => LibrenmsConfig::get('network_map_legend.dn.border'),
+                                'highlight' => LibrenmsConfig::get('network_map_legend.dn.edge'),
+                                'color' => LibrenmsConfig::get('network_map_legend.dn.edge'),
                             ],
                         ];
                     } else {
@@ -793,8 +794,8 @@ class MapDataController extends Controller
                 'device_name' => $service->device->shortDisplayName(),
                 'url' => \Blade::render('<x-device-link-map :device="$device" />', ['device' => $service->device]),
                 'updowntime' => $updowntime,
-                'compact' => Config::get('webui.availability_map_compact'),
-                'box_size' => Config::get('webui.availability_map_box_size'),
+                'compact' => LibrenmsConfig::get('webui.availability_map_compact'),
+                'box_size' => LibrenmsConfig::get('webui.availability_map_box_size'),
             ];
         }
 

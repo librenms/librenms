@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SnmpResponse.php
  *
@@ -25,10 +26,10 @@
 
 namespace LibreNMS\Data\Source;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Util\Oid;
 use Log;
 
@@ -105,6 +106,8 @@ class SnmpResponse
         }
 
         $oids = Arr::wrap($oids);
+
+        // search for an exact match
         foreach ($oids as $oid) {
             if ($forceNumeric) {
                 // translate all to numeric to make it easier to match
@@ -113,6 +116,15 @@ class SnmpResponse
 
             if (isset($values[$oid]) && $values[$oid] !== '') {
                 return $values[$oid];
+            }
+
+            // if this is a textual oid without an index, match the first one at any index
+            if (! preg_match('/[.[]\d+]?$/', $oid)) {
+                foreach ($values as $key => $value) {
+                    if (preg_match('/^' . preg_quote($oid, '/') . '[.[]/', $key) && $value !== '') {
+                        return $value;
+                    }
+                }
             }
         }
 
@@ -139,7 +151,7 @@ class SnmpResponse
         $this->values = [];
         $line = strtok($this->raw, PHP_EOL);
         while ($line !== false) {
-            if (Str::contains($line, ['at this OID', 'this MIB View', 'End of MIB'])) {
+            if (Str::contains($line, ['at this OID', 'this MIB View', 'End of MIB']) || str_ends_with($line, ' = NULL')) {
                 // these occur when we seek past the end of data, usually the end of the response, but grab the next line and continue
                 $line = strtok(PHP_EOL);
                 continue;
@@ -158,7 +170,7 @@ class SnmpResponse
             }
 
             // remove extra escapes
-            if (Config::get('snmp.unescape')) {
+            if (LibrenmsConfig::get('snmp.unescape')) {
                 $value = stripslashes($value);
             }
 
@@ -175,18 +187,18 @@ class SnmpResponse
 
     /**
      * Create a key to value pair for an OID
-     * Only works for single indexed tables
      * You may omit $oid if there is only one $oid in the walk
      */
     public function pluck(?string $oid = null): array
     {
         $output = [];
         $oid = $oid ?? '[a-zA-Z0-9:.-]+';
-        $regex = "/^{$oid}[[.](\d+)]?$/";
+        $regex = "/^{$oid}[[.]([\d.[\]]+?)]?$/";
 
         foreach ($this->values() as $key => $value) {
             if (preg_match($regex, $key, $matches)) {
-                $output[$matches[1]] = $value;
+                $output_key = str_replace('][', '.', $matches[1]);
+                $output[$output_key] = $value;
             }
         }
 
@@ -285,12 +297,14 @@ class SnmpResponse
      * Filter bad lines from the raw output, examples:
      * "No Such Instance currently exists at this OID"
      * "No more variables left in this MIB View (It is past the end of the MIB tree)"
+     * oidName = NULL
      */
     public function getRawWithoutBadLines(): string
     {
         return (string) preg_replace([
-            '/^.*No Such Instance currently exists.*$/m',
-            '/(\n[^\r\n]+No more variables left[^\r\n]+)+$/',
+            '/^.*No Such (Instance currently exists|Object available on this agent at this OID).*$/m',
+            '/(\n[^\r\n]+No more variables left[^\r\n]+)+$/m',
+            '/^.* = NULL[\r\n]*$/',
         ], '', $this->raw);
     }
 

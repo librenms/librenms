@@ -28,7 +28,7 @@ class UserPolicy
     public function create(User $user): ?bool
     {
         // if not mysql, forbid, otherwise defer to bouncer
-        if (\LibreNMS\Config::get('auth_mechanism') != 'mysql') {
+        if (\App\Facades\LibrenmsConfig::get('auth_mechanism') != 'mysql') {
             return false;
         }
 
@@ -41,7 +41,7 @@ class UserPolicy
      * @param  User  $user
      * @param  User  $target
      */
-    public function update(User $user, User $target = null): ?bool
+    public function update(User $user, ?User $target = null): ?bool
     {
         if ($target == null) {
             return null;

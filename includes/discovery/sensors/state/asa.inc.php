@@ -1,4 +1,5 @@
 <?php
+
 /*
  * asa.inc.php
  *
@@ -54,9 +55,6 @@ if (is_array($temp)) {
 
             //Discover Sensors
             discover_sensor(null, 'state', $device, $cur_oid . $oid_index, $oid_index, $state_name, $descr, 1, 1, null, null, null, null, $sensor_value, 'snmp', $oid_index);
-
-            //Create Sensor To State Index
-            create_sensor_to_state_index($device, $state_name, $oid_index);
         }
     }
 }

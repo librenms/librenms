@@ -9,19 +9,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use LibreNMS\Authentication\LegacyAuth;
 use NotificationChannels\WebPush\HasPushSubscriptions;
 use Permissions;
-use Silber\Bouncer\BouncerFacade as Bouncer;
-use Silber\Bouncer\Database\HasRolesAndAbilities;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @method static \Database\Factories\UserFactory factory(...$parameters)
  */
 class User extends Authenticatable
 {
-    use HasRolesAndAbilities, Notifiable, HasFactory, HasPushSubscriptions;
+    use HasFactory;
+    use HasPushSubscriptions;
+    use HasRoles;
+    use Notifiable;
 
     protected $primaryKey = 'user_id';
     protected $fillable = ['realname', 'username', 'email', 'descr', 'can_modify_passwd', 'auth_type', 'auth_id', 'enabled'];
@@ -35,12 +38,18 @@ class User extends Authenticatable
         'created' => UserCreated::class,
     ];
 
-    protected $casts = [
-        'realname' => 'string',
-        'descr' => 'string',
-        'email' => 'string',
-        'can_modify_passwd' => 'integer',
-    ];
+    /**
+     * @return array{realname: 'string', descr: 'string', email: 'string', can_modify_passwd: 'integer'}
+     */
+    protected function casts(): array
+    {
+        return [
+            'realname' => 'string',
+            'descr' => 'string',
+            'email' => 'string',
+            'can_modify_passwd' => 'integer',
+        ];
+    }
 
     public function toFlare(): array
     {
@@ -51,42 +60,34 @@ class User extends Authenticatable
 
     /**
      * Test if this user has global read access
-     *
-     * @return bool
      */
-    public function hasGlobalRead()
+    public function hasGlobalRead(): bool
     {
-        return $this->isA('admin', 'global-read');
+        return $this->can('global-read');
     }
 
     /**
      * Test if this user has global admin access
-     *
-     * @return bool
      */
-    public function hasGlobalAdmin()
+    public function hasGlobalAdmin(): bool
     {
-        return $this->isA('admin', 'demo');
+        return $this->can('global-admin');
     }
 
     /**
      * Test if the User is an admin.
-     *
-     * @return bool
      */
-    public function isAdmin()
+    public function isAdmin(): bool
     {
-        return $this->isA('admin');
+        return $this->can('admin');
     }
 
     /**
      * Test if this user is the demo user
-     *
-     * @return bool
      */
-    public function isDemo()
+    public function isDemo(): bool
     {
-        return $this->isA('demo');
+        return $this->hasRole('demo');
     }
 
     /**
@@ -95,7 +96,7 @@ class User extends Authenticatable
      * @param  Device|int  $device  can be a device Model or device id
      * @return bool
      */
-    public function canAccessDevice($device)
+    public function canAccessDevice($device): bool
     {
         return $this->hasGlobalRead() || Permissions::canAccessDevice($device, $this->user_id);
     }
@@ -108,20 +109,6 @@ class User extends Authenticatable
     public function setPassword($password)
     {
         $this->attributes['password'] = $password ? Hash::make($password) : null;
-    }
-
-    /**
-     * Set roles and remove extra roles, optionally creating non-existent roles, flush permissions cache for this user if roles changed
-     */
-    public function setRoles(array $roles, bool $create = false): void
-    {
-        if ($roles != $this->getRoles()) {
-            if ($create) {
-                $this->assign($roles);
-            }
-            Bouncer::sync($this)->roles($roles);
-            Bouncer::refresh($this);
-        }
     }
 
     /**
@@ -143,6 +130,18 @@ class User extends Authenticatable
         return false;
     }
 
+    public function getNotifications(?string $type = null): int|Collection
+    {
+        return match ($type) {
+            'total' => $this->notifications()->count(),
+            'read' => $this->notifications()->wherePivot('key', $type)->wherePivot('value', 1)->get(),
+            'unread' => Notification::whereNotIn('notifications_id', fn ($q) => $q->select('notifications_id')->from('notifications_attribs')->where('user_id', $this->user_id)->where('key', 'read')->where('value', 1))->get(),
+            'sticky' => Notification::leftJoin('notifications_attribs', 'notifications_attribs.notifications_id', '=', 'notifications.notifications_id')->where('key', 'sticky')->where('value', 1)->get(),
+            'sticky_count' => Notification::whereIn('notifications_id', fn ($q) => $q->select('notifications_id')->from('notifications_attribs')->where('key', 'sticky')->where('value', 1)->select('notifications_id'))->count(),
+            default => $this->notifications,
+        };
+    }
+
     /**
      * Checks if this user has a browser push notification transport configured.
      *
@@ -154,7 +153,10 @@ class User extends Authenticatable
 
         return AlertTransport::query()
             ->where('transport_type', 'browserpush')
-            ->where('transport_config', 'regexp', "\"user\":\"(0|$user_id)\"")
+            ->where(function ($query) use ($user_id) {
+                $query->whereJsonContains('transport_config->user', 0)
+                      ->orWhereJsonContains('transport_config->user', $user_id);
+            })
             ->exists();
     }
 
@@ -181,7 +183,7 @@ class User extends Authenticatable
 
     public function scopeAdminOnly($query)
     {
-        $query->whereIs('admin');
+        $query->role('admin');
     }
 
     // ---- Accessors/Mutators ----
@@ -222,15 +224,20 @@ class User extends Authenticatable
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\ApiToken, $this>
+     */
     public function apiTokens(): HasMany
     {
-        return $this->hasMany(\App\Models\ApiToken::class, 'user_id', 'user_id');
+        return $this->hasMany(ApiToken::class, 'user_id', 'user_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Bill, $this>
+     */
     public function bills(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\Bill::class, 'bill_perms', 'user_id', 'bill_id');
+        return $this->belongsToMany(Bill::class, 'bill_perms', 'user_id', 'bill_id');
     }
 
     public function devices()
@@ -241,14 +248,20 @@ class User extends Authenticatable
         });
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Device, $this>
+     */
     public function devicesOwned(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\Device::class, 'devices_perms', 'user_id', 'device_id');
+        return $this->belongsToMany(Device::class, 'devices_perms', 'user_id', 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\DeviceGroup, $this>
+     */
     public function deviceGroups(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\DeviceGroup::class, 'devices_group_perms', 'user_id', 'device_group_id');
+        return $this->belongsToMany(DeviceGroup::class, 'devices_group_perms', 'user_id', 'device_group_id');
     }
 
     public function ports()
@@ -261,28 +274,51 @@ class User extends Authenticatable
         }
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Port, $this>
+     */
     public function portsOwned(): BelongsToMany
     {
-        return $this->belongsToMany(\App\Models\Port::class, 'ports_perms', 'user_id', 'port_id');
+        return $this->belongsToMany(Port::class, 'ports_perms', 'user_id', 'port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Dashboard, $this>
+     */
     public function dashboards(): HasMany
     {
-        return $this->hasMany(\App\Models\Dashboard::class, 'user_id');
+        return $this->hasMany(Dashboard::class, 'user_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Notification, $this>
+     */
+    public function notifications(): BelongsToMany
+    {
+        return $this->belongsToMany(Notification::class, 'notifications_attribs', 'user_id', 'notifications_id', 'user_id', 'notifications_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\NotificationAttrib, $this>
+     */
     public function notificationAttribs(): HasMany
     {
         return $this->hasMany(NotificationAttrib::class, 'user_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UserPref, $this>
+     */
     public function preferences(): HasMany
     {
-        return $this->hasMany(\App\Models\UserPref::class, 'user_id');
+        return $this->hasMany(UserPref::class, 'user_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UserWidget, $this>
+     */
     public function widgets(): HasMany
     {
-        return $this->hasMany(\App\Models\UserWidget::class, 'user_id');
+        return $this->hasMany(UserWidget::class, 'user_id');
     }
 }

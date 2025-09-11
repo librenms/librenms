@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AvailabilityMapController.php
  *
@@ -25,11 +26,11 @@
 
 namespace App\Http\Controllers\Maps;
 
+use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use App\Models\DeviceGroup;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use LibreNMS\Config;
 
 class AvailabilityMapController extends Controller
 {
@@ -37,14 +38,14 @@ class AvailabilityMapController extends Controller
     public function availabilityMap(Request $request): View
     {
         $data = [
-            'page_refresh' => Config::get('page_refresh', 300),
-            'compact' => Config::get('webui.availability_map_compact'),
-            'box_size' => Config::get('webui.availability_map_box_size'),
-            'sort' => Config::get('webui.availability_map_sort_status') ? 'status' : 'hostname',
-            'use_groups' => Config::get('webui.availability_map_use_device_groups'),
-            'services' => Config::get('show_services'),
-            'uptime_warn' => Config::get('uptime_warning'),
-            'devicegroups' => Config::get('webui.availability_map_use_device_groups') ? DeviceGroup::hasAccess($request->user())->orderBy('name')->get(['id', 'name']) : [],
+            'page_refresh' => LibrenmsConfig::get('page_refresh', 300),
+            'compact' => LibrenmsConfig::get('webui.availability_map_compact'),
+            'box_size' => LibrenmsConfig::get('webui.availability_map_box_size'),
+            'sort' => LibrenmsConfig::get('webui.availability_map_sort_status') ? 'status' : 'hostname',
+            'use_groups' => LibrenmsConfig::get('webui.availability_map_use_device_groups'),
+            'services' => LibrenmsConfig::get('show_services'),
+            'uptime_warn' => LibrenmsConfig::get('uptime_warning'),
+            'devicegroups' => LibrenmsConfig::get('webui.availability_map_use_device_groups') ? DeviceGroup::hasAccess($request->user())->orderBy('name')->get(['id', 'name']) : [],
         ];
 
         return view('map.availability', $data);

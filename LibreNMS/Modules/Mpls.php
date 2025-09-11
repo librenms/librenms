@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mpls.php
  *
@@ -29,7 +30,6 @@ namespace LibreNMS\Modules;
 
 use App\Models\Device;
 use App\Observers\ModuleModelObserver;
-use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\MplsDiscovery;
@@ -59,42 +59,42 @@ class Mpls implements Module
      * Discover this module. Heavier processes can be run here
      * Run infrequently (default 4 times a day)
      *
-     * @param  \LibreNMS\OS  $os
+     * @param  OS  $os
      */
     public function discover(OS $os): void
     {
         if ($os instanceof MplsDiscovery) {
-            Log::info('MPLS LSPs: ');
-            ModuleModelObserver::observe(\App\Models\MplsLsp::class);
+            ModuleModelObserver::observe(\App\Models\MplsLsp::class, 'MPLS LSPs');
             $lsps = $this->syncModels($os->getDevice(), 'mplsLsps', $os->discoverMplsLsps());
+            ModuleModelObserver::done();
 
-            Log::info('MPLS LSP Paths: ');
-            ModuleModelObserver::observe(\App\Models\MplsLspPath::class);
+            ModuleModelObserver::observe(\App\Models\MplsLspPath::class, 'MPLS LSP Paths');
             $paths = $this->syncModels($os->getDevice(), 'mplsLspPaths', $os->discoverMplsPaths($lsps));
+            ModuleModelObserver::done();
 
-            Log::info('MPLS SDPs: ');
-            ModuleModelObserver::observe(\App\Models\MplsSdp::class);
+            ModuleModelObserver::observe(\App\Models\MplsSdp::class, 'MPLS SDPs');
             $sdps = $this->syncModels($os->getDevice(), 'mplsSdps', $os->discoverMplsSdps());
+            ModuleModelObserver::done();
 
-            Log::info('MPLS Services: ');
-            ModuleModelObserver::observe(\App\Models\MplsService::class);
+            ModuleModelObserver::observe(\App\Models\MplsService::class, 'MPLS Services');
             $svcs = $this->syncModels($os->getDevice(), 'mplsServices', $os->discoverMplsServices());
+            ModuleModelObserver::done();
 
-            Log::info('MPLS SAPs: ');
-            ModuleModelObserver::observe(\App\Models\MplsSap::class);
+            ModuleModelObserver::observe(\App\Models\MplsSap::class, 'MPLS SAPs');
             $this->syncModels($os->getDevice(), 'mplsSaps', $os->discoverMplsSaps($svcs));
+            ModuleModelObserver::done();
 
-            Log::info('MPLS SDP Bindings: ');
-            ModuleModelObserver::observe(\App\Models\MplsSdpBind::class);
+            ModuleModelObserver::observe(\App\Models\MplsSdpBind::class, 'MPLS SDP Bindings');
             $this->syncModels($os->getDevice(), 'mplsSdpBinds', $os->discoverMplsSdpBinds($sdps, $svcs));
+            ModuleModelObserver::done();
 
-            Log::info('MPLS Tunnel Active Routing Hops: ');
-            ModuleModelObserver::observe(\App\Models\MplsTunnelArHop::class);
+            ModuleModelObserver::observe(\App\Models\MplsTunnelArHop::class, 'MPLS Tunnel Active Routing Hops');
             $this->syncModels($os->getDevice(), 'mplsTunnelArHops', $os->discoverMplsTunnelArHops($paths));
+            ModuleModelObserver::done();
 
-            Log::info('MPLS Tunnel Constrained Shortest Path First Hops: ');
-            ModuleModelObserver::observe(\App\Models\MplsTunnelCHop::class);
+            ModuleModelObserver::observe(\App\Models\MplsTunnelCHop::class, 'MPLS Tunnel Constrained Shortest Path First Hops');
             $this->syncModels($os->getDevice(), 'mplsTunnelCHops', $os->discoverMplsTunnelCHops($paths));
+            ModuleModelObserver::done();
         }
     }
 
@@ -108,7 +108,7 @@ class Mpls implements Module
      * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
      * Run frequently (default every 5 minutes)
      *
-     * @param  \LibreNMS\OS  $os
+     * @param  OS  $os
      */
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
@@ -116,51 +116,50 @@ class Mpls implements Module
             $device = $os->getDevice();
 
             if ($device->mplsLsps()->exists()) {
-                Log::info('MPLS LSPs: ');
-                ModuleModelObserver::observe(\App\Models\MplsLsp::class);
+                ModuleModelObserver::observe(\App\Models\MplsLsp::class, 'MPLS LSPs');
                 $lsps = $this->syncModels($device, 'mplsLsps', $os->pollMplsLsps());
             }
 
             if ($device->mplsLspPaths()->exists()) {
-                Log::info('MPLS LSP Paths: ');
-                ModuleModelObserver::observe(\App\Models\MplsLspPath::class);
+                ModuleModelObserver::observe(\App\Models\MplsLspPath::class, 'MPLS LSP Paths');
                 $paths = $this->syncModels($device, 'mplsLspPaths', $os->pollMplsPaths($lsps));
+                ModuleModelObserver::done();
             }
 
             if ($device->mplsSdps()->exists()) {
-                Log::info('MPLS SDPs: ');
-                ModuleModelObserver::observe(\App\Models\MplsSdp::class);
+                ModuleModelObserver::observe(\App\Models\MplsSdp::class, 'MPLS SDPs');
                 $sdps = $this->syncModels($device, 'mplsSdps', $os->pollMplsSdps());
+                ModuleModelObserver::done();
             }
 
             if ($device->mplsServices()->exists()) {
-                Log::info('MPLS Services: ');
-                ModuleModelObserver::observe(\App\Models\MplsService::class);
+                ModuleModelObserver::observe(\App\Models\MplsService::class, 'MPLS Services');
                 $svcs = $this->syncModels($device, 'mplsServices', $os->pollMplsServices());
+                ModuleModelObserver::done();
             }
 
             if ($device->mplsSaps()->exists() && isset($svcs)) {
-                Log::info('MPLS SAPs: ');
-                ModuleModelObserver::observe(\App\Models\MplsSap::class);
+                ModuleModelObserver::observe(\App\Models\MplsSap::class, 'MPLS SAPs');
                 $this->syncModels($device, 'mplsSaps', $os->pollMplsSaps($svcs));
+                ModuleModelObserver::done();
             }
 
             if ($device->mplsSdpBinds()->exists() && isset($sdps, $svcs)) {
-                Log::info('MPLS SDP Bindings: ');
-                ModuleModelObserver::observe(\App\Models\MplsSdpBind::class);
+                ModuleModelObserver::observe(\App\Models\MplsSdpBind::class, 'MPLS SDP Bindings');
                 $this->syncModels($device, 'mplsSdpBinds', $os->pollMplsSdpBinds($sdps, $svcs));
+                ModuleModelObserver::done();
             }
 
             if ($device->mplsTunnelArHops()->exists()) {
-                Log::info('MPLS Tunnel Active Routing Hops: ');
-                ModuleModelObserver::observe(\App\Models\MplsTunnelArHop::class);
+                ModuleModelObserver::observe(\App\Models\MplsTunnelArHop::class, 'MPLS Tunnel Active Routing Hops');
                 $this->syncModels($device, 'mplsTunnelArHops', $os->pollMplsTunnelArHops($paths));
+                ModuleModelObserver::done();
             }
 
             if ($device->mplsTunnelCHops()->exists()) {
-                Log::info('MPLS Tunnel Constrained Shortest Path First Hops: ');
-                ModuleModelObserver::observe(\App\Models\MplsTunnelCHop::class);
+                ModuleModelObserver::observe(\App\Models\MplsTunnelCHop::class, 'MPLS Tunnel Constrained Shortest Path First Hops');
                 $this->syncModels($device, 'mplsTunnelCHops', $os->pollMplsTunnelCHops($paths));
+                ModuleModelObserver::done();
             }
         }
     }

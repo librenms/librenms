@@ -1,4 +1,5 @@
 <?php
+
 /*
  * VminfoLibvirt.php
  *
@@ -25,10 +26,10 @@
 
 namespace LibreNMS\OS\Traits;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Enum\PowerState;
 
 trait VminfoLibvirt
@@ -37,22 +38,23 @@ trait VminfoLibvirt
     {
         Log::info('LibVirt VM: ');
 
-        if (! Config::get('enable_libvirt')) {
+        if (! LibrenmsConfig::get('enable_libvirt')) {
             Log::info('not configured');
 
             return new Collection;
         }
 
+        /** @var Collection<\App\Models\Vminfo> $vms */
         $vms = new Collection;
 
         $ssh_ok = 0;
 
         $userHostname = $this->getDevice()->hostname;
-        if (Config::has('libvirt_username')) {
-            $userHostname = Config::get('libvirt_username') . '@' . $userHostname;
+        if (LibrenmsConfig::has('libvirt_username')) {
+            $userHostname = LibrenmsConfig::get('libvirt_username') . '@' . $userHostname;
         }
 
-        foreach (Config::get('libvirt_protocols') as $method) {
+        foreach (LibrenmsConfig::get('libvirt_protocols') as $method) {
             if (Str::contains($method, 'qemu')) {
                 $uri = $method . '://' . $userHostname . '/system';
             } else {
@@ -71,7 +73,7 @@ trait VminfoLibvirt
             if ($ssh_ok || ! Str::contains($method, 'ssh')) {
                 // Fetch virtual machine list
                 unset($domlist);
-                exec(Config::get('virsh') . ' -rc ' . $uri . ' list', $domlist);
+                exec(LibrenmsConfig::get('virsh') . ' -rc ' . $uri . ' list', $domlist);
 
                 foreach ($domlist as $dom) {
                     [$dom_id] = explode(' ', trim($dom), 2);
@@ -79,7 +81,7 @@ trait VminfoLibvirt
                     if (is_numeric($dom_id)) {
                         // Fetch the Virtual Machine information.
                         unset($vm_info_array);
-                        exec(Config::get('virsh') . ' -rc ' . $uri . ' dumpxml ' . $dom_id, $vm_info_array);
+                        exec(LibrenmsConfig::get('virsh') . ' -rc ' . $uri . ' dumpxml ' . $dom_id, $vm_info_array);
 
                         // Example xml:
                         // <domain type='kvm' id='3'>
@@ -104,7 +106,7 @@ trait VminfoLibvirt
                         Log::debug($xml);
 
                         // libvirt does not supply this
-                        exec(Config::get('virsh') . ' -rc ' . $uri . ' domstate ' . $dom_id, $vm_state);
+                        exec(LibrenmsConfig::get('virsh') . ' -rc ' . $uri . ' domstate ' . $dom_id, $vm_state);
                         $vmwVmState = PowerState::STATES[strtolower($vm_state[0])] ?? PowerState::UNKNOWN;
 
                         $vmwVmMemSize = $xml->memory;

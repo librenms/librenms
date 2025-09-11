@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ImageController.php
  *
@@ -27,17 +28,18 @@ namespace App\Http\Controllers\Widgets;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 class ImageController extends WidgetController
 {
-    protected $title = 'Custom Image';
+    protected string $name = 'generic-image';
     protected $defaults = [
         'title' => null,
         'image_url' => null,
         'target_url' => null,
     ];
 
-    public function getView(Request $request)
+    public function getView(Request $request): string|View
     {
         $data = $this->getSettings();
 
@@ -58,15 +60,10 @@ class ImageController extends WidgetController
             $data['image_url'] .= '?' . mt_rand();
         }
 
-        return view('widgets.image', $data);
+        return view('widgets.generic-image', $data);
     }
 
-    public function getSettingsView(Request $request)
-    {
-        return view('widgets.settings.image', $this->getSettings(true));
-    }
-
-    public function getSettings($settingsView = false)
+    public function getSettings($settingsView = false): array
     {
         if (is_null($this->settings)) {
             parent::getSettings();

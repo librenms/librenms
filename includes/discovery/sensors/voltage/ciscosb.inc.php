@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS
  *
@@ -10,25 +11,42 @@
  * the source code distribution for details.
  */
 
-echo 'CiscoSB';
+$oids = SnmpQuery::cache()->hideMib()->walk('CISCOSB-PHY-MIB::rlPhyTestGetResult')->table(1);
 
 $multiplier = 1;
 $divisor = 1000000;
-foreach ($pre_cache['ciscosb_rlPhyTestGetResult'] as $index => $ciscosb_data) {
+
+foreach ($oids as $index => $ciscosb_data) {
     foreach ($ciscosb_data as $key => $value) {
         if (! isset($value['rlPhyTestTableTransceiverSupply'])) {
             continue;
         }
 
         $oid = '.1.3.6.1.4.1.9.6.1.101.90.1.2.1.3.' . $index . '.6';
-        $sensor_type = 'rlPhyTestTableTransceiverSupply';
-        $port_descr = get_port_by_index_cache($device['device_id'], preg_replace('/^\d+\./', '', $index));
-        $descr = trim(($port_descr['ifDescr'] ?? null) . ' Supply Voltage');
+        $port = PortCache::getByIfIndex(preg_replace('/^\d+\./', '', $index), $device['device_id']);
+        $descr = trim($port?->ifDescr . ' Supply Voltage');
         $voltage = $value['rlPhyTestTableTransceiverSupply'] / $divisor;
-        $entPhysicalIndex = $index;
-        $entPhysicalIndex_measured = 'ports';
+
         if (is_numeric($voltage) && ($value['rlPhyTestTableTransceiverTemp'] != 0)) {
-            discover_sensor(null, 'voltage', $device, $oid, $index, $sensor_type, $descr, $divisor, $multiplier, null, null, null, null, $voltage, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
+            app('sensor-discovery')->discover(new \App\Models\Sensor([
+                'poller_type' => 'snmp',
+                'sensor_class' => 'voltage',
+                'sensor_oid' => $oid,
+                'sensor_index' => $index,
+                'sensor_type' => 'rlPhyTestTableTransceiverSupply',
+                'sensor_descr' => $descr,
+                'sensor_divisor' => $divisor,
+                'sensor_multiplier' => $multiplier,
+                'sensor_limit_low' => null,
+                'sensor_limit_low_warn' => null,
+                'sensor_limit_warn' => null,
+                'sensor_limit' => null,
+                'sensor_current' => $voltage,
+                'entPhysicalIndex' => $index,
+                'entPhysicalIndex_measured' => 'ports',
+                'user_func' => null,
+                'group' => null,
+            ]));
         }
     }
 }

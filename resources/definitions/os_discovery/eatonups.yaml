@@ -1,0 +1,159 @@
+# need to reference these MIBs
+mib: XUPS-MIB:EATON-EMP-MIB
+modules:
+    os:
+        hardware: XUPS-MIB::xupsIdentModel.0
+        version: XUPS-MIB::xupsIdentSoftwareVersion.0
+        serial: UPS-MIB::upsIdentName.0
+        serial_regex: '/ID: (?<serial>[^ ]+)/'
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: EATON-OIDS::xupsEnvironment
+                    value: XUPS-MIB::xupsEnvAmbientTemp
+                    num_oid: '.1.3.6.1.4.1.534.1.6.1.{{ $index }}'
+                    descr: 'Ambient'
+                    index: 'xupsEnvAmbientTemp.{{ $index }}'
+        load:
+            data:
+                -
+                    oid: XUPS-MIB::xupsOutput
+                    value: XUPS-MIB::xupsOutputLoad
+                    num_oid: '.1.3.6.1.4.1.534.1.4.1.{{ $index }}'
+                    descr: 'Output Load'
+                    index: 'xupsOutputLoad.{{ $index }}'
+        power:
+            data:
+                -
+                    oid: XUPS-MIB::xupsOutputTable
+                    value: XUPS-MIB::xupsOutputWatts
+                    num_oid: '.1.3.6.1.4.1.534.1.4.4.1.4.{{ $index }}'
+                    descr: 'Output Phase {{ $index }}'
+                    index: 'xupsOutputWatts.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: XUPS-MIB::xupsBattery
+                    value: XUPS-MIB::xupsBatteryAbmStatus
+                    num_oid: '.1.3.6.1.4.1.534.1.2.5.{{ $index }}'
+                    descr: 'Battery Status {{ $index }}'
+                    index: 'xupsBatteryAbmStatus.{{ $index }}'
+                    states:
+                        - { value: 2, descr: batteryDischarging, graph: 1, generic: 2 }
+                        - { value: 3, descr: batteryFloating, graph: 1, generic: 0 }
+                        - { value: 4, descr: batteryResting, graph: 1, generic: 0 }
+                        - { value: 5, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 6, descr: batteryDisconnected, graph: 1, generic: 2 }
+                        - { value: 7, descr: batteryUnderTest, graph: 1, generic: 0 }
+                        - { value: 8, descr: checkBattery, graph: 1, generic: 2 }
+                -
+                    oid: XUPS-MIB::xupsTest
+                    value: XUPS-MIB::xupsTestBatteryStatus
+                    num_oid: '.1.3.6.1.4.1.534.1.8.2.0.{{ $index }}'
+                    descr: 'Battery Test Status {{ $index }}'
+                    index: 'xupsTestBatteryStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 2, descr: passed, graph: 1, generic: 0 }
+                        - { value: 3, descr: failed, graph: 1, generic: 2 }
+                        - { value: 4, descr: inProgress, graph: 1, generic: 0 }
+                        - { value: 5, descr: notSupported, graph: 1, generic: 0 }
+                        - { value: 6, descr: inhibited, graph: 1, generic: 2 }
+                        - { value: 7, descr: scheduled, graph: 1, generic: 0 }
+        runtime:
+            data:
+                -
+                    oid: XUPS-MIB::xupsBattery
+                    value: XUPS-MIB::xupsBatTimeRemaining
+                    num_oid: '.1.3.6.1.4.1.534.1.2.1.{{ $index }}'
+                    descr: 'Runtime'
+                    index: 'xupsBatTimeRemaining.{{ $index }}'
+                    divisor: 60
+        voltage:
+            data:
+                -
+                    oid: XUPS-MIB::xupsBattery
+                    value: XUPS-MIB::xupsBatVoltage
+                    num_oid: '.1.3.6.1.4.1.534.1.2.2.{{ $index }}'
+                    descr: 'Battery #{{ $index }}'
+                    index: 'xupsBatVoltage.{{ $index }}'
+                    divisor: 1
+                -
+                    oid: XUPS-MIB::xupsInputTable
+                    value: XUPS-MIB::xupsInputVoltage
+                    num_oid: '.1.3.6.1.4.1.534.1.3.4.1.2.{{ $index }}'
+                    descr: 'Input Phase #{{ $index }}'
+                    index: 'xupsInputVoltage.{{ $index }}'
+                    divisor: 1
+                -
+                    oid: XUPS-MIB::xupsOutputTable
+                    value: XUPS-MIB::xupsOutputVoltage
+                    num_oid: '.1.3.6.1.4.1.534.1.4.4.1.2.{{ $index }}'
+                    descr: 'Output Phase #{{ $index }}'
+                    index: 'xupsOutputVoltage.{{ $index }}'
+                    divisor: 1
+                -
+                    oid: XUPS-MIB::xupsBypassTable
+                    value: XUPS-MIB::xupsBypassVoltage
+                    num_oid: '.1.3.6.1.4.1.534.1.5.3.1.2.{{ $index }}'
+                    descr: 'Bypass Phase #{{ $index }}'
+                    index: 'xupsBypassVoltage.{{ $index }}'
+                    divisor: 1
+        charge:
+            data:
+                -
+                    oid: XUPS-MIB::xupsBattery
+                    value: XUPS-MIB::xupsBatCapacity
+                    num_oid: '.1.3.6.1.4.1.534.1.2.4.{{ $index }}'
+                    descr: 'Battery #{{ $index }}'
+                    index: 'xupsBatCapacity.{{ $index }}'
+                    divisor: 1
+                    low_warn_limit: 10
+                    low_limit: 0
+        frequency:
+            data:
+                -
+                    oid: XUPS-MIB::xupsInput
+                    value: XUPS-MIB::xupsInputFrequency 
+                    num_oid: '.1.3.6.1.4.1.534.1.3.1.{{ $index }}'
+                    descr: 'Input Phase #{{ $index }}'
+                    index: 'xupsInputFrequency.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: XUPS-MIB::xupsOutput
+                    value: XUPS-MIB::xupsOutputFrequency
+                    num_oid: '.1.3.6.1.4.1.534.1.4.2.{{ $index }}'
+                    descr: 'Output Phase #{{ $index }}'
+                    index: 'xupsOutputFrequency.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: XUPS-MIB::xupsBypass
+                    value: XUPS-MIB::xupsBypassFrequency
+                    num_oid: '.1.3.6.1.4.1.534.1.5.1{{ $index }}'
+                    descr: 'Bypass Phase #{{ $index }}'
+                    index: 'xupsBypassFrequency.{{ $index }}'
+                    divisor: 10
+        current:
+            data:
+                -
+                    oid: XUPS-MIB::xupsBattery
+                    value: XUPS-MIB::xupsBatCurrent
+                    num_oid: '.1.3.6.1.4.1.534.1.2.3.{{ $index }}'
+                    descr: 'Battery #{{ $index }}'
+                    index: 'xupsBatCurrent.{{ $index }}'
+                    divisor: 1
+                -
+                    oid: XUPS-MIB::xupsInputTable 
+                    value: XUPS-MIB::xupsInputCurrent
+                    num_oid: '.1.3.6.1.4.1.534.1.3.4.1.3.{{ $index }}'
+                    descr: 'Input Phase #{{ $index }}'
+                    index: 'xupsInputCurrent.{{ $index }}'
+                    divisor: 1
+                -
+                    oid: XUPS-MIB::xupsOutputTable 
+                    value: XUPS-MIB::xupsOutputCurrent
+                    num_oid: '.1.3.6.1.4.1.534.1.4.4.1.3.{{ $index }}'
+                    descr: 'Output Phase #{{ $index }}'
+                    index: 'xupsOutputCurrent.{{ $index }}'
+                    divisor: 1

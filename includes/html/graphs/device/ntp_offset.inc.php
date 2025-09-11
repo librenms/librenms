@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS module to display captured NTP statistics
  *
@@ -31,7 +32,7 @@ foreach ($components as $id => $array) {
 
     if (Rrd::checkRrdExists($rrd_filename)) {
         // Grab a color from the array.
-        $color = \LibreNMS\Config::get("graph_colours.mixed.$count", \LibreNMS\Config::get('graph_colours.oranges.' . ($count - 7)));
+        $color = \App\Facades\LibrenmsConfig::get("graph_colours.mixed.$count", \App\Facades\LibrenmsConfig::get('graph_colours.oranges.' . ($count - 7)));
 
         $rrd_additions .= ' DEF:DS' . $count . '=' . $rrd_filename . ':offset:AVERAGE ';
         $rrd_additions .= ' LINE1.25:DS' . $count . '#' . $color . ":'" . str_pad(substr($array['peer'], 0, 15), 15) . "'" . $stack;

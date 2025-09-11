@@ -1,16 +1,22 @@
 <?php
 
+use LibreNMS\Util\Rewrite;
+
 $i = 0;
 
 foreach (explode(',', $vars['id']) as $ifid) {
     $port = dbFetchRow('SELECT * FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', [$ifid]);
+    if (! $port) {
+        continue;
+    }
+
     $rrd_file = get_port_rrdfile_path($port['hostname'], $ifid);
     if (Rrd::checkRrdExists($rrd_file)) {
         $port = cleanPort($port);
         $rrd_list[$i]['filename'] = $rrd_file;
         $rrd_list[$i]['descr'] = format_hostname($port) . ' ' . $port['ifDescr'];
         $rrd_list[$i]['descr_in'] = format_hostname($port);
-        $rrd_list[$i]['descr_out'] = makeshortif($port['label']);
+        $rrd_list[$i]['descr_out'] = Rewrite::shortenIfName($port['label']);
         $i++;
     }
 }

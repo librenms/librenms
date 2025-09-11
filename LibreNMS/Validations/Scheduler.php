@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Scheduler.php
  *
@@ -22,8 +23,9 @@
 
 namespace LibreNMS\Validations;
 
+use App\Facades\LibrenmsConfig;
+use Exception;
 use Illuminate\Support\Facades\Cache;
-use LibreNMS\Config;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 
@@ -37,7 +39,15 @@ class Scheduler extends BaseValidation
      */
     public function validate(Validator $validator): void
     {
-        if (! Cache::has('scheduler_working')) {
+        try {
+            $scheduler_working = Cache::has('scheduler_working');
+        } catch (Exception $e) {
+            $validator->fail(trans('validation.validations.poller.CheckLocking.fail', ['message' => $e->getMessage()]));
+
+            return;
+        }
+
+        if (! $scheduler_working) {
             $commands = $this->generateCommands($validator);
             $validator->result(ValidationResult::fail('Scheduler is not running')->setFix($commands));
         }
@@ -50,7 +60,7 @@ class Scheduler extends BaseValidation
     private function generateCommands(Validator $validator): array
     {
         $commands = [];
-        $systemctl_bin = Config::locateBinary('systemctl');
+        $systemctl_bin = LibrenmsConfig::locateBinary('systemctl');
         $base_dir = rtrim($validator->getBaseDir(), '/');
 
         if (is_executable($systemctl_bin)) {

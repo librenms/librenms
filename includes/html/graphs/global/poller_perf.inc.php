@@ -1,4 +1,5 @@
 <?php
+
 /**
  * poller_perf.php
  *
@@ -56,8 +57,8 @@ foreach (Device::pluck('hostname') as $index => $hostname) {
     }
 }
 
-$total_color = \LibreNMS\Config::get('graph_colours.mixed.2', '36393D');
-$device_color = \LibreNMS\Config::get('graph_colours.mixed.6', 'CCCCCC');
+$total_color = \App\Facades\LibrenmsConfig::get('graph_colours.mixed.2', '36393D');
+$device_color = \App\Facades\LibrenmsConfig::get('graph_colours.mixed.6', 'CCCCCC');
 
 // sum all the poll times
 $poler_cdef = implode(',', $cdef);

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * SnmpQueryInterface.php
  *
@@ -55,7 +56,7 @@ interface SnmpQueryInterface
      * Set a context for the snmp query
      * This is most commonly used to fetch alternate sets of data, such as different VRFs
      */
-    public function context(string $context): SnmpQueryInterface;
+    public function context(string $context, ?string $v3_prefix = null): SnmpQueryInterface;
 
     /**
      * Set an additional MIB directory to search for MIBs.
@@ -117,7 +118,7 @@ interface SnmpQueryInterface
      * Commonly used to fetch a single or multiple explicit values.
      *
      * @param  array|string  $oid
-     * @return \LibreNMS\Data\Source\SnmpResponse
+     * @return SnmpResponse
      */
     public function get($oid): SnmpResponse;
 
@@ -126,7 +127,7 @@ interface SnmpQueryInterface
      * Fetches all OIDs under a given OID, commonly used with tables.
      *
      * @param  array|string  $oid
-     * @return \LibreNMS\Data\Source\SnmpResponse
+     * @return SnmpResponse
      */
     public function walk($oid): SnmpResponse;
 
@@ -135,7 +136,7 @@ interface SnmpQueryInterface
      * snmpnext retrieves the first oid after the given oid.
      *
      * @param  array|string  $oid
-     * @return \LibreNMS\Data\Source\SnmpResponse
+     * @return SnmpResponse
      */
     public function next($oid): SnmpResponse;
 

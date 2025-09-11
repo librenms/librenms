@@ -1,4 +1,5 @@
 <?php
+
 /*
  * PluginManager.php
  *
@@ -117,7 +118,7 @@ class PluginManager implements PluginManagerInterface
                     $name = $hook['plugin_name'];
                     Log::error("Error calling hook $hookType for $name: " . $e->getMessage() . PHP_EOL . $e->getTraceAsString());
 
-                    if (\LibreNMS\Config::get('plugins.show_errors')) {
+                    if (\App\Facades\LibrenmsConfig::get('plugins.show_errors')) {
                         throw $e;
                     }
 
@@ -237,7 +238,7 @@ class PluginManager implements PluginManagerInterface
      * @param  string  $hookType
      * @param  array  $args
      * @param  string|null  $onlyPlugin
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     protected function hooksFor(string $hookType, array $args, ?string $onlyPlugin): Collection
     {

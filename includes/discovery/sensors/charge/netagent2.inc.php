@@ -1,4 +1,5 @@
 <?php
+
 /**
  * netagent2.inc.php
  *
@@ -28,7 +29,7 @@ $charge = snmp_get($device, $charge_oid, '-Osqnv');
 if (! empty($charge)) {
     $type = 'netagent2';
     $index = 0;
-    $limit = 100;
+    $limit = null;
     $lowlimit = 0;
     $lowwarnlimit = 10;
     $divisor = 1;

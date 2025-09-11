@@ -1,4 +1,5 @@
 <?php
+
 /**
  * GraphParameters.php
  *
@@ -26,8 +27,8 @@
 namespace LibreNMS\Data\Graphing;
 
 use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Clean;
 use LibreNMS\Util\Time;
@@ -42,6 +43,7 @@ class GraphParameters
     public readonly string $subtype;
     public readonly ImageFormat $imageFormat;
 
+    public readonly string $style;
     public readonly string $font;
     public readonly string $font_color;
     public readonly int $font_size;
@@ -83,7 +85,8 @@ class GraphParameters
         $this->full_size = ! empty($vars['absolute']);
         $this->is_small = $this->width < self::SMALL;
 
-        $this->font = Config::get('mono_font');
+        $this->style = $vars['style'] ?? '';
+        $this->font = LibrenmsConfig::get('mono_font');
         $this->font_color = Clean::alphaDash($vars['font'] ?? '');
         $this->font_size = $this->width <= self::MEDIUM_SMALL ? 7 : 8;
 
@@ -213,9 +216,9 @@ class GraphParameters
 
     private function graphColors(): array
     {
-        $config_suffix = Config::get('applied_site_style') == 'dark' ? '_dark' : '';
-        $def_colors = Config::get('rrdgraph_def_text' . $config_suffix);
-        $def_font = ltrim(Config::get('rrdgraph_def_text_color' . $config_suffix), '#');
+        $style = $this->style ?: session('applied_site_style');
+        $def_colors = LibrenmsConfig::get($style == 'dark' ? 'rrdgraph_def_text_dark' : 'rrdgraph_def_text');
+        $def_font = ltrim(LibrenmsConfig::get($style == 'dark' ? 'rrdgraph_def_text_color_dark' : 'rrdgraph_def_text_color'), '#');
 
         preg_match_all('/-c ([A-Z]+)#([0-9A-Fa-f]{6,8})/', $def_colors, $matches);
         $colors = ['FONT' => $def_font];

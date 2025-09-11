@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DynamicConfig.php
  *
@@ -25,9 +26,9 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use LibreNMS\Config;
 
 class DynamicConfig
 {
@@ -39,7 +40,7 @@ class DynamicConfig
         $config = [];
         @include base_path('config.php');
 
-        $this->definitions = collect(Config::getDefinitions())->map(function ($item, $key) use ($config) {
+        $this->definitions = collect(LibrenmsConfig::getDefinitions())->map(function ($item, $key) use ($config) {
             $item['overridden'] = Arr::has($config, $key);
 
             return new DynamicConfigItem($key, $item);
@@ -71,7 +72,7 @@ class DynamicConfig
     /**
      * Get all groups defined
      *
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     public function getGroups()
     {

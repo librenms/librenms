@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS module to capture Cisco Class-Based QoS Details
  *
@@ -135,8 +136,8 @@ if ($device['os_group'] == 'cisco') {
                     'count' => $count_vlan,
                 ];
 
-                $tags = compact('label', 'rrd_name', 'rrd_def');
-                data_update($device, 'cisco-otv-vlan', $tags, $fields);
+                $tags = ['label' => $label, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
+                app('Datastore')->put($device, 'cisco-otv-vlan', $tags, $fields);
             } elseif ($array['otvtype'] == 'adjacency') {
                 $array['uptime'] = $tblAdjacencyDatabaseEntry['1.3.6.1.4.1.9.9.810.1.3.1.1.6.' . $array['index'] . '.1.4.' . $array['endpoint']];
                 $message = false;
@@ -181,8 +182,8 @@ if ($device['os_group'] == 'cisco') {
                     'count' => $count,
                 ];
 
-                $tags = compact('endpoint', 'rrd_name', 'rrd_def');
-                data_update($device, 'cisco-otv-mac', $tags, $fields);
+                $tags = ['endpoint' => $endpoint, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
+                app('Datastore')->put($device, 'cisco-otv-mac', $tags, $fields);
             } // End If
         } // End foreach components
 

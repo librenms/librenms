@@ -1,5 +1,8 @@
 <?php
 
+// laravel routing uses section for sub-tab navigation
+$vars['proto'] ??= $vars['section'] ?? null;
+
 $link_array = [
     'page' => 'device',
     'device' => $device['device_id'],
@@ -19,6 +22,7 @@ $type_text['netscaler_vsvr'] = 'VServers';
 $type_text['bgp'] = 'BGP';
 $type_text['cef'] = 'CEF';
 $type_text['ospf'] = 'OSPF';
+$type_text['ospfv3'] = 'OSPFv3';
 $type_text['isis'] = 'ISIS';
 $type_text['vrf'] = 'VRFs';
 $type_text['routes'] = 'Routing Table';
@@ -62,9 +66,9 @@ if (is_file("includes/html/pages/device/routing/$protocol.inc.php")) {
             if (is_file("includes/html/pages/device/routing/overview/$type.inc.php")) {
                 $g_i++;
                 if (! is_integer($g_i / 2)) {
-                    $row_colour = \LibreNMS\Config::get('list_colour.even');
+                    $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
                 } else {
-                    $row_colour = \LibreNMS\Config::get('list_colour.odd');
+                    $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
                 }
 
                 echo '<div style="background-color: ' . $row_colour . ';">';

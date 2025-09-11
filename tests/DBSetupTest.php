@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DBSetup.php
  *
@@ -51,7 +52,7 @@ class DBSetupTest extends DBTestCase
         $this->assertSame(0, $result, 'Errors loading DB Schema: ' . Artisan::output());
     }
 
-    public function testSchema()
+    public function testSchema(): void
     {
         $files = array_map(function ($migration_file) {
             return basename($migration_file, '.php');
@@ -113,16 +114,17 @@ class DBSetupTest extends DBTestCase
 
     public function testValidateSchema(): void
     {
-        if (is_file('misc/db_schema.yaml')) {
+        $file = resource_path('definitions/schema/db_schema.yaml');
+        if (is_file($file)) {
             DB::connection($this->connection)->statement('SET time_zone = "+00:00";');
 
             $master_schema = \Symfony\Component\Yaml\Yaml::parse(
-                file_get_contents('misc/db_schema.yaml')
+                file_get_contents($file)
             );
 
             $current_schema = Schema::dump($this->connection);
 
-            $message = "Schema does not match the expected schema defined by misc/db_schema.yaml\n";
+            $message = "Schema does not match the expected schema defined by resources/definitions/schema/db_schema.yaml\n";
             $message .= "If you have changed the schema, make sure you update it with: lnms schema:dump\n";
 
             $this->assertEquals($master_schema, $current_schema, $message);

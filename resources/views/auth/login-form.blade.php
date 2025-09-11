@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <style>
     .panel.panel-default {
     margin: 100px;
@@ -6,13 +7,22 @@
 <x-panel>
     <x-slot name="title">
         <img class="logon-logo img-responsive" src="{{ asset(\LibreNMS\Config::get('title_image', 'images/telequill_loginpage.svg')) }}">
+=======
+<x-panel class="tw:rounded-lg tw:overflow-hidden">
+    <x-slot name="title">
+        <x-logo class="logon-logo tw:h-auto tw:w-full" />
+>>>>>>> upstream/master
     </x-slot>
 
     @config('login_message')
     <x-slot name="footer" class="text-center">
+<<<<<<< HEAD
         {{-- <div class="logon-message">{{ \LibreNMS\Config::get('login_message') }}</div> --}}
         <div class="logon-message">Alpha Bridge Technologies Pvt Ltd.</div>
         <span>Version 1.0</span>
+=======
+        <div class="logon-message">{{ \App\Facades\LibrenmsConfig::get('login_message') }}</div>
+>>>>>>> upstream/master
     </x-slot>
     @endconfig
 
@@ -57,8 +67,8 @@
             </div>
         </form>
 
-        @foreach (\LibreNMS\Config::get('auth.socialite.configs', []) as $provider => $config)
-        <form role="form" action="{{ route('socialite.redirect', $provider) }}" method="post" class="tw-mt-5">
+        @foreach (\App\Facades\LibrenmsConfig::get('auth.socialite.configs', []) as $provider => $config)
+        <form role="form" action="{{ route('socialite.redirect', $provider) }}" method="post" class="tw:mt-5">
             {{ csrf_field() }}
             <button type="submit" id="login" class="btn btn-success btn-block">
                 <i class="fab fa-btn fa-{{ $provider }}"></i> {{ __('Login with') }} {{ ucfirst($provider) }}

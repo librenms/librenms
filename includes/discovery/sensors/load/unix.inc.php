@@ -1,4 +1,5 @@
 <?php
+
 /**
  * unix.inc.php
  *
@@ -32,7 +33,7 @@ if (! empty($snmpData)) {
         8 => ['descr' => 'Ups Load', 'LL' => 0, 'LW' => 0, 'W' => null, 'H' => 100],
     ];
     foreach ($snmpData as $index => $upsData) {
-        if ($upsnut[$index]) {
+        if (isset($upsnut[$index])) {
             $value = intval($upsData['nsExtendOutLine']);
             if (! empty($value)) {
                 $oid = Oid::of('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut".' . $index)->toNumeric();

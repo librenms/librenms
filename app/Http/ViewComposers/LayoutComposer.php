@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LayoutComposer.php
  *
@@ -26,9 +27,9 @@
 namespace App\Http\ViewComposers;
 
 use App\Checks;
+use App\Facades\LibrenmsConfig;
 use App\Models\UserPref;
 use Illuminate\View\View;
-use LibreNMS\Config;
 
 class LayoutComposer
 {
@@ -45,15 +46,15 @@ class LayoutComposer
             // short sections escape the html entities, reverse that
             $title = html_entity_decode(trim($view->getFactory()->getSection('title')), ENT_QUOTES);
             $title = str_replace('    ', ' : ', $title);
-            $title .= ' | ' . Config::get('page_title_suffix');
+            $title .= ' | ' . LibrenmsConfig::get('page_title_suffix');
         } else {
-            $title = Config::get('page_title_suffix');
+            $title = LibrenmsConfig::get('page_title_suffix');
         }
 
         Checks::postAuth();
 
         $show_menu = auth()->check();
-        if ($show_menu && Config::get('twofactor') && ! session('twofactor')) {
+        if ($show_menu && LibrenmsConfig::get('twofactor') && ! session('twofactor')) {
             $show_menu = empty(UserPref::getPref(auth()->user(), 'twofactor'));
         }
 

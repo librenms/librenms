@@ -1,4 +1,5 @@
 <?php
+
 /*
  * SnmpQueryMock.php
  *
@@ -78,7 +79,7 @@ class SnmpQueryMock implements SnmpQueryInterface
         return $this; // ignore, always cached
     }
 
-    public function context(string $context): SnmpQueryInterface
+    public function context(string $context, ?string $v3_prefix = null): SnmpQueryInterface
     {
         $this->context = $context;
 
@@ -183,9 +184,9 @@ class SnmpQueryMock implements SnmpQueryInterface
 
     /**
      * @param  array|string  $oids
-     * @return \LibreNMS\Data\Source\SnmpResponse
+     * @return SnmpResponse
      *
-     * @throws \Exception
+     * @throws Exception
      */
     public function walk($oids): SnmpResponse
     {

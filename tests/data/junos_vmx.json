@@ -11736,7 +11736,7 @@
                     "owner": "test-rpm3",
                     "tag": "timestamp",
                     "rtt_type": "IcmpTimeStamp",
-                    "rtt": 47.84,
+                    "rtt": 47.841,
                     "status": 1,
                     "opstatus": 0,
                     "deleted": 0
@@ -11746,7 +11746,7 @@
                     "owner": "test-rpm",
                     "tag": "internet",
                     "rtt_type": "IcmpEcho",
-                    "rtt": 22.84,
+                    "rtt": 22.843,
                     "status": 1,
                     "opstatus": 0,
                     "deleted": 0
@@ -11756,7 +11756,7 @@
                     "owner": "test-twamp1",
                     "tag": "twamp",
                     "rtt_type": "twamp",
-                    "rtt": 27.01,
+                    "rtt": 27.008,
                     "status": 1,
                     "opstatus": 0,
                     "deleted": 0
@@ -11770,7 +11770,7 @@
                     "owner": "test-rpm3",
                     "tag": "timestamp",
                     "rtt_type": "IcmpTimeStamp",
-                    "rtt": 51.32,
+                    "rtt": 51.324,
                     "status": 1,
                     "opstatus": 0,
                     "deleted": 0
@@ -11780,7 +11780,7 @@
                     "owner": "test-rpm",
                     "tag": "internet",
                     "rtt_type": "IcmpEcho",
-                    "rtt": 24.56,
+                    "rtt": 24.562,
                     "status": 1,
                     "opstatus": 0,
                     "deleted": 0
@@ -12640,141 +12640,88 @@
         "discovery": {
             "storage": [
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "1",
                     "storage_type": "hrStorageFlashMemory",
                     "storage_descr": "/dev/gpt/junos: root file system, mounted on: /.mount",
                     "storage_size": 21403592704,
+                    "storage_size_oid": null,
                     "storage_units": 1024,
                     "storage_used": 1227826176,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.1",
+                    "storage_free": 20175766528,
+                    "storage_free_oid": null,
+                    "storage_perc": 6,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "16",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/dev/ada1s1e, mounted on: /.mount/config",
                     "storage_size": 316487680,
+                    "storage_size_oid": null,
                     "storage_units": 2048,
                     "storage_used": 34816,
-                    "storage_free": 0,
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.16",
+                    "storage_free": 316452864,
+                    "storage_free_oid": null,
                     "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "17",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "/dev/ada1s1f, mounted on: /.mount/var",
                     "storage_size": 5957548032,
+                    "storage_size_oid": null,
                     "storage_units": 2048,
                     "storage_used": 89348096,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.17",
+                    "storage_free": 5868199936,
+                    "storage_free_oid": null,
+                    "storage_perc": 1,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "18",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "tmpfs, mounted on: /.mount/tmp",
                     "storage_size": 3234828288,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 12288,
-                    "storage_free": 0,
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.18",
+                    "storage_free": 3234816000,
+                    "storage_free_oid": null,
                     "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 },
                 {
-                    "storage_mib": "hrstorage",
+                    "type": "hrstorage",
                     "storage_index": "50",
                     "storage_type": "hrStorageFixedDisk",
                     "storage_descr": "tmpfs, mounted on: /.mount/mfs",
                     "storage_size": 171216896,
+                    "storage_size_oid": null,
                     "storage_units": 4096,
                     "storage_used": 1617920,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
+                    "storage_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.50",
+                    "storage_free": 169598976,
+                    "storage_free_oid": null,
+                    "storage_perc": 1,
+                    "storage_perc_oid": null,
+                    "storage_perc_warn": 60
                 }
             ]
         },
-        "poller": {
-            "storage": [
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "1",
-                    "storage_type": "hrStorageFlashMemory",
-                    "storage_descr": "/dev/gpt/junos: root file system, mounted on: /.mount",
-                    "storage_size": 21403592704,
-                    "storage_units": 1024,
-                    "storage_used": 1227826176,
-                    "storage_free": 20175766528,
-                    "storage_perc": 6,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "16",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/dev/ada1s1e, mounted on: /.mount/config",
-                    "storage_size": 316487680,
-                    "storage_units": 2048,
-                    "storage_used": 34816,
-                    "storage_free": 316452864,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "17",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "/dev/ada1s1f, mounted on: /.mount/var",
-                    "storage_size": 5957548032,
-                    "storage_units": 2048,
-                    "storage_used": 89348096,
-                    "storage_free": 5868199936,
-                    "storage_perc": 1,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "18",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "tmpfs, mounted on: /.mount/tmp",
-                    "storage_size": 3234828288,
-                    "storage_units": 4096,
-                    "storage_used": 12288,
-                    "storage_free": 3234816000,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                },
-                {
-                    "storage_mib": "hrstorage",
-                    "storage_index": "50",
-                    "storage_type": "hrStorageFixedDisk",
-                    "storage_descr": "tmpfs, mounted on: /.mount/mfs",
-                    "storage_size": 171216896,
-                    "storage_units": 4096,
-                    "storage_used": 1617920,
-                    "storage_free": 169598976,
-                    "storage_perc": 1,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "bgp-peers": {
         "discovery": {
@@ -12982,43 +12929,18 @@
         "discovery": {
             "vlans": [
                 {
-                    "vlan_vlan": 0,
-                    "vlan_domain": 1,
-                    "vlan_name": "____juniper_private1____",
-                    "vlan_type": null,
-                    "vlan_mtu": null
-                },
-                {
                     "vlan_vlan": 10,
                     "vlan_domain": 1,
                     "vlan_name": "GVA-Backend",
-                    "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_type": "",
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 11,
                     "vlan_domain": 1,
                     "vlan_name": "GVA-Frontend",
-                    "vlan_type": null,
-                    "vlan_mtu": null
-                }
-            ],
-            "ports_vlans": [
-                {
-                    "vlan": 10,
-                    "baseport": 4098,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 11,
-                    "baseport": 4099,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
+                    "vlan_type": "",
+                    "vlan_state": 1
                 }
             ]
         }
@@ -13243,5 +13165,117 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "fec0:0000:0000:0000:000a:0000:0000:0004",
+                    "ipv6_compressed": "fec0::a:0:0:4",
+                    "ipv6_prefixlen": 0,
+                    "ipv6_origin": "manual",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 24
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.0.0.4",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "10.0.0.0/8",
+                    "ifIndex": 24
+                },
+                {
+                    "ipv4_address": "10.1.1.2",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "10.1.1.0/30",
+                    "ifIndex": 538
+                },
+                {
+                    "ipv4_address": "10.1.1.6",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "10.1.1.4/30",
+                    "ifIndex": 539
+                },
+                {
+                    "ipv4_address": "10.2.0.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.2.0.0/24",
+                    "ifIndex": 536
+                },
+                {
+                    "ipv4_address": "10.2.1.0",
+                    "ipv4_prefixlen": 31,
+                    "context_name": "",
+                    "ipv4_network": "10.2.1.0/31",
+                    "ifIndex": 544
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 21
+                },
+                {
+                    "ipv4_address": "128.0.0.1",
+                    "ipv4_prefixlen": 2,
+                    "context_name": "",
+                    "ipv4_network": "128.0.0.0/2",
+                    "ifIndex": 24
+                },
+                {
+                    "ipv4_address": "128.0.0.127",
+                    "ipv4_prefixlen": 2,
+                    "context_name": "",
+                    "ipv4_network": "128.0.0.0/2",
+                    "ifIndex": 514
+                },
+                {
+                    "ipv4_address": "128.0.0.4",
+                    "ipv4_prefixlen": 2,
+                    "context_name": "",
+                    "ipv4_network": "128.0.0.0/2",
+                    "ifIndex": 24
+                },
+                {
+                    "ipv4_address": "172.16.0.200",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "172.16.0.0/24",
+                    "ifIndex": 13
+                },
+                {
+                    "ipv4_address": "172.16.1.10",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 542
+                },
+                {
+                    "ipv4_address": "172.16.2.10",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 543
+                },
+                {
+                    "ipv4_address": "185.70.40.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "185.70.40.0/24",
+                    "ifIndex": 537
+                }
+            ]
+        }
     }
 }

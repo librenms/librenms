@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Python.php
  *
@@ -25,7 +26,7 @@
 
 namespace LibreNMS\Validations;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\Version;
 use LibreNMS\Validator;
 use Symfony\Component\Process\Process;
@@ -75,7 +76,7 @@ class Python extends BaseValidation
     private function checkExtensions(Validator $validator)
     {
         $pythonExtensions = '/scripts/dynamic_check_requirements.py';
-        $process = new Process([Config::get('install_dir') . $pythonExtensions, '-v']);
+        $process = new Process([LibrenmsConfig::get('install_dir') . $pythonExtensions, '-v']);
         $process->run();
 
         if ($process->getExitCode() !== 0) {
@@ -88,7 +89,7 @@ class Python extends BaseValidation
                     'The install docs show how this is done on a new install: https://docs.librenms.org/Installation/Install-LibreNMS/#configure-php-fpm'
                 );
             } else {
-                $validator->fail("Python3 module issue found: '" . $process->getOutput() . "'", 'pip3 install -r ' . Config::get('install_dir') . '/requirements.txt');
+                $validator->fail("Python3 module issue found: '" . $process->getOutput() . "'", 'pip3 install -r ' . LibrenmsConfig::get('install_dir') . '/requirements.txt');
             }
         }
     }

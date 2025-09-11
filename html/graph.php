@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LibreNMS
  *
@@ -7,7 +8,6 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Util\Debug;
 
 $auth = false;
@@ -26,9 +26,9 @@ if (! Auth::check()) {
 
 Debug::set(isset($_GET['debug']));
 
-require \LibreNMS\Config::get('install_dir') . '/includes/html/graphs/graph.inc.php';
+require \App\Facades\LibrenmsConfig::get('install_dir') . '/includes/html/graphs/graph.inc.php';
 
-Datastore::terminate();
+app('Datastore')->terminate();
 
 if (Debug::isEnabled()) {
     echo '<br />';

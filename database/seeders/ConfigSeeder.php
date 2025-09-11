@@ -1,4 +1,5 @@
 <?php
+
 /*
  * ConfigSeeder.php
  *
@@ -26,9 +27,9 @@
 
 namespace Database\Seeders;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Arr;
-use LibreNMS\Config;
 use Symfony\Component\Yaml\Yaml;
 
 class ConfigSeeder extends Seeder
@@ -59,7 +60,7 @@ class ConfigSeeder extends Seeder
 
         $reapply = getenv('REAPPLY_YAML_CONFIG');
 
-        if (Config::get('config_seeded') && ! $reapply) {
+        if (LibrenmsConfig::get('config_seeded') && ! $reapply) {
             if (! app()->runningInConsole() || ! $this->command->confirm(trans('commands.db:seed.existing_config'), false)) {
                 return; // don't overwrite existing settings.
             }
@@ -83,11 +84,11 @@ class ConfigSeeder extends Seeder
                     continue;
                 }
 
-                Config::persist($key, $value);
+                LibrenmsConfig::persist($key, $value);
             }
         }
 
-        Config::persist('config_seeded', true);
+        LibrenmsConfig::persist('config_seeded', true);
 
         if ($skipped_existing) {
             echo 'Skipped overwriting existing config settings.  To overwrite them, run: REAPPLY_YAML_CONFIG=1 lnms db:seed' . PHP_EOL;

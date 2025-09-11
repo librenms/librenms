@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AlertUtil.php
  *
@@ -25,12 +26,13 @@
 
 namespace LibreNMS\Alert;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\User;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
-use LibreNMS\Config;
+use LibreNMS\Enum\MaintenanceStatus;
 use PHPMailer\PHPMailer\PHPMailer;
 
 class AlertUtil
@@ -86,25 +88,25 @@ class AlertUtil
             return [];
         }
 
-        if (Config::get('alert.default_only') === true || Config::get('alerts.email.default_only') === true) {
-            $email = Config::get('alert.default_mail', Config::get('alerts.email.default'));
+        if (LibrenmsConfig::get('alert.default_only') === true || LibrenmsConfig::get('alerts.email.default_only') === true) {
+            $email = LibrenmsConfig::get('alert.default_mail', LibrenmsConfig::get('alerts.email.default'));
 
             return $email ? [$email => ''] : [];
         }
 
         $contacts = [];
 
-        if (Config::get('alert.syscontact')) {
+        if (LibrenmsConfig::get('alert.syscontact')) {
             $contacts = array_merge($contacts, self::findContactsSysContact($results));
         }
 
-        if (Config::get('alert.users')) {
+        if (LibrenmsConfig::get('alert.users')) {
             $contacts = array_merge($contacts, self::findContactsOwners($results));
         }
 
-        $roles = Config::get('alert.globals')
+        $roles = LibrenmsConfig::get('alert.globals')
             ? ['admin', 'global-read']
-            : (Config::get('alert.admins') ? ['admin'] : []);
+            : (LibrenmsConfig::get('alert.admins') ? ['admin'] : []);
         if ($roles) {
             $contacts = array_merge($contacts, self::findContactsRoles($roles));
         }
@@ -134,12 +136,12 @@ class AlertUtil
         }
 
         // Copy all email alerts to default contact if configured.
-        $default_mail = Config::get('alert.default_mail');
-        if (! isset($tmp_contacts[$default_mail]) && Config::get('alert.default_copy')) {
+        $default_mail = LibrenmsConfig::get('alert.default_mail');
+        if (! isset($tmp_contacts[$default_mail]) && LibrenmsConfig::get('alert.default_copy')) {
             $tmp_contacts[$default_mail] = '';
         }
         // Send email to default contact if no other contact found
-        if (empty($tmp_contacts) && Config::get('alert.default_if_none') && $default_mail) {
+        if (empty($tmp_contacts) && LibrenmsConfig::get('alert.default_if_none') && $default_mail) {
             $tmp_contacts[$default_mail] = '';
         }
 
@@ -148,7 +150,7 @@ class AlertUtil
 
     public static function findContactsRoles(array $roles): array
     {
-        return User::whereIs(...$roles)->whereNot('email', '')->pluck('realname', 'email')->toArray();
+        return User::role($roles)->whereNot('email', '')->pluck('realname', 'email')->toArray();
     }
 
     public static function findContactsSysContact(array $results): array
@@ -204,11 +206,11 @@ class AlertUtil
      * Check if device is under maintenance
      *
      * @param  int  $device_id  Device-ID
-     * @return bool
+     * @return MaintenanceStatus
      */
-    public static function isMaintenance($device_id)
+    public static function getMaintenanceStatus($device_id): MaintenanceStatus
     {
-        return DeviceCache::get($device_id)->isUnderMaintenance();
+        return DeviceCache::get($device_id)->getMaintenanceStatus();
     }
 
     /**
@@ -233,7 +235,7 @@ class AlertUtil
      */
     public static function runMacros($rule, $x = 1)
     {
-        $macros = Config::get('alert.macros.rule', []);
+        $macros = LibrenmsConfig::get('alert.macros.rule', []);
         krsort($macros);
         foreach ($macros as $macro => $value) {
             if (! strstr($macro, ' ')) {

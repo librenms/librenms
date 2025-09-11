@@ -1,4 +1,8 @@
 <?php
+
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Util\Mac;
+
 /**
  * aos.inc.php
  *
@@ -46,25 +50,29 @@ if (! empty($fdbPort_table)) {
     $portid_dict = [];
     $dot1dBasePortIfIndex = snmpwalk_group($device, 'dot1dBasePortIfIndex', 'BRIDGE-MIB');
     foreach ($dot1dBasePortIfIndex as $portLocal => $data) {
-        $port = get_port_by_index_cache($device['device_id'], $data['dot1dBasePortIfIndex']);
-        $portid_dict[$port['ifIndex']] = $port['port_id'];
+        $portid_dict[$port['ifIndex']] = PortCache::getIdFromIfIndex($data['dot1dBasePortIfIndex'], $device['device_id']);
     }
     // Collect data and populate $insert
     foreach ($fdbPort_table as $vlan => $data) {
         foreach ($data['dot1qTpFdbPort'] as $mac => $dot1dBasePort) {
             if ($dot1dBasePort == 0) {
-                d_echo("No port known for $mac\n");
+                Log::debug("No port known for $mac\n");
                 continue;
             }
-            $mac_address = implode(array_map('zeropad', explode(':', $mac)));
+
+            if (! isset($portid_dict[$dot1dBasePort])) {
+                continue;
+            }
+
+            $mac_address = Mac::parse($mac)->hex();
             if (strlen($mac_address) != 12) {
-                d_echo("MAC address padding failed for $mac\n");
+                Log::debug("MAC address padding failed for $mac\n");
                 continue;
             }
             $port_id = $portid_dict[$dot1dBasePort];
             $vlan_id = isset($vlans_dict[$vlan]) ? $vlans_dict[$vlan] : 0;
             $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
-            d_echo("vlan $vlan_id mac $mac_address port ($dot1dBasePort) $port_id\n");
+            Log::debug("vlan $vlan_id mac $mac_address port ($dot1dBasePort) $port_id\n");
         }
     }
 }

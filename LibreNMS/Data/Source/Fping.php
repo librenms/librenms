@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Fping.php
  *
@@ -25,7 +26,7 @@
 
 namespace LibreNMS\Data\Source;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\FpingUnparsableLine;
 use Log;
 use Symfony\Component\Process\Process;
@@ -43,14 +44,14 @@ class Fping
     public function __construct()
     {
         // prep fping parameters
-        $this->fping_bin = Config::get('fping', 'fping');
-        $fping6 = Config::get('fping6', 'fping6');
+        $this->fping_bin = LibrenmsConfig::get('fping', 'fping');
+        $fping6 = LibrenmsConfig::get('fping6', 'fping6');
         $this->fping6_bin = is_executable($fping6) ? $fping6 : false;
-        $this->count = max(Config::get('fping_options.count', 3), 1);
-        $this->interval = max(Config::get('fping_options.interval', 500), 20);
-        $this->timeout = max(Config::get('fping_options.timeout', 500), $this->interval);
-        $this->retries = Config::get('fping_options.retries', 2);
-        $this->tos = Config::get('fping_options.tos', 0);
+        $this->count = max(LibrenmsConfig::get('fping_options.count', 3), 1);
+        $this->interval = max(LibrenmsConfig::get('fping_options.interval', 500), 20);
+        $this->timeout = max(LibrenmsConfig::get('fping_options.timeout', 500), $this->interval);
+        $this->retries = LibrenmsConfig::get('fping_options.retries', 2);
+        $this->tos = LibrenmsConfig::get('fping_options.tos', 0);
     }
 
     /**
@@ -58,7 +59,7 @@ class Fping
      *
      * @param  string  $host  hostname or ip
      * @param  string  $address_family  ipv4 or ipv6
-     * @return \LibreNMS\Data\Source\FpingResponse
+     * @return FpingResponse
      */
     public function ping($host, $address_family = 'ipv4'): FpingResponse
     {
@@ -107,7 +108,7 @@ class Fping
         ]]);
 
         // twice polling interval
-        $process->setTimeout(Config::get('rrd.step', 300) * 2);
+        $process->setTimeout(LibrenmsConfig::get('rrd.step', 300) * 2);
         // send hostnames to stdin to avoid overflowing cli length limits
         $process->setInput(implode(PHP_EOL, $hosts) . PHP_EOL);
 

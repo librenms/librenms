@@ -129,20 +129,36 @@ common          OBJECT IDENTIFIER ::= { advaMIB 2 }
 -- **************************  ADVA Products  *******************************
 -- **************************************************************************
 
-fsp3000         OBJECT IDENTIFIER ::= { products 4 }
-fsp1000         OBJECT IDENTIFIER ::= { products 6 }
-fsp2000         OBJECT IDENTIFIER ::= { products 7 }
-fsp1000adm      OBJECT IDENTIFIER ::= { products 8 }
-fsp1500         OBJECT IDENTIFIER ::= { products 9 }
-fsp150          OBJECT IDENTIFIER ::= { products 10 }
-fspR7           OBJECT IDENTIFIER ::= { products 11 }
-fsp150cm        OBJECT IDENTIFIER ::= { products 12 }
-fspNm           OBJECT IDENTIFIER ::= { products 13 }
-fsp3000alm      OBJECT IDENTIFIER ::= { products 14 }
-fsp3000c        OBJECT IDENTIFIER ::= { products 15 }
-aos             OBJECT IDENTIFIER ::= { products 20 }
-aosCommon       OBJECT IDENTIFIER ::= { aos 1 }
-aosProducts     OBJECT IDENTIFIER ::= { aos 2 }
+fsp3000               OBJECT IDENTIFIER ::= { products 4 }
+fsp1000               OBJECT IDENTIFIER ::= { products 6 }
+fsp2000               OBJECT IDENTIFIER ::= { products 7 }
+fsp1000adm            OBJECT IDENTIFIER ::= { products 8 }
+fsp1500               OBJECT IDENTIFIER ::= { products 9 }
+fsp150                OBJECT IDENTIFIER ::= { products 10 }
+fspR7                 OBJECT IDENTIFIER ::= { products 11 }
+fsp150cm              OBJECT IDENTIFIER ::= { products 12 }
+fspNm                 OBJECT IDENTIFIER ::= { products 13 }
+fsp3000alm            OBJECT IDENTIFIER ::= { products 14 }
+
+aos                   OBJECT IDENTIFIER ::= { products 20 }
+aosCommon             OBJECT IDENTIFIER ::= { aos 1 }
+aosProducts           OBJECT IDENTIFIER ::= { aos 2 }
+
+fsp3000c              OBJECT IDENTIFIER ::= { aosProducts 1 }
+fspxg480              OBJECT IDENTIFIER ::= { aosProducts 2 }
+fspxg404              OBJECT IDENTIFIER ::= { aosProducts 3 }
+fspxg418              OBJECT IDENTIFIER ::= { aosProducts 4 }
+fspxg480-25g-100g              OBJECT IDENTIFIER ::= { aosProducts 5 }
+fspxg480-100g                  OBJECT IDENTIFIER ::= { aosProducts 6 }
+fspxg480-100gcfp2              OBJECT IDENTIFIER ::= { aosProducts 7 }
+fspxg404-100g                  OBJECT IDENTIFIER ::= { aosProducts 8 }
+fspxg404-100gcfp2              OBJECT IDENTIFIER ::= { aosProducts 9 }
+fspxg418-100g                  OBJECT IDENTIFIER ::= { aosProducts 10 }
+fspxg418-100gcfp2              OBJECT IDENTIFIER ::= { aosProducts 11 }
+fspxg118pro-cshac              OBJECT IDENTIFIER ::= { aosProducts 12 }
+fspxg118pro-cshdc              OBJECT IDENTIFIER ::= { aosProducts 13 }
+fspxg118pro-cshac-g            OBJECT IDENTIFIER ::= { aosProducts 14 }
+fspxg118pro-cshdc-g            OBJECT IDENTIFIER ::= { aosProducts 15 }
 
 
 -- **************************************************************************
@@ -1829,7 +1845,7 @@ OtnPayloadType ::= TEXTUAL-CONVENTION
             ifTypeF8500(110), --Fixed datarate 8500 Mbps; supports transport of 8G Fibre Channel
             ifTypeF10000(129), --Fixed Rate 10000 Mbps; supports transport of InifinBand 10G
             ifTypeF5000(150), --Fixed Rate 5.000 Gbps; supports transport of InfiniBand 5G
-            ifTypeF14025(178), --Fixed Rate 14.025 Gbps; supports transport of Fibre Channel 16G 
+            ifTypeF14025(178), --Fixed Rate 14.025 Gbps; supports transport of Fibre Channel 16G
             ifType40GbE(192), --Ethernet 40G: Line Rate 41.250; supports full protocol
             ifTypeF41250(194), --Fixed Rate 41.250 Gbps; supports transport of Ethernet 40G (40 GbE)
             ifTypeF103125(195), --Fixed Rate 103.125 Gbps; supports transport of Ethernet 100G (100 GbE)
@@ -1951,7 +1967,7 @@ ProtectionMech ::= TEXTUAL-CONVENTION
             channelCardProtection(2), --Channel card protection
             channelProtection(3), --Channel protection
             versatileSwitchedProtection(4),
-            flowProtection(5), --ELINE Flow (EVC) protection 
+            flowProtection(5), --ELINE Flow (EVC) protection
             clientCardProtection(6),
             controller(7),
             none(8)
@@ -2126,7 +2142,7 @@ SonetTraceForm ::= TEXTUAL-CONVENTION
             undefined(0),
             form64CRLF(1), --note: only 62 byte available for user
             form16CRC7(2), --note: only 15 byte available for user
-            form1Byte(3) --note: [000...255] consits of 3 strings of decimal numbers 
+            form1Byte(3) --note: [000...255] consits of 3 strings of decimal numbers
         }
 
 SonetTraceFormCaps ::= TEXTUAL-CONVENTION

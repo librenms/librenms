@@ -1,4 +1,5 @@
 <?php
+
 /**
  * DashboardController.php
  *
@@ -25,6 +26,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Dashboard;
 use App\Models\User;
 use App\Models\UserPref;
@@ -33,35 +35,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use LibreNMS\Config;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {
-    /** @var string[] */
-    public static $widgets = [
-        'alerts',
-        'alertlog',
-        'alertlog-stats',
-        'availability-map',
-        'component-status',
-        'custom-map',
-        'device-summary-horiz',
-        'device-summary-vert',
-        'device-types',
-        'eventlog',
-        'globe',
-        'generic-graph',
-        'graylog',
-        'generic-image',
-        'notes',
-        'server-stats',
-        'syslog',
-        'top-devices',
-        'top-errors',
-        'top-interfaces',
-        'worldmap',
-    ];
-
     /** @var \Illuminate\Support\Collection<\App\Models\Dashboard> */
     private $dashboards;
 
@@ -71,7 +49,7 @@ class DashboardController extends Controller
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return \Illuminate\Contracts\View\View
      */
     public function index(Request $request)
@@ -91,7 +69,7 @@ class DashboardController extends Controller
 
         // default dashboard
         $user_default_dash = (int) UserPref::getPref($user, 'dashboard');
-        $global_default = (int) Config::get('webui.default_dashboard_id');
+        $global_default = (int) LibrenmsConfig::get('webui.default_dashboard_id');
 
         // load user default
         if ($dashboards->has($user_default_dash)) {
@@ -117,8 +95,8 @@ class DashboardController extends Controller
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Dashboard  $dashboard
+     * @param  Request  $request
+     * @param  Dashboard  $dashboard
      * @return \Illuminate\Contracts\View\View
      */
     public function show(Request $request, Dashboard $dashboard)
@@ -152,9 +130,7 @@ class DashboardController extends Controller
             ];
         }
 
-        $widgets = array_combine(self::$widgets, array_map(function ($widget) {
-            return trans("widgets.$widget.title");
-        }, self::$widgets));
+        $widgets = self::listWidgets();
 
         $user_list = $user->can('manage', User::class)
             ? User::where('user_id', '!=', $user->user_id)
@@ -198,7 +174,7 @@ class DashboardController extends Controller
     {
         $validated = $this->validate($request, [
             'dashboard_name' => 'string|max:255',
-            'access' => 'int|in:0,1,2',
+            'access' => 'int|in:0,1,2,3',
         ]);
 
         $dashboard->fill($validated);
@@ -257,7 +233,31 @@ class DashboardController extends Controller
     }
 
     /**
-     * @param  \App\Models\User  $user
+     * @return Collection<string, string> widget name, widget localized title
+     */
+    public static function listWidgets(): Collection
+    {
+        return collect(Route::getRoutes())->filter(function (\Illuminate\Routing\Route $route) {
+            if (str_ends_with($route->uri, 'placeholder')) {
+                return false;
+            }
+
+            return $route->getPrefix() === 'ajax/dash';
+        })->mapWithKeys(function (\Illuminate\Routing\Route $route) {
+            $widget = Str::afterLast($route->uri, '/');
+            $title = $widget; // default to path for title
+
+            $controller = $route->getController();
+            if (method_exists($controller, 'getTitle')) {
+                $title = $controller->getTitle();
+            }
+
+            return [$widget => $title];
+        })->sort();
+    }
+
+    /**
+     * @param  User  $user
      * @return \Illuminate\Support\Collection<\App\Models\Dashboard>
      */
     private function getAvailableDashboards(User $user): Collection

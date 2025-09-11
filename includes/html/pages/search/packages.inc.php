@@ -151,7 +151,7 @@ foreach ($ordered as $name => $entry) {
             $devs[] = generate_device_link($variation);
         }
     }
-    if (sizeof($arch) > 0 && sizeof($vers) > 0) {
+    if (count($arch) > 0 && count($vers) > 0) {
         ?>
         <tr>
             <td><a href="<?php echo \LibreNMS\Util\Url::generate(['page' => 'packages', 'name' => $name]); ?>"><?php echo $name; ?></a></td>

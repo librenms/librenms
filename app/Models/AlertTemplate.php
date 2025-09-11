@@ -1,4 +1,5 @@
 <?php
+
 /**
  * app/Models/AlertTemplate.php
  *
@@ -33,15 +34,20 @@ class AlertTemplate extends BaseModel
     public $timestamps = false;
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\AlertTemplateMap, $this>
+     */
     public function map(): HasMany
     {
-        return $this->hasMany(\App\Models\AlertTemplateMap::class, 'alert_templates_id', 'id');
+        return $this->hasMany(AlertTemplateMap::class, 'alert_templates_id', 'id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\AlertRule, \App\Models\AlertTemplateMap, $this>
+     */
     public function alert_rules(): HasManyThrough
     {
-        return $this->hasManyThrough(\App\Models\AlertRule::class, \App\Models\AlertTemplateMap::class, 'alert_templates_id', 'id', 'id', 'alert_rule_id')
+        return $this->hasManyThrough(AlertRule::class, AlertTemplateMap::class, 'alert_templates_id', 'id', 'id', 'alert_rule_id')
                     ->select(['id' => 'alert_rules.id', 'name' => 'alert_rules.name'])
                     ->orderBy('alert_rules.name');
     }

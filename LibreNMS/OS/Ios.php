@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Ios.php
  *
@@ -25,7 +26,6 @@
 
 namespace LibreNMS\OS;
 
-use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessChannelDiscovery;
@@ -49,43 +49,33 @@ class Ios extends Cisco implements
     use CiscoCellular;
 
     /**
-     * @return array Sensors
+     * @return WirelessSensor[] Sensors
      */
-    public function discoverWirelessClients()
+    public function discoverWirelessClients(): array
     {
-        $device = $this->getDeviceArray();
+        $device = $this->getDevice();
 
-        if (! Str::startsWith($device['hardware'], 'AIR-') && ! Str::contains($device['hardware'], 'ciscoAIR')) {
+        if (empty($device->hardware) || (! str_starts_with($device->hardware, 'AIR-') && ! str_contains($device->hardware, 'ciscoAIR'))) {
             // unsupported IOS hardware
             return [];
         }
 
-        $data = snmpwalk_cache_oid($device, 'cDot11ActiveWirelessClients', [], 'CISCO-DOT11-ASSOCIATION-MIB');
-        $entPhys = snmpwalk_cache_oid($device, 'entPhysicalDescr', [], 'ENTITY-MIB');
+        $data = \SnmpQuery::walk('CISCO-DOT11-ASSOCIATION-MIB::cDot11ActiveWirelessClients')->table(1);
 
-        // fixup incorrect/missing entPhysicalIndex mapping
-        foreach ($data as $index => $_unused) {
-            foreach ($entPhys as $entIndex => $ent) {
-                $descr = $ent['entPhysicalDescr'];
-                unset($entPhys[$entIndex]); // only use each one once
-
-                if (Str::endsWith($descr, 'Radio')) {
-                    d_echo("Mapping entPhysicalIndex $entIndex to ifIndex $index\n");
-                    $data[$index]['entPhysicalIndex'] = $entIndex;
-                    $data[$index]['entPhysicalDescr'] = $descr;
-                    break;
-                }
-            }
+        if (empty($data)) {
+            return [];
         }
 
+        $this->mapToEntPhysical($data);
+
         $sensors = [];
-        foreach ($data as $index => $entry) {
+        foreach ($data as $ifIndex => $entry) {
             $sensors[] = new WirelessSensor(
                 'clients',
                 $device['device_id'],
-                ".1.3.6.1.4.1.9.9.273.1.1.2.1.1.$index",
+                ".1.3.6.1.4.1.9.9.273.1.1.2.1.1.$ifIndex",
                 'ios',
-                $index,
+                $ifIndex,
                 $entry['entPhysicalDescr'],
                 $entry['cDot11ActiveWirelessClients'],
                 1,
@@ -101,5 +91,43 @@ class Ios extends Cisco implements
         }
 
         return $sensors;
+    }
+
+    private function mapToEntPhysical(array &$data): array
+    {
+        // try DB first
+        $dbMap = $this->getDevice()->entityPhysical;
+        if ($dbMap->isNotEmpty()) {
+            foreach ($data as $ifIndex => $_unused) {
+                foreach ($dbMap as $entPhys) {
+                    if ($entPhys->ifIndex === $ifIndex) {
+                        $data[$ifIndex]['entPhysicalIndex'] = $entPhys->entPhysicalIndex;
+                        $data[$ifIndex]['entPhysicalDescr'] = $entPhys->entPhysicalDescr;
+                        break;
+                    }
+                }
+            }
+
+            return $data;
+        }
+
+        $entPhys = \SnmpQuery::walk('ENTITY-MIB::entPhysicalDescr')->table(1);
+
+        // fixup incorrect/missing entPhysicalIndex mapping (doesn't use entAliasMappingIdentifier for some reason)
+        foreach ($data as $ifIndex => $_unused) {
+            foreach ($entPhys as $entIndex => $ent) {
+                $descr = $ent['ENTITY-MIB::entPhysicalDescr'];
+                unset($entPhys[$entIndex]); // only use each one once
+
+                if (str_ends_with($descr, 'Radio')) {
+                    d_echo("Mapping entPhysicalIndex $entIndex to ifIndex $ifIndex\n");
+                    $data[$ifIndex]['entPhysicalIndex'] = $entIndex;
+                    $data[$ifIndex]['entPhysicalDescr'] = $descr;
+                    break;
+                }
+            }
+        }
+
+        return $data;
     }
 }

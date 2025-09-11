@@ -1,4 +1,5 @@
 <?php
+
 /**
  * RutosRutx.php
  *
@@ -39,20 +40,19 @@ class RutosRutx extends OS implements
     WirelessSinrDiscovery,
     WirelessCellDiscovery
 {
-    public function discoverWirelessRssi()
+    public function discoverWirelessRssi(): array
     {
         $data = $this->getCacheTable('TELTONIKA-RUTX-MIB::modemTable');
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('TELTONIKA-RUTX-MIB::mIndex');
             $sensors[] = new WirelessSensor(
                 'rssi',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.48690.2.2.1.12.' . $index,
                 'rutos-rutx',
                 $index,
-                'Modem ' . $name[$index] . ' RSSI',
+                'Modem ' . ($entry['mIndex'] ?? null) . ' RSSI',
                 $entry['mSignal']
             );
         }
@@ -60,20 +60,19 @@ class RutosRutx extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessRsrp()
+    public function discoverWirelessRsrp(): array
     {
         $data = $this->getCacheTable('TELTONIKA-RUTX-MIB::modemTable');
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('TELTONIKA-RUTX-MIB::mIndex');
             $sensors[] = new WirelessSensor(
                 'rsrp',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.48690.2.2.1.20.' . $index,
                 'rutos-rutx',
                 $index,
-                'Modem ' . $name[$index] . ' RSRP',
+                'Modem ' . ($entry['mIndex'] ?? null) . ' RSRP',
                 $entry['mRSRP']
             );
         }
@@ -81,20 +80,19 @@ class RutosRutx extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessRsrq()
+    public function discoverWirelessRsrq(): array
     {
         $data = $this->getCacheTable('TELTONIKA-RUTX-MIB::modemTable');
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('TELTONIKA-RUTX-MIB::mIndex');
             $sensors[] = new WirelessSensor(
                 'rsrq',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.48690.2.2.1.21.' . $index,
                 'rutos-rutx',
                 $index,
-                'Modem ' . $name[$index] . ' RSRQ',
+                'Modem ' . ($entry['mIndex'] ?? null) . ' RSRQ',
                 $entry['mRSRQ']
             );
         }
@@ -102,20 +100,19 @@ class RutosRutx extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessSinr()
+    public function discoverWirelessSinr(): array
     {
         $data = $this->getCacheTable('TELTONIKA-RUTX-MIB::modemTable');
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('TELTONIKA-RUTX-MIB::mIndex');
             $sensors[] = new WirelessSensor(
                 'sinr',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.48690.2.2.1.19.' . $index,
                 'rutos-rutx',
                 $index,
-                'Modem ' . $name[$index] . ' SINR',
+                'Modem ' . ($entry['mIndex'] ?? null) . ' SINR',
                 $entry['mSINR']
             );
         }
@@ -123,21 +120,20 @@ class RutosRutx extends OS implements
         return $sensors;
     }
 
-    public function discoverWirelessCell()
+    public function discoverWirelessCell(): array
     {
         $data = $this->getCacheTable('TELTONIKA-RUTX-MIB::modemTable');
 
         $sensors = [];
         foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('TELTONIKA-RUTX-MIB::mIndex');
             $sensors[] = new WirelessSensor(
                 'cell',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.48690.2.2.1.18.' . $index,
                 'rutos-rutx',
                 $index,
-                'Modem ' . $name[$index] . ' CELL ID',
-                $entry['CELLID']
+                'Modem ' . ($entry['mIndex'] ?? null) . ' CELL ID',
+                $entry['CELLID'] ?? null
             );
         }
 

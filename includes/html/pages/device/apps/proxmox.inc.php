@@ -18,14 +18,14 @@
 
 include 'includes/html/application/proxmox.inc.php';
 
-if (! \LibreNMS\Config::get('enable_proxmox')) {
+if (! \App\Facades\LibrenmsConfig::get('enable_proxmox')) {
     print_error('Proxmox agent was discovered on this host. Please enable Proxmox in your config.');
 } else {
     $graphs = [
         'proxmox_traffic' => 'Traffic',
     ];
 
-    foreach (proxmox_node_vms(Request::get('device')) as $nvm) {
+    foreach (proxmox_node_vms($device['device_id']) as $nvm) {
         $vm = proxmox_vm_info($nvm['vmid'], $nvm['cluster']);
 
         foreach ($vm['ports'] as $port) {
@@ -34,7 +34,7 @@ if (! \LibreNMS\Config::get('enable_proxmox')) {
 
                 $graph_array['height'] = '100';
                 $graph_array['width'] = '215';
-                $graph_array['to'] = \LibreNMS\Config::get('time.now');
+                $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
                 $graph_array['id'] = $vm['app_id'];
                 $graph_array['device_id'] = $vm['device_id'];
                 $graph_array['type'] = 'application_' . $key;

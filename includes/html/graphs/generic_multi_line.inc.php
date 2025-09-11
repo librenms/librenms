@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -17,8 +18,10 @@ require 'includes/html/graphs/common.inc.php';
 
 $stacked = generate_stacked_graphs();
 
-$descr_len = $descr_len ?? 12;
-$unitlen = $unitlen ?? 0;
+$descr_len ??= 12;
+$unitlen ??= 0;
+$units ??= '';
+$unit_text ??= '';
 $rrd_optionsb = '';
 
 if ($nototal) {
@@ -31,15 +34,15 @@ $rrd_options .= " COMMENT:'" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr($unit_te
 $i = 0;
 $iter = 0;
 
-foreach ($rrd_list as $rrd) {
+foreach ($rrd_list ?? [] as $rrd) {
     // get the color for this data set
     if (isset($rrd['colour'])) {
         $colour = $rrd['colour'];
     } else {
-        if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+        if (! \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter")) {
             $iter = 0;
         }
-        $colour = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+        $colour = \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter");
         $iter++;
     }
 

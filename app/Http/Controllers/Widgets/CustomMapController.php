@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CustomMapController.php
  *
@@ -25,13 +26,14 @@
 
 namespace App\Http\Controllers\Widgets;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\CustomMap;
 use Illuminate\Http\Request;
-use LibreNMS\Config;
+use Illuminate\View\View;
 
 class CustomMapController extends WidgetController
 {
-    protected $title = 'Custom Map';
+    protected string $name = 'custom-map';
     protected $defaults = [
         'title' => null,
         'custom_map' => null,
@@ -43,15 +45,15 @@ class CustomMapController extends WidgetController
         $this->authorizeResource(CustomMap::class, 'map');
     }
 
-    public function getView(Request $request)
+    public function getView(Request $request): string|View
     {
-        $data = $this->getSettings(true);
+        $data = $this->getSettings();
 
         $data['map'] = CustomMap::find($data['custom_map']);
         if (! $data['map']) {
             return __('map.custom.widget.not_found');
         }
-        $data['base_url'] = Config::get('base_url');
+        $data['base_url'] = LibrenmsConfig::get('base_url');
         $data['background_config'] = $data['map']->getBackgroundConfig();
         $data['map_conf'] = $data['map']->options;
 
@@ -62,7 +64,7 @@ class CustomMapController extends WidgetController
         return view('widgets.custom-map', $data);
     }
 
-    public function getSettingsView(Request $request)
+    public function getSettingsView(Request $request): View
     {
         $data = $this->getSettings(true);
         $data['map'] = CustomMap::find($data['custom_map']);

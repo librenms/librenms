@@ -1,4 +1,5 @@
 <?php
+
 /**
  * StringHelpers.php
  *
@@ -19,7 +20,7 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2021 Tony Murray
+ * @copyright  2025 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
@@ -27,22 +28,6 @@ namespace LibreNMS\Util;
 
 class StringHelpers
 {
-    /**
-     * Shorten text over 50 chars, if shortened, add ellipsis
-     *
-     * @param  string  $string
-     * @param  int  $max
-     * @return string
-     */
-    public static function shortenText($string, $max = 30)
-    {
-        if (strlen($string) > 50) {
-            return substr($string, 0, $max) . '...';
-        }
-
-        return $string;
-    }
-
     public static function niceCase($string)
     {
         $replacements = [
@@ -201,8 +186,64 @@ class StringHelpers
         return preg_replace($regex, '', str_replace("\n", '', $string));
     }
 
-    public static function isHex(string $string): bool
+    /**
+     * If string has a number at the start (excluding whitespace) that can be extraced by Number::cast()
+     */
+    public static function hasNumber(string $string): bool
     {
-        return (bool) preg_match('/^[a-f0-9][a-f0-9]( [a-f0-9][a-f0-9])*$/is', trim($string));
+        return (bool) preg_match('/^\s*-?\d+(\.\d+)?/', $string);
+    }
+
+    public static function isHex(string $string, string $delimiter = ''): bool
+    {
+        $string = trim($string);
+
+        if ($delimiter === '') {
+            return (bool) preg_match('/^(?:[[:xdigit:]]{2})+$/', $string);
+        }
+
+        $escapedDelimiter = preg_quote($delimiter, '/');
+        $pattern = '/^[[:xdigit:]]{2}(?:' . $escapedDelimiter . '[[:xdigit:]]{2})*$/';
+
+        return (bool) preg_match($pattern, $string);
+    }
+
+    /**
+     * Convert hex string to an array of 1-based indices of the nonzero bits
+     * ie. '9a00' -> '100110100000' -> array(1, 4, 5, 7)
+     *
+     * @return int[]
+     */
+    public static function bitsToIndices(string $hex_data): array
+    {
+        $hex_data = str_replace([' ', "\n"], '', $hex_data);
+
+        // we need an even number of digits for hex2bin
+        if (strlen($hex_data) % 2 === 1) {
+            $hex_data = '0' . $hex_data;
+        }
+
+        if (! StringHelpers::isHex($hex_data)) {
+            // could be malformed
+            if (preg_match('/^(\d+)(,\d+)*$/', ltrim($hex_data, '0'), $matches)) {
+                return array_map(fn ($v) => intval($v), explode(',', $matches[0]));
+            }
+
+            return [];
+        }
+
+        $value = hex2bin($hex_data);
+        $length = strlen($value);
+        $indices = [];
+        for ($i = 0; $i < $length; $i++) {
+            $byte = ord($value[$i]);
+            for ($j = 7; $j >= 0; $j--) {
+                if ($byte & (1 << $j)) {
+                    $indices[] = 8 * $i + 8 - $j;
+                }
+            }
+        }
+
+        return $indices;
     }
 }

@@ -15,7 +15,7 @@
 <?php
 
 // FIXME svn stuff still using optc etc, won't work, needs updating!
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use Symfony\Component\Process\Process;
 
 
@@ -28,7 +28,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
         echo "<span style='font-weight: bold;'>Config</span> &#187; ";
 
-        if (! $vars['rev']) {
+        if (empty($vars['rev'])) {
             echo '<span class="pagemenu-selected">';
             echo generate_link('Latest', ['page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig']);
             echo '</span>';
@@ -36,30 +36,50 @@ if (Auth::user()->hasGlobalAdmin()) {
             echo generate_link('Latest', ['page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig']);
         }
 
-        if (Config::get('rancid_repo_type') == 'svn' && function_exists('svn_log')) {
-            $sep = ' | ';
-            $svnlogs = svn_log($rancid_file, SVN_REVISION_HEAD, null, 8);
-            $revlist = [];
-
-            foreach ($svnlogs as $svnlog) {
-                echo $sep;
-                $revlist[] = $svnlog['rev'];
-
-                if ($vars['rev'] == $svnlog['rev']) {
-                    echo '<span class="pagemenu-selected">';
-                }
-
-                $linktext = 'r' . $svnlog['rev'] . ' <small>' . date(Config::get('dateformat.byminute'), strtotime($svnlog['date'])) . '</small>';
-                echo generate_link($linktext, ['page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig', 'rev' => $svnlog['rev']]);
-
-                if ($vars['rev'] == $svnlog['rev']) {
-                    echo '</span>';
-                }
-
+        if (LibrenmsConfig::get('rancid_repo_type') == 'svn') {
+            $svn_binary = LibrenmsConfig::locateBinary('svn');
+            if (is_executable($svn_binary)) {
                 $sep = ' | ';
+
+                $process = new Process([$svn_binary, 'log', '-l 8', '-q', '--xml', $rancid_file], $rancid_path);
+                $process->run();
+                $svnlogs_xmlstring = $process->getOutput();
+                $svnlogs = [];
+
+                $svnlogs_xml = simplexml_load_string($svnlogs_xmlstring);
+                foreach ($svnlogs_xml->logentry as $svnlogentry) {
+                    $rev = $svnlogentry['revision'];
+                    $ts = strtotime($svnlogentry->date);
+                    $svnlogs[] = ['rev' => $rev, 'date' => $ts];
+                }
+
+                $revlist = [];
+
+                foreach ($svnlogs as $svnlog) {
+                    echo $sep;
+                    $revlist[] = $svnlog['rev'];
+
+                    if ($vars['rev'] == $svnlog['rev']) {
+                        echo '<span class="pagemenu-selected">';
+                    }
+
+                    $linktext = 'r' . $svnlog['rev'] . ' <small>' . date(LibrenmsConfig::get('dateformat.byminute'), $svnlog['date']) . '</small>';
+                    echo generate_link($linktext, ['page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig', 'rev' => $svnlog['rev']]);
+
+                    if ($vars['rev'] == $svnlog['rev']) {
+                        echo '</span>';
+                    }
+
+                    $sep = ' | ';
+                }
             }
+<<<<<<< HEAD
         } //end if
         if (Config::get('rancid_repo_type') == 'git') {
+=======
+        }//end if
+        if (LibrenmsConfig::get('rancid_repo_type') == 'git') {
+>>>>>>> upstream/master
             $sep = ' | ';
 
             $process = new Process(['git', 'log', '-n 8', '--pretty=format:%h;%ct', $rancid_file], $rancid_path);
@@ -82,7 +102,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                     echo '<span class="pagemenu-selected">';
                 }
 
-                $linktext = 'r' . $gitlog['rev'] . ' <small>' . date(Config::get('dateformat.byminute'), $gitlog['date']) . '</small>';
+                $linktext = 'r' . $gitlog['rev'] . ' <small>' . date(LibrenmsConfig::get('dateformat.byminute'), $gitlog['date']) . '</small>';
                 echo generate_link($linktext, ['page' => 'device', 'device' => $device['device_id'], 'tab' => 'showconfig', 'rev' => $gitlog['rev']]);
 
                 if ($vars['rev'] == $gitlog['rev']) {
@@ -95,19 +115,17 @@ if (Auth::user()->hasGlobalAdmin()) {
 
         print_optionbar_end();
 
-        if (Config::get('rancid_repo_type') == 'svn') {
-            if (function_exists('svn_log') && in_array($vars['rev'], $revlist)) {
-                [$diff, $errors] = svn_diff($rancid_file, $vars['rev'] - 1, $rancid_file, $vars['rev']);
+        if (LibrenmsConfig::get('rancid_repo_type') == 'svn') {
+            $svn_binary = LibrenmsConfig::locateBinary('svn');
+            if (is_executable($svn_binary) && in_array($vars['rev'], $revlist)) {
+                $process = new Process([$svn_binary, 'diff', '-c', 'r' . $vars['rev'], $rancid_file], $rancid_path);
+                $process->run();
+                $diff = $process->getOutput();
                 if (! $diff) {
                     $text = 'No Difference';
                 } else {
-                    $text = '';
-                    while (! feof($diff)) {
-                        $text .= fread($diff, 8192);
-                    }
-
-                    fclose($diff);
-                    fclose($errors);
+                    $text = $diff;
+                    $previous_config = $vars['rev'] . '^';
                 }
             } else {
                 $fh = fopen($rancid_file, 'r');
@@ -124,7 +142,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $text = fread($fh, filesize($rancid_file));
                 fclose($fh);
             }
-        } elseif (Config::get('rancid_repo_type') == 'git') {
+        } elseif (LibrenmsConfig::get('rancid_repo_type') == 'git') {
             if (in_array($vars['rev'], $revlist)) {
                 $process = new Process(['git', 'diff', $vars['rev'] . '^', $vars['rev'], $rancid_file], $rancid_path);
                 $process->run();
@@ -152,7 +170,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             }
         }
 
-        if (Config::get('rancid_ignorecomments')) {
+        if (LibrenmsConfig::get('rancid_ignorecomments')) {
             $lines = explode("\n", $text);
             for ($i = 0; $i < count($lines); $i++) {
                 if ($lines[$i][0] == '#') {
@@ -162,16 +180,17 @@ if (Auth::user()->hasGlobalAdmin()) {
 
             $text = join("\n", $lines);
         }
-    } elseif (Config::get('oxidized.enabled') === true && Config::has('oxidized.url')) {
+    } elseif (LibrenmsConfig::get('oxidized.enabled') === true && LibrenmsConfig::has('oxidized.url')) {
         // Try with hostname as set in librenms first
         $oxidized_hostname = $device['hostname'];
         // fetch info about the node and then a list of versions for that node
-        $node_info = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/show/' . $oxidized_hostname . '?format=json'), true);
+        $response = (new \App\ApiClients\Oxidized())->getContent('/node/show/' . $oxidized_hostname . '?format=json');
+        $node_info = json_decode($response, true);
         if (! empty($node_info['last']['start'])) {
-            $node_info['last']['start'] = date(Config::get('dateformat.long'), strtotime($node_info['last']['start']));
+            $node_info['last']['start'] = date(LibrenmsConfig::get('dateformat.long'), strtotime($node_info['last']['start']));
         }
         if (! empty($node_info['last']['end'])) {
-            $node_info['last']['end'] = date(Config::get('dateformat.long'), strtotime($node_info['last']['end']));
+            $node_info['last']['end'] = date(LibrenmsConfig::get('dateformat.long'), strtotime($node_info['last']['end']));
         }
         // Try other hostname format if Oxidized request failed
         if (! $node_info) {
@@ -179,8 +198,8 @@ if (Auth::user()->hasGlobalAdmin()) {
             if (strpos($oxidized_hostname, '.') !== false) {
                 // Use short name
                 $oxidized_hostname = strtok($device['hostname'], '.');
-            } elseif (Config::get('mydomain')) {
-                $oxidized_hostname = $device['hostname'] . '.' . Config::get('mydomain');
+            } elseif (LibrenmsConfig::get('mydomain')) {
+                $oxidized_hostname = $device['hostname'] . '.' . LibrenmsConfig::get('mydomain');
             }
 
             // Try Oxidized again with new hostname, if it has changed
@@ -189,7 +208,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             }
         }
 
-        if (Config::get('oxidized.features.versioning') === true) { // fetch a list of versions
+        if (LibrenmsConfig::get('oxidized.features.versioning') === true) { // fetch a list of versions
             $config_versions = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/version?node_full=' . (isset($node_info['full_name']) ? $node_info['full_name'] : $oxidized_hostname) . '&format=json'), true);
         }
 
@@ -399,7 +418,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                         } else {
                             echo 'selected>*';
                         }
-                    } elseif ($previous_config['oid'] == $version['oid']) {
+                    } elseif (isset($previous_config['oid']) && $previous_config['oid'] == $version['oid']) {
                         echo '>&nbsp;-';
                     } else {
                         echo '>&nbsp;&nbsp;';
@@ -430,6 +449,9 @@ if (Auth::user()->hasGlobalAdmin()) {
         } else {
             echo '<br />';
             print_error("We couldn't retrieve the device information from Oxidized");
+            if (isset($response) && preg_match('#<title>(.*)</title>#', $response, $error_matches)) {
+                print_error(strip_tags($error_matches[1]));
+            }
             $text = '';
         }
     } //end if
@@ -447,8 +469,13 @@ if (Auth::user()->hasGlobalAdmin()) {
         echo '
                           </div>';
     }
+<<<<<<< HEAD
     if (!empty($text)) {
         $language = isset($previous_config) ? 'diff' : Config::getOsSetting($device['os'], 'config_highlighting', 'ios');
+=======
+    if (! empty($text)) {
+        $language = isset($previous_config) ? 'diff' : LibrenmsConfig::getOsSetting($device['os'], 'config_highlighting', 'ios');
+>>>>>>> upstream/master
         $geshi = new GeSHi(htmlspecialchars_decode($text, ENT_QUOTES | ENT_HTML5), $language);
     
         // Extract command blocks using refined regex

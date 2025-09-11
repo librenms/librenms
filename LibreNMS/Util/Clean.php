@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Clean.php
  *
@@ -25,9 +26,7 @@
 
 namespace LibreNMS\Util;
 
-use HTMLPurifier;
-use HTMLPurifier_Config;
-use LibreNMS\Config;
+use Mews\Purifier\Facades\Purifier;
 
 class Clean
 {
@@ -59,10 +58,10 @@ class Clean
      * For use in non-blade pages
      *
      * @param  string|null  $value
-     * @param  array  $purifier_config  (key, value pair)
+     * @param  array<string, mixed>  $purifier_config
      * @return string
      */
-    public static function html($value, $purifier_config = []): string
+    public static function html(?string $value, array $purifier_config = []): string
     {
         if (empty($value)) {
             return '';
@@ -75,18 +74,6 @@ class Clean
             $value = htmlentities($value);
         }
 
-        static $purifier;
-
-        if (! $purifier instanceof HTMLPurifier) {
-            // initialize HTML Purifier here since this is the only user
-            $p_config = HTMLPurifier_Config::createDefault();
-            $p_config->set('Cache.SerializerPath', Config::get('temp_dir', '/tmp'));
-            foreach ($purifier_config as $k => $v) {
-                $p_config->set($k, $v);
-            }
-            $purifier = new HTMLPurifier($p_config);
-        }
-
-        return $purifier->purify(stripslashes($value));
+        return Purifier::clean(stripslashes($value), $purifier_config);
     }
 }

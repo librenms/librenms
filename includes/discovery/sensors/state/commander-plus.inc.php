@@ -1,4 +1,5 @@
 <?php
+
 /**
  * commander-plus.inc.php
  *
@@ -35,9 +36,6 @@ foreach ($state_table[0] as $state_name => $state_value) {
 
     $descr = $state_name;
     discover_sensor(null, 'state', $device, $start_oid . '.' . $x . '.0', $state_name, $state_name, $descr, 1, 1, null, null, null, null, $state_value, 'snmp');
-
-    //Create Sensor To State Index
-    create_sensor_to_state_index($device, $state_name, $state_name);
     $x++;
 }
 

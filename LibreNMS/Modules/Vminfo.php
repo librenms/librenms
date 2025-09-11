@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Vminfo.php
  *
@@ -25,9 +26,9 @@
 
 namespace LibreNMS\Modules;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Observers\ModuleModelObserver;
-use LibreNMS\Config;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
@@ -50,7 +51,7 @@ class Vminfo implements \LibreNMS\Interfaces\Module
     public function shouldDiscover(OS $os, ModuleStatus $status): bool
     {
         // libvirt does not use snmp, only ssh tunnels
-        return $status->isEnabledAndDeviceUp($os->getDevice(), check_snmp: ! Config::get('enable_libvirt')) && $os instanceof VminfoDiscovery;
+        return $status->isEnabledAndDeviceUp($os->getDevice(), check_snmp: ! LibrenmsConfig::get('enable_libvirt')) && $os instanceof VminfoDiscovery;
     }
 
     /**

@@ -62,8 +62,8 @@ if ($device['os_group'] == 'cisco') {
         }
 
         if (isset($classmaps[$classmap])) {
-            $tags = compact('classmap_id', 'rrd_name', 'rrd_def');
-            data_update($device, 'vservers', $tags, $fields);
+            $tags = ['classmap_id' => $classmap_id, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
+            app('Datastore')->put($device, 'vservers', $tags, $fields);
         }
     }//end foreach
 

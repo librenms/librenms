@@ -1,0 +1,125 @@
+mib: BW-BroadworksApplicationServer:BW-BroadworksMediaServer:BW-BroadworksNetworkServer:BroadworksMaintenance
+modules:
+  sensors:
+    count: 
+      data:
+        -
+          oid: bwCallpCallsPerSecond
+          num_oid: '.1.3.6.1.4.1.6431.1.2.7.1.12.{{ $index }}'
+          index: bwCallpCallsPerSecond.{{ $index }}
+          descr: 'Call per second'
+        -
+          oid: bwCallpEmergencyCallAttempts
+          num_oid: '.1.3.6.1.4.1.6431.1.2.7.1.7.{{ $index }}'
+          index: bwCallpEmergencyCallAttempts.{{ $index }}
+          descr: 'Emergency Call Attempt'
+        -
+          oid: bwCallpEmergencyCallAlarms
+          num_oid: '.1.3.6.1.4.1.6431.1.2.7.1.8.{{ $index }}'
+          index: bwCallpEmergencyCallAlarms.{{ $index }}
+          descr: 'Emergency Call Attempt Failures'
+        -
+          oid: bwSMTPTotalPrimaryEmailSendAttempts
+          num_oid: '.1.3.6.1.4.1.6431.1.2.8.1.1.{{ $index }}'
+          index: bwSMTPTotalPrimaryEmailSendAttempts.{{ $index }}
+          descr: 'Primary SMTP Server delivery failures'
+        -
+          oid: bwCallpActiveCalls
+          num_oid: '.1.3.6.1.4.1.6431.1.2.7.1.10.{{ $index }}'
+          index: bwCallpActiveCalls.{{ $index }}
+          descr: 'Active callP session'
+        -
+          oid: bwUserLocationRequests
+          num_oid: '.1.3.6.1.4.1.6431.1.11.1.1.1.{{ $index }}'
+          index: bwUserLocationRequests.{{ $index }}
+          descr: 'Total user location requests'
+        -
+          oid: bwUserLocationRequestSuccess
+          num_oid: '.1.3.6.1.4.1.6431.1.11.1.1.2.{{ $index }}'
+          index: bwUserLocationRequestSuccess.{{ $index }}
+          descr: 'Total user location succesful requests'
+        -
+          oid: bwUserLocationRequestUnknownUser
+          num_oid: '.1.3.6.1.4.1.6431.1.11.1.1.3.{{ $index }}'
+          index: bwUserLocationRequestUnknownUser.{{ $index }}
+          descr: 'Total unknown user location requests'
+        -
+          oid: bwUserLocationRequestFailures
+          num_oid: '.1.3.6.1.4.1.6431.1.11.1.1.4.{{ $index }}'
+          index: bwUserLocationRequestFailures.{{ $index }}
+          descr: 'Total failed user location requests'
+        -
+          oid: nbOfMigratedUsers
+          num_oid: '.1.3.6.1.4.1.6431.1.2.18.1.1.{{ $index }}'
+          index: nbOfMigratedUsers.{{ $index }}
+          descr: 'Migrated Users'
+        -
+          oid: psOciStatsActiveSessions
+          num_oid: '.1.3.6.1.4.1.6431.1.6.8.1.9.{{ $index }}'
+          index: psOciStasActiveSessions.{{ $index }}
+          descr: 'Provisioning OCI Connections'
+        -
+          oid: psPerNbFailedTransactions
+          num_oid: '{.1.3.6.1.4.1.6431.1.6.1.1.4.{{ $index }}'
+          index: psPerNbFailedTransactions.{{ $index }}
+          descr: 'Provisioning Failed transactions'
+        -
+          oid: psPerNbCriticalErrors
+          num_oid: '.1.3.6.1.4.1.6431.1.6.1.1.5.{{ $index }}'
+          index: psPerNbCriticalErrors.{{ $index }}
+          descr: 'Provisioning Critical errors'
+        -
+          oid: msNoPortAvailableErrors
+          num_oid: '.1.3.6.1.4.1.6431.1.3.1.6.{{ $index }}'
+          index: msNoPortAvailableErrors.{{ $index }}
+          descr: 'No ports available'
+        -
+          oid: systemNbEnterprises
+          num_oid: '.1.3.6.1.4.1.6431.1.9.1.7.{{ $index }}'
+          index: systemNbEnterprises.{{ $index }}
+          descr: 'Total number of provisioned enterprises'
+        -
+          oid: systemNbGrps
+          num_oid: '.1.3.6.1.4.1.6431.1.9.1.1.{{ $index }}'
+          index: systemNbGrps.{{ $index }}
+          descr: 'Total number of provisioned groups'
+        -
+          oid: systemNbDNs
+          num_oid: '.1.3.6.1.4.1.6431.1.9.1.2.{{ $index }}'
+          index: systemNbDNs.{{ $index }}
+          descr: 'Total number of provisioned numbers'
+        -
+          oid: systemNbUnassignedDNs
+          num_oid: '.1.3.6.1.4.1.6431.1.9.1.8.{{ $index }}'
+          index: systemNbUnassignedDNs.{{ $index }}
+          descr: 'Total number of provisioned numbers which are unassigned'
+        -
+          oid: msPortsInUse
+          num_oid: '.1.3.6.1.4.1.6431.1.3.1.5.{{ $index }}'
+          index: msPortsInUse.{{ $index }}
+          descr: 'Total ports in use'
+        -
+          oid: msPrimarySmtpErrors
+          num_oid: '.1.3.6.1.4.1.6431.1.3.3.1.2.{{ $index }}'
+          index: msPrimarySmtpErrors.{{ $index }}
+          descr: 'Primary SMTP server errrors'
+        -
+          oid: msRtpSessionsInUse
+          num_oid: '.1.3.6.1.4.1.6431.1.3.2.4.{{ $index }}'
+          index: msRtpSessionsInUse.{{ $index }}
+          descr: 'Rtp sessions in use'
+    state: 
+      data:
+        -
+          oid: bwAdminState
+          num_oid: '.1.3.6.1.4.1.6431.1.1.2.1.4.{{ $index }}'
+          index: bwAdminState.{{ $index }}
+          descr: 'Broadworks lock status'
+          states:
+            - {value: 0, generic: 1, graph: 0, descr: 'Lock'}
+            - {value: 1, generic: 1, graph: 0, descr: 'Locking'}
+            - {value: 2, generic: 0, graph: 0, descr: 'Unlock'}
+            - {value: 3, generic: 2, graph: 0, descr: 'ShuttingDown'}
+            - {value: 4, generic: 2, graph: 0, descr: 'Stopped'}
+            - {value: 5, generic: 1, graph: 0, descr: 'Forced Lock'}
+

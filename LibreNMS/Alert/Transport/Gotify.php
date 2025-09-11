@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LibreNMS Gotify alerting transport
  *

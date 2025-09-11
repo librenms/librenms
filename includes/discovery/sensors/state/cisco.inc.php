@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS
  *
@@ -10,8 +11,11 @@
  * the source code distribution for details.
  */
 
+use Illuminate\Support\Facades\Log;
+
 $role_data = SnmpQuery::walk('CISCO-STACKWISE-MIB::cswSwitchRole')->values();
 $redundant_data = SnmpQuery::enumStrings()->get('CISCO-STACKWISE-MIB::cswRingRedundant.0')->value();
+$entPhysName = SnmpQuery::get('ENTITY-MIB::entPhysicalName.1')->value();
 
 $tables = [
     ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.1.1.6.',    'oid' => 'CISCO-WAN-3G-MIB::c3gModemStatus',                            'state_name' => 'c3gModemStatus',                  'descr' => 'Modem status'],
@@ -52,6 +56,13 @@ foreach ($tables as $tablevalue) {
 
         if ((isset($temp[0][$state_name]) && $temp[0][$state_name] == 'nonRedundant') || (isset($temp[0]['cswMaxSwitchNum']) && $temp[0]['cswMaxSwitchNum'] == '1')) {
             break;
+        }
+        // Cisco StackWise Virtual always reports FALSE (2) for cswRingRedundant OID
+        // This OID has no meaning in the context of StackWise Virtual
+        // Skip the creation of the "Stack Ring - Redundant" state sensor if the device operates in StackWise Virtual mode
+        // This can be identified by "Virtual Stack" in entPhysicalName OID
+        if (isset($temp[0]['cswRingRedundant']) && $temp[0]['cswRingRedundant'] == 2 && $entPhysName == 'Virtual Stack') {
+            continue;
         }
 
         //Create State Index
@@ -193,7 +204,7 @@ foreach ($tables as $tablevalue) {
         foreach ($temp as $index => $entry) {
             $state_group = null;
             if ($state_name == 'ciscoEnvMonTemperatureState' && (empty($entry[$tablevalue['descr']]))) {
-                d_echo('Invalid sensor, skipping..');
+                Log::debug('Invalid sensor, skipping..');
             } else {
                 //Discover Sensors
                 $descr = ucwords($entry[$tablevalue['descr']] ?? 'State');
@@ -206,8 +217,8 @@ foreach ($tables as $tablevalue) {
                     $swstatenumber++;
                     $descr = $tablevalue['descr'] . $swstatenumber;
                 } elseif ($state_name == 'cswStackPortOperStatus') {
-                    $stack_port_descr = get_port_by_index_cache($device['device_id'], $index);
-                    $descr = $tablevalue['descr'] . $stack_port_descr['ifDescr'];
+                    $port = PortCache::getByIfIndex($index, $device['device_id']);
+                    $descr = $tablevalue['descr'] . $port?->ifDescr;
                 } elseif ($state_name == 'cefcFRUPowerOperStatus') {
                     $descr = SnmpQuery::get('ENTITY-MIB::entPhysicalName.' . $index)->value();
                 } elseif ($state_name == 'c3gModemStatus' || $state_name == 'c3gGsmCurrentBand' || $state_name == 'c3gGsmPacketService' || $state_name == 'c3gGsmCurrentRoamingStatus' || $state_name == 'c3gGsmSimStatus') {
@@ -218,9 +229,6 @@ foreach ($tables as $tablevalue) {
                     $descr = $tablevalue['descr'] . $repsegmentnumber;
                 }
                 discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, trim($descr), 1, 1, null, null, null, null, $entry[$state_name], 'snmp', $index, null, null, $state_group);
-
-                //Create Sensor To State Index
-                create_sensor_to_state_index($device, $state_name, $index);
             }
         }
     }

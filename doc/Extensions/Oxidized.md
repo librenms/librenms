@@ -277,7 +277,7 @@ You can also ignore whole groups of devices
 ## Trigger configuration backups
 
 Using the Oxidized REST API and [Syslog
-Hooks](/Extensions/Syslog/#external-hooks), Oxidized can trigger
+Hooks](Syslog.md#external-hooks), Oxidized can trigger
 configuration downloads whenever a configuration change event has been
 logged. An example script to do this is included in
 `./scripts/syslog-notify-oxidized.php`. Oxidized can spawn a new

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * GraphController.php
  *
@@ -75,7 +76,7 @@ class GraphController extends Controller
             $data[] = [
                 'text' => 'Aggregators',
                 'children' => $aggregators->map(function ($text, $id) {
-                    return compact('id', 'text');
+                    return ['id' => $id, 'text' => $text];
                 })->values(),
             ];
         }
@@ -87,7 +88,7 @@ class GraphController extends Controller
             $data[] = [
                 'text' => 'Bill',
                 'children' => $billing->map(function ($text, $id) {
-                    return compact('id', 'text');
+                    return ['id' => $id, 'text' => $text];
                 })->values(),
             ];
         }

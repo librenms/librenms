@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS
  *
@@ -36,7 +37,7 @@ if ($port) {
             $device_tune = $port->device->getAttrib('override_rrdtool_tune');
             if ($port_tune == 'true' ||
                 ($device_tune == 'true' && $port_tune != 'false') ||
-                (\LibreNMS\Config::get('rrdtool_tune') == 'true' && $port_tune != 'false' && $device_tune != 'false')) {
+                (\App\Facades\LibrenmsConfig::get('rrdtool_tune') == 'true' && $port_tune != 'false' && $device_tune != 'false')) {
                 $rrdfile = get_port_rrdfile_path($port->device->hostname, $port_id);
                 Rrd::tune('port', $rrdfile, $speed);
             }

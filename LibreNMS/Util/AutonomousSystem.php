@@ -1,4 +1,5 @@
 <?php
+
 /**
  * AutonomousSystem.php
  *
@@ -25,9 +26,9 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\LibrenmsConfig;
 use ErrorException;
 use Illuminate\Support\Facades\Cache;
-use LibreNMS\Config;
 
 class AutonomousSystem
 {
@@ -49,8 +50,8 @@ class AutonomousSystem
     public function name(): string
     {
         return Cache::remember("astext.$this->asn", 86400, function () {
-            if (Config::has("astext.$this->asn")) {
-                return Config::get("astext.$this->asn");
+            if (LibrenmsConfig::has("astext.$this->asn")) {
+                return LibrenmsConfig::get("astext.$this->asn");
             }
 
             try {

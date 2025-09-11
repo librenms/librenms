@@ -1,4 +1,5 @@
 <?php
+
 /*
  * PortsController.php
  *
@@ -28,10 +29,10 @@ namespace App\Http\Controllers\Table;
 use App\Models\Port;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
-use LibreNMS\Util\Url;
 
 class PortsController extends TableController
 {
@@ -142,7 +143,7 @@ class PortsController extends TableController
     }
 
     /**
-     * @param  \App\Models\Port  $port
+     * @param  Port  $port
      * @return array
      */
     public function formatItem($port)
@@ -153,8 +154,8 @@ class PortsController extends TableController
 
         return [
             'status' => $status,
-            'device' => Url::deviceLink($port->device),
-            'port' => Url::portLink($port),
+            'device' => Blade::render('<x-device-link :device="$device" />', ['device' => $port->device]),
+            'port' => Blade::render('<x-port-link :port="$port"/>', ['port' => $port]),
             'secondsIfLastChange' => ceil($port->device?->uptime - ($port->ifLastChange / 100)),
             'ifConnectorPresent' => ($port->ifConnectorPresent == 'true') ? 'yes' : 'no',
             'ifSpeed' => $port->ifSpeed,
@@ -170,6 +171,69 @@ class PortsController extends TableController
             'ifType' => Rewrite::normalizeIfType($port->ifType),
             'ifAlias' => htmlentities($port->ifAlias),
             'actions' => (string) view('port.actions', ['port' => $port]),
+        ];
+    }
+
+    /**
+     * Get headers for CSV export
+     *
+     * @return array
+     */
+    protected function getExportHeaders()
+    {
+        return [
+            'Device ID',
+            'Hostname',
+            'Port',
+            'ifIndex',
+            'Status',
+            'Admin Status',
+            'Speed',
+            'MTU',
+            'Type',
+            'In Rate (bps)',
+            'Out Rate (bps)',
+            'In Errors',
+            'Out Errors',
+            'In Error Rate',
+            'Out Error Rate',
+            'Description',
+            'Last Change',
+            'Connector Present',
+        ];
+    }
+
+    /**
+     * Format a row for CSV export
+     *
+     * @param  Port  $port
+     * @return array
+     */
+    protected function formatExportRow($port)
+    {
+        $status = $port->ifOperStatus;
+        $adminStatus = $port->ifAdminStatus;
+        $speed = Number::formatSi($port->ifSpeed);
+
+        return [
+            'device_id' => $port->device_id,
+            'hostname' => $port->device->displayName(),
+            'port' => $port->ifName ?: $port->ifDescr,
+            'ifindex' => $port->ifIndex,
+            'status' => $status,
+            'admin_status' => $adminStatus,
+            'speed' => $speed,
+            'mtu' => $port->ifMtu,
+            'type' => Rewrite::normalizeIfType($port->ifType),
+            'in_rate' => Number::formatBi($port->ifInOctets_rate * 8) . 'bps',
+            'out_rate' => Number::formatBi($port->ifOutOctets_rate * 8) . 'bps',
+            'in_errors' => $port->ifInErrors,
+            'out_errors' => $port->ifOutErrors,
+            'in_errors_rate' => $port->poll_period ? Number::formatSi($port->ifInErrors_delta / $port->poll_period, 2, 0, 'EPS') : '',
+            'out_errors_rate' => $port->poll_period ? Number::formatSi($port->ifOutErrors_delta / $port->poll_period, 2, 0, 'EPS') : '',
+            'description' => $port->ifAlias,
+            'last_change' => $port->device ? ($port->device->uptime - ($port->ifLastChange / 100)) : 'N/A',
+            'connector_present' => ($port->ifConnectorPresent == 'true') ? 'yes' : 'no',
         ];
     }
 }

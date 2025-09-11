@@ -28457,35 +28457,35 @@
                     "vlan_domain": 1,
                     "vlan_name": "default",
                     "vlan_type": "ethernet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1002,
                     "vlan_domain": 1,
                     "vlan_name": "fddi-default",
                     "vlan_type": "fddi",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1003,
                     "vlan_domain": 1,
                     "vlan_name": "token-ring-default",
                     "vlan_type": "tokenRing",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1004,
                     "vlan_domain": 1,
                     "vlan_name": "fddinet-default",
                     "vlan_type": "fddiNet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1005,
                     "vlan_domain": 1,
                     "vlan_name": "trnet-default",
                     "vlan_type": "trNet",
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -28876,17 +28876,17 @@
                 {
                     "vlan": 1,
                     "baseport": 97,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 2,
                     "untagged": 1
                 },
                 {
                     "vlan": 1,
                     "baseport": 98,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 4,
                     "untagged": 1
                 },
                 {
@@ -28956,17 +28956,17 @@
                 {
                     "vlan": 1,
                     "baseport": 193,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 2,
                     "untagged": 1
                 },
                 {
                     "vlan": 1,
                     "baseport": 194,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "cost": 4,
                     "untagged": 1
                 },
                 {
@@ -29427,7 +29427,7 @@
                     "vlan": null,
                     "rootBridge": 0,
                     "bridgeAddress": "00eeab8f4200",
-                    "protocolSpecification": "unknown",
+                    "protocolSpecification": "rapidPvstPlus",
                     "priority": 32769,
                     "timeSinceTopologyChange": "2879862",
                     "topChanges": 167,
@@ -34304,7 +34304,7 @@
             "transceivers": [
                 {
                     "index": "2072",
-                    "entity_physical_index": 50,
+                    "entity_physical_index": 2072,
                     "type": "10G AOC2M",
                     "vendor": "CISCO-AVAGO",
                     "oui": null,
@@ -34323,7 +34323,7 @@
                 },
                 {
                     "index": "2078",
-                    "entity_physical_index": 51,
+                    "entity_physical_index": 2078,
                     "type": "GE T",
                     "vendor": "CISCO-AVAGO",
                     "oui": null,
@@ -34342,7 +34342,7 @@
                 },
                 {
                     "index": "3072",
-                    "entity_physical_index": 60,
+                    "entity_physical_index": 3072,
                     "type": "10G AOC2M",
                     "vendor": "CISCO-AVAGO",
                     "oui": null,
@@ -34361,7 +34361,7 @@
                 },
                 {
                     "index": "3078",
-                    "entity_physical_index": 61,
+                    "entity_physical_index": 3078,
                     "type": "GE T",
                     "vendor": "CISCO-AVAGO",
                     "oui": null,

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * HiveosWireless.php
  *
@@ -51,10 +52,8 @@ class HiveosWireless extends OS implements
      *
      * @return array Processors
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): array
     {
-        $device = $this->getDeviceArray();
-
         return [
             Processor::discover(
                 $this->getName(),

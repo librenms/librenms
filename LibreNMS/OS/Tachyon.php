@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Tachyon.php
  *
@@ -73,7 +74,6 @@ class Tachyon extends OS implements
 
         foreach ($data as $index => $entry) {
             if (! empty($entry['wirelessRadioFrequency'])) {
-                $mac = $entry['wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
                     'frequency',
                     $this->getDeviceId(),
@@ -104,7 +104,6 @@ class Tachyon extends OS implements
 
         foreach ($data as $index => $entry) {
             if (! empty($entry['wirelessRadioTxPower'])) {
-                $mac = $entry['wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
                     'power',
                     $this->getDeviceId(),

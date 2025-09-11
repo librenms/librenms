@@ -1,0 +1,127 @@
+mib: OPTIX-BOARD-MANAGE-MIB
+modules:
+    os:
+        hardware:
+            - OPTIX-NE-MIB::optixNeDeviceType.0
+        serial: OPTIX-RTN-ODU-MGR-MIB::optixRtnOduFactoryInfo.23.255
+        sysDescr_regex: '/Huawei Optix RTN (?<version>\S+)/'   #Huawei Optix RTN V100R011C00SPC200
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - optixPhyBoardType
+                        - OPTIX-NE-MIB::optixNeName
+        state:
+            data:
+                -
+                    oid: optixPhyBoardTable
+                    num_oid: '.1.3.6.1.4.1.2011.2.25.4.30.14.1.2.1.3.{{ $index }}'
+                    value: optixPhyBoardState
+                    descr: '"{{ optixPhyBoardType:0 }}" working status'
+                    index: 'optixPhyBoardType.{{ $index }}'
+                    state_name: optixPhyBoardState
+                    group: 'Board "{{ optixPhyBoardType:0 }}"'
+                    states:
+                        - { descr: Work, graph: 1, value: 1, generic: 0 }
+                        - { descr: NotWork, graph: 1, value: 0, generic: 2 }
+                -
+                    oid: optixLogBoardTable
+                    num_oid: '.1.3.6.1.4.1.2011.2.25.4.30.14.1.1.1.6.{{ $index }}'
+                    value: optixLogBoardBusdetect
+                    descr: '"{{ optixPhyBoardType:0 }}" status'
+                    index: 'optixLogBoardBusdetect.{{ $index }}'
+                    state_name: optixLogBoardBusdetect
+                    group: 'Board "{{ optixPhyBoardType:0 }}"'
+                    states:
+                        - { descr: Enable, graph: 1, value: 1, generic: 0 }
+                        - { descr: Disable, graph: 1, value: 0, generic: 2 }
+                -
+                    oid: OptixPhyBoardEntry
+                    num_oid: '.1.3.6.1.4.1.2011.2.25.4.30.14.1.2.1.8.{{ $index }}'
+                    value: optixPhyBDOnlineFlag
+                    descr: '"{{ optixPhyBoardType:0 }}" Board Online Flag'
+                    index: 'optixPhyBoardType.{{ $index }}'
+                    state_name: optixPhyBDOnlineFlag
+                    group: 'Board "{{ optixPhyBoardType:0 }}"'
+                    states:
+                        - { descr: offline, graph: 1, value: 0, generic: 2 }
+                        - { descr: online, graph: 1, value: 1, generic: 0 }
+                        - { descr: not match, graph: 1, value: 2, generic: 1 }
+                -
+                    oid: OPTIX-MISC-MIB::optixFanSpeed
+                    num_oid: '.1.3.6.1.4.1.2011.2.25.4.30.39.1.1.{{ $index }}'
+                    descr: 'NE Fan State'
+                    index: 'optixFanSpeed.{{ $index }}'
+                    state_name: optixFanSpeed
+                    group: 'NE {{ OPTIX-NE-MIB::optixNeName }}'
+                    states:
+                        - { descr: stop, graph: 1, value: 4, generic: 2 }
+                        - { descr: low, graph: 1, value: 1, generic: 0 }
+                        - { descr: mid, graph: 1, value: 2, generic: 0 }
+                        - { descr: high, graph: 1, value: 3, generic: 1 }
+                        - { descr: autoLow, graph: 1, value: 5, generic: 0 }
+                        - { descr: autoMid, graph: 1, value: 6, generic: 0 }
+                        - { descr: autoHigh, graph: 1, value: 7, generic: 0 }
+                        - { descr: auto, graph: 1, value: 9, generic: 0 }
+                -
+                    oid: OPTIX-MISC-MIB::optixFanMinDispersion
+                    num_oid: '.1.3.6.1.4.1.2011.2.25.4.30.39.1.2.{{ $index }}'
+                    descr: 'NE Fan Min Temp Difference'
+                    index: 'optixFanMinDispersion.{{ $index }}'
+                    state_name: optixFanMinDispersion
+                    group: 'NE {{ OPTIX-NE-MIB::optixNeName }}'
+                    states:
+                        - { descr: stop, graph: 1, value: 0, generic: 2 }
+                        - { descr: low, graph: 1, value: 45, generic: 0 }
+                        - { descr: mid, graph: 1, value: 58, generic: 0 }
+                        - { descr: high, graph: 1, value: 65, generic: 1 }
+        dbm:
+            data:
+                -
+                    oid: OPTIX-RTN-ODU-MGR-MIB::optixRtnOduPowerTable
+                    value: OPTIX-RTN-ODU-MGR-MIB::optixRtnOduActualRxPower
+                    num_oid: '.1.3.6.1.4.1.2011.2.25.4.40.4.10.30.1.9.{{ $index }}'
+                    descr: '"{{ optixPhyBoardType:0 }}" Rx Power'
+                    divisor: 10
+                    index: 'optixRtnOduActualRxPower.{{ $index }}'
+                    group: 'Board "{{ optixPhyBoardType:0 }}"'
+                -
+                    oid: OPTIX-RTN-ODU-MGR-MIB::optixRtnOduPowerTable
+                    value: OPTIX-RTN-ODU-MGR-MIB::optixRtnOduActualTxPower
+                    num_oid: '.1.3.6.1.4.1.2011.2.25.4.40.4.10.30.1.8.{{ $index }}'
+                    descr: '"{{ optixPhyBoardType:0 }}" Tx Power'
+                    divisor: 10
+                    index: 'optixRtnOduActualTxPower.{{ $index }}'
+                    group: 'Board "{{ optixPhyBoardType:0 }}"'
+        temperature:
+            data:
+                -
+                    oid: optixLogBoardTable
+                    value: optixLogBoardCurTemp
+                    num_oid: '.1.3.6.1.4.1.2011.2.25.4.30.14.1.1.1.5.{{ $index }}'
+                    descr: '"{{ optixPhyBoardType:0 }}" current Temp (C)'
+                    index: 'optixLogBoardCurTemp.{{ $index }}'
+                    group: 'Board "{{ optixPhyBoardType:0 }}"'
+                    low_limit: optixLogBoardTempLowTh
+                    high_limit: optixLogBoardTempHighTh
+        frequency:
+            data:
+                -
+                    oid: OPTIX-RTN-ODU-MGR-MIB::optixRtnOduActualTxFreq
+                    value: OPTIX-RTN-ODU-MGR-MIB::optixRtnOduActualTxFreq
+                    num_oid: '.1.3.6.1.4.1.2011.2.25.4.40.4.10.20.1.3.{{ $index }}'
+                    descr: '"{{ optixPhyBoardType:0 }}" Tx Freq RF Unit (kHz)'
+                    multiplier: 1000
+                    index: 'optixRtnOduActualTxFreq.{{ $index }}'
+                    group: 'Board "{{ optixPhyBoardType:0 }}"'
+                    low_limit: OPTIX-RTN-ODU-MGR-MIB::optixRtnOduMinTxFreq
+                    high_limit: OPTIX-RTN-ODU-MGR-MIB::optixRtnOduMaxTxFreq
+                -
+                    oid: OPTIX-RTN-ODU-MGR-MIB::optixRtnOduActualRxFreq
+                    value: OPTIX-RTN-ODU-MGR-MIB::optixRtnOduActualRxFreq
+                    num_oid: '.1.3.6.1.4.1.2011.2.25.4.40.4.10.20.1.4.{{ $index }}'
+                    descr: '"{{ optixPhyBoardType:0 }}" Rx Freq RF Unit (kHz)'
+                    multiplier: 1000
+                    index: 'optixRtnOduActualRxFreq.{{ $index }}'
+                    group: 'Board "{{ optixPhyBoardType:0 }}"'

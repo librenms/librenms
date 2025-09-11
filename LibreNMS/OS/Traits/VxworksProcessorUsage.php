@@ -1,4 +1,5 @@
 <?php
+
 /**
  * VxworksProcessorUsage.php
  *
@@ -39,19 +40,22 @@ trait VxworksProcessorUsage
      */
     public function discoverProcessors($oid = '.1.3.6.1.4.1.4413.1.1.1.1.4.9.0')
     {
-        $usage = $this->parseCpuUsage(snmp_get($this->getDeviceArray(), $oid, '-Ovq'));
-        if (is_numeric($usage)) {
-            return [
-                Processor::discover(
-                    $this->getName(),
-                    $this->getDeviceId(),
-                    $oid,
-                    0,
-                    'Processor',
-                    1,
-                    $usage
-                ),
-            ];
+        $usage = snmp_get($this->getDeviceArray(), $oid, '-Ovq');
+        if ($usage) {
+            $usage = $this->parseCpuUsage($usage);
+            if (is_numeric($usage)) {
+                return [
+                    Processor::discover(
+                        $this->getName(),
+                        $this->getDeviceId(),
+                        $oid,
+                        0,
+                        'Processor',
+                        1,
+                        $usage
+                    ),
+                ];
+            }
         }
 
         return [];

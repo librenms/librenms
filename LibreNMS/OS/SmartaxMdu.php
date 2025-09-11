@@ -8,8 +8,8 @@ use LibreNMS\Util\StringHelpers;
 
 class SmartaxMdu extends OS
 {
-    use OS\Traits\EntityMib {
-        OS\Traits\EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
+    use Traits\EntityMib {
+        Traits\EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
     }
 
     protected ?string $entityVendorTypeMib = 'HUAWEI-MIB';

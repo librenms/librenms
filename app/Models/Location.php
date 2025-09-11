@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Location.php
  *
@@ -42,10 +43,21 @@ class Location extends Model
     public $fillable = ['location', 'lat', 'lng'];
     const CREATED_AT = null;
     const UPDATED_AT = 'timestamp';
-    protected $casts = ['lat' => 'float', 'lng' => 'float', 'fixed_coordinates' => 'bool'];
 
     private $location_regex = '/\[\s*(?<lat>[-+]?(?:[1-8]?\d(?:\.\d+)?|90(?:\.0+)?))\s*,\s*(?<lng>[-+]?(?:180(?:\.0+)?|(?:(?:1[0-7]\d)|(?:[1-9]?\d))(?:\.\d+)?))\s*\]/';
     private $location_ignore_regex = '/\(.*?\)/';
+
+    /**
+     * @return array{lat: 'float', lng: 'float', fixed_coordinates: 'bool'}
+     */
+    protected function casts(): array
+    {
+        return [
+            'lat' => 'float',
+            'lng' => 'float',
+            'fixed_coordinates' => 'bool',
+        ];
+    }
 
     // ---- Helper Functions ----
 
@@ -83,7 +95,7 @@ class Location extends Model
             return true;
         }
 
-        if ($hostname && \LibreNMS\Config::get('geoloc.dns')) {
+        if ($hostname && \App\Facades\LibrenmsConfig::get('geoloc.dns')) {
             $coord = app(Dns::class)->getCoordinates($hostname);
 
             if (! empty($coord)) {
@@ -93,7 +105,7 @@ class Location extends Model
             }
         }
 
-        if ($this->location && ! $this->hasCoordinates() && \LibreNMS\Config::get('geoloc.latlng', true)) {
+        if ($this->location && ! $this->hasCoordinates() && \App\Facades\LibrenmsConfig::get('geoloc.latlng', true)) {
             return $this->fetchCoordinates();
         }
 
@@ -169,10 +181,12 @@ class Location extends Model
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Device, $this>
+     */
     public function devices(): HasMany
     {
-        return $this->hasMany(\App\Models\Device::class, 'location_id');
+        return $this->hasMany(Device::class, 'location_id');
     }
 
     public function __toString()

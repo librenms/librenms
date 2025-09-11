@@ -6056,105 +6056,105 @@
                     "vlan_domain": 1,
                     "vlan_name": "default.",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN002.",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN003.",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 6,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN006.",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 10,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0010.",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 30,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0030.",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 33,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0033.",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 50,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0050.",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 51,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0051.",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 52,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0052.",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 53,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0053.",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 54,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0054.",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 55,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0055.",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 56,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0056.",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 300,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN00300.",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -6426,5 +6426,42 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv6-addresses": {
+        "discovery": {
+            "ipv6_addresses": [
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:021f:ceff:fe73:3b73",
+                    "ipv6_compressed": "fe80::21f:ceff:fe73:3b73",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "other",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 11001
+                },
+                {
+                    "ipv6_address": "fe80:0000:0000:0000:021f:ceff:fe73:3b73",
+                    "ipv6_compressed": "fe80::21f:ceff:fe73:3b73",
+                    "ipv6_prefixlen": 64,
+                    "ipv6_origin": "other",
+                    "context_name": "",
+                    "ipv6_network": null,
+                    "ifIndex": 11006
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "172.7.6.18",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "172.7.6.16/29",
+                    "ifIndex": 11006
+                }
+            ]
+        }
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Config.php
  *
@@ -27,7 +28,7 @@ namespace LibreNMS;
 
 use App\Facades\LibrenmsConfig;
 
-// not yet: @deprecated Please use the facade App\Facades\LibrenmsConfig instead
+/** @deprecated Please use the facade App\Facades\LibrenmsConfig instead */
 class Config
 {
     /**

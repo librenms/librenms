@@ -1,4 +1,5 @@
 <?php
+
 /**
  * sentry4.inc.php
  *

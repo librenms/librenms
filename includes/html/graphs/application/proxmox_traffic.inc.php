@@ -18,11 +18,7 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$proxmox_rrd = Rrd::proxmoxName($vars['cluster'], $vars['vmid'], $vars['port']);
-
-if (Rrd::checkRrdExists($proxmox_rrd)) {
-    $rrd_filename = $proxmox_rrd;
-}
+$rrd_filename = Rrd::proxmoxName($vars['cluster'], $vars['vmid'], $vars['port']);
 
 $ds_in = 'INOCTETS';
 $ds_out = 'OUTOCTETS';

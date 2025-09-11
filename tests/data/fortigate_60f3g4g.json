@@ -5082,5 +5082,172 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 1,
+                    "low_ifIndex": 20,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 3,
+                    "low_ifIndex": 18,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 8,
+                    "low_ifIndex": 22,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 22,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 2,
+                    "ifStackStatus": "notInService"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 7,
+                    "ifStackStatus": "notInService"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 12,
+                    "ifStackStatus": "notInService"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 14,
+                    "ifStackStatus": "notInService"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 15,
+                    "ifStackStatus": "notInService"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 17,
+                    "ifStackStatus": "notInService"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 21,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 11,
+                    "low_ifIndex": 22,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 13,
+                    "low_ifIndex": 22,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 16,
+                    "low_ifIndex": 10,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 21,
+                    "low_ifIndex": 22,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "forti-60f-3g4g",
+                    "remote_port": "port12 (e8123456789a)",
+                    "remote_platform": null,
+                    "remote_version": "FortiSwitchRugged-112D-POE v6.4.5,build0461,201215 (GA)",
+                    "ifAlias": "TEMP LINK TO FORTI SWITCH",
+                    "ifDescr": "wan2",
+                    "ifName": "wan2"
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.176.228.122",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 3
+                },
+                {
+                    "ipv4_address": "169.254.1.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "169.254.1.0/24",
+                    "ifIndex": 10
+                },
+                {
+                    "ipv4_address": "169.254.11.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "169.254.11.0/24",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "169.254.12.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "169.254.12.0/24",
+                    "ifIndex": 14
+                },
+                {
+                    "ipv4_address": "169.254.13.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "169.254.13.0/24",
+                    "ifIndex": 15
+                },
+                {
+                    "ipv4_address": "169.254.14.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "169.254.14.0/24",
+                    "ifIndex": 17
+                },
+                {
+                    "ipv4_address": "172.16.2.49",
+                    "ipv4_prefixlen": 28,
+                    "context_name": "",
+                    "ipv4_network": "172.16.2.48/28",
+                    "ifIndex": 22
+                },
+                {
+                    "ipv4_address": "172.16.31.22",
+                    "ipv4_prefixlen": 28,
+                    "context_name": "",
+                    "ipv4_network": "172.16.31.16/28",
+                    "ifIndex": 20
+                },
+                {
+                    "ipv4_address": "192.168.1.22",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.1.0/24",
+                    "ifIndex": 18
+                }
+            ]
+        }
     }
 }

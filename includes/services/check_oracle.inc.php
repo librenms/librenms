@@ -1,4 +1,5 @@
 <?php
+
 /**
  * check_oracle Nagios Plugin
  * Docs: https://www.monitoring-plugins.org/doc/man/check_oracle.html
@@ -10,4 +11,4 @@
  * This plugin does not accept the '-H' flag for hostname/IP address
  * that most other Nagios plugins do.
  */
-$check_cmd = \LibreNMS\Config::get('nagios_plugins') . '/check_oracle ' . $service['service_param'];
+$check_cmd = \App\Facades\LibrenmsConfig::get('nagios_plugins') . '/check_oracle ' . $service['service_param'];

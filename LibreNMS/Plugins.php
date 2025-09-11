@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Plugins.php
  *
@@ -26,6 +27,7 @@
 
 namespace LibreNMS;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Plugin;
 use LibreNMS\Util\Notifications;
 use Log;
@@ -67,7 +69,7 @@ class Plugins
         }
 
         self::$plugins = [];
-        $plugin_dir = Config::get('plugin_dir');
+        $plugin_dir = LibrenmsConfig::get('plugin_dir');
 
         if (! file_exists($plugin_dir)) {
             return false;
@@ -101,7 +103,7 @@ class Plugins
      */
     public static function load($file, $pluginName)
     {
-        chdir(Config::get('install_dir') . '/html');
+        chdir(LibrenmsConfig::get('install_dir') . '/html');
         $plugin = self::getInstance($file, $pluginName);
 
         if (! is_null($plugin)) {
@@ -115,7 +117,7 @@ class Plugins
             }
         }
 
-        chdir(Config::get('install_dir'));
+        chdir(LibrenmsConfig::get('install_dir'));
 
         return $plugin;
     }
@@ -179,7 +181,7 @@ class Plugins
      */
     public static function call($hook, $params = false)
     {
-        chdir(Config::get('install_dir') . '/html');
+        chdir(LibrenmsConfig::get('install_dir') . '/html');
         self::start();
 
         ob_start();
@@ -205,7 +207,7 @@ class Plugins
         $output = ob_get_contents();
         ob_end_clean();
 
-        chdir(Config::get('install_dir'));
+        chdir(LibrenmsConfig::get('install_dir'));
 
         return $output;
     }
@@ -226,12 +228,12 @@ class Plugins
     {
         $countInstalled = 0;
 
-        if (file_exists(\LibreNMS\Config::get('plugin_dir'))) {
-            $plugin_files = array_diff(scandir(\LibreNMS\Config::get('plugin_dir')), ['..', '.']);
+        if (file_exists(LibrenmsConfig::get('plugin_dir'))) {
+            $plugin_files = array_diff(scandir(LibrenmsConfig::get('plugin_dir')), ['..', '.']);
             $plugin_files = array_diff($plugin_files, Plugin::versionOne()->pluck('plugin_name')->toArray());
             foreach ($plugin_files as $name) {
-                if (is_dir(\LibreNMS\Config::get('plugin_dir') . '/' . $name)
-                    && is_file(\LibreNMS\Config::get('plugin_dir') . '/' . $name . '/' . $name . '.php')) {
+                if (is_dir(LibrenmsConfig::get('plugin_dir') . '/' . $name)
+                    && is_file(LibrenmsConfig::get('plugin_dir') . '/' . $name . '/' . $name . '.php')) {
                     Plugin::create(['plugin_name' => $name, 'plugin_active' => false, 'version' => 1]);
                     $countInstalled++;
                 }
@@ -245,8 +247,8 @@ class Plugins
     {
         $countRemoved = 0;
 
-        if (file_exists(\LibreNMS\Config::get('plugin_dir'))) {
-            $plugin_files = array_diff(scandir(\LibreNMS\Config::get('plugin_dir')), ['.', '..', '.gitignore']);
+        if (file_exists(LibrenmsConfig::get('plugin_dir'))) {
+            $plugin_files = array_diff(scandir(LibrenmsConfig::get('plugin_dir')), ['.', '..', '.gitignore']);
             $plugins = Plugin::versionOne()->whereNotIn('plugin_name', $plugin_files)->select('plugin_id')->get();
             foreach ($plugins as $plugin) {
                 if ($plugin->delete()) {

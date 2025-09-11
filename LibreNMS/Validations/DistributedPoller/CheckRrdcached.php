@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CheckRrdcached.php
  *
@@ -25,7 +26,7 @@
 
 namespace LibreNMS\Validations\DistributedPoller;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validations\Rrd\CheckRrdcachedConnectivity;
 
@@ -36,7 +37,7 @@ class CheckRrdcached implements \LibreNMS\Interfaces\Validation
      */
     public function validate(): ValidationResult
     {
-        if (! Config::get('rrdcached')) {
+        if (! LibrenmsConfig::get('rrdcached')) {
             return ValidationResult::fail(trans('validation.validations.distributedpoller.CheckRrdcached.fail'), 'lnms config:set rrdcached <rrdcached server ip:port>');
         }
 
@@ -48,6 +49,6 @@ class CheckRrdcached implements \LibreNMS\Interfaces\Validation
      */
     public function enabled(): bool
     {
-        return (bool) Config::get('distributed_poller');
+        return (bool) LibrenmsConfig::get('distributed_poller');
     }
 }

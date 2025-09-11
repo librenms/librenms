@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Stats.php
  *
@@ -40,10 +41,15 @@ class Stats
         if ($stats->isEnabled()) {
             Http::client()
                 ->asForm()
-                ->post(\LibreNMS\Config::get('callback_post'), [
+                ->post(\App\Facades\LibrenmsConfig::get('callback_post'), [
                     'data' => json_encode($stats->collectData()),
                 ]);
         }
+    }
+
+    public function dump(): array
+    {
+        return $this->collectData();
     }
 
     public function isEnabled(): bool
@@ -65,7 +71,7 @@ class Stats
 
         $response = Http::client()
             ->asForm()
-            ->post(\LibreNMS\Config::get('callback_clear'), ['uuid' => $uuid]);
+            ->post(\App\Facades\LibrenmsConfig::get('callback_clear'), ['uuid' => $uuid]);
 
         if ($response->successful()) {
             Callback::where('name', 'uuid')->delete();
@@ -107,7 +113,6 @@ class Stats
             'bgppeer_status' => $this->selectTotal('bgpPeers', ['bgpPeerAdminStatus']),
             'bills' => $this->selectTotal('bills', ['bill_type']),
             'cef' => $this->selectTotal('cef_switching'),
-            'cisco_asa' => $this->selectTotal(DB::table('ciscoASA')->where('disabled', 0), ['oid']),
             'mempool' => $this->selectTotal('mempools', ['mempool_descr']),
             'dbschema' => $this->selectStatic(DB::table('migrations')->count()),
             'snmp_version' => $this->selectTotal('devices', ['snmpver']),
@@ -123,8 +128,11 @@ class Stats
             'xdp' => $this->selectTotal('links', ['protocol']),
             'ospf' => $this->selectTotal('ospf_instances', ['ospfVersionNumber']),
             'ospf_links' => $this->selectTotal('ospf_ports', ['ospfIfType']),
+            'ospfv3' => $this->selectTotal('ospfv3_instances', ['ospfv3VersionNumber']),
+            'ospfv3_links' => $this->selectTotal('ospfv3_ports', ['ospfv3IfType']),
             'arch' => $this->selectTotal('packages', ['arch']),
             'pollers' => $this->selectTotal('pollers'),
+            'port_assoc' => $this->selectTotal('devices', ['port_association_mode']),
             'port_type' => $this->selectTotal('ports', ['ifType']),
             'port_ifspeed' => DB::table('ports')->select([DB::raw('COUNT(*) AS `total`'), DB::raw('ROUND(`ifSpeed`/1000/1000) as ifSpeed')])->groupBy(['ifSpeed'])->get(),
             'port_vlans' => $this->selectTotal('ports_vlans', ['state']),
@@ -183,7 +191,7 @@ class Stats
     /**
      * @param  Builder|string  $table
      * @param  array  $groups
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     private function selectTotal($table, array $groups = []): Collection
     {

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * FullscreenMapController.php
  *
@@ -25,13 +26,13 @@
 
 namespace App\Http\Controllers\Maps;
 
+use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use App\Models\DeviceGroup;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
-use LibreNMS\Config;
 
 class FullscreenMapController extends Controller
 {
@@ -58,32 +59,32 @@ class FullscreenMapController extends Controller
 
         $init_lat = $request->get('lat');
         if (! $init_lat) {
-            $init_lat = Config::get('leaflet.default_lat', 51.48);
+            $init_lat = LibrenmsConfig::get('leaflet.default_lat', 51.48);
         }
 
         $init_lng = $request->get('lng');
         if (! $init_lng) {
-            $init_lng = Config::get('leaflet.default_lng', 0);
+            $init_lng = LibrenmsConfig::get('leaflet.default_lng', 0);
         }
 
         $init_zoom = $request->get('zoom');
         if (! $init_zoom) {
-            $init_zoom = Config::get('leaflet.default_zoom', 5);
+            $init_zoom = LibrenmsConfig::get('leaflet.default_zoom', 5);
         }
 
         $data = [
-            'map_engine' => Config::get('map.engine', 'leaflet'),
-            'map_provider' => Config::get('geoloc.engine', 'openstreetmap'),
-            'map_api_key' => Config::get('geoloc.api_key', ''),
-            'show_netmap' => Config::get('network_map_show_on_worldmap', false),
-            'netmap_source' => Config::get('network_map_worldmap_link_type', 'xdp'),
-            'netmap_include_disabled_alerts' => Config::get('network_map_worldmap_show_disabled_alerts', true) ? 'null' : 0,
-            'page_refresh' => Config::get('page_refresh', 300),
+            'map_engine' => LibrenmsConfig::get('map.engine', 'leaflet'),
+            'map_provider' => LibrenmsConfig::get('geoloc.engine', 'openstreetmap'),
+            'map_api_key' => LibrenmsConfig::get('geoloc.api_key', ''),
+            'show_netmap' => LibrenmsConfig::get('network_map_show_on_worldmap', false),
+            'netmap_source' => LibrenmsConfig::get('network_map_worldmap_link_type', 'xdp'),
+            'netmap_include_disabled_alerts' => LibrenmsConfig::get('network_map_worldmap_show_disabled_alerts', true) ? 'null' : 0,
+            'page_refresh' => LibrenmsConfig::get('page_refresh', 300),
             'init_lat' => $init_lat,
             'init_lng' => $init_lng,
             'init_zoom' => $init_zoom,
-            'group_radius' => Config::get('leaflet.group_radius', 80),
-            'tile_url' => Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org'),
+            'group_radius' => LibrenmsConfig::get('leaflet.group_radius', 80),
+            'tile_url' => LibrenmsConfig::get('leaflet.tile_url', '{s}.tile.openstreetmap.org'),
             'group_id' => $request->get('group'),
             'group_name' => $group_name,
         ];

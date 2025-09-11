@@ -1,4 +1,5 @@
 <?php
+
 /**
  * hp.inc.php
  *
@@ -77,9 +78,6 @@ foreach ($tables as $tablevalue) {
                 'snmp',
                 $index
             );
-
-            //Create Sensor To State Index
-            create_sensor_to_state_index($device, $state_name, $index);
         }
     }
 }

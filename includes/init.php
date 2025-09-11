@@ -1,4 +1,5 @@
 <?php
+
 /**
  * init.php
  *
@@ -27,20 +28,15 @@
  * @param  array  $modules  Which modules to initialize
  */
 
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Authentication\LegacyAuth;
-use LibreNMS\Config;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Laravel;
 
 global $vars, $console_color;
 
-error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR);
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
-
-if (! defined('IGNORE_ERRORS')) {
-    define('IGNORE_ERRORS', true);
-}
 
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
@@ -62,7 +58,6 @@ if (! function_exists('module_selected')) {
 // function only files
 require_once $install_dir . '/includes/common.php';
 require_once $install_dir . '/includes/dbFacile.php';
-require_once $install_dir . '/includes/datastore.inc.php';
 require_once $install_dir . '/includes/syslog.php';
 require_once $install_dir . '/includes/snmp.inc.php';
 require_once $install_dir . '/includes/services.inc.php';
@@ -80,8 +75,6 @@ if (module_selected('discovery', $init_modules)) {
 if (module_selected('polling', $init_modules)) {
     require_once $install_dir . '/includes/polling/functions.inc.php';
 }
-
-Debug::set($debug ?? false); // disable debug initially
 
 // Boot Laravel
 if (module_selected('web', $init_modules)) {
@@ -105,8 +98,8 @@ if (! module_selected('nodb', $init_modules)) {
 }
 \LibreNMS\DB\Eloquent::setStrictMode(false); // disable strict mode for legacy code...
 
-if (is_numeric(Config::get('php_memory_limit')) && Config::get('php_memory_limit') > 128) {
-    ini_set('memory_limit', Config::get('php_memory_limit') . 'M');
+if (is_numeric(LibrenmsConfig::get('php_memory_limit')) && LibrenmsConfig::get('php_memory_limit') > 128) {
+    ini_set('memory_limit', LibrenmsConfig::get('php_memory_limit') . 'M');
 }
 
 try {

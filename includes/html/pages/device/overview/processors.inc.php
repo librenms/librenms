@@ -15,9 +15,9 @@ if (count($processors)) {
         <table class="table table-hover table-condensed table-striped">';
 
     $graph_array = [];
-    $graph_array['to'] = \LibreNMS\Config::get('time.now');
+    $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
     $graph_array['type'] = 'processor_usage';
-    $graph_array['from'] = \LibreNMS\Config::get('time.day');
+    $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
     $graph_array['legend'] = 'no';
 
     $total_percent = [];
@@ -26,7 +26,7 @@ if (count($processors)) {
         $text_descr = rewrite_entity_descr($proc['processor_descr']);
 
         $percent = $proc['processor_usage'];
-        if (\LibreNMS\Config::get('cpu_details_overview') === true) {
+        if (\App\Facades\LibrenmsConfig::get('cpu_details_overview') === true) {
             $background = \LibreNMS\Util\Color::percentage($percent, $proc['processor_perc_warn']);
 
             $graph_array['id'] = $proc['processor_id'];
@@ -67,7 +67,7 @@ if (count($processors)) {
         }
     }//end foreach
 
-    if (\LibreNMS\Config::get('cpu_details_overview') === false) {
+    if (\App\Facades\LibrenmsConfig::get('cpu_details_overview') === false) {
         $graph_array = \App\Http\Controllers\Device\Tabs\OverviewController::setGraphWidth($graph_array);
 
         //Generate average cpu graph

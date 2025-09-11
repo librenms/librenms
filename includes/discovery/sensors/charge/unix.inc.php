@@ -1,4 +1,5 @@
 <?php
+
 /**
  * unix.inc.php
  *
@@ -29,10 +30,10 @@ if (! empty($snmpData)) {
     echo 'UPS-NUT-MIB: ' . PHP_EOL;
     $snmpData = array_shift($snmpData); //drop [ups-nut]
     $upsnut = [
-        1 => ['descr' => 'Battery Charge', 'LL' => 0, 'LW' => 10, 'W' => null, 'H' => 100],
+        1 => ['descr' => 'Battery Charge', 'LL' => 0, 'LW' => 10, 'W' => null, 'H' => null],
     ];
     foreach ($snmpData as $index => $upsData) {
-        if ($upsnut[$index]) {
+        if (isset($upsnut[$index])) {
             $value = intval($upsData['nsExtendOutLine']);
             if (! empty($value)) {
                 $oid = Oid::of('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut".' . $index)->toNumeric();

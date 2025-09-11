@@ -1,0 +1,281 @@
+mib: Stulz-WIB8000-MIB
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: busalarm
+                    value: busalarm
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.4.1.1.1.10.{{ $index }}'
+                    index: 'busalarm.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} bus alarm'
+                    states:
+                        - { descr: Ok, graph: 1, value: 0, generic: 0 }
+                        - { descr: Error, graph: 1, value: 1, generic: 2 }
+                -
+                    oid: basadrconflict
+                    value: busadrconflict
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.4.1.1.1.12.{{ $index }}'
+                    index: 'busadrconflict.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} bus conflict'
+                    states:
+                        - { descr: Ok, graph: 1, value: 0, generic: 0 }
+                        - { descr: Error, graph: 1, value: 1, generic: 2 }
+                -
+                    oid: unitOnOff
+                    value: unitOnOff
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.4.1.1.1.1013.{{ $index }}'
+                    index: 'unitOnOff.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} running state'
+                    states:
+                        - { descr: Stopped, graph: 1, value: 0, generic: 0 }
+                        - { descr: Running, graph: 1, value: 1, generic: 0 }
+                -
+                    oid: generalError
+                    value: generalError
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.4.2.1.1.8.{{ $index }}'
+                    index: 'generalError.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} error state'
+                    states:
+                        - { descr: Ok, graph: 1, value: 0, generic: 0 }
+                        - { descr: Error, graph: 1, value: 1, generic: 2 }
+                -
+                    oid: compr1Running
+                    value: compr1Running
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.1.1.1.1.4403.{{ $index }}'
+                    index: 'compr1Running.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} compressor state'
+                    states:
+                        - { descr: Stopped, graph: 1, value: 0, generic: 0 }
+                        - { descr: Running, graph: 1, value: 1, generic: 0 }
+                -
+                    oid: humidifier1Running
+                    value: humidifier1Running
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.3.1.1.6402.{{ $index }}'
+                    index: 'humidifier1Running.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} humidifier state'
+                    states:
+                        - { descr: Stopped, graph: 1, value: 0, generic: 0 }
+                        - { descr: Running, graph: 1, value: 1, generic: 0 }
+                -
+                    oid: dehumidificationRunning
+                    value: dehumidificationRunning
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.3.1.1.6802.{{ $index }}'
+                    index: 'dehumidificationRunning.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} dehumidification'
+                    states:
+                        - { descr: Stopped, graph: 1, value: 0, generic: 0 }
+                        - { descr: Running, graph: 1, value: 1, generic: 0 }
+                -
+                    oid: fan1Running
+                    value: fan1Running
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.4.1.1.6902.{{ $index }}'
+                    index: 'fan1Running.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} fan state'
+                    states:
+                        - { descr: Stopped, graph: 1, value: 0, generic: 0 }
+                        - { descr: Running, graph: 1, value: 1, generic: 0 }
+                -
+                    oid: unitFreecoolingValve
+                    value: unitFreecoolingValve
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.1.2.5.1.2238.{{ $index }}'
+                    index: 'unitFreecoolingValve.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} freecool valve'
+                    states:
+                        - { descr: Closed, graph: 1, value: 0, generic: 0 }
+                        - { descr: Open, graph: 1, value: 1, generic: 0 }
+        temperature:
+            data:
+                -
+                    oid: unitTemperature
+                    value: unitTemperature
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.1.1.1.1170.{{ $index }}'
+                    index: 'unitTemperature.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} temp'
+                    divisor: 10
+                -
+                    oid: unitSupplyAirTemperature
+                    value: unitSupplyAirTemperature
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.1.1.1.1193.{{ $index }}'
+                    index: 'unitSupplyAirTemperature.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} supply temp'
+                    divisor: 10
+                -
+                    oid: unitReturnAirTemperature
+                    value: unitReturnAirTemperature
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.1.1.1.1192.{{ $index }}'
+                    index: 'unitReturnAirTemperature.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} return temp'
+                    divisor: 10
+                -
+                    oid: unitOutsideAirTemperature
+                    value: unitOutsideAirTemperature
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.1.1.1.1196.{{ $index }}'
+                    index: 'unitOutsideAirTemperature.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} outside air temp'
+                    divisor: 10
+                -
+                    oid: unitWaterInTemperature1
+                    value: unitWaterInTemperature1
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.2.1.1.1191.{{ $index }}'
+                    index: 'unitWaterInTemperature1.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} Water In Temperature Primary'
+                    divisor: 10
+                    group: Water In Temperature Primary
+                -
+                    oid: Stulz-WIB8000-MIB::unitSetpointAirTratureCorrected
+                    value: Stulz-WIB8000-MIB::unitSetpointAirTratureCorrected
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.1.1.1.1175.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} Setpoint Air Temperature'
+                    index: 'unitSetpointAirTratureCorrected.{{ $index }}'
+                    divisor: 10
+                    group: Air Setpoint
+                -
+                    oid: Stulz-WIB8000-MIB::waterInTemperatu1ChillersPrimary
+                    value: Stulz-WIB8000-MIB::waterInTemperatu1ChillersPrimary
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.2.1.1.1191.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} Water In Temperature Primary'
+                    index: 'waterInTemperatu1ChillersPrimary.{{ $index }}'
+                    divisor: 10
+                    group: Water In Temperature Primary
+                -
+                    oid: Stulz-WIB8000-MIB::waterInTemperatuhillersSecondary
+                    value: Stulz-WIB8000-MIB::waterInTemperatuhillersSecondary
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.2.1.1.1202.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} Water In Temperature Secondary'
+                    index: 'waterInTemperatuhillersSecondary.{{ $index }}'
+                    divisor: 10
+                    group: Water In Temperature Secondary
+                -
+                    oid: Stulz-WIB8000-MIB::waterOutTemperatChillersPrimary
+                    value: Stulz-WIB8000-MIB::waterOutTemperatChillersPrimary
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.2.1.1.1206.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} Water Out Temperature Primary'
+                    index: 'waterOutTemperatChillersPrimary.{{ $index }}'
+                    divisor: 10
+                    group: Water Out Temperature Primary
+                -
+                    oid: Stulz-WIB8000-MIB::waterOutTemperatillersSecondary
+                    value: Stulz-WIB8000-MIB::waterOutTemperatillersSecondary
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.2.1.1.1207.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} Water Out Temperature Secondary'
+                    index: 'waterOutTemperatillersSecondary.{{ $index }}'
+                    divisor: 10
+                    group: Water Out Temperature Secondary
+
+        humidity:
+            data:
+                -
+                    oid: unitHumidity
+                    value: unitHumidity
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.2.1.1.1171.{{ $index }}'
+                    index: 'unitHumidity.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} humidity'
+                    divisor: 10
+                -
+                    oid: unitSupplyAirHumidity
+                    value: unitSupplyAirHumidity
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.2.1.1.1195.{{ $index }}'
+                    index: 'unitSupplyAirHumidity.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} supply humidity'
+                    divisor: 10
+                    group: Supply Air
+                -
+                    oid: unitReturnAirHumidity
+                    value: unitReturnAirHumidity
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.2.1.1.1194.{{ $index }}'
+                    index: 'unitReturnAirHumidity.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} return humidity'
+                    divisor: 10
+                    group: Return Air
+                -
+                    oid: Stulz-WIB8000-MIB::unitSetpointHumidityCorrected
+                    value: Stulz-WIB8000-MIB::unitSetpointHumidityCorrected
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.2.1.1.1178.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} Setpoint Humidity'
+                    index: 'unitSetpointHumidityCorrected.{{ $index }}'
+                    divisor: 10
+                    group: Humidity Setpoint
+        pressure:
+            data:
+                -
+                    oid: unitCondensationPressure1
+                    value: unitCondensationPressure1
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.3.1.1.2235.{{ $index }}'
+                    index: 'unitCondensationPressure1.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} condensation pressure'
+                    multiplier: 10
+                -
+                    oid: filter1PressureDrop
+                    value: filter1PressureDrop
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.2.2.4.6.1.1.11009.{{ $index }}'
+                    index: 'filter1PressureDrop.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} filter 1 pressure drop'
+                    divisor: 1000
+                -
+                    oid: filter2PressureDrop
+                    value: filter2PressureDrop
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.2.2.4.6.1.1.11109.{{ $index }}'
+                    index: 'filter2PressureDrop.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} filter 2 pressure drop'
+                    divisor: 1000
+                -
+                    oid: filter3PressureDrop
+                    value: filter3PressureDrop
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.2.2.4.6.1.1.11209.{{ $index }}'
+                    index: 'filter3PressureDrop.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} filter 3 pressure drop'
+                    divisor: 1000
+        percent:
+            data:
+                -
+                    oid: fan1Speed
+                    value: fan1Speed
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.4.1.1.6932.{{ $index }}'
+                    index: 'fan1Speed.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} fan speed'
+                -
+                    oid: gValveOpeningGrade
+                    value: gValveOpeningGrade
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.1.2.5.1.5312.{{ $index }}'
+                    index: 'gValveOpeningGrade.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} gValve grade'
+                -
+                    oid: Stulz-WIB8000-MIB::unitFreecoolingValve
+                    value: Stulz-WIB8000-MIB::unitFreecoolingValve
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.1.2.5.1.2238.{{ $index }}'
+                    index: 'unitFreecoolingValve.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} Freecooling Valve Opening'
+                    group: Free Cooling
+                -
+                    oid: Stulz-WIB8000-MIB::gECWValveOpeningGrade1
+                    value: Stulz-WIB8000-MIB::gECWValveOpeningGrade1
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.1.2.2.1.1.5214.{{ $index }}'
+                    index: 'gECWValveOpeningGrade1.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} GE/CW Valve 1 Opening'
+                    group: GE/CW Valve 1
+                -
+                    oid: Stulz-WIB8000-MIB::gECWValveOpeningGrade2
+                    value: Stulz-WIB8000-MIB::gECWValveOpeningGrade2
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.2.1.2.2.1.1.5224.{{ $index }}'
+                    index: 'gECWValveOpeningGrade2.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} GE/CW Valve 2 Opening'
+                    group: GE/CW Valve 2
+        waterflow:
+            data:
+                -
+                    oid: Stulz-WIB8000-MIB::waterFlowVolume
+                    value: Stulz-WIB8000-MIB::waterFlowVolume
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.2.1.1.1249.{{ $index }}'
+                    index: 'waterFlowVolume.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} Water Flow Volume'
+                    multiplier: 50 #Multiply and divide to generate a multiplier of 16.66667
+                    divisor: 3
+                -
+                    oid: Stulz-WIB8000-MIB::waterFlowVolumeB
+                    value: Stulz-WIB8000-MIB::waterFlowVolumeB
+                    num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.2.1.1.1740.{{ $index }}'
+                    index: 'waterFlowVolumeB.{{ $index }}'
+                    descr: 'Unit {{ $subindex1 }} Water Flow Volume B'
+                    multiplier: 50 #Multiply and divide to generate a multiplier of 16.66667
+                    divisor: 3

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LinkUp.php
  *

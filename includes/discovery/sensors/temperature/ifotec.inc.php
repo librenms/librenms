@@ -1,4 +1,5 @@
 <?php
+
 /**
  * ifotec.inc.php
  *
@@ -23,7 +24,7 @@
  * @author     Cedric MARMONIER
  */
 $index = 0;
-foreach ($pre_cache['ifoTemperatureTable'] as $ifoSensor) {
+foreach ($pre_cache['ifoTemperatureTable'] ?? [] as $ifoSensor) {
     discover_sensor(
         null,
         'temperature',

@@ -1,4 +1,5 @@
 <?php
+
 /*
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -29,10 +30,6 @@ $colour_area_max = 'FFEE99';
 $graph_max = 0;
 $unit_text = 'Percent';
 $ups_nut = Rrd::name($device['hostname'], ['app', 'ups-nut', $app->app_id]);
-if (Rrd::checkRrdExists($ups_nut)) {
-    $rrd_filename = $ups_nut;
-} else {
-    echo "file missing: $rrd_filename";
-}
+$rrd_filename = $ups_nut;
 
 require 'includes/html/graphs/generic_simplex.inc.php';

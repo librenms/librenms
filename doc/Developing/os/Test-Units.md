@@ -64,9 +64,16 @@ tests: `lnms dev:check unit --db --snmpsim`
 
 `lnms dev:check unit -o osname`
 
+### Test an OS, but only discovery and polling modules (exluding OS detection)
+`lnms dev:check unit --os osname --os-modules-only`
+
+
 ### Specific Module
 
 `lnms dev:check unit -m modulename`
+
+### Test all modules for all os and stop on failure
+`lnms dev:check unit --db -snmpsim --os-modules-only -f`
 
 ## Using snmpsim for testing
 
@@ -82,6 +89,17 @@ the community and 127.1.6.1:1161 as the host.
 ```bash
 snmpget -v 2c -c ios_c3560e 127.1.6.1:1161 sysDescr.0
 ```
+
+## Simulate specific device from test data
+
+Add/update a device called "snmpsim" to your install and set to use a specific snmprec file
+
+```bash
+lnms dev:simulate ios_2960x
+```
+
+You can then run `./discovery.php -h snmpsim -d -v` and `lnms device:poll snmpsim -vvv`
+to discover and poll the simulated device.
 
 ## Snmprec format
 

@@ -13,7 +13,7 @@ $param = [];
 $where = '';
 $ignore_filter = 0;
 $disabled_filter = 0;
-$device = DeviceCache::get((int) $vars['device_id']);
+$device = DeviceCache::get((int) ($vars['device_id'] ?? 0));
 
 $device_selected = json_encode($device->exists ? ['id' => $device->device_id, 'text' => $device->displayName()] : '');
 echo '<script>init_select2("#device_id", "device", {field: "device_id"}, ' . $device_selected . ' , "All Devices")</script>';
@@ -181,10 +181,10 @@ foreach ($ports as $port) {
         $graph_array = [];
         $graph_array['height'] = 100;
         $graph_array['width'] = 210;
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
         $graph_array['id'] = $port['port_id'];
         $graph_array['type'] = $graph_type;
-        $graph_array['from'] = \LibreNMS\Config::get('time.day');
+        $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
         $graph_array['legend'] = 'no';
 
         $link_array = $graph_array;

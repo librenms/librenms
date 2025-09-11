@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mail.php
  *
@@ -25,7 +26,7 @@
 
 namespace LibreNMS\Validations;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Validator;
 
 class Mail extends BaseValidation
@@ -40,37 +41,37 @@ class Mail extends BaseValidation
      */
     public function validate(Validator $validator): void
     {
-        if (Config::get('alert.transports.mail') === true) {
+        if (LibrenmsConfig::get('alert.transports.mail') === true) {
             $run_test = 1;
-            if (! Config::has('alert.default_mail')) {
+            if (! LibrenmsConfig::has('alert.default_mail')) {
                 $validator->fail('default_mail config option needs to be specified to test email');
                 $run_test = 0;
-            } elseif (Config::get('email_backend') == 'sendmail') {
-                if (! Config::has('email_sendmail_path')) {
+            } elseif (LibrenmsConfig::get('email_backend') == 'sendmail') {
+                if (! LibrenmsConfig::has('email_sendmail_path')) {
                     $validator->fail('You have selected sendmail but not configured email_sendmail_path');
                     $run_test = 0;
-                } elseif (! file_exists(Config::get('email_sendmail_path'))) {
+                } elseif (! file_exists(LibrenmsConfig::get('email_sendmail_path'))) {
                     $validator->fail('The configured email_sendmail_path is not valid');
                     $run_test = 0;
                 }
-            } elseif (Config::get('email_backend') == 'smtp') {
-                if (! Config::has('email_smtp_host')) {
+            } elseif (LibrenmsConfig::get('email_backend') == 'smtp') {
+                if (! LibrenmsConfig::has('email_smtp_host')) {
                     $validator->fail('You have selected SMTP but not configured an SMTP host');
                     $run_test = 0;
                 }
-                if (! Config::has('email_smtp_port')) {
+                if (! LibrenmsConfig::has('email_smtp_port')) {
                     $validator->fail('You have selected SMTP but not configured an SMTP port');
                     $run_test = 0;
                 }
-                if (Config::get('email_smtp_auth')
-                    && (! Config::has('email_smtp_username') || ! Config::has('email_smtp_password'))
+                if (LibrenmsConfig::get('email_smtp_auth')
+                    && (! LibrenmsConfig::has('email_smtp_username') || ! LibrenmsConfig::has('email_smtp_password'))
                 ) {
                     $validator->fail('You have selected SMTP auth but have not configured both username and password');
                     $run_test = 0;
                 }
             }//end if
             if ($run_test == 1) {
-                $email = Config::get('alert.default_mail');
+                $email = LibrenmsConfig::get('alert.default_mail');
                 try {
                     \LibreNMS\Util\Mail::send($email, 'Test email', 'Testing email from NMS');
                     $validator->ok('Email has been sent');

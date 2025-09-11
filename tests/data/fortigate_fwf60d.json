@@ -2224,5 +2224,43 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 2,
+                    "low_ifIndex": 9,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.10.10.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.10.10.0/24",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "192.168.1.99",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.1.0/24",
+                    "ifIndex": 8
+                },
+                {
+                    "ipv4_address": "192.168.70.125",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.70.0/24",
+                    "ifIndex": 2
+                }
+            ]
+        }
     }
 }

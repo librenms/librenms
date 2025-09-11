@@ -1,4 +1,5 @@
 <?php
+
 /*
  * CheckRrdVersion.php
  *
@@ -25,9 +26,9 @@
 
 namespace LibreNMS\Validations\Rrd;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\Validation;
 use LibreNMS\Interfaces\ValidationFixer;
 use LibreNMS\Util\Version;
@@ -40,7 +41,7 @@ class CheckRrdVersion implements Validation, ValidationFixer
     {
         // Check that rrdtool config version is what we see
         $rrd_version = Version::get()->rrdtool();
-        $config_version = Config::get('rrdtool_version');
+        $config_version = LibrenmsConfig::get('rrdtool_version');
 
         if (version_compare($config_version, '1.5.5', '<')
             && version_compare($config_version, $rrd_version, '>')
@@ -56,7 +57,7 @@ class CheckRrdVersion implements Validation, ValidationFixer
 
     public function enabled(): bool
     {
-        return Config::has('rrdtool_version');
+        return LibrenmsConfig::has('rrdtool_version');
     }
 
     public function fix(): bool

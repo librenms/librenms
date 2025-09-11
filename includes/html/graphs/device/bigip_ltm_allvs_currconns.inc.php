@@ -1,4 +1,5 @@
 <?php
+
 /*
  * LibreNMS module to display F5 LTM Virtual Server Details
  *
@@ -22,7 +23,7 @@ $components = $components[$device['device_id']];
 include 'includes/html/graphs/common.inc.php';
 $rrd_options .= ' -l 0 -E ';
 $rrd_options .= " COMMENT:'VS Current Connections       Now      Avg      Max\\n'";
-$colours = array_merge(\LibreNMS\Config::get('graph_colours.mixed'), \LibreNMS\Config::get('graph_colours.manycolours'));
+$colours = array_merge(\App\Facades\LibrenmsConfig::get('graph_colours.mixed'), \App\Facades\LibrenmsConfig::get('graph_colours.manycolours'));
 $colcount = 0;
 $count = 0;
 

@@ -1,5 +1,6 @@
 #!/usr/bin/env php
 <?php
+
 /**
  * poller.php
  *
@@ -30,7 +31,7 @@ $options = getopt('h:rfpdvm:q');
 
 c_echo('%RWarning: poller.php is deprecated!%n Use %9lnms device:poll%n instead.' . PHP_EOL . PHP_EOL);
 
-$scheduler = \LibreNMS\Config::get('schedule_type.poller');
+$scheduler = \App\Facades\LibrenmsConfig::get('schedule_type.poller');
 if ($scheduler != 'legacy' && $scheduler != 'cron') {
     exit(0); // message above is sufficient
 }

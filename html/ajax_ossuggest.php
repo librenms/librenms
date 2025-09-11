@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (C) 2017 Oscar Ekeroth <zmegolaz@gmail.com>
  * This program is free software: you can redistribute it and/or modify
@@ -59,7 +60,7 @@ function levsortos($base, $obj, $keys)
 header('Content-type: application/json');
 if (isset($_GET['term'])) {
     $_GET['term'] = strip_tags($_GET['term']);
-    $sortos = levsortos($_GET['term'], \LibreNMS\Config::get('os'), ['text', 'os']);
+    $sortos = levsortos($_GET['term'], \App\Facades\LibrenmsConfig::get('os'), ['text', 'os']);
     $sortos = array_slice($sortos, 0, 20);
     foreach ($sortos as $lev => $os) {
         $ret[$lev] = array_intersect_key($os, ['os' => true, 'text' => true]);

@@ -52,7 +52,6 @@ Parameters:
   -n, --no-save      Don't save database entries, print them out instead
   -f, --file         Save data to file instead of the standard location
   -d, --debug        Enable debug output
-      --snmpsim      Run snmpsimd.py using the collected data for manual testing.
 
 Examples:
   ./save-test-data.php -o ios -v 2960x
@@ -127,7 +126,7 @@ $snmpsim->waitForStartup();
 
 if (! $snmpsim->isRunning()) {
     echo "Failed to start snmpsim, make sure it is installed, working, and there are no bad snmprec files.\n";
-    echo "Run ./scripts/save-test-data.php --snmpsim to see the log output\n";
+    echo $snmpsim->getErrorOutput();
     exit(1);
 }
 
@@ -149,7 +148,7 @@ try {
         if (! $no_save && ! empty($output_file)) {
             $tester->setJsonSavePath($output_file);
         }
-        $test_data = $tester->generateTestData($snmpsim, $no_save);
+        $test_data = $tester->generateTestData($snmpsim->ip, $snmpsim->port, $no_save);
 
         if ($no_save) {
             print_r($test_data);

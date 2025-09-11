@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Compare.php
  *
@@ -42,10 +43,14 @@ class Compare
      */
     public static function values($a, $b, $comparison = '=')
     {
-        // handle PHP8 change to implicit casting
-        if (is_numeric($a) || is_numeric($b)) {
-            $a = Number::cast($a);
-            $b = is_array($b) ? $b : Number::cast($b);
+        $numeric_comparisons = ['=', '!=', '==', '!==', '>=', '<=', '>', '<'];
+
+        if (in_array($comparison, $numeric_comparisons)) {
+            // handle PHP8 change to implicit casting
+            if (is_numeric($a) || is_numeric($b)) {
+                $a = Number::cast($a);
+                $b = is_array($b) ? $b : Number::cast($b);
+            }
         }
 
         switch ($comparison) {
@@ -78,9 +83,9 @@ class Compare
             case 'not_ends':
                 return ! Str::endsWith($a, $b);
             case 'regex':
-                return (bool) preg_match($b, $a);
+                return Str::isMatch($b, $a);
             case 'not_regex':
-                return ! ((bool) preg_match($b, $a));
+                return ! Str::isMatch($b, $a);
             case 'in_array':
                 return in_array($a, $b);
             case 'not_in_array':
