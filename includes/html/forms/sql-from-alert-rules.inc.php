@@ -1,4 +1,8 @@
 <?php
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8f8bf04ba52459b79a5000bfe1ae9e50c0d7be8e
 /**
  * alert-rules.inc.php
  *
@@ -23,8 +27,13 @@
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
 
+<<<<<<< HEAD
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
+=======
+use App\Facades\LibrenmsConfig;
+use LibreNMS\Alerting\QueryBuilderParser;
+>>>>>>> 8f8bf04ba52459b79a5000bfe1ae9e50c0d7be8e
 
 header('Content-type: application/json');
 
@@ -41,6 +50,7 @@ if (is_numeric($rule_id)) {
     $rule = dbFetchRow('SELECT * FROM alert_rules where id=?', [$rule_id]);
 
     $default_extra = [
+<<<<<<< HEAD
         'mute' => Config::get('alert_rule.mute_alerts'),
         'count' => Config::get('alert_rule.max_alerts'),
         'delay' => 60 * Config::get('alert_rule.delay'),
@@ -48,13 +58,26 @@ if (is_numeric($rule_id)) {
         'interval' => 60 * Config::get('alert_rule.interval'),
         'recovery' => Config::get('alert_rule.recovery_alerts'),
         'acknowledgement' => Config::get('alert_rule.acknowledgement_alerts'),
+=======
+        'mute' => LibrenmsConfig::get('alert_rule.mute_alerts'),
+        'count' => LibrenmsConfig::get('alert_rule.max_alerts'),
+        'delay' => 60 * LibrenmsConfig::get('alert_rule.delay'),
+        'invert' => LibrenmsConfig::get('alert_rule.invert_rule_match'),
+        'interval' => 60 * LibrenmsConfig::get('alert_rule.interval'),
+        'recovery' => LibrenmsConfig::get('alert_rule.recovery_alerts'),
+        'acknowledgement' => LibrenmsConfig::get('alert_rule.acknowledgement_alerts'),
+>>>>>>> 8f8bf04ba52459b79a5000bfe1ae9e50c0d7be8e
     ];
     $output = [
         'status' => 'ok',
         'name' => $rule['name'] . ' - Copy',
         'builder' => QueryBuilderParser::fromJson($rule['builder']),
         'extra' => array_replace($default_extra, (array) json_decode($rule['extra'])),
+<<<<<<< HEAD
         'severity' => $rule['severity'] ?: Config::get('alert_rule.severity'),
+=======
+        'severity' => $rule['severity'] ?: LibrenmsConfig::get('alert_rule.severity'),
+>>>>>>> 8f8bf04ba52459b79a5000bfe1ae9e50c0d7be8e
         'invert_map' => $rule['invert_map'],
     ];
 } else {

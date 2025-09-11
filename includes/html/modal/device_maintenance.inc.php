@@ -22,7 +22,14 @@
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
+<<<<<<< HEAD
 use App\Facades\DeviceCache;
+=======
+
+use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
+use LibreNMS\Enum\MaintenanceBehavior;
+>>>>>>> 8f8bf04ba52459b79a5000bfe1ae9e50c0d7be8e
 
 if (! Auth::user()->hasGlobalAdmin()) {
     exit('ERROR: You need to be admin');
@@ -33,6 +40,10 @@ $minute_steps = [0, 30];
 $exclude_durations = ['0:00'];
 
 $maintenance_duration_list = [];
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8f8bf04ba52459b79a5000bfe1ae9e50c0d7be8e
 foreach ($hour_steps as $hour) {
     foreach ($minute_steps as $min) {
         if (empty($hour) && empty($min)) {
@@ -49,6 +60,12 @@ foreach ($hour_steps as $hour) {
         $maintenance_duration_list[] = $duration;
     }
 }
+<<<<<<< HEAD
+=======
+
+$default_behavior = MaintenanceBehavior::from((int) LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior'));
+
+>>>>>>> 8f8bf04ba52459b79a5000bfe1ae9e50c0d7be8e
 ?>
 <div class="modal fade" id="device_maintenance_modal" tabindex="-1" role="dialog" aria-labelledby="device_edit" aria-hidden="true">
     <div class="modal-dialog">
@@ -77,9 +94,41 @@ foreach ($hour_steps as $hour) {
                         </div>
                     </div>
                     <div class="form-group">
+<<<<<<< HEAD
                         <label for="maintenance-submit" class="col-sm-4 control-label"></label>
                         <div class="col-sm-8">
                             <button type="button" id="maintenance-submit" data-device_id="<?php echo $device['device_id']; ?>" <?php echo \LibreNMS\Alert\AlertUtil::isMaintenance($device['device_id']) ? 'disabled class="btn btn-warning"' : 'class="btn btn-success"'?> name="maintenance-submit">Start Maintenance</button>
+=======
+                        <label for="behavior" class="col-sm-4 control-label">Behavior: </label>
+                        <div class="col-sm-8">
+                            <select name='behavior' id='behavior' class='form-control input-sm'>
+                                <option value='<?= MaintenanceBehavior::SKIP_ALERTS->value ?>' <?= $default_behavior === MaintenanceBehavior::SKIP_ALERTS ? 'selected' : '' ?>>
+                                    <?= __('alerting.maintenance.behavior.options.skip_alerts') ?>
+                                </option>
+                                <option value='<?= MaintenanceBehavior::MUTE_ALERTS->value; ?>' <?= $default_behavior === MaintenanceBehavior::MUTE_ALERTS ? 'selected' : '' ?>>
+                                    <?= __('alerting.maintenance.behavior.options.mute_alerts') ?>
+                                </option>
+                                <option value='<?= MaintenanceBehavior::RUN_ALERTS->value; ?>' <?= $default_behavior === MaintenanceBehavior::RUN_ALERTS ? 'selected' : '' ?>>
+                                    <?= __('alerting.maintenance.behavior.options.run_alerts') ?>
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="maintenance-submit" class="col-sm-4 control-label"></label>
+                        <div class="col-sm-8">
+                            <button
+                             type="button"
+                             id="maintenance-submit"
+                             data-device_id="<?php echo $device['device_id']; ?>"
+                             <?php echo DeviceCache::get($device['device_id'])->isUnderMaintenance()
+                                    ? 'disabled class="btn btn-warning"'
+                                    : 'class="btn btn-success"'
+                             ?>
+                             name="maintenance-submit">
+                                Start Maintenance
+                            </button>
+>>>>>>> 8f8bf04ba52459b79a5000bfe1ae9e50c0d7be8e
                         </div>
                     </div>
                 </form>
@@ -95,6 +144,10 @@ foreach ($hour_steps as $hour) {
         var recurring = 0;
         var start = '<?=date('Y-m-d H:i:00'); ?>';
         var duration = $('#duration').val();
+<<<<<<< HEAD
+=======
+        var behavior = $('#behavior').val();
+>>>>>>> 8f8bf04ba52459b79a5000bfe1ae9e50c0d7be8e
         $.ajax({
             type: 'POST',
             url: 'ajax_form.php',
@@ -102,6 +155,10 @@ foreach ($hour_steps as $hour) {
                     sub_type: 'new-maintenance',
                     title: title,
                     notes: notes,
+<<<<<<< HEAD
+=======
+                    behavior: behavior,
+>>>>>>> 8f8bf04ba52459b79a5000bfe1ae9e50c0d7be8e
                     recurring: recurring,
                     start: start,
                     duration: duration,

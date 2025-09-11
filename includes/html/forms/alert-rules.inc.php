@@ -1,4 +1,8 @@
 <?php
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8f8bf04ba52459b79a5000bfe1ae9e50c0d7be8e
 /**
  * alert-rules.inc.php
  *
@@ -39,7 +43,11 @@ $status = 'ok';
 $message = '';
 
 $builder_json = $vars['builder_json'];
+<<<<<<< HEAD
 $override_query = $vars['override_query'];
+=======
+$override_query = $vars['override_query'] ?? null;
+>>>>>>> 8f8bf04ba52459b79a5000bfe1ae9e50c0d7be8e
 
 $options = [
     'override_query' => $override_query,
@@ -92,7 +100,11 @@ $extra = [
 
 $extra_json = json_encode($extra);
 
+<<<<<<< HEAD
 if (! is_array($vars['maps']) && $invert_map) {
+=======
+if (isset($vars['maps']) && ! is_array($vars['maps']) && $invert_map) {
+>>>>>>> 8f8bf04ba52459b79a5000bfe1ae9e50c0d7be8e
     exit(json_encode([
         'status' => 'error',
         'message' => 'Invert map is on but no selection in devices, groups and locations match list<br />',
@@ -129,7 +141,10 @@ if (is_numeric($rule_id) && $rule_id > 0) {
         $message = 'No rules provided';
     } else {
         $rule_id = dbInsert([
+<<<<<<< HEAD
             'rule' => '',
+=======
+>>>>>>> 8f8bf04ba52459b79a5000bfe1ae9e50c0d7be8e
             'severity' => $severity,
             'extra' => $extra_json,
             'disabled' => 0,
@@ -159,7 +174,11 @@ if (is_numeric($rule_id) && $rule_id > 0) {
     $devices = [];
     $groups = [];
     $locations = [];
+<<<<<<< HEAD
     foreach ((array) $vars['maps'] as $item) {
+=======
+    foreach ((array) ($vars['maps'] ?? []) as $item) {
+>>>>>>> 8f8bf04ba52459b79a5000bfe1ae9e50c0d7be8e
         if (Str::startsWith($item, 'l')) {
             $locations[] = (int) substr($item, 1);
         } elseif (Str::startsWith($item, 'g')) {
@@ -176,7 +195,11 @@ if (is_numeric($rule_id) && $rule_id > 0) {
     //Update transport groups and transports - can't use dbSyncRelationship
     $transports = [];
     $groups = [];
+<<<<<<< HEAD
     foreach ((array) $vars['transports'] as $item) {
+=======
+    foreach ((array) ($vars['transports'] ?? []) as $item) {
+>>>>>>> 8f8bf04ba52459b79a5000bfe1ae9e50c0d7be8e
         if (Str::startsWith($item, 'g')) {
             $groups[] = (int) substr($item, 1);
         } else {

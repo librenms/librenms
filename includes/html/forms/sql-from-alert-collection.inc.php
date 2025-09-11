@@ -1,4 +1,8 @@
 <?php
+<<<<<<< HEAD
+=======
+
+>>>>>>> 8f8bf04ba52459b79a5000bfe1ae9e50c0d7be8e
 /**
  * alert-rules.inc.php
  *
@@ -23,8 +27,12 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
+<<<<<<< HEAD
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
+=======
+use App\Facades\LibrenmsConfig;
+>>>>>>> 8f8bf04ba52459b79a5000bfe1ae9e50c0d7be8e
 
 header('Content-type: application/json');
 
@@ -41,6 +49,7 @@ if (is_numeric($template_id)) {
     $rules = get_rules_from_json();
     $rule = $rules[$template_id];
     $default_extra = [
+<<<<<<< HEAD
         'mute' => Config::get('alert_rule.mute_alerts'),
         'count' => Config::get('alert_rule.max_alerts'),
         'delay' => 60 * Config::get('alert_rule.delay'),
@@ -48,15 +57,32 @@ if (is_numeric($template_id)) {
         'interval' => 60 * Config::get('alert_rule.interval'),
         'recovery' => Config::get('alert_rule.recovery_alerts'),
         'acknowledgement' => Config::get('alert_rule.acknowledgement_alerts'),
+=======
+        'mute' => LibrenmsConfig::get('alert_rule.mute_alerts'),
+        'count' => LibrenmsConfig::get('alert_rule.max_alerts'),
+        'delay' => 60 * LibrenmsConfig::get('alert_rule.delay'),
+        'invert' => LibrenmsConfig::get('alert_rule.invert_rule_match'),
+        'interval' => 60 * LibrenmsConfig::get('alert_rule.interval'),
+        'recovery' => LibrenmsConfig::get('alert_rule.recovery_alerts'),
+        'acknowledgement' => LibrenmsConfig::get('alert_rule.acknowledgement_alerts'),
+>>>>>>> 8f8bf04ba52459b79a5000bfe1ae9e50c0d7be8e
     ];
     $output = [
         'status' => 'ok',
         'name' => $rule['name'],
+<<<<<<< HEAD
         'notes' => $rule['notes'],
         'builder' => $rule['builder'] ?: QueryBuilderParser::fromOld($rule['rule'])->toArray(),
         'extra' => array_replace($default_extra, (array) $rule['extra']),
         'severity' => $rule['severity'] ?: Config::get('alert_rule.severity'),
         'invert_map' => Config::get('alert_rule.invert_map'),
+=======
+        'notes' => $rule['notes'] ?? null,
+        'builder' => $rule['builder'] ?? [],
+        'extra' => array_replace($default_extra, (array) ($rule['extra'] ?? [])),
+        'severity' => $rule['severity'] ?? LibrenmsConfig::get('alert_rule.severity'),
+        'invert_map' => LibrenmsConfig::get('alert_rule.invert_map'),
+>>>>>>> 8f8bf04ba52459b79a5000bfe1ae9e50c0d7be8e
     ];
 } else {
     $output = [

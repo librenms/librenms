@@ -10,7 +10,11 @@
             @foreach($tabs as $tab)
                 @if($tab->visible($device))
                     <li role="presentation" @if( $current_tab == $tab->slug() ) class="active" @endif>
+<<<<<<< HEAD
                         <a href="{{ route('device', [$device_id, $tab->slug()]) }}" class="tw-whitespace-nowrap">
+=======
+                        <a href="{{ route('device', [$device_id, $tab->slug()]) }}" class="tw:whitespace-nowrap">
+>>>>>>> 8f8bf04ba52459b79a5000bfe1ae9e50c0d7be8e
                             <i class="fa {{ $tab->icon() }} fa-lg icon-theme" aria-hidden="true"></i>
                             {{ $tab->name() }}
                         </a>

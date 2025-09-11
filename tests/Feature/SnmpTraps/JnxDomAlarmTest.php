@@ -34,7 +34,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 
-class JnxDomAlarmTest extends SnmpTrapTestCase
+final class JnxDomAlarmTest extends SnmpTrapTestCase
 {
     use RequiresDatabase;
     use DatabaseTransactions;
