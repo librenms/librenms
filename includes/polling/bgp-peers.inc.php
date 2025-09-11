@@ -700,6 +700,8 @@ if (! empty($peers)) {
                     $cbgpPeerWithdrawnPrefixes = null;
                 }//end if
 
+                d_echo('checking debug');
+
                 if ($device['os'] == 'timos') {
                     // Nokia TiMOS SAFI mappings (per AFI)
                     // AFI: 1 = IPv4, 2 = IPv6
