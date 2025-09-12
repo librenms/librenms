@@ -1,10 +1,11 @@
 <div class="tab-content" style="margin-top: 15px;">
     <div role="tabpanel" class="tab-pane active" id="main">
         <legend>{{ __('Rule setup') }}</legend>
-        <div class='form-group' title="The description of this alert rule.">
+        <div class='form-group'>
             <label for='rule_name' class='col-sm-3 col-md-2 control-label'>{{ __('Rule name') }}</label>
             <div class='col-sm-9 col-md-10'>
                 <input type='text' id='rule_name' name='name' class='form-control validation' maxlength='200' required>
+                <span class="help-block">{{ __('A display name for this alert rule') }}</span>
             </div>
         </div>
         <div class="form-group">
@@ -24,94 +25,113 @@
             </div>
             <div class="col-sm-9 col-md-10">
                 <div id="builder"></div>
+                <span class="help-block">{{ __('Build an SQL query to match rows from the database. If the query returns row(s) this alert will trigger.') }}</span>
             </div>
         </div>
-        <div class='form-group form-inline'>
-            <label for='invert' class='col-sm-3 col-md-2 control-label' title="Invert the match. If the rule matches, the alert is considered OK.">Invert match result </label>
-            <div class='col-sm-2' title="Invert the match. If the rule matches, the alert is considered OK.">
+        <div class='form-group'>
+            <label for='invert' class='col-sm-3 col-md-2 control-label'>Invert match result </label>
+            <div class='form col-sm-9 col-md-10'>
                 <input type="checkbox" name="invert" id="invert">
+                <span class="help-block">{{ __('Invert the match. If the rule matches, the alert is considered OK.') }}</span>
             </div>
         </div>
 
         <legend>{{ __('Targeting') }}</legend>
 
-        <div class="form-group form-inline">
-            <label for='maps' class='col-sm-3 col-md-2 control-label' title="Restrict this alert rule to the selected devices, groups, or locations.">Devices, groups, and locations </label>
-            <div class="col-sm-7" style="width: 56%;">
+        <div class="form-group">
+            <label for='maps' class='col-sm-3 col-md-2 control-label'>Devices, groups, and locations </label>
+            <div class="col-sm-9 col-md-10">
                 <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
+                <span class="help-block">{{ __('Restrict this alert rule to the selected devices, groups, or locations.') }}</span>
             </div>
-            <div>
-                <label for='invert_map' class='col-md-1' style="width: 14.1333%;" text-align="left" title="If ON, alert rule checks will run on all devices except the selected devices and groups.">Run on all devices except selected </label>
+        </div>
+
+        <div class="form-group">
+            <label for='invert_map' class='col-sm-3 col-md-2 control-label' text-align="left">Run on all devices except selected </label>
+            <div class="col-sm-9 col-md-10">
                 <input type='checkbox' name='invert_map' id='invert_map'>
+                <span class="help-block">{{ __('If ON, alert rule checks will run on all devices except the selected devices and groups.') }}</span>
             </div>
         </div>
 
         <legend>{{ __('Notifications') }}</legend>
-        <div class="form-group" title="How to display the alert.  OK: green, Warning: yellow, Critical: red">
+        <div class="form-group">
             <label for='severity' class='col-sm-3 col-md-2 control-label'>{{ __('Severity') }}</label>
-            <div class="col-sm-2">
-                <select name='severity' id='severity' class='form-control'>
+            <div class="col-sm-9 col-md-10">
+                <select name='severity' id='severity' class='form-control' style="max-width: 7.5em">
                     <option value='ok' {{ ($default_severity ?? '') === 'ok' ? 'selected' : '' }}>OK</option>
                     <option value='warning' {{ ($default_severity ?? '') === 'warning' ? 'selected' : '' }}>Warning</option>
                     <option value='critical' {{ ($default_severity ?? '') === 'critical' ? 'selected' : '' }}>Critical</option>
                 </select>
+                <span class="help-block">{{ __('How to display the alert.  OK: green, Warning: yellow, Critical: red') }}</span>
             </div>
         </div>
-        <div class="form-group form-inline">
-            <label for='count' class='col-sm-3 col-md-2 control-label' title="How many notifications to issue while active before stopping. -1 means no limit. If interval is 0, this has no effect.">Max alerts </label>
-            <div class="col-sm-2" title="How many notifications to issue while active before stopping. -1 means no limit. If interval is 0, this has no effect.">
-                <input type='text' id='count' name='count' class='form-control' size="4" value="{{ $default_max_alerts ?? '' }}">
-            </div>
-            <div class="col-sm-3" title="How long to wait before issuing a notification. If the alert clears before the delay, no notification will be issued. (s,m,h,d)">
-                <label for='delay' class='control-label' style="vertical-align: top;">Delay </label>
-                <input type='text' id='delay' name='delay' class='form-control' size="4" value="{{ $default_delay ?? '' }}">
-            </div>
-            <div class="col-sm-4 col-md-3" title="How often to re-issue notifications while this alert is active. 0 means notify once. This is affected by the poller interval. (s,m,h,d)">
-                <label for='interval' class='control-label' style="vertical-align: top;">Interval </label>
-                <input type='text' id='interval' name='interval' class='form-control' size="4" value="{{ $default_interval ?? '' }}">
+        <div class="form-group">
+            <label for='delay' class='col-sm-3 col-md-2 control-label'>Delay</label>
+            <div class="col-sm-9 col-md-10">
+                <input type='text' id='delay' name='delay' class='form-control' style="max-width: 7.5em" value="{{ $default_delay ?? '' }}">
+                <span class="help-block">{{ __('How long to wait before issuing a notification. If the alert clears before the delay, no notification will be issued. (s,m,h,d)') }}</span>
             </div>
         </div>
-        <div class='form-group form-inline'>
-            <label for='mute' class='col-sm-3 col-md-2 control-label' title="Show alert status in the webui, but do not issue notifications.">Mute alerts </label>
-            <div class='col-sm-2' title="Show alert status in the webui, but do not issue notifications.">
+        <div class="form-group">
+            <label for='count' class='col-sm-3 col-md-2 control-label'>Max alerts</label>
+            <div class="col-sm-9 col-md-10">
+                <input type='text' id='count' name='count' class='form-control' style="max-width: 7.5em" value="{{ $default_max_alerts ?? '' }}">
+                <span class="help-block">{{ __('How many notifications to issue while active before stopping. -1 means no limit. If interval is 0, this has no effect.') }}</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for='interval' class='col-sm-3 col-md-2 control-label'>Interval</label>
+            <div class="col-sm-9 col-md-10">
+                <input type='text' id='interval' name='interval' class='form-control' style="max-width: 7.5em" value="{{ $default_interval ?? '' }}">
+                <span class="help-block">{{ __('How often to re-issue notifications while this alert is active. 0 means notify once. This is affected by the poller interval. (s,m,h,d)') }}</span>
+            </div>
+        </div>
+        <div class='form-group'>
+            <label for='mute' class='col-sm-3 col-md-2 control-label'>Mute alerts </label>
+            <div class='col-sm-9 col-md-10'>
                 <input type="checkbox" name="mute" id="mute">
+                <span class="help-block">{{ __('Show alert status in the webui, but do not issue notifications.') }}</span>
             </div>
         </div>
-        <div class='form-group form-inline'>
-            <label for='recovery' class='col-sm-3 col-md-2 control-label' title="Send recovery notification when alert clears.">Recovery alerts </label>
-            <div class='col-sm-2' title="Send recovery notification when alert clears.">
+        <div class='form-group'>
+            <label for='recovery' class='col-sm-3 col-md-2 control-label'>Recovery alerts </label>
+            <div class='col-sm-9 col-md-10'>
                 <input type="checkbox" name="recovery" id="recovery">
+                <span class="help-block">{{ __('Send recovery notification when alert clears.') }}</span>
             </div>
         </div>
-        <div class='form-group form-inline'>
-            <label for='acknowledgement' class='col-sm-3 col-md-2 control-label' title="Send acknowledgement notification when alert is acknowledged.">Acknowledgement alerts </label>
-            <div class='col-sm-2' title="Send acknowledgement notification when alert is acknowledged.">
+        <div class='form-group'>
+            <label for='acknowledgement' class='col-sm-3 col-md-2 control-label'>Acknowledgement alerts </label>
+            <div class='col-sm-9 col-md-10'>
                 <input type="checkbox" name="acknowledgement" id="acknowledgement">
+                <span class="help-block">{{ __('Send acknowledgement notification when alert is acknowledged.') }}</span>
             </div>
         </div>
 
-        <legend>{{ __('Delivery channels') }}</legend>
-        <div class="form-group" title="Restricts this alert rule to specified transports.">
+        <legend>{{ __('Delivery transports') }}</legend>
+        <div class="form-group">
             <label for="transports" class="col-sm-3 col-md-2 control-label">Transports </label>
             <div class="col-sm-9 col-md-10">
                 <select id="transports" name="transports[]" class="form-control" multiple="multiple"></select>
+                <span class="help-block">{{ __('Restricts this alert rule to specified transports.') }}</span>
             </div>
         </div>
 
         <legend>{{ __('Templates') }}</legend>
-        <div class="form-group" title="Select the template to use for notifications.">
-            <label for='template_id' class='col-sm-3 col-md-2 control-label'>{{ __('Global Template') }}</label>
+        <div class="form-group">
+            <label for='template_id' class='col-sm-3 col-md-2 control-label'>{{ __('Template') }}</label>
             <div class='col-sm-9 col-md-10'>
                 <select id="template_id" name="template_id" class="form-control">
-                    <option value="">{{ __('Use default (or per-transport overrides)') }}</option>
+                    <option value="">{{ __('Use default template') }}</option>
                     @foreach(($templates ?? []) as $tpl)
                         <option value="{{ $tpl->id }}">{{ $tpl->name }}</option>
                     @endforeach
                 </select>
-                <span class="help-block">{{ __('Optionally choose a global template for all transports. You can override per transport below.') }}</span>
+                <span class="help-block">{{ __('Choose template for all transports. You can override per transport below.') }}</span>
             </div>
         </div>
-        <div class="form-group" id="per-transport-templates" title="Optionally override the template for specific transports.">
+        <div class="form-group" id="per-transport-templates">
             <label class='col-sm-3 col-md-2 control-label'>{{ __('Per-transport overrides') }}</label>
             <div class='col-sm-9 col-md-10'>
                 <div id="transport-template-list"></div>
@@ -119,17 +139,19 @@
             </div>
         </div>
 
-        <legend>{{ __('Notes & documentation') }}</legend>
-        <div class='form-group' title="A link to some documentation on how to handle this alert. This will be included in notifications.">
+        <legend>{{ __('Notes & Documentation') }}</legend>
+        <div class='form-group'>
             <label for='proc' class='col-sm-3 col-md-2 control-label'>Procedure URL </label>
             <div class='col-sm-9 col-md-10'>
                 <input type='text' id='proc' name='proc' class='form-control validation' pattern='(http|https)://.*' maxlength='80'>
+                <span class="help-block">{{ __('A link to some documentation on how to handle this alert. This can be included in notifications.') }}</span>
             </div>
         </div>
-        <div class='form-group' title="A brief description for this alert rule">
+        <div class='form-group'>
             <label for='notes' class='col-sm-3 col-md-2 control-label'>Notes</label>
             <div class='col-sm-9 col-md-10'>
                 <textarea class="form-control" rows="6" name="notes" id='notes'></textarea>
+                <span class="help-block">{{ __('A brief description for this alert rule') }}</span>
             </div>
         </div>
     </div>
@@ -290,7 +312,7 @@
                 }
             }
             $('#maps').select2({ width: '100%', placeholder: 'Devices, Groups or Locations', ajax: { url: 'ajax_list.php', delay: 250, data: function (params) { return { type: 'devices_groups_locations', search: params.term }; } } });
-            $('#transports').select2({ width: '100%', placeholder: 'Transport/Group Name', ajax: { url: 'ajax_list.php', delay: 250, data: function (params) { return { type: 'transport_groups', search: params.term }; } } });
+            $('#transports').select2({ width: '100%', placeholder: 'Use default transport', ajax: { url: 'ajax_list.php', delay: 250, data: function (params) { return { type: 'transport_groups', search: params.term }; } } });
 
             // Templates JS data
             var templateOptions = @json(($templates ?? collect())->toArray());
@@ -307,7 +329,7 @@
                     var row = $('<div class="form-inline" style="margin-bottom:6px;"></div>');
                     var label = $('<label class="control-label" style="min-width:220px; margin-right:8px;"></label>').text(labelText);
                     var select = $('<select class="form-control" style="min-width:260px;"></select>').attr('name', 'template_transports[' + id + ']');
-                    select.append($('<option value=""></option>').text('— ' + 'Use global or default' + ' —'));
+                    select.append($('<option value=""></option>').text('— No Override —'));
                     templateOptions.forEach(function(opt){ select.append($('<option></option>').attr('value', opt.id).text(opt.name)); });
                     row.append(label).append(select);
                     rows.push(row);
