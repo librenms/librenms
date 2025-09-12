@@ -8,6 +8,8 @@ use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Oid;
 
+d_echo('TOP LEVEL debug');
+
 $peers = dbFetchRows('SELECT * FROM `bgpPeers` AS B LEFT JOIN `vrfs` AS V ON `B`.`vrf_id` = `V`.`vrf_id` WHERE `B`.`device_id` = ?', [$device['device_id']]);
 
 if (! empty($peers)) {
