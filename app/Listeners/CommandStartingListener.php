@@ -30,7 +30,7 @@ use Illuminate\Console\Events\CommandStarting;
 class CommandStartingListener
 {
     private array $skip_user_check = [
-        'list:bash-completion'
+        'list:bash-completion',
     ];
 
     public function handle(CommandStarting $event): void
