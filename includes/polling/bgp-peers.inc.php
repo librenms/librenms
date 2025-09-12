@@ -582,6 +582,7 @@ if (! empty($peers)) {
             }
         }
 
+        d_echo("outisde if")
         // --- Populate cbgp data ---
         if ($device['os_group'] == 'vrp' || $device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os'] == 'aos7' || $device['os_group'] === 'arista' || $device['os'] == 'dell-os10' || $device['os'] == 'firebrick') {
             // Poll each AFI/SAFI for this peer (using CISCO-BGP4-MIB or BGP4-V2-JUNIPER MIB)
@@ -985,7 +986,7 @@ if (! empty($peers)) {
             } //end foreach
         } //end if
         else{
-            $echo('not in if')
+            d_echo('not in if')
         }
         echo "\n";
     } //end foreach
