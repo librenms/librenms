@@ -1,172 +1,172 @@
 <div class="tab-content" style="margin-top: 15px;">
     <div role="tabpanel" class="tab-pane active" id="main">
-        <legend>{{ __('Rule setup') }}</legend>
+        <legend>{{ __('alerting.rules.setup.legend') }}</legend>
         <div class='form-group'>
-            <label for='rule_name' class='col-sm-3 col-md-2 control-label'>{{ __('Rule name') }}</label>
+            <label for='rule_name' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.setup.name.label') }}</label>
             <div class='col-sm-9 col-md-10'>
                 <input type='text' id='rule_name' name='name' class='form-control validation' maxlength='200' required>
-                <span class="help-block">{{ __('A display name for this alert rule') }}</span>
+                <span class="help-block">{{ __('alerting.rules.setup.name.help') }}</span>
             </div>
         </div>
         <div class="form-group">
             <div class="col-sm-3 col-md-2">
                 <div class="dropdown">
                     <button class="btn btn-default dropdown-toggle" type="button" id="import-from" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                        {{ __('Import from') }}
+                        {{ __('alerting.rules.setup.import.button') }}
                         <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="import-from" id="import-dropdown">
-                        <li><a href="#" name="import-query" id="import-query">SQL Query</a></li>
-                        <li><a href="#" name="import-old-format" id="import-old-format">Old Format</a></li>
-                        <li><a href="#" name="import-collection" id="import-collection">Collection</a></li>
-                        <li><a href="#" name="import-alert_rule" id="import-alert_rule">Alert Rule</a></li>
+                        <li><a href="#" name="import-query" id="import-query">{{ __('alerting.rules.setup.import.sql_query') }}</a></li>
+                        <li><a href="#" name="import-old-format" id="import-old-format">{{ __('alerting.rules.setup.import.old_format') }}</a></li>
+                        <li><a href="#" name="import-collection" id="import-collection">{{ __('alerting.rules.setup.import.collection') }}</a></li>
+                        <li><a href="#" name="import-alert_rule" id="import-alert_rule">{{ __('alerting.rules.setup.import.alert_rule') }}</a></li>
                     </ul>
                 </div>
             </div>
             <div class="col-sm-9 col-md-10">
                 <div id="builder"></div>
-                <span class="help-block">{{ __('Build an SQL query to match rows from the database. If the query returns row(s) this alert will trigger.') }}</span>
+                <span class="help-block">{{ __('alerting.rules.setup.builder.help') }}</span>
             </div>
         </div>
         <div class='form-group'>
-            <label for='invert' class='col-sm-3 col-md-2 control-label'>Invert match result </label>
+            <label for='invert' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.setup.invert_match.label') }} </label>
             <div class='form col-sm-9 col-md-10'>
                 <input type="checkbox" name="invert" id="invert">
-                <span class="help-block">{{ __('Invert the match. If the rule matches, the alert is considered OK.') }}</span>
+                <span class="help-block">{{ __('alerting.rules.setup.invert_match.help') }}</span>
             </div>
         </div>
 
-        <legend>{{ __('Targeting') }}</legend>
+        <legend>{{ __('alerting.rules.targeting.legend') }}</legend>
 
         <div class="form-group">
-            <label for='maps' class='col-sm-3 col-md-2 control-label'>Devices, groups, and locations </label>
+            <label for='maps' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.targeting.maps.label') }} </label>
             <div class="col-sm-9 col-md-10">
                 <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
-                <span class="help-block">{{ __('Restrict this alert rule to the selected devices, groups, or locations.') }}</span>
+                <span class="help-block">{{ __('alerting.rules.targeting.maps.help') }}</span>
             </div>
         </div>
 
         <div class="form-group">
-            <label for='invert_map' class='col-sm-3 col-md-2 control-label' text-align="left">Run on all devices except selected </label>
+            <label for='invert_map' class='col-sm-3 col-md-2 control-label' text-align="left">{{ __('alerting.rules.targeting.invert_map.label') }} </label>
             <div class="col-sm-9 col-md-10">
                 <input type='checkbox' name='invert_map' id='invert_map'>
-                <span class="help-block">{{ __('If ON, alert rule checks will run on all devices except the selected devices and groups.') }}</span>
+                <span class="help-block">{{ __('alerting.rules.targeting.invert_map.help') }}</span>
             </div>
         </div>
 
-        <legend>{{ __('Notifications') }}</legend>
+        <legend>{{ __('alerting.rules.notifications.legend') }}</legend>
         <div class="form-group">
-            <label for='severity' class='col-sm-3 col-md-2 control-label'>{{ __('Severity') }}</label>
+            <label for='severity' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.severity.label') }}</label>
             <div class="col-sm-9 col-md-10">
                 <select name='severity' id='severity' class='form-control' style="max-width: 7.5em">
-                    <option value='ok' {{ ($default_severity ?? '') === 'ok' ? 'selected' : '' }}>OK</option>
-                    <option value='warning' {{ ($default_severity ?? '') === 'warning' ? 'selected' : '' }}>Warning</option>
-                    <option value='critical' {{ ($default_severity ?? '') === 'critical' ? 'selected' : '' }}>Critical</option>
+                    <option value='ok' {{ ($default_severity ?? '') === 'ok' ? 'selected' : '' }}>{{ __('alerting.rules.notifications.severity.options.ok') }}</option>
+                    <option value='warning' {{ ($default_severity ?? '') === 'warning' ? 'selected' : '' }}>{{ __('alerting.rules.notifications.severity.options.warning') }}</option>
+                    <option value='critical' {{ ($default_severity ?? '') === 'critical' ? 'selected' : '' }}>{{ __('alerting.rules.notifications.severity.options.critical') }}</option>
                 </select>
-                <span class="help-block">{{ __('How to display the alert.  OK: green, Warning: yellow, Critical: red') }}</span>
+                <span class="help-block">{{ __('alerting.rules.notifications.severity.help') }}</span>
             </div>
         </div>
         <div class="form-group">
-            <label for='delay' class='col-sm-3 col-md-2 control-label'>Delay</label>
+            <label for='delay' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.delay.label') }}</label>
             <div class="col-sm-9 col-md-10">
                 <input type='text' id='delay' name='delay' class='form-control' style="max-width: 7.5em" value="{{ $default_delay ?? '' }}">
-                <span class="help-block">{{ __('How long to wait before issuing a notification. If the alert clears before the delay, no notification will be issued. (s,m,h,d)') }}</span>
+                <span class="help-block">{{ __('alerting.rules.notifications.delay.help') }}</span>
             </div>
         </div>
         <div class="form-group">
-            <label for='count' class='col-sm-3 col-md-2 control-label'>Max alerts</label>
+            <label for='count' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.count.label') }}</label>
             <div class="col-sm-9 col-md-10">
                 <input type='text' id='count' name='count' class='form-control' style="max-width: 7.5em" value="{{ $default_max_alerts ?? '' }}">
-                <span class="help-block">{{ __('How many notifications to issue while active before stopping. -1 means no limit. If interval is 0, this has no effect.') }}</span>
+                <span class="help-block">{{ __('alerting.rules.notifications.count.help') }}</span>
             </div>
         </div>
         <div class="form-group">
-            <label for='interval' class='col-sm-3 col-md-2 control-label'>Interval</label>
+            <label for='interval' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.interval.label') }}</label>
             <div class="col-sm-9 col-md-10">
                 <input type='text' id='interval' name='interval' class='form-control' style="max-width: 7.5em" value="{{ $default_interval ?? '' }}">
-                <span class="help-block">{{ __('How often to re-issue notifications while this alert is active. 0 means notify once. This is affected by the poller interval. (s,m,h,d)') }}</span>
+                <span class="help-block">{{ __('alerting.rules.notifications.interval.help') }}</span>
             </div>
         </div>
         <div class='form-group'>
-            <label for='mute' class='col-sm-3 col-md-2 control-label'>Mute alerts </label>
+            <label for='mute' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.mute.label') }} </label>
             <div class='col-sm-9 col-md-10'>
                 <input type="checkbox" name="mute" id="mute">
-                <span class="help-block">{{ __('Show alert status in the webui, but do not issue notifications.') }}</span>
+                <span class="help-block">{{ __('alerting.rules.notifications.mute.help') }}</span>
             </div>
         </div>
         <div class='form-group'>
-            <label for='recovery' class='col-sm-3 col-md-2 control-label'>Recovery alerts </label>
+            <label for='recovery' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.recovery.label') }} </label>
             <div class='col-sm-9 col-md-10'>
                 <input type="checkbox" name="recovery" id="recovery">
-                <span class="help-block">{{ __('Send recovery notification when alert clears.') }}</span>
+                <span class="help-block">{{ __('alerting.rules.notifications.recovery.help') }}</span>
             </div>
         </div>
         <div class='form-group'>
-            <label for='acknowledgement' class='col-sm-3 col-md-2 control-label'>Acknowledgement alerts </label>
+            <label for='acknowledgement' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.acknowledgement.label') }} </label>
             <div class='col-sm-9 col-md-10'>
                 <input type="checkbox" name="acknowledgement" id="acknowledgement">
-                <span class="help-block">{{ __('Send acknowledgement notification when alert is acknowledged.') }}</span>
+                <span class="help-block">{{ __('alerting.rules.notifications.acknowledgement.help') }}</span>
             </div>
         </div>
 
-        <legend>{{ __('Delivery transports') }}</legend>
+        <legend>{{ __('alerting.rules.notifications.delivery.legend') }}</legend>
         <div class="form-group">
-            <label for="transports" class="col-sm-3 col-md-2 control-label">Transports </label>
+            <label for="transports" class="col-sm-3 col-md-2 control-label">{{ __('alerting.rules.notifications.delivery.label') }} </label>
             <div class="col-sm-9 col-md-10">
                 <select id="transports" name="transports[]" class="form-control" multiple="multiple"></select>
-                <span class="help-block">{{ __('Restricts this alert rule to specified transports.') }}</span>
+                <span class="help-block">{{ __('alerting.rules.notifications.delivery.help') }}</span>
             </div>
         </div>
 
-        <legend>{{ __('Templates') }}</legend>
+        <legend>{{ __('alerting.rules.templates.legend') }}</legend>
         <div class="form-group">
-            <label for='template_id' class='col-sm-3 col-md-2 control-label'>{{ __('Template') }}</label>
+            <label for='template_id' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.templates.label') }}</label>
             <div class='col-sm-9 col-md-10'>
                 <select id="template_id" name="template_id" class="form-control">
-                    <option value="">{{ __('Use default template') }}</option>
+                    <option value="">{{ __('alerting.rules.templates.use_default') }}</option>
                     @foreach(($templates ?? []) as $tpl)
                         <option value="{{ $tpl->id }}">{{ $tpl->name }}</option>
                     @endforeach
                 </select>
-                <span class="help-block">{{ __('Choose template for all transports. You can override per transport below.') }}</span>
+                <span class="help-block">{{ __('alerting.rules.templates.help') }}</span>
             </div>
         </div>
         <div class="form-group" id="per-transport-templates">
-            <label class='col-sm-3 col-md-2 control-label'>{{ __('Per-transport overrides') }}</label>
+            <label class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.templates.per_transport.label') }}</label>
             <div class='col-sm-9 col-md-10'>
                 <div id="transport-template-list"></div>
-                <span class="help-block">{{ __('After selecting transports above, choose a template for any you want to override.') }}</span>
+                <span class="help-block">{{ __('alerting.rules.templates.per_transport.help') }}</span>
             </div>
         </div>
 
-        <legend>{{ __('Notes & Documentation') }}</legend>
+        <legend>{{ __('alerting.rules.notes.legend') }}</legend>
         <div class='form-group'>
-            <label for='proc' class='col-sm-3 col-md-2 control-label'>Procedure URL </label>
+            <label for='proc' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notes.proc_url.label') }} </label>
             <div class='col-sm-9 col-md-10'>
                 <input type='text' id='proc' name='proc' class='form-control validation' pattern='(http|https)://.*' maxlength='80'>
-                <span class="help-block">{{ __('A link to some documentation on how to handle this alert. This can be included in notifications.') }}</span>
+                <span class="help-block">{{ __('alerting.rules.notes.proc_url.help') }}</span>
             </div>
         </div>
         <div class='form-group'>
-            <label for='notes' class='col-sm-3 col-md-2 control-label'>Notes</label>
+            <label for='notes' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notes.notes.label') }}</label>
             <div class='col-sm-9 col-md-10'>
                 <textarea class="form-control" rows="6" name="notes" id='notes'></textarea>
-                <span class="help-block">{{ __('A brief description for this alert rule') }}</span>
+                <span class="help-block">{{ __('alerting.rules.notes.notes.help') }}</span>
             </div>
         </div>
     </div>
     <div role="tabpanel" class="tab-pane" id="advanced">
         <div class='form-group'>
-            <label for='override_query' class='col-sm-3 col-md-2 control-label'>Override SQL</label>
+            <label for='override_query' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.advanced.override_sql.label') }}</label>
             <div class='col-sm-9 col-md-10'>
                 <input type='checkbox' name='override_query' id='override_query'>
             </div>
         </div>
         <div class='form-group'>
-            <label for='adv_query' class='col-sm-3 col-md-2 control-label'>SQL</label>
+            <label for='adv_query' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.advanced.sql.label') }}</label>
             <div class='col-sm-9 col-md-10'>
                 <textarea id='adv_query' name='adv_query' class='form-control' rows="3"></textarea>
-                <span class="help-block">{{ __('Optional: Provide a raw SQL WHERE clause to override the builder.') }}</span>
+                <span class="help-block">{{ __('alerting.rules.advanced.sql.help') }}</span>
             </div>
         </div>
     </div>
@@ -265,13 +265,13 @@
         if ($collectionTable.length) {
             var grid = $collectionTable.bootgrid({
                 caseSensitive: false,
-                formatters: { "action": function (column, row) { return "<button type=\"button\" data-rule_id=\"" + row.action + "\" class=\"btn btn-sm btn-primary rule_from_collection\">Select<\/button>"; } }
+                formatters: { "action": function (column, row) { return "<button type=\"button\" data-rule_id=\"" + row.action + "\" class=\"btn btn-sm btn-primary rule_from_collection\">" + @json(__('alerting.rules.messages.select')) + "<\/button>"; } }
             }).on("loaded.rs.jquery.bootgrid", function () {
                 grid.find(".rule_from_collection").on("click", function () {
                     var template_rule_id = $(this).data("rule_id");
                     $.getJSON('{{ route('alert-rule-template.show', ':template_id') }}'.replace(':template_id', template_rule_id))
-                        .done(function (data) { if (data.status === 'ok') { $("#search_rule_modal").modal('hide'); loadRule(data); } else { toastr.error(data.message || 'Failed to load template'); } })
-                        .fail(function () { toastr.error('Failed to process template'); });
+                        .done(function (data) { if (data.status === 'ok') { $("#search_rule_modal").modal('hide'); loadRule(data); } else { toastr.error(data.message || @json(__('alerting.rules.messages.failed_load_template'))); } })
+                        .fail(function () { toastr.error(@json(__('alerting.rules.messages.failed_process_template'))); });
                 }).end();
             });
         }
@@ -281,14 +281,14 @@
         if ($alertTable.length) {
             var alert_grid = $alertTable.bootgrid({
                 caseSensitive: false,
-                formatters: { "alert_action": function (column, row) { return "<button type=\"button\" data-rule_id=\"" + row.alert_action + "\" class=\"btn btn-sm btn-primary alert_rule_from_list\">Select<\/button>"; } },
+                formatters: { "alert_action": function (column, row) { return "<button type=\"button\" data-rule_id=\"" + row.alert_action + "\" class=\"btn btn-sm btn-primary alert_rule_from_list\">" + @json(__('alerting.rules.messages.select')) + "<\/button>"; } },
                 templates: { footer: "<div id=\"@{{ctx.id}}\" class=\"@{{css.footer}}\"><div class=\"row\"><div class=\"col-sm-12\"><p class=\"@{{css.pagination}}\"></p></div></div></div>" }
             }).on("loaded.rs.jquery.bootgrid", function() {
                 alert_grid.find(".alert_rule_from_list").on("click", function() {
                     var alert_rule_id = $(this).data("rule_id");
                     $.getJSON('{{ route('alert-rule-template.rule', ':rule_id') }}'.replace(':rule_id', alert_rule_id))
-                        .done(function (data) { if (data.status === 'ok') { $("#search_alert_rule_modal").modal('hide'); loadRule(data); } else { toastr.error(data.message || 'Failed to load rule'); } })
-                        .fail(function () { toastr.error('Failed to process template'); });
+                        .done(function (data) { if (data.status === 'ok') { $("#search_alert_rule_modal").modal('hide'); loadRule(data); } else { toastr.error(data.message || @json(__('alerting.rules.messages.failed_load_rule'))); } })
+                        .fail(function () { toastr.error(@json(__('alerting.rules.messages.failed_process_template'))); });
                 }).end();
             });
         }
@@ -311,11 +311,12 @@
                     $('#maps').append(option).trigger('change');
                 }
             }
-            $('#maps').select2({ width: '100%', placeholder: 'Devices, Groups or Locations', ajax: { url: 'ajax_list.php', delay: 250, data: function (params) { return { type: 'devices_groups_locations', search: params.term }; } } });
-            $('#transports').select2({ width: '100%', placeholder: 'Use default transport', ajax: { url: 'ajax_list.php', delay: 250, data: function (params) { return { type: 'transport_groups', search: params.term }; } } });
+            $('#maps').select2({ width: '100%', placeholder: @json(__('alerting.rules.placeholders.maps')), ajax: { url: 'ajax_list.php', delay: 250, data: function (params) { return { type: 'devices_groups_locations', search: params.term }; } } });
+            $('#transports').select2({ width: '100%', placeholder: @json(__('alerting.rules.placeholders.transports')), ajax: { url: 'ajax_list.php', delay: 250, data: function (params) { return { type: 'transport_groups', search: params.term }; } } });
 
             // Templates JS data
             var templateOptions = @json(($templates ?? collect())->toArray());
+            var perTransportNoOverride = @json(__('alerting.rules.templates.per_transport.no_override'));
             function renderPerTransportTemplates() {
                 var $list = $('#transport-template-list');
                 $list.empty();
@@ -329,7 +330,7 @@
                     var row = $('<div class="form-inline" style="margin-bottom:6px;"></div>');
                     var label = $('<label class="control-label" style="min-width:220px; margin-right:8px;"></label>').text(labelText);
                     var select = $('<select class="form-control" style="min-width:260px;"></select>').attr('name', 'template_transports[' + id + ']');
-                    select.append($('<option value=""></option>').text('— No Override —'));
+                    select.append($('<option value=""></option>').text(perTransportNoOverride));
                     templateOptions.forEach(function(opt){ select.append($('<option></option>').attr('value', opt.id).text(opt.name)); });
                     row.append(label).append(select);
                     rows.push(row);
@@ -383,7 +384,7 @@
                 $('#proc').val(''); $('#notes').val(''); $('#maps').val(null).trigger('change'); $('#transports').val(null).trigger('change');
                 if (typeof window.setRuleDevice === 'function') { setRuleDevice(); }
             } else if (MODE === 'edit' && LOAD_URL) {
-                $.getJSON(LOAD_URL).done(function (data) { loadRule(data); }).fail(function () { toastr.error('Failed to load rule'); });
+                $.getJSON(LOAD_URL).done(function (data) { loadRule(data); }).fail(function () { toastr.error(@json(__('alerting.rules.messages.failed_load_rule'))); });
             }
 
             // Save handler
@@ -397,20 +398,20 @@
                             if (data.status === 'ok') { toastr.success(data.message); window.location.href = "{{ url('alert-rules') }}"; }
                             else { toastr.error(data.message); }
                         },
-                        error: function () { toastr.error('Failed to process rule'); }
+                        error: function () { toastr.error(@json(__('alerting.rules.messages.failed_process_rule'))); }
                     });
-                } else { toastr.error('Invalid rule, please complete the required fields'); }
+                } else { toastr.error(@json(__('alerting.rules.messages.invalid_rule'))); }
             });
 
             // Import helpers
             $('#import-query').on('click', function (e) {
                 e.preventDefault();
-                var sql_import = window.prompt('Enter your SQL query:');
-                if (sql_import) { try { $("#builder").queryBuilder("setRulesFromSQL", sql_import); } catch (e) { alert('Your query could not be parsed'); } }
+                var sql_import = window.prompt(@json(__('alerting.rules.messages.prompt_sql_query')));
+                if (sql_import) { try { $("#builder").queryBuilder("setRulesFromSQL", sql_import); } catch (e) { alert(@json(__('alerting.rules.messages.query_not_parsed'))); } }
             });
             $('#import-old-format').on('click', function (e) {
                 e.preventDefault();
-                var old_import = window.prompt('Enter your old alert rule:');
+                var old_import = window.prompt(@json(__('alerting.rules.messages.prompt_old_rule')));
                 if (old_import) {
                     try {
                         old_import = old_import.replace(/&&/g, 'AND');
