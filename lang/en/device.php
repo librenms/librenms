@@ -34,6 +34,7 @@ return [
 
         'description' => 'Description',
         'type' => 'Type',
+        'static_groups' => 'Static Groups',
 
         'override_sysLocation' => 'Override sysLocation',
         'coordinates_title' => 'To set coordinates, include [latitude,longitude]',
