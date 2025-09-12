@@ -33,7 +33,7 @@ class CommandStartingListener
         'list:bash-completion'
     ];
 
-    public function handle(CommandStarting $event)
+    public function handle(CommandStarting $event): void
     {
         // Check that we don't run this as the wrong user and break the install
         if (in_array($event->command, $this->skip_user_check)) {
