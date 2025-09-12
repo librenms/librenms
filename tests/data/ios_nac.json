@@ -1,4 +1,25 @@
 {
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.9.1.1006",
+                    "sysDescr": "Cisco IOS Software, C2960 Software (C2960-LANLITEK9-M), Version 15.0(2)SE8, RELEASE SOFTWARE (fc1)\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2015 by Cisco Systems, Inc.\r\nCompiled Thu 14-May-15 02:39 by prod_rel_team",
+                    "sysContact": "<private>",
+                    "version": "15.0(2)SE8",
+                    "hardware": "catalyst29608TCS",
+                    "features": "LANLITEK9",
+                    "location": "<private>",
+                    "os": "ios",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "cisco.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
     "ports": {
         "discovery": {
             "ports": [
@@ -2501,105 +2522,6 @@
                     "time_elapsed": null,
                     "historical": 0,
                     "ifIndex": 10003
-                }
-            ]
-        }
-    },
-    "os": {
-        "discovery": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.9.1.1006",
-                    "sysDescr": "Cisco IOS Software, C2960 Software (C2960-LANLITEK9-M), Version 15.0(2)SE8, RELEASE SOFTWARE (fc1)\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2015 by Cisco Systems, Inc.\r\nCompiled Thu 14-May-15 02:39 by prod_rel_team",
-                    "sysContact": "<private>",
-                    "version": "15.0(2)SE8",
-                    "hardware": "catalyst29608TCS",
-                    "features": "LANLITEK9",
-                    "location": "<private>",
-                    "os": "ios",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "cisco.svg"
-                }
-            ]
-        },
-        "poller": "matches discovery"
-    },
-    "vlans": {
-        "discovery": {
-            "ports_vlans": [
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 10,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 100,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 100,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 100,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 100,
-                    "baseport": 0,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
                 }
             ]
         }
