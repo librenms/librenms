@@ -28,7 +28,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
 
-class AdvaDyingGaspTrapTest extends SnmpTrapTestCase
+final class AdvaDyingGaspTrapTest extends SnmpTrapTestCase
 {
     public function testDyingGasp(): void
     {

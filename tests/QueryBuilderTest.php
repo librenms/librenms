@@ -30,7 +30,7 @@ use App\Facades\LibrenmsConfig;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 use PHPUnit\Framework\Attributes\DataProvider;
 
-class QueryBuilderTest extends TestCase
+final class QueryBuilderTest extends TestCase
 {
     private static string $data_file = 'tests/data/misc/querybuilder.json';
 
