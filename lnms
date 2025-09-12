@@ -15,11 +15,6 @@
 
 require __DIR__.'/vendor/autoload.php';
 
-// Check that we don't run this as the wrong user and break the install
-if ($argc !== 2 || $argv[1] !== 'list:bash-completion') {
-    \App\Checks::runningUser();
-}
-
 $app = require_once __DIR__.'/bootstrap/app.php';
 
 /*
