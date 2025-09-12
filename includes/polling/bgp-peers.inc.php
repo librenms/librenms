@@ -984,6 +984,9 @@ if (! empty($peers)) {
                 app('Datastore')->put($device, 'cbgp', $tags, $fields);
             } //end foreach
         } //end if
+        else{
+            $echo('not in if')
+        }
         echo "\n";
     } //end foreach
 } //end if
