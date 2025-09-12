@@ -90,6 +90,9 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": false
+        },
+        "platform": {
+            "php": "8.2"
         }
     },
     "extra": {
