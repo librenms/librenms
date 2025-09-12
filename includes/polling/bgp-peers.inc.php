@@ -708,7 +708,7 @@ if (! empty($peers)) {
                     $cbgpPeerWithdrawnPrefixes = null;
                 }//end if
 
-                d_echo('checking debug');
+                d_echo("checking debug");
 
                 if ($device['os'] == 'timos') {
                     // Nokia TiMOS SAFI mappings (per AFI)
