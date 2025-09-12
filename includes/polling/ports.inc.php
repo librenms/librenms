@@ -908,10 +908,7 @@ foreach ($ports as $port) {
                 }
             }
 
-<<<<<<< HEAD
             // End Update PAgP
-=======
->>>>>>> 11bab14d90 (Removed port_security polling from ports.inc)
             // Do EtherLike-MIB
             if (LibrenmsConfig::get('enable_ports_etherlike')) {
                 include 'ports/port-etherlike.inc.php';

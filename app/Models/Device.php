@@ -1100,11 +1100,6 @@ class Device extends BaseModel
         return $this->hasMany(PortStp::class, 'device_id', 'device_id');
     }
 
-    public function portSecurity(): HasManyThrough
-    {
-        return $this->hasManyThrough(\App\Models\PortSecurity::class, \App\Models\Port::class, 'device_id', 'port_id');
-    }
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\PortSecurity, \App\Models\Port, \App\Models\Device, $this>
      */

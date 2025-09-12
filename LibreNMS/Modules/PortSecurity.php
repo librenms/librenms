@@ -28,14 +28,13 @@ namespace LibreNMS\Modules;
 use App\Models\Device;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Facades\DB;
-use LibreNMS\Config;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\PortSecurityDiscovery;
+use LibreNMS\Interfaces\Module;
+use LibreNMS\Interfaces\Polling\PortSecurityPolling;
 use LibreNMS\OS;
 use LibreNMS\Polling\ModuleStatus;
-use SnmpQuery;
-use LibreNMS\Interfaces\Polling\PortSecurityPolling;
 
 class PortSecurity implements Module
 {
@@ -68,20 +67,18 @@ class PortSecurity implements Module
     }
 
     /**
-     * @inheritDoc
+     * Poll data for this module and update the DB
+     *
+     * @param  \LibreNMS\OS  $os
      */
-    public function poll(OS $os): void
+    public function poll(OS $os, DataStorageInterface $datastore): void
     {
-        if ($os->getDevice()->portSecurity->isEmpty()) {
-            return;
-        }
         if ($os instanceof PortSecurityPolling) {
             $device = $os->getDevice();
             $portsec = $os->pollPortSecurity($os, $device);
             ModuleModelObserver::observe(\App\Models\PortSecurity::class);
             $this->syncModels($device, 'portSecurity', $portsec);
         }
-        return;
     }
 
     public function dataExists(Device $device): bool
@@ -100,10 +97,10 @@ class PortSecurity implements Module
     /**
      * @inheritDoc
      */
-    public function dump(Device $device)
+    public function dump(Device $device, string $type): ?array
     {
         return [
-            'PortSecurity' => $device->PortSecurity()->orderBy('port_id')
+            'PortSecurity' => $device->portSecurity()->orderBy('port_id')
                 ->get()->map->makeHidden(['id', 'device_id']),
         ];
     }
