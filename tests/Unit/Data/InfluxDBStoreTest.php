@@ -33,7 +33,7 @@ use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('datastores')]
-class InfluxDBStoreTest extends TestCase
+final class InfluxDBStoreTest extends TestCase
 {
     public function testBadSettings(): void
     {

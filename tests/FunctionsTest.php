@@ -30,7 +30,7 @@ use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Enum\IntegerType;
 use LibreNMS\Util\Number;
 
-class FunctionsTest extends TestCase
+final class FunctionsTest extends TestCase
 {
     public function testHex2Str(): void
     {

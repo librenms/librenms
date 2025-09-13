@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 include_once 'includes/functions.php';
 
-class StringHelperBitsToIndicesTest extends TestCase
+final class StringHelperBitsToIndicesTest extends TestCase
 {
     /**
      * Test the basic functionality with the example from the comment
