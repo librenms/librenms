@@ -127,11 +127,6 @@ class Fabos extends OS implements OSDiscovery, TransceiverDiscovery
 
     public function discoverTransceivers(): Collection
     {
-        //Only used the 2 below lines to allow "collect_snmp_data" to do the collection
-        //for some reason, it does not collect the SnmpQuery
-        //$unused = snmp_walk($this->getDeviceArray(), 'swConnUnitPortTable', '-OQXUt', 'FA-EXT-MIB');
-        //$unused = snmp_walk($this->getDeviceArray(), 'connUnitPortTable', '-OQXUt', 'FCMGMT-MIB');
-
         $snmpData = SnmpQuery::hideMib()->mibs(['FA-EXT-MIB', 'FCMGMT-MIB'])->enumStrings()->walk(['connUnitPortModuleType', 'connUnitPortTransmitterType', 'connUnitPortRevision', 'connUnitPortSn', 'connUnitPortVendor']);
 
         // indexed by 'connUnitPortUnitId' (string) and 'connUnitPortIndex' (int)
@@ -159,7 +154,8 @@ class Fabos extends OS implements OSDiscovery, TransceiverDiscovery
                 'serial' => $data['connUnitPortSn'] ?? null,
                 'vendor' => $data['connUnitPortVendor'] ?? null,
                 'cable' => null,
-                'entity_physical_index' => '200000' . $portIndex,
+                'entity_physical_index' => '200000' . $portIndex, // Avoid any collisions with "real" entity-mib indexes.
+                // using concatenation instead of maths to allow YAML discovery of the sensors (YAML cannot do maths ...)
             ]);
         })->filter();  // Filter out null values
     }
