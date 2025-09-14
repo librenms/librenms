@@ -33,6 +33,7 @@ use App\Models\Ospfv3Port;
 use App\Models\PollerGroup;
 use App\Models\Port;
 use App\Models\PortGroup;
+use App\Models\PortSecurity;
 use App\Models\PortsFdb;
 use App\Models\PortsNac;
 use App\Models\Sensor;
@@ -1334,49 +1335,29 @@ function get_port_stack(Illuminate\Http\Request $request)
     });
 }
 
-function get_port_security_all(Illuminate\Http\Request $request)
+function get_port_security(Illuminate\Http\Request $request)
 {
-    return check_port_permission($port_id, null, function ($port_id) {
-        // search port_security with no parameters
-        $port = dbFetchRows('SELECT * FROM `port_security`');
+    $hostname = $request->route('hostname') ?? null;
+    $port_id = $request->route('portid') ?? null;
 
-        return api_success($port, 'port');
-    });
-}
-
-function get_port_security_by_port(Illuminate\Http\Request $request)
-{
-    $port_id = $request->route('portid');
-
-    return check_port_permission($port_id, null, function ($port_id) {
-        // search port_security with port_id
-        $port = dbFetchRows('SELECT * FROM `port_security` WHERE `port_id` = ?', [$port_id]);
-
-        return api_success($port, 'port');
-    });
-}
-
-function get_port_security_by_hostname(Illuminate\Http\Request $request)
-{
-    // return details of a single device
-    $hostname = $request->route('hostname');
-
-    // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-
-    // find device matching the id
-    $device = device_by_id_cache($device_id);
-    if (! $device || ! isset($device['device_id'])) {
-        return api_error(404, "Device $hostname does not exist");
+    if ($port_id) {
+        return check_port_permission($port_id, null, function ($port_id) {
+            $port = PortSecurity::where('port_id', $port_id)->get()->toArray();
+            return api_success($port, 'port');
+        });
+    } elseif ($hostname) {
+        $device = DeviceCache::get($hostname);
+        return check_device_permission($device->device_id, function () use ($device) {
+            $port = PortSecurity::where('device_id', $device->device_id)->get()->toArray();
+            return api_success($port, 'port');
+        });
+    } else {
+        return check_device_permission($device->device_id, function () use ($device) {
+            // search port_security with no parameters
+            $port = PortSecurity::get()->toArray();
+            return api_success($port, 'port');
+        });
     }
-    // Check if user has permission for device
-    $permission = check_device_permission($device_id);
-    if ($permission !== true) {
-        return $permission;
-    }
-    $port = dbFetchRows('SELECT * FROM `port_security` WHERE `device_id` = ?', [$device_id]);
-
-    return api_success($port, 'port');
 }
 
 function update_device_port_notes(Illuminate\Http\Request $request): JsonResponse

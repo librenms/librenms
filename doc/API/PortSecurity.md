@@ -35,7 +35,6 @@ Output:
           "cpsIfViolationCount": 0,
           "cpsIfSecureLastMacAddress": "0:1e:f7:c3:50:6",
           "cpsIfStickyEnable": "false"
-          //"cpsIfSecureLastMacAddrVlanId": null
         },
         {
           "id": "2",
@@ -49,7 +48,6 @@ Output:
           "cpsIfViolationCount": "0",
           "cpsIfSecureLastMacAddress": "0:1e:f7:c3:50:6",
           "cpsIfStickyEnable": "false"
-          //"cpsIfSecureLastMacAddrVlanId": null
         },
         ...
         {
@@ -64,7 +62,6 @@ Output:
           "cpsIfViolationCount": "10",
           "cpsIfSecureLastMacAddress": "0:1e:f7:c3:50:6",
           "cpsIfStickyEnable": "false"
-          //"cpsIfSecureLastMacAddrVlanId": null
         },
     ]
 }
@@ -74,7 +71,7 @@ Output:
 
 Get all port security info by inputting port_id
 
-Route: `/api/v0/port_security/:port_id`
+Route: `/api/v0/port_security/port/:port_id`
 
   - portid must be an integer
 
@@ -107,7 +104,6 @@ Output:
           "cpsIfViolationCount": 0,
           "cpsIfSecureLastMacAddress": "0:1e:f7:c3:50:6",
           "cpsIfStickyEnable": "false"
-          //"cpsIfSecureLastMacAddrVlanId": null
         },
         {
           "id": "2",
@@ -121,7 +117,6 @@ Output:
           "cpsIfViolationCount": "0",
           "cpsIfSecureLastMacAddress": "0:1e:f7:c3:50:6",
           "cpsIfStickyEnable": "false"
-          //"cpsIfSecureLastMacAddrVlanId": null
         },
         ...
         {
@@ -136,7 +131,6 @@ Output:
           "cpsIfViolationCount": "10",
           "cpsIfSecureLastMacAddress": "0:1e:f7:c3:50:6",
           "cpsIfStickyEnable": "false"
-          //"cpsIfSecureLastMacAddrVlanId": null
         },
     ]
 }
@@ -157,8 +151,8 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/port_security/switch1
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/port_security/5
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/port_security/device/switch1
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/port_security/device/5
 ```
 
 Output:
@@ -180,7 +174,6 @@ Output:
           "cpsIfViolationCount": 0,
           "cpsIfSecureLastMacAddress": "0:1e:f7:c3:50:6",
           "cpsIfStickyEnable": "false"
-          //"cpsIfSecureLastMacAddrVlanId": null
         },
         {
           "id": "2",
@@ -194,7 +187,6 @@ Output:
           "cpsIfViolationCount": "0",
           "cpsIfSecureLastMacAddress": "0:1e:f7:c3:50:6",
           "cpsIfStickyEnable": "false"
-          //"cpsIfSecureLastMacAddrVlanId": null
         },
         ...
         {
@@ -209,7 +201,6 @@ Output:
           "cpsIfViolationCount": "10",
           "cpsIfSecureLastMacAddress": "0:1e:f7:c3:50:6",
           "cpsIfStickyEnable": "false"
-          //"cpsIfSecureLastMacAddrVlanId": null
         },
     ]
 }

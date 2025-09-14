@@ -26,10 +26,8 @@
 
 namespace LibreNMS\OS;
 
-use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
@@ -153,15 +151,17 @@ class Ios extends Cisco implements
         $device = $device->toArray();
 
         $portsec_snmp = [];
-        $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfPortSecurityEnable', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
-        $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfPortSecurityStatus', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
-        $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfMaxSecureMacAddr', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
-        $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfCurrentSecureMacAddrCount', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
-        $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfViolationAction', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
-        $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfViolationCount', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
-        $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfSecureLastMacAddress', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
-        $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfStickyEnable', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
-        $portsec_snmp = snmpwalk_cache_oid($device, 'cpsIfSecureLastMacAddrVlanId', $portsec_snmp, 'CISCO-PORT-SECURITY-MIB');
+        $portsec_snmp = \SnmpQuery::hideMib()->enumStrings()->walk([
+            'CISCO-PORT-SECURITY-MIB::cpsIfPortSecurityEnable',
+            'CISCO-PORT-SECURITY-MIB::cpsIfPortSecurityStatus',
+            'CISCO-PORT-SECURITY-MIB::cpsIfMaxSecureMacAddr',
+            'CISCO-PORT-SECURITY-MIB::cpsIfCurrentSecureMacAddrCount',
+            'CISCO-PORT-SECURITY-MIB::cpsIfViolationAction',
+            'CISCO-PORT-SECURITY-MIB::cpsIfViolationCount',
+            'CISCO-PORT-SECURITY-MIB::cpsIfSecureLastMacAddress',
+            'CISCO-PORT-SECURITY-MIB::cpsIfStickyEnable',
+            'CISCO-PORT-SECURITY-MIB::cpsIfSecureLastMacAddrVlanId',
+            ])->table(1);
 
         // Storing all polled data into an array using ifIndex as the index
         // Getting all ports from device. Port has to exist in ports table to be populated in port_security
