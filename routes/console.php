@@ -3,9 +3,9 @@
 use App\Console\Commands\MaintenanceCleanupNetworks;
 use App\Console\Commands\MaintenanceFetchOuis;
 use App\Jobs\PingCheck;
-use LibreNMS\Util\Time;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
+use LibreNMS\Util\Time;
 use Symfony\Component\Process\Process;
 
 /*
