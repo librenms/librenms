@@ -1500,7 +1500,7 @@ function add_edit_rule(Illuminate\Http\Request $request)
     ];
     $extra_json = json_encode($extra);
 
-    if ($override_query === 'on') {
+    if ($override_query === 'on' || $override_query === true) {
         $query = $adv_query;
     } else {
         $query = QueryBuilderParser::fromJson($builder)->toSql();
