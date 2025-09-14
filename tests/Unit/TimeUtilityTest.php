@@ -72,7 +72,7 @@ final class TimeUtilityTest extends TestCase
         $this->assertLessThanOrEqual($end, $randomTime);
 
         // test with pesudo random
-        $randomTime = Time::pseudoRandomBetween($start, $end, "U");
+        $randomTime = Time::pseudoRandomBetween($start, $end, 'U');
         $this->assertGreaterThanOrEqual($start, $randomTime);
         $this->assertLessThanOrEqual($end, $randomTime);
 

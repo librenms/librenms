@@ -3,9 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
-use LibreNMS\Util\Notifications;
 use Illuminate\Support\Facades\Cache;
-use Symfony\Component\Console\Input\InputOption;
+use LibreNMS\Util\Notifications;
 
 class MaintenanceFetchRSS extends LnmsCommand
 {

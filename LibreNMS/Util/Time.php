@@ -147,9 +147,10 @@ class Time
      * Return a psedudo random time between the two given times.
      * The same time will always be returned for a given node_id
      */
-    public static function pseudoRandomBetween(string|int $min, string|int $max, string $format = 'H:i'): string {
+    public static function pseudoRandomBetween(string|int $min, string|int $max, string $format = 'H:i'): string
+    {
         // Seed the random number generator to get consistent results for a given node_id
-        mt_srand(crc32(config('librenms.node_id').$min.$max));
+        mt_srand(crc32(config('librenms.node_id') . $min . $max));
 
         $time = self::randomBetween($min, $max);
 
