@@ -51,7 +51,7 @@ trait YamlOSDiscovery
         'features',
         'serial',
         'sysName',
-    ];   
+    ];
 
     private $locationFields = [
         'location',
