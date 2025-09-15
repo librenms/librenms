@@ -157,7 +157,7 @@ if ($device['os_group'] == 'cisco') {
                         // Critical Limit
                         if (($key['entSensorThresholdSeverity'] == 'major' || $key['entSensorThresholdSeverity'] == 'critical') && ($key['entSensorThresholdRelation'] == 'greaterOrEqual' || $key['entSensorThresholdRelation'] == 'greaterThan')) {
                             if ($key['entSensorThresholdValue'] == '0' && isset($limit)) {
-                                # Ignore a threshold of 0 if another threshold has been set (major vs critical)
+                                // Ignore a threshold of 0 if another threshold has been set (major vs critical)
                                 continue;
                             }
                             $limit = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
@@ -165,7 +165,7 @@ if ($device['os_group'] == 'cisco') {
 
                         if (($key['entSensorThresholdSeverity'] == 'major' || $key['entSensorThresholdSeverity'] == 'critical') && ($key['entSensorThresholdRelation'] == 'lessOrEqual' || $key['entSensorThresholdRelation'] == 'lessThan')) {
                             if ($key['entSensorThresholdValue'] == '0' && isset($limit_low)) {
-                                # Ignore a threshold of 0 if another threshold has been set (major vs critical)
+                                // Ignore a threshold of 0 if another threshold has been set (major vs critical)
                                 continue;
                             }
                             $limit_low = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
