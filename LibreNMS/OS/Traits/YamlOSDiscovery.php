@@ -51,6 +51,12 @@ trait YamlOSDiscovery
         'features',
         'serial',
         'sysName',
+    ];   
+    
+    private $locationFields = [
+        'location',
+        'lat',
+        'lng',
     ];
 
     public function discoverOS(Device $device): void
@@ -108,11 +114,33 @@ trait YamlOSDiscovery
         Log::debug('Yaml location data:', $data);
 
         $location = $this->findFirst($data, $name, $numeric) ?? snmp_get($this->getDeviceArray(), 'SNMPv2-MIB::sysLocation.0', '-Oqv');
+        $latVal = $this->findFirst($data, $lat, $numeric) ?? null;
+        $lngVal = $this->findFirst($data, $lng, $numeric) ?? null;
+
+        $template_data = array_merge($this->getDevice()->only($this->locationFields), $data);
+        
+        if (isset($os_yaml['location_template'])) {
+            $location = trim(SimpleTemplate::parse($os_yaml['location_template'], $template_data));
+        }
+        
+        if (isset($os_yaml['lat_template'])) {
+            $latVal = trim(SimpleTemplate::parse($os_yaml['lat_template'], $template_data));
+        }
+
+        if (isset($os_yaml['long_template'])) {
+            $lngVal = trim(SimpleTemplate::parse($os_yaml['long_template'], $template_data));
+        }
+
+        $location = StringHelpers::inferEncoding($location);
+
+        Log::debug('Parsed location:' . $location);
+        Log::debug('Parsed lat:' . $latVal);
+        Log::debug('Parsed lng:' . $lngVal);
 
         return new Location([
-            'location' => StringHelpers::inferEncoding($location),
-            'lat' => $this->findFirst($data, $lat, $numeric),
-            'lng' => $this->findFirst($data, $lng, $numeric),
+            'location' => $location,
+            'lat' => $latVal, 
+            'lng' => $lngVal,
         ]);
     }
 
