@@ -52,7 +52,7 @@ trait YamlOSDiscovery
         'serial',
         'sysName',
     ];   
-    
+
     private $locationFields = [
         'location',
         'lat',
@@ -118,11 +118,11 @@ trait YamlOSDiscovery
         $lngVal = $this->findFirst($data, $lng, $numeric) ?? null;
 
         $template_data = array_merge($this->getDevice()->only($this->locationFields), $data);
-        
+
         if (isset($os_yaml['location_template'])) {
             $location = trim(SimpleTemplate::parse($os_yaml['location_template'], $template_data));
         }
-        
+
         if (isset($os_yaml['lat_template'])) {
             $latVal = trim(SimpleTemplate::parse($os_yaml['lat_template'], $template_data));
         }
@@ -139,7 +139,7 @@ trait YamlOSDiscovery
 
         return new Location([
             'location' => $location,
-            'lat' => $latVal, 
+            'lat' => $latVal,
             'lng' => $lngVal,
         ]);
     }
