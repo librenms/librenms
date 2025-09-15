@@ -1,4 +1,4 @@
-mib: ENTITY-MIB:ENTITY-SENSOR-MIB:ARUBAWIRED-VSX-MIB:ARUBAWIRED-TEMPSENSOR-MIB:ARUBAWIRED-POWERSUPPLY-MIB
+mib: ENTITY-MIB:ENTITY-SENSOR-MIB:ARUBAWIRED-VSX-MIB:ARUBAWIRED-TEMPSENSOR-MIB:ARUBAWIRED-POWERSUPPLY-MIB:ARUBAWIRED-PM-MIB
 modules:
     os:
         sysDescr_regex:
@@ -28,6 +28,19 @@ modules:
                     descr: arubaWiredTempSensorName
                     divisor: 1000
                     value: arubaWiredTempSensorTemperature
+                -
+                    oid: arubaWiredPmXcvrDomTable
+                    num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.27.1.2.{{ $index }}'
+                    descr: '{{ arubaWiredPmXcvrDomPortDesc }} Temperature'
+                    value: arubaWiredPmXcvrDomTemp
+                    group: transceiver
+                    index: 'temperature-{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    entPhysicalIndex: '{{ $index }}'
+                    high_limit: arubaWiredPmXcvrDomTempHiAlarmThreshold
+                    warn_limit: arubaWiredPmXcvrDomTempHiWarnThreshold
+                    low_warn_limit: arubaWiredPmXcvrDomTempLoWarnThreshold
+                    low_limit: arubaWiredPmXcvrDomTempLoAlarmThreshold
         power:
             data:
                 -
@@ -36,6 +49,49 @@ modules:
                     descr: 'Power Supply {{ $arubaWiredPSUName }}'
                     value: arubaWiredPSUInstantaneousPower
                     high_limit: arubaWiredPSUMaximumPower
+                -
+                    oid: arubaWiredPmXcvrLaneDomTable
+                    num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.27.1.2.2.1.7.{{ $index }}'
+                    value: arubaWiredPmXcvrLaneDomTxPower
+                    descr: "{{ $subindex0 }} TX Power"
+                    divisor: 1000
+                    group: transceiver
+                    index: 'txpower-{{ $subindex0 }}'
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: ports
+                -
+                    oid: arubaWiredPmXcvrLaneDomTable
+                    num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.27.1.2.2.1.12.{{ $index }}'
+                    value: arubaWiredPmXcvrLaneDomRxPower
+                    descr: "{{ $subindex0 }} RX Power"
+                    divisor: 1000
+                    group: transceiver
+                    index: 'rxpower-{{ $subindex0 }}'
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: ports
+        voltage:
+            data:
+                -
+                    oid: arubaWiredPmXcvrDomTable
+                    num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.27.1.2.1.1.11.{{ $index }}'
+                    value: arubaWiredPmXcvrDomVoltage
+                    descr: '{{ arubaWiredPmXcvrDomPortDesc }} Voltage'
+                    group: transceiver
+                    index: 'voltage-{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+        current:
+            data:
+                -
+                    oid: arubaWiredPmXcvrLaneDomTable
+                    num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.27.1.2.2.1.2.{{ $index }}'
+                    value: arubaWiredPmXcvrLaneDomTxBias
+                    descr: '{{ $subindex0 }} TX Bias'
+                    divisor: 1000
+                    group: transceiver
+                    index: 'tx-{{ $subindex0 }}'
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    entPhysicalIndex_measured: ports
         state:
             data:
                 -
@@ -77,4 +133,3 @@ modules:
                         - { value: 1, descr: init, graph: 1, generic: 3 }
                         - { value: 2, descr: out Sync, graph: 1, generic: 2 }
                         - { value: 3, descr: in Sync, graph: 1, generic: 0 }
-
