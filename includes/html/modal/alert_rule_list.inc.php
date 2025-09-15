@@ -52,7 +52,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
                         <?php
                         $alert_rules = dbFetchRows('SELECT * FROM alert_rules order by name');
                         foreach ($alert_rules as $rule) {
-                            if (isset($rule_extra['options']['override_query']) && $rule_extra['options']['override_query'] === 'on') {
+                            if (isset($rule_extra['options']['override_query']) && ($rule_extra['options']['override_query'] === 'on' || $rule_extra['options']['override_query'] === true)) {
                                 $rule_display = 'Custom SQL Query';
                             } else {
                                 $rule_display = QueryBuilderParser::fromJson($rule['builder'])->toSql(false);

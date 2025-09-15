@@ -1496,7 +1496,7 @@
                     "type": "firewall"
                 },
                 {
-                    "icon": "scale-blanaced",
+                    "icon": "scale-balanced",
                     "text": "Load Balancers",
                     "type": "loadbalancer"
                 },

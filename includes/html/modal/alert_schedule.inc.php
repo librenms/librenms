@@ -198,11 +198,7 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
                 $('#notes').val(output['notes']);
                 $('#behavior').find('option[value="'+output['behavior']+'"]').prop('selected', true);
                 if (output['recurring'] == 0){
-                    var start = $('#start').data("DateTimePicker");
-                    if (output['start']) {
-                        start.minDate(moment(output['start']));
-                    }
-                    start.date(moment(output['start']));
+                    $('#start').data("DateTimePicker").date(moment(output['start']));
                     $('#end').data("DateTimePicker").date(moment(output['end']));
 
                     $('#norecurringgroup').show();

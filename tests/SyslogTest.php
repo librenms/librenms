@@ -26,7 +26,7 @@
 
 namespace LibreNMS\Tests;
 
-class SyslogTest extends TestCase
+final class SyslogTest extends TestCase
 {
     // The format is:
     // $SOURCEIP||$FACILITY||$PRIORITY||$LEVEL||$TAG||$YEAR-$MONTH-$DAY $HOUR:$MIN:$SEC||$MSG||$PROGRAM

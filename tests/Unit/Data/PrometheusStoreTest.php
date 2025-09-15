@@ -34,7 +34,7 @@ use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('datastores')]
-class PrometheusStoreTest extends TestCase
+final class PrometheusStoreTest extends TestCase
 {
     protected function setUp(): void
     {

@@ -35,7 +35,7 @@ use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
-class YamlSchemaTest extends TestCase
+final class YamlSchemaTest extends TestCase
 {
     private array $excluded = [
         '/os_detection/default.yaml',
