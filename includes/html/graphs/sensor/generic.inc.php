@@ -2,6 +2,7 @@
 
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Util\Number;
+use LibreNMS\Exceptions\RrdGraphException;
 
 if (empty($sensor)) {
     throw new RrdGraphException('Invalid sensor');

@@ -100,7 +100,6 @@ function poll_sensor($device, $class)
                     }
                 }
             }//end if
-            unset($mib);
             unset($mibdir);
             $sensor['new_value'] = $sensor_value;
             $all_sensors[] = $sensor;
@@ -109,14 +108,7 @@ function poll_sensor($device, $class)
 
     foreach ($misc_sensors as $sensor) {
         if ($sensor['poller_type'] == 'agent') {
-            if (isset($agent_sensors)) {
-                $sensor_value = $agent_sensors[$class][$sensor['sensor_type']][$sensor['sensor_index']]['current'];
-                $sensor['new_value'] = $sensor_value;
-                $all_sensors[] = $sensor;
-            } else {
-                Log::info('no agent data!');
-                continue;
-            }
+            continue;
         } elseif ($sensor['poller_type'] == 'ipmi') {
             Log::info(' already polled.');
             // ipmi should probably move here from the ipmi poller file (FIXME)
