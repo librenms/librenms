@@ -255,6 +255,7 @@ hooks:
     async: true
     cmd: 'curl -k -s -X POST -d "{\"text\": \"Config change observed on check. Commit Ref: ${OX_REPO_COMMITREF} Group: ${OX_NODE_GROUP} Timetaken: ${OX_JOB_TIME}\",\"severity\":\"2\",\"type\":\"oxidized\"}" -H "X-Auth-Token: YOURAPITOKENHERE" https://librenms.org/api/v0/devices/${OX_NODE_NAME}/eventlog'
 ```
+Note: Ensure /bin/sh uses bash or substitutions may fail. [Ruby only executes commands with the shell defined as /bin/sh.](https://ruby-doc.org/core-2.6.5/Process.html#method-c-exec)
 
 ## Miscellaneous
 
