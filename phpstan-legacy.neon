@@ -1,0 +1,15 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    phpVersion:
+        min: 80200
+        max: 80499
+
+    resultCachePath: %tmpDir%/resultCache-legacy.php
+
+    paths:
+        - includes
+        - html
+
+    level: 0
