@@ -193,6 +193,9 @@ return [
         'error' => 'Error processing Mac OUI:',
         'vendor_update' => 'Adding OUI :oui for :vendor',
     ],
+    'maintenance:syslog-cleanup' => [
+        'delete' => 'Cleared syslog entries older than :days days (:count rows)',
+    ],
     'plugin:disable' => [
         'description' => 'Disable all plugins with the given name',
         'arguments' => [
