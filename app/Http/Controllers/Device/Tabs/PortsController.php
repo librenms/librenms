@@ -126,7 +126,7 @@ class PortsController implements DeviceTab
             $relationships['stackParent'] = fn ($q) => $q->select('port_id');
             $relationships['stackChildren'] = fn ($q) => $q->select('port_id');
 
-            if (Config::get('ports_ipv4_neighbours') == 'arp') {
+            if (LibrenmsConfig::get('ports_ipv4_neighbours') == 'arp') {
                 $relationships[] = 'macLinkedPorts';
             } else {
                 $relationships[] = 'ipv4Networks.ipv4';
@@ -184,7 +184,7 @@ class PortsController implements DeviceTab
         // IPv4 + IPv6 subnet if detailed
         // fa-arrow-right green portlink on devicelink
         $ids = [];
-        if (Config::get('ports_ipv4_neighbours') == 'arp') {
+        if (LibrenmsConfig::get('ports_ipv4_neighbours') == 'arp') {
             if ($port->macLinkedPorts->isNotEmpty()) {
                 $ids = $port->macLinkedPorts->pluck('port_id');
             }
@@ -422,7 +422,7 @@ class PortsController implements DeviceTab
             };
         }
 
-        return $request->route('vars', Config::get('ports_page_default')); // fourth segment is called vars to handle legacy urls
+        return $request->route('vars', LibrenmsConfig::get('ports_page_default')); // fourth segment is called vars to handle legacy urls
     }
 
     private function pageLinks(Request $request): array
