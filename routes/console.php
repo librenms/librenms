@@ -7,7 +7,6 @@ use App\Jobs\PingCheck;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schedule;
-use LibreNMS\Util\Time;
 use Symfony\Component\Process\Process;
 
 /*
