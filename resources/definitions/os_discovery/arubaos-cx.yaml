@@ -37,10 +37,10 @@ modules:
                     index: 'temperature-{{ $index }}'
                     entPhysicalIndex_measured: ports
                     entPhysicalIndex: '{{ $index }}'
-                    high_limit: arubaWiredPmXcvrDomTempHiAlarmThreshold
-                    warn_limit: arubaWiredPmXcvrDomTempHiWarnThreshold
-                    low_warn_limit: arubaWiredPmXcvrDomTempLoWarnThreshold
-                    low_limit: arubaWiredPmXcvrDomTempLoAlarmThreshold
+                    #high_limit: arubaWiredPmXcvrDomTempHiAlarmThreshold
+                    #warn_limit: arubaWiredPmXcvrDomTempHiWarnThreshold
+                    #low_warn_limit: arubaWiredPmXcvrDomTempLoWarnThreshold
+                    #low_limit: arubaWiredPmXcvrDomTempLoAlarmThreshold
         power:
             data:
                 -
