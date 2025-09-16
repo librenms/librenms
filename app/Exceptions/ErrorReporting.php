@@ -185,7 +185,7 @@ class ErrorReporting
                     // limit reported errors so php-fpm headers don't get too large
                     $max_errors = $this->errorCount == self::MAX_PROD_ERRORS ? ' (max reported errors reached)' : '';
 
-                    error_log("\e[31mPHP Error($severity)\e[0m: $message in $file:$line$max_errors");
+                    //error_log("\e[31mPHP Error($severity)\e[0m: $message in $file:$line$max_errors");
                 }
             }
 
