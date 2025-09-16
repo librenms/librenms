@@ -15715,7 +15715,7 @@
                     "sensor_current": 0.034,
                     "sensor_limit": 0.1,
                     "sensor_limit_warn": 0,
-                    "sensor_limit_low": 0,
+                    "sensor_limit_low": 0.0001,
                     "sensor_limit_low_warn": 0,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
