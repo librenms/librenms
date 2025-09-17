@@ -100,7 +100,7 @@ function poll_sensor($device, $class)
                     }
                 }
             }//end if
-            if(isset($mib)) {
+            if (isset($mib)) {
                 unset($mib);
             }
             unset($mibdir);
