@@ -62,7 +62,7 @@ class Fping
      * @param  AddressFamily  $address_family  ipv4 or ipv6
      * @return FpingResponse
      */
-    public function ping(string $host, AddressFamily $address_family): FpingResponse
+    public function ping(string $host, AddressFamily $address_family = AddressFamily::IPv4): FpingResponse
     {
         $cmd = match ($address_family) {
             AddressFamily::IPv4 => $this->fping6_bin === false ? [$this->fping_bin, '-4'] : [$this->fping_bin],
