@@ -979,7 +979,7 @@ function lowest_time($time, $seconds = 300)
 /**
  * @params int
  *
- * @return string
+ * @return string|void
  *
  * This returns the subpath for working with nfdump.
  *
@@ -1048,7 +1048,7 @@ function nfsen_hostname($hostname)
 /**
  * @params string hostname
  *
- * @return string
+ * @return string|void
  *
  * Takes a hostname and returns the path to the nfsen
  * live dir.
