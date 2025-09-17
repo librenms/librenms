@@ -80,7 +80,6 @@ class Jira extends Transport
             $data['fields'] = array_merge($data['fields'], $custom);
         }
 
-
         $client = Http::client();
 
         if ($webhook_on) {
