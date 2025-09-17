@@ -1,0 +1,12 @@
+os: rad-rici
+text: 'RAD RICi'
+type: network
+icon: rad
+group: rad
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.164.6.1.6
