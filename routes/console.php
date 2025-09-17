@@ -2,9 +2,11 @@
 
 use App\Console\Commands\MaintenanceCleanupNetworks;
 use App\Console\Commands\MaintenanceFetchOuis;
+use App\Console\Commands\MaintenanceFetchRSS;
 use App\Jobs\PingCheck;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
+use LibreNMS\Util\Time;
 use Symfony\Component\Process\Process;
 
 /*
@@ -199,12 +201,17 @@ Schedule::call(function () {
 
 // schedule maintenance, should be after all others
 $maintenance_log_file = Config::get('log_dir') . '/maintenance.log';
-Schedule::command(MaintenanceFetchOuis::class, ['--wait'])
-    ->weeklyOn(0, '1:00')
+Schedule::command(MaintenanceFetchOuis::class)
+    ->weeklyOn(0, Time::pseudoRandomBetween('01:00', '01:59'))
     ->onOneServer()
     ->appendOutputTo($maintenance_log_file);
 
-Schedule::command(MaintenanceCleanupNetworks::class, [])
-    ->weeklyOn(0, '2:00')
+Schedule::command(MaintenanceCleanupNetworks::class)
+    ->weeklyOn(0, Time::pseudoRandomBetween('02:00', '02:59'))
+    ->onOneServer()
+    ->appendOutputTo($maintenance_log_file);
+
+Schedule::command(MaintenanceFetchRSS::class)
+    ->dailyAt(Time::pseudoRandomBetween('03:00', '03:59'))
     ->onOneServer()
     ->appendOutputTo($maintenance_log_file);
