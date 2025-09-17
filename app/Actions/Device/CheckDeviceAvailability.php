@@ -12,7 +12,8 @@ class CheckDeviceAvailability
         private SetDeviceAvailability $setDeviceAvailability,
         private DeviceIsPingable $deviceIsPingable,
         private DeviceIsSnmpable $deviceIsSnmpable,
-    ) {}
+    ) {
+    }
 
     public function execute(Device $device, bool $commit = false): bool
     {

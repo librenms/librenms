@@ -13,7 +13,8 @@ class DeviceIsPingable
 {
     public function __construct(
         private Fping $fping,
-    ) {}
+    ) {
+    }
 
     public function execute(Device $device): FpingResponse
     {

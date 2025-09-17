@@ -9,13 +9,14 @@ class SetDeviceAvailability
 {
     public function __construct(
         private UpdateDeviceOutage $updateDeviceOutage,
-    ){}
+    ) {
+    }
 
     /**
-     * @param Device $device
-     * @param bool $available
-     * @param AvailabilitySource $source
-     * @param bool $commit Save changes to the database
+     * @param  Device  $device
+     * @param  bool  $available
+     * @param  AvailabilitySource  $source
+     * @param  bool  $commit  Save changes to the database
      * @return bool true if the status changed
      */
     public function execute(Device $device, bool $available, AvailabilitySource $source = AvailabilitySource::NONE, bool $commit = true): bool

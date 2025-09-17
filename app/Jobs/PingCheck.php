@@ -182,7 +182,7 @@ class PingCheck implements ShouldQueue
         }
 
         // mark up only if snmp is not down too
-        $changed = app(SetDeviceAvailability::class)->execute($device,  $response->success(), AvailabilitySource::ICMP, true);
+        $changed = app(SetDeviceAvailability::class)->execute($device, $response->success(), AvailabilitySource::ICMP, true);
 
         // save last_ping_timetaken and rrd data
         $response->saveStats($device);
