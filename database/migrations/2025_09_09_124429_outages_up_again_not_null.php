@@ -14,7 +14,7 @@ return new class extends Migration
         // Set all up_again to 0
         DB::table('device_outages')->whereNull('up_again')->update(['up_again' => 0]);
 
-        // Set up_again to down_at for devices with multiple up_again entries
+        // Set up_again to going_down for devices with multiple open outages
         $devices = DB::table('device_outages')
             ->select('device_id')
             ->where('up_again', 0)
@@ -34,7 +34,7 @@ return new class extends Migration
                 ->where('up_again', 0)
                 ->where('id', '<>', $latestId)
                 ->update([
-                    'up_again' => DB::raw('down_at'),
+                    'up_again' => DB::raw('going_down'),
                 ]);
         }
 

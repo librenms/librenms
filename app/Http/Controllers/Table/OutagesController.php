@@ -31,6 +31,7 @@ use App\Models\DeviceOutage;
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
 
@@ -38,7 +39,7 @@ class OutagesController extends TableController
 {
     protected $model = DeviceOutage::class;
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'device' => 'nullable|int',
@@ -48,25 +49,22 @@ class OutagesController extends TableController
         ];
     }
 
-    protected function filterFields($request)
+    protected function filterFields($request): array
     {
         return [
             'device_id' => 'device',
         ];
     }
 
-    protected function sortFields($request)
+    protected function sortFields($request): array
     {
         return ['going_down', 'up_again', 'device_id'];
     }
 
     /**
      * Defines the base query for this resource
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
-    public function baseQuery($request)
+    public function baseQuery(Request $request): Builder
     {
         $from_ts = Time::parseInput($request->from);
         $to_ts = Time::parseInput($request->to);
@@ -98,7 +96,7 @@ class OutagesController extends TableController
     /**
      * @param  DeviceOutage  $outage
      */
-    public function formatItem($outage)
+    public function formatItem($outage): array
     {
         $start = $this->formatDatetime($outage->going_down);
         $end = $outage->up_again ? $this->formatDatetime($outage->up_again) : '-';
@@ -131,7 +129,7 @@ class OutagesController extends TableController
             ->format(LibrenmsConfig::get('dateformat.compact'));
     }
 
-    private function statusLabel($outage)
+    private function statusLabel(DeviceOutage $outage): string
     {
         if (empty($outage->up_again)) {
             $label = 'label-danger';
@@ -149,7 +147,7 @@ class OutagesController extends TableController
      *
      * @return array
      */
-    protected function getExportHeaders()
+    protected function getExportHeaders(): array
     {
         return [
             'Device Hostname',
@@ -165,7 +163,7 @@ class OutagesController extends TableController
      * @param  DeviceOutage  $outage
      * @return array
      */
-    protected function formatExportRow($outage)
+    protected function formatExportRow($outage): array
     {
         return [
             $outage->device ? $outage->device->displayName() : '',
