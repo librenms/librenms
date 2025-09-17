@@ -31,7 +31,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class MgmtTrapNmsEventTest extends SnmpTrapTestCase
+final class MgmtTrapNmsEventTest extends SnmpTrapTestCase
 {
     public function testEvent(): void
     {

@@ -187,7 +187,11 @@ class LdapAuthorizer extends AuthorizerBase
             return false;
         }
 
-        foreach ($entries as $entry) {
+        foreach ($entries as $key => $entry) {
+            if ($key == 'count') {
+                continue;
+            }
+
             $user = $this->ldapToUser($entry);
             if ($user['user_id'] != $user_id) {
                 continue;

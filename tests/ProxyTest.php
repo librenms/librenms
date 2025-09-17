@@ -27,7 +27,7 @@ use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\Http;
 use LibreNMS\Util\Version;
 
-class ProxyTest extends TestCase
+final class ProxyTest extends TestCase
 {
     public function testClientAgentIsCorrect(): void
     {

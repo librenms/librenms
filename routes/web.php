@@ -3,6 +3,8 @@
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\Ajax;
 use App\Http\Controllers\AlertController;
+use App\Http\Controllers\AlertRuleController;
+use App\Http\Controllers\AlertRuleTemplateController;
 use App\Http\Controllers\AlertTransportController;
 use App\Http\Controllers\Auth;
 use App\Http\Controllers\Auth\SocialiteController;
@@ -109,6 +111,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('nac', [NacController::class, 'index']);
 
     // Device Tabs
+    Route::middleware('can:admin')->group(function () {
+        Route::get('/device/{device}/edit', [Device\EditDeviceController::class, 'index'])->name('device.edit');
+        Route::put('/device/{device}/edit', [Device\EditDeviceController::class, 'update'])->name('device.edit.update');
+        Route::post('/device/{device}/rediscover', [DeviceController::class, 'rediscover'])->name('device.rediscover');
+    });
+
     Route::prefix('device/{device}')->name('device.')->group(function () {
         Route::get('popup', \App\Http\Controllers\DevicePopupController::class)->name('popup');
         Route::put('notes', [Device\Tabs\NotesController::class, 'update'])->name('notes.update');
@@ -116,6 +124,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('module/{module}', [Device\Tabs\ModuleController::class, 'delete'])->name('module.delete');
     });
 
+    // fallback device routes
     Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', [DeviceController::class, 'index'])
         ->name('device')->where('vars', '.*');
 
@@ -170,6 +179,10 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('settings/{name}', [SettingsController::class, 'destroy'])->name('settings.destroy');
 
         Route::post('alert/transports/{transport}/test', [AlertTransportController::class, 'test'])->name('alert.transports.test');
+        Route::resource('alert-rule', AlertRuleController::class)->only(['show', 'store', 'update', 'destroy']);
+        Route::put('alert-rule/{alert_rule}/toggle', [AlertRuleController::class, 'toggle'])->name('alert-rule.toggle');
+        Route::get('alert-rule-from-template/{template_id}', [AlertRuleTemplateController::class, 'template'])->name('alert-rule-template');
+        Route::get('alert-rule-from-rule/{alert_rule}', [AlertRuleTemplateController::class, 'rule'])->name('alert-rule-template.rule');
 
         Route::get('plugin/settings', App\Http\Controllers\PluginAdminController::class)->name('plugin.admin');
         Route::get('plugin/settings/{plugin:plugin_name}', PluginSettingsController::class)->name('plugin.settings');
