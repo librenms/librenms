@@ -1,0 +1,2824 @@
+-- ===========================================================================
+-- File Identification:
+-- ===========================================================================
+-- 
+-- Rev: 11 of ProflineSfd.mib
+--
+-- =====================
+-- Revision Information:
+-- =====================
+--
+-- Please refer to MODULE-IDENTITY for file revision information. 
+--
+-- =============
+-- File Summary:
+-- =============
+--
+-- SFD MIB SMIv2
+-- This MIB contains object definitions for PROFline SFD de-modulator.
+-- ===========================================================================
+
+--
+-- MIB objects for agent module PROFLINE-SFD-MIB implementations
+--
+PROFLINE-SFD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	demodulators 				FROM PROFLINE-MIB
+	Integer32, Counter32, Gauge32		FROM SNMPv2-SMI 
+	OBJECT-TYPE, MODULE-IDENTITY		FROM SNMPv2-SMI
+	OBJECT-GROUP, NOTIFICATION-GROUP	FROM SNMPv2-CONF
+	MODULE-COMPLIANCE				FROM SNMPv2-CONF
+	TEXTUAL-CONVENTION, DateAndTime	FROM SNMPv2-TC
+	NOTIFICATION-TYPE				FROM SNMPv2-SMI
+	sysDescr, sysUpTime, snmpTrapOID	FROM SNMPv2-MIB
+	sysName, sysLocation			FROM SNMPv2-MIB
+;
+
+sfd MODULE-IDENTITY
+	LAST-UPDATED 	"201010180749Z"             -- year 2010, month 10, day 18
+	ORGANIZATION 	"Profline BV"
+	CONTACT-INFO 	"+31-26-3236969"
+	DESCRIPTION  	"The profline SFD mib"
+	REVISION        	"201010180749Z"             -- year 2010, month 10, day 18
+	DESCRIPTION		"Rev: 11
+				Added binding sysName and sysLocation to all notifications."
+	REVISION        	"201009220830Z"             -- year 2010, month 9, day 22
+	DESCRIPTION		"Rev: 10
+				Added status notifications sfdNotificationStatusRfInFrequency, sfdNotificationStatusRfInInput, sfdNotificationStatusRfInMute and sdfNotificationStatusRfInFilter.
+				Added status notifications sfdNotificationStatusMpxSource.
+				Added status notifications sfdNotificationStatusAudioTesttone and sfdNotificationStatusAudioDeEmphase.
+				Added node group sfdSetNotificationModeStatus
+				Added status mode settings sfdSetNotificationModeStatusRfInFrequency, sfdSetNotificationModeStatusRfInInput, sfdSetNotificationModeStatusRfInMute and sfdSetNotificationModeStatusRfInFilter.
+				Added status mode settings sfdSetNotificationModeStatusMpxSource.
+				Added status mode settings sfdSetNotificationModeStatusAudioTesttone and sfdSetNotificationModeStatusAudioDeEmphase.
+				Added status mode settings sfdSetNotificationPriorityStatusRfInFrequency, sfdSetNotificationPriorityStatusRfInInput, sfdSetNotificationPriorityStatusRfInMute and sfdSetNotificationPriorityStatusRfInFilter.
+				Added status mode settings sfdSetNotificationPriorityStatusMpxSource.
+				Added status mode settings sfdSetNotificationPriorityStatusAudioTesttone and sfdSetNotificationPriorityStatusAudioDeEmphase.
+				Added measurement leaf sfdMsrRfInMuted.
+				Renamed ...ControlModeChanged to ...ControlMode.
+				Increased the maximum level of sfdSetRfInMute with 10dBuV to 60dBuV.
+				sfdSetAudioGain renamed to sfdSetAudioAnalogXlrGain."
+	REVISION        	"201005271500Z"             -- year 2010, month 05, day 27 
+	DESCRIPTION		"Rev: 9
+				Corrected erronous sfdMsrNotificationTimeStamp description.
+				Implemented RDS PI Alarm and notification functionality.
+				Corrected sfdSetNotificationModeAlarm... descriptions."
+	REVISION        	"201004081200Z"             -- year 2010, month 04, day 8 
+	DESCRIPTION		"Rev: 8
+				Removed table column sfdIdnFirmwareStatus from version table sfdIdnFirmwareVersionTable because it is a read-only table.
+				Added sfdSetClockTimezone. 
+				Added sfdMsrNotificationPriority binding to the notifications.
+				Renamed sfdSetNotificationControlMode to sfdSetNotificationControlModeChanged.
+				Added sfdSetPresetActiveName and obsoletet sfdSetNameUnit.
+				Renamed sfdMsrRfInPFC to sfdMsrRfInFilter in order to let it more closely resemble the WEB presentation.
+				Added some extra descriptive text to sfdIdnDeviceManualLink.
+				Improved descriptive texts of sfdIdnDeviceInfo... .
+				Corrected erronous sfdMsrRfInSignalStrength description."
+	REVISION        	"200912020847Z"             -- year 2009, month 12, day 02 
+	DESCRIPTION		"Rev: 7
+                		Changed sfdSetClockOffset description
+				Added complete node group sfdSetNotificationPriority
+				Syntax range of sfdIdnFirmwareType and sfdIdnFirmwareVersion is extended to support mib version information
+				Concerning notification event sfdNotificationSettingChanged, bindings sfdMsrNotificationLastSettingChanged and sysDescr are switched in place
+				Added complete node group sfdIdnDeviceInfo[1..12] and sfdIdnDeviceManualLink
+				Added node sfdMsrNotificationPriority and binded to notification events to register event priorities
+				Changed syntax of sfdMsrNotificationTimestamp to DateAndTime"
+	REVISION        	"200910071440Z"             -- year 2009, month 10, day 7
+	DESCRIPTION		"Rev: 6
+				Range of ControlMode is extended to support localPlusRemote state
+				sfdSetMpxLevel name changed to sfdSetMpxGain
+				Range of sfdSetMpxGain is extended to support 'TR5/3.5' option
+				Description of sfdSetMpxGain changed to explain supported range 
+				sfdSetAudioLevel renamed to sfdSetAudioGain
+				Range of sfdSetAudioGain is extended to support 'TR5/3.5' option
+				Description of sfdSetAudioGain changed to explain supported range
+				sfdSetAlarmPilotLevel renamed to sfdSetAlarmPilotLevelKhz
+				Description of sfdSetAlarmPilotLevelKhz changed to explain availability
+				Added sfdSetAlarmPilotLevelDbu to support dBu scale with 'TR5/3.5' option
+				sfdSetAlarmRdsLevelLevel renamed to sfdSetAlarmRdsLevelLevelKhz
+				Description of sfdSetAlarmRdsLevelLevelKhz changed to explain availability
+				Added sfdSetAlarmRdsLevelLevelDbu to support dBu scale with 'TR5/3.5' option
+				sfdMsrMpxPilotLevel renamed to sfdMsrMpxPilotLevelKhz
+				sfdMsrMpxRdsLevel renamed to sfdMsrMpxRdsLevelKhz
+				Added sfdMsrMpxPilotLevelDbu to support dBu scale with 'TR5/3.5' option
+				Added sfdMsrMpxRdsLevelDbu to support dBu scale with 'TR5/3.5' option
+				Name of sfdSetIOInput changed to sfdSetControlIOInput to meet local menu changes
+				Name of sfdSetIOOutput changed to sfdSetControlIOOutput to meet local menu changes
+				Range of sfdSetPresetRecall and sfdSetPresetSaveAs extended with value 0 (= do nothing) to correct snmp tests"
+	REVISION        	"200902280730Z"             -- year 2009, month 02, day 28 
+      DESCRIPTION		"Rev: 5
+				Global textual change of sfd..Trap.. to sfd..Notification..
+				Added complete node group sfdSetPreset
+				Added complete node group sfdMsr
+				Text-Convention LockToSourceModes increased by sntp option
+				Added Text-Convention ControlMode
+				Added binding sysUpTime and snmpTrapOID to all notifications
+				Added binding sfdMsrNotificationTimeStamp to all notifications
+				Added notification sfdTrapSettingChanged
+				Added notification sfdTrapControlModeChanged
+				Added object nodes sfdSetNotificationSettingChanged, sfdMsrNotificationLastSettingChanged and
+				sfdMsrNotificationLastSettingChangedFrom
+				Added object node sfdSetNotificationModeControlMode and sfdSetNotificationModeControlModeLocalSuppress"
+	REVISION        	"200812100802Z"             -- year 2008, month 12, day 10 
+      DESCRIPTION		"Rev: 4
+				Table index sfdIdnFirmwareIndex changed to state not-accessible
+			    	Added mib compliance group sfdCompliance"
+	REVISION		"200809121050Z"             -- year 2008, month 09, day 12 
+      DESCRIPTION		"Rev: 3
+				 Changed description from node sfdSetAudioLevel, unit dBm replaced by dBu
+				 All trap V2 descriptions are changed, added depending on description."
+      REVISION		"200807301350Z"             -- year 2008, month 07, day 30 
+      DESCRIPTION		"Rev: 2
+				 Changed description from node sfdSetClockOffset, added calculation example
+				 Changed description from node sfdMsrMpxResetMaxDeviation."
+	REVISION     	"200804161119Z"             -- year 2008, month 04, day 16
+	DESCRIPTION  	"Rev: 1
+				The Initial revision of this MIB"
+	::= { demodulators 1 }
+
+--
+-- top level structure
+--
+sfdNotifications				OBJECT IDENTIFIER ::= { sfd 0 }
+sfdIdentity					OBJECT IDENTIFIER ::= { sfd 1 }
+sfdSettings					OBJECT IDENTIFIER ::= { sfd 2 }
+	sfdSet					OBJECT IDENTIFIER ::= { sfdSettings 1 }
+	sfdSetClock					OBJECT IDENTIFIER ::= { sfdSettings 2 }
+	sfdSetRfIn					OBJECT IDENTIFIER ::= { sfdSettings 3 }
+	sfdSetFilter				OBJECT IDENTIFIER ::= { sfdSettings 4 }
+	sfdSetMpx					OBJECT IDENTIFIER ::= { sfdSettings 5 }
+	sfdSetAudio					OBJECT IDENTIFIER ::= { sfdSettings 6 }
+	sfdSetName					OBJECT IDENTIFIER ::= { sfdSettings 7 }
+	sfdSetAlarm					OBJECT IDENTIFIER ::= { sfdSettings 8 }
+		sfdSetAlarmRfIn				OBJECT IDENTIFIER ::= { sfdSetAlarm 1 }
+			sfdSetAlarmRfInLow			OBJECT IDENTIFIER ::= { sfdSetAlarmRfIn 1 }
+			sfdSetAlarmRfInHigh			OBJECT IDENTIFIER ::= { sfdSetAlarmRfIn 2 }
+		sfdSetAlarmPilot				OBJECT IDENTIFIER ::= { sfdSetAlarm 2 }
+		sfdSetAlarmRds				OBJECT IDENTIFIER ::= { sfdSetAlarm 3 }
+			sfdSetAlarmRdsLevel			OBJECT IDENTIFIER ::= { sfdSetAlarmRds 1 }
+			sfdSetAlarmRdsBer			OBJECT IDENTIFIER ::= { sfdSetAlarmRds 2 }
+			sfdSetAlarmRdsPi			OBJECT IDENTIFIER ::= { sfdSetAlarmRds 3 }
+		sfdSetAlarmMpxDeviation			OBJECT IDENTIFIER ::= { sfdSetAlarm 4 }
+		sfdSetAlarmAudio				OBJECT IDENTIFIER ::= { sfdSetAlarm 5 }
+			sfdSetAlarmAudioLeft			OBJECT IDENTIFIER ::= { sfdSetAlarmAudio 1 }
+			sfdSetAlarmAudioRight			OBJECT IDENTIFIER ::= { sfdSetAlarmAudio 2 }
+			sfdSetAlarmAudioBoth			OBJECT IDENTIFIER ::= { sfdSetAlarmAudio 3 }
+	sfdSetControlIO				OBJECT IDENTIFIER ::= { sfdSettings 9 }
+		sfdSetControlIOInput			OBJECT IDENTIFIER ::= { sfdSetControlIO 1 }
+		sfdSetControlIOOutput			OBJECT IDENTIFIER ::= { sfdSetControlIO 2 }
+	sfdSetNotification			OBJECT IDENTIFIER ::= { sfdSettings 10 }
+		sfdSetNotificationMode			OBJECT IDENTIFIER ::= { sfdSetNotification 1 }
+		sfdSetNotificationModeAlarm		OBJECT IDENTIFIER ::= { sfdSetNotification 2 }
+		sfdSetNotificationPriority		OBJECT IDENTIFIER ::= { sfdSetNotification 3 }
+		sfdSetNotificationModeStatus		OBJECT IDENTIFIER ::= { sfdSetNotification 4 }
+	sfdSetPreset				OBJECT IDENTIFIER ::= { sfdSettings 11 }
+sfdMeasurements				OBJECT IDENTIFIER ::= { sfd 3 }
+	sfdMsrAlarm					OBJECT IDENTIFIER ::= { sfdMeasurements 1 }
+	sfdMsrNotification			OBJECT IDENTIFIER ::= { sfdMeasurements 2 }
+	sfdMsrRfIn					OBJECT IDENTIFIER ::= { sfdMeasurements 3 }				
+	sfdMsrMpx					OBJECT IDENTIFIER ::= { sfdMeasurements 4 }
+	sfdMsrAudio					OBJECT IDENTIFIER ::= { sfdMeasurements 5 }
+	sfdMsrRds					OBJECT IDENTIFIER ::= { sfdMeasurements 6 }
+	sfdMsr					OBJECT IDENTIFIER ::= { sfdMeasurements 7 }
+sfdGroups					OBJECT IDENTIFIER ::= { sfd 4 }
+
+
+-- define enumerates
+LockToSourceModes ::= TEXTUAL-CONVENTION
+	STATUS 		current
+	DESCRIPTION 	"Defines the LockToSourceModes"
+	SYNTAX INTEGER
+	{
+		off(1),
+		rds(2),
+		sntp(3)
+	}
+
+RfInInputModes ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION		"Defines the RfInInputModes"
+	SYNTAX INTEGER
+	{
+		a(1),
+		b(2)
+	}
+
+FilterIfMpxModes ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION		"Defines the FilterIfMpxModes"
+	SYNTAX INTEGER
+	{
+		mono(1),
+		narrow(2),
+		wide(3)
+	}
+
+MpxPreEmphaseModes ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION		"Defines the MpxPreEmphaseModes"
+	SYNTAX INTEGER
+	{
+		off(1),
+		on(2)
+	}
+
+MpxSourceModes ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION		"Defines the MpxSourceModes"
+	SYNTAX INTEGER
+	{
+		internal(1),
+		externalAuto(2),
+		external15kHz(3),
+		external100kHz(4)
+	}
+
+MpxRdsModes ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION		"Defines the MpxRdsModes"
+	SYNTAX INTEGER
+	{
+		rds(1),
+		rbds(2)
+	}
+
+AudioTesttoneModes ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION		"Defines the AudioTesttoneModes"
+	SYNTAX INTEGER
+	{
+		off(1),
+		on(2)
+	}
+
+AudioDeEmphaseModes ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION		"Defines the AudioDeEmphaseModes"
+	SYNTAX INTEGER
+	{
+		d0uS(1),
+		d50uS(2),
+		d75uS(3)
+	}
+
+AlarmModes ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION		"Defines the AlarmModes"
+	SYNTAX INTEGER
+	{
+		off(1),
+		warningOnly(2),
+		warningPlusRelayA(3),
+		warningPlusRelayB(4),
+		warningPlusRelayC(5)
+	}
+
+InputModes ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION		"Defines the InputModes"
+	SYNTAX INTEGER
+	{
+		notUsed(1),
+		inputAB(2),
+		frequencyPlus10kHz(3),
+		frequencyPlus100kHz(4),
+		frequencyMinus10kHz(5),
+		frequencyMinus100kHz(6),
+		presetNext(7),
+		presetPrevious(8),
+		preset1(9),
+		preset2(10),
+		preset3(11),
+		preset4(12),
+		preset5(13),
+		preset6(14),
+		preset7(15),
+		preset8(16),
+		preset9(17),
+		preset10(18),
+		preset11(19),
+		preset12(20),
+		preset13(21),
+		preset14(22),
+		preset15(23),
+		preset16(24),
+		preset17(25),
+		preset18(26),
+		preset19(27),
+		preset20(28),
+		preset21(29),
+		preset22(30),
+		preset23(31),
+		preset24(32),
+		preset25(33),
+		preset26(34),
+		preset27(35),
+		preset28(36),
+		preset29(37),
+		preset30(38),
+		preset31(39),
+		preset32(40),
+		preset33(41),
+		preset34(42),
+		preset35(43),
+		preset36(44),
+		preset37(45),
+		preset38(46),
+		preset39(47),
+		preset40(48),
+		preset41(49),
+		preset42(50),
+		preset43(51),
+		preset44(52),
+		preset45(53),
+		preset46(54),
+		preset47(55),
+		preset48(56),
+		preset49(57),
+		preset50(58),
+		preset51(59),
+		preset52(60),
+		preset53(61),
+		preset54(62),
+		preset55(63),
+		preset56(64),
+		preset57(65),
+		preset58(66),
+		preset59(67),
+		preset60(68),
+		preset61(69),
+		preset62(70),
+		preset63(71),
+		preset64(72)   			  
+	}
+
+
+OutputModes ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION		"Defines the OutputModes"
+	SYNTAX INTEGER
+	{
+		notUsed(1),
+		rdsTA(2),
+		rdsTP(3),
+		rdsTAAndTp(4),
+		rdsMS(5),
+		rdsPTYnews(6),
+		rdsPTYalarm(7),
+		mpxMonoOrStereo(8)
+	}
+
+RdsTAModes ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION		"Defines the RdsTAModes"
+	SYNTAX INTEGER
+	{
+		no(1),
+		yes(2)
+	}
+
+RdsTPModes ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION		"Defines the RdsTPModes"
+	SYNTAX INTEGER
+	{
+		off(1),
+		on(2)
+	}
+
+RdsDIModes ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION		"Defines the RdsDIModes"
+	SYNTAX INTEGER
+	{
+		mono(1),
+		stereo(2)
+	}
+
+RdsMSModes ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION		"Defines the RdsMSModes"
+	SYNTAX INTEGER
+	{
+		speech(1),
+		music(2)
+	}
+
+RdsPTYModes ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION		"Defines the RdsPTYModes"
+	SYNTAX INTEGER
+	{
+		rdsNone(1),
+		rdsNews(2),
+		rdsCurrentAffairs(3),
+		rdsInformation(4),
+		rdsSport(5),
+		rdsEducation(6),
+		rdsDrama(7),
+		rdsCultures(8),
+		rdsScience(9),
+		rdsVariedSpeech(10),
+		rdsPopMusic(11),
+		rdsRockMusic(12),
+		rdsEasyListening(13),
+		rdsLightClassics(14),
+		rdsSeriousClassics(15),
+		rdsOtherMusic(16),
+		rdsWeatherMetr(17),
+		rdsFinance(18),
+		rdsChildrensProgs(19),
+		rdsSocialAffairs(20),
+		rdsReligion(21),
+		rdsPhoneIn(22),
+		rdsTravelTouring(23),
+		rdsLeisureHobby(24),
+		rdsJazzMusic(25),
+		rdsCountryMusic(26),
+		rdsNationalMusic(27),
+		rdsOldiesMusic(28),
+		rdsFolkMusic(29),
+		rdsDocumentary(30),
+		rdsAlarmTest(31),
+		rdsAlarmAlarm(32),
+		rbdsNone(33),
+		rbdsNews(34),
+		rbdsInformation(35),
+		rbdsSports(36),
+		rbdsTalk(37),
+		rbdsRock(38),
+		rbdsClassicRock(39),
+		rbdsAdultHits(40),
+		rbdsSoftRock(41),
+		rbdsTop40(42),
+		rbdsCountry(43),
+		rbdsOldies(44),
+		rbdsSoft(45),
+		rbdsNostalgia(46),
+		rbdsJazz(47),
+		rbdsClassical(48),
+		rbdsRhythmAndBlues(49),
+		rbdsSoftRhythmAndBlues(50),
+		rbdsLanguage(51),
+		rbdsReligiousMusic(52),
+		rbdsReligiousTalk(53),
+		rbdsPersonality(54),
+		rbdsPublic(55),
+		rbdsCollege(56),
+		rbdsUnassigned1(57),
+		rbdsUnassigned2(58),
+		rbdsUnassigned3(59),
+		rbdsUnassigned4(60),
+		rbdsUnassigned5(61),
+		rbdsWeather(62),
+		rbdsEmergencyTest(63),
+		rbdsEmergency(64)
+	}
+
+ControlMode ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION 	"Defines the ControlMode"
+	SYNTAX INTEGER
+	{
+		local(1),
+		remote(2),
+		localPlusRemote(3)
+	}
+
+NotificationOffOn ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION 	"Defines the NotificationOffOn"
+	SYNTAX INTEGER
+	{
+		off(1),
+		on(2)
+	}
+
+NotificationSettingChangedFrom ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION 	"Defines the NotificationSource"
+	SYNTAX INTEGER
+	{
+		snmp(1),
+		web(2),
+		local(3)
+	}
+
+AlarmStatus ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION		"Defines the AlarmStatus"
+	SYNTAX INTEGER
+	{
+		noProblem(1),
+		warning(3),
+		alarm(5)
+	}
+
+NotificationModes ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION		"Defines the NotificationModes"
+	SYNTAX INTEGER
+	{
+		off(1),
+		warning(2),
+		warningAndAlarm(3),
+		alarm(4)
+	}
+
+TimezoneModes ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION		"Defines the TimezoneModes."
+	SYNTAX INTEGER
+	{
+		tzUTCminus12h00Internationaldatelinewest(1),
+		tzUTCminus11h00MidwayislandSamoa(2),
+		tzUTCminus10h00Hawaii(3),
+		tzUTCminus09h00Alaska(4),
+		tzUTCminus08h00Pacifictimeusandcanada(5),
+		tzUTCminus08h00TijuanaBajacalifornia(6),
+		tzUTCminus07h00Arizona(7),
+		tzUTCminus07h00ChihuahuaLapazMazatlan(8),
+		tzUTCminus07h00Mountaintimeusandcanada(9),
+		tzUTCminus06h00Centralamerica(10),
+		tzUTCminus06h00Centraltimeusandcanada(11),
+		tzUTCminus06h00GuadalajaraMexicocityMonterrey(12),
+		tzUTCminus06h00Saskatchewan(13),
+		tzUTCminus05h00BogotaLimaQuitoRiobranco(14),
+		tzUTCminus05h00Easterntimeusandcanada(15),
+		tzUTCminus05h00Indianaeast(16),
+		tzUTCminus04h30Caracas(17),
+		tzUTCminus04h00Atlantictimecanada(18),
+		tzUTCminus04h00Lapaz(19),
+		tzUTCminus04h00Manaus(20),
+		tzUTCminus04h00Santiago(21),
+		tzUTCminus03h30Newfoundland(22),
+		tzUTCminus03h00Brasilia(23),
+		tzUTCminus03h00BuenosAires(24),
+		tzUTCminus03h00Georgetown(25),
+		tzUTCminus03h00Greenland(26),
+		tzUTCminus03h00Montevideo(27),
+		tzUTCminus02h00Midatlantic(28),
+		tzUTCminus01h00Azores(29),
+		tzUTCminus01h00Capeverdeis(30),
+		tzUTCplus00h00Casablanca(31),
+		tzUTCplus00h00DublinEdinburghLisbonLondon(32),
+		tzUTCplus00h00UTCMonroviaReykjavik(33),
+		tzUTCplus01h00AmsterdamBerlinBernRomeStockholmVienna(34),
+		tzUTCplus01h00BelgradeBratislavaBudapestLjubljanaPrague(35),
+		tzUTCplus01h00BrusselsCopenhagenMadridParis(36),
+		tzUTCplus01h00SarajevoSkopjeWarsawZagreb(37),
+		tzUTCplus01h00Westcentralafrica(38),
+		tzUTCplus02h00Amman(39),
+		tzUTCplus02h00AthensBucharestIstanbul(40),
+		tzUTCplus02h00Beirut(41),
+		tzUTCplus02h00Cairo(42),
+		tzUTCplus02h00HararePretoria(43),
+		tzUTCplus02h00HelsinkiKyivRigaSofiaTallinnVilnius(44),
+		tzUTCplus02h00Jerusalem(45),
+		tzUTCplus02h00Minsk(46),
+		tzUTCplus02h00Windhoek(47),
+		tzUTCplus03h00Baghdad(48),
+		tzUTCplus03h00KuwaitRiyadh(49),
+		tzUTCplus03h00MoscowStpetersburgVolgograd(50),
+		tzUTCplus03h00Nairobi(51),
+		tzUTCplus03h00Tbilisi(52),
+		tzUTCplus03h30Tehran(53),
+		tzUTCplus04h00AbudhabiMuscat(54),
+		tzUTCplus04h00Baku(55),
+		tzUTCplus04h00Yerevan(56),
+		tzUTCplus04h30Kabul(57),
+		tzUTCplus05h00Ekaterinburg(58),
+		tzUTCplus05h00IslamabadKarachi(59),
+		tzUTCplus05h00Tashkent(60),
+		tzUTCplus05h30ChennaiKolkataMumbaiNewdelhi(61),
+		tzUTCplus05h30Srijayawardenepura(62),
+		tzUTCplus05h45Kathmandu(63),
+		tzUTCplus06h00AlmatyNovosibirsk(64),
+		tzUTCplus06h00AstanaDhaka(65),
+		tzUTCplus06h30Yangonrangoon(66),
+		tzUTCplus07h00BangkokHanoiJakarta(67),
+		tzUTCplus07h00Krasnoyarsk(68),
+		tzUTCplus08h00BeijingChongqingHongkongUrumqi(69),
+		tzUTCplus08h00IrkutskUlaanbataar(70),
+		tzUTCplus08h00KualalumpurSingapore(71),
+		tzUTCplus08h00Perth(72),
+		tzUTCplus08h00Taipei(73),
+		tzUTCplus09h00OsakaSapporoTokyo(74),
+		tzUTCplus09h00Seoul(75),
+		tzUTCplus09h00Yakutsk(76),
+		tzUTCplus09h30Adelaide(77),
+		tzUTCplus09h30Darwin(78),
+		tzUTCplus10h00Brisbane(79),
+		tzUTCplus10h00CanberraMelbourneSydney(80),
+		tzUTCplus10h00GuamPortmoresby(81),
+		tzUTCplus10h00Hobart(82),
+		tzUTCplus10h00Vladivostok(83),
+		tzUTCplus11h00MagadanSolomonisNewcaledonia(84),
+		tzUTCplus12h00AucklandWellington(85),
+		tzUTCplus12h00FijiKamchatkaMarshallis(86),
+		tzUTCplus13h00Nukualofa(87)
+	}
+
+DSTOffOn ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION 	"Defines the DSTOffOn."
+	SYNTAX INTEGER
+	{
+		off(1),
+		on(2)
+	}
+
+RfInMuted ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION 	"Defines the RfInMuted."
+	SYNTAX INTEGER
+	{
+		notMuted(1),
+		muted(2)
+	}
+
+-- define OBJECTS (leaves)
+--****************************************************************************
+-- sfdNotifications sub-tree
+--**************************************************************************** 
+--****************************************************************************
+-- Identity sub-tree
+--****************************************************************************
+sfdIdnOptions OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"Displays the installed options or shows 'None' if there are no installed options."
+	::= { sfdIdentity 1}
+
+sfdIdnSerialNumber OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(9))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"The serialnumber of the device."
+	::= { sfdIdentity 2}
+
+--****************************************************************************
+-- FirmwareTable sub-tree
+--**************************************************************************** 
+sfdIdnFirmwareVersionTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF SfdIdnFirmwareVersionEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION		"Table containing versions for firmware."
+	::= { sfdIdentity 3 }
+
+sfdIdnFirmwareVersionEntry OBJECT-TYPE
+	SYNTAX		SfdIdnFirmwareVersionEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION		"Entrypoint of the firmwareversion table."
+	INDEX			{ sfdIdnFirmwareIndex }
+	::= { sfdIdnFirmwareVersionTable 1 }
+
+SfdIdnFirmwareVersionEntry ::=
+	SEQUENCE 
+	{
+            sfdIdnFirmwareIndex	Integer32,
+		sfdIdnFirmwareType	OCTET STRING,
+		sfdIdnFirmwareVersion	OCTET STRING
+	}
+
+sfdIdnFirmwareIndex OBJECT-TYPE
+	SYNTAX		Integer32 (1..65535)
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION		"Index to the firmwareversion table."
+	::= { sfdIdnFirmwareVersionEntry 1 }
+
+sfdIdnFirmwareType OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(1..32))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION 	"Type of firmware."
+	::= { sfdIdnFirmwareVersionEntry 2 }
+
+sfdIdnFirmwareVersion OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(4..8))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"Version of the firmware."
+	::= { sfdIdnFirmwareVersionEntry 3 }
+
+-- Reserved 3 oid's for future references
+
+sfdIdnDeviceInfo1 OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..64))
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"User definable device information field 1"
+	::= { sfdIdentity 7 }
+
+sfdIdnDeviceInfo2 OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..64))
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"User definable device information field 2"
+	::= { sfdIdentity 8 }
+
+sfdIdnDeviceInfo3 OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..64))
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"User definable device information field 3"
+	::= { sfdIdentity 9 }
+
+sfdIdnDeviceInfo4 OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..64))
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"User definable device information field 4"
+	::= { sfdIdentity 10 }
+
+sfdIdnDeviceInfo5 OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..64))
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"User definable device information field 5"
+	::= { sfdIdentity 11 }
+
+sfdIdnDeviceInfo6 OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..64))
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"User definable device information field 6"
+	::= { sfdIdentity 12 }
+
+sfdIdnDeviceInfo7 OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..64))
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"User definable device information field 7"
+	::= { sfdIdentity 13 }
+
+sfdIdnDeviceInfo8 OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..64))
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"User definable device information field 8"
+	::= { sfdIdentity 14 }
+
+sfdIdnDeviceInfo9 OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..64))
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"User definable device information field 9"
+	::= { sfdIdentity 15 }
+
+sfdIdnDeviceInfo10 OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..64))
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"User definable device information field 10"
+	::= { sfdIdentity 16 }
+
+sfdIdnDeviceInfo11 OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..64))
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"User definable device information field 11"
+	::= { sfdIdentity 17 }
+
+sfdIdnDeviceInfo12 OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..64))
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"User definable device information field 12"
+	::= { sfdIdentity 18 }
+
+sfdIdnDeviceManualLink OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..1024))
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"User definable link to a device manual. Examples:
+				 file://///server/share/path ftp://server/file ftps://server/file http://sitelink https://sitelink"
+	::= { sfdIdentity 19 }
+
+--****************************************************************************
+-- sfdSet sub-tree
+--**************************************************************************** 
+sfdSetReboot OBJECT-TYPE
+	SYNTAX		Integer32 (0..1)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"With this OID the device can be triggered for reboot.
+				0 = do nothing
+				1 = reboot the device"
+	::= { sfdSet 1 }
+
+sfdSetAsPowerOnDefault OBJECT-TYPE
+	SYNTAX		Integer32 (0..1)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"All device settings and MIB-II variables sysContact, sysName and sysLocation will be saved.
+				0 = do nothing
+				1 = save current settings"
+	::= { sfdSet 3 }
+    
+--****************************************************************************
+-- sfySetClock sub-tree
+--**************************************************************************** 
+sfdSetClockDateTime OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(19))
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Date and time according to format.
+				'YYYY-MM-DD,HH:MM:SS'"
+	::= { sfdSetClock 1 }
+
+sfdSetClockOffset OBJECT-TYPE
+	SYNTAX		Integer32 (-120..120)
+	MAX-ACCESS		read-write
+	STATUS		obsolete
+	DESCRIPTION		"Sets the offset, stepsize 5 [1/10 hour].
+				A value of 5 means 0.5 hour."
+	::= { sfdSetClock 2 }
+
+sfdSetClockLockTo OBJECT-TYPE
+	SYNTAX		LockToSourceModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Lock the internal clock to the time received from an external source.
+				1 = off
+				2 = rds
+                        3 = sntp"
+	::= { sfdSetClock 3 }
+
+sfdSetClockTimezone OBJECT-TYPE
+	SYNTAX		TimezoneModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Sets the timezone.
+				1 = (UTC-12:00) International Date Line West
+				2 = (UTC-11:00) Midway Island; Samoa
+				3 = (UTC-10:00) Hawaii
+				4 = (UTC-09:00) Alaska
+				5 = (UTC-08:00) Pacific Time (US  and  Canada)
+				6 = (UTC-08:00) Tijuana; Baja California
+				7 = (UTC-07:00) Arizona
+				8 = (UTC-07:00) Chihuahua; La Paz; Mazatlan
+				9 = (UTC-07:00) Mountain Time (US  and  Canada)
+				10 = (UTC-06:00) Central America
+				11 = (UTC-06:00) Central Time (US  and  Canada)
+				12 = (UTC-06:00) Guadalajara; Mexico City; Monterrey
+				13 = (UTC-06:00) Saskatchewan
+				14 = (UTC-05:00) Bogota; Lima; Quito; Rio Branco
+				15 = (UTC-05:00) Eastern Time (US  and  Canada)
+				16 = (UTC-05:00) Indiana (East)
+				17 = (UTC-04:30) Caracas
+				18 = (UTC-04:00) Atlantic Time (Canada)
+				19 = (UTC-04:00) La Paz
+				20 = (UTC-04:00) Manaus
+				21 = (UTC-04:00) Santiago
+				22 = (UTC-03:30) Newfoundland
+				23 = (UTC-03:00) Brasilia
+				24 = (UTC-03:00) Buenos Aires
+				25 = (UTC-03:00) Georgetown
+				26 = (UTC-03:00) Greenland
+				27 = (UTC-03:00) Montevideo
+				28 = (UTC-02:00) Mid-Atlantic
+				29 = (UTC-01:00) Azores
+				30 = (UTC-01:00) Cape Verde Is.
+				31 = (UTC+00:00) Casablanca
+				32 = (UTC+00:00) Dublin; Edinburgh; Lisbon; London
+				33 = (UTC+00:00) UTC; Monrovia; Reykjavik
+				34 = (UTC+01:00) Amsterdam; Berlin; Bern; Rome; Stockholm; Vienna
+				35 = (UTC+01:00) Belgrade; Bratislava; Budapest; Ljubljana; Prague
+				36 = (UTC+01:00) Brussels; Copenhagen; Madrid; Paris
+				37 = (UTC+01:00) Sarajevo; Skopje; Warsaw; Zagreb
+				38 = (UTC+01:00) West Central Africa
+				39 = (UTC+02:00) Amman
+				40 = (UTC+02:00) Athens; Bucharest; Istanbul
+				41 = (UTC+02:00) Beirut
+				42 = (UTC+02:00) Cairo
+				43 = (UTC+02:00) Harare; Pretoria
+				44 = (UTC+02:00) Helsinki; Kyiv; Riga; Sofia; Tallinn; Vilnius
+				45 = (UTC+02:00) Jerusalem
+				46 = (UTC+02:00) Minsk
+				47 = (UTC+02:00) Windhoek
+				48 = (UTC+03:00) Baghdad
+				49 = (UTC+03:00) Kuwait; Riyadh
+				50 = (UTC+03:00) Moscow; St. Petersburg; Volgograd
+				51 = (UTC+03:00) Nairobi
+				52 = (UTC+03:00) Tbilisi
+				53 = (UTC+03:30) Tehran
+				54 = (UTC+04:00) Abu Dhabi; Muscat
+				55 = (UTC+04:00) Baku
+				56 = (UTC+04:00) Yerevan
+				57 = (UTC+04:30) Kabul
+				58 = (UTC+05:00) Ekaterinburg
+				59 = (UTC+05:00) Islamabad; Karachi
+				60 = (UTC+05:00) Tashkent
+				61 = (UTC+05:30) Chennai; Kolkata; Mumbai; New Delhi
+				62 = (UTC+05:30) Sri Jayawardenepura
+				63 = (UTC+05:45) Kathmandu
+				64 = (UTC+06:00) Almaty; Novosibirsk
+				65 = (UTC+06:00) Astana; Dhaka
+				66 = (UTC+06:30) Yangon (Rangoon)
+				67 = (UTC+07:00) Bangkok; Hanoi; Jakarta
+				68 = (UTC+07:00) Krasnoyarsk
+				69 = (UTC+08:00) Beijing; Chongqing; Hong Kong; Urumqi
+				70 = (UTC+08:00) Irkutsk; Ulaan Bataar
+				71 = (UTC+08:00) Kuala Lumpur; Singapore
+				72 = (UTC+08:00) Perth
+				73 = (UTC+08:00) Taipei
+				74 = (UTC+09:00) Osaka; Sapporo; Tokyo
+				75 = (UTC+09:00) Seoul	
+				76 = (UTC+09:00) Yakutsk
+				77 = (UTC+09:30) Adelaide
+				78 = (UTC+09:30) Darwin
+				79 = (UTC+10:00) Brisbane
+				80 = (UTC+10:00) Canberra; Melbourne; Sydney
+				81 = (UTC+10:00) Guam; Port Moresby
+				82 = (UTC+10:00) Hobart
+				83 = (UTC+10:00) Vladivostok
+				84 = (UTC+11:00) Magadan; Solomon Is.; New Caledonia
+				85 = (UTC+12:00) Auckland; Wellington
+				86 = (UTC+12:00) Fiji; Kamchatka; Marshall Is.
+				87 = (UTC+13:00) Nuku'alofa"
+	::= { sfdSetClock 4 }
+
+sfdSetClockDST OBJECT-TYPE
+	SYNTAX		DSTOffOn 
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Allows automatic daylight saving time changes.
+				This oid will return error NoSuchName when configured timezone will not support daylight saving time.
+				1 = off (disable daylight saving time)
+				2 = on (enable daylight saving time)"
+	::= { sfdSetClock 5 }
+
+--****************************************************************************
+-- sfdSetRfIn sub-tree
+--**************************************************************************** 
+sfdSetRfInFrequency OBJECT-TYPE
+	SYNTAX		Integer32 (8500..11050)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Receiver frequency [1/100 MHz].
+				When option RX85_110.5 is installed, range is 8500..11050, otherwise range is 8750..10800."
+	::= { sfdSetRfIn 1 }
+
+sfdSetRfInInput OBJECT-TYPE
+	SYNTAX		RfInInputModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Selected RF-input.
+				1 = RF-in A
+				2 = RF-in B"
+	::= { sfdSetRfIn 2 }
+
+sfdSetRfInAttenuator OBJECT-TYPE
+	SYNTAX		Integer32 (0..41)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Attenuation of the RF-input [dB]. 
+                        41 = AUTO"
+	::= { sfdSetRfIn 3 }
+
+sfdSetRfInMute OBJECT-TYPE
+	SYNTAX		Integer32 (1..61)
+	MAX-ACCESS		read-write
+	STATUS		current
+      DESCRIPTION		"When the RF-input level becomes lower than this level, the RF-input will be muted [dBuV].
+                        61 = OFF.
+                        (When the SFD software version is older then V043 the maximum level is 50dBuV and 51=OFF.)"
+	::= { sfdSetRfIn 4 }
+
+--****************************************************************************
+-- sfdSetFilter sub-tree
+--**************************************************************************** 
+sfdSetFilterIfMpx OBJECT-TYPE
+	SYNTAX		FilterIfMpxModes
+	MAX-ACCESS		read-write
+	STATUS		current
+      DESCRIPTION		"IF- and AF-filter settings.
+                        1 = 180/15 kHz (small IF(180 kHz), mono MPX (15 kHz)-processing)
+                        2 = 180/100 kHz (small IF(180 kHz), full MPX (100 kHz)-processing)
+				3 = 240/100 kHz (wide IF(240 kHz), full MPX (100 kHz)-processing)"                        
+	::= { sfdSetFilter 1 }
+
+sfdSetFilterStereoThreshold OBJECT-TYPE
+	SYNTAX		Integer32 (20..50)
+	MAX-ACCESS		read-write
+	STATUS		current
+      DESCRIPTION		"RF-input threshold level which automatically enables the 180/15 kHz (narrow) filter.  
+                        The stereo threshold has an 5 dBuV hysteresis [dBuV]." 
+	::= { sfdSetFilter 2 }
+
+--****************************************************************************
+-- sfdSetMpx sub-tree
+--**************************************************************************** 
+sfdSetMpxGain OBJECT-TYPE
+	SYNTAX		Integer32 (-60..110)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Gain of MPX-signal at the BNC-connectors (MPX-out) [1/10 dB].
+				In SFD versions older then V041 the range is 0..110, newer versions supports range -60..50"
+	::= { sfdSetMpx 1 }
+
+sfdSetMpxPreEmphase OBJECT-TYPE
+	SYNTAX		MpxPreEmphaseModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Pre-emphase filter for the External MPX-input.
+				This functionality can be switched ON when there is a straight (not pre-emphased) mono-audio-signal on the External MPX-input.
+                        1 = off
+                        2 = on
+			The external MPX-input can be selected with sfdSetMpxSource."
+	::= { sfdSetMpx 2 }
+
+sfdSetMpxSource OBJECT-TYPE
+	SYNTAX		MpxSourceModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"The MPX-source used for stereo de-modulation.
+				1 = internal
+				2 = external (auto)
+				3 = external (15kHz)
+				4 = external (100kHz)"
+	::= { sfdSetMpx 3 }
+
+sfdSetMpxRdsMode OBJECT-TYPE
+	SYNTAX		MpxRdsModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Selects the type of RDS (Radio Data System) decoding.
+				1 = RDS (European standard)
+				2 = RBDS (USA standard)"
+	::= { sfdSetMpx 4 }
+
+sfdSetMpxResetMaxDeviation OBJECT-TYPE
+	SYNTAX		Integer32 (0..1)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"This OID will trigger a max deviation value reset.
+				0 = do nothing
+				1 = reset sfdMsrMpxMaxDeviation value"
+	::= { sfdSetMpx 5 }
+
+--****************************************************************************
+-- sfdSetAudio sub-tree
+--**************************************************************************** 
+sfdSetAudioAnalogXlrGain OBJECT-TYPE
+	SYNTAX		Integer32 (-960..150)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Audio output gain at the XLR-connectors [1/10 dB, step size 5].
+				In SFD versions older then V041 the range is -900..150, newer versions supports range -960..90"
+	::= { sfdSetAudio 1 }
+
+sfdSetAudioTesttone OBJECT-TYPE
+	SYNTAX		AudioTesttoneModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Testtone of 500 Hz triangle waveform.
+				1 = off
+				2 = on"
+	::= { sfdSetAudio 2 }
+
+sfdSetAudioDeEmphase OBJECT-TYPE
+	SYNTAX		AudioDeEmphaseModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"De-emphase applied to the audio signal.
+                        1 = 0uS (off)
+                        2 = 50uS
+                        3 = 75uS"
+	::= { sfdSetAudio 3 }
+
+--****************************************************************************
+-- sfdSetName sub-tree
+--**************************************************************************** 
+sfdSetNameUnit OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..8))
+	MAX-ACCESS		read-write
+	STATUS		obsolete
+	DESCRIPTION		"Sets the unitname.
+                        This name will be displayed when there is no RDS(PS) name available."
+	::= { sfdSetName 1 }
+
+
+--****************************************************************************
+-- sfdSetAlarmRfIn sub-tree
+--****************************************************************************
+--****************************************************************************
+-- sfdSetAlarmRfInLow sub-tree
+--**************************************************************************** 
+sfdSetAlarmRfInLowMode OBJECT-TYPE
+	SYNTAX		AlarmModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Alarm RF-input low mode selector.
+				1 = off
+				2 = WarningOnly
+				3 = warningPlusRelayA
+				4 = warningPlusRelayB
+				5 = warningPlusRelayC"
+	::= { sfdSetAlarmRfInLow 1 }
+
+sfdSetAlarmRfInLowLevel OBJECT-TYPE
+	SYNTAX		Integer32 (1..120)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"RF-input low level [dBuV].
+				monitoring of RF-input level, this alarm will be activated if the
+				RF-input level comes below the alarm RF-input level during entered delay-time."
+	::= { sfdSetAlarmRfInLow 2 }
+
+sfdSetAlarmRfInLowWarningDelay OBJECT-TYPE
+	SYNTAX		Integer32 (0..599)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Warning delay [s], must be smaller as the corresponding alarm delay."
+	::= { sfdSetAlarmRfInLow 3 }
+
+sfdSetAlarmRfInLowAlarmDelay OBJECT-TYPE
+	SYNTAX		Integer32 (1..600)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Alarm delay [s], must be bigger as the corresponding warning delay."
+	::= { sfdSetAlarmRfInLow 4 }
+
+--****************************************************************************
+-- sfdSetAlarmRfInHigh sub-tree
+--****************************************************************************
+sfdSetAlarmRfInHighMode OBJECT-TYPE
+	SYNTAX		AlarmModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Alarm RF-input high mode selector.
+				1 = off
+				2 = WarningOnly
+				3 = warningPlusRelayA
+				4 = warningPlusRelayB
+				5 = warningPlusRelayC"
+	::= { sfdSetAlarmRfInHigh 1 }
+
+sfdSetAlarmRfInHighLevel OBJECT-TYPE
+	SYNTAX		Integer32 (1..120)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"RF-input high level [dBuV].
+				monitoring of RF-input level, this alarm will be activated if the
+				RF-input level comes above the alarm RF-input level during entered delay-time."
+	::= { sfdSetAlarmRfInHigh 2 }
+
+sfdSetAlarmRfInHighWarningDelay OBJECT-TYPE
+	SYNTAX		Integer32 (0..599)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Warning delay [s], must be smaller as the corresponding alarm delay."
+	::= { sfdSetAlarmRfInHigh 3 }
+
+sfdSetAlarmRfInHighAlarmDelay OBJECT-TYPE
+	SYNTAX		Integer32 (1..600)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Alarm delay [s], must be bigger as the corresponding warning delay."
+	::= { sfdSetAlarmRfInHigh 4 }
+
+
+--****************************************************************************
+-- sfdSetAlarmPilot sub-tree
+--****************************************************************************
+--****************************************************************************
+-- sfdSetAlarmPilotLevel sub-tree
+--****************************************************************************
+sfdSetAlarmPilotMode OBJECT-TYPE
+	SYNTAX		AlarmModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Alarm pilot mode selector.
+				1 = off
+				2 = WarningOnly
+				3 = warningPlusRelayA
+				4 = warningPlusRelayB
+				5 = warningPlusRelayC"
+	::= { sfdSetAlarmPilot 1 }
+
+sfdSetAlarmPilotLevelKhz OBJECT-TYPE
+	SYNTAX		Integer32 (1..150)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Pilot low level [1/10 kHz].
+				monitoring of pilot level, this alarm will be activated if the
+				pilot level comes below the alarm pilot level during entered delay-time.
+				This OID is not available when using with option 'TR5/3.5', in this case
+				use sfdSetAlarmPilotLevelDbu."
+	::= { sfdSetAlarmPilot 2 }
+
+sfdSetAlarmPilotWarningDelay OBJECT-TYPE
+	SYNTAX		Integer32 (0..599)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Warning delay [s], must be smaller as the corresponding alarm delay."
+	::= { sfdSetAlarmPilot 3 }
+
+sfdSetAlarmPilotAlarmDelay OBJECT-TYPE
+	SYNTAX		Integer32 (1..600)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Alarm delay [s], must be bigger as the corresponding warning delay."
+	::= { sfdSetAlarmPilot 4 }
+
+sfdSetAlarmPilotLevelDbu OBJECT-TYPE
+	SYNTAX		Integer32 (-600..-25)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Pilot low level [1/10 dBu].
+				monitoring of pilot level, this alarm will be activated if the
+				pilot level comes below the alarm pilot level during entered delay-time.
+				This OID is only available when option 'TR5/3.5' is installed, otherwise
+				use sfdSetAlarmPilotLevelKhz."
+	::= { sfdSetAlarmPilot 5 }
+
+
+--****************************************************************************
+-- sfdSetAlarmRds sub-tree
+--**************************************************************************** 
+--****************************************************************************
+-- sfdSetAlarmRdsLevel sub-tree
+--****************************************************************************
+sfdSetAlarmRdsLevelMode OBJECT-TYPE
+	SYNTAX		AlarmModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Alarm RDS mode selector.
+				1 = off
+				2 = WarningOnly
+				3 = warningPlusRelayA
+				4 = warningPlusRelayB
+				5 = warningPlusRelayC"
+	::= { sfdSetAlarmRdsLevel 1 }
+
+sfdSetAlarmRdsLevelLevelKhz OBJECT-TYPE
+	SYNTAX		Integer32 (1..60)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"RDS deviation low level [1/10 kHz].
+				monitoring of RDS deviation level, this alarm will be activated if the
+				RDS deviation level comes below the alarm RDS deviation level during 
+				entered delay-time.
+				This OID is not available when using with option 'TR5/3.5', in this case
+				use sfdSetAlarmRdsLevelLevelDbu."
+	::= { sfdSetAlarmRdsLevel 2 }
+
+sfdSetAlarmRdsLevelWarningDelay OBJECT-TYPE
+	SYNTAX		Integer32 (0..599)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Warning delay [s], must be smaller as the corresponding alarm delay."
+	::= { sfdSetAlarmRdsLevel 3 }
+
+sfdSetAlarmRdsLevelAlarmDelay OBJECT-TYPE
+	SYNTAX		Integer32 (1..600)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Alarm delay [s], must be bigger as the corresponding warning delay."
+	::= { sfdSetAlarmRdsLevel 4 }
+
+sfdSetAlarmRdsLevelLevelDbu OBJECT-TYPE
+	SYNTAX		Integer32 (-600..-105)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"RDS deviation low level [1/10 dBu].
+				monitoring of RDS deviation level, this alarm will be activated if the
+				RDS deviation level comes below the alarm RDS deviation level during 
+				entered delay-time.
+				This OID is not available when using with option 'TR5/3.5', in this case
+				use sfdSetAlarmRdsLevelLevelKhz."
+	::= { sfdSetAlarmRdsLevel 5 }
+
+--****************************************************************************
+-- sfdSetAlarmRdsBer sub-tree
+--****************************************************************************
+sfdSetAlarmRdsBerMode OBJECT-TYPE
+	SYNTAX		AlarmModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Alarm RDS bit error rate mode selector.
+				1 = off
+				2 = WarningOnly
+				3 = warningPlusRelayA
+				4 = warningPlusRelayB
+				5 = warningPlusRelayC"
+	::= { sfdSetAlarmRdsBer 1 }
+
+sfdSetAlarmRdsBerLevel OBJECT-TYPE
+	SYNTAX		Integer32 (0..99)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"BER RDS-data [%].
+				monitoring of RDS data Bit Error Rate, this alarm will be activated if the
+				RDS BER comes below the alarm BER RDS-data during entered delay-time."
+	::= { sfdSetAlarmRdsBer 2 }
+
+sfdSetAlarmRdsBerWarningDelay OBJECT-TYPE
+	SYNTAX		Integer32 (0..599)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Warning delay [s], must be smaller as the corresponding alarm delay."
+	::= { sfdSetAlarmRdsBer 3 }
+
+sfdSetAlarmRdsBerAlarmDelay OBJECT-TYPE
+	SYNTAX		Integer32 (1..600)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Alarm delay [s], must be bigger as the corresponding warning delay."
+	::= { sfdSetAlarmRdsBer 4 }
+
+--****************************************************************************
+-- sfdSetAlarmRdsPi sub-tree
+--****************************************************************************
+sfdSetAlarmRdsPiMode OBJECT-TYPE
+	SYNTAX		AlarmModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Alarm RDS PI mode selector.
+				1 = off
+				2 = WarningOnly
+				3 = warningPlusRelayA
+				4 = warningPlusRelayB
+				5 = warningPlusRelayC"
+	::= { sfdSetAlarmRdsPi 1 }
+
+sfdSetAlarmRdsPiPi OBJECT-TYPE
+	SYNTAX		Integer32 (0..65535)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"PI Code monitored by the RDS PI Alarm.
+				This alarm will be activated if sfdSetAlarmRdsPiPi differs from the recieved PI Code, or no PI code is received at all."
+	::= { sfdSetAlarmRdsPi 2 }
+
+sfdSetAlarmRdsPiWarningDelay OBJECT-TYPE
+	SYNTAX		Integer32 (0..599)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Warning delay [s], must be smaller as the corresponding alarm delay."
+	::= { sfdSetAlarmRdsPi 3 }
+
+sfdSetAlarmRdsPiAlarmDelay OBJECT-TYPE
+	SYNTAX		Integer32 (1..600)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Alarm delay [s], must be bigger as the corresponding warning delay."
+	::= { sfdSetAlarmRdsPi 4 }
+
+--****************************************************************************
+-- sfdSetAlarmMpx sub-tree
+--**************************************************************************** 
+--****************************************************************************
+-- sfdSetAlarmMpxDeviation sub-tree
+--**************************************************************************** 
+sfdSetAlarmMpxDeviationMode OBJECT-TYPE
+	SYNTAX		AlarmModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Alarm MPX deviation mode selector.
+				1 = off
+				2 = WarningOnly
+				3 = warningPlusRelayA
+				4 = warningPlusRelayB
+				5 = warningPlusRelayC"
+	::= { sfdSetAlarmMpxDeviation 1 }
+
+sfdSetAlarmMpxDeviationLevel OBJECT-TYPE
+	SYNTAX		Integer32 (0..159)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"MPX-deviation [kHz].
+				monitoring of MPX deviation, this alarm will be activated if the
+				MPX deviation comes above the alarm MPX deviation during entered delay-time."
+	::= { sfdSetAlarmMpxDeviation 2 }
+
+sfdSetAlarmMpxDeviationOffDelay OBJECT-TYPE
+	SYNTAX		Integer32 (10..600)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Alarm delay [s]."
+	::= { sfdSetAlarmMpxDeviation 3 }
+
+
+--****************************************************************************
+-- sfdSetAlarmAudio sub-tree
+--****************************************************************************
+--****************************************************************************
+-- sfdSetAlarmAudioLevelLeft sub-tree
+--**************************************************************************** 
+sfdSetAlarmAudioLeftMode OBJECT-TYPE
+	SYNTAX		AlarmModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Alarm audio level left mode selector.
+				1 = off
+				2 = WarningOnly
+				3 = warningPlusRelayA
+				4 = warningPlusRelayB
+				5 = warningPlusRelayC"
+	::= { sfdSetAlarmAudioLeft 1 }
+
+sfdSetAlarmAudioLeftLevel OBJECT-TYPE
+	SYNTAX		Integer32 (-50..6)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Level Left [dBu].
+				monitoring of Left audio-channel only, this alarm will be activated if Left 
+                        audio channel is below the alarm-level during entered delay-time.
+				In SFD versions older then V041 the range is -50dB(=0.14 kHz)..0 dB(=40.0 kHz), 
+				newer versions supports range -44dB(=0.14 kHz)..6 dB(=40.0 kHz)"
+	::= { sfdSetAlarmAudioLeft 2 }
+
+sfdSetAlarmAudioLeftWarningDelay OBJECT-TYPE
+	SYNTAX		Integer32 (0..599)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Warning delay [s], must be smaller as the corresponding alarm delay."
+	::= { sfdSetAlarmAudioLeft 3 }
+
+sfdSetAlarmAudioLeftAlarmDelay OBJECT-TYPE
+	SYNTAX		Integer32 (1..600)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Alarm delay [s], must be bigger as the corresponding warning delay."
+	::= { sfdSetAlarmAudioLeft 4 }
+
+--****************************************************************************
+-- sfdSetAlarmAudioLevelRight sub-tree
+--****************************************************************************
+sfdSetAlarmAudioRightMode OBJECT-TYPE
+	SYNTAX		AlarmModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Alarm audio level right mode selector.
+				1 = off
+				2 = WarningOnly
+				3 = warningPlusRelayA
+				4 = warningPlusRelayB
+				5 = warningPlusRelayC"
+	::= { sfdSetAlarmAudioRight 1 }
+
+sfdSetAlarmAudioRightLevel OBJECT-TYPE
+	SYNTAX		Integer32 (-50..6)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Level Right [dBu]
+				monitoring of Right audio-channel only, this alarm will be activated if Right
+                        audio channel is below the alarm-level during entered delay-time.
+				In SFD versions older then V041 the range is -50dB(=0.14 kHz)..0 dB(=40.0 kHz), 
+				newer versions supports range -44dB(=0.14 kHz)..6 dB(=40.0 kHz)"
+	::= { sfdSetAlarmAudioRight 2 }
+
+sfdSetAlarmAudioRightWarningDelay OBJECT-TYPE
+	SYNTAX		Integer32 (0..599)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Warning delay [s], must be smaller as the corresponding alarm delay."
+	::= { sfdSetAlarmAudioRight 3 }
+
+sfdSetAlarmAudioRightAlarmDelay OBJECT-TYPE
+	SYNTAX		Integer32 (1..600)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Alarm delay [s], must be bigger as the corresponding warning delay."
+	::= { sfdSetAlarmAudioRight 4 }
+
+--****************************************************************************
+-- sfdSetAlarmAudioLevelBoth sub-tree
+--****************************************************************************
+sfdSetAlarmAudioBothMode OBJECT-TYPE
+	SYNTAX		AlarmModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Alarm audio level both mode selector.
+				1 = off
+				2 = WarningOnly
+				3 = warningPlusRelayA
+				4 = warningPlusRelayB
+				5 = warningPlusRelayC"
+	::= { sfdSetAlarmAudioBoth 1 }
+
+sfdSetAlarmAudioBothLevel OBJECT-TYPE
+	SYNTAX		Integer32 (-50..6)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Level Both [dBu].
+				monitoring of Left and Right audio-channel, this alarm will be activated if both Left 
+                        and Right are below the alarm-level during entered delay-time.
+				In SFD versions older then V041 the range is -50dB(=0.14 kHz)..0 dB(=40.0 kHz), 
+				newer versions supports range -44dB(=0.14 kHz)..6 dB(=40.0 kHz)"
+	::= { sfdSetAlarmAudioBoth 2 }
+
+sfdSetAlarmAudioBothWarningDelay OBJECT-TYPE
+	SYNTAX		Integer32 (0..599)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Warning delay [s], must be smaller as the corresponding alarm delay."
+	::= { sfdSetAlarmAudioBoth 3 }
+
+sfdSetAlarmAudioBothAlarmDelay OBJECT-TYPE
+	SYNTAX		Integer32 (1..600)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Alarm delay [s], must be bigger as the corresponding warning delay."
+	::= { sfdSetAlarmAudioBoth 4 }
+
+--****************************************************************************
+-- sfdSetControlIO sub-tree
+--****************************************************************************
+--****************************************************************************
+-- sfdSetControlIOInput sub-tree
+--**************************************************************************** 
+sfdSetControlIOInput0 OBJECT-TYPE
+	SYNTAX		InputModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Input 0 mode selector.
+				1 = Not Used (no function assigned)
+                        2 = Input A/B (input will switch to the other RF-input)
+                        3 = Frequency + 10 kHz (RF-input frequency will be increased with 10 kHz)
+                        4 = Frequency + 100 kHz	(RF-input frequency will be increased with 100 kHz)
+                        5 = Frequency - 10 kHz (RF-input frequency will be decreased with 10 kHz)
+                        6 = Frequency - 100 kHz	(RF-input frequency will be decreased with 100 kHz)
+                        7 = Preset next (next preset will become active)
+                        8 = Preset previous (previous preset will become active)
+                        9..72 = Preset x (x=1 to 64) (The SFD will switch to Preset x (which becomes active))"
+	::= { sfdSetControlIOInput 1 }
+
+sfdSetControlIOInput1 OBJECT-TYPE
+	SYNTAX		InputModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Input 1 mode selector.
+				1 = Not Used (no function assigned)
+                        2 = Input A/B (input will switch to the other RF-input)
+                        3 = Frequency + 10 kHz (RF-input frequency will be increased with 10 kHz)
+                        4 = Frequency + 100 kHz	(RF-input frequency will be increased with 100 kHz)
+                        5 = Frequency - 10 kHz (RF-input frequency will be decreased with 10 kHz)
+                        6 = Frequency - 100 kHz	(RF-input frequency will be decreased with 100 kHz)
+                        7 = Preset next (next preset will become active)
+                        8 = Preset previous (previous preset will become active)
+                        9..72 = Preset x (x=1 to 64) (The SFD will switch to Preset x (which becomes active))"
+	::= { sfdSetControlIOInput 2 }
+
+sfdSetControlIOInput2 OBJECT-TYPE
+	SYNTAX		InputModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Input 2 mode selector.
+				1 = Not Used (no function assigned)
+                        2 = Input A/B (input will switch to the other RF-input)
+                        3 = Frequency + 10 kHz (RF-input frequency will be increased with 10 kHz)
+                        4 = Frequency + 100 kHz	(RF-input frequency will be increased with 100 kHz)
+                        5 = Frequency - 10 kHz (RF-input frequency will be decreased with 10 kHz)
+                        6 = Frequency - 100 kHz	(RF-input frequency will be decreased with 100 kHz)
+                        7 = Preset next (next preset will become active)
+                        8 = Preset previous (previous preset will become active)
+                        9..72 = Preset x (x=1 to 64) (The SFD will switch to Preset x (which becomes active))"
+	::= { sfdSetControlIOInput 3 }
+
+sfdSetControlIOInput3 OBJECT-TYPE
+	SYNTAX		InputModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Input 3 mode selector.
+				1 = Not Used (no function assigned)
+                        2 = Input A/B (input will switch to the other RF-input)
+                        3 = Frequency + 10 kHz (RF-input frequency will be increased with 10 kHz)
+                        4 = Frequency + 100 kHz	(RF-input frequency will be increased with 100 kHz)
+                        5 = Frequency - 10 kHz (RF-input frequency will be decreased with 10 kHz)
+                        6 = Frequency - 100 kHz	(RF-input frequency will be decreased with 100 kHz)
+                        7 = Preset next (next preset will become active)
+                        8 = Preset previous (previous preset will become active)
+                        9..72 = Preset x (x=1 to 64) (The SFD will switch to Preset x (which becomes active))"
+	::= { sfdSetControlIOInput 4 }
+
+
+--****************************************************************************
+-- sfdSetControlIOOutput sub-tree
+--**************************************************************************** 
+sfdSetControlIOOutput0 OBJECT-TYPE
+	SYNTAX		OutputModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Output 0 mode selector.
+                        1 = Not Used (no function assigned)
+				2 = RDS TA (when RDS TA-bit is set the output will be TRUE)
+                        3 = RDS TP (when RDS TP-bit is set the output will be TRUE)
+                        4 = RDS TA & TP (when RDS TA and the TP-bit are set the output will be TRUE)
+                        5 = RDS MS (when RDS M/S-bit is set to Mono the output will be TRUE, when Stereo the output will be CLEARED)
+                        6 = RDS PTY NEWS (when RDS PTY is set to NEWS set the output will be TRUE)
+                        7 = RDS PTY ALARM (when RDS PTY is set to ALARM set the output will be TRUE)
+                        8 = MPX MONO/STEREO (when received signal is Mono the output will be TRUE, when Stereo the output will be CLEARED)"
+	::= { sfdSetControlIOOutput 1 }
+
+sfdSetControlIOOutput1 OBJECT-TYPE
+	SYNTAX		OutputModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Output 1 mode selector.
+                        1 = Not Used (no function assigned)
+				2 = RDS TA (when RDS TA-bit is set the output will be TRUE)
+                        3 = RDS TP (when RDS TP-bit is set the output will be TRUE)
+                        4 = RDS TA & TP (when RDS TA and the TP-bit are set the output will be TRUE)
+                        5 = RDS MS (when RDS M/S-bit is set to Mono the output will be TRUE, when Stereo the output will be CLEARED)
+                        6 = RDS PTY NEWS (when RDS PTY is set to NEWS set the output will be TRUE)
+                        7 = RDS PTY ALARM (when RDS PTY is set to ALARM set the output will be TRUE)
+                        8 = MPX MONO/STEREO (when received signal is Mono the output will be TRUE, when Stereo the output will be CLEARED)"
+	::= { sfdSetControlIOOutput 2 }
+
+sfdSetControlIOOutput2 OBJECT-TYPE
+	SYNTAX		OutputModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Output 2 mode selector.
+                        1 = Not Used (no function assigned)
+				2 = RDS TA (when RDS TA-bit is set the output will be TRUE)
+                        3 = RDS TP (when RDS TP-bit is set the output will be TRUE)
+                        4 = RDS TA & TP (when RDS TA and the TP-bit are set the output will be TRUE)
+                        5 = RDS MS (when RDS M/S-bit is set to Mono the output will be TRUE, when Stereo the output will be CLEARED)
+                        6 = RDS PTY NEWS (when RDS PTY is set to NEWS set the output will be TRUE)
+                        7 = RDS PTY ALARM (when RDS PTY is set to ALARM set the output will be TRUE)
+                        8 = MPX MONO/STEREO (when received signal is Mono the output will be TRUE, when Stereo the output will be CLEARED)"
+	::= { sfdSetControlIOOutput 3 }
+
+sfdSetControlIOOutput3 OBJECT-TYPE
+	SYNTAX		OutputModes
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Output 3 mode selector.
+                        1 = Not Used (no function assigned)
+				2 = RDS TA (when RDS TA-bit is set the output will be TRUE)
+                        3 = RDS TP (when RDS TP-bit is set the output will be TRUE)
+                        4 = RDS TA & TP (when RDS TA and the TP-bit are set the output will be TRUE)
+                        5 = RDS MS (when RDS M/S-bit is set to Mono the output will be TRUE, when Stereo the output will be CLEARED)
+                        6 = RDS PTY NEWS (when RDS PTY is set to NEWS set the output will be TRUE)
+                        7 = RDS PTY ALARM (when RDS PTY is set to ALARM set the output will be TRUE)
+                        8 = MPX MONO/STEREO (when received signal is Mono the output will be TRUE, when Stereo the output will be CLEARED)"
+	::= { sfdSetControlIOOutput 4 }
+
+
+--****************************************************************************
+-- sfdSetNotification sub-tree
+--****************************************************************************
+--****************************************************************************
+-- sfdSetNotificationMode sub-tree
+--****************************************************************************
+sfdSetNotificationModeAll OBJECT-TYPE
+	SYNTAX		NotificationOffOn 
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Select if device notifications will be sent. 
+				This includes coldStart, warmStart and authenticationFailure notifications.
+				1 = off (disable all notifications)
+				2 = on (send notifications)"
+	::= { sfdSetNotificationMode 1}
+
+sfdSetNotificationModeHeartbeat OBJECT-TYPE
+	SYNTAX		NotificationOffOn
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Select if heartbeat notification will be sent
+				1 = off (disable heartbeat notification)
+				2 = on (enable heartbeat notification)"
+	::= { sfdSetNotificationMode 2}
+
+sfdSetNotificationModeSettingChanged OBJECT-TYPE
+	SYNTAX		NotificationOffOn
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Select if last setting changed notification will be sent.
+				1 = off (disable last changed setting notification)
+				2 = on (enable last changed setting notification)"
+	::= { sfdSetNotificationMode 3}
+
+sfdSetNotificationModeControlMode OBJECT-TYPE
+	SYNTAX		NotificationOffOn
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Select if control mode notification will be sent.
+				1 = off (disable control mode notification)
+				2 = on (enable control mode notification)"
+	::= { sfdSetNotificationMode 4}
+
+sfdSetNotificationModeControlModeLocalSuppress OBJECT-TYPE
+	SYNTAX		NotificationOffOn
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Select of notifications will be suppressed during device local mode.
+				1 = off (don't suppress notifications when when sfdMsrControlMode is local)
+				2 = on (supress notifications when when sfdMsrControlMode is local)"
+	::= { sfdSetNotificationMode 5}
+
+--****************************************************************************
+-- sfdSetNotificationModeAlarm sub-tree
+--****************************************************************************
+sfdSetNotificationModeAlarmRfInLevelLow OBJECT-TYPE
+	SYNTAX		NotificationModes 
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Select which status-change of sfdMsrAlarmRfInLevelLow sends a notification.
+				1 = off (no notification will be sent when value changes)
+				2 = warning (notification only send when value changes from idle to warning state or problem solves)
+				3 = warningAndAlarm (notification send when value changes from idle to warning or alarm state, or from warning to alarm state, or problem solves)
+				4 = alarm (notification only send when value changes from idle to alarm state, or from warning to alarm state, or problem solves)"
+	::= { sfdSetNotificationModeAlarm 1}
+
+sfdSetNotificationModeAlarmRfInLevelHigh OBJECT-TYPE
+	SYNTAX		NotificationModes 
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Select which status-change of sfdMsrAlarmRfInLevelHigh sends a notification.
+				1 = off (no notification will be sent when value changes)
+				2 = warning (notification only send when value changes from idle to warning state or problem solves)
+				3 = warningAndAlarm (notification send when value changes from idle to warning or alarm state, or from warning to alarm state, or problem solves)
+				4 = alarm (notification only send when value changes from idle to alarm state, or from warning to alarm state, or problem solves)"
+	::= { sfdSetNotificationModeAlarm 2}
+
+sfdSetNotificationModeAlarmPilotLevel OBJECT-TYPE
+	SYNTAX		NotificationModes 
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Select which status-change of sfdMsrAlarmAlarmPilotLevel sends a notification.
+				1 = off (no notification will be sent when value changes)
+				2 = warning (notification only send when value changes from idle to warning state or problem solves)
+				3 = warningAndAlarm (notification send when value changes from idle to warning or alarm state, or from warning to alarm state, or problem solves)
+				4 = alarm (notification only send when value changes from idle to alarm state, or from warning to alarm state, or problem solves)"
+	::= { sfdSetNotificationModeAlarm 3}
+
+sfdSetNotificationModeAlarmMpxDeviation OBJECT-TYPE
+	SYNTAX		NotificationModes 
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Select which status-change of sfdMsrAlarmMpxDeviation sends a notification.
+				1 = off (no notification will be sent when value changes)
+				2 = warning (notification only send when value changes from idle to warning state or problem solves)
+				3 = warningAndAlarm (notification send when value changes from idle to warning or alarm state, or from warning to alarm state, or problem solves)
+				4 = alarm (notification only send when value changes from idle to alarm state, or from warning to alarm state, or problem solves)"
+	::= { sfdSetNotificationModeAlarm 4}
+
+sfdSetNotificationModeAlarmRdsBer OBJECT-TYPE
+	SYNTAX		NotificationModes 
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Select which status-change of sfdMsrAlarmRdsBer sends a notification.
+				1 = off (no notification will be sent when value changes)
+				2 = warning (notification only send when value changes from idle to warning state or problem solves)
+				3 = warningAndAlarm (notification send when value changes from idle to warning or alarm state, or from warning to alarm state, or problem solves)
+				4 = alarm (notification only send when value changes from idle to alarm state, or from warning to alarm state, or problem solves)"
+	::= { sfdSetNotificationModeAlarm 5}
+
+sfdSetNotificationModeAlarmRdsLevel OBJECT-TYPE
+	SYNTAX		NotificationModes 
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Select which status-change of sfdMsrAlarmRdsLevel sends a notification.
+				1 = off (no notification will be sent when value changes)
+				2 = warning (notification only send when value changes from idle to warning state or problem solves)
+				3 = warningAndAlarm (notification send when value changes from idle to warning or alarm state, or from warning to alarm state, or problem solves)
+				4 = alarm (notification only send when value changes from idle to alarm state, or from warning to alarm state, or problem solves)"
+	::= { sfdSetNotificationModeAlarm 6}
+
+sfdSetNotificationModeAlarmAudioLevelLeft OBJECT-TYPE
+	SYNTAX		NotificationModes 
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Select which status-change of sfdMsrAlarmAudioLevelLeft sends a notification.
+				1 = off (no notification will be sent when value changes)
+				2 = warning (notification only send when value changes from idle to warning state or problem solves)
+				3 = warningAndAlarm (notification send when value changes from idle to warning or alarm state, or from warning to alarm state, or problem solves)
+				4 = alarm (notification only send when value changes from idle to alarm state, or from warning to alarm state, or problem solves)"
+	::= { sfdSetNotificationModeAlarm 7}
+
+sfdSetNotificationModeAlarmAudioLevelRight OBJECT-TYPE
+	SYNTAX		NotificationModes 
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Select which status-change of sfdMsrAlarmAudioLevelRight sends a notification.
+				1 = off (no notification will be sent when value changes)
+				2 = warning (notification only send when value changes from idle to warning state or problem solves)
+				3 = warningAndAlarm (notification send when value changes from idle to warning or alarm state, or from warning to alarm state, or problem solves)
+				4 = alarm (notification only send when value changes from idle to alarm state, or from warning to alarm state, or problem solves)"
+	::= { sfdSetNotificationModeAlarm 8}
+
+sfdSetNotificationModeAlarmAudioLevelBoth OBJECT-TYPE
+	SYNTAX		NotificationModes 
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Select which status-change of sfdMsrAlarmAudioLevelBoth sends a notification.
+				1 = off (no notification will be sent when value changes)
+				2 = warning (notification only send when value changes from idle to warning state or problem solves)
+				3 = warningAndAlarm (notification send when value changes from idle to warning or alarm state, or from warning to alarm state, or problem solves)
+				4 = alarm (notification only send when value changes from idle to alarm state, or from warning to alarm state, or problem solves)"
+	::= { sfdSetNotificationModeAlarm 9}
+
+sfdSetNotificationModeAlarmRdsPi OBJECT-TYPE
+	SYNTAX		NotificationModes 
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Select which status-change of sfdMsrAlarmRdsPi sends a notification.
+				1 = off (no notification will be sent when value changes)
+				2 = warning (notification only send when value changes from idle to warning state or problem solves)
+				3 = warningAndAlarm (notification send when value changes from idle to warning or alarm state, or from warning to alarm state, or problem solves)
+				4 = alarm (notification only send when value changes from idle to alarm state, or from warning to alarm state, or problem solves)"
+	::= { sfdSetNotificationModeAlarm 10}
+
+--****************************************************************************
+-- sfdSetNotificationPriority sub-tree
+--****************************************************************************
+sfdSetNotificationPriorityHeartbeat OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Priority level which is coupled into the bindings of the notification"
+	::= { sfdSetNotificationPriority 1}
+
+sfdSetNotificationPrioritySettingChanged OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Priority level which is coupled into the bindings of the notification"
+	::= { sfdSetNotificationPriority 2}
+
+sfdSetNotificationPriorityControlMode OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Priority level which is coupled into the bindings of the notification"
+	::= { sfdSetNotificationPriority 3}
+
+sfdSetNotificationPriorityAlarmRfInLevelLow OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Priority level which is coupled into the bindings of the notification"
+	::= { sfdSetNotificationPriority 401}
+
+sfdSetNotificationPriorityAlarmRfInLevelHigh OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Priority level which is coupled into the bindings of the notification"
+	::= { sfdSetNotificationPriority 402}
+
+sfdSetNotificationPriorityAlarmPilotLevel OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Priority level which is coupled into the bindings of the notification"
+	::= { sfdSetNotificationPriority 403}
+
+sfdSetNotificationPriorityAlarmMpxDeviation OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Priority level which is coupled into the bindings of the notification"
+	::= { sfdSetNotificationPriority 404}
+
+sfdSetNotificationPriorityAlarmRdsBer OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Priority level which is coupled into the bindings of the notification"
+	::= { sfdSetNotificationPriority 405}
+
+sfdSetNotificationPriorityAlarmRdsLevel OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Priority level which is coupled into the bindings of the notification"
+	::= { sfdSetNotificationPriority 406}
+
+sfdSetNotificationPriorityAlarmAudioLevelLeft OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Priority level which is coupled into the bindings of the notification"
+	::= { sfdSetNotificationPriority 407}
+
+sfdSetNotificationPriorityAlarmAudioLevelRight OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Priority level which is coupled into the bindings of the notification"
+	::= { sfdSetNotificationPriority 408}
+
+sfdSetNotificationPriorityAlarmAudioLevelBoth OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Priority level which is coupled into the bindings of the notification"
+	::= { sfdSetNotificationPriority 409}
+
+sfdSetNotificationPriorityAlarmRdsPi OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Priority level which is coupled into the bindings of the notification"
+	::= { sfdSetNotificationPriority 410}
+
+sfdSetNotificationPriorityStatusRfInFrequency OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Priority level which is coupled into the bindings of the notification"
+	::= { sfdSetNotificationPriority 451}
+
+sfdSetNotificationPriorityStatusRfInInput OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Priority level which is coupled into the bindings of the notification"
+	::= { sfdSetNotificationPriority 452}
+
+sfdSetNotificationPriorityStatusRfInMuted OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Priority level which is coupled into the bindings of the notification"
+	::= { sfdSetNotificationPriority 453}
+
+sfdSetNotificationPriorityStatusRfInFilter OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Priority level which is coupled into the bindings of the notification"
+	::= { sfdSetNotificationPriority 454}
+
+sfdSetNotificationPriorityStatusMpxSource OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Priority level which is coupled into the bindings of the notification"
+	::= { sfdSetNotificationPriority 455}
+
+sfdSetNotificationPriorityStatusAudioTestTone OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Priority level which is coupled into the bindings of the notification"
+	::= { sfdSetNotificationPriority 456}
+
+sfdSetNotificationPriorityStatusAudioDeEmphase OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Priority level which is coupled into the bindings of the notification"
+	::= { sfdSetNotificationPriority 457}
+
+--****************************************************************************
+-- sfdSetNotificationModeStatus sub-tree
+--****************************************************************************
+sfdSetNotificationModeStatusRfInFrequency OBJECT-TYPE
+	SYNTAX		NotificationOffOn
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Select if status changed notification of sfdSetRfInFrequency will be sent.
+				1 = off (disable status changed notification)
+				2 = on (enable status changed notification)"
+	::= { sfdSetNotificationModeStatus 1}
+
+sfdSetNotificationModeStatusRfInInput OBJECT-TYPE
+	SYNTAX		NotificationOffOn
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Select if status changed notification of sfdSetRfInInput will be sent.
+				1 = off (disable status changed notification)
+				2 = on (enable status changed notification)"
+	::= { sfdSetNotificationModeStatus 2}
+
+sfdSetNotificationModeStatusRfInMuted OBJECT-TYPE
+	SYNTAX		NotificationOffOn
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Select if status changed notification of sfdMsrRfInMuted will be sent.
+				1 = off (disable status changed notification)
+				2 = on (enable status changed notification)"
+	::= { sfdSetNotificationModeStatus 3}
+
+sfdSetNotificationModeStatusRfInFilter OBJECT-TYPE
+	SYNTAX		NotificationOffOn
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Select if status changed notification of sfdMsrRfInFilter will be sent.
+				1 = off (disable status changed notification)
+				2 = on (enable status changed notification)"
+	::= { sfdSetNotificationModeStatus 4}
+
+sfdSetNotificationModeStatusMpxSource OBJECT-TYPE
+	SYNTAX		NotificationOffOn
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Select if status changed notification of sfdSetMpxSource will be sent.
+				1 = off (disable status changed notification)
+				2 = on (enable status changed notification)"
+	::= { sfdSetNotificationModeStatus 5}
+
+sfdSetNotificationModeStatusAudioTestTone OBJECT-TYPE
+	SYNTAX		NotificationOffOn
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Select if status changed notification of sfdSetAudioTestTone will be sent.
+				1 = off (disable status changed notification)
+				2 = on (enable status changed notification)"
+	::= { sfdSetNotificationModeStatus 6}
+
+sfdSetNotificationModeStatusAudioDeEmphase OBJECT-TYPE
+	SYNTAX		NotificationOffOn
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Select if status changed notification of sfdSetAudioDeEmphase will be sent.
+				1 = off (disable status changed notification)
+				2 = on (enable status changed notification)"
+	::= { sfdSetNotificationModeStatus 7}
+
+--****************************************************************************
+-- sfdSetPreset sub-tree
+--****************************************************************************
+sfdSetPresetRecall OBJECT-TYPE
+	SYNTAX		Integer32 (0..64)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Recall preset with a given preset number.
+				0 = do nothing
+				1..64 = given preset number"
+	::= { sfdSetPreset 1 }
+
+sfdSetPresetSaveAs OBJECT-TYPE
+	SYNTAX		Integer32 (0..64)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Save preset as a given preset number.
+				0 = do nothing
+				1..64 = given preset number"
+	::= { sfdSetPreset 2 }
+
+sfdSetPresetActiveDefaults OBJECT-TYPE
+	SYNTAX		Integer32 (0..1)
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Load active preset defaults.
+				0 = do nothing
+				1 = active default preset"
+	::= { sfdSetPreset 3 }
+
+sfdSetPresetActiveName OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..8))
+	MAX-ACCESS		read-write
+	STATUS		current
+	DESCRIPTION		"Sets the name of the active preset."
+	::= { sfdSetPreset 4 }
+
+--****************************************************************************
+-- sfdMeasurement sub-tree
+--****************************************************************************
+--****************************************************************************
+-- sfdMsrAlarm sub-tree
+--****************************************************************************  
+sfdMsrAlarmRfInLevelLow OBJECT-TYPE
+	SYNTAX		AlarmStatus
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"Alarm-status of the receiver frequency low level.
+				1 = noProblem (no alarm indication)
+				3 = warning (warning indication)
+				5 = alarm (alarm indication)"
+	::= { sfdMsrAlarm 1}
+
+sfdMsrAlarmRfInLevelHigh OBJECT-TYPE
+	SYNTAX		AlarmStatus
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"Alarm-status of the receiver frequency high level alarm.
+				1 = noProblem (no alarm indication)
+				3 = warning (warning indication)
+				5 = alarm (alarm indication)"
+	::= { sfdMsrAlarm 2}
+
+sfdMsrAlarmPilotLevel OBJECT-TYPE
+	SYNTAX		AlarmStatus
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"Alarm-status of the pilot level alarm.
+				1 = noProblem (no alarm indication)
+				3 = warning (warning indication)
+				5 = alarm (alarm indication)"
+	::= { sfdMsrAlarm 3}
+
+sfdMsrAlarmMpxDeviation OBJECT-TYPE
+	SYNTAX		AlarmStatus
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"Alarm-status of the MPX deviation level alarm.
+				1 = noProblem (no alarm indication)
+				3 = warning (warning indication)
+				5 = alarm (alarm indication)"
+	::= { sfdMsrAlarm 4}
+
+sfdMsrAlarmRdsBer OBJECT-TYPE
+	SYNTAX		AlarmStatus
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"Alarm-status of the RDS bit error rate alarm.
+				1 = noProblem (no alarm indication)
+				3 = warning (warning indication)
+				5 = alarm (alarm indication)"
+	::= { sfdMsrAlarm 5}
+
+sfdMsrAlarmRdsLevel OBJECT-TYPE
+	SYNTAX		AlarmStatus
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"Alarm-status of the RDS level alarm.
+				1 = noProblem (no alarm indication)
+				3 = warning (warning indication)
+				5 = alarm (alarm indication)"
+	::= { sfdMsrAlarm 6}
+
+sfdMsrAlarmAudioLevelLeft OBJECT-TYPE
+	SYNTAX		AlarmStatus
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"Alarm-status of the left audio level alarm.
+				1 = noProblem (no alarm indication)
+				3 = warning (warning indication)
+				5 = alarm (alarm indication)"
+	::= { sfdMsrAlarm 7}
+
+sfdMsrAlarmAudioLevelRight OBJECT-TYPE
+	SYNTAX		AlarmStatus
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"Alarm-status of the right audio level alarm.
+				1 = noProblem (no alarm indication)
+				3 = warning (warning indication)
+				5 = alarm (alarm indication)"
+	::= { sfdMsrAlarm 8}
+
+sfdMsrAlarmAudioLevelBoth OBJECT-TYPE
+	SYNTAX		AlarmStatus
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"Alarm-status of the both audio level alarm.
+				1 = noProblem (no alarm indication)
+				3 = warning (warning indication)
+				5 = alarm (alarm indication)"
+	::= { sfdMsrAlarm 9}
+
+sfdMsrAlarmRdsPi OBJECT-TYPE
+	SYNTAX		AlarmStatus
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"Alarm-status of the RDS PI alarm.
+				1 = noProblem (no alarm indication)
+				3 = warning (warning indication)
+				5 = alarm (alarm indication)"
+	::= { sfdMsrAlarm 10}
+
+--****************************************************************************
+-- sfdMsrNotification sub-tree
+--****************************************************************************  
+sfdMsrNotificationCounter OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"The number of Notifications sent. Is set to 0 when the LAN port boots."
+	::= { sfdMsrNotification 1}
+
+sfdMsrNotificationTimeStamp OBJECT-TYPE
+	SYNTAX		DateAndTime
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"The Timestamp of the last sent notification in DateAndTime(2d-1d-1d,1d:1d:1d.1d,1a1d:1d) format."
+	::= { sfdMsrNotification 2}
+
+sfdMsrNotificationLastSettingChanged OBJECT-TYPE
+	SYNTAX		OBJECT IDENTIFIER
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"The object identification (OID) number of the last changed setting."
+	::= { sfdMsrNotification 3}
+
+sfdMsrNotificationLastSettingChangedFrom OBJECT-TYPE
+	SYNTAX		NotificationSettingChangedFrom
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"The last changed setting was changed from this source:
+				1 = snmp (settings are change from SNMP service)
+				2 = web (settings are change from WEB service)
+				3 = local (settings are change locally on the device)"
+	::= { sfdMsrNotification 4}
+
+sfdMsrNotificationPriority OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"The priority level of the last sent notification."
+	::= { sfdMsrNotification 5}
+
+--****************************************************************************
+-- sfdMsrRfIn sub-tree
+--**************************************************************************** 
+sfdMsrRfInFilter OBJECT-TYPE
+	SYNTAX		FilterIfMpxModes
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"Mode of the configurable filter.
+				1 = mono 180/15kHz
+				2 = narrow 180/100kHz
+				3 = wide 240/100kHz
+				The behaviour can be altered with sfdSetFilterIfMpx and sfdSetFilterStereoThreshold."
+	::= { sfdMsrRfIn 1 }
+
+sfdMsrRfInSignalStrength OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"Frequency audio level strength [dbuV].
+				If the value is greater then 115 this indicates an overload situation"
+	::= { sfdMsrRfIn 2}
+
+sfdMsrRfInMuted OBJECT-TYPE
+	SYNTAX		RfInMuted
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"Indicates if the RF-input is muted.
+				1 = notMuted
+				2 = muted
+				The behaviour can be altered with sfdSetRfInMute."
+	::= { sfdMsrRfIn 3}
+
+--****************************************************************************
+-- sfdMsrMpx sub-tree
+--**************************************************************************** 
+sfdMsrMpxPilotLevelKhz OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"MPX Pilot level [1/10 kHz].
+				when value is greater than 150, this indicates an overload situation.
+				This OID is not available when using with option 'TR5/3.5', in this case
+				use sfdMsrMpxPilotLevelDbu."
+	::= { sfdMsrMpx 1 }
+
+sfdMsrMpxRdsLevelKhz OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"MPX RDS level [1/10 kHz].
+				when value is greater than 60, this indicates an overload situation.
+				This OID is not available when using with option 'TR5/3.5', in this case
+				use sfdMsrMpxRdsLevelDbu."
+	::= { sfdMsrMpx 2}
+
+sfdMsrMpxRdsBer OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"MPX RDS bit error rate [%]."
+	::= { sfdMsrMpx 3}
+
+sfdMsrMpxMaxDeviation OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"MPX maximal frequency deviation [kHz].
+				when value is greater than 160, this indicates an overload situation
+				This value can be reset by sfdSetMpxResetMaxDeviation."
+	::= { sfdMsrMpx 4}
+
+sfdMsrMpxDeviation OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"MPX frequency deviation [kHz]."
+	::= { sfdMsrMpx 5}
+
+sfdMsrMpxPilotLevelDbu OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"MPX Pilot level [1/10 dBu].
+				when value is greater than -25, this indicates an overload situation.
+				This OID is only available when option 'TR5/3.5' is installed, otherwise
+				use sfdMsrMpxPilotLevelKhz."
+	::= { sfdMsrMpx 6 }
+
+sfdMsrMpxRdsLevelDbu OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"MPX RDS level [1/10 dBu].
+				when value is greater than -105, this indicates an overload situation.
+				This OID is only available when option 'TR5/3.5' is installed, otherwise
+				use sfdMsrMpxRdsLevelKhz."
+	::= { sfdMsrMpx 7}
+
+--****************************************************************************
+-- sfdMsrAudio sub-tree
+--****************************************************************************
+sfdMsrAudioLeftLevel OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"Audio left channel level [dBFS]."
+	::= { sfdMsrAudio 1}
+
+sfdMsrAudioRightLevel OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"Audio right channel level [dBFS]."
+	::= { sfdMsrAudio 2}
+
+--****************************************************************************
+-- sfdMsrRds sub-tree
+--****************************************************************************
+sfdMsrRdsTA OBJECT-TYPE
+	SYNTAX		RdsTAModes
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"RDS Traffic Announcement.
+				1 = no
+				2 = yes"
+	::= { sfdMsrRds 1}
+
+sfdMsrRdsTP OBJECT-TYPE
+	SYNTAX		RdsTPModes
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"RDS Traffic Programme.
+				1 = off
+				2 = on"
+	::= { sfdMsrRds 2}
+
+sfdMsrRdsPI OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"RDS Programme Identification."
+	::= { sfdMsrRds 3}
+
+sfdMsrRdsDI OBJECT-TYPE
+	SYNTAX		RdsDIModes
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"RDS Decoder Identification.
+				1 = mono
+				2 = stereo"
+	::= { sfdMsrRds 4}
+
+sfdMsrRdsPS OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"RDS Programme Service name."
+	::= { sfdMsrRds 5}
+
+sfdMsrRdsMS OBJECT-TYPE
+	SYNTAX		RdsMSModes
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"RDS Music Speech.
+				1 = speech
+				2 = music"
+	::= { sfdMsrRds 6}
+
+sfdMsrRdsPTY OBJECT-TYPE
+	SYNTAX		RdsPTYModes
+	MAX-ACCESS		read-only	
+	STATUS		current
+	DESCRIPTION		"RDS Programme Type.
+				when sfdSetMpxRdsMode is set to 1 (=RDS) the range is 1..32, otherwise sfdSetMpxRdsMode is set to 2 (=RBDS) the range is 33..64.
+				1 = None
+				2 = News
+				3 = Current Affairs
+				4 = Information
+				5 = Sport
+				6 = Education
+				7 = Drama
+				8 = Cultures
+				9 = Science
+				10 = Varied Speech
+				11 = Pop Music
+				12 = Rock Music
+				13 = Easy Listening
+				14 = Light Classics
+				15 = Serious Classics
+				16 = Other Music
+				17 = Weather
+				18 = Finance
+				19 = Childers Progs
+				20 = Social Affairs
+				21 = Religion
+				22 = Phone In
+				23 = Travel Touring
+				24 = Leisure Hobby
+				25 = Jazz Music
+				26 = Country Music
+				27 = National Music
+				28 = Oldies Music
+				29 = Folk Music
+				30 = Documentary
+				31 = Alarm Test
+				32 = Alarm Alarm
+				33 = None(33),
+				34 = News(34),
+				35 = Information(35),
+				36 = Sports(36),
+				37 = Talk(37),
+				38 = Rock(38),
+				39 = Classic Rock(39),
+				40 = Adult Hits(40),
+				41 = Soft Rock(41),
+				42 = Top 40(42),
+				43 = Country(43),
+				44 = Oldies(44),
+				45 = Soft(45),
+				46 = Nostalgia(46),
+				47 = Jazz(47),
+				48 = Classical(48),
+				49 = Rhythm and Blues(49),
+				50 = Soft Rhythm and Blues(50),
+				51 = Language(51),
+				52 = Religious Music(52),
+				53 = Religious Talk(53),
+				54 = Personality(54),
+				55 = Public(55),
+				56 = College(56),
+				57 = Unassigned(57),
+				58 = Unassigned(58),
+				59 = Unassigned(59),
+				60 = Unassigned(60),
+				61 = Unassigned(61),
+				62 = Weather(62),
+				63 = Emergency Test(63),
+				64 = Emergency(64)"
+	::= { sfdMsrRds 7}
+
+sfdMsrRdsRT OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"RDS Radio Text."
+	::= { sfdMsrRds 8}
+
+sfdMsrRdsCTTime OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"RDS Clock Time."
+	::= { sfdMsrRds 9}
+
+sfdMsrRdsCTDate OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"RDS Clock Date."
+	::= { sfdMsrRds 10}
+
+--****************************************************************************
+-- sfdMsr sub-tree
+--****************************************************************************
+
+sfdMsrControlMode OBJECT-TYPE
+	SYNTAX		ControlMode
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION		"The active control mode.
+				1 = local (device can only be controlled locally)
+				2 = remote (device can only be controlled remotely)
+				3 = localPlusRemote (device can be controlled locally and remotely)
+				
+				localPlusRemote is not supported when option 'TR5/3.5' is installed."
+	::= { sfdMsr 1}
+
+--****************************************************************************
+-- sfdGroups sub-tree
+--**************************************************************************** 
+sfdGrpIdentity OBJECT-GROUP
+	OBJECTS 		{ sfdIdnOptions, sfdIdnSerialNumber, 
+				sfdIdnFirmwareType, sfdIdnFirmwareVersion,
+				sfdIdnDeviceInfo1, sfdIdnDeviceInfo2, 
+				sfdIdnDeviceInfo3, sfdIdnDeviceInfo4, 
+				sfdIdnDeviceInfo5, sfdIdnDeviceInfo6, 
+				sfdIdnDeviceInfo7, sfdIdnDeviceInfo8, 
+				sfdIdnDeviceInfo9, sfdIdnDeviceInfo10, 
+				sfdIdnDeviceInfo11, sfdIdnDeviceInfo12, 
+				sfdIdnDeviceManualLink }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 1 }
+
+sfdGrpSet OBJECT-GROUP
+	OBJECTS		{ sfdSetReboot, sfdSetAsPowerOnDefault }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 2 }
+
+sfdGrpSetClock OBJECT-GROUP
+	OBJECTS		{ sfdSetClockDateTime, sfdSetClockLockTo,
+				sfdSetClockTimezone, sfdSetClockDST }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 3 }
+
+sfdGrpSetRfIn OBJECT-GROUP
+	OBJECTS		{ sfdSetRfInFrequency, sfdSetRfInInput,
+				sfdSetRfInAttenuator, sfdSetRfInMute }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 4 }
+
+sfdGrpSetFilter OBJECT-GROUP
+	OBJECTS		{ sfdSetFilterIfMpx, sfdSetFilterStereoThreshold }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 5 }
+
+sfdGrpSetMpx OBJECT-GROUP
+	OBJECTS		{ sfdSetMpxGain, sfdSetMpxPreEmphase,
+				sfdSetMpxSource, sfdSetMpxRdsMode, 
+				sfdSetMpxResetMaxDeviation }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 6 }
+
+sfdGrpSetAudio OBJECT-GROUP
+	OBJECTS		{ sfdSetAudioAnalogXlrGain, sfdSetAudioTesttone,
+				sfdSetAudioDeEmphase }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 7 }
+
+sfdGrpSetName OBJECT-GROUP
+	OBJECTS		{ sfdSetNameUnit }
+	STATUS		obsolete
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 8 }
+
+sfdGrpSetAlarmRfInLow OBJECT-GROUP
+	OBJECTS		{ sfdSetAlarmRfInLowMode, sfdSetAlarmRfInLowLevel,
+				sfdSetAlarmRfInLowWarningDelay, sfdSetAlarmRfInLowAlarmDelay }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 9 }
+
+sfdGrpSetAlarmRfInHigh OBJECT-GROUP
+	OBJECTS		{ sfdSetAlarmRfInHighMode, sfdSetAlarmRfInHighLevel,
+				sfdSetAlarmRfInHighWarningDelay, sfdSetAlarmRfInHighAlarmDelay }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 10 }
+
+sfdGrpSetAlarmPilot OBJECT-GROUP
+	OBJECTS		{ sfdSetAlarmPilotMode, sfdSetAlarmPilotLevelKhz,
+				sfdSetAlarmPilotWarningDelay, sfdSetAlarmPilotAlarmDelay,
+				sfdSetAlarmPilotLevelDbu }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 11 }
+
+sfdGrpSetAlarmRdsLevel OBJECT-GROUP
+	OBJECTS		{ sfdSetAlarmRdsLevelMode, sfdSetAlarmRdsLevelLevelKhz,
+				sfdSetAlarmRdsLevelWarningDelay, sfdSetAlarmRdsLevelAlarmDelay,
+				sfdSetAlarmRdsLevelLevelDbu }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 12 }
+
+sfdGrpSetAlarmRdsBer OBJECT-GROUP
+	OBJECTS		{ sfdSetAlarmRdsBerMode, sfdSetAlarmRdsBerLevel,
+				sfdSetAlarmRdsBerWarningDelay, sfdSetAlarmRdsBerAlarmDelay }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 13 }
+
+sfdGrpSetAlarmMpxDeviation OBJECT-GROUP
+	OBJECTS		{ sfdSetAlarmMpxDeviationMode, sfdSetAlarmMpxDeviationLevel,
+				sfdSetAlarmMpxDeviationOffDelay }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 14 }
+
+sfdGrpSetAlarmAudioLeft OBJECT-GROUP
+	OBJECTS		{ sfdSetAlarmAudioLeftMode, sfdSetAlarmAudioLeftLevel,
+				sfdSetAlarmAudioLeftWarningDelay, sfdSetAlarmAudioLeftAlarmDelay }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 15 }
+
+sfdGrpSetAlarmAudioRight OBJECT-GROUP
+	OBJECTS		{ sfdSetAlarmAudioRightMode, sfdSetAlarmAudioRightLevel,
+				sfdSetAlarmAudioRightWarningDelay, sfdSetAlarmAudioRightAlarmDelay }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 16 }
+
+sfdGrpSetAlarmAudioBoth OBJECT-GROUP
+	OBJECTS		{ sfdSetAlarmAudioBothMode, sfdSetAlarmAudioBothLevel, 
+				sfdSetAlarmAudioBothWarningDelay, sfdSetAlarmAudioBothAlarmDelay }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 17 }
+
+sfdGrpSetIOInput OBJECT-GROUP
+	OBJECTS		{ sfdSetControlIOInput0, sfdSetControlIOInput1,
+				sfdSetControlIOInput2, sfdSetControlIOInput3 }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 18 }
+
+sfdGrpSetIOOutput OBJECT-GROUP
+	OBJECTS		{ sfdSetControlIOOutput0, sfdSetControlIOOutput1,
+				sfdSetControlIOOutput2, sfdSetControlIOOutput3 }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 19 }
+
+sfdGrpSetNotificationMode OBJECT-GROUP
+	OBJECTS		{ sfdSetNotificationModeAll, sfdSetNotificationModeHeartbeat,
+				sfdSetNotificationModeSettingChanged, sfdSetNotificationModeControlMode,
+				sfdSetNotificationModeControlModeLocalSuppress }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 20 }
+
+sfdGrpSetNotificationModeAlarm OBJECT-GROUP
+	OBJECTS		{ sfdSetNotificationModeAlarmRfInLevelLow, sfdSetNotificationModeAlarmRfInLevelHigh,
+				sfdSetNotificationModeAlarmPilotLevel, sfdSetNotificationModeAlarmMpxDeviation,
+				sfdSetNotificationModeAlarmRdsBer, sfdSetNotificationModeAlarmRdsLevel,
+				sfdSetNotificationModeAlarmAudioLevelLeft, sfdSetNotificationModeAlarmAudioLevelRight,
+				sfdSetNotificationModeAlarmAudioLevelBoth, sfdSetNotificationModeAlarmRdsPi }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 21 }
+
+sfdGrpMsrAlarm OBJECT-GROUP
+	OBJECTS		{ sfdMsrAlarmRfInLevelLow, sfdMsrAlarmRfInLevelHigh,
+				sfdMsrAlarmPilotLevel, sfdMsrAlarmMpxDeviation,
+				sfdMsrAlarmRdsBer, sfdMsrAlarmRdsLevel,
+				sfdMsrAlarmAudioLevelLeft, sfdMsrAlarmAudioLevelRight,
+				sfdMsrAlarmAudioLevelBoth, sfdMsrAlarmRdsPi }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 22 }    
+
+sfdGrpMsrNotification OBJECT-GROUP
+	OBJECTS		{ sfdMsrNotificationCounter, sfdMsrNotificationTimeStamp,
+				sfdMsrNotificationLastSettingChanged, sfdMsrNotificationLastSettingChangedFrom,
+				sfdMsrNotificationPriority }
+	STATUS		current
+	DESCRIPTION 	"For future reference."
+	::= { sfdGroups 23 }
+
+sfdGrpMsrRfin OBJECT-GROUP
+	OBJECTS		{ sfdMsrRfInFilter, sfdMsrRfInSignalStrength,
+				sfdMsrRfInMuted }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 24 }
+
+sfdGrpMsrMpx OBJECT-GROUP
+	OBJECTS		{ sfdMsrMpxPilotLevelKhz, sfdMsrMpxRdsLevelKhz, 
+				sfdMsrMpxRdsBer, sfdMsrMpxMaxDeviation,
+				sfdMsrMpxDeviation, sfdMsrMpxPilotLevelDbu,
+				sfdMsrMpxRdsLevelDbu }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 25 }
+
+sfdGrpMsrAudio OBJECT-GROUP
+	OBJECTS		{ sfdMsrAudioLeftLevel, sfdMsrAudioRightLevel }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 26 }
+
+sfdGrpMsrRds OBJECT-GROUP
+	OBJECTS		{ sfdMsrRdsTA, sfdMsrRdsTP,
+				sfdMsrRdsPI, sfdMsrRdsDI,
+				sfdMsrRdsPS, sfdMsrRdsMS,
+				sfdMsrRdsPTY, sfdMsrRdsRT,
+				sfdMsrRdsCTTime, sfdMsrRdsCTDate }
+	STATUS		current
+	DESCRIPTION 	"For future reference."
+	::= { sfdGroups 27 }
+
+sfdGrpNotifications NOTIFICATION-GROUP
+	NOTIFICATIONS	{ sfdNotificationHeartbeat, sfdNotificationSettingChanged,
+				sfdNotificationControlMode, sfdNotificationAlarmRfInLevelLow, 
+				sfdNotificationAlarmRfInLevelHigh, sfdNotificationAlarmPilotLevel, 
+				sfdNotificationAlarmMpxDeviation, sfdNotificationAlarmRdsBer, 
+				sfdNotificationAlarmRdsLevel, sfdNotificationAlarmAudioLevelLeft, 
+				sfdNotificationAlarmAudioLevelRight, sfdNotificationAlarmAudioLevelBoth,
+				sfdNotificationAlarmRdsPi, sfdNotificationStatusRfInFrequency,
+				sfdNotificationStatusRfInInput, sfdNotificationStatusRfInMuted,
+				sfdNotificationStatusRfInFilter, sfdNotificationStatusMpxSource,
+				sfdNotificationStatusAudioTestTone, sfdNotificationStatusAudioDeEmphase }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 28 }
+
+sfdGrpSetPreset OBJECT-GROUP
+	OBJECTS		{ sfdSetPresetRecall, sfdSetPresetSaveAs,
+				sfdSetPresetActiveDefaults, sfdSetPresetActiveName }
+	STATUS		current
+	DESCRIPTION 	"For future reference."
+	::= { sfdGroups 29 }
+
+sfdGrpMsr OBJECT-GROUP
+	OBJECTS		{ sfdMsrControlMode }
+	STATUS		current
+	DESCRIPTION 	"For future reference."
+	::= { sfdGroups 30 }
+
+sfdGrpSetNotificationPriority OBJECT-GROUP
+	OBJECTS		{ sfdSetNotificationPriorityHeartbeat, sfdSetNotificationPrioritySettingChanged,
+				sfdSetNotificationPriorityControlMode, sfdSetNotificationPriorityAlarmRfInLevelLow, 
+				sfdSetNotificationPriorityAlarmRfInLevelHigh, sfdSetNotificationPriorityAlarmPilotLevel, 
+				sfdSetNotificationPriorityAlarmMpxDeviation, sfdSetNotificationPriorityAlarmRdsBer, 
+				sfdSetNotificationPriorityAlarmRdsLevel, sfdSetNotificationPriorityAlarmAudioLevelLeft,
+				sfdSetNotificationPriorityAlarmAudioLevelRight, sfdSetNotificationPriorityAlarmAudioLevelBoth,
+				sfdSetNotificationPriorityAlarmRdsPi, sfdSetNotificationPriorityStatusRfInFrequency,
+				sfdSetNotificationPriorityStatusRfInInput, sfdSetNotificationPriorityStatusRfInMuted,
+				sfdSetNotificationPriorityStatusRfInFilter, sfdSetNotificationPriorityStatusMpxSource,
+				sfdSetNotificationPriorityStatusAudioTestTone, sfdSetNotificationPriorityStatusAudioDeEmphase }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 31 }
+
+sfdGrpSetObsoletedItems OBJECT-GROUP
+	OBJECTS		{ sfdSetClockOffset }
+	STATUS		obsolete
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 32 }
+
+sfdGrpSetAlarmRdsPi OBJECT-GROUP
+	OBJECTS		{ sfdSetAlarmRdsPiMode, sfdSetAlarmRdsPiPi,
+				sfdSetAlarmRdsPiWarningDelay, sfdSetAlarmRdsPiAlarmDelay }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 33 }
+
+sfdGrpSetNotificationModeStatus OBJECT-GROUP
+	OBJECTS		{ sfdSetNotificationModeStatusRfInFrequency, sfdSetNotificationModeStatusRfInInput,
+				sfdSetNotificationModeStatusRfInMuted, sfdSetNotificationModeStatusRfInFilter,
+				sfdSetNotificationModeStatusMpxSource, sfdSetNotificationModeStatusAudioTestTone,
+				sfdSetNotificationModeStatusAudioDeEmphase }
+	STATUS		current
+	DESCRIPTION		"For future reference."
+	::= { sfdGroups 34 }
+
+
+sfdCompliance		MODULE-COMPLIANCE
+	STATUS		current
+	DESCRIPTION		"The implementation requirements specification for implementing the complete sfd module.
+				Exceptions, optional conditions and value range requirements are denoted in the object description."
+	MODULE
+	MANDATORY-GROUPS {
+		sfdGrpIdentity,
+		sfdGrpSet,
+		sfdGrpSetClock,
+		sfdGrpSetRfIn,
+		sfdGrpSetFilter,
+		sfdGrpSetMpx,
+		sfdGrpSetAudio,
+		sfdGrpSetAlarmRfInLow,
+		sfdGrpSetAlarmRfInHigh,
+		sfdGrpSetAlarmPilot,
+		sfdGrpSetAlarmRdsLevel,
+		sfdGrpSetAlarmRdsBer,
+		sfdGrpSetAlarmRdsPi,
+		sfdGrpSetAlarmMpxDeviation,
+		sfdGrpSetAlarmAudioLeft,
+		sfdGrpSetAlarmAudioRight,
+		sfdGrpSetAlarmAudioBoth,
+		sfdGrpSetIOInput,
+		sfdGrpSetIOOutput,
+		sfdGrpSetNotificationMode,
+		sfdGrpSetNotificationModeAlarm,
+		sfdGrpMsrAlarm,
+		sfdGrpMsrNotification,
+		sfdGrpMsrRfin,
+		sfdGrpMsrMpx,
+		sfdGrpMsrAudio,
+		sfdGrpMsrRds,
+		sfdGrpNotifications,
+		sfdGrpSetPreset,
+		sfdGrpMsr,
+		sfdGrpSetNotificationPriority,
+		sfdGrpSetNotificationModeStatus
+	}
+::= { sfd 5 }
+ 
+END
+
+
+
+
