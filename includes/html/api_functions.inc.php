@@ -2209,7 +2209,7 @@ function add_port_group(Illuminate\Http\Request $request)
         return api_error(422, $v->messages());
     }
 
-    $portGroup = PortGroup::make(['name' => $data['name'], 'desc' => $data['desc']]);
+    $portGroup = new PortGroup(['name' => $data['name'], 'desc' => $data['desc']]);
     $portGroup->save();
 
     return api_success($portGroup->id, 'id', 'Port group ' . $portGroup->name . ' created', 201);
@@ -2326,7 +2326,7 @@ function add_device_group(Illuminate\Http\Request $request)
         }
     }
 
-    $deviceGroup = DeviceGroup::make(['name' => $data['name'], 'type' => $data['type'], 'desc' => $data['desc']]);
+    $deviceGroup = new DeviceGroup(['name' => $data['name'], 'type' => $data['type'], 'desc' => $data['desc']]);
     if ($data['type'] == 'dynamic') {
         $deviceGroup->rules = json_decode($data['rules']);
     }
@@ -2807,7 +2807,7 @@ function get_nac(Illuminate\Http\Request $request)
         return api_error(404, "Device $hostname not found");
     }
 
-    return check_device_permission($device_id, function () use ($device) {
+    return check_device_permission($device, function () use ($device) {
         $nac = $device->portsNac;
 
         return api_success($nac, 'ports_nac');
@@ -3218,7 +3218,7 @@ function add_service_template_for_device_group(Illuminate\Http\Request $request)
         return api_error(500, "We couldn't parse your rule");
     }
 
-    $serviceTemplate = ServiceTemplate::make(['name' => $data['name'], 'device_group_id' => $data['device_group_id'], 'type' => $data['type'], 'param' => $data['param'], 'ip' => $data['ip'], 'desc' => $data['desc'], 'changed' => $data['changed'], 'disabled' => $data['disabled'], 'ignore' => $data['ignore']]);
+    $serviceTemplate = new ServiceTemplate(['name' => $data['name'], 'device_group_id' => $data['device_group_id'], 'type' => $data['type'], 'param' => $data['param'], 'ip' => $data['ip'], 'desc' => $data['desc'], 'changed' => $data['changed'], 'disabled' => $data['disabled'], 'ignore' => $data['ignore']]);
     $serviceTemplate->save();
 
     return api_success($serviceTemplate->id, 'id', 'Service Template ' . $serviceTemplate->name . ' created', 201);
