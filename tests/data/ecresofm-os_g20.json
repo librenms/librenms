@@ -565,11 +565,11 @@
                     "pagpEthcOperationMode": null,
                     "pagpDeviceId": null,
                     "pagpGroupIfIndex": null,
-                    "ifInUcastPkts": 73026613,
+                    "ifInUcastPkts": 73027700,
                     "ifInUcastPkts_prev": 0,
                     "ifInUcastPkts_delta": null,
                     "ifInUcastPkts_rate": null,
-                    "ifOutUcastPkts": 71192421,
+                    "ifOutUcastPkts": 71193488,
                     "ifOutUcastPkts_prev": 0,
                     "ifOutUcastPkts_delta": null,
                     "ifOutUcastPkts_rate": null,
@@ -581,11 +581,11 @@
                     "ifOutErrors_prev": 0,
                     "ifOutErrors_delta": null,
                     "ifOutErrors_rate": null,
-                    "ifInOctets": 6824497063,
+                    "ifInOctets": 6824601392,
                     "ifInOctets_prev": 0,
                     "ifInOctets_delta": null,
                     "ifInOctets_rate": null,
-                    "ifOutOctets": 6802267618,
+                    "ifOutOctets": 6802396204,
                     "ifOutOctets_prev": 0,
                     "ifOutOctets_delta": null,
                     "ifOutOctets_rate": null,
@@ -639,7 +639,7 @@
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.768",
                     "processor_index": "768",
                     "processor_type": "hr",
-                    "processor_usage": 13,
+                    "processor_usage": 12,
                     "processor_descr": "Processor",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
@@ -2751,7 +2751,7 @@
                     "hrDeviceType": "",
                     "hrDeviceErrors": 0,
                     "hrDeviceStatus": "unknown",
-                    "hrProcessorLoad": 13
+                    "hrProcessorLoad": 12
                 }
             ]
         }
