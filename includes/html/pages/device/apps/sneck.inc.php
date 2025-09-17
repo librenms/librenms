@@ -50,7 +50,7 @@ if (isset($sneck_data)) {
         }
         // run time
         if (isset($app->data['data']['run_time'])) {
-            echo '<b>Run Time:</b> ' . htmlspecialchars($app->data['data']['run_time']) . " seconds<br>\n";
+            echo '<b>Runtime:</b> ' . htmlspecialchars($app->data['data']['run_time']) . " seconds<br>\n";
         }
         print_optionbar_end();
     }
@@ -76,7 +76,7 @@ if ((isset($vars['sneck_check']) && isset($app->data['data']['checks'][$vars['sn
     }
     // run time
     if (isset($app->data['data'][$type][$type_name]['run_time'])) {
-        echo '<b>Run Time:</b> ' . htmlspecialchars($app->data['data'][$type][$type_name]['run_time']) . " seconds<br>\n";
+        echo '<b>Runtime:</b> ' . htmlspecialchars($app->data['data'][$type][$type_name]['run_time']) . " seconds<br>\n";
     }
     // exit code
     if (isset($app->data['data'][$type][$type_name]['exit'])) {
@@ -102,7 +102,7 @@ if ((isset($vars['sneck_check']) && isset($app->data['data']['checks'][$vars['sn
     ];
 
     if (isset($app->data['data']['checks'])) {
-        $graphs['sneck_run_time'] = 'Run Time';
+        $graphs['sneck_runtime'] = 'Runtime';
     }
 
     foreach ($graphs as $key => $text) {

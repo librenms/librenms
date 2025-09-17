@@ -16,7 +16,7 @@ $rrd_list = [
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr' => 'Run Time',
+        'descr' => 'Runtime',
         'ds' => 'data',
     ];
 }
