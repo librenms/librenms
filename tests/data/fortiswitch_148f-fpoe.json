@@ -11218,6 +11218,28 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "a0:ce:c8:f3:eb:12 (a0cec8f3eb12)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "port10",
+                    "ifDescr": "** XXX Desktop + IP Phone **",
+                    "ifName": "port10"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "94:c6:91:ac:43:31 (94c691ac4331)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "port17",
+                    "ifDescr": "**Schotklok PC**",
+                    "ifName": "port17"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
                     "remote_hostname": "SIP-T41S",
                     "remote_port": "80:5e:0c:46:17:ed (805e0c4617ed)",
                     "remote_platform": null,

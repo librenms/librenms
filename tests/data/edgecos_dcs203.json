@@ -28330,7 +28330,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "removed",
-                    "remote_port": "Eth4(Port4) ()",
+                    "remote_port": "Eth4(Port4)",
                     "remote_platform": null,
                     "remote_version": "SONiC Software Version: SONiC.Edgecore-SONiC_20230706_055328_ec202111_453 - HwSku: Accton-AS4630-54TE - Distribution: Debian 11.7 - Kernel: 5.10.0-8-2-amd64",
                     "ifAlias": "Management Port",
@@ -28341,7 +28341,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "HPE ProLiant DL360 Gen10",
-                    "remote_port": " ()",
+                    "remote_port": "",
                     "remote_platform": null,
                     "remote_version": "HPE ProLiant DL360 Gen10",
                     "ifAlias": "removed",
@@ -28352,7 +28352,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "HPE ProLiant DL360 Gen10",
-                    "remote_port": " ()",
+                    "remote_port": "",
                     "remote_platform": null,
                     "remote_version": "HPE ProLiant DL360 Gen10",
                     "ifAlias": "removed",
@@ -28363,7 +28363,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "HPE ProLiant DL360 Gen10",
-                    "remote_port": " ()",
+                    "remote_port": "",
                     "remote_platform": null,
                     "remote_version": "HPE ProLiant DL360 Gen10",
                     "ifAlias": "removed",
@@ -28373,8 +28373,30 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "removed",
+                    "ifDescr": "Ethernet28",
+                    "ifName": "Eth31/3(Port29)"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "removed",
+                    "ifDescr": "Ethernet29",
+                    "ifName": "Eth30/1(Port30)"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
                     "remote_hostname": "HPE ProLiant DL360 Gen10",
-                    "remote_port": " ()",
+                    "remote_port": "",
                     "remote_platform": null,
                     "remote_version": "HPE ProLiant DL360 Gen10",
                     "ifAlias": "removed",
@@ -28385,7 +28407,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "HPE ProLiant DL360 Gen10",
-                    "remote_port": " ()",
+                    "remote_port": "",
                     "remote_platform": null,
                     "remote_version": "HPE ProLiant DL360 Gen10",
                     "ifAlias": "removed",
@@ -28396,7 +28418,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "removed",
-                    "remote_port": "Eth44/1(Port44) ()",
+                    "remote_port": "Eth44/1(Port44)",
                     "remote_platform": null,
                     "remote_version": "SONiC Software Version: SONiC.Edgecore-SONiC_20230706_055328_ec202111_453 - HwSku: Accton-AS7326-56X - Distribution: Debian 11.7 - Kernel: 5.10.0-8-2-amd64",
                     "ifAlias": "removed",
@@ -28407,7 +28429,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "removed",
-                    "remote_port": "x3 ()",
+                    "remote_port": "x3",
                     "remote_platform": null,
                     "remote_version": "FortiGate-200F v7.2.7,build1577,240131 (GA.M)",
                     "ifAlias": "removed",
@@ -28418,7 +28440,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "removed",
-                    "remote_port": "x1 ()",
+                    "remote_port": "x1",
                     "remote_platform": null,
                     "remote_version": "FortiGate-200F v7.2.7,build1577,240131 (GA.M)",
                     "ifAlias": "removed",
@@ -28429,7 +28451,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "removed",
-                    "remote_port": "Te1/1/4 ()",
+                    "remote_port": "Te1/1/4",
                     "remote_platform": null,
                     "remote_version": "",
                     "ifAlias": "removed",
@@ -28440,7 +28462,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "removed",
-                    "remote_port": "Eth49(Port49) ()",
+                    "remote_port": "Eth49(Port49)",
                     "remote_platform": null,
                     "remote_version": "SONiC Software Version: SONiC.Edgecore-SONiC_20230706_055328_ec202111_453 - HwSku: Accton-AS7326-56X - Distribution: Debian 11.7 - Kernel: 5.10.0-8-2-amd64",
                     "ifAlias": "removed",
@@ -28451,7 +28473,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "HPE ProLiant DL360 Gen10",
-                    "remote_port": " ()",
+                    "remote_port": "",
                     "remote_platform": null,
                     "remote_version": "HPE ProLiant DL360 Gen10",
                     "ifAlias": "removed",
@@ -28462,7 +28484,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "removed",
-                    "remote_port": "Eth50(Port50) ()",
+                    "remote_port": "Eth50(Port50)",
                     "remote_platform": null,
                     "remote_version": "SONiC Software Version: SONiC.Edgecore-SONiC_20230706_055328_ec202111_453 - HwSku: Accton-AS7326-56X - Distribution: Debian 11.7 - Kernel: 5.10.0-8-2-amd64",
                     "ifAlias": "removed",
@@ -28473,7 +28495,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "removed",
-                    "remote_port": "Eth53(Port53) ()",
+                    "remote_port": "Eth53(Port53)",
                     "remote_platform": null,
                     "remote_version": "SONiC Software Version: SONiC.Edgecore-SONiC_20230706_055328_ec202111_453 - HwSku: Accton-AS4630-54TE - Distribution: Debian 11.7 - Kernel: 5.10.0-8-2-amd64",
                     "ifAlias": "removed",
@@ -28484,7 +28506,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "ProLiant DL380 Gen10",
-                    "remote_port": " ()",
+                    "remote_port": "",
                     "remote_platform": null,
                     "remote_version": "ProLiant DL380 Gen10",
                     "ifAlias": "removed",
@@ -28495,7 +28517,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "ProLiant DL380 Gen10",
-                    "remote_port": " ()",
+                    "remote_port": "",
                     "remote_platform": null,
                     "remote_version": "ProLiant DL380 Gen10",
                     "ifAlias": "removed",
@@ -28506,7 +28528,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "removed",
-                    "remote_port": "Eth56(Port56) ()",
+                    "remote_port": "Eth56(Port56)",
                     "remote_platform": null,
                     "remote_version": "SONiC Software Version: SONiC.Edgecore-SONiC_20230706_055328_ec202111_453 - HwSku: Accton-AS7326-56X - Distribution: Debian 11.7 - Kernel: 5.10.0-8-2-amd64",
                     "ifAlias": "removed",
@@ -28517,7 +28539,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "ProLiant DL360 Gen10",
-                    "remote_port": " ()",
+                    "remote_port": "",
                     "remote_platform": null,
                     "remote_version": "ProLiant DL360 Gen10",
                     "ifAlias": "removed",
@@ -28527,8 +28549,30 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "removed",
+                    "ifDescr": "Ethernet9",
+                    "ifName": "Eth11/2(Port10)"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Server: removed",
+                    "ifDescr": "Ethernet10",
+                    "ifName": "Eth11/1(Port11)"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
                     "remote_hostname": "Emulex OneConnect 10Gb Multi function Adapter",
-                    "remote_port": " ()",
+                    "remote_port": "",
                     "remote_platform": null,
                     "remote_version": "Emulex OneConnect 10Gb Multi function Adapter",
                     "ifAlias": "Server: removed",
@@ -28539,7 +28583,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "Emulex OneConnect 10Gb Multi function Adapter",
-                    "remote_port": " ()",
+                    "remote_port": "",
                     "remote_platform": null,
                     "remote_version": "Emulex OneConnect 10Gb Multi function Adapter",
                     "ifAlias": "Server: removed",
@@ -28550,7 +28594,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "Emulex OneConnect 10Gb Multi function Adapter",
-                    "remote_port": " ()",
+                    "remote_port": "",
                     "remote_platform": null,
                     "remote_version": "Emulex OneConnect 10Gb Multi function Adapter",
                     "ifAlias": "Server: removed",
@@ -28561,14 +28605,266 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "Emulex OneConnect 10Gb Multi function Adapter",
-                    "remote_port": " ()",
+                    "remote_port": "",
                     "remote_platform": null,
                     "remote_version": "Emulex OneConnect 10Gb Multi function Adapter",
                     "ifAlias": "Server: removed",
                     "ifDescr": "Ethernet16",
                     "ifName": "Eth19/3(Port17)"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Server: removed",
+                    "ifDescr": "Ethernet17",
+                    "ifName": "Eth18/1(Port18)"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Server: removed",
+                    "ifDescr": "Ethernet18",
+                    "ifName": "Eth19/1(Port19)"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Server: removed",
+                    "ifDescr": "Ethernet19",
+                    "ifName": "Eth23/4(Port20)"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Server: removed",
+                    "ifDescr": "Ethernet20",
+                    "ifName": "Eth19/2(Port21)"
                 }
             ]
         }
+    },
+    "processors": {
+        "discovery": {
+            "processors": [
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 196608,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196608",
+                    "processor_index": "196608",
+                    "processor_type": "hr",
+                    "processor_usage": 11,
+                    "processor_descr": "Intel Xeon D-1518 @ 2.20GHz",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 196609,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196609",
+                    "processor_index": "196609",
+                    "processor_type": "hr",
+                    "processor_usage": 10,
+                    "processor_descr": "Intel Xeon D-1518 @ 2.20GHz",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 196610,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196610",
+                    "processor_index": "196610",
+                    "processor_type": "hr",
+                    "processor_usage": 14,
+                    "processor_descr": "Intel Xeon D-1518 @ 2.20GHz",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 196611,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196611",
+                    "processor_index": "196611",
+                    "processor_type": "hr",
+                    "processor_usage": 15,
+                    "processor_descr": "Intel Xeon D-1518 @ 2.20GHz",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 196612,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196612",
+                    "processor_index": "196612",
+                    "processor_type": "hr",
+                    "processor_usage": 14,
+                    "processor_descr": "Intel Xeon D-1518 @ 2.20GHz",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 196613,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196613",
+                    "processor_index": "196613",
+                    "processor_type": "hr",
+                    "processor_usage": 17,
+                    "processor_descr": "Intel Xeon D-1518 @ 2.20GHz",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 196614,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196614",
+                    "processor_index": "196614",
+                    "processor_type": "hr",
+                    "processor_usage": 12,
+                    "processor_descr": "Intel Xeon D-1518 @ 2.20GHz",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 196615,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196615",
+                    "processor_index": "196615",
+                    "processor_type": "hr",
+                    "processor_usage": 14,
+                    "processor_descr": "Intel Xeon D-1518 @ 2.20GHz",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "hr-device": {
+        "discovery": {
+            "hrDevice": [
+                {
+                    "hrDeviceIndex": 196608,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) CPU D-1518 @ 2.20GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 11
+                },
+                {
+                    "hrDeviceIndex": 196609,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) CPU D-1518 @ 2.20GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 10
+                },
+                {
+                    "hrDeviceIndex": 196610,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) CPU D-1518 @ 2.20GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 14
+                },
+                {
+                    "hrDeviceIndex": 196611,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) CPU D-1518 @ 2.20GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 15
+                },
+                {
+                    "hrDeviceIndex": 196612,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) CPU D-1518 @ 2.20GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 14
+                },
+                {
+                    "hrDeviceIndex": 196613,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) CPU D-1518 @ 2.20GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 17
+                },
+                {
+                    "hrDeviceIndex": 196614,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) CPU D-1518 @ 2.20GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 12
+                },
+                {
+                    "hrDeviceIndex": 196615,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) CPU D-1518 @ 2.20GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 14
+                },
+                {
+                    "hrDeviceIndex": 786432,
+                    "hrDeviceDescr": "Guessing that there's a floating point co-processor",
+                    "hrDeviceType": "hrDeviceCoprocessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                }
+            ]
+        }
+    },
+    "ucd-diskio": {
+        "discovery": {
+            "disks": [
+                {
+                    "diskio_index": 6,
+                    "diskio_descr": "loop0"
+                },
+                {
+                    "diskio_index": 7,
+                    "diskio_descr": "loop1"
+                },
+                {
+                    "diskio_index": 1,
+                    "diskio_descr": "sda"
+                },
+                {
+                    "diskio_index": 2,
+                    "diskio_descr": "sda1"
+                },
+                {
+                    "diskio_index": 3,
+                    "diskio_descr": "sda2"
+                },
+                {
+                    "diskio_index": 4,
+                    "diskio_descr": "sda3"
+                },
+                {
+                    "diskio_index": 5,
+                    "diskio_descr": "sda4"
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }
