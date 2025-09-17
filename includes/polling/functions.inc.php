@@ -100,6 +100,9 @@ function poll_sensor($device, $class)
                     }
                 }
             }//end if
+            if(isset($mib)) {
+                unset($mib);
+            }
             unset($mibdir);
             $sensor['new_value'] = $sensor_value;
             $all_sensors[] = $sensor;
