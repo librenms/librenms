@@ -78,18 +78,29 @@ class OutagesController extends TableController
 
                     // OR outage ends within range (if it has ended)
                     $q->orWhere(function ($subQuery) use ($from_ts, $to_ts) {
-                        $subQuery->where('up_again', '>', 0);
+                        $subQuery->whereNotNull('up_again');
                         $this->applyDateRangeCondition($subQuery, 'up_again', $from_ts, $to_ts);
+                    });
+
+                    // OR outage spans the entire range (started before, still ongoing or ended after)
+                    $q->orWhere(function ($subQuery) use ($from_ts, $to_ts) {
+                        if ($from_ts) {
+                            $subQuery->where('going_down', '<', $from_ts);
+                        }
+                        if ($to_ts) {
+                            $subQuery->where(function ($q) use ($to_ts) {
+                                $q->whereNotNull('up_again') // Still ongoing
+                                ->orWhere('up_again', '>', $to_ts); // Ended after range
+                            });
+                        }
                     });
                 });
             })
             ->when($request->status === 'current', function ($query) {
-                $query->where(function ($q) {
-                    $q->orWhere('up_again', 0);
-                });
+                $query->whereNull('up_again');
             })
             ->when($request->status === 'previous', function ($query) {
-                $query->where('up_again', '>', 0);
+                $query->whereNotNull('up_again');
             });
     }
 

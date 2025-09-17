@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('device_outages', function (Blueprint $table) {
-            $table->index(['going_down', 'up_again']);
-            $table->index(['device_id', 'going_down', 'up_again']);
+            $table->index('going_down');
+            $table->index('up_again');
         });
     }
 
@@ -23,8 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('device_outages', function (Blueprint $table) {
-            $table->dropIndex(['device_id', 'going_down', 'up_again']);
-            $table->dropIndex(['going_down', 'up_again']);
+            $table->dropIndex('going_down');
+            $table->dropIndex('up_again');
         });
     }
 };

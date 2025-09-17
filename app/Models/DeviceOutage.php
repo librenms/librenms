@@ -34,4 +34,30 @@ class DeviceOutage extends DeviceRelatedModel
 
     public $timestamps = false;
     protected $fillable = ['going_down', 'up_again'];
+
+    public static function startOutage(Device $device, ?int $startedAt = null): DeviceOutage
+    {
+        $startedAt ??= time();
+
+        // Check for existing ongoing outage
+        static::where('device_id', $device->device_id)
+            ->whereNull('up_again')
+            ->update(['ended_at' => $startedAt]);
+
+        return static::create([
+            'device_id' => $device->device_id,
+            'started_at' => $startedAt,
+        ]);
+    }
+
+
+    public function scopeOngoing($query)
+    {
+        return $query->whereNull('up_again');
+    }
+
+    public function scopeResolved($query)
+    {
+        return $query->whereNotNull('up_again');
+    }
 }
