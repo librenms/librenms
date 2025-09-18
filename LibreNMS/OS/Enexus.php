@@ -90,7 +90,7 @@ class Enexus extends OS implements OSDiscovery
             Log::debug('rectifier: ' . json_encode($rectifier));
             $inventory->push(new EntPhysical([
                 'entPhysicalIndex' => $rectifierIndex,
-                'entPhysicalDescr' => 'Rectifier ' . $rectifier['SP2-MIB::rectifierType'] ?? null,
+                'entPhysicalDescr' => 'Rectifier ' . ($rectifier['SP2-MIB::rectifierType'] ?? $rectifierIndex),
                 'entPhysicalClass' => 'module',
                 'entPhysicalName' => $rectifier['SP2-MIB::rectifierType'] ?? null,
                 'entPhysicalModelName' => $rectifier['SP2-MIB::rectifierHwPartNumber'] ?? null,
