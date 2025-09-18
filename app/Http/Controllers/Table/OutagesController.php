@@ -71,6 +71,9 @@ class OutagesController extends TableController
 
         return DeviceOutage::hasAccess($request->user())
             ->with('device')
+            ->whereHas('device', function ($query) {
+                $query->where('disabled', 0);
+            })
             ->when($from_ts || $to_ts, function ($query) use ($from_ts, $to_ts) {
                 $query->where(function ($q) use ($from_ts, $to_ts) {
                     // Outage starts within range
