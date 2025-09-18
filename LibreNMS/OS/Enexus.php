@@ -22,19 +22,23 @@ class Enexus extends OS implements OSDiscovery
     {
         $location = parent::fetchLocation();
 
-        $latInt = (int) SnmpQuery::get('SP2-MIB::powerSystemLatitude.0')->value();
-        $latFrac = (int) SnmpQuery::get('SP2-MIB::powerSystemLatitudeDecimal.0')->value();
-        $longInt = (int) SnmpQuery::get('SP2-MIB::powerSystemLongitude.0')->value();
-        $longFrac = (int) SnmpQuery::get('SP2-MIB::powerSystemLongitudeDecimal.0')->value();
+        $latIntRaw = SnmpQuery::get('SP2-MIB::powerSystemLatitude.0')->value();
+        $latFracRaw = SnmpQuery::get('SP2-MIB::powerSystemLatitudeDecimal.0')->value();
+        $longIntRaw = SnmpQuery::get('SP2-MIB::powerSystemLongitude.0')->value();
+        $longFracRaw = SnmpQuery::get('SP2-MIB::powerSystemLongitudeDecimal.0')->value();
 
         $lat = null;
         $long = null;
 
-        if ($latInt !== null && $latFrac !== null) {
+        if ($latIntRaw !== null && $latFracRaw !== null) {
+            $latInt = (int) $latIntRaw;
+            $latFrac = (int) $latFracRaw;
             $lat = $latInt + ($latFrac / 1000000);
         }
 
-        if ($longInt !== null && $longFrac !== null) {
+        if ($longIntRaw !== null && $longFracRaw !== null) {
+            $longInt = (int) $longIntRaw;
+            $longFrac = (int) $longFracRaw;
             $long = $longInt + ($longFrac / 1000000);
         }
 
