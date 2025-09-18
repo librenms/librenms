@@ -5,19 +5,14 @@ namespace LibreNMS\OS;
 use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\Location;
-
-use LibreNMS\OS;
-use LibreNMS\Interfaces\Discovery\OSDiscovery;
-use LibreNMS\Interfaces\Data\DataStorageInterface;
-
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Collection;
-
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\OS;
 use SnmpQuery;
 
 class Enexus extends OS implements OSDiscovery
 {
-
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
@@ -49,7 +44,6 @@ class Enexus extends OS implements OSDiscovery
         return $location;
     }
 
-
     public function discoverEntityPhysical(): Collection
     {
         $inventory = new Collection;
@@ -67,7 +61,6 @@ class Enexus extends OS implements OSDiscovery
             'entPhysicalIsFRU' => 'false',
         ]));
 
-
         $controlUnits = SnmpQuery::walk('SP2-MIB::controlUnitTable')->table(1);
         foreach ($controlUnits as $controlUnitIndex => $controlUnit) {
             $inventory->push(new EntPhysical([
@@ -83,7 +76,7 @@ class Enexus extends OS implements OSDiscovery
                 'entPhysicalHardwareRev' => $controlUnit['SP2-MIB::controlUnitHwVersion'] ?? null,
                 'entPhysicalSoftwareRev' => $controlUnit['SP2-MIB::controlUnitSwVersion'] ?? null,
                 'entPhysicalFirmwareRev' => null,
-                'entPhysicalIsFRU' => 'true'
+                'entPhysicalIsFRU' => 'true',
             ]));
         }
 
@@ -92,7 +85,7 @@ class Enexus extends OS implements OSDiscovery
             Log::debug('rectifierIndex: ' . $rectifierIndex);
             Log::debug('rectifier: ' . json_encode($rectifier));
             $inventory->push(new EntPhysical([
-                'entPhysicalIndex' =>  $rectifierIndex,
+                'entPhysicalIndex' => $rectifierIndex,
                 'entPhysicalDescr' => 'Rectifier ' . $rectifier['SP2-MIB::rectifierType'] ?? null,
                 'entPhysicalClass' => 'module',
                 'entPhysicalName' => $rectifier['SP2-MIB::rectifierType'] ?? null,
@@ -104,13 +97,13 @@ class Enexus extends OS implements OSDiscovery
                 'entPhysicalHardwareRev' => $rectifier['SP2-MIB::rectifierHwVersion'] ?? null,
                 'entPhysicalSoftwareRev' => $rectifier['SP2-MIB::rectifierSwVersion'] ?? null,
                 'entPhysicalFirmwareRev' => null,
-                'entPhysicalIsFRU' => 'true'
+                'entPhysicalIsFRU' => 'true',
             ]));
         }
 
         $batteryInstalledType = SnmpQuery::get('SP2-MIB::batteryDescription.0')->value();
         $inventory->push(new EntPhysical([
-            'entPhysicalIndex' =>  100,
+            'entPhysicalIndex' => 100,
             'entPhysicalDescr' => 'Battery',
             'entPhysicalClass' => 'module',
             'entPhysicalName' => $batteryInstalledType,
@@ -122,7 +115,7 @@ class Enexus extends OS implements OSDiscovery
             'entPhysicalHardwareRev' => null,
             'entPhysicalSoftwareRev' => null,
             'entPhysicalFirmwareRev' => null,
-            'entPhysicalIsFRU' => 'true'
+            'entPhysicalIsFRU' => 'true',
         ]));
 
         return $inventory;

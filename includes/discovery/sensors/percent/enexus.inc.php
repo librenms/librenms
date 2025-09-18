@@ -1,4 +1,5 @@
 <?php
+
 if (is_array($pre_cache['enexus_battery_test_result_table'])) {
     $numeric_results = array_filter($pre_cache['enexus_battery_test_result_table'], function ($key) {
         return is_int($key);
