@@ -71,6 +71,10 @@ class AlertRuleRequest extends FormRequest
             'transports' => ['sometimes', 'array'],
             'transports.*' => ['string'],
 
+            'template_id' => ['nullable', 'integer', 'exists:alert_templates,id'],
+            'template_transports' => ['sometimes', 'array'],
+            'template_transports.*' => ['nullable', 'integer', 'exists:alert_templates,id'],
+
             'proc' => ['nullable', 'string'],
             'notes' => ['nullable', 'string'],
         ];
@@ -93,8 +97,8 @@ class AlertRuleRequest extends FormRequest
                 default => false
             }])->toArray());
 
-        // Ensure maps/transports are arrays if present as empty string
-        foreach (['maps', 'transports'] as $key) {
+        // Ensure maps/transports/template_transports are arrays if present as empty string
+        foreach (['maps', 'transports', 'template_transports'] as $key) {
             $value = $this->input($key);
             if ($value === '' || $value === null) {
                 $this->merge([$key => []]);
