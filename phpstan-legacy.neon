@@ -8,6 +8,8 @@ parameters:
 
     resultCachePath: %tmpDir%/resultCache-legacy.php
 
+    reportUnmatchedIgnoredErrors: false
+
     paths:
         - includes
         - html
