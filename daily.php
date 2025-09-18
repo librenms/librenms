@@ -305,7 +305,7 @@ if ($options['f'] === 'refresh_alert_rules') {
         $rules = dbFetchRows('SELECT `id`, `builder`, `extra` FROM `alert_rules`');
         foreach ($rules as $rule) {
             $rule_options = json_decode($rule['extra'], true);
-            if ($rule_options['options']['override_query'] !== 'on') {
+            if ($rule_options['options']['override_query'] !== 'on' && $rule_options['options']['override_query'] !== true) {
                 $data['query'] = QueryBuilderParser::fromJson($rule['builder'])->toSql();
                 if (! empty($data['query'])) {
                     dbUpdate($data, 'alert_rules', 'id=?', [$rule['id']]);
