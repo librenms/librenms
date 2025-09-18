@@ -30,13 +30,13 @@ class Enexus extends OS implements OSDiscovery
         $lat = null;
         $long = null;
 
-        if ($latIntRaw !== null && $latFracRaw !== null) {
+        if ($latIntRaw !== '' && $latFracRaw !== '') {
             $latInt = (int) $latIntRaw;
             $latFrac = (int) $latFracRaw;
             $lat = $latInt + ($latFrac / 1000000);
         }
 
-        if ($longIntRaw !== null && $longFracRaw !== null) {
+        if ($longIntRaw !== '' && $longFracRaw !== '') {
             $longInt = (int) $longIntRaw;
             $longFrac = (int) $longFracRaw;
             $long = $longInt + ($longFrac / 1000000);
