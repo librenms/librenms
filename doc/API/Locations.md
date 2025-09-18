@@ -11,7 +11,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/locations
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/locations
 ```
 
 Output:
@@ -49,7 +49,7 @@ Input:
 Example:
 
 ```curl
-curl -X POST -d '{"location":"Google", "lat":"37.4220041","lng":"-122.0862462"}' -H 'X-Auth-Token:YOUR-API-TOKEN' https://librenms.org/api/v0/locations
+curl -X POST -d '{"location":"Google", "lat":"37.4220041","lng":"-122.0862462"}' -H 'X-Auth-Token:YOUR-API-TOKEN' https://foo.example/api/v0/locations
 ```
 
 Output:
@@ -72,7 +72,7 @@ Route: `/api/v0/locations/:location`
 Example:
 
 ```curl
-curl -X DELETE -H 'X-Auth-Token:YOUR-API-TOKEN' https://librenms.org/api/v0/locations/Google
+curl -X DELETE -H 'X-Auth-Token:YOUR-API-TOKEN' https://foo.example/api/v0/locations/Google
 ```
 
 Output:
@@ -101,7 +101,7 @@ Input:
 Example:
 
 ```curl
-curl -X PATCH -d '{"lng":"100.0862462"}' -H 'X-Auth-Token:YOUR-API-TOKEN' https://librenms.org/api/v0/locations/Google
+curl -X PATCH -d '{"lng":"100.0862462"}' -H 'X-Auth-Token:YOUR-API-TOKEN' https://foo.example/api/v0/locations/Google
 ```
 
 Output:
