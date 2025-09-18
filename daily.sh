@@ -380,7 +380,6 @@ main () {
                                "refresh_os_cache"
                                "refresh_device_groups"
                                "recalculate_device_dependencies"
-                               "syslog"
                                "eventlog"
                                "authlog"
                                "callback"
