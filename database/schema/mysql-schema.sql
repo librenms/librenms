@@ -3009,7 +3009,6 @@ CREATE TABLE `wireless_sensors` (
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
-/*M!999999\- enable the sandbox mode */ 
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (1,'2018_07_03_091314_create_access_points_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (2,'2018_07_03_091314_create_alert_device_map_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (3,'2018_07_03_091314_create_alert_group_map_table',1);
