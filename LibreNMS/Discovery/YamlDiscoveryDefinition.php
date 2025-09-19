@@ -179,7 +179,7 @@ class YamlDiscoveryDefinition
         if (empty($data['oids'])) {
             return [];
         }
-        
+
         if (isset($yaml['pre-cache'])) {
             Eventlog::log('This device discovery yaml is using deprecated pre-cache key, use additional_oids instead.  pre-cache will be removed in a future version.');
         }
