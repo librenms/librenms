@@ -4,7 +4,7 @@ modules:
         sysDescr_regex: '/(?<hardware>.*)_(?<version>.*)/'
         serial: XAVI-XG6846-MIB::serialnum.0
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

@@ -19,7 +19,7 @@ modules:
         serial:
             - NMS-CHASSIS::nmscardSerial.0
             - NMS-CHASSIS::nmscardSerial.1
-    pre-cache:
+    additional_oids:
         data:
             -
                 oid:
@@ -269,7 +269,7 @@ modules:
                     warn_limit: txPowerHighWarning
                     high_limit: txPowerHighAlarm
         humidity:
-            data:        
+            data:
                 -
                     oid: nmsHumidity
                     num_oid: '.1.3.6.1.4.1.52642.3.6.17.{{ $index }}'
@@ -306,7 +306,7 @@ modules:
                         - { descr: lost, graph: 2, value: 2, generic: 2 }
                     skip_values:
                         - # skip ports with no tansceiver inserted
-                            oid: sfpPresentStatus 
+                            oid: sfpPresentStatus
                             op: '='
                             value: 2
                 -
@@ -363,7 +363,7 @@ modules:
                     group: "EPON Inactive Onu Num"
                     descr: "{{ $ponIfIndex }}"
                     index: "inactiveOnuNum.{{ $index }}"
-                    
+
         fanspeed:
             data:
                 -

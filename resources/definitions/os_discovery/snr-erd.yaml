@@ -1,6 +1,6 @@
 mib: SNR-ERD-4
 modules:
-    pre-cache:
+    additional_oids:
         data:
             -
                 oid:
@@ -41,13 +41,13 @@ modules:
                         - { descr: On, graph: 1, value: 1, generic: 0 }
                         - { descr: Reload, graph: 1, value: 2, generic: 2 }
         humidity:
-            data:        
+            data:
                 -
                     oid: rsshtpHum
                     num_oid: '.1.3.6.1.4.1.40418.2.6.1.30.1.1.4.{{ $index }}'
                     descr: '{{ $rsshtpName }} {{ $index }}'
         pressure:
-            data:        
+            data:
                 -
                     oid: rsshtpPssr
                     num_oid: '.1.3.6.1.4.1.40418.2.6.1.30.1.1.6.{{ $index }}'

@@ -14,7 +14,7 @@ modules:
         version:
             - NAG-MIB::sysSoftwareVersion.0
             - NAG-MIB::sysSoftwareVersion.1
-    pre-cache:
+    additional_oids:
         data:
             -
                 oid:

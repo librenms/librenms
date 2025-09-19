@@ -11,7 +11,8 @@
                 "mempools": {
                     "type": "object",
                     "properties": {
-                        "pre-cache": {"$ref": "#/$defs/pre-cache"},
+                        "pre-cache": {"$ref": "#/$defs/additional_oids"},
+                        "additional_oids": {"$ref": "#/$defs/additional_oids"},
                         "data": {
                             "type": "array",
                             "items": {
@@ -316,37 +317,8 @@
                         "voltage": {"$ref": "#/$defs/sensor"},
                         "fanspeed": {"$ref": "#/$defs/sensor"},
                         "temperature": {"$ref": "#/$defs/sensor"},
-                        "pre-cache": {
-                            "type": "object",
-                            "properties": {
-                                "data": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "oid": {"$ref": "#/$defs/oids"},
-                                            "snmp_flags": {
-                                                "type": [
-                                                    "string",
-                                                    "array"
-                                                ]
-                                            },
-                                            "snmp_no_Ih_flag": {
-                                                "type": "string"
-                                            }
-                                        },
-                                        "additionalProperties": false,
-                                        "required": [
-                                            "oid"
-                                        ]
-                                    }
-                                }
-                            },
-                            "additionalProperties": false,
-                            "required": [
-                                "data"
-                            ]
-                        },
+                        "pre-fetch": {"$ref":  "#/$defs/sensor_additional_oids"},
+                        "additional_oids": {"$ref":  "#/$defs/sensor_additional_oids"},
                         "humidity": {"$ref": "#/$defs/sensor"},
                         "airflow": {"$ref": "#/$defs/sensor"},
                         "current": {"$ref": "#/$defs/sensor"},
@@ -451,7 +423,7 @@
                 "pattern": "^((?!sysDescr\\.0|^\\.?1\\.3\\.6\\.1\\.2\\.1\\.1\\.1\\.0).)*$"
             }
         },
-        "pre-cache": {
+        "additional_oids": {
             "type": "object",
             "properties": {
                 "oids": {"$ref": "#/$defs/oids"},
@@ -468,6 +440,35 @@
             "additionalProperties": false,
             "required": [
                 "oids"
+            ]
+        },
+        "sensor_additional_oids": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "oid": {"$ref": "#/$defs/oids"},
+                            "snmp_flags": {
+                                "type": [
+                                    "string",
+                                    "array"
+                                ]
+                            },
+                            "snmp_no_Ih_flag": {
+                                "type": "string"
+                            }
+                        },
+                        "additionalProperties": false,
+                        "required": ["oid"]
+                    }
+                }
+            },
+            "additionalProperties": false,
+            "required": [
+                "data"
             ]
         },
         "sensor": {
