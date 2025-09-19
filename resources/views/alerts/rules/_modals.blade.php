@@ -62,3 +62,58 @@
         </div>
     </div>
 </div>
+
+<script>
+    (function() {
+        var grid = $("#rule_collection").bootgrid({
+            caseSensitive: false,
+            formatters: {
+                "action": function (column, row) {
+                    return "<button type=\"button\" data-rule_id=\"" + row.action + "\" class=\"btn btn-sm btn-primary rule_from_collection\">" + @json(__('alerting.rules.messages.select')) +"<\/button>";
+                }
+            }
+        }).on("loaded.rs.jquery.bootgrid", function () {
+            grid.find(".rule_from_collection").on("click", function () {
+                var template_rule_id = $(this).data("rule_id");
+                $.getJSON('{{ route('alert-rule-template.show', ':template_id') }}'.replace(':template_id', template_rule_id))
+                    .done(function (data) {
+                        if (data.status === 'ok') {
+                            $("#search_rule_modal").modal('hide');
+                            loadRule(data);
+                        } else {
+                            toastr.error(data.message || @json(__('alerting.rules.messages.failed_load_template')));
+                        }
+                    })
+                    .fail(function () {
+                        toastr.error(@json(__('alerting.rules.messages.failed_process_template')));
+                    });
+            }).end();
+        });
+
+        var alert_grid = $("#alert_rule_list").bootgrid({
+            caseSensitive: false,
+            formatters: {
+                "alert_action": function (column, row) {
+                    return "<button type=\"button\" data-rule_id=\"" + row.alert_action + "\" class=\"btn btn-sm btn-primary alert_rule_from_list\">" + @json(__('alerting.rules.messages.select')) +"<\/button>";
+                }
+            },
+            templates: {footer: "<div id=\"@{{ctx.id}}\" class=\"@{{css.footer}}\"><div class=\"row\"><div class=\"col-sm-12\"><p class=\"@{{css.pagination}}\"></p></div></div></div>"}
+        }).on("loaded.rs.jquery.bootgrid", function () {
+            alert_grid.find(".alert_rule_from_list").on("click", function () {
+                var alert_rule_id = $(this).data("rule_id");
+                $.getJSON('{{ route('alert-rule-template.rule', ':rule_id') }}'.replace(':rule_id', alert_rule_id))
+                    .done(function (data) {
+                        if (data.status === 'ok') {
+                            $("#search_alert_rule_modal").modal('hide');
+                            loadRule(data);
+                        } else {
+                            toastr.error(data.message || @json(__('alerting.rules.messages.failed_load_rule')));
+                        }
+                    })
+                    .fail(function () {
+                        toastr.error(@json(__('alerting.rules.messages.failed_process_template')));
+                    });
+            }).end();
+        });
+    })();
+</script>
