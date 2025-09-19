@@ -120,7 +120,7 @@ class RunAlerts
         $obj['proc'] = $alert['proc'];
         $obj['status'] = $device->status;
         $obj['status_reason'] = $device->status_reason;
-        if ((new ConnectivityHelper($device))->canPing()) {
+        if (ConnectivityHelper::pingIsAllowed($device)) {
             $last_ping = Rrd::lastUpdate(Rrd::name($device->hostname, 'icmp-perf'));
             if ($last_ping) {
                 $obj['ping_timestamp'] = $last_ping->timestamp;
