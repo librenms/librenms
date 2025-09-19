@@ -8,7 +8,7 @@ modules:
         serial: ENTITY-MIB::entPhysicalSerialNum.1
         version: ENTITY-MIB::entPhysicalSoftwareRev.1
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:
@@ -39,14 +39,14 @@ modules:
                     num_oid: '.1.3.6.1.4.1.2544.1.12.4.1.57.1.11.{{ $index }}'
                     descr: 'Current number of good/usable satellites'
                     group: GNSS
-                    index: 'f3GPSReceiverPortNumTrackingSatellites.{{ $index }}' 
+                    index: 'f3GPSReceiverPortNumTrackingSatellites.{{ $index }}'
                 -
                     oid: f3NtpClockStratumLevel
                     value: f3NtpClockStratumLevel
                     num_oid: '.1.3.6.1.4.1.2544.1.12.47.1.1.1.6.{{ $index }}'
                     descr: 'Current stratum'
                     group: NTP
-                    index: 'f3NtpClockStratumLevel.{{ $index }}' 
+                    index: 'f3NtpClockStratumLevel.{{ $index }}'
                 -
                     oid: f3PtpSOOCEntry
                     value: f3PtpSOOCCurrentOffsetFromMaster
@@ -58,7 +58,7 @@ modules:
                         -
                           oid: f3PtpSOOCAdminState
                           op: '!='
-                          value: 1       
+                          value: 1
                 -
                     oid: f3PtpSOOCEntry
                     value: f3PtpSOOCRecentMeanPathDelay
@@ -71,7 +71,7 @@ modules:
                         -
                           oid: f3PtpSOOCAdminState
                           op: '!='
-                          value: 1 
+                          value: 1
         state:
             data:
                 -
@@ -151,7 +151,7 @@ modules:
                     index: 'f3TimeClockOperationalState.{{ $index }}'
                     states:
                         - { value: 1, descr: ok, graph: 1, generic: 0 }
-                        - { value: 2, descr: nok, graph: 1, generic: 2 }     
+                        - { value: 2, descr: nok, graph: 1, generic: 2 }
                 -
                     oid: f3TimeClockClockMode
                     value: f3TimeClockClockMode
@@ -161,10 +161,10 @@ modules:
                     index: 'f3TimeClockClockMode.{{ $index }}'
                     states:
                         - { value: 1, descr: freerun, graph: 1, generic: 2 }
-                        - { value: 2, descr: warmup, graph: 1, generic: 1 }     
-                        - { value: 3, descr: tracking, graph: 1, generic: 1 }   
-                        - { value: 4, descr: transition, graph: 1, generic: 1 }   
-                        - { value: 5, descr: holdover, graph: 1, generic: 2 }   
+                        - { value: 2, descr: warmup, graph: 1, generic: 1 }
+                        - { value: 3, descr: tracking, graph: 1, generic: 1 }
+                        - { value: 4, descr: transition, graph: 1, generic: 1 }
+                        - { value: 5, descr: holdover, graph: 1, generic: 2 }
                         - { value: 6, descr: locked, graph: 1, generic: 0 }
                 -
                     oid: f3GPSReceiverPortOperationalState
@@ -175,7 +175,7 @@ modules:
                     index: 'f3GPSReceiverPortOperationalState.{{ $index }}'
                     states:
                         - { value: 1, descr: ok, graph: 1, generic: 0 }
-                        - { value: 2, descr: nok, graph: 1, generic: 2 } 
+                        - { value: 2, descr: nok, graph: 1, generic: 2 }
                 -
                     oid: f3GPSReceiverPortAntennaStatus
                     value: f3GPSReceiverPortAntennaStatus
@@ -185,9 +185,9 @@ modules:
                     index: 'f3GPSReceiverPortAntennaStatus.{{ $index }}'
                     states:
                         - { value: 1, descr: open, graph: 1, generic: 2 }
-                        - { value: 2, descr: short, graph: 1, generic: 2 }    
-                        - { value: 3, descr: normal, graph: 1, generic: 0 }    
-                        - { value: 4, descr: unavailable, graph: 1, generic: 3 } 
+                        - { value: 2, descr: short, graph: 1, generic: 2 }
+                        - { value: 3, descr: normal, graph: 1, generic: 0 }
+                        - { value: 4, descr: unavailable, graph: 1, generic: 3 }
                 -
                     oid: f3NtpClockOperationalState
                     value: f3NtpClockOperationalState
@@ -197,7 +197,7 @@ modules:
                     index: 'f3NtpClockOperationalState.{{ $index }}'
                     states:
                         - { value: 1, descr: ok, graph: 1, generic: 0 }
-                        - { value: 2, descr: nok, graph: 1, generic: 2 }    
+                        - { value: 2, descr: nok, graph: 1, generic: 2 }
                 -
                     oid: f3PtpMasterClockEntry
                     value: f3PtpMasterClockOperationalState
@@ -212,7 +212,7 @@ modules:
                           value: 1
                     states:
                         - { value: 1, descr: ok, graph: 1, generic: 0 }
-                        - { value: 2, descr: nok, graph: 1, generic: 2 }      
+                        - { value: 2, descr: nok, graph: 1, generic: 2 }
                 -
                     oid: f3PtpTSEntry
                     value: f3PtpTSOperationalState
@@ -242,7 +242,7 @@ modules:
                           value: 1
                     states:
                         - { value: 1, descr: ok, graph: 1, generic: 0 }
-                        - { value: 2, descr: nok, graph: 1, generic: 2 }      
+                        - { value: 2, descr: nok, graph: 1, generic: 2 }
                 -
                     oid: f3PtpDynamicRemoteSlaveEntry
                     value: f3PtpDynamicRemoteSlaveOperationalState
@@ -257,4 +257,4 @@ modules:
                           value: 1
                     states:
                         - { value: 1, descr: ok, graph: 1, generic: 0 }
-                        - { value: 2, descr: nok, graph: 1, generic: 2 }  
+                        - { value: 2, descr: nok, graph: 1, generic: 2 }

@@ -1,6 +1,6 @@
 modules:
     mempools:
-        pre-cache:
+        additional_oids:
             oids:
                 - ASAM-EQUIP-MIB::eqptBoardTable
         data:
