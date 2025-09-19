@@ -626,7 +626,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
     if (isset($tmp_alerts['sensor_id'])) {
         if ($tmp_alerts['sensor_class'] == 'state') {
             // Give more details for a state (textual form)
-            $details = 'State: ' . $tmp_alerts['state_descr'] ?? '' . ' (numerical ' . $tmp_alerts['sensor_current'] . ')<br>  ';
+            $details = 'State: ' . ($tmp_alerts['state_descr'] ?? '') . ' (numerical ' . $tmp_alerts['sensor_current'] . ')<br>  ';
         } else {
             // Other sensors
             $details = 'Value: ' . $tmp_alerts['sensor_current'] . ' (' . $tmp_alerts['sensor_class'] . ')<br>  ';
