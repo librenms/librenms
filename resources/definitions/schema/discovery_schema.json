@@ -11,7 +11,6 @@
                 "mempools": {
                     "type": "object",
                     "properties": {
-                        "pre-cache": {"$ref": "#/$defs/additional_oids"},
                         "additional_oids": {"$ref": "#/$defs/additional_oids"},
                         "data": {
                             "type": "array",
@@ -317,7 +316,6 @@
                         "voltage": {"$ref": "#/$defs/sensor"},
                         "fanspeed": {"$ref": "#/$defs/sensor"},
                         "temperature": {"$ref": "#/$defs/sensor"},
-                        "pre-fetch": {"$ref":  "#/$defs/sensor_additional_oids"},
                         "additional_oids": {"$ref":  "#/$defs/sensor_additional_oids"},
                         "humidity": {"$ref": "#/$defs/sensor"},
                         "airflow": {"$ref": "#/$defs/sensor"},
