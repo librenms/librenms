@@ -246,7 +246,7 @@ Route::middleware(['auth'])->group(function (): void {
 
     Route::resource('alert-rule', AlertRuleController::class)->except(['index']);
     Route::resource('alert-operation', AlertOperationController::class)->only(['show', 'store', 'update', 'destroy']);
-    Route::put('alert-rule/{alert_rule}/toggle', [AlertRuleController::class, 'toggle'])->name('alert-rule.toggle');
+    Route::put('alert-rule/{alert_rule}/toggleInput', [AlertRuleController::class, 'toggle'])->name('alert-rule.toggleInput');
     Route::resource('alert-rule-template', AlertRuleTemplateController::class)->only('index', 'show');
     Route::get('alert-rule-template/from-rule/{alert_rule}', [AlertRuleTemplateController::class, 'rule'])->name('alert-rule-template.rule');
     Route::get('alertlog/{alertLog}/details', Ajax\AlertDetailsController::class)->name('alertlog.details');

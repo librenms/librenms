@@ -33,8 +33,8 @@ $response[] = [
     'id' => '<button type="submit" id="save-form" class="btn btn-success btn-sm" title="Save current component disable/ignore settings">Save</button><button type="submit" id="form-reset" class="btn btn-danger btn-sm" title="Reset form to when the page was loaded">Reset</button>',
     'label' => '&nbsp;',
     'status' => '<button type="submit" id="warning-select" class="btn btn-default btn-sm" title="Disable alerting on all currently warning components">Warning</button>&nbsp;<button type="submit" id="critical-select" class="btn btn-default btn-sm" title="Disable alerting on all currently critical components">Critical</button>',
-    'disable' => '<button type="submit" id="disable-toggle" class="btn btn-default btn-sm" title="Toggle polling for all components">Toggle</button><button type="button" id="disable-select" class="btn btn-default btn-sm" title="Disable polling on all components">Select All</button>',
-    'ignore' => '<button type="submit" id="ignore-toggle" class="btn btn-default btn-sm" title="Toggle alert tag for all components">Toggle</button><button type="button" id="ignore-select" class="btn btn-default btn-sm" title="Disable alert tag on all components">Select All</button>',
+    'disable' => '<button type="submit" id="disable-toggleInput" class="btn btn-default btn-sm" title="Toggle polling for all components">Toggle</button><button type="button" id="disable-select" class="btn btn-default btn-sm" title="Disable polling on all components">Select All</button>',
+    'ignore' => '<button type="submit" id="ignore-toggleInput" class="btn btn-default btn-sm" title="Toggle alert tag for all components">Toggle</button><button type="button" id="ignore-select" class="btn btn-default btn-sm" title="Disable alert tag on all components">Select All</button>',
 ];
 
 foreach ($COMPONENTS[$device_id] as $ID => $AVP) {
