@@ -168,11 +168,11 @@ $common_output[] = '<div class="form-group"> \
 
         $(".pdf-export").html("<a href=\'pdf.php?report=alert-log&device_id=' . htmlspecialchars($device_id) . '&string=" + search + "&results=" + max + "&start=" + low + "\'><i class=\'fa fa-file-pdf-o fa-lg icon-theme\' aria-hidden=\'true\'></i> Export to PDF</a>");
 
-        grid.find(".incident-toggle").each(function () {
-            $(this).parent().addClass(\'incident-toggle-td\');
+        grid.find(".incident-toggleInput").each(function () {
+            $(this).parent().addClass(\'incident-toggleInput-td\');
         }).on("click", function (e) {
             var target = $(this).data("target");
-            $(target).collapse(\'toggle\');
+            $(target).collapse(\'toggleInput\');
             $(this).toggleClass(\'fa-plus fa-minus\');
         });
         grid.find(".verbose-alert-details").on("click", function(e) {
@@ -187,20 +187,20 @@ $common_output[] = '<div class="form-group"> \
                 $(this).parent().parent().find(".verbose-alert-details").fadeIn(0);
             }
             $(this).parent().parent().on("mouseenter", function () {
-                $(this).find(".incident-toggle").fadeIn(200);
+                $(this).find(".incident-toggleInput").fadeIn(200);
                 if ($(this).find(".alert-status").hasClass(\'label-danger\')){
                     $(this).find(".command-alert-details").fadeIn(200);
                 }
             }).on("mouseleave", function () {
-                $(this).find(".incident-toggle").fadeOut(200);
+                $(this).find(".incident-toggleInput").fadeOut(200);
                 if ($(this).find(".alert-status").hasClass(\'label-danger\')){
                     $(this).find(".command-alert-details").fadeOut(200);
                 }
-            }).on("click", "td:not(.incident-toggle-td)", function () {
-                var target = $(this).parent().find(".incident-toggle").data("target");
-                if ($(this).parent().find(".incident-toggle").hasClass(\'fa-plus\')) {
-                    $(this).parent().find(".incident-toggle").toggleClass(\'fa-plus fa-minus\');
-                    $(target).collapse(\'toggle\');
+            }).on("click", "td:not(.incident-toggleInput-td)", function () {
+                var target = $(this).parent().find(".incident-toggleInput").data("target");
+                if ($(this).parent().find(".incident-toggleInput").hasClass(\'fa-plus\')) {
+                    $(this).parent().find(".incident-toggleInput").toggleClass(\'fa-plus fa-minus\');
+                    $(target).collapse(\'toggleInput\');
                 }
             });
         });

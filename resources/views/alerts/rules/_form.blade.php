@@ -1,10 +1,30 @@
-<div class="tab-content" style="margin-top: 15px;">
+<div class="panel panel-default" x-data="alertRuleForm()" x-init="init()">
+    <div class="panel-heading">
+        <h3 class="panel-title">
+            {{ __('Create Alert Rule') }}
+            <div class="pull-right">
+                <a target="_blank" href="https://docs.librenms.org/Alerting/" class="tw:mr-5"><i class="fa fa-book"></i> {{ __('Documentation') }}</a>
+                <a href="javascript:void(0);" onclick="window.history.back();" class="tw:text-gray-700 tw:hover:text-red-600 tw:no-underline tw:text-3xl tw:transition-colors tw:duration-200" title="{{ __('Close') }}">
+                    <i class="fa fa-times"></i>
+                </a>
+            </div>
+        </h3>
+    </div>
+    <div class="panel-body">
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#main" aria-controls="main" role="tab" data-toggle="tab">{{ __('Main') }}&nbsp;</a></li>
+            <li role="presentation"><a href="#advanced" aria-controls="advanced" role="tab" data-toggle="tab">{{ __('Advanced') }}&nbsp;</a></li>
+        </ul>
+        <form method="post" role="form" id="rules" class="form-horizontal alerts-form">
+            @csrf
+
+            <div class="tab-content" style="margin-top: 15px;">
     <div role="tabpanel" class="tab-pane active" id="main">
         <legend>{{ __('alerting.rules.setup.legend') }}</legend>
         <div class='form-group'>
             <label for='rule_name' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.setup.name.label') }}</label>
             <div class='col-sm-9 col-md-10'>
-                <input type='text' id='rule_name' name='name' class='form-control validation' maxlength='200' required>
+                <input type='text' id='rule_name' name='name' class='form-control validation' maxlength='200' required x-model="rule.name">
                 <span class="help-block">{{ __('alerting.rules.setup.name.help') }}</span>
             </div>
         </div>
@@ -58,10 +78,10 @@
         <div class="form-group">
             <label for='severity' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.severity.label') }}</label>
             <div class="col-sm-9 col-md-10">
-                <select name='severity' id='severity' class='form-control' style="max-width: 7.5em">
-                    <option value='ok' {{ ($default_severity ?? '') === 'ok' ? 'selected' : '' }}>{{ __('alerting.rules.notifications.severity.options.ok') }}</option>
-                    <option value='warning' {{ ($default_severity ?? '') === 'warning' ? 'selected' : '' }}>{{ __('alerting.rules.notifications.severity.options.warning') }}</option>
-                    <option value='critical' {{ ($default_severity ?? '') === 'critical' ? 'selected' : '' }}>{{ __('alerting.rules.notifications.severity.options.critical') }}</option>
+                <select name='severity' id='severity' class='form-control' style="max-width: 7.5em" x-model="rule.severity">
+                    <option value='ok'>{{ __('alerting.rules.notifications.severity.options.ok') }}</option>
+                    <option value='warning'>{{ __('alerting.rules.notifications.severity.options.warning') }}</option>
+                    <option value='critical'>{{ __('alerting.rules.notifications.severity.options.critical') }}</option>
                 </select>
                 <span class="help-block">{{ __('alerting.rules.notifications.severity.help') }}</span>
             </div>
@@ -69,51 +89,51 @@
         <div class="form-group">
             <label for='delay' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.delay.label') }}</label>
             <div class="col-sm-9 col-md-10">
-                <input type='text' id='delay' name='delay' class='form-control' style="max-width: 7.5em" value="{{ $default_delay ?? '' }}">
+                <input type='text' id='delay' name='delay' class='form-control' style="max-width: 7.5em" value="{{ $default_delay ?? '' }}" x-model="rule.extra.delay">
                 <span class="help-block">{{ __('alerting.rules.notifications.delay.help') }}</span>
             </div>
         </div>
         <div class="form-group">
             <label for='count' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.count.label') }}</label>
             <div class="col-sm-9 col-md-10">
-                <input type='text' id='count' name='count' class='form-control' style="max-width: 7.5em" value="{{ $default_max_alerts ?? '' }}">
+                <input type='text' id='count' name='count' class='form-control' style="max-width: 7.5em" value="{{ $default_max_alerts ?? '' }}" x-model="rule.extra.count">
                 <span class="help-block">{{ __('alerting.rules.notifications.count.help') }}</span>
             </div>
         </div>
         <div class="form-group">
             <label for='interval' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.interval.label') }}</label>
             <div class="col-sm-9 col-md-10">
-                <input type='text' id='interval' name='interval' class='form-control' style="max-width: 7.5em" value="{{ $default_interval ?? '' }}">
+                <input type='text' id='interval' name='interval' class='form-control' style="max-width: 7.5em" value="{{ $default_interval ?? '' }}" x-model="rule.extra.interval">
                 <span class="help-block">{{ __('alerting.rules.notifications.interval.help') }}</span>
             </div>
         </div>
         <div class='form-group'>
-            <label for='mute' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.mute.label') }} </label>
+            <label for='mute' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.mute.label') }}</label>
             <div class='col-sm-9 col-md-10'>
-                <input type="checkbox" name="mute" id="mute">
+                <input type="checkbox" x-data="toggleInput()" x-model="rule.extra.mute">
                 <span class="help-block">{{ __('alerting.rules.notifications.mute.help') }}</span>
             </div>
         </div>
         <div class='form-group'>
-            <label for='recovery' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.recovery.label') }} </label>
+            <label for='recovery' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.recovery.label') }}</label>
             <div class='col-sm-9 col-md-10'>
-                <input type="checkbox" name="recovery" id="recovery">
+                <input type="checkbox" name="recovery" id="recovery" x-model="rule.extra.recovery">
                 <span class="help-block">{{ __('alerting.rules.notifications.recovery.help') }}</span>
             </div>
         </div>
         <div class='form-group'>
-            <label for='acknowledgement' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.acknowledgement.label') }} </label>
+            <label for='acknowledgement' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.acknowledgement.label') }}</label>
             <div class='col-sm-9 col-md-10'>
-                <input type="checkbox" name="acknowledgement" id="acknowledgement">
+                <input type="checkbox" name="acknowledgement" id="acknowledgement" x-model="rule.extra.acknowledgement">
                 <span class="help-block">{{ __('alerting.rules.notifications.acknowledgement.help') }}</span>
             </div>
         </div>
 
         <legend>{{ __('alerting.rules.notifications.delivery.legend') }}</legend>
         <div class="form-group">
-            <label for="transports" class="col-sm-3 col-md-2 control-label">{{ __('alerting.rules.notifications.delivery.label') }} </label>
+            <label for="transports" class="col-sm-3 col-md-2 control-label">{{ __('alerting.rules.notifications.delivery.label') }}</label>
             <div class="col-sm-9 col-md-10">
-                <select id="transports" name="transports[]" class="form-control" multiple="multiple"></select>
+                <select id="transports" name="transports[]" class="form-control" multiple="multiple" x-model="rule.template"></select>
                 <span class="help-block">{{ __('alerting.rules.notifications.delivery.help') }}</span>
             </div>
         </div>
@@ -143,14 +163,14 @@
         <div class='form-group'>
             <label for='proc' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notes.proc_url.label') }} </label>
             <div class='col-sm-9 col-md-10'>
-                <input type='text' id='proc' name='proc' class='form-control validation' pattern='(http|https)://.*' maxlength='80'>
+                <input type='text' id='proc' name='proc' class='form-control validation' pattern='(http|https)://.*' maxlength='80' x-model="rule.proc">
                 <span class="help-block">{{ __('alerting.rules.notes.proc_url.help') }}</span>
             </div>
         </div>
         <div class='form-group'>
             <label for='notes' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notes.notes.label') }}</label>
             <div class='col-sm-9 col-md-10'>
-                <textarea class="form-control" rows="6" name="notes" id='notes'></textarea>
+                <textarea class="form-control" rows="6" name="notes" id='notes' x-model="rule.notes"></textarea>
                 <span class="help-block">{{ __('alerting.rules.notes.notes.help') }}</span>
             </div>
         </div>
@@ -159,13 +179,13 @@
         <div class='form-group'>
             <label for='override_query' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.advanced.override_sql.label') }}</label>
             <div class='col-sm-9 col-md-10'>
-                <input type='checkbox' name='override_query' id='override_query'>
+                <input type='checkbox' name='override_query' id='override_query' x-model="rule.extra.override_query">
             </div>
         </div>
         <div class='form-group'>
             <label for='adv_query' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.advanced.sql.label') }}</label>
             <div class='col-sm-9 col-md-10'>
-                <textarea id='adv_query' name='adv_query' class='form-control' rows="3"></textarea>
+                <textarea id='adv_query' name='adv_query' class='form-control' rows="3" x-model="rule.extra.adv_query"></textarea>
                 <span class="help-block">{{ __('alerting.rules.advanced.sql.help') }}</span>
             </div>
         </div>
@@ -174,8 +194,12 @@
 
 <div class="form-group">
     <div class="col-sm-offset-3 col-sm-9 col-md-offset-2 col-md-10">
-        <button id="btn-save" type="submit" class="btn btn-primary">{{ __('Save') }}</button>
-        <a href="{{ url('alert-rules') }}" class="btn btn-default">{{ __('Cancel') }}</a>
+        <button @click.prevent="save" class="btn btn-primary">{{ __('Save') }}</button>
+        <a href="javascript:void(0);" onclick="window.history.back();" class="btn btn-default">{{ __('Cancel') }}</a>
+    </div>
+</div>
+
+        </form>
     </div>
 </div>
 
@@ -186,6 +210,131 @@
 @endsection
 
 @push('scripts')
+<script>
+    function alertRuleForm() {
+        return {
+            mode: @json($mode ?? 'create'),
+            saveUrl: @json($saveUrl ?? url('alert-rule')),
+            saveMethod: @json($saveMethod ?? 'POST'),
+            loadUrl: @json($loadUrl ?? null),
+            rule: {
+                name: '',
+                severity: 'critical',
+                notes: '',
+                builder: null,
+                proc: '',
+                extra: {
+                    mute: {{ ($default_mute_alerts ?? false) ? 'true' : 'false' }},
+                    invert: {{ ($default_invert_rule_match ?? false) ? 'true' : 'false' }},
+                    recovery: {{ ($default_recovery_alerts ?? false) ? 'true' : 'false' }},
+                    acknowledgement: {{ ($default_acknowledgement_alerts ?? false) ? 'true' : 'false' }},
+                    override_query: false,
+                    adv_query: '',
+                },
+                maps: [],
+                transports: [],
+            },
+
+            init() {
+                this.initQueryBuilder();
+                this.initSelect2('#maps', 'devices_groups_locations', v => this.rule.maps = v);
+                this.initSelect2('#transports', 'transport_groups', v => this.rule.transports = v);
+
+                if (this.mode === 'edit' && this.loadUrl) {
+                    fetch(this.loadUrl)
+                        .then(r => r.json())
+                        .then(data => this.loadRule(data))
+                        .catch(() => toastr.error("Failed to load rule"));
+                }
+            },
+
+            initQueryBuilder() {
+                $('#builder').queryBuilder({
+                    plugins: ['bt-tooltip-errors'],
+                    allow_empty: true,
+                    filters: {!! $filters !!},
+                });
+            },
+
+            initSelect2(el, type, callback) {
+                $(el).select2({
+                    width: '100%',
+                    ajax: {
+                        url: 'ajax_list.php',
+                        delay: 250,
+                        data: params => ({ type, search: params.term })
+                    }
+                }).on('change', () => callback($(el).val()));
+            },
+
+            loadRule(rule) {
+                this.rule = {
+                    ...this.rule,
+                    ...rule,
+                    extra: { ...this.rule.extra, ...(rule.extra || {}) },
+                    maps: rule.maps?.map(m => m.id) || [],
+                    transports: rule.transports?.map(t => t.id) || [],
+                };
+                $('#builder').queryBuilder('setRules', this.rule.builder || {});
+                $('#maps').val(this.rule.maps).trigger('change');
+                $('#transports').val(this.rule.transports).trigger('change');
+            },
+
+            async save() {
+                const rules = $('#builder').queryBuilder('getRules');
+                if (!rules?.valid) {
+                    toastr.error("Invalid rule");
+                    return;
+                }
+                this.rule.builder = rules;
+
+                try {
+                    const res = await fetch(this.saveUrl, {
+                        method: this.saveMethod,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(this.rule)
+                    });
+                    const data = await res.json();
+                    if (data.status === 'ok') {
+                        toastr.success(data.message);
+                        window.location.href = "{{ url('alert-rules') }}";
+                    } else {
+                        toastr.error(data.message);
+                    }
+                } catch {
+                    toastr.error("Failed to process rule");
+                }
+            },
+
+            importSql() {
+                const sql = window.prompt("Enter SQL query");
+                if (!sql) return;
+                try {
+                    $("#builder").queryBuilder("setRulesFromSQL", sql);
+                } catch {
+                    alert("Could not parse SQL");
+                }
+            },
+
+            importOld() {
+                let input = window.prompt("Enter old rule format");
+                if (!input) return;
+                try {
+                    input = input
+                        .replace(/&&/g, 'AND')
+                        .replace(/\|\|/g, 'OR')
+                        .replace(/%/g, '')
+                        .replace(/"/g, "'")
+                        .replace(/~/g, 'REGEXP')
+                        .replace(/@/g, '.*');
+                    $("#builder").queryBuilder("setRulesFromSQL", input);
+                } catch {
+                    alert("Could not parse old rule");
+                }
+            }
+        }
+    }
+</script>
 <script>
     // helper to format seconds to s/m/h/d string
     function formatDuration(val) {
@@ -260,38 +409,6 @@
         var SAVE_METHOD = @json($saveMethod ?? 'POST');
         var LOAD_URL = @json($loadUrl ?? null);
 
-        // Collection modal grid (if present on page)
-        var $collectionTable = $("#rule_collection");
-        if ($collectionTable.length) {
-            var grid = $collectionTable.bootgrid({
-                caseSensitive: false,
-                formatters: { "action": function (column, row) { return "<button type=\"button\" data-rule_id=\"" + row.action + "\" class=\"btn btn-sm btn-primary rule_from_collection\">" + @json(__('alerting.rules.messages.select')) + "<\/button>"; } }
-            }).on("loaded.rs.jquery.bootgrid", function () {
-                grid.find(".rule_from_collection").on("click", function () {
-                    var template_rule_id = $(this).data("rule_id");
-                    $.getJSON('{{ route('alert-rule-template.show', ':template_id') }}'.replace(':template_id', template_rule_id))
-                        .done(function (data) { if (data.status === 'ok') { $("#search_rule_modal").modal('hide'); loadRule(data); } else { toastr.error(data.message || @json(__('alerting.rules.messages.failed_load_template'))); } })
-                        .fail(function () { toastr.error(@json(__('alerting.rules.messages.failed_process_template'))); });
-                }).end();
-            });
-        }
-
-        // Existing alert rules modal grid (if present)
-        var $alertTable = $("#alert_rule_list");
-        if ($alertTable.length) {
-            var alert_grid = $alertTable.bootgrid({
-                caseSensitive: false,
-                formatters: { "alert_action": function (column, row) { return "<button type=\"button\" data-rule_id=\"" + row.alert_action + "\" class=\"btn btn-sm btn-primary alert_rule_from_list\">" + @json(__('alerting.rules.messages.select')) + "<\/button>"; } },
-                templates: { footer: "<div id=\"@{{ctx.id}}\" class=\"@{{css.footer}}\"><div class=\"row\"><div class=\"col-sm-12\"><p class=\"@{{css.pagination}}\"></p></div></div></div>" }
-            }).on("loaded.rs.jquery.bootgrid", function() {
-                alert_grid.find(".alert_rule_from_list").on("click", function() {
-                    var alert_rule_id = $(this).data("rule_id");
-                    $.getJSON('{{ route('alert-rule-template.rule', ':rule_id') }}'.replace(':rule_id', alert_rule_id))
-                        .done(function (data) { if (data.status === 'ok') { $("#search_alert_rule_modal").modal('hide'); loadRule(data); } else { toastr.error(data.message || @json(__('alerting.rules.messages.failed_load_rule'))); } })
-                        .fail(function () { toastr.error(@json(__('alerting.rules.messages.failed_process_template'))); });
-                }).end();
-            });
-        }
 
         $(function() {
             // Initialize switches

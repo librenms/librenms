@@ -1998,8 +1998,12 @@ label {
 }
 
 /* Workaround for https://github.com/select2/select2/issues/291 */
-.select2-selection--multiple .select2-search--inline .select2-search__field {
-  width: auto !important;
+/* updated workardound https://github.com/select2/select2/pull/4898#issuecomment-408568031 */
+.select2-container .select2-selection__rendered > *:first-child.select2-search--inline {
+    width: 100% !important;
+}
+.select2-container .select2-selection__rendered > *:first-child.select2-search--inline .select2-search__field {
+    width: 100% !important;
 }
 
 .tooltip {
