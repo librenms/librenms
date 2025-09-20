@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
@@ -290,6 +291,23 @@ class Device extends BaseModel
         return $this->maintenanceStatus;
     }
 
+    public function getDeviceStatus(): DeviceStatus
+    {
+        if ($this->disabled) {
+            return DeviceStatus::DISABLED;
+        }
+
+        if ($this->ignore) {
+            return $this->status ? DeviceStatus::IGNORED_UP : DeviceStatus::IGNORED_DOWN;
+        }
+
+        if ($this->status) {
+            return DeviceStatus::UP;
+        }
+
+        return $this->last_polled ? DeviceStatus::DOWN : DeviceStatus::NEVER_POLLED;
+    }
+
     /**
      * Get the shortened display name of this device.
      * Length is always overridden by shorthost_target_length.
@@ -321,9 +339,11 @@ class Device extends BaseModel
      */
     public function getCurrentOutage(): ?DeviceOutage
     {
-        return $this->relationLoaded('outages')
-            ? $this->outages->whereNull('up_again')->sortBy('going_down', descending: true)->first()
-            : $this->outages()->whereNull('up_again')->orderBy('going_down', 'desc')->first();
+        if ($this->relationLoaded('outages')) {
+            return $this->outages->whereNull('up_again')->sortBy('going_down', descending: true)->first();
+        }
+
+        return $this->outages()->whereNull('up_again')->orderBy('going_down', 'desc')->first();
     }
 
     /**
