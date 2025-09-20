@@ -1,4 +1,5 @@
+mib: ICT-PDU-MIB
 modules:
     os:
-        hardware: ICT-DISTRIBUTION-PANEL-MIB::deviceModel.0
-        version: ICT-DISTRIBUTION-PANEL-MIB::deviceFirmware.0
+        hardware: ICT-PDU-MIB::deviceModel.0
+        version: ICT-PDU-MIB::deviceFirmware.0

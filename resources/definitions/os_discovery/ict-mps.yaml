@@ -1,8 +1,8 @@
-mib: ICT-MODULAR-POWER-SYSTEM-MIB
+mib: ICT-POWERSYSTEM-MIB
 modules:
     os:
-        hardware: ICT-MODULAR-POWER-SYSTEM-MIB::deviceModel.0
-        version: ICT-MODULAR-POWER-SYSTEM-MIB::deviceFirmware.0
+        hardware: ICT-POWERSYSTEM-MIB::deviceModel.0
+        version: ICT-POWERSYSTEM-MIB::deviceFirmware.0
     sensors:
         current:
             data:
@@ -57,3 +57,24 @@ modules:
                         - { graph: 0, value: 2, generic: 0, descr: power }
                         - { graph: 0, value: 3, generic: 0, descr: battery }
                         - { graph: 0, value: 4, generic: 0, descr: distribution }
+        temperature:
+            data:
+                -
+                    oid: probeTemperature.0
+                    num_oid: '.1.3.6.1.4.1.39145.13.12.0'
+                    descr: 'Battery Probe'
+                    value: probeTemperature
+        charge:
+            data:
+                -
+                    oid: batterySoc.0
+                    num_oid: '.1.3.6.1.4.1.39145.13.13.0'
+                    descr: 'Battery Charge'
+                    value: batterySoc
+        runtime:
+            data:
+                -
+                    oid: batteryRunTime.0
+                    num_oid: '.1.3.6.1.4.1.39145.13.15.0'
+                    descr: 'Battery Run-time'
+                    value: batteryRunTime

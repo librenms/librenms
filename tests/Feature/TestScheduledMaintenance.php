@@ -8,7 +8,7 @@ use Carbon\CarbonImmutable;
 use LibreNMS\Enum\AlertScheduleStatus;
 use LibreNMS\Tests\DBTestCase;
 
-class TestScheduledMaintenance extends DBTestCase
+final class TestScheduledMaintenance extends DBTestCase
 {
     private $timezone;
 

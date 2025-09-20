@@ -29,7 +29,7 @@ namespace LibreNMS\Tests\Feature\Commands;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Tests\InMemoryDbTestCase;
 
-class TestConfigCommands extends InMemoryDbTestCase
+final class TestConfigCommands extends InMemoryDbTestCase
 {
     public function testSetting(): void
     {
