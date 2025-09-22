@@ -1,0 +1,838 @@
+-- *****************************************************************
+-- MIB-SNMP: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-SNMP DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Integer32 FROM SNMPv2-SMI
+    IpAddress FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    DisplayString FROM BTS-TC
+    RowEditorState FROM BTS-TC
+    ;
+
+snmpMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of SNMP"
+    REVISION    "201407180000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 36 }
+
+
+SnmpAuthProtocl ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The SNMP authentication protocol"
+    SYNTAX      INTEGER { snmpNoAuthProtocol(0),
+                          snmpMD5AuthProtocol(1),
+                          snmpSHAAuthProtocol(2) }
+
+SnmpPrivProtocl ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The SNMP privacy protocol"
+    SYNTAX      INTEGER { snmpNoPrivProtocol(0),
+                          snmpDESPrivProtocol(1),
+                          snmpAESPrivProtocol(2) }
+
+SnmpSecurityLevel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The SNMP authentication protocol"
+    SYNTAX      INTEGER { snmpNoAuthNoPriv(1), snmpAuthNoPriv(2),
+                          snmpAuthPriv(3) }
+
+SnmpSecurityModel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The SNMP security model"
+    SYNTAX      INTEGER { any(0), v1(1), v2c(2), usm(3) }
+
+SnmpVersion ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The version of SNMP"
+    SYNTAX      INTEGER { snmpV1(0), snmpV2c(1), snmpV3(2) }
+
+SnmpViewType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The SNMP view type"
+    SYNTAX      INTEGER { included(0), excluded(1) }
+
+snmpMibObjects OBJECT IDENTIFIER
+    ::= { snmpMib 1 }
+
+snmpConfig OBJECT IDENTIFIER
+    ::= { snmpMibObjects 2 }
+
+snmpConfigGlobals OBJECT IDENTIFIER
+    ::= { snmpConfig 1 }
+
+snmpConfigGlobalsMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global mode of SNMP."
+    ::= { snmpConfigGlobals 1 }
+
+snmpConfigGlobalsVersion OBJECT-TYPE
+    SYNTAX      SnmpVersion
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "SNMP Version. The supported versions are snmpV1, snmpV2c, snmpV3."
+    ::= { snmpConfigGlobals 2 }
+
+snmpConfigGlobalsReadCommunity OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The community read access string to permit access to SNMP agent."
+    ::= { snmpConfigGlobals 3 }
+
+snmpConfigGlobalsWriteCommunity OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The community write access string to permit access to SNMP agent."
+    ::= { snmpConfigGlobals 4 }
+
+snmpConfigGlobalsEngineId OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(5..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "SNMPv3 engine ID. The size of Engine ID is between 5 ~ 32 bytes.But
+         all-zeros and all-'F's are not allowed. Change of the Engine ID will
+         clear all original local users."
+    ::= { snmpConfigGlobals 5 }
+
+snmpConfigCommunityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SnmpConfigCommunityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table for configuring SNMPv3 communities."
+    ::= { snmpConfig 2 }
+
+snmpConfigCommunityEntry OBJECT-TYPE
+    SYNTAX      SnmpConfigCommunityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry index key is community."
+    INDEX       { snmpConfigCommunityName,
+                  snmpConfigCommunitySourceIP,
+                  snmpConfigCommunitySourceIPPrefixSize }
+    ::= { snmpConfigCommunityTable 1 }
+
+SnmpConfigCommunityEntry ::= SEQUENCE {
+    snmpConfigCommunityName                DisplayString,
+    snmpConfigCommunitySourceIP            IpAddress,
+    snmpConfigCommunitySourceIPPrefixSize  Integer32,
+    snmpConfigCommunityAction              RowEditorState
+}
+
+snmpConfigCommunityName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Name of SNMP community"
+    ::= { snmpConfigCommunityEntry 1 }
+
+snmpConfigCommunitySourceIP OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The SNMP access source IP address"
+    ::= { snmpConfigCommunityEntry 2 }
+
+snmpConfigCommunitySourceIPPrefixSize OBJECT-TYPE
+    SYNTAX      Integer32 (0..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The SNMP access source IP address mask"
+    ::= { snmpConfigCommunityEntry 3 }
+
+snmpConfigCommunityAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { snmpConfigCommunityEntry 100 }
+
+snmpConfigCommunityTableRowEditor OBJECT IDENTIFIER
+    ::= { snmpConfig 3 }
+
+snmpConfigCommunityTableRowEditorName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Name of SNMP community"
+    ::= { snmpConfigCommunityTableRowEditor 1 }
+
+snmpConfigCommunityTableRowEditorSourceIP OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The SNMP access source IP address"
+    ::= { snmpConfigCommunityTableRowEditor 2 }
+
+snmpConfigCommunityTableRowEditorSourceIPPrefixSize OBJECT-TYPE
+    SYNTAX      Integer32 (0..32)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The SNMP access source IP address mask"
+    ::= { snmpConfigCommunityTableRowEditor 3 }
+
+snmpConfigCommunityTableRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { snmpConfigCommunityTableRowEditor 100 }
+
+snmpConfigUserTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SnmpConfigUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table for configuring SNMPv3 users."
+    ::= { snmpConfig 4 }
+
+snmpConfigUserEntry OBJECT-TYPE
+    SYNTAX      SnmpConfigUserEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry index keys are engine ID and user name."
+    INDEX       { snmpConfigUserEngineId,
+                  snmpConfigUserUserName }
+    ::= { snmpConfigUserTable 1 }
+
+SnmpConfigUserEntry ::= SEQUENCE {
+    snmpConfigUserEngineId       OCTET STRING,
+    snmpConfigUserUserName       DisplayString,
+    snmpConfigUserSecurityLevel  SnmpSecurityLevel,
+    snmpConfigUserAuthProtocol   SnmpAuthProtocl,
+    snmpConfigUserAuthPassword   DisplayString,
+    snmpConfigUserPrivProtocol   SnmpPrivProtocl,
+    snmpConfigUserPrivPassword   DisplayString,
+    snmpConfigUserAction         RowEditorState
+}
+
+snmpConfigUserEngineId OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(5..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "SNMPv3 engine ID. The length is between 5 ~ 32 bytes. But all-zeros and
+         all-'F's are not allowed. Change of the Engine ID will clear all
+         original local users."
+    ::= { snmpConfigUserEntry 1 }
+
+snmpConfigUserUserName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of this entry"
+    ::= { snmpConfigUserEntry 2 }
+
+snmpConfigUserSecurityLevel OBJECT-TYPE
+    SYNTAX      SnmpSecurityLevel
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The security level of this entry."
+    ::= { snmpConfigUserEntry 3 }
+
+snmpConfigUserAuthProtocol OBJECT-TYPE
+    SYNTAX      SnmpAuthProtocl
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The authentication protocol of this entry."
+    ::= { snmpConfigUserEntry 4 }
+
+snmpConfigUserAuthPassword OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The authentication password of this entry."
+    ::= { snmpConfigUserEntry 5 }
+
+snmpConfigUserPrivProtocol OBJECT-TYPE
+    SYNTAX      SnmpPrivProtocl
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The privacy protocol of this entry."
+    ::= { snmpConfigUserEntry 6 }
+
+snmpConfigUserPrivPassword OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The privacy password of this entry."
+    ::= { snmpConfigUserEntry 7 }
+
+snmpConfigUserAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { snmpConfigUserEntry 100 }
+
+snmpConfigUserTableRowEditor OBJECT IDENTIFIER
+    ::= { snmpConfig 5 }
+
+snmpConfigUserTableRowEditorEngineId OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(5..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "SNMPv3 engine ID. The length is between 5 ~ 32 bytes. But all-zeros and
+         all-'F's are not allowed. Change of the Engine ID will clear all
+         original local users."
+    ::= { snmpConfigUserTableRowEditor 1 }
+
+snmpConfigUserTableRowEditorUserName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of this entry"
+    ::= { snmpConfigUserTableRowEditor 2 }
+
+snmpConfigUserTableRowEditorSecurityLevel OBJECT-TYPE
+    SYNTAX      SnmpSecurityLevel
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The security level of this entry."
+    ::= { snmpConfigUserTableRowEditor 3 }
+
+snmpConfigUserTableRowEditorAuthProtocol OBJECT-TYPE
+    SYNTAX      SnmpAuthProtocl
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The authentication protocol of this entry."
+    ::= { snmpConfigUserTableRowEditor 4 }
+
+snmpConfigUserTableRowEditorAuthPassword OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The authentication password of this entry."
+    ::= { snmpConfigUserTableRowEditor 5 }
+
+snmpConfigUserTableRowEditorPrivProtocol OBJECT-TYPE
+    SYNTAX      SnmpPrivProtocl
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The privacy protocol of this entry."
+    ::= { snmpConfigUserTableRowEditor 6 }
+
+snmpConfigUserTableRowEditorPrivPassword OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The privacy password of this entry."
+    ::= { snmpConfigUserTableRowEditor 7 }
+
+snmpConfigUserTableRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { snmpConfigUserTableRowEditor 100 }
+
+snmpConfigUserToAccessGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SnmpConfigUserToAccessGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table for configuring SNMPv3 groups."
+    ::= { snmpConfig 6 }
+
+snmpConfigUserToAccessGroupEntry OBJECT-TYPE
+    SYNTAX      SnmpConfigUserToAccessGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry index keys are engine ID and user/community name."
+    INDEX       { snmpConfigUserToAccessGroupSecurityModel,
+                  snmpConfigUserToAccessGroupUserOrCommunity }
+    ::= { snmpConfigUserToAccessGroupTable 1 }
+
+SnmpConfigUserToAccessGroupEntry ::= SEQUENCE {
+    snmpConfigUserToAccessGroupSecurityModel    SnmpSecurityModel,
+    snmpConfigUserToAccessGroupUserOrCommunity  DisplayString,
+    snmpConfigUserToAccessGroupAccessGroupName  DisplayString,
+    snmpConfigUserToAccessGroupAction           RowEditorState
+}
+
+snmpConfigUserToAccessGroupSecurityModel OBJECT-TYPE
+    SYNTAX      SnmpSecurityModel
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The security model of this entry"
+    ::= { snmpConfigUserToAccessGroupEntry 1 }
+
+snmpConfigUserToAccessGroupUserOrCommunity OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The user or community name of this entry"
+    ::= { snmpConfigUserToAccessGroupEntry 2 }
+
+snmpConfigUserToAccessGroupAccessGroupName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The access group name of this entry."
+    ::= { snmpConfigUserToAccessGroupEntry 3 }
+
+snmpConfigUserToAccessGroupAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { snmpConfigUserToAccessGroupEntry 100 }
+
+snmpConfigUserToAccessGroupTableRowEditor OBJECT IDENTIFIER
+    ::= { snmpConfig 7 }
+
+snmpConfigUserToAccessGroupTableRowEditorSecurityModel OBJECT-TYPE
+    SYNTAX      SnmpSecurityModel
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The security model of this entry"
+    ::= { snmpConfigUserToAccessGroupTableRowEditor 1 }
+
+snmpConfigUserToAccessGroupTableRowEditorUserOrCommunity OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The user or community name of this entry"
+    ::= { snmpConfigUserToAccessGroupTableRowEditor 2 }
+
+snmpConfigUserToAccessGroupTableRowEditorAccessGroupName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The access group name of this entry."
+    ::= { snmpConfigUserToAccessGroupTableRowEditor 3 }
+
+snmpConfigUserToAccessGroupTableRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { snmpConfigUserToAccessGroupTableRowEditor 100 }
+
+snmpConfigAccessGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SnmpConfigAccessGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table for configuring SNMPv3 accesse groups."
+    ::= { snmpConfig 8 }
+
+snmpConfigAccessGroupEntry OBJECT-TYPE
+    SYNTAX      SnmpConfigAccessGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry index keys are access group name, security model and security
+         level."
+    INDEX       { snmpConfigAccessGroupAccessGroupName,
+                  snmpConfigAccessGroupSecurityModel,
+                  snmpConfigAccessGroupSecurityLevel }
+    ::= { snmpConfigAccessGroupTable 1 }
+
+SnmpConfigAccessGroupEntry ::= SEQUENCE {
+    snmpConfigAccessGroupAccessGroupName  DisplayString,
+    snmpConfigAccessGroupSecurityModel    SnmpSecurityModel,
+    snmpConfigAccessGroupSecurityLevel    SnmpSecurityLevel,
+    snmpConfigAccessGroupReadViewName     DisplayString,
+    snmpConfigAccessGroupWriteViewName    DisplayString,
+    snmpConfigAccessGroupAction           RowEditorState
+}
+
+snmpConfigAccessGroupAccessGroupName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The access group name of this entry"
+    ::= { snmpConfigAccessGroupEntry 1 }
+
+snmpConfigAccessGroupSecurityModel OBJECT-TYPE
+    SYNTAX      SnmpSecurityModel
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The security model of this entry"
+    ::= { snmpConfigAccessGroupEntry 2 }
+
+snmpConfigAccessGroupSecurityLevel OBJECT-TYPE
+    SYNTAX      SnmpSecurityLevel
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The security level of this entry"
+    ::= { snmpConfigAccessGroupEntry 3 }
+
+snmpConfigAccessGroupReadViewName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of the MIB view defining the MIB objects for which this
+         request may request the current values."
+    ::= { snmpConfigAccessGroupEntry 4 }
+
+snmpConfigAccessGroupWriteViewName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of the MIB view defining the MIB objects for which this
+         request may potentially set new values."
+    ::= { snmpConfigAccessGroupEntry 5 }
+
+snmpConfigAccessGroupAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { snmpConfigAccessGroupEntry 100 }
+
+snmpConfigAccessGroupTableRowEditor OBJECT IDENTIFIER
+    ::= { snmpConfig 9 }
+
+snmpConfigAccessGroupTableRowEditorAccessGroupName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The access group name of this entry"
+    ::= { snmpConfigAccessGroupTableRowEditor 1 }
+
+snmpConfigAccessGroupTableRowEditorSecurityModel OBJECT-TYPE
+    SYNTAX      SnmpSecurityModel
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The security model of this entry"
+    ::= { snmpConfigAccessGroupTableRowEditor 2 }
+
+snmpConfigAccessGroupTableRowEditorSecurityLevel OBJECT-TYPE
+    SYNTAX      SnmpSecurityLevel
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The security level of this entry"
+    ::= { snmpConfigAccessGroupTableRowEditor 3 }
+
+snmpConfigAccessGroupTableRowEditorReadViewName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of the MIB view defining the MIB objects for which this
+         request may request the current values."
+    ::= { snmpConfigAccessGroupTableRowEditor 4 }
+
+snmpConfigAccessGroupTableRowEditorWriteViewName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of the MIB view defining the MIB objects for which this
+         request may potentially set new values."
+    ::= { snmpConfigAccessGroupTableRowEditor 5 }
+
+snmpConfigAccessGroupTableRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { snmpConfigAccessGroupTableRowEditor 100 }
+
+snmpConfigViewTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SnmpConfigViewEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table for configuring SNMPv3 views."
+    ::= { snmpConfig 10 }
+
+snmpConfigViewEntry OBJECT-TYPE
+    SYNTAX      SnmpConfigViewEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry index keys are name and subtree."
+    INDEX       { snmpConfigViewName, snmpConfigViewSubtree }
+    ::= { snmpConfigViewTable 1 }
+
+SnmpConfigViewEntry ::= SEQUENCE {
+    snmpConfigViewName      DisplayString,
+    snmpConfigViewSubtree   DisplayString,
+    snmpConfigViewViewType  SnmpViewType,
+    snmpConfigViewAction    RowEditorState
+}
+
+snmpConfigViewName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of this entry"
+    ::= { snmpConfigViewEntry 1 }
+
+snmpConfigViewSubtree OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The OID defining the root of the subtree to add to the named view."
+    ::= { snmpConfigViewEntry 2 }
+
+snmpConfigViewViewType OBJECT-TYPE
+    SYNTAX      SnmpViewType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The view name of this entry."
+    ::= { snmpConfigViewEntry 3 }
+
+snmpConfigViewAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { snmpConfigViewEntry 100 }
+
+snmpConfigViewTableRowEditor OBJECT IDENTIFIER
+    ::= { snmpConfig 11 }
+
+snmpConfigViewTableRowEditorName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of this entry"
+    ::= { snmpConfigViewTableRowEditor 1 }
+
+snmpConfigViewTableRowEditorSubtree OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The OID defining the root of the subtree to add to the named view."
+    ::= { snmpConfigViewTableRowEditor 2 }
+
+snmpConfigViewTableRowEditorViewType OBJECT-TYPE
+    SYNTAX      SnmpViewType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The view name of this entry."
+    ::= { snmpConfigViewTableRowEditor 3 }
+
+snmpConfigViewTableRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { snmpConfigViewTableRowEditor 100 }
+
+snmpMibConformance OBJECT IDENTIFIER
+    ::= { snmpMib 2 }
+
+snmpMibCompliances OBJECT IDENTIFIER
+    ::= { snmpMibConformance 1 }
+
+snmpMibGroups OBJECT IDENTIFIER
+    ::= { snmpMibConformance 2 }
+
+snmpConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { snmpConfigGlobalsMode,
+                  snmpConfigGlobalsVersion,
+                  snmpConfigGlobalsReadCommunity,
+                  snmpConfigGlobalsWriteCommunity,
+                  snmpConfigGlobalsEngineId }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { snmpMibGroups 1 }
+
+snmpConfigCommunityTableInfoGroup OBJECT-GROUP
+    OBJECTS     { snmpConfigCommunityAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { snmpMibGroups 2 }
+
+snmpConfigCommunityTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { snmpConfigCommunityTableRowEditorName,
+                  snmpConfigCommunityTableRowEditorSourceIP,
+                  snmpConfigCommunityTableRowEditorSourceIPPrefixSize,
+                  snmpConfigCommunityTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { snmpMibGroups 3 }
+
+snmpConfigUserTableInfoGroup OBJECT-GROUP
+    OBJECTS     { snmpConfigUserSecurityLevel,
+                  snmpConfigUserAuthProtocol,
+                  snmpConfigUserAuthPassword,
+                  snmpConfigUserPrivProtocol,
+                  snmpConfigUserPrivPassword,
+                  snmpConfigUserAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { snmpMibGroups 4 }
+
+snmpConfigUserTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { snmpConfigUserTableRowEditorEngineId,
+                  snmpConfigUserTableRowEditorUserName,
+                  snmpConfigUserTableRowEditorSecurityLevel,
+                  snmpConfigUserTableRowEditorAuthProtocol,
+                  snmpConfigUserTableRowEditorAuthPassword,
+                  snmpConfigUserTableRowEditorPrivProtocol,
+                  snmpConfigUserTableRowEditorPrivPassword,
+                  snmpConfigUserTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { snmpMibGroups 5 }
+
+snmpConfigUserToAccessGroupTableInfoGroup OBJECT-GROUP
+    OBJECTS     { snmpConfigUserToAccessGroupAccessGroupName,
+                  snmpConfigUserToAccessGroupAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { snmpMibGroups 6 }
+
+snmpConfigUserToAccessGroupTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     {                   snmpConfigUserToAccessGroupTableRowEditorSecurityModel,
+                  snmpConfigUserToAccessGroupTableRowEditorUserOrCommunity,
+                  snmpConfigUserToAccessGroupTableRowEditorAccessGroupName,
+                  snmpConfigUserToAccessGroupTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { snmpMibGroups 7 }
+
+snmpConfigAccessGroupTableInfoGroup OBJECT-GROUP
+    OBJECTS     { snmpConfigAccessGroupReadViewName,
+                  snmpConfigAccessGroupWriteViewName,
+                  snmpConfigAccessGroupAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { snmpMibGroups 8 }
+
+snmpConfigAccessGroupTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     {                   snmpConfigAccessGroupTableRowEditorAccessGroupName,
+                  snmpConfigAccessGroupTableRowEditorSecurityModel,
+                  snmpConfigAccessGroupTableRowEditorSecurityLevel,
+                  snmpConfigAccessGroupTableRowEditorReadViewName,
+                  snmpConfigAccessGroupTableRowEditorWriteViewName,
+                  snmpConfigAccessGroupTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { snmpMibGroups 9 }
+
+snmpConfigViewTableInfoGroup OBJECT-GROUP
+    OBJECTS     { snmpConfigViewViewType,
+                  snmpConfigViewAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { snmpMibGroups 10 }
+
+snmpConfigViewTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { snmpConfigViewTableRowEditorName,
+                  snmpConfigViewTableRowEditorSubtree,
+                  snmpConfigViewTableRowEditorViewType,
+                  snmpConfigViewTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { snmpMibGroups 11 }
+
+snmpMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { snmpConfigGlobalsInfoGroup,
+                       snmpConfigCommunityTableInfoGroup,
+                       snmpConfigCommunityTableRowEditorInfoGroup,
+                       snmpConfigUserTableInfoGroup,
+                       snmpConfigUserTableRowEditorInfoGroup,
+                       snmpConfigUserToAccessGroupTableInfoGroup,
+                       snmpConfigUserToAccessGroupTableRowEditorInfoGroup,
+                       snmpConfigAccessGroupTableInfoGroup,
+                       snmpConfigAccessGroupTableRowEditorInfoGroup,
+                       snmpConfigViewTableInfoGroup,
+                       snmpConfigViewTableRowEditorInfoGroup }
+
+    ::= { snmpMibCompliances 1 }
+
+END

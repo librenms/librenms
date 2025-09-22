@@ -1,0 +1,247 @@
+-- *****************************************************************
+-- MIB-SYSUTIL: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-SYSUTIL DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Integer32 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    DisplayString FROM BTS-TC
+    ;
+
+sysutilMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of SysUtil"
+    REVISION    "201410100000Z"
+    DESCRIPTION
+        "Editorial changes"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 24 }
+
+
+SysutilPowerSupplyStateType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the type of power supply state."
+    SYNTAX      INTEGER { active(0), standby(1), notPresent(2) }
+
+SysutilRebootType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the type of reboot."
+    SYNTAX      INTEGER { noReboot(0), coldReboot(1), warmReboot(2) }
+
+sysutilMibObjects OBJECT IDENTIFIER
+    ::= { sysutilMib 1 }
+
+sysutilCapabilities OBJECT IDENTIFIER
+    ::= { sysutilMibObjects 1 }
+
+sysutilCapabilitiesWarmRebootSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate if warm restart is supported or not. true means it is
+         supported. false means it is not supported."
+    ::= { sysutilCapabilities 1 }
+
+sysutilStatus OBJECT IDENTIFIER
+    ::= { sysutilMibObjects 3 }
+
+sysutilStatusCpuLoad OBJECT IDENTIFIER
+    ::= { sysutilStatus 1 }
+
+sysutilStatusCpuLoadAverage100msec OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average CPU load (%) in 100 milli-seconds."
+    ::= { sysutilStatusCpuLoad 1 }
+
+sysutilStatusCpuLoadAverage1sec OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average CPU load (%) in 1 second."
+    ::= { sysutilStatusCpuLoad 2 }
+
+sysutilStatusCpuLoadAverage10sec OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average CPU load (%) in 10 seconds."
+    ::= { sysutilStatusCpuLoad 3 }
+
+sysutilStatusPowerSupplyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SysutilStatusPowerSupplyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of power supply status."
+    ::= { sysutilStatus 2 }
+
+sysutilStatusPowerSupplyEntry OBJECT-TYPE
+    SYNTAX      SysutilStatusPowerSupplyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the power supply status."
+    INDEX       { sysutilStatusPowerSupplySwitchId,
+                  sysutilStatusPowerSupplyPsuId }
+    ::= { sysutilStatusPowerSupplyTable 1 }
+
+SysutilStatusPowerSupplyEntry ::= SEQUENCE {
+    sysutilStatusPowerSupplySwitchId     Integer32,
+    sysutilStatusPowerSupplyPsuId        Integer32,
+    sysutilStatusPowerSupplyState        SysutilPowerSupplyStateType,
+    sysutilStatusPowerSupplyDescription  DisplayString
+}
+
+sysutilStatusPowerSupplySwitchId OBJECT-TYPE
+    SYNTAX      Integer32 (1..16)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The identification of switch."
+    ::= { sysutilStatusPowerSupplyEntry 1 }
+
+sysutilStatusPowerSupplyPsuId OBJECT-TYPE
+    SYNTAX      Integer32 (1..2)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The identification of power supply."
+    ::= { sysutilStatusPowerSupplyEntry 2 }
+
+sysutilStatusPowerSupplyState OBJECT-TYPE
+    SYNTAX      SysutilPowerSupplyStateType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of power supply."
+    ::= { sysutilStatusPowerSupplyEntry 3 }
+
+sysutilStatusPowerSupplyDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..30))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The description of power supply."
+    ::= { sysutilStatusPowerSupplyEntry 4 }
+
+sysutilControl OBJECT IDENTIFIER
+    ::= { sysutilMibObjects 4 }
+
+sysutilControlRebootTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SysutilControlRebootEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to reboot a swicth"
+    ::= { sysutilControl 1 }
+
+sysutilControlRebootEntry OBJECT-TYPE
+    SYNTAX      SysutilControlRebootEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each switch has a set of parameters"
+    INDEX       { sysutilControlRebootSwitchId }
+    ::= { sysutilControlRebootTable 1 }
+
+SysutilControlRebootEntry ::= SEQUENCE {
+    sysutilControlRebootSwitchId  Integer32,
+    sysutilControlRebootType      SysutilRebootType
+}
+
+sysutilControlRebootSwitchId OBJECT-TYPE
+    SYNTAX      Integer32 (1..16)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The identification of switch."
+    ::= { sysutilControlRebootEntry 1 }
+
+sysutilControlRebootType OBJECT-TYPE
+    SYNTAX      SysutilRebootType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Type of reboot. noReboot(0) does not reboot. coldReboot(1) is to do
+         cold reboot. warmReboot(2) is to do warm reboot, but this is optional.
+         The OID of sysutilCapabilitiesWarmRebootSupported tells if warm
+         reboot is supported or not."
+    ::= { sysutilControlRebootEntry 2 }
+
+sysutilMibConformance OBJECT IDENTIFIER
+    ::= { sysutilMib 2 }
+
+sysutilMibCompliances OBJECT IDENTIFIER
+    ::= { sysutilMibConformance 1 }
+
+sysutilMibGroups OBJECT IDENTIFIER
+    ::= { sysutilMibConformance 2 }
+
+sysutilCapabilitiesInfoGroup OBJECT-GROUP
+    OBJECTS     { sysutilCapabilitiesWarmRebootSupported }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { sysutilMibGroups 1 }
+
+sysutilStatusCpuLoadInfoGroup OBJECT-GROUP
+    OBJECTS     { sysutilStatusCpuLoadAverage100msec,
+                  sysutilStatusCpuLoadAverage1sec,
+                  sysutilStatusCpuLoadAverage10sec }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { sysutilMibGroups 2 }
+
+sysutilStatusPowerSupplyInfoGroup OBJECT-GROUP
+    OBJECTS     { sysutilStatusPowerSupplyState,
+                  sysutilStatusPowerSupplyDescription }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { sysutilMibGroups 3 }
+
+sysutilControlRebootInfoGroup OBJECT-GROUP
+    OBJECTS     { sysutilControlRebootType }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { sysutilMibGroups 4 }
+
+sysutilMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { sysutilCapabilitiesInfoGroup,
+                       sysutilStatusCpuLoadInfoGroup,
+                       sysutilStatusPowerSupplyInfoGroup,
+                       sysutilControlRebootInfoGroup }
+
+    ::= { sysutilMibCompliances 1 }
+
+END

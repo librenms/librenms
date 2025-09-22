@@ -1,0 +1,1311 @@
+-- *****************************************************************
+-- MIB-Y1564: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-Y1564 DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    MacAddress FROM SNMPv2-TC
+    TruthValue FROM SNMPv2-TC
+    DisplayString FROM BTS-TC
+    InterfaceIndex FROM BTS-TC
+    RowEditorState FROM BTS-TC
+    Unsigned16 FROM BTS-TC
+    Unsigned8 FROM BTS-TC
+    ;
+
+y1564Mib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of the Y1564 MIB"
+    REVISION    "201510200000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 84 }
+
+
+Y1564TestStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An integer that indicates the test status."
+    SYNTAX      INTEGER { inactive(0), executing(1), cancelling(2),
+                          cancelled(3), passed(4), failed(5) }
+
+Y1564TrafficType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An integer that indicates the traffic type."
+    SYNTAX      INTEGER { oam(0), customerSimulated(1) }
+
+y1564MibObjects OBJECT IDENTIFIER
+    ::= { y1564Mib 1 }
+
+y1564Capabilities OBJECT IDENTIFIER
+    ::= { y1564MibObjects 1 }
+
+y1564CapabilitiesProfileCntMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of profiles that can be defined and saved to non-volatile
+         memory."
+    ::= { y1564Capabilities 1 }
+
+y1564CapabilitiesReportCntMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of reports that can be saved to non-volatile memory."
+    ::= { y1564Capabilities 2 }
+
+y1564CapabilitiesConcurrentTestMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of concurrently running tests."
+    ::= { y1564Capabilities 3 }
+
+y1564CapabilitiesEceTestCntMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of ECEs per EVC that can be tested simultaneously."
+    ::= { y1564Capabilities 4 }
+
+y1564CapabilitiesEmixMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of frames in an EMIX."
+    ::= { y1564Capabilities 5 }
+
+y1564Config OBJECT IDENTIFIER
+    ::= { y1564MibObjects 2 }
+
+y1564ConfigProfile OBJECT IDENTIFIER
+    ::= { y1564Config 3 }
+
+y1564ConfigProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Y1564ConfigProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table for managing Y.1564 profile entries."
+    ::= { y1564ConfigProfile 1 }
+
+y1564ConfigProfileEntry OBJECT-TYPE
+    SYNTAX      Y1564ConfigProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of parameters"
+    INDEX       { y1564ConfigProfileName }
+    ::= { y1564ConfigProfileTable 1 }
+
+Y1564ConfigProfileEntry ::= SEQUENCE {
+    y1564ConfigProfileName                  DisplayString,
+    y1564ConfigProfileDescription           DisplayString,
+    y1564ConfigProfileDstOamAware           TruthValue,
+    y1564ConfigProfileTrafficType           Y1564TrafficType,
+    y1564ConfigProfileMegLevel              Unsigned32,
+    y1564ConfigProfileEmix                  DisplayString,
+    y1564ConfigProfileUserDefinedFrameSize  Unsigned32,
+    y1564ConfigProfileDwellTime             Unsigned32,
+    y1564ConfigProfileSacFlr                Unsigned32,
+    y1564ConfigProfileSacFtd                Unsigned32,
+    y1564ConfigProfileSacFdv                Unsigned32,
+    y1564ConfigProfileCirEnable             TruthValue,
+    y1564ConfigProfileCirDuration           Unsigned32,
+    y1564ConfigProfileCirDmInterval         Unsigned32,
+    y1564ConfigProfileCirStepCnt            Unsigned32,
+    y1564ConfigProfileEirEnable             TruthValue,
+    y1564ConfigProfileEirDuration           Unsigned32,
+    y1564ConfigProfileEirDmInterval         Unsigned32,
+    y1564ConfigProfilePolEnable             TruthValue,
+    y1564ConfigProfilePolDuration           Unsigned32,
+    y1564ConfigProfilePolDmInterval         Unsigned32,
+    y1564ConfigProfilePrfEnable             TruthValue,
+    y1564ConfigProfilePrfDuration           Unsigned32,
+    y1564ConfigProfilePrfDmInterval         Unsigned32,
+    y1564ConfigProfileAction                RowEditorState
+}
+
+y1564ConfigProfileName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the Y.1564 profile."
+    ::= { y1564ConfigProfileEntry 1 }
+
+y1564ConfigProfileDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The description of the Y.1564 profile."
+    ::= { y1564ConfigProfileEntry 2 }
+
+y1564ConfigProfileDstOamAware OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TRUE if DST is OAM aware."
+    ::= { y1564ConfigProfileEntry 4 }
+
+y1564ConfigProfileTrafficType OBJECT-TYPE
+    SYNTAX      Y1564TrafficType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Type of traffic to inject."
+    ::= { y1564ConfigProfileEntry 5 }
+
+y1564ConfigProfileMegLevel OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The MEG level (0 - 7) used in the generated OAM frames."
+    ::= { y1564ConfigProfileEntry 6 }
+
+y1564ConfigProfileEmix OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..253))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sequence of letters that indicate the frame sizes that one flow is made
+         up of. The frame sizes are at the UNI, so possible encapsulation added
+         at the NNI is not included.
+         
+         The string may contain the following letters:
+         
+         a: 64 byte frames
+         
+         b: 128 byte frames
+         
+         c: 256 byte frames
+         
+         d: 512 byte frames
+         
+         e: 1024 byte frames
+         
+         f: 1280 byte frames
+         
+         g: 1518 byte frames
+         
+         h: MTU byte frames, where MTU is what the UNI port is currently
+         configured to.
+         
+         u: User-defined. See UserDefinedFrameSize.
+         
+         On architectures with EMIX support, CapabilitiesEmixMax is > 1, and any
+         combination of the above letters may be specified, default being as
+         many of the characters 'abceg' that there is room for in the emix. This
+         sequence indicates frame sizes of 64, 128, 256, 1024, and 1518 bytes.
+         The same size may be used more than once.
+         
+         On architectures without EMIX support, CapabilitiesEmixMax is 1,
+         restricting the size to a single. Default in that case is 'd'
+         corresponding to 512 byte frames."
+    ::= { y1564ConfigProfileEntry 7 }
+
+y1564ConfigProfileUserDefinedFrameSize OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..10236)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If Emix includes 'u', this is the user-specified frame size."
+    ::= { y1564ConfigProfileEntry 8 }
+
+y1564ConfigProfileDwellTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time (in milliseconds with a granularity of 100) to wait after each
+         trial for the system to settle before acquiring counters and other
+         statistics from hardware."
+    ::= { y1564ConfigProfileEntry 9 }
+
+y1564ConfigProfileSacFlr OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Acceptable Frame Loss Ratio in permille. Valid range is [0; 1000]
+         permille. Set to 1000 to disable this check."
+    ::= { y1564ConfigProfileEntry 50 }
+
+y1564ConfigProfileSacFtd OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Acceptable Frame Transfer Delay in milliseconds. Valid range is [0;
+         10,000] msecs. Set to 0 to disable this check."
+    ::= { y1564ConfigProfileEntry 51 }
+
+y1564ConfigProfileSacFdv OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Acceptable Frame Delay Variation in milliseconds. Valid range is [0;
+         10,000] msecs. Set to 0 to disable this check."
+    ::= { y1564ConfigProfileEntry 52 }
+
+y1564ConfigProfileCirEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls whether the CIR test is enabled or not."
+    ::= { y1564ConfigProfileEntry 100 }
+
+y1564ConfigProfileCirDuration OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Duration (in seconds) of a test. This is the duration per step for test
+         cases. The total duration is therefore CirDuration * CirStepCnt
+         seconds."
+    ::= { y1564ConfigProfileEntry 101 }
+
+y1564ConfigProfileCirDmInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Delay measurement interval (in msecs) of a test. Set to 0 to disable
+         FTD and FDV measurements."
+    ::= { y1564ConfigProfileEntry 102 }
+
+y1564ConfigProfileCirStepCnt OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the number of steps to reach CIR. With, e.g., a value of 4,
+         the EVC will be tested at 25%, 50%, 75% and 100% of CIR.
+         
+         A non-step-load test (A.1) can be achieved by setting CirStepCnt to 1."
+    ::= { y1564ConfigProfileEntry 103 }
+
+y1564ConfigProfileEirEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls whether the EIR test is enabled or not."
+    ::= { y1564ConfigProfileEntry 200 }
+
+y1564ConfigProfileEirDuration OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Duration (in seconds) of a test."
+    ::= { y1564ConfigProfileEntry 201 }
+
+y1564ConfigProfileEirDmInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Delay measurement interval (in msecs) of a test. Set to 0 to disable
+         FTD and FDV measurements."
+    ::= { y1564ConfigProfileEntry 202 }
+
+y1564ConfigProfilePolEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls whether the Traffic Policing test is enabled or not."
+    ::= { y1564ConfigProfileEntry 300 }
+
+y1564ConfigProfilePolDuration OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Duration (in seconds) of a test."
+    ::= { y1564ConfigProfileEntry 301 }
+
+y1564ConfigProfilePolDmInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Delay measurement interval (in msecs) of a test. Set to 0 to disable
+         FTD and FDV measurements."
+    ::= { y1564ConfigProfileEntry 302 }
+
+y1564ConfigProfilePrfEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls whether the Traffic Policing test is enabled or not."
+    ::= { y1564ConfigProfileEntry 600 }
+
+y1564ConfigProfilePrfDuration OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Duration (in seconds) of a test."
+    ::= { y1564ConfigProfileEntry 601 }
+
+y1564ConfigProfilePrfDmInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Delay measurement interval (in msecs) of a test. Set to 0 to disable
+         FTD and FDV measurements."
+    ::= { y1564ConfigProfileEntry 602 }
+
+y1564ConfigProfileAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { y1564ConfigProfileEntry 10000 }
+
+y1564ConfigProfileTableRowEditor OBJECT IDENTIFIER
+    ::= { y1564ConfigProfile 2 }
+
+y1564ConfigProfileTableRowEditorName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of the Y.1564 profile."
+    ::= { y1564ConfigProfileTableRowEditor 1 }
+
+y1564ConfigProfileTableRowEditorDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The description of the Y.1564 profile."
+    ::= { y1564ConfigProfileTableRowEditor 2 }
+
+y1564ConfigProfileTableRowEditorDstOamAware OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TRUE if DST is OAM aware."
+    ::= { y1564ConfigProfileTableRowEditor 4 }
+
+y1564ConfigProfileTableRowEditorTrafficType OBJECT-TYPE
+    SYNTAX      Y1564TrafficType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Type of traffic to inject."
+    ::= { y1564ConfigProfileTableRowEditor 5 }
+
+y1564ConfigProfileTableRowEditorMegLevel OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The MEG level (0 - 7) used in the generated OAM frames."
+    ::= { y1564ConfigProfileTableRowEditor 6 }
+
+y1564ConfigProfileTableRowEditorEmix OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..253))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sequence of letters that indicate the frame sizes that one flow is made
+         up of. The frame sizes are at the UNI, so possible encapsulation added
+         at the NNI is not included.
+         
+         The string may contain the following letters:
+         
+         a: 64 byte frames
+         
+         b: 128 byte frames
+         
+         c: 256 byte frames
+         
+         d: 512 byte frames
+         
+         e: 1024 byte frames
+         
+         f: 1280 byte frames
+         
+         g: 1518 byte frames
+         
+         h: MTU byte frames, where MTU is what the UNI port is currently
+         configured to.
+         
+         u: User-defined. See UserDefinedFrameSize.
+         
+         On architectures with EMIX support, CapabilitiesEmixMax is > 1, and any
+         combination of the above letters may be specified, default being as
+         many of the characters 'abceg' that there is room for in the emix. This
+         sequence indicates frame sizes of 64, 128, 256, 1024, and 1518 bytes.
+         The same size may be used more than once.
+         
+         On architectures without EMIX support, CapabilitiesEmixMax is 1,
+         restricting the size to a single. Default in that case is 'd'
+         corresponding to 512 byte frames."
+    ::= { y1564ConfigProfileTableRowEditor 7 }
+
+y1564ConfigProfileTableRowEditorUserDefinedFrameSize OBJECT-TYPE
+    SYNTAX      Unsigned32 (64..10236)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If Emix includes 'u', this is the user-specified frame size."
+    ::= { y1564ConfigProfileTableRowEditor 8 }
+
+y1564ConfigProfileTableRowEditorDwellTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time (in milliseconds with a granularity of 100) to wait after each
+         trial for the system to settle before acquiring counters and other
+         statistics from hardware."
+    ::= { y1564ConfigProfileTableRowEditor 9 }
+
+y1564ConfigProfileTableRowEditorSacFlr OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Acceptable Frame Loss Ratio in permille. Valid range is [0; 1000]
+         permille. Set to 1000 to disable this check."
+    ::= { y1564ConfigProfileTableRowEditor 50 }
+
+y1564ConfigProfileTableRowEditorSacFtd OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Acceptable Frame Transfer Delay in milliseconds. Valid range is [0;
+         10,000] msecs. Set to 0 to disable this check."
+    ::= { y1564ConfigProfileTableRowEditor 51 }
+
+y1564ConfigProfileTableRowEditorSacFdv OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Acceptable Frame Delay Variation in milliseconds. Valid range is [0;
+         10,000] msecs. Set to 0 to disable this check."
+    ::= { y1564ConfigProfileTableRowEditor 52 }
+
+y1564ConfigProfileTableRowEditorCirEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls whether the CIR test is enabled or not."
+    ::= { y1564ConfigProfileTableRowEditor 100 }
+
+y1564ConfigProfileTableRowEditorCirDuration OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Duration (in seconds) of a test. This is the duration per step for test
+         cases. The total duration is therefore CirDuration * CirStepCnt
+         seconds."
+    ::= { y1564ConfigProfileTableRowEditor 101 }
+
+y1564ConfigProfileTableRowEditorCirDmInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Delay measurement interval (in msecs) of a test. Set to 0 to disable
+         FTD and FDV measurements."
+    ::= { y1564ConfigProfileTableRowEditor 102 }
+
+y1564ConfigProfileTableRowEditorCirStepCnt OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the number of steps to reach CIR. With, e.g., a value of 4,
+         the EVC will be tested at 25%, 50%, 75% and 100% of CIR.
+         
+         A non-step-load test (A.1) can be achieved by setting CirStepCnt to 1."
+    ::= { y1564ConfigProfileTableRowEditor 103 }
+
+y1564ConfigProfileTableRowEditorEirEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls whether the EIR test is enabled or not."
+    ::= { y1564ConfigProfileTableRowEditor 200 }
+
+y1564ConfigProfileTableRowEditorEirDuration OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Duration (in seconds) of a test."
+    ::= { y1564ConfigProfileTableRowEditor 201 }
+
+y1564ConfigProfileTableRowEditorEirDmInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Delay measurement interval (in msecs) of a test. Set to 0 to disable
+         FTD and FDV measurements."
+    ::= { y1564ConfigProfileTableRowEditor 202 }
+
+y1564ConfigProfileTableRowEditorPolEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls whether the Traffic Policing test is enabled or not."
+    ::= { y1564ConfigProfileTableRowEditor 300 }
+
+y1564ConfigProfileTableRowEditorPolDuration OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Duration (in seconds) of a test."
+    ::= { y1564ConfigProfileTableRowEditor 301 }
+
+y1564ConfigProfileTableRowEditorPolDmInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Delay measurement interval (in msecs) of a test. Set to 0 to disable
+         FTD and FDV measurements."
+    ::= { y1564ConfigProfileTableRowEditor 302 }
+
+y1564ConfigProfileTableRowEditorPrfEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls whether the Traffic Policing test is enabled or not."
+    ::= { y1564ConfigProfileTableRowEditor 600 }
+
+y1564ConfigProfileTableRowEditorPrfDuration OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Duration (in seconds) of a test."
+    ::= { y1564ConfigProfileTableRowEditor 601 }
+
+y1564ConfigProfileTableRowEditorPrfDmInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Delay measurement interval (in msecs) of a test. Set to 0 to disable
+         FTD and FDV measurements."
+    ::= { y1564ConfigProfileTableRowEditor 602 }
+
+y1564ConfigProfileTableRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { y1564ConfigProfileTableRowEditor 10000 }
+
+y1564Status OBJECT IDENTIFIER
+    ::= { y1564MibObjects 3 }
+
+y1564StatusReport OBJECT IDENTIFIER
+    ::= { y1564Status 3 }
+
+y1564StatusReportTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Y1564StatusReportEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains report information and is ordered by report name."
+    ::= { y1564StatusReport 1 }
+
+y1564StatusReportEntry OBJECT-TYPE
+    SYNTAX      Y1564StatusReportEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of parameters"
+    INDEX       { y1564StatusReportName }
+    ::= { y1564StatusReportTable 1 }
+
+Y1564StatusReportEntry ::= SEQUENCE {
+    y1564StatusReportName          DisplayString,
+    y1564StatusReportDescription   DisplayString,
+    y1564StatusReportCreationTime  DisplayString,
+    y1564StatusReportStatus        Y1564TestStatus,
+    y1564StatusReportPath          DisplayString
+}
+
+y1564StatusReportName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the Y.1564 test report."
+    ::= { y1564StatusReportEntry 1 }
+
+y1564StatusReportDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The description of the Y.1564 test report."
+    ::= { y1564StatusReportEntry 2 }
+
+y1564StatusReportCreationTime OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..25))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time of creation of this report."
+    ::= { y1564StatusReportEntry 3 }
+
+y1564StatusReportStatus OBJECT-TYPE
+    SYNTAX      Y1564TestStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Execution status of this report."
+    ::= { y1564StatusReportEntry 4 }
+
+y1564StatusReportPath OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the file system location to retrieve this report."
+    ::= { y1564StatusReportEntry 5 }
+
+y1564Control OBJECT IDENTIFIER
+    ::= { y1564MibObjects 4 }
+
+y1564ControlReport OBJECT IDENTIFIER
+    ::= { y1564Control 3 }
+
+y1564ControlReportDelete OBJECT IDENTIFIER
+    ::= { y1564ControlReport 1 }
+
+y1564ControlReportDeleteName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of the Y.1564 test report to delete."
+    ::= { y1564ControlReportDelete 1 }
+
+y1564ControlTest OBJECT IDENTIFIER
+    ::= { y1564Control 4 }
+
+y1564ControlTestTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Y1564ControlTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table for managing Y.1564 tests.
+         
+         Use the row editor to add a new entry.
+         
+         Start a test by setting the Y1564ControlTestStartName object to the
+         name of the test report.
+         
+         The entry is automatically deleted when the test is started."
+    ::= { y1564ControlTest 1 }
+
+y1564ControlTestEntry OBJECT-TYPE
+    SYNTAX      Y1564ControlTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of parameters that controls the test."
+    INDEX       { y1564ControlTestName }
+    ::= { y1564ControlTestTable 1 }
+
+Y1564ControlTestEntry ::= SEQUENCE {
+    y1564ControlTestName         DisplayString,
+    y1564ControlTestDescription  DisplayString,
+    y1564ControlTestProfileName  DisplayString,
+    y1564ControlTestEvcId        Unsigned16,
+    y1564ControlTestPeerMac      MacAddress,
+    y1564ControlTestAction       RowEditorState
+}
+
+y1564ControlTestName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the Y.1564 test report."
+    ::= { y1564ControlTestEntry 1 }
+
+y1564ControlTestDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The description of the Y.1564 test report."
+    ::= { y1564ControlTestEntry 2 }
+
+y1564ControlTestProfileName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of the Y.1564 profile to use when performing the test."
+    ::= { y1564ControlTestEntry 3 }
+
+y1564ControlTestEvcId OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "ID that uniquely identifies the EVC under test."
+    ::= { y1564ControlTestEntry 4 }
+
+y1564ControlTestPeerMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The destination MAC address used in the generated frames.
+         
+         It must be a non-NULL, unicast MAC address.
+         
+         The MAC address should be the MAC address of the peer of the EVC under
+         test (remote NNI residence port's MAC address).
+         
+         Since all generated frames will use this MAC address as DMAC, it is not
+         possible to test ECEs with customer simulated traffic, if the ECE
+         dictates a particular DMAC address."
+    ::= { y1564ControlTestEntry 5 }
+
+y1564ControlTestAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { y1564ControlTestEntry 10000 }
+
+y1564ControlTestTableRowEditor OBJECT IDENTIFIER
+    ::= { y1564ControlTest 2 }
+
+y1564ControlTestTableRowEditorName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of the Y.1564 test report."
+    ::= { y1564ControlTestTableRowEditor 1 }
+
+y1564ControlTestTableRowEditorDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The description of the Y.1564 test report."
+    ::= { y1564ControlTestTableRowEditor 2 }
+
+y1564ControlTestTableRowEditorProfileName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of the Y.1564 profile to use when performing the test."
+    ::= { y1564ControlTestTableRowEditor 3 }
+
+y1564ControlTestTableRowEditorEvcId OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "ID that uniquely identifies the EVC under test."
+    ::= { y1564ControlTestTableRowEditor 4 }
+
+y1564ControlTestTableRowEditorPeerMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The destination MAC address used in the generated frames.
+         
+         It must be a non-NULL, unicast MAC address.
+         
+         The MAC address should be the MAC address of the peer of the EVC under
+         test (remote NNI residence port's MAC address).
+         
+         Since all generated frames will use this MAC address as DMAC, it is not
+         possible to test ECEs with customer simulated traffic, if the ECE
+         dictates a particular DMAC address."
+    ::= { y1564ControlTestTableRowEditor 5 }
+
+y1564ControlTestTableRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { y1564ControlTestTableRowEditor 10000 }
+
+y1564ControlTestEceTestTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Y1564ControlTestEceTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the data of ECE related attributes.
+         
+         Adding an entry in the Y1564ControlTestTable will automatically create
+         a corresponding set of entries in this table, which will exist until
+         the test is started."
+    ::= { y1564ControlTest 3 }
+
+y1564ControlTestEceTestEntry OBJECT-TYPE
+    SYNTAX      Y1564ControlTestEceTestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of parameters that controls a single ECE entry."
+    INDEX       { y1564ControlTestEceTestName,
+                  y1564ControlTestEceTestIndex }
+    ::= { y1564ControlTestEceTestTable 1 }
+
+Y1564ControlTestEceTestEntry ::= SEQUENCE {
+    y1564ControlTestEceTestName     DisplayString,
+    y1564ControlTestEceTestIndex    Unsigned32,
+    y1564ControlTestEceTestEceId    Unsigned32,
+    y1564ControlTestEceTestEceUni   InterfaceIndex,
+    y1564ControlTestEceTestVlanId   Unsigned16,
+    y1564ControlTestEceTestVlanPcp  Unsigned32,
+    y1564ControlTestEceTestVlanDei  Unsigned32,
+    y1564ControlTestEceTestDscp     Unsigned8
+}
+
+y1564ControlTestEceTestName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the Y.1564 test report."
+    ::= { y1564ControlTestEceTestEntry 1 }
+
+y1564ControlTestEceTestIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index of the ECE data to configure."
+    ::= { y1564ControlTestEceTestEntry 2 }
+
+y1564ControlTestEceTestEceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ID of the ECE to test. This can be set to 0 to terminate the list.
+         If the first entry is set to 0, it is assumed that all ECEs of an EVC
+         should be tested, and all of them will get defaults for the remaining
+         parameters of this structure."
+    ::= { y1564ControlTestEceTestEntry 3 }
+
+y1564ControlTestEceTestEceUni OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If the ECE under test can be reached from multiple UNI ports, this one
+         points out the one to be used.
+         
+         Leave at 0 to have the Y.1564 module auto-pick a port. This is useful
+         if you know that the ECE only can be reached from one single UNI, or
+         you don't care which UNI to use, as long as the ECE can be reached
+         through the chosen UNI.
+         
+         If set to 0 and it turns out that the ECE can be reached from multiple
+         UNIs, the software will pick the lowest numbered UNI.
+         
+         If set to a UNI different from 0, and the ECE is not reachable from
+         that UNI, the test will fail.
+         
+         Only 0 and port ifindex type are allowed. Other interface indices will
+         result in an error."
+    ::= { y1564ControlTestEceTestEntry 4 }
+
+y1564ControlTestEceTestVlanId OBJECT-TYPE
+    SYNTAX      Unsigned16 (0..4097)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The VLAN ID used in the generated frames.
+         
+         This field is only used in cases where the ECE matches multiple VLAN
+         IDs or both tagged and untagged traffic. In cases where an ECE match
+         w.r.t. VLAN tagging can only occur in one single, unambiguous way, this
+         field is not used and can be set to anything.
+         
+         If set to 4096:
+         
+         The software will insert a VLAN tag with a VLAN ID corresponding to the
+         lowest non-zero VLAN, in the range that the ECE matches. VLAN ID 0 is
+         only picked if its range only matches this particular. The above
+         applies if the ECE matches tagged only as well as tagged and untagged
+         traffic. If the ECE only matches untagged traffic, no VLAN tag will be
+         inserted in the frame.
+         
+         If set to 4097:
+         
+         An error will be returned if the ECE does not match untagged traffic.
+         Otherwise the test frames will be generated without tag.
+         
+         If set to 0:
+         
+         An error will be returned if the ECE does not match priority tagged
+         traffic. Otherwise the test frames will be generated with a priority
+         tag.
+         
+         If set to a value in range [1; 4095]:
+         
+         If the ECE does not match the particular VID, an error will be
+         returned. Otherwise the VID will be used in the generated frames.
+         
+         If set to any other value, an error will be returned."
+    ::= { y1564ControlTestEceTestEntry 5 }
+
+y1564ControlTestEceTestVlanPcp OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..8)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The PCP value to use in the generated frames.
+         
+         It is only used when TrafficType is set to customerSimulated. In the
+         Y.1731 OAM case, the requested CoS is used to determine which PCP to
+         use in the tag for the OAM traffic.
+         
+         Also, the value is only used when an outer tag is required in the
+         frame.
+         
+         If set to 8:
+         
+         The software will insert the lowest PCP value in the range that the ECE
+         matches on.
+         
+         If set to a value in range [0; 7]:
+         
+         The software will use this value, if the ECE matches on it. Otherwise
+         an error will be returned.
+         
+         If set to any other value, an error will be returned."
+    ::= { y1564ControlTestEceTestEntry 6 }
+
+y1564ControlTestEceTestVlanDei OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DEI value to use in the generated frames.
+         
+         It is only used when TrafficType is set to customerSimulated. In the
+         Y.1731 OAM case, the requested CoS along with the policer's color mode,
+         is used to determine which DEI to use in the tag for the OAM_TS_STATUS
+         traffic.
+         
+         Also, the value is only used when an outer tag is required in the
+         frame.
+         
+         Two flows (a green and a yellow) will be generated if the classified DP
+         is controllable with the DEI-bit. Otherwise (as for untagged frames),
+         only one single flow will be generated.
+         
+         If set to 2:
+         
+         -------------------------
+         
+         Case #1:
+         
+         If the ECE matches on a specific DEI-value, then that value will be
+         used and only one single frame flow will be generated. Case #2 and #3
+         below are in action when the ECE matches any DEI value.
+         
+         Case #2:
+         
+         If the policer is not color-aware or if the ECE's action's Drop
+         Precedence (DP) is 0 or 1, injected frames will get this DP no matter
+         the DEI value in the frame. In this case, software will always generate
+         one frame flow for this ECE, and make sure the frame's DEI is set so
+         that a match occurs.
+         
+         Case #3:
+         
+         If the policer is color-aware and the ECE's action's DP is 'disabled',
+         injected frames will get a classified DP according to the port
+         configuration. The software looks into the current port configuration
+         and if the generated frame's <PCP, DEI = 0> gives the same DP as <PCP,
+         DEI = 1>, then one single frame flow is generated. Otherwise, a green
+         frame flow with DEI = the-value-causing-DP-to-become-0 and a yellow
+         frame flow with DEI = the-value-causing-DP-to-become-1 are generated.
+         
+         If set to value in range [0; 1]:
+         
+         --------------------------------------------------------
+         
+         Only one single frame flow will be generated with DEI set to the
+         specified value, provided that the ECE matches on this DEI. Otherwise
+         an error will be returned.
+         
+         If set to any other value:
+         
+         --------------------------
+         
+         An error will be returned."
+    ::= { y1564ControlTestEceTestEntry 7 }
+
+y1564ControlTestEceTestDscp OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..64)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DSCP value to use in the generated frames.
+         
+         It is only used when TrafficType is set to customerSimulated.
+         
+         Also, it is only used when the ECE is configured to match IPv4 or IPv6
+         frames.
+         
+         If set to 64:
+         
+         The software will insert the lowest DSCP value in the range that the
+         ECE matches on.
+         
+         If set to a value in range [0; 63]:
+         
+         The software will use this value, if the ECE matches on it. Otherwise
+         an error will be returned.
+         
+         If set to any other value, an error will be returned."
+    ::= { y1564ControlTestEceTestEntry 8 }
+
+y1564ControlTestStart OBJECT IDENTIFIER
+    ::= { y1564ControlTest 4 }
+
+y1564ControlTestStartName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of the Y.1564 test to start."
+    ::= { y1564ControlTestStart 1 }
+
+y1564ControlTestStop OBJECT IDENTIFIER
+    ::= { y1564ControlTest 5 }
+
+y1564ControlTestStopName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of the Y.1564 test to stop."
+    ::= { y1564ControlTestStop 1 }
+
+y1564MibConformance OBJECT IDENTIFIER
+    ::= { y1564Mib 2 }
+
+y1564MibCompliances OBJECT IDENTIFIER
+    ::= { y1564MibConformance 1 }
+
+y1564MibGroups OBJECT IDENTIFIER
+    ::= { y1564MibConformance 2 }
+
+y1564CapabilitiesInfoGroup OBJECT-GROUP
+    OBJECTS     { y1564CapabilitiesProfileCntMax,
+                  y1564CapabilitiesReportCntMax,
+                  y1564CapabilitiesConcurrentTestMax,
+                  y1564CapabilitiesEceTestCntMax,
+                  y1564CapabilitiesEmixMax }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { y1564MibGroups 1 }
+
+y1564ConfigProfileTableInfoGroup OBJECT-GROUP
+    OBJECTS     { y1564ConfigProfileDescription,
+                  y1564ConfigProfileDstOamAware,
+                  y1564ConfigProfileTrafficType,
+                  y1564ConfigProfileMegLevel,
+                  y1564ConfigProfileEmix,
+                  y1564ConfigProfileUserDefinedFrameSize,
+                  y1564ConfigProfileDwellTime,
+                  y1564ConfigProfileSacFlr,
+                  y1564ConfigProfileSacFtd,
+                  y1564ConfigProfileSacFdv,
+                  y1564ConfigProfileCirEnable,
+                  y1564ConfigProfileCirDuration,
+                  y1564ConfigProfileCirDmInterval,
+                  y1564ConfigProfileCirStepCnt,
+                  y1564ConfigProfileEirEnable,
+                  y1564ConfigProfileEirDuration,
+                  y1564ConfigProfileEirDmInterval,
+                  y1564ConfigProfilePolEnable,
+                  y1564ConfigProfilePolDuration,
+                  y1564ConfigProfilePolDmInterval,
+                  y1564ConfigProfilePrfEnable,
+                  y1564ConfigProfilePrfDuration,
+                  y1564ConfigProfilePrfDmInterval,
+                  y1564ConfigProfileAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { y1564MibGroups 2 }
+
+y1564ConfigProfileTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { y1564ConfigProfileTableRowEditorName,
+                  y1564ConfigProfileTableRowEditorDescription,
+                  y1564ConfigProfileTableRowEditorDstOamAware,
+                  y1564ConfigProfileTableRowEditorTrafficType,
+                  y1564ConfigProfileTableRowEditorMegLevel,
+                  y1564ConfigProfileTableRowEditorEmix,
+                  y1564ConfigProfileTableRowEditorUserDefinedFrameSize,
+                  y1564ConfigProfileTableRowEditorDwellTime,
+                  y1564ConfigProfileTableRowEditorSacFlr,
+                  y1564ConfigProfileTableRowEditorSacFtd,
+                  y1564ConfigProfileTableRowEditorSacFdv,
+                  y1564ConfigProfileTableRowEditorCirEnable,
+                  y1564ConfigProfileTableRowEditorCirDuration,
+                  y1564ConfigProfileTableRowEditorCirDmInterval,
+                  y1564ConfigProfileTableRowEditorCirStepCnt,
+                  y1564ConfigProfileTableRowEditorEirEnable,
+                  y1564ConfigProfileTableRowEditorEirDuration,
+                  y1564ConfigProfileTableRowEditorEirDmInterval,
+                  y1564ConfigProfileTableRowEditorPolEnable,
+                  y1564ConfigProfileTableRowEditorPolDuration,
+                  y1564ConfigProfileTableRowEditorPolDmInterval,
+                  y1564ConfigProfileTableRowEditorPrfEnable,
+                  y1564ConfigProfileTableRowEditorPrfDuration,
+                  y1564ConfigProfileTableRowEditorPrfDmInterval,
+                  y1564ConfigProfileTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { y1564MibGroups 3 }
+
+y1564StatusReportTableInfoGroup OBJECT-GROUP
+    OBJECTS     { y1564StatusReportDescription,
+                  y1564StatusReportCreationTime,
+                  y1564StatusReportStatus,
+                  y1564StatusReportPath }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { y1564MibGroups 4 }
+
+y1564ControlReportDeleteInfoGroup OBJECT-GROUP
+    OBJECTS     { y1564ControlReportDeleteName }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { y1564MibGroups 5 }
+
+y1564ControlTestTableInfoGroup OBJECT-GROUP
+    OBJECTS     { y1564ControlTestDescription,
+                  y1564ControlTestProfileName,
+                  y1564ControlTestEvcId,
+                  y1564ControlTestPeerMac,
+                  y1564ControlTestAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { y1564MibGroups 6 }
+
+y1564ControlTestTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { y1564ControlTestTableRowEditorName,
+                  y1564ControlTestTableRowEditorDescription,
+                  y1564ControlTestTableRowEditorProfileName,
+                  y1564ControlTestTableRowEditorEvcId,
+                  y1564ControlTestTableRowEditorPeerMac,
+                  y1564ControlTestTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { y1564MibGroups 7 }
+
+y1564ControlTestEceTestTableInfoGroup OBJECT-GROUP
+    OBJECTS     { y1564ControlTestEceTestEceId,
+                  y1564ControlTestEceTestEceUni,
+                  y1564ControlTestEceTestVlanId,
+                  y1564ControlTestEceTestVlanPcp,
+                  y1564ControlTestEceTestVlanDei,
+                  y1564ControlTestEceTestDscp }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { y1564MibGroups 8 }
+
+y1564ControlTestStartInfoGroup OBJECT-GROUP
+    OBJECTS     { y1564ControlTestStartName }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { y1564MibGroups 9 }
+
+y1564ControlTestStopInfoGroup OBJECT-GROUP
+    OBJECTS     { y1564ControlTestStopName }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { y1564MibGroups 10 }
+
+y1564MibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { y1564CapabilitiesInfoGroup,
+                       y1564ConfigProfileTableInfoGroup,
+                       y1564ConfigProfileTableRowEditorInfoGroup,
+                       y1564StatusReportTableInfoGroup,
+                       y1564ControlReportDeleteInfoGroup,
+                       y1564ControlTestTableInfoGroup,
+                       y1564ControlTestTableRowEditorInfoGroup,
+                       y1564ControlTestEceTestTableInfoGroup,
+                       y1564ControlTestStartInfoGroup,
+                       y1564ControlTestStopInfoGroup }
+
+    ::= { y1564MibCompliances 1 }
+
+END

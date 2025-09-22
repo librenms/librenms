@@ -1,0 +1,1255 @@
+-- *****************************************************************
+-- MIB-MSTP: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-MSTP DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Integer32 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    DisplayString FROM BTS-TC
+    InterfaceIndex FROM BTS-TC
+    Unsigned16 FROM BTS-TC
+    Unsigned8 FROM BTS-TC
+    ;
+
+mstpMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of the 802.1Q-2005 MSTP MIB"
+    REVISION    "201511130000Z"
+    DESCRIPTION
+        "Add TCN counters"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 20 }
+
+
+MSTPForceVersion ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration control the STP protocol variant to run."
+    SYNTAX      INTEGER { stp(0), rstp(2), mstp(3) }
+
+MstpPoint2Point ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration describe the values of adminPointToPointMAC and
+         operPointToPointMAC parameters. (Full duplex port administrative and
+         operational status.) See 6.4.3 of IEEE Std 802.1D."
+    SYNTAX      INTEGER { forceTrue(0), forceFalse(1), auto(2) }
+
+MstpPortState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration describe the forwarding state of an interface."
+    SYNTAX      INTEGER { disabled(0), discarding(1), learning(2),
+                          forwarding(3) }
+
+mstpMibObjects OBJECT IDENTIFIER
+    ::= { mstpMib 1 }
+
+mstpConfig OBJECT IDENTIFIER
+    ::= { mstpMibObjects 2 }
+
+mstpConfigBridgeParams OBJECT IDENTIFIER
+    ::= { mstpConfig 1 }
+
+mstpConfigBridgeParamsBridgeMaxAge OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Bridge Max Age, IEEE-802.1D-2004 sect 13.23.4"
+    ::= { mstpConfigBridgeParams 1 }
+
+mstpConfigBridgeParamsBridgeHelloTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Bridge Hello Time, 13.25.7 of IEEE-802.1Q-2005. Fixed value of two
+         seconds by the standard, but this implementation allow a compatibility
+         range from 1 to 2 seconds, in stipulated in 802.1Q-2005"
+    ::= { mstpConfigBridgeParams 2 }
+
+mstpConfigBridgeParamsBridgeForwardDelay OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Bridge Forward Delay, IEEE-802.1D-2004 sect 17.20"
+    ::= { mstpConfigBridgeParams 3 }
+
+mstpConfigBridgeParamsForceVersion OBJECT-TYPE
+    SYNTAX      MSTPForceVersion
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "value of the Force Protocol Version parameter - 13.6.2 of
+         IEEE-802.1Q-2005"
+    ::= { mstpConfigBridgeParams 4 }
+
+mstpConfigBridgeParamsTxHoldCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TxHoldCount - 17.13.12 of IEEE Std 802.1D"
+    ::= { mstpConfigBridgeParams 5 }
+
+mstpConfigBridgeParamsMaxHops OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "MaxHops - 13.22.1 of IEEE-802.1Q-2005"
+    ::= { mstpConfigBridgeParams 6 }
+
+mstpConfigBridgeParamsBpduFiltering OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "BPDU filtering for edge ports. Control whether a port explicitly
+         configured as Edge will transmit and receive BPDUs"
+    ::= { mstpConfigBridgeParams 7 }
+
+mstpConfigBridgeParamsBpduGuard OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "BPDU guard for edge ports. Control whether a port explicitly configured
+         as Edge will disable itself upon reception of a BPDU. The port will
+         enter the error-disabled state, and will be removed from the active
+         topology. "
+    ::= { mstpConfigBridgeParams 8 }
+
+mstpConfigBridgeParamsErrorRecoveryDelay OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds until a STP inconsistent port is recovered. Valid
+         values are zero (recovery disabled) or between 30 and 86400 (24 hours)"
+    ::= { mstpConfigBridgeParams 9 }
+
+mstpConfigMstiParamTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MstpConfigMstiParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of the bridge instance (MSTIs) parameters"
+    ::= { mstpConfig 2 }
+
+mstpConfigMstiParamEntry OBJECT-TYPE
+    SYNTAX      MstpConfigMstiParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each MSTI has a set of parameters"
+    INDEX       { mstpConfigMstiParamInstance }
+    ::= { mstpConfigMstiParamTable 1 }
+
+MstpConfigMstiParamEntry ::= SEQUENCE {
+    mstpConfigMstiParamInstance  Integer32,
+    mstpConfigMstiParamPriority  Unsigned8
+}
+
+mstpConfigMstiParamInstance OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Bridge instance number. The CIST = 0, MSTI1 = 1, etc"
+    ::= { mstpConfigMstiParamEntry 1 }
+
+mstpConfigMstiParamPriority OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Bridge Priority"
+    ::= { mstpConfigMstiParamEntry 2 }
+
+mstpConfigMstiConfig OBJECT IDENTIFIER
+    ::= { mstpConfig 3 }
+
+mstpConfigMstiConfigId OBJECT IDENTIFIER
+    ::= { mstpConfigMstiConfig 1 }
+
+mstpConfigMstiConfigIdName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..31))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The configuration name"
+    ::= { mstpConfigMstiConfigId 1 }
+
+mstpConfigMstiConfigIdRevision OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The configuration revision"
+    ::= { mstpConfigMstiConfigId 2 }
+
+mstpConfigMstiConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MstpConfigMstiConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the 802.1Q - 8.9 MST Configuration table
+         
+         For the purposes of calculating the Configuration Digest, the MST
+         Configuration Table is considered to contain 4096 consecutive single
+         octet elements, where each element of the table (with the exception of
+         the first and last) contains an MSTID value."
+    ::= { mstpConfigMstiConfig 2 }
+
+mstpConfigMstiConfigEntry OBJECT-TYPE
+    SYNTAX      MstpConfigMstiConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The first element of the table contains the value 0, the second element
+         the MSTID value corresponding to VID 1, the third element the MSTID
+         value corresponding to VID 2, and so on, with the next to last element
+         of the table containing the MSTID value corresponding to VID 4094, and
+         the last element containing the value 0."
+    INDEX       { mstpConfigMstiConfigVid }
+    ::= { mstpConfigMstiConfigTable 1 }
+
+MstpConfigMstiConfigEntry ::= SEQUENCE {
+    mstpConfigMstiConfigVid    Integer32,
+    mstpConfigMstiConfigMstid  Unsigned8
+}
+
+mstpConfigMstiConfigVid OBJECT-TYPE
+    SYNTAX      Integer32 (1..4095)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Vlan id"
+    ::= { mstpConfigMstiConfigEntry 1 }
+
+mstpConfigMstiConfigMstid OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The MSTID value associated with the vlan id"
+    ::= { mstpConfigMstiConfigEntry 2 }
+
+mstpConfigCistInterfaceParamTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MstpConfigCistInterfaceParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of the CIST physical interface parameters"
+    ::= { mstpConfig 4 }
+
+mstpConfigCistInterfaceParamEntry OBJECT-TYPE
+    SYNTAX      MstpConfigCistInterfaceParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each CIST physical interface has a set of parameters"
+    INDEX       { mstpConfigCistInterfaceParamInterfaceNo }
+    ::= { mstpConfigCistInterfaceParamTable 1 }
+
+MstpConfigCistInterfaceParamEntry ::= SEQUENCE {
+    mstpConfigCistInterfaceParamInterfaceNo           InterfaceIndex,
+    mstpConfigCistInterfaceParamEnable                TruthValue,
+    mstpConfigCistInterfaceParamAdminEdgePort         TruthValue,
+    mstpConfigCistInterfaceParamAdminAutoEdgePort     TruthValue,
+    mstpConfigCistInterfaceParamAdminPointToPointMAC  MstpPoint2Point,
+    mstpConfigCistInterfaceParamRestrictedRole        TruthValue,
+    mstpConfigCistInterfaceParamRestrictedTcn         TruthValue,
+    mstpConfigCistInterfaceParamBpduGuard             TruthValue
+}
+
+mstpConfigCistInterfaceParamInterfaceNo OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { mstpConfigCistInterfaceParamEntry 1 }
+
+mstpConfigCistInterfaceParamEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Control whether port is controlled by xSTP. If disabled, the port
+         forwarding state follow the MAC state"
+    ::= { mstpConfigCistInterfaceParamEntry 2 }
+
+mstpConfigCistInterfaceParamAdminEdgePort OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "adminEdgePort parameter - 18.3.3 of IEEE Std 802.1D"
+    ::= { mstpConfigCistInterfaceParamEntry 3 }
+
+mstpConfigCistInterfaceParamAdminAutoEdgePort OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "adminAutoEdgePort parameter - 17.13.3 of IEEE Std 802.1D"
+    ::= { mstpConfigCistInterfaceParamEntry 4 }
+
+mstpConfigCistInterfaceParamAdminPointToPointMAC OBJECT-TYPE
+    SYNTAX      MstpPoint2Point
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "adminPointToPointMAC parameter - 6.4.3 of IEEE Std 802.1D"
+    ::= { mstpConfigCistInterfaceParamEntry 5 }
+
+mstpConfigCistInterfaceParamRestrictedRole OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "restrictedRole parameter - 13.25.14 of IEEE Std 802.1Q-2005"
+    ::= { mstpConfigCistInterfaceParamEntry 6 }
+
+mstpConfigCistInterfaceParamRestrictedTcn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "restrictedRole parameter - 13.25.15 of IEEE Std 802.1Q-2005"
+    ::= { mstpConfigCistInterfaceParamEntry 7 }
+
+mstpConfigCistInterfaceParamBpduGuard OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If enabled, causes the port to disable itself upon receiving valid
+         BPDU's. Contrary to the similar bridge setting, the port Edge status
+         does not effect this setting. A port entering error-disabled state due
+         to this setting is subject to the bridge ErrorRecoveryDelay setting as
+         well"
+    ::= { mstpConfigCistInterfaceParamEntry 8 }
+
+mstpConfigAggrParams OBJECT IDENTIFIER
+    ::= { mstpConfig 5 }
+
+mstpConfigAggrParamsEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Control whether port is controlled by xSTP. If disabled, the port
+         forwarding state follow the MAC state"
+    ::= { mstpConfigAggrParams 1 }
+
+mstpConfigAggrParamsAdminEdgePort OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "adminEdgePort parameter - 18.3.3 of IEEE Std 802.1D"
+    ::= { mstpConfigAggrParams 2 }
+
+mstpConfigAggrParamsAdminAutoEdgePort OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "adminAutoEdgePort parameter - 17.13.3 of IEEE Std 802.1D"
+    ::= { mstpConfigAggrParams 3 }
+
+mstpConfigAggrParamsAdminPointToPointMAC OBJECT-TYPE
+    SYNTAX      MstpPoint2Point
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "adminPointToPointMAC parameter - 6.4.3 of IEEE Std 802.1D"
+    ::= { mstpConfigAggrParams 4 }
+
+mstpConfigAggrParamsRestrictedRole OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "restrictedRole parameter - 13.25.14 of IEEE Std 802.1Q-2005"
+    ::= { mstpConfigAggrParams 5 }
+
+mstpConfigAggrParamsRestrictedTcn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "restrictedRole parameter - 13.25.15 of IEEE Std 802.1Q-2005"
+    ::= { mstpConfigAggrParams 6 }
+
+mstpConfigAggrParamsBpduGuard OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If enabled, causes the port to disable itself upon receiving valid
+         BPDU's. Contrary to the similar bridge setting, the port Edge status
+         does not effect this setting. A port entering error-disabled state due
+         to this setting is subject to the bridge ErrorRecoveryDelay setting as
+         well"
+    ::= { mstpConfigAggrParams 7 }
+
+mstpConfigMstiInterfaceParamTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MstpConfigMstiInterfaceParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of the MSTI interface parameters"
+    ::= { mstpConfig 6 }
+
+mstpConfigMstiInterfaceParamEntry OBJECT-TYPE
+    SYNTAX      MstpConfigMstiInterfaceParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each MSTI interface has a set of parameters"
+    INDEX       { mstpConfigMstiInterfaceParamInterfaceNo,
+                  mstpConfigMstiInterfaceParamInstance }
+    ::= { mstpConfigMstiInterfaceParamTable 1 }
+
+MstpConfigMstiInterfaceParamEntry ::= SEQUENCE {
+    mstpConfigMstiInterfaceParamInterfaceNo        InterfaceIndex,
+    mstpConfigMstiInterfaceParamInstance           Integer32,
+    mstpConfigMstiInterfaceParamAdminPathCost      Unsigned32,
+    mstpConfigMstiInterfaceParamAdminPortPriority  Unsigned8
+}
+
+mstpConfigMstiInterfaceParamInterfaceNo OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { mstpConfigMstiInterfaceParamEntry 1 }
+
+mstpConfigMstiInterfaceParamInstance OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Bridge instance number. The CIST = 0, MSTI1 = 1, etc"
+    ::= { mstpConfigMstiInterfaceParamEntry 2 }
+
+mstpConfigMstiInterfaceParamAdminPathCost OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Path Cost - 13.37.1 of 802.1Q-2005"
+    ::= { mstpConfigMstiInterfaceParamEntry 3 }
+
+mstpConfigMstiInterfaceParamAdminPortPriority OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "priority field for the Port Identifier - 13.24.12 of 802.1Q-2005"
+    ::= { mstpConfigMstiInterfaceParamEntry 4 }
+
+mstpConfigMstiAggrParamTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MstpConfigMstiAggrParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of the MSTI aggregations parameters"
+    ::= { mstpConfig 7 }
+
+mstpConfigMstiAggrParamEntry OBJECT-TYPE
+    SYNTAX      MstpConfigMstiAggrParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The aggregations for each MSTI has a set of parameters"
+    INDEX       { mstpConfigMstiAggrParamInstance }
+    ::= { mstpConfigMstiAggrParamTable 1 }
+
+MstpConfigMstiAggrParamEntry ::= SEQUENCE {
+    mstpConfigMstiAggrParamInstance           Integer32,
+    mstpConfigMstiAggrParamAdminPathCost      Unsigned32,
+    mstpConfigMstiAggrParamAdminPortPriority  Unsigned8
+}
+
+mstpConfigMstiAggrParamInstance OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Bridge instance number. The CIST = 0, MSTI1 = 1, etc"
+    ::= { mstpConfigMstiAggrParamEntry 1 }
+
+mstpConfigMstiAggrParamAdminPathCost OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Path Cost - 13.37.1 of 802.1Q-2005"
+    ::= { mstpConfigMstiAggrParamEntry 3 }
+
+mstpConfigMstiAggrParamAdminPortPriority OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "priority field for the Port Identifier - 13.24.12 of 802.1Q-2005"
+    ::= { mstpConfigMstiAggrParamEntry 4 }
+
+mstpStatus OBJECT IDENTIFIER
+    ::= { mstpMibObjects 3 }
+
+mstpStatusBridgeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MstpStatusBridgeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table represent the status of the bridge instances"
+    ::= { mstpStatus 1 }
+
+mstpStatusBridgeEntry OBJECT-TYPE
+    SYNTAX      MstpStatusBridgeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A MSTP Bridge instance set of status objects"
+    INDEX       { mstpStatusBridgeInstance }
+    ::= { mstpStatusBridgeTable 1 }
+
+MstpStatusBridgeEntry ::= SEQUENCE {
+    mstpStatusBridgeInstance                 Integer32,
+    mstpStatusBridgeBridgeId                 OCTET STRING,
+    mstpStatusBridgeTimeSinceTopologyChange  Unsigned32,
+    mstpStatusBridgeTopologyChangeCount      Unsigned32,
+    mstpStatusBridgeTopologyChange           TruthValue,
+    mstpStatusBridgeDesignatedRoot           OCTET STRING,
+    mstpStatusBridgeRootPathCost             Unsigned32,
+    mstpStatusBridgeRootPort                 Unsigned32,
+    mstpStatusBridgeMaxAge                   Unsigned32,
+    mstpStatusBridgeForwardDelay             Unsigned32,
+    mstpStatusBridgeBridgeMaxAge             Unsigned32,
+    mstpStatusBridgeBridgeHelloTime          Unsigned32,
+    mstpStatusBridgeBridgeForwardDelay       Unsigned32,
+    mstpStatusBridgeTxHoldCount              Unsigned32,
+    mstpStatusBridgeForceVersion             MSTPForceVersion,
+    mstpStatusBridgeCistRegionalRoot         OCTET STRING,
+    mstpStatusBridgeCistInternalPathCost     Unsigned32,
+    mstpStatusBridgeMaxHops                  Unsigned8
+}
+
+mstpStatusBridgeInstance OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Bridge instance number. The CIST = 0, MSTI1 = 1, etc"
+    ::= { mstpStatusBridgeEntry 1 }
+
+mstpStatusBridgeBridgeId OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bridge Identifier of this bridge"
+    ::= { mstpStatusBridgeEntry 2 }
+
+mstpStatusBridgeTimeSinceTopologyChange OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The count in seconds of the time elapsed since the Topology Change flag
+         was last True"
+    ::= { mstpStatusBridgeEntry 3 }
+
+mstpStatusBridgeTopologyChangeCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The count of the times the Topology Change flag parameter for the
+         Bridge has been set since the Bridge was powered on or initialized"
+    ::= { mstpStatusBridgeEntry 4 }
+
+mstpStatusBridgeTopologyChange OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Topology Change Flag current status"
+    ::= { mstpStatusBridgeEntry 5 }
+
+mstpStatusBridgeDesignatedRoot OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Designated Root Bridge"
+    ::= { mstpStatusBridgeEntry 6 }
+
+mstpStatusBridgeRootPathCost OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Root Path Cost"
+    ::= { mstpStatusBridgeEntry 7 }
+
+mstpStatusBridgeRootPort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Root Port"
+    ::= { mstpStatusBridgeEntry 8 }
+
+mstpStatusBridgeMaxAge OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Max Age, IEEE-802.1D-2004 sect 13.23.7"
+    ::= { mstpStatusBridgeEntry 9 }
+
+mstpStatusBridgeForwardDelay OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Forward Delay, IEEE-802.1D-2004 sect 13.23.7"
+    ::= { mstpStatusBridgeEntry 10 }
+
+mstpStatusBridgeBridgeMaxAge OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bridge Max Age, IEEE-802.1D-2004 sect 13.23.4"
+    ::= { mstpStatusBridgeEntry 11 }
+
+mstpStatusBridgeBridgeHelloTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bridge Hello Time, IEEE-802.1D-2004 sect 13.23.4"
+    ::= { mstpStatusBridgeEntry 12 }
+
+mstpStatusBridgeBridgeForwardDelay OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bridge Forward Delay, IEEE-802.1D-2004 sect 13.23.4"
+    ::= { mstpStatusBridgeEntry 13 }
+
+mstpStatusBridgeTxHoldCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Hold Time / Transmission Limit, IEEE-802.1D-2004 sect 13.22"
+    ::= { mstpStatusBridgeEntry 14 }
+
+mstpStatusBridgeForceVersion OBJECT-TYPE
+    SYNTAX      MSTPForceVersion
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Value of the Force Protocol Version parameter - IEEE-802.1D-2004 sect
+         17.16.1"
+    ::= { mstpStatusBridgeEntry 15 }
+
+mstpStatusBridgeCistRegionalRoot OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CIST Regional Root Identifier (13.16.4)"
+    ::= { mstpStatusBridgeEntry 16 }
+
+mstpStatusBridgeCistInternalPathCost OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CIST Path Cost"
+    ::= { mstpStatusBridgeEntry 17 }
+
+mstpStatusBridgeMaxHops OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MaxHops (13.22.1)"
+    ::= { mstpStatusBridgeEntry 18 }
+
+mstpStatusInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MstpStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table represent the status of the interface instances"
+    ::= { mstpStatus 2 }
+
+mstpStatusInterfaceEntry OBJECT-TYPE
+    SYNTAX      MstpStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A MSTP interface instance set of status objects"
+    INDEX       { mstpStatusInterfaceInterfaceNo,
+                  mstpStatusInterfaceInstance }
+    ::= { mstpStatusInterfaceTable 1 }
+
+MstpStatusInterfaceEntry ::= SEQUENCE {
+    mstpStatusInterfaceInterfaceNo           InterfaceIndex,
+    mstpStatusInterfaceInstance              Integer32,
+    mstpStatusInterfaceEnabled               TruthValue,
+    mstpStatusInterfaceActive                TruthValue,
+    mstpStatusInterfaceParentPort            Unsigned32,
+    mstpStatusInterfaceUpTime                Unsigned32,
+    mstpStatusInterfacePortState             MstpPortState,
+    mstpStatusInterfacePortId                OCTET STRING,
+    mstpStatusInterfacePathCost              Unsigned32,
+    mstpStatusInterfaceDesignatedRoot        OCTET STRING,
+    mstpStatusInterfaceDesignatedCost        Unsigned32,
+    mstpStatusInterfaceDesignatedBridge      OCTET STRING,
+    mstpStatusInterfaceDesignatedPort        OCTET STRING,
+    mstpStatusInterfaceTcAck                 TruthValue,
+    mstpStatusInterfaceHelloTime             Unsigned32,
+    mstpStatusInterfaceAdminEdgePort         TruthValue,
+    mstpStatusInterfaceOperEdgePort          TruthValue,
+    mstpStatusInterfaceAutoEdgePort          TruthValue,
+    mstpStatusInterfaceMacOperational        TruthValue,
+    mstpStatusInterfaceAdminPointToPointMAC  MstpPoint2Point,
+    mstpStatusInterfaceOperPointToPointMAC   TruthValue,
+    mstpStatusInterfaceRestrictedRole        TruthValue,
+    mstpStatusInterfaceRestrictedTcn         TruthValue,
+    mstpStatusInterfacePortRole              DisplayString,
+    mstpStatusInterfaceDisputed              TruthValue
+}
+
+mstpStatusInterfaceInterfaceNo OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { mstpStatusInterfaceEntry 1 }
+
+mstpStatusInterfaceInstance OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Bridge instance number. The CIST = 0, MSTI1 = 1, etc"
+    ::= { mstpStatusInterfaceEntry 2 }
+
+mstpStatusInterfaceEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether port is controlled by xSTP"
+    ::= { mstpStatusInterfaceEntry 3 }
+
+mstpStatusInterfaceActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether port is active"
+    ::= { mstpStatusInterfaceEntry 4 }
+
+mstpStatusInterfaceParentPort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Parent port if physical port is aggregated. (Otherwise 0xffff)"
+    ::= { mstpStatusInterfaceEntry 5 }
+
+mstpStatusInterfaceUpTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "seconds of the time elapsed since the Port was last reset or
+         initialized"
+    ::= { mstpStatusInterfaceEntry 6 }
+
+mstpStatusInterfacePortState OBJECT-TYPE
+    SYNTAX      MstpPortState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current state of the Port"
+    ::= { mstpStatusInterfaceEntry 7 }
+
+mstpStatusInterfacePortId OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(2))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unique Port identifier comprising two parts, the Port Number and the
+         Port Priority field"
+    ::= { mstpStatusInterfaceEntry 8 }
+
+mstpStatusInterfacePathCost OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Path Cost (17.16.5 of IEEE Std 802.1D)"
+    ::= { mstpStatusInterfaceEntry 9 }
+
+mstpStatusInterfaceDesignatedRoot OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Designated Root"
+    ::= { mstpStatusInterfaceEntry 10 }
+
+mstpStatusInterfaceDesignatedCost OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Designated Cost"
+    ::= { mstpStatusInterfaceEntry 11 }
+
+mstpStatusInterfaceDesignatedBridge OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Designated Bridge"
+    ::= { mstpStatusInterfaceEntry 12 }
+
+mstpStatusInterfaceDesignatedPort OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(2))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Designated Port"
+    ::= { mstpStatusInterfaceEntry 13 }
+
+mstpStatusInterfaceTcAck OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Topology Change Acknowledge"
+    ::= { mstpStatusInterfaceEntry 14 }
+
+mstpStatusInterfaceHelloTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Hello Time"
+    ::= { mstpStatusInterfaceEntry 15 }
+
+mstpStatusInterfaceAdminEdgePort OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "adminEdgePort (18.3.3 of IEEE Std 802.1D)"
+    ::= { mstpStatusInterfaceEntry 16 }
+
+mstpStatusInterfaceOperEdgePort OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "operEdgePort (18.3.4 of IEEE Std 802.1D)"
+    ::= { mstpStatusInterfaceEntry 17 }
+
+mstpStatusInterfaceAutoEdgePort OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "autoEdgePort (17.13.3 of IEEE Std 802.1D)"
+    ::= { mstpStatusInterfaceEntry 18 }
+
+mstpStatusInterfaceMacOperational OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current state of the MAC Operational parameter (6.4.2 of IEEE Std
+         802.1D,)"
+    ::= { mstpStatusInterfaceEntry 19 }
+
+mstpStatusInterfaceAdminPointToPointMAC OBJECT-TYPE
+    SYNTAX      MstpPoint2Point
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current state of the adminPointToPointMAC parameter (6.4.3 of IEEE Std
+         802.1D)"
+    ::= { mstpStatusInterfaceEntry 20 }
+
+mstpStatusInterfaceOperPointToPointMAC OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current state of the operPointToPointMAC parameter (6.4.3 of IEEE Std
+         802.1D)"
+    ::= { mstpStatusInterfaceEntry 21 }
+
+mstpStatusInterfaceRestrictedRole OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current state of the restrictedRole parameter for the Port (13.25.14)"
+    ::= { mstpStatusInterfaceEntry 22 }
+
+mstpStatusInterfaceRestrictedTcn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current state of the restrictedTcn parameter for the Port (13.25.15)"
+    ::= { mstpStatusInterfaceEntry 23 }
+
+mstpStatusInterfacePortRole OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current Port Role"
+    ::= { mstpStatusInterfaceEntry 24 }
+
+mstpStatusInterfaceDisputed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current value of the disputed variable for the CIST Port"
+    ::= { mstpStatusInterfaceEntry 25 }
+
+mstpStatusInterfaceStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MstpStatusInterfaceStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table represent the statistics of the CIST interfaces"
+    ::= { mstpStatus 3 }
+
+mstpStatusInterfaceStatisticsEntry OBJECT-TYPE
+    SYNTAX      MstpStatusInterfaceStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A CIST interface set of statistics"
+    INDEX       { mstpStatusInterfaceStatisticsInterfaceNo }
+    ::= { mstpStatusInterfaceStatisticsTable 1 }
+
+MstpStatusInterfaceStatisticsEntry ::= SEQUENCE {
+    mstpStatusInterfaceStatisticsInterfaceNo            InterfaceIndex,
+    mstpStatusInterfaceStatisticsStpFrameXmits          Unsigned32,
+    mstpStatusInterfaceStatisticsStpFrameReceived       Unsigned32,
+    mstpStatusInterfaceStatisticsRstpFrameXmits         Unsigned32,
+    mstpStatusInterfaceStatisticsRstpFrameReceived      Unsigned32,
+    mstpStatusInterfaceStatisticsMstpFrameXmits         Unsigned32,
+    mstpStatusInterfaceStatisticsMstpFrameReceived      Unsigned32,
+    mstpStatusInterfaceStatisticsUnknownFramesReceived  Unsigned32,
+    mstpStatusInterfaceStatisticsIllegalFrameReceived   Unsigned32,
+    mstpStatusInterfaceStatisticsTcnFrameXmits          Unsigned32,
+    mstpStatusInterfaceStatisticsTcnFrameReceived       Unsigned32
+}
+
+mstpStatusInterfaceStatisticsInterfaceNo OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { mstpStatusInterfaceStatisticsEntry 1 }
+
+mstpStatusInterfaceStatisticsStpFrameXmits OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of STP frames transmitted"
+    ::= { mstpStatusInterfaceStatisticsEntry 2 }
+
+mstpStatusInterfaceStatisticsStpFrameReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of STP frames received"
+    ::= { mstpStatusInterfaceStatisticsEntry 3 }
+
+mstpStatusInterfaceStatisticsRstpFrameXmits OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of RSTP frames transmitted"
+    ::= { mstpStatusInterfaceStatisticsEntry 4 }
+
+mstpStatusInterfaceStatisticsRstpFrameReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of RSTP frames received"
+    ::= { mstpStatusInterfaceStatisticsEntry 5 }
+
+mstpStatusInterfaceStatisticsMstpFrameXmits OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of MSTP frames transmitted"
+    ::= { mstpStatusInterfaceStatisticsEntry 6 }
+
+mstpStatusInterfaceStatisticsMstpFrameReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of MSTP frames received"
+    ::= { mstpStatusInterfaceStatisticsEntry 7 }
+
+mstpStatusInterfaceStatisticsUnknownFramesReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of unknown frames received and discarded in error"
+    ::= { mstpStatusInterfaceStatisticsEntry 8 }
+
+mstpStatusInterfaceStatisticsIllegalFrameReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of illegal frames received and discarded in error"
+    ::= { mstpStatusInterfaceStatisticsEntry 9 }
+
+mstpStatusInterfaceStatisticsTcnFrameXmits OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of TCN frames transmitted"
+    ::= { mstpStatusInterfaceStatisticsEntry 10 }
+
+mstpStatusInterfaceStatisticsTcnFrameReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of TCN frames received"
+    ::= { mstpStatusInterfaceStatisticsEntry 11 }
+
+mstpMibConformance OBJECT IDENTIFIER
+    ::= { mstpMib 2 }
+
+mstpMibCompliances OBJECT IDENTIFIER
+    ::= { mstpMibConformance 1 }
+
+mstpMibGroups OBJECT IDENTIFIER
+    ::= { mstpMibConformance 2 }
+
+mstpConfigBridgeParamsInfoGroup OBJECT-GROUP
+    OBJECTS     { mstpConfigBridgeParamsBridgeMaxAge,
+                  mstpConfigBridgeParamsBridgeHelloTime,
+                  mstpConfigBridgeParamsBridgeForwardDelay,
+                  mstpConfigBridgeParamsForceVersion,
+                  mstpConfigBridgeParamsTxHoldCount,
+                  mstpConfigBridgeParamsMaxHops,
+                  mstpConfigBridgeParamsBpduFiltering,
+                  mstpConfigBridgeParamsBpduGuard,
+                  mstpConfigBridgeParamsErrorRecoveryDelay }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mstpMibGroups 1 }
+
+mstpConfigMstiParamTableInfoGroup OBJECT-GROUP
+    OBJECTS     { mstpConfigMstiParamPriority }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mstpMibGroups 2 }
+
+mstpConfigMstiConfigIdInfoGroup OBJECT-GROUP
+    OBJECTS     { mstpConfigMstiConfigIdName,
+                  mstpConfigMstiConfigIdRevision }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mstpMibGroups 3 }
+
+mstpConfigMstiConfigTableInfoGroup OBJECT-GROUP
+    OBJECTS     { mstpConfigMstiConfigMstid }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mstpMibGroups 4 }
+
+mstpConfigCistInterfaceParamTableInfoGroup OBJECT-GROUP
+    OBJECTS     { mstpConfigCistInterfaceParamEnable,
+                  mstpConfigCistInterfaceParamAdminEdgePort,
+                  mstpConfigCistInterfaceParamAdminAutoEdgePort,
+                  mstpConfigCistInterfaceParamAdminPointToPointMAC,
+                  mstpConfigCistInterfaceParamRestrictedRole,
+                  mstpConfigCistInterfaceParamRestrictedTcn,
+                  mstpConfigCistInterfaceParamBpduGuard }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mstpMibGroups 5 }
+
+mstpConfigAggrParamsInfoGroup OBJECT-GROUP
+    OBJECTS     { mstpConfigAggrParamsEnable,
+                  mstpConfigAggrParamsAdminEdgePort,
+                  mstpConfigAggrParamsAdminAutoEdgePort,
+                  mstpConfigAggrParamsAdminPointToPointMAC,
+                  mstpConfigAggrParamsRestrictedRole,
+                  mstpConfigAggrParamsRestrictedTcn,
+                  mstpConfigAggrParamsBpduGuard }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mstpMibGroups 6 }
+
+mstpConfigMstiInterfaceParamTableInfoGroup OBJECT-GROUP
+    OBJECTS     { mstpConfigMstiInterfaceParamAdminPathCost,
+                  mstpConfigMstiInterfaceParamAdminPortPriority }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mstpMibGroups 7 }
+
+mstpConfigMstiAggrParamTableInfoGroup OBJECT-GROUP
+    OBJECTS     { mstpConfigMstiAggrParamAdminPathCost,
+                  mstpConfigMstiAggrParamAdminPortPriority }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mstpMibGroups 8 }
+
+mstpStatusBridgeTableInfoGroup OBJECT-GROUP
+    OBJECTS     { mstpStatusBridgeBridgeId,
+                  mstpStatusBridgeTimeSinceTopologyChange,
+                  mstpStatusBridgeTopologyChangeCount,
+                  mstpStatusBridgeTopologyChange,
+                  mstpStatusBridgeDesignatedRoot,
+                  mstpStatusBridgeRootPathCost,
+                  mstpStatusBridgeRootPort,
+                  mstpStatusBridgeMaxAge,
+                  mstpStatusBridgeForwardDelay,
+                  mstpStatusBridgeBridgeMaxAge,
+                  mstpStatusBridgeBridgeHelloTime,
+                  mstpStatusBridgeBridgeForwardDelay,
+                  mstpStatusBridgeTxHoldCount,
+                  mstpStatusBridgeForceVersion,
+                  mstpStatusBridgeCistRegionalRoot,
+                  mstpStatusBridgeCistInternalPathCost,
+                  mstpStatusBridgeMaxHops }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mstpMibGroups 9 }
+
+mstpStatusInterfaceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { mstpStatusInterfaceEnabled,
+                  mstpStatusInterfaceActive,
+                  mstpStatusInterfaceParentPort,
+                  mstpStatusInterfaceUpTime,
+                  mstpStatusInterfacePortState,
+                  mstpStatusInterfacePortId,
+                  mstpStatusInterfacePathCost,
+                  mstpStatusInterfaceDesignatedRoot,
+                  mstpStatusInterfaceDesignatedCost,
+                  mstpStatusInterfaceDesignatedBridge,
+                  mstpStatusInterfaceDesignatedPort,
+                  mstpStatusInterfaceTcAck,
+                  mstpStatusInterfaceHelloTime,
+                  mstpStatusInterfaceAdminEdgePort,
+                  mstpStatusInterfaceOperEdgePort,
+                  mstpStatusInterfaceAutoEdgePort,
+                  mstpStatusInterfaceMacOperational,
+                  mstpStatusInterfaceAdminPointToPointMAC,
+                  mstpStatusInterfaceOperPointToPointMAC,
+                  mstpStatusInterfaceRestrictedRole,
+                  mstpStatusInterfaceRestrictedTcn,
+                  mstpStatusInterfacePortRole,
+                  mstpStatusInterfaceDisputed }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mstpMibGroups 10 }
+
+mstpStatusInterfaceStatisticsTableInfoGroup OBJECT-GROUP
+    OBJECTS     { mstpStatusInterfaceStatisticsStpFrameXmits,
+                  mstpStatusInterfaceStatisticsStpFrameReceived,
+                  mstpStatusInterfaceStatisticsRstpFrameXmits,
+                  mstpStatusInterfaceStatisticsRstpFrameReceived,
+                  mstpStatusInterfaceStatisticsMstpFrameXmits,
+                  mstpStatusInterfaceStatisticsMstpFrameReceived,
+                  mstpStatusInterfaceStatisticsUnknownFramesReceived,
+                  mstpStatusInterfaceStatisticsIllegalFrameReceived,
+                  mstpStatusInterfaceStatisticsTcnFrameXmits,
+                  mstpStatusInterfaceStatisticsTcnFrameReceived }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mstpMibGroups 11 }
+
+mstpMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { mstpConfigBridgeParamsInfoGroup,
+                       mstpConfigMstiParamTableInfoGroup,
+                       mstpConfigMstiConfigIdInfoGroup,
+                       mstpConfigMstiConfigTableInfoGroup,
+                       mstpConfigCistInterfaceParamTableInfoGroup,
+                       mstpConfigAggrParamsInfoGroup,
+                       mstpConfigMstiInterfaceParamTableInfoGroup,
+                       mstpConfigMstiAggrParamTableInfoGroup,
+                       mstpStatusBridgeTableInfoGroup,
+                       mstpStatusInterfaceTableInfoGroup,
+                       mstpStatusInterfaceStatisticsTableInfoGroup }
+
+    ::= { mstpMibCompliances 1 }
+
+END

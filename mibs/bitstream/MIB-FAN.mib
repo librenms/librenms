@@ -1,0 +1,215 @@
+-- *****************************************************************
+-- MIB-FAN: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-FAN DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Integer32 FROM SNMPv2-SMI
+    Integer16 FROM BTS-TC
+    Unsigned16 FROM BTS-TC
+    Unsigned8 FROM BTS-TC
+    ;
+
+fanMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private MIB for controlling fan speed, in order to reduce
+         noise and power consumption"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 75 }
+
+
+fanMibObjects OBJECT IDENTIFIER
+    ::= { fanMib 1 }
+
+fanCapabilities OBJECT IDENTIFIER
+    ::= { fanMibObjects 1 }
+
+fanCapabilitiesSensorCount OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported temperature sensors in a switch. "
+    ::= { fanCapabilities 1 }
+
+fanConfig OBJECT IDENTIFIER
+    ::= { fanMibObjects 2 }
+
+fanConfigGlobals OBJECT IDENTIFIER
+    ::= { fanConfig 1 }
+
+fanConfigGlobalsMaxSpeedTemperature OBJECT-TYPE
+    SYNTAX      Integer16 (-127..127)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The temperature(in C) where fan shall be running at full speed (maximum
+         cooling). Valid range:-127 to 127"
+    ::= { fanConfigGlobals 1 }
+
+fanConfigGlobalsOnTemperature OBJECT-TYPE
+    SYNTAX      Integer16 (-127..127)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The temperature(in C) where cooling is needed (fan is started). Valid
+         range:-127 to 127"
+    ::= { fanConfigGlobals 2 }
+
+fanStatus OBJECT IDENTIFIER
+    ::= { fanMibObjects 3 }
+
+fanStatusSpeedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FanStatusSpeedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table for switch fan speed"
+    ::= { fanStatus 1 }
+
+fanStatusSpeedEntry OBJECT-TYPE
+    SYNTAX      FanStatusSpeedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each switch have fan module"
+    INDEX       { fanStatusSpeedSwitchId }
+    ::= { fanStatusSpeedTable 1 }
+
+FanStatusSpeedEntry ::= SEQUENCE {
+    fanStatusSpeedSwitchId  Integer32,
+    fanStatusSpeedRunning   Unsigned16
+}
+
+fanStatusSpeedSwitchId OBJECT-TYPE
+    SYNTAX      Integer32 (1..16)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The identification of switch. For non-stackable switch, the valid value
+         is limited to 1."
+    ::= { fanStatusSpeedEntry 1 }
+
+fanStatusSpeedRunning OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The fan speed, currently running (in RPM)."
+    ::= { fanStatusSpeedEntry 3 }
+
+fanStatusSensorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FanStatusSensorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to chip temperature"
+    ::= { fanStatus 2 }
+
+fanStatusSensorEntry OBJECT-TYPE
+    SYNTAX      FanStatusSensorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each switch have temperature sensor status"
+    INDEX       { fanStatusSensorSwitchId,
+                  fanStatusSensorIndex }
+    ::= { fanStatusSensorTable 1 }
+
+FanStatusSensorEntry ::= SEQUENCE {
+    fanStatusSensorSwitchId  Integer32,
+    fanStatusSensorIndex     Integer32,
+    fanStatusSensorChipTemp  Integer16
+}
+
+fanStatusSensorSwitchId OBJECT-TYPE
+    SYNTAX      Integer32 (1..16)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The identification of switch. For non-stackable switch, the valid value
+         is limited to 1."
+    ::= { fanStatusSensorEntry 1 }
+
+fanStatusSensorIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The temperature sensor index. Some switches may also have more than one
+         temperature sensor."
+    ::= { fanStatusSensorEntry 2 }
+
+fanStatusSensorChipTemp OBJECT-TYPE
+    SYNTAX      Integer16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current chip temperature (in C)."
+    ::= { fanStatusSensorEntry 4 }
+
+fanMibConformance OBJECT IDENTIFIER
+    ::= { fanMib 2 }
+
+fanMibCompliances OBJECT IDENTIFIER
+    ::= { fanMibConformance 1 }
+
+fanMibGroups OBJECT IDENTIFIER
+    ::= { fanMibConformance 2 }
+
+fanCapabilitiesInfoGroup OBJECT-GROUP
+    OBJECTS     { fanCapabilitiesSensorCount }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { fanMibGroups 1 }
+
+fanConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { fanConfigGlobalsMaxSpeedTemperature,
+                  fanConfigGlobalsOnTemperature }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { fanMibGroups 2 }
+
+fanStatusSpeedInfoGroup OBJECT-GROUP
+    OBJECTS     { fanStatusSpeedRunning }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { fanMibGroups 3 }
+
+fanStatusSensorInfoGroup OBJECT-GROUP
+    OBJECTS     { fanStatusSensorChipTemp }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { fanMibGroups 4 }
+
+fanMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { fanCapabilitiesInfoGroup,
+                       fanConfigGlobalsInfoGroup,
+                       fanStatusSpeedInfoGroup,
+                       fanStatusSensorInfoGroup }
+
+    ::= { fanMibCompliances 1 }
+
+END

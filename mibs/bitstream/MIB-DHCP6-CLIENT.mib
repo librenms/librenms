@@ -1,0 +1,533 @@
+-- *****************************************************************
+-- MIB-DHCP6-CLIENT: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-DHCP6-CLIENT DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    InetAddressIPv6 FROM INET-ADDRESS-MIB
+    Counter64 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    InterfaceIndex FROM BTS-TC
+    RowEditorState FROM BTS-TC
+    ;
+
+dhcp6ClientMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of the DHCPv6 Client MIB"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 126 }
+
+
+dhcp6ClientMibObjects OBJECT IDENTIFIER
+    ::= { dhcp6ClientMib 1 }
+
+dhcp6ClientCapabilities OBJECT IDENTIFIER
+    ::= { dhcp6ClientMibObjects 1 }
+
+dhcp6ClientCapabilitiesMaxNumberOfInterfaces OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of DHCPv6 client interfaces supported by the device."
+    ::= { dhcp6ClientCapabilities 1 }
+
+dhcp6ClientConfig OBJECT IDENTIFIER
+    ::= { dhcp6ClientMibObjects 2 }
+
+dhcp6ClientConfigInterface OBJECT IDENTIFIER
+    ::= { dhcp6ClientConfig 1 }
+
+dhcp6ClientConfigInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dhcp6ClientConfigInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table for managing DHCPv6 client interface entries."
+    ::= { dhcp6ClientConfigInterface 1 }
+
+dhcp6ClientConfigInterfaceEntry OBJECT-TYPE
+    SYNTAX      Dhcp6ClientConfigInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of parameters."
+    INDEX       { dhcp6ClientConfigInterfaceIfIndex }
+    ::= { dhcp6ClientConfigInterfaceTable 1 }
+
+Dhcp6ClientConfigInterfaceEntry ::= SEQUENCE {
+    dhcp6ClientConfigInterfaceIfIndex      InterfaceIndex,
+    dhcp6ClientConfigInterfaceRapidCommit  TruthValue,
+    dhcp6ClientConfigInterfaceAction       RowEditorState
+}
+
+dhcp6ClientConfigInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number of the VLAN interface."
+    ::= { dhcp6ClientConfigInterfaceEntry 1 }
+
+dhcp6ClientConfigInterfaceRapidCommit OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable the rapid-commit capability in DHCPv6 message exchanges."
+    ::= { dhcp6ClientConfigInterfaceEntry 2 }
+
+dhcp6ClientConfigInterfaceAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { dhcp6ClientConfigInterfaceEntry 100 }
+
+dhcp6ClientConfigInterfaceTableRowEditor OBJECT IDENTIFIER
+    ::= { dhcp6ClientConfigInterface 2 }
+
+dhcp6ClientConfigInterfaceTableRowEditorIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number of the VLAN interface."
+    ::= { dhcp6ClientConfigInterfaceTableRowEditor 1 }
+
+dhcp6ClientConfigInterfaceTableRowEditorRapidCommit OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable the rapid-commit capability in DHCPv6 message exchanges."
+    ::= { dhcp6ClientConfigInterfaceTableRowEditor 2 }
+
+dhcp6ClientConfigInterfaceTableRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { dhcp6ClientConfigInterfaceTableRowEditor 100 }
+
+dhcp6ClientStatus OBJECT IDENTIFIER
+    ::= { dhcp6ClientMibObjects 3 }
+
+dhcp6ClientStatusInterface OBJECT IDENTIFIER
+    ::= { dhcp6ClientStatus 1 }
+
+dhcp6ClientStatusInterfaceInformationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dhcp6ClientStatusInterfaceInformationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table for displaying per DHCPv6 client interface information
+         derived from DHCPv6 server."
+    ::= { dhcp6ClientStatusInterface 1 }
+
+dhcp6ClientStatusInterfaceInformationEntry OBJECT-TYPE
+    SYNTAX      Dhcp6ClientStatusInterfaceInformationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of parameters."
+    INDEX       { dhcp6ClientStatusInterfaceInformationIfIndex }
+    ::= { dhcp6ClientStatusInterfaceInformationTable 1 }
+
+Dhcp6ClientStatusInterfaceInformationEntry ::= SEQUENCE {
+    dhcp6ClientStatusInterfaceInformationIfIndex            InterfaceIndex,
+    dhcp6ClientStatusInterfaceInformationAddress            InetAddressIPv6,
+    dhcp6ClientStatusInterfaceInformationServerAddress      InetAddressIPv6,
+    dhcp6ClientStatusInterfaceInformationDnsServerAddress   InetAddressIPv6,
+    dhcp6ClientStatusInterfaceInformationPreferredLifetime  Counter64,
+    dhcp6ClientStatusInterfaceInformationValidLifetime      Counter64,
+    dhcp6ClientStatusInterfaceInformationT1                 Counter64,
+    dhcp6ClientStatusInterfaceInformationT2                 Counter64
+}
+
+dhcp6ClientStatusInterfaceInformationIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number of the VLAN interface."
+    ::= { dhcp6ClientStatusInterfaceInformationEntry 1 }
+
+dhcp6ClientStatusInterfaceInformationAddress OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IPv6 address determined from DHCPv6 for this interface."
+    ::= { dhcp6ClientStatusInterfaceInformationEntry 2 }
+
+dhcp6ClientStatusInterfaceInformationServerAddress OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IPv6 address of the bounded DHCPv6 server for this interface."
+    ::= { dhcp6ClientStatusInterfaceInformationEntry 3 }
+
+dhcp6ClientStatusInterfaceInformationDnsServerAddress OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The DNS server address retrieved from DHCPv6."
+    ::= { dhcp6ClientStatusInterfaceInformationEntry 4 }
+
+dhcp6ClientStatusInterfaceInformationPreferredLifetime OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The recorded Preferred-Lifetime for the DHCPv6 client interface. From
+         RFC-4862 and RFC-3315: It is the preferred lifetime for the IPv6
+         address, expressed in units of seconds. When the preferred lifetime
+         expires, the address becomes deprecated."
+    ::= { dhcp6ClientStatusInterfaceInformationEntry 5 }
+
+dhcp6ClientStatusInterfaceInformationValidLifetime OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The recorded Valid-Lifetime for the DHCPv6 client interface. From
+         RFC-4862 and RFC-3315: It is the valid lifetime for the IPv6 address,
+         expressed in units of seconds. The valid lifetime must be greater than
+         or equal to the preferred lifetime. When the valid lifetime expires,
+         the address becomes invalid."
+    ::= { dhcp6ClientStatusInterfaceInformationEntry 6 }
+
+dhcp6ClientStatusInterfaceInformationT1 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The recorded T1 for the DHCPv6 client interface. From RFC-3315: It is
+         the time at which the client contacts the server from which the address
+         is obtained to extend the lifetimes of the non-temporary address
+         assigned; T1 is a time duration relative to the current time expressed
+         in units of seconds."
+    ::= { dhcp6ClientStatusInterfaceInformationEntry 7 }
+
+dhcp6ClientStatusInterfaceInformationT2 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The recorded T2 for the DHCPv6 client interface. From RFC-3315: It is
+         the time at which the client contacts any available server to extend
+         the lifetimes of the non-temporary address assigned; T2 is a time
+         duration relative to the current time expressed in units of seconds."
+    ::= { dhcp6ClientStatusInterfaceInformationEntry 8 }
+
+dhcp6ClientStatusInterfaceStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dhcp6ClientStatusInterfaceStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table for displaying per DHCPv6 client interface control
+         message statistics in DHCPv6 message exchanges."
+    ::= { dhcp6ClientStatusInterface 2 }
+
+dhcp6ClientStatusInterfaceStatisticsEntry OBJECT-TYPE
+    SYNTAX      Dhcp6ClientStatusInterfaceStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of counters."
+    INDEX       { dhcp6ClientStatusInterfaceStatisticsIfIndex }
+    ::= { dhcp6ClientStatusInterfaceStatisticsTable 1 }
+
+Dhcp6ClientStatusInterfaceStatisticsEntry ::= SEQUENCE {
+    dhcp6ClientStatusInterfaceStatisticsIfIndex        InterfaceIndex,
+    dhcp6ClientStatusInterfaceStatisticsTxSolicit      Unsigned32,
+    dhcp6ClientStatusInterfaceStatisticsTxRequest      Unsigned32,
+    dhcp6ClientStatusInterfaceStatisticsTxConfirm      Unsigned32,
+    dhcp6ClientStatusInterfaceStatisticsTxRenew        Unsigned32,
+    dhcp6ClientStatusInterfaceStatisticsTxRebind       Unsigned32,
+    dhcp6ClientStatusInterfaceStatisticsTxRelease      Unsigned32,
+    dhcp6ClientStatusInterfaceStatisticsTxDecline      Unsigned32,
+    dhcp6ClientStatusInterfaceStatisticsTxInfoRequest  Unsigned32,
+    dhcp6ClientStatusInterfaceStatisticsTxError        Unsigned32,
+    dhcp6ClientStatusInterfaceStatisticsTxDrop         Unsigned32,
+    dhcp6ClientStatusInterfaceStatisticsTxUnknown      Unsigned32,
+    dhcp6ClientStatusInterfaceStatisticsRxAdvertise    Unsigned32,
+    dhcp6ClientStatusInterfaceStatisticsRxReply        Unsigned32,
+    dhcp6ClientStatusInterfaceStatisticsRxReconfigure  Unsigned32,
+    dhcp6ClientStatusInterfaceStatisticsRxError        Unsigned32,
+    dhcp6ClientStatusInterfaceStatisticsRxDrop         Unsigned32,
+    dhcp6ClientStatusInterfaceStatisticsRxUnknown      Unsigned32
+}
+
+dhcp6ClientStatusInterfaceStatisticsIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number of the VLAN interface."
+    ::= { dhcp6ClientStatusInterfaceStatisticsEntry 1 }
+
+dhcp6ClientStatusInterfaceStatisticsTxSolicit OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted DHCPv6 SOLICIT message count."
+    ::= { dhcp6ClientStatusInterfaceStatisticsEntry 2 }
+
+dhcp6ClientStatusInterfaceStatisticsTxRequest OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted DHCPv6 REQUEST message count."
+    ::= { dhcp6ClientStatusInterfaceStatisticsEntry 3 }
+
+dhcp6ClientStatusInterfaceStatisticsTxConfirm OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted DHCPv6 CONFIRM message count."
+    ::= { dhcp6ClientStatusInterfaceStatisticsEntry 4 }
+
+dhcp6ClientStatusInterfaceStatisticsTxRenew OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted DHCPv6 RENEW message count."
+    ::= { dhcp6ClientStatusInterfaceStatisticsEntry 5 }
+
+dhcp6ClientStatusInterfaceStatisticsTxRebind OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted DHCPv6 REBIND message count."
+    ::= { dhcp6ClientStatusInterfaceStatisticsEntry 6 }
+
+dhcp6ClientStatusInterfaceStatisticsTxRelease OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted DHCPv6 RELEASE message count."
+    ::= { dhcp6ClientStatusInterfaceStatisticsEntry 7 }
+
+dhcp6ClientStatusInterfaceStatisticsTxDecline OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted DHCPv6 DECLINE message count."
+    ::= { dhcp6ClientStatusInterfaceStatisticsEntry 8 }
+
+dhcp6ClientStatusInterfaceStatisticsTxInfoRequest OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted DHCPv6 INFORMATION-REQUEST message count."
+    ::= { dhcp6ClientStatusInterfaceStatisticsEntry 9 }
+
+dhcp6ClientStatusInterfaceStatisticsTxError OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted DHCPv6 message error count."
+    ::= { dhcp6ClientStatusInterfaceStatisticsEntry 10 }
+
+dhcp6ClientStatusInterfaceStatisticsTxDrop OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted DHCPv6 message drop count."
+    ::= { dhcp6ClientStatusInterfaceStatisticsEntry 11 }
+
+dhcp6ClientStatusInterfaceStatisticsTxUnknown OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted DHCPv6 unknown message type count."
+    ::= { dhcp6ClientStatusInterfaceStatisticsEntry 12 }
+
+dhcp6ClientStatusInterfaceStatisticsRxAdvertise OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received DHCPv6 ADVERTISE message count."
+    ::= { dhcp6ClientStatusInterfaceStatisticsEntry 13 }
+
+dhcp6ClientStatusInterfaceStatisticsRxReply OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received DHCPv6 REPLY message count."
+    ::= { dhcp6ClientStatusInterfaceStatisticsEntry 14 }
+
+dhcp6ClientStatusInterfaceStatisticsRxReconfigure OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received DHCPv6 RECONFIGURE message count."
+    ::= { dhcp6ClientStatusInterfaceStatisticsEntry 15 }
+
+dhcp6ClientStatusInterfaceStatisticsRxError OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received DHCPv6 message error count."
+    ::= { dhcp6ClientStatusInterfaceStatisticsEntry 16 }
+
+dhcp6ClientStatusInterfaceStatisticsRxDrop OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received DHCPv6 message drop count."
+    ::= { dhcp6ClientStatusInterfaceStatisticsEntry 17 }
+
+dhcp6ClientStatusInterfaceStatisticsRxUnknown OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received DHCPv6 unknown message type count."
+    ::= { dhcp6ClientStatusInterfaceStatisticsEntry 18 }
+
+dhcp6ClientControl OBJECT IDENTIFIER
+    ::= { dhcp6ClientMibObjects 4 }
+
+dhcp6ClientControlInterface OBJECT IDENTIFIER
+    ::= { dhcp6ClientControl 1 }
+
+dhcp6ClientControlInterfaceRestart OBJECT IDENTIFIER
+    ::= { dhcp6ClientControlInterface 1 }
+
+dhcp6ClientControlInterfaceRestartIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number of the VLAN interface."
+    ::= { dhcp6ClientControlInterfaceRestart 1 }
+
+dhcp6ClientMibConformance OBJECT IDENTIFIER
+    ::= { dhcp6ClientMib 2 }
+
+dhcp6ClientMibCompliances OBJECT IDENTIFIER
+    ::= { dhcp6ClientMibConformance 1 }
+
+dhcp6ClientMibGroups OBJECT IDENTIFIER
+    ::= { dhcp6ClientMibConformance 2 }
+
+dhcp6ClientCapabilitiesInfoGroup OBJECT-GROUP
+    OBJECTS     { dhcp6ClientCapabilitiesMaxNumberOfInterfaces }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcp6ClientMibGroups 1 }
+
+dhcp6ClientConfigInterfaceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { dhcp6ClientConfigInterfaceRapidCommit,
+                  dhcp6ClientConfigInterfaceAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcp6ClientMibGroups 2 }
+
+dhcp6ClientConfigInterfaceTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     {                   dhcp6ClientConfigInterfaceTableRowEditorIfIndex,
+                  dhcp6ClientConfigInterfaceTableRowEditorRapidCommit,
+                  dhcp6ClientConfigInterfaceTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcp6ClientMibGroups 3 }
+
+dhcp6ClientStatusInterfaceInformationTableInfoGroup OBJECT-GROUP
+    OBJECTS     { dhcp6ClientStatusInterfaceInformationAddress,
+                  dhcp6ClientStatusInterfaceInformationServerAddress,
+                  dhcp6ClientStatusInterfaceInformationDnsServerAddress,
+                  dhcp6ClientStatusInterfaceInformationPreferredLifetime,
+                  dhcp6ClientStatusInterfaceInformationValidLifetime,
+                  dhcp6ClientStatusInterfaceInformationT1,
+                  dhcp6ClientStatusInterfaceInformationT2 }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcp6ClientMibGroups 4 }
+
+dhcp6ClientStatusInterfaceStatisticsTableInfoGroup OBJECT-GROUP
+    OBJECTS     { dhcp6ClientStatusInterfaceStatisticsTxSolicit,
+                  dhcp6ClientStatusInterfaceStatisticsTxRequest,
+                  dhcp6ClientStatusInterfaceStatisticsTxConfirm,
+                  dhcp6ClientStatusInterfaceStatisticsTxRenew,
+                  dhcp6ClientStatusInterfaceStatisticsTxRebind,
+                  dhcp6ClientStatusInterfaceStatisticsTxRelease,
+                  dhcp6ClientStatusInterfaceStatisticsTxDecline,
+                  dhcp6ClientStatusInterfaceStatisticsTxInfoRequest,
+                  dhcp6ClientStatusInterfaceStatisticsTxError,
+                  dhcp6ClientStatusInterfaceStatisticsTxDrop,
+                  dhcp6ClientStatusInterfaceStatisticsTxUnknown,
+                  dhcp6ClientStatusInterfaceStatisticsRxAdvertise,
+                  dhcp6ClientStatusInterfaceStatisticsRxReply,
+                  dhcp6ClientStatusInterfaceStatisticsRxReconfigure,
+                  dhcp6ClientStatusInterfaceStatisticsRxError,
+                  dhcp6ClientStatusInterfaceStatisticsRxDrop,
+                  dhcp6ClientStatusInterfaceStatisticsRxUnknown }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcp6ClientMibGroups 5 }
+
+dhcp6ClientControlInterfaceRestartInfoGroup OBJECT-GROUP
+    OBJECTS     { dhcp6ClientControlInterfaceRestartIfIndex }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { dhcp6ClientMibGroups 6 }
+
+dhcp6ClientMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { dhcp6ClientCapabilitiesInfoGroup,
+                       dhcp6ClientConfigInterfaceTableInfoGroup,
+                       dhcp6ClientConfigInterfaceTableRowEditorInfoGroup,
+                       dhcp6ClientStatusInterfaceInformationTableInfoGroup,
+                       dhcp6ClientStatusInterfaceStatisticsTableInfoGroup,
+                       dhcp6ClientControlInterfaceRestartInfoGroup }
+
+    ::= { dhcp6ClientMibCompliances 1 }
+
+END

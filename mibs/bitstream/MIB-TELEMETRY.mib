@@ -1,0 +1,357 @@
+-- *****************************************************************
+-- MIB-TELEMETRY: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-TELEMETRY DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    switchMgmt FROM BTS-SMI
+    Integer32 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    ;
+    
+    
+telemetryMib	OBJECT IDENTIFIER ::= { switchMgmt 7 }
+
+-- the Sensors group
+sensors		OBJECT IDENTIFIER ::= { telemetryMib 1 }
+
+sensor1		OBJECT IDENTIFIER ::= { sensors 1 }
+sensor2		OBJECT IDENTIFIER ::= { sensors 2 }
+sensor3		OBJECT IDENTIFIER ::= { sensors 3 }
+sensor4		OBJECT IDENTIFIER ::= { sensors 4 }
+sensor5		OBJECT IDENTIFIER ::= { sensors 5 }
+sensor6		OBJECT IDENTIFIER ::= { sensors 6 }
+sensor7		OBJECT IDENTIFIER ::= { sensors 7 }
+sensor8		OBJECT IDENTIFIER ::= { sensors 8 }
+
+sensorCount  OBJECT-TYPE
+    SYNTAX  INTEGER (0..8)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensors count"
+    ::= { sensors 100 }
+    
+sensor1Type  OBJECT-TYPE
+    SYNTAX  INTEGER (0..3)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor type. 0 - Undef., 1 - DS18B20 (T), 2 - DS2438 (T and H or V), 3 - DS2408 (IO), 4 - DHT22 (T,H), 5 - DHT11 (T,H)"
+    ::= { sensor1 1 }
+    
+sensor1Id  OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(8))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor 8 byte identification."
+    ::= { sensor1 2 }
+    
+sensor1Temp  OBJECT-TYPE
+    SYNTAX  INTEGER (-9999..9999)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured temperature value in celsius degrees. Need divide by 10 to acquire real value"
+    ::= { sensor1 3 }
+        
+sensor1Humid  OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured relavite humidity value in percent. Need divide by 10 to acquire real value"
+    ::= { sensor1 4 }
+
+sensor1Volt  OBJECT-TYPE
+    SYNTAX  INTEGER (0..10000)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Sensor measured voltage value."
+    ::= { sensor1 5 }
+
+sensor2Type  OBJECT-TYPE
+    SYNTAX  INTEGER (0..3)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor type. 0 - Undef., 1 - DS18B20 (T), 2 - DS2438 (T and H or V), 3 - DS2408 (IO), 4 - DHT22 (T,H), 5 - DHT11 (T,H)"
+    ::= { sensor2 1 }
+    
+sensor2Id  OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(8))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor 8 byte identification."
+    ::= { sensor2 2 }
+    
+sensor2Temp  OBJECT-TYPE
+    SYNTAX  INTEGER (-9999..9999)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured temperature value in celsius degrees. Need divide by 10 to acquire real value"
+    ::= { sensor2 3 }
+        
+sensor2Humid  OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured relavite humidity value in percent. Need divide by 10 to acquire real value"
+    ::= { sensor2 4 }
+
+sensor2Volt  OBJECT-TYPE
+    SYNTAX  INTEGER (0..10000)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Sensor measured voltage value."
+    ::= { sensor2 5 }            
+    
+sensor3Type  OBJECT-TYPE
+    SYNTAX  INTEGER (0..3)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor type. 0 - Undef., 1 - DS18B20 (T), 2 - DS2438 (T and H or V), 3 - DS2408 (IO), 4 - DHT22 (T,H), 5 - DHT11 (T,H)"
+    ::= { sensor3 1 }
+    
+sensor3Id  OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(8))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor 8 byte identification."
+    ::= { sensor3 2 }
+    
+sensor3Temp  OBJECT-TYPE
+    SYNTAX  INTEGER (-9999..9999)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured temperature value in celsius degrees. Need divide by 10 to acquire real value"
+    ::= { sensor3 3 }
+        
+sensor3Humid  OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured relavite humidity value in percent. Need divide by 10 to acquire real value"
+    ::= { sensor3 4 }
+    
+sensor3Volt  OBJECT-TYPE
+    SYNTAX  INTEGER (0..10000)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Sensor measured voltage value."
+    ::= { sensor3 5 }
+
+sensor4Type  OBJECT-TYPE
+    SYNTAX  INTEGER (0..3)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor type. 0 - Undef., 1 - DS18B20 (T), 2 - DS2438 (T and H or V), 3 - DS2408 (IO), 4 - DHT22 (T,H), 5 - DHT11 (T,H)"
+    ::= { sensor4 1 }
+    
+sensor4Id  OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(8))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor 8 byte identification."
+    ::= { sensor4 2 }
+    
+sensor4Temp  OBJECT-TYPE
+    SYNTAX  INTEGER (-9999..9999)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured temperature value in celsius degrees. Need divide by 10 to acquire real value"
+    ::= { sensor4 3 }
+        
+sensor4Humid  OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured relavite humidity value in percent. Need divide by 10 to acquire real value"
+    ::= { sensor4 4 }
+
+sensor4Volt  OBJECT-TYPE
+    SYNTAX  INTEGER (0..10000)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Sensor measured voltage value."
+    ::= { sensor4 5 }
+
+sensor5Type  OBJECT-TYPE
+    SYNTAX  INTEGER (0..3)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor type. 0 - Undef., 1 - DS18B20 (T), 2 - DS2438 (T and H or V), 3 - DS2408 (IO), 4 - DHT22 (T,H), 5 - DHT11 (T,H)"
+    ::= { sensor5 1 }
+    
+sensor5Id  OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(8))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor 8 byte identification."
+    ::= { sensor5 2 }
+    
+sensor5Temp  OBJECT-TYPE
+    SYNTAX  INTEGER (-9999..9999)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured temperature value in celsius degrees. Need divide by 10 to acquire real value"
+    ::= { sensor5 3 }
+        
+sensor5Humid  OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured relavite humidity value in percent. Need divide by 10 to acquire real value"
+    ::= { sensor5 4 }
+
+sensor5Volt  OBJECT-TYPE
+    SYNTAX  INTEGER (0..10000)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Sensor measured voltage value."
+    ::= { sensor5 5 }
+
+sensor6Type  OBJECT-TYPE
+    SYNTAX  INTEGER (0..3)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor type. 0 - Undef., 1 - DS18B20 (T), 2 - DS2438 (T and H or V), 3 - DS2408 (IO), 4 - DHT22 (T,H), 5 - DHT11 (T,H)"
+    ::= { sensor6 1 }
+    
+sensor6Id  OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(8))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor 8 byte identification."
+    ::= { sensor6 2 }
+    
+sensor6Temp  OBJECT-TYPE
+    SYNTAX  INTEGER (-9999..9999)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured temperature value in celsius degrees. Need divide by 10 to acquire real value"
+    ::= { sensor6 3 }
+        
+sensor6Humid  OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured relavite humidity value in percent. Need divide by 10 to acquire real value"
+    ::= { sensor6 4 } 
+    
+sensor6Volt  OBJECT-TYPE
+    SYNTAX  INTEGER (0..10000)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Sensor measured voltage value."
+    ::= { sensor6 5 }
+
+sensor7Type  OBJECT-TYPE
+    SYNTAX  INTEGER (0..3)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor type. 0 - Undef., 1 - DS18B20 (T), 2 - DS2438 (T and H or V), 3 - DS2408 (IO), 4 - DHT22 (T,H), 5 - DHT11 (T,H)"
+    ::= { sensor7 1 }
+    
+sensor7Id  OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(8))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor 8 byte identification."
+    ::= { sensor7 2 }
+    
+sensor7Temp  OBJECT-TYPE
+    SYNTAX  INTEGER (-9999..9999)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured temperature value in celsius degrees. Need divide by 10 to acquire real value"
+    ::= { sensor7 3 }
+        
+sensor7Humid  OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured relavite humidity value in percent. Need divide by 10 to acquire real value"
+    ::= { sensor7 4 }       
+   
+sensor7Volt  OBJECT-TYPE
+    SYNTAX  INTEGER (0..10000)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Sensor measured voltage value."
+    ::= { sensor7 5 }
+
+sensor8Type  OBJECT-TYPE
+    SYNTAX  INTEGER (0..3)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor type. 0 - Undef., 1 - DS18B20 (T), 2 - DS2438 (T and H or V), 3 - DS2408 (IO), 4 - DHT22 (T,H), 5 - DHT11 (T,H)"
+    ::= { sensor8 1 }
+    
+sensor8Id  OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(8))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor 8 byte identification."
+    ::= { sensor8 2 }
+    
+sensor8Temp  OBJECT-TYPE
+    SYNTAX  INTEGER (-9999..9999)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured temperature value in celsius degrees. Need divide by 10 to acquire real value"
+    ::= { sensor8 3 }
+        
+sensor8Humid  OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "T/H sensor measured relavite humidity value in percent. Need divide by 10 to acquire real value"
+    ::= { sensor8 4 }
+    
+sensor8Volt  OBJECT-TYPE
+    SYNTAX  INTEGER (0..10000)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Sensor measured voltage value."
+    ::= { sensor8 5 }    
+END

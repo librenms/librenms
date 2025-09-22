@@ -1,0 +1,401 @@
+-- *****************************************************************
+-- MIB-TT-LOOP: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-TT-LOOP DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Integer32 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    DisplayString FROM BTS-TC
+    InterfaceIndex FROM BTS-TC
+    RowEditorState FROM BTS-TC
+    ;
+
+ttLoopMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private Traffic Test Loop MIB that can be used for RFC2544
+         and Y.1564 (remote end) testing"
+    REVISION    "201411140000Z"
+    DESCRIPTION
+        "Refactoring regarding Ifindex. Domain element is removed and flow
+         element is changed to be Ifindex containing domain"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 128 }
+
+
+TtLoopInstanceAdminState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The instance Administrative State."
+    SYNTAX      INTEGER { adminDisabled(0), adminEnabled(1) }
+
+TtLoopInstanceDirection ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The instance direction."
+    SYNTAX      INTEGER { facility(0), terminal(1) }
+
+TtLoopInstanceOperState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The instance Operational State."
+    SYNTAX      INTEGER { operDown(0), operUp(1) }
+
+TtLoopInstanceSubscriber ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The instance subscriber mode."
+    SYNTAX      INTEGER { none(0), all(1), test(2) }
+
+TtLoopInstanceType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The instance type."
+    SYNTAX      INTEGER { macLoop(0), oamLoop(1) }
+
+ttLoopMibObjects OBJECT IDENTIFIER
+    ::= { ttLoopMib 1 }
+
+ttLoopCapabilities OBJECT IDENTIFIER
+    ::= { ttLoopMibObjects 1 }
+
+ttLoopCapabilitiesInstanceMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Max number of TT_LOOP instance"
+    ::= { ttLoopCapabilities 1 }
+
+ttLoopCapabilitiesNameMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Max length of instance name"
+    ::= { ttLoopCapabilities 2 }
+
+ttLoopConfig OBJECT IDENTIFIER
+    ::= { ttLoopMibObjects 2 }
+
+ttLoopConfigInstanceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TtLoopConfigInstanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of created instance configuration parameters"
+    ::= { ttLoopConfig 1 }
+
+ttLoopConfigInstanceEntry OBJECT-TYPE
+    SYNTAX      TtLoopConfigInstanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a created instance configuration parameters. Not all parameters
+         can be changed"
+    INDEX       { ttLoopConfigInstanceId }
+    ::= { ttLoopConfigInstanceTable 1 }
+
+TtLoopConfigInstanceEntry ::= SEQUENCE {
+    ttLoopConfigInstanceId          Integer32,
+    ttLoopConfigInstanceName        DisplayString,
+    ttLoopConfigInstanceType        TtLoopInstanceType,
+    ttLoopConfigInstanceDirection   TtLoopInstanceDirection,
+    ttLoopConfigInstanceFlow        InterfaceIndex,
+    ttLoopConfigInstancePort        InterfaceIndex,
+    ttLoopConfigInstanceLevel       Unsigned32,
+    ttLoopConfigInstanceSubscriber  TtLoopInstanceSubscriber,
+    ttLoopConfigInstanceAdminState  TtLoopInstanceAdminState,
+    ttLoopConfigInstanceAction      RowEditorState
+}
+
+ttLoopConfigInstanceId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The TT_LOOP instance ID"
+    ::= { ttLoopConfigInstanceEntry 1 }
+
+ttLoopConfigInstanceName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Instance name"
+    ::= { ttLoopConfigInstanceEntry 2 }
+
+ttLoopConfigInstanceType OBJECT-TYPE
+    SYNTAX      TtLoopInstanceType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Traffic Test loop type. Currently OAM Loop is only supported in EVC
+         domain."
+    ::= { ttLoopConfigInstanceEntry 3 }
+
+ttLoopConfigInstanceDirection OBJECT-TYPE
+    SYNTAX      TtLoopInstanceDirection
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The instance direction. Currently Terminal Loop is only supported in
+         EVC domain."
+    ::= { ttLoopConfigInstanceEntry 4 }
+
+ttLoopConfigInstanceFlow OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The flow instance. Currently VLAN domain is not supported."
+    ::= { ttLoopConfigInstanceEntry 6 }
+
+ttLoopConfigInstancePort OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The instance residence port."
+    ::= { ttLoopConfigInstanceEntry 7 }
+
+ttLoopConfigInstanceLevel OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The instance MEG level"
+    ::= { ttLoopConfigInstanceEntry 8 }
+
+ttLoopConfigInstanceSubscriber OBJECT-TYPE
+    SYNTAX      TtLoopInstanceSubscriber
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The EVC OAM loop subscriber mode"
+    ::= { ttLoopConfigInstanceEntry 9 }
+
+ttLoopConfigInstanceAdminState OBJECT-TYPE
+    SYNTAX      TtLoopInstanceAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The instance Administrative state."
+    ::= { ttLoopConfigInstanceEntry 10 }
+
+ttLoopConfigInstanceAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { ttLoopConfigInstanceEntry 100 }
+
+ttLoopConfigInstanceRowEditor OBJECT IDENTIFIER
+    ::= { ttLoopConfig 2 }
+
+ttLoopConfigInstanceRowEditorId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The TT_LOOP instance ID"
+    ::= { ttLoopConfigInstanceRowEditor 1 }
+
+ttLoopConfigInstanceRowEditorName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Instance name"
+    ::= { ttLoopConfigInstanceRowEditor 2 }
+
+ttLoopConfigInstanceRowEditorType OBJECT-TYPE
+    SYNTAX      TtLoopInstanceType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Traffic Test loop type. Currently OAM Loop is only supported in EVC
+         domain."
+    ::= { ttLoopConfigInstanceRowEditor 3 }
+
+ttLoopConfigInstanceRowEditorDirection OBJECT-TYPE
+    SYNTAX      TtLoopInstanceDirection
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The instance direction. Currently Terminal Loop is only supported in
+         EVC domain."
+    ::= { ttLoopConfigInstanceRowEditor 4 }
+
+ttLoopConfigInstanceRowEditorFlow OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The flow instance. Currently VLAN domain is not supported."
+    ::= { ttLoopConfigInstanceRowEditor 6 }
+
+ttLoopConfigInstanceRowEditorPort OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The instance residence port."
+    ::= { ttLoopConfigInstanceRowEditor 7 }
+
+ttLoopConfigInstanceRowEditorLevel OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The instance MEG level"
+    ::= { ttLoopConfigInstanceRowEditor 8 }
+
+ttLoopConfigInstanceRowEditorSubscriber OBJECT-TYPE
+    SYNTAX      TtLoopInstanceSubscriber
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The EVC OAM loop subscriber mode"
+    ::= { ttLoopConfigInstanceRowEditor 9 }
+
+ttLoopConfigInstanceRowEditorAdminState OBJECT-TYPE
+    SYNTAX      TtLoopInstanceAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The instance Administrative state."
+    ::= { ttLoopConfigInstanceRowEditor 10 }
+
+ttLoopConfigInstanceRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { ttLoopConfigInstanceRowEditor 100 }
+
+ttLoopStatus OBJECT IDENTIFIER
+    ::= { ttLoopMibObjects 3 }
+
+ttLoopStatusInstanceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TtLoopStatusInstanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of created instance status"
+    ::= { ttLoopStatus 1 }
+
+ttLoopStatusInstanceEntry OBJECT-TYPE
+    SYNTAX      TtLoopStatusInstanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a created instance status"
+    INDEX       { ttLoopStatusInstanceId }
+    ::= { ttLoopStatusInstanceTable 1 }
+
+TtLoopStatusInstanceEntry ::= SEQUENCE {
+    ttLoopStatusInstanceId         Integer32,
+    ttLoopStatusInstanceOperState  TtLoopInstanceOperState
+}
+
+ttLoopStatusInstanceId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The TT_LOOP instance ID"
+    ::= { ttLoopStatusInstanceEntry 1 }
+
+ttLoopStatusInstanceOperState OBJECT-TYPE
+    SYNTAX      TtLoopInstanceOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The instance Operational state."
+    ::= { ttLoopStatusInstanceEntry 2 }
+
+ttLoopMibConformance OBJECT IDENTIFIER
+    ::= { ttLoopMib 2 }
+
+ttLoopMibCompliances OBJECT IDENTIFIER
+    ::= { ttLoopMibConformance 1 }
+
+ttLoopMibGroups OBJECT IDENTIFIER
+    ::= { ttLoopMibConformance 2 }
+
+ttLoopCapabilitiesInfoGroup OBJECT-GROUP
+    OBJECTS     { ttLoopCapabilitiesInstanceMax,
+                  ttLoopCapabilitiesNameMax }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ttLoopMibGroups 1 }
+
+ttLoopConfigInstanceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { ttLoopConfigInstanceName,
+                  ttLoopConfigInstanceType,
+                  ttLoopConfigInstanceDirection,
+                  ttLoopConfigInstanceFlow,
+                  ttLoopConfigInstancePort,
+                  ttLoopConfigInstanceLevel,
+                  ttLoopConfigInstanceSubscriber,
+                  ttLoopConfigInstanceAdminState,
+                  ttLoopConfigInstanceAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ttLoopMibGroups 2 }
+
+ttLoopConfigInstanceRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { ttLoopConfigInstanceRowEditorId,
+                  ttLoopConfigInstanceRowEditorName,
+                  ttLoopConfigInstanceRowEditorType,
+                  ttLoopConfigInstanceRowEditorDirection,
+                  ttLoopConfigInstanceRowEditorFlow,
+                  ttLoopConfigInstanceRowEditorPort,
+                  ttLoopConfigInstanceRowEditorLevel,
+                  ttLoopConfigInstanceRowEditorSubscriber,
+                  ttLoopConfigInstanceRowEditorAdminState,
+                  ttLoopConfigInstanceRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ttLoopMibGroups 3 }
+
+ttLoopStatusInstanceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { ttLoopStatusInstanceOperState }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ttLoopMibGroups 4 }
+
+ttLoopMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { ttLoopCapabilitiesInfoGroup,
+                       ttLoopConfigInstanceTableInfoGroup,
+                       ttLoopConfigInstanceRowEditorInfoGroup,
+                       ttLoopStatusInstanceTableInfoGroup }
+
+    ::= { ttLoopMibCompliances 1 }
+
+END

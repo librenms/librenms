@@ -1,0 +1,106 @@
+-- *****************************************************************
+-- MIB-UPNP: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-UPNP DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Integer32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    Unsigned8 FROM BTS-TC
+    ;
+
+upnpMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of UPnP"
+    REVISION    "201410100000Z"
+    DESCRIPTION
+        "Editorial changes"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 52 }
+
+
+upnpMibObjects OBJECT IDENTIFIER
+    ::= { upnpMib 1 }
+
+upnpConfig OBJECT IDENTIFIER
+    ::= { upnpMibObjects 2 }
+
+upnpConfigGlobals OBJECT IDENTIFIER
+    ::= { upnpConfig 1 }
+
+upnpConfigGlobalsMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global mode of UPnP. true is to enable the functions of HTTPS and false
+         is to disable it."
+    ::= { upnpConfigGlobals 1 }
+
+upnpConfigGlobalsTtl OBJECT-TYPE
+    SYNTAX      Unsigned8 (1..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The TTL value is used by UPnP to send SSDP advertisement messages.Valid
+         values are in the range 1 to 255. "
+    ::= { upnpConfigGlobals 2 }
+
+upnpConfigGlobalsAdvertisingDuration OBJECT-TYPE
+    SYNTAX      Integer32 (100..86400)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The duration, carried in SSDP packets, is used to inform a control
+         point or control points how often it or they should receive an SSDP
+         advertisement message from this switch. If a control point does not
+         receive any message within the duration, it will think that the switch
+         no longer exists. Due to the unreliable nature of UDP, in the standard
+         it is recommended that such refreshing of advertisements to be done at
+         less than one-half of the advertising duration. In the implementation,
+         the switch sends SSDP messages periodically at the interval one-half of
+         the advertising duration minus 30 seconds. Valid values are in the
+         range 100 to 86400. "
+    ::= { upnpConfigGlobals 3 }
+
+upnpMibConformance OBJECT IDENTIFIER
+    ::= { upnpMib 2 }
+
+upnpMibCompliances OBJECT IDENTIFIER
+    ::= { upnpMibConformance 1 }
+
+upnpMibGroups OBJECT IDENTIFIER
+    ::= { upnpMibConformance 2 }
+
+upnpConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { upnpConfigGlobalsMode, upnpConfigGlobalsTtl,
+                  upnpConfigGlobalsAdvertisingDuration }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { upnpMibGroups 1 }
+
+upnpMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { upnpConfigGlobalsInfoGroup }
+
+    ::= { upnpMibCompliances 1 }
+
+END

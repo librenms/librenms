@@ -1,0 +1,164 @@
+-- *****************************************************************
+-- MIB-GVRP: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-GVRP DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Integer32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    ;
+
+gvrpMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "Private GVRP MIB."
+    REVISION    "201408220000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 89 }
+
+
+gvrpMibObjects OBJECT IDENTIFIER
+    ::= { gvrpMib 1 }
+
+gvrpCapabilities OBJECT IDENTIFIER
+    ::= { gvrpMibObjects 1 }
+
+gvrpConfig OBJECT IDENTIFIER
+    ::= { gvrpMibObjects 2 }
+
+gvrpConfigGlobal OBJECT IDENTIFIER
+    ::= { gvrpConfig 1 }
+
+gvrpConfigGlobalGlobalEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global enabling of GVRP protocol."
+    ::= { gvrpConfigGlobal 1 }
+
+gvrpConfigGlobalJoinTimer OBJECT-TYPE
+    SYNTAX      Integer32 (1..20)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Join-time protocol parameter. Range [1,20] centi seconds."
+    ::= { gvrpConfigGlobal 2 }
+
+gvrpConfigGlobalLeaveTimer OBJECT-TYPE
+    SYNTAX      Integer32 (60..300)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Leave-time protocol parameter. Range [60,300] centi seconds."
+    ::= { gvrpConfigGlobal 3 }
+
+gvrpConfigGlobalLeaveAllTimer OBJECT-TYPE
+    SYNTAX      Integer32 (1000..5000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Leave-all-time protocol parameter. Range [1000,5000] centi seconds."
+    ::= { gvrpConfigGlobal 4 }
+
+gvrpConfigGlobalMaxVlans OBJECT-TYPE
+    SYNTAX      Integer32 (1..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of VLANs simultaneously supported by GVRP. Range is
+         [1,4094]. Setting this attribute will fail, if GVRP is globally enabled
+         *and* the new value is less than what is actually in use.Thus, an
+         increase will always succeed while a decrease might fail if the
+         protocol is currently using more VLANs that the new value."
+    ::= { gvrpConfigGlobal 5 }
+
+gvrpConfigPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GvrpConfigPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the configurable part of GVRP ports."
+    ::= { gvrpConfig 2 }
+
+gvrpConfigPortEntry OBJECT-TYPE
+    SYNTAX      GvrpConfigPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The portId index must be a value must be a value from 1 up to the
+         number of ports."
+    INDEX       { gvrpConfigPortPortId }
+    ::= { gvrpConfigPortTable 1 }
+
+GvrpConfigPortEntry ::= SEQUENCE {
+    gvrpConfigPortPortId      Integer32,
+    gvrpConfigPortPortEnable  TruthValue
+}
+
+gvrpConfigPortPortId OBJECT-TYPE
+    SYNTAX      Integer32 (0..32767)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "-"
+    ::= { gvrpConfigPortEntry 1 }
+
+gvrpConfigPortPortEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The GVRP enable state of port."
+    ::= { gvrpConfigPortEntry 2 }
+
+gvrpMibConformance OBJECT IDENTIFIER
+    ::= { gvrpMib 2 }
+
+gvrpMibCompliances OBJECT IDENTIFIER
+    ::= { gvrpMibConformance 1 }
+
+gvrpMibGroups OBJECT IDENTIFIER
+    ::= { gvrpMibConformance 2 }
+
+gvrpConfigGlobalInfoGroup OBJECT-GROUP
+    OBJECTS     { gvrpConfigGlobalGlobalEnable,
+                  gvrpConfigGlobalJoinTimer,
+                  gvrpConfigGlobalLeaveTimer,
+                  gvrpConfigGlobalLeaveAllTimer,
+                  gvrpConfigGlobalMaxVlans }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { gvrpMibGroups 1 }
+
+gvrpConfigPortTableInfoGroup OBJECT-GROUP
+    OBJECTS     { gvrpConfigPortPortEnable }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { gvrpMibGroups 2 }
+
+gvrpMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { gvrpConfigGlobalInfoGroup,
+                       gvrpConfigPortTableInfoGroup }
+
+    ::= { gvrpMibCompliances 1 }
+
+END

@@ -1,0 +1,391 @@
+-- *****************************************************************
+-- MIB-FIRMWARE: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-FIRMWARE DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Integer32 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    DisplayString FROM BTS-TC
+    ;
+
+firmwareMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of Firmware"
+    REVISION    "201412160000Z"
+    DESCRIPTION
+        "Add switch table"
+    REVISION    "201410100000Z"
+    DESCRIPTION
+        "Editorial changes"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 28 }
+
+
+FirmwareStatusImageEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the type of image for status."
+    SYNTAX      INTEGER { bootloader(0), activeFirmware(1),
+                          alternativeFirmware(2) }
+
+FirmwareUploadImageEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the type of image to upload."
+    SYNTAX      INTEGER { bootloader(0), firmware(1) }
+
+FirmwareUploadStatusEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the status of upload operation."
+    SYNTAX      INTEGER { none(0), success(1), inProgress(2),
+                          errIvalidIp(3), errTftpFailed(4),
+                          errBusy(5), errMemoryInsufficient(6),
+                          errInvalidImage(7), errWriteFlash(8),
+                          errSameImageExisted(9), errUnknownImage(10),
+                          errFlashImageNotFound(11),
+                          errFlashEntryNotFound(12), errCrc(13),
+                          errImageSize(14), errEraseFlash(15),
+                          errIncorrectImageVersion(16),
+                          errDownloadUrl(17), errInvalidUrl(18) }
+
+firmwareMibObjects OBJECT IDENTIFIER
+    ::= { firmwareMib 1 }
+
+firmwareStatus OBJECT IDENTIFIER
+    ::= { firmwareMibObjects 3 }
+
+firmwareStatusImageTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FirmwareStatusImageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of status of images in flash."
+    ::= { firmwareStatus 1 }
+
+firmwareStatusImageEntry OBJECT-TYPE
+    SYNTAX      FirmwareStatusImageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of image status."
+    INDEX       { firmwareStatusImageNumber }
+    ::= { firmwareStatusImageTable 1 }
+
+FirmwareStatusImageEntry ::= SEQUENCE {
+    firmwareStatusImageNumber        Integer32,
+    firmwareStatusImageType          FirmwareStatusImageEnum,
+    firmwareStatusImageName          DisplayString,
+    firmwareStatusImageVersion       DisplayString,
+    firmwareStatusImageBuiltDate     DisplayString,
+    firmwareStatusImageCodeRevision  DisplayString
+}
+
+firmwareStatusImageNumber OBJECT-TYPE
+    SYNTAX      Integer32 (0..2)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The number of image. The number starts from 0."
+    ::= { firmwareStatusImageEntry 1 }
+
+firmwareStatusImageType OBJECT-TYPE
+    SYNTAX      FirmwareStatusImageEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Image type of the status. bootloader(0) is for boot loader.
+         activeFirmware(1) is for active (primary) firmware.
+         alternativeFirmware(2) is for alternative (backup) firmware."
+    ::= { firmwareStatusImageEntry 2 }
+
+firmwareStatusImageName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Image name."
+    ::= { firmwareStatusImageEntry 3 }
+
+firmwareStatusImageVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Image version."
+    ::= { firmwareStatusImageEntry 4 }
+
+firmwareStatusImageBuiltDate OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The built date when the image is built."
+    ::= { firmwareStatusImageEntry 5 }
+
+firmwareStatusImageCodeRevision OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The code revesion which the image is built."
+    ::= { firmwareStatusImageEntry 6 }
+
+firmwareStatusImageUpload OBJECT IDENTIFIER
+    ::= { firmwareStatus 2 }
+
+firmwareStatusImageUploadStatus OBJECT-TYPE
+    SYNTAX      FirmwareUploadStatusEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status indicates the status of current upload operation. It is
+         updated automatically. Modifying this flag does not take any effect.
+         none(0) means no upload operation. success(1) means upload operation is
+         successful. inProgress(2) means current upload operation is in
+         progress. errIvalidIp(3) means upload operation is failed due to
+         invalid IP address. errTftpFailed(4) means upload operation is failed
+         due to failed TFTP operation. errBusy(5) means upload operation is
+         failed due to other upload in processing. errMemoryInsufficient(6)
+         means upload operation is failed due to memory insufficient.
+         errInvalidImage(7) means upload operation is failed due to invalid
+         image. errWriteFlash(8) means upload operation is failed due to failed
+         writing flash. errSameImageExisted(9) means upload operation is failed
+         because the upload image is the same as the one in flash.
+         errUnknownImage(10) means upload operation is failed because the type
+         of upload image is unknown. errFlashImageNotFound(11) means upload
+         operation is failed because the location in flash to upload the image
+         is not found. errFlashEntryNotFound(12) means upload operation is
+         failed because the corresponding entry in flash to upload the image is
+         not found. errCrc(13) means upload operation is failed due to incorrect
+         CRC in the upload image. errImageSize(14) means upload operation is
+         failed due to invalid image size. errEraseFlash(15) means upload
+         operation is failed due to failed erasing flash.
+         errIncorrectImageVersion(16) means upload operation is failed due to
+         incorrect version of the upload image. errDownloadUrl(17) means upload
+         operation is failed due to fail to download image from URL.
+         errInvalidUrl(18) means upload operation is failed due to invalid URL. "
+    ::= { firmwareStatusImageUpload 1 }
+
+firmwareStatusSwitchTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FirmwareStatusSwitchEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of status of images in switch."
+    ::= { firmwareStatus 3 }
+
+firmwareStatusSwitchEntry OBJECT-TYPE
+    SYNTAX      FirmwareStatusSwitchEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of image status."
+    INDEX       { firmwareStatusSwitchSwitchId }
+    ::= { firmwareStatusSwitchTable 1 }
+
+FirmwareStatusSwitchEntry ::= SEQUENCE {
+    firmwareStatusSwitchSwitchId   Integer32,
+    firmwareStatusSwitchChipId     DisplayString,
+    firmwareStatusSwitchBoardType  DisplayString,
+    firmwareStatusSwitchPortCnt    Unsigned32,
+    firmwareStatusSwitchProduct    DisplayString,
+    firmwareStatusSwitchVersion    DisplayString,
+    firmwareStatusSwitchBuiltDate  DisplayString
+}
+
+firmwareStatusSwitchSwitchId OBJECT-TYPE
+    SYNTAX      Integer32 (1..16)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ID of switch."
+    ::= { firmwareStatusSwitchEntry 1 }
+
+firmwareStatusSwitchChipId OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ID of chip."
+    ::= { firmwareStatusSwitchEntry 2 }
+
+firmwareStatusSwitchBoardType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Type of board."
+    ::= { firmwareStatusSwitchEntry 3 }
+
+firmwareStatusSwitchPortCnt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Count of ports."
+    ::= { firmwareStatusSwitchEntry 4 }
+
+firmwareStatusSwitchProduct OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Product name."
+    ::= { firmwareStatusSwitchEntry 5 }
+
+firmwareStatusSwitchVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Image version."
+    ::= { firmwareStatusSwitchEntry 6 }
+
+firmwareStatusSwitchBuiltDate OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The built date when the image is built."
+    ::= { firmwareStatusSwitchEntry 7 }
+
+firmwareControl OBJECT IDENTIFIER
+    ::= { firmwareMibObjects 4 }
+
+firmwareControlGlobals OBJECT IDENTIFIER
+    ::= { firmwareControl 1 }
+
+firmwareControlGlobalsSwapFirmware OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Swap firmware between active (primary) and alternative (backup). true
+         is to swap the firmware. false is to do nothing."
+    ::= { firmwareControlGlobals 1 }
+
+firmwareControlImageUpload OBJECT IDENTIFIER
+    ::= { firmwareControl 2 }
+
+firmwareControlImageUploadDoUpload OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action to do upload image or not. true is to do the upload operation.
+         false is to do nothing. The upload operation may need longer time to
+         upload the image, so the SNMP timeout time needs to be modified
+         accordingly."
+    ::= { firmwareControlImageUpload 1 }
+
+firmwareControlImageUploadImageType OBJECT-TYPE
+    SYNTAX      FirmwareUploadImageEnum
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Type of image to upload. bootloader(0) is to upload bootloader.
+         firmware(1) is to upload application firmware."
+    ::= { firmwareControlImageUpload 2 }
+
+firmwareControlImageUploadUrl OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The location of image to upload. It is a specific character string that
+         constitutes a reference to a resource. Syntax:
+         <protocol>://[<username>[:<password>]@]<host>[:<port>][/<path>]/<file_name>
+         For example, tftp://10.10.10.10/new_image_path/new_image.dat,
+         http://username:password@10.10.10.10:80/new_image_path/new_image.dat. A
+         valid file name is a text string drawn from alphabet (A-Za-z), digits
+         (0-9), dot (.), hyphen (-), under score(_). The maximum length is 63
+         and hyphen must not be first character. The file name content that only
+         contains '.' is not allowed."
+    ::= { firmwareControlImageUpload 3 }
+
+firmwareMibConformance OBJECT IDENTIFIER
+    ::= { firmwareMib 2 }
+
+firmwareMibCompliances OBJECT IDENTIFIER
+    ::= { firmwareMibConformance 1 }
+
+firmwareMibGroups OBJECT IDENTIFIER
+    ::= { firmwareMibConformance 2 }
+
+firmwareStatusImageTableInfoGroup OBJECT-GROUP
+    OBJECTS     { firmwareStatusImageType,
+                  firmwareStatusImageName,
+                  firmwareStatusImageVersion,
+                  firmwareStatusImageBuiltDate,
+                  firmwareStatusImageCodeRevision }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { firmwareMibGroups 1 }
+
+firmwareStatusImageUploadInfoGroup OBJECT-GROUP
+    OBJECTS     { firmwareStatusImageUploadStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { firmwareMibGroups 2 }
+
+firmwareStatusSwitchTableInfoGroup OBJECT-GROUP
+    OBJECTS     { firmwareStatusSwitchChipId,
+                  firmwareStatusSwitchBoardType,
+                  firmwareStatusSwitchPortCnt,
+                  firmwareStatusSwitchProduct,
+                  firmwareStatusSwitchVersion,
+                  firmwareStatusSwitchBuiltDate }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { firmwareMibGroups 3 }
+
+firmwareControlGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { firmwareControlGlobalsSwapFirmware }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { firmwareMibGroups 4 }
+
+firmwareControlImageUploadInfoGroup OBJECT-GROUP
+    OBJECTS     { firmwareControlImageUploadDoUpload,
+                  firmwareControlImageUploadImageType,
+                  firmwareControlImageUploadUrl }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { firmwareMibGroups 5 }
+
+firmwareMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { firmwareStatusImageTableInfoGroup,
+                       firmwareStatusImageUploadInfoGroup,
+                       firmwareStatusSwitchTableInfoGroup,
+                       firmwareControlGlobalsInfoGroup,
+                       firmwareControlImageUploadInfoGroup }
+
+    ::= { firmwareMibCompliances 1 }
+
+END

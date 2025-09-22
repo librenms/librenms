@@ -1,0 +1,343 @@
+-- *****************************************************************
+-- MIB-SYSLOG: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-SYSLOG DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Integer32 FROM SNMPv2-SMI
+    DateAndTime FROM SNMPv2-TC
+    TruthValue FROM SNMPv2-TC
+    DisplayString FROM BTS-TC
+    InetAddress FROM BTS-TC
+    ;
+
+syslogMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private MIB for Syslog"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 37 }
+
+
+SyslogLevelType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The syslog severity level."
+    SYNTAX      INTEGER { error(3), warning(4), notice(5),
+                          informational(6), all(8) }
+
+syslogMibObjects OBJECT IDENTIFIER
+    ::= { syslogMib 1 }
+
+syslogConfig OBJECT IDENTIFIER
+    ::= { syslogMibObjects 2 }
+
+syslogConfigServer OBJECT IDENTIFIER
+    ::= { syslogConfig 1 }
+
+syslogConfigServerMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the syslog server mode operation. When the mode operation is
+         enabled, the syslog message will send out to syslog server."
+    ::= { syslogConfigServer 1 }
+
+syslogConfigServerAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The domain name of syslog server."
+    ::= { syslogConfigServer 2 }
+
+syslogConfigServerLevel OBJECT-TYPE
+    SYNTAX      SyslogLevelType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates what level of message will send to syslog server. For
+         example, the error level will send the specific messages which severity
+         code is less or equal than error(3), the warning level will send the
+         specific messages which severity code is less or equal than warning(4),
+         the notice level will send the specific messages which severity code is
+         less or equal than notice(5), the informational level will send the
+         specific messages which severity code is less or equal than
+         informational(6) and the enumeration option of all(8) isn't used in
+         this case."
+    ::= { syslogConfigServer 3 }
+
+syslogConfigServers OBJECT IDENTIFIER
+    ::= { syslogConfig 2 }
+
+--  syslogConfigServersNumber OBJECT-TYPE
+--      SYNTAX      INTEGER
+--      MAX-ACCESS  read-only
+--      STATUS      current
+--      DESCRIPTION
+--          "Indicates the syslog servers number present on this system."
+--      ::= { syslogConfigServers 1 }
+
+-- the syslogConfigServers table
+
+syslogConfigServersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF syslogConfigServersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of server entries.  The number of entries is 
+            given by the value of syslogConfigServersNumber."
+    ::= { syslogConfigServers 1 }
+
+syslogConfigServersEntry OBJECT-TYPE
+    SYNTAX      syslogConfigServersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An server entry containing objects for a particular
+            server."
+    INDEX   { syslogConfigServerIndex }
+    ::= { syslogConfigServersTable 1 }
+
+syslogConfigServersEntry ::= SEQUENCE {
+        syslogConfigServerIndex     INTEGER,
+        syslogConfigServerMode      TruthValue,
+        syslogConfigServerAddress   InetAddress,
+        syslogConfigServerPort      INTEGER (0..65535),
+        syslogConfigServerLevel     SyslogLevelType
+    }
+
+syslogConfigServerIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value for each server.  Its value
+            ranges between 1 and the value of syslogConfigServersNumber."
+    ::= { syslogConfigServersEntry 1 }
+
+syslogConfigServerMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the syslog server mode operation. When the mode operation is
+         enabled, the syslog message will send out to syslog server."
+    ::= { syslogConfigServersEntry 2 }
+
+syslogConfigServerAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The domain name of syslog server."
+    ::= { syslogConfigServersEntry 3 }
+
+syslogConfigServerPort OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The UDP port of syslog server."
+    ::= { syslogConfigServersEntry 4 }
+
+syslogConfigServerLevel OBJECT-TYPE
+    SYNTAX      SyslogLevelType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates what level of message will send to syslog server. For
+         example, the error level will send the specific messages which severity
+         code is less or equal than error(3), the warning level will send the
+         specific messages which severity code is less or equal than warning(4),
+         the notice level will send the specific messages which severity code is
+         less or equal than notice(5), the informational level will send the
+         specific messages which severity code is less or equal than
+         informational(6) and the enumeration option of all(8) isn't used in
+         this case."
+    ::= { syslogConfigServersEntry 5 }
+
+syslogStatus OBJECT IDENTIFIER
+    ::= { syslogMibObjects 3 }
+
+syslogStatusHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SyslogStatusHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The syslog history table."
+    ::= { syslogStatus 1 }
+
+syslogStatusHistoryEntry OBJECT-TYPE
+    SYNTAX      SyslogStatusHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains a set of parameters."
+    INDEX       { syslogStatusHistorySwitchId,
+                  syslogStatusHistoryMsgId }
+    ::= { syslogStatusHistoryTable 1 }
+
+SyslogStatusHistoryEntry ::= SEQUENCE {
+    syslogStatusHistorySwitchId      Integer32,
+    syslogStatusHistoryMsgId         Integer32,
+    syslogStatusHistoryMsgLevel      SyslogLevelType,
+    syslogStatusHistoryMsgTimeStamp  DateAndTime,
+    syslogStatusHistoryMsgText       DisplayString
+}
+
+syslogStatusHistorySwitchId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The identification of switch. For non-stackable switch, the valid value
+         is limited to 1. "
+    ::= { syslogStatusHistoryEntry 1 }
+
+syslogStatusHistoryMsgId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The identification of Syslog message."
+    ::= { syslogStatusHistoryEntry 2 }
+
+syslogStatusHistoryMsgLevel OBJECT-TYPE
+    SYNTAX      SyslogLevelType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The severity level of the system log message. Note that enumeration
+         option of all(8) isn't used in this case."
+    ::= { syslogStatusHistoryEntry 3 }
+
+syslogStatusHistoryMsgTimeStamp OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime when this message was generated."
+    ::= { syslogStatusHistoryEntry 4 }
+
+syslogStatusHistoryMsgText OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The detailed context of the system log message."
+    ::= { syslogStatusHistoryEntry 5 }
+
+syslogControl OBJECT IDENTIFIER
+    ::= { syslogMibObjects 4 }
+
+syslogControlHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SyslogControlHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The syslog history clear table."
+    ::= { syslogControl 1 }
+
+syslogControlHistoryEntry OBJECT-TYPE
+    SYNTAX      SyslogControlHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains a set of parameters."
+    INDEX       { syslogControlHistorySwitchId,
+                  syslogControlHistoryClearLevel }
+    ::= { syslogControlHistoryTable 1 }
+
+SyslogControlHistoryEntry ::= SEQUENCE {
+    syslogControlHistorySwitchId    Integer32,
+    syslogControlHistoryClearLevel  SyslogLevelType,
+    syslogControlHistoryClear       TruthValue
+}
+
+syslogControlHistorySwitchId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The identification of switch. For non-stackable switch, the valid value
+         is limited to 1. For stackable switch, value 0 means the action is
+         applied to all switches."
+    ::= { syslogControlHistoryEntry 1 }
+
+syslogControlHistoryClearLevel OBJECT-TYPE
+    SYNTAX      SyslogLevelType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Indicates which level of message want to clear."
+    ::= { syslogControlHistoryEntry 2 }
+
+syslogControlHistoryClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Clear syslog history by setting to true."
+    ::= { syslogControlHistoryEntry 3 }
+
+syslogMibConformance OBJECT IDENTIFIER
+    ::= { syslogMib 2 }
+
+syslogMibCompliances OBJECT IDENTIFIER
+    ::= { syslogMibConformance 1 }
+
+syslogMibGroups OBJECT IDENTIFIER
+    ::= { syslogMibConformance 2 }
+
+syslogConfigServerInfoGroup OBJECT-GROUP
+    OBJECTS     { syslogConfigServerMode,
+                  syslogConfigServerAddress,
+                  syslogConfigServerLevel }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { syslogMibGroups 1 }
+
+syslogStatusHistoryTableInfoGroup OBJECT-GROUP
+    OBJECTS     { syslogStatusHistoryMsgLevel,
+                  syslogStatusHistoryMsgTimeStamp,
+                  syslogStatusHistoryMsgText }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { syslogMibGroups 2 }
+
+syslogControlHistoryTableInfoGroup OBJECT-GROUP
+    OBJECTS     { syslogControlHistoryClear }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { syslogMibGroups 3 }
+
+syslogMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { syslogConfigServerInfoGroup,
+                       syslogStatusHistoryTableInfoGroup,
+                       syslogControlHistoryTableInfoGroup }
+
+    ::= { syslogMibCompliances 1 }
+
+END

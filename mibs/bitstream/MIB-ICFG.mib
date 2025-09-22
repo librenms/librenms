@@ -1,0 +1,328 @@
+-- *****************************************************************
+-- MIB-ICFG: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-ICFG DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Integer32 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    DisplayString FROM BTS-TC
+    ;
+
+icfgMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of ICFG"
+    REVISION    "201410100000Z"
+    DESCRIPTION
+        "Editorial changes"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 101 }
+
+
+IcfgConfigStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the type of configuration."
+    SYNTAX      INTEGER { none(0), success(1), inProgress(2),
+                          errOtherInProcessing(3), errNoSuchFile(4),
+                          errSameSrcDst(5), errPermissionDenied(6),
+                          errLoadSrc(7), errSaveDst(8) }
+
+IcfgConfigType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the type of configuration."
+    SYNTAX      INTEGER { none(0), runningConfig(1), startupConfig(2),
+                          configFile(3) }
+
+IcfgReloadDefault ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the type of reload default."
+    SYNTAX      INTEGER { none(0), default(1), defaultKeepIp(2) }
+
+icfgMibObjects OBJECT IDENTIFIER
+    ::= { icfgMib 1 }
+
+icfgStatus OBJECT IDENTIFIER
+    ::= { icfgMibObjects 3 }
+
+icfgStatusFileStatistics OBJECT IDENTIFIER
+    ::= { icfgStatus 1 }
+
+icfgStatusFileStatisticsNumberOfFiles OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of files in flash."
+    ::= { icfgStatusFileStatistics 1 }
+
+icfgStatusFileStatisticsTotalBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of bytes used by all files in flash."
+    ::= { icfgStatusFileStatistics 2 }
+
+icfgStatusFileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IcfgStatusFileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of status of files in flash."
+    ::= { icfgStatus 2 }
+
+icfgStatusFileEntry OBJECT-TYPE
+    SYNTAX      IcfgStatusFileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of file status."
+    INDEX       { icfgStatusFileFileNo }
+    ::= { icfgStatusFileTable 1 }
+
+IcfgStatusFileEntry ::= SEQUENCE {
+    icfgStatusFileFileNo        Integer32,
+    icfgStatusFileFileName      DisplayString,
+    icfgStatusFileBytes         Unsigned32,
+    icfgStatusFileModifiedTime  DisplayString,
+    icfgStatusFileAttribute     DisplayString
+}
+
+icfgStatusFileFileNo OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The number of File. The number starts from 1."
+    ::= { icfgStatusFileEntry 1 }
+
+icfgStatusFileFileName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "File name."
+    ::= { icfgStatusFileEntry 2 }
+
+icfgStatusFileBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of bytes of the file."
+    ::= { icfgStatusFileEntry 3 }
+
+icfgStatusFileModifiedTime OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..39))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Last modified time of the file."
+    ::= { icfgStatusFileEntry 4 }
+
+icfgStatusFileAttribute OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "File attribute in the linux format of drwxrwxrwx. 'd' is directory or
+         not, the permission of rwx is for owner, group and other, respectively."
+    ::= { icfgStatusFileEntry 5 }
+
+icfgStatusCopyConfig OBJECT IDENTIFIER
+    ::= { icfgStatus 3 }
+
+icfgStatusCopyConfigStatus OBJECT-TYPE
+    SYNTAX      IcfgConfigStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status indicates the status of current copy operation. none(0)
+         means no copy operation. success(1) means copy operation is successful.
+         inProgress(2) means current copy operation is in progress.
+         errOtherInProcessing(3) means copy operation is failed due to other in
+         processing. errNoSuchFile(4) means copy operation is failed due to file
+         not existing. errSameSrcDst(5) means copy operation is failed due to
+         the source and destination are the same. errPermissionDenied(6) means
+         copy operation is failed due to the destination is not permitted to
+         modify. errLoadSrc(7) means copy operation is failed due to the error
+         to load source file. errSaveDst(8) means copy operation is failed due
+         to the error to save or commit destination."
+    ::= { icfgStatusCopyConfig 1 }
+
+icfgControl OBJECT IDENTIFIER
+    ::= { icfgMibObjects 4 }
+
+icfgControlGlobals OBJECT IDENTIFIER
+    ::= { icfgControl 1 }
+
+icfgControlGlobalsReloadDefault OBJECT-TYPE
+    SYNTAX      IcfgReloadDefault
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Reset system to default. none(0) is to do nothing. default(1) is to
+         reset the whole system to default. defaultKeepIp(2) is to reset system
+         to default, but keep IP address of VLAN 1."
+    ::= { icfgControlGlobals 1 }
+
+icfgControlGlobalsDeleteFile OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..127))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Delete file in flash. The format is flash:filename. Where
+         'default-config' is read-only and not allowed to be deleted."
+    ::= { icfgControlGlobals 2 }
+
+icfgControlCopyConfig OBJECT IDENTIFIER
+    ::= { icfgControl 2 }
+
+icfgControlCopyConfigCopy OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action to do copy or not. true is to do the copy operation. false is to
+         do nothing"
+    ::= { icfgControlCopyConfig 1 }
+
+icfgControlCopyConfigSourceConfigType OBJECT-TYPE
+    SYNTAX      IcfgConfigType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source configuration type. none(0) means no configuration file.
+         runningConfig(1) means running configuration. startupConfig(2) means
+         startup configuration file in flash. configFile(3) is the configuration
+         file specified in SourceConfigFile."
+    ::= { icfgControlCopyConfig 2 }
+
+icfgControlCopyConfigSourceConfigFile OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..127))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source configuration file. If the configuration file is in flash then
+         the format is flash:'filename'. If the configuration file is from tftp
+         then the format is tftp://server[:port]/path-to-file."
+    ::= { icfgControlCopyConfig 3 }
+
+icfgControlCopyConfigDestinationConfigType OBJECT-TYPE
+    SYNTAX      IcfgConfigType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source configuration type. none(0) means no configuration file.
+         runningConfig(1) means running configuration. startupConfig(2) means
+         startup configuration file in flash. configFile(3) is the configuration
+         file specified in DestinationConfigFile."
+    ::= { icfgControlCopyConfig 4 }
+
+icfgControlCopyConfigDestinationConfigFile OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..127))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination configuration file. If the configuration file is in flash
+         then the format is flash:filename. If the configuration file is from
+         tftp then the format is tftp://server[:port]/filename_with_path. Where
+         'default-config' is read-only and not allowed to be deleted."
+    ::= { icfgControlCopyConfig 5 }
+
+icfgControlCopyConfigMerge OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This flag works only if DestinationConfigType is runningConfig(1). true
+         is to merge the source configuration into the current running
+         configuration. false is to replace the current running configuration
+         with the source configuration."
+    ::= { icfgControlCopyConfig 6 }
+
+icfgMibConformance OBJECT IDENTIFIER
+    ::= { icfgMib 2 }
+
+icfgMibCompliances OBJECT IDENTIFIER
+    ::= { icfgMibConformance 1 }
+
+icfgMibGroups OBJECT IDENTIFIER
+    ::= { icfgMibConformance 2 }
+
+icfgStatusFileStatisticsInfoGroup OBJECT-GROUP
+    OBJECTS     { icfgStatusFileStatisticsNumberOfFiles,
+                  icfgStatusFileStatisticsTotalBytes }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { icfgMibGroups 1 }
+
+icfgStatusFileTableInfoGroup OBJECT-GROUP
+    OBJECTS     { icfgStatusFileFileName, icfgStatusFileBytes,
+                  icfgStatusFileModifiedTime,
+                  icfgStatusFileAttribute }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { icfgMibGroups 2 }
+
+icfgStatusCopyConfigInfoGroup OBJECT-GROUP
+    OBJECTS     { icfgStatusCopyConfigStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { icfgMibGroups 3 }
+
+icfgControlGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { icfgControlGlobalsReloadDefault,
+                  icfgControlGlobalsDeleteFile }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { icfgMibGroups 4 }
+
+icfgControlCopyConfigInfoGroup OBJECT-GROUP
+    OBJECTS     { icfgControlCopyConfigCopy,
+                  icfgControlCopyConfigSourceConfigType,
+                  icfgControlCopyConfigSourceConfigFile,
+                  icfgControlCopyConfigDestinationConfigType,
+                  icfgControlCopyConfigDestinationConfigFile,
+                  icfgControlCopyConfigMerge }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { icfgMibGroups 5 }
+
+icfgMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { icfgStatusFileStatisticsInfoGroup,
+                       icfgStatusFileTableInfoGroup,
+                       icfgStatusCopyConfigInfoGroup,
+                       icfgControlGlobalsInfoGroup,
+                       icfgControlCopyConfigInfoGroup }
+
+    ::= { icfgMibCompliances 1 }
+
+END

@@ -1,0 +1,349 @@
+-- *****************************************************************
+-- MIB-EEE: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-EEE DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Integer32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    InterfaceIndex FROM BTS-TC
+    Unsigned8 FROM BTS-TC
+    ;
+
+eeeMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of Energy Efficient Ethernet(EEE). "
+    REVISION    "201407240000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 74 }
+
+
+EeePreference ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the types of optimization preferences, either
+         maximum power savings or low traffic latency."
+    SYNTAX      INTEGER { latency(0), power(1) }
+
+EeeQueueType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the types of egress port queues."
+    SYNTAX      INTEGER { normal(0), urgent(1) }
+
+EeeStatusType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the feature status."
+    SYNTAX      INTEGER { no(0), yes(1), notSupported(2) }
+
+eeeMibObjects OBJECT IDENTIFIER
+    ::= { eeeMib 1 }
+
+eeeCapabilities OBJECT IDENTIFIER
+    ::= { eeeMibObjects 1 }
+
+eeeCapabilitiesGlobals OBJECT IDENTIFIER
+    ::= { eeeCapabilities 1 }
+
+eeeCapabilitiesGlobalsOptimizationPreferences OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether device supports optimization preferences, true means
+         supported. false means not supported."
+    ::= { eeeCapabilitiesGlobals 1 }
+
+eeeCapabilitiesInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EeeCapabilitiesInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to interface capabilities"
+    ::= { eeeCapabilities 2 }
+
+eeeCapabilitiesInterfaceEntry OBJECT-TYPE
+    SYNTAX      EeeCapabilitiesInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each interface has a set of capability parameters"
+    INDEX       { eeeCapabilitiesInterfaceIfIndex }
+    ::= { eeeCapabilitiesInterfaceTable 1 }
+
+EeeCapabilitiesInterfaceEntry ::= SEQUENCE {
+    eeeCapabilitiesInterfaceIfIndex          InterfaceIndex,
+    eeeCapabilitiesInterfaceMaxEgressQueues  Unsigned8,
+    eeeCapabilitiesInterfaceEEE              TruthValue
+}
+
+eeeCapabilitiesInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { eeeCapabilitiesInterfaceEntry 1 }
+
+eeeCapabilitiesInterfaceMaxEgressQueues OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of supported egress port queues."
+    ::= { eeeCapabilitiesInterfaceEntry 2 }
+
+eeeCapabilitiesInterfaceEEE OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether interface supports EEE(IEEE 802.3az). true means EEE
+         supported. false means not supported."
+    ::= { eeeCapabilitiesInterfaceEntry 3 }
+
+eeeConfig OBJECT IDENTIFIER
+    ::= { eeeMibObjects 2 }
+
+eeeConfigGlobals OBJECT IDENTIFIER
+    ::= { eeeConfig 1 }
+
+eeeConfigGlobalsOptimizationPreferences OBJECT-TYPE
+    SYNTAX      EeePreference
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "EEE optimization preferences, either maximum power saving or low
+         traffic latency."
+    ::= { eeeConfigGlobals 1 }
+
+eeeConfigInterface OBJECT IDENTIFIER
+    ::= { eeeConfig 2 }
+
+eeeConfigInterfaceParamTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EeeConfigInterfaceParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to configure EEE configurations for a specific
+         interface."
+    ::= { eeeConfigInterface 1 }
+
+eeeConfigInterfaceParamEntry OBJECT-TYPE
+    SYNTAX      EeeConfigInterfaceParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each interface has a set of EEE configurable parameters"
+    INDEX       { eeeConfigInterfaceParamIfIndex }
+    ::= { eeeConfigInterfaceParamTable 1 }
+
+EeeConfigInterfaceParamEntry ::= SEQUENCE {
+    eeeConfigInterfaceParamIfIndex    InterfaceIndex,
+    eeeConfigInterfaceParamEnableEEE  TruthValue
+}
+
+eeeConfigInterfaceParamIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { eeeConfigInterfaceParamEntry 1 }
+
+eeeConfigInterfaceParamEnableEEE OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable EEE (IEEE 802.3az) feature at a interface. true is to advertize
+         EEE(IEEE 802.3az) capabilities to partner device. false is to disable
+         it."
+    ::= { eeeConfigInterfaceParamEntry 2 }
+
+eeeConfigInterfaceQueueTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EeeConfigInterfaceQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to configure egress port queue type, whether urgent
+         queue or normal queue. We can configure more than one egress queues as
+         urgent queues. Queues configured as urgent, en-queued data will be
+         transmitted with minimum latency. Queue configured as normal, en-queued
+         data will be transmitted with latency depending upon traffic
+         utilization."
+    ::= { eeeConfigInterface 2 }
+
+eeeConfigInterfaceQueueEntry OBJECT-TYPE
+    SYNTAX      EeeConfigInterfaceQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each interface has set of egress queues"
+    INDEX       { eeeConfigInterfaceQueueIfIndex,
+                  eeeConfigInterfaceQueueIndex }
+    ::= { eeeConfigInterfaceQueueTable 1 }
+
+EeeConfigInterfaceQueueEntry ::= SEQUENCE {
+    eeeConfigInterfaceQueueIfIndex          InterfaceIndex,
+    eeeConfigInterfaceQueueIndex            Integer32,
+    eeeConfigInterfaceQueueEgressQueueType  EeeQueueType
+}
+
+eeeConfigInterfaceQueueIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { eeeConfigInterfaceQueueEntry 1 }
+
+eeeConfigInterfaceQueueIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Egress port queue index."
+    ::= { eeeConfigInterfaceQueueEntry 2 }
+
+eeeConfigInterfaceQueueEgressQueueType OBJECT-TYPE
+    SYNTAX      EeeQueueType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Egress port queue is urgent queue or normal queue."
+    ::= { eeeConfigInterfaceQueueEntry 3 }
+
+eeeStatus OBJECT IDENTIFIER
+    ::= { eeeMibObjects 3 }
+
+eeeStatusInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EeeStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to Energy Efficient Ethernet interface status"
+    ::= { eeeStatus 1 }
+
+eeeStatusInterfaceEntry OBJECT-TYPE
+    SYNTAX      EeeStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each interface has a set of status parameters"
+    INDEX       { eeeStatusInterfaceIfIndex }
+    ::= { eeeStatusInterfaceTable 1 }
+
+EeeStatusInterfaceEntry ::= SEQUENCE {
+    eeeStatusInterfaceIfIndex      InterfaceIndex,
+    eeeStatusInterfacePartnerEEE   EeeStatusType,
+    eeeStatusInterfaceRxPowerSave  EeeStatusType
+}
+
+eeeStatusInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { eeeStatusInterfaceEntry 1 }
+
+eeeStatusInterfacePartnerEEE OBJECT-TYPE
+    SYNTAX      EeeStatusType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether link partner advertising EEE(IEEE 802.3az)
+         capabilities."
+    ::= { eeeStatusInterfaceEntry 2 }
+
+eeeStatusInterfaceRxPowerSave OBJECT-TYPE
+    SYNTAX      EeeStatusType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether interfcae rx path currently in power save state."
+    ::= { eeeStatusInterfaceEntry 3 }
+
+eeeMibConformance OBJECT IDENTIFIER
+    ::= { eeeMib 2 }
+
+eeeMibCompliances OBJECT IDENTIFIER
+    ::= { eeeMibConformance 1 }
+
+eeeMibGroups OBJECT IDENTIFIER
+    ::= { eeeMibConformance 2 }
+
+eeeCapabilitiesGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { eeeCapabilitiesGlobalsOptimizationPreferences }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { eeeMibGroups 1 }
+
+eeeCapabilitiesInterfaceInfoGroup OBJECT-GROUP
+    OBJECTS     { eeeCapabilitiesInterfaceMaxEgressQueues,
+                  eeeCapabilitiesInterfaceEEE }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { eeeMibGroups 2 }
+
+eeeConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { eeeConfigGlobalsOptimizationPreferences }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { eeeMibGroups 3 }
+
+eeeConfigInterfaceParamTableInfoGroup OBJECT-GROUP
+    OBJECTS     { eeeConfigInterfaceParamEnableEEE }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { eeeMibGroups 4 }
+
+eeeConfigInterfaceQueueTableInfoGroup OBJECT-GROUP
+    OBJECTS     { eeeConfigInterfaceQueueEgressQueueType }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { eeeMibGroups 5 }
+
+eeeStatusInterfaceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { eeeStatusInterfacePartnerEEE,
+                  eeeStatusInterfaceRxPowerSave }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { eeeMibGroups 6 }
+
+eeeMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { eeeCapabilitiesGlobalsInfoGroup,
+                       eeeCapabilitiesInterfaceInfoGroup,
+                       eeeConfigGlobalsInfoGroup,
+                       eeeConfigInterfaceParamTableInfoGroup,
+                       eeeConfigInterfaceQueueTableInfoGroup,
+                       eeeStatusInterfaceTableInfoGroup }
+
+    ::= { eeeMibCompliances 1 }
+
+END

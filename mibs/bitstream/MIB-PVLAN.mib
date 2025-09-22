@@ -1,0 +1,241 @@
+-- *****************************************************************
+-- MIB-PVLAN: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-PVLAN DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    InterfaceIndex FROM BTS-TC
+    PortList FROM BTS-TC
+    RowEditorState FROM BTS-TC
+    ;
+
+pvlanMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of the Private VLAN MIB"
+    REVISION    "201407160000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 23 }
+
+
+pvlanMibObjects OBJECT IDENTIFIER
+    ::= { pvlanMib 1 }
+
+pvlanCapabilities OBJECT IDENTIFIER
+    ::= { pvlanMibObjects 1 }
+
+pvlanCapabilitiesHasVlanMembershipMgmt OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The capability to support PVLAN membership configuration by the device."
+    ::= { pvlanCapabilities 1 }
+
+pvlanCapabilitiesVlanIdMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum VLAN ID of PVLAN membership configuration supported by the
+         device."
+    ::= { pvlanCapabilities 2 }
+
+pvlanCapabilitiesVlanIdMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum VLAN ID of PVLAN membership configuration supported by the
+         device."
+    ::= { pvlanCapabilities 3 }
+
+pvlanConfig OBJECT IDENTIFIER
+    ::= { pvlanMibObjects 2 }
+
+pvlanConfigInterface OBJECT IDENTIFIER
+    ::= { pvlanConfig 1 }
+
+pvlanConfigInterfaceVlanMembershipTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PvlanConfigInterfaceVlanMembershipEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table for managing Private VLAN VLAN membership entries."
+    ::= { pvlanConfigInterface 1 }
+
+pvlanConfigInterfaceVlanMembershipEntry OBJECT-TYPE
+    SYNTAX      PvlanConfigInterfaceVlanMembershipEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of parameters."
+    INDEX       { pvlanConfigInterfaceVlanMembershipPvlanIndex }
+    ::= { pvlanConfigInterfaceVlanMembershipTable 1 }
+
+PvlanConfigInterfaceVlanMembershipEntry ::= SEQUENCE {
+    pvlanConfigInterfaceVlanMembershipPvlanIndex  Unsigned32,
+    pvlanConfigInterfaceVlanMembershipPortList    PortList,
+    pvlanConfigInterfaceVlanMembershipAction      RowEditorState
+}
+
+pvlanConfigInterfaceVlanMembershipPvlanIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Configuration index of the Private VLAN membership table."
+    ::= { pvlanConfigInterfaceVlanMembershipEntry 1 }
+
+pvlanConfigInterfaceVlanMembershipPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "It is used to denote the memberships of the specific Private VLAN
+         configuration."
+    ::= { pvlanConfigInterfaceVlanMembershipEntry 2 }
+
+pvlanConfigInterfaceVlanMembershipAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { pvlanConfigInterfaceVlanMembershipEntry 100 }
+
+pvlanConfigInterfaceVlanMembershipTableRowEditor OBJECT IDENTIFIER
+    ::= { pvlanConfigInterface 2 }
+
+pvlanConfigInterfaceVlanMembershipTableRowEditorPvlanIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configuration index of the Private VLAN membership table."
+    ::= { pvlanConfigInterfaceVlanMembershipTableRowEditor 1 }
+
+pvlanConfigInterfaceVlanMembershipTableRowEditorPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "It is used to denote the memberships of the specific Private VLAN
+         configuration."
+    ::= { pvlanConfigInterfaceVlanMembershipTableRowEditor 2 }
+
+pvlanConfigInterfaceVlanMembershipTableRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { pvlanConfigInterfaceVlanMembershipTableRowEditor 100 }
+
+pvlanConfigInterfacePortIsolatationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PvlanConfigInterfacePortIsolatationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table for managing Private VLAN port isolation entries."
+    ::= { pvlanConfigInterface 3 }
+
+pvlanConfigInterfacePortIsolatationEntry OBJECT-TYPE
+    SYNTAX      PvlanConfigInterfacePortIsolatationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of parameters."
+    INDEX       { pvlanConfigInterfacePortIsolatationPortIndex }
+    ::= { pvlanConfigInterfacePortIsolatationTable 1 }
+
+PvlanConfigInterfacePortIsolatationEntry ::= SEQUENCE {
+    pvlanConfigInterfacePortIsolatationPortIndex  InterfaceIndex,
+    pvlanConfigInterfacePortIsolatationEnabled    TruthValue
+}
+
+pvlanConfigInterfacePortIsolatationPortIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number of the Private VLAN port isolation."
+    ::= { pvlanConfigInterfacePortIsolatationEntry 1 }
+
+pvlanConfigInterfacePortIsolatationEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable the Private VLAN isolation functionality."
+    ::= { pvlanConfigInterfacePortIsolatationEntry 2 }
+
+pvlanMibConformance OBJECT IDENTIFIER
+    ::= { pvlanMib 2 }
+
+pvlanMibCompliances OBJECT IDENTIFIER
+    ::= { pvlanMibConformance 1 }
+
+pvlanMibGroups OBJECT IDENTIFIER
+    ::= { pvlanMibConformance 2 }
+
+pvlanCapabilitiesInfoGroup OBJECT-GROUP
+    OBJECTS     { pvlanCapabilitiesHasVlanMembershipMgmt,
+                  pvlanCapabilitiesVlanIdMax,
+                  pvlanCapabilitiesVlanIdMin }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { pvlanMibGroups 1 }
+
+pvlanConfigInterfaceVlanMembershipTableInfoGroup OBJECT-GROUP
+    OBJECTS     { pvlanConfigInterfaceVlanMembershipPortList,
+                  pvlanConfigInterfaceVlanMembershipAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { pvlanMibGroups 2 }
+
+pvlanConfigInterfaceVlanMembershipTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     {                   pvlanConfigInterfaceVlanMembershipTableRowEditorPvlanIndex,
+                  pvlanConfigInterfaceVlanMembershipTableRowEditorPortList,
+                  pvlanConfigInterfaceVlanMembershipTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { pvlanMibGroups 3 }
+
+pvlanConfigInterfacePortIsolatationTableInfoGroup OBJECT-GROUP
+    OBJECTS     { pvlanConfigInterfacePortIsolatationEnabled }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { pvlanMibGroups 4 }
+
+pvlanMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { pvlanCapabilitiesInfoGroup,
+                       pvlanConfigInterfaceVlanMembershipTableInfoGroup,
+                       pvlanConfigInterfaceVlanMembershipTableRowEditorInfoGroup,
+                       pvlanConfigInterfacePortIsolatationTableInfoGroup }
+
+    ::= { pvlanMibCompliances 1 }
+
+END

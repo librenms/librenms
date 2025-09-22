@@ -1,0 +1,549 @@
+-- *****************************************************************
+-- MIB-VCL: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-VCL DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Integer32 FROM SNMPv2-SMI
+    IpAddress FROM SNMPv2-SMI
+    MacAddress FROM SNMPv2-TC
+    DisplayString FROM BTS-TC
+    PortList FROM BTS-TC
+    RowEditorState FROM BTS-TC
+    VclProtoEncap FROM BTS-TC
+    ;
+
+vclMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "Private VCL MIB."
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 79 }
+
+
+vclMibObjects OBJECT IDENTIFIER
+    ::= { vclMib 1 }
+
+vclConfig OBJECT IDENTIFIER
+    ::= { vclMibObjects 2 }
+
+vclConfigMac OBJECT IDENTIFIER
+    ::= { vclConfig 1 }
+
+vclConfigMacTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VclConfigMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the MAC address to VLAN ID configuration table."
+    ::= { vclConfigMac 1 }
+
+vclConfigMacEntry OBJECT-TYPE
+    SYNTAX      VclConfigMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents a configured MAC-based
+         classification.
+         
+         "
+    INDEX       { vclConfigMacMacAddress }
+    ::= { vclConfigMacTable 1 }
+
+VclConfigMacEntry ::= SEQUENCE {
+    vclConfigMacMacAddress  MacAddress,
+    vclConfigMacVlanId      Integer32,
+    vclConfigMacPortList    PortList,
+    vclConfigMacAction      RowEditorState
+}
+
+vclConfigMacMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The MAC address for which this entry is applicable."
+    ::= { vclConfigMacEntry 1 }
+
+vclConfigMacVlanId OBJECT-TYPE
+    SYNTAX      Integer32 (1..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vlan id of the mapping."
+    ::= { vclConfigMacEntry 2 }
+
+vclConfigMacPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "List of stack/switch ports on which this entry is active."
+    ::= { vclConfigMacEntry 3 }
+
+vclConfigMacAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { vclConfigMacEntry 100 }
+
+vclConfigMacRowEditor OBJECT IDENTIFIER
+    ::= { vclConfigMac 2 }
+
+vclConfigMacRowEditorMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The MAC address for which this entry is applicable."
+    ::= { vclConfigMacRowEditor 1 }
+
+vclConfigMacRowEditorVlanId OBJECT-TYPE
+    SYNTAX      Integer32 (1..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vlan id of the mapping."
+    ::= { vclConfigMacRowEditor 2 }
+
+vclConfigMacRowEditorPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "List of stack/switch ports on which this entry is active."
+    ::= { vclConfigMacRowEditor 3 }
+
+vclConfigMacRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { vclConfigMacRowEditor 100 }
+
+vclConfigIp OBJECT IDENTIFIER
+    ::= { vclConfig 2 }
+
+vclConfigIpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VclConfigIpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the IP Subnet to VLAN ID configuration table. The key of this
+         table is the IP subnet expressed as x.x.x.x/x, where the first 4 octets
+         represent the IPv4 address and the last one is the mask length.
+         
+         NOTE#1: Inside the VCL module these entries are actually sorted based
+         on a priority defined by the mask length, so that subnets with larger
+         mask lengths are first in the list, followed by entries with smaller
+         mask lengths. SNMP cannot follow this sorting, therefore the order the
+         entries are retrieved by the iterator may not be the same as the
+         actually stored order. (This is not an issue, but should be taken into
+         consideration when using the SNMP interface to create a user interface.
+         
+         NOTE#2: Even though only the subnet address is stored in the table
+         (i.e. both 192.168.1.0/4 and 192.168.2.0/4 will end up as 192.0.0.0/4),
+         the SNMP iterator will NOT take this into consideration. So, when
+         searching the next subnet of 192.168.1.0/4, the result could be
+         193.0.0.0/4 but not 192.168.1.0/24 (granted that these entries are
+         present)"
+    ::= { vclConfigIp 1 }
+
+vclConfigIpEntry OBJECT-TYPE
+    SYNTAX      VclConfigIpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents a configured IP Subnet-based
+         classification.
+         
+         "
+    INDEX       { vclConfigIpIpSubnetAddress,
+                  vclConfigIpIpSubnetMaskLength }
+    ::= { vclConfigIpTable 1 }
+
+VclConfigIpEntry ::= SEQUENCE {
+    vclConfigIpIpSubnetAddress     IpAddress,
+    vclConfigIpIpSubnetMaskLength  Integer32,
+    vclConfigIpVlanId              Integer32,
+    vclConfigIpPortList            PortList,
+    vclConfigIpAction              RowEditorState
+}
+
+vclConfigIpIpSubnetAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP subnet address for which this entry is applicable."
+    ::= { vclConfigIpEntry 1 }
+
+vclConfigIpIpSubnetMaskLength OBJECT-TYPE
+    SYNTAX      Integer32 (1..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP subnet mask length for which this entry is applicable."
+    ::= { vclConfigIpEntry 2 }
+
+vclConfigIpVlanId OBJECT-TYPE
+    SYNTAX      Integer32 (1..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vlan id of the mapping."
+    ::= { vclConfigIpEntry 3 }
+
+vclConfigIpPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "List of stack/switch ports on which this entry is active."
+    ::= { vclConfigIpEntry 4 }
+
+vclConfigIpAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { vclConfigIpEntry 100 }
+
+vclConfigIpRowEditor OBJECT IDENTIFIER
+    ::= { vclConfigIp 2 }
+
+vclConfigIpRowEditorIpSubnetAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The IP subnet address for which this entry is applicable."
+    ::= { vclConfigIpRowEditor 1 }
+
+vclConfigIpRowEditorIpSubnetMaskLength OBJECT-TYPE
+    SYNTAX      Integer32 (1..32)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The IP subnet mask length for which this entry is applicable."
+    ::= { vclConfigIpRowEditor 2 }
+
+vclConfigIpRowEditorVlanId OBJECT-TYPE
+    SYNTAX      Integer32 (1..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vlan id of the mapping."
+    ::= { vclConfigIpRowEditor 3 }
+
+vclConfigIpRowEditorPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "List of stack/switch ports on which this entry is active."
+    ::= { vclConfigIpRowEditor 4 }
+
+vclConfigIpRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { vclConfigIpRowEditor 100 }
+
+vclConfigProtocol OBJECT IDENTIFIER
+    ::= { vclConfig 3 }
+
+vclConfigProtocolProto OBJECT IDENTIFIER
+    ::= { vclConfigProtocol 1 }
+
+vclConfigProtocolProtoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VclConfigProtocolProtoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the Protocol to Protocol Group mapping table."
+    ::= { vclConfigProtocolProto 1 }
+
+vclConfigProtocolProtoEntry OBJECT-TYPE
+    SYNTAX      VclConfigProtocolProtoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents a Protocol to Group mapping.
+         
+         "
+    INDEX       { vclConfigProtocolProtoProtocolEncapsulation }
+    ::= { vclConfigProtocolProtoTable 1 }
+
+VclConfigProtocolProtoEntry ::= SEQUENCE {
+    vclConfigProtocolProtoProtocolEncapsulation  VclProtoEncap,
+    vclConfigProtocolProtoProtocolGroupName      DisplayString,
+    vclConfigProtocolProtoAction                 RowEditorState
+}
+
+vclConfigProtocolProtoProtocolEncapsulation OBJECT-TYPE
+    SYNTAX      VclProtoEncap
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The protocol encapsulation of the Protocol to Group mapping."
+    ::= { vclConfigProtocolProtoEntry 1 }
+
+vclConfigProtocolProtoProtocolGroupName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is a name identifying the protocol group."
+    ::= { vclConfigProtocolProtoEntry 2 }
+
+vclConfigProtocolProtoAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { vclConfigProtocolProtoEntry 100 }
+
+vclConfigProtocolProtoRowEditor OBJECT IDENTIFIER
+    ::= { vclConfigProtocolProto 2 }
+
+vclConfigProtocolProtoRowEditorProtocolEncapsulation OBJECT-TYPE
+    SYNTAX      VclProtoEncap
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The protocol encapsulation of the Protocol to Group mapping."
+    ::= { vclConfigProtocolProtoRowEditor 1 }
+
+vclConfigProtocolProtoRowEditorProtocolGroupName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is a name identifying the protocol group."
+    ::= { vclConfigProtocolProtoRowEditor 2 }
+
+vclConfigProtocolProtoRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { vclConfigProtocolProtoRowEditor 100 }
+
+vclConfigProtocolGroup OBJECT IDENTIFIER
+    ::= { vclConfigProtocol 2 }
+
+vclConfigProtocolGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VclConfigProtocolGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the Protocol Group to VLAN ID configuration table."
+    ::= { vclConfigProtocolGroup 1 }
+
+vclConfigProtocolGroupEntry OBJECT-TYPE
+    SYNTAX      VclConfigProtocolGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents a Protocol Group to VLAN ID
+         mapping.
+         
+         "
+    INDEX       { vclConfigProtocolGroupProtocolGroupName }
+    ::= { vclConfigProtocolGroupTable 1 }
+
+VclConfigProtocolGroupEntry ::= SEQUENCE {
+    vclConfigProtocolGroupProtocolGroupName  DisplayString,
+    vclConfigProtocolGroupVlanId             Integer32,
+    vclConfigProtocolGroupPortList           PortList,
+    vclConfigProtocolGroupAction             RowEditorState
+}
+
+vclConfigProtocolGroupProtocolGroupName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a name identifying the protocol group."
+    ::= { vclConfigProtocolGroupEntry 1 }
+
+vclConfigProtocolGroupVlanId OBJECT-TYPE
+    SYNTAX      Integer32 (1..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vlan id of the mapping."
+    ::= { vclConfigProtocolGroupEntry 2 }
+
+vclConfigProtocolGroupPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "List of stack/switch ports on which this entry is active."
+    ::= { vclConfigProtocolGroupEntry 3 }
+
+vclConfigProtocolGroupAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { vclConfigProtocolGroupEntry 100 }
+
+vclConfigProtocolGroupRowEditor OBJECT IDENTIFIER
+    ::= { vclConfigProtocolGroup 2 }
+
+vclConfigProtocolGroupRowEditorProtocolGroupName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is a name identifying the protocol group."
+    ::= { vclConfigProtocolGroupRowEditor 1 }
+
+vclConfigProtocolGroupRowEditorVlanId OBJECT-TYPE
+    SYNTAX      Integer32 (1..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Vlan id of the mapping."
+    ::= { vclConfigProtocolGroupRowEditor 2 }
+
+vclConfigProtocolGroupRowEditorPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "List of stack/switch ports on which this entry is active."
+    ::= { vclConfigProtocolGroupRowEditor 3 }
+
+vclConfigProtocolGroupRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { vclConfigProtocolGroupRowEditor 100 }
+
+vclMibConformance OBJECT IDENTIFIER
+    ::= { vclMib 2 }
+
+vclMibCompliances OBJECT IDENTIFIER
+    ::= { vclMibConformance 1 }
+
+vclMibGroups OBJECT IDENTIFIER
+    ::= { vclMibConformance 2 }
+
+vclConfigMacTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vclConfigMacVlanId, vclConfigMacPortList,
+                  vclConfigMacAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vclMibGroups 1 }
+
+vclConfigMacRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { vclConfigMacRowEditorMacAddress,
+                  vclConfigMacRowEditorVlanId,
+                  vclConfigMacRowEditorPortList,
+                  vclConfigMacRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vclMibGroups 2 }
+
+vclConfigIpTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vclConfigIpVlanId, vclConfigIpPortList,
+                  vclConfigIpAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vclMibGroups 3 }
+
+vclConfigIpRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { vclConfigIpRowEditorIpSubnetAddress,
+                  vclConfigIpRowEditorIpSubnetMaskLength,
+                  vclConfigIpRowEditorVlanId,
+                  vclConfigIpRowEditorPortList,
+                  vclConfigIpRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vclMibGroups 4 }
+
+vclConfigProtocolProtoTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vclConfigProtocolProtoProtocolGroupName,
+                  vclConfigProtocolProtoAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vclMibGroups 5 }
+
+vclConfigProtocolProtoRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     {                   vclConfigProtocolProtoRowEditorProtocolEncapsulation,
+                  vclConfigProtocolProtoRowEditorProtocolGroupName,
+                  vclConfigProtocolProtoRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vclMibGroups 6 }
+
+vclConfigProtocolGroupTableInfoGroup OBJECT-GROUP
+    OBJECTS     { vclConfigProtocolGroupVlanId,
+                  vclConfigProtocolGroupPortList,
+                  vclConfigProtocolGroupAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vclMibGroups 7 }
+
+vclConfigProtocolGroupRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     {                   vclConfigProtocolGroupRowEditorProtocolGroupName,
+                  vclConfigProtocolGroupRowEditorVlanId,
+                  vclConfigProtocolGroupRowEditorPortList,
+                  vclConfigProtocolGroupRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { vclMibGroups 8 }
+
+vclMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { vclConfigMacTableInfoGroup,
+                       vclConfigMacRowEditorInfoGroup,
+                       vclConfigIpTableInfoGroup,
+                       vclConfigIpRowEditorInfoGroup,
+                       vclConfigProtocolProtoTableInfoGroup,
+                       vclConfigProtocolProtoRowEditorInfoGroup,
+                       vclConfigProtocolGroupTableInfoGroup,
+                       vclConfigProtocolGroupRowEditorInfoGroup }
+
+    ::= { vclMibCompliances 1 }
+
+END

@@ -1,0 +1,100 @@
+-- *****************************************************************
+-- MIB-POE: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-POE DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    switchMgmt FROM BTS-SMI
+    Integer32 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    ;
+    
+poeMib					OBJECT IDENTIFIER ::= { switchMgmt 9 } 
+
+
+
+-- POE Ports Configuration Table
+poePortsConfigTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF poePortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A list of PoE port table entries."
+    ::= { poeMib 2 }
+     
+poePortConfigEntry OBJECT-TYPE
+    SYNTAX  poePortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "POE port configuration table entry."
+    INDEX   { pIdx }
+    ::= { poePortsConfigTable 1 }
+
+poePortConfigEntry ::= SEQUENCE {
+    pIdx
+        INTEGER,
+    pName
+        DisplayString (SIZE (0..32)),
+    pMode
+        INTEGER { disable(0), standard(1), plus(2), plusplus(3), force(4), manual(5) },
+    pPriority
+        INTEGER { low(0), high(1), critical(2) },
+    pMaxPower
+        INTEGER (0..120000),
+    pPowerUpDelay
+        INTEGER (0..100)
+}
+    
+pIdx OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A unique value for each PoE port."
+    ::= { poePortConfigEntry 1 }
+        
+pName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Physical port name."
+    ::= { poePortConfigEntry 2 }
+    
+pMode OBJECT-TYPE
+    SYNTAX  INTEGER { disable(0), standard(1), plus(2), plusplus(3), force(4), manual(5) }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "PoE port mode."
+    ::= { poePortConfigEntry 3 }
+
+pPriority OBJECT-TYPE
+    SYNTAX  INTEGER { low(0), high(1), critical(2) }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "PoE port priority. When the maximum budget of the 'Power Supply Budget' is exceeded, the ports supplying voltage are turned off according to those set priorities."
+    ::= { poePortConfigEntry 4 }
+
+pMaxPower OBJECT-TYPE
+    SYNTAX  INTEGER (0..120000)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "PoE port power limit [mW]."
+    ::= { poePortConfigEntry 5 }
+
+pPowerUpDelay OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Delay time starting the port after device or previous port startup"
+    ::= { poePortConfigEntry 6 }
+    
+END

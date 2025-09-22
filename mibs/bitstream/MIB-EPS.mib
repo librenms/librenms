@@ -1,0 +1,685 @@
+-- *****************************************************************
+-- MIB-EPS: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-EPS DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Integer32 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    InterfaceIndex FROM BTS-TC
+    RowEditorState FROM BTS-TC
+    ;
+
+epsMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private Linear EPS (G.8031) MIB"
+    REVISION    "201411050000Z"
+    DESCRIPTION
+        "Remove the appl_eps_domain_t type and the domain from
+         appl_eps_create_param_t"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 45 }
+
+
+EpsArchitecture ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The EPS protection architecture."
+    SYNTAX      INTEGER { onePlusOne(0), oneForOne(1) }
+
+EpsCommand ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "protection group command."
+    SYNTAX      INTEGER { none(0), clear(1), lockOut(2),
+                          forcedSwitch(3), manualSwitchProtection(4),
+                          manualSwitchWorking(5), exercise(6),
+                          localFreeze(7), localLockOut(8) }
+
+EpsDefectState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Flow defect state."
+    SYNTAX      INTEGER { ok(0), sd(1), sf(2) }
+
+EpsDirectional ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The EPS 1+1 directional."
+    SYNTAX      INTEGER { uniDirectional(0), biDirectional(1) }
+
+EpsProtectionState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "protection group state."
+    SYNTAX      INTEGER { disabled(0), noRequestWorking(1),
+                          noRequestProtecting(2), lockOut(3),
+                          forcedSwitch(4), signalFailWorking(5),
+                          signalFailProtecting(6),
+                          manualSwitchWorking(7),
+                          manualSwitchProtecting(8), waitToRestore(9),
+                          exerciseWorking(10), exerciseProtecting(11),
+                          reverseRequestWorking(12),
+                          reverseRequestProtecting(13),
+                          doNotRevert(14) }
+
+EpsRequest ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "APS request/state."
+    SYNTAX      INTEGER { nr(0), dnr(1), rr(2), exer(3), wtr(4),
+                          msW(5), msP(6), sd(7), sfW(8), fs(9),
+                          sfP(10), lo(11) }
+
+epsMibObjects OBJECT IDENTIFIER
+    ::= { epsMib 1 }
+
+epsCapabilities OBJECT IDENTIFIER
+    ::= { epsMibObjects 1 }
+
+epsCapabilitiesInstanceMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of created EPS instances"
+    ::= { epsCapabilities 1 }
+
+epsCapabilitiesWtrMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum WTR timer value"
+    ::= { epsCapabilities 2 }
+
+epsCapabilitiesHoldOffOff OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Hold Off timer OFF value"
+    ::= { epsCapabilities 3 }
+
+epsCapabilitiesHoldOffMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum Hold Off timer value"
+    ::= { epsCapabilities 4 }
+
+epsCapabilitiesMepMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum MEP relation instance value"
+    ::= { epsCapabilities 5 }
+
+epsCapabilitiesMepInvalid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Invalid MEP indication. This is returned when EPS has no MEP relations"
+    ::= { epsCapabilities 6 }
+
+epsConfig OBJECT IDENTIFIER
+    ::= { epsMibObjects 2 }
+
+epsConfigInstanceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EpsConfigInstanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of created EPS instance parameters."
+    ::= { epsConfig 1 }
+
+epsConfigInstanceEntry OBJECT-TYPE
+    SYNTAX      EpsConfigInstanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a created EPS instance parameters. No parameters can be changed
+         after create."
+    INDEX       { epsConfigInstanceId }
+    ::= { epsConfigInstanceTable 1 }
+
+EpsConfigInstanceEntry ::= SEQUENCE {
+    epsConfigInstanceId              Integer32,
+    epsConfigInstanceArchitecture    EpsArchitecture,
+    epsConfigInstanceWorkingFlow     InterfaceIndex,
+    epsConfigInstanceProtectingFlow  InterfaceIndex,
+    epsConfigInstanceAction          RowEditorState
+}
+
+epsConfigInstanceId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The EPS instance ID"
+    ::= { epsConfigInstanceEntry 1 }
+
+epsConfigInstanceArchitecture OBJECT-TYPE
+    SYNTAX      EpsArchitecture
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The protection architecture. Cannot be changed after creation."
+    ::= { epsConfigInstanceEntry 2 }
+
+epsConfigInstanceWorkingFlow OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The working flow. Cannot be changed after creation."
+    ::= { epsConfigInstanceEntry 3 }
+
+epsConfigInstanceProtectingFlow OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The protecting flow. Cannot be changed after creation."
+    ::= { epsConfigInstanceEntry 4 }
+
+epsConfigInstanceAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { epsConfigInstanceEntry 100 }
+
+epsConfigInstanceRowEditor OBJECT IDENTIFIER
+    ::= { epsConfig 2 }
+
+epsConfigInstanceRowEditorId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The EPS instance ID"
+    ::= { epsConfigInstanceRowEditor 1 }
+
+epsConfigInstanceRowEditorArchitecture OBJECT-TYPE
+    SYNTAX      EpsArchitecture
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The protection architecture. Cannot be changed after creation."
+    ::= { epsConfigInstanceRowEditor 2 }
+
+epsConfigInstanceRowEditorWorkingFlow OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The working flow. Cannot be changed after creation."
+    ::= { epsConfigInstanceRowEditor 3 }
+
+epsConfigInstanceRowEditorProtectingFlow OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The protecting flow. Cannot be changed after creation."
+    ::= { epsConfigInstanceRowEditor 4 }
+
+epsConfigInstanceRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { epsConfigInstanceRowEditor 100 }
+
+epsConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EpsConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of created EPS instance configuration parameters. When
+         an EPS instance is created in the 'InstanceTable', an entry is
+         automatically created here with default value."
+    ::= { epsConfig 3 }
+
+epsConfigEntry OBJECT-TYPE
+    SYNTAX      EpsConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a created EPS instance configuration parameters"
+    INDEX       { epsConfigId }
+    ::= { epsConfigTable 1 }
+
+EpsConfigEntry ::= SEQUENCE {
+    epsConfigId            Integer32,
+    epsConfigDirectional   EpsDirectional,
+    epsConfigApsEnable     TruthValue,
+    epsConfigRevertive     TruthValue,
+    epsConfigRestoreTimer  Unsigned32,
+    epsConfigHoldOffTimer  Unsigned32
+}
+
+epsConfigId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The EPS instance ID"
+    ::= { epsConfigEntry 1 }
+
+epsConfigDirectional OBJECT-TYPE
+    SYNTAX      EpsDirectional
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Protection is uni or bi directional. Only for 1+1."
+    ::= { epsConfigEntry 2 }
+
+epsConfigApsEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "APS can be enabled or disabled. Only for 1+1."
+    ::= { epsConfigEntry 3 }
+
+epsConfigRevertive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Revertive operation can enabled or disabled."
+    ::= { epsConfigEntry 4 }
+
+epsConfigRestoreTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Wait to restore timer in seconds - max. 720 - min. 1."
+    ::= { epsConfigEntry 5 }
+
+epsConfigHoldOffTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Hold off timer in 100 ms - max. 100 - 0 means no hold off"
+    ::= { epsConfigEntry 6 }
+
+epsConfigMepTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EpsConfigMepEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of created EPS instance MEP configuration parameters.
+         When an EPS instance is created in the 'InstanceTable', an entry is
+         automatically created here with default value 100 - meaning no MEP
+         instance related."
+    ::= { epsConfig 4 }
+
+epsConfigMepEntry OBJECT-TYPE
+    SYNTAX      EpsConfigMepEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a created EPS instance MEP configuration parameters."
+    INDEX       { epsConfigMepId }
+    ::= { epsConfigMepTable 1 }
+
+EpsConfigMepEntry ::= SEQUENCE {
+    epsConfigMepId             Integer32,
+    epsConfigMepWorkingMep     Unsigned32,
+    epsConfigMepProtectingMep  Unsigned32,
+    epsConfigMepApsMep         Unsigned32
+}
+
+epsConfigMepId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The EPS instance ID"
+    ::= { epsConfigMepEntry 1 }
+
+epsConfigMepWorkingMep OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Working SF MEP reference - max. 100-1 - min. 0. During get 100 indicate
+         no reference"
+    ::= { epsConfigMepEntry 2 }
+
+epsConfigMepProtectingMep OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Protecting SF MEP reference - max. 100-1 - min. 0. During get 100
+         indicate no reference"
+    ::= { epsConfigMepEntry 3 }
+
+epsConfigMepApsMep OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "APS MEP reference - max. 100-1 - min. 0. During get 100 indicate no
+         reference"
+    ::= { epsConfigMepEntry 4 }
+
+epsConfigCommandTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EpsConfigCommandEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of created EPS instance command. When an EPS instance
+         is created in the 'InstanceTable', an entry is automatically created
+         here with 'no command'."
+    ::= { epsConfig 5 }
+
+epsConfigCommandEntry OBJECT-TYPE
+    SYNTAX      EpsConfigCommandEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a created EPS instance command"
+    INDEX       { epsConfigCommandId }
+    ::= { epsConfigCommandTable 1 }
+
+EpsConfigCommandEntry ::= SEQUENCE {
+    epsConfigCommandId       Integer32,
+    epsConfigCommandCommand  EpsCommand
+}
+
+epsConfigCommandId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The EPS instance ID"
+    ::= { epsConfigCommandEntry 1 }
+
+epsConfigCommandCommand OBJECT-TYPE
+    SYNTAX      EpsCommand
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "protection group command"
+    ::= { epsConfigCommandEntry 2 }
+
+epsStatus OBJECT IDENTIFIER
+    ::= { epsMibObjects 3 }
+
+epsStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EpsStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of created EPS instance status."
+    ::= { epsStatus 1 }
+
+epsStatusEntry OBJECT-TYPE
+    SYNTAX      EpsStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a created EPS instance status."
+    INDEX       { epsStatusId }
+    ::= { epsStatusTable 1 }
+
+EpsStatusEntry ::= SEQUENCE {
+    epsStatusId                      Integer32,
+    epsStatusProtectionState         EpsProtectionState,
+    epsStatusWorkingState            EpsDefectState,
+    epsStatusProtectingState         EpsDefectState,
+    epsStatusTransmittedApsRequest   EpsRequest,
+    epsStatusTransmittedApsReSignal  Unsigned32,
+    epsStatusTransmittedApsBrSignal  Unsigned32,
+    epsStatusReceivedApsRequest      EpsRequest,
+    epsStatusReceivedApsReSignal     Unsigned32,
+    epsStatusReceivedApsBrSignal     Unsigned32,
+    epsStatusDfopPm                  TruthValue,
+    epsStatusDfopCm                  TruthValue,
+    epsStatusDfopNr                  TruthValue,
+    epsStatusDfopNoAps               TruthValue
+}
+
+epsStatusId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The EPS instance ID"
+    ::= { epsStatusEntry 1 }
+
+epsStatusProtectionState OBJECT-TYPE
+    SYNTAX      EpsProtectionState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Protection state according to to G.8031 Annex A"
+    ::= { epsStatusEntry 2 }
+
+epsStatusWorkingState OBJECT-TYPE
+    SYNTAX      EpsDefectState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Working flow defect state"
+    ::= { epsStatusEntry 3 }
+
+epsStatusProtectingState OBJECT-TYPE
+    SYNTAX      EpsDefectState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Protecting flow defect state"
+    ::= { epsStatusEntry 4 }
+
+epsStatusTransmittedApsRequest OBJECT-TYPE
+    SYNTAX      EpsRequest
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted APS request"
+    ::= { epsStatusEntry 5 }
+
+epsStatusTransmittedApsReSignal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted APS requested signal"
+    ::= { epsStatusEntry 6 }
+
+epsStatusTransmittedApsBrSignal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted APS bridged signal"
+    ::= { epsStatusEntry 7 }
+
+epsStatusReceivedApsRequest OBJECT-TYPE
+    SYNTAX      EpsRequest
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received APS request"
+    ::= { epsStatusEntry 8 }
+
+epsStatusReceivedApsReSignal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received APS requested signal"
+    ::= { epsStatusEntry 9 }
+
+epsStatusReceivedApsBrSignal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received APS bridged signal"
+    ::= { epsStatusEntry 10 }
+
+epsStatusDfopPm OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "FOP Protection type Mismatch - unexpected B bit"
+    ::= { epsStatusEntry 11 }
+
+epsStatusDfopCm OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "FOP Configuration Mismatch - APS received on working"
+    ::= { epsStatusEntry 12 }
+
+epsStatusDfopNr OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "FOP Not expected Request - receiving request is not the expected
+         (transmitted)"
+    ::= { epsStatusEntry 13 }
+
+epsStatusDfopNoAps OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "FOP No APS received"
+    ::= { epsStatusEntry 14 }
+
+epsControl OBJECT IDENTIFIER
+    ::= { epsMibObjects 4 }
+
+epsMibConformance OBJECT IDENTIFIER
+    ::= { epsMib 2 }
+
+epsMibCompliances OBJECT IDENTIFIER
+    ::= { epsMibConformance 1 }
+
+epsMibGroups OBJECT IDENTIFIER
+    ::= { epsMibConformance 2 }
+
+epsCapabilitiesInfoGroup OBJECT-GROUP
+    OBJECTS     { epsCapabilitiesInstanceMax,
+                  epsCapabilitiesWtrMax,
+                  epsCapabilitiesHoldOffOff,
+                  epsCapabilitiesHoldOffMax,
+                  epsCapabilitiesMepMax,
+                  epsCapabilitiesMepInvalid }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { epsMibGroups 1 }
+
+epsConfigInstanceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { epsConfigInstanceArchitecture,
+                  epsConfigInstanceWorkingFlow,
+                  epsConfigInstanceProtectingFlow,
+                  epsConfigInstanceAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { epsMibGroups 2 }
+
+epsConfigInstanceRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { epsConfigInstanceRowEditorId,
+                  epsConfigInstanceRowEditorArchitecture,
+                  epsConfigInstanceRowEditorWorkingFlow,
+                  epsConfigInstanceRowEditorProtectingFlow,
+                  epsConfigInstanceRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { epsMibGroups 3 }
+
+epsConfigTableInfoGroup OBJECT-GROUP
+    OBJECTS     { epsConfigDirectional, epsConfigApsEnable,
+                  epsConfigRevertive, epsConfigRestoreTimer,
+                  epsConfigHoldOffTimer }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { epsMibGroups 4 }
+
+epsConfigMepTableInfoGroup OBJECT-GROUP
+    OBJECTS     { epsConfigMepWorkingMep,
+                  epsConfigMepProtectingMep,
+                  epsConfigMepApsMep }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { epsMibGroups 5 }
+
+epsConfigCommandTableInfoGroup OBJECT-GROUP
+    OBJECTS     { epsConfigCommandCommand }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { epsMibGroups 6 }
+
+epsStatusTableInfoGroup OBJECT-GROUP
+    OBJECTS     { epsStatusProtectionState,
+                  epsStatusWorkingState,
+                  epsStatusProtectingState,
+                  epsStatusTransmittedApsRequest,
+                  epsStatusTransmittedApsReSignal,
+                  epsStatusTransmittedApsBrSignal,
+                  epsStatusReceivedApsRequest,
+                  epsStatusReceivedApsReSignal,
+                  epsStatusReceivedApsBrSignal,
+                  epsStatusDfopPm, epsStatusDfopCm,
+                  epsStatusDfopNr, epsStatusDfopNoAps }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { epsMibGroups 7 }
+
+epsMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { epsCapabilitiesInfoGroup,
+                       epsConfigInstanceTableInfoGroup,
+                       epsConfigInstanceRowEditorInfoGroup,
+                       epsConfigTableInfoGroup,
+                       epsConfigMepTableInfoGroup,
+                       epsConfigCommandTableInfoGroup,
+                       epsStatusTableInfoGroup }
+
+    ::= { epsMibCompliances 1 }
+
+END

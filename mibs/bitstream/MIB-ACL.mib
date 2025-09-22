@@ -1,0 +1,2851 @@
+-- *****************************************************************
+-- ACL-MIB: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-ACL DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    InetAddressIPv6 FROM INET-ADDRESS-MIB
+    Integer32 FROM SNMPv2-SMI
+    IpAddress FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    MacAddress FROM SNMPv2-TC
+    TruthValue FROM SNMPv2-TC
+    ASRType FROM BTS-TC
+    ASType FROM BTS-TC
+    AdvDestMacType FROM BTS-TC
+    BitType FROM BTS-TC
+    DisplayString FROM BTS-TC
+    InterfaceIndex FROM BTS-TC
+    PortList FROM BTS-TC
+    RowEditorState FROM BTS-TC
+    Unsigned16 FROM BTS-TC
+    Unsigned8 FROM BTS-TC
+    VlanTagPriority FROM BTS-TC
+    ;
+
+aclMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of ACL"
+    REVISION    "201501120000Z"
+    DESCRIPTION
+        "Add ACE parameters for stacking device"
+    REVISION    "201411130000Z"
+    DESCRIPTION
+        "Add ACE Ingress parameters"
+    REVISION    "201408050000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 17 }
+
+
+AclAceArpOp ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "ARP opcode."
+    SYNTAX      INTEGER { any(0), arp(1), rarp(2), other(3) }
+
+AclAceFrameType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The frame type of the ACE."
+    SYNTAX      INTEGER { any(0), etype(1), arp(4), ipv4(5), ipv6(6) }
+
+AclAceIngressPortListMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The ingress port list mode of the ACE."
+    SYNTAX      INTEGER { any(0), specific(1), switch(2),
+                          switchport(3) }
+
+AclAceVlanTagged ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "VLAN tagged/untagged."
+    SYNTAX      INTEGER { any(0), untagged(1), tagged(2) }
+
+AclHitAction ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The hit action."
+    SYNTAX      INTEGER { permit(0), deny(1), redirect(2), egress(3) }
+
+aclMibObjects OBJECT IDENTIFIER
+    ::= { aclMib 1 }
+
+aclCapabilities OBJECT IDENTIFIER
+    ::= { aclMibObjects 1 }
+
+aclCapabilitiesAceIdMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum ID of ACE."
+    ::= { aclCapabilities 1 }
+
+aclCapabilitiesPolicyIdMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum ID of policy."
+    ::= { aclCapabilities 2 }
+
+aclCapabilitiesRateLimiterIdMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum ID of rate limiter."
+    ::= { aclCapabilities 3 }
+
+aclCapabilitiesEvcPolicerIdMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum ID of EVC policer."
+    ::= { aclCapabilities 4 }
+
+aclCapabilitiesRateLimiterBitRateSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the rate limiter can be configured by bit rate."
+    ::= { aclCapabilities 5 }
+
+aclCapabilitiesEvcPolicerSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, EVC policer can be configured."
+    ::= { aclCapabilities 6 }
+
+aclCapabilitiesMirrorSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, mirror action is supported."
+    ::= { aclCapabilities 7 }
+
+aclCapabilitiesMultipleRedirectPortsSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, redirect port list can be configured with multiple ports. If
+         false, redirect port list can be configured with only one single port."
+    ::= { aclCapabilities 8 }
+
+aclCapabilitiesSecondLookupSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, second lookup can be configured."
+    ::= { aclCapabilities 9 }
+
+aclCapabilitiesMultipleIngressPortsSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, ingress port list can be configured with multiple ports. If
+         false, ingress port list can be configured with only one single port."
+    ::= { aclCapabilities 10 }
+
+aclCapabilitiesEgressPortSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, egress port list can be configured."
+    ::= { aclCapabilities 11 }
+
+aclCapabilitiesVlanTaggedSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, VLAN tagged can be configured."
+    ::= { aclCapabilities 12 }
+
+aclCapabilitiesStackableAceSupported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, stackable ACE is supported. The 'switch' and 'switchport' ACE
+         ingress type can be configured. Otherwize, only 'any' and 'specific'
+         ACE ingress type can be configured."
+    ::= { aclCapabilities 13 }
+
+aclConfig OBJECT IDENTIFIER
+    ::= { aclMibObjects 2 }
+
+aclConfigInterface OBJECT IDENTIFIER
+    ::= { aclConfig 2 }
+
+aclConfigInterfaceConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AclConfigInterfaceConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of interface configuration"
+    ::= { aclConfigInterface 1 }
+
+aclConfigInterfaceConfigEntry OBJECT-TYPE
+    SYNTAX      AclConfigInterfaceConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each interface has a set of parameters"
+    INDEX       { aclConfigInterfaceConfigIfIndex }
+    ::= { aclConfigInterfaceConfigTable 1 }
+
+AclConfigInterfaceConfigEntry ::= SEQUENCE {
+    aclConfigInterfaceConfigIfIndex           InterfaceIndex,
+    aclConfigInterfaceConfigPolicyId          Unsigned32,
+    aclConfigInterfaceConfigHitAction         AclHitAction,
+    aclConfigInterfaceConfigRedirectPortList  PortList,
+    aclConfigInterfaceConfigRateLimiterId     Unsigned32,
+    aclConfigInterfaceConfigEvcPolicerId      Unsigned16,
+    aclConfigInterfaceConfigMirror            TruthValue,
+    aclConfigInterfaceConfigLogging           TruthValue,
+    aclConfigInterfaceConfigShutdown          TruthValue
+}
+
+aclConfigInterfaceConfigIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index of logical interface."
+    ::= { aclConfigInterfaceConfigEntry 1 }
+
+aclConfigInterfaceConfigPolicyId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The policy ID."
+    ::= { aclConfigInterfaceConfigEntry 2 }
+
+aclConfigInterfaceConfigHitAction OBJECT-TYPE
+    SYNTAX      AclHitAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The hit action operation for this interface. egress(2) is not
+         supported."
+    ::= { aclConfigInterfaceConfigEntry 101 }
+
+aclConfigInterfaceConfigRedirectPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The redirect port list for this interface."
+    ::= { aclConfigInterfaceConfigEntry 102 }
+
+aclConfigInterfaceConfigRateLimiterId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The rate limiter ID. 0 means to be disabled."
+    ::= { aclConfigInterfaceConfigEntry 103 }
+
+aclConfigInterfaceConfigEvcPolicerId OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The EVC policer ID. 0 means to be disabled.
+         
+         This object is only available if the capability object
+         'aclCapabilitiesEvcPolicerSupported' is True."
+    ::= { aclConfigInterfaceConfigEntry 104 }
+
+aclConfigInterfaceConfigMirror OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The mirror operation. Frames matching this interface rule are mirrored
+         to the destination mirror port that is configured in the mirror
+         modules.
+         
+         This object is only available if the capability object
+         'aclCapabilitiesMirrorSupported' is True."
+    ::= { aclConfigInterfaceConfigEntry 105 }
+
+aclConfigInterfaceConfigLogging OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specify the logging operation of the interface. Notice that the logging
+         message doesn't include the 4 bytes CRC information. The allowed values
+         are: True - Frames matching the ACE are stored in the System Log. False
+         - Frames matching the ACE are not logged. Note: The logging feature
+         only works when the packet length is less than 1518(without VLAN tags)
+         and the System Log memory size and logging rate is limited."
+    ::= { aclConfigInterfaceConfigEntry 106 }
+
+aclConfigInterfaceConfigShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specify the port shut down operation of the interface. The allowed
+         values are: True - If a frame matches the interface rule, the ingress
+         port will be disabled. False - Port shut down is disabled for the
+         interface. Note: The shutdown feature only works when the packet length
+         is less than 1518(without VLAN tags)."
+    ::= { aclConfigInterfaceConfigEntry 107 }
+
+aclConfigRateLimiterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AclConfigRateLimiterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of rate limiter configuration"
+    ::= { aclConfig 3 }
+
+aclConfigRateLimiterEntry OBJECT-TYPE
+    SYNTAX      AclConfigRateLimiterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each rate limiter has a set of parameters"
+    INDEX       { aclConfigRateLimiterRateLimiterId }
+    ::= { aclConfigRateLimiterTable 1 }
+
+AclConfigRateLimiterEntry ::= SEQUENCE {
+    aclConfigRateLimiterRateLimiterId  Integer32,
+    aclConfigRateLimiterBitRateEnable  TruthValue,
+    aclConfigRateLimiterBitRate        Unsigned32,
+    aclConfigRateLimiterPacketRate     Unsigned32
+}
+
+aclConfigRateLimiterRateLimiterId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The rate limter ID."
+    ::= { aclConfigRateLimiterEntry 1 }
+
+aclConfigRateLimiterBitRateEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Use bit rate policing instead of packet rate. True means bit rate is
+         used and false means packet rate is used.
+         
+         This object is only available if the capability object
+         'aclCapabilitiesRateLimiterBitRateSupported' is True."
+    ::= { aclConfigRateLimiterEntry 2 }
+
+aclConfigRateLimiterBitRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Bit rate in kbps.
+         
+         This object is only available if the capability object
+         'aclCapabilitiesRateLimiterBitRateSupported' is True."
+    ::= { aclConfigRateLimiterEntry 3 }
+
+aclConfigRateLimiterPacketRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Packet rate in pps."
+    ::= { aclConfigRateLimiterEntry 4 }
+
+aclConfigAce OBJECT IDENTIFIER
+    ::= { aclConfig 4 }
+
+aclConfigAceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AclConfigAceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ACL ACE configuration table."
+    ::= { aclConfigAce 1 }
+
+aclConfigAceEntry OBJECT-TYPE
+    SYNTAX      AclConfigAceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains a set of parameters."
+    INDEX       { aclConfigAceAceId }
+    ::= { aclConfigAceTable 1 }
+
+AclConfigAceEntry ::= SEQUENCE {
+    aclConfigAceAceId                       Integer32,
+    aclConfigAceNextAceId                   Unsigned32,
+    aclConfigAceHitAction                   AclHitAction,
+    aclConfigAceRedirectPortList            PortList,
+    aclConfigAceRedirectPortListSwitchPort  Unsigned32,
+    aclConfigAceEgressPortList              PortList,
+    aclConfigAceRateLimiterId               Unsigned32,
+    aclConfigAceEvcPolicerId                Unsigned16,
+    aclConfigAceMirror                      TruthValue,
+    aclConfigAceLogging                     TruthValue,
+    aclConfigAceShutdown                    TruthValue,
+    aclConfigAceIngressPortListMode         AclAceIngressPortListMode,
+    aclConfigAceIngressPortList             PortList,
+    aclConfigAceIngressPortListSwitch       Unsigned32,
+    aclConfigAceIngressPortListSwitchPort   Unsigned32,
+    aclConfigAcePolicyValue                 Unsigned8,
+    aclConfigAcePolicyMask                  Unsigned8,
+    aclConfigAceSecondLookup                TruthValue,
+    aclConfigAceVlanId                      Unsigned16,
+    aclConfigAceVlanTagPriority             VlanTagPriority,
+    aclConfigAceVlanTagged                  AclAceVlanTagged,
+    aclConfigAceFrameType                   AclAceFrameType,
+    aclConfigAceDestMacOp                   AdvDestMacType,
+    aclConfigAceEtherSrcMacOp               ASType,
+    aclConfigAceEtherSrcMac                 MacAddress,
+    aclConfigAceEtherDestMac                MacAddress,
+    aclConfigAceEtherType                   Unsigned16,
+    aclConfigAceArpSrcMacOp                 ASType,
+    aclConfigAceArpSrcMac                   MacAddress,
+    aclConfigAceArpSenderIp                 IpAddress,
+    aclConfigAceArpSenderIpMask             IpAddress,
+    aclConfigAceArpTargetIp                 IpAddress,
+    aclConfigAceArpTargetIpMask             IpAddress,
+    aclConfigAceArpOpcode                   AclAceArpOp,
+    aclConfigAceArpFlagReq                  BitType,
+    aclConfigAceArpFlagSha                  BitType,
+    aclConfigAceArpFlagTha                  BitType,
+    aclConfigAceArpFlagHln                  BitType,
+    aclConfigAceArpFlagHrd                  BitType,
+    aclConfigAceArpFlagPro                  BitType,
+    aclConfigAceIpv4ProtocolOp              ASType,
+    aclConfigAceIpv4Protocol                Unsigned8,
+    aclConfigAceIpv4SrcIp                   IpAddress,
+    aclConfigAceIpv4SrcIpMask               IpAddress,
+    aclConfigAceIpv4DestIp                  IpAddress,
+    aclConfigAceIpv4DestIpMask              IpAddress,
+    aclConfigAceIpv4IcmpTypeOp              ASType,
+    aclConfigAceIpv4IcmpType                Unsigned8,
+    aclConfigAceIpv4IcmpCodeOp              ASType,
+    aclConfigAceIpv4IcmpCode                Unsigned8,
+    aclConfigAceIpv4SrcPortOp               ASRType,
+    aclConfigAceIpv4SrcPort                 Unsigned16,
+    aclConfigAceIpv4SrcPortRange            Unsigned16,
+    aclConfigAceIpv4DestPortOp              ASRType,
+    aclConfigAceIpv4DestPort                Unsigned16,
+    aclConfigAceIpv4DestPortRange           Unsigned16,
+    aclConfigAceIpv4FlagTtl                 BitType,
+    aclConfigAceIpv4FlagFragment            BitType,
+    aclConfigAceIpv4FlagIpOption            BitType,
+    aclConfigAceIpv4TcpFlagFin              BitType,
+    aclConfigAceIpv4TcpFlagSyn              BitType,
+    aclConfigAceIpv4TcpFlagRst              BitType,
+    aclConfigAceIpv4TcpFlagPsh              BitType,
+    aclConfigAceIpv4TcpFlagAck              BitType,
+    aclConfigAceIpv4TcpFlagUrg              BitType,
+    aclConfigAceIpv6NextHeaderOp            ASType,
+    aclConfigAceIpv6NextHeader              Unsigned8,
+    aclConfigAceIpv6Icmpv6TypeOp            ASType,
+    aclConfigAceIpv6Icmpv6Type              Unsigned8,
+    aclConfigAceIpv6Icmpv6CodeOp            ASType,
+    aclConfigAceIpv6Icmpv6Code              Unsigned8,
+    aclConfigAceIpv6SrcIp                   InetAddressIPv6,
+    aclConfigAceIpv6SrcIpMask               InetAddressIPv6,
+    aclConfigAceIpv6SrcPortOp               ASRType,
+    aclConfigAceIpv6SrcPort                 Unsigned16,
+    aclConfigAceIpv6SrcPortRange            Unsigned16,
+    aclConfigAceIpv6DestPortOp              ASRType,
+    aclConfigAceIpv6DestPort                Unsigned16,
+    aclConfigAceIpv6DestPortRange           Unsigned16,
+    aclConfigAceIpv6FlagTtl                 BitType,
+    aclConfigAceIpv6TcpFlagFin              BitType,
+    aclConfigAceIpv6TcpFlagSyn              BitType,
+    aclConfigAceIpv6TcpFlagRst              BitType,
+    aclConfigAceIpv6TcpFlagPsh              BitType,
+    aclConfigAceIpv6TcpFlagAck              BitType,
+    aclConfigAceIpv6TcpFlagUrg              BitType,
+    aclConfigAceAction                      RowEditorState
+}
+
+aclConfigAceAceId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ACE ID."
+    ::= { aclConfigAceEntry 1 }
+
+aclConfigAceNextAceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ID of ACE next to this ACE."
+    ::= { aclConfigAceEntry 2 }
+
+aclConfigAceHitAction OBJECT-TYPE
+    SYNTAX      AclHitAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The hit action operation for this ACE."
+    ::= { aclConfigAceEntry 101 }
+
+aclConfigAceRedirectPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The redirect port list for this ACE."
+    ::= { aclConfigAceEntry 102 }
+
+aclConfigAceRedirectPortListSwitchPort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The redirect switch port for this ACE. The object is only abaliable if
+         AclAceIngressPortListMode is switchport. And it is used when this ACE
+         is applied on specific switch port of all switches in stackable
+         devices.
+         
+         This object is only available if the capability object
+         'aclCapabilitiesStackableAceSupported' is True."
+    ::= { aclConfigAceEntry 103 }
+
+aclConfigAceEgressPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The egress port list. The port list is to define what ports are allowed
+         to be egress ports. If the egress port of an incoming frame is in the
+         port list then the frame will be forwared to that port. Otherwise, if
+         the egress port is not in the port list then the egress port is not
+         allowed and the incoming frame will be dropped.
+         
+         This object is only available if the capability object
+         'aclCapabilitiesEgressPortSupported' is True."
+    ::= { aclConfigAceEntry 104 }
+
+aclConfigAceRateLimiterId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The rate limiter ID. 0 means to be disabled."
+    ::= { aclConfigAceEntry 105 }
+
+aclConfigAceEvcPolicerId OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The EVC policer ID. 0 means to be disabled.
+         
+         This object is only available if the capability object
+         'aclCapabilitiesEvcPolicerSupported' is True."
+    ::= { aclConfigAceEntry 106 }
+
+aclConfigAceMirror OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The mirror operation. Frames matching this ACE are mirrored to the
+         destination mirror port that is configured in the mirror module.
+         
+         This object is only available if the capability object
+         'aclCapabilitiesMirrorSupported' is True."
+    ::= { aclConfigAceEntry 107 }
+
+aclConfigAceLogging OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specify the logging operation of the ACE. Notice that the logging
+         message doesn't include the 4 bytes CRC information. The allowed values
+         are: True - Frames matching the ACE are stored in the System Log. False
+         - Frames matching the ACE are not logged. Note: The logging feature
+         only works when the packet length is less than 1518(without VLAN tags)
+         and the system log memory size and logging rate is limited."
+    ::= { aclConfigAceEntry 108 }
+
+aclConfigAceShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specify the port shut down operation of the ACE. The allowed values
+         are: True: If a frame matches the ACE, the ingress port will be shuted
+         down. False: Port shut down is disabled for the ACE. Note: The shutdown
+         feature only works when the packet length is less than 1518(without
+         VLAN tags)."
+    ::= { aclConfigAceEntry 109 }
+
+aclConfigAceIngressPortListMode OBJECT-TYPE
+    SYNTAX      AclAceIngressPortListMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ingress port list mode for this ACE. The possible mode are: 'any':
+         Indicates this ACE is applied on all switches and all ports.
+         'specific': Indicates this ACE is applied on specific switch and
+         specific ports. 'switch': Indicates this ACE is applied on all ports of
+         specific switch in stackable devices. 'switchport': Indicates this ACE
+         is applied on specific switch port of all switches in stackable
+         devices."
+    ::= { aclConfigAceEntry 201 }
+
+aclConfigAceIngressPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ingress port list for this ACE. The object is only abaliable if
+         AclAceIngressPortListMode is specific. And it is used when this ACE is
+         applied on specific switch and specific ports."
+    ::= { aclConfigAceEntry 202 }
+
+aclConfigAceIngressPortListSwitch OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ingress switch ID for this ACE. The object is only abaliable if
+         AclAceIngressPortListMode is switch. And it is used when this ACE is
+         applied on specific switch port of all switches in stackable devices.
+         
+         This object is only available if the capability object
+         'aclCapabilitiesStackableAceSupported' is True."
+    ::= { aclConfigAceEntry 203 }
+
+aclConfigAceIngressPortListSwitchPort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ingress switch port for this ACE. The object is only abaliable if
+         AclAceIngressPortListMode is switchport. And it is used when this ACE
+         is applied on specific switch port of all switches in stackable
+         devices.
+         
+         This object is only available if the capability object
+         'aclCapabilitiesStackableAceSupported' is True."
+    ::= { aclConfigAceEntry 204 }
+
+aclConfigAcePolicyValue OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The policy number for this ACE."
+    ::= { aclConfigAceEntry 205 }
+
+aclConfigAcePolicyMask OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The policy mask for this ACE. The allowed range is 0x0 to 0xff. If the
+         binary bit value is '0', it means this bit is don't-care. The real
+         matched pattern is [policy_value & policy_bitmask]. For example, if the
+         policy value is 3 and the policy bitmask is 0x10(bit 0 is don't-care
+         bit), then policy 2 and 3 are applied to this rule."
+    ::= { aclConfigAceEntry 206 }
+
+aclConfigAceSecondLookup OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The second lookup operation for this ACE.
+         
+         This object is only available if the capability object
+         'aclCapabilitiesSecondLookupSupported' is True."
+    ::= { aclConfigAceEntry 207 }
+
+aclConfigAceVlanId OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The VLAN ID for this ACE. Possible values are: 0(disabled), 1-4095."
+    ::= { aclConfigAceEntry 301 }
+
+aclConfigAceVlanTagPriority OBJECT-TYPE
+    SYNTAX      VlanTagPriority
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The VLAN tag priority for this ACE."
+    ::= { aclConfigAceEntry 302 }
+
+aclConfigAceVlanTagged OBJECT-TYPE
+    SYNTAX      AclAceVlanTagged
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The 802.1Q VLAN tagged for this ACE.
+         
+         This object is only available if the capability object
+         'aclCapabilitiesVlanTaggedSupported' is True."
+    ::= { aclConfigAceEntry 303 }
+
+aclConfigAceFrameType OBJECT-TYPE
+    SYNTAX      AclAceFrameType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The frame type for this ACE."
+    ::= { aclConfigAceEntry 401 }
+
+aclConfigAceDestMacOp OBJECT-TYPE
+    SYNTAX      AdvDestMacType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a packet's destination MAC address to be matched."
+    ::= { aclConfigAceEntry 402 }
+
+aclConfigAceEtherSrcMacOp OBJECT-TYPE
+    SYNTAX      ASType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a Ethernet type packet's source MAC address to be
+         matched. This object is only available if FrameType is ether(1)."
+    ::= { aclConfigAceEntry 501 }
+
+aclConfigAceEtherSrcMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the 48 bits source MAC address. This object is only available
+         if FrameType is ether(1) and EtherSrcMacOp is specific(1)."
+    ::= { aclConfigAceEntry 502 }
+
+aclConfigAceEtherDestMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the 48 bits destination MAC address. This object is only
+         available if FrameType is ether(1) and EtherDestMacOp is specific(1)."
+    ::= { aclConfigAceEntry 503 }
+
+aclConfigAceEtherType OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the packet's 16 bit Ethernet type field. Possible values are:
+         0(disabled), 0x600-0xFFFF but excluding 0x800(IPv4), 0x806(ARP) and
+         0x86DD(IPv6). This object is only available if FrameType is ether(1)
+         and EtherDestMacOp is specific(1)."
+    ::= { aclConfigAceEntry 504 }
+
+aclConfigAceArpSrcMacOp OBJECT-TYPE
+    SYNTAX      ASType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a ARP packet's source MAC address to be matched. This
+         object is only available if FrameType is arp(4)."
+    ::= { aclConfigAceEntry 601 }
+
+aclConfigAceArpSrcMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the 48 bits source MAC address. This object is only available
+         if FrameType is arp(4) and ArpSrcMacOp is specific(1)."
+    ::= { aclConfigAceEntry 602 }
+
+aclConfigAceArpSenderIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified ARP sender IP address. The packet's sender address is
+         AND-ed with the value of ArpSenderIpMask and then compared with the
+         value of this object. If ArpSenderIp and ArpSrcIpMask are 0.0.0.0, this
+         entry matches any sender IP address. This object is only available if
+         FrameType is arp(4)."
+    ::= { aclConfigAceEntry 603 }
+
+aclConfigAceArpSenderIpMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified ARP sender IP address mask. This object is only available
+         if FrameType is arp(4)."
+    ::= { aclConfigAceEntry 604 }
+
+aclConfigAceArpTargetIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified ARP target IP address. The packet's target address is
+         AND-ed with the value of ArpTragetIpMask and then compared with the
+         value of this object. If ArpTragetIp and ArpSrcIpMask are 0.0.0.0, this
+         entry matches any target IP address. This object is only available if
+         FrameType is arp(4)."
+    ::= { aclConfigAceEntry 605 }
+
+aclConfigAceArpTargetIpMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified ARP target IP address mask. This object is only available
+         if FrameType is arp(4)."
+    ::= { aclConfigAceEntry 606 }
+
+aclConfigAceArpOpcode OBJECT-TYPE
+    SYNTAX      AclAceArpOp
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a ARP packet's opcode to be matched. This object is only
+         available if FrameType is arp(4)."
+    ::= { aclConfigAceEntry 607 }
+
+aclConfigAceArpFlagReq OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a ARP packet's request/reply opcode is to be compared.
+         This object is only available if FrameType is arp(4)."
+    ::= { aclConfigAceEntry 608 }
+
+aclConfigAceArpFlagSha OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a ARP packet's sender hardware address field (SHA) to be
+         compared. This object is only available if FrameType is arp(4)."
+    ::= { aclConfigAceEntry 609 }
+
+aclConfigAceArpFlagTha OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a ARP packet's target hardware address field (THA) is to
+         be compared. This object is only available if FrameType is arp(4)."
+    ::= { aclConfigAceEntry 610 }
+
+aclConfigAceArpFlagHln OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a ARP packet's s hardware address length field (HLN) is
+         to be compared. The value 0 means any HLN value is allowed (don't-care
+         field), value 1 means HLN is not equal to Ethernet (0x06) or the (PLN)
+         is not equal to IPv4 (0x04) and value 2 means HLN is equal to Ethernet
+         (0x06) or the (PLN) is not equal to IPv4 (0x04). This object is only
+         available if FrameType is arp(4)."
+    ::= { aclConfigAceEntry 611 }
+
+aclConfigAceArpFlagHrd OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a ARP packet's hardware address space field (HRD) is to
+         be compared. The value 0 means any HRD value is allowed (don't-care
+         field), value 1 means HRD is not equal to Ethernet (1) and value 2
+         means HRD is equal to Ethernet (1). This object is only available if
+         FrameType is arp(4)."
+    ::= { aclConfigAceEntry 612 }
+
+aclConfigAceArpFlagPro OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a ARP packet's protocol address space field (PRO) is to
+         be compared. The value 0 means any PRO value is allowed (don't-care
+         field), value 1 means PRO is not equal to IP (0x800) and value 2 means
+         PRO is equal to IP (0x800). This object is only available if FrameType
+         is arp(4)."
+    ::= { aclConfigAceEntry 613 }
+
+aclConfigAceIpv4ProtocolOp OBJECT-TYPE
+    SYNTAX      ASType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv4 packet's protocol field is to be compared. This
+         object is only available if FrameType is ipv4(5)."
+    ::= { aclConfigAceEntry 701 }
+
+aclConfigAceIpv4Protocol OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The protocol number field in the IPv4 header used to indicate a higher
+         layer protocol. Possible values are 0-255. This object is only
+         available if FrameType is ipv4(5) and Ipv4ProtocolOp is specific(1)."
+    ::= { aclConfigAceEntry 702 }
+
+aclConfigAceIpv4SrcIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified source IPv4 address. The packet's sender address is
+         AND-ed with the value of Ipv4SrcIpMask and then compared with the value
+         of this object. If Ipv4SrcIp and Ipv4SrcIpMask are 0.0.0.0, this entry
+         matches any source IP address. This object is only available if
+         FrameType is ipv4(5)."
+    ::= { aclConfigAceEntry 703 }
+
+aclConfigAceIpv4SrcIpMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified source IPv4 address mask. This object is only available
+         if FrameType is ipv4(5)."
+    ::= { aclConfigAceEntry 704 }
+
+aclConfigAceIpv4DestIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified destination IPv4 address. The packet's sender address is
+         AND-ed with the value of Ipv4DestIpMask and then compared with the
+         value of this object. If Ipv4DestIp and Ipv4DestIpMask are 0.0.0.0,
+         this entry matches any destination IP address. This object is only
+         available if FrameType is ipv4(5)."
+    ::= { aclConfigAceEntry 705 }
+
+aclConfigAceIpv4DestIpMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified destination IPv4 address mask. This object is only
+         available if FrameType is ipv4(5)."
+    ::= { aclConfigAceEntry 706 }
+
+aclConfigAceIpv4IcmpTypeOp OBJECT-TYPE
+    SYNTAX      ASType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv4 packet's ICMP type field is to be compared. This
+         object is only available if FrameType is ipv4(5) and Ipv4Protocol is
+         icmp(1)."
+    ::= { aclConfigAceEntry 707 }
+
+aclConfigAceIpv4IcmpType OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ICMP type field in the IPv4 header. Possible values are 0-255. This
+         object is only available if FrameType is ipv4(5), Ipv4Protocol is
+         icmp(1) and Ipv4IcmpTypeOp is specific(1)."
+    ::= { aclConfigAceEntry 708 }
+
+aclConfigAceIpv4IcmpCodeOp OBJECT-TYPE
+    SYNTAX      ASType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv4 packet's ICMP code field is to be compared. This
+         object is only available if FrameType is ipv4(5) and Ipv4Protocol is
+         icmp(1)."
+    ::= { aclConfigAceEntry 709 }
+
+aclConfigAceIpv4IcmpCode OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ICMP code field in the IPv4 header. Possible values are 0-255. This
+         object is only available if FrameType is ipv4(5), Ipv4Protocol is
+         icmp(1) and Ipv4IcmpCodeOp is specific(1)."
+    ::= { aclConfigAceEntry 710 }
+
+aclConfigAceIpv4SrcPortOp OBJECT-TYPE
+    SYNTAX      ASRType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a packet's source TCP/UDP port number is to be compared.
+         This object is only available if FrameType is ipv4(5)."
+    ::= { aclConfigAceEntry 711 }
+
+aclConfigAceIpv4SrcPort OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source port number of the TCP or UDP protocol. If the Ipv4SrcPortOp
+         object is range(2), this object will be the starting port number of the
+         port range. Valid range is 0-65535. This object is only available if
+         FrameType is ipv4(5) and Ipv4SrcPortOp is not any(0)."
+    ::= { aclConfigAceEntry 712 }
+
+aclConfigAceIpv4SrcPortRange OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source port number of the TCP or UDP protocol. If the Ipv4SrcPortOp
+         object is range(2), this object will be the ending port number of the
+         port range. Valid range is 0-65535. This object is only available if
+         FrameType is ipv4(5) and Ipv4SrcPortOp is range(2)."
+    ::= { aclConfigAceEntry 713 }
+
+aclConfigAceIpv4DestPortOp OBJECT-TYPE
+    SYNTAX      ASRType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a packet's destination TCP/UDP port number is to be
+         compared. This object is only available if FrameType is ipv4(5)."
+    ::= { aclConfigAceEntry 714 }
+
+aclConfigAceIpv4DestPort OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The destination port number of the TCP or UDP protocol. If the
+         Ipv4DestPortOp object in the same row is range(2), this object will be
+         the starting port number of the port range. Valid range is 0-65535.
+         This object is only available if FrameType is ipv4(5) and
+         Ipv4DestPortOp is not any(0)."
+    ::= { aclConfigAceEntry 715 }
+
+aclConfigAceIpv4DestPortRange OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The destination port number of the TCP or UDP protocol. If the
+         Ipv4DestPortOp object in the same row is range(2), this object will be
+         the ending port number of the port range. Valid range is 0-65535. This
+         object is only available if FrameType is ipv4(5) and Ipv4DestPortOp is
+         range(2)."
+    ::= { aclConfigAceEntry 716 }
+
+aclConfigAceIpv4FlagTtl OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv4 packet's Time-to-Live field (TTL) is to be
+         compared. The value 0 means any TTL value is allowed (don't-care
+         field), value 1 means TTL is not equal zero and value 2 means TTL is
+         equal to zero. This object is only available if FrameType is ipv4(5)."
+    ::= { aclConfigAceEntry 717 }
+
+aclConfigAceIpv4FlagFragment OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv4 packet's More-Fragments field (MF) is to be
+         compared. The value 0 means any MF value is allowed (don't-care field),
+         value 1 means MF is not equal one (MF field isn't set) and value 2
+         means MF is equal to one (MF field is set). This object is only
+         available if FrameType is ipv4(5)."
+    ::= { aclConfigAceEntry 718 }
+
+aclConfigAceIpv4FlagIpOption OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv4 packet's options field is to be compared. This
+         object is only available if FrameType is ipv4(5)."
+    ::= { aclConfigAceEntry 719 }
+
+aclConfigAceIpv4TcpFlagFin OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how the IPv4 TCP FIN flag is matched. This object is only
+         available if FrameType is ipv4(5) and Ipv4Protocol is tcp(6)."
+    ::= { aclConfigAceEntry 720 }
+
+aclConfigAceIpv4TcpFlagSyn OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how the IPv4 TCP SYN flag is matched. This object is only
+         available if FrameType is ipv4(5) and Ipv4Protocol is tcp(6)."
+    ::= { aclConfigAceEntry 721 }
+
+aclConfigAceIpv4TcpFlagRst OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how the IPv4 TCP RST flag is matched. This object is only
+         available if FrameType is ipv4(5) and Ipv4Protocol is tcp(6)."
+    ::= { aclConfigAceEntry 722 }
+
+aclConfigAceIpv4TcpFlagPsh OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how the IPv4 TCP PSH flag is matched. This object is only
+         available if FrameType is ipv4(5) and Ipv4Protocol is tcp(6)."
+    ::= { aclConfigAceEntry 723 }
+
+aclConfigAceIpv4TcpFlagAck OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how the IPv4 TCP ACK flag is matched. This object is only
+         available if FrameType is ipv4(5) and Ipv4Protocol is tcp(6)."
+    ::= { aclConfigAceEntry 724 }
+
+aclConfigAceIpv4TcpFlagUrg OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how the IPv4 TCP URG flag is matched. This object is only
+         available if FrameType is ipv4(5) and Ipv4Protocol is tcp(6)."
+    ::= { aclConfigAceEntry 725 }
+
+aclConfigAceIpv6NextHeaderOp OBJECT-TYPE
+    SYNTAX      ASType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specify the IPv6 next header filter for this ACE. This object is only
+         available if FrameType is ipv6(6)."
+    ::= { aclConfigAceEntry 801 }
+
+aclConfigAceIpv6NextHeader OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When 'Specific' is selected for the IPv6 next header value, you can
+         enter a specific value. The allowed range is 0 to 255. A frame that
+         hits this ACE matches this IPv6 protocol value. This object is only
+         available if FrameType is ipv6(6) and Ipv6NextHeaderOp is specific(1)."
+    ::= { aclConfigAceEntry 802 }
+
+aclConfigAceIpv6Icmpv6TypeOp OBJECT-TYPE
+    SYNTAX      ASType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv6 packet's ICMPv6 type field is to be compared. This
+         object is only available if FrameType is ipv6(6) and Ipv6NextHeader is
+         icmpv6(58)."
+    ::= { aclConfigAceEntry 803 }
+
+aclConfigAceIpv6Icmpv6Type OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ICMPv6 type field in the IPv6 header. Possible values are 0-255.
+         This object is only available if FrameType is ipv6(6), Ipv6NextHeader
+         is icmpv6(58) and Ipv6Icmpv6TypeOp is specific(1)."
+    ::= { aclConfigAceEntry 804 }
+
+aclConfigAceIpv6Icmpv6CodeOp OBJECT-TYPE
+    SYNTAX      ASType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv6 packet's ICMPv6 code field is to be compared. This
+         object is only available if FrameType is ipv6(6) and Ipv6NextHeader is
+         icmpv6(58)."
+    ::= { aclConfigAceEntry 805 }
+
+aclConfigAceIpv6Icmpv6Code OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ICMP code field in the IPv6 header. Possible values are 0-255. This
+         object is only available if FrameType is ipv6(6), Ipv6NextHeader is
+         icmpv6(58) and Ipv6Icmpv6CodeOp is specific(1)."
+    ::= { aclConfigAceEntry 806 }
+
+aclConfigAceIpv6SrcIp OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified source IPv6 address. The packet's sender address is
+         AND-ed with the value of Ipv6SrcIpMask and then compared with the value
+         of this object. If Ipv6SrcIp and Ipv4SrcIpMask are 0::, this entry
+         matches any source IP address. This object is only available if
+         FrameType is ipv6(6)."
+    ::= { aclConfigAceEntry 807 }
+
+aclConfigAceIpv6SrcIpMask OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified source IPv6 address mask. This object is only available
+         if FrameType is ipv6(6)."
+    ::= { aclConfigAceEntry 808 }
+
+aclConfigAceIpv6SrcPortOp OBJECT-TYPE
+    SYNTAX      ASRType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a packet's source TCP/UDP port number is to be compared.
+         This object is only available if FrameType is ipv6(6)."
+    ::= { aclConfigAceEntry 809 }
+
+aclConfigAceIpv6SrcPort OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source port number of the TCP or UDP protocol. If the Ipv6SrcPortOp
+         object in the same row is range(2), this object will be the starting
+         port number of the port range. Valid range is 0-65535. This object is
+         only available if FrameType is ipv6(6) and Ipv6SrcPortOp is not any(0)."
+    ::= { aclConfigAceEntry 810 }
+
+aclConfigAceIpv6SrcPortRange OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source port number of the TCP or UDP protocol. If the Ipv6SrcPortOp
+         object in the same row is range(2), this object will be the ending port
+         number of the port range. Valid range is 0-65535. This object is only
+         available if FrameType is ipv6(6) and Ipv6SrcPortOp is range(2)."
+    ::= { aclConfigAceEntry 811 }
+
+aclConfigAceIpv6DestPortOp OBJECT-TYPE
+    SYNTAX      ASRType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a packet's destination TCP/UDP port number is to be
+         compared. This object is only available if FrameType is ipv6(6)."
+    ::= { aclConfigAceEntry 812 }
+
+aclConfigAceIpv6DestPort OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The destination port number of the TCP or UDP protocol. If the
+         Ipv6DestPortOp object in the same row is range(2), this object will be
+         the starting port number of the port range. Valid range is 0-65535.
+         This object is only available if FrameType is ipv6(6) and
+         Ipv6DestPortOp is not any(0)."
+    ::= { aclConfigAceEntry 813 }
+
+aclConfigAceIpv6DestPortRange OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The destination port number of the TCP or UDP protocol. If the
+         Ipv6DestPortOp object in the same row is range(2), this object will be
+         the ending port number of the port range. Valid range is 0-65535. This
+         object is only available if FrameType is ipv6(6) and Ipv6DestPortOp is
+         range(2)."
+    ::= { aclConfigAceEntry 814 }
+
+aclConfigAceIpv6FlagTtl OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv6 packet's Time-to-Live field (TTL) is to be
+         compared. The value 0 means any TTL value is allowed (don't-care
+         field), value 1 means TTL is not equal zero and value 2 means TTL is
+         equal to zero. This object is only available if FrameType is ipv6(6)."
+    ::= { aclConfigAceEntry 815 }
+
+aclConfigAceIpv6TcpFlagFin OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv6 TCP packet's 'No more data from sender' field
+         (FIN) is to be compared. The value 0 means any FIN value is allowed
+         (don't-care field), value 1 means FIN is not equal one (FIN field isn't
+         set) and value 2 means FIN is equal to one (FIN field is set). This
+         object is only available if FrameType is ipv6(6) and Ipv6NextHeader is
+         tcp(6)."
+    ::= { aclConfigAceEntry 816 }
+
+aclConfigAceIpv6TcpFlagSyn OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv6 TCP packet's 'Synchronize sequence numbers' field
+         (SYN) is to be compared. The value 0 means any SYN value is allowed
+         (don't-care field), value 1 means SYN is not equal one (FIN field isn't
+         set) and value 2 means SYN is equal to one (FIN field is set). This
+         object is only available if FrameType is ipv6(6) and Ipv6NextHeader is
+         tcp(6)."
+    ::= { aclConfigAceEntry 817 }
+
+aclConfigAceIpv6TcpFlagRst OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv6 TCP packet's 'Reset the connection' field (RST) is
+         to be compared. The value 0 means any RST value is allowed (don't-care
+         field), value 1 means RST is not equal one (FIN field isn't set) and
+         value 2 means RST is equal to one (FIN field is set). This object is
+         only available if FrameType is ipv6(6) and Ipv6NextHeader is tcp(6)."
+    ::= { aclConfigAceEntry 818 }
+
+aclConfigAceIpv6TcpFlagPsh OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv6 TCP packet's 'Push Function' field (PSH) is to be
+         compared. The value 0 means any PSH value is allowed (don't-care
+         field), value 1 means PSH is not equal one (FIN field isn't set) and
+         value 2 means PSH is equal to one (FIN field is set). This object is
+         only available if FrameType is ipv6(6) and Ipv6NextHeader is tcp(6)."
+    ::= { aclConfigAceEntry 819 }
+
+aclConfigAceIpv6TcpFlagAck OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv6 TCP packet's 'Acknowledgment field significant'
+         field (ACK) is to be compared. The value 0 means any FIN value is
+         allowed (don't-care field), value 1 means ACK is not equal one (FIN
+         field isn't set) and value 2 means ACK is equal to one (FIN field is
+         set). This object is only available if FrameType is ipv6(6) and
+         Ipv6NextHeader is tcp(6)."
+    ::= { aclConfigAceEntry 820 }
+
+aclConfigAceIpv6TcpFlagUrg OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv6 TCP packet's 'Urgent Pointer field significant'
+         field (URG) is to be compared. The value 0 means any URG value is
+         allowed (don't-care field), value 1 means URG is not equal one (FIN
+         field isn't set) and value 2 means URG is equal to one (FIN field is
+         set). This object is only available if FrameType is ipv6(6) and
+         Ipv6NextHeader is tcp(6)."
+    ::= { aclConfigAceEntry 821 }
+
+aclConfigAceAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { aclConfigAceEntry 10000 }
+
+aclConfigAceRowEditor OBJECT IDENTIFIER
+    ::= { aclConfigAce 2 }
+
+aclConfigAceRowEditorAceId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ACE ID."
+    ::= { aclConfigAceRowEditor 1 }
+
+aclConfigAceRowEditorNextAceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ID of ACE next to this ACE."
+    ::= { aclConfigAceRowEditor 2 }
+
+aclConfigAceRowEditorHitAction OBJECT-TYPE
+    SYNTAX      AclHitAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The hit action operation for this ACE."
+    ::= { aclConfigAceRowEditor 101 }
+
+aclConfigAceRowEditorRedirectPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The redirect port list for this ACE."
+    ::= { aclConfigAceRowEditor 102 }
+
+aclConfigAceRowEditorRedirectPortListSwitchPort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The redirect switch port for this ACE. The object is only abaliable if
+         AclAceIngressPortListMode is switchport. And it is used when this ACE
+         is applied on specific switch port of all switches in stackable
+         devices.
+         
+         This object is only available if the capability object
+         'aclCapabilitiesStackableAceSupported' is True."
+    ::= { aclConfigAceRowEditor 103 }
+
+aclConfigAceRowEditorEgressPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The egress port list. The port list is to define what ports are allowed
+         to be egress ports. If the egress port of an incoming frame is in the
+         port list then the frame will be forwared to that port. Otherwise, if
+         the egress port is not in the port list then the egress port is not
+         allowed and the incoming frame will be dropped.
+         
+         This object is only available if the capability object
+         'aclCapabilitiesEgressPortSupported' is True."
+    ::= { aclConfigAceRowEditor 104 }
+
+aclConfigAceRowEditorRateLimiterId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The rate limiter ID. 0 means to be disabled."
+    ::= { aclConfigAceRowEditor 105 }
+
+aclConfigAceRowEditorEvcPolicerId OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The EVC policer ID. 0 means to be disabled.
+         
+         This object is only available if the capability object
+         'aclCapabilitiesEvcPolicerSupported' is True."
+    ::= { aclConfigAceRowEditor 106 }
+
+aclConfigAceRowEditorMirror OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The mirror operation. Frames matching this ACE are mirrored to the
+         destination mirror port that is configured in the mirror module.
+         
+         This object is only available if the capability object
+         'aclCapabilitiesMirrorSupported' is True."
+    ::= { aclConfigAceRowEditor 107 }
+
+aclConfigAceRowEditorLogging OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specify the logging operation of the ACE. Notice that the logging
+         message doesn't include the 4 bytes CRC information. The allowed values
+         are: True - Frames matching the ACE are stored in the System Log. False
+         - Frames matching the ACE are not logged. Note: The logging feature
+         only works when the packet length is less than 1518(without VLAN tags)
+         and the system log memory size and logging rate is limited."
+    ::= { aclConfigAceRowEditor 108 }
+
+aclConfigAceRowEditorShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specify the port shut down operation of the ACE. The allowed values
+         are: True: If a frame matches the ACE, the ingress port will be shuted
+         down. False: Port shut down is disabled for the ACE. Note: The shutdown
+         feature only works when the packet length is less than 1518(without
+         VLAN tags)."
+    ::= { aclConfigAceRowEditor 109 }
+
+aclConfigAceRowEditorIngressPortListMode OBJECT-TYPE
+    SYNTAX      AclAceIngressPortListMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ingress port list mode for this ACE. The possible mode are: 'any':
+         Indicates this ACE is applied on all switches and all ports.
+         'specific': Indicates this ACE is applied on specific switch and
+         specific ports. 'switch': Indicates this ACE is applied on all ports of
+         specific switch in stackable devices. 'switchport': Indicates this ACE
+         is applied on specific switch port of all switches in stackable
+         devices."
+    ::= { aclConfigAceRowEditor 201 }
+
+aclConfigAceRowEditorIngressPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ingress port list for this ACE. The object is only abaliable if
+         AclAceIngressPortListMode is specific. And it is used when this ACE is
+         applied on specific switch and specific ports."
+    ::= { aclConfigAceRowEditor 202 }
+
+aclConfigAceRowEditorIngressPortListSwitch OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ingress switch ID for this ACE. The object is only abaliable if
+         AclAceIngressPortListMode is switch. And it is used when this ACE is
+         applied on specific switch port of all switches in stackable devices.
+         
+         This object is only available if the capability object
+         'aclCapabilitiesStackableAceSupported' is True."
+    ::= { aclConfigAceRowEditor 203 }
+
+aclConfigAceRowEditorIngressPortListSwitchPort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ingress switch port for this ACE. The object is only abaliable if
+         AclAceIngressPortListMode is switchport. And it is used when this ACE
+         is applied on specific switch port of all switches in stackable
+         devices.
+         
+         This object is only available if the capability object
+         'aclCapabilitiesStackableAceSupported' is True."
+    ::= { aclConfigAceRowEditor 204 }
+
+aclConfigAceRowEditorPolicyValue OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The policy number for this ACE."
+    ::= { aclConfigAceRowEditor 205 }
+
+aclConfigAceRowEditorPolicyMask OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The policy mask for this ACE. The allowed range is 0x0 to 0xff. If the
+         binary bit value is '0', it means this bit is don't-care. The real
+         matched pattern is [policy_value & policy_bitmask]. For example, if the
+         policy value is 3 and the policy bitmask is 0x10(bit 0 is don't-care
+         bit), then policy 2 and 3 are applied to this rule."
+    ::= { aclConfigAceRowEditor 206 }
+
+aclConfigAceRowEditorSecondLookup OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The second lookup operation for this ACE.
+         
+         This object is only available if the capability object
+         'aclCapabilitiesSecondLookupSupported' is True."
+    ::= { aclConfigAceRowEditor 207 }
+
+aclConfigAceRowEditorVlanId OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The VLAN ID for this ACE. Possible values are: 0(disabled), 1-4095."
+    ::= { aclConfigAceRowEditor 301 }
+
+aclConfigAceRowEditorVlanTagPriority OBJECT-TYPE
+    SYNTAX      VlanTagPriority
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The VLAN tag priority for this ACE."
+    ::= { aclConfigAceRowEditor 302 }
+
+aclConfigAceRowEditorVlanTagged OBJECT-TYPE
+    SYNTAX      AclAceVlanTagged
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The 802.1Q VLAN tagged for this ACE.
+         
+         This object is only available if the capability object
+         'aclCapabilitiesVlanTaggedSupported' is True."
+    ::= { aclConfigAceRowEditor 303 }
+
+aclConfigAceRowEditorFrameType OBJECT-TYPE
+    SYNTAX      AclAceFrameType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The frame type for this ACE."
+    ::= { aclConfigAceRowEditor 401 }
+
+aclConfigAceRowEditorDestMacOp OBJECT-TYPE
+    SYNTAX      AdvDestMacType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a packet's destination MAC address to be matched."
+    ::= { aclConfigAceRowEditor 402 }
+
+aclConfigAceRowEditorEtherSrcMacOp OBJECT-TYPE
+    SYNTAX      ASType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a Ethernet type packet's source MAC address to be
+         matched. This object is only available if FrameType is ether(1)."
+    ::= { aclConfigAceRowEditor 501 }
+
+aclConfigAceRowEditorEtherSrcMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the 48 bits source MAC address. This object is only available
+         if FrameType is ether(1) and EtherSrcMacOp is specific(1)."
+    ::= { aclConfigAceRowEditor 502 }
+
+aclConfigAceRowEditorEtherDestMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the 48 bits destination MAC address. This object is only
+         available if FrameType is ether(1) and EtherDestMacOp is specific(1)."
+    ::= { aclConfigAceRowEditor 503 }
+
+aclConfigAceRowEditorEtherType OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the packet's 16 bit Ethernet type field. Possible values are:
+         0(disabled), 0x600-0xFFFF but excluding 0x800(IPv4), 0x806(ARP) and
+         0x86DD(IPv6). This object is only available if FrameType is ether(1)
+         and EtherDestMacOp is specific(1)."
+    ::= { aclConfigAceRowEditor 504 }
+
+aclConfigAceRowEditorArpSrcMacOp OBJECT-TYPE
+    SYNTAX      ASType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a ARP packet's source MAC address to be matched. This
+         object is only available if FrameType is arp(4)."
+    ::= { aclConfigAceRowEditor 601 }
+
+aclConfigAceRowEditorArpSrcMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the 48 bits source MAC address. This object is only available
+         if FrameType is arp(4) and ArpSrcMacOp is specific(1)."
+    ::= { aclConfigAceRowEditor 602 }
+
+aclConfigAceRowEditorArpSenderIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified ARP sender IP address. The packet's sender address is
+         AND-ed with the value of ArpSenderIpMask and then compared with the
+         value of this object. If ArpSenderIp and ArpSrcIpMask are 0.0.0.0, this
+         entry matches any sender IP address. This object is only available if
+         FrameType is arp(4)."
+    ::= { aclConfigAceRowEditor 603 }
+
+aclConfigAceRowEditorArpSenderIpMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified ARP sender IP address mask. This object is only available
+         if FrameType is arp(4)."
+    ::= { aclConfigAceRowEditor 604 }
+
+aclConfigAceRowEditorArpTargetIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified ARP target IP address. The packet's target address is
+         AND-ed with the value of ArpTragetIpMask and then compared with the
+         value of this object. If ArpTragetIp and ArpSrcIpMask are 0.0.0.0, this
+         entry matches any target IP address. This object is only available if
+         FrameType is arp(4)."
+    ::= { aclConfigAceRowEditor 605 }
+
+aclConfigAceRowEditorArpTargetIpMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified ARP target IP address mask. This object is only available
+         if FrameType is arp(4)."
+    ::= { aclConfigAceRowEditor 606 }
+
+aclConfigAceRowEditorArpOpcode OBJECT-TYPE
+    SYNTAX      AclAceArpOp
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a ARP packet's opcode to be matched. This object is only
+         available if FrameType is arp(4)."
+    ::= { aclConfigAceRowEditor 607 }
+
+aclConfigAceRowEditorArpFlagReq OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a ARP packet's request/reply opcode is to be compared.
+         This object is only available if FrameType is arp(4)."
+    ::= { aclConfigAceRowEditor 608 }
+
+aclConfigAceRowEditorArpFlagSha OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a ARP packet's sender hardware address field (SHA) to be
+         compared. This object is only available if FrameType is arp(4)."
+    ::= { aclConfigAceRowEditor 609 }
+
+aclConfigAceRowEditorArpFlagTha OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a ARP packet's target hardware address field (THA) is to
+         be compared. This object is only available if FrameType is arp(4)."
+    ::= { aclConfigAceRowEditor 610 }
+
+aclConfigAceRowEditorArpFlagHln OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a ARP packet's s hardware address length field (HLN) is
+         to be compared. The value 0 means any HLN value is allowed (don't-care
+         field), value 1 means HLN is not equal to Ethernet (0x06) or the (PLN)
+         is not equal to IPv4 (0x04) and value 2 means HLN is equal to Ethernet
+         (0x06) or the (PLN) is not equal to IPv4 (0x04). This object is only
+         available if FrameType is arp(4)."
+    ::= { aclConfigAceRowEditor 611 }
+
+aclConfigAceRowEditorArpFlagHrd OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a ARP packet's hardware address space field (HRD) is to
+         be compared. The value 0 means any HRD value is allowed (don't-care
+         field), value 1 means HRD is not equal to Ethernet (1) and value 2
+         means HRD is equal to Ethernet (1). This object is only available if
+         FrameType is arp(4)."
+    ::= { aclConfigAceRowEditor 612 }
+
+aclConfigAceRowEditorArpFlagPro OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a ARP packet's protocol address space field (PRO) is to
+         be compared. The value 0 means any PRO value is allowed (don't-care
+         field), value 1 means PRO is not equal to IP (0x800) and value 2 means
+         PRO is equal to IP (0x800). This object is only available if FrameType
+         is arp(4)."
+    ::= { aclConfigAceRowEditor 613 }
+
+aclConfigAceRowEditorIpv4ProtocolOp OBJECT-TYPE
+    SYNTAX      ASType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv4 packet's protocol field is to be compared. This
+         object is only available if FrameType is ipv4(5)."
+    ::= { aclConfigAceRowEditor 701 }
+
+aclConfigAceRowEditorIpv4Protocol OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The protocol number field in the IPv4 header used to indicate a higher
+         layer protocol. Possible values are 0-255. This object is only
+         available if FrameType is ipv4(5) and Ipv4ProtocolOp is specific(1)."
+    ::= { aclConfigAceRowEditor 702 }
+
+aclConfigAceRowEditorIpv4SrcIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified source IPv4 address. The packet's sender address is
+         AND-ed with the value of Ipv4SrcIpMask and then compared with the value
+         of this object. If Ipv4SrcIp and Ipv4SrcIpMask are 0.0.0.0, this entry
+         matches any source IP address. This object is only available if
+         FrameType is ipv4(5)."
+    ::= { aclConfigAceRowEditor 703 }
+
+aclConfigAceRowEditorIpv4SrcIpMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified source IPv4 address mask. This object is only available
+         if FrameType is ipv4(5)."
+    ::= { aclConfigAceRowEditor 704 }
+
+aclConfigAceRowEditorIpv4DestIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified destination IPv4 address. The packet's sender address is
+         AND-ed with the value of Ipv4DestIpMask and then compared with the
+         value of this object. If Ipv4DestIp and Ipv4DestIpMask are 0.0.0.0,
+         this entry matches any destination IP address. This object is only
+         available if FrameType is ipv4(5)."
+    ::= { aclConfigAceRowEditor 705 }
+
+aclConfigAceRowEditorIpv4DestIpMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified destination IPv4 address mask. This object is only
+         available if FrameType is ipv4(5)."
+    ::= { aclConfigAceRowEditor 706 }
+
+aclConfigAceRowEditorIpv4IcmpTypeOp OBJECT-TYPE
+    SYNTAX      ASType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv4 packet's ICMP type field is to be compared. This
+         object is only available if FrameType is ipv4(5) and Ipv4Protocol is
+         icmp(1)."
+    ::= { aclConfigAceRowEditor 707 }
+
+aclConfigAceRowEditorIpv4IcmpType OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ICMP type field in the IPv4 header. Possible values are 0-255. This
+         object is only available if FrameType is ipv4(5), Ipv4Protocol is
+         icmp(1) and Ipv4IcmpTypeOp is specific(1)."
+    ::= { aclConfigAceRowEditor 708 }
+
+aclConfigAceRowEditorIpv4IcmpCodeOp OBJECT-TYPE
+    SYNTAX      ASType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv4 packet's ICMP code field is to be compared. This
+         object is only available if FrameType is ipv4(5) and Ipv4Protocol is
+         icmp(1)."
+    ::= { aclConfigAceRowEditor 709 }
+
+aclConfigAceRowEditorIpv4IcmpCode OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ICMP code field in the IPv4 header. Possible values are 0-255. This
+         object is only available if FrameType is ipv4(5), Ipv4Protocol is
+         icmp(1) and Ipv4IcmpCodeOp is specific(1)."
+    ::= { aclConfigAceRowEditor 710 }
+
+aclConfigAceRowEditorIpv4SrcPortOp OBJECT-TYPE
+    SYNTAX      ASRType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a packet's source TCP/UDP port number is to be compared.
+         This object is only available if FrameType is ipv4(5)."
+    ::= { aclConfigAceRowEditor 711 }
+
+aclConfigAceRowEditorIpv4SrcPort OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source port number of the TCP or UDP protocol. If the Ipv4SrcPortOp
+         object is range(2), this object will be the starting port number of the
+         port range. Valid range is 0-65535. This object is only available if
+         FrameType is ipv4(5) and Ipv4SrcPortOp is not any(0)."
+    ::= { aclConfigAceRowEditor 712 }
+
+aclConfigAceRowEditorIpv4SrcPortRange OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source port number of the TCP or UDP protocol. If the Ipv4SrcPortOp
+         object is range(2), this object will be the ending port number of the
+         port range. Valid range is 0-65535. This object is only available if
+         FrameType is ipv4(5) and Ipv4SrcPortOp is range(2)."
+    ::= { aclConfigAceRowEditor 713 }
+
+aclConfigAceRowEditorIpv4DestPortOp OBJECT-TYPE
+    SYNTAX      ASRType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a packet's destination TCP/UDP port number is to be
+         compared. This object is only available if FrameType is ipv4(5)."
+    ::= { aclConfigAceRowEditor 714 }
+
+aclConfigAceRowEditorIpv4DestPort OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The destination port number of the TCP or UDP protocol. If the
+         Ipv4DestPortOp object in the same row is range(2), this object will be
+         the starting port number of the port range. Valid range is 0-65535.
+         This object is only available if FrameType is ipv4(5) and
+         Ipv4DestPortOp is not any(0)."
+    ::= { aclConfigAceRowEditor 715 }
+
+aclConfigAceRowEditorIpv4DestPortRange OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The destination port number of the TCP or UDP protocol. If the
+         Ipv4DestPortOp object in the same row is range(2), this object will be
+         the ending port number of the port range. Valid range is 0-65535. This
+         object is only available if FrameType is ipv4(5) and Ipv4DestPortOp is
+         range(2)."
+    ::= { aclConfigAceRowEditor 716 }
+
+aclConfigAceRowEditorIpv4FlagTtl OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv4 packet's Time-to-Live field (TTL) is to be
+         compared. The value 0 means any TTL value is allowed (don't-care
+         field), value 1 means TTL is not equal zero and value 2 means TTL is
+         equal to zero. This object is only available if FrameType is ipv4(5)."
+    ::= { aclConfigAceRowEditor 717 }
+
+aclConfigAceRowEditorIpv4FlagFragment OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv4 packet's More-Fragments field (MF) is to be
+         compared. The value 0 means any MF value is allowed (don't-care field),
+         value 1 means MF is not equal one (MF field isn't set) and value 2
+         means MF is equal to one (MF field is set). This object is only
+         available if FrameType is ipv4(5)."
+    ::= { aclConfigAceRowEditor 718 }
+
+aclConfigAceRowEditorIpv4FlagIpOption OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv4 packet's options field is to be compared. This
+         object is only available if FrameType is ipv4(5)."
+    ::= { aclConfigAceRowEditor 719 }
+
+aclConfigAceRowEditorIpv4TcpFlagFin OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how the IPv4 TCP FIN flag is matched. This object is only
+         available if FrameType is ipv4(5) and Ipv4Protocol is tcp(6)."
+    ::= { aclConfigAceRowEditor 720 }
+
+aclConfigAceRowEditorIpv4TcpFlagSyn OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how the IPv4 TCP SYN flag is matched. This object is only
+         available if FrameType is ipv4(5) and Ipv4Protocol is tcp(6)."
+    ::= { aclConfigAceRowEditor 721 }
+
+aclConfigAceRowEditorIpv4TcpFlagRst OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how the IPv4 TCP RST flag is matched. This object is only
+         available if FrameType is ipv4(5) and Ipv4Protocol is tcp(6)."
+    ::= { aclConfigAceRowEditor 722 }
+
+aclConfigAceRowEditorIpv4TcpFlagPsh OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how the IPv4 TCP PSH flag is matched. This object is only
+         available if FrameType is ipv4(5) and Ipv4Protocol is tcp(6)."
+    ::= { aclConfigAceRowEditor 723 }
+
+aclConfigAceRowEditorIpv4TcpFlagAck OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how the IPv4 TCP ACK flag is matched. This object is only
+         available if FrameType is ipv4(5) and Ipv4Protocol is tcp(6)."
+    ::= { aclConfigAceRowEditor 724 }
+
+aclConfigAceRowEditorIpv4TcpFlagUrg OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how the IPv4 TCP URG flag is matched. This object is only
+         available if FrameType is ipv4(5) and Ipv4Protocol is tcp(6)."
+    ::= { aclConfigAceRowEditor 725 }
+
+aclConfigAceRowEditorIpv6NextHeaderOp OBJECT-TYPE
+    SYNTAX      ASType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specify the IPv6 next header filter for this ACE. This object is only
+         available if FrameType is ipv6(6)."
+    ::= { aclConfigAceRowEditor 801 }
+
+aclConfigAceRowEditorIpv6NextHeader OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When 'Specific' is selected for the IPv6 next header value, you can
+         enter a specific value. The allowed range is 0 to 255. A frame that
+         hits this ACE matches this IPv6 protocol value. This object is only
+         available if FrameType is ipv6(6) and Ipv6NextHeaderOp is specific(1)."
+    ::= { aclConfigAceRowEditor 802 }
+
+aclConfigAceRowEditorIpv6Icmpv6TypeOp OBJECT-TYPE
+    SYNTAX      ASType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv6 packet's ICMPv6 type field is to be compared. This
+         object is only available if FrameType is ipv6(6) and Ipv6NextHeader is
+         icmpv6(58)."
+    ::= { aclConfigAceRowEditor 803 }
+
+aclConfigAceRowEditorIpv6Icmpv6Type OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ICMPv6 type field in the IPv6 header. Possible values are 0-255.
+         This object is only available if FrameType is ipv6(6), Ipv6NextHeader
+         is icmpv6(58) and Ipv6Icmpv6TypeOp is specific(1)."
+    ::= { aclConfigAceRowEditor 804 }
+
+aclConfigAceRowEditorIpv6Icmpv6CodeOp OBJECT-TYPE
+    SYNTAX      ASType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv6 packet's ICMPv6 code field is to be compared. This
+         object is only available if FrameType is ipv6(6) and Ipv6NextHeader is
+         icmpv6(58)."
+    ::= { aclConfigAceRowEditor 805 }
+
+aclConfigAceRowEditorIpv6Icmpv6Code OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ICMP code field in the IPv6 header. Possible values are 0-255. This
+         object is only available if FrameType is ipv6(6), Ipv6NextHeader is
+         icmpv6(58) and Ipv6Icmpv6CodeOp is specific(1)."
+    ::= { aclConfigAceRowEditor 806 }
+
+aclConfigAceRowEditorIpv6SrcIp OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified source IPv6 address. The packet's sender address is
+         AND-ed with the value of Ipv6SrcIpMask and then compared with the value
+         of this object. If Ipv6SrcIp and Ipv4SrcIpMask are 0::, this entry
+         matches any source IP address. This object is only available if
+         FrameType is ipv6(6)."
+    ::= { aclConfigAceRowEditor 807 }
+
+aclConfigAceRowEditorIpv6SrcIpMask OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified source IPv6 address mask. This object is only available
+         if FrameType is ipv6(6)."
+    ::= { aclConfigAceRowEditor 808 }
+
+aclConfigAceRowEditorIpv6SrcPortOp OBJECT-TYPE
+    SYNTAX      ASRType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a packet's source TCP/UDP port number is to be compared.
+         This object is only available if FrameType is ipv6(6)."
+    ::= { aclConfigAceRowEditor 809 }
+
+aclConfigAceRowEditorIpv6SrcPort OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source port number of the TCP or UDP protocol. If the Ipv6SrcPortOp
+         object in the same row is range(2), this object will be the starting
+         port number of the port range. Valid range is 0-65535. This object is
+         only available if FrameType is ipv6(6) and Ipv6SrcPortOp is not any(0)."
+    ::= { aclConfigAceRowEditor 810 }
+
+aclConfigAceRowEditorIpv6SrcPortRange OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source port number of the TCP or UDP protocol. If the Ipv6SrcPortOp
+         object in the same row is range(2), this object will be the ending port
+         number of the port range. Valid range is 0-65535. This object is only
+         available if FrameType is ipv6(6) and Ipv6SrcPortOp is range(2)."
+    ::= { aclConfigAceRowEditor 811 }
+
+aclConfigAceRowEditorIpv6DestPortOp OBJECT-TYPE
+    SYNTAX      ASRType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a packet's destination TCP/UDP port number is to be
+         compared. This object is only available if FrameType is ipv6(6)."
+    ::= { aclConfigAceRowEditor 812 }
+
+aclConfigAceRowEditorIpv6DestPort OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The destination port number of the TCP or UDP protocol. If the
+         Ipv6DestPortOp object in the same row is range(2), this object will be
+         the starting port number of the port range. Valid range is 0-65535.
+         This object is only available if FrameType is ipv6(6) and
+         Ipv6DestPortOp is not any(0)."
+    ::= { aclConfigAceRowEditor 813 }
+
+aclConfigAceRowEditorIpv6DestPortRange OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The destination port number of the TCP or UDP protocol. If the
+         Ipv6DestPortOp object in the same row is range(2), this object will be
+         the ending port number of the port range. Valid range is 0-65535. This
+         object is only available if FrameType is ipv6(6) and Ipv6DestPortOp is
+         range(2)."
+    ::= { aclConfigAceRowEditor 814 }
+
+aclConfigAceRowEditorIpv6FlagTtl OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv6 packet's Time-to-Live field (TTL) is to be
+         compared. The value 0 means any TTL value is allowed (don't-care
+         field), value 1 means TTL is not equal zero and value 2 means TTL is
+         equal to zero. This object is only available if FrameType is ipv6(6)."
+    ::= { aclConfigAceRowEditor 815 }
+
+aclConfigAceRowEditorIpv6TcpFlagFin OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv6 TCP packet's 'No more data from sender' field
+         (FIN) is to be compared. The value 0 means any FIN value is allowed
+         (don't-care field), value 1 means FIN is not equal one (FIN field isn't
+         set) and value 2 means FIN is equal to one (FIN field is set). This
+         object is only available if FrameType is ipv6(6) and Ipv6NextHeader is
+         tcp(6)."
+    ::= { aclConfigAceRowEditor 816 }
+
+aclConfigAceRowEditorIpv6TcpFlagSyn OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv6 TCP packet's 'Synchronize sequence numbers' field
+         (SYN) is to be compared. The value 0 means any SYN value is allowed
+         (don't-care field), value 1 means SYN is not equal one (FIN field isn't
+         set) and value 2 means SYN is equal to one (FIN field is set). This
+         object is only available if FrameType is ipv6(6) and Ipv6NextHeader is
+         tcp(6)."
+    ::= { aclConfigAceRowEditor 817 }
+
+aclConfigAceRowEditorIpv6TcpFlagRst OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv6 TCP packet's 'Reset the connection' field (RST) is
+         to be compared. The value 0 means any RST value is allowed (don't-care
+         field), value 1 means RST is not equal one (FIN field isn't set) and
+         value 2 means RST is equal to one (FIN field is set). This object is
+         only available if FrameType is ipv6(6) and Ipv6NextHeader is tcp(6)."
+    ::= { aclConfigAceRowEditor 818 }
+
+aclConfigAceRowEditorIpv6TcpFlagPsh OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv6 TCP packet's 'Push Function' field (PSH) is to be
+         compared. The value 0 means any PSH value is allowed (don't-care
+         field), value 1 means PSH is not equal one (FIN field isn't set) and
+         value 2 means PSH is equal to one (FIN field is set). This object is
+         only available if FrameType is ipv6(6) and Ipv6NextHeader is tcp(6)."
+    ::= { aclConfigAceRowEditor 819 }
+
+aclConfigAceRowEditorIpv6TcpFlagAck OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv6 TCP packet's 'Acknowledgment field significant'
+         field (ACK) is to be compared. The value 0 means any FIN value is
+         allowed (don't-care field), value 1 means ACK is not equal one (FIN
+         field isn't set) and value 2 means ACK is equal to one (FIN field is
+         set). This object is only available if FrameType is ipv6(6) and
+         Ipv6NextHeader is tcp(6)."
+    ::= { aclConfigAceRowEditor 820 }
+
+aclConfigAceRowEditorIpv6TcpFlagUrg OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a IPv6 TCP packet's 'Urgent Pointer field significant'
+         field (URG) is to be compared. The value 0 means any URG value is
+         allowed (don't-care field), value 1 means URG is not equal one (FIN
+         field isn't set) and value 2 means URG is equal to one (FIN field is
+         set). This object is only available if FrameType is ipv6(6) and
+         Ipv6NextHeader is tcp(6)."
+    ::= { aclConfigAceRowEditor 821 }
+
+aclConfigAceRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { aclConfigAceRowEditor 10000 }
+
+aclConfigAcePrecedenceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AclConfigAcePrecedenceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "It displays the sequence of ACEs to be hit."
+    ::= { aclConfigAce 3 }
+
+aclConfigAcePrecedenceEntry OBJECT-TYPE
+    SYNTAX      AclConfigAcePrecedenceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the corresponding ACE ID."
+    INDEX       { aclConfigAcePrecedencePrecedence }
+    ::= { aclConfigAcePrecedenceTable 1 }
+
+AclConfigAcePrecedenceEntry ::= SEQUENCE {
+    aclConfigAcePrecedencePrecedence  Integer32,
+    aclConfigAcePrecedenceAceId       Unsigned32
+}
+
+aclConfigAcePrecedencePrecedence OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ACL ACE hit precedence."
+    ::= { aclConfigAcePrecedenceEntry 1 }
+
+aclConfigAcePrecedenceAceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifier of ACE"
+    ::= { aclConfigAcePrecedenceEntry 2 }
+
+aclStatus OBJECT IDENTIFIER
+    ::= { aclMibObjects 3 }
+
+aclStatusInterface OBJECT IDENTIFIER
+    ::= { aclStatus 2 }
+
+aclStatusInterfaceHitCountTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AclStatusInterfaceHitCountEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of interface hit count status."
+    ::= { aclStatusInterface 1 }
+
+aclStatusInterfaceHitCountEntry OBJECT-TYPE
+    SYNTAX      AclStatusInterfaceHitCountEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the hit count status per interface."
+    INDEX       { aclStatusInterfaceHitCountIfIndex }
+    ::= { aclStatusInterfaceHitCountTable 1 }
+
+AclStatusInterfaceHitCountEntry ::= SEQUENCE {
+    aclStatusInterfaceHitCountIfIndex  InterfaceIndex,
+    aclStatusInterfaceHitCountCounter  Unsigned32
+}
+
+aclStatusInterfaceHitCountIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index of logical interface."
+    ::= { aclStatusInterfaceHitCountEntry 1 }
+
+aclStatusInterfaceHitCountCounter OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The hit count of this interface."
+    ::= { aclStatusInterfaceHitCountEntry 2 }
+
+aclStatusAce OBJECT IDENTIFIER
+    ::= { aclStatus 3 }
+
+aclStatusAceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AclStatusAceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of ACE status."
+    ::= { aclStatusAce 1 }
+
+aclStatusAceEntry OBJECT-TYPE
+    SYNTAX      AclStatusAceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the status per switch per precedence."
+    INDEX       { aclStatusAceSwitchId,
+                  aclStatusAcePrecedence }
+    ::= { aclStatusAceTable 1 }
+
+AclStatusAceEntry ::= SEQUENCE {
+    aclStatusAceSwitchId    Integer32,
+    aclStatusAcePrecedence  Integer32,
+    aclStatusAceAclUser     DisplayString,
+    aclStatusAceAceId       Unsigned32,
+    aclStatusAceConflict    TruthValue
+}
+
+aclStatusAceSwitchId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The switch ID."
+    ::= { aclStatusAceEntry 1 }
+
+aclStatusAcePrecedence OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ACL ACE hit precedence."
+    ::= { aclStatusAceEntry 2 }
+
+aclStatusAceAclUser OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "User of ACE"
+    ::= { aclStatusAceEntry 3 }
+
+aclStatusAceAceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifier of ACE"
+    ::= { aclStatusAceEntry 4 }
+
+aclStatusAceConflict OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The conflict status of this ACE. When the status value is true, it
+         means the specific ACE is not applied to the hardware due to hardware
+         limitations."
+    ::= { aclStatusAceEntry 5 }
+
+aclStatusAceHitCountTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AclStatusAceHitCountEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of ACE hit count status."
+    ::= { aclStatusAce 2 }
+
+aclStatusAceHitCountEntry OBJECT-TYPE
+    SYNTAX      AclStatusAceHitCountEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the hit count status per ACE."
+    INDEX       { aclStatusAceHitCountAceId }
+    ::= { aclStatusAceHitCountTable 1 }
+
+AclStatusAceHitCountEntry ::= SEQUENCE {
+    aclStatusAceHitCountAceId    Integer32,
+    aclStatusAceHitCountCounter  Unsigned32
+}
+
+aclStatusAceHitCountAceId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ACE ID."
+    ::= { aclStatusAceHitCountEntry 1 }
+
+aclStatusAceHitCountCounter OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The hit count of this ACE."
+    ::= { aclStatusAceHitCountEntry 2 }
+
+aclControl OBJECT IDENTIFIER
+    ::= { aclMibObjects 4 }
+
+aclControlGlobals OBJECT IDENTIFIER
+    ::= { aclControl 1 }
+
+aclControlGlobalsClearAllHitCount OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set true to clear hit counts of all ACEs and interfaces."
+    ::= { aclControlGlobals 1 }
+
+aclControlInterface OBJECT IDENTIFIER
+    ::= { aclControl 2 }
+
+aclControlInterfaceControlTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AclControlInterfaceControlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of interface control"
+    ::= { aclControlInterface 1 }
+
+aclControlInterfaceControlEntry OBJECT-TYPE
+    SYNTAX      AclControlInterfaceControlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each interface has a set of parameters"
+    INDEX       { aclControlInterfaceControlIfIndex }
+    ::= { aclControlInterfaceControlTable 1 }
+
+AclControlInterfaceControlEntry ::= SEQUENCE {
+    aclControlInterfaceControlIfIndex  InterfaceIndex,
+    aclControlInterfaceControlState    TruthValue
+}
+
+aclControlInterfaceControlIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index of logical interface."
+    ::= { aclControlInterfaceControlEntry 1 }
+
+aclControlInterfaceControlState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specify the port status. True is to enable the port and false is to
+         shutdown the port"
+    ::= { aclControlInterfaceControlEntry 2 }
+
+aclMibConformance OBJECT IDENTIFIER
+    ::= { aclMib 2 }
+
+aclMibCompliances OBJECT IDENTIFIER
+    ::= { aclMibConformance 1 }
+
+aclMibGroups OBJECT IDENTIFIER
+    ::= { aclMibConformance 2 }
+
+aclCapabilitiesInfoGroup OBJECT-GROUP
+    OBJECTS     { aclCapabilitiesAceIdMax,
+                  aclCapabilitiesPolicyIdMax,
+                  aclCapabilitiesRateLimiterIdMax,
+                  aclCapabilitiesEvcPolicerIdMax,
+                  aclCapabilitiesRateLimiterBitRateSupported,
+                  aclCapabilitiesEvcPolicerSupported,
+                  aclCapabilitiesMirrorSupported,
+                  aclCapabilitiesMultipleRedirectPortsSupported,
+                  aclCapabilitiesSecondLookupSupported,
+                  aclCapabilitiesMultipleIngressPortsSupported,
+                  aclCapabilitiesEgressPortSupported,
+                  aclCapabilitiesVlanTaggedSupported,
+                  aclCapabilitiesStackableAceSupported }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { aclMibGroups 1 }
+
+aclConfigInterfaceConfigInfoGroup OBJECT-GROUP
+    OBJECTS     { aclConfigInterfaceConfigPolicyId,
+                  aclConfigInterfaceConfigHitAction,
+                  aclConfigInterfaceConfigRedirectPortList,
+                  aclConfigInterfaceConfigRateLimiterId,
+                  aclConfigInterfaceConfigEvcPolicerId,
+                  aclConfigInterfaceConfigMirror,
+                  aclConfigInterfaceConfigLogging,
+                  aclConfigInterfaceConfigShutdown }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { aclMibGroups 2 }
+
+aclConfigRateLimiterInfoGroup OBJECT-GROUP
+    OBJECTS     { aclConfigRateLimiterBitRateEnable,
+                  aclConfigRateLimiterBitRate,
+                  aclConfigRateLimiterPacketRate }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { aclMibGroups 3 }
+
+aclConfigAceInfoGroup OBJECT-GROUP
+    OBJECTS     { aclConfigAceNextAceId,
+                  aclConfigAceHitAction,
+                  aclConfigAceRedirectPortList,
+                  aclConfigAceRedirectPortListSwitchPort,
+                  aclConfigAceEgressPortList,
+                  aclConfigAceRateLimiterId,
+                  aclConfigAceEvcPolicerId,
+                  aclConfigAceMirror, aclConfigAceLogging,
+                  aclConfigAceShutdown,
+                  aclConfigAceIngressPortListMode,
+                  aclConfigAceIngressPortList,
+                  aclConfigAceIngressPortListSwitch,
+                  aclConfigAceIngressPortListSwitchPort,
+                  aclConfigAcePolicyValue,
+                  aclConfigAcePolicyMask,
+                  aclConfigAceSecondLookup,
+                  aclConfigAceVlanId,
+                  aclConfigAceVlanTagPriority,
+                  aclConfigAceVlanTagged,
+                  aclConfigAceFrameType,
+                  aclConfigAceDestMacOp,
+                  aclConfigAceEtherSrcMacOp,
+                  aclConfigAceEtherSrcMac,
+                  aclConfigAceEtherDestMac,
+                  aclConfigAceEtherType,
+                  aclConfigAceArpSrcMacOp,
+                  aclConfigAceArpSrcMac,
+                  aclConfigAceArpSenderIp,
+                  aclConfigAceArpSenderIpMask,
+                  aclConfigAceArpTargetIp,
+                  aclConfigAceArpTargetIpMask,
+                  aclConfigAceArpOpcode,
+                  aclConfigAceArpFlagReq,
+                  aclConfigAceArpFlagSha,
+                  aclConfigAceArpFlagTha,
+                  aclConfigAceArpFlagHln,
+                  aclConfigAceArpFlagHrd,
+                  aclConfigAceArpFlagPro,
+                  aclConfigAceIpv4ProtocolOp,
+                  aclConfigAceIpv4Protocol,
+                  aclConfigAceIpv4SrcIp,
+                  aclConfigAceIpv4SrcIpMask,
+                  aclConfigAceIpv4DestIp,
+                  aclConfigAceIpv4DestIpMask,
+                  aclConfigAceIpv4IcmpTypeOp,
+                  aclConfigAceIpv4IcmpType,
+                  aclConfigAceIpv4IcmpCodeOp,
+                  aclConfigAceIpv4IcmpCode,
+                  aclConfigAceIpv4SrcPortOp,
+                  aclConfigAceIpv4SrcPort,
+                  aclConfigAceIpv4SrcPortRange,
+                  aclConfigAceIpv4DestPortOp,
+                  aclConfigAceIpv4DestPort,
+                  aclConfigAceIpv4DestPortRange,
+                  aclConfigAceIpv4FlagTtl,
+                  aclConfigAceIpv4FlagFragment,
+                  aclConfigAceIpv4FlagIpOption,
+                  aclConfigAceIpv4TcpFlagFin,
+                  aclConfigAceIpv4TcpFlagSyn,
+                  aclConfigAceIpv4TcpFlagRst,
+                  aclConfigAceIpv4TcpFlagPsh,
+                  aclConfigAceIpv4TcpFlagAck,
+                  aclConfigAceIpv4TcpFlagUrg,
+                  aclConfigAceIpv6NextHeaderOp,
+                  aclConfigAceIpv6NextHeader,
+                  aclConfigAceIpv6Icmpv6TypeOp,
+                  aclConfigAceIpv6Icmpv6Type,
+                  aclConfigAceIpv6Icmpv6CodeOp,
+                  aclConfigAceIpv6Icmpv6Code,
+                  aclConfigAceIpv6SrcIp,
+                  aclConfigAceIpv6SrcIpMask,
+                  aclConfigAceIpv6SrcPortOp,
+                  aclConfigAceIpv6SrcPort,
+                  aclConfigAceIpv6SrcPortRange,
+                  aclConfigAceIpv6DestPortOp,
+                  aclConfigAceIpv6DestPort,
+                  aclConfigAceIpv6DestPortRange,
+                  aclConfigAceIpv6FlagTtl,
+                  aclConfigAceIpv6TcpFlagFin,
+                  aclConfigAceIpv6TcpFlagSyn,
+                  aclConfigAceIpv6TcpFlagRst,
+                  aclConfigAceIpv6TcpFlagPsh,
+                  aclConfigAceIpv6TcpFlagAck,
+                  aclConfigAceIpv6TcpFlagUrg,
+                  aclConfigAceAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { aclMibGroups 4 }
+
+aclConfigAceRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { aclConfigAceRowEditorAceId,
+                  aclConfigAceRowEditorNextAceId,
+                  aclConfigAceRowEditorHitAction,
+                  aclConfigAceRowEditorRedirectPortList,
+                  aclConfigAceRowEditorRedirectPortListSwitchPort,
+                  aclConfigAceRowEditorEgressPortList,
+                  aclConfigAceRowEditorRateLimiterId,
+                  aclConfigAceRowEditorEvcPolicerId,
+                  aclConfigAceRowEditorMirror,
+                  aclConfigAceRowEditorLogging,
+                  aclConfigAceRowEditorShutdown,
+                  aclConfigAceRowEditorIngressPortListMode,
+                  aclConfigAceRowEditorIngressPortList,
+                  aclConfigAceRowEditorIngressPortListSwitch,
+                  aclConfigAceRowEditorIngressPortListSwitchPort,
+                  aclConfigAceRowEditorPolicyValue,
+                  aclConfigAceRowEditorPolicyMask,
+                  aclConfigAceRowEditorSecondLookup,
+                  aclConfigAceRowEditorVlanId,
+                  aclConfigAceRowEditorVlanTagPriority,
+                  aclConfigAceRowEditorVlanTagged,
+                  aclConfigAceRowEditorFrameType,
+                  aclConfigAceRowEditorDestMacOp,
+                  aclConfigAceRowEditorEtherSrcMacOp,
+                  aclConfigAceRowEditorEtherSrcMac,
+                  aclConfigAceRowEditorEtherDestMac,
+                  aclConfigAceRowEditorEtherType,
+                  aclConfigAceRowEditorArpSrcMacOp,
+                  aclConfigAceRowEditorArpSrcMac,
+                  aclConfigAceRowEditorArpSenderIp,
+                  aclConfigAceRowEditorArpSenderIpMask,
+                  aclConfigAceRowEditorArpTargetIp,
+                  aclConfigAceRowEditorArpTargetIpMask,
+                  aclConfigAceRowEditorArpOpcode,
+                  aclConfigAceRowEditorArpFlagReq,
+                  aclConfigAceRowEditorArpFlagSha,
+                  aclConfigAceRowEditorArpFlagTha,
+                  aclConfigAceRowEditorArpFlagHln,
+                  aclConfigAceRowEditorArpFlagHrd,
+                  aclConfigAceRowEditorArpFlagPro,
+                  aclConfigAceRowEditorIpv4ProtocolOp,
+                  aclConfigAceRowEditorIpv4Protocol,
+                  aclConfigAceRowEditorIpv4SrcIp,
+                  aclConfigAceRowEditorIpv4SrcIpMask,
+                  aclConfigAceRowEditorIpv4DestIp,
+                  aclConfigAceRowEditorIpv4DestIpMask,
+                  aclConfigAceRowEditorIpv4IcmpTypeOp,
+                  aclConfigAceRowEditorIpv4IcmpType,
+                  aclConfigAceRowEditorIpv4IcmpCodeOp,
+                  aclConfigAceRowEditorIpv4IcmpCode,
+                  aclConfigAceRowEditorIpv4SrcPortOp,
+                  aclConfigAceRowEditorIpv4SrcPort,
+                  aclConfigAceRowEditorIpv4SrcPortRange,
+                  aclConfigAceRowEditorIpv4DestPortOp,
+                  aclConfigAceRowEditorIpv4DestPort,
+                  aclConfigAceRowEditorIpv4DestPortRange,
+                  aclConfigAceRowEditorIpv4FlagTtl,
+                  aclConfigAceRowEditorIpv4FlagFragment,
+                  aclConfigAceRowEditorIpv4FlagIpOption,
+                  aclConfigAceRowEditorIpv4TcpFlagFin,
+                  aclConfigAceRowEditorIpv4TcpFlagSyn,
+                  aclConfigAceRowEditorIpv4TcpFlagRst,
+                  aclConfigAceRowEditorIpv4TcpFlagPsh,
+                  aclConfigAceRowEditorIpv4TcpFlagAck,
+                  aclConfigAceRowEditorIpv4TcpFlagUrg,
+                  aclConfigAceRowEditorIpv6NextHeaderOp,
+                  aclConfigAceRowEditorIpv6NextHeader,
+                  aclConfigAceRowEditorIpv6Icmpv6TypeOp,
+                  aclConfigAceRowEditorIpv6Icmpv6Type,
+                  aclConfigAceRowEditorIpv6Icmpv6CodeOp,
+                  aclConfigAceRowEditorIpv6Icmpv6Code,
+                  aclConfigAceRowEditorIpv6SrcIp,
+                  aclConfigAceRowEditorIpv6SrcIpMask,
+                  aclConfigAceRowEditorIpv6SrcPortOp,
+                  aclConfigAceRowEditorIpv6SrcPort,
+                  aclConfigAceRowEditorIpv6SrcPortRange,
+                  aclConfigAceRowEditorIpv6DestPortOp,
+                  aclConfigAceRowEditorIpv6DestPort,
+                  aclConfigAceRowEditorIpv6DestPortRange,
+                  aclConfigAceRowEditorIpv6FlagTtl,
+                  aclConfigAceRowEditorIpv6TcpFlagFin,
+                  aclConfigAceRowEditorIpv6TcpFlagSyn,
+                  aclConfigAceRowEditorIpv6TcpFlagRst,
+                  aclConfigAceRowEditorIpv6TcpFlagPsh,
+                  aclConfigAceRowEditorIpv6TcpFlagAck,
+                  aclConfigAceRowEditorIpv6TcpFlagUrg,
+                  aclConfigAceRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { aclMibGroups 5 }
+
+aclConfigAcePrecedenceInfoGroup OBJECT-GROUP
+    OBJECTS     { aclConfigAcePrecedenceAceId }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { aclMibGroups 6 }
+
+aclStatusInterfaceHitCountInfoGroup OBJECT-GROUP
+    OBJECTS     { aclStatusInterfaceHitCountCounter }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { aclMibGroups 7 }
+
+aclStatusAceInfoGroup OBJECT-GROUP
+    OBJECTS     { aclStatusAceAclUser, aclStatusAceAceId,
+                  aclStatusAceConflict }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { aclMibGroups 8 }
+
+aclStatusAceHitCountInfoGroup OBJECT-GROUP
+    OBJECTS     { aclStatusAceHitCountCounter }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { aclMibGroups 9 }
+
+aclControlGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { aclControlGlobalsClearAllHitCount }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { aclMibGroups 10 }
+
+aclControlInterfaceControlInfoGroup OBJECT-GROUP
+    OBJECTS     { aclControlInterfaceControlState }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { aclMibGroups 11 }
+
+aclMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { aclCapabilitiesInfoGroup,
+                       aclConfigInterfaceConfigInfoGroup,
+                       aclConfigRateLimiterInfoGroup,
+                       aclConfigAceInfoGroup,
+                       aclConfigAceRowEditorInfoGroup,
+                       aclConfigAcePrecedenceInfoGroup,
+                       aclStatusInterfaceHitCountInfoGroup,
+                       aclStatusAceInfoGroup,
+                       aclStatusAceHitCountInfoGroup,
+                       aclControlGlobalsInfoGroup,
+                       aclControlInterfaceControlInfoGroup }
+
+    ::= { aclMibCompliances 1 }
+
+END

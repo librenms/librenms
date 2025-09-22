@@ -1,0 +1,192 @@
+-- *****************************************************************
+-- MIB-USERS: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-USERS DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    DisplayString FROM BTS-TC
+    RowEditorState FROM BTS-TC
+    ;
+
+usersMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of Users"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 58 }
+
+
+usersMibObjects OBJECT IDENTIFIER
+    ::= { usersMib 1 }
+
+usersConfig OBJECT IDENTIFIER
+    ::= { usersMibObjects 2 }
+
+usersConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF UsersConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table is Users onfiguration table. The index is user name."
+    ::= { usersConfig 1 }
+
+usersConfigEntry OBJECT-TYPE
+    SYNTAX      UsersConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of parameters"
+    INDEX       { usersConfigUsername }
+    ::= { usersConfigTable 1 }
+
+UsersConfigEntry ::= SEQUENCE {
+    usersConfigUsername   DisplayString,
+    usersConfigPrivilege  Unsigned32,
+    usersConfigEncrypted  TruthValue,
+    usersConfigPassword   DisplayString,
+    usersConfigAction     RowEditorState
+}
+
+usersConfigUsername OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..31))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Name of user."
+    ::= { usersConfigEntry 1 }
+
+usersConfigPrivilege OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Privilege level of the user."
+    ::= { usersConfigEntry 2 }
+
+usersConfigEncrypted OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The flag indicates the password is encrypted or not. TRUE means the
+         password is encrypted. FALSE means the password is plain text."
+    ::= { usersConfigEntry 3 }
+
+usersConfigPassword OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..44))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Password of the user. The password length depends on the type of
+         password. If the password is encrypted, then the length is from 4 to
+         44. If it is unencrypted, then the maximum length is 31."
+    ::= { usersConfigEntry 4 }
+
+usersConfigAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { usersConfigEntry 100 }
+
+usersConfigTableRowEditor OBJECT IDENTIFIER
+    ::= { usersConfig 2 }
+
+usersConfigTableRowEditorUsername OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..31))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Name of user."
+    ::= { usersConfigTableRowEditor 1 }
+
+usersConfigTableRowEditorPrivilege OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Privilege level of the user."
+    ::= { usersConfigTableRowEditor 2 }
+
+usersConfigTableRowEditorEncrypted OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The flag indicates the password is encrypted or not. TRUE means the
+         password is encrypted. FALSE means the password is plain text."
+    ::= { usersConfigTableRowEditor 3 }
+
+usersConfigTableRowEditorPassword OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..44))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Password of the user. The password length depends on the type of
+         password. If the password is encrypted, then the length is from 4 to
+         44. If it is unencrypted, then the maximum length is 31."
+    ::= { usersConfigTableRowEditor 4 }
+
+usersConfigTableRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { usersConfigTableRowEditor 100 }
+
+usersMibConformance OBJECT IDENTIFIER
+    ::= { usersMib 2 }
+
+usersMibCompliances OBJECT IDENTIFIER
+    ::= { usersMibConformance 1 }
+
+usersMibGroups OBJECT IDENTIFIER
+    ::= { usersMibConformance 2 }
+
+usersConfigTableInfoGroup OBJECT-GROUP
+    OBJECTS     { usersConfigPrivilege, usersConfigEncrypted,
+                  usersConfigPassword, usersConfigAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { usersMibGroups 1 }
+
+usersConfigTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { usersConfigTableRowEditorUsername,
+                  usersConfigTableRowEditorPrivilege,
+                  usersConfigTableRowEditorEncrypted,
+                  usersConfigTableRowEditorPassword,
+                  usersConfigTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { usersMibGroups 2 }
+
+usersMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { usersConfigTableInfoGroup,
+                       usersConfigTableRowEditorInfoGroup }
+
+    ::= { usersMibCompliances 1 }
+
+END

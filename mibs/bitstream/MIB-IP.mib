@@ -1,0 +1,4679 @@
+-- *****************************************************************
+-- MIB-IP: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-IP DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    InetAddressIPv6 FROM INET-ADDRESS-MIB
+    Counter64 FROM SNMPv2-SMI
+    Integer32 FROM SNMPv2-SMI
+    IpAddress FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    MacAddress FROM SNMPv2-TC
+    TruthValue FROM SNMPv2-TC
+    InterfaceIndex FROM BTS-TC
+    RowEditorState FROM BTS-TC
+    Unsigned8 FROM BTS-TC
+    ;
+
+ipMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "Private IP MIB."
+    REVISION    "201410290000Z"
+    DESCRIPTION
+        "Removed the fields arpRetransmitTime and reasmMaxSize."
+    REVISION    "201410210000Z"
+    DESCRIPTION
+        "Added arpCheck in the DhcpClientState enum"
+    REVISION    "201409110000Z"
+    DESCRIPTION
+        "Revise definition of IPv4/IPv6 interface status table index."
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version."
+    ::= { switchMgmt 102 }
+
+
+IpDhcpClientState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "-"
+    SYNTAX      INTEGER { stopped(0), init(1), selecting(2),
+                          requesting(3), rebinding(4), bound(5),
+                          renewing(6), fallback(7), arpCheck(8) }
+
+ipMibObjects OBJECT IDENTIFIER
+    ::= { ipMib 1 }
+
+ipCapabilities OBJECT IDENTIFIER
+    ::= { ipMibObjects 1 }
+
+ipCapabilitiesHasIpv4HostCapabilities OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The device has IPv4 host capabilities for management."
+    ::= { ipCapabilities 1 }
+
+ipCapabilitiesHasIpv6HostCapabilities OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The device has IPv6 host capabilities for management."
+    ::= { ipCapabilities 2 }
+
+ipCapabilitiesHasIpv4UnicastRoutingCapabilities OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The device has IPv4 unicast routing capabilities."
+    ::= { ipCapabilities 3 }
+
+ipCapabilitiesHasIpv4UnicastHwRoutingCapabilities OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The device has IPv4 unicast hardware accelerated routing capabilities."
+    ::= { ipCapabilities 4 }
+
+ipCapabilitiesHasIpv6UnicastRoutingCapabilities OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The device has IPv6 unicast routing capabilities."
+    ::= { ipCapabilities 5 }
+
+ipCapabilitiesHasIpv6UnicastHwRoutingCapabilities OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The device has IPv6 unicast hardware accelerated routing capabilities."
+    ::= { ipCapabilities 6 }
+
+ipCapabilitiesMaxNumberOfIpInterfaces OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of IP interfaces supported by the device."
+    ::= { ipCapabilities 7 }
+
+ipCapabilitiesMaxNumberOfStaticRoutes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of static configured IP routes (shared by IPv4 and
+         IPv6)."
+    ::= { ipCapabilities 8 }
+
+ipCapabilitiesNumberOfLpmHardwareEntries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of hardware LPM (longest prefix match) entries."
+    ::= { ipCapabilities 9 }
+
+ipConfig OBJECT IDENTIFIER
+    ::= { ipMibObjects 2 }
+
+ipConfigGlobals OBJECT IDENTIFIER
+    ::= { ipConfig 1 }
+
+ipConfigGlobalsMain OBJECT IDENTIFIER
+    ::= { ipConfigGlobals 1 }
+
+ipConfigGlobalsMainEnableRouting OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable routing."
+    ::= { ipConfigGlobalsMain 1 }
+
+ipConfigInterfaces OBJECT IDENTIFIER
+    ::= { ipConfig 2 }
+
+ipConfigInterfacesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpConfigInterfacesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the IP interface table. When an IP interface is created it can
+         be configured in the other tables found in this MIB."
+    ::= { ipConfigInterfaces 1 }
+
+ipConfigInterfacesEntry OBJECT-TYPE
+    SYNTAX      IpConfigInterfacesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entries in this table represent IP interfaces created on the system"
+    INDEX       { ipConfigInterfacesIfIndex }
+    ::= { ipConfigInterfacesTable 1 }
+
+IpConfigInterfacesEntry ::= SEQUENCE {
+    ipConfigInterfacesIfIndex  InterfaceIndex,
+    ipConfigInterfacesAction   RowEditorState
+}
+
+ipConfigInterfacesIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Interface index number."
+    ::= { ipConfigInterfacesEntry 1 }
+
+ipConfigInterfacesAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { ipConfigInterfacesEntry 100 }
+
+ipConfigInterfacesTableRowEditor OBJECT IDENTIFIER
+    ::= { ipConfigInterfaces 2 }
+
+ipConfigInterfacesTableRowEditorIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Interface index number."
+    ::= { ipConfigInterfacesTableRowEditor 1 }
+
+ipConfigInterfacesTableRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { ipConfigInterfacesTableRowEditor 100 }
+
+ipConfigInterfacesIpv4Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpConfigInterfacesIpv4Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IPv4 interface configuration table. This table enables IPv4 related
+         configuration of the corresponding IP interface."
+    ::= { ipConfigInterfaces 3 }
+
+ipConfigInterfacesIpv4Entry OBJECT-TYPE
+    SYNTAX      IpConfigInterfacesIpv4Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents an IP interface."
+    INDEX       { ipConfigInterfacesIpv4IfIndex }
+    ::= { ipConfigInterfacesIpv4Table 1 }
+
+IpConfigInterfacesIpv4Entry ::= SEQUENCE {
+    ipConfigInterfacesIpv4IfIndex                    InterfaceIndex,
+    ipConfigInterfacesIpv4Active                     TruthValue,
+    ipConfigInterfacesIpv4EnableDhcpClient           TruthValue,
+    ipConfigInterfacesIpv4Ipv4Address                IpAddress,
+    ipConfigInterfacesIpv4PrefixSize                 Unsigned32,
+    ipConfigInterfacesIpv4DhcpClientFallbackTimeout  Unsigned32
+}
+
+ipConfigInterfacesIpv4IfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Interface index number."
+    ::= { ipConfigInterfacesIpv4Entry 1 }
+
+ipConfigInterfacesIpv4Active OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable IPv4.
+         
+         IPv4 can only be enabled if either the DHCP client is enabled, or a
+         valid address has been configured."
+    ::= { ipConfigInterfacesIpv4Entry 2 }
+
+ipConfigInterfacesIpv4EnableDhcpClient OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable IPv4 DHCP client.
+         
+         Note: the DHCP client can only be enabled if there is no conflict in
+         the values of: ipv4Address, prefixSize, and dhcpClientFallbackTimeout."
+    ::= { ipConfigInterfacesIpv4Entry 3 }
+
+ipConfigInterfacesIpv4Ipv4Address OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "IPv4 address.
+         
+         Note: Multiple interfaces may not have overlapping networks."
+    ::= { ipConfigInterfacesIpv4Entry 4 }
+
+ipConfigInterfacesIpv4PrefixSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Prefix size of the network.
+         
+         Note: Multiple interfaces may not have overlapping networks."
+    ::= { ipConfigInterfacesIpv4Entry 5 }
+
+ipConfigInterfacesIpv4DhcpClientFallbackTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DHCP client fallback timer.
+         
+         If DHCP is disabled then this object has no effect. If DHCP is enabled
+         and the fallback timeout value is different from zero, then this timer
+         will stop the DHCP process and assign the ipv4Address to the interface
+         instead."
+    ::= { ipConfigInterfacesIpv4Entry 6 }
+
+ipConfigInterfacesIpv6Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpConfigInterfacesIpv6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IPv6 interface configuration table. This table enables IPv6 related
+         configuration of the corresponding IP interface."
+    ::= { ipConfigInterfaces 4 }
+
+ipConfigInterfacesIpv6Entry OBJECT-TYPE
+    SYNTAX      IpConfigInterfacesIpv6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents an IP interface."
+    INDEX       { ipConfigInterfacesIpv6IfIndex }
+    ::= { ipConfigInterfacesIpv6Table 1 }
+
+IpConfigInterfacesIpv6Entry ::= SEQUENCE {
+    ipConfigInterfacesIpv6IfIndex      InterfaceIndex,
+    ipConfigInterfacesIpv6Active       TruthValue,
+    ipConfigInterfacesIpv6Ipv6Address  InetAddressIPv6,
+    ipConfigInterfacesIpv6PrefixSize   Unsigned32
+}
+
+ipConfigInterfacesIpv6IfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Interface index number."
+    ::= { ipConfigInterfacesIpv6Entry 1 }
+
+ipConfigInterfacesIpv6Active OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable the static configured IPv6 address.
+         
+         The static configured IPv6 address can only be configured if a valid
+         address has been written into 'ipv6Address' and 'prefixSize'."
+    ::= { ipConfigInterfacesIpv6Entry 2 }
+
+ipConfigInterfacesIpv6Ipv6Address OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Static configured IPv6 address."
+    ::= { ipConfigInterfacesIpv6Entry 3 }
+
+ipConfigInterfacesIpv6PrefixSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Prefix size of the network."
+    ::= { ipConfigInterfacesIpv6Entry 4 }
+
+ipConfigRoutes OBJECT IDENTIFIER
+    ::= { ipConfig 3 }
+
+ipConfigRoutesIpv4Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpConfigRoutesIpv4Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the IPv4 route configuration table."
+    ::= { ipConfigRoutes 1 }
+
+ipConfigRoutesIpv4Entry OBJECT-TYPE
+    SYNTAX      IpConfigRoutesIpv4Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents a configured route.
+         
+         Note: a route may be configured without being active."
+    INDEX       { ipConfigRoutesIpv4NetworkAddress,
+                  ipConfigRoutesIpv4NetworkPrefixSize,
+                  ipConfigRoutesIpv4NextHop }
+    ::= { ipConfigRoutesIpv4Table 1 }
+
+IpConfigRoutesIpv4Entry ::= SEQUENCE {
+    ipConfigRoutesIpv4NetworkAddress     IpAddress,
+    ipConfigRoutesIpv4NetworkPrefixSize  Integer32,
+    ipConfigRoutesIpv4NextHop            IpAddress,
+    ipConfigRoutesIpv4Action             RowEditorState
+}
+
+ipConfigRoutesIpv4NetworkAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Network address."
+    ::= { ipConfigRoutesIpv4Entry 1 }
+
+ipConfigRoutesIpv4NetworkPrefixSize OBJECT-TYPE
+    SYNTAX      Integer32 (0..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Network prefix size."
+    ::= { ipConfigRoutesIpv4Entry 2 }
+
+ipConfigRoutesIpv4NextHop OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Next-hop address."
+    ::= { ipConfigRoutesIpv4Entry 3 }
+
+ipConfigRoutesIpv4Action OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { ipConfigRoutesIpv4Entry 100 }
+
+ipConfigRoutesIpv4RowEditor OBJECT IDENTIFIER
+    ::= { ipConfigRoutes 2 }
+
+ipConfigRoutesIpv4RowEditorNetworkAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Network address."
+    ::= { ipConfigRoutesIpv4RowEditor 1 }
+
+ipConfigRoutesIpv4RowEditorNetworkPrefixSize OBJECT-TYPE
+    SYNTAX      Integer32 (0..32)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Network prefix size."
+    ::= { ipConfigRoutesIpv4RowEditor 2 }
+
+ipConfigRoutesIpv4RowEditorNextHop OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Next-hop address."
+    ::= { ipConfigRoutesIpv4RowEditor 3 }
+
+ipConfigRoutesIpv4RowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { ipConfigRoutesIpv4RowEditor 100 }
+
+ipConfigRoutesIpv6Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpConfigRoutesIpv6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the IPv6 route configuration table."
+    ::= { ipConfigRoutes 3 }
+
+ipConfigRoutesIpv6Entry OBJECT-TYPE
+    SYNTAX      IpConfigRoutesIpv6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents a configured route.
+         
+         Note: a route may be configured without being active."
+    INDEX       { ipConfigRoutesIpv6NetworkAddress,
+                  ipConfigRoutesIpv6NetworkPrefixSize,
+                  ipConfigRoutesIpv6NextHop,
+                  ipConfigRoutesIpv6NextHopInterface }
+    ::= { ipConfigRoutesIpv6Table 1 }
+
+IpConfigRoutesIpv6Entry ::= SEQUENCE {
+    ipConfigRoutesIpv6NetworkAddress     InetAddressIPv6,
+    ipConfigRoutesIpv6NetworkPrefixSize  Integer32,
+    ipConfigRoutesIpv6NextHop            InetAddressIPv6,
+    ipConfigRoutesIpv6NextHopInterface   InterfaceIndex,
+    ipConfigRoutesIpv6Action             RowEditorState
+}
+
+ipConfigRoutesIpv6NetworkAddress OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Network address."
+    ::= { ipConfigRoutesIpv6Entry 1 }
+
+ipConfigRoutesIpv6NetworkPrefixSize OBJECT-TYPE
+    SYNTAX      Integer32 (0..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Network prefix size."
+    ::= { ipConfigRoutesIpv6Entry 2 }
+
+ipConfigRoutesIpv6NextHop OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Next-hop address."
+    ::= { ipConfigRoutesIpv6Entry 3 }
+
+ipConfigRoutesIpv6NextHopInterface OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "If the next-hop address is a link-local address, then the interface of
+         the link-local address must be specified here. Otherwise this value is
+         not used."
+    ::= { ipConfigRoutesIpv6Entry 4 }
+
+ipConfigRoutesIpv6Action OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { ipConfigRoutesIpv6Entry 100 }
+
+ipConfigRoutesIpv6RowEditor OBJECT IDENTIFIER
+    ::= { ipConfigRoutes 4 }
+
+ipConfigRoutesIpv6RowEditorNetworkAddress OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Network address."
+    ::= { ipConfigRoutesIpv6RowEditor 1 }
+
+ipConfigRoutesIpv6RowEditorNetworkPrefixSize OBJECT-TYPE
+    SYNTAX      Integer32 (0..128)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Network prefix size."
+    ::= { ipConfigRoutesIpv6RowEditor 2 }
+
+ipConfigRoutesIpv6RowEditorNextHop OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Next-hop address."
+    ::= { ipConfigRoutesIpv6RowEditor 3 }
+
+ipConfigRoutesIpv6RowEditorNextHopInterface OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If the next-hop address is a link-local address, then the interface of
+         the link-local address must be specified here. Otherwise this value is
+         not used."
+    ::= { ipConfigRoutesIpv6RowEditor 4 }
+
+ipConfigRoutesIpv6RowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { ipConfigRoutesIpv6RowEditor 100 }
+
+ipStatus OBJECT IDENTIFIER
+    ::= { ipMibObjects 3 }
+
+ipStatusGlobals OBJECT IDENTIFIER
+    ::= { ipStatus 1 }
+
+ipStatusGlobalsIpv4NeighbourTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpStatusGlobalsIpv4NeighbourEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the IPv4 neighbour table (ARP)."
+    ::= { ipStatusGlobals 1 }
+
+ipStatusGlobalsIpv4NeighbourEntry OBJECT-TYPE
+    SYNTAX      IpStatusGlobalsIpv4NeighbourEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents an entry in the underlying operting
+         system's ARP table."
+    INDEX       { ipStatusGlobalsIpv4NeighbourIpv4 }
+    ::= { ipStatusGlobalsIpv4NeighbourTable 1 }
+
+IpStatusGlobalsIpv4NeighbourEntry ::= SEQUENCE {
+    ipStatusGlobalsIpv4NeighbourIpv4        IpAddress,
+    ipStatusGlobalsIpv4NeighbourMacAddress  MacAddress,
+    ipStatusGlobalsIpv4NeighbourInterface   InterfaceIndex
+}
+
+ipStatusGlobalsIpv4NeighbourIpv4 OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IPv4 address."
+    ::= { ipStatusGlobalsIpv4NeighbourEntry 1 }
+
+ipStatusGlobalsIpv4NeighbourMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MAC address associated with the IP address"
+    ::= { ipStatusGlobalsIpv4NeighbourEntry 2 }
+
+ipStatusGlobalsIpv4NeighbourInterface OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Interface the neighbour can be reached on."
+    ::= { ipStatusGlobalsIpv4NeighbourEntry 3 }
+
+ipStatusGlobalsIpv6NeighbourTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpStatusGlobalsIpv6NeighbourEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the IPv6 neighbour table."
+    ::= { ipStatusGlobals 2 }
+
+ipStatusGlobalsIpv6NeighbourEntry OBJECT-TYPE
+    SYNTAX      IpStatusGlobalsIpv6NeighbourEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents an entry in the underlying operting
+         system's nieghbour table."
+    INDEX       { ipStatusGlobalsIpv6NeighbourIpAddress,
+                  ipStatusGlobalsIpv6NeighbourInterfaceQuery }
+    ::= { ipStatusGlobalsIpv6NeighbourTable 1 }
+
+IpStatusGlobalsIpv6NeighbourEntry ::= SEQUENCE {
+    ipStatusGlobalsIpv6NeighbourIpAddress       InetAddressIPv6,
+    ipStatusGlobalsIpv6NeighbourInterfaceQuery  Integer32,
+    ipStatusGlobalsIpv6NeighbourMacAddress      MacAddress,
+    ipStatusGlobalsIpv6NeighbourInterface       InterfaceIndex
+}
+
+ipStatusGlobalsIpv6NeighbourIpAddress OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IP address."
+    ::= { ipStatusGlobalsIpv6NeighbourEntry 1 }
+
+ipStatusGlobalsIpv6NeighbourInterfaceQuery OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "If 'ipAddress' is a link-local address, then the interface index where
+         the host can be reached must be specified here, otherwise set this to
+         zero."
+    ::= { ipStatusGlobalsIpv6NeighbourEntry 2 }
+
+ipStatusGlobalsIpv6NeighbourMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MAC address associated with the IP address"
+    ::= { ipStatusGlobalsIpv6NeighbourEntry 3 }
+
+ipStatusGlobalsIpv6NeighbourInterface OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Interface the neighbour can be reached on."
+    ::= { ipStatusGlobalsIpv6NeighbourEntry 4 }
+
+ipStatusInterfaces OBJECT IDENTIFIER
+    ::= { ipStatus 2 }
+
+ipStatusInterfacesLinkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpStatusInterfacesLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides link-layer status information for IP interfaces."
+    ::= { ipStatusInterfaces 1 }
+
+ipStatusInterfacesLinkEntry OBJECT-TYPE
+    SYNTAX      IpStatusInterfacesLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents an IP interface."
+    INDEX       { ipStatusInterfacesLinkIfIndex }
+    ::= { ipStatusInterfacesLinkTable 1 }
+
+IpStatusInterfacesLinkEntry ::= SEQUENCE {
+    ipStatusInterfacesLinkIfIndex           InterfaceIndex,
+    ipStatusInterfacesLinkOsInterfaceIndex  Unsigned32,
+    ipStatusInterfacesLinkMtu               Unsigned32,
+    ipStatusInterfacesLinkMacAddress        MacAddress,
+    ipStatusInterfacesLinkUp                TruthValue,
+    ipStatusInterfacesLinkBroadcast         TruthValue,
+    ipStatusInterfacesLinkLoopback          TruthValue,
+    ipStatusInterfacesLinkRunning           TruthValue,
+    ipStatusInterfacesLinkNoarp             TruthValue,
+    ipStatusInterfacesLinkPromisc           TruthValue,
+    ipStatusInterfacesLinkMulticast         TruthValue
+}
+
+ipStatusInterfacesLinkIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Interface index number."
+    ::= { ipStatusInterfacesLinkEntry 1 }
+
+ipStatusInterfacesLinkOsInterfaceIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Interface index used by the operating system."
+    ::= { ipStatusInterfacesLinkEntry 2 }
+
+ipStatusInterfacesLinkMtu OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MTU for the interface."
+    ::= { ipStatusInterfacesLinkEntry 3 }
+
+ipStatusInterfacesLinkMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MAC-address of the interface."
+    ::= { ipStatusInterfacesLinkEntry 4 }
+
+ipStatusInterfacesLinkUp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates if the interface is up."
+    ::= { ipStatusInterfacesLinkEntry 5 }
+
+ipStatusInterfacesLinkBroadcast OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates if the interface is capable of transmitting broadcast
+         traffic."
+    ::= { ipStatusInterfacesLinkEntry 6 }
+
+ipStatusInterfacesLinkLoopback OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates if the interface is a loop-back interface."
+    ::= { ipStatusInterfacesLinkEntry 7 }
+
+ipStatusInterfacesLinkRunning OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Interface is running (according to the operating system)."
+    ::= { ipStatusInterfacesLinkEntry 8 }
+
+ipStatusInterfacesLinkNoarp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates if the interface will answer to ARP requests."
+    ::= { ipStatusInterfacesLinkEntry 9 }
+
+ipStatusInterfacesLinkPromisc OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates if the interface is in promisc mode."
+    ::= { ipStatusInterfacesLinkEntry 10 }
+
+ipStatusInterfacesLinkMulticast OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates if the interface supports multicast."
+    ::= { ipStatusInterfacesLinkEntry 11 }
+
+ipStatusInterfacesIpv4Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpStatusInterfacesIpv4Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides IPv4 status information for IP interfaces. If an
+         interface is configured to use a DHCP client, then the address can be
+         found here."
+    ::= { ipStatusInterfaces 2 }
+
+ipStatusInterfacesIpv4Entry OBJECT-TYPE
+    SYNTAX      IpStatusInterfacesIpv4Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents an IP interface."
+    INDEX       { ipStatusInterfacesIpv4IfIndex,
+                  ipStatusInterfacesIpv4NetworkAddress,
+                  ipStatusInterfacesIpv4NetworkMaskLength }
+    ::= { ipStatusInterfacesIpv4Table 1 }
+
+IpStatusInterfacesIpv4Entry ::= SEQUENCE {
+    ipStatusInterfacesIpv4IfIndex            InterfaceIndex,
+    ipStatusInterfacesIpv4NetworkAddress     IpAddress,
+    ipStatusInterfacesIpv4NetworkMaskLength  Integer32,
+    ipStatusInterfacesIpv4Broadcast          IpAddress
+}
+
+ipStatusInterfacesIpv4IfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Interface index number."
+    ::= { ipStatusInterfacesIpv4Entry 1 }
+
+ipStatusInterfacesIpv4NetworkAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IPv4 network address."
+    ::= { ipStatusInterfacesIpv4Entry 2 }
+
+ipStatusInterfacesIpv4NetworkMaskLength OBJECT-TYPE
+    SYNTAX      Integer32 (0..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IPv4 network mask length."
+    ::= { ipStatusInterfacesIpv4Entry 3 }
+
+ipStatusInterfacesIpv4Broadcast OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Broadcast address."
+    ::= { ipStatusInterfacesIpv4Entry 4 }
+
+ipStatusInterfacesDhcpClientV4Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpStatusInterfacesDhcpClientV4Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides status on the DHCP client running on a given
+         interface."
+    ::= { ipStatusInterfaces 3 }
+
+ipStatusInterfacesDhcpClientV4Entry OBJECT-TYPE
+    SYNTAX      IpStatusInterfacesDhcpClientV4Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents an instance of a DHCP client."
+    INDEX       { ipStatusInterfacesDhcpClientV4IfIndex }
+    ::= { ipStatusInterfacesDhcpClientV4Table 1 }
+
+IpStatusInterfacesDhcpClientV4Entry ::= SEQUENCE {
+    ipStatusInterfacesDhcpClientV4IfIndex   InterfaceIndex,
+    ipStatusInterfacesDhcpClientV4State     IpDhcpClientState,
+    ipStatusInterfacesDhcpClientV4ServerIp  IpAddress
+}
+
+ipStatusInterfacesDhcpClientV4IfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Interface index number."
+    ::= { ipStatusInterfacesDhcpClientV4Entry 1 }
+
+ipStatusInterfacesDhcpClientV4State OBJECT-TYPE
+    SYNTAX      IpDhcpClientState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "State of the DHCP client."
+    ::= { ipStatusInterfacesDhcpClientV4Entry 2 }
+
+ipStatusInterfacesDhcpClientV4ServerIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IP address of the DHCP server that has provided the DHCP offer."
+    ::= { ipStatusInterfacesDhcpClientV4Entry 3 }
+
+ipStatusInterfacesIpv6Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpStatusInterfacesIpv6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides IPv6 status information for IP interfaces. If an
+         interface is configured to use a DHCP client, then the address can be
+         found here."
+    ::= { ipStatusInterfaces 4 }
+
+ipStatusInterfacesIpv6Entry OBJECT-TYPE
+    SYNTAX      IpStatusInterfacesIpv6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents an IP interface."
+    INDEX       { ipStatusInterfacesIpv6IfIndex,
+                  ipStatusInterfacesIpv6NetworkAddress,
+                  ipStatusInterfacesIpv6NetworkMaskLength }
+    ::= { ipStatusInterfacesIpv6Table 1 }
+
+IpStatusInterfacesIpv6Entry ::= SEQUENCE {
+    ipStatusInterfacesIpv6IfIndex            InterfaceIndex,
+    ipStatusInterfacesIpv6NetworkAddress     InetAddressIPv6,
+    ipStatusInterfacesIpv6NetworkMaskLength  Integer32,
+    ipStatusInterfacesIpv6Tentative          TruthValue,
+    ipStatusInterfacesIpv6Duplicated         TruthValue,
+    ipStatusInterfacesIpv6Detached           TruthValue,
+    ipStatusInterfacesIpv6Nodad              TruthValue,
+    ipStatusInterfacesIpv6Autoconf           TruthValue
+}
+
+ipStatusInterfacesIpv6IfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Interface index number."
+    ::= { ipStatusInterfacesIpv6Entry 1 }
+
+ipStatusInterfacesIpv6NetworkAddress OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IPv6 network address."
+    ::= { ipStatusInterfacesIpv6Entry 2 }
+
+ipStatusInterfacesIpv6NetworkMaskLength OBJECT-TYPE
+    SYNTAX      Integer32 (0..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IPv6 network mask length."
+    ::= { ipStatusInterfacesIpv6Entry 3 }
+
+ipStatusInterfacesIpv6Tentative OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An address whose uniqueness on a link is being verified, prior to its
+         assignment to an interface. A tentative address is not considered
+         assigned to an interface in the usual sense."
+    ::= { ipStatusInterfacesIpv6Entry 4 }
+
+ipStatusInterfacesIpv6Duplicated OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the address duplication is detected by Duplicate Address
+         Detection (DAD).
+         
+         If the address is a link-local address formed from an interface
+         identifier based on the hardware address, which is supposed to be
+         uniquely assigned (e.g., EUI-64 for an Ethernet interface), IP
+         operation on the interface should be disabled."
+    ::= { ipStatusInterfacesIpv6Entry 5 }
+
+ipStatusInterfacesIpv6Detached OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates this address is ready to be detached from the link (IPv6
+         network)."
+    ::= { ipStatusInterfacesIpv6Entry 6 }
+
+ipStatusInterfacesIpv6Nodad OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates this address does not perform Duplicate Address Detection
+         (DAD)."
+    ::= { ipStatusInterfacesIpv6Entry 7 }
+
+ipStatusInterfacesIpv6Autoconf OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates this address is capable of being retrieved by stateless
+         address autoconfiguration."
+    ::= { ipStatusInterfacesIpv6Entry 8 }
+
+ipStatusRoutes OBJECT IDENTIFIER
+    ::= { ipStatus 3 }
+
+ipStatusRoutesIpv4Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpStatusRoutesIpv4Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides IPv4 routing status."
+    ::= { ipStatusRoutes 1 }
+
+ipStatusRoutesIpv4Entry OBJECT-TYPE
+    SYNTAX      IpStatusRoutesIpv4Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents an IP route in the system's routing
+         table."
+    INDEX       { ipStatusRoutesIpv4NetworkAddress,
+                  ipStatusRoutesIpv4NetworkPrefixSize,
+                  ipStatusRoutesIpv4NextHop }
+    ::= { ipStatusRoutesIpv4Table 1 }
+
+IpStatusRoutesIpv4Entry ::= SEQUENCE {
+    ipStatusRoutesIpv4NetworkAddress           IpAddress,
+    ipStatusRoutesIpv4NetworkPrefixSize        Integer32,
+    ipStatusRoutesIpv4NextHop                  IpAddress,
+    ipStatusRoutesIpv4DerivedNextHopInterface  InterfaceIndex,
+    ipStatusRoutesIpv4FlagUp                   TruthValue,
+    ipStatusRoutesIpv4FlagHost                 TruthValue,
+    ipStatusRoutesIpv4FlagGateway              TruthValue,
+    ipStatusRoutesIpv4OwnerConf                TruthValue,
+    ipStatusRoutesIpv4OwnerDhcp                TruthValue,
+    ipStatusRoutesIpv4OwnerDynamic             TruthValue
+}
+
+ipStatusRoutesIpv4NetworkAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Network address."
+    ::= { ipStatusRoutesIpv4Entry 1 }
+
+ipStatusRoutesIpv4NetworkPrefixSize OBJECT-TYPE
+    SYNTAX      Integer32 (0..32)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Network prefix size."
+    ::= { ipStatusRoutesIpv4Entry 2 }
+
+ipStatusRoutesIpv4NextHop OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Next-hop address."
+    ::= { ipStatusRoutesIpv4Entry 3 }
+
+ipStatusRoutesIpv4DerivedNextHopInterface OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Next-hop interface."
+    ::= { ipStatusRoutesIpv4Entry 4 }
+
+ipStatusRoutesIpv4FlagUp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The route is up."
+    ::= { ipStatusRoutesIpv4Entry 35 }
+
+ipStatusRoutesIpv4FlagHost OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The route is forwarding to this host (loop-back)."
+    ::= { ipStatusRoutesIpv4Entry 36 }
+
+ipStatusRoutesIpv4FlagGateway OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The route is using a gateway as next-hop, of not set then an interface
+         is used."
+    ::= { ipStatusRoutesIpv4Entry 37 }
+
+ipStatusRoutesIpv4OwnerConf OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The route is installed as part of the user configuration."
+    ::= { ipStatusRoutesIpv4Entry 67 }
+
+ipStatusRoutesIpv4OwnerDhcp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The route is installed by a DHCP client."
+    ::= { ipStatusRoutesIpv4Entry 68 }
+
+ipStatusRoutesIpv4OwnerDynamic OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The route is installed by a routing protocol."
+    ::= { ipStatusRoutesIpv4Entry 69 }
+
+ipStatusRoutesIpv6Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpStatusRoutesIpv6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides IPv6 routing status."
+    ::= { ipStatusRoutes 2 }
+
+ipStatusRoutesIpv6Entry OBJECT-TYPE
+    SYNTAX      IpStatusRoutesIpv6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents an IP route in the system's routing
+         table."
+    INDEX       { ipStatusRoutesIpv6NetworkAddress,
+                  ipStatusRoutesIpv6NetworkPrefixSize,
+                  ipStatusRoutesIpv6NextHop,
+                  ipStatusRoutesIpv6NextHopInterface }
+    ::= { ipStatusRoutesIpv6Table 1 }
+
+IpStatusRoutesIpv6Entry ::= SEQUENCE {
+    ipStatusRoutesIpv6NetworkAddress           InetAddressIPv6,
+    ipStatusRoutesIpv6NetworkPrefixSize        Integer32,
+    ipStatusRoutesIpv6NextHop                  InetAddressIPv6,
+    ipStatusRoutesIpv6NextHopInterface         InterfaceIndex,
+    ipStatusRoutesIpv6DerivedNextHopInterface  InterfaceIndex,
+    ipStatusRoutesIpv6FlagUp                   TruthValue,
+    ipStatusRoutesIpv6FlagHost                 TruthValue,
+    ipStatusRoutesIpv6FlagGateway              TruthValue,
+    ipStatusRoutesIpv6OwnerConf                TruthValue,
+    ipStatusRoutesIpv6OwnerDhcp                TruthValue,
+    ipStatusRoutesIpv6OwnerDynamic             TruthValue
+}
+
+ipStatusRoutesIpv6NetworkAddress OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Network address."
+    ::= { ipStatusRoutesIpv6Entry 1 }
+
+ipStatusRoutesIpv6NetworkPrefixSize OBJECT-TYPE
+    SYNTAX      Integer32 (0..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Network prefix size."
+    ::= { ipStatusRoutesIpv6Entry 2 }
+
+ipStatusRoutesIpv6NextHop OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Next-hop address."
+    ::= { ipStatusRoutesIpv6Entry 3 }
+
+ipStatusRoutesIpv6NextHopInterface OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "If the next-hop address is a link-local address, then the interface of
+         the link-local address must be specified here. Otherwise this value is
+         not used."
+    ::= { ipStatusRoutesIpv6Entry 4 }
+
+ipStatusRoutesIpv6DerivedNextHopInterface OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Next-hop interface."
+    ::= { ipStatusRoutesIpv6Entry 5 }
+
+ipStatusRoutesIpv6FlagUp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The route is up."
+    ::= { ipStatusRoutesIpv6Entry 36 }
+
+ipStatusRoutesIpv6FlagHost OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The route is forwarding to this host (loop-back)."
+    ::= { ipStatusRoutesIpv6Entry 37 }
+
+ipStatusRoutesIpv6FlagGateway OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The route is using a gateway as next-hop, of not set then an interface
+         is used."
+    ::= { ipStatusRoutesIpv6Entry 38 }
+
+ipStatusRoutesIpv6OwnerConf OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The route is installed as part of the user configuration."
+    ::= { ipStatusRoutesIpv6Entry 68 }
+
+ipStatusRoutesIpv6OwnerDhcp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The route is installed by a DHCP client."
+    ::= { ipStatusRoutesIpv6Entry 69 }
+
+ipStatusRoutesIpv6OwnerDynamic OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The route is installed by a routing protocol."
+    ::= { ipStatusRoutesIpv6Entry 70 }
+
+ipControl OBJECT IDENTIFIER
+    ::= { ipMibObjects 4 }
+
+ipControlGlobals OBJECT IDENTIFIER
+    ::= { ipControl 1 }
+
+ipControlGlobalsIpv4NeighbourTableClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Flush the entries in IPv4 ARP cache except for the permanent ones."
+    ::= { ipControlGlobals 1 }
+
+ipControlGlobalsIpv6NeighbourTableClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Erase all the NDP (Neighbor Discovery Protocol) entries registered in
+         IPv6 neighbour cache."
+    ::= { ipControlGlobals 2 }
+
+ipControlGlobalsIpv4SystemStatisticsClear OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Clear the system-wide IPv4 traffic statistics."
+    ::= { ipControlGlobals 3 }
+
+ipControlGlobalsIpv6SystemStatisticsClear OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Clear the system-wide IPv6 traffic statistics."
+    ::= { ipControlGlobals 4 }
+
+ipControlInterface OBJECT IDENTIFIER
+    ::= { ipControl 2 }
+
+ipControlInterfaceDhcpClientTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpControlInterfaceDhcpClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides control facilities to control an instance of the
+         DHCP client."
+    ::= { ipControlInterface 1 }
+
+ipControlInterfaceDhcpClientEntry OBJECT-TYPE
+    SYNTAX      IpControlInterfaceDhcpClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents an instance of the DHCP client."
+    INDEX       { ipControlInterfaceDhcpClientIfIndex }
+    ::= { ipControlInterfaceDhcpClientTable 1 }
+
+IpControlInterfaceDhcpClientEntry ::= SEQUENCE {
+    ipControlInterfaceDhcpClientIfIndex  InterfaceIndex,
+    ipControlInterfaceDhcpClientRestart  TruthValue
+}
+
+ipControlInterfaceDhcpClientIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Interface index number."
+    ::= { ipControlInterfaceDhcpClientEntry 1 }
+
+ipControlInterfaceDhcpClientRestart OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Restart the DHCP client."
+    ::= { ipControlInterfaceDhcpClientEntry 2 }
+
+ipStatistics OBJECT IDENTIFIER
+    ::= { ipMibObjects 5 }
+
+ipStatisticsGlobals OBJECT IDENTIFIER
+    ::= { ipStatistics 1 }
+
+ipStatisticsGlobalsIpv4 OBJECT IDENTIFIER
+    ::= { ipStatisticsGlobals 1 }
+
+ipStatisticsGlobalsIpv4InReceives OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams received, including those received in
+         error.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 1 }
+
+ipStatisticsGlobalsIpv4HCInReceives OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams received, including those received in
+         error. This object counts the same datagrams as InReceives, but allows
+         for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 2 }
+
+ipStatisticsGlobalsIpv4InOctets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets received in input IP datagrams, including those
+         received in error. Octets from datagrams counted in InReceives must be
+         counted here.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 3 }
+
+ipStatisticsGlobalsIpv4HCInOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets received in input IP datagrams, including those
+         received in error. This object counts the same octets as InOctets, but
+         allows for a larger value.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 4 }
+
+ipStatisticsGlobalsIpv4InHdrErrors OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams discarded due to errors in their IP
+         headers, including version number mismatch, other format errors, hop
+         count exceeded, and errors discovered in processing their IP options.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 5 }
+
+ipStatisticsGlobalsIpv4InNoRoutes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams discarded because no route could be found
+         to transmit them to their destination.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 6 }
+
+ipStatisticsGlobalsIpv4InAddrErrors OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams discarded because the IP address in their
+         IP header's destination field was not a valid address to be received at
+         this entity. This count includes invalid addresses (e.g., ::0). For
+         entities that are not IP routers and therefore do not forward
+         datagrams, this counter includes datagrams discarded because the
+         destination address was not a local address.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 7 }
+
+ipStatisticsGlobalsIpv4InUnknownProtos OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of locally-addressed IP datagrams received successfully but
+         discarded because of an unknown or unsupported protocol.
+         
+         When tracking interface statistics, the counter of the interface to
+         which these datagrams were addressed is incremented. This interface
+         might not be the same as the input interface for some of the datagrams.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 8 }
+
+ipStatisticsGlobalsIpv4InTruncatedPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams discarded because the datagram frame
+         didn't carry enough data.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 9 }
+
+ipStatisticsGlobalsIpv4InForwDatagrams OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input datagrams for which this entity was not their final IP
+         destination and for which this entity attempted to find a route to
+         forward them to their final destination.
+         
+         When tracking interface statistics, the counter of the incoming
+         interface is incremented for each datagram.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 10 }
+
+ipStatisticsGlobalsIpv4HCInForwDatagrams OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input datagrams for which this entity was not their final IP
+         destination and for which this entity attempted to find a route to
+         forward them to their final destination. This object counts the same
+         packets as InForwDatagrams, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 11 }
+
+ipStatisticsGlobalsIpv4ReasmReqds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP fragments received that needed to be reassembled at this
+         interface.
+         
+         When tracking interface statistics, the counter of the interface to
+         which these fragments were addressed is incremented. This interface
+         might not be the same as the input interface for some of the fragments.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 12 }
+
+ipStatisticsGlobalsIpv4ReasmOKs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams successfully reassembled.
+         
+         When tracking interface statistics, the counter of the interface to
+         which these datagrams were addressed is incremented. This interface
+         might not be the same as the input interface for some of the datagrams.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 13 }
+
+ipStatisticsGlobalsIpv4ReasmFails OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of failures detected by the IP re-assembly algorithm.
+         
+         Note: this is not necessarily a count of discarded IP fragments because
+         some algorithms (notably the algorithm in RFC 815) can lose track of
+         the number of fragments by combining them as they are received.
+         
+         When tracking interface statistics, the counter of the interface to
+         which these fragments were addressed is incremented. This interface
+         might not be the same as the input interface for some of the fragments.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 14 }
+
+ipStatisticsGlobalsIpv4InDiscards OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams for which no problems were encountered to
+         prevent their continued processing, but were discarded.
+         
+         Note: this counter does not include any datagrams discarded while
+         awaiting re-assembly.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 15 }
+
+ipStatisticsGlobalsIpv4InDelivers OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of datagrams successfully delivered to IP user-protocols
+         (including ICMP).
+         
+         When tracking interface statistics, the counter of the interface to
+         which these datagrams were addressed is incremented. This interface
+         might not be the same as the input interface for some of the datagrams.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 16 }
+
+ipStatisticsGlobalsIpv4HCInDelivers OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of datagrams successfully delivered to IP user-protocols
+         (including ICMP). This object counts the same packets as
+         ipSystemStatsInDelivers, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 17 }
+
+ipStatisticsGlobalsIpv4OutRequests OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that local IP user-protocols (including ICMP)
+         supplied to IP in requests for transmission.
+         
+         Note: this counter does not include any datagrams counted in
+         OutForwDatagrams.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 18 }
+
+ipStatisticsGlobalsIpv4HCOutRequests OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that local IP user-protocols (including ICMP)
+         supplied to IP in requests for transmission. This object counts the
+         same packets as OutRequests, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 19 }
+
+ipStatisticsGlobalsIpv4OutNoRoutes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of locally generated IP datagrams discarded because no route
+         could be found to transmit them to their destination.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 20 }
+
+ipStatisticsGlobalsIpv4OutForwDatagrams OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of datagrams for which this entity was not their final IP
+         destination and for which it was successful in finding a path to their
+         final destination.
+         
+         When tracking interface statistics, the counter of the outgoing
+         interface is incremented for a successfully forwarded datagram.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 21 }
+
+ipStatisticsGlobalsIpv4HCOutForwDatagrams OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of datagrams for which this entity was not their final IP
+         destination and for which it was successful in finding a path to their
+         final destination. This object counts the same packets as
+         OutForwDatagrams, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 22 }
+
+ipStatisticsGlobalsIpv4OutDiscards OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of output IP datagrams for which no problem was encountered to
+         prevent their transmission to their destination, but were discarded.
+         
+         Note: this counter includes datagrams counted in OutForwDatagrams if
+         any such datagrams met this (discretionary) discard criterion.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 23 }
+
+ipStatisticsGlobalsIpv4OutFragReqds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that require fragmentation in order to be
+         transmitted.
+         
+         When tracking interface statistics, the counter of the outgoing
+         interface is incremented for a successfully fragmented datagram.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 24 }
+
+ipStatisticsGlobalsIpv4OutFragOKs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that have been successfully fragmented.
+         
+         When tracking interface statistics, the counter of the outgoing
+         interface is incremented for a successfully fragmented datagram.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 25 }
+
+ipStatisticsGlobalsIpv4OutFragFails OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that have been discarded because they needed to
+         be fragmented but could not be. This includes IPv4 packets that have
+         the DF bit set and IPv6 packets that are being forwarded and exceed the
+         outgoing link MTU.
+         
+         When tracking interface statistics, the counter of the outgoing
+         interface is incremented for an unsuccessfully fragmented datagram.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 26 }
+
+ipStatisticsGlobalsIpv4OutFragCreates OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of output datagram fragments that have been generated as a
+         result of IP fragmentation.
+         
+         When tracking interface statistics, the counter of the outgoing
+         interface is incremented for a successfully fragmented datagram.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 27 }
+
+ipStatisticsGlobalsIpv4OutTransmits OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that this entity supplied to the lower layers
+         for transmission. This includes datagrams generated locally and those
+         forwarded by this entity.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 28 }
+
+ipStatisticsGlobalsIpv4HCOutTransmits OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that this entity supplied to the lower layers
+         for transmission. This object counts the same datagrams as
+         OutTransmits, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 29 }
+
+ipStatisticsGlobalsIpv4OutOctets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets in IP datagrams delivered to the lower layers for
+         transmission. Octets from datagrams counted in OutTransmits must be
+         counted here.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 30 }
+
+ipStatisticsGlobalsIpv4HCOutOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets in IP datagrams delivered to the lower layers for
+         transmission. This objects counts the same octets as OutOctets, but
+         allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 31 }
+
+ipStatisticsGlobalsIpv4InMcastPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP multicast datagrams received.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 32 }
+
+ipStatisticsGlobalsIpv4HCInMcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP multicast datagrams received. This object counts the same
+         datagrams as InMcastPkts but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 33 }
+
+ipStatisticsGlobalsIpv4InMcastOctets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets received in IP multicast datagrams. Octets from
+         datagrams counted in InMcastPkts MUST be counted here.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 34 }
+
+ipStatisticsGlobalsIpv4HCInMcastOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets received in IP multicast datagrams. This object counts
+         the same octets as InMcastOctets, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 35 }
+
+ipStatisticsGlobalsIpv4OutMcastPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP multicast datagrams transmitted.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 36 }
+
+ipStatisticsGlobalsIpv4HCOutMcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP multicast datagrams transmitted. This object counts the
+         same datagrams as OutMcastPkts, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 37 }
+
+ipStatisticsGlobalsIpv4OutMcastOctets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets transmitted in IP multicast datagrams. Octets from
+         datagrams counted in OutMcastPkts must be counted here.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 38 }
+
+ipStatisticsGlobalsIpv4HCOutMcastOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets transmitted in IP multicast datagrams. This object
+         counts the same octets as OutMcastOctets, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 39 }
+
+ipStatisticsGlobalsIpv4InBcastPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP broadcast datagrams received.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 40 }
+
+ipStatisticsGlobalsIpv4HCInBcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP broadcast datagrams received. This object counts the same
+         datagrams as InBcastPkts but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 41 }
+
+ipStatisticsGlobalsIpv4OutBcastPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP broadcast datagrams transmitted.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 42 }
+
+ipStatisticsGlobalsIpv4HCOutBcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP broadcast datagrams transmitted. This object counts the
+         same datagrams as OutBcastPkts, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv4 43 }
+
+ipStatisticsGlobalsIpv4DiscontinuityTime OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Value of sysUpTime on the most recent occasion when any one or more of
+         this entry's counters suffered a discontinuity.
+         
+         If no such discontinuities have occurred since the last
+         re-initialization of the IP stack, then this object contains a zero
+         value."
+    ::= { ipStatisticsGlobalsIpv4 44 }
+
+ipStatisticsGlobalsIpv4RefreshRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum reasonable polling interval for this entry. This object
+         provides an indication of the minimum amount of time required to update
+         the counters in this entry."
+    ::= { ipStatisticsGlobalsIpv4 45 }
+
+ipStatisticsGlobalsIpv6 OBJECT IDENTIFIER
+    ::= { ipStatisticsGlobals 2 }
+
+ipStatisticsGlobalsIpv6InReceives OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams received, including those received in
+         error.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 1 }
+
+ipStatisticsGlobalsIpv6HCInReceives OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams received, including those received in
+         error. This object counts the same datagrams as InReceives, but allows
+         for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 2 }
+
+ipStatisticsGlobalsIpv6InOctets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets received in input IP datagrams, including those
+         received in error. Octets from datagrams counted in InReceives must be
+         counted here.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 3 }
+
+ipStatisticsGlobalsIpv6HCInOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets received in input IP datagrams, including those
+         received in error. This object counts the same octets as InOctets, but
+         allows for a larger value.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 4 }
+
+ipStatisticsGlobalsIpv6InHdrErrors OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams discarded due to errors in their IP
+         headers, including version number mismatch, other format errors, hop
+         count exceeded, and errors discovered in processing their IP options.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 5 }
+
+ipStatisticsGlobalsIpv6InNoRoutes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams discarded because no route could be found
+         to transmit them to their destination.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 6 }
+
+ipStatisticsGlobalsIpv6InAddrErrors OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams discarded because the IP address in their
+         IP header's destination field was not a valid address to be received at
+         this entity. This count includes invalid addresses (e.g., ::0). For
+         entities that are not IP routers and therefore do not forward
+         datagrams, this counter includes datagrams discarded because the
+         destination address was not a local address.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 7 }
+
+ipStatisticsGlobalsIpv6InUnknownProtos OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of locally-addressed IP datagrams received successfully but
+         discarded because of an unknown or unsupported protocol.
+         
+         When tracking interface statistics, the counter of the interface to
+         which these datagrams were addressed is incremented. This interface
+         might not be the same as the input interface for some of the datagrams.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 8 }
+
+ipStatisticsGlobalsIpv6InTruncatedPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams discarded because the datagram frame
+         didn't carry enough data.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 9 }
+
+ipStatisticsGlobalsIpv6InForwDatagrams OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input datagrams for which this entity was not their final IP
+         destination and for which this entity attempted to find a route to
+         forward them to their final destination.
+         
+         When tracking interface statistics, the counter of the incoming
+         interface is incremented for each datagram.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 10 }
+
+ipStatisticsGlobalsIpv6HCInForwDatagrams OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input datagrams for which this entity was not their final IP
+         destination and for which this entity attempted to find a route to
+         forward them to their final destination. This object counts the same
+         packets as InForwDatagrams, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 11 }
+
+ipStatisticsGlobalsIpv6ReasmReqds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP fragments received that needed to be reassembled at this
+         interface.
+         
+         When tracking interface statistics, the counter of the interface to
+         which these fragments were addressed is incremented. This interface
+         might not be the same as the input interface for some of the fragments.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 12 }
+
+ipStatisticsGlobalsIpv6ReasmOKs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams successfully reassembled.
+         
+         When tracking interface statistics, the counter of the interface to
+         which these datagrams were addressed is incremented. This interface
+         might not be the same as the input interface for some of the datagrams.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 13 }
+
+ipStatisticsGlobalsIpv6ReasmFails OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of failures detected by the IP re-assembly algorithm.
+         
+         Note: this is not necessarily a count of discarded IP fragments because
+         some algorithms (notably the algorithm in RFC 815) can lose track of
+         the number of fragments by combining them as they are received.
+         
+         When tracking interface statistics, the counter of the interface to
+         which these fragments were addressed is incremented. This interface
+         might not be the same as the input interface for some of the fragments.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 14 }
+
+ipStatisticsGlobalsIpv6InDiscards OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams for which no problems were encountered to
+         prevent their continued processing, but were discarded.
+         
+         Note: this counter does not include any datagrams discarded while
+         awaiting re-assembly.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 15 }
+
+ipStatisticsGlobalsIpv6InDelivers OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of datagrams successfully delivered to IP user-protocols
+         (including ICMP).
+         
+         When tracking interface statistics, the counter of the interface to
+         which these datagrams were addressed is incremented. This interface
+         might not be the same as the input interface for some of the datagrams.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 16 }
+
+ipStatisticsGlobalsIpv6HCInDelivers OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of datagrams successfully delivered to IP user-protocols
+         (including ICMP). This object counts the same packets as
+         ipSystemStatsInDelivers, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 17 }
+
+ipStatisticsGlobalsIpv6OutRequests OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that local IP user-protocols (including ICMP)
+         supplied to IP in requests for transmission.
+         
+         Note: this counter does not include any datagrams counted in
+         OutForwDatagrams.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 18 }
+
+ipStatisticsGlobalsIpv6HCOutRequests OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that local IP user-protocols (including ICMP)
+         supplied to IP in requests for transmission. This object counts the
+         same packets as OutRequests, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 19 }
+
+ipStatisticsGlobalsIpv6OutNoRoutes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of locally generated IP datagrams discarded because no route
+         could be found to transmit them to their destination.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 20 }
+
+ipStatisticsGlobalsIpv6OutForwDatagrams OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of datagrams for which this entity was not their final IP
+         destination and for which it was successful in finding a path to their
+         final destination.
+         
+         When tracking interface statistics, the counter of the outgoing
+         interface is incremented for a successfully forwarded datagram.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 21 }
+
+ipStatisticsGlobalsIpv6HCOutForwDatagrams OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of datagrams for which this entity was not their final IP
+         destination and for which it was successful in finding a path to their
+         final destination. This object counts the same packets as
+         OutForwDatagrams, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 22 }
+
+ipStatisticsGlobalsIpv6OutDiscards OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of output IP datagrams for which no problem was encountered to
+         prevent their transmission to their destination, but were discarded.
+         
+         Note: this counter includes datagrams counted in OutForwDatagrams if
+         any such datagrams met this (discretionary) discard criterion.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 23 }
+
+ipStatisticsGlobalsIpv6OutFragReqds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that require fragmentation in order to be
+         transmitted.
+         
+         When tracking interface statistics, the counter of the outgoing
+         interface is incremented for a successfully fragmented datagram.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 24 }
+
+ipStatisticsGlobalsIpv6OutFragOKs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that have been successfully fragmented.
+         
+         When tracking interface statistics, the counter of the outgoing
+         interface is incremented for a successfully fragmented datagram.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 25 }
+
+ipStatisticsGlobalsIpv6OutFragFails OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that have been discarded because they needed to
+         be fragmented but could not be. This includes IPv4 packets that have
+         the DF bit set and IPv6 packets that are being forwarded and exceed the
+         outgoing link MTU.
+         
+         When tracking interface statistics, the counter of the outgoing
+         interface is incremented for an unsuccessfully fragmented datagram.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 26 }
+
+ipStatisticsGlobalsIpv6OutFragCreates OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of output datagram fragments that have been generated as a
+         result of IP fragmentation.
+         
+         When tracking interface statistics, the counter of the outgoing
+         interface is incremented for a successfully fragmented datagram.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 27 }
+
+ipStatisticsGlobalsIpv6OutTransmits OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that this entity supplied to the lower layers
+         for transmission. This includes datagrams generated locally and those
+         forwarded by this entity.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 28 }
+
+ipStatisticsGlobalsIpv6HCOutTransmits OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that this entity supplied to the lower layers
+         for transmission. This object counts the same datagrams as
+         OutTransmits, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 29 }
+
+ipStatisticsGlobalsIpv6OutOctets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets in IP datagrams delivered to the lower layers for
+         transmission. Octets from datagrams counted in OutTransmits must be
+         counted here.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 30 }
+
+ipStatisticsGlobalsIpv6HCOutOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets in IP datagrams delivered to the lower layers for
+         transmission. This objects counts the same octets as OutOctets, but
+         allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 31 }
+
+ipStatisticsGlobalsIpv6InMcastPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP multicast datagrams received.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 32 }
+
+ipStatisticsGlobalsIpv6HCInMcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP multicast datagrams received. This object counts the same
+         datagrams as InMcastPkts but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 33 }
+
+ipStatisticsGlobalsIpv6InMcastOctets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets received in IP multicast datagrams. Octets from
+         datagrams counted in InMcastPkts MUST be counted here.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 34 }
+
+ipStatisticsGlobalsIpv6HCInMcastOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets received in IP multicast datagrams. This object counts
+         the same octets as InMcastOctets, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 35 }
+
+ipStatisticsGlobalsIpv6OutMcastPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP multicast datagrams transmitted.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 36 }
+
+ipStatisticsGlobalsIpv6HCOutMcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP multicast datagrams transmitted. This object counts the
+         same datagrams as OutMcastPkts, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 37 }
+
+ipStatisticsGlobalsIpv6OutMcastOctets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets transmitted in IP multicast datagrams. Octets from
+         datagrams counted in OutMcastPkts must be counted here.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 38 }
+
+ipStatisticsGlobalsIpv6HCOutMcastOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets transmitted in IP multicast datagrams. This object
+         counts the same octets as OutMcastOctets, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 39 }
+
+ipStatisticsGlobalsIpv6InBcastPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP broadcast datagrams received.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 40 }
+
+ipStatisticsGlobalsIpv6HCInBcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP broadcast datagrams received. This object counts the same
+         datagrams as InBcastPkts but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 41 }
+
+ipStatisticsGlobalsIpv6OutBcastPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP broadcast datagrams transmitted.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 42 }
+
+ipStatisticsGlobalsIpv6HCOutBcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP broadcast datagrams transmitted. This object counts the
+         same datagrams as OutBcastPkts, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsGlobalsIpv6 43 }
+
+ipStatisticsGlobalsIpv6DiscontinuityTime OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Value of sysUpTime on the most recent occasion when any one or more of
+         this entry's counters suffered a discontinuity.
+         
+         If no such discontinuities have occurred since the last
+         re-initialization of the IP stack, then this object contains a zero
+         value."
+    ::= { ipStatisticsGlobalsIpv6 44 }
+
+ipStatisticsGlobalsIpv6RefreshRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum reasonable polling interval for this entry. This object
+         provides an indication of the minimum amount of time required to update
+         the counters in this entry."
+    ::= { ipStatisticsGlobalsIpv6 45 }
+
+ipStatisticsInterfaces OBJECT IDENTIFIER
+    ::= { ipStatistics 2 }
+
+ipStatisticsInterfacesLinkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpStatisticsInterfacesLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides interface link statistics for a given IP interface."
+    ::= { ipStatisticsInterfaces 1 }
+
+ipStatisticsInterfacesLinkEntry OBJECT-TYPE
+    SYNTAX      IpStatisticsInterfacesLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents an IP interface."
+    INDEX       { ipStatisticsInterfacesLinkIfIndex }
+    ::= { ipStatisticsInterfacesLinkTable 1 }
+
+IpStatisticsInterfacesLinkEntry ::= SEQUENCE {
+    ipStatisticsInterfacesLinkIfIndex        InterfaceIndex,
+    ipStatisticsInterfacesLinkInPackets      Counter64,
+    ipStatisticsInterfacesLinkOutPackets     Counter64,
+    ipStatisticsInterfacesLinkInBytes        Counter64,
+    ipStatisticsInterfacesLinkOutBytes       Counter64,
+    ipStatisticsInterfacesLinkInMulticasts   Counter64,
+    ipStatisticsInterfacesLinkOutMulticasts  Counter64,
+    ipStatisticsInterfacesLinkInBroadcasts   Counter64,
+    ipStatisticsInterfacesLinkOutBroadcasts  Counter64
+}
+
+ipStatisticsInterfacesLinkIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Interface index number."
+    ::= { ipStatisticsInterfacesLinkEntry 1 }
+
+ipStatisticsInterfacesLinkInPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets delivered by MAC layer to IP layer."
+    ::= { ipStatisticsInterfacesLinkEntry 2 }
+
+ipStatisticsInterfacesLinkOutPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets IP protocols requested be transmitted, including
+         those that were discarded or not sent."
+    ::= { ipStatisticsInterfacesLinkEntry 3 }
+
+ipStatisticsInterfacesLinkInBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets received on the interface, including framing
+         characters."
+    ::= { ipStatisticsInterfacesLinkEntry 4 }
+
+ipStatisticsInterfacesLinkOutBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets transmitted out of the interface, including framing
+         characters."
+    ::= { ipStatisticsInterfacesLinkEntry 5 }
+
+ipStatisticsInterfacesLinkInMulticasts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets delivered by MAC layer to IP layer that were
+         addressed to a MAC multicast address.
+         
+         For a MAC layer protocol, this includes both Group and Functional
+         addresses."
+    ::= { ipStatisticsInterfacesLinkEntry 6 }
+
+ipStatisticsInterfacesLinkOutMulticasts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets addressed to a multicast MAC address that IP
+         protocols requested be transmitted, including those that were discarded
+         or not sent.
+         
+         For a MAC layer protocol, this includes both Group and Functional
+         addresses."
+    ::= { ipStatisticsInterfacesLinkEntry 7 }
+
+ipStatisticsInterfacesLinkInBroadcasts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets delivered by MAC layer to IP layer that were
+         addressed to a MAC broadcast address."
+    ::= { ipStatisticsInterfacesLinkEntry 8 }
+
+ipStatisticsInterfacesLinkOutBroadcasts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets addressed to a broadcast MAC address that IP
+         protocols requested be transmitted, including those that were discarded
+         or not sent."
+    ::= { ipStatisticsInterfacesLinkEntry 9 }
+
+ipStatisticsInterfacesIpv4Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpStatisticsInterfacesIpv4Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides IPv4 related statitics for a given IP interface."
+    ::= { ipStatisticsInterfaces 2 }
+
+ipStatisticsInterfacesIpv4Entry OBJECT-TYPE
+    SYNTAX      IpStatisticsInterfacesIpv4Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents an IP interface."
+    INDEX       { ipStatisticsInterfacesIpv4IfIndex }
+    ::= { ipStatisticsInterfacesIpv4Table 1 }
+
+IpStatisticsInterfacesIpv4Entry ::= SEQUENCE {
+    ipStatisticsInterfacesIpv4IfIndex             InterfaceIndex,
+    ipStatisticsInterfacesIpv4InReceives          Unsigned32,
+    ipStatisticsInterfacesIpv4HCInReceives        Counter64,
+    ipStatisticsInterfacesIpv4InOctets            Unsigned32,
+    ipStatisticsInterfacesIpv4HCInOctets          Counter64,
+    ipStatisticsInterfacesIpv4InHdrErrors         Unsigned32,
+    ipStatisticsInterfacesIpv4InNoRoutes          Unsigned32,
+    ipStatisticsInterfacesIpv4InAddrErrors        Unsigned32,
+    ipStatisticsInterfacesIpv4InUnknownProtos     Unsigned32,
+    ipStatisticsInterfacesIpv4InTruncatedPkts     Unsigned32,
+    ipStatisticsInterfacesIpv4InForwDatagrams     Unsigned32,
+    ipStatisticsInterfacesIpv4HCInForwDatagrams   Counter64,
+    ipStatisticsInterfacesIpv4ReasmReqds          Unsigned32,
+    ipStatisticsInterfacesIpv4ReasmOKs            Unsigned32,
+    ipStatisticsInterfacesIpv4ReasmFails          Unsigned32,
+    ipStatisticsInterfacesIpv4InDiscards          Unsigned32,
+    ipStatisticsInterfacesIpv4InDelivers          Unsigned32,
+    ipStatisticsInterfacesIpv4HCInDelivers        Counter64,
+    ipStatisticsInterfacesIpv4OutRequests         Unsigned32,
+    ipStatisticsInterfacesIpv4HCOutRequests       Counter64,
+    ipStatisticsInterfacesIpv4OutNoRoutes         Unsigned32,
+    ipStatisticsInterfacesIpv4OutForwDatagrams    Unsigned32,
+    ipStatisticsInterfacesIpv4HCOutForwDatagrams  Counter64,
+    ipStatisticsInterfacesIpv4OutDiscards         Unsigned32,
+    ipStatisticsInterfacesIpv4OutFragReqds        Unsigned32,
+    ipStatisticsInterfacesIpv4OutFragOKs          Unsigned32,
+    ipStatisticsInterfacesIpv4OutFragFails        Unsigned32,
+    ipStatisticsInterfacesIpv4OutFragCreates      Unsigned32,
+    ipStatisticsInterfacesIpv4OutTransmits        Unsigned32,
+    ipStatisticsInterfacesIpv4HCOutTransmits      Counter64,
+    ipStatisticsInterfacesIpv4OutOctets           Unsigned32,
+    ipStatisticsInterfacesIpv4HCOutOctets         Counter64,
+    ipStatisticsInterfacesIpv4InMcastPkts         Unsigned32,
+    ipStatisticsInterfacesIpv4HCInMcastPkts       Counter64,
+    ipStatisticsInterfacesIpv4InMcastOctets       Unsigned32,
+    ipStatisticsInterfacesIpv4HCInMcastOctets     Counter64,
+    ipStatisticsInterfacesIpv4OutMcastPkts        Unsigned32,
+    ipStatisticsInterfacesIpv4HCOutMcastPkts      Counter64,
+    ipStatisticsInterfacesIpv4OutMcastOctets      Unsigned32,
+    ipStatisticsInterfacesIpv4HCOutMcastOctets    Counter64,
+    ipStatisticsInterfacesIpv4InBcastPkts         Unsigned32,
+    ipStatisticsInterfacesIpv4HCInBcastPkts       Counter64,
+    ipStatisticsInterfacesIpv4OutBcastPkts        Unsigned32,
+    ipStatisticsInterfacesIpv4HCOutBcastPkts      Counter64,
+    ipStatisticsInterfacesIpv4DiscontinuityTime   Counter64,
+    ipStatisticsInterfacesIpv4RefreshRate         Unsigned32
+}
+
+ipStatisticsInterfacesIpv4IfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Interface index number."
+    ::= { ipStatisticsInterfacesIpv4Entry 1 }
+
+ipStatisticsInterfacesIpv4InReceives OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams received, including those received in
+         error.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 2 }
+
+ipStatisticsInterfacesIpv4HCInReceives OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams received, including those received in
+         error. This object counts the same datagrams as InReceives, but allows
+         for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 3 }
+
+ipStatisticsInterfacesIpv4InOctets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets received in input IP datagrams, including those
+         received in error. Octets from datagrams counted in InReceives must be
+         counted here.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 4 }
+
+ipStatisticsInterfacesIpv4HCInOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets received in input IP datagrams, including those
+         received in error. This object counts the same octets as InOctets, but
+         allows for a larger value.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 5 }
+
+ipStatisticsInterfacesIpv4InHdrErrors OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams discarded due to errors in their IP
+         headers, including version number mismatch, other format errors, hop
+         count exceeded, and errors discovered in processing their IP options.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 6 }
+
+ipStatisticsInterfacesIpv4InNoRoutes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams discarded because no route could be found
+         to transmit them to their destination.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 7 }
+
+ipStatisticsInterfacesIpv4InAddrErrors OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams discarded because the IP address in their
+         IP header's destination field was not a valid address to be received at
+         this entity. This count includes invalid addresses (e.g., ::0). For
+         entities that are not IP routers and therefore do not forward
+         datagrams, this counter includes datagrams discarded because the
+         destination address was not a local address.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 8 }
+
+ipStatisticsInterfacesIpv4InUnknownProtos OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of locally-addressed IP datagrams received successfully but
+         discarded because of an unknown or unsupported protocol.
+         
+         When tracking interface statistics, the counter of the interface to
+         which these datagrams were addressed is incremented. This interface
+         might not be the same as the input interface for some of the datagrams.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 9 }
+
+ipStatisticsInterfacesIpv4InTruncatedPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams discarded because the datagram frame
+         didn't carry enough data.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 10 }
+
+ipStatisticsInterfacesIpv4InForwDatagrams OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input datagrams for which this entity was not their final IP
+         destination and for which this entity attempted to find a route to
+         forward them to their final destination.
+         
+         When tracking interface statistics, the counter of the incoming
+         interface is incremented for each datagram.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 11 }
+
+ipStatisticsInterfacesIpv4HCInForwDatagrams OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input datagrams for which this entity was not their final IP
+         destination and for which this entity attempted to find a route to
+         forward them to their final destination. This object counts the same
+         packets as InForwDatagrams, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 12 }
+
+ipStatisticsInterfacesIpv4ReasmReqds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP fragments received that needed to be reassembled at this
+         interface.
+         
+         When tracking interface statistics, the counter of the interface to
+         which these fragments were addressed is incremented. This interface
+         might not be the same as the input interface for some of the fragments.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 13 }
+
+ipStatisticsInterfacesIpv4ReasmOKs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams successfully reassembled.
+         
+         When tracking interface statistics, the counter of the interface to
+         which these datagrams were addressed is incremented. This interface
+         might not be the same as the input interface for some of the datagrams.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 14 }
+
+ipStatisticsInterfacesIpv4ReasmFails OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of failures detected by the IP re-assembly algorithm.
+         
+         Note: this is not necessarily a count of discarded IP fragments because
+         some algorithms (notably the algorithm in RFC 815) can lose track of
+         the number of fragments by combining them as they are received.
+         
+         When tracking interface statistics, the counter of the interface to
+         which these fragments were addressed is incremented. This interface
+         might not be the same as the input interface for some of the fragments.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 15 }
+
+ipStatisticsInterfacesIpv4InDiscards OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams for which no problems were encountered to
+         prevent their continued processing, but were discarded.
+         
+         Note: this counter does not include any datagrams discarded while
+         awaiting re-assembly.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 16 }
+
+ipStatisticsInterfacesIpv4InDelivers OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of datagrams successfully delivered to IP user-protocols
+         (including ICMP).
+         
+         When tracking interface statistics, the counter of the interface to
+         which these datagrams were addressed is incremented. This interface
+         might not be the same as the input interface for some of the datagrams.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 17 }
+
+ipStatisticsInterfacesIpv4HCInDelivers OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of datagrams successfully delivered to IP user-protocols
+         (including ICMP). This object counts the same packets as
+         ipSystemStatsInDelivers, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 18 }
+
+ipStatisticsInterfacesIpv4OutRequests OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that local IP user-protocols (including ICMP)
+         supplied to IP in requests for transmission.
+         
+         Note: this counter does not include any datagrams counted in
+         OutForwDatagrams.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 19 }
+
+ipStatisticsInterfacesIpv4HCOutRequests OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that local IP user-protocols (including ICMP)
+         supplied to IP in requests for transmission. This object counts the
+         same packets as OutRequests, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 20 }
+
+ipStatisticsInterfacesIpv4OutNoRoutes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of locally generated IP datagrams discarded because no route
+         could be found to transmit them to their destination.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 21 }
+
+ipStatisticsInterfacesIpv4OutForwDatagrams OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of datagrams for which this entity was not their final IP
+         destination and for which it was successful in finding a path to their
+         final destination.
+         
+         When tracking interface statistics, the counter of the outgoing
+         interface is incremented for a successfully forwarded datagram.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 22 }
+
+ipStatisticsInterfacesIpv4HCOutForwDatagrams OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of datagrams for which this entity was not their final IP
+         destination and for which it was successful in finding a path to their
+         final destination. This object counts the same packets as
+         OutForwDatagrams, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 23 }
+
+ipStatisticsInterfacesIpv4OutDiscards OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of output IP datagrams for which no problem was encountered to
+         prevent their transmission to their destination, but were discarded.
+         
+         Note: this counter includes datagrams counted in OutForwDatagrams if
+         any such datagrams met this (discretionary) discard criterion.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 24 }
+
+ipStatisticsInterfacesIpv4OutFragReqds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that require fragmentation in order to be
+         transmitted.
+         
+         When tracking interface statistics, the counter of the outgoing
+         interface is incremented for a successfully fragmented datagram.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 25 }
+
+ipStatisticsInterfacesIpv4OutFragOKs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that have been successfully fragmented.
+         
+         When tracking interface statistics, the counter of the outgoing
+         interface is incremented for a successfully fragmented datagram.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 26 }
+
+ipStatisticsInterfacesIpv4OutFragFails OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that have been discarded because they needed to
+         be fragmented but could not be. This includes IPv4 packets that have
+         the DF bit set and IPv6 packets that are being forwarded and exceed the
+         outgoing link MTU.
+         
+         When tracking interface statistics, the counter of the outgoing
+         interface is incremented for an unsuccessfully fragmented datagram.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 27 }
+
+ipStatisticsInterfacesIpv4OutFragCreates OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of output datagram fragments that have been generated as a
+         result of IP fragmentation.
+         
+         When tracking interface statistics, the counter of the outgoing
+         interface is incremented for a successfully fragmented datagram.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 28 }
+
+ipStatisticsInterfacesIpv4OutTransmits OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that this entity supplied to the lower layers
+         for transmission. This includes datagrams generated locally and those
+         forwarded by this entity.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 29 }
+
+ipStatisticsInterfacesIpv4HCOutTransmits OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that this entity supplied to the lower layers
+         for transmission. This object counts the same datagrams as
+         OutTransmits, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 30 }
+
+ipStatisticsInterfacesIpv4OutOctets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets in IP datagrams delivered to the lower layers for
+         transmission. Octets from datagrams counted in OutTransmits must be
+         counted here.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 31 }
+
+ipStatisticsInterfacesIpv4HCOutOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets in IP datagrams delivered to the lower layers for
+         transmission. This objects counts the same octets as OutOctets, but
+         allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 32 }
+
+ipStatisticsInterfacesIpv4InMcastPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP multicast datagrams received.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 33 }
+
+ipStatisticsInterfacesIpv4HCInMcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP multicast datagrams received. This object counts the same
+         datagrams as InMcastPkts but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 34 }
+
+ipStatisticsInterfacesIpv4InMcastOctets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets received in IP multicast datagrams. Octets from
+         datagrams counted in InMcastPkts MUST be counted here.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 35 }
+
+ipStatisticsInterfacesIpv4HCInMcastOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets received in IP multicast datagrams. This object counts
+         the same octets as InMcastOctets, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 36 }
+
+ipStatisticsInterfacesIpv4OutMcastPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP multicast datagrams transmitted.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 37 }
+
+ipStatisticsInterfacesIpv4HCOutMcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP multicast datagrams transmitted. This object counts the
+         same datagrams as OutMcastPkts, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 38 }
+
+ipStatisticsInterfacesIpv4OutMcastOctets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets transmitted in IP multicast datagrams. Octets from
+         datagrams counted in OutMcastPkts must be counted here.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 39 }
+
+ipStatisticsInterfacesIpv4HCOutMcastOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets transmitted in IP multicast datagrams. This object
+         counts the same octets as OutMcastOctets, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 40 }
+
+ipStatisticsInterfacesIpv4InBcastPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP broadcast datagrams received.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 41 }
+
+ipStatisticsInterfacesIpv4HCInBcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP broadcast datagrams received. This object counts the same
+         datagrams as InBcastPkts but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 42 }
+
+ipStatisticsInterfacesIpv4OutBcastPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP broadcast datagrams transmitted.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 43 }
+
+ipStatisticsInterfacesIpv4HCOutBcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP broadcast datagrams transmitted. This object counts the
+         same datagrams as OutBcastPkts, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv4Entry 44 }
+
+ipStatisticsInterfacesIpv4DiscontinuityTime OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Value of sysUpTime on the most recent occasion when any one or more of
+         this entry's counters suffered a discontinuity.
+         
+         If no such discontinuities have occurred since the last
+         re-initialization of the IP stack, then this object contains a zero
+         value."
+    ::= { ipStatisticsInterfacesIpv4Entry 45 }
+
+ipStatisticsInterfacesIpv4RefreshRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum reasonable polling interval for this entry. This object
+         provides an indication of the minimum amount of time required to update
+         the counters in this entry."
+    ::= { ipStatisticsInterfacesIpv4Entry 46 }
+
+ipStatisticsInterfacesIpv6Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpStatisticsInterfacesIpv6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides IPv6 related statitics for a given IP interface."
+    ::= { ipStatisticsInterfaces 3 }
+
+ipStatisticsInterfacesIpv6Entry OBJECT-TYPE
+    SYNTAX      IpStatisticsInterfacesIpv6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents an IP interface."
+    INDEX       { ipStatisticsInterfacesIpv6IfIndex }
+    ::= { ipStatisticsInterfacesIpv6Table 1 }
+
+IpStatisticsInterfacesIpv6Entry ::= SEQUENCE {
+    ipStatisticsInterfacesIpv6IfIndex             InterfaceIndex,
+    ipStatisticsInterfacesIpv6InReceives          Unsigned32,
+    ipStatisticsInterfacesIpv6HCInReceives        Counter64,
+    ipStatisticsInterfacesIpv6InOctets            Unsigned32,
+    ipStatisticsInterfacesIpv6HCInOctets          Counter64,
+    ipStatisticsInterfacesIpv6InHdrErrors         Unsigned32,
+    ipStatisticsInterfacesIpv6InNoRoutes          Unsigned32,
+    ipStatisticsInterfacesIpv6InAddrErrors        Unsigned32,
+    ipStatisticsInterfacesIpv6InUnknownProtos     Unsigned32,
+    ipStatisticsInterfacesIpv6InTruncatedPkts     Unsigned32,
+    ipStatisticsInterfacesIpv6InForwDatagrams     Unsigned32,
+    ipStatisticsInterfacesIpv6HCInForwDatagrams   Counter64,
+    ipStatisticsInterfacesIpv6ReasmReqds          Unsigned32,
+    ipStatisticsInterfacesIpv6ReasmOKs            Unsigned32,
+    ipStatisticsInterfacesIpv6ReasmFails          Unsigned32,
+    ipStatisticsInterfacesIpv6InDiscards          Unsigned32,
+    ipStatisticsInterfacesIpv6InDelivers          Unsigned32,
+    ipStatisticsInterfacesIpv6HCInDelivers        Counter64,
+    ipStatisticsInterfacesIpv6OutRequests         Unsigned32,
+    ipStatisticsInterfacesIpv6HCOutRequests       Counter64,
+    ipStatisticsInterfacesIpv6OutNoRoutes         Unsigned32,
+    ipStatisticsInterfacesIpv6OutForwDatagrams    Unsigned32,
+    ipStatisticsInterfacesIpv6HCOutForwDatagrams  Counter64,
+    ipStatisticsInterfacesIpv6OutDiscards         Unsigned32,
+    ipStatisticsInterfacesIpv6OutFragReqds        Unsigned32,
+    ipStatisticsInterfacesIpv6OutFragOKs          Unsigned32,
+    ipStatisticsInterfacesIpv6OutFragFails        Unsigned32,
+    ipStatisticsInterfacesIpv6OutFragCreates      Unsigned32,
+    ipStatisticsInterfacesIpv6OutTransmits        Unsigned32,
+    ipStatisticsInterfacesIpv6HCOutTransmits      Counter64,
+    ipStatisticsInterfacesIpv6OutOctets           Unsigned32,
+    ipStatisticsInterfacesIpv6HCOutOctets         Counter64,
+    ipStatisticsInterfacesIpv6InMcastPkts         Unsigned32,
+    ipStatisticsInterfacesIpv6HCInMcastPkts       Counter64,
+    ipStatisticsInterfacesIpv6InMcastOctets       Unsigned32,
+    ipStatisticsInterfacesIpv6HCInMcastOctets     Counter64,
+    ipStatisticsInterfacesIpv6OutMcastPkts        Unsigned32,
+    ipStatisticsInterfacesIpv6HCOutMcastPkts      Counter64,
+    ipStatisticsInterfacesIpv6OutMcastOctets      Unsigned32,
+    ipStatisticsInterfacesIpv6HCOutMcastOctets    Counter64,
+    ipStatisticsInterfacesIpv6InBcastPkts         Unsigned32,
+    ipStatisticsInterfacesIpv6HCInBcastPkts       Counter64,
+    ipStatisticsInterfacesIpv6OutBcastPkts        Unsigned32,
+    ipStatisticsInterfacesIpv6HCOutBcastPkts      Counter64,
+    ipStatisticsInterfacesIpv6DiscontinuityTime   Counter64,
+    ipStatisticsInterfacesIpv6RefreshRate         Unsigned32
+}
+
+ipStatisticsInterfacesIpv6IfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Interface index number."
+    ::= { ipStatisticsInterfacesIpv6Entry 1 }
+
+ipStatisticsInterfacesIpv6InReceives OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams received, including those received in
+         error.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 2 }
+
+ipStatisticsInterfacesIpv6HCInReceives OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams received, including those received in
+         error. This object counts the same datagrams as InReceives, but allows
+         for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 3 }
+
+ipStatisticsInterfacesIpv6InOctets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets received in input IP datagrams, including those
+         received in error. Octets from datagrams counted in InReceives must be
+         counted here.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 4 }
+
+ipStatisticsInterfacesIpv6HCInOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets received in input IP datagrams, including those
+         received in error. This object counts the same octets as InOctets, but
+         allows for a larger value.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 5 }
+
+ipStatisticsInterfacesIpv6InHdrErrors OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams discarded due to errors in their IP
+         headers, including version number mismatch, other format errors, hop
+         count exceeded, and errors discovered in processing their IP options.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 6 }
+
+ipStatisticsInterfacesIpv6InNoRoutes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams discarded because no route could be found
+         to transmit them to their destination.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 7 }
+
+ipStatisticsInterfacesIpv6InAddrErrors OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams discarded because the IP address in their
+         IP header's destination field was not a valid address to be received at
+         this entity. This count includes invalid addresses (e.g., ::0). For
+         entities that are not IP routers and therefore do not forward
+         datagrams, this counter includes datagrams discarded because the
+         destination address was not a local address.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 8 }
+
+ipStatisticsInterfacesIpv6InUnknownProtos OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of locally-addressed IP datagrams received successfully but
+         discarded because of an unknown or unsupported protocol.
+         
+         When tracking interface statistics, the counter of the interface to
+         which these datagrams were addressed is incremented. This interface
+         might not be the same as the input interface for some of the datagrams.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 9 }
+
+ipStatisticsInterfacesIpv6InTruncatedPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams discarded because the datagram frame
+         didn't carry enough data.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 10 }
+
+ipStatisticsInterfacesIpv6InForwDatagrams OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input datagrams for which this entity was not their final IP
+         destination and for which this entity attempted to find a route to
+         forward them to their final destination.
+         
+         When tracking interface statistics, the counter of the incoming
+         interface is incremented for each datagram.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 11 }
+
+ipStatisticsInterfacesIpv6HCInForwDatagrams OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input datagrams for which this entity was not their final IP
+         destination and for which this entity attempted to find a route to
+         forward them to their final destination. This object counts the same
+         packets as InForwDatagrams, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 12 }
+
+ipStatisticsInterfacesIpv6ReasmReqds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP fragments received that needed to be reassembled at this
+         interface.
+         
+         When tracking interface statistics, the counter of the interface to
+         which these fragments were addressed is incremented. This interface
+         might not be the same as the input interface for some of the fragments.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 13 }
+
+ipStatisticsInterfacesIpv6ReasmOKs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams successfully reassembled.
+         
+         When tracking interface statistics, the counter of the interface to
+         which these datagrams were addressed is incremented. This interface
+         might not be the same as the input interface for some of the datagrams.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 14 }
+
+ipStatisticsInterfacesIpv6ReasmFails OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of failures detected by the IP re-assembly algorithm.
+         
+         Note: this is not necessarily a count of discarded IP fragments because
+         some algorithms (notably the algorithm in RFC 815) can lose track of
+         the number of fragments by combining them as they are received.
+         
+         When tracking interface statistics, the counter of the interface to
+         which these fragments were addressed is incremented. This interface
+         might not be the same as the input interface for some of the fragments.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 15 }
+
+ipStatisticsInterfacesIpv6InDiscards OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of input IP datagrams for which no problems were encountered to
+         prevent their continued processing, but were discarded.
+         
+         Note: this counter does not include any datagrams discarded while
+         awaiting re-assembly.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 16 }
+
+ipStatisticsInterfacesIpv6InDelivers OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of datagrams successfully delivered to IP user-protocols
+         (including ICMP).
+         
+         When tracking interface statistics, the counter of the interface to
+         which these datagrams were addressed is incremented. This interface
+         might not be the same as the input interface for some of the datagrams.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 17 }
+
+ipStatisticsInterfacesIpv6HCInDelivers OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of datagrams successfully delivered to IP user-protocols
+         (including ICMP). This object counts the same packets as
+         ipSystemStatsInDelivers, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 18 }
+
+ipStatisticsInterfacesIpv6OutRequests OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that local IP user-protocols (including ICMP)
+         supplied to IP in requests for transmission.
+         
+         Note: this counter does not include any datagrams counted in
+         OutForwDatagrams.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 19 }
+
+ipStatisticsInterfacesIpv6HCOutRequests OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that local IP user-protocols (including ICMP)
+         supplied to IP in requests for transmission. This object counts the
+         same packets as OutRequests, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 20 }
+
+ipStatisticsInterfacesIpv6OutNoRoutes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of locally generated IP datagrams discarded because no route
+         could be found to transmit them to their destination.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 21 }
+
+ipStatisticsInterfacesIpv6OutForwDatagrams OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of datagrams for which this entity was not their final IP
+         destination and for which it was successful in finding a path to their
+         final destination.
+         
+         When tracking interface statistics, the counter of the outgoing
+         interface is incremented for a successfully forwarded datagram.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 22 }
+
+ipStatisticsInterfacesIpv6HCOutForwDatagrams OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of datagrams for which this entity was not their final IP
+         destination and for which it was successful in finding a path to their
+         final destination. This object counts the same packets as
+         OutForwDatagrams, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 23 }
+
+ipStatisticsInterfacesIpv6OutDiscards OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of output IP datagrams for which no problem was encountered to
+         prevent their transmission to their destination, but were discarded.
+         
+         Note: this counter includes datagrams counted in OutForwDatagrams if
+         any such datagrams met this (discretionary) discard criterion.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 24 }
+
+ipStatisticsInterfacesIpv6OutFragReqds OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that require fragmentation in order to be
+         transmitted.
+         
+         When tracking interface statistics, the counter of the outgoing
+         interface is incremented for a successfully fragmented datagram.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 25 }
+
+ipStatisticsInterfacesIpv6OutFragOKs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that have been successfully fragmented.
+         
+         When tracking interface statistics, the counter of the outgoing
+         interface is incremented for a successfully fragmented datagram.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 26 }
+
+ipStatisticsInterfacesIpv6OutFragFails OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that have been discarded because they needed to
+         be fragmented but could not be. This includes IPv4 packets that have
+         the DF bit set and IPv6 packets that are being forwarded and exceed the
+         outgoing link MTU.
+         
+         When tracking interface statistics, the counter of the outgoing
+         interface is incremented for an unsuccessfully fragmented datagram.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 27 }
+
+ipStatisticsInterfacesIpv6OutFragCreates OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of output datagram fragments that have been generated as a
+         result of IP fragmentation.
+         
+         When tracking interface statistics, the counter of the outgoing
+         interface is incremented for a successfully fragmented datagram.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 28 }
+
+ipStatisticsInterfacesIpv6OutTransmits OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that this entity supplied to the lower layers
+         for transmission. This includes datagrams generated locally and those
+         forwarded by this entity.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 29 }
+
+ipStatisticsInterfacesIpv6HCOutTransmits OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP datagrams that this entity supplied to the lower layers
+         for transmission. This object counts the same datagrams as
+         OutTransmits, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 30 }
+
+ipStatisticsInterfacesIpv6OutOctets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets in IP datagrams delivered to the lower layers for
+         transmission. Octets from datagrams counted in OutTransmits must be
+         counted here.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 31 }
+
+ipStatisticsInterfacesIpv6HCOutOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets in IP datagrams delivered to the lower layers for
+         transmission. This objects counts the same octets as OutOctets, but
+         allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 32 }
+
+ipStatisticsInterfacesIpv6InMcastPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP multicast datagrams received.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 33 }
+
+ipStatisticsInterfacesIpv6HCInMcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP multicast datagrams received. This object counts the same
+         datagrams as InMcastPkts but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 34 }
+
+ipStatisticsInterfacesIpv6InMcastOctets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets received in IP multicast datagrams. Octets from
+         datagrams counted in InMcastPkts MUST be counted here.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 35 }
+
+ipStatisticsInterfacesIpv6HCInMcastOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets received in IP multicast datagrams. This object counts
+         the same octets as InMcastOctets, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 36 }
+
+ipStatisticsInterfacesIpv6OutMcastPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP multicast datagrams transmitted.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 37 }
+
+ipStatisticsInterfacesIpv6HCOutMcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP multicast datagrams transmitted. This object counts the
+         same datagrams as OutMcastPkts, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 38 }
+
+ipStatisticsInterfacesIpv6OutMcastOctets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets transmitted in IP multicast datagrams. Octets from
+         datagrams counted in OutMcastPkts must be counted here.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 39 }
+
+ipStatisticsInterfacesIpv6HCOutMcastOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets transmitted in IP multicast datagrams. This object
+         counts the same octets as OutMcastOctets, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 40 }
+
+ipStatisticsInterfacesIpv6InBcastPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP broadcast datagrams received.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 41 }
+
+ipStatisticsInterfacesIpv6HCInBcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP broadcast datagrams received. This object counts the same
+         datagrams as InBcastPkts but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 42 }
+
+ipStatisticsInterfacesIpv6OutBcastPkts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP broadcast datagrams transmitted.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 43 }
+
+ipStatisticsInterfacesIpv6HCOutBcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP broadcast datagrams transmitted. This object counts the
+         same datagrams as OutBcastPkts, but allows for larger values.
+         
+         Discontinuities in the value of this counter may occur at
+         re-initialization of the system, and at other times as indicated by the
+         value of DiscontinuityTime."
+    ::= { ipStatisticsInterfacesIpv6Entry 44 }
+
+ipStatisticsInterfacesIpv6DiscontinuityTime OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Value of sysUpTime on the most recent occasion when any one or more of
+         this entry's counters suffered a discontinuity.
+         
+         If no such discontinuities have occurred since the last
+         re-initialization of the IP stack, then this object contains a zero
+         value."
+    ::= { ipStatisticsInterfacesIpv6Entry 45 }
+
+ipStatisticsInterfacesIpv6RefreshRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum reasonable polling interval for this entry. This object
+         provides an indication of the minimum amount of time required to update
+         the counters in this entry."
+    ::= { ipStatisticsInterfacesIpv6Entry 46 }
+
+ipMibConformance OBJECT IDENTIFIER
+    ::= { ipMib 2 }
+
+ipMibCompliances OBJECT IDENTIFIER
+    ::= { ipMibConformance 1 }
+
+ipMibGroups OBJECT IDENTIFIER
+    ::= { ipMibConformance 2 }
+
+ipCapabilitiesInfoGroup OBJECT-GROUP
+    OBJECTS     { ipCapabilitiesHasIpv4HostCapabilities,
+                  ipCapabilitiesHasIpv6HostCapabilities,
+                  ipCapabilitiesHasIpv4UnicastRoutingCapabilities,
+                  ipCapabilitiesHasIpv4UnicastHwRoutingCapabilities,
+                  ipCapabilitiesHasIpv6UnicastRoutingCapabilities,
+                  ipCapabilitiesHasIpv6UnicastHwRoutingCapabilities,
+                  ipCapabilitiesMaxNumberOfIpInterfaces,
+                  ipCapabilitiesMaxNumberOfStaticRoutes,
+                  ipCapabilitiesNumberOfLpmHardwareEntries }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 1 }
+
+ipConfigGlobalsMainInfoGroup OBJECT-GROUP
+    OBJECTS     { ipConfigGlobalsMainEnableRouting }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 2 }
+
+ipConfigInterfacesTableInfoGroup OBJECT-GROUP
+    OBJECTS     { ipConfigInterfacesAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 3 }
+
+ipConfigInterfacesTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { ipConfigInterfacesTableRowEditorIfIndex,
+                  ipConfigInterfacesTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 4 }
+
+ipConfigInterfacesIpv4TableInfoGroup OBJECT-GROUP
+    OBJECTS     { ipConfigInterfacesIpv4Active,
+                  ipConfigInterfacesIpv4EnableDhcpClient,
+                  ipConfigInterfacesIpv4Ipv4Address,
+                  ipConfigInterfacesIpv4PrefixSize,
+                  ipConfigInterfacesIpv4DhcpClientFallbackTimeout }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 5 }
+
+ipConfigInterfacesIpv6TableInfoGroup OBJECT-GROUP
+    OBJECTS     { ipConfigInterfacesIpv6Active,
+                  ipConfigInterfacesIpv6Ipv6Address,
+                  ipConfigInterfacesIpv6PrefixSize }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 6 }
+
+ipConfigRoutesIpv4TableInfoGroup OBJECT-GROUP
+    OBJECTS     { ipConfigRoutesIpv4Action }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 7 }
+
+ipConfigRoutesIpv4RowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { ipConfigRoutesIpv4RowEditorNetworkAddress,
+                  ipConfigRoutesIpv4RowEditorNetworkPrefixSize,
+                  ipConfigRoutesIpv4RowEditorNextHop,
+                  ipConfigRoutesIpv4RowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 8 }
+
+ipConfigRoutesIpv6TableInfoGroup OBJECT-GROUP
+    OBJECTS     { ipConfigRoutesIpv6Action }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 9 }
+
+ipConfigRoutesIpv6RowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { ipConfigRoutesIpv6RowEditorNetworkAddress,
+                  ipConfigRoutesIpv6RowEditorNetworkPrefixSize,
+                  ipConfigRoutesIpv6RowEditorNextHop,
+                  ipConfigRoutesIpv6RowEditorNextHopInterface,
+                  ipConfigRoutesIpv6RowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 10 }
+
+ipStatusGlobalsIpv4NeighbourInfoGroup OBJECT-GROUP
+    OBJECTS     { ipStatusGlobalsIpv4NeighbourMacAddress,
+                  ipStatusGlobalsIpv4NeighbourInterface }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 11 }
+
+ipStatusGlobalsIpv6NeighbourInfoGroup OBJECT-GROUP
+    OBJECTS     { ipStatusGlobalsIpv6NeighbourMacAddress,
+                  ipStatusGlobalsIpv6NeighbourInterface }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 12 }
+
+ipStatusInterfacesLinkInfoGroup OBJECT-GROUP
+    OBJECTS     { ipStatusInterfacesLinkOsInterfaceIndex,
+                  ipStatusInterfacesLinkMtu,
+                  ipStatusInterfacesLinkMacAddress,
+                  ipStatusInterfacesLinkUp,
+                  ipStatusInterfacesLinkBroadcast,
+                  ipStatusInterfacesLinkLoopback,
+                  ipStatusInterfacesLinkRunning,
+                  ipStatusInterfacesLinkNoarp,
+                  ipStatusInterfacesLinkPromisc,
+                  ipStatusInterfacesLinkMulticast }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 13 }
+
+ipStatusInterfacesIpv4InfoGroup OBJECT-GROUP
+    OBJECTS     { ipStatusInterfacesIpv4Broadcast }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 14 }
+
+ipStatusInterfacesDhcpClientV4InfoGroup OBJECT-GROUP
+    OBJECTS     { ipStatusInterfacesDhcpClientV4State,
+                  ipStatusInterfacesDhcpClientV4ServerIp }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 15 }
+
+ipStatusInterfacesIpv6InfoGroup OBJECT-GROUP
+    OBJECTS     { ipStatusInterfacesIpv6Tentative,
+                  ipStatusInterfacesIpv6Duplicated,
+                  ipStatusInterfacesIpv6Detached,
+                  ipStatusInterfacesIpv6Nodad,
+                  ipStatusInterfacesIpv6Autoconf }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 16 }
+
+ipStatusRoutesIpv4InfoGroup OBJECT-GROUP
+    OBJECTS     { ipStatusRoutesIpv4DerivedNextHopInterface,
+                  ipStatusRoutesIpv4FlagUp,
+                  ipStatusRoutesIpv4FlagHost,
+                  ipStatusRoutesIpv4FlagGateway,
+                  ipStatusRoutesIpv4OwnerConf,
+                  ipStatusRoutesIpv4OwnerDhcp,
+                  ipStatusRoutesIpv4OwnerDynamic }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 17 }
+
+ipStatusRoutesIpv6InfoGroup OBJECT-GROUP
+    OBJECTS     { ipStatusRoutesIpv6DerivedNextHopInterface,
+                  ipStatusRoutesIpv6FlagUp,
+                  ipStatusRoutesIpv6FlagHost,
+                  ipStatusRoutesIpv6FlagGateway,
+                  ipStatusRoutesIpv6OwnerConf,
+                  ipStatusRoutesIpv6OwnerDhcp,
+                  ipStatusRoutesIpv6OwnerDynamic }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 18 }
+
+ipControlGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { ipControlGlobalsIpv4NeighbourTableClear,
+                  ipControlGlobalsIpv6NeighbourTableClear,
+                  ipControlGlobalsIpv4SystemStatisticsClear,
+                  ipControlGlobalsIpv6SystemStatisticsClear }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 19 }
+
+ipControlInterfaceDhcpClientInfoGroup OBJECT-GROUP
+    OBJECTS     { ipControlInterfaceDhcpClientRestart }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 20 }
+
+ipStatisticsGlobalsIpv4InfoGroup OBJECT-GROUP
+    OBJECTS     { ipStatisticsGlobalsIpv4InReceives,
+                  ipStatisticsGlobalsIpv4HCInReceives,
+                  ipStatisticsGlobalsIpv4InOctets,
+                  ipStatisticsGlobalsIpv4HCInOctets,
+                  ipStatisticsGlobalsIpv4InHdrErrors,
+                  ipStatisticsGlobalsIpv4InNoRoutes,
+                  ipStatisticsGlobalsIpv4InAddrErrors,
+                  ipStatisticsGlobalsIpv4InUnknownProtos,
+                  ipStatisticsGlobalsIpv4InTruncatedPkts,
+                  ipStatisticsGlobalsIpv4InForwDatagrams,
+                  ipStatisticsGlobalsIpv4HCInForwDatagrams,
+                  ipStatisticsGlobalsIpv4ReasmReqds,
+                  ipStatisticsGlobalsIpv4ReasmOKs,
+                  ipStatisticsGlobalsIpv4ReasmFails,
+                  ipStatisticsGlobalsIpv4InDiscards,
+                  ipStatisticsGlobalsIpv4InDelivers,
+                  ipStatisticsGlobalsIpv4HCInDelivers,
+                  ipStatisticsGlobalsIpv4OutRequests,
+                  ipStatisticsGlobalsIpv4HCOutRequests,
+                  ipStatisticsGlobalsIpv4OutNoRoutes,
+                  ipStatisticsGlobalsIpv4OutForwDatagrams,
+                  ipStatisticsGlobalsIpv4HCOutForwDatagrams,
+                  ipStatisticsGlobalsIpv4OutDiscards,
+                  ipStatisticsGlobalsIpv4OutFragReqds,
+                  ipStatisticsGlobalsIpv4OutFragOKs,
+                  ipStatisticsGlobalsIpv4OutFragFails,
+                  ipStatisticsGlobalsIpv4OutFragCreates,
+                  ipStatisticsGlobalsIpv4OutTransmits,
+                  ipStatisticsGlobalsIpv4HCOutTransmits,
+                  ipStatisticsGlobalsIpv4OutOctets,
+                  ipStatisticsGlobalsIpv4HCOutOctets,
+                  ipStatisticsGlobalsIpv4InMcastPkts,
+                  ipStatisticsGlobalsIpv4HCInMcastPkts,
+                  ipStatisticsGlobalsIpv4InMcastOctets,
+                  ipStatisticsGlobalsIpv4HCInMcastOctets,
+                  ipStatisticsGlobalsIpv4OutMcastPkts,
+                  ipStatisticsGlobalsIpv4HCOutMcastPkts,
+                  ipStatisticsGlobalsIpv4OutMcastOctets,
+                  ipStatisticsGlobalsIpv4HCOutMcastOctets,
+                  ipStatisticsGlobalsIpv4InBcastPkts,
+                  ipStatisticsGlobalsIpv4HCInBcastPkts,
+                  ipStatisticsGlobalsIpv4OutBcastPkts,
+                  ipStatisticsGlobalsIpv4HCOutBcastPkts,
+                  ipStatisticsGlobalsIpv4DiscontinuityTime,
+                  ipStatisticsGlobalsIpv4RefreshRate }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 21 }
+
+ipStatisticsGlobalsIpv6InfoGroup OBJECT-GROUP
+    OBJECTS     { ipStatisticsGlobalsIpv6InReceives,
+                  ipStatisticsGlobalsIpv6HCInReceives,
+                  ipStatisticsGlobalsIpv6InOctets,
+                  ipStatisticsGlobalsIpv6HCInOctets,
+                  ipStatisticsGlobalsIpv6InHdrErrors,
+                  ipStatisticsGlobalsIpv6InNoRoutes,
+                  ipStatisticsGlobalsIpv6InAddrErrors,
+                  ipStatisticsGlobalsIpv6InUnknownProtos,
+                  ipStatisticsGlobalsIpv6InTruncatedPkts,
+                  ipStatisticsGlobalsIpv6InForwDatagrams,
+                  ipStatisticsGlobalsIpv6HCInForwDatagrams,
+                  ipStatisticsGlobalsIpv6ReasmReqds,
+                  ipStatisticsGlobalsIpv6ReasmOKs,
+                  ipStatisticsGlobalsIpv6ReasmFails,
+                  ipStatisticsGlobalsIpv6InDiscards,
+                  ipStatisticsGlobalsIpv6InDelivers,
+                  ipStatisticsGlobalsIpv6HCInDelivers,
+                  ipStatisticsGlobalsIpv6OutRequests,
+                  ipStatisticsGlobalsIpv6HCOutRequests,
+                  ipStatisticsGlobalsIpv6OutNoRoutes,
+                  ipStatisticsGlobalsIpv6OutForwDatagrams,
+                  ipStatisticsGlobalsIpv6HCOutForwDatagrams,
+                  ipStatisticsGlobalsIpv6OutDiscards,
+                  ipStatisticsGlobalsIpv6OutFragReqds,
+                  ipStatisticsGlobalsIpv6OutFragOKs,
+                  ipStatisticsGlobalsIpv6OutFragFails,
+                  ipStatisticsGlobalsIpv6OutFragCreates,
+                  ipStatisticsGlobalsIpv6OutTransmits,
+                  ipStatisticsGlobalsIpv6HCOutTransmits,
+                  ipStatisticsGlobalsIpv6OutOctets,
+                  ipStatisticsGlobalsIpv6HCOutOctets,
+                  ipStatisticsGlobalsIpv6InMcastPkts,
+                  ipStatisticsGlobalsIpv6HCInMcastPkts,
+                  ipStatisticsGlobalsIpv6InMcastOctets,
+                  ipStatisticsGlobalsIpv6HCInMcastOctets,
+                  ipStatisticsGlobalsIpv6OutMcastPkts,
+                  ipStatisticsGlobalsIpv6HCOutMcastPkts,
+                  ipStatisticsGlobalsIpv6OutMcastOctets,
+                  ipStatisticsGlobalsIpv6HCOutMcastOctets,
+                  ipStatisticsGlobalsIpv6InBcastPkts,
+                  ipStatisticsGlobalsIpv6HCInBcastPkts,
+                  ipStatisticsGlobalsIpv6OutBcastPkts,
+                  ipStatisticsGlobalsIpv6HCOutBcastPkts,
+                  ipStatisticsGlobalsIpv6DiscontinuityTime,
+                  ipStatisticsGlobalsIpv6RefreshRate }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 22 }
+
+ipStatisticsInterfacesLinkInfoGroup OBJECT-GROUP
+    OBJECTS     { ipStatisticsInterfacesLinkInPackets,
+                  ipStatisticsInterfacesLinkOutPackets,
+                  ipStatisticsInterfacesLinkInBytes,
+                  ipStatisticsInterfacesLinkOutBytes,
+                  ipStatisticsInterfacesLinkInMulticasts,
+                  ipStatisticsInterfacesLinkOutMulticasts,
+                  ipStatisticsInterfacesLinkInBroadcasts,
+                  ipStatisticsInterfacesLinkOutBroadcasts }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 23 }
+
+ipStatisticsInterfacesIpv4InfoGroup OBJECT-GROUP
+    OBJECTS     { ipStatisticsInterfacesIpv4InReceives,
+                  ipStatisticsInterfacesIpv4HCInReceives,
+                  ipStatisticsInterfacesIpv4InOctets,
+                  ipStatisticsInterfacesIpv4HCInOctets,
+                  ipStatisticsInterfacesIpv4InHdrErrors,
+                  ipStatisticsInterfacesIpv4InNoRoutes,
+                  ipStatisticsInterfacesIpv4InAddrErrors,
+                  ipStatisticsInterfacesIpv4InUnknownProtos,
+                  ipStatisticsInterfacesIpv4InTruncatedPkts,
+                  ipStatisticsInterfacesIpv4InForwDatagrams,
+                  ipStatisticsInterfacesIpv4HCInForwDatagrams,
+                  ipStatisticsInterfacesIpv4ReasmReqds,
+                  ipStatisticsInterfacesIpv4ReasmOKs,
+                  ipStatisticsInterfacesIpv4ReasmFails,
+                  ipStatisticsInterfacesIpv4InDiscards,
+                  ipStatisticsInterfacesIpv4InDelivers,
+                  ipStatisticsInterfacesIpv4HCInDelivers,
+                  ipStatisticsInterfacesIpv4OutRequests,
+                  ipStatisticsInterfacesIpv4HCOutRequests,
+                  ipStatisticsInterfacesIpv4OutNoRoutes,
+                  ipStatisticsInterfacesIpv4OutForwDatagrams,
+                  ipStatisticsInterfacesIpv4HCOutForwDatagrams,
+                  ipStatisticsInterfacesIpv4OutDiscards,
+                  ipStatisticsInterfacesIpv4OutFragReqds,
+                  ipStatisticsInterfacesIpv4OutFragOKs,
+                  ipStatisticsInterfacesIpv4OutFragFails,
+                  ipStatisticsInterfacesIpv4OutFragCreates,
+                  ipStatisticsInterfacesIpv4OutTransmits,
+                  ipStatisticsInterfacesIpv4HCOutTransmits,
+                  ipStatisticsInterfacesIpv4OutOctets,
+                  ipStatisticsInterfacesIpv4HCOutOctets,
+                  ipStatisticsInterfacesIpv4InMcastPkts,
+                  ipStatisticsInterfacesIpv4HCInMcastPkts,
+                  ipStatisticsInterfacesIpv4InMcastOctets,
+                  ipStatisticsInterfacesIpv4HCInMcastOctets,
+                  ipStatisticsInterfacesIpv4OutMcastPkts,
+                  ipStatisticsInterfacesIpv4HCOutMcastPkts,
+                  ipStatisticsInterfacesIpv4OutMcastOctets,
+                  ipStatisticsInterfacesIpv4HCOutMcastOctets,
+                  ipStatisticsInterfacesIpv4InBcastPkts,
+                  ipStatisticsInterfacesIpv4HCInBcastPkts,
+                  ipStatisticsInterfacesIpv4OutBcastPkts,
+                  ipStatisticsInterfacesIpv4HCOutBcastPkts,
+                  ipStatisticsInterfacesIpv4DiscontinuityTime,
+                  ipStatisticsInterfacesIpv4RefreshRate }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 24 }
+
+ipStatisticsInterfacesIpv6InfoGroup OBJECT-GROUP
+    OBJECTS     { ipStatisticsInterfacesIpv6InReceives,
+                  ipStatisticsInterfacesIpv6HCInReceives,
+                  ipStatisticsInterfacesIpv6InOctets,
+                  ipStatisticsInterfacesIpv6HCInOctets,
+                  ipStatisticsInterfacesIpv6InHdrErrors,
+                  ipStatisticsInterfacesIpv6InNoRoutes,
+                  ipStatisticsInterfacesIpv6InAddrErrors,
+                  ipStatisticsInterfacesIpv6InUnknownProtos,
+                  ipStatisticsInterfacesIpv6InTruncatedPkts,
+                  ipStatisticsInterfacesIpv6InForwDatagrams,
+                  ipStatisticsInterfacesIpv6HCInForwDatagrams,
+                  ipStatisticsInterfacesIpv6ReasmReqds,
+                  ipStatisticsInterfacesIpv6ReasmOKs,
+                  ipStatisticsInterfacesIpv6ReasmFails,
+                  ipStatisticsInterfacesIpv6InDiscards,
+                  ipStatisticsInterfacesIpv6InDelivers,
+                  ipStatisticsInterfacesIpv6HCInDelivers,
+                  ipStatisticsInterfacesIpv6OutRequests,
+                  ipStatisticsInterfacesIpv6HCOutRequests,
+                  ipStatisticsInterfacesIpv6OutNoRoutes,
+                  ipStatisticsInterfacesIpv6OutForwDatagrams,
+                  ipStatisticsInterfacesIpv6HCOutForwDatagrams,
+                  ipStatisticsInterfacesIpv6OutDiscards,
+                  ipStatisticsInterfacesIpv6OutFragReqds,
+                  ipStatisticsInterfacesIpv6OutFragOKs,
+                  ipStatisticsInterfacesIpv6OutFragFails,
+                  ipStatisticsInterfacesIpv6OutFragCreates,
+                  ipStatisticsInterfacesIpv6OutTransmits,
+                  ipStatisticsInterfacesIpv6HCOutTransmits,
+                  ipStatisticsInterfacesIpv6OutOctets,
+                  ipStatisticsInterfacesIpv6HCOutOctets,
+                  ipStatisticsInterfacesIpv6InMcastPkts,
+                  ipStatisticsInterfacesIpv6HCInMcastPkts,
+                  ipStatisticsInterfacesIpv6InMcastOctets,
+                  ipStatisticsInterfacesIpv6HCInMcastOctets,
+                  ipStatisticsInterfacesIpv6OutMcastPkts,
+                  ipStatisticsInterfacesIpv6HCOutMcastPkts,
+                  ipStatisticsInterfacesIpv6OutMcastOctets,
+                  ipStatisticsInterfacesIpv6HCOutMcastOctets,
+                  ipStatisticsInterfacesIpv6InBcastPkts,
+                  ipStatisticsInterfacesIpv6HCInBcastPkts,
+                  ipStatisticsInterfacesIpv6OutBcastPkts,
+                  ipStatisticsInterfacesIpv6HCOutBcastPkts,
+                  ipStatisticsInterfacesIpv6DiscontinuityTime,
+                  ipStatisticsInterfacesIpv6RefreshRate }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { ipMibGroups 25 }
+
+ipMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { ipCapabilitiesInfoGroup,
+                       ipConfigGlobalsMainInfoGroup,
+                       ipConfigInterfacesTableInfoGroup,
+                       ipConfigInterfacesTableRowEditorInfoGroup,
+                       ipConfigInterfacesIpv4TableInfoGroup,
+                       ipConfigInterfacesIpv6TableInfoGroup,
+                       ipConfigRoutesIpv4TableInfoGroup,
+                       ipConfigRoutesIpv4RowEditorInfoGroup,
+                       ipConfigRoutesIpv6TableInfoGroup,
+                       ipConfigRoutesIpv6RowEditorInfoGroup,
+                       ipStatusGlobalsIpv4NeighbourInfoGroup,
+                       ipStatusGlobalsIpv6NeighbourInfoGroup,
+                       ipStatusInterfacesLinkInfoGroup,
+                       ipStatusInterfacesIpv4InfoGroup,
+                       ipStatusInterfacesDhcpClientV4InfoGroup,
+                       ipStatusInterfacesIpv6InfoGroup,
+                       ipStatusRoutesIpv4InfoGroup,
+                       ipStatusRoutesIpv6InfoGroup,
+                       ipControlGlobalsInfoGroup,
+                       ipControlInterfaceDhcpClientInfoGroup,
+                       ipStatisticsGlobalsIpv4InfoGroup,
+                       ipStatisticsGlobalsIpv6InfoGroup,
+                       ipStatisticsInterfacesLinkInfoGroup,
+                       ipStatisticsInterfacesIpv4InfoGroup,
+                       ipStatisticsInterfacesIpv6InfoGroup }
+
+    ::= { ipMibCompliances 1 }
+
+END

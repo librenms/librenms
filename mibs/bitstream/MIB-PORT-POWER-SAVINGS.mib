@@ -1,0 +1,248 @@
+-- *****************************************************************
+-- MIB-PORT-POWER-SAVINGS: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-PORT-POWER-SAVINGS DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    TruthValue FROM SNMPv2-TC
+    InterfaceIndex FROM BTS-TC
+    ;
+
+portPowerSavingsMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of Port Power Saving. Port power saving
+         reduces the switch power consumptionby lowering the port power supply
+         when there is no link partner connected to a port as well as when link
+         partner is connected through a short cable."
+    REVISION    "201408070000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 100 }
+
+
+PortPowerSavingsStatusType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the feature status."
+    SYNTAX      INTEGER { no(0), yes(1), notSupported(2) }
+
+portPowerSavingsMibObjects OBJECT IDENTIFIER
+    ::= { portPowerSavingsMib 1 }
+
+portPowerSavingsCapabilities OBJECT IDENTIFIER
+    ::= { portPowerSavingsMibObjects 1 }
+
+portPowerSavingsCapabilitiesInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PortPowerSavingsCapabilitiesInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to interface capabilities"
+    ::= { portPowerSavingsCapabilities 1 }
+
+portPowerSavingsCapabilitiesInterfaceEntry OBJECT-TYPE
+    SYNTAX      PortPowerSavingsCapabilitiesInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each interface has a set of capability parameters"
+    INDEX       { portPowerSavingsCapabilitiesInterfaceIfIndex }
+    ::= { portPowerSavingsCapabilitiesInterfaceTable 1 }
+
+PortPowerSavingsCapabilitiesInterfaceEntry ::= SEQUENCE {
+    portPowerSavingsCapabilitiesInterfaceIfIndex      InterfaceIndex,
+    portPowerSavingsCapabilitiesInterfaceLinkPartner  TruthValue,
+    portPowerSavingsCapabilitiesInterfaceShortReach   TruthValue
+}
+
+portPowerSavingsCapabilitiesInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { portPowerSavingsCapabilitiesInterfaceEntry 1 }
+
+portPowerSavingsCapabilitiesInterfaceLinkPartner OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate whether interface is capable for detecting link partner or
+         not. true means interface is capable to detect link partner, false
+         means interface is not capable to detect link partner."
+    ::= { portPowerSavingsCapabilitiesInterfaceEntry 2 }
+
+portPowerSavingsCapabilitiesInterfaceShortReach OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether interface is able to determine the cable length
+         connected to partner port. true means interface is capable to determine
+         the cable length, false means interface is not capable to determine the
+         cable length."
+    ::= { portPowerSavingsCapabilitiesInterfaceEntry 3 }
+
+portPowerSavingsConfig OBJECT IDENTIFIER
+    ::= { portPowerSavingsMibObjects 2 }
+
+portPowerSavingsConfigInterfaceParamTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PortPowerSavingsConfigInterfaceParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides Port Power Savings configuration for an interface"
+    ::= { portPowerSavingsConfig 1 }
+
+portPowerSavingsConfigInterfaceParamEntry OBJECT-TYPE
+    SYNTAX      PortPowerSavingsConfigInterfaceParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each interface has a set of Port Power Savings configurable parameters"
+    INDEX       { portPowerSavingsConfigInterfaceParamIfIndex }
+    ::= { portPowerSavingsConfigInterfaceParamTable 1 }
+
+PortPowerSavingsConfigInterfaceParamEntry ::= SEQUENCE {
+    portPowerSavingsConfigInterfaceParamIfIndex      InterfaceIndex,
+    portPowerSavingsConfigInterfaceParamLinkPartner  TruthValue,
+    portPowerSavingsConfigInterfaceParamShortReach   TruthValue
+}
+
+portPowerSavingsConfigInterfaceParamIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { portPowerSavingsConfigInterfaceParamEntry 1 }
+
+portPowerSavingsConfigInterfaceParamLinkPartner OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Save port power if there is no link partner connected to the port. true
+         is to enable port power saving when there is no link partner connected,
+         false is to disable it."
+    ::= { portPowerSavingsConfigInterfaceParamEntry 2 }
+
+portPowerSavingsConfigInterfaceParamShortReach OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Save port power if port is connected to link partner through short
+         cable. true is to enable port power saving when link partner connected
+         through short cable, false is to disable it."
+    ::= { portPowerSavingsConfigInterfaceParamEntry 3 }
+
+portPowerSavingsStatus OBJECT IDENTIFIER
+    ::= { portPowerSavingsMibObjects 3 }
+
+portPowerSavingsStatusInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PortPowerSavingsStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to Port Power Savings interface status"
+    ::= { portPowerSavingsStatus 1 }
+
+portPowerSavingsStatusInterfaceEntry OBJECT-TYPE
+    SYNTAX      PortPowerSavingsStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each interface has a set of status parameters"
+    INDEX       { portPowerSavingsStatusInterfaceIfIndex }
+    ::= { portPowerSavingsStatusInterfaceTable 1 }
+
+PortPowerSavingsStatusInterfaceEntry ::= SEQUENCE {
+    portPowerSavingsStatusInterfaceIfIndex        InterfaceIndex,
+    portPowerSavingsStatusInterfaceNoLinkPartner  PortPowerSavingsStatusType,
+    portPowerSavingsStatusInterfaceShortCable     PortPowerSavingsStatusType
+}
+
+portPowerSavingsStatusInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { portPowerSavingsStatusInterfaceEntry 1 }
+
+portPowerSavingsStatusInterfaceNoLinkPartner OBJECT-TYPE
+    SYNTAX      PortPowerSavingsStatusType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate whether port is saving power due to no link partner connected."
+    ::= { portPowerSavingsStatusInterfaceEntry 2 }
+
+portPowerSavingsStatusInterfaceShortCable OBJECT-TYPE
+    SYNTAX      PortPowerSavingsStatusType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicate whether port is saving power due to link partner connected
+         through short cable."
+    ::= { portPowerSavingsStatusInterfaceEntry 3 }
+
+portPowerSavingsMibConformance OBJECT IDENTIFIER
+    ::= { portPowerSavingsMib 2 }
+
+portPowerSavingsMibCompliances OBJECT IDENTIFIER
+    ::= { portPowerSavingsMibConformance 1 }
+
+portPowerSavingsMibGroups OBJECT IDENTIFIER
+    ::= { portPowerSavingsMibConformance 2 }
+
+portPowerSavingsCapabilitiesInterfaceInfoGroup OBJECT-GROUP
+    OBJECTS     {                   portPowerSavingsCapabilitiesInterfaceLinkPartner,
+                  portPowerSavingsCapabilitiesInterfaceShortReach }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { portPowerSavingsMibGroups 1 }
+
+portPowerSavingsConfigInterfaceParamTableInfoGroup OBJECT-GROUP
+    OBJECTS     {                   portPowerSavingsConfigInterfaceParamLinkPartner,
+                  portPowerSavingsConfigInterfaceParamShortReach }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { portPowerSavingsMibGroups 2 }
+
+portPowerSavingsStatusInterfaceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { portPowerSavingsStatusInterfaceNoLinkPartner,
+                  portPowerSavingsStatusInterfaceShortCable }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { portPowerSavingsMibGroups 3 }
+
+portPowerSavingsMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS {                        portPowerSavingsCapabilitiesInterfaceInfoGroup,
+                       portPowerSavingsConfigInterfaceParamTableInfoGroup,
+                       portPowerSavingsStatusInterfaceTableInfoGroup }
+
+    ::= { portPowerSavingsMibCompliances 1 }
+
+END

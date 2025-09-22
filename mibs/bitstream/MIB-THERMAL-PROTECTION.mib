@@ -1,0 +1,243 @@
+-- *****************************************************************
+-- MIB-THERMAL-PROTECTION: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-THERMAL-PROTECTION DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Integer32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    Integer16 FROM BTS-TC
+    InterfaceIndex FROM BTS-TC
+    Unsigned8 FROM BTS-TC
+    ;
+
+thermalProtectionMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of thermal protection. The PHY thermal
+         protections consists of four groups. Each PHY is associated to a group,
+         and each group has a configured max temperature. If the average
+         temperature of all sensors exceeds the configured max temperature of a
+         group, then the PHYs in that group is shoutdown."
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 78 }
+
+
+thermalProtectionMibObjects OBJECT IDENTIFIER
+    ::= { thermalProtectionMib 1 }
+
+thermalProtectionCapabilities OBJECT IDENTIFIER
+    ::= { thermalProtectionMibObjects 1 }
+
+thermalProtectionCapabilitiesMaxSupportedGroup OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of supported thermal protection groups."
+    ::= { thermalProtectionCapabilities 1 }
+
+thermalProtectionConfig OBJECT IDENTIFIER
+    ::= { thermalProtectionMibObjects 2 }
+
+thermalProtectionConfigGlobals OBJECT IDENTIFIER
+    ::= { thermalProtectionConfig 1 }
+
+thermalProtectionConfigGlobalsParamTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ThermalProtectionConfigGlobalsParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to assign a temperature to each of the groups"
+    ::= { thermalProtectionConfigGlobals 1 }
+
+thermalProtectionConfigGlobalsParamEntry OBJECT-TYPE
+    SYNTAX      ThermalProtectionConfigGlobalsParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each group associates with a temperature"
+    INDEX       { thermalProtectionConfigGlobalsParamGroupIndex }
+    ::= { thermalProtectionConfigGlobalsParamTable 1 }
+
+ThermalProtectionConfigGlobalsParamEntry ::= SEQUENCE {
+    thermalProtectionConfigGlobalsParamGroupIndex        Integer32,
+    thermalProtectionConfigGlobalsParamGroupTemperature  Integer16
+}
+
+thermalProtectionConfigGlobalsParamGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..3)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Group number."
+    ::= { thermalProtectionConfigGlobalsParamEntry 1 }
+
+thermalProtectionConfigGlobalsParamGroupTemperature OBJECT-TYPE
+    SYNTAX      Integer16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Temperature(in C) where the interfaces mapped to the group will be shut
+         down."
+    ::= { thermalProtectionConfigGlobalsParamEntry 2 }
+
+thermalProtectionConfigInterface OBJECT IDENTIFIER
+    ::= { thermalProtectionConfig 2 }
+
+thermalProtectionConfigInterfaceParamTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ThermalProtectionConfigInterfaceParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to interface group configuration"
+    ::= { thermalProtectionConfigInterface 1 }
+
+thermalProtectionConfigInterfaceParamEntry OBJECT-TYPE
+    SYNTAX      ThermalProtectionConfigInterfaceParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each physical port associates with a group temperature"
+    INDEX       { thermalProtectionConfigInterfaceParamIfIndex }
+    ::= { thermalProtectionConfigInterfaceParamTable 1 }
+
+ThermalProtectionConfigInterfaceParamEntry ::= SEQUENCE {
+    thermalProtectionConfigInterfaceParamIfIndex  InterfaceIndex,
+    thermalProtectionConfigInterfaceParamGroup    Unsigned8
+}
+
+thermalProtectionConfigInterfaceParamIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { thermalProtectionConfigInterfaceParamEntry 1 }
+
+thermalProtectionConfigInterfaceParamGroup OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..4)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Thermal protection groups. Object value (4) mean disable thermal
+         protect for the interface. Object values from 0 to 3 are for the
+         temperature group. "
+    ::= { thermalProtectionConfigInterfaceParamEntry 2 }
+
+thermalProtectionStatus OBJECT IDENTIFIER
+    ::= { thermalProtectionMibObjects 3 }
+
+thermalProtectionStatusInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ThermalProtectionStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to thermal protection interface status"
+    ::= { thermalProtectionStatus 1 }
+
+thermalProtectionStatusInterfaceEntry OBJECT-TYPE
+    SYNTAX      ThermalProtectionStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each interface has a set of status parameters"
+    INDEX       { thermalProtectionStatusInterfaceIfIndex }
+    ::= { thermalProtectionStatusInterfaceTable 1 }
+
+ThermalProtectionStatusInterfaceEntry ::= SEQUENCE {
+    thermalProtectionStatusInterfaceIfIndex      InterfaceIndex,
+    thermalProtectionStatusInterfaceTemperature  Integer16,
+    thermalProtectionStatusInterfacePower        TruthValue
+}
+
+thermalProtectionStatusInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { thermalProtectionStatusInterfaceEntry 1 }
+
+thermalProtectionStatusInterfaceTemperature OBJECT-TYPE
+    SYNTAX      Integer16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current port temperature(in C)."
+    ::= { thermalProtectionStatusInterfaceEntry 2 }
+
+thermalProtectionStatusInterfacePower OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port thermal protection status. false means port link is up and port is
+         operating normally. true means port link is down and port is thermal
+         protected."
+    ::= { thermalProtectionStatusInterfaceEntry 3 }
+
+thermalProtectionMibConformance OBJECT IDENTIFIER
+    ::= { thermalProtectionMib 2 }
+
+thermalProtectionMibCompliances OBJECT IDENTIFIER
+    ::= { thermalProtectionMibConformance 1 }
+
+thermalProtectionMibGroups OBJECT IDENTIFIER
+    ::= { thermalProtectionMibConformance 2 }
+
+thermalProtectionCapabilitiesInfoGroup OBJECT-GROUP
+    OBJECTS     {                   thermalProtectionCapabilitiesMaxSupportedGroup }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { thermalProtectionMibGroups 1 }
+
+thermalProtectionConfigGlobalsParamTableInfoGroup OBJECT-GROUP
+    OBJECTS     {                   thermalProtectionConfigGlobalsParamGroupTemperature }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { thermalProtectionMibGroups 2 }
+
+thermalProtectionConfigInterfaceParamTableInfoGroup OBJECT-GROUP
+    OBJECTS     { thermalProtectionConfigInterfaceParamGroup }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { thermalProtectionMibGroups 3 }
+
+thermalProtectionStatusInterfaceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { thermalProtectionStatusInterfaceTemperature,
+                  thermalProtectionStatusInterfacePower }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { thermalProtectionMibGroups 4 }
+
+thermalProtectionMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { thermalProtectionCapabilitiesInfoGroup,
+                       thermalProtectionConfigGlobalsParamTableInfoGroup,
+                       thermalProtectionConfigInterfaceParamTableInfoGroup,
+                       thermalProtectionStatusInterfaceTableInfoGroup }
+
+    ::= { thermalProtectionMibCompliances 1 }
+
+END

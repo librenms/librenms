@@ -1,0 +1,253 @@
+-- *****************************************************************
+-- MIB-LOOP-PROTECTION: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-LOOP-PROTECTION DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    InterfaceIndex FROM BTS-TC
+    Unsigned64 FROM BTS-TC
+    ;
+
+loopProtectionMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private MIB for loop protection"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 91 }
+
+
+LoopProtectionAction ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the available actions for when a loop on an
+         interface is detected."
+    SYNTAX      INTEGER { shutdown(0), shutdownAndLogEvent(1),
+                          logEvent(2) }
+
+loopProtectionMibObjects OBJECT IDENTIFIER
+    ::= { loopProtectionMib 1 }
+
+loopProtectionConfig OBJECT IDENTIFIER
+    ::= { loopProtectionMibObjects 2 }
+
+loopProtectionConfigGlobals OBJECT IDENTIFIER
+    ::= { loopProtectionConfig 1 }
+
+loopProtectionConfigGlobalsEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global enabled for loop protection on any port."
+    ::= { loopProtectionConfigGlobals 1 }
+
+loopProtectionConfigGlobalsTransmitInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Port transmission interval (seconds). Valid range: 1-10 seconds."
+    ::= { loopProtectionConfigGlobals 2 }
+
+loopProtectionConfigGlobalsShutdownPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Port shutdown period (seconds). Valid range: 0 to 604800 seconds."
+    ::= { loopProtectionConfigGlobals 3 }
+
+loopProtectionConfigInterface OBJECT IDENTIFIER
+    ::= { loopProtectionConfig 2 }
+
+loopProtectionConfigInterfaceParamTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LoopProtectionConfigInterfaceParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of loop protection interface parameters"
+    ::= { loopProtectionConfigInterface 1 }
+
+loopProtectionConfigInterfaceParamEntry OBJECT-TYPE
+    SYNTAX      LoopProtectionConfigInterfaceParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each physical interface has a set of parameters"
+    INDEX       { loopProtectionConfigInterfaceParamIfIndex }
+    ::= { loopProtectionConfigInterfaceParamTable 1 }
+
+LoopProtectionConfigInterfaceParamEntry ::= SEQUENCE {
+    loopProtectionConfigInterfaceParamIfIndex   InterfaceIndex,
+    loopProtectionConfigInterfaceParamEnabled   TruthValue,
+    loopProtectionConfigInterfaceParamAction    LoopProtectionAction,
+    loopProtectionConfigInterfaceParamTransmit  TruthValue
+}
+
+loopProtectionConfigInterfaceParamIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { loopProtectionConfigInterfaceParamEntry 1 }
+
+loopProtectionConfigInterfaceParamEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enabled loop protection on port"
+    ::= { loopProtectionConfigInterfaceParamEntry 2 }
+
+loopProtectionConfigInterfaceParamAction OBJECT-TYPE
+    SYNTAX      LoopProtectionAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action if loop detected"
+    ::= { loopProtectionConfigInterfaceParamEntry 3 }
+
+loopProtectionConfigInterfaceParamTransmit OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Actively generate PDUs"
+    ::= { loopProtectionConfigInterfaceParamEntry 4 }
+
+loopProtectionStatus OBJECT IDENTIFIER
+    ::= { loopProtectionMibObjects 3 }
+
+loopProtectionStatusInterface OBJECT IDENTIFIER
+    ::= { loopProtectionStatus 2 }
+
+loopProtectionStatusInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LoopProtectionStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of loop protection interface status"
+    ::= { loopProtectionStatusInterface 1 }
+
+loopProtectionStatusInterfaceEntry OBJECT-TYPE
+    SYNTAX      LoopProtectionStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each physical interface has a set of status objects"
+    INDEX       { loopProtectionStatusInterfaceIfIndex }
+    ::= { loopProtectionStatusInterfaceTable 1 }
+
+LoopProtectionStatusInterfaceEntry ::= SEQUENCE {
+    loopProtectionStatusInterfaceIfIndex       InterfaceIndex,
+    loopProtectionStatusInterfaceDisabled      TruthValue,
+    loopProtectionStatusInterfaceLoopDetected  TruthValue,
+    loopProtectionStatusInterfaceLoopCount     Unsigned32,
+    loopProtectionStatusInterfaceLastLoop      Unsigned64
+}
+
+loopProtectionStatusInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { loopProtectionStatusInterfaceEntry 1 }
+
+loopProtectionStatusInterfaceDisabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether a port is currently disabled"
+    ::= { loopProtectionStatusInterfaceEntry 2 }
+
+loopProtectionStatusInterfaceLoopDetected OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether a port has a loop detected"
+    ::= { loopProtectionStatusInterfaceEntry 3 }
+
+loopProtectionStatusInterfaceLoopCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of times a loop has been detected on a port"
+    ::= { loopProtectionStatusInterfaceEntry 4 }
+
+loopProtectionStatusInterfaceLastLoop OBJECT-TYPE
+    SYNTAX      Unsigned64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time of last loop condition"
+    ::= { loopProtectionStatusInterfaceEntry 5 }
+
+loopProtectionMibConformance OBJECT IDENTIFIER
+    ::= { loopProtectionMib 2 }
+
+loopProtectionMibCompliances OBJECT IDENTIFIER
+    ::= { loopProtectionMibConformance 1 }
+
+loopProtectionMibGroups OBJECT IDENTIFIER
+    ::= { loopProtectionMibConformance 2 }
+
+loopProtectionConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { loopProtectionConfigGlobalsEnabled,
+                  loopProtectionConfigGlobalsTransmitInterval,
+                  loopProtectionConfigGlobalsShutdownPeriod }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { loopProtectionMibGroups 1 }
+
+loopProtectionConfigInterfaceParamTableInfoGroup OBJECT-GROUP
+    OBJECTS     { loopProtectionConfigInterfaceParamEnabled,
+                  loopProtectionConfigInterfaceParamAction,
+                  loopProtectionConfigInterfaceParamTransmit }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { loopProtectionMibGroups 2 }
+
+loopProtectionStatusInterfaceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { loopProtectionStatusInterfaceDisabled,
+                  loopProtectionStatusInterfaceLoopDetected,
+                  loopProtectionStatusInterfaceLoopCount,
+                  loopProtectionStatusInterfaceLastLoop }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { loopProtectionMibGroups 3 }
+
+loopProtectionMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { loopProtectionConfigGlobalsInfoGroup,
+                       loopProtectionConfigInterfaceParamTableInfoGroup,
+                       loopProtectionStatusInterfaceTableInfoGroup }
+
+    ::= { loopProtectionMibCompliances 1 }
+
+END

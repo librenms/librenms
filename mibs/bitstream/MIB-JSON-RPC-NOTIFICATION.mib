@@ -1,0 +1,307 @@
+-- *****************************************************************
+-- MIB-JSON-RPC-NOTIFICATION: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-JSON-RPC-NOTIFICATION DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    DisplayString FROM BTS-TC
+    RowEditorState FROM BTS-TC
+    ;
+
+jsonRpcNotificationMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "Private JSON-RPC Notification MIB."
+    REVISION    "201410030000Z"
+    DESCRIPTION
+        "Initial version."
+    ::= { switchMgmt 129 }
+
+
+JsonRpcNotificationDestAuthType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Type of authentication (if any)."
+    SYNTAX      INTEGER { none(0), basic(1) }
+
+jsonRpcNotificationMibObjects OBJECT IDENTIFIER
+    ::= { jsonRpcNotificationMib 1 }
+
+jsonRpcNotificationConfig OBJECT IDENTIFIER
+    ::= { jsonRpcNotificationMibObjects 2 }
+
+jsonRpcNotificationConfigDestinationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JsonRpcNotificationConfigDestinationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of JSON-RPC Notification destinations."
+    ::= { jsonRpcNotificationConfig 1 }
+
+jsonRpcNotificationConfigDestinationEntry OBJECT-TYPE
+    SYNTAX      JsonRpcNotificationConfigDestinationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entries in this table represent a JSON-RPC Notification destination
+         which can be referred to in the notification subscription table."
+    INDEX       { jsonRpcNotificationConfigDestinationName }
+    ::= { jsonRpcNotificationConfigDestinationTable 1 }
+
+JsonRpcNotificationConfigDestinationEntry ::= SEQUENCE {
+    jsonRpcNotificationConfigDestinationName      DisplayString,
+    jsonRpcNotificationConfigDestinationUrl       DisplayString,
+    jsonRpcNotificationConfigDestinationAuthType  JsonRpcNotificationDestAuthType,
+    jsonRpcNotificationConfigDestinationUsername  DisplayString,
+    jsonRpcNotificationConfigDestinationPassword  DisplayString,
+    jsonRpcNotificationConfigDestinationAction    RowEditorState
+}
+
+jsonRpcNotificationConfigDestinationName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Name of destination"
+    ::= { jsonRpcNotificationConfigDestinationEntry 1 }
+
+jsonRpcNotificationConfigDestinationUrl OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..254))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "URL of the destination where the events are delivered to."
+    ::= { jsonRpcNotificationConfigDestinationEntry 2 }
+
+jsonRpcNotificationConfigDestinationAuthType OBJECT-TYPE
+    SYNTAX      JsonRpcNotificationDestAuthType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Type of authentication to use (if any)"
+    ::= { jsonRpcNotificationConfigDestinationEntry 3 }
+
+jsonRpcNotificationConfigDestinationUsername OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "User name for the authentication process"
+    ::= { jsonRpcNotificationConfigDestinationEntry 4 }
+
+jsonRpcNotificationConfigDestinationPassword OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Password for the authentication process"
+    ::= { jsonRpcNotificationConfigDestinationEntry 5 }
+
+jsonRpcNotificationConfigDestinationAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { jsonRpcNotificationConfigDestinationEntry 100 }
+
+jsonRpcNotificationConfigDestinationRowEditor OBJECT IDENTIFIER
+    ::= { jsonRpcNotificationConfig 2 }
+
+jsonRpcNotificationConfigDestinationRowEditorName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Name of destination"
+    ::= { jsonRpcNotificationConfigDestinationRowEditor 1 }
+
+jsonRpcNotificationConfigDestinationRowEditorUrl OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..254))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "URL of the destination where the events are delivered to."
+    ::= { jsonRpcNotificationConfigDestinationRowEditor 2 }
+
+jsonRpcNotificationConfigDestinationRowEditorAuthType OBJECT-TYPE
+    SYNTAX      JsonRpcNotificationDestAuthType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Type of authentication to use (if any)"
+    ::= { jsonRpcNotificationConfigDestinationRowEditor 3 }
+
+jsonRpcNotificationConfigDestinationRowEditorUsername OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "User name for the authentication process"
+    ::= { jsonRpcNotificationConfigDestinationRowEditor 4 }
+
+jsonRpcNotificationConfigDestinationRowEditorPassword OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Password for the authentication process"
+    ::= { jsonRpcNotificationConfigDestinationRowEditor 5 }
+
+jsonRpcNotificationConfigDestinationRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { jsonRpcNotificationConfigDestinationRowEditor 100 }
+
+jsonRpcNotificationConfigNotificationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JsonRpcNotificationConfigNotificationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of JSON-RPC Notifications subscriptions."
+    ::= { jsonRpcNotificationConfig 3 }
+
+jsonRpcNotificationConfigNotificationEntry OBJECT-TYPE
+    SYNTAX      JsonRpcNotificationConfigNotificationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry represents a subscription of a given notification to a given
+         destination. If the corresponding destination is deleted, then
+         subscription is deleted as well."
+    INDEX       {                   jsonRpcNotificationConfigNotificationDestination,
+                  jsonRpcNotificationConfigNotificationNotification }
+    ::= { jsonRpcNotificationConfigNotificationTable 1 }
+
+JsonRpcNotificationConfigNotificationEntry ::= SEQUENCE {
+    jsonRpcNotificationConfigNotificationDestination   DisplayString,
+    jsonRpcNotificationConfigNotificationNotification  DisplayString,
+    jsonRpcNotificationConfigNotificationAction        RowEditorState
+}
+
+jsonRpcNotificationConfigNotificationDestination OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Name of destination"
+    ::= { jsonRpcNotificationConfigNotificationEntry 1 }
+
+jsonRpcNotificationConfigNotificationNotification OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..96))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Name of notification"
+    ::= { jsonRpcNotificationConfigNotificationEntry 2 }
+
+jsonRpcNotificationConfigNotificationAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { jsonRpcNotificationConfigNotificationEntry 100 }
+
+jsonRpcNotificationConfigNotificationRowEditor OBJECT IDENTIFIER
+    ::= { jsonRpcNotificationConfig 4 }
+
+jsonRpcNotificationConfigNotificationRowEditorDestination OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Name of destination"
+    ::= { jsonRpcNotificationConfigNotificationRowEditor 1 }
+
+jsonRpcNotificationConfigNotificationRowEditorNotification OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..96))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Name of notification"
+    ::= { jsonRpcNotificationConfigNotificationRowEditor 2 }
+
+jsonRpcNotificationConfigNotificationRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { jsonRpcNotificationConfigNotificationRowEditor 100 }
+
+jsonRpcNotificationMibConformance OBJECT IDENTIFIER
+    ::= { jsonRpcNotificationMib 2 }
+
+jsonRpcNotificationMibCompliances OBJECT IDENTIFIER
+    ::= { jsonRpcNotificationMibConformance 1 }
+
+jsonRpcNotificationMibGroups OBJECT IDENTIFIER
+    ::= { jsonRpcNotificationMibConformance 2 }
+
+jsonRpcNotificationConfigDestinationTableInfoGroup OBJECT-GROUP
+    OBJECTS     { jsonRpcNotificationConfigDestinationUrl,
+                  jsonRpcNotificationConfigDestinationAuthType,
+                  jsonRpcNotificationConfigDestinationUsername,
+                  jsonRpcNotificationConfigDestinationPassword,
+                  jsonRpcNotificationConfigDestinationAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { jsonRpcNotificationMibGroups 1 }
+
+jsonRpcNotificationConfigDestinationRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     {                   jsonRpcNotificationConfigDestinationRowEditorName,
+                  jsonRpcNotificationConfigDestinationRowEditorUrl,
+                  jsonRpcNotificationConfigDestinationRowEditorAuthType,
+                  jsonRpcNotificationConfigDestinationRowEditorUsername,
+                  jsonRpcNotificationConfigDestinationRowEditorPassword,
+                  jsonRpcNotificationConfigDestinationRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { jsonRpcNotificationMibGroups 2 }
+
+jsonRpcNotificationConfigNotificationTableInfoGroup OBJECT-GROUP
+    OBJECTS     { jsonRpcNotificationConfigNotificationAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { jsonRpcNotificationMibGroups 3 }
+
+jsonRpcNotificationConfigNotificationRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     {                   jsonRpcNotificationConfigNotificationRowEditorDestination,
+                  jsonRpcNotificationConfigNotificationRowEditorNotification,
+                  jsonRpcNotificationConfigNotificationRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { jsonRpcNotificationMibGroups 4 }
+
+jsonRpcNotificationMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS {                        jsonRpcNotificationConfigDestinationTableInfoGroup,
+                       jsonRpcNotificationConfigDestinationRowEditorInfoGroup,
+                       jsonRpcNotificationConfigNotificationTableInfoGroup,
+                       jsonRpcNotificationConfigNotificationRowEditorInfoGroup }
+
+    ::= { jsonRpcNotificationMibCompliances 1 }
+
+END

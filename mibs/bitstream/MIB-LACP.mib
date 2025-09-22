@@ -1,0 +1,490 @@
+-- *****************************************************************
+-- MIB-LACP: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-LACP DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Counter64 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    MacAddress FROM SNMPv2-TC
+    TruthValue FROM SNMPv2-TC
+    InterfaceIndex FROM BTS-TC
+    PortList FROM BTS-TC
+    Unsigned16 FROM BTS-TC
+    Unsigned8 FROM BTS-TC
+    ;
+
+lacpMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of the IEEE802.3ad LAG MIB"
+    REVISION    "201411140000Z"
+    DESCRIPTION
+        "Added a new leaf for LACP system priority"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 35 }
+
+
+lacpMibObjects OBJECT IDENTIFIER
+    ::= { lacpMib 1 }
+
+lacpConfig OBJECT IDENTIFIER
+    ::= { lacpMibObjects 2 }
+
+lacpConfigPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LacpConfigPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of the LACP port configurations"
+    ::= { lacpConfig 1 }
+
+lacpConfigPortEntry OBJECT-TYPE
+    SYNTAX      LacpConfigPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each port has a set of parameters"
+    INDEX       { lacpConfigPortInterfaceNo }
+    ::= { lacpConfigPortTable 1 }
+
+LacpConfigPortEntry ::= SEQUENCE {
+    lacpConfigPortInterfaceNo               InterfaceIndex,
+    lacpConfigPortDot3adAggrActorAdminMode  TruthValue,
+    lacpConfigPortDot3adAggrActorAdminKey   Unsigned32,
+    lacpConfigPortDot3adAggrRole            TruthValue,
+    lacpConfigPortDot3adAggrTimeout         TruthValue,
+    lacpConfigPortDot3adAggrPortPriority    Unsigned32
+}
+
+lacpConfigPortInterfaceNo OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { lacpConfigPortEntry 1 }
+
+lacpConfigPortDot3adAggrActorAdminMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Control whether port is LACP enabled(1) or disabled(0)."
+    ::= { lacpConfigPortEntry 2 }
+
+lacpConfigPortDot3adAggrActorAdminKey OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The current administrative value of the Key for the Aggregator. The
+         administrative Key value may differ from the operational Key value for
+         the reasons discussed in 43.6.2. This is a 16-bit, read-write value.
+         The meaning of particular Key values is of local significance"
+    ::= { lacpConfigPortEntry 3 }
+
+lacpConfigPortDot3adAggrRole OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Role shows the LACP activity status. The Active(true) will transmit
+         LACP packets each second, while Passive(false) will wait for a LACP
+         packet from a partner"
+    ::= { lacpConfigPortEntry 4 }
+
+lacpConfigPortDot3adAggrTimeout OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Timeout controls the period between BPDU transmissions. Fast(true)
+         will transmit LACP packets each second, while Slow(0) will wait for 30
+         seconds before sending a LACP packet."
+    ::= { lacpConfigPortEntry 5 }
+
+lacpConfigPortDot3adAggrPortPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Port Priority controls the priority of the port. If the LACP
+         partner wants to form a larger group than is supported by this device
+         then this parameter will control which ports will be active and which
+         ports will be in a backup role. Lower number means greater priority."
+    ::= { lacpConfigPortEntry 6 }
+
+lacpConfigGlobals OBJECT IDENTIFIER
+    ::= { lacpConfig 2 }
+
+lacpConfigGlobalsDot3adAggrSystemPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "LACP system priority is a value."
+    ::= { lacpConfigGlobals 1 }
+
+lacpStatus OBJECT IDENTIFIER
+    ::= { lacpMibObjects 3 }
+
+lacpStatusSystemTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LacpStatusSystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of the LACP system status"
+    ::= { lacpStatus 1 }
+
+lacpStatusSystemEntry OBJECT-TYPE
+    SYNTAX      LacpStatusSystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each lag has a set of parameters"
+    INDEX       { lacpStatusSystemInterfaceNo }
+    ::= { lacpStatusSystemTable 1 }
+
+LacpStatusSystemEntry ::= SEQUENCE {
+    lacpStatusSystemInterfaceNo                          InterfaceIndex,
+    lacpStatusSystemDot3adAggrID                         Unsigned16,
+    lacpStatusSystemDot3adAggrPartnerSystemID            MacAddress,
+    lacpStatusSystemDot3adAggrPartnerOperKey             Unsigned16,
+    lacpStatusSystemDot3adAggrPartnerOperSystemPriority  Unsigned16,
+    lacpStatusSystemDot3adAggrPartnerStateLastChanged    Unsigned32,
+    lacpStatusSystemDot3adAggrLocalPorts                 PortList
+}
+
+lacpStatusSystemInterfaceNo OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { lacpStatusSystemEntry 1 }
+
+lacpStatusSystemDot3adAggrID OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The aggregation ID for a particular link aggregation group."
+    ::= { lacpStatusSystemEntry 2 }
+
+lacpStatusSystemDot3adAggrPartnerSystemID OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system ID (MAC address) of the aggregation partner."
+    ::= { lacpStatusSystemEntry 3 }
+
+lacpStatusSystemDot3adAggrPartnerOperKey OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Key that the partner has assigned to this aggregation ID."
+    ::= { lacpStatusSystemEntry 4 }
+
+lacpStatusSystemDot3adAggrPartnerOperSystemPriority OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A 2-octet read-only value indicating the operational value of priority
+         associated with the Partner's System ID. The value of this attribute
+         may contain the manually configured value carried in
+         aAggPortPartnerAdminSystemPriority if there is no protocol Partner."
+    ::= { lacpStatusSystemEntry 5 }
+
+lacpStatusSystemDot3adAggrPartnerStateLastChanged OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time in second since this aggregation changed"
+    ::= { lacpStatusSystemEntry 6 }
+
+lacpStatusSystemDot3adAggrLocalPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Local port list"
+    ::= { lacpStatusSystemEntry 7 }
+
+lacpStatusPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LacpStatusPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of the LACP port status"
+    ::= { lacpStatus 2 }
+
+lacpStatusPortEntry OBJECT-TYPE
+    SYNTAX      LacpStatusPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each port has a set of parameters"
+    INDEX       { lacpStatusPortInterfaceNo }
+    ::= { lacpStatusPortTable 1 }
+
+LacpStatusPortEntry ::= SEQUENCE {
+    lacpStatusPortInterfaceNo                        InterfaceIndex,
+    lacpStatusPortDot3adAggrActorAdminMode           TruthValue,
+    lacpStatusPortDot3adAggrActorAdminKey            Unsigned16,
+    lacpStatusPortDot3adAggrPartnerOperPortIndex     Unsigned8,
+    lacpStatusPortDot3adAggrPartnerOperPortPriority  Unsigned16
+}
+
+lacpStatusPortInterfaceNo OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { lacpStatusPortEntry 1 }
+
+lacpStatusPortDot3adAggrActorAdminMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the current Admin mode of port, if LACP enabled then returns true
+         else returns false."
+    ::= { lacpStatusPortEntry 2 }
+
+lacpStatusPortDot3adAggrActorAdminKey OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the current administrative value of the Key for the Aggregator.
+         The administrative Key value may differ from the operational Key value
+         for the reasons discussed in 43.6.2. This is a 16-bit, read-write
+         value. The meaning of particular Key values is of local significance"
+    ::= { lacpStatusPortEntry 3 }
+
+lacpStatusPortDot3adAggrPartnerOperPortIndex OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the port index of the partner port connected to this port."
+    ::= { lacpStatusPortEntry 4 }
+
+lacpStatusPortDot3adAggrPartnerOperPortPriority OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the port priority of the port partner port connected to this
+         port."
+    ::= { lacpStatusPortEntry 5 }
+
+lacpControl OBJECT IDENTIFIER
+    ::= { lacpMibObjects 4 }
+
+lacpControlPortStatsClearTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LacpControlPortStatsClearEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table to clear LACP port statistics"
+    ::= { lacpControl 1 }
+
+lacpControlPortStatsClearEntry OBJECT-TYPE
+    SYNTAX      LacpControlPortStatsClearEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each port has a set of parameters"
+    INDEX       { lacpControlPortStatsClearInterfaceNo }
+    ::= { lacpControlPortStatsClearTable 1 }
+
+LacpControlPortStatsClearEntry ::= SEQUENCE {
+    lacpControlPortStatsClearInterfaceNo          InterfaceIndex,
+    lacpControlPortStatsClearPortStatisticsClear  TruthValue
+}
+
+lacpControlPortStatsClearInterfaceNo OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { lacpControlPortStatsClearEntry 1 }
+
+lacpControlPortStatsClearPortStatisticsClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set to true to clear the statistics of a port."
+    ::= { lacpControlPortStatsClearEntry 2 }
+
+lacpStatistics OBJECT IDENTIFIER
+    ::= { lacpMibObjects 5 }
+
+lacpStatisticsPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LacpStatisticsPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of the LACP port statistics"
+    ::= { lacpStatistics 3 }
+
+lacpStatisticsPortEntry OBJECT-TYPE
+    SYNTAX      LacpStatisticsPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each port has a set of parameters"
+    INDEX       { lacpStatisticsPortInterfaceNo }
+    ::= { lacpStatisticsPortTable 1 }
+
+LacpStatisticsPortEntry ::= SEQUENCE {
+    lacpStatisticsPortInterfaceNo                InterfaceIndex,
+    lacpStatisticsPortDot3adAggrRxFrames         Counter64,
+    lacpStatisticsPortDot3adAggrTxFrames         Counter64,
+    lacpStatisticsPortDot3adAggrRxIllegalFrames  Counter64,
+    lacpStatisticsPortDot3adAggrRxUnknownFrames  Counter64
+}
+
+lacpStatisticsPortInterfaceNo OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number."
+    ::= { lacpStatisticsPortEntry 1 }
+
+lacpStatisticsPortDot3adAggrRxFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows received LACP frame count."
+    ::= { lacpStatisticsPortEntry 2 }
+
+lacpStatisticsPortDot3adAggrTxFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows transmitted LACP frame count."
+    ::= { lacpStatisticsPortEntry 3 }
+
+lacpStatisticsPortDot3adAggrRxIllegalFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows recevied illegal LACP frame count."
+    ::= { lacpStatisticsPortEntry 4 }
+
+lacpStatisticsPortDot3adAggrRxUnknownFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows recevied unknown LACP frame count."
+    ::= { lacpStatisticsPortEntry 5 }
+
+lacpMibConformance OBJECT IDENTIFIER
+    ::= { lacpMib 2 }
+
+lacpMibCompliances OBJECT IDENTIFIER
+    ::= { lacpMibConformance 1 }
+
+lacpMibGroups OBJECT IDENTIFIER
+    ::= { lacpMibConformance 2 }
+
+lacpConfigPortTableInfoGroup OBJECT-GROUP
+    OBJECTS     { lacpConfigPortDot3adAggrActorAdminMode,
+                  lacpConfigPortDot3adAggrActorAdminKey,
+                  lacpConfigPortDot3adAggrRole,
+                  lacpConfigPortDot3adAggrTimeout,
+                  lacpConfigPortDot3adAggrPortPriority }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { lacpMibGroups 1 }
+
+lacpConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { lacpConfigGlobalsDot3adAggrSystemPriority }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { lacpMibGroups 2 }
+
+lacpStatusSystemTableInfoGroup OBJECT-GROUP
+    OBJECTS     { lacpStatusSystemDot3adAggrID,
+                  lacpStatusSystemDot3adAggrPartnerSystemID,
+                  lacpStatusSystemDot3adAggrPartnerOperKey,
+                  lacpStatusSystemDot3adAggrPartnerOperSystemPriority,
+                  lacpStatusSystemDot3adAggrPartnerStateLastChanged,
+                  lacpStatusSystemDot3adAggrLocalPorts }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { lacpMibGroups 3 }
+
+lacpStatusPortTableInfoGroup OBJECT-GROUP
+    OBJECTS     { lacpStatusPortDot3adAggrActorAdminMode,
+                  lacpStatusPortDot3adAggrActorAdminKey,
+                  lacpStatusPortDot3adAggrPartnerOperPortIndex,
+                  lacpStatusPortDot3adAggrPartnerOperPortPriority }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { lacpMibGroups 4 }
+
+lacpControlPortStatsClearTableInfoGroup OBJECT-GROUP
+    OBJECTS     { lacpControlPortStatsClearPortStatisticsClear }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { lacpMibGroups 5 }
+
+lacpStatisticsPortTableInfoGroup OBJECT-GROUP
+    OBJECTS     { lacpStatisticsPortDot3adAggrRxFrames,
+                  lacpStatisticsPortDot3adAggrTxFrames,
+                  lacpStatisticsPortDot3adAggrRxIllegalFrames,
+                  lacpStatisticsPortDot3adAggrRxUnknownFrames }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { lacpMibGroups 6 }
+
+lacpMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { lacpConfigPortTableInfoGroup,
+                       lacpConfigGlobalsInfoGroup,
+                       lacpStatusSystemTableInfoGroup,
+                       lacpStatusPortTableInfoGroup,
+                       lacpControlPortStatsClearTableInfoGroup,
+                       lacpStatisticsPortTableInfoGroup }
+
+    ::= { lacpMibCompliances 1 }
+
+END

@@ -1,0 +1,5236 @@
+-- *****************************************************************
+-- MIB-QOS: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-QOS DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Dscp FROM DIFFSERV-DSCP-TC
+    InetAddressIPv6 FROM INET-ADDRESS-MIB
+    Integer32 FROM SNMPv2-SMI
+    IpAddress FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    MacAddress FROM SNMPv2-TC
+    TruthValue FROM SNMPv2-TC
+    ASRType FROM BTS-TC
+    BitType FROM BTS-TC
+    DestMacType FROM BTS-TC
+    EtherType FROM BTS-TC
+    InterfaceIndex FROM BTS-TC
+    Percent FROM BTS-TC
+    PortList FROM BTS-TC
+    RowEditorState FROM BTS-TC
+    Unsigned16 FROM BTS-TC
+    Unsigned8 FROM BTS-TC
+    VcapKeyType FROM BTS-TC
+    VlanTagPriority FROM BTS-TC
+    VlanTagType FROM BTS-TC
+    ;
+
+qosMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private MIB for QoS"
+    REVISION    "201508130000Z"
+    DESCRIPTION
+        "Changed to use Dscp types in QCEs."
+    REVISION    "201504070000Z"
+    DESCRIPTION
+        "Added QosConfigInterfaceQueueShaperRateType,
+         QosConfigInterfaceShaperRateType objects."
+    REVISION    "201411060000Z"
+    DESCRIPTION
+        "Added new WredV3 related objects and adapted WredTable to WredV3."
+    REVISION    "201410080000Z"
+    DESCRIPTION
+        "Removed QosCapabilitiesBitrateMin, QosCapabilitiesBitrateMax,
+         QosCapabilitiesBurstSizeMin and QosCapabilitiesBurstSizeMax.
+         
+         Added policer and shaper specific min/max capabilities objects.
+         
+         Added QosConfigGlobalStormPolicersUnicastFrameRate,
+         QosConfigGlobalStormPolicersMulticastFrameRate and
+         QosConfigGlobalStormPolicersBroadcastFrameRate."
+    REVISION    "201409170000Z"
+    DESCRIPTION
+        "Added QosCapabilitiesHasQueueShapersExcess object."
+    REVISION    "201408120000Z"
+    DESCRIPTION
+        "Updated descriptions when referring to a capability."
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 14 }
+
+
+QosDscpClassify ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An integer that indicates the DSCP classify mode."
+    SYNTAX      INTEGER { none(0), zero(1), selected(2), all(3) }
+
+QosDscpRemark ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An integer that indicates the DSCP remark mode."
+    SYNTAX      INTEGER { disabled(0), rewrite(1), remap(2),
+                          remapDp(3) }
+
+QosQceFrameType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An integer that indicates the QCE frame type key."
+    SYNTAX      INTEGER { any(0), etype(1), llc(2), snap(3), ipv4(4),
+                          ipv6(5) }
+
+QosQceUserType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An integer that indicates the QCE user type.
+         
+         If the value is zero it indicates a static configuration.
+         
+         If the value is non-zero it indicates a dynamic configuration made by
+         another subsystem."
+    SYNTAX      INTEGER { admin(0), voiceVlan(1) }
+
+QosShaperRateType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An integer that indicates the shaper rate type.
+         
+         If the value is zero, it indicates the shaper uses line-rate.
+         
+         If the value is one, it indicates the shaper uses data-rate.
+         
+         NOTE: For QoS Queue shapers, this configuration is valid only for
+         Normal port mode. If the port is in Basic or Hierarchical mode, the
+         rate-type will be stored and become active when the port is switched
+         back to Normal Scheduling mode."
+    SYNTAX      INTEGER { line(0), data(1) }
+
+QosTagRemarkingMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An integer that indicates the tag remarking mode."
+    SYNTAX      INTEGER { classified(0), default(2), mapped(3) }
+
+QosWredMaxSelector ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An integer that selects between 'Maximum Drop Probability' or 'Maximum
+         Fill Level'."
+    SYNTAX      INTEGER { maximumDropProbability(0),
+                          maximumFillLevel(1) }
+
+qosMibObjects OBJECT IDENTIFIER
+    ::= { qosMib 1 }
+
+qosCapabilities OBJECT IDENTIFIER
+    ::= { qosMibObjects 1 }
+
+qosCapabilitiesClassMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum allowed QoS class."
+    ::= { qosCapabilities 1 }
+
+qosCapabilitiesClassMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum allowed QoS class."
+    ::= { qosCapabilities 2 }
+
+qosCapabilitiesDplMin OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum allowed drop precedence level."
+    ::= { qosCapabilities 3 }
+
+qosCapabilitiesDplMax OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum allowed drop precedence level."
+    ::= { qosCapabilities 4 }
+
+qosCapabilitiesWredGroupMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum allowed WRED group number."
+    ::= { qosCapabilities 5 }
+
+qosCapabilitiesWredGroupMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum allowed WRED group number."
+    ::= { qosCapabilities 6 }
+
+qosCapabilitiesWredDplMin OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum allowed WRED drop precedence level."
+    ::= { qosCapabilities 7 }
+
+qosCapabilitiesWredDplMax OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum allowed WRED drop precedence level."
+    ::= { qosCapabilities 8 }
+
+qosCapabilitiesQceIdMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum allowed QCE Id."
+    ::= { qosCapabilities 9 }
+
+qosCapabilitiesQceIdMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum allowed QCE Id."
+    ::= { qosCapabilities 10 }
+
+qosCapabilitiesPortPolicerBitRateMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum supported bit rate in kbps for port policers using bit rate
+         mode."
+    ::= { qosCapabilities 11 }
+
+qosCapabilitiesPortPolicerBitRateMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported bit rate in kbps for port policers using bit rate
+         mode.
+         
+         If zero, the port policers does not support bit rate mode."
+    ::= { qosCapabilities 12 }
+
+qosCapabilitiesPortPolicerBitBurstMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum supported burst size in bytes for port policers using bit rate
+         mode."
+    ::= { qosCapabilities 13 }
+
+qosCapabilitiesPortPolicerBitBurstMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported burst size in bytes for port policers using bit rate
+         mode."
+    ::= { qosCapabilities 14 }
+
+qosCapabilitiesPortPolicerFrameRateMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum supported frame rate in fps for port policers using frame rate
+         mode."
+    ::= { qosCapabilities 15 }
+
+qosCapabilitiesPortPolicerFrameRateMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported frame rate in fps for port policers using frame rate
+         mode.
+         
+         If zero, the port policers does not support frame rate mode."
+    ::= { qosCapabilities 16 }
+
+qosCapabilitiesPortPolicerFrameBurstMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum supported burst size in frames for port policers using frame
+         rate mode."
+    ::= { qosCapabilities 17 }
+
+qosCapabilitiesPortPolicerFrameBurstMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported burst size in frames for port policers using frame
+         rate mode."
+    ::= { qosCapabilities 18 }
+
+qosCapabilitiesQueuePolicerBitRateMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum supported bit rate in kbps for queue policers using bit rate
+         mode."
+    ::= { qosCapabilities 19 }
+
+qosCapabilitiesQueuePolicerBitRateMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported bit rate in kbps for queue policers using bit rate
+         mode.
+         
+         If zero, the queue policers does not support bit rate mode."
+    ::= { qosCapabilities 20 }
+
+qosCapabilitiesQueuePolicerBitBurstMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum supported burst size in bytes for queue policers using bit rate
+         mode."
+    ::= { qosCapabilities 21 }
+
+qosCapabilitiesQueuePolicerBitBurstMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported burst size in bytes for queue policers using bit rate
+         mode."
+    ::= { qosCapabilities 22 }
+
+qosCapabilitiesQueuePolicerFrameRateMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum supported frame rate in fps for queue policers using frame rate
+         mode."
+    ::= { qosCapabilities 23 }
+
+qosCapabilitiesQueuePolicerFrameRateMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported frame rate in fps for queue policers using frame rate
+         mode.
+         
+         If zero, the port policers does not support frame rate mode."
+    ::= { qosCapabilities 24 }
+
+qosCapabilitiesQueuePolicerFrameBurstMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum supported burst size in frames for queue policers using frame
+         rate mode."
+    ::= { qosCapabilities 25 }
+
+qosCapabilitiesQueuePolicerFrameBurstMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported burst size in frames for queue policers using frame
+         rate mode."
+    ::= { qosCapabilities 26 }
+
+qosCapabilitiesPortShaperBitRateMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum supported bit rate in kbps for port shapers using bit rate
+         mode."
+    ::= { qosCapabilities 27 }
+
+qosCapabilitiesPortShaperBitRateMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported bit rate in kbps for port shapers using bit rate
+         mode.
+         
+         If zero, the port shapers does not support bit rate mode."
+    ::= { qosCapabilities 28 }
+
+qosCapabilitiesPortShaperBitBurstMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum supported burst size in bytes for port shapers using bit rate
+         mode."
+    ::= { qosCapabilities 29 }
+
+qosCapabilitiesPortShaperBitBurstMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported burst size in bytes for port shapers using bit rate
+         mode."
+    ::= { qosCapabilities 30 }
+
+qosCapabilitiesPortShaperFrameRateMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum supported frame rate in fps for port shapers using frame rate
+         mode."
+    ::= { qosCapabilities 31 }
+
+qosCapabilitiesPortShaperFrameRateMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported frame rate in fps for port shapers using frame rate
+         mode.
+         
+         If zero, the port shapers does not support frame rate mode."
+    ::= { qosCapabilities 32 }
+
+qosCapabilitiesPortShaperFrameBurstMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum supported burst size in frames for port shapers using frame
+         rate mode."
+    ::= { qosCapabilities 33 }
+
+qosCapabilitiesPortShaperFrameBurstMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported burst size in frames for port shapers using frame
+         rate mode."
+    ::= { qosCapabilities 34 }
+
+qosCapabilitiesQueueShaperBitRateMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum supported bit rate in kbps for queue shapers using bit rate
+         mode."
+    ::= { qosCapabilities 35 }
+
+qosCapabilitiesQueueShaperBitRateMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported bit rate in kbps for queue shapers using bit rate
+         mode.
+         
+         If zero, the queue shapers does not support bit rate mode."
+    ::= { qosCapabilities 36 }
+
+qosCapabilitiesQueueShaperBitBurstMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum supported burst size in bytes for queue shapers using bit rate
+         mode."
+    ::= { qosCapabilities 37 }
+
+qosCapabilitiesQueueShaperBitBurstMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported burst size in bytes for queue shapers using bit rate
+         mode."
+    ::= { qosCapabilities 38 }
+
+qosCapabilitiesQueueShaperFrameRateMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum supported frame rate in fps for queue shapers using frame rate
+         mode."
+    ::= { qosCapabilities 39 }
+
+qosCapabilitiesQueueShaperFrameRateMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported frame rate in fps for queue shapers using frame rate
+         mode.
+         
+         If zero, the port shapers does not support frame rate mode."
+    ::= { qosCapabilities 40 }
+
+qosCapabilitiesQueueShaperFrameBurstMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum supported burst size in frames for queue shapers using frame
+         rate mode."
+    ::= { qosCapabilities 41 }
+
+qosCapabilitiesQueueShaperFrameBurstMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported burst size in frames for queue shapers using frame
+         rate mode."
+    ::= { qosCapabilities 42 }
+
+qosCapabilitiesGlobalStormBitRateMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum supported bit rate in kbps for global storm policers using bit
+         rate mode."
+    ::= { qosCapabilities 43 }
+
+qosCapabilitiesGlobalStormBitRateMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported bit rate in kbps for global storm policers using bit
+         rate mode.
+         
+         If zero, the global storm policers does not support bit rate mode."
+    ::= { qosCapabilities 44 }
+
+qosCapabilitiesGlobalStormBitBurstMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum supported burst size in bytes for global storm policers using
+         bit rate mode."
+    ::= { qosCapabilities 45 }
+
+qosCapabilitiesGlobalStormBitBurstMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported burst size in bytes for global storm policers using
+         bit rate mode."
+    ::= { qosCapabilities 46 }
+
+qosCapabilitiesGlobalStormFrameRateMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum supported frame rate in fps for global storm policers using
+         frame rate mode."
+    ::= { qosCapabilities 47 }
+
+qosCapabilitiesGlobalStormFrameRateMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported frame rate in fps for global storm policers using
+         frame rate mode.
+         
+         If zero, the global storm policers does not support frame rate mode."
+    ::= { qosCapabilities 48 }
+
+qosCapabilitiesGlobalStormFrameBurstMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum supported burst size in frames for global storm policers using
+         frame rate mode."
+    ::= { qosCapabilities 49 }
+
+qosCapabilitiesGlobalStormFrameBurstMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported burst size in frames for global storm policers using
+         frame rate mode."
+    ::= { qosCapabilities 50 }
+
+qosCapabilitiesPortStormBitRateMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum supported bit rate in kbps for port storm policers using bit
+         rate mode."
+    ::= { qosCapabilities 51 }
+
+qosCapabilitiesPortStormBitRateMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported bit rate in kbps for port storm policers using bit
+         rate mode.
+         
+         If zero, the port storm policers does not support bit rate mode."
+    ::= { qosCapabilities 52 }
+
+qosCapabilitiesPortStormBitBurstMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum supported burst size in bytes for port storm policers using bit
+         rate mode."
+    ::= { qosCapabilities 53 }
+
+qosCapabilitiesPortStormBitBurstMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported burst size in bytes for port storm policers using bit
+         rate mode."
+    ::= { qosCapabilities 54 }
+
+qosCapabilitiesPortStormFrameRateMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum supported frame rate in fps for port storm policers using frame
+         rate mode."
+    ::= { qosCapabilities 55 }
+
+qosCapabilitiesPortStormFrameRateMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported frame rate in fps for port storm policers using frame
+         rate mode.
+         
+         If zero, the port storm policers does not support frame rate mode."
+    ::= { qosCapabilities 56 }
+
+qosCapabilitiesPortStormFrameBurstMin OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum supported burst size in frames for port storm policers using
+         frame rate mode."
+    ::= { qosCapabilities 57 }
+
+qosCapabilitiesPortStormFrameBurstMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum supported burst size in frames for port storm policers using
+         frame rate mode."
+    ::= { qosCapabilities 58 }
+
+qosCapabilitiesDwrrCountMask OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A bitmask used to show allowed values of DwrrCount (zero is always
+         allowed).
+         
+         Example:
+         
+         00100000 (0x20): Allowed values are 0 and 6
+         
+         11111110 (0xFE): Allowed values are 0 and 2..8"
+    ::= { qosCapabilities 101 }
+
+qosCapabilitiesHasGlobalStormPolicers OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports global storm policers."
+    ::= { qosCapabilities 201 }
+
+qosCapabilitiesHasPortStormPolicers OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports per port storm policers."
+    ::= { qosCapabilities 202 }
+
+qosCapabilitiesHasPortQueuePolicers OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports per port queue policers."
+    ::= { qosCapabilities 203 }
+
+qosCapabilitiesHasWredV1 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports WRED version 1."
+    ::= { qosCapabilities 204 }
+
+qosCapabilitiesHasWredV2 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports WRED version 2."
+    ::= { qosCapabilities 205 }
+
+qosCapabilitiesHasFixedTagCosMap OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports fixed tag to cos mapping only."
+    ::= { qosCapabilities 206 }
+
+qosCapabilitiesHasTagClassification OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports using VLAN tag for classification."
+    ::= { qosCapabilities 207 }
+
+qosCapabilitiesHasTagRemarking OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports VLAN tag remarking."
+    ::= { qosCapabilities 208 }
+
+qosCapabilitiesHasDscp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports DSCP translation and remarking."
+    ::= { qosCapabilities 209 }
+
+qosCapabilitiesHasDscpDplClassification OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports DPL based DSCP classification."
+    ::= { qosCapabilities 210 }
+
+qosCapabilitiesHasDscpDplRemarking OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports DPL based DSCP remarking."
+    ::= { qosCapabilities 211 }
+
+qosCapabilitiesHasPortPolicersFc OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports flow control in port policers."
+    ::= { qosCapabilities 212 }
+
+qosCapabilitiesHasQueuePolicersFc OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports flow control in queue policers."
+    ::= { qosCapabilities 213 }
+
+qosCapabilitiesHasPortShapersDlb OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports dual leaky bucket egress port shapers."
+    ::= { qosCapabilities 214 }
+
+qosCapabilitiesHasQueueShapersDlb OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports dual leaky bucket egress queue shapers."
+    ::= { qosCapabilities 215 }
+
+qosCapabilitiesHasQueueShapersExcess OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports excess bandwidth in egress queue
+         shapers."
+    ::= { qosCapabilities 216 }
+
+qosCapabilitiesHasWredV3 OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports WRED version 3."
+    ::= { qosCapabilities 217 }
+
+qosCapabilitiesHasQce OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports QCEs."
+    ::= { qosCapabilities 301 }
+
+qosCapabilitiesHasQceAddressMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports QCE address mode."
+    ::= { qosCapabilities 302 }
+
+qosCapabilitiesHasQceKeyType OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports QCE key type."
+    ::= { qosCapabilities 303 }
+
+qosCapabilitiesHasQceMacOui OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports QCE MAC OUI part only (24 most
+         significant bits)."
+    ::= { qosCapabilities 304 }
+
+qosCapabilitiesHasQceDmac OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports QCE destination MAC keys."
+    ::= { qosCapabilities 305 }
+
+qosCapabilitiesHasQceDip OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports QCE destination IP keys."
+    ::= { qosCapabilities 306 }
+
+qosCapabilitiesHasQceCTag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports QCE VLAN C-TAG keys."
+    ::= { qosCapabilities 307 }
+
+qosCapabilitiesHasQceSTag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports QCE VLAN S-TAG keys."
+    ::= { qosCapabilities 308 }
+
+qosCapabilitiesHasQceInnerTag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports QCE inner VLAN tag keys."
+    ::= { qosCapabilities 309 }
+
+qosCapabilitiesHasQceActionPcpDei OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports QCE PCP and DEI actions."
+    ::= { qosCapabilities 310 }
+
+qosCapabilitiesHasQceActionPolicy OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports QCE policy actions."
+    ::= { qosCapabilities 311 }
+
+qosCapabilitiesHasShapersRt OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, the platform supports rate-type configurable egress shapers."
+    ::= { qosCapabilities 312 }
+
+qosConfig OBJECT IDENTIFIER
+    ::= { qosMibObjects 2 }
+
+qosConfigGlobals OBJECT IDENTIFIER
+    ::= { qosConfig 1 }
+
+qosConfigGlobalsStormPolicers OBJECT IDENTIFIER
+    ::= { qosConfigGlobals 1 }
+
+qosConfigGlobalsStormPolicersUnicast OBJECT IDENTIFIER
+    ::= { qosConfigGlobalsStormPolicers 1 }
+
+qosConfigGlobalsStormPolicersUnicastEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the storm policer is enabled.
+         
+         This object is only valid if QosCapabilitiesHasGlobalStormPolicers is
+         true."
+    ::= { qosConfigGlobalsStormPolicersUnicast 1 }
+
+qosConfigGlobalsStormPolicersUnicastRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure the storm policer rate.
+         
+         Valid range is from the smallest value of
+         QosCapabilitiesGlobalStormBitRateMin and
+         QosCapabilitiesGlobalStormFrameRateMin to the largest value of
+         QosCapabilitiesGlobalStormBitRateMax and
+         QosCapabilitiesGlobalStormFrameRateMax.
+         
+         This object is only valid if QosCapabilitiesHasGlobalStormPolicers is
+         true."
+    ::= { qosConfigGlobalsStormPolicersUnicast 2 }
+
+qosConfigGlobalsStormPolicersUnicastFrameRate OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the rate is measured in fps instead of kbps.
+         
+         fps (FrameRate == TRUE) is only valid if
+         QosCapabilitiesGlobalStormFrameRateMax is non-zero.
+         
+         kbps (FrameRate == FALSE) is only valid if
+         QosCapabilitiesGlobalStormBitRateMax is non-zero.
+         
+         This object is only valid if QosCapabilitiesHasGlobalStormPolicers is
+         true."
+    ::= { qosConfigGlobalsStormPolicersUnicast 3 }
+
+qosConfigGlobalsStormPolicersMulticast OBJECT IDENTIFIER
+    ::= { qosConfigGlobalsStormPolicers 2 }
+
+qosConfigGlobalsStormPolicersMulticastEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the storm policer is enabled.
+         
+         This object is only valid if QosCapabilitiesHasGlobalStormPolicers is
+         true."
+    ::= { qosConfigGlobalsStormPolicersMulticast 1 }
+
+qosConfigGlobalsStormPolicersMulticastRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure the storm policer rate.
+         
+         Valid range is from the smallest value of
+         QosCapabilitiesGlobalStormBitRateMin and
+         QosCapabilitiesGlobalStormFrameRateMin to the largest value of
+         QosCapabilitiesGlobalStormBitRateMax and
+         QosCapabilitiesGlobalStormFrameRateMax.
+         
+         This object is only valid if QosCapabilitiesHasGlobalStormPolicers is
+         true."
+    ::= { qosConfigGlobalsStormPolicersMulticast 2 }
+
+qosConfigGlobalsStormPolicersMulticastFrameRate OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the rate is measured in fps instead of kbps.
+         
+         fps (FrameRate == TRUE) is only valid if
+         QosCapabilitiesGlobalStormFrameRateMax is non-zero.
+         
+         kbps (FrameRate == FALSE) is only valid if
+         QosCapabilitiesGlobalStormBitRateMax is non-zero.
+         
+         This object is only valid if QosCapabilitiesHasGlobalStormPolicers is
+         true."
+    ::= { qosConfigGlobalsStormPolicersMulticast 3 }
+
+qosConfigGlobalsStormPolicersBroadcast OBJECT IDENTIFIER
+    ::= { qosConfigGlobalsStormPolicers 3 }
+
+qosConfigGlobalsStormPolicersBroadcastEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the storm policer is enabled.
+         
+         This object is only valid if QosCapabilitiesHasGlobalStormPolicers is
+         true."
+    ::= { qosConfigGlobalsStormPolicersBroadcast 1 }
+
+qosConfigGlobalsStormPolicersBroadcastRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Configure the storm policer rate.
+         
+         Valid range is from the smallest value of
+         QosCapabilitiesGlobalStormBitRateMin and
+         QosCapabilitiesGlobalStormFrameRateMin to the largest value of
+         QosCapabilitiesGlobalStormBitRateMax and
+         QosCapabilitiesGlobalStormFrameRateMax.
+         
+         This object is only valid if QosCapabilitiesHasGlobalStormPolicers is
+         true."
+    ::= { qosConfigGlobalsStormPolicersBroadcast 2 }
+
+qosConfigGlobalsStormPolicersBroadcastFrameRate OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the rate is measured in fps instead of kbps.
+         
+         fps (FrameRate == TRUE) is only valid if
+         QosCapabilitiesGlobalStormFrameRateMax is non-zero.
+         
+         kbps (FrameRate == FALSE) is only valid if
+         QosCapabilitiesGlobalStormBitRateMax is non-zero.
+         
+         This object is only valid if QosCapabilitiesHasGlobalStormPolicers is
+         true."
+    ::= { qosConfigGlobalsStormPolicersBroadcast 3 }
+
+qosConfigGlobalsWredTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosConfigGlobalsWredEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the configuration of WRED (Weighted Random Early
+         Discard).
+         
+         This is an optional table and is only present if
+         qosCapabilitiesHasWredV1, qosCapabilitiesHasWredV2 or
+         qosCapabilitiesHasWredV3 is true."
+    ::= { qosConfigGlobals 2 }
+
+qosConfigGlobalsWredEntry OBJECT-TYPE
+    SYNTAX      QosConfigGlobalsWredEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the configuration for a specific WRED profile"
+    INDEX       { qosConfigGlobalsWredGroup,
+                  qosConfigGlobalsWredQueue,
+                  qosConfigGlobalsWredDpl }
+    ::= { qosConfigGlobalsWredTable 1 }
+
+QosConfigGlobalsWredEntry ::= SEQUENCE {
+    qosConfigGlobalsWredGroup             Integer32,
+    qosConfigGlobalsWredQueue             Integer32,
+    qosConfigGlobalsWredDpl               Integer32,
+    qosConfigGlobalsWredEnable            TruthValue,
+    qosConfigGlobalsWredMinimumFillLevel  Percent,
+    qosConfigGlobalsWredMaximum           Percent,
+    qosConfigGlobalsWredMaxSelector       QosWredMaxSelector,
+    qosConfigGlobalsWredMaximumDp1        Percent,
+    qosConfigGlobalsWredMaximumDp2        Percent,
+    qosConfigGlobalsWredMaximumDp3        Percent
+}
+
+qosConfigGlobalsWredGroup OBJECT-TYPE
+    SYNTAX      Integer32 (1..3)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "WRED group index."
+    ::= { qosConfigGlobalsWredEntry 1 }
+
+qosConfigGlobalsWredQueue OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Queue index."
+    ::= { qosConfigGlobalsWredEntry 2 }
+
+qosConfigGlobalsWredDpl OBJECT-TYPE
+    SYNTAX      Integer32 (0..3)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "DPL index."
+    ::= { qosConfigGlobalsWredEntry 3 }
+
+qosConfigGlobalsWredEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, RED is enabled for this queue."
+    ::= { qosConfigGlobalsWredEntry 4 }
+
+qosConfigGlobalsWredMinimumFillLevel OBJECT-TYPE
+    SYNTAX      Percent
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls the lower RED fill level threshold in percent of the whole
+         queue.
+         
+         If the queue filling level is below this threshold, the drop
+         probability is zero.
+         
+         Valid range is 0-100."
+    ::= { qosConfigGlobalsWredEntry 5 }
+
+qosConfigGlobalsWredMaximum OBJECT-TYPE
+    SYNTAX      Percent
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls the upper RED drop probability or fill level threshold for
+         frames marked with Drop Precedence Level 1 (yellow frames).
+         
+         Valid range is 1-100.
+         
+         This object is only valid if QosCapabilitiesHasWredV2 or
+         QosCapabilitiesHasWredV3 is true."
+    ::= { qosConfigGlobalsWredEntry 6 }
+
+qosConfigGlobalsWredMaxSelector OBJECT-TYPE
+    SYNTAX      QosWredMaxSelector
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Selects whether 'Maximum' controls 'Maximum Drop Probability' or
+         'Maximum Fill Level'.
+         
+         This object is only valid if QosCapabilitiesHasWredV2 or
+         QosCapabilitiesHasWredV3 is true."
+    ::= { qosConfigGlobalsWredEntry 7 }
+
+qosConfigGlobalsWredMaximumDp1 OBJECT-TYPE
+    SYNTAX      Percent
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls the upper RED drop probability for frames marked with Drop
+         Precedence Level 1 (yellow frames).
+         
+         Valid range is 0-100.
+         
+         This object is only valid if QosCapabilitiesHasWredV1 is true."
+    ::= { qosConfigGlobalsWredEntry 8 }
+
+qosConfigGlobalsWredMaximumDp2 OBJECT-TYPE
+    SYNTAX      Percent
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls the upper RED drop probability for frames marked with Drop
+         Precedence Level 2 (yellow frames).
+         
+         Valid range is 0-100.
+         
+         This object is only valid if QosCapabilitiesHasWredV1 is true."
+    ::= { qosConfigGlobalsWredEntry 9 }
+
+qosConfigGlobalsWredMaximumDp3 OBJECT-TYPE
+    SYNTAX      Percent
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Controls the upper RED drop probability for frames marked with Drop
+         Precedence Level 3 (yellow frames).
+         
+         Valid range is 0-100.
+         
+         This object is only valid if QosCapabilitiesHasWredV1 is true."
+    ::= { qosConfigGlobalsWredEntry 10 }
+
+qosConfigGlobalsDscpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosConfigGlobalsDscpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table has 64 entries, one for each DSCP value.
+         
+         This is an optional table and is only present if qosCapabilitiesHasDscp
+         is true."
+    ::= { qosConfigGlobals 3 }
+
+qosConfigGlobalsDscpEntry OBJECT-TYPE
+    SYNTAX      QosConfigGlobalsDscpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the configuration for a specific DSCP"
+    INDEX       { qosConfigGlobalsDscpDscp }
+    ::= { qosConfigGlobalsDscpTable 1 }
+
+QosConfigGlobalsDscpEntry ::= SEQUENCE {
+    qosConfigGlobalsDscpDscp                  Dscp,
+    qosConfigGlobalsDscpTrust                 TruthValue,
+    qosConfigGlobalsDscpCos                   Unsigned32,
+    qosConfigGlobalsDscpDpl                   Unsigned8,
+    qosConfigGlobalsDscpIngressTranslation    Dscp,
+    qosConfigGlobalsDscpClassify              TruthValue,
+    qosConfigGlobalsDscpEgressTranslation     Dscp,
+    qosConfigGlobalsDscpEgressTranslationDp1  Dscp
+}
+
+qosConfigGlobalsDscpDscp OBJECT-TYPE
+    SYNTAX      Dscp
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "DSCP index."
+    ::= { qosConfigGlobalsDscpEntry 1 }
+
+qosConfigGlobalsDscpTrust OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, this DSCP value is trusted. Packets arriving on interfaces
+         where 'TrustDscp' is enabled will be classified to the corresponding
+         CoS and DPL in this table."
+    ::= { qosConfigGlobalsDscpEntry 2 }
+
+qosConfigGlobalsDscpCos OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The CoS value which the DSCP value maps to.
+         
+         Valid range is qosCapabilitiesClassMin-qosCapabilitiesClassMax."
+    ::= { qosConfigGlobalsDscpEntry 3 }
+
+qosConfigGlobalsDscpDpl OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DPL (Drop Precedence Level) which the DSCP value maps to.
+         
+         Valid range is qosCapabilitiesDplMin-qosCapabilitiesDplMax."
+    ::= { qosConfigGlobalsDscpEntry 4 }
+
+qosConfigGlobalsDscpIngressTranslation OBJECT-TYPE
+    SYNTAX      Dscp
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The new classified DSCP value which the original DSCP value is replaced
+         with if 'DscpTranslate' is enabled on the interface"
+    ::= { qosConfigGlobalsDscpEntry 5 }
+
+qosConfigGlobalsDscpClassify OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, then packets received on interfaces where 'DscpClassify' is
+         set to 'selected' will be classified to a new DSCP value based on the
+         values configured in the qosConfigGlobalsCosToDscpTable."
+    ::= { qosConfigGlobalsDscpEntry 6 }
+
+qosConfigGlobalsDscpEgressTranslation OBJECT-TYPE
+    SYNTAX      Dscp
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The new DSCP value that will be written into the packet at egress if
+         'DscpRemark' on the interface is set to 'remap' or 'remap-dp'.
+         
+         If 'remap-dp' is set then only packets classified to Dpl 0 will use
+         this table."
+    ::= { qosConfigGlobalsDscpEntry 7 }
+
+qosConfigGlobalsDscpEgressTranslationDp1 OBJECT-TYPE
+    SYNTAX      Dscp
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The new DSCP value that will be written into the packet at egress if
+         'DscpRemark' on the interface is set to 'remap-dp'.
+         
+         Only packets classified to Dpl 1 will use this table.
+         
+         This object is only valid if QosCapabilitiesHasDscpDplRemarking is
+         true."
+    ::= { qosConfigGlobalsDscpEntry 8 }
+
+qosConfigGlobalsCosToDscpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosConfigGlobalsCosToDscpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table has 8 entries, one for each Cos value.
+         
+         This is an optional table and is only present if qosCapabilitiesHasDscp
+         is true."
+    ::= { qosConfigGlobals 4 }
+
+qosConfigGlobalsCosToDscpEntry OBJECT-TYPE
+    SYNTAX      QosConfigGlobalsCosToDscpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the configuration for a specific Cos"
+    INDEX       { qosConfigGlobalsCosToDscpCos }
+    ::= { qosConfigGlobalsCosToDscpTable 1 }
+
+QosConfigGlobalsCosToDscpEntry ::= SEQUENCE {
+    qosConfigGlobalsCosToDscpCos      Integer32,
+    qosConfigGlobalsCosToDscpDscp     Dscp,
+    qosConfigGlobalsCosToDscpDscpDp1  Dscp,
+    qosConfigGlobalsCosToDscpDscpDp2  Dscp,
+    qosConfigGlobalsCosToDscpDscpDp3  Dscp
+}
+
+qosConfigGlobalsCosToDscpCos OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "CoS index."
+    ::= { qosConfigGlobalsCosToDscpEntry 1 }
+
+qosConfigGlobalsCosToDscpDscp OBJECT-TYPE
+    SYNTAX      Dscp
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If qosCapabilitiesHasDscpDplClassification is true: This is the DSCP
+         value which the classified CoS value maps to when the classified DPL is
+         0.
+         
+         If qosCapabilitiesHasDscpDplClassification is false: This is the DSCP
+         value which the classified CoS value maps to."
+    ::= { qosConfigGlobalsCosToDscpEntry 2 }
+
+qosConfigGlobalsCosToDscpDscpDp1 OBJECT-TYPE
+    SYNTAX      Dscp
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DSCP value which the classified CoS value maps to when the
+         classified DPL is 1.
+         
+         This object is only valid if QosCapabilitiesHasDscpDplClassification is
+         true."
+    ::= { qosConfigGlobalsCosToDscpEntry 3 }
+
+qosConfigGlobalsCosToDscpDscpDp2 OBJECT-TYPE
+    SYNTAX      Dscp
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DSCP value which the classified CoS value maps to when the
+         classified DPL is 2.
+         
+         This object is only valid if QosCapabilitiesHasDscpDplClassification is
+         true and QosCapabilitiesDplMax is greater than 1."
+    ::= { qosConfigGlobalsCosToDscpEntry 4 }
+
+qosConfigGlobalsCosToDscpDscpDp3 OBJECT-TYPE
+    SYNTAX      Dscp
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DSCP value which the classified CoS value maps to when the
+         classified DPL is 3.
+         
+         This object is only valid if QosCapabilitiesHasDscpDplClassification is
+         true and QosCapabilitiesDplMax is greater than 2."
+    ::= { qosConfigGlobalsCosToDscpEntry 5 }
+
+qosConfigInterface OBJECT IDENTIFIER
+    ::= { qosConfig 2 }
+
+qosConfigInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosConfigInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides QoS configuration for QoS manageable interfaces"
+    ::= { qosConfigInterface 1 }
+
+qosConfigInterfaceEntry OBJECT-TYPE
+    SYNTAX      QosConfigInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the configuration for a specific interface"
+    INDEX       { qosConfigInterfaceIfIndex }
+    ::= { qosConfigInterfaceTable 1 }
+
+QosConfigInterfaceEntry ::= SEQUENCE {
+    qosConfigInterfaceIfIndex           InterfaceIndex,
+    qosConfigInterfaceCos               Unsigned32,
+    qosConfigInterfaceDpl               Unsigned8,
+    qosConfigInterfacePcp               Unsigned32,
+    qosConfigInterfaceDei               Unsigned8,
+    qosConfigInterfaceTrustTag          TruthValue,
+    qosConfigInterfaceTrustDscp         TruthValue,
+    qosConfigInterfaceDwrrCount         Unsigned8,
+    qosConfigInterfaceTagRemarkingMode  QosTagRemarkingMode,
+    qosConfigInterfaceTagPcp            Unsigned32,
+    qosConfigInterfaceTagDei            Unsigned8,
+    qosConfigInterfaceDscpTranslate     TruthValue,
+    qosConfigInterfaceDscpClassify      QosDscpClassify,
+    qosConfigInterfaceDscpRemark        QosDscpRemark,
+    qosConfigInterfaceQceAddressMode    TruthValue,
+    qosConfigInterfaceQceKeyType        VcapKeyType,
+    qosConfigInterfaceWredGroup         Unsigned32
+}
+
+qosConfigInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface index."
+    ::= { qosConfigInterfaceEntry 1 }
+
+qosConfigInterfaceCos OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default CoS value a packet is classified to.
+         
+         Valid range is qosCapabilitiesClassMin-qosCapabilitiesClassMax."
+    ::= { qosConfigInterfaceEntry 2 }
+
+qosConfigInterfaceDpl OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default DPL (Drop Precedence Level) a packet is classified to.
+         
+         Valid range is qosCapabilitiesDplMin-qosCapabilitiesDplMax."
+    ::= { qosConfigInterfaceEntry 3 }
+
+qosConfigInterfacePcp OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default PCP value a packet is classified to.
+         
+         Valid range is 0-7.
+         
+         This object is only valid if QosCapabilitiesHasFixedTagCosMap is false."
+    ::= { qosConfigInterfaceEntry 4 }
+
+qosConfigInterfaceDei OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The default DEI value a packet is classified to.
+         
+         Valid range is 0-1.
+         
+         This object is only valid if QosCapabilitiesHasFixedTagCosMap is false."
+    ::= { qosConfigInterfaceEntry 5 }
+
+qosConfigInterfaceTrustTag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true and the packet is VLAN tagged, then the CoS and DPL assigned to
+         the packet is the PCP and DEI value in the packet mapped to a CoS and
+         DPL value defined in the qosConfigInterfaceTagToCosTable.
+         
+         This object is only valid if QosCapabilitiesHasFixedTagCosMap is false
+         and QosCapabilitiesHasTagClassification is true."
+    ::= { qosConfigInterfaceEntry 6 }
+
+qosConfigInterfaceTrustDscp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true and the packet type is IPv4 or IPv6 and the packet DSCP value
+         is trusted in qosConfigGlobalsDscpTable, then the CoS and DPL assigned
+         to the packet is the DSCP value in the packet mapped to a CoS and DPL
+         value defined in the qosConfigGlobalsDscpTable.
+         
+         This object is only valid if QosCapabilitiesHasDscp is true."
+    ::= { qosConfigInterfaceEntry 7 }
+
+qosConfigInterfaceDwrrCount OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of queues that are running Deficit Weighted Round Robin
+         scheduling.
+         
+         This value is restricted to 0 or one of the values defined by
+         qosCapabilitiesDwrrCountMask."
+    ::= { qosConfigInterfaceEntry 8 }
+
+qosConfigInterfaceTagRemarkingMode OBJECT-TYPE
+    SYNTAX      QosTagRemarkingMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Selects the tag remarking mode for egress. Valid values are:
+         
+         'classified' : Remark the tag with the classified values of PCP and
+         DEI.
+         
+         'default' : Remark the tag with the configured TagPcp and TagDei.
+         
+         'mapped' : Remark the tag with the values from the classified CoS and
+         DPL mapped through the qosConfigInterfaceCosToTagTable.
+         
+         This object is only valid if QosCapabilitiesHasTagRemarking is true."
+    ::= { qosConfigInterfaceEntry 9 }
+
+qosConfigInterfaceTagPcp OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The PCP value to put in the packet if TagRemarkingMode is set to
+         'default'.
+         
+         Valid range is 0-7.
+         
+         This object is only valid if QosCapabilitiesHasTagRemarking is true."
+    ::= { qosConfigInterfaceEntry 10 }
+
+qosConfigInterfaceTagDei OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DEI value to put in the packet if TagRemarkingMode is set to
+         'default'.
+         
+         Valid range is 0-1.
+         
+         This object is only valid if QosCapabilitiesHasTagRemarking is true."
+    ::= { qosConfigInterfaceEntry 11 }
+
+qosConfigInterfaceDscpTranslate OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true then the classified DSCP value is the DSCP value in the packed
+         mapped to a new DSCP value defined in
+         qosConfigGlobalsDscpTable.IngressTranslation.
+         
+         This object is only valid if QosCapabilitiesHasDscp is true."
+    ::= { qosConfigInterfaceEntry 12 }
+
+qosConfigInterfaceDscpClassify OBJECT-TYPE
+    SYNTAX      QosDscpClassify
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If qosCapabilitiesHasDscpDplClassification is true: Selects if and how
+         the classified DSCP is based on the classified CoS and DPL for IPv4 and
+         IPv6 packets on ingress.
+         
+         If a packet is selected for being classified to a new DSCP, the
+         classification in based on the classified CoS mapped to a new DSCP
+         value through the qosConfigGlobalsCosToDscpTable. If the classified DPL
+         is 1, the new DSCP value is taken from the DscpDp1 entry, otherwise it
+         is taken from the Dscp entry. Valid values are:
+         
+         'none' : Always classify to the DSCP value in the received packet and
+         ignore the classified CoS and DPL.
+         
+         'zero' : If the DSCP value in the received packet is 0, then classify
+         to a new DSCP value based on the classified CoS and DPL.
+         
+         'selected' : If the DSCP value in the received packet is enabled in
+         qosConfigGlobalsDscpTable.Classify, then classify to a new DSCP value
+         based on the classified CoS and DPL.
+         
+         'all' : Always classify to a new DSCP value based on the classified CoS
+         and DPL.
+         
+         
+         
+         If qosCapabilitiesHasDscpDplClassification is false: Selects if and how
+         the classified DSCP is based on the classified CoS for IPv4 and IPv6
+         packets on ingress.
+         
+         If a packet is selected for being classified to a new DSCP, the
+         classification in based on the classified CoS mapped to a new DSCP
+         value through the qosConfigGlobalsCosToDscpTable.Dscp Valid values are:
+         
+         'none' : Always classify to the DSCP value in the received packet and
+         ignore the classified CoS.
+         
+         'zero' : If the DSCP value in the received packet is 0, then classify
+         to a new DSCP value based on the classified CoS.
+         
+         'selected' : If the DSCP value in the received packet is enabled in
+         qosConfigGlobalsDscpTable.Classify, then classify to a new DSCP value
+         based on the classified CoS.
+         
+         'all' : Always classify to a new DSCP value based on the classified
+         CoS.
+         
+         This object is only valid if QosCapabilitiesHasDscp is true."
+    ::= { qosConfigInterfaceEntry 13 }
+
+qosConfigInterfaceDscpRemark OBJECT-TYPE
+    SYNTAX      QosDscpRemark
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If qosCapabilitiesHasDscpDplRemarking is true: Selects if and how the
+         classified DSCP is written into the packet at egress. Valid values are:
+         
+         'disabled' : Do not write the classified DSCP into the packet.
+         
+         'rewrite' : Write the classified DSCP into the packet.
+         
+         'remap' : Remap the classified DSCP through qosConfigGlobalsDscpTable,
+         and write the value from EgressTranslation into the packet.
+         
+         'remap-dp' : Remap the classified DSCP through
+         qosConfigGlobalsDscpTable. If the classified DPL is 0 then write the
+         value from EgressTranslation into the packet, otherwise write the value
+         from EgressTranslationDp1 into the packet.
+         
+         If qosCapabilitiesHasDscpDplRemarking is false: Selects if and how the
+         classified DSCP is written into the packet at egress. Valid values are:
+         
+         'disabled' : Do not write the classified DSCP into the packet.
+         
+         'rewrite' : Write the classified DSCP into the packet.
+         
+         'remap' : Remap the classified DSCP through qosConfigGlobalsDscpTable,
+         and write the value from EgressTranslation into the packet.
+         
+         This object is only valid if QosCapabilitiesHasDscp is true."
+    ::= { qosConfigInterfaceEntry 14 }
+
+qosConfigInterfaceQceAddressMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If false, the QCE classification for this interface is based on source
+         (SMAC/SIP) addresses.
+         
+         If true, the QCE classification for this interface is based on
+         destination (DMAC/DIP) addresses.
+         
+         This parameter is only used when QosCapabilitiesHasQceKeyType is false
+         or QceKeyType is normal.
+         
+         This object is only valid if QosCapabilitiesHasQceAddressMode is true."
+    ::= { qosConfigInterfaceEntry 15 }
+
+qosConfigInterfaceQceKeyType OBJECT-TYPE
+    SYNTAX      VcapKeyType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The key type specifying the key generated for packets received on the
+         interface. Valid values are:
+         
+         'normal' : Half key, match outer tag, SIP and SMAC.
+         
+         'double-tag' : Quarter key, match inner and outer tag.
+         
+         'ip-addr' : Half key, match inner and outer tag, SIP and DIP. For
+         non-IP frames, match outer tag only.
+         
+         'mac-ip-addr' : Full key, match inner and outer tag, SMAC, DMAC, SIP
+         and DIP.
+         
+         Filtering on DMAC type (unicast/multicast/broadcast) is supported for
+         any key type.
+         
+         This object is only valid if QosCapabilitiesHasQceKeyType is true."
+    ::= { qosConfigInterfaceEntry 16 }
+
+qosConfigInterfaceWredGroup OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The WRED group an interface is a member of.
+         
+         This object is only valid if QosCapabilitiesHasWredV3 is true."
+    ::= { qosConfigInterfaceEntry 17 }
+
+qosConfigInterfaceTagToCosTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosConfigInterfaceTagToCosEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the mapping of (interface, PCP, DEI) to (CoS, DPL)
+         values.
+         
+         The mappings given by this table is used for all tagged packets
+         received on an interface if and only if that interface has the value of
+         TrustTag set to 'true'
+         
+         This is an optional table and is only present if
+         QosCapabilitiesHasFixedTagCosMap is false and
+         QosCapabilitiesHasTagClassification is true."
+    ::= { qosConfigInterface 2 }
+
+qosConfigInterfaceTagToCosEntry OBJECT-TYPE
+    SYNTAX      QosConfigInterfaceTagToCosEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the mapping from (interface, PCP, DEI) to (CoS, DPL)
+         values."
+    INDEX       { qosConfigInterfaceTagToCosIfIndex,
+                  qosConfigInterfaceTagToCosPcp,
+                  qosConfigInterfaceTagToCosDei }
+    ::= { qosConfigInterfaceTagToCosTable 1 }
+
+QosConfigInterfaceTagToCosEntry ::= SEQUENCE {
+    qosConfigInterfaceTagToCosIfIndex  InterfaceIndex,
+    qosConfigInterfaceTagToCosPcp      Integer32,
+    qosConfigInterfaceTagToCosDei      Integer32,
+    qosConfigInterfaceTagToCosCos      Unsigned32,
+    qosConfigInterfaceTagToCosDpl      Unsigned8
+}
+
+qosConfigInterfaceTagToCosIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface index."
+    ::= { qosConfigInterfaceTagToCosEntry 1 }
+
+qosConfigInterfaceTagToCosPcp OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "PCP index."
+    ::= { qosConfigInterfaceTagToCosEntry 2 }
+
+qosConfigInterfaceTagToCosDei OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "DEI index."
+    ::= { qosConfigInterfaceTagToCosEntry 3 }
+
+qosConfigInterfaceTagToCosCos OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The CoS value which this entry maps to.
+         
+         Valid range is qosCapabilitiesClassMin-qosCapabilitiesClassMax."
+    ::= { qosConfigInterfaceTagToCosEntry 4 }
+
+qosConfigInterfaceTagToCosDpl OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DPL (Drop Precedence Level) value which this entry maps to.
+         
+         Valid range is qosCapabilitiesDplMin-qosCapabilitiesDplMax."
+    ::= { qosConfigInterfaceTagToCosEntry 5 }
+
+qosConfigInterfaceCosToTagTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosConfigInterfaceCosToTagEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the mapping of (interface, CoS, DPL) to (PCP, DEI)
+         values.
+         
+         The mappings given by this table is used for packets transmitted on an
+         interface if and only if that interface has the value of
+         TagRemarkingMode set to 'mapped'
+         
+         This is an optional table and is only present if
+         QosCapabilitiesHasTagRemarking is true."
+    ::= { qosConfigInterface 3 }
+
+qosConfigInterfaceCosToTagEntry OBJECT-TYPE
+    SYNTAX      QosConfigInterfaceCosToTagEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the mapping from (interface, CoS, DPL) to (PCP, DEI)
+         values."
+    INDEX       { qosConfigInterfaceCosToTagIfIndex,
+                  qosConfigInterfaceCosToTagCos,
+                  qosConfigInterfaceCosToTagDpl }
+    ::= { qosConfigInterfaceCosToTagTable 1 }
+
+QosConfigInterfaceCosToTagEntry ::= SEQUENCE {
+    qosConfigInterfaceCosToTagIfIndex  InterfaceIndex,
+    qosConfigInterfaceCosToTagCos      Integer32,
+    qosConfigInterfaceCosToTagDpl      Integer32,
+    qosConfigInterfaceCosToTagPcp      Unsigned32,
+    qosConfigInterfaceCosToTagDei      Unsigned8
+}
+
+qosConfigInterfaceCosToTagIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface index."
+    ::= { qosConfigInterfaceCosToTagEntry 1 }
+
+qosConfigInterfaceCosToTagCos OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "CoS index."
+    ::= { qosConfigInterfaceCosToTagEntry 2 }
+
+qosConfigInterfaceCosToTagDpl OBJECT-TYPE
+    SYNTAX      Integer32 (0..3)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "DPL index."
+    ::= { qosConfigInterfaceCosToTagEntry 3 }
+
+qosConfigInterfaceCosToTagPcp OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The PCP value which this entry maps to.
+         
+         Valid range is 0-7."
+    ::= { qosConfigInterfaceCosToTagEntry 4 }
+
+qosConfigInterfaceCosToTagDei OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DEI value which this entry maps to.
+         
+         Valid range is 0-1."
+    ::= { qosConfigInterfaceCosToTagEntry 5 }
+
+qosConfigInterfacePolicerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosConfigInterfacePolicerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides policer configuration for an interface"
+    ::= { qosConfigInterface 4 }
+
+qosConfigInterfacePolicerEntry OBJECT-TYPE
+    SYNTAX      QosConfigInterfacePolicerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the configuration for a specific policer"
+    INDEX       { qosConfigInterfacePolicerIfIndex }
+    ::= { qosConfigInterfacePolicerTable 1 }
+
+QosConfigInterfacePolicerEntry ::= SEQUENCE {
+    qosConfigInterfacePolicerIfIndex      InterfaceIndex,
+    qosConfigInterfacePolicerEnable       TruthValue,
+    qosConfigInterfacePolicerFrameRate    TruthValue,
+    qosConfigInterfacePolicerFlowControl  TruthValue,
+    qosConfigInterfacePolicerCir          Unsigned32
+}
+
+qosConfigInterfacePolicerIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface index."
+    ::= { qosConfigInterfacePolicerEntry 1 }
+
+qosConfigInterfacePolicerEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the port policer is enabled."
+    ::= { qosConfigInterfacePolicerEntry 2 }
+
+qosConfigInterfacePolicerFrameRate OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the rate is measured in fps instead of kbps."
+    ::= { qosConfigInterfacePolicerEntry 3 }
+
+qosConfigInterfacePolicerFlowControl OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, and flow control is enabled on the interface, then issue flow
+         control pause frames instead of discarding frames.
+         
+         This object is only valid if QosCapabilitiesHasPortPolicersFc is true."
+    ::= { qosConfigInterfacePolicerEntry 4 }
+
+qosConfigInterfacePolicerCir OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Committed Information Rate. Measured in kbps if FrameRate is false and
+         fps if FrameRate is true.
+         
+         Valid range is qosCapabilitiesBitrateMin-qosCapabilitiesBitrateMax"
+    ::= { qosConfigInterfacePolicerEntry 5 }
+
+qosConfigInterfaceQueuePolicerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosConfigInterfaceQueuePolicerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides queue policer configuration for interfaces
+         
+         This is an optional table and is only present if
+         QosCapabilitiesHasPortQueuePolicers is true."
+    ::= { qosConfigInterface 5 }
+
+qosConfigInterfaceQueuePolicerEntry OBJECT-TYPE
+    SYNTAX      QosConfigInterfaceQueuePolicerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the configuration for a specific queue policer"
+    INDEX       { qosConfigInterfaceQueuePolicerIfIndex,
+                  qosConfigInterfaceQueuePolicerQueue }
+    ::= { qosConfigInterfaceQueuePolicerTable 1 }
+
+QosConfigInterfaceQueuePolicerEntry ::= SEQUENCE {
+    qosConfigInterfaceQueuePolicerIfIndex  InterfaceIndex,
+    qosConfigInterfaceQueuePolicerQueue    Integer32,
+    qosConfigInterfaceQueuePolicerEnable   TruthValue,
+    qosConfigInterfaceQueuePolicerCir      Unsigned32
+}
+
+qosConfigInterfaceQueuePolicerIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface index."
+    ::= { qosConfigInterfaceQueuePolicerEntry 1 }
+
+qosConfigInterfaceQueuePolicerQueue OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Queue index."
+    ::= { qosConfigInterfaceQueuePolicerEntry 2 }
+
+qosConfigInterfaceQueuePolicerEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the queue policer is enabled."
+    ::= { qosConfigInterfaceQueuePolicerEntry 3 }
+
+qosConfigInterfaceQueuePolicerCir OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Committed Information Rate. Measured in kbps.
+         
+         Valid range is qosCapabilitiesBitrateMin-qosCapabilitiesBitrateMax"
+    ::= { qosConfigInterfaceQueuePolicerEntry 6 }
+
+qosConfigInterfaceShaperTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosConfigInterfaceShaperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides shaper configuration for an interface"
+    ::= { qosConfigInterface 6 }
+
+qosConfigInterfaceShaperEntry OBJECT-TYPE
+    SYNTAX      QosConfigInterfaceShaperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the configuration for a specific shaper"
+    INDEX       { qosConfigInterfaceShaperIfIndex }
+    ::= { qosConfigInterfaceShaperTable 1 }
+
+QosConfigInterfaceShaperEntry ::= SEQUENCE {
+    qosConfigInterfaceShaperIfIndex   InterfaceIndex,
+    qosConfigInterfaceShaperEnable    TruthValue,
+    qosConfigInterfaceShaperCir       Unsigned32,
+    qosConfigInterfaceShaperRateType  QosShaperRateType
+}
+
+qosConfigInterfaceShaperIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface index."
+    ::= { qosConfigInterfaceShaperEntry 1 }
+
+qosConfigInterfaceShaperEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the port shaper is enabled."
+    ::= { qosConfigInterfaceShaperEntry 2 }
+
+qosConfigInterfaceShaperCir OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Committed Information Rate. Measured in kbps.
+         
+         Valid range is qosCapabilitiesBitrateMin-qosCapabilitiesBitrateMax"
+    ::= { qosConfigInterfaceShaperEntry 3 }
+
+qosConfigInterfaceShaperRateType OBJECT-TYPE
+    SYNTAX      QosShaperRateType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the shaper's rate type.
+         
+         Valid selections are line-rate (0) and data-rate (1).
+         
+         This object is only valid if QosCapabilitiesHasShapersRt is true."
+    ::= { qosConfigInterfaceShaperEntry 4 }
+
+qosConfigInterfaceQueueShaperTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosConfigInterfaceQueueShaperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides queue shaper configuration for interfaces"
+    ::= { qosConfigInterface 7 }
+
+qosConfigInterfaceQueueShaperEntry OBJECT-TYPE
+    SYNTAX      QosConfigInterfaceQueueShaperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the configuration for a specific queue shaper"
+    INDEX       { qosConfigInterfaceQueueShaperIfIndex,
+                  qosConfigInterfaceQueueShaperQueue }
+    ::= { qosConfigInterfaceQueueShaperTable 1 }
+
+QosConfigInterfaceQueueShaperEntry ::= SEQUENCE {
+    qosConfigInterfaceQueueShaperIfIndex   InterfaceIndex,
+    qosConfigInterfaceQueueShaperQueue     Integer32,
+    qosConfigInterfaceQueueShaperEnable    TruthValue,
+    qosConfigInterfaceQueueShaperExcess    TruthValue,
+    qosConfigInterfaceQueueShaperCir       Unsigned32,
+    qosConfigInterfaceQueueShaperRateType  QosShaperRateType
+}
+
+qosConfigInterfaceQueueShaperIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface index."
+    ::= { qosConfigInterfaceQueueShaperEntry 1 }
+
+qosConfigInterfaceQueueShaperQueue OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Queue index."
+    ::= { qosConfigInterfaceQueueShaperEntry 2 }
+
+qosConfigInterfaceQueueShaperEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the queue shaper is enabled."
+    ::= { qosConfigInterfaceQueueShaperEntry 3 }
+
+qosConfigInterfaceQueueShaperExcess OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, then allow this queue to get a share of the excess bandwidth.
+         
+         Excess bandwidth is allowed if this shaper is closed and no other
+         queues with open shapers have frames for transmission.
+         
+         This object is only valid if QosCapabilitiesHasQueueShapersExcess is
+         true."
+    ::= { qosConfigInterfaceQueueShaperEntry 4 }
+
+qosConfigInterfaceQueueShaperCir OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Committed Information Rate. Measured in kbps.
+         
+         Valid range is qosCapabilitiesBitrateMin-qosCapabilitiesBitrateMax"
+    ::= { qosConfigInterfaceQueueShaperEntry 5 }
+
+qosConfigInterfaceQueueShaperRateType OBJECT-TYPE
+    SYNTAX      QosShaperRateType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the shaper's rate type.
+         
+         Valid selections are line-rate (0) and data-rate (1).
+         
+         NOTE: This configuration is valid only for Normal port mode. If the
+         port is in Basic or Hierarchical mode, the rate-type will be stored and
+         become active when the port is switched back to Normal Scheduling mode.
+         
+         This object is only valid if QosCapabilitiesHasShapersRt is true."
+    ::= { qosConfigInterfaceQueueShaperEntry 6 }
+
+qosConfigInterfaceSchedulerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosConfigInterfaceSchedulerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the mapping of (interface, queue) to weight values.
+         
+         The mappings given by this table is used when an interface has the
+         value of DwrrCount greater than 0.
+         
+         Read the qosSchedulerStatusTable in order to get the 'real' weights in
+         percent as used by the hardware."
+    ::= { qosConfigInterface 8 }
+
+qosConfigInterfaceSchedulerEntry OBJECT-TYPE
+    SYNTAX      QosConfigInterfaceSchedulerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the scheduler configuration for a specific queue."
+    INDEX       { qosConfigInterfaceSchedulerIfIndex,
+                  qosConfigInterfaceSchedulerQueue }
+    ::= { qosConfigInterfaceSchedulerTable 1 }
+
+QosConfigInterfaceSchedulerEntry ::= SEQUENCE {
+    qosConfigInterfaceSchedulerIfIndex  InterfaceIndex,
+    qosConfigInterfaceSchedulerQueue    Integer32,
+    qosConfigInterfaceSchedulerWeight   Percent
+}
+
+qosConfigInterfaceSchedulerIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface index."
+    ::= { qosConfigInterfaceSchedulerEntry 1 }
+
+qosConfigInterfaceSchedulerQueue OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Queue index."
+    ::= { qosConfigInterfaceSchedulerEntry 2 }
+
+qosConfigInterfaceSchedulerWeight OBJECT-TYPE
+    SYNTAX      Percent
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The weight for this queue.
+         
+         Valid range is 1-100."
+    ::= { qosConfigInterfaceSchedulerEntry 3 }
+
+qosConfigInterfaceStormPolicerUnicastTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosConfigInterfaceStormPolicerUnicastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides storm policer configuration for unicast packets
+         received on an interface
+         
+         This is an optional table and is only present if
+         QosCapabilitiesHasPortStormPolicers is true."
+    ::= { qosConfigInterface 9 }
+
+qosConfigInterfaceStormPolicerUnicastEntry OBJECT-TYPE
+    SYNTAX      QosConfigInterfaceStormPolicerUnicastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the configuration for a specific storm policer"
+    INDEX       { qosConfigInterfaceStormPolicerUnicastIfIndex }
+    ::= { qosConfigInterfaceStormPolicerUnicastTable 1 }
+
+QosConfigInterfaceStormPolicerUnicastEntry ::= SEQUENCE {
+    qosConfigInterfaceStormPolicerUnicastIfIndex    InterfaceIndex,
+    qosConfigInterfaceStormPolicerUnicastEnable     TruthValue,
+    qosConfigInterfaceStormPolicerUnicastFrameRate  TruthValue,
+    qosConfigInterfaceStormPolicerUnicastCir        Unsigned32
+}
+
+qosConfigInterfaceStormPolicerUnicastIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface index."
+    ::= { qosConfigInterfaceStormPolicerUnicastEntry 1 }
+
+qosConfigInterfaceStormPolicerUnicastEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the storm policer is enabled.
+         
+         This object is only valid if QosCapabilitiesHasPortStormPolicers is
+         true."
+    ::= { qosConfigInterfaceStormPolicerUnicastEntry 2 }
+
+qosConfigInterfaceStormPolicerUnicastFrameRate OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the rate is measured in fps instead of kbps.
+         
+         This object is only valid if QosCapabilitiesHasPortStormPolicers is
+         true."
+    ::= { qosConfigInterfaceStormPolicerUnicastEntry 3 }
+
+qosConfigInterfaceStormPolicerUnicastCir OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Committed Information Rate. Measured in kbps if FrameRate is false and
+         fps if FrameRate is true.
+         
+         Valid range is qosCapabilitiesBitrateMin-qosCapabilitiesBitrateMax.
+         
+         This object is only valid if QosCapabilitiesHasPortStormPolicers is
+         true."
+    ::= { qosConfigInterfaceStormPolicerUnicastEntry 4 }
+
+qosConfigInterfaceStormPolicerBroadcastTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosConfigInterfaceStormPolicerBroadcastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides storm policer configuration for broadcast packets
+         received on an interface
+         
+         This is an optional table and is only present if
+         QosCapabilitiesHasPortStormPolicers is true."
+    ::= { qosConfigInterface 10 }
+
+qosConfigInterfaceStormPolicerBroadcastEntry OBJECT-TYPE
+    SYNTAX      QosConfigInterfaceStormPolicerBroadcastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the configuration for a specific storm policer"
+    INDEX       {                   qosConfigInterfaceStormPolicerBroadcastIfIndex }
+    ::= { qosConfigInterfaceStormPolicerBroadcastTable 1 }
+
+QosConfigInterfaceStormPolicerBroadcastEntry ::= SEQUENCE {
+    qosConfigInterfaceStormPolicerBroadcastIfIndex    InterfaceIndex,
+    qosConfigInterfaceStormPolicerBroadcastEnable     TruthValue,
+    qosConfigInterfaceStormPolicerBroadcastFrameRate  TruthValue,
+    qosConfigInterfaceStormPolicerBroadcastCir        Unsigned32
+}
+
+qosConfigInterfaceStormPolicerBroadcastIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface index."
+    ::= { qosConfigInterfaceStormPolicerBroadcastEntry 1 }
+
+qosConfigInterfaceStormPolicerBroadcastEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the storm policer is enabled.
+         
+         This object is only valid if QosCapabilitiesHasPortStormPolicers is
+         true."
+    ::= { qosConfigInterfaceStormPolicerBroadcastEntry 2 }
+
+qosConfigInterfaceStormPolicerBroadcastFrameRate OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the rate is measured in fps instead of kbps.
+         
+         This object is only valid if QosCapabilitiesHasPortStormPolicers is
+         true."
+    ::= { qosConfigInterfaceStormPolicerBroadcastEntry 3 }
+
+qosConfigInterfaceStormPolicerBroadcastCir OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Committed Information Rate. Measured in kbps if FrameRate is false and
+         fps if FrameRate is true.
+         
+         Valid range is qosCapabilitiesBitrateMin-qosCapabilitiesBitrateMax.
+         
+         This object is only valid if QosCapabilitiesHasPortStormPolicers is
+         true."
+    ::= { qosConfigInterfaceStormPolicerBroadcastEntry 4 }
+
+qosConfigInterfaceStormPolicerUnknownTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosConfigInterfaceStormPolicerUnknownEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides storm policer configuration for unknown (flooded)
+         packets received on an interface
+         
+         This is an optional table and is only present if
+         QosCapabilitiesHasPortStormPolicers is true."
+    ::= { qosConfigInterface 11 }
+
+qosConfigInterfaceStormPolicerUnknownEntry OBJECT-TYPE
+    SYNTAX      QosConfigInterfaceStormPolicerUnknownEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the configuration for a specific storm policer"
+    INDEX       { qosConfigInterfaceStormPolicerUnknownIfIndex }
+    ::= { qosConfigInterfaceStormPolicerUnknownTable 1 }
+
+QosConfigInterfaceStormPolicerUnknownEntry ::= SEQUENCE {
+    qosConfigInterfaceStormPolicerUnknownIfIndex    InterfaceIndex,
+    qosConfigInterfaceStormPolicerUnknownEnable     TruthValue,
+    qosConfigInterfaceStormPolicerUnknownFrameRate  TruthValue,
+    qosConfigInterfaceStormPolicerUnknownCir        Unsigned32
+}
+
+qosConfigInterfaceStormPolicerUnknownIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface index."
+    ::= { qosConfigInterfaceStormPolicerUnknownEntry 1 }
+
+qosConfigInterfaceStormPolicerUnknownEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the storm policer is enabled.
+         
+         This object is only valid if QosCapabilitiesHasPortStormPolicers is
+         true."
+    ::= { qosConfigInterfaceStormPolicerUnknownEntry 2 }
+
+qosConfigInterfaceStormPolicerUnknownFrameRate OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the rate is measured in fps instead of kbps.
+         
+         This object is only valid if QosCapabilitiesHasPortStormPolicers is
+         true."
+    ::= { qosConfigInterfaceStormPolicerUnknownEntry 3 }
+
+qosConfigInterfaceStormPolicerUnknownCir OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Committed Information Rate. Measured in kbps if FrameRate is false and
+         fps if FrameRate is true.
+         
+         Valid range is qosCapabilitiesBitrateMin-qosCapabilitiesBitrateMax.
+         
+         This object is only valid if QosCapabilitiesHasPortStormPolicers is
+         true."
+    ::= { qosConfigInterfaceStormPolicerUnknownEntry 4 }
+
+qosConfigQce OBJECT IDENTIFIER
+    ::= { qosConfig 3 }
+
+qosConfigQceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosConfigQceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the configuration of QCEs. The index is QceId.
+         
+         This is an optional table and is only present if qosCapabilitiesHasQce
+         is true."
+    ::= { qosConfigQce 1 }
+
+qosConfigQceEntry OBJECT-TYPE
+    SYNTAX      QosConfigQceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the configuration of a single QCE."
+    INDEX       { qosConfigQceQceId }
+    ::= { qosConfigQceTable 1 }
+
+QosConfigQceEntry ::= SEQUENCE {
+    qosConfigQceQceId               Integer32,
+    qosConfigQceNextQceId           Unsigned32,
+    qosConfigQceSwitchId            Unsigned32,
+    qosConfigQcePortList            PortList,
+    qosConfigQceDestMacType         DestMacType,
+    qosConfigQceDestMac             MacAddress,
+    qosConfigQceDestMacMask         MacAddress,
+    qosConfigQceSrcMac              MacAddress,
+    qosConfigQceSrcMacMask          MacAddress,
+    qosConfigQceVlanTagType         VlanTagType,
+    qosConfigQceVlanIdOp            ASRType,
+    qosConfigQceVlanId              Unsigned16,
+    qosConfigQceVlanIdRange         Unsigned16,
+    qosConfigQcePcp                 VlanTagPriority,
+    qosConfigQceDei                 BitType,
+    qosConfigQceInnerVlanTagType    VlanTagType,
+    qosConfigQceInnerVlanIdOp       ASRType,
+    qosConfigQceInnerVlanId         Unsigned16,
+    qosConfigQceInnerVlanIdRange    Unsigned16,
+    qosConfigQceInnerPcp            VlanTagPriority,
+    qosConfigQceInnerDei            BitType,
+    qosConfigQceFrameType           QosQceFrameType,
+    qosConfigQceEtype               EtherType,
+    qosConfigQceLlcDsap             Unsigned8,
+    qosConfigQceLlcDsapMask         Unsigned8,
+    qosConfigQceLlcSsap             Unsigned8,
+    qosConfigQceLlcSsapMask         Unsigned8,
+    qosConfigQceLlcControl          Unsigned8,
+    qosConfigQceLlcControlMask      Unsigned8,
+    qosConfigQceSnapPid             Unsigned16,
+    qosConfigQceSnapPidMask         Unsigned16,
+    qosConfigQceIpv4Fragment        BitType,
+    qosConfigQceIpv4DscpOp          ASRType,
+    qosConfigQceIpv4Dscp            Dscp,
+    qosConfigQceIpv4DscpRange       Dscp,
+    qosConfigQceIpv4Protocol        Unsigned8,
+    qosConfigQceIpv4ProtocolMask    Unsigned8,
+    qosConfigQceIpv4SrcIp           IpAddress,
+    qosConfigQceIpv4SrcIpMask       IpAddress,
+    qosConfigQceIpv4DestIp          IpAddress,
+    qosConfigQceIpv4DestIpMask      IpAddress,
+    qosConfigQceIpv4SrcPortOp       ASRType,
+    qosConfigQceIpv4SrcPort         Unsigned16,
+    qosConfigQceIpv4SrcPortRange    Unsigned16,
+    qosConfigQceIpv4DestPortOp      ASRType,
+    qosConfigQceIpv4DestPort        Unsigned16,
+    qosConfigQceIpv4DestPortRange   Unsigned16,
+    qosConfigQceIpv6DscpOp          ASRType,
+    qosConfigQceIpv6Dscp            Dscp,
+    qosConfigQceIpv6DscpRange       Dscp,
+    qosConfigQceIpv6Protocol        Unsigned8,
+    qosConfigQceIpv6ProtocolMask    Unsigned8,
+    qosConfigQceIpv6SrcIp           InetAddressIPv6,
+    qosConfigQceIpv6SrcIpMask       InetAddressIPv6,
+    qosConfigQceIpv6DestIp          InetAddressIPv6,
+    qosConfigQceIpv6DestIpMask      InetAddressIPv6,
+    qosConfigQceIpv6SrcPortOp       ASRType,
+    qosConfigQceIpv6SrcPort         Unsigned16,
+    qosConfigQceIpv6SrcPortRange    Unsigned16,
+    qosConfigQceIpv6DestPortOp      ASRType,
+    qosConfigQceIpv6DestPort        Unsigned16,
+    qosConfigQceIpv6DestPortRange   Unsigned16,
+    qosConfigQceActionCosEnable     TruthValue,
+    qosConfigQceActionCos           Unsigned32,
+    qosConfigQceActionDplEnable     TruthValue,
+    qosConfigQceActionDpl           Unsigned8,
+    qosConfigQceActionDscpEnable    TruthValue,
+    qosConfigQceActionDscp          Unsigned8,
+    qosConfigQceActionPcpDeiEnable  TruthValue,
+    qosConfigQceActionPcp           Unsigned32,
+    qosConfigQceActionDei           Unsigned8,
+    qosConfigQceActionPolicyEnable  TruthValue,
+    qosConfigQceActionPolicy        Unsigned32,
+    qosConfigQceAction              RowEditorState
+}
+
+qosConfigQceQceId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "QCE Id.
+         
+         Valid range is qosCapabilitiesQceIdMin-qosCapabilitiesQceIdMax or 0.
+         
+         Using a value of 0 when adding a new QCE, will assign the QCE Id in the
+         new QCE to the first unused QCE Id."
+    ::= { qosConfigQceEntry 1 }
+
+qosConfigQceNextQceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "QCE Id of the next QCE. Valid range is
+         qosCapabilitiesQceIdMin-qosCapabilitiesQceIdMax or 0.
+         
+         The value 0, denotes the end of the list."
+    ::= { qosConfigQceEntry 2 }
+
+qosConfigQceSwitchId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the switch on which this QCE is active.Valid range is
+         documented in the Stacking MIB.
+         
+         This object is only valid on stacking platforms."
+    ::= { qosConfigQceEntry 3 }
+
+qosConfigQcePortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "List of ports that are member of this QCE."
+    ::= { qosConfigQceEntry 4 }
+
+qosConfigQceDestMacType OBJECT-TYPE
+    SYNTAX      DestMacType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the destination MAC type to match."
+    ::= { qosConfigQceEntry 5 }
+
+qosConfigQceDestMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the 48 bits destination MAC address.
+         
+         The packets destination address is AND-ed with the value of DestMacMask
+         and then compared against the value of this object.
+         
+         If this object value and the value of DestMacMask is 00-00-00-00-00-00,
+         this entry matches any destination MAC address.
+         
+         This object can only be configured if DestMacType is any(0) and
+         DestMacMask is ff-ff-ff-ff-ff-ff.
+         
+         This object is only valid if QosCapabilitiesHasQceDmac is true."
+    ::= { qosConfigQceEntry 6 }
+
+qosConfigQceDestMacMask OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the 48 bits destination MAC address mask.
+         
+         Valid values are 00-00-00-00-00-00 or ff-ff-ff-ff-ff-ff.
+         
+         This object is only valid if QosCapabilitiesHasQceDmac is true."
+    ::= { qosConfigQceEntry 7 }
+
+qosConfigQceSrcMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the 48 bits source MAC address.
+         
+         The packets source address is AND-ed with the value of SrcMacMask and
+         then compared against the value of this object.
+         
+         If this object value and the value of SrcMacMask is 00-00-00-00-00-00,
+         this entry matches any source MAC address.
+         
+         This object can only be configured if SrcMacMask is ff-ff-ff-ff-ff-ff.
+         
+         If the value of qosCapabilitiesHasQceMacOui is true then only the OUI
+         part of the MAC address (24 most significant bits) is used."
+    ::= { qosConfigQceEntry 8 }
+
+qosConfigQceSrcMacMask OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the 48 bits source MAC address mask.
+         
+         Valid values are 00-00-00-00-00-00 or ff-ff-ff-ff-ff-ff."
+    ::= { qosConfigQceEntry 9 }
+
+qosConfigQceVlanTagType OBJECT-TYPE
+    SYNTAX      VlanTagType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the VLAN tag type to match.
+         
+         The value cTagged(3) is only supported if qosCapabilitiesHasCTag is
+         true.
+         
+         The value sTagged(3) is only supported if qosCapabilitiesHasSTag is
+         true."
+    ::= { qosConfigQceEntry 10 }
+
+qosConfigQceVlanIdOp OBJECT-TYPE
+    SYNTAX      ASRType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a packets's VLAN ID is to be compared."
+    ::= { qosConfigQceEntry 11 }
+
+qosConfigQceVlanId OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The VLAN ID to be compared.
+         
+         If the VlanIdOp object in the same row is range(2), this object will be
+         the starting VLAN ID of the range.
+         
+         Valid range is vlanCapabilitiesVlanIdMin-vlanCapabilitiesVlanIdMax.
+         
+         This object can only be configured if VlanIdOp is not any(0)."
+    ::= { qosConfigQceEntry 12 }
+
+qosConfigQceVlanIdRange OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The VLAN ID to be compared.
+         
+         If the VlanIdOp object in the same row is range(2), this object will be
+         the ending VLAN ID of the range.
+         
+         Valid range is vlanCapabilitiesVlanIdMin-vlanCapabilitiesVlanIdMax.
+         
+         This object can only be configured if VlanIdOp is range(2)."
+    ::= { qosConfigQceEntry 13 }
+
+qosConfigQcePcp OBJECT-TYPE
+    SYNTAX      VlanTagPriority
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The PCP value(s) to be compared."
+    ::= { qosConfigQceEntry 14 }
+
+qosConfigQceDei OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DEI value to be compared.
+         
+         Valid range is 0-1."
+    ::= { qosConfigQceEntry 15 }
+
+qosConfigQceInnerVlanTagType OBJECT-TYPE
+    SYNTAX      VlanTagType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the inner VLAN tag type to match.
+         
+         This object is only valid if QosCapabilitiesHasQceInnerTag is true."
+    ::= { qosConfigQceEntry 16 }
+
+qosConfigQceInnerVlanIdOp OBJECT-TYPE
+    SYNTAX      ASRType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a packets's inner VLAN ID is to be compared.
+         
+         This object is only valid if QosCapabilitiesHasQceInnerTag is true."
+    ::= { qosConfigQceEntry 17 }
+
+qosConfigQceInnerVlanId OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The inner VLAN ID to be compared.
+         
+         If the InnerVlanIdOp object in the same row is range(2), this object
+         will be the starting VLAN ID of the range.
+         
+         Valid range is vlanCapabilitiesVlanIdMin-vlanCapabilitiesVlanIdMax.
+         
+         This object can only be configured if InnerVlanIdOp is not any(0).
+         
+         This object is only valid if QosCapabilitiesHasQceInnerTag is true."
+    ::= { qosConfigQceEntry 18 }
+
+qosConfigQceInnerVlanIdRange OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The inner VLAN ID to be compared.
+         
+         If the InnerVlanIdOp object in the same row is range(2), this object
+         will be the ending VLAN ID of the range.
+         
+         Valid range is vlanCapabilitiesVlanIdMin-vlanCapabilitiesVlanIdMax.
+         
+         This object can only be configured if InnerVlanIdOp is range(2).
+         
+         This object is only valid if QosCapabilitiesHasQceInnerTag is true."
+    ::= { qosConfigQceEntry 19 }
+
+qosConfigQceInnerPcp OBJECT-TYPE
+    SYNTAX      VlanTagPriority
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The inner PCP value(s) to be compared.
+         
+         This object is only valid if QosCapabilitiesHasQceInnerTag is true."
+    ::= { qosConfigQceEntry 20 }
+
+qosConfigQceInnerDei OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The inner DEI value to be compared.
+         
+         Valid range is 0-1.
+         
+         This object is only valid if QosCapabilitiesHasQceInnerTag is true."
+    ::= { qosConfigQceEntry 21 }
+
+qosConfigQceFrameType OBJECT-TYPE
+    SYNTAX      QosQceFrameType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the packet's frame type.
+         
+         Modifying the frame type on an existing QCE will restore the content of
+         all frame type dependent configuration to default."
+    ::= { qosConfigQceEntry 100 }
+
+qosConfigQceEtype OBJECT-TYPE
+    SYNTAX      EtherType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the packet's 16 bit Ethernet type field.
+         
+         Valid values are: 0(match any), 0x600-0xFFFF but excluding 0x800(IPv4)
+         and 0x86DD(IPv6).
+         
+         This object can only be configured if FrameType is etype(1)."
+    ::= { qosConfigQceEntry 101 }
+
+qosConfigQceLlcDsap OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the packets's 8 bit LLC DSAP field.
+         
+         The packets LLC DSAP field is AND-ed with the value of LlcDsapMask and
+         then compared against the value of this object.
+         
+         If this object value and the value of LlcDsapMask is 0x00, this entry
+         matches any LLC DSAP.
+         
+         Valid range is 0x00-0xFF.
+         
+         This object can only be configured if FrameType is llc(2)."
+    ::= { qosConfigQceEntry 200 }
+
+qosConfigQceLlcDsapMask OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the 8 bit LLC DSAP mask.
+         
+         Valid values are 0x00 or 0xFF.
+         
+         This object can only be configured if FrameType is llc(2)."
+    ::= { qosConfigQceEntry 201 }
+
+qosConfigQceLlcSsap OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the packets's 8 bit LLC SSAP field.
+         
+         The packets LLC SSAP field is AND-ed with the value of LlcSsapMask and
+         then compared against the value of this object.
+         
+         If this object value and the value of LlcSsapMask is 0x00, this entry
+         matches any LLC SSAP.
+         
+         Valid range is 0x00-0xFF.
+         
+         This object can only be configured if FrameType is llc(2)."
+    ::= { qosConfigQceEntry 202 }
+
+qosConfigQceLlcSsapMask OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the 8 bit LLC SSAP mask.
+         
+         Valid values are 0x00 or 0xFF.
+         
+         This object can only be configured if FrameType is llc(2)."
+    ::= { qosConfigQceEntry 203 }
+
+qosConfigQceLlcControl OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the packets's 8 bit LLC Control field.
+         
+         The packets LLC Control field is AND-ed with the value of
+         LlcControlMask and then compared against the value of this object.
+         
+         If this object value and the value of LlcControlMask is 0x00, this
+         entry matches any LLC Control.
+         
+         Valid range is 0x00-0xFF.
+         
+         This object can only be configured if FrameType is llc(2)."
+    ::= { qosConfigQceEntry 204 }
+
+qosConfigQceLlcControlMask OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the 8 bit LLC Control mask.
+         
+         Valid values are 0x00 or 0xFF.
+         
+         This object can only be configured if FrameType is llc(2)."
+    ::= { qosConfigQceEntry 205 }
+
+qosConfigQceSnapPid OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the packet's 16 bit SNAP PID field.
+         
+         The packets SNAP PID field is AND-ed with the value of SnapPidMask and
+         then compared against the value of this object.
+         
+         If this object value and the value of SnapPidMask is 0x0000, this entry
+         matches any ethertype.
+         
+         This object can only be configured if FrameType is snap(3)."
+    ::= { qosConfigQceEntry 302 }
+
+qosConfigQceSnapPidMask OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the 16 bit SNAP PID mask.
+         
+         Valid values are 0x0000 or 0xFFFF.
+         
+         This object can only be configured if FrameType is snap(3)."
+    ::= { qosConfigQceEntry 303 }
+
+qosConfigQceIpv4Fragment OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how an IPv4 fragment bit is to be compared.
+         
+         This object can only be configured if FrameType is ipv4(4)."
+    ::= { qosConfigQceEntry 400 }
+
+qosConfigQceIpv4DscpOp OBJECT-TYPE
+    SYNTAX      ASRType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how an IPv4 DSCP field is to be compared.
+         
+         This object can only be configured if FrameType is ipv4(4)."
+    ::= { qosConfigQceEntry 401 }
+
+qosConfigQceIpv4Dscp OBJECT-TYPE
+    SYNTAX      Dscp
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DSCP value to be compared.
+         
+         If the Ipv4DscpOp object in the same row is range(2), this object will
+         be the starting DSCP value of the range.
+         
+         Valid range is 0-63.
+         
+         This object can only be configured if FrameType is ipv4(4) and
+         Ipv4DscpOp is not any(0)."
+    ::= { qosConfigQceEntry 402 }
+
+qosConfigQceIpv4DscpRange OBJECT-TYPE
+    SYNTAX      Dscp
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DSCP value to be compared.
+         
+         If the Ipv4DscpOp object in the same row is range(2), this object will
+         be the ending DSCP value of the range.
+         
+         Valid range is 0-63.
+         
+         This object can only be configured if FrameType is ipv4(4) and
+         Ipv4DscpOp is range(2)."
+    ::= { qosConfigQceEntry 403 }
+
+qosConfigQceIpv4Protocol OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The protocol number field in the IPv4 header used to indicate a higher
+         layer protocol.
+         
+         The packets protocol number field is AND-ed with the value of
+         Ipv4ProtocolMask and then compared with the value of this object.
+         
+         If Ipv4Protocol and Ipv4protocolMask are 0, this entry matches any IPv4
+         protocol.
+         
+         Valid range is 0-255.
+         
+         This object can only be configured if FrameType is ipv4(4)."
+    ::= { qosConfigQceEntry 404 }
+
+qosConfigQceIpv4ProtocolMask OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified IPv4 protocol number mask.
+         
+         Valid values are 0 or 255.
+         
+         This object can only be configured if FrameType is ipv4(4)."
+    ::= { qosConfigQceEntry 405 }
+
+qosConfigQceIpv4SrcIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified IPv4 source address.
+         
+         The packets source address is AND-ed with the value of Ipv4SrcIpMask
+         and then compared with the value of this object.
+         
+         If Ipv4SrcIP and Ipv4SrcIpMask are 0.0.0.0, this entry matches any IPv4
+         source address.
+         
+         This object can only be configured if FrameType is ipv4(4)."
+    ::= { qosConfigQceEntry 406 }
+
+qosConfigQceIpv4SrcIpMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified IPv4 source address mask.
+         
+         This object can only be configured if FrameType is ipv4(4)."
+    ::= { qosConfigQceEntry 407 }
+
+qosConfigQceIpv4DestIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified IPv4 destination address.
+         
+         The packets destination address is AND-ed with the value of
+         Ipv4DestIpMask and then compared with the value of this object.
+         
+         If Ipv4DestIP and Ipv4DestIpMask are 0.0.0.0, this entry matches any
+         IPv4 destination address.
+         
+         This object can only be configured if FrameType is ipv4(4).
+         
+         This object is only valid if QosCapabilitiesHasQceDip is true."
+    ::= { qosConfigQceEntry 408 }
+
+qosConfigQceIpv4DestIpMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified IPv4 destination address mask.
+         
+         This object can only be configured if FrameType is ipv4(4).
+         
+         This object is only valid if QosCapabilitiesHasQceDip is true."
+    ::= { qosConfigQceEntry 409 }
+
+qosConfigQceIpv4SrcPortOp OBJECT-TYPE
+    SYNTAX      ASRType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a packet's source TCP/UDP port number is to be compared.
+         
+         This object can only be configured if FrameType is ipv4(4)."
+    ::= { qosConfigQceEntry 410 }
+
+qosConfigQceIpv4SrcPort OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source port number of the TCP or UDP protocol.
+         
+         If the Ipv4SrcPortOp object in the same row is range(2), this object
+         will be the starting port number of the port range.
+         
+         Valid range is 0-65535.
+         
+         This object can only be configured if FrameType is ipv4(4) and
+         Ipv4SrcPortOp is not any(0)."
+    ::= { qosConfigQceEntry 411 }
+
+qosConfigQceIpv4SrcPortRange OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source port number of the TCP or UDP protocol.
+         
+         If the Ipv4SrcPortOp object in the same row is range(2), this object
+         will be the ending port number of the port range.
+         
+         Valid range is 0-65535.
+         
+         This object can only be configured if FrameType is ipv4(4) and
+         Ipv4SrcPortOp is range(2)."
+    ::= { qosConfigQceEntry 412 }
+
+qosConfigQceIpv4DestPortOp OBJECT-TYPE
+    SYNTAX      ASRType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a packet's destination TCP/UDP port number is to be
+         compared.
+         
+         This object can only be configured if FrameType is ipv4(4)."
+    ::= { qosConfigQceEntry 413 }
+
+qosConfigQceIpv4DestPort OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The destination port number of the TCP or UDP protocol.
+         
+         If the Ipv4DestPortOp object in the same row is range(2), this object
+         will be the starting port number of the port range.
+         
+         Valid range is 0-65535.
+         
+         This object can only be configured if FrameType is ipv4(4) and
+         Ipv4DestPortOp is not any(0)."
+    ::= { qosConfigQceEntry 414 }
+
+qosConfigQceIpv4DestPortRange OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source port number of the TCP or UDP protocol.
+         
+         If the Ipv4DestPortOp object in the same row is range(2), this object
+         will be the ending port number of the port range.
+         
+         Valid range is 0-65535.
+         
+         This object can only be configured if FrameType is ipv4(4) and
+         Ipv4DestPortOp is range(2)."
+    ::= { qosConfigQceEntry 415 }
+
+qosConfigQceIpv6DscpOp OBJECT-TYPE
+    SYNTAX      ASRType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how an IPv6 DSCP field is to be compared.
+         
+         This object can only be configured if FrameType is ipv6(5)."
+    ::= { qosConfigQceEntry 500 }
+
+qosConfigQceIpv6Dscp OBJECT-TYPE
+    SYNTAX      Dscp
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DSCP value to be compared.
+         
+         If the Ipv6DscpOp object in the same row is range(2), this object will
+         be the starting DSCP value of the range.
+         
+         Valid range is 0-63.
+         
+         This object can only be configured if FrameType is ipv6(5) and
+         Ipv6DscpOp is not any(0)."
+    ::= { qosConfigQceEntry 501 }
+
+qosConfigQceIpv6DscpRange OBJECT-TYPE
+    SYNTAX      Dscp
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DSCP value to be compared.
+         
+         If the Ipv6DscpOp object in the same row is range(2), this object will
+         be the ending DSCP value of the range.
+         
+         Valid range is 0-63.
+         
+         This object can only be configured if FrameType is ipv6(5) and
+         Ipv6DscpOp is range(2)."
+    ::= { qosConfigQceEntry 502 }
+
+qosConfigQceIpv6Protocol OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The protocol number field in the IPv6 header used to indicate a higher
+         layer protocol.
+         
+         The packets protocol number field is AND-ed with the value of
+         Ipv6ProtocolMask and then compared with the value of this object.
+         
+         If Ipv46rotocol and Ipv6protocolMask are 0, this entry matches any IPv6
+         protocol.
+         
+         Valid range is 0-255.
+         
+         This object can only be configured if FrameType is ipv6(5)."
+    ::= { qosConfigQceEntry 503 }
+
+qosConfigQceIpv6ProtocolMask OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified IPv6 protocol number mask.
+         
+         Valid values are 0 or 255.
+         
+         This object can only be configured if FrameType is ipv6(5)."
+    ::= { qosConfigQceEntry 504 }
+
+qosConfigQceIpv6SrcIp OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified IPv6 source address.
+         
+         The packets source address is AND-ed with the value of Ipv6SrcIpMask
+         and then compared with the value of this object.
+         
+         If Ipv6SrcIP and Ipv6SrcIpMask are all zeros, this entry matches any
+         IPv6 source address.
+         
+         Only the least significant 32 bits of this object are used.
+         
+         This object can only be configured if FrameType is ipv6(5)."
+    ::= { qosConfigQceEntry 506 }
+
+qosConfigQceIpv6SrcIpMask OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified IPv6 source address mask.
+         
+         Only the least significant 32 bits of this object are used.
+         
+         This object can only be configured if FrameType is ipv6(5)."
+    ::= { qosConfigQceEntry 508 }
+
+qosConfigQceIpv6DestIp OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified IPv6 destination address.
+         
+         The packets destination address is AND-ed with the value of
+         Ipv6DestIpMask and then compared with the value of this object.
+         
+         If Ipv6DestIP and Ipv6DestIpMask are all zeros, this entry matches any
+         IPv6 destination address.
+         
+         Only the least significant 32 bits of this object are used.
+         
+         This object can only be configured if FrameType is ipv6(5).
+         
+         This object is only valid if QosCapabilitiesHasQceDip is true."
+    ::= { qosConfigQceEntry 510 }
+
+qosConfigQceIpv6DestIpMask OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified IPv6 destination address mask.
+         
+         Only the least significant 32 bits of this object are used.
+         
+         This object can only be configured if FrameType is ipv6(5).
+         
+         This object is only valid if QosCapabilitiesHasQceDip is true."
+    ::= { qosConfigQceEntry 512 }
+
+qosConfigQceIpv6SrcPortOp OBJECT-TYPE
+    SYNTAX      ASRType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a packet's source TCP/UDP port number is to be compared.
+         
+         This object can only be configured if FrameType is ipv6(5)."
+    ::= { qosConfigQceEntry 513 }
+
+qosConfigQceIpv6SrcPort OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source port number of the TCP or UDP protocol.
+         
+         If the Ipv6SrcPortOp object in the same row is range(2), this object
+         will be the starting port number of the port range.
+         
+         Valid range is 0-65535.
+         
+         This object can only be configured if FrameType is ipv6(5) and
+         Ipv6SrcPortOp is not any(0)."
+    ::= { qosConfigQceEntry 514 }
+
+qosConfigQceIpv6SrcPortRange OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source port number of the TCP or UDP protocol.
+         
+         If the Ipv6SrcPortOp object in the same row is range(2), this object
+         will be the ending port number of the port range.
+         
+         Valid range is 0-65535.
+         
+         This object can only be configured if FrameType is ipv6(5) and
+         Ipv6SrcPortOp is range(2)."
+    ::= { qosConfigQceEntry 515 }
+
+qosConfigQceIpv6DestPortOp OBJECT-TYPE
+    SYNTAX      ASRType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a packet's destination TCP/UDP port number is to be
+         compared.
+         
+         This object can only be configured if FrameType is ipv6(5)."
+    ::= { qosConfigQceEntry 516 }
+
+qosConfigQceIpv6DestPort OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The destination port number of the TCP or UDP protocol.
+         
+         If the Ipv6DestPortOp object in the same row is range(2), this object
+         will be the starting port number of the port range.
+         
+         Valid range is 0-65535.
+         
+         This object can only be configured if FrameType is ipv6(5) and
+         Ipv6DestPortOp is not any(0)."
+    ::= { qosConfigQceEntry 517 }
+
+qosConfigQceIpv6DestPortRange OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source port number of the TCP or UDP protocol.
+         
+         If the Ipv6DestPortOp object in the same row is range(2), this object
+         will be the ending port number of the port range.
+         
+         Valid range is 0-65535.
+         
+         This object can only be configured if FrameType is ipv6(5) and
+         Ipv6DestPortOp is range(2)."
+    ::= { qosConfigQceEntry 518 }
+
+qosConfigQceActionCosEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the packet is classified to the CoS value in ActionCos."
+    ::= { qosConfigQceEntry 1000 }
+
+qosConfigQceActionCos OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The CoS value used for classification.
+         
+         Valid range is qosCapabilitiesClassMin-qosCapabilitiesClassMax."
+    ::= { qosConfigQceEntry 1001 }
+
+qosConfigQceActionDplEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the packet is classified to the DPL value in ActionDpl."
+    ::= { qosConfigQceEntry 1002 }
+
+qosConfigQceActionDpl OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DPL value used for classification.
+         
+         Valid range is qosCapabilitiesDplMin-qosCapabilitiesDplMax."
+    ::= { qosConfigQceEntry 1003 }
+
+qosConfigQceActionDscpEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the packet is classified to the DSCP value in ActionDscp."
+    ::= { qosConfigQceEntry 1004 }
+
+qosConfigQceActionDscp OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DSCP value used for classification.
+         
+         Valid range is 0-63."
+    ::= { qosConfigQceEntry 1005 }
+
+qosConfigQceActionPcpDeiEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the packet is classified to the PCP value in ActionPcp and the
+         DEI value in ActionDei.
+         
+         This object is only valid if QosCapabilitiesHasQceActionPcpDei is true."
+    ::= { qosConfigQceEntry 1006 }
+
+qosConfigQceActionPcp OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The PCP value used for classification.
+         
+         Valid range is 0-7.
+         
+         This object is only valid if QosCapabilitiesHasQceActionPcpDei is true."
+    ::= { qosConfigQceEntry 1007 }
+
+qosConfigQceActionDei OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DEI value used for classification.
+         
+         Valid range is 0-1.
+         
+         This object is only valid if QosCapabilitiesHasQceActionPcpDei is true."
+    ::= { qosConfigQceEntry 1008 }
+
+qosConfigQceActionPolicyEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the packet is classified to the policy number in ActionPolicy.
+         
+         This object is only valid if QosCapabilitiesHasQceActionPolicy is true."
+    ::= { qosConfigQceEntry 1009 }
+
+qosConfigQceActionPolicy OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The policy number used for classification.
+         
+         Valid range is documented in the ACL MIB.
+         
+         This object is only valid if QosCapabilitiesHasQceActionPcpDei is true."
+    ::= { qosConfigQceEntry 1010 }
+
+qosConfigQceAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { qosConfigQceEntry 10000 }
+
+qosConfigQceTableRowEditor OBJECT IDENTIFIER
+    ::= { qosConfigQce 2 }
+
+qosConfigQceTableRowEditorQceId OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "QCE Id.
+         
+         Valid range is qosCapabilitiesQceIdMin-qosCapabilitiesQceIdMax or 0.
+         
+         Using a value of 0 when adding a new QCE, will assign the QCE Id in the
+         new QCE to the first unused QCE Id."
+    ::= { qosConfigQceTableRowEditor 1 }
+
+qosConfigQceTableRowEditorNextQceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "QCE Id of the next QCE. Valid range is
+         qosCapabilitiesQceIdMin-qosCapabilitiesQceIdMax or 0.
+         
+         The value 0, denotes the end of the list."
+    ::= { qosConfigQceTableRowEditor 2 }
+
+qosConfigQceTableRowEditorSwitchId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the switch on which this QCE is active.Valid range is
+         documented in the Stacking MIB.
+         
+         This object is only valid on stacking platforms."
+    ::= { qosConfigQceTableRowEditor 3 }
+
+qosConfigQceTableRowEditorPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "List of ports that are member of this QCE."
+    ::= { qosConfigQceTableRowEditor 4 }
+
+qosConfigQceTableRowEditorDestMacType OBJECT-TYPE
+    SYNTAX      DestMacType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the destination MAC type to match."
+    ::= { qosConfigQceTableRowEditor 5 }
+
+qosConfigQceTableRowEditorDestMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the 48 bits destination MAC address.
+         
+         The packets destination address is AND-ed with the value of DestMacMask
+         and then compared against the value of this object.
+         
+         If this object value and the value of DestMacMask is 00-00-00-00-00-00,
+         this entry matches any destination MAC address.
+         
+         This object can only be configured if DestMacType is any(0) and
+         DestMacMask is ff-ff-ff-ff-ff-ff.
+         
+         This object is only valid if QosCapabilitiesHasQceDmac is true."
+    ::= { qosConfigQceTableRowEditor 6 }
+
+qosConfigQceTableRowEditorDestMacMask OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the 48 bits destination MAC address mask.
+         
+         Valid values are 00-00-00-00-00-00 or ff-ff-ff-ff-ff-ff.
+         
+         This object is only valid if QosCapabilitiesHasQceDmac is true."
+    ::= { qosConfigQceTableRowEditor 7 }
+
+qosConfigQceTableRowEditorSrcMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the 48 bits source MAC address.
+         
+         The packets source address is AND-ed with the value of SrcMacMask and
+         then compared against the value of this object.
+         
+         If this object value and the value of SrcMacMask is 00-00-00-00-00-00,
+         this entry matches any source MAC address.
+         
+         This object can only be configured if SrcMacMask is ff-ff-ff-ff-ff-ff.
+         
+         If the value of qosCapabilitiesHasQceMacOui is true then only the OUI
+         part of the MAC address (24 most significant bits) is used."
+    ::= { qosConfigQceTableRowEditor 8 }
+
+qosConfigQceTableRowEditorSrcMacMask OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the 48 bits source MAC address mask.
+         
+         Valid values are 00-00-00-00-00-00 or ff-ff-ff-ff-ff-ff."
+    ::= { qosConfigQceTableRowEditor 9 }
+
+qosConfigQceTableRowEditorVlanTagType OBJECT-TYPE
+    SYNTAX      VlanTagType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the VLAN tag type to match.
+         
+         The value cTagged(3) is only supported if qosCapabilitiesHasCTag is
+         true.
+         
+         The value sTagged(3) is only supported if qosCapabilitiesHasSTag is
+         true."
+    ::= { qosConfigQceTableRowEditor 10 }
+
+qosConfigQceTableRowEditorVlanIdOp OBJECT-TYPE
+    SYNTAX      ASRType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a packets's VLAN ID is to be compared."
+    ::= { qosConfigQceTableRowEditor 11 }
+
+qosConfigQceTableRowEditorVlanId OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The VLAN ID to be compared.
+         
+         If the VlanIdOp object in the same row is range(2), this object will be
+         the starting VLAN ID of the range.
+         
+         Valid range is vlanCapabilitiesVlanIdMin-vlanCapabilitiesVlanIdMax.
+         
+         This object can only be configured if VlanIdOp is not any(0)."
+    ::= { qosConfigQceTableRowEditor 12 }
+
+qosConfigQceTableRowEditorVlanIdRange OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The VLAN ID to be compared.
+         
+         If the VlanIdOp object in the same row is range(2), this object will be
+         the ending VLAN ID of the range.
+         
+         Valid range is vlanCapabilitiesVlanIdMin-vlanCapabilitiesVlanIdMax.
+         
+         This object can only be configured if VlanIdOp is range(2)."
+    ::= { qosConfigQceTableRowEditor 13 }
+
+qosConfigQceTableRowEditorPcp OBJECT-TYPE
+    SYNTAX      VlanTagPriority
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The PCP value(s) to be compared."
+    ::= { qosConfigQceTableRowEditor 14 }
+
+qosConfigQceTableRowEditorDei OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DEI value to be compared.
+         
+         Valid range is 0-1."
+    ::= { qosConfigQceTableRowEditor 15 }
+
+qosConfigQceTableRowEditorInnerVlanTagType OBJECT-TYPE
+    SYNTAX      VlanTagType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the inner VLAN tag type to match.
+         
+         This object is only valid if QosCapabilitiesHasQceInnerTag is true."
+    ::= { qosConfigQceTableRowEditor 16 }
+
+qosConfigQceTableRowEditorInnerVlanIdOp OBJECT-TYPE
+    SYNTAX      ASRType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a packets's inner VLAN ID is to be compared.
+         
+         This object is only valid if QosCapabilitiesHasQceInnerTag is true."
+    ::= { qosConfigQceTableRowEditor 17 }
+
+qosConfigQceTableRowEditorInnerVlanId OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The inner VLAN ID to be compared.
+         
+         If the InnerVlanIdOp object in the same row is range(2), this object
+         will be the starting VLAN ID of the range.
+         
+         Valid range is vlanCapabilitiesVlanIdMin-vlanCapabilitiesVlanIdMax.
+         
+         This object can only be configured if InnerVlanIdOp is not any(0).
+         
+         This object is only valid if QosCapabilitiesHasQceInnerTag is true."
+    ::= { qosConfigQceTableRowEditor 18 }
+
+qosConfigQceTableRowEditorInnerVlanIdRange OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The inner VLAN ID to be compared.
+         
+         If the InnerVlanIdOp object in the same row is range(2), this object
+         will be the ending VLAN ID of the range.
+         
+         Valid range is vlanCapabilitiesVlanIdMin-vlanCapabilitiesVlanIdMax.
+         
+         This object can only be configured if InnerVlanIdOp is range(2).
+         
+         This object is only valid if QosCapabilitiesHasQceInnerTag is true."
+    ::= { qosConfigQceTableRowEditor 19 }
+
+qosConfigQceTableRowEditorInnerPcp OBJECT-TYPE
+    SYNTAX      VlanTagPriority
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The inner PCP value(s) to be compared.
+         
+         This object is only valid if QosCapabilitiesHasQceInnerTag is true."
+    ::= { qosConfigQceTableRowEditor 20 }
+
+qosConfigQceTableRowEditorInnerDei OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The inner DEI value to be compared.
+         
+         Valid range is 0-1.
+         
+         This object is only valid if QosCapabilitiesHasQceInnerTag is true."
+    ::= { qosConfigQceTableRowEditor 21 }
+
+qosConfigQceTableRowEditorFrameType OBJECT-TYPE
+    SYNTAX      QosQceFrameType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the packet's frame type.
+         
+         Modifying the frame type on an existing QCE will restore the content of
+         all frame type dependent configuration to default."
+    ::= { qosConfigQceTableRowEditor 100 }
+
+qosConfigQceTableRowEditorEtype OBJECT-TYPE
+    SYNTAX      EtherType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the packet's 16 bit Ethernet type field.
+         
+         Valid values are: 0(match any), 0x600-0xFFFF but excluding 0x800(IPv4)
+         and 0x86DD(IPv6).
+         
+         This object can only be configured if FrameType is etype(1)."
+    ::= { qosConfigQceTableRowEditor 101 }
+
+qosConfigQceTableRowEditorLlcDsap OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the packets's 8 bit LLC DSAP field.
+         
+         The packets LLC DSAP field is AND-ed with the value of LlcDsapMask and
+         then compared against the value of this object.
+         
+         If this object value and the value of LlcDsapMask is 0x00, this entry
+         matches any LLC DSAP.
+         
+         Valid range is 0x00-0xFF.
+         
+         This object can only be configured if FrameType is llc(2)."
+    ::= { qosConfigQceTableRowEditor 200 }
+
+qosConfigQceTableRowEditorLlcDsapMask OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the 8 bit LLC DSAP mask.
+         
+         Valid values are 0x00 or 0xFF.
+         
+         This object can only be configured if FrameType is llc(2)."
+    ::= { qosConfigQceTableRowEditor 201 }
+
+qosConfigQceTableRowEditorLlcSsap OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the packets's 8 bit LLC SSAP field.
+         
+         The packets LLC SSAP field is AND-ed with the value of LlcSsapMask and
+         then compared against the value of this object.
+         
+         If this object value and the value of LlcSsapMask is 0x00, this entry
+         matches any LLC SSAP.
+         
+         Valid range is 0x00-0xFF.
+         
+         This object can only be configured if FrameType is llc(2)."
+    ::= { qosConfigQceTableRowEditor 202 }
+
+qosConfigQceTableRowEditorLlcSsapMask OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the 8 bit LLC SSAP mask.
+         
+         Valid values are 0x00 or 0xFF.
+         
+         This object can only be configured if FrameType is llc(2)."
+    ::= { qosConfigQceTableRowEditor 203 }
+
+qosConfigQceTableRowEditorLlcControl OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the packets's 8 bit LLC Control field.
+         
+         The packets LLC Control field is AND-ed with the value of
+         LlcControlMask and then compared against the value of this object.
+         
+         If this object value and the value of LlcControlMask is 0x00, this
+         entry matches any LLC Control.
+         
+         Valid range is 0x00-0xFF.
+         
+         This object can only be configured if FrameType is llc(2)."
+    ::= { qosConfigQceTableRowEditor 204 }
+
+qosConfigQceTableRowEditorLlcControlMask OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the 8 bit LLC Control mask.
+         
+         Valid values are 0x00 or 0xFF.
+         
+         This object can only be configured if FrameType is llc(2)."
+    ::= { qosConfigQceTableRowEditor 205 }
+
+qosConfigQceTableRowEditorSnapPid OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the packet's 16 bit SNAP PID field.
+         
+         The packets SNAP PID field is AND-ed with the value of SnapPidMask and
+         then compared against the value of this object.
+         
+         If this object value and the value of SnapPidMask is 0x0000, this entry
+         matches any ethertype.
+         
+         This object can only be configured if FrameType is snap(3)."
+    ::= { qosConfigQceTableRowEditor 302 }
+
+qosConfigQceTableRowEditorSnapPidMask OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the 16 bit SNAP PID mask.
+         
+         Valid values are 0x0000 or 0xFFFF.
+         
+         This object can only be configured if FrameType is snap(3)."
+    ::= { qosConfigQceTableRowEditor 303 }
+
+qosConfigQceTableRowEditorIpv4Fragment OBJECT-TYPE
+    SYNTAX      BitType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how an IPv4 fragment bit is to be compared.
+         
+         This object can only be configured if FrameType is ipv4(4)."
+    ::= { qosConfigQceTableRowEditor 400 }
+
+qosConfigQceTableRowEditorIpv4DscpOp OBJECT-TYPE
+    SYNTAX      ASRType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how an IPv4 DSCP field is to be compared.
+         
+         This object can only be configured if FrameType is ipv4(4)."
+    ::= { qosConfigQceTableRowEditor 401 }
+
+qosConfigQceTableRowEditorIpv4Dscp OBJECT-TYPE
+    SYNTAX      Dscp
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DSCP value to be compared.
+         
+         If the Ipv4DscpOp object in the same row is range(2), this object will
+         be the starting DSCP value of the range.
+         
+         Valid range is 0-63.
+         
+         This object can only be configured if FrameType is ipv4(4) and
+         Ipv4DscpOp is not any(0)."
+    ::= { qosConfigQceTableRowEditor 402 }
+
+qosConfigQceTableRowEditorIpv4DscpRange OBJECT-TYPE
+    SYNTAX      Dscp
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DSCP value to be compared.
+         
+         If the Ipv4DscpOp object in the same row is range(2), this object will
+         be the ending DSCP value of the range.
+         
+         Valid range is 0-63.
+         
+         This object can only be configured if FrameType is ipv4(4) and
+         Ipv4DscpOp is range(2)."
+    ::= { qosConfigQceTableRowEditor 403 }
+
+qosConfigQceTableRowEditorIpv4Protocol OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The protocol number field in the IPv4 header used to indicate a higher
+         layer protocol.
+         
+         The packets protocol number field is AND-ed with the value of
+         Ipv4ProtocolMask and then compared with the value of this object.
+         
+         If Ipv4Protocol and Ipv4protocolMask are 0, this entry matches any IPv4
+         protocol.
+         
+         Valid range is 0-255.
+         
+         This object can only be configured if FrameType is ipv4(4)."
+    ::= { qosConfigQceTableRowEditor 404 }
+
+qosConfigQceTableRowEditorIpv4ProtocolMask OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified IPv4 protocol number mask.
+         
+         Valid values are 0 or 255.
+         
+         This object can only be configured if FrameType is ipv4(4)."
+    ::= { qosConfigQceTableRowEditor 405 }
+
+qosConfigQceTableRowEditorIpv4SrcIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified IPv4 source address.
+         
+         The packets source address is AND-ed with the value of Ipv4SrcIpMask
+         and then compared with the value of this object.
+         
+         If Ipv4SrcIP and Ipv4SrcIpMask are 0.0.0.0, this entry matches any IPv4
+         source address.
+         
+         This object can only be configured if FrameType is ipv4(4)."
+    ::= { qosConfigQceTableRowEditor 406 }
+
+qosConfigQceTableRowEditorIpv4SrcIpMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified IPv4 source address mask.
+         
+         This object can only be configured if FrameType is ipv4(4)."
+    ::= { qosConfigQceTableRowEditor 407 }
+
+qosConfigQceTableRowEditorIpv4DestIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified IPv4 destination address.
+         
+         The packets destination address is AND-ed with the value of
+         Ipv4DestIpMask and then compared with the value of this object.
+         
+         If Ipv4DestIP and Ipv4DestIpMask are 0.0.0.0, this entry matches any
+         IPv4 destination address.
+         
+         This object can only be configured if FrameType is ipv4(4).
+         
+         This object is only valid if QosCapabilitiesHasQceDip is true."
+    ::= { qosConfigQceTableRowEditor 408 }
+
+qosConfigQceTableRowEditorIpv4DestIpMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified IPv4 destination address mask.
+         
+         This object can only be configured if FrameType is ipv4(4).
+         
+         This object is only valid if QosCapabilitiesHasQceDip is true."
+    ::= { qosConfigQceTableRowEditor 409 }
+
+qosConfigQceTableRowEditorIpv4SrcPortOp OBJECT-TYPE
+    SYNTAX      ASRType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a packet's source TCP/UDP port number is to be compared.
+         
+         This object can only be configured if FrameType is ipv4(4)."
+    ::= { qosConfigQceTableRowEditor 410 }
+
+qosConfigQceTableRowEditorIpv4SrcPort OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source port number of the TCP or UDP protocol.
+         
+         If the Ipv4SrcPortOp object in the same row is range(2), this object
+         will be the starting port number of the port range.
+         
+         Valid range is 0-65535.
+         
+         This object can only be configured if FrameType is ipv4(4) and
+         Ipv4SrcPortOp is not any(0)."
+    ::= { qosConfigQceTableRowEditor 411 }
+
+qosConfigQceTableRowEditorIpv4SrcPortRange OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source port number of the TCP or UDP protocol.
+         
+         If the Ipv4SrcPortOp object in the same row is range(2), this object
+         will be the ending port number of the port range.
+         
+         Valid range is 0-65535.
+         
+         This object can only be configured if FrameType is ipv4(4) and
+         Ipv4SrcPortOp is range(2)."
+    ::= { qosConfigQceTableRowEditor 412 }
+
+qosConfigQceTableRowEditorIpv4DestPortOp OBJECT-TYPE
+    SYNTAX      ASRType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a packet's destination TCP/UDP port number is to be
+         compared.
+         
+         This object can only be configured if FrameType is ipv4(4)."
+    ::= { qosConfigQceTableRowEditor 413 }
+
+qosConfigQceTableRowEditorIpv4DestPort OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The destination port number of the TCP or UDP protocol.
+         
+         If the Ipv4DestPortOp object in the same row is range(2), this object
+         will be the starting port number of the port range.
+         
+         Valid range is 0-65535.
+         
+         This object can only be configured if FrameType is ipv4(4) and
+         Ipv4DestPortOp is not any(0)."
+    ::= { qosConfigQceTableRowEditor 414 }
+
+qosConfigQceTableRowEditorIpv4DestPortRange OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source port number of the TCP or UDP protocol.
+         
+         If the Ipv4DestPortOp object in the same row is range(2), this object
+         will be the ending port number of the port range.
+         
+         Valid range is 0-65535.
+         
+         This object can only be configured if FrameType is ipv4(4) and
+         Ipv4DestPortOp is range(2)."
+    ::= { qosConfigQceTableRowEditor 415 }
+
+qosConfigQceTableRowEditorIpv6DscpOp OBJECT-TYPE
+    SYNTAX      ASRType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how an IPv6 DSCP field is to be compared.
+         
+         This object can only be configured if FrameType is ipv6(5)."
+    ::= { qosConfigQceTableRowEditor 500 }
+
+qosConfigQceTableRowEditorIpv6Dscp OBJECT-TYPE
+    SYNTAX      Dscp
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DSCP value to be compared.
+         
+         If the Ipv6DscpOp object in the same row is range(2), this object will
+         be the starting DSCP value of the range.
+         
+         Valid range is 0-63.
+         
+         This object can only be configured if FrameType is ipv6(5) and
+         Ipv6DscpOp is not any(0)."
+    ::= { qosConfigQceTableRowEditor 501 }
+
+qosConfigQceTableRowEditorIpv6DscpRange OBJECT-TYPE
+    SYNTAX      Dscp
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DSCP value to be compared.
+         
+         If the Ipv6DscpOp object in the same row is range(2), this object will
+         be the ending DSCP value of the range.
+         
+         Valid range is 0-63.
+         
+         This object can only be configured if FrameType is ipv6(5) and
+         Ipv6DscpOp is range(2)."
+    ::= { qosConfigQceTableRowEditor 502 }
+
+qosConfigQceTableRowEditorIpv6Protocol OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The protocol number field in the IPv6 header used to indicate a higher
+         layer protocol.
+         
+         The packets protocol number field is AND-ed with the value of
+         Ipv6ProtocolMask and then compared with the value of this object.
+         
+         If Ipv46rotocol and Ipv6protocolMask are 0, this entry matches any IPv6
+         protocol.
+         
+         Valid range is 0-255.
+         
+         This object can only be configured if FrameType is ipv6(5)."
+    ::= { qosConfigQceTableRowEditor 503 }
+
+qosConfigQceTableRowEditorIpv6ProtocolMask OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified IPv6 protocol number mask.
+         
+         Valid values are 0 or 255.
+         
+         This object can only be configured if FrameType is ipv6(5)."
+    ::= { qosConfigQceTableRowEditor 504 }
+
+qosConfigQceTableRowEditorIpv6SrcIp OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified IPv6 source address.
+         
+         The packets source address is AND-ed with the value of Ipv6SrcIpMask
+         and then compared with the value of this object.
+         
+         If Ipv6SrcIP and Ipv6SrcIpMask are all zeros, this entry matches any
+         IPv6 source address.
+         
+         Only the least significant 32 bits of this object are used.
+         
+         This object can only be configured if FrameType is ipv6(5)."
+    ::= { qosConfigQceTableRowEditor 506 }
+
+qosConfigQceTableRowEditorIpv6SrcIpMask OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified IPv6 source address mask.
+         
+         Only the least significant 32 bits of this object are used.
+         
+         This object can only be configured if FrameType is ipv6(5)."
+    ::= { qosConfigQceTableRowEditor 508 }
+
+qosConfigQceTableRowEditorIpv6DestIp OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified IPv6 destination address.
+         
+         The packets destination address is AND-ed with the value of
+         Ipv6DestIpMask and then compared with the value of this object.
+         
+         If Ipv6DestIP and Ipv6DestIpMask are all zeros, this entry matches any
+         IPv6 destination address.
+         
+         Only the least significant 32 bits of this object are used.
+         
+         This object can only be configured if FrameType is ipv6(5).
+         
+         This object is only valid if QosCapabilitiesHasQceDip is true."
+    ::= { qosConfigQceTableRowEditor 510 }
+
+qosConfigQceTableRowEditorIpv6DestIpMask OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The specified IPv6 destination address mask.
+         
+         Only the least significant 32 bits of this object are used.
+         
+         This object can only be configured if FrameType is ipv6(5).
+         
+         This object is only valid if QosCapabilitiesHasQceDip is true."
+    ::= { qosConfigQceTableRowEditor 512 }
+
+qosConfigQceTableRowEditorIpv6SrcPortOp OBJECT-TYPE
+    SYNTAX      ASRType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a packet's source TCP/UDP port number is to be compared.
+         
+         This object can only be configured if FrameType is ipv6(5)."
+    ::= { qosConfigQceTableRowEditor 513 }
+
+qosConfigQceTableRowEditorIpv6SrcPort OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source port number of the TCP or UDP protocol.
+         
+         If the Ipv6SrcPortOp object in the same row is range(2), this object
+         will be the starting port number of the port range.
+         
+         Valid range is 0-65535.
+         
+         This object can only be configured if FrameType is ipv6(5) and
+         Ipv6SrcPortOp is not any(0)."
+    ::= { qosConfigQceTableRowEditor 514 }
+
+qosConfigQceTableRowEditorIpv6SrcPortRange OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source port number of the TCP or UDP protocol.
+         
+         If the Ipv6SrcPortOp object in the same row is range(2), this object
+         will be the ending port number of the port range.
+         
+         Valid range is 0-65535.
+         
+         This object can only be configured if FrameType is ipv6(5) and
+         Ipv6SrcPortOp is range(2)."
+    ::= { qosConfigQceTableRowEditor 515 }
+
+qosConfigQceTableRowEditorIpv6DestPortOp OBJECT-TYPE
+    SYNTAX      ASRType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates how a packet's destination TCP/UDP port number is to be
+         compared.
+         
+         This object can only be configured if FrameType is ipv6(5)."
+    ::= { qosConfigQceTableRowEditor 516 }
+
+qosConfigQceTableRowEditorIpv6DestPort OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The destination port number of the TCP or UDP protocol.
+         
+         If the Ipv6DestPortOp object in the same row is range(2), this object
+         will be the starting port number of the port range.
+         
+         Valid range is 0-65535.
+         
+         This object can only be configured if FrameType is ipv6(5) and
+         Ipv6DestPortOp is not any(0)."
+    ::= { qosConfigQceTableRowEditor 517 }
+
+qosConfigQceTableRowEditorIpv6DestPortRange OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The source port number of the TCP or UDP protocol.
+         
+         If the Ipv6DestPortOp object in the same row is range(2), this object
+         will be the ending port number of the port range.
+         
+         Valid range is 0-65535.
+         
+         This object can only be configured if FrameType is ipv6(5) and
+         Ipv6DestPortOp is range(2)."
+    ::= { qosConfigQceTableRowEditor 518 }
+
+qosConfigQceTableRowEditorActionCosEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the packet is classified to the CoS value in ActionCos."
+    ::= { qosConfigQceTableRowEditor 1000 }
+
+qosConfigQceTableRowEditorActionCos OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The CoS value used for classification.
+         
+         Valid range is qosCapabilitiesClassMin-qosCapabilitiesClassMax."
+    ::= { qosConfigQceTableRowEditor 1001 }
+
+qosConfigQceTableRowEditorActionDplEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the packet is classified to the DPL value in ActionDpl."
+    ::= { qosConfigQceTableRowEditor 1002 }
+
+qosConfigQceTableRowEditorActionDpl OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DPL value used for classification.
+         
+         Valid range is qosCapabilitiesDplMin-qosCapabilitiesDplMax."
+    ::= { qosConfigQceTableRowEditor 1003 }
+
+qosConfigQceTableRowEditorActionDscpEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the packet is classified to the DSCP value in ActionDscp."
+    ::= { qosConfigQceTableRowEditor 1004 }
+
+qosConfigQceTableRowEditorActionDscp OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DSCP value used for classification.
+         
+         Valid range is 0-63."
+    ::= { qosConfigQceTableRowEditor 1005 }
+
+qosConfigQceTableRowEditorActionPcpDeiEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the packet is classified to the PCP value in ActionPcp and the
+         DEI value in ActionDei.
+         
+         This object is only valid if QosCapabilitiesHasQceActionPcpDei is true."
+    ::= { qosConfigQceTableRowEditor 1006 }
+
+qosConfigQceTableRowEditorActionPcp OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The PCP value used for classification.
+         
+         Valid range is 0-7.
+         
+         This object is only valid if QosCapabilitiesHasQceActionPcpDei is true."
+    ::= { qosConfigQceTableRowEditor 1007 }
+
+qosConfigQceTableRowEditorActionDei OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DEI value used for classification.
+         
+         Valid range is 0-1.
+         
+         This object is only valid if QosCapabilitiesHasQceActionPcpDei is true."
+    ::= { qosConfigQceTableRowEditor 1008 }
+
+qosConfigQceTableRowEditorActionPolicyEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true, the packet is classified to the policy number in ActionPolicy.
+         
+         This object is only valid if QosCapabilitiesHasQceActionPolicy is true."
+    ::= { qosConfigQceTableRowEditor 1009 }
+
+qosConfigQceTableRowEditorActionPolicy OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The policy number used for classification.
+         
+         Valid range is documented in the ACL MIB.
+         
+         This object is only valid if QosCapabilitiesHasQceActionPcpDei is true."
+    ::= { qosConfigQceTableRowEditor 1010 }
+
+qosConfigQceTableRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { qosConfigQceTableRowEditor 10000 }
+
+qosConfigQcePrecedenceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosConfigQcePrecedenceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the precedence of QCEs ordered by their position in
+         the QCL.
+         
+         This is an optional table and is only present if qosCapabilitiesHasQce
+         is true."
+    ::= { qosConfigQce 3 }
+
+qosConfigQcePrecedenceEntry OBJECT-TYPE
+    SYNTAX      QosConfigQcePrecedenceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the precedence of a single QCE."
+    INDEX       { qosConfigQcePrecedenceIndex }
+    ::= { qosConfigQcePrecedenceTable 1 }
+
+QosConfigQcePrecedenceEntry ::= SEQUENCE {
+    qosConfigQcePrecedenceIndex  Integer32,
+    qosConfigQcePrecedenceQceId  Unsigned32
+}
+
+qosConfigQcePrecedenceIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "QCE precedence index. Indicates the position in QCL."
+    ::= { qosConfigQcePrecedenceEntry 1 }
+
+qosConfigQcePrecedenceQceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "QCE Id."
+    ::= { qosConfigQcePrecedenceEntry 2 }
+
+qosStatus OBJECT IDENTIFIER
+    ::= { qosMibObjects 3 }
+
+qosStatusInterface OBJECT IDENTIFIER
+    ::= { qosStatus 2 }
+
+qosStatusInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides QoS status for QoS manageable interfaces"
+    ::= { qosStatusInterface 1 }
+
+qosStatusInterfaceEntry OBJECT-TYPE
+    SYNTAX      QosStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the status for a specific interface"
+    INDEX       { qosStatusInterfaceIfIndex }
+    ::= { qosStatusInterfaceTable 1 }
+
+QosStatusInterfaceEntry ::= SEQUENCE {
+    qosStatusInterfaceIfIndex  InterfaceIndex,
+    qosStatusInterfaceCos      Unsigned32
+}
+
+qosStatusInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface index."
+    ::= { qosStatusInterfaceEntry 1 }
+
+qosStatusInterfaceCos OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Some subsystems are allowed to modify the default CoS value for an
+         interface. This object shows the actual default CoS value a packet is
+         classified to."
+    ::= { qosStatusInterfaceEntry 2 }
+
+qosStatusInterfaceSchedulerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosStatusInterfaceSchedulerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the mapping of (interface, queue) to weight values.
+         
+         The mappings given by this table are the 'real' weights in percent as
+         used by the hardware."
+    ::= { qosStatusInterface 2 }
+
+qosStatusInterfaceSchedulerEntry OBJECT-TYPE
+    SYNTAX      QosStatusInterfaceSchedulerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the scheduler status for a specific queue."
+    INDEX       { qosStatusInterfaceSchedulerIfIndex,
+                  qosStatusInterfaceSchedulerQueue }
+    ::= { qosStatusInterfaceSchedulerTable 1 }
+
+QosStatusInterfaceSchedulerEntry ::= SEQUENCE {
+    qosStatusInterfaceSchedulerIfIndex  InterfaceIndex,
+    qosStatusInterfaceSchedulerQueue    Integer32,
+    qosStatusInterfaceSchedulerWeight   Percent
+}
+
+qosStatusInterfaceSchedulerIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Logical interface index."
+    ::= { qosStatusInterfaceSchedulerEntry 1 }
+
+qosStatusInterfaceSchedulerQueue OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Queue index."
+    ::= { qosStatusInterfaceSchedulerEntry 2 }
+
+qosStatusInterfaceSchedulerWeight OBJECT-TYPE
+    SYNTAX      Percent
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The weight for this queue.
+         
+         Valid range is 1-100."
+    ::= { qosStatusInterfaceSchedulerEntry 3 }
+
+qosStatusQce OBJECT IDENTIFIER
+    ::= { qosStatus 3 }
+
+qosStatusQceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosStatusQceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the QCE status in the hardware table.
+         
+         This is an optional table and is only present if QosCapabilitiesHasQce
+         is true."
+    ::= { qosStatusQce 1 }
+
+qosStatusQceEntry OBJECT-TYPE
+    SYNTAX      QosStatusQceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row contains the status of a single QCE."
+    INDEX       { qosStatusQceSwitchId, qosStatusQceIndex }
+    ::= { qosStatusQceTable 1 }
+
+QosStatusQceEntry ::= SEQUENCE {
+    qosStatusQceSwitchId  Unsigned32,
+    qosStatusQceIndex     Integer32,
+    qosStatusQceUserId    QosQceUserType,
+    qosStatusQceQceId     Unsigned32,
+    qosStatusQceConflict  TruthValue
+}
+
+qosStatusQceSwitchId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Switch Id index."
+    ::= { qosStatusQceEntry 1 }
+
+qosStatusQceIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "QCE precedence index. Indicates the position in QCL."
+    ::= { qosStatusQceEntry 2 }
+
+qosStatusQceUserId OBJECT-TYPE
+    SYNTAX      QosQceUserType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "User Id."
+    ::= { qosStatusQceEntry 3 }
+
+qosStatusQceQceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "QCE Id."
+    ::= { qosStatusQceEntry 4 }
+
+qosStatusQceConflict OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If true, a resource conflict is detected."
+    ::= { qosStatusQceEntry 100 }
+
+qosControl OBJECT IDENTIFIER
+    ::= { qosMibObjects 4 }
+
+qosControlQce OBJECT IDENTIFIER
+    ::= { qosControl 3 }
+
+qosControlQceConflictResolve OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set to true to resolve resource conflicts.
+         
+         If different components competes for the same resources in the switch,
+         it is possible that some of resources needed by one or more QCE are not
+         available.
+         
+         These conflicts, if any, are shown in the qosStatusQceTable.
+         
+         To solve these conflicts, you must delete one or more of the competing
+         settings and set ConflictResolve to true. The switch will then reapply
+         the current QCE configuration.
+         
+         This object is only valid if QosCapabilitiesHasQce is true."
+    ::= { qosControlQce 1 }
+
+qosMibConformance OBJECT IDENTIFIER
+    ::= { qosMib 2 }
+
+qosMibCompliances OBJECT IDENTIFIER
+    ::= { qosMibConformance 1 }
+
+qosMibGroups OBJECT IDENTIFIER
+    ::= { qosMibConformance 2 }
+
+qosCapabilitiesInfoGroup OBJECT-GROUP
+    OBJECTS     { qosCapabilitiesClassMin,
+                  qosCapabilitiesClassMax,
+                  qosCapabilitiesDplMin,
+                  qosCapabilitiesDplMax,
+                  qosCapabilitiesWredGroupMin,
+                  qosCapabilitiesWredGroupMax,
+                  qosCapabilitiesWredDplMin,
+                  qosCapabilitiesWredDplMax,
+                  qosCapabilitiesQceIdMin,
+                  qosCapabilitiesQceIdMax,
+                  qosCapabilitiesPortPolicerBitRateMin,
+                  qosCapabilitiesPortPolicerBitRateMax,
+                  qosCapabilitiesPortPolicerBitBurstMin,
+                  qosCapabilitiesPortPolicerBitBurstMax,
+                  qosCapabilitiesPortPolicerFrameRateMin,
+                  qosCapabilitiesPortPolicerFrameRateMax,
+                  qosCapabilitiesPortPolicerFrameBurstMin,
+                  qosCapabilitiesPortPolicerFrameBurstMax,
+                  qosCapabilitiesQueuePolicerBitRateMin,
+                  qosCapabilitiesQueuePolicerBitRateMax,
+                  qosCapabilitiesQueuePolicerBitBurstMin,
+                  qosCapabilitiesQueuePolicerBitBurstMax,
+                  qosCapabilitiesQueuePolicerFrameRateMin,
+                  qosCapabilitiesQueuePolicerFrameRateMax,
+                  qosCapabilitiesQueuePolicerFrameBurstMin,
+                  qosCapabilitiesQueuePolicerFrameBurstMax,
+                  qosCapabilitiesPortShaperBitRateMin,
+                  qosCapabilitiesPortShaperBitRateMax,
+                  qosCapabilitiesPortShaperBitBurstMin,
+                  qosCapabilitiesPortShaperBitBurstMax,
+                  qosCapabilitiesPortShaperFrameRateMin,
+                  qosCapabilitiesPortShaperFrameRateMax,
+                  qosCapabilitiesPortShaperFrameBurstMin,
+                  qosCapabilitiesPortShaperFrameBurstMax,
+                  qosCapabilitiesQueueShaperBitRateMin,
+                  qosCapabilitiesQueueShaperBitRateMax,
+                  qosCapabilitiesQueueShaperBitBurstMin,
+                  qosCapabilitiesQueueShaperBitBurstMax,
+                  qosCapabilitiesQueueShaperFrameRateMin,
+                  qosCapabilitiesQueueShaperFrameRateMax,
+                  qosCapabilitiesQueueShaperFrameBurstMin,
+                  qosCapabilitiesQueueShaperFrameBurstMax,
+                  qosCapabilitiesGlobalStormBitRateMin,
+                  qosCapabilitiesGlobalStormBitRateMax,
+                  qosCapabilitiesGlobalStormBitBurstMin,
+                  qosCapabilitiesGlobalStormBitBurstMax,
+                  qosCapabilitiesGlobalStormFrameRateMin,
+                  qosCapabilitiesGlobalStormFrameRateMax,
+                  qosCapabilitiesGlobalStormFrameBurstMin,
+                  qosCapabilitiesGlobalStormFrameBurstMax,
+                  qosCapabilitiesPortStormBitRateMin,
+                  qosCapabilitiesPortStormBitRateMax,
+                  qosCapabilitiesPortStormBitBurstMin,
+                  qosCapabilitiesPortStormBitBurstMax,
+                  qosCapabilitiesPortStormFrameRateMin,
+                  qosCapabilitiesPortStormFrameRateMax,
+                  qosCapabilitiesPortStormFrameBurstMin,
+                  qosCapabilitiesPortStormFrameBurstMax,
+                  qosCapabilitiesDwrrCountMask,
+                  qosCapabilitiesHasGlobalStormPolicers,
+                  qosCapabilitiesHasPortStormPolicers,
+                  qosCapabilitiesHasPortQueuePolicers,
+                  qosCapabilitiesHasWredV1,
+                  qosCapabilitiesHasWredV2,
+                  qosCapabilitiesHasFixedTagCosMap,
+                  qosCapabilitiesHasTagClassification,
+                  qosCapabilitiesHasTagRemarking,
+                  qosCapabilitiesHasDscp,
+                  qosCapabilitiesHasDscpDplClassification,
+                  qosCapabilitiesHasDscpDplRemarking,
+                  qosCapabilitiesHasPortPolicersFc,
+                  qosCapabilitiesHasQueuePolicersFc,
+                  qosCapabilitiesHasPortShapersDlb,
+                  qosCapabilitiesHasQueueShapersDlb,
+                  qosCapabilitiesHasQueueShapersExcess,
+                  qosCapabilitiesHasWredV3,
+                  qosCapabilitiesHasQce,
+                  qosCapabilitiesHasQceAddressMode,
+                  qosCapabilitiesHasQceKeyType,
+                  qosCapabilitiesHasQceMacOui,
+                  qosCapabilitiesHasQceDmac,
+                  qosCapabilitiesHasQceDip,
+                  qosCapabilitiesHasQceCTag,
+                  qosCapabilitiesHasQceSTag,
+                  qosCapabilitiesHasQceInnerTag,
+                  qosCapabilitiesHasQceActionPcpDei,
+                  qosCapabilitiesHasQceActionPolicy,
+                  qosCapabilitiesHasShapersRt }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 1 }
+
+qosConfigGlobalsStormPolicersUnicastInfoGroup OBJECT-GROUP
+    OBJECTS     { qosConfigGlobalsStormPolicersUnicastEnable,
+                  qosConfigGlobalsStormPolicersUnicastRate,
+                  qosConfigGlobalsStormPolicersUnicastFrameRate }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 2 }
+
+qosConfigGlobalsStormPolicersMulticastInfoGroup OBJECT-GROUP
+    OBJECTS     { qosConfigGlobalsStormPolicersMulticastEnable,
+                  qosConfigGlobalsStormPolicersMulticastRate,
+                  qosConfigGlobalsStormPolicersMulticastFrameRate }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 3 }
+
+qosConfigGlobalsStormPolicersBroadcastInfoGroup OBJECT-GROUP
+    OBJECTS     { qosConfigGlobalsStormPolicersBroadcastEnable,
+                  qosConfigGlobalsStormPolicersBroadcastRate,
+                  qosConfigGlobalsStormPolicersBroadcastFrameRate }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 4 }
+
+qosConfigGlobalsWredTableInfoGroup OBJECT-GROUP
+    OBJECTS     { qosConfigGlobalsWredEnable,
+                  qosConfigGlobalsWredMinimumFillLevel,
+                  qosConfigGlobalsWredMaximum,
+                  qosConfigGlobalsWredMaxSelector,
+                  qosConfigGlobalsWredMaximumDp1,
+                  qosConfigGlobalsWredMaximumDp2,
+                  qosConfigGlobalsWredMaximumDp3 }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 5 }
+
+qosConfigGlobalsDscpTableInfoGroup OBJECT-GROUP
+    OBJECTS     { qosConfigGlobalsDscpTrust,
+                  qosConfigGlobalsDscpCos,
+                  qosConfigGlobalsDscpDpl,
+                  qosConfigGlobalsDscpIngressTranslation,
+                  qosConfigGlobalsDscpClassify,
+                  qosConfigGlobalsDscpEgressTranslation,
+                  qosConfigGlobalsDscpEgressTranslationDp1 }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 6 }
+
+qosConfigGlobalsCosToDscpTableInfoGroup OBJECT-GROUP
+    OBJECTS     { qosConfigGlobalsCosToDscpDscp,
+                  qosConfigGlobalsCosToDscpDscpDp1,
+                  qosConfigGlobalsCosToDscpDscpDp2,
+                  qosConfigGlobalsCosToDscpDscpDp3 }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 7 }
+
+qosConfigInterfaceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { qosConfigInterfaceCos,
+                  qosConfigInterfaceDpl,
+                  qosConfigInterfacePcp,
+                  qosConfigInterfaceDei,
+                  qosConfigInterfaceTrustTag,
+                  qosConfigInterfaceTrustDscp,
+                  qosConfigInterfaceDwrrCount,
+                  qosConfigInterfaceTagRemarkingMode,
+                  qosConfigInterfaceTagPcp,
+                  qosConfigInterfaceTagDei,
+                  qosConfigInterfaceDscpTranslate,
+                  qosConfigInterfaceDscpClassify,
+                  qosConfigInterfaceDscpRemark,
+                  qosConfigInterfaceQceAddressMode,
+                  qosConfigInterfaceQceKeyType,
+                  qosConfigInterfaceWredGroup }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 8 }
+
+qosConfigInterfaceTagToCosTableInfoGroup OBJECT-GROUP
+    OBJECTS     { qosConfigInterfaceTagToCosCos,
+                  qosConfigInterfaceTagToCosDpl }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 9 }
+
+qosConfigInterfaceCosToTagTableInfoGroup OBJECT-GROUP
+    OBJECTS     { qosConfigInterfaceCosToTagPcp,
+                  qosConfigInterfaceCosToTagDei }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 10 }
+
+qosConfigInterfacePolicerTableInfoGroup OBJECT-GROUP
+    OBJECTS     { qosConfigInterfacePolicerEnable,
+                  qosConfigInterfacePolicerFrameRate,
+                  qosConfigInterfacePolicerFlowControl,
+                  qosConfigInterfacePolicerCir }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 11 }
+
+qosConfigInterfaceQueuePolicerTableInfoGroup OBJECT-GROUP
+    OBJECTS     { qosConfigInterfaceQueuePolicerEnable,
+                  qosConfigInterfaceQueuePolicerCir }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 12 }
+
+qosConfigInterfaceShaperTableInfoGroup OBJECT-GROUP
+    OBJECTS     { qosConfigInterfaceShaperEnable,
+                  qosConfigInterfaceShaperCir,
+                  qosConfigInterfaceShaperRateType }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 13 }
+
+qosConfigInterfaceQueueShaperTableInfoGroup OBJECT-GROUP
+    OBJECTS     { qosConfigInterfaceQueueShaperEnable,
+                  qosConfigInterfaceQueueShaperExcess,
+                  qosConfigInterfaceQueueShaperCir,
+                  qosConfigInterfaceQueueShaperRateType }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 14 }
+
+qosConfigInterfaceSchedulerTableInfoGroup OBJECT-GROUP
+    OBJECTS     { qosConfigInterfaceSchedulerWeight }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 15 }
+
+qosConfigInterfaceStormPolicerUnicastTableInfoGroup OBJECT-GROUP
+    OBJECTS     { qosConfigInterfaceStormPolicerUnicastEnable,
+                  qosConfigInterfaceStormPolicerUnicastFrameRate,
+                  qosConfigInterfaceStormPolicerUnicastCir }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 16 }
+
+qosConfigInterfaceStormPolicerBroadcastTableInfoGroup OBJECT-GROUP
+    OBJECTS     { qosConfigInterfaceStormPolicerBroadcastEnable,
+                  qosConfigInterfaceStormPolicerBroadcastFrameRate,
+                  qosConfigInterfaceStormPolicerBroadcastCir }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 17 }
+
+qosConfigInterfaceStormPolicerUnknownTableInfoGroup OBJECT-GROUP
+    OBJECTS     { qosConfigInterfaceStormPolicerUnknownEnable,
+                  qosConfigInterfaceStormPolicerUnknownFrameRate,
+                  qosConfigInterfaceStormPolicerUnknownCir }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 18 }
+
+qosConfigQceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { qosConfigQceNextQceId, qosConfigQceSwitchId,
+                  qosConfigQcePortList,
+                  qosConfigQceDestMacType,
+                  qosConfigQceDestMac,
+                  qosConfigQceDestMacMask, qosConfigQceSrcMac,
+                  qosConfigQceSrcMacMask,
+                  qosConfigQceVlanTagType,
+                  qosConfigQceVlanIdOp, qosConfigQceVlanId,
+                  qosConfigQceVlanIdRange, qosConfigQcePcp,
+                  qosConfigQceDei,
+                  qosConfigQceInnerVlanTagType,
+                  qosConfigQceInnerVlanIdOp,
+                  qosConfigQceInnerVlanId,
+                  qosConfigQceInnerVlanIdRange,
+                  qosConfigQceInnerPcp, qosConfigQceInnerDei,
+                  qosConfigQceFrameType, qosConfigQceEtype,
+                  qosConfigQceLlcDsap,
+                  qosConfigQceLlcDsapMask,
+                  qosConfigQceLlcSsap,
+                  qosConfigQceLlcSsapMask,
+                  qosConfigQceLlcControl,
+                  qosConfigQceLlcControlMask,
+                  qosConfigQceSnapPid,
+                  qosConfigQceSnapPidMask,
+                  qosConfigQceIpv4Fragment,
+                  qosConfigQceIpv4DscpOp,
+                  qosConfigQceIpv4Dscp,
+                  qosConfigQceIpv4DscpRange,
+                  qosConfigQceIpv4Protocol,
+                  qosConfigQceIpv4ProtocolMask,
+                  qosConfigQceIpv4SrcIp,
+                  qosConfigQceIpv4SrcIpMask,
+                  qosConfigQceIpv4DestIp,
+                  qosConfigQceIpv4DestIpMask,
+                  qosConfigQceIpv4SrcPortOp,
+                  qosConfigQceIpv4SrcPort,
+                  qosConfigQceIpv4SrcPortRange,
+                  qosConfigQceIpv4DestPortOp,
+                  qosConfigQceIpv4DestPort,
+                  qosConfigQceIpv4DestPortRange,
+                  qosConfigQceIpv6DscpOp,
+                  qosConfigQceIpv6Dscp,
+                  qosConfigQceIpv6DscpRange,
+                  qosConfigQceIpv6Protocol,
+                  qosConfigQceIpv6ProtocolMask,
+                  qosConfigQceIpv6SrcIp,
+                  qosConfigQceIpv6SrcIpMask,
+                  qosConfigQceIpv6DestIp,
+                  qosConfigQceIpv6DestIpMask,
+                  qosConfigQceIpv6SrcPortOp,
+                  qosConfigQceIpv6SrcPort,
+                  qosConfigQceIpv6SrcPortRange,
+                  qosConfigQceIpv6DestPortOp,
+                  qosConfigQceIpv6DestPort,
+                  qosConfigQceIpv6DestPortRange,
+                  qosConfigQceActionCosEnable,
+                  qosConfigQceActionCos,
+                  qosConfigQceActionDplEnable,
+                  qosConfigQceActionDpl,
+                  qosConfigQceActionDscpEnable,
+                  qosConfigQceActionDscp,
+                  qosConfigQceActionPcpDeiEnable,
+                  qosConfigQceActionPcp,
+                  qosConfigQceActionDei,
+                  qosConfigQceActionPolicyEnable,
+                  qosConfigQceActionPolicy,
+                  qosConfigQceAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 19 }
+
+qosConfigQceTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { qosConfigQceTableRowEditorQceId,
+                  qosConfigQceTableRowEditorNextQceId,
+                  qosConfigQceTableRowEditorSwitchId,
+                  qosConfigQceTableRowEditorPortList,
+                  qosConfigQceTableRowEditorDestMacType,
+                  qosConfigQceTableRowEditorDestMac,
+                  qosConfigQceTableRowEditorDestMacMask,
+                  qosConfigQceTableRowEditorSrcMac,
+                  qosConfigQceTableRowEditorSrcMacMask,
+                  qosConfigQceTableRowEditorVlanTagType,
+                  qosConfigQceTableRowEditorVlanIdOp,
+                  qosConfigQceTableRowEditorVlanId,
+                  qosConfigQceTableRowEditorVlanIdRange,
+                  qosConfigQceTableRowEditorPcp,
+                  qosConfigQceTableRowEditorDei,
+                  qosConfigQceTableRowEditorInnerVlanTagType,
+                  qosConfigQceTableRowEditorInnerVlanIdOp,
+                  qosConfigQceTableRowEditorInnerVlanId,
+                  qosConfigQceTableRowEditorInnerVlanIdRange,
+                  qosConfigQceTableRowEditorInnerPcp,
+                  qosConfigQceTableRowEditorInnerDei,
+                  qosConfigQceTableRowEditorFrameType,
+                  qosConfigQceTableRowEditorEtype,
+                  qosConfigQceTableRowEditorLlcDsap,
+                  qosConfigQceTableRowEditorLlcDsapMask,
+                  qosConfigQceTableRowEditorLlcSsap,
+                  qosConfigQceTableRowEditorLlcSsapMask,
+                  qosConfigQceTableRowEditorLlcControl,
+                  qosConfigQceTableRowEditorLlcControlMask,
+                  qosConfigQceTableRowEditorSnapPid,
+                  qosConfigQceTableRowEditorSnapPidMask,
+                  qosConfigQceTableRowEditorIpv4Fragment,
+                  qosConfigQceTableRowEditorIpv4DscpOp,
+                  qosConfigQceTableRowEditorIpv4Dscp,
+                  qosConfigQceTableRowEditorIpv4DscpRange,
+                  qosConfigQceTableRowEditorIpv4Protocol,
+                  qosConfigQceTableRowEditorIpv4ProtocolMask,
+                  qosConfigQceTableRowEditorIpv4SrcIp,
+                  qosConfigQceTableRowEditorIpv4SrcIpMask,
+                  qosConfigQceTableRowEditorIpv4DestIp,
+                  qosConfigQceTableRowEditorIpv4DestIpMask,
+                  qosConfigQceTableRowEditorIpv4SrcPortOp,
+                  qosConfigQceTableRowEditorIpv4SrcPort,
+                  qosConfigQceTableRowEditorIpv4SrcPortRange,
+                  qosConfigQceTableRowEditorIpv4DestPortOp,
+                  qosConfigQceTableRowEditorIpv4DestPort,
+                  qosConfigQceTableRowEditorIpv4DestPortRange,
+                  qosConfigQceTableRowEditorIpv6DscpOp,
+                  qosConfigQceTableRowEditorIpv6Dscp,
+                  qosConfigQceTableRowEditorIpv6DscpRange,
+                  qosConfigQceTableRowEditorIpv6Protocol,
+                  qosConfigQceTableRowEditorIpv6ProtocolMask,
+                  qosConfigQceTableRowEditorIpv6SrcIp,
+                  qosConfigQceTableRowEditorIpv6SrcIpMask,
+                  qosConfigQceTableRowEditorIpv6DestIp,
+                  qosConfigQceTableRowEditorIpv6DestIpMask,
+                  qosConfigQceTableRowEditorIpv6SrcPortOp,
+                  qosConfigQceTableRowEditorIpv6SrcPort,
+                  qosConfigQceTableRowEditorIpv6SrcPortRange,
+                  qosConfigQceTableRowEditorIpv6DestPortOp,
+                  qosConfigQceTableRowEditorIpv6DestPort,
+                  qosConfigQceTableRowEditorIpv6DestPortRange,
+                  qosConfigQceTableRowEditorActionCosEnable,
+                  qosConfigQceTableRowEditorActionCos,
+                  qosConfigQceTableRowEditorActionDplEnable,
+                  qosConfigQceTableRowEditorActionDpl,
+                  qosConfigQceTableRowEditorActionDscpEnable,
+                  qosConfigQceTableRowEditorActionDscp,
+                  qosConfigQceTableRowEditorActionPcpDeiEnable,
+                  qosConfigQceTableRowEditorActionPcp,
+                  qosConfigQceTableRowEditorActionDei,
+                  qosConfigQceTableRowEditorActionPolicyEnable,
+                  qosConfigQceTableRowEditorActionPolicy,
+                  qosConfigQceTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 20 }
+
+qosConfigQcePrecedenceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { qosConfigQcePrecedenceQceId }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 21 }
+
+qosStatusInterfaceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { qosStatusInterfaceCos }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 22 }
+
+qosStatusInterfaceSchedulerTableInfoGroup OBJECT-GROUP
+    OBJECTS     { qosStatusInterfaceSchedulerWeight }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 23 }
+
+qosStatusQceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { qosStatusQceUserId, qosStatusQceQceId,
+                  qosStatusQceConflict }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 24 }
+
+qosControlQceInfoGroup OBJECT-GROUP
+    OBJECTS     { qosControlQceConflictResolve }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { qosMibGroups 25 }
+
+qosMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { qosCapabilitiesInfoGroup,
+                       qosConfigGlobalsStormPolicersUnicastInfoGroup,
+                       qosConfigGlobalsStormPolicersMulticastInfoGroup,
+                       qosConfigGlobalsStormPolicersBroadcastInfoGroup,
+                       qosConfigGlobalsWredTableInfoGroup,
+                       qosConfigGlobalsDscpTableInfoGroup,
+                       qosConfigGlobalsCosToDscpTableInfoGroup,
+                       qosConfigInterfaceTableInfoGroup,
+                       qosConfigInterfaceTagToCosTableInfoGroup,
+                       qosConfigInterfaceCosToTagTableInfoGroup,
+                       qosConfigInterfacePolicerTableInfoGroup,
+                       qosConfigInterfaceQueuePolicerTableInfoGroup,
+                       qosConfigInterfaceShaperTableInfoGroup,
+                       qosConfigInterfaceQueueShaperTableInfoGroup,
+                       qosConfigInterfaceSchedulerTableInfoGroup,
+                       qosConfigInterfaceStormPolicerUnicastTableInfoGroup,
+                       qosConfigInterfaceStormPolicerBroadcastTableInfoGroup,
+                       qosConfigInterfaceStormPolicerUnknownTableInfoGroup,
+                       qosConfigQceTableInfoGroup,
+                       qosConfigQceTableRowEditorInfoGroup,
+                       qosConfigQcePrecedenceTableInfoGroup,
+                       qosStatusInterfaceTableInfoGroup,
+                       qosStatusInterfaceSchedulerTableInfoGroup,
+                       qosStatusQceTableInfoGroup,
+                       qosControlQceInfoGroup }
+
+    ::= { qosMibCompliances 1 }
+
+END

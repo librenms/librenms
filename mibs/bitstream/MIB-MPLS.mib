@@ -1,0 +1,4380 @@
+-- *****************************************************************
+-- MIB-MPLS: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-MPLS DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    Counter64 FROM SNMPv2-SMI
+    Integer32 FROM SNMPv2-SMI
+    IpAddress FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    MacAddress FROM SNMPv2-TC
+    TruthValue FROM SNMPv2-TC
+    DisplayString FROM BTS-TC
+    InterfaceIndex FROM BTS-TC
+    RowEditorState FROM BTS-TC
+    Unsigned16 FROM BTS-TC
+    Unsigned8 FROM BTS-TC
+    ;
+
+mplsMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "Private MIB for Multi Protocol Label Switching, MPLS."
+    REVISION    "201506220000Z"
+    DESCRIPTION
+        "Added mplsStatisticsLinkTable"
+    REVISION    "201411170000Z"
+    DESCRIPTION
+        "Changed range for ccCarrierCode"
+    REVISION    "201411030000Z"
+    DESCRIPTION
+        "Added range to HQoSId, ForwardHQoSId, ReverseHQoSId and changed name of
+         tunnelmode from undefined to useglobal"
+    REVISION    "201410010000Z"
+    DESCRIPTION
+        "Added mplsStatusTunnelIngressLabel, mplsStatusTunnelEgressLabel
+         and mplsStatusTunnelWorkingActive to MplsStatusTunnelEntry"
+    REVISION    "201408040000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 127 }
+
+
+MplsStateType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Specifies the MPLS state."
+    SYNTAX      INTEGER { unconfigured(0), configured(1), up(2),
+                          down(3) }
+
+MplsTagType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Specifies the MPLS tag type."
+    SYNTAX      INTEGER { untagged(0), ctagged(1), stagged(2) }
+
+MplsTunnelMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Specifies the MPLS tunnel mode."
+    SYNTAX      INTEGER { pipe(0), shortpipe(1), uniform(2),
+                          useglobal(3) }
+
+MplsVccvType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Specifies the MPLS Vccv type."
+    SYNTAX      INTEGER { none(0), vccv1(1), vccv2(2), vccv3(3),
+                          vccv4(4) }
+
+mplsMibObjects OBJECT IDENTIFIER
+    ::= { mplsMib 1 }
+
+mplsCapabilities OBJECT IDENTIFIER
+    ::= { mplsMibObjects 1 }
+
+mplsCapabilitiesMaxLinks OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of links."
+    ::= { mplsCapabilities 1 }
+
+mplsCapabilitiesMaxTunnels OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of tunnels."
+    ::= { mplsCapabilities 2 }
+
+mplsCapabilitiesMaxPw OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of pseudo wires."
+    ::= { mplsCapabilities 3 }
+
+mplsCapabilitiesMaxLsp OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of LSP and xc."
+    ::= { mplsCapabilities 4 }
+
+mplsCapabilitiesMaxCosMap OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of Class of Service maps."
+    ::= { mplsCapabilities 5 }
+
+mplsCapabilitiesMaxTunnelNameLen OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of characters in tunnel name."
+    ::= { mplsCapabilities 6 }
+
+mplsConfig OBJECT IDENTIFIER
+    ::= { mplsMibObjects 2 }
+
+mplsConfigGlobal OBJECT IDENTIFIER
+    ::= { mplsConfig 1 }
+
+mplsConfigGlobalMain OBJECT IDENTIFIER
+    ::= { mplsConfigGlobal 1 }
+
+mplsConfigGlobalMainTunnelMode OBJECT-TYPE
+    SYNTAX      MplsTunnelMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Tunnel Mode"
+    ::= { mplsConfigGlobalMain 1 }
+
+mplsConfigGlobalMainGlobalId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global ID (for OAM)"
+    ::= { mplsConfigGlobalMain 2 }
+
+mplsConfigGlobalMainNodeId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Node ID (for OAM)"
+    ::= { mplsConfigGlobalMain 3 }
+
+mplsConfigGlobalMainIccCarrierCode OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..6))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "ITU-T M.1400 Carrier Code (ICC)."
+    ::= { mplsConfigGlobalMain 4 }
+
+mplsConfigLink OBJECT IDENTIFIER
+    ::= { mplsConfig 2 }
+
+mplsConfigLinkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsConfigLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the MPLS Link configuration table."
+    ::= { mplsConfigLink 1 }
+
+mplsConfigLinkEntry OBJECT-TYPE
+    SYNTAX      MplsConfigLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents an MPLS Link."
+    INDEX       { mplsConfigLinkGroupIfIndex }
+    ::= { mplsConfigLinkTable 1 }
+
+MplsConfigLinkEntry ::= SEQUENCE {
+    mplsConfigLinkGroupIfIndex       InterfaceIndex,
+    mplsConfigLinkPort               InterfaceIndex,
+    mplsConfigLinkMACAddressNextHop  MacAddress,
+    mplsConfigLinkMACAddress         MacAddress,
+    mplsConfigLinkVLANTagType        MplsTagType,
+    mplsConfigLinkVLANId             Unsigned16,
+    mplsConfigLinkVLANpcp            Unsigned32,
+    mplsConfigLinkVLANdei            Unsigned8,
+    mplsConfigLinkSrcNodeId          IpAddress,
+    mplsConfigLinkSrcGlobalId        Unsigned32,
+    mplsConfigLinkDstNodeId          IpAddress,
+    mplsConfigLinkDstGlobalId        Unsigned32,
+    mplsConfigLinkDstIfNum           Unsigned32,
+    mplsConfigLinkSrcNodeIdValid     TruthValue,
+    mplsConfigLinkSrcGlobalIdValid   TruthValue,
+    mplsConfigLinkDstGlobalIdValid   TruthValue,
+    mplsConfigLinkAction             RowEditorState
+}
+
+mplsConfigLinkGroupIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MPLS group interface index. Valid range is BASE+GROUP where the base is
+         specified in the interface index textual convention and the group
+         number range is 1..maximum group number. This maximum is
+         platform-specific and can be retrieved from the MPLS capabilities."
+    ::= { mplsConfigLinkEntry 1 }
+
+mplsConfigLinkPort OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Physical port interface index."
+    ::= { mplsConfigLinkEntry 2 }
+
+mplsConfigLinkMACAddressNextHop OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "MAC address of peer (next hop) MPLS node."
+    ::= { mplsConfigLinkEntry 3 }
+
+mplsConfigLinkMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "MAC address of this MPLS interface."
+    ::= { mplsConfigLinkEntry 4 }
+
+mplsConfigLinkVLANTagType OBJECT-TYPE
+    SYNTAX      MplsTagType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "VLAN tag type."
+    ::= { mplsConfigLinkEntry 5 }
+
+mplsConfigLinkVLANId OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "VLAN ID, if tag_type isn't untagged."
+    ::= { mplsConfigLinkEntry 6 }
+
+mplsConfigLinkVLANpcp OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "VLAN PCP; only relevant if tagged."
+    ::= { mplsConfigLinkEntry 7 }
+
+mplsConfigLinkVLANdei OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "VLAN DEI; only relevant if tagged."
+    ::= { mplsConfigLinkEntry 8 }
+
+mplsConfigLinkSrcNodeId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source node ID (for OAM)."
+    ::= { mplsConfigLinkEntry 9 }
+
+mplsConfigLinkSrcGlobalId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source global ID (for OAM)."
+    ::= { mplsConfigLinkEntry 10 }
+
+mplsConfigLinkDstNodeId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination node ID (for OAM)."
+    ::= { mplsConfigLinkEntry 11 }
+
+mplsConfigLinkDstGlobalId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination global ID (for OAM)."
+    ::= { mplsConfigLinkEntry 12 }
+
+mplsConfigLinkDstIfNum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination interface number (for OAM)."
+    ::= { mplsConfigLinkEntry 13 }
+
+mplsConfigLinkSrcNodeIdValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source node ID valid (for OAM)."
+    ::= { mplsConfigLinkEntry 14 }
+
+mplsConfigLinkSrcGlobalIdValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source global ID valid (for OAM)."
+    ::= { mplsConfigLinkEntry 15 }
+
+mplsConfigLinkDstGlobalIdValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination global ID valid (for OAM)."
+    ::= { mplsConfigLinkEntry 16 }
+
+mplsConfigLinkAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { mplsConfigLinkEntry 100 }
+
+mplsConfigLinkRowEditor OBJECT IDENTIFIER
+    ::= { mplsConfigLink 2 }
+
+mplsConfigLinkRowEditorGroupIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "MPLS group interface index. Valid range is BASE+GROUP where the base is
+         specified in the interface index textual convention and the group
+         number range is 1..maximum group number. This maximum is
+         platform-specific and can be retrieved from the MPLS capabilities."
+    ::= { mplsConfigLinkRowEditor 1 }
+
+mplsConfigLinkRowEditorPort OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Physical port interface index."
+    ::= { mplsConfigLinkRowEditor 2 }
+
+mplsConfigLinkRowEditorMACAddressNextHop OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "MAC address of peer (next hop) MPLS node."
+    ::= { mplsConfigLinkRowEditor 3 }
+
+mplsConfigLinkRowEditorMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "MAC address of this MPLS interface."
+    ::= { mplsConfigLinkRowEditor 4 }
+
+mplsConfigLinkRowEditorVLANTagType OBJECT-TYPE
+    SYNTAX      MplsTagType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "VLAN tag type."
+    ::= { mplsConfigLinkRowEditor 5 }
+
+mplsConfigLinkRowEditorVLANId OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "VLAN ID, if tag_type isn't untagged."
+    ::= { mplsConfigLinkRowEditor 6 }
+
+mplsConfigLinkRowEditorVLANpcp OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "VLAN PCP; only relevant if tagged."
+    ::= { mplsConfigLinkRowEditor 7 }
+
+mplsConfigLinkRowEditorVLANdei OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "VLAN DEI; only relevant if tagged."
+    ::= { mplsConfigLinkRowEditor 8 }
+
+mplsConfigLinkRowEditorSrcNodeId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source node ID (for OAM)."
+    ::= { mplsConfigLinkRowEditor 9 }
+
+mplsConfigLinkRowEditorSrcGlobalId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source global ID (for OAM)."
+    ::= { mplsConfigLinkRowEditor 10 }
+
+mplsConfigLinkRowEditorDstNodeId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination node ID (for OAM)."
+    ::= { mplsConfigLinkRowEditor 11 }
+
+mplsConfigLinkRowEditorDstGlobalId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination global ID (for OAM)."
+    ::= { mplsConfigLinkRowEditor 12 }
+
+mplsConfigLinkRowEditorDstIfNum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination interface number (for OAM)."
+    ::= { mplsConfigLinkRowEditor 13 }
+
+mplsConfigLinkRowEditorSrcNodeIdValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source node ID valid (for OAM)."
+    ::= { mplsConfigLinkRowEditor 14 }
+
+mplsConfigLinkRowEditorSrcGlobalIdValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source global ID valid (for OAM)."
+    ::= { mplsConfigLinkRowEditor 15 }
+
+mplsConfigLinkRowEditorDstGlobalIdValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination global ID valid (for OAM)."
+    ::= { mplsConfigLinkRowEditor 16 }
+
+mplsConfigLinkRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { mplsConfigLinkRowEditor 100 }
+
+mplsConfigTunnel OBJECT IDENTIFIER
+    ::= { mplsConfig 3 }
+
+mplsConfigTunnelTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsConfigTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the MPLS Tunnel configuration table."
+    ::= { mplsConfigTunnel 1 }
+
+mplsConfigTunnelEntry OBJECT-TYPE
+    SYNTAX      MplsConfigTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents an MPLS Tunnel."
+    INDEX       { mplsConfigTunnelGroupIfIndex }
+    ::= { mplsConfigTunnelTable 1 }
+
+MplsConfigTunnelEntry ::= SEQUENCE {
+    mplsConfigTunnelGroupIfIndex      InterfaceIndex,
+    mplsConfigTunnelTunnelName        DisplayString,
+    mplsConfigTunnelTunnelMode        MplsTunnelMode,
+    mplsConfigTunnelSrcNodeId         IpAddress,
+    mplsConfigTunnelSrcGlobalId       Unsigned32,
+    mplsConfigTunnelDstNodeId         IpAddress,
+    mplsConfigTunnelDstGlobalId       Unsigned32,
+    mplsConfigTunnelDstTunnelTpNum    Unsigned32,
+    mplsConfigTunnelSrcTunnelTpNum    Unsigned16,
+    mplsConfigTunnelSrcLspNum         Unsigned16,
+    mplsConfigTunnelDstLspNum         Unsigned16,
+    mplsConfigTunnelIsSpme            TruthValue,
+    mplsConfigTunnelSrcNodeIsValid    TruthValue,
+    mplsConfigTunnelSrcGlobalIdValid  TruthValue,
+    mplsConfigTunnelDstGlobalIdValid  TruthValue,
+    mplsConfigTunnelIngressLabel      Unsigned32,
+    mplsConfigTunnelEgressLabel       Unsigned32,
+    mplsConfigTunnelAttachInterface   InterfaceIndex,
+    mplsConfigTunnelTrafficClass      Unsigned8,
+    mplsConfigTunnelTtl               Unsigned8,
+    mplsConfigTunnelInCosMapId        Unsigned8,
+    mplsConfigTunnelOutCosMapId       Unsigned8,
+    mplsConfigTunnelIsLLsp            TruthValue,
+    mplsConfigTunnelLLspCos           Unsigned8,
+    mplsConfigTunnelAction            RowEditorState
+}
+
+mplsConfigTunnelGroupIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MPLS group interface index. Valid range is BASE+GROUP where the base is
+         specified in the interface index textual convention and the group
+         number range is 1..maximum group number. This maximum is
+         platform-specific and can be retrieved from the MPLS capabilities."
+    ::= { mplsConfigTunnelEntry 1 }
+
+mplsConfigTunnelTunnelName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..31))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Tunnel name."
+    ::= { mplsConfigTunnelEntry 2 }
+
+mplsConfigTunnelTunnelMode OBJECT-TYPE
+    SYNTAX      MplsTunnelMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DiffServ tunnel modes for Traffic Class and TTL."
+    ::= { mplsConfigTunnelEntry 3 }
+
+mplsConfigTunnelSrcNodeId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source node ID (for OAM)."
+    ::= { mplsConfigTunnelEntry 4 }
+
+mplsConfigTunnelSrcGlobalId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source global ID (for OAM)."
+    ::= { mplsConfigTunnelEntry 5 }
+
+mplsConfigTunnelDstNodeId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination node ID (for OAM)."
+    ::= { mplsConfigTunnelEntry 6 }
+
+mplsConfigTunnelDstGlobalId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination global ID (for OAM)."
+    ::= { mplsConfigTunnelEntry 7 }
+
+mplsConfigTunnelDstTunnelTpNum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination tunnel ID number (for OAM)."
+    ::= { mplsConfigTunnelEntry 8 }
+
+mplsConfigTunnelSrcTunnelTpNum OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source tunnel ID number (if SPME, for OAM)."
+    ::= { mplsConfigTunnelEntry 9 }
+
+mplsConfigTunnelSrcLspNum OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source LSP number (if SPME, for OAM)."
+    ::= { mplsConfigTunnelEntry 10 }
+
+mplsConfigTunnelDstLspNum OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination LSP number (if SPME, for OAM)."
+    ::= { mplsConfigTunnelEntry 11 }
+
+mplsConfigTunnelIsSpme OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TRUE if tunnel endpoint is an SPME (OAM)."
+    ::= { mplsConfigTunnelEntry 12 }
+
+mplsConfigTunnelSrcNodeIsValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source node ID valid (for OAM)."
+    ::= { mplsConfigTunnelEntry 13 }
+
+mplsConfigTunnelSrcGlobalIdValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source global ID valid (for OAM)."
+    ::= { mplsConfigTunnelEntry 14 }
+
+mplsConfigTunnelDstGlobalIdValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination global ID valid (for OAM)."
+    ::= { mplsConfigTunnelEntry 15 }
+
+mplsConfigTunnelIngressLabel OBJECT-TYPE
+    SYNTAX      Unsigned32 (16..1048575)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress MPLS label value or APPL_MPLSTP_LABEL_NONE."
+    ::= { mplsConfigTunnelEntry 16 }
+
+mplsConfigTunnelEgressLabel OBJECT-TYPE
+    SYNTAX      Unsigned32 (16..1048575)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Egress MPLS label value or APPL_MPLSTP_LABEL_NONE."
+    ::= { mplsConfigTunnelEntry 17 }
+
+mplsConfigTunnelAttachInterface OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "MPLS link interface or MPLS tunnel endpoint interface that tunnel
+         endpoint is attached to."
+    ::= { mplsConfigTunnelEntry 18 }
+
+mplsConfigTunnelTrafficClass OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Traffic class used on egress unless overruled by uniform tunnel mode."
+    ::= { mplsConfigTunnelEntry 19 }
+
+mplsConfigTunnelTtl OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Time-to-live used on egress unless overruled by uniform tunnel mode."
+    ::= { mplsConfigTunnelEntry 20 }
+
+mplsConfigTunnelInCosMapId OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Class of Service Map ID or 0 for no mapping."
+    ::= { mplsConfigTunnelEntry 21 }
+
+mplsConfigTunnelOutCosMapId OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Egress Class of Service Map ID or 0 for no mapping."
+    ::= { mplsConfigTunnelEntry 22 }
+
+mplsConfigTunnelIsLLsp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TRUE for L-LSP, FALSE for E-LSP. Note that for L-LSP, the Ingress Class
+         of Service Map only maps the ingress Traffic Class to Drop Precedence.
+         The Class of Service is given by the mplsConfigTunnelLLspCos field."
+    ::= { mplsConfigTunnelEntry 23 }
+
+mplsConfigTunnelLLspCos OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Class of Service for L-LSP (mplsConfigTunnelIsLLsp == TRUE)"
+    ::= { mplsConfigTunnelEntry 24 }
+
+mplsConfigTunnelAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { mplsConfigTunnelEntry 100 }
+
+mplsConfigTunnelRowEditor OBJECT IDENTIFIER
+    ::= { mplsConfigTunnel 2 }
+
+mplsConfigTunnelRowEditorGroupIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "MPLS group interface index. Valid range is BASE+GROUP where the base is
+         specified in the interface index textual convention and the group
+         number range is 1..maximum group number. This maximum is
+         platform-specific and can be retrieved from the MPLS capabilities."
+    ::= { mplsConfigTunnelRowEditor 1 }
+
+mplsConfigTunnelRowEditorTunnelName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..31))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Tunnel name."
+    ::= { mplsConfigTunnelRowEditor 2 }
+
+mplsConfigTunnelRowEditorTunnelMode OBJECT-TYPE
+    SYNTAX      MplsTunnelMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DiffServ tunnel modes for Traffic Class and TTL."
+    ::= { mplsConfigTunnelRowEditor 3 }
+
+mplsConfigTunnelRowEditorSrcNodeId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source node ID (for OAM)."
+    ::= { mplsConfigTunnelRowEditor 4 }
+
+mplsConfigTunnelRowEditorSrcGlobalId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source global ID (for OAM)."
+    ::= { mplsConfigTunnelRowEditor 5 }
+
+mplsConfigTunnelRowEditorDstNodeId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination node ID (for OAM)."
+    ::= { mplsConfigTunnelRowEditor 6 }
+
+mplsConfigTunnelRowEditorDstGlobalId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination global ID (for OAM)."
+    ::= { mplsConfigTunnelRowEditor 7 }
+
+mplsConfigTunnelRowEditorDstTunnelTpNum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination tunnel ID number (for OAM)."
+    ::= { mplsConfigTunnelRowEditor 8 }
+
+mplsConfigTunnelRowEditorSrcTunnelTpNum OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source tunnel ID number (if SPME, for OAM)."
+    ::= { mplsConfigTunnelRowEditor 9 }
+
+mplsConfigTunnelRowEditorSrcLspNum OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source LSP number (if SPME, for OAM)."
+    ::= { mplsConfigTunnelRowEditor 10 }
+
+mplsConfigTunnelRowEditorDstLspNum OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination LSP number (if SPME, for OAM)."
+    ::= { mplsConfigTunnelRowEditor 11 }
+
+mplsConfigTunnelRowEditorIsSpme OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TRUE if tunnel endpoint is an SPME (OAM)."
+    ::= { mplsConfigTunnelRowEditor 12 }
+
+mplsConfigTunnelRowEditorSrcNodeIsValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source node ID valid (for OAM)."
+    ::= { mplsConfigTunnelRowEditor 13 }
+
+mplsConfigTunnelRowEditorSrcGlobalIdValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source global ID valid (for OAM)."
+    ::= { mplsConfigTunnelRowEditor 14 }
+
+mplsConfigTunnelRowEditorDstGlobalIdValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination global ID valid (for OAM)."
+    ::= { mplsConfigTunnelRowEditor 15 }
+
+mplsConfigTunnelRowEditorIngressLabel OBJECT-TYPE
+    SYNTAX      Unsigned32 (16..1048575)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress MPLS label value or APPL_MPLSTP_LABEL_NONE."
+    ::= { mplsConfigTunnelRowEditor 16 }
+
+mplsConfigTunnelRowEditorEgressLabel OBJECT-TYPE
+    SYNTAX      Unsigned32 (16..1048575)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Egress MPLS label value or APPL_MPLSTP_LABEL_NONE."
+    ::= { mplsConfigTunnelRowEditor 17 }
+
+mplsConfigTunnelRowEditorAttachInterface OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "MPLS link interface or MPLS tunnel endpoint interface that tunnel
+         endpoint is attached to."
+    ::= { mplsConfigTunnelRowEditor 18 }
+
+mplsConfigTunnelRowEditorTrafficClass OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Traffic class used on egress unless overruled by uniform tunnel mode."
+    ::= { mplsConfigTunnelRowEditor 19 }
+
+mplsConfigTunnelRowEditorTtl OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Time-to-live used on egress unless overruled by uniform tunnel mode."
+    ::= { mplsConfigTunnelRowEditor 20 }
+
+mplsConfigTunnelRowEditorInCosMapId OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Class of Service Map ID or 0 for no mapping."
+    ::= { mplsConfigTunnelRowEditor 21 }
+
+mplsConfigTunnelRowEditorOutCosMapId OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Egress Class of Service Map ID or 0 for no mapping."
+    ::= { mplsConfigTunnelRowEditor 22 }
+
+mplsConfigTunnelRowEditorIsLLsp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TRUE for L-LSP, FALSE for E-LSP. Note that for L-LSP, the Ingress Class
+         of Service Map only maps the ingress Traffic Class to Drop Precedence.
+         The Class of Service is given by the mplsConfigTunnelLLspCos field."
+    ::= { mplsConfigTunnelRowEditor 23 }
+
+mplsConfigTunnelRowEditorLLspCos OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Class of Service for L-LSP (mplsConfigTunnelIsLLsp == TRUE)"
+    ::= { mplsConfigTunnelRowEditor 24 }
+
+mplsConfigTunnelRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { mplsConfigTunnelRowEditor 100 }
+
+mplsConfigLsp OBJECT IDENTIFIER
+    ::= { mplsConfig 4 }
+
+mplsConfigLspTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsConfigLspEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the MPLS Lsp configuration table."
+    ::= { mplsConfigLsp 1 }
+
+mplsConfigLspEntry OBJECT-TYPE
+    SYNTAX      MplsConfigLspEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents an MPLS Lsp."
+    INDEX       { mplsConfigLspGroupIndex }
+    ::= { mplsConfigLspTable 1 }
+
+MplsConfigLspEntry ::= SEQUENCE {
+    mplsConfigLspGroupIndex              Integer32,
+    mplsConfigLspXcName                  DisplayString,
+    mplsConfigLspSrcNodeId               IpAddress,
+    mplsConfigLspSrcNodeIdIsDefined      TruthValue,
+    mplsConfigLspSrcGlobalId             Unsigned32,
+    mplsConfigLspSrcGlobalIdIsDefined    TruthValue,
+    mplsConfigLspSrcTunnelTpNum          Unsigned16,
+    mplsConfigLspDstNodeId               IpAddress,
+    mplsConfigLspDstGlobalId             Unsigned32,
+    mplsConfigLspDstGlobalIdIsDefined    TruthValue,
+    mplsConfigLspDstTunnelTpNum          Unsigned16,
+    mplsConfigLspSrcLspNumber            Unsigned16,
+    mplsConfigLspDstLspNumber            Unsigned16,
+    mplsConfigLspForwardIngressLabel     Unsigned32,
+    mplsConfigLspForwardEgressLabel      Unsigned32,
+    mplsConfigLspForwardAttachInterface  InterfaceIndex,
+    mplsConfigLspForwardInCosMapId       Unsigned8,
+    mplsConfigLspForwardOutCosMapId      Unsigned8,
+    mplsConfigLspForwardIsLLsp           TruthValue,
+    mplsConfigLspForwardHQoSId           Unsigned16,
+    mplsConfigLspForwardLLspCos          Unsigned8,
+    mplsConfigLspReverseIngressLabel     Unsigned32,
+    mplsConfigLspReverseEgressLabel      Unsigned32,
+    mplsConfigLspReverseAttachInterface  InterfaceIndex,
+    mplsConfigLspReverseInCosMapId       Unsigned8,
+    mplsConfigLspReverseOutCosMapId      Unsigned8,
+    mplsConfigLspReverseIsLLsp           TruthValue,
+    mplsConfigLspReverseLLspCos          Unsigned8,
+    mplsConfigLspReverseHQoSId           Unsigned16,
+    mplsConfigLspAction                  RowEditorState
+}
+
+mplsConfigLspGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MPLS group index number. Valid range is (1..max groups). The maximum
+         group number is platform-specific and can be retrieved from the MPLS
+         capabilities."
+    ::= { mplsConfigLspEntry 1 }
+
+mplsConfigLspXcName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..31))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "LSP cross-connect name."
+    ::= { mplsConfigLspEntry 2 }
+
+mplsConfigLspSrcNodeId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source node ID (for OAM)."
+    ::= { mplsConfigLspEntry 3 }
+
+mplsConfigLspSrcNodeIdIsDefined OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates if Source node ID (for OAM) is defined."
+    ::= { mplsConfigLspEntry 4 }
+
+mplsConfigLspSrcGlobalId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source global ID (for OAM)."
+    ::= { mplsConfigLspEntry 5 }
+
+mplsConfigLspSrcGlobalIdIsDefined OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates if Source global ID (for OAM) is defined."
+    ::= { mplsConfigLspEntry 6 }
+
+mplsConfigLspSrcTunnelTpNum OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source tunnel ID number (for OAM)."
+    ::= { mplsConfigLspEntry 7 }
+
+mplsConfigLspDstNodeId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination node ID (for OAM)."
+    ::= { mplsConfigLspEntry 8 }
+
+mplsConfigLspDstGlobalId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination global ID (for OAM)."
+    ::= { mplsConfigLspEntry 9 }
+
+mplsConfigLspDstGlobalIdIsDefined OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates if Destination global ID (for OAM) is defined."
+    ::= { mplsConfigLspEntry 10 }
+
+mplsConfigLspDstTunnelTpNum OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination tunnel ID number (for OAM)."
+    ::= { mplsConfigLspEntry 11 }
+
+mplsConfigLspSrcLspNumber OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source LSP number (for OAM)."
+    ::= { mplsConfigLspEntry 12 }
+
+mplsConfigLspDstLspNumber OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination LSP number (for OAM)."
+    ::= { mplsConfigLspEntry 13 }
+
+mplsConfigLspForwardIngressLabel OBJECT-TYPE
+    SYNTAX      Unsigned32 (16..1048575)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress MPLS label value or APPL_MPLSTP_LABEL_NONE."
+    ::= { mplsConfigLspEntry 14 }
+
+mplsConfigLspForwardEgressLabel OBJECT-TYPE
+    SYNTAX      Unsigned32 (16..1048575)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Egress MPLS label value or APPL_MPLSTP_LABEL_NONE."
+    ::= { mplsConfigLspEntry 15 }
+
+mplsConfigLspForwardAttachInterface OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Egress MPLS link interface or MPLS tunnel interface for forward part of
+         LSP cross-connect."
+    ::= { mplsConfigLspEntry 16 }
+
+mplsConfigLspForwardInCosMapId OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Class of Service Map ID or 0 for forward part of LSP
+         cross-connect."
+    ::= { mplsConfigLspEntry 17 }
+
+mplsConfigLspForwardOutCosMapId OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Egress Class of Service Map ID or 0 for forward part of LSP
+         cross-connect."
+    ::= { mplsConfigLspEntry 18 }
+
+mplsConfigLspForwardIsLLsp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TRUE for L-LSP, FALSE for E-LSP. Note that for L-LSP, the Ingress Class
+         of Service Map only maps the ingress Traffic Class to Drop Precedence.
+         The Class of Service is given by the mplsConfigLspForwardLLspCos
+         field."
+    ::= { mplsConfigLspEntry 19 }
+
+mplsConfigLspForwardHQoSId OBJECT-TYPE
+    SYNTAX      Unsigned16 (0..256)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "HQoS Id for forward direction (1..256) or 0 for none"
+    ::= { mplsConfigLspEntry 20 }
+
+mplsConfigLspForwardLLspCos OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Class of Service for L-LSP (ForwardIsLLsp == TRUE)"
+    ::= { mplsConfigLspEntry 21 }
+
+mplsConfigLspReverseIngressLabel OBJECT-TYPE
+    SYNTAX      Unsigned32 (16..1048575)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress MPLS label value or APPL_MPLSTP_LABEL_NONE."
+    ::= { mplsConfigLspEntry 22 }
+
+mplsConfigLspReverseEgressLabel OBJECT-TYPE
+    SYNTAX      Unsigned32 (16..1048575)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Egress MPLS label value or APPL_MPLSTP_LABEL_NONE."
+    ::= { mplsConfigLspEntry 23 }
+
+mplsConfigLspReverseAttachInterface OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Egress MPLS link interface or MPLS tunnel endpoint interface for
+         reverse part of LSP cross-connect."
+    ::= { mplsConfigLspEntry 24 }
+
+mplsConfigLspReverseInCosMapId OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Class of Service Map ID or 0 for reverse part of LSP
+         cross-connect."
+    ::= { mplsConfigLspEntry 25 }
+
+mplsConfigLspReverseOutCosMapId OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Egress Class of Service Map ID or 0 for reverse part of LSP
+         cross-connect."
+    ::= { mplsConfigLspEntry 26 }
+
+mplsConfigLspReverseIsLLsp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TRUE for L-LSP, FALSE for E-LSP. Note that for L-LSP, the Ingress Class
+         of Service Map only maps the ingress Traffic Class to Drop Precedence.
+         The Class of Service is given by the mplsConfigLspReverseLLspCos
+         field."
+    ::= { mplsConfigLspEntry 27 }
+
+mplsConfigLspReverseLLspCos OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Class of Service for L-LSP (ReverseIsLLsp == TRUE)"
+    ::= { mplsConfigLspEntry 28 }
+
+mplsConfigLspReverseHQoSId OBJECT-TYPE
+    SYNTAX      Unsigned16 (0..256)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "HQoS Id for reverse direction (1..256) or 0 for none"
+    ::= { mplsConfigLspEntry 29 }
+
+mplsConfigLspAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { mplsConfigLspEntry 100 }
+
+mplsConfigLspRowEditor OBJECT IDENTIFIER
+    ::= { mplsConfigLsp 2 }
+
+mplsConfigLspRowEditorGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "MPLS group index number. Valid range is (1..max groups). The maximum
+         group number is platform-specific and can be retrieved from the MPLS
+         capabilities."
+    ::= { mplsConfigLspRowEditor 1 }
+
+mplsConfigLspRowEditorXcName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..31))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "LSP cross-connect name."
+    ::= { mplsConfigLspRowEditor 2 }
+
+mplsConfigLspRowEditorSrcNodeId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source node ID (for OAM)."
+    ::= { mplsConfigLspRowEditor 3 }
+
+mplsConfigLspRowEditorSrcNodeIdIsDefined OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates if Source node ID (for OAM) is defined."
+    ::= { mplsConfigLspRowEditor 4 }
+
+mplsConfigLspRowEditorSrcGlobalId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source global ID (for OAM)."
+    ::= { mplsConfigLspRowEditor 5 }
+
+mplsConfigLspRowEditorSrcGlobalIdIsDefined OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates if Source global ID (for OAM) is defined."
+    ::= { mplsConfigLspRowEditor 6 }
+
+mplsConfigLspRowEditorSrcTunnelTpNum OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source tunnel ID number (for OAM)."
+    ::= { mplsConfigLspRowEditor 7 }
+
+mplsConfigLspRowEditorDstNodeId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination node ID (for OAM)."
+    ::= { mplsConfigLspRowEditor 8 }
+
+mplsConfigLspRowEditorDstGlobalId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination global ID (for OAM)."
+    ::= { mplsConfigLspRowEditor 9 }
+
+mplsConfigLspRowEditorDstGlobalIdIsDefined OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates if Destination global ID (for OAM) is defined."
+    ::= { mplsConfigLspRowEditor 10 }
+
+mplsConfigLspRowEditorDstTunnelTpNum OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination tunnel ID number (for OAM)."
+    ::= { mplsConfigLspRowEditor 11 }
+
+mplsConfigLspRowEditorSrcLspNumber OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source LSP number (for OAM)."
+    ::= { mplsConfigLspRowEditor 12 }
+
+mplsConfigLspRowEditorDstLspNumber OBJECT-TYPE
+    SYNTAX      Unsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination LSP number (for OAM)."
+    ::= { mplsConfigLspRowEditor 13 }
+
+mplsConfigLspRowEditorForwardIngressLabel OBJECT-TYPE
+    SYNTAX      Unsigned32 (16..1048575)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress MPLS label value or APPL_MPLSTP_LABEL_NONE."
+    ::= { mplsConfigLspRowEditor 14 }
+
+mplsConfigLspRowEditorForwardEgressLabel OBJECT-TYPE
+    SYNTAX      Unsigned32 (16..1048575)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Egress MPLS label value or APPL_MPLSTP_LABEL_NONE."
+    ::= { mplsConfigLspRowEditor 15 }
+
+mplsConfigLspRowEditorForwardAttachInterface OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Egress MPLS link interface or MPLS tunnel interface for forward part of
+         LSP cross-connect."
+    ::= { mplsConfigLspRowEditor 16 }
+
+mplsConfigLspRowEditorForwardInCosMapId OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Class of Service Map ID or 0 for forward part of LSP
+         cross-connect."
+    ::= { mplsConfigLspRowEditor 17 }
+
+mplsConfigLspRowEditorForwardOutCosMapId OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Egress Class of Service Map ID or 0 for forward part of LSP
+         cross-connect."
+    ::= { mplsConfigLspRowEditor 18 }
+
+mplsConfigLspRowEditorForwardIsLLsp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TRUE for L-LSP, FALSE for E-LSP. Note that for L-LSP, the Ingress Class
+         of Service Map only maps the ingress Traffic Class to Drop Precedence.
+         The Class of Service is given by the mplsConfigLspForwardLLspCos
+         field."
+    ::= { mplsConfigLspRowEditor 19 }
+
+mplsConfigLspRowEditorForwardHQoSId OBJECT-TYPE
+    SYNTAX      Unsigned16 (0..256)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "HQoS Id for forward direction (1..256) or 0 for none"
+    ::= { mplsConfigLspRowEditor 20 }
+
+mplsConfigLspRowEditorForwardLLspCos OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Class of Service for L-LSP (ForwardIsLLsp == TRUE)"
+    ::= { mplsConfigLspRowEditor 21 }
+
+mplsConfigLspRowEditorReverseIngressLabel OBJECT-TYPE
+    SYNTAX      Unsigned32 (16..1048575)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress MPLS label value or APPL_MPLSTP_LABEL_NONE."
+    ::= { mplsConfigLspRowEditor 22 }
+
+mplsConfigLspRowEditorReverseEgressLabel OBJECT-TYPE
+    SYNTAX      Unsigned32 (16..1048575)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Egress MPLS label value or APPL_MPLSTP_LABEL_NONE."
+    ::= { mplsConfigLspRowEditor 23 }
+
+mplsConfigLspRowEditorReverseAttachInterface OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Egress MPLS link interface or MPLS tunnel endpoint interface for
+         reverse part of LSP cross-connect."
+    ::= { mplsConfigLspRowEditor 24 }
+
+mplsConfigLspRowEditorReverseInCosMapId OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Class of Service Map ID or 0 for reverse part of LSP
+         cross-connect."
+    ::= { mplsConfigLspRowEditor 25 }
+
+mplsConfigLspRowEditorReverseOutCosMapId OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Egress Class of Service Map ID or 0 for reverse part of LSP
+         cross-connect."
+    ::= { mplsConfigLspRowEditor 26 }
+
+mplsConfigLspRowEditorReverseIsLLsp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TRUE for L-LSP, FALSE for E-LSP. Note that for L-LSP, the Ingress Class
+         of Service Map only maps the ingress Traffic Class to Drop Precedence.
+         The Class of Service is given by the mplsConfigLspReverseLLspCos
+         field."
+    ::= { mplsConfigLspRowEditor 27 }
+
+mplsConfigLspRowEditorReverseLLspCos OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Class of Service for L-LSP (ReverseIsLLsp == TRUE)"
+    ::= { mplsConfigLspRowEditor 28 }
+
+mplsConfigLspRowEditorReverseHQoSId OBJECT-TYPE
+    SYNTAX      Unsigned16 (0..256)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "HQoS Id for reverse direction (1..256) or 0 for none"
+    ::= { mplsConfigLspRowEditor 29 }
+
+mplsConfigLspRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { mplsConfigLspRowEditor 100 }
+
+mplsConfigPw OBJECT IDENTIFIER
+    ::= { mplsConfig 5 }
+
+mplsConfigPwTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsConfigPwEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the MPLS Pseudo Wire configuration table."
+    ::= { mplsConfigPw 1 }
+
+mplsConfigPwEntry OBJECT-TYPE
+    SYNTAX      MplsConfigPwEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents an MPLS Pseudo Wire."
+    INDEX       { mplsConfigPwGroupIfIndex }
+    ::= { mplsConfigPwTable 1 }
+
+MplsConfigPwEntry ::= SEQUENCE {
+    mplsConfigPwGroupIfIndex          InterfaceIndex,
+    mplsConfigPwInLabel               Unsigned32,
+    mplsConfigPwOutLabel              Unsigned32,
+    mplsConfigPwControlWord           Unsigned32,
+    mplsConfigPwUseControlWord        TruthValue,
+    mplsConfigPwTunnelMode            MplsTunnelMode,
+    mplsConfigPwTrafficClass          Unsigned8,
+    mplsConfigPwTtl                   Unsigned8,
+    mplsConfigPwInCosMapId            Unsigned8,
+    mplsConfigPwOutCosMapId           Unsigned8,
+    mplsConfigPwIsLLsp                TruthValue,
+    mplsConfigPwLLspCos               Unsigned8,
+    mplsConfigPwAttachInterface       InterfaceIndex,
+    mplsConfigPwStitchPwInterface     InterfaceIndex,
+    mplsConfigPwVccvType              MplsVccvType,
+    mplsConfigPwHQoSId                Unsigned16,
+    mplsConfigPwSrcNodeId             IpAddress,
+    mplsConfigPwSrcNodeIdIsDefined    TruthValue,
+    mplsConfigPwSrcGlobalId           Unsigned32,
+    mplsConfigPwSrcGlobalIdIsDefined  TruthValue,
+    mplsConfigPwDstNodeId             IpAddress,
+    mplsConfigPwDstGlobalId           Unsigned32,
+    mplsConfigPwDstGlobalIdIsDefined  TruthValue,
+    mplsConfigPwSrcAcId               Unsigned32,
+    mplsConfigPwDstAcId               Unsigned32,
+    mplsConfigPwSrcAgiValue           OCTET STRING,
+    mplsConfigPwDstAgiValue           OCTET STRING,
+    mplsConfigPwSrcAgiType            Unsigned8,
+    mplsConfigPwSrcAgiLength          Unsigned8,
+    mplsConfigPwDstAgiType            Unsigned8,
+    mplsConfigPwDstAgiLength          Unsigned8,
+    mplsConfigPwAction                RowEditorState
+}
+
+mplsConfigPwGroupIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MPLS group interface index. Valid range is BASE+GROUP where the base is
+         specified in the interface index textual convention and the group
+         number range is 1..maximum group number. This maximum is
+         platform-specific and can be retrieved from the MPLS capabilities."
+    ::= { mplsConfigPwEntry 1 }
+
+mplsConfigPwInLabel OBJECT-TYPE
+    SYNTAX      Unsigned32 (16..1048575)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "PW local/ingress MPLS label value or APPL_MPLSTP_LABEL_NONE."
+    ::= { mplsConfigPwEntry 2 }
+
+mplsConfigPwOutLabel OBJECT-TYPE
+    SYNTAX      Unsigned32 (16..1048575)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "PW remote/egress MPLS label value or APPL_MPLSTP_LABEL_NONE."
+    ::= { mplsConfigPwEntry 3 }
+
+mplsConfigPwControlWord OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..268435455)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "PW control word value to use on egress."
+    ::= { mplsConfigPwEntry 4 }
+
+mplsConfigPwUseControlWord OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TRUE: Use control word on egress and ingress, FALSE: Do not use."
+    ::= { mplsConfigPwEntry 5 }
+
+mplsConfigPwTunnelMode OBJECT-TYPE
+    SYNTAX      MplsTunnelMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DiffServ tunnel modes for Traffic Class and TTL."
+    ::= { mplsConfigPwEntry 6 }
+
+mplsConfigPwTrafficClass OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Traffic class used on egress unless overruled by uniform tunnel mode."
+    ::= { mplsConfigPwEntry 7 }
+
+mplsConfigPwTtl OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Time-to-live used on egress unless overruled by uniform tunnel mode."
+    ::= { mplsConfigPwEntry 8 }
+
+mplsConfigPwInCosMapId OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Class of Service Map ID or 0 no mapping."
+    ::= { mplsConfigPwEntry 9 }
+
+mplsConfigPwOutCosMapId OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Egress Class of Service Map ID or 0 for no mapping."
+    ::= { mplsConfigPwEntry 10 }
+
+mplsConfigPwIsLLsp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TRUE for L-LSP, FALSE for E-LSP. Note that for L-LSP, the Ingress Class
+         of Service Map only maps the ingress Traffic Class to Drop Precedence.
+         The Class of Service is given by the LLspCos field."
+    ::= { mplsConfigPwEntry 11 }
+
+mplsConfigPwLLspCos OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Class of Service for L-LSP (IsLLsp == TRUE)"
+    ::= { mplsConfigPwEntry 12 }
+
+mplsConfigPwAttachInterface OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "MPLS link interface or MPLS tunnel endpoint number that PW is attached
+         to."
+    ::= { mplsConfigPwEntry 13 }
+
+mplsConfigPwStitchPwInterface OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "MPLS PW interface index to stitch this PW with, 0 for no stitch."
+    ::= { mplsConfigPwEntry 14 }
+
+mplsConfigPwVccvType OBJECT-TYPE
+    SYNTAX      MplsVccvType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "MPLS PW OAM Vccv type."
+    ::= { mplsConfigPwEntry 15 }
+
+mplsConfigPwHQoSId OBJECT-TYPE
+    SYNTAX      Unsigned16 (0..256)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "HQoS Id (1..256) or 0 for none. Will only take effect for stitched PWs."
+    ::= { mplsConfigPwEntry 16 }
+
+mplsConfigPwSrcNodeId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source node ID (for OAM)."
+    ::= { mplsConfigPwEntry 17 }
+
+mplsConfigPwSrcNodeIdIsDefined OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates if Source node ID (for OAM) is defined."
+    ::= { mplsConfigPwEntry 18 }
+
+mplsConfigPwSrcGlobalId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source global ID (for OAM)."
+    ::= { mplsConfigPwEntry 19 }
+
+mplsConfigPwSrcGlobalIdIsDefined OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates if Source global ID (for OAM) is defined."
+    ::= { mplsConfigPwEntry 20 }
+
+mplsConfigPwDstNodeId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination node ID (for OAM)."
+    ::= { mplsConfigPwEntry 21 }
+
+mplsConfigPwDstGlobalId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination global ID (for OAM)."
+    ::= { mplsConfigPwEntry 22 }
+
+mplsConfigPwDstGlobalIdIsDefined OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates if Destination global ID (for OAM) is defined."
+    ::= { mplsConfigPwEntry 23 }
+
+mplsConfigPwSrcAcId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source AC_ID (for OAM)."
+    ::= { mplsConfigPwEntry 24 }
+
+mplsConfigPwDstAcId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination AC_ID (for OAM)."
+    ::= { mplsConfigPwEntry 25 }
+
+mplsConfigPwSrcAgiValue OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(8))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source AGI Value (for OAM)."
+    ::= { mplsConfigPwEntry 26 }
+
+mplsConfigPwDstAgiValue OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(8))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination AGI Value (for OAM).."
+    ::= { mplsConfigPwEntry 27 }
+
+mplsConfigPwSrcAgiType OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source AGI Type (for OAM)."
+    ::= { mplsConfigPwEntry 28 }
+
+mplsConfigPwSrcAgiLength OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source AGI Length 0-7 (for OAM)."
+    ::= { mplsConfigPwEntry 29 }
+
+mplsConfigPwDstAgiType OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination AGI Type (for OAM)."
+    ::= { mplsConfigPwEntry 30 }
+
+mplsConfigPwDstAgiLength OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination AGI Length 0-7 (for OAM)."
+    ::= { mplsConfigPwEntry 31 }
+
+mplsConfigPwAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { mplsConfigPwEntry 100 }
+
+mplsConfigPwRowEditor OBJECT IDENTIFIER
+    ::= { mplsConfigPw 2 }
+
+mplsConfigPwRowEditorGroupIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "MPLS group interface index. Valid range is BASE+GROUP where the base is
+         specified in the interface index textual convention and the group
+         number range is 1..maximum group number. This maximum is
+         platform-specific and can be retrieved from the MPLS capabilities."
+    ::= { mplsConfigPwRowEditor 1 }
+
+mplsConfigPwRowEditorInLabel OBJECT-TYPE
+    SYNTAX      Unsigned32 (16..1048575)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "PW local/ingress MPLS label value or APPL_MPLSTP_LABEL_NONE."
+    ::= { mplsConfigPwRowEditor 2 }
+
+mplsConfigPwRowEditorOutLabel OBJECT-TYPE
+    SYNTAX      Unsigned32 (16..1048575)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "PW remote/egress MPLS label value or APPL_MPLSTP_LABEL_NONE."
+    ::= { mplsConfigPwRowEditor 3 }
+
+mplsConfigPwRowEditorControlWord OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..268435455)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "PW control word value to use on egress."
+    ::= { mplsConfigPwRowEditor 4 }
+
+mplsConfigPwRowEditorUseControlWord OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TRUE: Use control word on egress and ingress, FALSE: Do not use."
+    ::= { mplsConfigPwRowEditor 5 }
+
+mplsConfigPwRowEditorTunnelMode OBJECT-TYPE
+    SYNTAX      MplsTunnelMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DiffServ tunnel modes for Traffic Class and TTL."
+    ::= { mplsConfigPwRowEditor 6 }
+
+mplsConfigPwRowEditorTrafficClass OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Traffic class used on egress unless overruled by uniform tunnel mode."
+    ::= { mplsConfigPwRowEditor 7 }
+
+mplsConfigPwRowEditorTtl OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Time-to-live used on egress unless overruled by uniform tunnel mode."
+    ::= { mplsConfigPwRowEditor 8 }
+
+mplsConfigPwRowEditorInCosMapId OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Class of Service Map ID or 0 no mapping."
+    ::= { mplsConfigPwRowEditor 9 }
+
+mplsConfigPwRowEditorOutCosMapId OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Egress Class of Service Map ID or 0 for no mapping."
+    ::= { mplsConfigPwRowEditor 10 }
+
+mplsConfigPwRowEditorIsLLsp OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TRUE for L-LSP, FALSE for E-LSP. Note that for L-LSP, the Ingress Class
+         of Service Map only maps the ingress Traffic Class to Drop Precedence.
+         The Class of Service is given by the LLspCos field."
+    ::= { mplsConfigPwRowEditor 11 }
+
+mplsConfigPwRowEditorLLspCos OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Class of Service for L-LSP (IsLLsp == TRUE)"
+    ::= { mplsConfigPwRowEditor 12 }
+
+mplsConfigPwRowEditorAttachInterface OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "MPLS link interface or MPLS tunnel endpoint number that PW is attached
+         to."
+    ::= { mplsConfigPwRowEditor 13 }
+
+mplsConfigPwRowEditorStitchPwInterface OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "MPLS PW interface index to stitch this PW with, 0 for no stitch."
+    ::= { mplsConfigPwRowEditor 14 }
+
+mplsConfigPwRowEditorVccvType OBJECT-TYPE
+    SYNTAX      MplsVccvType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "MPLS PW OAM Vccv type."
+    ::= { mplsConfigPwRowEditor 15 }
+
+mplsConfigPwRowEditorHQoSId OBJECT-TYPE
+    SYNTAX      Unsigned16 (0..256)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "HQoS Id (1..256) or 0 for none. Will only take effect for stitched PWs."
+    ::= { mplsConfigPwRowEditor 16 }
+
+mplsConfigPwRowEditorSrcNodeId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source node ID (for OAM)."
+    ::= { mplsConfigPwRowEditor 17 }
+
+mplsConfigPwRowEditorSrcNodeIdIsDefined OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates if Source node ID (for OAM) is defined."
+    ::= { mplsConfigPwRowEditor 18 }
+
+mplsConfigPwRowEditorSrcGlobalId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source global ID (for OAM)."
+    ::= { mplsConfigPwRowEditor 19 }
+
+mplsConfigPwRowEditorSrcGlobalIdIsDefined OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates if Source global ID (for OAM) is defined."
+    ::= { mplsConfigPwRowEditor 20 }
+
+mplsConfigPwRowEditorDstNodeId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination node ID (for OAM)."
+    ::= { mplsConfigPwRowEditor 21 }
+
+mplsConfigPwRowEditorDstGlobalId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination global ID (for OAM)."
+    ::= { mplsConfigPwRowEditor 22 }
+
+mplsConfigPwRowEditorDstGlobalIdIsDefined OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates if Destination global ID (for OAM) is defined."
+    ::= { mplsConfigPwRowEditor 23 }
+
+mplsConfigPwRowEditorSrcAcId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source AC_ID (for OAM)."
+    ::= { mplsConfigPwRowEditor 24 }
+
+mplsConfigPwRowEditorDstAcId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination AC_ID (for OAM)."
+    ::= { mplsConfigPwRowEditor 25 }
+
+mplsConfigPwRowEditorSrcAgiValue OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(8))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source AGI Value (for OAM)."
+    ::= { mplsConfigPwRowEditor 26 }
+
+mplsConfigPwRowEditorDstAgiValue OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(8))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination AGI Value (for OAM).."
+    ::= { mplsConfigPwRowEditor 27 }
+
+mplsConfigPwRowEditorSrcAgiType OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source AGI Type (for OAM)."
+    ::= { mplsConfigPwRowEditor 28 }
+
+mplsConfigPwRowEditorSrcAgiLength OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Source AGI Length 0-7 (for OAM)."
+    ::= { mplsConfigPwRowEditor 29 }
+
+mplsConfigPwRowEditorDstAgiType OBJECT-TYPE
+    SYNTAX      Unsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination AGI Type (for OAM)."
+    ::= { mplsConfigPwRowEditor 30 }
+
+mplsConfigPwRowEditorDstAgiLength OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Destination AGI Length 0-7 (for OAM)."
+    ::= { mplsConfigPwRowEditor 31 }
+
+mplsConfigPwRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { mplsConfigPwRowEditor 100 }
+
+mplsConfigCosMap OBJECT IDENTIFIER
+    ::= { mplsConfig 6 }
+
+mplsConfigCosMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsConfigCosMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is the MPLS Class of Service map configuration table."
+    ::= { mplsConfigCosMap 1 }
+
+mplsConfigCosMapEntry OBJECT-TYPE
+    SYNTAX      MplsConfigCosMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in this table represents an MPLS Class of Service mapping."
+    INDEX       { mplsConfigCosMapGroupIndex }
+    ::= { mplsConfigCosMapTable 1 }
+
+MplsConfigCosMapEntry ::= SEQUENCE {
+    mplsConfigCosMapGroupIndex      Integer32,
+    mplsConfigCosMapInTcToCos0      Unsigned8,
+    mplsConfigCosMapInTcToCos1      Unsigned8,
+    mplsConfigCosMapInTcToCos2      Unsigned8,
+    mplsConfigCosMapInTcToCos3      Unsigned8,
+    mplsConfigCosMapInTcToCos4      Unsigned8,
+    mplsConfigCosMapInTcToCos5      Unsigned8,
+    mplsConfigCosMapInTcToCos6      Unsigned8,
+    mplsConfigCosMapInTcToCos7      Unsigned8,
+    mplsConfigCosMapInTcToDp0       Unsigned8,
+    mplsConfigCosMapInTcToDp1       Unsigned8,
+    mplsConfigCosMapInTcToDp2       Unsigned8,
+    mplsConfigCosMapInTcToDp3       Unsigned8,
+    mplsConfigCosMapInTcToDp4       Unsigned8,
+    mplsConfigCosMapInTcToDp5       Unsigned8,
+    mplsConfigCosMapInTcToDp6       Unsigned8,
+    mplsConfigCosMapInTcToDp7       Unsigned8,
+    mplsConfigCosMapOutCosDpToTc00  Unsigned8,
+    mplsConfigCosMapOutCosDpToTc10  Unsigned8,
+    mplsConfigCosMapOutCosDpToTc20  Unsigned8,
+    mplsConfigCosMapOutCosDpToTc30  Unsigned8,
+    mplsConfigCosMapOutCosDpToTc40  Unsigned8,
+    mplsConfigCosMapOutCosDpToTc50  Unsigned8,
+    mplsConfigCosMapOutCosDpToTc60  Unsigned8,
+    mplsConfigCosMapOutCosDpToTc70  Unsigned8,
+    mplsConfigCosMapOutCosDpToTc01  Unsigned8,
+    mplsConfigCosMapOutCosDpToTc11  Unsigned8,
+    mplsConfigCosMapOutCosDpToTc21  Unsigned8,
+    mplsConfigCosMapOutCosDpToTc31  Unsigned8,
+    mplsConfigCosMapOutCosDpToTc41  Unsigned8,
+    mplsConfigCosMapOutCosDpToTc51  Unsigned8,
+    mplsConfigCosMapOutCosDpToTc61  Unsigned8,
+    mplsConfigCosMapOutCosDpToTc71  Unsigned8,
+    mplsConfigCosMapAction          RowEditorState
+}
+
+mplsConfigCosMapGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MPLS group index number. Valid range is (1..max groups). The maximum
+         group number is platform-specific and can be retrieved from the MPLS
+         capabilities."
+    ::= { mplsConfigCosMapEntry 1 }
+
+mplsConfigCosMapInTcToCos0 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Class of Service mapping"
+    ::= { mplsConfigCosMapEntry 10 }
+
+mplsConfigCosMapInTcToCos1 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Class of Service mapping"
+    ::= { mplsConfigCosMapEntry 11 }
+
+mplsConfigCosMapInTcToCos2 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Class of Service mapping"
+    ::= { mplsConfigCosMapEntry 12 }
+
+mplsConfigCosMapInTcToCos3 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Class of Service mapping"
+    ::= { mplsConfigCosMapEntry 13 }
+
+mplsConfigCosMapInTcToCos4 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Class of Service mapping"
+    ::= { mplsConfigCosMapEntry 14 }
+
+mplsConfigCosMapInTcToCos5 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Class of Service mapping"
+    ::= { mplsConfigCosMapEntry 15 }
+
+mplsConfigCosMapInTcToCos6 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Class of Service mapping"
+    ::= { mplsConfigCosMapEntry 16 }
+
+mplsConfigCosMapInTcToCos7 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Class of Service mapping"
+    ::= { mplsConfigCosMapEntry 17 }
+
+mplsConfigCosMapInTcToDp0 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Drop Precedence mapping."
+    ::= { mplsConfigCosMapEntry 20 }
+
+mplsConfigCosMapInTcToDp1 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Drop Precedence mapping."
+    ::= { mplsConfigCosMapEntry 21 }
+
+mplsConfigCosMapInTcToDp2 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Drop Precedence mapping."
+    ::= { mplsConfigCosMapEntry 22 }
+
+mplsConfigCosMapInTcToDp3 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Drop Precedence mapping."
+    ::= { mplsConfigCosMapEntry 23 }
+
+mplsConfigCosMapInTcToDp4 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Drop Precedence mapping."
+    ::= { mplsConfigCosMapEntry 24 }
+
+mplsConfigCosMapInTcToDp5 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Drop Precedence mapping."
+    ::= { mplsConfigCosMapEntry 25 }
+
+mplsConfigCosMapInTcToDp6 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Drop Precedence mapping."
+    ::= { mplsConfigCosMapEntry 26 }
+
+mplsConfigCosMapInTcToDp7 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Drop Precedence mapping."
+    ::= { mplsConfigCosMapEntry 27 }
+
+mplsConfigCosMapOutCosDpToTc00 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (0) to Traffic Class
+         mapping."
+    ::= { mplsConfigCosMapEntry 30 }
+
+mplsConfigCosMapOutCosDpToTc10 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (0) to Traffic Class
+         mapping."
+    ::= { mplsConfigCosMapEntry 31 }
+
+mplsConfigCosMapOutCosDpToTc20 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (0) to Traffic Class
+         mapping."
+    ::= { mplsConfigCosMapEntry 32 }
+
+mplsConfigCosMapOutCosDpToTc30 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (0) to Traffic Class
+         mapping."
+    ::= { mplsConfigCosMapEntry 33 }
+
+mplsConfigCosMapOutCosDpToTc40 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (0) to Traffic Class
+         mapping."
+    ::= { mplsConfigCosMapEntry 34 }
+
+mplsConfigCosMapOutCosDpToTc50 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (0) to Traffic Class
+         mapping."
+    ::= { mplsConfigCosMapEntry 35 }
+
+mplsConfigCosMapOutCosDpToTc60 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (0) to Traffic Class
+         mapping."
+    ::= { mplsConfigCosMapEntry 36 }
+
+mplsConfigCosMapOutCosDpToTc70 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (0) to Traffic Class
+         mapping."
+    ::= { mplsConfigCosMapEntry 37 }
+
+mplsConfigCosMapOutCosDpToTc01 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (1) toTraffic Class
+         mapping."
+    ::= { mplsConfigCosMapEntry 40 }
+
+mplsConfigCosMapOutCosDpToTc11 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (1) toTraffic Class
+         mapping."
+    ::= { mplsConfigCosMapEntry 41 }
+
+mplsConfigCosMapOutCosDpToTc21 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (1) toTraffic Class
+         mapping."
+    ::= { mplsConfigCosMapEntry 42 }
+
+mplsConfigCosMapOutCosDpToTc31 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (1) toTraffic Class
+         mapping."
+    ::= { mplsConfigCosMapEntry 43 }
+
+mplsConfigCosMapOutCosDpToTc41 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (1) toTraffic Class
+         mapping."
+    ::= { mplsConfigCosMapEntry 44 }
+
+mplsConfigCosMapOutCosDpToTc51 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (1) toTraffic Class
+         mapping."
+    ::= { mplsConfigCosMapEntry 45 }
+
+mplsConfigCosMapOutCosDpToTc61 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (1) toTraffic Class
+         mapping."
+    ::= { mplsConfigCosMapEntry 46 }
+
+mplsConfigCosMapOutCosDpToTc71 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (1) toTraffic Class
+         mapping."
+    ::= { mplsConfigCosMapEntry 47 }
+
+mplsConfigCosMapAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { mplsConfigCosMapEntry 100 }
+
+mplsConfigCosMapRowEditor OBJECT IDENTIFIER
+    ::= { mplsConfigCosMap 2 }
+
+mplsConfigCosMapRowEditorGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "MPLS group index number. Valid range is (1..max groups). The maximum
+         group number is platform-specific and can be retrieved from the MPLS
+         capabilities."
+    ::= { mplsConfigCosMapRowEditor 1 }
+
+mplsConfigCosMapRowEditorInTcToCos0 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Class of Service mapping"
+    ::= { mplsConfigCosMapRowEditor 10 }
+
+mplsConfigCosMapRowEditorInTcToCos1 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Class of Service mapping"
+    ::= { mplsConfigCosMapRowEditor 11 }
+
+mplsConfigCosMapRowEditorInTcToCos2 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Class of Service mapping"
+    ::= { mplsConfigCosMapRowEditor 12 }
+
+mplsConfigCosMapRowEditorInTcToCos3 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Class of Service mapping"
+    ::= { mplsConfigCosMapRowEditor 13 }
+
+mplsConfigCosMapRowEditorInTcToCos4 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Class of Service mapping"
+    ::= { mplsConfigCosMapRowEditor 14 }
+
+mplsConfigCosMapRowEditorInTcToCos5 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Class of Service mapping"
+    ::= { mplsConfigCosMapRowEditor 15 }
+
+mplsConfigCosMapRowEditorInTcToCos6 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Class of Service mapping"
+    ::= { mplsConfigCosMapRowEditor 16 }
+
+mplsConfigCosMapRowEditorInTcToCos7 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Class of Service mapping"
+    ::= { mplsConfigCosMapRowEditor 17 }
+
+mplsConfigCosMapRowEditorInTcToDp0 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Drop Precedence mapping."
+    ::= { mplsConfigCosMapRowEditor 20 }
+
+mplsConfigCosMapRowEditorInTcToDp1 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Drop Precedence mapping."
+    ::= { mplsConfigCosMapRowEditor 21 }
+
+mplsConfigCosMapRowEditorInTcToDp2 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Drop Precedence mapping."
+    ::= { mplsConfigCosMapRowEditor 22 }
+
+mplsConfigCosMapRowEditorInTcToDp3 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Drop Precedence mapping."
+    ::= { mplsConfigCosMapRowEditor 23 }
+
+mplsConfigCosMapRowEditorInTcToDp4 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Drop Precedence mapping."
+    ::= { mplsConfigCosMapRowEditor 24 }
+
+mplsConfigCosMapRowEditorInTcToDp5 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Drop Precedence mapping."
+    ::= { mplsConfigCosMapRowEditor 25 }
+
+mplsConfigCosMapRowEditorInTcToDp6 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Drop Precedence mapping."
+    ::= { mplsConfigCosMapRowEditor 26 }
+
+mplsConfigCosMapRowEditorInTcToDp7 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress Traffic Class to Drop Precedence mapping."
+    ::= { mplsConfigCosMapRowEditor 27 }
+
+mplsConfigCosMapRowEditorOutCosDpToTc00 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (0) to Traffic Class
+         mapping."
+    ::= { mplsConfigCosMapRowEditor 30 }
+
+mplsConfigCosMapRowEditorOutCosDpToTc10 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (0) to Traffic Class
+         mapping."
+    ::= { mplsConfigCosMapRowEditor 31 }
+
+mplsConfigCosMapRowEditorOutCosDpToTc20 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (0) to Traffic Class
+         mapping."
+    ::= { mplsConfigCosMapRowEditor 32 }
+
+mplsConfigCosMapRowEditorOutCosDpToTc30 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (0) to Traffic Class
+         mapping."
+    ::= { mplsConfigCosMapRowEditor 33 }
+
+mplsConfigCosMapRowEditorOutCosDpToTc40 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (0) to Traffic Class
+         mapping."
+    ::= { mplsConfigCosMapRowEditor 34 }
+
+mplsConfigCosMapRowEditorOutCosDpToTc50 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (0) to Traffic Class
+         mapping."
+    ::= { mplsConfigCosMapRowEditor 35 }
+
+mplsConfigCosMapRowEditorOutCosDpToTc60 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (0) to Traffic Class
+         mapping."
+    ::= { mplsConfigCosMapRowEditor 36 }
+
+mplsConfigCosMapRowEditorOutCosDpToTc70 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (0) to Traffic Class
+         mapping."
+    ::= { mplsConfigCosMapRowEditor 37 }
+
+mplsConfigCosMapRowEditorOutCosDpToTc01 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (1) toTraffic Class
+         mapping."
+    ::= { mplsConfigCosMapRowEditor 40 }
+
+mplsConfigCosMapRowEditorOutCosDpToTc11 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (1) toTraffic Class
+         mapping."
+    ::= { mplsConfigCosMapRowEditor 41 }
+
+mplsConfigCosMapRowEditorOutCosDpToTc21 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (1) toTraffic Class
+         mapping."
+    ::= { mplsConfigCosMapRowEditor 42 }
+
+mplsConfigCosMapRowEditorOutCosDpToTc31 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (1) toTraffic Class
+         mapping."
+    ::= { mplsConfigCosMapRowEditor 43 }
+
+mplsConfigCosMapRowEditorOutCosDpToTc41 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (1) toTraffic Class
+         mapping."
+    ::= { mplsConfigCosMapRowEditor 44 }
+
+mplsConfigCosMapRowEditorOutCosDpToTc51 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (1) toTraffic Class
+         mapping."
+    ::= { mplsConfigCosMapRowEditor 45 }
+
+mplsConfigCosMapRowEditorOutCosDpToTc61 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (1) toTraffic Class
+         mapping."
+    ::= { mplsConfigCosMapRowEditor 46 }
+
+mplsConfigCosMapRowEditorOutCosDpToTc71 OBJECT-TYPE
+    SYNTAX      Unsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Class of Service (0-7) and Egress Drop Precedence (1) toTraffic Class
+         mapping."
+    ::= { mplsConfigCosMapRowEditor 47 }
+
+mplsConfigCosMapRowEditorAction OBJECT-TYPE
+    SYNTAX      RowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Action"
+    ::= { mplsConfigCosMapRowEditor 100 }
+
+mplsStatus OBJECT IDENTIFIER
+    ::= { mplsMibObjects 3 }
+
+mplsStatusGlobal OBJECT IDENTIFIER
+    ::= { mplsStatus 1 }
+
+mplsStatusLink OBJECT IDENTIFIER
+    ::= { mplsStatus 2 }
+
+mplsStatusLinkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsStatusLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains MPLS Link status per MPLS group."
+    ::= { mplsStatusLink 1 }
+
+mplsStatusLinkEntry OBJECT-TYPE
+    SYNTAX      MplsStatusLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Status."
+    INDEX       { mplsStatusLinkGroupIfIndex }
+    ::= { mplsStatusLinkTable 1 }
+
+MplsStatusLinkEntry ::= SEQUENCE {
+    mplsStatusLinkGroupIfIndex  InterfaceIndex,
+    mplsStatusLinkOamActive     TruthValue
+}
+
+mplsStatusLinkGroupIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MPLS group interface index. Valid range is BASE+GROUP where the base is
+         specified in the interface index textual convention and the group
+         number range is 1..maximum group number. This maximum is
+         platform-specific and can be retrieved from the MPLS capabilities."
+    ::= { mplsStatusLinkEntry 1 }
+
+mplsStatusLinkOamActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether Oam is currently active or not on this Link."
+    ::= { mplsStatusLinkEntry 2 }
+
+mplsStatusTunnel OBJECT IDENTIFIER
+    ::= { mplsStatus 3 }
+
+mplsStatusTunnelTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsStatusTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains MPLS Tunnel status per MPLS group."
+    ::= { mplsStatusTunnel 1 }
+
+mplsStatusTunnelEntry OBJECT-TYPE
+    SYNTAX      MplsStatusTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Status."
+    INDEX       { mplsStatusTunnelGroupIfIndex }
+    ::= { mplsStatusTunnelTable 1 }
+
+MplsStatusTunnelEntry ::= SEQUENCE {
+    mplsStatusTunnelGroupIfIndex   InterfaceIndex,
+    mplsStatusTunnelOamActive      TruthValue,
+    mplsStatusTunnelState          MplsStateType,
+    mplsStatusTunnelIngressLabel   Unsigned32,
+    mplsStatusTunnelEgressLabel    Unsigned32,
+    mplsStatusTunnelWorkingActive  TruthValue
+}
+
+mplsStatusTunnelGroupIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MPLS group interface index. Valid range is BASE+GROUP where the base is
+         specified in the interface index textual convention and the group
+         number range is 1..maximum group number. This maximum is
+         platform-specific and can be retrieved from the MPLS capabilities."
+    ::= { mplsStatusTunnelEntry 1 }
+
+mplsStatusTunnelOamActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether Oam is currently active or not on this Tunnel."
+    ::= { mplsStatusTunnelEntry 2 }
+
+mplsStatusTunnelState OBJECT-TYPE
+    SYNTAX      MplsStateType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies current MPLS-TP Tunnel state."
+    ::= { mplsStatusTunnelEntry 3 }
+
+mplsStatusTunnelIngressLabel OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current MPLS-TP Tunnel ingress MPLS label value or
+         APPL_MPLSTP_LABEL_NONE."
+    ::= { mplsStatusTunnelEntry 4 }
+
+mplsStatusTunnelEgressLabel OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current MPLS-TP Tunnel egress MPLS label value or
+         APPL_MPLSTP_LABEL_NONE."
+    ::= { mplsStatusTunnelEntry 5 }
+
+mplsStatusTunnelWorkingActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "TRUE if working tunnel is active in a protection setup, FALSE if
+         protection tunnel is active. Always TRUE for non-protection case."
+    ::= { mplsStatusTunnelEntry 6 }
+
+mplsStatusLsp OBJECT IDENTIFIER
+    ::= { mplsStatus 4 }
+
+mplsStatusLspTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsStatusLspEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains MPLS Lsp status per MPLS group."
+    ::= { mplsStatusLsp 1 }
+
+mplsStatusLspEntry OBJECT-TYPE
+    SYNTAX      MplsStatusLspEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Status."
+    INDEX       { mplsStatusLspGroupIndex }
+    ::= { mplsStatusLspTable 1 }
+
+MplsStatusLspEntry ::= SEQUENCE {
+    mplsStatusLspGroupIndex  Integer32,
+    mplsStatusLspOamActive   TruthValue,
+    mplsStatusLspState       MplsStateType
+}
+
+mplsStatusLspGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MPLS group index number. Valid range is (1..max groups). The maximum
+         group number is platform-specific and can be retrieved from the MPLS
+         capabilities."
+    ::= { mplsStatusLspEntry 1 }
+
+mplsStatusLspOamActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether Oam is currently active or not on this LSP."
+    ::= { mplsStatusLspEntry 2 }
+
+mplsStatusLspState OBJECT-TYPE
+    SYNTAX      MplsStateType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies current MPLS-TP LSP state."
+    ::= { mplsStatusLspEntry 3 }
+
+mplsStatusPw OBJECT IDENTIFIER
+    ::= { mplsStatus 5 }
+
+mplsStatusPwTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsStatusPwEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains MPLS Pseudo Wire status per MPLS group."
+    ::= { mplsStatusPw 1 }
+
+mplsStatusPwEntry OBJECT-TYPE
+    SYNTAX      MplsStatusPwEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Status."
+    INDEX       { mplsStatusPwGroupIfIndex }
+    ::= { mplsStatusPwTable 1 }
+
+MplsStatusPwEntry ::= SEQUENCE {
+    mplsStatusPwGroupIfIndex  InterfaceIndex,
+    mplsStatusPwOamActive     TruthValue,
+    mplsStatusPwState         MplsStateType
+}
+
+mplsStatusPwGroupIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MPLS group interface index. Valid range is BASE+GROUP where the base is
+         specified in the interface index textual convention and the group
+         number range is 1..maximum group number. This maximum is
+         platform-specific and can be retrieved from the MPLS capabilities."
+    ::= { mplsStatusPwEntry 1 }
+
+mplsStatusPwOamActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether Oam is currently active or not on this Pseudo Wire."
+    ::= { mplsStatusPwEntry 2 }
+
+mplsStatusPwState OBJECT-TYPE
+    SYNTAX      MplsStateType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies current MPLS-TP Pseudo Wire state."
+    ::= { mplsStatusPwEntry 3 }
+
+mplsControl OBJECT IDENTIFIER
+    ::= { mplsMibObjects 4 }
+
+mplsControlGlobal OBJECT IDENTIFIER
+    ::= { mplsControl 1 }
+
+mplsControlLsp OBJECT IDENTIFIER
+    ::= { mplsControl 2 }
+
+mplsControlLspTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsControlLspEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of created instance MPLS-TP LSP control parameters"
+    ::= { mplsControlLsp 1 }
+
+mplsControlLspEntry OBJECT-TYPE
+    SYNTAX      MplsControlLspEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a created instance MPLS-TP LSP control parameters"
+    INDEX       { mplsControlLspGroupIndex }
+    ::= { mplsControlLspTable 1 }
+
+MplsControlLspEntry ::= SEQUENCE {
+    mplsControlLspGroupIndex  Integer32,
+    mplsControlLspClear       TruthValue
+}
+
+mplsControlLspGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MPLS group index number. Valid range is (1..max groups). The maximum
+         group number is platform-specific and can be retrieved from the MPLS
+         capabilities."
+    ::= { mplsControlLspEntry 1 }
+
+mplsControlLspClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Clear statistics counters"
+    ::= { mplsControlLspEntry 2 }
+
+mplsControlIf OBJECT IDENTIFIER
+    ::= { mplsControl 3 }
+
+mplsControlIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsControlIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a table of created instance MPLS-TP link, tunnel or PW control
+         parameters"
+    ::= { mplsControlIf 1 }
+
+mplsControlIfEntry OBJECT-TYPE
+    SYNTAX      MplsControlIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a created instance MPLS-TP link, tunnel or PW control
+         parameters"
+    INDEX       { mplsControlIfGroupIfIndex }
+    ::= { mplsControlIfTable 1 }
+
+MplsControlIfEntry ::= SEQUENCE {
+    mplsControlIfGroupIfIndex  InterfaceIndex,
+    mplsControlIfClear         TruthValue
+}
+
+mplsControlIfGroupIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MPLS group interface index. Valid range is BASE+GROUP where the base is
+         specified in the interface index textual convention and the group
+         number range is 1..maximum group number. This maximum is
+         platform-specific and can be retrieved from the MPLS capabilities."
+    ::= { mplsControlIfEntry 1 }
+
+mplsControlIfClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Clear statistics counters"
+    ::= { mplsControlIfEntry 2 }
+
+mplsStatistics OBJECT IDENTIFIER
+    ::= { mplsMibObjects 5 }
+
+mplsStatisticsGlobal OBJECT IDENTIFIER
+    ::= { mplsStatistics 1 }
+
+mplsStatisticsLink OBJECT IDENTIFIER
+    ::= { mplsStatistics 2 }
+
+mplsStatisticsLinkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsStatisticsLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains MPLS Link Counters."
+    ::= { mplsStatisticsLink 1 }
+
+mplsStatisticsLinkEntry OBJECT-TYPE
+    SYNTAX      MplsStatisticsLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Counters."
+    INDEX       { mplsStatisticsLinkGroupIfIndex }
+    ::= { mplsStatisticsLinkTable 1 }
+
+MplsStatisticsLinkEntry ::= SEQUENCE {
+    mplsStatisticsLinkGroupIfIndex     InterfaceIndex,
+    mplsStatisticsLinkRxGreenFrames    Counter64,
+    mplsStatisticsLinkRxGreenBytes     Counter64,
+    mplsStatisticsLinkRxYellowFrames   Counter64,
+    mplsStatisticsLinkRxYellowBytes    Counter64,
+    mplsStatisticsLinkRxRedFrames      Counter64,
+    mplsStatisticsLinkRxRedBytes       Counter64,
+    mplsStatisticsLinkRxDiscardFrames  Counter64,
+    mplsStatisticsLinkRxDiscardBytes   Counter64,
+    mplsStatisticsLinkTxGreenFrames    Counter64,
+    mplsStatisticsLinkTxGreenBytes     Counter64,
+    mplsStatisticsLinkTxYellowFrames   Counter64,
+    mplsStatisticsLinkTxYellowBytes    Counter64,
+    mplsStatisticsLinkTxDiscardFrames  Counter64,
+    mplsStatisticsLinkTxDiscardBytes   Counter64
+}
+
+mplsStatisticsLinkGroupIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MPLS group interface index. Valid range is BASE+GROUP where the base is
+         specified in the interface index textual convention and the group
+         number range is 1..maximum group number. This maximum is
+         platform-specific and can be retrieved from the MPLS capabilities."
+    ::= { mplsStatisticsLinkEntry 1 }
+
+mplsStatisticsLinkRxGreenFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received green frames."
+    ::= { mplsStatisticsLinkEntry 3 }
+
+mplsStatisticsLinkRxGreenBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received green bytes."
+    ::= { mplsStatisticsLinkEntry 4 }
+
+mplsStatisticsLinkRxYellowFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received yellow frames."
+    ::= { mplsStatisticsLinkEntry 5 }
+
+mplsStatisticsLinkRxYellowBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received yellow bytes."
+    ::= { mplsStatisticsLinkEntry 6 }
+
+mplsStatisticsLinkRxRedFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received red frames."
+    ::= { mplsStatisticsLinkEntry 7 }
+
+mplsStatisticsLinkRxRedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received red bytes."
+    ::= { mplsStatisticsLinkEntry 8 }
+
+mplsStatisticsLinkRxDiscardFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received discarded frames."
+    ::= { mplsStatisticsLinkEntry 9 }
+
+mplsStatisticsLinkRxDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received discarded bytes."
+    ::= { mplsStatisticsLinkEntry 10 }
+
+mplsStatisticsLinkTxGreenFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted green frames."
+    ::= { mplsStatisticsLinkEntry 11 }
+
+mplsStatisticsLinkTxGreenBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted green bytes."
+    ::= { mplsStatisticsLinkEntry 12 }
+
+mplsStatisticsLinkTxYellowFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted yellow frames."
+    ::= { mplsStatisticsLinkEntry 13 }
+
+mplsStatisticsLinkTxYellowBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted yellow bytes."
+    ::= { mplsStatisticsLinkEntry 14 }
+
+mplsStatisticsLinkTxDiscardFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of egress discarded frames."
+    ::= { mplsStatisticsLinkEntry 15 }
+
+mplsStatisticsLinkTxDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of egress discarded bytes."
+    ::= { mplsStatisticsLinkEntry 16 }
+
+mplsStatisticsTunnel OBJECT IDENTIFIER
+    ::= { mplsStatistics 3 }
+
+mplsStatisticsTunnelTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsStatisticsTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains MPLS Tunnel Counters."
+    ::= { mplsStatisticsTunnel 1 }
+
+mplsStatisticsTunnelEntry OBJECT-TYPE
+    SYNTAX      MplsStatisticsTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Counters."
+    INDEX       { mplsStatisticsTunnelGroupIfIndex }
+    ::= { mplsStatisticsTunnelTable 1 }
+
+MplsStatisticsTunnelEntry ::= SEQUENCE {
+    mplsStatisticsTunnelGroupIfIndex     InterfaceIndex,
+    mplsStatisticsTunnelRxGreenFrames    Counter64,
+    mplsStatisticsTunnelRxGreenBytes     Counter64,
+    mplsStatisticsTunnelRxYellowFrames   Counter64,
+    mplsStatisticsTunnelRxYellowBytes    Counter64,
+    mplsStatisticsTunnelRxRedFrames      Counter64,
+    mplsStatisticsTunnelRxRedBytes       Counter64,
+    mplsStatisticsTunnelRxDiscardFrames  Counter64,
+    mplsStatisticsTunnelRxDiscardBytes   Counter64,
+    mplsStatisticsTunnelTxGreenFrames    Counter64,
+    mplsStatisticsTunnelTxGreenBytes     Counter64,
+    mplsStatisticsTunnelTxYellowFrames   Counter64,
+    mplsStatisticsTunnelTxYellowBytes    Counter64,
+    mplsStatisticsTunnelTxDiscardFrames  Counter64,
+    mplsStatisticsTunnelTxDiscardBytes   Counter64
+}
+
+mplsStatisticsTunnelGroupIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MPLS group interface index. Valid range is BASE+GROUP where the base is
+         specified in the interface index textual convention and the group
+         number range is 1..maximum group number. This maximum is
+         platform-specific and can be retrieved from the MPLS capabilities."
+    ::= { mplsStatisticsTunnelEntry 1 }
+
+mplsStatisticsTunnelRxGreenFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received green frames."
+    ::= { mplsStatisticsTunnelEntry 3 }
+
+mplsStatisticsTunnelRxGreenBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received green bytes."
+    ::= { mplsStatisticsTunnelEntry 4 }
+
+mplsStatisticsTunnelRxYellowFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received yellow frames."
+    ::= { mplsStatisticsTunnelEntry 5 }
+
+mplsStatisticsTunnelRxYellowBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received yellow bytes."
+    ::= { mplsStatisticsTunnelEntry 6 }
+
+mplsStatisticsTunnelRxRedFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received red frames."
+    ::= { mplsStatisticsTunnelEntry 7 }
+
+mplsStatisticsTunnelRxRedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received red bytes."
+    ::= { mplsStatisticsTunnelEntry 8 }
+
+mplsStatisticsTunnelRxDiscardFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received discarded frames."
+    ::= { mplsStatisticsTunnelEntry 9 }
+
+mplsStatisticsTunnelRxDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received discarded bytes."
+    ::= { mplsStatisticsTunnelEntry 10 }
+
+mplsStatisticsTunnelTxGreenFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted green frames."
+    ::= { mplsStatisticsTunnelEntry 11 }
+
+mplsStatisticsTunnelTxGreenBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted green bytes."
+    ::= { mplsStatisticsTunnelEntry 12 }
+
+mplsStatisticsTunnelTxYellowFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted yellow frames."
+    ::= { mplsStatisticsTunnelEntry 13 }
+
+mplsStatisticsTunnelTxYellowBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted yellow bytes."
+    ::= { mplsStatisticsTunnelEntry 14 }
+
+mplsStatisticsTunnelTxDiscardFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of egress discarded frames."
+    ::= { mplsStatisticsTunnelEntry 15 }
+
+mplsStatisticsTunnelTxDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of egress discarded bytes."
+    ::= { mplsStatisticsTunnelEntry 16 }
+
+mplsStatisticsLsp OBJECT IDENTIFIER
+    ::= { mplsStatistics 4 }
+
+mplsStatisticsLspTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsStatisticsLspEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains MPLS Lsp Counters."
+    ::= { mplsStatisticsLsp 1 }
+
+mplsStatisticsLspEntry OBJECT-TYPE
+    SYNTAX      MplsStatisticsLspEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Counters."
+    INDEX       { mplsStatisticsLspGroupIndex }
+    ::= { mplsStatisticsLspTable 1 }
+
+MplsStatisticsLspEntry ::= SEQUENCE {
+    mplsStatisticsLspGroupIndex          Integer32,
+    mplsStatisticsLspFwdRxGreenFrames    Counter64,
+    mplsStatisticsLspFwdRxGreenBytes     Counter64,
+    mplsStatisticsLspFwdRxYellowFrames   Counter64,
+    mplsStatisticsLspFwdRxYellowBytes    Counter64,
+    mplsStatisticsLspFwdRxRedFrames      Counter64,
+    mplsStatisticsLspFwdRxRedBytes       Counter64,
+    mplsStatisticsLspFwdRxDiscardFrames  Counter64,
+    mplsStatisticsLspFwdRxDiscardBytes   Counter64,
+    mplsStatisticsLspFwdTxGreenFrames    Counter64,
+    mplsStatisticsLspFwdTxGreenBytes     Counter64,
+    mplsStatisticsLspFwdTxYellowFrames   Counter64,
+    mplsStatisticsLspFwdTxYellowBytes    Counter64,
+    mplsStatisticsLspFwdTxDiscardFrames  Counter64,
+    mplsStatisticsLspFwdTxDiscardBytes   Counter64,
+    mplsStatisticsLspRewRxGreenFrames    Counter64,
+    mplsStatisticsLspRewRxGreenBytes     Counter64,
+    mplsStatisticsLspRewRxYellowFrames   Counter64,
+    mplsStatisticsLspRewRxYellowBytes    Counter64,
+    mplsStatisticsLspRewRxRedFrames      Counter64,
+    mplsStatisticsLspRewRxRedBytes       Counter64,
+    mplsStatisticsLspRewRxDiscardFrames  Counter64,
+    mplsStatisticsLspRewRxDiscardBytes   Counter64,
+    mplsStatisticsLspRewTxGreenFrames    Counter64,
+    mplsStatisticsLspRewTxGreenBytes     Counter64,
+    mplsStatisticsLspRewTxYellowFrames   Counter64,
+    mplsStatisticsLspRewTxYellowBytes    Counter64,
+    mplsStatisticsLspRewTxDiscardFrames  Counter64,
+    mplsStatisticsLspRewTxDiscardBytes   Counter64
+}
+
+mplsStatisticsLspGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MPLS group index number. Valid range is (1..max groups). The maximum
+         group number is platform-specific and can be retrieved from the MPLS
+         capabilities."
+    ::= { mplsStatisticsLspEntry 1 }
+
+mplsStatisticsLspFwdRxGreenFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received green frames."
+    ::= { mplsStatisticsLspEntry 3 }
+
+mplsStatisticsLspFwdRxGreenBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received green bytes."
+    ::= { mplsStatisticsLspEntry 4 }
+
+mplsStatisticsLspFwdRxYellowFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received yellow frames."
+    ::= { mplsStatisticsLspEntry 5 }
+
+mplsStatisticsLspFwdRxYellowBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received yellow bytes."
+    ::= { mplsStatisticsLspEntry 6 }
+
+mplsStatisticsLspFwdRxRedFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received red frames."
+    ::= { mplsStatisticsLspEntry 7 }
+
+mplsStatisticsLspFwdRxRedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received red bytes."
+    ::= { mplsStatisticsLspEntry 8 }
+
+mplsStatisticsLspFwdRxDiscardFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received discarded frames."
+    ::= { mplsStatisticsLspEntry 9 }
+
+mplsStatisticsLspFwdRxDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received discarded bytes."
+    ::= { mplsStatisticsLspEntry 10 }
+
+mplsStatisticsLspFwdTxGreenFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted green frames."
+    ::= { mplsStatisticsLspEntry 11 }
+
+mplsStatisticsLspFwdTxGreenBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted green bytes."
+    ::= { mplsStatisticsLspEntry 12 }
+
+mplsStatisticsLspFwdTxYellowFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted yellow frames."
+    ::= { mplsStatisticsLspEntry 13 }
+
+mplsStatisticsLspFwdTxYellowBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted yellow bytes."
+    ::= { mplsStatisticsLspEntry 14 }
+
+mplsStatisticsLspFwdTxDiscardFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of egress discarded frames."
+    ::= { mplsStatisticsLspEntry 15 }
+
+mplsStatisticsLspFwdTxDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of egress discarded bytes."
+    ::= { mplsStatisticsLspEntry 16 }
+
+mplsStatisticsLspRewRxGreenFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received green frames."
+    ::= { mplsStatisticsLspEntry 17 }
+
+mplsStatisticsLspRewRxGreenBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received green bytes."
+    ::= { mplsStatisticsLspEntry 18 }
+
+mplsStatisticsLspRewRxYellowFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received yellow frames."
+    ::= { mplsStatisticsLspEntry 19 }
+
+mplsStatisticsLspRewRxYellowBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received yellow bytes."
+    ::= { mplsStatisticsLspEntry 20 }
+
+mplsStatisticsLspRewRxRedFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received red frames."
+    ::= { mplsStatisticsLspEntry 21 }
+
+mplsStatisticsLspRewRxRedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received red bytes."
+    ::= { mplsStatisticsLspEntry 22 }
+
+mplsStatisticsLspRewRxDiscardFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received discarded frames."
+    ::= { mplsStatisticsLspEntry 23 }
+
+mplsStatisticsLspRewRxDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received discarded bytes."
+    ::= { mplsStatisticsLspEntry 24 }
+
+mplsStatisticsLspRewTxGreenFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted green frames."
+    ::= { mplsStatisticsLspEntry 25 }
+
+mplsStatisticsLspRewTxGreenBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted green bytes."
+    ::= { mplsStatisticsLspEntry 26 }
+
+mplsStatisticsLspRewTxYellowFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted yellow frames."
+    ::= { mplsStatisticsLspEntry 27 }
+
+mplsStatisticsLspRewTxYellowBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted yellow bytes."
+    ::= { mplsStatisticsLspEntry 28 }
+
+mplsStatisticsLspRewTxDiscardFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of egress discarded frames."
+    ::= { mplsStatisticsLspEntry 29 }
+
+mplsStatisticsLspRewTxDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of egress discarded bytes."
+    ::= { mplsStatisticsLspEntry 30 }
+
+mplsStatisticsPw OBJECT IDENTIFIER
+    ::= { mplsStatistics 5 }
+
+mplsStatisticsPwTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsStatisticsPwEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains MPLS Tunnel Counters."
+    ::= { mplsStatisticsPw 1 }
+
+mplsStatisticsPwEntry OBJECT-TYPE
+    SYNTAX      MplsStatisticsPwEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Counters."
+    INDEX       { mplsStatisticsPwGroupIfIndex }
+    ::= { mplsStatisticsPwTable 1 }
+
+MplsStatisticsPwEntry ::= SEQUENCE {
+    mplsStatisticsPwGroupIfIndex     InterfaceIndex,
+    mplsStatisticsPwRxGreenFrames    Counter64,
+    mplsStatisticsPwRxGreenBytes     Counter64,
+    mplsStatisticsPwRxYellowFrames   Counter64,
+    mplsStatisticsPwRxYellowBytes    Counter64,
+    mplsStatisticsPwRxRedFrames      Counter64,
+    mplsStatisticsPwRxRedBytes       Counter64,
+    mplsStatisticsPwRxDiscardFrames  Counter64,
+    mplsStatisticsPwRxDiscardBytes   Counter64,
+    mplsStatisticsPwTxGreenFrames    Counter64,
+    mplsStatisticsPwTxGreenBytes     Counter64,
+    mplsStatisticsPwTxYellowFrames   Counter64,
+    mplsStatisticsPwTxYellowBytes    Counter64,
+    mplsStatisticsPwTxDiscardFrames  Counter64,
+    mplsStatisticsPwTxDiscardBytes   Counter64
+}
+
+mplsStatisticsPwGroupIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "MPLS group interface index. Valid range is BASE+GROUP where the base is
+         specified in the interface index textual convention and the group
+         number range is 1..maximum group number. This maximum is
+         platform-specific and can be retrieved from the MPLS capabilities."
+    ::= { mplsStatisticsPwEntry 1 }
+
+mplsStatisticsPwRxGreenFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received green frames."
+    ::= { mplsStatisticsPwEntry 3 }
+
+mplsStatisticsPwRxGreenBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received green bytes."
+    ::= { mplsStatisticsPwEntry 4 }
+
+mplsStatisticsPwRxYellowFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received yellow frames."
+    ::= { mplsStatisticsPwEntry 5 }
+
+mplsStatisticsPwRxYellowBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received yellow bytes."
+    ::= { mplsStatisticsPwEntry 6 }
+
+mplsStatisticsPwRxRedFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received red frames."
+    ::= { mplsStatisticsPwEntry 7 }
+
+mplsStatisticsPwRxRedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received red bytes."
+    ::= { mplsStatisticsPwEntry 8 }
+
+mplsStatisticsPwRxDiscardFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received discarded frames."
+    ::= { mplsStatisticsPwEntry 9 }
+
+mplsStatisticsPwRxDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received discarded bytes."
+    ::= { mplsStatisticsPwEntry 10 }
+
+mplsStatisticsPwTxGreenFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted green frames."
+    ::= { mplsStatisticsPwEntry 11 }
+
+mplsStatisticsPwTxGreenBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted green bytes."
+    ::= { mplsStatisticsPwEntry 12 }
+
+mplsStatisticsPwTxYellowFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted yellow frames."
+    ::= { mplsStatisticsPwEntry 13 }
+
+mplsStatisticsPwTxYellowBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmitted yellow bytes."
+    ::= { mplsStatisticsPwEntry 14 }
+
+mplsStatisticsPwTxDiscardFrames OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of egress discarded frames."
+    ::= { mplsStatisticsPwEntry 15 }
+
+mplsStatisticsPwTxDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of egress discarded bytes."
+    ::= { mplsStatisticsPwEntry 16 }
+
+mplsMibConformance OBJECT IDENTIFIER
+    ::= { mplsMib 2 }
+
+mplsMibCompliances OBJECT IDENTIFIER
+    ::= { mplsMibConformance 1 }
+
+mplsMibGroups OBJECT IDENTIFIER
+    ::= { mplsMibConformance 2 }
+
+mplsCapabilitiesInfoGroup OBJECT-GROUP
+    OBJECTS     { mplsCapabilitiesMaxLinks,
+                  mplsCapabilitiesMaxTunnels,
+                  mplsCapabilitiesMaxPw,
+                  mplsCapabilitiesMaxLsp,
+                  mplsCapabilitiesMaxCosMap,
+                  mplsCapabilitiesMaxTunnelNameLen }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mplsMibGroups 1 }
+
+mplsConfigGlobalMainInfoGroup OBJECT-GROUP
+    OBJECTS     { mplsConfigGlobalMainTunnelMode,
+                  mplsConfigGlobalMainGlobalId,
+                  mplsConfigGlobalMainNodeId,
+                  mplsConfigGlobalMainIccCarrierCode }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mplsMibGroups 2 }
+
+mplsConfigLinkTableInfoGroup OBJECT-GROUP
+    OBJECTS     { mplsConfigLinkPort,
+                  mplsConfigLinkMACAddressNextHop,
+                  mplsConfigLinkMACAddress,
+                  mplsConfigLinkVLANTagType,
+                  mplsConfigLinkVLANId, mplsConfigLinkVLANpcp,
+                  mplsConfigLinkVLANdei,
+                  mplsConfigLinkSrcNodeId,
+                  mplsConfigLinkSrcGlobalId,
+                  mplsConfigLinkDstNodeId,
+                  mplsConfigLinkDstGlobalId,
+                  mplsConfigLinkDstIfNum,
+                  mplsConfigLinkSrcNodeIdValid,
+                  mplsConfigLinkSrcGlobalIdValid,
+                  mplsConfigLinkDstGlobalIdValid,
+                  mplsConfigLinkAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mplsMibGroups 3 }
+
+mplsConfigLinkRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { mplsConfigLinkRowEditorGroupIfIndex,
+                  mplsConfigLinkRowEditorPort,
+                  mplsConfigLinkRowEditorMACAddressNextHop,
+                  mplsConfigLinkRowEditorMACAddress,
+                  mplsConfigLinkRowEditorVLANTagType,
+                  mplsConfigLinkRowEditorVLANId,
+                  mplsConfigLinkRowEditorVLANpcp,
+                  mplsConfigLinkRowEditorVLANdei,
+                  mplsConfigLinkRowEditorSrcNodeId,
+                  mplsConfigLinkRowEditorSrcGlobalId,
+                  mplsConfigLinkRowEditorDstNodeId,
+                  mplsConfigLinkRowEditorDstGlobalId,
+                  mplsConfigLinkRowEditorDstIfNum,
+                  mplsConfigLinkRowEditorSrcNodeIdValid,
+                  mplsConfigLinkRowEditorSrcGlobalIdValid,
+                  mplsConfigLinkRowEditorDstGlobalIdValid,
+                  mplsConfigLinkRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mplsMibGroups 4 }
+
+mplsConfigTunnelTableInfoGroup OBJECT-GROUP
+    OBJECTS     { mplsConfigTunnelTunnelName,
+                  mplsConfigTunnelTunnelMode,
+                  mplsConfigTunnelSrcNodeId,
+                  mplsConfigTunnelSrcGlobalId,
+                  mplsConfigTunnelDstNodeId,
+                  mplsConfigTunnelDstGlobalId,
+                  mplsConfigTunnelDstTunnelTpNum,
+                  mplsConfigTunnelSrcTunnelTpNum,
+                  mplsConfigTunnelSrcLspNum,
+                  mplsConfigTunnelDstLspNum,
+                  mplsConfigTunnelIsSpme,
+                  mplsConfigTunnelSrcNodeIsValid,
+                  mplsConfigTunnelSrcGlobalIdValid,
+                  mplsConfigTunnelDstGlobalIdValid,
+                  mplsConfigTunnelIngressLabel,
+                  mplsConfigTunnelEgressLabel,
+                  mplsConfigTunnelAttachInterface,
+                  mplsConfigTunnelTrafficClass,
+                  mplsConfigTunnelTtl,
+                  mplsConfigTunnelInCosMapId,
+                  mplsConfigTunnelOutCosMapId,
+                  mplsConfigTunnelIsLLsp,
+                  mplsConfigTunnelLLspCos,
+                  mplsConfigTunnelAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mplsMibGroups 5 }
+
+mplsConfigTunnelRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { mplsConfigTunnelRowEditorGroupIfIndex,
+                  mplsConfigTunnelRowEditorTunnelName,
+                  mplsConfigTunnelRowEditorTunnelMode,
+                  mplsConfigTunnelRowEditorSrcNodeId,
+                  mplsConfigTunnelRowEditorSrcGlobalId,
+                  mplsConfigTunnelRowEditorDstNodeId,
+                  mplsConfigTunnelRowEditorDstGlobalId,
+                  mplsConfigTunnelRowEditorDstTunnelTpNum,
+                  mplsConfigTunnelRowEditorSrcTunnelTpNum,
+                  mplsConfigTunnelRowEditorSrcLspNum,
+                  mplsConfigTunnelRowEditorDstLspNum,
+                  mplsConfigTunnelRowEditorIsSpme,
+                  mplsConfigTunnelRowEditorSrcNodeIsValid,
+                  mplsConfigTunnelRowEditorSrcGlobalIdValid,
+                  mplsConfigTunnelRowEditorDstGlobalIdValid,
+                  mplsConfigTunnelRowEditorIngressLabel,
+                  mplsConfigTunnelRowEditorEgressLabel,
+                  mplsConfigTunnelRowEditorAttachInterface,
+                  mplsConfigTunnelRowEditorTrafficClass,
+                  mplsConfigTunnelRowEditorTtl,
+                  mplsConfigTunnelRowEditorInCosMapId,
+                  mplsConfigTunnelRowEditorOutCosMapId,
+                  mplsConfigTunnelRowEditorIsLLsp,
+                  mplsConfigTunnelRowEditorLLspCos,
+                  mplsConfigTunnelRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mplsMibGroups 6 }
+
+mplsConfigLspTableInfoGroup OBJECT-GROUP
+    OBJECTS     { mplsConfigLspXcName, mplsConfigLspSrcNodeId,
+                  mplsConfigLspSrcNodeIdIsDefined,
+                  mplsConfigLspSrcGlobalId,
+                  mplsConfigLspSrcGlobalIdIsDefined,
+                  mplsConfigLspSrcTunnelTpNum,
+                  mplsConfigLspDstNodeId,
+                  mplsConfigLspDstGlobalId,
+                  mplsConfigLspDstGlobalIdIsDefined,
+                  mplsConfigLspDstTunnelTpNum,
+                  mplsConfigLspSrcLspNumber,
+                  mplsConfigLspDstLspNumber,
+                  mplsConfigLspForwardIngressLabel,
+                  mplsConfigLspForwardEgressLabel,
+                  mplsConfigLspForwardAttachInterface,
+                  mplsConfigLspForwardInCosMapId,
+                  mplsConfigLspForwardOutCosMapId,
+                  mplsConfigLspForwardIsLLsp,
+                  mplsConfigLspForwardHQoSId,
+                  mplsConfigLspForwardLLspCos,
+                  mplsConfigLspReverseIngressLabel,
+                  mplsConfigLspReverseEgressLabel,
+                  mplsConfigLspReverseAttachInterface,
+                  mplsConfigLspReverseInCosMapId,
+                  mplsConfigLspReverseOutCosMapId,
+                  mplsConfigLspReverseIsLLsp,
+                  mplsConfigLspReverseLLspCos,
+                  mplsConfigLspReverseHQoSId,
+                  mplsConfigLspAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mplsMibGroups 7 }
+
+mplsConfigLspRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { mplsConfigLspRowEditorGroupIndex,
+                  mplsConfigLspRowEditorXcName,
+                  mplsConfigLspRowEditorSrcNodeId,
+                  mplsConfigLspRowEditorSrcNodeIdIsDefined,
+                  mplsConfigLspRowEditorSrcGlobalId,
+                  mplsConfigLspRowEditorSrcGlobalIdIsDefined,
+                  mplsConfigLspRowEditorSrcTunnelTpNum,
+                  mplsConfigLspRowEditorDstNodeId,
+                  mplsConfigLspRowEditorDstGlobalId,
+                  mplsConfigLspRowEditorDstGlobalIdIsDefined,
+                  mplsConfigLspRowEditorDstTunnelTpNum,
+                  mplsConfigLspRowEditorSrcLspNumber,
+                  mplsConfigLspRowEditorDstLspNumber,
+                  mplsConfigLspRowEditorForwardIngressLabel,
+                  mplsConfigLspRowEditorForwardEgressLabel,
+                  mplsConfigLspRowEditorForwardAttachInterface,
+                  mplsConfigLspRowEditorForwardInCosMapId,
+                  mplsConfigLspRowEditorForwardOutCosMapId,
+                  mplsConfigLspRowEditorForwardIsLLsp,
+                  mplsConfigLspRowEditorForwardHQoSId,
+                  mplsConfigLspRowEditorForwardLLspCos,
+                  mplsConfigLspRowEditorReverseIngressLabel,
+                  mplsConfigLspRowEditorReverseEgressLabel,
+                  mplsConfigLspRowEditorReverseAttachInterface,
+                  mplsConfigLspRowEditorReverseInCosMapId,
+                  mplsConfigLspRowEditorReverseOutCosMapId,
+                  mplsConfigLspRowEditorReverseIsLLsp,
+                  mplsConfigLspRowEditorReverseLLspCos,
+                  mplsConfigLspRowEditorReverseHQoSId,
+                  mplsConfigLspRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mplsMibGroups 8 }
+
+mplsConfigPwTableInfoGroup OBJECT-GROUP
+    OBJECTS     { mplsConfigPwInLabel, mplsConfigPwOutLabel,
+                  mplsConfigPwControlWord,
+                  mplsConfigPwUseControlWord,
+                  mplsConfigPwTunnelMode,
+                  mplsConfigPwTrafficClass, mplsConfigPwTtl,
+                  mplsConfigPwInCosMapId,
+                  mplsConfigPwOutCosMapId, mplsConfigPwIsLLsp,
+                  mplsConfigPwLLspCos,
+                  mplsConfigPwAttachInterface,
+                  mplsConfigPwStitchPwInterface,
+                  mplsConfigPwVccvType, mplsConfigPwHQoSId,
+                  mplsConfigPwSrcNodeId,
+                  mplsConfigPwSrcNodeIdIsDefined,
+                  mplsConfigPwSrcGlobalId,
+                  mplsConfigPwSrcGlobalIdIsDefined,
+                  mplsConfigPwDstNodeId,
+                  mplsConfigPwDstGlobalId,
+                  mplsConfigPwDstGlobalIdIsDefined,
+                  mplsConfigPwSrcAcId, mplsConfigPwDstAcId,
+                  mplsConfigPwSrcAgiValue,
+                  mplsConfigPwDstAgiValue,
+                  mplsConfigPwSrcAgiType,
+                  mplsConfigPwSrcAgiLength,
+                  mplsConfigPwDstAgiType,
+                  mplsConfigPwDstAgiLength,
+                  mplsConfigPwAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mplsMibGroups 9 }
+
+mplsConfigPwRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { mplsConfigPwRowEditorGroupIfIndex,
+                  mplsConfigPwRowEditorInLabel,
+                  mplsConfigPwRowEditorOutLabel,
+                  mplsConfigPwRowEditorControlWord,
+                  mplsConfigPwRowEditorUseControlWord,
+                  mplsConfigPwRowEditorTunnelMode,
+                  mplsConfigPwRowEditorTrafficClass,
+                  mplsConfigPwRowEditorTtl,
+                  mplsConfigPwRowEditorInCosMapId,
+                  mplsConfigPwRowEditorOutCosMapId,
+                  mplsConfigPwRowEditorIsLLsp,
+                  mplsConfigPwRowEditorLLspCos,
+                  mplsConfigPwRowEditorAttachInterface,
+                  mplsConfigPwRowEditorStitchPwInterface,
+                  mplsConfigPwRowEditorVccvType,
+                  mplsConfigPwRowEditorHQoSId,
+                  mplsConfigPwRowEditorSrcNodeId,
+                  mplsConfigPwRowEditorSrcNodeIdIsDefined,
+                  mplsConfigPwRowEditorSrcGlobalId,
+                  mplsConfigPwRowEditorSrcGlobalIdIsDefined,
+                  mplsConfigPwRowEditorDstNodeId,
+                  mplsConfigPwRowEditorDstGlobalId,
+                  mplsConfigPwRowEditorDstGlobalIdIsDefined,
+                  mplsConfigPwRowEditorSrcAcId,
+                  mplsConfigPwRowEditorDstAcId,
+                  mplsConfigPwRowEditorSrcAgiValue,
+                  mplsConfigPwRowEditorDstAgiValue,
+                  mplsConfigPwRowEditorSrcAgiType,
+                  mplsConfigPwRowEditorSrcAgiLength,
+                  mplsConfigPwRowEditorDstAgiType,
+                  mplsConfigPwRowEditorDstAgiLength,
+                  mplsConfigPwRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mplsMibGroups 10 }
+
+mplsConfigCosMapTableInfoGroup OBJECT-GROUP
+    OBJECTS     { mplsConfigCosMapInTcToCos0,
+                  mplsConfigCosMapInTcToCos1,
+                  mplsConfigCosMapInTcToCos2,
+                  mplsConfigCosMapInTcToCos3,
+                  mplsConfigCosMapInTcToCos4,
+                  mplsConfigCosMapInTcToCos5,
+                  mplsConfigCosMapInTcToCos6,
+                  mplsConfigCosMapInTcToCos7,
+                  mplsConfigCosMapInTcToDp0,
+                  mplsConfigCosMapInTcToDp1,
+                  mplsConfigCosMapInTcToDp2,
+                  mplsConfigCosMapInTcToDp3,
+                  mplsConfigCosMapInTcToDp4,
+                  mplsConfigCosMapInTcToDp5,
+                  mplsConfigCosMapInTcToDp6,
+                  mplsConfigCosMapInTcToDp7,
+                  mplsConfigCosMapOutCosDpToTc00,
+                  mplsConfigCosMapOutCosDpToTc10,
+                  mplsConfigCosMapOutCosDpToTc20,
+                  mplsConfigCosMapOutCosDpToTc30,
+                  mplsConfigCosMapOutCosDpToTc40,
+                  mplsConfigCosMapOutCosDpToTc50,
+                  mplsConfigCosMapOutCosDpToTc60,
+                  mplsConfigCosMapOutCosDpToTc70,
+                  mplsConfigCosMapOutCosDpToTc01,
+                  mplsConfigCosMapOutCosDpToTc11,
+                  mplsConfigCosMapOutCosDpToTc21,
+                  mplsConfigCosMapOutCosDpToTc31,
+                  mplsConfigCosMapOutCosDpToTc41,
+                  mplsConfigCosMapOutCosDpToTc51,
+                  mplsConfigCosMapOutCosDpToTc61,
+                  mplsConfigCosMapOutCosDpToTc71,
+                  mplsConfigCosMapAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mplsMibGroups 11 }
+
+mplsConfigCosMapRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { mplsConfigCosMapRowEditorGroupIndex,
+                  mplsConfigCosMapRowEditorInTcToCos0,
+                  mplsConfigCosMapRowEditorInTcToCos1,
+                  mplsConfigCosMapRowEditorInTcToCos2,
+                  mplsConfigCosMapRowEditorInTcToCos3,
+                  mplsConfigCosMapRowEditorInTcToCos4,
+                  mplsConfigCosMapRowEditorInTcToCos5,
+                  mplsConfigCosMapRowEditorInTcToCos6,
+                  mplsConfigCosMapRowEditorInTcToCos7,
+                  mplsConfigCosMapRowEditorInTcToDp0,
+                  mplsConfigCosMapRowEditorInTcToDp1,
+                  mplsConfigCosMapRowEditorInTcToDp2,
+                  mplsConfigCosMapRowEditorInTcToDp3,
+                  mplsConfigCosMapRowEditorInTcToDp4,
+                  mplsConfigCosMapRowEditorInTcToDp5,
+                  mplsConfigCosMapRowEditorInTcToDp6,
+                  mplsConfigCosMapRowEditorInTcToDp7,
+                  mplsConfigCosMapRowEditorOutCosDpToTc00,
+                  mplsConfigCosMapRowEditorOutCosDpToTc10,
+                  mplsConfigCosMapRowEditorOutCosDpToTc20,
+                  mplsConfigCosMapRowEditorOutCosDpToTc30,
+                  mplsConfigCosMapRowEditorOutCosDpToTc40,
+                  mplsConfigCosMapRowEditorOutCosDpToTc50,
+                  mplsConfigCosMapRowEditorOutCosDpToTc60,
+                  mplsConfigCosMapRowEditorOutCosDpToTc70,
+                  mplsConfigCosMapRowEditorOutCosDpToTc01,
+                  mplsConfigCosMapRowEditorOutCosDpToTc11,
+                  mplsConfigCosMapRowEditorOutCosDpToTc21,
+                  mplsConfigCosMapRowEditorOutCosDpToTc31,
+                  mplsConfigCosMapRowEditorOutCosDpToTc41,
+                  mplsConfigCosMapRowEditorOutCosDpToTc51,
+                  mplsConfigCosMapRowEditorOutCosDpToTc61,
+                  mplsConfigCosMapRowEditorOutCosDpToTc71,
+                  mplsConfigCosMapRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mplsMibGroups 12 }
+
+mplsStatusLinkTableInfoGroup OBJECT-GROUP
+    OBJECTS     { mplsStatusLinkOamActive }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mplsMibGroups 13 }
+
+mplsStatusTunnelTableInfoGroup OBJECT-GROUP
+    OBJECTS     { mplsStatusTunnelOamActive,
+                  mplsStatusTunnelState,
+                  mplsStatusTunnelIngressLabel,
+                  mplsStatusTunnelEgressLabel,
+                  mplsStatusTunnelWorkingActive }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mplsMibGroups 14 }
+
+mplsStatusLspTableInfoGroup OBJECT-GROUP
+    OBJECTS     { mplsStatusLspOamActive, mplsStatusLspState }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mplsMibGroups 15 }
+
+mplsStatusPwTableInfoGroup OBJECT-GROUP
+    OBJECTS     { mplsStatusPwOamActive, mplsStatusPwState }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mplsMibGroups 16 }
+
+mplsControlLspTableInfoGroup OBJECT-GROUP
+    OBJECTS     { mplsControlLspClear }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mplsMibGroups 17 }
+
+mplsControlIfTableInfoGroup OBJECT-GROUP
+    OBJECTS     { mplsControlIfClear }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mplsMibGroups 18 }
+
+mplsStatisticsLinkTableInfoGroup OBJECT-GROUP
+    OBJECTS     { mplsStatisticsLinkRxGreenFrames,
+                  mplsStatisticsLinkRxGreenBytes,
+                  mplsStatisticsLinkRxYellowFrames,
+                  mplsStatisticsLinkRxYellowBytes,
+                  mplsStatisticsLinkRxRedFrames,
+                  mplsStatisticsLinkRxRedBytes,
+                  mplsStatisticsLinkRxDiscardFrames,
+                  mplsStatisticsLinkRxDiscardBytes,
+                  mplsStatisticsLinkTxGreenFrames,
+                  mplsStatisticsLinkTxGreenBytes,
+                  mplsStatisticsLinkTxYellowFrames,
+                  mplsStatisticsLinkTxYellowBytes,
+                  mplsStatisticsLinkTxDiscardFrames,
+                  mplsStatisticsLinkTxDiscardBytes }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mplsMibGroups 19 }
+
+mplsStatisticsTunnelTableInfoGroup OBJECT-GROUP
+    OBJECTS     { mplsStatisticsTunnelRxGreenFrames,
+                  mplsStatisticsTunnelRxGreenBytes,
+                  mplsStatisticsTunnelRxYellowFrames,
+                  mplsStatisticsTunnelRxYellowBytes,
+                  mplsStatisticsTunnelRxRedFrames,
+                  mplsStatisticsTunnelRxRedBytes,
+                  mplsStatisticsTunnelRxDiscardFrames,
+                  mplsStatisticsTunnelRxDiscardBytes,
+                  mplsStatisticsTunnelTxGreenFrames,
+                  mplsStatisticsTunnelTxGreenBytes,
+                  mplsStatisticsTunnelTxYellowFrames,
+                  mplsStatisticsTunnelTxYellowBytes,
+                  mplsStatisticsTunnelTxDiscardFrames,
+                  mplsStatisticsTunnelTxDiscardBytes }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mplsMibGroups 20 }
+
+mplsStatisticsLspTableInfoGroup OBJECT-GROUP
+    OBJECTS     { mplsStatisticsLspFwdRxGreenFrames,
+                  mplsStatisticsLspFwdRxGreenBytes,
+                  mplsStatisticsLspFwdRxYellowFrames,
+                  mplsStatisticsLspFwdRxYellowBytes,
+                  mplsStatisticsLspFwdRxRedFrames,
+                  mplsStatisticsLspFwdRxRedBytes,
+                  mplsStatisticsLspFwdRxDiscardFrames,
+                  mplsStatisticsLspFwdRxDiscardBytes,
+                  mplsStatisticsLspFwdTxGreenFrames,
+                  mplsStatisticsLspFwdTxGreenBytes,
+                  mplsStatisticsLspFwdTxYellowFrames,
+                  mplsStatisticsLspFwdTxYellowBytes,
+                  mplsStatisticsLspFwdTxDiscardFrames,
+                  mplsStatisticsLspFwdTxDiscardBytes,
+                  mplsStatisticsLspRewRxGreenFrames,
+                  mplsStatisticsLspRewRxGreenBytes,
+                  mplsStatisticsLspRewRxYellowFrames,
+                  mplsStatisticsLspRewRxYellowBytes,
+                  mplsStatisticsLspRewRxRedFrames,
+                  mplsStatisticsLspRewRxRedBytes,
+                  mplsStatisticsLspRewRxDiscardFrames,
+                  mplsStatisticsLspRewRxDiscardBytes,
+                  mplsStatisticsLspRewTxGreenFrames,
+                  mplsStatisticsLspRewTxGreenBytes,
+                  mplsStatisticsLspRewTxYellowFrames,
+                  mplsStatisticsLspRewTxYellowBytes,
+                  mplsStatisticsLspRewTxDiscardFrames,
+                  mplsStatisticsLspRewTxDiscardBytes }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mplsMibGroups 21 }
+
+mplsStatisticsPwTableInfoGroup OBJECT-GROUP
+    OBJECTS     { mplsStatisticsPwRxGreenFrames,
+                  mplsStatisticsPwRxGreenBytes,
+                  mplsStatisticsPwRxYellowFrames,
+                  mplsStatisticsPwRxYellowBytes,
+                  mplsStatisticsPwRxRedFrames,
+                  mplsStatisticsPwRxRedBytes,
+                  mplsStatisticsPwRxDiscardFrames,
+                  mplsStatisticsPwRxDiscardBytes,
+                  mplsStatisticsPwTxGreenFrames,
+                  mplsStatisticsPwTxGreenBytes,
+                  mplsStatisticsPwTxYellowFrames,
+                  mplsStatisticsPwTxYellowBytes,
+                  mplsStatisticsPwTxDiscardFrames,
+                  mplsStatisticsPwTxDiscardBytes }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { mplsMibGroups 22 }
+
+mplsMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { mplsCapabilitiesInfoGroup,
+                       mplsConfigGlobalMainInfoGroup,
+                       mplsConfigLinkTableInfoGroup,
+                       mplsConfigLinkRowEditorInfoGroup,
+                       mplsConfigTunnelTableInfoGroup,
+                       mplsConfigTunnelRowEditorInfoGroup,
+                       mplsConfigLspTableInfoGroup,
+                       mplsConfigLspRowEditorInfoGroup,
+                       mplsConfigPwTableInfoGroup,
+                       mplsConfigPwRowEditorInfoGroup,
+                       mplsConfigCosMapTableInfoGroup,
+                       mplsConfigCosMapRowEditorInfoGroup,
+                       mplsStatusLinkTableInfoGroup,
+                       mplsStatusTunnelTableInfoGroup,
+                       mplsStatusLspTableInfoGroup,
+                       mplsStatusPwTableInfoGroup,
+                       mplsControlLspTableInfoGroup,
+                       mplsControlIfTableInfoGroup,
+                       mplsStatisticsLinkTableInfoGroup,
+                       mplsStatisticsTunnelTableInfoGroup,
+                       mplsStatisticsLspTableInfoGroup,
+                       mplsStatisticsPwTableInfoGroup }
+
+    ::= { mplsMibCompliances 1 }
+
+END

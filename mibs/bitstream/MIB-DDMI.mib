@@ -1,0 +1,474 @@
+-- *****************************************************************
+-- MIB-DDMI: BitStream ENT private MIB
+-- ****************************************************************
+
+MIB-DDMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-GROUP, MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    NOTIFICATION-TYPE, MODULE-IDENTITY, OBJECT-TYPE FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION FROM SNMPv2-TC
+    switchMgmt FROM BTS-SMI
+    TruthValue FROM SNMPv2-TC
+    DisplayString FROM BTS-TC
+    InterfaceIndex FROM BTS-TC
+    SfpTransceiver FROM BTS-TC
+    ;
+
+ddmiMib MODULE-IDENTITY
+    LAST-UPDATED "202503200000Z"
+    ORGANIZATION
+        "BitStream Sp. z o.o."
+    CONTACT-INFO
+        "www.bitstream.pl"
+    DESCRIPTION
+        "This is a private version of DDMI"
+    REVISION    "201711270000Z"
+    DESCRIPTION
+        "Add IfIndex to DdmiStatusInterfaceTableInfoGroup. Editorial changes"
+    REVISION    "201410100000Z"
+    DESCRIPTION
+        "Editorial changes"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { switchMgmt 121 }
+
+
+ddmiMibObjects OBJECT IDENTIFIER
+    ::= { ddmiMib 1 }
+
+ddmiConfig OBJECT IDENTIFIER
+    ::= { ddmiMibObjects 2 }
+
+ddmiConfigGlobals OBJECT IDENTIFIER
+    ::= { ddmiConfig 1 }
+
+ddmiConfigGlobalsMode OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global operation mode of DDMI. true is to enable the functions of DDMI
+         and false is to disable it."
+    ::= { ddmiConfigGlobals 1 }
+
+ddmiStatus OBJECT IDENTIFIER
+    ::= { ddmiMibObjects 3 }
+
+ddmiStatusInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DdmiStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a DDMI status table of port interface."
+    ::= { ddmiStatus 2 }
+
+ddmiStatusInterfaceEntry OBJECT-TYPE
+    SYNTAX      DdmiStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry has a set of DDMI status."
+    INDEX       { ddmiStatusInterfaceIfIndex }
+    ::= { ddmiStatusInterfaceTable 1 }
+
+DdmiStatusInterfaceEntry ::= SEQUENCE {
+    ddmiStatusInterfaceIfIndex                          InterfaceIndex,
+    ddmiStatusInterfaceA0Supported                      TruthValue,
+    ddmiStatusInterfaceA0SfpDetected                    TruthValue,
+    ddmiStatusInterfaceA0Vendor                         DisplayString,
+    ddmiStatusInterfaceA0PartNumber                     DisplayString,
+    ddmiStatusInterfaceA0SerialNumber                   DisplayString,
+    ddmiStatusInterfaceA0Revision                       DisplayString,
+    ddmiStatusInterfaceA0DateCode                       DisplayString,
+    ddmiStatusInterfaceA0SfpType                        SfpTransceiver,
+    ddmiStatusInterfaceA2Supported                      TruthValue,
+    ddmiStatusInterfaceA2CurrentTemperature             DisplayString,
+    ddmiStatusInterfaceA2TemperatureHighAlarmThreshold  DisplayString,
+    ddmiStatusInterfaceA2TemperatureLowAlarmThreshold   DisplayString,
+    ddmiStatusInterfaceA2TemperatureHighWarnThreshold   DisplayString,
+    ddmiStatusInterfaceA2TemperatureLowWarnThreshold    DisplayString,
+    ddmiStatusInterfaceA2CurrentVoltage                 DisplayString,
+    ddmiStatusInterfaceA2VoltageHighAlarmThreshold      DisplayString,
+    ddmiStatusInterfaceA2VoltageLowAlarmThreshold       DisplayString,
+    ddmiStatusInterfaceA2VoltageHighWarnThreshold       DisplayString,
+    ddmiStatusInterfaceA2VoltageLowWarnThreshold        DisplayString,
+    ddmiStatusInterfaceA2CurrentTxBias                  DisplayString,
+    ddmiStatusInterfaceA2TxBiasHighAlarmThreshold       DisplayString,
+    ddmiStatusInterfaceA2TxBiasLowAlarmThreshold        DisplayString,
+    ddmiStatusInterfaceA2TxBiasHighWarnThreshold        DisplayString,
+    ddmiStatusInterfaceA2TxBiasLowWarnThreshold         DisplayString,
+    ddmiStatusInterfaceA2CurrentTxPower                 DisplayString,
+    ddmiStatusInterfaceA2TxPowerHighAlarmThreshold      DisplayString,
+    ddmiStatusInterfaceA2TxPowerLowAlarmThreshold       DisplayString,
+    ddmiStatusInterfaceA2TxPowerHighWarnThreshold       DisplayString,
+    ddmiStatusInterfaceA2TxPowerLowWarnThreshold        DisplayString,
+    ddmiStatusInterfaceA2CurrentRxPower                 DisplayString,
+    ddmiStatusInterfaceA2RxPowerHighAlarmThreshold      DisplayString,
+    ddmiStatusInterfaceA2RxPowerLowAlarmThreshold       DisplayString,
+    ddmiStatusInterfaceA2RxPowerHighWarnThreshold       DisplayString,
+    ddmiStatusInterfaceA2RxPowerLowWarnThreshold        DisplayString
+}
+
+ddmiStatusInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Logical interface number of physical port."
+    ::= { ddmiStatusInterfaceEntry 1 }
+
+ddmiStatusInterfaceA0Supported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Support transceiver status information or not. true is to supported and
+         false is not supported."
+    ::= { ddmiStatusInterfaceEntry 2 }
+
+ddmiStatusInterfaceA0SfpDetected OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "SFP module is detected or not. true is to detected and false is not
+         detected."
+    ::= { ddmiStatusInterfaceEntry 3 }
+
+ddmiStatusInterfaceA0Vendor OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Vendor name."
+    ::= { ddmiStatusInterfaceEntry 4 }
+
+ddmiStatusInterfaceA0PartNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Part number."
+    ::= { ddmiStatusInterfaceEntry 5 }
+
+ddmiStatusInterfaceA0SerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Serial number."
+    ::= { ddmiStatusInterfaceEntry 6 }
+
+ddmiStatusInterfaceA0Revision OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Revision."
+    ::= { ddmiStatusInterfaceEntry 7 }
+
+ddmiStatusInterfaceA0DateCode OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Date Code."
+    ::= { ddmiStatusInterfaceEntry 8 }
+
+ddmiStatusInterfaceA0SfpType OBJECT-TYPE
+    SYNTAX      SfpTransceiver
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "SFP type. none(0) means no SFP module. notSupported(1) means SFP module
+         is not supported. sfp100Fx(2) means SFP 100BASE-FX. sfp100BaseLx(3)
+         means SFP 100BASE-LX. sfp100BaseBx10(4) means SFP 100BASE-BX10.
+         sfp100BaseT(5) means SFP 100BASE-T. sfp1000BaseBx10(6) means SFP
+         1000BASE-BX10. sfp1000BaseT(7) means SFP 1000BASE-T. sfp1000BaseCx(8)
+         means SFP 1000BASE-CX. sfp1000BaseSx(9) means SFP 1000BASE-SX.
+         sfp1000BaseLx(10) means SFP 1000BASE-LX. sfp1000BaseX(11) means SFP
+         1000BASE-X. sfp2G5(12) means SFP 2.5G. sfp5G(13) means SFP 5G.
+         sfp10G(14) means SFP 10G."
+    ::= { ddmiStatusInterfaceEntry 9 }
+
+ddmiStatusInterfaceA2Supported OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Support DDMI status information or not. true is to supported and false
+         is not supported."
+    ::= { ddmiStatusInterfaceEntry 1002 }
+
+ddmiStatusInterfaceA2CurrentTemperature OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current temperature in Celcius."
+    ::= { ddmiStatusInterfaceEntry 1003 }
+
+ddmiStatusInterfaceA2TemperatureHighAlarmThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Temperature high alarm threshold in Celcius."
+    ::= { ddmiStatusInterfaceEntry 1004 }
+
+ddmiStatusInterfaceA2TemperatureLowAlarmThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Temperature low alarm threshold in Celcius."
+    ::= { ddmiStatusInterfaceEntry 1005 }
+
+ddmiStatusInterfaceA2TemperatureHighWarnThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Temperature high warning threshold in Celcius."
+    ::= { ddmiStatusInterfaceEntry 1006 }
+
+ddmiStatusInterfaceA2TemperatureLowWarnThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Temperature low warning threshold in Celcius."
+    ::= { ddmiStatusInterfaceEntry 1007 }
+
+ddmiStatusInterfaceA2CurrentVoltage OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current voltage in Volt."
+    ::= { ddmiStatusInterfaceEntry 1008 }
+
+ddmiStatusInterfaceA2VoltageHighAlarmThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Voltage high alarm threshold in Volt."
+    ::= { ddmiStatusInterfaceEntry 1009 }
+
+ddmiStatusInterfaceA2VoltageLowAlarmThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Voltage low alarm threshold in Volt."
+    ::= { ddmiStatusInterfaceEntry 1010 }
+
+ddmiStatusInterfaceA2VoltageHighWarnThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Voltage high warning threshold in Volt."
+    ::= { ddmiStatusInterfaceEntry 1011 }
+
+ddmiStatusInterfaceA2VoltageLowWarnThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Voltage low warning threshold in Volt."
+    ::= { ddmiStatusInterfaceEntry 1012 }
+
+ddmiStatusInterfaceA2CurrentTxBias OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current Tx bias in mA."
+    ::= { ddmiStatusInterfaceEntry 1013 }
+
+ddmiStatusInterfaceA2TxBiasHighAlarmThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx bias high alarm threshold in mA."
+    ::= { ddmiStatusInterfaceEntry 1014 }
+
+ddmiStatusInterfaceA2TxBiasLowAlarmThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx bias low alarm threshold in mA."
+    ::= { ddmiStatusInterfaceEntry 1015 }
+
+ddmiStatusInterfaceA2TxBiasHighWarnThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx bias high warning threshold in mA."
+    ::= { ddmiStatusInterfaceEntry 1016 }
+
+ddmiStatusInterfaceA2TxBiasLowWarnThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx bias low warning threshold in mA."
+    ::= { ddmiStatusInterfaceEntry 1017 }
+
+ddmiStatusInterfaceA2CurrentTxPower OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current Tx power in mW."
+    ::= { ddmiStatusInterfaceEntry 1018 }
+
+ddmiStatusInterfaceA2TxPowerHighAlarmThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx power high alarm threshold in mW."
+    ::= { ddmiStatusInterfaceEntry 1019 }
+
+ddmiStatusInterfaceA2TxPowerLowAlarmThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx power low alarm threshold in mW."
+    ::= { ddmiStatusInterfaceEntry 1020 }
+
+ddmiStatusInterfaceA2TxPowerHighWarnThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx power high warning threshold in mW."
+    ::= { ddmiStatusInterfaceEntry 1021 }
+
+ddmiStatusInterfaceA2TxPowerLowWarnThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx power low warning threshold in mW."
+    ::= { ddmiStatusInterfaceEntry 1022 }
+
+ddmiStatusInterfaceA2CurrentRxPower OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current Rx power in mW."
+    ::= { ddmiStatusInterfaceEntry 1023 }
+
+ddmiStatusInterfaceA2RxPowerHighAlarmThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx power high alarm threshold in mW."
+    ::= { ddmiStatusInterfaceEntry 1024 }
+
+ddmiStatusInterfaceA2RxPowerLowAlarmThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx power low alarm threshold in mW."
+    ::= { ddmiStatusInterfaceEntry 1025 }
+
+ddmiStatusInterfaceA2RxPowerHighWarnThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx power high warning threshold in mW."
+    ::= { ddmiStatusInterfaceEntry 1026 }
+
+ddmiStatusInterfaceA2RxPowerLowWarnThreshold OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx power low warning threshold in mW."
+    ::= { ddmiStatusInterfaceEntry 1027 }
+
+ddmiMibConformance OBJECT IDENTIFIER
+    ::= { ddmiMib 2 }
+
+ddmiMibCompliances OBJECT IDENTIFIER
+    ::= { ddmiMibConformance 1 }
+
+ddmiMibGroups OBJECT IDENTIFIER
+    ::= { ddmiMibConformance 2 }
+
+ddmiConfigGlobalsInfoGroup OBJECT-GROUP
+    OBJECTS     { ddmiConfigGlobalsMode }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects."
+    ::= { ddmiMibGroups 1 }
+
+ddmiStatusInterfaceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { ddmiStatusInterfaceIfIndex,
+                  ddmiStatusInterfaceA0Supported,
+                  ddmiStatusInterfaceA0SfpDetected,
+                  ddmiStatusInterfaceA0Vendor,
+                  ddmiStatusInterfaceA0PartNumber,
+                  ddmiStatusInterfaceA0SerialNumber,
+                  ddmiStatusInterfaceA0Revision,
+                  ddmiStatusInterfaceA0DateCode,
+                  ddmiStatusInterfaceA0SfpType,
+                  ddmiStatusInterfaceA2Supported,
+                  ddmiStatusInterfaceA2CurrentTemperature,
+                  ddmiStatusInterfaceA2TemperatureHighAlarmThreshold,
+                  ddmiStatusInterfaceA2TemperatureLowAlarmThreshold,
+                  ddmiStatusInterfaceA2TemperatureHighWarnThreshold,
+                  ddmiStatusInterfaceA2TemperatureLowWarnThreshold,
+                  ddmiStatusInterfaceA2CurrentVoltage,
+                  ddmiStatusInterfaceA2VoltageHighAlarmThreshold,
+                  ddmiStatusInterfaceA2VoltageLowAlarmThreshold,
+                  ddmiStatusInterfaceA2VoltageHighWarnThreshold,
+                  ddmiStatusInterfaceA2VoltageLowWarnThreshold,
+                  ddmiStatusInterfaceA2CurrentTxBias,
+                  ddmiStatusInterfaceA2TxBiasHighAlarmThreshold,
+                  ddmiStatusInterfaceA2TxBiasLowAlarmThreshold,
+                  ddmiStatusInterfaceA2TxBiasHighWarnThreshold,
+                  ddmiStatusInterfaceA2TxBiasLowWarnThreshold,
+                  ddmiStatusInterfaceA2CurrentTxPower,
+                  ddmiStatusInterfaceA2TxPowerHighAlarmThreshold,
+                  ddmiStatusInterfaceA2TxPowerLowAlarmThreshold,
+                  ddmiStatusInterfaceA2TxPowerHighWarnThreshold,
+                  ddmiStatusInterfaceA2TxPowerLowWarnThreshold,
+                  ddmiStatusInterfaceA2CurrentRxPower,
+                  ddmiStatusInterfaceA2RxPowerHighAlarmThreshold,
+                  ddmiStatusInterfaceA2RxPowerLowAlarmThreshold,
+                  ddmiStatusInterfaceA2RxPowerHighWarnThreshold,
+                  ddmiStatusInterfaceA2RxPowerLowWarnThreshold }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects."
+    ::= { ddmiMibGroups 2 }
+
+ddmiMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+    MANDATORY-GROUPS { ddmiConfigGlobalsInfoGroup,
+                       ddmiStatusInterfaceTableInfoGroup }
+
+    ::= { ddmiMibCompliances 1 }
+
+END
