@@ -3,6 +3,11 @@ modules:
         serial: ECRESO-FM-TRANS-MIB::syGeSerial.0
         location: ECRESO-FM-TRANS-MIB::syGeLocation.0
         hardware: ECRESO-FM-TRANS-MIB::syGeType.0
+        hardware_replace:
+            - ['/E01/', '100W']
+            - ['/E03/', '300W']
+            - ['/G10/', '1000W']
+            - ['/G20/', '2000W']
         version: ECRESO-FM-TRANS-MIB::syGeSoftRel.0
         features: ECRESO-FM-TRANS-MIB::syGeOptList.0
     sensors:
