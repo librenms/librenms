@@ -270,13 +270,33 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
     echo ' LLDP-MIB: ';
     $lldp_array = SnmpQuery::hideMib()->walk('LLDP-MIB::lldpRemTable')->table(3);
     if (! empty($lldp_array)) {
-        $lldp_remAddr_num = SnmpQuery::hideMib()->numeric()->walk('.1.0.8802.1.1.2.1.4.2.1.3');
-        foreach ($lldp_remAddr_num as $key => $value) {
+        $lldp_remAddr_num = SnmpQuery::hideMib()->numeric()->walk('.1.0.8802.1.1.2.1.4.2.1.3')->groupByIndex(1);
+        // Process OID list, set up structure with OIDs in array keys
+        foreach ($lldp_remAddr_num as $lldp_item) {
+            foreach ($lldp_item as $lldp_oid=>$value) {
+                $oid_list[$lldp_oid] = $value;
+            }
+        }
+        foreach ($oid_list as $key => $value) {
             $res = preg_match("/1\.0\.8802\.1\.1\.2\.1\.4\.2\.1\.3\.([^\.]*)\.([^\.]*)\.([^\.]*)\.([^\.]*)\.([^\.]*).(([^\.]*)(\.([^\.]*))+)/", $key, $matches);
             if ($res) {
+                $lldpRemTimemark = $matches[1];
+                $lldpRemLocalPort = $matches[2];
+                $lldpRemIndex = $matches[3];
+                $lldpRemAddrSubtype = $matches[4];
+                $lldpRemManAddrLen = $matches[5];
+                $lldpRemManAddr = $matches[6];
                 //collect the Management IP address from the OID
-                if ($matches[5] == 4) {
-                    $lldp_array[$matches[1]][$matches[2]][$matches[3]]['lldpRemManAddr'] = $matches[6];
+                if ($lldpRemManAddrLen == 4) {
+                    foreach ($lldp_array as $time_mark=>$local_port_array) {
+                        foreach ($local_port_array as $local_port=>$index) {
+                            foreach ($index as $index_key=>$lldp_rem_table_values) {
+                                if ($local_port == $lldpRemLocalPort && $index_key == $lldpRemIndex) {
+                                    $lldp_array[$time_mark][$local_port][$index_key]['lldpRemManAddr'] = $lldpRemManAddr;
+                                }
+                            }
+                        }
+                    }
                 } else {
                     $ipv6 = implode(
                         ':',
@@ -284,7 +304,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                             function ($v) {
                                 return sprintf('%02x', $v);
                             },
-                            explode('.', $matches[6])
+                            explode('.', $lldpRemManAddr)
                         )
                     );
                     $ipv6 = preg_replace('/([^:]{2}):([^:]{2})/i', '$1$2', $ipv6);
