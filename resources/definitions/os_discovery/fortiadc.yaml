@@ -3,6 +3,7 @@ modules:
     os:
         version: FORTINET-FORTIADC-MIB::fadcSysVersion.0
         serial: FORTINET-FORTIADC-MIB::fadcSysSerial.0
+        hardware: FORTINET-FORTIADC-MIB::fadcSysModel.0
     processors:
         data:
             -
