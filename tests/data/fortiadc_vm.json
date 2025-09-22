@@ -8,7 +8,7 @@
                     "sysDescr": "",
                     "sysContact": "<private>",
                     "version": "v7.0.1,build0022,220323 (Interim)",
-                    "hardware": "FortiADC VM",
+                    "hardware": "FortiADC-VM",
                     "features": null,
                     "location": "<private>",
                     "os": "fortiadc",
