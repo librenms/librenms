@@ -30,8 +30,8 @@ modules:
                     descr: Client SSL Sessions
                     group: Server Load Balance
                 -
-                    oid: fadcVirturalServerNumber
-                    index: 'fadcVirturalServerNumber.{{ $index }}'
+                    oid: fadcVirtualServerNumber
+                    index: 'fadcVirtualServerNumber.{{ $index }}'
                     descr: Virtual Servers
                     group: Server Load Balance
                 -
