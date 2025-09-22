@@ -2183,7 +2183,7 @@
                     "sensor_class": "count",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.12356.112.8.2.1.0",
-                    "sensor_index": "fadcVirturalServerNumber.0",
+                    "sensor_index": "fadcVirtualServerNumber.0",
                     "sensor_type": "fortiadc",
                     "sensor_descr": "Virtual Servers",
                     "group": "Server Load Balance",
