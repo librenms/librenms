@@ -8,7 +8,7 @@
                     "sysDescr": "FM Tx HSRN 2",
                     "sysContact": "<private>",
                     "version": "011300",
-                    "hardware": "G20",
+                    "hardware": "2000W",
                     "features": "IP,MPX_IN,RDS_STATIC,COMM_PACK,AUDIO_INPUT,S-FM,ACTIVATION",
                     "location": "Husareyn",
                     "os": "ecresofm-os",
@@ -2752,6 +2752,46 @@
                     "hrDeviceErrors": 0,
                     "hrDeviceStatus": "unknown",
                     "hrProcessorLoad": 12
+                },
+                {
+                    "hrDeviceIndex": 1025,
+                    "hrDeviceDescr": "network interface lo",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1026,
+                    "hrDeviceDescr": "network interface can0",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1027,
+                    "hrDeviceDescr": "network interface eth0",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1280,
+                    "hrDeviceDescr": "such file or directory",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 3072,
+                    "hrDeviceDescr": "Guessing that there's a floating point co-processor",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
                 }
             ]
         }
