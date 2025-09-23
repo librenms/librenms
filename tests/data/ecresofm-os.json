@@ -8,7 +8,7 @@
                     "sysDescr": "FM Tx HSRN 2",
                     "sysContact": "<private>",
                     "version": "011300",
-                    "hardware": "G20",
+                    "hardware": "2000W",
                     "features": "IP,MPX_IN,RDS_STATIC,COMM_PACK,AUDIO_INPUT,S-FM,ACTIVATION",
                     "location": "Husareyn",
                     "os": "ecresofm-os",

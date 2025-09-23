@@ -8,7 +8,7 @@
                     "sysDescr": "Ecreso Sornfelli TX 300W",
                     "sysContact": "<private>",
                     "version": "0190",
-                    "hardware": "E03",
+                    "hardware": "300W",
                     "features": "IP,MPX_IN,RDS_STATIC,COMM_PACK,AUDIO_INPUT,S-FM,ACTIVATION",
                     "location": "Sornfelli",
                     "os": "ecresofm-os",
