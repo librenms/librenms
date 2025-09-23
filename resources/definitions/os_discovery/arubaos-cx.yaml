@@ -15,7 +15,7 @@ modules:
             - ENTITY-MIB::entPhysicalDescr.1
             - ENTITY-MIB::entPhysicalDescr.101001
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

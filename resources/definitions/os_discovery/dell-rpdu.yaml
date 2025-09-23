@@ -8,7 +8,7 @@ modules:
         serial: DellrPDU-MIB::rPDUIdentSerialNumberD.1
         version: DellrPDU-MIB::rPDUIdentFirmwareRevD.1
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:
