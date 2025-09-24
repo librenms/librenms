@@ -350,13 +350,6 @@ if ($options['f'] === 'peeringdb') {
     }
 }
 
-if ($options['f'] === 'refresh_os_cache') {
-    echo 'Clearing OS cache' . PHP_EOL;
-    if (is_file(LibrenmsConfig::get('install_dir') . '/cache/os_defs.cache')) {
-        unlink(LibrenmsConfig::get('install_dir') . '/cache/os_defs.cache');
-    }
-}
-
 if ($options['f'] === 'recalculate_device_dependencies') {
     // fix broken dependency max_depth calculation in case things weren't done though eloquent
 

@@ -5,7 +5,7 @@ modules:
         serial: AC-SYSTEM-MIB::acSysIdSerialNumber.0
         version: AC-SYSTEM-MIB::acSysVersionSoftware.0
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:
