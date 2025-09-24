@@ -533,6 +533,9 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     }
 
                     // process the limits
+                    // phpstan does not like $$var variables
+                    $low_limit = $low_warn_limit = $warn_limit = $high_limit = null;
+
                     $limits = ['low_limit', 'low_warn_limit', 'warn_limit', 'high_limit'];
                     foreach ($limits as $limit) {
                         if (isset($data[$limit]) && is_numeric($data[$limit])) {

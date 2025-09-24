@@ -1,7 +1,7 @@
 mib: HUAWEI-DEVICE-MIB:HUAWEI-POWER-MIB:HWMUSA-DEV-MIB:HUAWEI-XPON-MIB:IF-MIB
 modules:
     mempools:
-        pre-cache:
+        additional_oids:
             oids:
                 - HWMUSA-DEV-MIB::hwMusaBoardSlotDesc
         data:
@@ -21,7 +21,7 @@ modules:
         serial: HUAWEI-DEVICE-MIB::hwBackplanePhySerialNum.0
         version: HUAWEI-DEVICE-MIB::hwSysVersionVrcb.0
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:
