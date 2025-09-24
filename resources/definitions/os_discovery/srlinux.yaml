@@ -19,18 +19,6 @@ modules:
                 type: nokia
                 descr: 'CPU'
     sensors:
-        pre-cache:
-            data:
-                -
-                    oid:
-                        - ifName
-                        - tmnxPhysChassisFanEntry
-                        - tmnxPhysChassisFanOperStatus
-                        - tBgpPeerNgTable
-                        - tmnxHwClass
-                        - tmnxPhysChassisFanTable
-                        - tmnxPhysChassisFanSpeedPercent
-                    snmp_flags: ['-OtbeQUs']
         state:
             data:
                 -
