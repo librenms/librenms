@@ -1,0 +1,7033 @@
+TREDESS-DVBT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY, 
+	enterprises, Integer32, IpAddress
+		FROM SNMPv2-SMI
+	MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+		FROM SNMPv2-CONF
+	TEXTUAL-CONVENTION, TruthValue, DisplayString
+		FROM SNMPv2-TC;
+
+dvbtBroadcastTredessMIB MODULE-IDENTITY
+	LAST-UPDATED "201301281044Z"
+	ORGANIZATION 
+		"TREDESS 2010 S.L."
+	CONTACT-INFO 
+		"Volta do Castro, s/n
+		15705 Santiago de Compostela - SPAIN
+		aprieto@tredess.com"
+	DESCRIPTION 
+		"MIB of DVB-T Broadcast Gap Filler & Transmitter"
+
+	REVISION "201301281044Z"
+	DESCRIPTION 
+		"Add T2 tables. 
+		Add new OIDs:
+		asi2ErrorAlarm, asi2EnableAlarm, asi2EnableTrap,
+		mpeg1ErrorAlarm, mpeg1EnableAlarm, mpeg1EnableTrap,
+		mpeg2ErrorAlarm, mpeg2EnableAlarm, mpeg2EnableTrap,
+		tsErrorAlarm, tsEnableAlarm, tsEnableTrap,
+		t2miErrorAlarm, t2miEnableAlarm, t2miEnableTrap"
+
+	REVISION "201209251201Z"
+	DESCRIPTION 
+		"New splitter GPS table"
+
+	REVISION "201202021031Z"
+	DESCRIPTION 
+		"New OIDs in gpsTable: 
+		gpsState, gpsGMTdate, gpsHardware, gpsHoldoverDrift
+		
+		New OIDs in gpsAlarmTable:
+		gpsSync, gpsSyncEnableAlarm, gpsSyncEnableTrap
+		
+		Renamed OIDs
+		gpsReceiver[...] OIDs for gpsHoldover[...]"
+
+	REVISION "201105261443Z"
+	DESCRIPTION 
+		"Add muxEchoCancelerOn in muxConfigurationTable.
+		1: DAE/DEEC on
+		2: DAE/DEEC off
+		3: NotApply (Transmitter/Regenerative)"
+
+	REVISION "201104201732Z"
+	DESCRIPTION 
+		"Delete muxDeecTemperature OID because
+		this value is in muxTemperature.
+		There are obsoleted values due new Compact Range.
+		Hardware reset MUXs value hardwareResetMuxs(7) in dvbtBroadcastTredessMIB->adminDBTM->status OID"
+
+	REVISION "201104200833Z"
+	DESCRIPTION 
+		"Included DEE Canceler. New OID for this:
+		
+		Mux Configuration Table:
+		muxBW now available for DEEC also with 5MHz
+		muxDeecWindow1Stat
+		muxDeecWindow1Speed
+		muxDeecWindow1Position
+		muxDeecWindow2Speed
+		muxDeecWindow2Position
+		muxDeecWindow3Stat
+		muxDeecWindow3Speed
+		muxDeecWindow3Position
+		
+		Mux Measurement Table:
+		muxDeecTemperature"
+
+	REVISION "201104070807Z"
+	DESCRIPTION 
+		"snmpV2InformTimeout up to 1800 send.
+		snmpV2InformRetries up to 10 retries."
+
+	REVISION "201103210939Z"
+	DESCRIPTION 
+		"muxUserLocalDelay description/unit changed."
+
+	REVISION "201008311333Z"
+	DESCRIPTION 
+		"muxCommunicationEnableTrap is writabled for Gap-Filler
+		Two new columns in muxConfigurationTable:
+		muxCellIdEnabled & muxCellIdValue (R/W)."
+
+	REVISION "201006130934Z"
+	DESCRIPTION 
+		"NTP IP is correct although NTP client is disabled.
+		Change OIDs traps for incommunication traps.
+		New uca1Ready column for expecial commutations.
+		uca1Mode description correction."
+
+	REVISION "201005041045Z"
+	DESCRIPTION 
+		"New column in contactsInputTable (contactsInputSimulate)
+		Writable ntpServerStatus (0 enabled, 1 disabled)
+		New column in networkRoutingTable (networkRoutingInterfaz)
+		Change web user change password system"
+
+	REVISION "201004071925Z"
+	DESCRIPTION 
+		"Fan Traps
+		Fan Service Time
+		Mute configuration
+		GPS Antenna position"
+
+	REVISION "201003301154Z"
+	DESCRIPTION 
+		"New muxEnableAlarm Table.
+		New newConfigurationFileTrap."
+
+	REVISION "201003221756Z"
+	DESCRIPTION 
+		"New UCA 1+1 traps and organization,
+		Integer Enums starts in 1 for snmpv1 compatibility"
+
+	REVISION "201003111114Z"
+	DESCRIPTION 
+		"Errors in UCA 1+1 tables definition
+		News OIDs for index (MUXs and UCA 1+1 tables)
+		muxCtrlAddressMeassurement OID
+		MIB descriptions errors
+		v2Inform OIDs has changed"
+
+	REVISION "201002041132Z"
+	DESCRIPTION 
+		"Revision, add new features:
+		
+		UCA 1+1
+		NTP
+		Routing Table
+		WEBserver users (change passwords)
+		FastTrapsSync
+		v2 Inform"
+
+	REVISION "200702231549Z"
+	DESCRIPTION 
+		"Initial version."
+::= { tredessProducts 1 }
+
+
+BitsStates ::= TEXTUAL-CONVENTION
+	STATUS     deprecated
+	DESCRIPTION 
+		"Bit String providing a status summary for all
+		alarms defined in this MIB module. A bit is set
+		to one if the state of that alarm is 'fail'."
+	SYNTAX  BITS {
+		transmittedPowerMinor (0),
+		transmittedPowerMajor (1),
+		channelBERMinor (2),
+		channelBERMajor (3),
+		trtCurrentsOutRange (4),
+		temperature (5),
+		reflectedPower (6),
+		unlockTS (7),
+		noInputSignal (8),
+		asiError (9),
+		mipError (10),
+		ppsError (11),
+		iFDVBTSignal (12),
+		gps10MHz (13),
+		powerAmplifierCommunication (14),
+		moduleCommunication (15),
+		powerSupply1 (16),
+		powerSupply2 (17),
+		externalSupply (18),
+		gpsHoldover (19),
+		gpsAntenna (20)
+	}
+
+
+Mutes ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION 
+		"Mutes status.
+		
+		Bit - Mutes
+		1 - MPEG Error (lsb)
+		2 - No MIP
+		3 - GPS
+		4 - ASI
+		5 - MPEG overflow
+		"
+	SYNTAX  BITS {
+		null0 (0),
+		null1 (1),
+		null2 (2),
+		mpegOverflow (3),
+		asi (4),
+		gps (5),
+		noMIP (6),
+		mpegError (7)
+	}
+
+
+RateStatus ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION 
+		"RateStatus is used in trap control 
+		                            
+		                            1: disabled 2: enabled 3: enabledPeriod"
+	SYNTAX  INTEGER {
+		disabled (1),
+		enabled (2),
+		enabledPeriod (3)
+	}
+
+televes              OBJECT IDENTIFIER ::= { enterprises 23180 }
+televesGroup         OBJECT IDENTIFIER ::= { televes 2 }
+tredess              OBJECT IDENTIFIER ::= { televesGroup 1 }
+tredessProducts      OBJECT IDENTIFIER ::= { tredess 1 }
+
+-- ###
+-- ###  Description system
+-- ###
+
+systemDBTM           OBJECT IDENTIFIER ::= { dvbtBroadcastTredessMIB 1 }
+
+-- ###
+-- ###  General parameters
+-- ###
+
+adminDBTM            OBJECT IDENTIFIER ::= { dvbtBroadcastTredessMIB 2 }
+networkAdmin         OBJECT IDENTIFIER ::= { adminDBTM 4 }
+snmpAdmin            OBJECT IDENTIFIER ::= { adminDBTM 5 }
+snmpTrapsConfiguration  OBJECT IDENTIFIER ::= { snmpAdmin 3 }
+webserverAdmin       OBJECT IDENTIFIER ::= { adminDBTM 7 }
+
+-- Configure server NTP (Network Time Protocol)
+
+ntpServer            OBJECT IDENTIFIER ::= { adminDBTM 8 }
+
+-- ###
+-- ###  System elements
+-- ###
+
+dvbtBroadcastModules  OBJECT IDENTIFIER ::= { dvbtBroadcastTredessMIB 3 }
+
+-- ###
+-- ###  MULTIPLEX (Gap Filler OR Transmitter)
+-- ###
+
+mux                  OBJECT IDENTIFIER ::= { dvbtBroadcastModules 1 }
+
+-- DVB-T2 Tables
+
+dvbT2Tables          OBJECT IDENTIFIER ::= { mux 10 }
+
+-- ###
+-- ###  UCA
+-- ###
+
+uca                  OBJECT IDENTIFIER ::= { dvbtBroadcastModules 2 }
+
+-- ###
+-- ###  GPS
+-- ###
+
+gps                  OBJECT IDENTIFIER ::= { dvbtBroadcastModules 3 }
+
+-- ###
+-- ###  Dry contacts module (relays)
+-- ###
+-- 
+
+contacts             OBJECT IDENTIFIER ::= { dvbtBroadcastModules 4 }
+ucan                 OBJECT IDENTIFIER ::= { dvbtBroadcastModules 5 }
+ucanStateConfiguration  OBJECT IDENTIFIER ::= { ucan 1 }
+
+-- UCA n+1 State commutation
+
+ucanStateCommutation  OBJECT IDENTIFIER ::= { ucan 2 }
+
+-- UCA n+1 Alarms
+
+ucanAlarm            OBJECT IDENTIFIER ::= { ucan 3 }
+
+-- UCA N+1 for Compact Serie
+
+ucanCompact          OBJECT IDENTIFIER ::= { ucan 4 }
+
+-- ###
+-- ###  UCA 1+1
+-- ###
+
+uca1                 OBJECT IDENTIFIER ::= { dvbtBroadcastModules 6 }
+
+-- ###
+-- ###  Alarm Section
+-- ###
+
+dvbtBroadcastAlarm   OBJECT IDENTIFIER ::= { dvbtBroadcastTredessMIB 4 }
+transmittedPowerObjects  OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 1 }
+
+-- Severity Major (2): transmitted forward power is 6 dB lower than nominal
+-- Severity Minor (3):  transmitted power 3-6 dB lower than nominal 
+-- Severity Cleared (5): transmitted prowe is the nominal 
+
+transmittedPowerTrapsPrefix  OBJECT IDENTIFIER ::= { transmittedPowerObjects 0 }
+trtCurrentsOutRangeObjects  OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 2 }
+
+-- Severity Minor (3): Output stage transistors drain currents out of range (Power Amplifier)
+-- Severity Cleared (5): Output stage transistors drain currents whithin the range (Power Amplifier)
+
+trtCurrectsOutRangeTrapsPrefix  OBJECT IDENTIFIER ::= { trtCurrentsOutRangeObjects 0 }
+reflectedPowerObjects  OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 3 }
+
+-- Severity Minor (3): High reflected Power (> 40% of transmitted signal)
+-- Severity Cleared (5): reflected Power is correct (< 40% of transmitted signal)
+
+reflectedPowerTrapsPrefix  OBJECT IDENTIFIER ::= { reflectedPowerObjects 0 }
+unlockTSObjects      OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 4 }
+unlockTSTrapsPrefix  OBJECT IDENTIFIER ::= { unlockTSObjects 0 }
+noInputSignalObjects  OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 5 }
+
+-- Severity Minor (3): no input signal detected
+-- Severity Cleared (5): input signal is detected
+
+noInputSignalTrapsPrefix  OBJECT IDENTIFIER ::= { noInputSignalObjects 0 }
+asi1ErrorObjects      OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 6 }
+
+-- For Transmitter T (MOD description):
+-- Severity Minor (3): no ASI signals available in any of the ASI inputs
+-- Severity Cleared (5): ASI signals is available
+-- 
+-- For Transmitter T/T2 (MT2 description):
+-- Severity Minor (3): no ASI 1 signal available
+-- Severity Cleared (5): ASI 1 signal is available
+
+asi1ErrorTrapsPrefix  OBJECT IDENTIFIER ::= { asi1ErrorObjects 0 }
+mipErrorObjects      OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 7 }
+
+-- Severity Minor (3): MIP Errors
+-- Severity Cleared (5): MIP is correct
+
+mipErrorTrapsPrefix  OBJECT IDENTIFIER ::= { mipErrorObjects 0 }
+ppsObjects           OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 8 }
+
+-- Severity Minor (3): 1pps signal error in modulator
+-- Severity Cleared (5): 1pps signal in modulator is correct
+
+ppsTrapsPrefix       OBJECT IDENTIFIER ::= { ppsObjects 0 }
+iFDVBTSignalObjects  OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 9 }
+
+-- Severity Minor (3): no DVB-T signal at IF stage (36.15MHz)
+-- Severity Cleared (5): DVB-T signal at IF stage (36.15MHz) is correct
+
+iFDVBTSignalTrapsPrefix  OBJECT IDENTIFIER ::= { iFDVBTSignalObjects 0 }
+gps10MHzObjects      OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 10 }
+
+-- Severity Minor (3): no 10 MHZ signal at the 10MHZ input of modulator
+-- Severity Cleared (5): 10 MHZ signal at the 10MHZ input of modulator is correct
+
+gps10MHzTrapsPrefix  OBJECT IDENTIFIER ::= { gps10MHzObjects 0 }
+powerAmplifierCommunicatObjects  OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 11 }
+
+-- Severity Minor (3): no power amplifier communication
+-- Severity Cleared (5): power amplifier communication recovered
+
+powerAmplifierCommunTrapsPrefix  OBJECT IDENTIFIER ::= { powerAmplifierCommunicatObjects 0 }
+temperatureObjects   OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 12 }
+
+-- Severity Minor (3): high temperature
+-- Severity Cleared (5): normal temperature
+
+temperatureTrapsPrefix  OBJECT IDENTIFIER ::= { temperatureObjects 0 }
+moduleCommunicationObjects  OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 13 }
+
+-- Severity Minor (3): no module communication
+-- Severity Cleared (5): module communication recovered
+-- 
+-- Index could be:
+-- 1..15: MUX
+-- 1...4: UCA
+-- 1,2: GPS
+-- 1: CONTACTS
+
+moduleCommunicationTrapsPrefix  OBJECT IDENTIFIER ::= { moduleCommunicationObjects 0 }
+powerSupply1Objects  OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 14 }
+
+-- Severity Minor (3): power supply 1 failure
+-- Severity Cleared (5): power supply 1 recovered
+
+powerSupply1TrapsPrefix  OBJECT IDENTIFIER ::= { powerSupply1Objects 0 }
+powerSupply2Objects  OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 15 }
+
+-- Severity Minor (3): power supply 2 failure
+-- Severity Cleared (5): power supply 2 recovered
+
+powerSupply2TrapsPrefix  OBJECT IDENTIFIER ::= { powerSupply2Objects 0 }
+gpsHoldoverObjects   OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 16 }
+
+-- Severity Minor (3): GPS receiver failure
+-- Severity Cleared (5): GPS receiver recovered
+
+gpsHoldoverTrapsPrefix  OBJECT IDENTIFIER ::= { gpsHoldoverObjects 0 }
+gpsAntennaObjects    OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 17 }
+
+-- Severity Minor (3): GPS antenna failure (disconnected or short-circuit)
+-- Severity Cleared (5): GPS antenna connection is correct
+
+gpsAntennaTrapsPrefix  OBJECT IDENTIFIER ::= { gpsAntennaObjects 0 }
+relayObjects         OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 18 }
+
+-- Severity Minor (3): external relay is close
+-- Severity Cleared (5): external relay is open
+
+relayTrapsPrefix     OBJECT IDENTIFIER ::= { relayObjects 0 }
+channelBerObjects    OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 19 }
+
+-- Severity Major (2): high Channel-BER (CBER > 2 x E-02)
+-- Severity Minor (3): high Channel-BER (>1xE-04)
+-- Severity Cleared (5): normal Channel-BER
+
+channelBerTrapsPrefix  OBJECT IDENTIFIER ::= { channelBerObjects 0 }
+minorObjects         OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 20 }
+minorTrapsPrefix     OBJECT IDENTIFIER ::= { minorObjects 0 }
+majorObjects         OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 21 }
+majorTrapsPrefix     OBJECT IDENTIFIER ::= { majorObjects 0 }
+generalObjects       OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 22 }
+
+-- ###  Traps Prefix
+-- This prefix is necessary to satisfy the requirement of RFC 2578
+-- section 8.5 that 'the next to last sub-identifier in the name of
+-- any newly-defined notification must have the value zero'.
+
+generalTrapsPrefix   OBJECT IDENTIFIER ::= { generalObjects 0 }
+inputsContactsObjects  OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 23 }
+inputsContactsTrapsPrefix  OBJECT IDENTIFIER ::= { inputsContactsObjects 0 }
+viterbiBerObjects    OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 24 }
+
+-- Severity Major (2): high Channel-BER (CBER > 2 x E-02)
+-- Severity Minor (3): high Channel-BER (>1xE-04)
+-- Severity Cleared (5): normal Channel-BER
+
+viterbiBerTrapsPrefix  OBJECT IDENTIFIER ::= { viterbiBerObjects 0 }
+alternativeAsiObjects  OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 25 }
+
+-- Severity Minor (3): alternative ASI OK
+-- Severity Cleared (5): alternative ASI NOK
+
+alternativeAsiTrapsPrefix  OBJECT IDENTIFIER ::= { alternativeAsiObjects 0 }
+adaptativeEchoObjects  OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 26 }
+
+-- Severity Minor (3): Adaptative Echo ON
+-- Severity Cleared (5): Adaptative Echo OFF
+
+adaptativeEchoTrapsPrefix  OBJECT IDENTIFIER ::= { adaptativeEchoObjects 0 }
+n1ConmutationObjects  OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 27 }
+
+-- Severity Minor (3): MUX n switched
+-- Severity Cleared (5): MUX n no-switched
+
+n1conmutationTrapsPrefix  OBJECT IDENTIFIER ::= { n1ConmutationObjects 0 }
+ucaN1Objects         OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 28 }
+
+-- Severity Minor (3): the alarm is ON
+-- Severity Cleared (5): the alarm is OFF
+
+ucaN1TrapsPrefix     OBJECT IDENTIFIER ::= { ucaN1Objects 0 }
+uca1Objects          OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 29 }
+uca101CompTrapsPrefix  OBJECT IDENTIFIER ::= { uca1Objects 0 }
+uca101TrapsPrefix    OBJECT IDENTIFIER ::= { uca101CompTrapsPrefix 0 }
+uca102CompTrapsPrefix  OBJECT IDENTIFIER ::= { uca1Objects 1 }
+uca102TrapsPrefix    OBJECT IDENTIFIER ::= { uca102CompTrapsPrefix 0 }
+uca103CompTrapsPrefix  OBJECT IDENTIFIER ::= { uca1Objects 2 }
+uca103TrapsPrefix    OBJECT IDENTIFIER ::= { uca103CompTrapsPrefix 0 }
+uca104CompTrapsPrefix  OBJECT IDENTIFIER ::= { uca1Objects 3 }
+uca104TrapsPrefix    OBJECT IDENTIFIER ::= { uca104CompTrapsPrefix 0 }
+uca105CompTrapsPrefix  OBJECT IDENTIFIER ::= { uca1Objects 4 }
+uca105TrapsPrefix    OBJECT IDENTIFIER ::= { uca105CompTrapsPrefix 0 }
+uca106CompTrapsPrefix  OBJECT IDENTIFIER ::= { uca1Objects 5 }
+uca106TrapsPrefix    OBJECT IDENTIFIER ::= { uca106CompTrapsPrefix 0 }
+uca107CompTrapsPrefix  OBJECT IDENTIFIER ::= { uca1Objects 6 }
+uca107TrapsPrefix    OBJECT IDENTIFIER ::= { uca107CompTrapsPrefix 0 }
+uca108CompTrapsPrefix  OBJECT IDENTIFIER ::= { uca1Objects 7 }
+uca108TrapsPrefix    OBJECT IDENTIFIER ::= { uca108CompTrapsPrefix 0 }
+uca109CompTrapsPrefix  OBJECT IDENTIFIER ::= { uca1Objects 8 }
+uca109TrapsPrefix    OBJECT IDENTIFIER ::= { uca109CompTrapsPrefix 0 }
+uca110CompTrapsPrefix  OBJECT IDENTIFIER ::= { uca1Objects 9 }
+uca110TrapsPrefix    OBJECT IDENTIFIER ::= { uca110CompTrapsPrefix 0 }
+uca111CompTrapsPrefix  OBJECT IDENTIFIER ::= { uca1Objects 10 }
+uca111TrapsPrefix    OBJECT IDENTIFIER ::= { uca111CompTrapsPrefix 0 }
+uca112CompTrapsPrefix  OBJECT IDENTIFIER ::= { uca1Objects 11 }
+uca112TrapsPrefix    OBJECT IDENTIFIER ::= { uca112CompTrapsPrefix 0 }
+uca113CompTrapsPrefix  OBJECT IDENTIFIER ::= { uca1Objects 12 }
+uca113TrapsPrefix    OBJECT IDENTIFIER ::= { uca113CompTrapsPrefix 0 }
+uca114CompTrapsPrefix  OBJECT IDENTIFIER ::= { uca1Objects 13 }
+uca114TrapsPrefix    OBJECT IDENTIFIER ::= { uca114CompTrapsPrefix 0 }
+uca115CompTrapsPrefix  OBJECT IDENTIFIER ::= { uca1Objects 14 }
+uca115TrapsPrefix    OBJECT IDENTIFIER ::= { uca115CompTrapsPrefix 0 }
+fanAlarmObjects      OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 31 }
+
+-- Severity Major (2): transmitted forward power is 6 dB lower than nominal
+-- Severity Minor (3):  transmitted power 3-6 dB lower than nominal 
+-- Severity Cleared (5): transmitted prowe is the nominal 
+
+fanAlarmTrapsPrefix  OBJECT IDENTIFIER ::= { fanAlarmObjects 0 }
+gpsSyncObjects       OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 32 }
+
+-- Severity Minor (3): GPS is synchronized
+-- Severity Cleared (5): GPS is not synchronized
+
+gpsSyncTrapsPrefix   OBJECT IDENTIFIER ::= { gpsSyncObjects 0 }
+asi2ErrorObjects     OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 34 }
+
+-- Only T/T2 Transmitter
+-- Severity Minor (3): no ASI 2 signal available. 
+-- Severity Cleared (5): ASI 2 signal is available.
+
+asi2ErrorTrapsPrefix  OBJECT IDENTIFIER ::= { asi2ErrorObjects 0 }
+mpeg1ErrorObjects     OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 37 }
+
+-- Severity Minor (3): MPEG 1 error.
+-- Severity Cleared (5): MPEG 1 signal OK.
+
+mpeg1ErrorTrapsPrefix  OBJECT IDENTIFIER ::= { mpeg1ErrorObjects 0 }
+mpeg2ErrorObjects     OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 38 }
+
+-- Severity Minor (3): MPEG 2 error.
+-- Severity Cleared (5): MPEG 2 signal OK.
+
+mpeg2ErrorTrapsPrefix  OBJECT IDENTIFIER ::= { mpeg2ErrorObjects 0 }
+tsErrorObjects     OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 39 }
+
+-- Only T/T2 Transmitter
+-- Severity Minor (3): ts error.
+-- Severity Cleared (5): ts available.
+
+tsErrorTrapsPrefix  OBJECT IDENTIFIER ::= { tsErrorObjects 0 }
+t2miErrorObjects     OBJECT IDENTIFIER ::= { dvbtBroadcastAlarm 40 }
+
+-- Only T/T2 Transmitter
+-- Severity Minor (3): t2mi error.
+-- Severity Cleared (5): t2mi available.
+
+t2miErrorTrapsPrefix  OBJECT IDENTIFIER ::= { t2miErrorObjects 0 }
+conformance          OBJECT IDENTIFIER ::= { dvbtBroadcastTredessMIB 10 }
+objectGroups         OBJECT IDENTIFIER ::= { conformance 1 }
+groupCompilance      OBJECT IDENTIFIER ::= { conformance 2 }
+
+sysDescrDBTM  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A textual description of the entity."
+	::= { systemDBTM 1 }
+
+sysNameDBTM  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(12))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Name of the station."
+	::= { systemDBTM 2 }
+
+sysManagementVersionDBTM  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Management software version"
+	::= { systemDBTM 3 }
+
+sysKernelVersionDBTM  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Kernel version."
+	::= { systemDBTM 4 }
+
+sysSnmpVersionDBTM  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"SNMP Version"
+	::= { systemDBTM 5 }
+
+sysCycleDBTM  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Last time that has completed a cycle of polling
+		
+		DD/MM/YYYY hh:mm:ss (for example: 20/01/2007 12:14:09)"
+	::= { systemDBTM 6 }
+
+sysFileDateHourDBTM  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Configuration File date/hour
+		
+		DD/MM/YYYY hh:mm:ss (for example: 08/03/2010 14:04:37)"
+	::= { systemDBTM 7 }
+
+sysRedundanceDBTM  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		noRedundance (1),
+		onePlusOneRedundance (2),
+		nPlusOneRedundance (3),
+		multichannel (4),
+		compact (5)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Information redundancy.
+		
+		1: system is not redundant
+		2: 1+1 system
+		3: n+1 system
+		4: multichannel Serie
+		5: Compact Serie"
+	::= { systemDBTM 8 }
+
+date  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"System date DDMMYYYY (for example: 22012008 22/01/2007)"
+	::= { adminDBTM 1 }
+
+hour  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"System time HHMMSS (for example 180300 18:03:00)"
+	::= { adminDBTM 2 }
+
+status  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		systemOK (1),
+		systemReboot (2),
+		systemSoftReset (3),
+		systemHardReset (4),
+		systemFindModules (5),
+		systemReadConfigurations (6),
+		hardwareResetMuxs (7)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"If the manager writes in this variable:
+		
+		1 = it does not efect (telecontrol is ON and polling the modules)
+		2 = telecontrol system will be reboot (telecontrol application)
+		3 = telecontrol system will be soft reset (reboot with actual values)
+		4 = telecontrol system will be hard reset (reboot with default values)
+		5 = telecontrol system will find new modules connected to the control bus
+		6 = telecontrol system will read module configurations - Obsolete in Compact Range
+		7 = telecontrol system will resets MUXs
+		"
+	::= { adminDBTM 3 }
+
+networkIpAddress  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"IP address"
+	::= { networkAdmin 1 }
+
+networkMaskAddress  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Network mask IP address"
+	::= { networkAdmin 2 }
+
+networkGatewayAddress  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Gateway Address"
+	::= { networkAdmin 3 }
+
+networkRoutingTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF NetworkRoutingEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Static Routing Table"
+	::= { networkAdmin 4 }
+
+networkRoutingEntry  OBJECT-TYPE
+	SYNTAX 	NetworkRoutingEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Each row is IP route"
+	INDEX { networkRoutingIndex }
+	::= { networkRoutingTable 1 }
+
+NetworkRoutingEntry ::= SEQUENCE {
+	networkRoutingIndex
+		Integer32,
+	networkRoutingDestination
+		IpAddress,
+	networkRoutingMask
+		IpAddress,
+	networkRoutingGateway
+		IpAddress,
+	networkRoutingInterfaz
+		INTEGER,
+	networkRoutingEnabled
+		TruthValue
+}
+
+networkRoutingIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..4)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Routing table index"
+	::= { networkRoutingEntry 1 }
+
+networkRoutingDestination  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Destination Host/Network IP"
+	::= { networkRoutingEntry 2 }
+
+networkRoutingMask  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Network Mask"
+	::= { networkRoutingEntry 3 }
+
+networkRoutingGateway  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Routing gateway"
+	::= { networkRoutingEntry 4 }
+
+networkRoutingInterfaz  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		networkRoutingEthernet (1),
+		networkRoutingGprs (2),
+		networkRoutingVpn (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Interfaz for this route.
+		
+		1: Ethernet
+		2: GPRS
+		3: VPN"
+	::= { networkRoutingEntry 5 }
+
+networkRoutingEnabled  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/disable this route"
+	::= { networkRoutingEntry 6 }
+
+snmpReadCommunity  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..32))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The read-community parameter specifies the SNMP community 
+		name for read access
+		
+		1..32 characters"
+	::= { snmpAdmin 1 }
+
+snmpWriteCommunity  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..32))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The read-write-community parameter specifies SNMP community 
+		name for read/write acces.
+		
+		1..32 characters"
+	::= { snmpAdmin 2 }
+
+snmpTrapsDestinationTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF SnmpTrapsDestinationEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table contains the posibles trap destinations. 1..4"
+	::= { snmpTrapsConfiguration 1 }
+
+snmpTrapsDestinationEntry  OBJECT-TYPE
+	SYNTAX 	SnmpTrapsDestinationEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Each row is a traps destination IP"
+	INDEX { snmpTrapsDestinationIndex }
+	::= { snmpTrapsDestinationTable 1 }
+
+SnmpTrapsDestinationEntry ::= SEQUENCE {
+	snmpTrapsDestinationIndex
+		Integer32,
+	snmpTrapsDestionationEnable
+		TruthValue,
+	snmpTrapsDestinationIP
+		IpAddress
+}
+
+snmpTrapsDestinationIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..3)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Traps destinations indexs"
+	::= { snmpTrapsDestinationEntry 1 }
+
+snmpTrapsDestionationEnable  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/disable this IP trap destination.
+		
+		True : this IP destination is disables
+		False: this IP destination is enabled"
+	::= { snmpTrapsDestinationEntry 2 }
+
+snmpTrapsDestinationIP  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"IP address for sending traps"
+	::= { snmpTrapsDestinationEntry 3 }
+
+snmpTrapControlRateStatus  OBJECT-TYPE
+	SYNTAX     RateStatus
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object is used for rate control of traps,
+		preventing overload of the management network
+		by transmission of an excessive number of traps.
+		The value 'disabled' means that traps are never
+		sent. The value 'enabled' means that a trap will
+		be sent when triggered.
+		                            
+		When a trap is sent, the agent changes the value
+		of this object to 'enabledPeriod'. In this
+		state the agent will not send any more traps.
+		The agent automatically changes the value back
+		to 'enabled' when the time specified by
+		alarmTrapControlPeriod
+		expires. A management application may set the
+		value to 'enabled' at any time, but must never
+		set the value to 'enabledPeriod'.
+		"
+	::= { snmpTrapsConfiguration 2 }
+
+snmpTrapControlPeriod  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"seconds"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The agent will ensure that the interval between
+		sending traps is no shorter than this time period
+		(unless overridden by the manager)."
+	::= { snmpTrapsConfiguration 3 }
+
+snmpTrapsSync  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This value is the last sent trap number. It is used for synchronizing the traps.
+		
+		If the remote user writes this variable with a number lower than actual,
+		the agent will send the traps since that number to the actual.
+		"
+	::= { snmpTrapsConfiguration 4 }
+
+snmpTrapsAuthTrapEnable  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Setting this variable to 1enables generation of authentication failure traps.
+		
+		True = authentication failure traps disable
+		False  = authentication failure traps enable
+		
+		"
+	::= { snmpTrapsConfiguration 5 }
+
+snmpTrapsCommunity  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..32))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This define the default comunity string to be used when sending traps.
+		
+		1..32 characters"
+	::= { snmpTrapsConfiguration 6 }
+
+snmpTrapsPeriodic  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Seconds"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The agent will send one trap if passed 
+		this amount of seconds has not been sent no alarm
+		
+		0: the periodicTrap never will be sent"
+	::= { snmpTrapsConfiguration 7 }
+
+snmpFastTrapsSync  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Fast Trap Syncronization sends to SNMP Managers 
+		the traps which are actually activated alarms.
+		
+		false: is the default value. 
+		true: starts fast trap syncronization process."
+	::= { snmpTrapsConfiguration 8 }
+
+snmpInformAck  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Traps behavior.
+		
+		Indicates if the Manager has to send an ACK for each received trap or not.
+		
+		1: v2inform (ACK are necessary)
+		2: v2trap (ACK are not necessary)
+		
+		"
+	::= { snmpTrapsConfiguration 9 }
+
+snmpInformTimeout  OBJECT-TYPE
+	SYNTAX     Integer32 (1..1800)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"When this time out is completed if an ACK is not received and the attemps 
+		number executed is lower than configurated value, the agent resends
+		the trap."
+	::= { snmpTrapsConfiguration 10 }
+
+snmpInformRetries  OBJECT-TYPE
+	SYNTAX     Integer32 (1..10)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Number of retries for sending a trap."
+	::= { snmpTrapsConfiguration 11 }
+
+powerSupplyStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		powerSupplyAC (1),
+		powerSupplyBattery (2),
+		powerSupplyBatterySAE (3)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Indicates the power supply status.
+		
+		1: Management is powered by AC.
+		2: Management is powered by battery.
+		3: Management is powered by SAE (only if system has fuse box connected to realys module)"
+	::= { adminDBTM 6 }
+
+webserverAutoRefresh  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"seconds"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Auto-refresh web is enabled if this value is not 0.
+		Time in seconds"
+	::= { webserverAdmin 1 }
+
+webserverNewPass  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..10))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"New Password
+		
+		Only write!
+		
+		First set the new value. After that:
+		- setting webserverUser1 with the same password for changing not privileged user ('user')
+		- setting webserverUser1 with the same password for changing privileged user ('admin')"
+	::= { webserverAdmin 2 }
+
+webserverUser1  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..10))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"New Password User1
+		
+		Only write!
+		
+		After setting webserverNewPass, setting this value with the same password for changing not privileged user ('user')
+		"
+	::= { webserverAdmin 3 }
+
+webserverUser2  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(1..10))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"New Password User2
+		
+		Only write!
+		
+		After setting webserverNewPass, setting this value with the same password for changing privileged user ('admin')"
+	::= { webserverAdmin 4 }
+
+-- NTP status
+-- 
+-- 1: Disabled
+-- 2: Updated
+-- 3: Updating
+-- 4: Error
+
+ntpServerStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		ntpServerEnabled (0),
+		ntpServerDisabled (1),
+		ntpServerUpdated (2),
+		ntpServerUpdating (3),
+		ntpServerError (4)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Indicates the NTP server status
+		
+		0: enabled
+		1: disabled
+		2: udpated
+		3: udpating
+		4: error during updating process
+		
+		It is possible only write values 0 (enabled) and 1(disabled)"
+	::= { ntpServer 1 }
+
+ntpServerIp  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"NTP IP server"
+	::= { ntpServer 2 }
+
+ntpServerVersion  OBJECT-TYPE
+	SYNTAX     Integer32 (1..3)
+	MAX-ACCESS read-write
+	STATUS     deprecated
+	DESCRIPTION 
+		"NTP version 1,2,3"
+	::= { ntpServer 3 }
+
+ntpServerOffset  OBJECT-TYPE
+	SYNTAX     Integer32 (-12..14)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"GMT offset
+		-12 ... +14"
+	::= { ntpServer 4 }
+
+muxConfigurationTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MuxConfigurationEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table contains the basic information of multiplex connected to the system."
+	::= { mux 1 }
+
+muxConfigurationEntry  OBJECT-TYPE
+	SYNTAX 	MuxConfigurationEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Multiplex slot. Multiplex could be Gap Filler or Transmitter system."
+	INDEX { muxConfigurationIndex }
+	::= { muxConfigurationTable 1 }
+
+MuxConfigurationEntry ::= SEQUENCE {
+	muxConfigurationIndex
+		Integer32,
+	muxConfigurationDescription
+		DisplayString,
+	muxCtrlAddress
+		Integer32,
+	muxChannelIn
+		Integer32,
+	muxChannelOut
+		Integer32,
+	muxFreqIn
+		Integer32,
+	muxFreqOut
+		Integer32,
+	muxTNetworkMode
+		INTEGER,
+	muxAutoMIP
+		INTEGER,
+	muxFFTSize
+		INTEGER,
+	muxGuardInterval
+		INTEGER,
+	muxBW
+		INTEGER,
+	muxConstellation
+		INTEGER,
+	muxFEC
+		INTEGER,
+	muxUserLocalDelay
+		Integer32,
+	muxMutes
+		Mutes,
+	muxVcorr1
+		Integer32,
+	muxVcorr2
+		Integer32,
+	muxHysteresis
+		Integer32,
+	muxCBERwarningLevel
+		OCTET STRING,
+	muxCBERcriticalLevel
+		OCTET STRING,
+	muxTrapsConfiguration
+		BitsStates,
+	muxVBERwarningLevel
+		OCTET STRING,
+	muxVBERcriticalLevel
+		OCTET STRING,
+	muxEchoAdaptation
+		INTEGER,
+	muxAsiInput
+		INTEGER,
+	muxUmbralTemp
+		Integer32,
+	muxConfigurationRowIndex
+		Integer32,
+	muxRfMute
+		TruthValue,
+	muxTCellIdEnable
+		TruthValue,
+	muxTCellIdValue
+		Integer32,
+	muxDeecWindow1Stat
+		TruthValue,
+	muxDeecWindow1Speed
+		INTEGER,
+	muxDeecWindow1Position
+		Integer32,
+	muxDeecWindow2Speed
+		INTEGER,
+	muxDeecWindow2Position
+		Integer32,
+	muxDeecWindow3Stat
+		TruthValue,
+	muxDeecWindow3Speed
+		INTEGER,
+	muxDeecWindow3Position
+		Integer32,
+	muxEchoCancelerOn
+		INTEGER,
+	muxConfigurationType
+		INTEGER,
+	muxUmbralTempFPGA
+		Integer32,
+	muxTcfgPPSedge
+		INTEGER,
+	muxTtxId
+		INTEGER
+}
+
+muxConfigurationIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..30)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"MUX index"
+	::= { muxConfigurationEntry 1 }
+
+muxConfigurationDescription  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"MUX description. The module could be 
+		
+		REM: GapFiller DAE
+		DEEC: GapFiller DEEC
+		MOD: Transmitter.
+		REG: retransmitter
+		MT2: Modualtor T/T2"
+	::= { muxConfigurationEntry 2 }
+
+muxCtrlAddress  OBJECT-TYPE
+	SYNTAX     Integer32 (1..15|101..115)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Control address"
+	::= { muxConfigurationEntry 3 }
+
+muxChannelIn  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Input Channel
+		0: N/A (The multiplex is a Transmitter)"
+	::= { muxConfigurationEntry 4 }
+
+muxChannelOut  OBJECT-TYPE
+	SYNTAX     Integer32 (21..69)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Output Channel"
+	::= { muxConfigurationEntry 5 }
+
+muxFreqIn  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Input frequency
+		0: N/A (The multiplex is a Transmitter)"
+	::= { muxConfigurationEntry 6 }
+
+muxFreqOut  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Output frequency"
+	::= { muxConfigurationEntry 7 }
+
+muxTNetworkMode  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		sfn (1),
+		mfn (2),
+		unknown (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Network Mode (SFN/MFN) for DVB-T transmitter (or DVB-T2 module working on T mode)
+		
+		1: SFN
+		2: MFN
+		3: unkown (Gap-Filler / Retransmitter / DVB-T2)
+		"
+	::= { muxConfigurationEntry 8 }
+
+muxAutoMIP  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		autoMIPon (1),
+		autoMIPoff (2),
+		notApply (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Auto MIP On/Off
+		For Retransmitter Module is Auto-Configuration (web tag)
+		
+		1: On
+		2: Off
+		3: N/A (The multiplex is a GapFiller)
+		
+		
+		"
+	::= { muxConfigurationEntry 9 }
+
+muxFFTSize  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notApply (1),
+		muxFFTSize2K (2),
+		muxFFTSize8K (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"OFDM transmission mode (2K, 8K) 
+		
+		1: N/A (The multiplex is a GapFiller)
+		2: 2K-OFDM
+		3: 8K-OFDM"
+	::= { muxConfigurationEntry 10 }
+
+muxGuardInterval  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notApply (1),
+		guardIntervalDIV32 (2),
+		guardIntervalDIV16 (3),
+		guardIntervalDIV8 (4),
+		guardIntervalDIV4 (5)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Guard Interval: 
+		1: N/A (The multiplex is a GapFiller)
+		2: 1/32 
+		3: 1/16 
+		4: 1/8 
+		5: 1/4"
+	::= { muxConfigurationEntry 11 }
+
+muxBW  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notApply (1),
+		muxBW8MHz (2),
+		muxBW7MHz (3),
+		muxBW6MHz (4),
+		muxBW5MHz (5)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"OFDM Bandwith (6-7-8 MHz)
+		
+		1: N/A (The multiplex is a GapFiller and has not an DEEC)
+		2: 8 MHz
+		3: 7 MHz
+		4: 6 MHz
+		5: 5 MHz (Only for DEE Canceler)"
+	::= { muxConfigurationEntry 12 }
+
+muxConstellation  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notApply (1),
+		constellationQPSK (2),
+		constellation16QAM (3),
+		constellation64QAM (4)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"QAM Constellation
+		
+		1: N/A (The multiplex is a GapFiller)
+		2: QPSK 
+		3: 16-QAM 
+		4: 64-QAM"
+	::= { muxConfigurationEntry 13 }
+
+muxFEC  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notApply (1),
+		fec1div2 (2),
+		fec2div3 (3),
+		fec3div4 (4),
+		fec5div6 (5),
+		fec7div8 (6)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"FEC (Code Rate) 
+		
+		1: N/A (The multiplex is a GapFiller)
+		2: 1/2 
+		3: 2/3 
+		4: 3/4
+		5: 5/6 
+		6: 7/8"
+	::= { muxConfigurationEntry 14 }
+
+muxUserLocalDelay  OBJECT-TYPE
+	SYNTAX     Integer32 (-20000..20000)
+	UNITS 	"usec/10"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User Delay in 0.1 microseconds steps"
+	::= { muxConfigurationEntry 15 }
+
+muxMutes  OBJECT-TYPE
+	SYNTAX     Mutes
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This bits arrays indicates that 
+		
+		Each bit indicates that cause mute the transmitter output.
+		
+		bit - mute if
+		1 - there are errors in the MIP
+		2 - there aren't MIP
+		3 - there aren't GPS reference
+		4 - there aren't ASI input
+		5 - there are MPEG overflow
+		"
+	::= { muxConfigurationEntry 16 }
+
+muxVcorr1  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Precorrector 1 Voltage "
+	::= { muxConfigurationEntry 17 }
+
+muxVcorr2  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     deprecated
+	DESCRIPTION 
+		"Precorrector 2 Voltage "
+	::= { muxConfigurationEntry 18 }
+
+muxHysteresis  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"dsec"
+	MAX-ACCESS read-write
+	STATUS     deprecated
+	DESCRIPTION 
+		"Time to validate the alarm status."
+	::= { muxConfigurationEntry 19 }
+
+muxCBERwarningLevel  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(9))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"CBER level for warning alarm"
+	::= { muxConfigurationEntry 20 }
+
+muxCBERcriticalLevel  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(9))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"CBER level for critical alarm"
+	::= { muxConfigurationEntry 21 }
+
+muxTrapsConfiguration  OBJECT-TYPE
+	SYNTAX     BitsStates
+	MAX-ACCESS read-write
+	STATUS     deprecated
+	DESCRIPTION 
+		"Bits array for enable/disable the traps from this module
+		
+		For each bit:
+		     False: disable
+		     true: enable
+		
+		The bits are represented in BitsStates convection"
+	::= { muxConfigurationEntry 22 }
+
+muxVBERwarningLevel  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(9))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"CBER level for warning alarm"
+	::= { muxConfigurationEntry 23 }
+
+muxVBERcriticalLevel  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(9))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"CBER level for critical alarm"
+	::= { muxConfigurationEntry 24 }
+
+muxEchoAdaptation  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		on (1),
+		off (2),
+		notApply (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     deprecated
+	DESCRIPTION 
+		"Switch on/off echo adaptations. Reduce the transmited power if the echo is high.
+		
+		1: On
+		2: Off
+		3: N/A this mux is a transmisor or the version is not compatible
+		"
+	::= { muxConfigurationEntry 25 }
+
+muxAsiInput  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		manualAsi1 (1),
+		manualAsi2 (2),
+		auto (3),
+		autoPriority1 (4),
+		notApply (5)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"ASI selection:
+		
+		1: Manual ASI 1
+		2: Manual ASI 2
+		3: Automatic without priority
+		4: Automatic  with priority 1
+		5: N/A this mux is a gap-filler or the version is not comptible"
+	::= { muxConfigurationEntry 26 }
+
+muxUmbralTemp  OBJECT-TYPE
+	SYNTAX     Integer32 (0..99)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Alarm temperature threshold"
+	::= { muxConfigurationEntry 27 }
+
+muxConfigurationRowIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..30)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"MUX index (readable)"
+	::= { muxConfigurationEntry 28 }
+
+muxRfMute  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The RF output can be muted with this variable."
+	::= { muxConfigurationEntry 29 }
+
+muxTCellIdEnable  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable Cell ID"
+	::= { muxConfigurationEntry 30 }
+
+muxTCellIdValue  OBJECT-TYPE
+	SYNTAX     Integer32 (0..65535)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Cell ID value (if Cell ID is enabled)"
+	::= { muxConfigurationEntry 31 }
+
+muxDeecWindow1Stat  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"On/Off Cancellation window 1 on DEE Canceler
+		
+		If the MUX has not an DEEC, do not apply"
+	::= { muxConfigurationEntry 32 }
+
+muxDeecWindow1Speed  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		speed0 (0),
+		speed1 (1),
+		speed2 (2),
+		speed3 (3),
+		speed4 (4),
+		speed5 (5),
+		speed6 (6),
+		speed7 (7)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Speed  Cancellation window 1 on DEE Canceler
+		
+		If the MUX has not an DEEC, do not apply"
+	::= { muxConfigurationEntry 33 }
+
+-- This is an time aproximation from 0 up to 255 values.
+-- So you can set an value (0,5 .... 32,1) and EEC willl use an aproximate value.
+
+muxDeecWindow1Position  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"usec/10"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Cancellation window 1 Position for DEE Canceler
+		
+		Position in 0.1 microseconds steps
+		
+		From 5 (0.5 usec) up to 316 (31.6 usec)
+		
+		If the MUX has not an DEEC, do not apply"
+	::= { muxConfigurationEntry 34 }
+
+muxDeecWindow2Speed  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		speed0 (0),
+		speed1 (1),
+		speed2 (2),
+		speed3 (3),
+		speed4 (4),
+		speed5 (5),
+		speed6 (6),
+		speed7 (7)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Speed  Cancellation window 2 on DEE Canceler
+		
+		If the MUX has not an DEEC, do not apply"
+	::= { muxConfigurationEntry 35 }
+
+-- This is an time aproximation from 0 up to 255 values.
+-- So you can set an value (0,5 .... 32,1) and EEC willl use an aproximate value.
+
+muxDeecWindow2Position  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"usec/10"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Cancellation window 2 Position for DEE Canceler
+		
+		Position in 0.1 microseconds steps
+		
+		From 50 (5 usec) up to 361 (36.1 usec)
+		
+		If the MUX has not an DEEC, do not apply"
+	::= { muxConfigurationEntry 36 }
+
+muxDeecWindow3Stat  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"On/Off Cancellation window 3 on DEE Canceler
+		
+		If the MUX has not an DEEC, do not apply"
+	::= { muxConfigurationEntry 37 }
+
+muxDeecWindow3Speed  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		speed0 (0),
+		speed1 (1),
+		speed2 (2),
+		speed3 (3),
+		speed4 (4),
+		speed5 (5),
+		speed6 (6),
+		speed7 (7)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Speed  Cancellation window 1 on DEE Canceler
+		
+		If the MUX has not an DEEC, do not apply"
+	::= { muxConfigurationEntry 38 }
+
+-- This is an time aproximation from 0 up to 255 values.
+-- So you can set an value (0,5 .... 32,1) and EEC willl use an aproximate value.
+
+muxDeecWindow3Position  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"usec/10"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Cancellation window 3 Position for DEE Canceler
+		
+		Position in 0.1 microseconds steps
+		
+		From 5 (0.5 usec) up to 316 (31.6 usec)
+		
+		If the MUX has not an DEEC, do not apply"
+	::= { muxConfigurationEntry 39 }
+
+muxEchoCancelerOn  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		muxEchoCancelerOn (1),
+		muxEchoCancelerOff (2),
+		notApply (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Echo Canceler On/Off
+		
+		MUX trasnsmitter will be notApply(3).
+		
+		1: Echo Canceler is On
+		2: Echo Canceler is Off
+		3: NotApply"
+	::= { muxConfigurationEntry 40 }
+
+muxConfigurationType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		dvbt (1),
+		dvbt2 (2),
+		unknown (3),
+		notApply (4)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"DVB-T / DVB-T2 selector
+		
+		1: DVB-T
+		2: DVB-T2
+		3: Unknown (Gap-Filler)
+		4: Not Apply (dummy)"
+	::= { muxConfigurationEntry 43 }
+
+muxUmbralTempFPGA  OBJECT-TYPE
+	SYNTAX     Integer32 (-1|0..99)
+	UNITS 	"Celsius"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Alarm temperature (FPGA) threshold
+		
+		Only available for T/T2 Transmitter.
+		
+		-1: N/A this mux is a dummy or not T/T2 Transmitter"
+	DEFVAL  { 65 }
+	::= { muxConfigurationEntry 44 }
+
+muxTcfgPPSedge  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		rising (1),
+		falling (2),
+		notApply (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"PPS edge:
+		
+		1: rising
+		2: falling
+		3: notApply
+		"
+	::= { muxConfigurationEntry 45 }
+
+muxTtxId  OBJECT-TYPE
+	SYNTAX     Integer32 (-1|0..65535)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"DVB-T trasmitter ID"
+	::= { muxConfigurationEntry 46 }
+
+muxMeasurementTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MuxMeasurementEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table contains the status information of multiplex connected to the system."
+	::= { mux 2 }
+
+muxMeasurementEntry  OBJECT-TYPE
+	SYNTAX 	MuxMeasurementEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Each row is the Multiplex information. 1 multiplex 
+		could be Gap Filler or Transmitter system."
+	INDEX { muxMeasurementIndex }
+	::= { muxMeasurementTable 1 }
+
+MuxMeasurementEntry ::= SEQUENCE {
+	muxMeasurementIndex
+		Integer32,
+	muxMeasurementDescription
+		DisplayString,
+	muxChannel
+		Integer32,
+	muxChannelBER
+		DisplayString,
+	muxTransmittedPower
+		DisplayString,
+	muxReflectedPower
+		DisplayString,
+	muxTemperature
+		DisplayString,
+	muxIdT1
+		DisplayString,
+	muxIdT2
+		DisplayString,
+	muxNetworkMaxDelay
+		DisplayString,
+	muxLocalMarginDelay
+		DisplayString,
+	muxAlarmStatus
+		BitsStates,
+	muxViterbiBER
+		DisplayString,
+	echoMG
+		DisplayString,
+	echoAdaptationFactor
+		DisplayString,
+	asi1Status
+		INTEGER,
+	asi2Status
+		INTEGER,
+	muxCtrlAddressMeasurerement
+		Integer32,
+	muxMeasurementRowIndex
+		Integer32,
+	muxFan1ServiceTime
+		Integer32,
+	muxFan2ServiceTime
+		Integer32,
+	muxFan3ServiceTime
+		Integer32,
+	muxMeasurementType
+		INTEGER
+}
+
+muxMeasurementIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..30)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"MUX index"
+	::= { muxMeasurementEntry 1 }
+
+muxMeasurementDescription  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"MUX description. The module could be 
+		
+		REM: GapFiller DAE
+		DEEC: GapFiller DEEC
+		MOD: Transmitter.
+		REG: retransmitter"
+	::= { muxMeasurementEntry 2 }
+
+muxChannel  OBJECT-TYPE
+	SYNTAX     Integer32 (21..69)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Output Channel"
+	::= { muxMeasurementEntry 3 }
+
+muxChannelBER  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Channel BER"
+	::= { muxMeasurementEntry 4 }
+
+muxTransmittedPower  OBJECT-TYPE
+	SYNTAX     DisplayString
+	UNITS 	"W"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Transmitted Power (W)"
+	::= { muxMeasurementEntry 5 }
+
+muxReflectedPower  OBJECT-TYPE
+	SYNTAX     DisplayString
+	UNITS 	"W"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Reflected Power (W)"
+	::= { muxMeasurementEntry 6 }
+
+muxTemperature  OBJECT-TYPE
+	SYNTAX     DisplayString
+	UNITS 	"C"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Temperature"
+	::= { muxMeasurementEntry 7 }
+
+muxIdT1  OBJECT-TYPE
+	SYNTAX     DisplayString
+	UNITS 	"mA"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Output Stage Transistor 1 Drain Current"
+	::= { muxMeasurementEntry 8 }
+
+muxIdT2  OBJECT-TYPE
+	SYNTAX     DisplayString
+	UNITS 	"mA"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Output Stage Transistor 2 Drain Current"
+	::= { muxMeasurementEntry 9 }
+
+muxNetworkMaxDelay  OBJECT-TYPE
+	SYNTAX     DisplayString
+	UNITS 	"usec"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Maximum Network Delay (microseconds)"
+	::= { muxMeasurementEntry 10 }
+
+muxLocalMarginDelay  OBJECT-TYPE
+	SYNTAX     DisplayString
+	UNITS 	"usec"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Margin delay necessary for synchronization. Steps of 100ns."
+	::= { muxMeasurementEntry 11 }
+
+muxAlarmStatus  OBJECT-TYPE
+	SYNTAX     BitsStates
+	MAX-ACCESS read-only
+	STATUS     deprecated
+	DESCRIPTION 
+		"Alarm bits states for this module."
+	::= { muxMeasurementEntry 12 }
+
+muxViterbiBER  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Channel BER"
+	::= { muxMeasurementEntry 13 }
+
+echoMG  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Echo Gain Margin"
+	::= { muxMeasurementEntry 14 }
+
+echoAdaptationFactor  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Echo Adaptation Factor is the power reduction factor."
+	::= { muxMeasurementEntry 15 }
+
+asi1Status  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		asiOk (1),
+		asiError (2),
+		noMIP (3),
+		noMPEG (4),
+		noCRC (5),
+		notApply (6)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"ASI 1 status:
+		
+		1: ASI OK
+		2: asiError
+		3: No MIP
+		4: No MPEG
+		5: No CRC
+		6: N/A. This mux is a gap-filler or version is not compatible"
+	::= { muxMeasurementEntry 16 }
+
+asi2Status  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		asiOk (1),
+		asiError (2),
+		noMIP (3),
+		noMPEG (4),
+		noCRC (5),
+		notApply (6)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"ASI 2 status:
+		
+		1: ASI OK
+		2: asiError
+		3: No MIP
+		4: No MPEG
+		5: No CRC
+		6: N/A. This mux is a gap-filler or version is not compatible"
+	::= { muxMeasurementEntry 17 }
+
+muxCtrlAddressMeasurerement  OBJECT-TYPE
+	SYNTAX     Integer32 (1..15|101..115)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Control address"
+	::= { muxMeasurementEntry 18 }
+
+muxMeasurementRowIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..30)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"MUX index (readable)"
+	::= { muxMeasurementEntry 19 }
+
+muxFan1ServiceTime  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Fan 1 services time (hours).
+		If this value is -1, this time is not available
+		This value is only available in Compact Range and 50W broadcast"
+	::= { muxMeasurementEntry 20 }
+
+muxFan2ServiceTime  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     obsolete
+	DESCRIPTION 
+		"Fan 2 services time (hours).
+		This value is useful for 50W power amplifier."
+	::= { muxMeasurementEntry 21 }
+
+muxFan3ServiceTime  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     obsolete
+	DESCRIPTION 
+		"Fan 3 services time (hours).
+		This value is useful for 50W power amplifier."
+	::= { muxMeasurementEntry 22 }
+
+muxMeasurementType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		dvbt (1),
+		dvbt2 (2),
+		unknown (3),
+		notApply (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"DVB-T / DVB-T2 selector
+		
+		1: DVB-T
+		2: DVB-T2
+		3: Unknown (Gap-Filler)
+		4: Not Apply (dummy)"
+	::= { muxMeasurementEntry 23 }
+
+muxVersionTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MuxVersionEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table contains the status information of multiplex connected to the system."
+	::= { mux 3 }
+
+muxVersionEntry  OBJECT-TYPE
+	SYNTAX 	MuxVersionEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Each row is the Multiplex information. 1 multiplex 
+		could be Gap Filler or Transmitter system."
+	INDEX { muxVersionIndex }
+	::= { muxVersionTable 1 }
+
+MuxVersionEntry ::= SEQUENCE {
+	muxVersionIndex
+		Integer32,
+	muxCtrlAddressVersion
+		Integer32,
+	muxRFoutVersion
+		Integer32,
+	muxMicrocontrollerVersion
+		DisplayString,
+	muxMicrocontrollerAmpVersion
+		DisplayString,
+	muxFPGAVersion
+		DisplayString,
+	muxVersionRowIndex
+		Integer32,
+	muxVersionType
+		INTEGER
+}
+
+muxVersionIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..30)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"MUX index"
+	::= { muxVersionEntry 1 }
+
+muxCtrlAddressVersion  OBJECT-TYPE
+	SYNTAX     Integer32 (1..15|101..115)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Control address for this module"
+	::= { muxVersionEntry 2 }
+
+muxRFoutVersion  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"RF out channel for this multiplex"
+	::= { muxVersionEntry 3 }
+
+muxMicrocontrollerVersion  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Multiplex firmware version"
+	::= { muxVersionEntry 4 }
+
+muxMicrocontrollerAmpVersion  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Power amplifier firmware version"
+	::= { muxVersionEntry 5 }
+
+muxFPGAVersion  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"FPGA version"
+	::= { muxVersionEntry 6 }
+
+muxVersionRowIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..30)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"MUX index (readable)"
+	::= { muxVersionEntry 7 }
+
+muxVersionType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		dvbt (1),
+		dvbt2 (2),
+		unknown (3),
+		notApply (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"DVB-T / DVB-T2 selector
+		
+		1: DVB-T
+		2: DVB-T2
+		3: Unknown (Gap-Filler)
+		4: Not Apply (dummy)"
+	::= { muxVersionEntry 8 }
+
+muxAlarmsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MuxAlarmsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table contains the alarm status of each mux."
+	::= { mux 4 }
+
+muxAlarmsEntry  OBJECT-TYPE
+	SYNTAX 	MuxAlarmsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Each row is the Multiplex information. 1 multiplex 
+		could be Gap Filler or Transmitter system."
+	INDEX { muxAlarmsIndex }
+	::= { muxAlarmsTable 1 }
+
+MuxAlarmsEntry ::= SEQUENCE {
+	muxAlarmsIndex
+		Integer32,
+	muxCtrlAddressAlarm
+		Integer32,
+	muxRFoutAlarm
+		Integer32,
+	muxMajorAlarm
+		TruthValue,
+	muxMinorAlarm
+		TruthValue,
+	transmittedPower6dBAlarm
+		TruthValue,
+	transmittedPower3dBAlarm
+		TruthValue,
+	trtCurrentsOutRangeAlarm
+		TruthValue,
+	reflectedPowerAlarm
+		TruthValue,
+	unLockTSAlarm
+		TruthValue,
+	noInputSignalAlarm
+		TruthValue,
+	asi1ErrorAlarm
+		TruthValue,
+	mipErrorAlarm
+		TruthValue,
+	ppsAlarm
+		TruthValue,
+	iFDVBTSignalAlarm
+		TruthValue,
+	gps10MHzAlarm
+		TruthValue,
+	powerAmplifierCommunicatAlarm
+		TruthValue,
+	temperatureAlarm
+		TruthValue,
+	moduleCommunitacionAlarm
+		TruthValue,
+	onOffAlarm
+		TruthValue,
+	cBerAlarm
+		TruthValue,
+	vBerAlarm
+		TruthValue,
+	muxAlarmsRowIndex
+		Integer32,
+	fanAlarm
+		TruthValue,
+	asi2ErrorAlarm
+		TruthValue,
+	mpeg1ErrorAlarm
+		TruthValue,
+	mpeg2ErrorAlarm
+		TruthValue,
+	tsErrorAlarm
+		TruthValue,
+	t2miErrorAlarm
+		TruthValue
+}
+
+muxAlarmsIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..15)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"MUX index"
+	::= { muxAlarmsEntry 1 }
+
+muxCtrlAddressAlarm  OBJECT-TYPE
+	SYNTAX     Integer32 (1..15|101..115)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Control address for this module"
+	::= { muxAlarmsEntry 2 }
+
+muxRFoutAlarm  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"RF out channel for this multiplex
+		
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter"
+	::= { muxAlarmsEntry 3 }
+
+muxMajorAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Major MUX status
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter"
+	::= { muxAlarmsEntry 4 }
+
+muxMinorAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Minor MUX status
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter"
+	::= { muxAlarmsEntry 5 }
+
+transmittedPower6dBAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Transmitted Power 6dB lower than nominal
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter"
+	::= { muxAlarmsEntry 6 }
+
+transmittedPower3dBAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Transmitted Power 3dB lower than nominal
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter"
+	::= { muxAlarmsEntry 7 }
+
+trtCurrentsOutRangeAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Power amplifier firmware version
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter"
+	::= { muxAlarmsEntry 8 }
+
+reflectedPowerAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Reflected power alarm status
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter"
+	::= { muxAlarmsEntry 9 }
+
+unLockTSAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Unlock Transport Stream alarm
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter
+		
+		
+		If DVB-T Receiver is installed on Management Module"
+	::= { muxAlarmsEntry 10 }
+
+noInputSignalAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"No input signal alarm
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative: Means MPEG ERROR"
+	::= { muxAlarmsEntry 11 }
+
+asi1ErrorAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"ASI error alarm. 
+		General for only T transmitter.
+		ASI 1 for T/T2 transmitter"
+	::= { muxAlarmsEntry 12 }
+
+mipErrorAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"MIP error alarm
+		Applies to:
+		
+		Transmitter"
+	::= { muxAlarmsEntry 13 }
+
+ppsAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"1 pps alarm status
+		Applies to:
+		
+		Transmitter"
+	::= { muxAlarmsEntry 14 }
+
+iFDVBTSignalAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"No DVBT IF signal alarm
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter"
+	::= { muxAlarmsEntry 15 }
+
+gps10MHzAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"10 MHz alarm
+		Applies to:
+		
+		Transmitter"
+	::= { muxAlarmsEntry 16 }
+
+powerAmplifierCommunicatAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     obsolete
+	DESCRIPTION 
+		"Power Amplifier communication"
+	::= { muxAlarmsEntry 17 }
+
+temperatureAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Temperature alarm
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter"
+	::= { muxAlarmsEntry 18 }
+
+moduleCommunitacionAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Communication alarm
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter"
+	::= { muxAlarmsEntry 19 }
+
+onOffAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     deprecated
+	DESCRIPTION 
+		"MUX status"
+	::= { muxAlarmsEntry 20 }
+
+cBerAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Channel BER (pre-Viterbi) alarm status
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter
+		
+		
+		If DVB-T Receiver is installed on Management Module"
+	::= { muxAlarmsEntry 21 }
+
+vBerAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"VBER (post-Viterbi) alarm status
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter
+		
+		
+		If DVB-T Receiver is installed on Management Module"
+	::= { muxAlarmsEntry 22 }
+
+muxAlarmsRowIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..30)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"MUX index (readable)"
+	::= { muxAlarmsEntry 23 }
+
+fanAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     obsolete
+	DESCRIPTION 
+		"Fan alarm.
+		This value is useful for 50W power amplifier."
+	::= { muxAlarmsEntry 24 }
+
+asi2ErrorAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"ASI 2 error alarm."
+	::= { muxAlarmsEntry 25 }
+
+mpeg1ErrorAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"MPEG 1 error alarm."
+	::= { muxAlarmsEntry 26 }
+
+mpeg2ErrorAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"MPEG 2 error alarm."
+	::= { muxAlarmsEntry 27 }
+
+tsErrorAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"TS error alarm. Only available for T/T2 transmitter."
+	::= { muxAlarmsEntry 28 }
+
+t2miErrorAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"T2MI error alarm. Only available for T/T2 transmitter."
+	::= { muxAlarmsEntry 29 }
+
+muxEnableAlarmTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MuxEnableAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table contains the enable alarm status for each MUX."
+	::= { mux 5 }
+
+muxEnableAlarmEntry  OBJECT-TYPE
+	SYNTAX 	MuxEnableAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Each row is the Multiplex information. 1 multiplex  could be Gap Filler or Transmitter system."
+	INDEX { muxEnableAlarmIndex }
+	::= { muxEnableAlarmTable 1 }
+
+MuxEnableAlarmEntry ::= SEQUENCE {
+	muxEnableAlarmIndex
+		Integer32,
+	muxCtrlAddressEnableAlarm
+		Integer32,
+	muxRFoutEnableAlarm
+		Integer32,
+	transmittedPower6dBEnableAlarm
+		TruthValue,
+	transmittedPower3dBEnableAlarm
+		TruthValue,
+	trtCurrentsOutRangeEnableAlarm
+		TruthValue,
+	reflectedPowerEnableAlarm
+		TruthValue,
+	unLockTSEnableAlarm
+		TruthValue,
+	noInputSignalEnableAlarm
+		TruthValue,
+	asi1ErrorEnableAlarm
+		TruthValue,
+	mipErrorEnableAlarm
+		TruthValue,
+	ppsEnableAlarm
+		TruthValue,
+	iFDVBTSignalEnableAlarm
+		TruthValue,
+	gps10MHzEnableAlarm
+		TruthValue,
+	powerAmplifierCommunicatEnAlarm
+		TruthValue,
+	muxCBerEnableAlarm
+		TruthValue,
+	temperatureEnableAlarm
+		TruthValue,
+	muxVBerEnableAlarm
+		TruthValue,
+	muxEnableTrapRowAlarm
+		Integer32,
+	fanEnableAlarm
+		TruthValue,
+	communicationEnableAlarm
+		TruthValue,
+	asi2EnableAlarm
+		TruthValue,
+	mpeg1EnableAlarm
+		TruthValue,
+	mpeg2EnableAlarm
+		TruthValue,
+	tsEnableAlarm
+		TruthValue,
+	t2miEnableAlarm
+		TruthValue
+}
+
+muxEnableAlarmIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..15)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"MUX index"
+	::= { muxEnableAlarmEntry 1 }
+
+muxCtrlAddressEnableAlarm  OBJECT-TYPE
+	SYNTAX     Integer32 (1..15|101..115)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Control address for this module"
+	::= { muxEnableAlarmEntry 2 }
+
+muxRFoutEnableAlarm  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"RF out channel for this multiplex
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter"
+	::= { muxEnableAlarmEntry 3 }
+
+transmittedPower6dBEnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable alarm: Transmitted Power 6dB lower than nominal
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter"
+	::= { muxEnableAlarmEntry 4 }
+
+transmittedPower3dBEnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable alarm: Transmitted Power 3dB lower than nominal
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		Regenerative
+		
+		Transmitter"
+	::= { muxEnableAlarmEntry 5 }
+
+trtCurrentsOutRangeEnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable alarm: Power amplifier firmware version
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter"
+	::= { muxEnableAlarmEntry 6 }
+
+reflectedPowerEnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable alarm: Reflected power alarm status
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter"
+	::= { muxEnableAlarmEntry 7 }
+
+unLockTSEnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable alarm: Unlock Transport Stream alarm
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter"
+	::= { muxEnableAlarmEntry 8 }
+
+noInputSignalEnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable alarm: No input signal alarm
+		
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative: Means MPEG ERROR"
+	::= { muxEnableAlarmEntry 9 }
+
+asi1ErrorEnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable alarm: ASI error alarm
+		Applies to:
+		
+		Transmitter"
+	::= { muxEnableAlarmEntry 10 }
+
+mipErrorEnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable alarm: MIP error alarm
+		Applies to:
+		
+		Transmitter"
+	::= { muxEnableAlarmEntry 11 }
+
+ppsEnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable alarm: 1 pps alarm status
+		Applies to:
+		
+		Transmitter"
+	::= { muxEnableAlarmEntry 12 }
+
+iFDVBTSignalEnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable alarm: No DVBT IF signal alarm
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter"
+	::= { muxEnableAlarmEntry 13 }
+
+gps10MHzEnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable alarm: 10 MHz alarm
+		Applies to:
+		
+		Transmitter"
+	::= { muxEnableAlarmEntry 14 }
+
+powerAmplifierCommunicatEnAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     obsolete
+	DESCRIPTION 
+		"Enable/Disable alarm: Power Amplifier communication"
+	::= { muxEnableAlarmEntry 15 }
+
+muxCBerEnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable alarm: Cber trap
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter
+		
+		
+		If DVB-T Receiver is installed on Management Module"
+	::= { muxEnableAlarmEntry 16 }
+
+temperatureEnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable alarm: Temperature alarm
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter"
+	::= { muxEnableAlarmEntry 17 }
+
+muxVBerEnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable alarm: Cber trap
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter
+		
+		
+		If DVB-T Receiver is installed on Management Module"
+	::= { muxEnableAlarmEntry 18 }
+
+muxEnableTrapRowAlarm  OBJECT-TYPE
+	SYNTAX     Integer32 (1..30)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"MUX index (readable)"
+	::= { muxEnableAlarmEntry 19 }
+
+fanEnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     obsolete
+	DESCRIPTION 
+		"Enable/Disable Alarm: Fan(s)
+		This value is useful for 50W power amplifier."
+	::= { muxEnableAlarmEntry 20 }
+
+communicationEnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     deprecated
+	DESCRIPTION 
+		"Enable/Disable communication alarm."
+	::= { muxEnableAlarmEntry 21 }
+	
+asi2EnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable alarm: ASI 2 error alarm."
+	::= { muxEnableAlarmEntry 22 }
+
+mpeg1EnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable alarm: MPEG 1 error alarm."
+	::= { muxEnableAlarmEntry 23 }
+
+mpeg2EnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable alarm: MPEG 2 error alarm."
+	::= { muxEnableAlarmEntry 24 }
+
+tsEnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"TS error alarm."
+	::= { muxEnableAlarmEntry 25 }
+
+t2miEnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"T2MI error alarm."
+	::= { muxEnableAlarmEntry 26 }
+
+muxEnableTrapTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MuxEnableTrapEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table contains the enable trap status"
+	::= { mux 6 }
+
+muxEnableTrapEntry  OBJECT-TYPE
+	SYNTAX 	MuxEnableTrapEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Each row is the Multiplex information. 1 multiplex 
+		could be Gap Filler or Transmitter system."
+	INDEX { muxEnableTrapIndex }
+	::= { muxEnableTrapTable 1 }
+
+MuxEnableTrapEntry ::= SEQUENCE {
+	muxEnableTrapIndex
+		Integer32,
+	muxCtrlAddressEnableTrap
+		Integer32,
+	muxRFoutEnableTrap
+		Integer32,
+	muxEnableTrapRowIndex
+		Integer32,
+	transmittedPower6dBEnableTrap
+		TruthValue,
+	transmittedPower3dBEnableTrap
+		TruthValue,
+	trtCurrentsOutRangeEnableTrap
+		TruthValue,
+	reflectedPowerEnableTrap
+		TruthValue,
+	unLockTSEnableTrap
+		TruthValue,
+	noInputSignalEnableTrap
+		TruthValue,
+	asi1ErrorEnableTrap
+		TruthValue,
+	mipErrorEnableTrap
+		TruthValue,
+	ppsEnableTrap
+		TruthValue,
+	iFDVBTSignalEnableTrap
+		TruthValue,
+	gps10MHzEnableTrap
+		TruthValue,
+	powerAmplifierCommunicatEnTrap
+		TruthValue,
+	muxCBerEnableTrap
+		TruthValue,
+	temperatureEnableTrap
+		TruthValue,
+	muxVBerEnableTrap
+		TruthValue,
+	muxCommunicationEnableTrap
+		TruthValue,
+	fanEnableTrap
+		TruthValue,
+	asi2EnableTrap
+		TruthValue,
+	mpeg1EnableTrap
+		TruthValue,
+	mpeg2EnableTrap
+		TruthValue,
+	tsEnableTrap
+		TruthValue,
+	t2miEnableTrap
+		TruthValue
+}
+
+muxEnableTrapIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..15)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"MUX index"
+	::= { muxEnableTrapEntry 1 }
+
+muxCtrlAddressEnableTrap  OBJECT-TYPE
+	SYNTAX     Integer32 (1..15|101..115)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Control address for this module"
+	::= { muxEnableTrapEntry 2 }
+
+muxRFoutEnableTrap  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"RF out channel for this multiplex"
+	::= { muxEnableTrapEntry 3 }
+
+muxEnableTrapRowIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..30)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"MUX index (readable)"
+	::= { muxEnableTrapEntry 4 }
+
+transmittedPower6dBEnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: Transmitted Power 6dB lower than nominal
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter"
+	::= { muxEnableTrapEntry 5 }
+
+transmittedPower3dBEnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: Transmitted Power 3dB lower than nominal
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter"
+	::= { muxEnableTrapEntry 6 }
+
+trtCurrentsOutRangeEnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: Power amplifier firmware version
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter"
+	::= { muxEnableTrapEntry 7 }
+
+reflectedPowerEnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: Reflected power alarm status
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter"
+	::= { muxEnableTrapEntry 8 }
+
+unLockTSEnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: Unlock Transport Stream alarm
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter"
+	::= { muxEnableTrapEntry 9 }
+
+noInputSignalEnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: No input signal alarm
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative: Means MPEG ERROR"
+	::= { muxEnableTrapEntry 10 }
+
+asi1ErrorEnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: ASI error alarm
+		Applies to:
+		
+		Transmitter"
+	::= { muxEnableTrapEntry 11 }
+
+mipErrorEnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: MIP error alarm
+		Applies to:
+		
+		Transmitter"
+	::= { muxEnableTrapEntry 12 }
+
+ppsEnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: 1 pps alarm status
+		Applies to:
+		
+		Transmitter"
+	::= { muxEnableTrapEntry 13 }
+
+iFDVBTSignalEnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: No DVBT IF signal alarm
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter"
+	::= { muxEnableTrapEntry 14 }
+
+gps10MHzEnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: 10 MHz alarm
+		Applies to:
+		
+		Transmitter"
+	::= { muxEnableTrapEntry 15 }
+
+powerAmplifierCommunicatEnTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     obsolete
+	DESCRIPTION 
+		"Enable/Disable trap: Power Amplifier communication"
+	::= { muxEnableTrapEntry 16 }
+
+muxCBerEnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: Cber trap
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter
+		
+		
+		If DVB-T Receiver is installed on Management Module"
+	::= { muxEnableTrapEntry 17 }
+
+temperatureEnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: Temperature alarm
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter"
+	::= { muxEnableTrapEntry 18 }
+
+muxVBerEnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: Cber trap
+		Applies to:
+		
+		Gap Filler DEEC/DAE
+		
+		Regenerative
+		
+		Transmitter
+		
+		
+		If DVB-T Receiver is installed on Management Module"
+	::= { muxEnableTrapEntry 19 }
+
+muxCommunicationEnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: communication fail trap"
+	::= { muxEnableTrapEntry 20 }
+
+fanEnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     obsolete
+	DESCRIPTION 
+		"Enable/Disable trap: fan(s)
+		This value is useful for 50W power amplifier."
+	::= { muxEnableTrapEntry 21 }
+
+asi2EnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: ASI 2 error alarm."
+	::= { muxEnableTrapEntry 22 }
+
+mpeg1EnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: MPEG 1 error alarm."
+	::= { muxEnableTrapEntry 23 }
+
+mpeg2EnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: MPEG 2 error alarm."
+	::= { muxEnableTrapEntry 24 }
+
+tsEnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: TS error alarm. Only available for T/T2 transmitter."
+	::= { muxEnableTrapEntry 25 }
+
+t2miEnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: T2MI error alarm. Only available for T/T2 transmitter."
+	::= { muxEnableTrapEntry 26 }
+
+muxT2SystemTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MuxT2SystemEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table contains the basic information of multiplex connected to the system."
+	::= { dvbT2Tables 1 }
+
+muxT2SystemEntry  OBJECT-TYPE
+	SYNTAX 	MuxT2SystemEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Each row is the Multiplex information. 1 multiplex 
+		could be Gap Filler or Transmitter system."
+	INDEX { muxT2SystemIndex }
+	::= { muxT2SystemTable 1 }
+
+MuxT2SystemEntry ::= SEQUENCE {
+	muxT2SystemIndex
+		Integer32,
+	muxT2SystemDescription
+		DisplayString,
+	muxT2SystemCtrlAddress
+		Integer32,
+	muxT2SystenRowIndex
+		Integer32,
+	muxT2SystemChannelOut
+		Integer32,
+	muxT2SystemType
+		INTEGER,
+	muxT2cfgSource
+		INTEGER,
+	muxT2cfgNetworkMode
+		INTEGER,
+	muxT2cfgPPSedge
+		INTEGER,
+	muxT2cfgBW
+		INTEGER,
+	muxT2cfgVersion
+		INTEGER,
+	muxT2frequency
+		Integer32,
+	muxT2idTxID
+		Integer32,
+	muxT2idCellID
+		Integer32,
+	muxT2idNetworkID
+		Integer32,
+	muxT2idT2SystemID
+		Integer32,
+	muxT2UserLocalDelay
+		Integer32,
+	muxT2Pid
+		Integer32
+}
+
+muxT2SystemIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..36)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"MUX index"
+	::= { muxT2SystemEntry 1 }
+
+muxT2SystemDescription  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"MUX description. The module could be:
+		
+		GapFiller (REM)
+		Transmitter (MOD)
+		Profesional GapFiller (PRO)
+		Modualtor T/T2 (MT2)"
+	::= { muxT2SystemEntry 2 }
+
+muxT2SystemCtrlAddress  OBJECT-TYPE
+	SYNTAX     Integer32 (-1|1..18|101..118)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Control address:
+		
+		-1: N/A (The multiplex is a dummy)"
+	::= { muxT2SystemEntry 3 }
+
+muxT2SystenRowIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..36)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"MUX index (readable)
+		
+		Usable for row reference"
+	::= { muxT2SystemEntry 4 }
+
+muxT2SystemChannelOut  OBJECT-TYPE
+	SYNTAX     Integer32 (-1|21..69)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Output Channel:
+		
+		-1: N/A (The multiplex is a Dummy)"
+	::= { muxT2SystemEntry 5 }
+
+muxT2SystemType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		dvbt (1),
+		dvbt2 (2),
+		unknown (3),
+		notApply (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"DVB-T / DVB-T2 selector
+		
+		1: DVB-T
+		2: DVB-T2
+		3: Unknown (Gap-Filler)
+		4: Not Apply (dummy)"
+	::= { muxT2SystemEntry 6 }
+
+muxT2cfgSource  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		t2mi (1),
+		ts (2),
+		unknown (3),
+		notApply (4)
+	}
+	UNITS 	"Hertzios"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Source Mode:
+		
+		1: T2MI
+		2: TS
+		3: unknown (Gap-Filler)
+		4: notApply (Dummy)
+		"
+	::= { muxT2SystemEntry 7 }
+
+muxT2cfgNetworkMode  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		sfn (1),
+		mfn (2),
+		unknown (3),
+		notApply (4)
+	}
+	UNITS 	"Hertzios"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Network Mode:
+		
+		1: SFN
+		2: MFN
+		3: unknown (Gap-Filler)
+		4: notApply (Dummy)
+		"
+	::= { muxT2SystemEntry 8 }
+
+muxT2cfgPPSedge  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		rising (1),
+		falling (2),
+		notApply (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"PPS edge:
+		
+		1: rising
+		2: falling
+		3: notApply
+		"
+	::= { muxT2SystemEntry 9 }
+
+muxT2cfgBW  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notApply (1),
+		bw10MHz (2),
+		bw8MHz (3),
+		bw7MHz (4),
+		bw6MHz (5),
+		bw5MHz (6),
+		bw1M7Hz (7)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"OFDM Bandwith:
+		
+		1: N/A (The multiplex is a GapFiller/Dummy)
+		2: 10 MHz
+		3: 8 MHz
+		4: 7 MHz
+		5: 6 MHz
+		6: 5 MHz
+		7: 1.7 MHz
+		
+		"
+	::= { muxT2SystemEntry 10 }
+
+muxT2cfgVersion  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notApply (1),
+		v111 (2),
+		v121 (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"T2 Version
+		
+		1: Not Apply
+		2: Version 1_1_1
+		3: Version 1_2_1
+		"
+	::= { muxT2SystemEntry 11 }
+
+muxT2frequency  OBJECT-TYPE
+	SYNTAX     Integer32 (-1|470000000..862000000)
+	UNITS 	"Hertzios"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"T2 Frequency
+		
+		-1: N/A (The multiplex is a Dummy)"
+	::= { muxT2SystemEntry 12 }
+
+muxT2idTxID  OBJECT-TYPE
+	SYNTAX     Integer32 (-1|0..65535)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Tx ID
+		
+		-1: N/A (The multiplex is a Dummy)"
+	::= { muxT2SystemEntry 13 }
+
+muxT2idCellID  OBJECT-TYPE
+	SYNTAX     Integer32 (-1|0..65535)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Cell ID
+		
+		-1: N/A (The multiplex is a Dummy)"
+	::= { muxT2SystemEntry 14 }
+
+muxT2idNetworkID  OBJECT-TYPE
+	SYNTAX     Integer32 (-1|0..65535)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Network ID
+		
+		-1: N/A (The multiplex is a Dummy)"
+	::= { muxT2SystemEntry 15 }
+
+muxT2idT2SystemID  OBJECT-TYPE
+	SYNTAX     Integer32 (-1|0..65535)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"T2 System ID
+		
+		-1: N/A (The multiplex is a Dummy)"
+	::= { muxT2SystemEntry 16 }
+
+muxT2UserLocalDelay  OBJECT-TYPE
+	SYNTAX     Integer32 (-20000..20000)
+	UNITS 	"usec/10"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User Delay in 0.1 microseconds steps
+		
+		
+		-1: N/A (The multiplex is a GapFiller/Dummy)"
+	::= { muxT2SystemEntry 17 }
+
+muxT2Pid  OBJECT-TYPE
+	SYNTAX     Integer32 (32..8191)
+	UNITS 	"usec/10"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Modulation Interface: Packet IDentifier
+		
+		32...8191"
+	::= { muxT2SystemEntry 18 }
+
+muxT2FrameTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MuxT2FrameEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Layer 1 configuration"
+	::= { dvbT2Tables 2 }
+
+muxT2FrameEntry  OBJECT-TYPE
+	SYNTAX 	MuxT2FrameEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Each row is the Multiplex information. 1 multiplex 
+		could be Gap Filler or Transmitter system."
+	INDEX { muxT2FrameIndex }
+	::= { muxT2FrameTable 1 }
+
+MuxT2FrameEntry ::= SEQUENCE {
+	muxT2FrameIndex
+		Integer32,
+	muxT2FrameDescription
+		DisplayString,
+	muxT2FrameCtrlAddress
+		Integer32,
+	muxT2FrameRowIndex
+		Integer32,
+	muxT2FrameChannelOut
+		Integer32,
+	muxT2FrameType
+		INTEGER,
+	muxT2FrameL1Mode
+		INTEGER,
+	muxT2FramePreamb
+		INTEGER,
+	muxT2FrameExtCarr
+		INTEGER,
+	muxT2FrameFFT
+		INTEGER,
+	muxT2FrameGuardInterval
+		INTEGER,
+	muxT2FramePAPR
+		INTEGER,
+	muxT2FramePilotPattern
+		INTEGER,
+	muxT2FrameT2Frames
+		Integer32,
+	muxT2FrameDataSymbol
+		Integer32
+}
+
+muxT2FrameIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..36)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"MUX index"
+	::= { muxT2FrameEntry 1 }
+
+muxT2FrameDescription  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"MUX description. The module could be:
+		
+		GapFiller (REM)
+		Transmitter (MOD)
+		Profesional GapFiller (PRO)
+		Modualtor T/T2 (MT2)
+		"
+	::= { muxT2FrameEntry 2 }
+
+muxT2FrameCtrlAddress  OBJECT-TYPE
+	SYNTAX     Integer32 (-1|1..18|101..118)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Control address:
+		
+		-1: N/A (The multiplex is a dummy)"
+	::= { muxT2FrameEntry 3 }
+
+muxT2FrameRowIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..36)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Input Channel:
+		
+		-1: N/A (The multiplex is a Transmitter/Dummy)"
+	::= { muxT2FrameEntry 4 }
+
+muxT2FrameChannelOut  OBJECT-TYPE
+	SYNTAX     Integer32 (-1|21..69)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Output Channel:
+		
+		-1: N/A (The multiplex is a Transmitter/Dummy)"
+	::= { muxT2FrameEntry 5 }
+
+muxT2FrameType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		dvbt (1),
+		dvbt2 (2),
+		unknown (3),
+		notApply (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"DVB-T / DVB-T2 selector
+		
+		1: DVB-T
+		2: DVB-T2
+		3: Unknown (Gap-Filler)
+		4: Not Apply (dummy)"
+	::= { muxT2FrameEntry 6 }
+
+muxT2FrameL1Mode  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notApply (1),
+		modeBPSK (2),
+		modeQPSK (3),
+		mode16QAM (4),
+		mode64QAM (5)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"L1 Mode:
+		
+		1: not Apply
+		2: BPSK
+		3: QPSK
+		4: 16QAM
+		5: 64QAM"
+	::= { muxT2FrameEntry 7 }
+
+muxT2FramePreamb  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notApply (1),
+		preamMISO (2),
+		preamSISO (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Format SISO/MISO
+		
+		1: not Apply
+		2: MISO
+		3: SISO"
+	::= { muxT2FrameEntry 8 }
+
+muxT2FrameExtCarr  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notApply (1),
+		extCarrON (2),
+		extCarrOFF (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Extended Carriers
+		
+		1: not Apply
+		2: On
+		3: Off
+		"
+	::= { muxT2FrameEntry 9 }
+
+muxT2FrameFFT  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notApply (1),
+		fft32K (2),
+		fft16K (3),
+		fft8K (4),
+		fft4K (5),
+		fft2K (6),
+		fft1K (7)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"FFT size
+		
+		1: not Apply
+		2: 32K
+		3: 16K
+		4: 8K
+		5: 4K
+		6: 2K
+		7: 1K
+		"
+	::= { muxT2FrameEntry 10 }
+
+muxT2FrameGuardInterval  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notApply (1),
+		guard1div32 (2),
+		guard1div16 (3),
+		guard1div8 (4),
+		guard1div4 (5),
+		guard1div128 (6),
+		guard19div128 (7),
+		guard19div256 (8)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Guard Interval:
+		
+		1: not Apply
+		2: 1/32
+		3: 1/16
+		4: 1/8
+		5: 1/4
+		6: 1/128
+		7: 19/128
+		8: 19/256
+		"
+	::= { muxT2FrameEntry 11 }
+
+muxT2FramePAPR  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notApply (1),
+		paprNullTRP2 (2),
+		paprACE (3),
+		paprTR (4),
+		paprACETR (5)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Reduction PAPR
+		
+		Possible combinations:
+		v1_1_1 => - / ACE / TR / ACE-TR
+		v1_2_1 => TR-P2 / ACE / TR / ACE-TR
+		
+		1: not apply
+		2: -/TR-P2 (version dependent)
+		3: ACE
+		4: TR
+		5: ACE-TR
+		"
+	::= { muxT2FrameEntry 12 }
+
+muxT2FramePilotPattern  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notApply (1),
+		pilotPattern8 (2),
+		pilotPattern7 (3),
+		pilotPattern6 (4),
+		pilotPattern5 (5),
+		pilotPattern4 (6),
+		pilotPattern3 (7),
+		pilotPattern2 (8),
+		pilotPattern1 (9)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Pilot Pattern:
+		
+		1: not Apply
+		2: 8
+		3: 7
+		4: 6
+		5: 5
+		6: 4
+		7: 3
+		8: 2
+		9: 1
+		"
+	::= { muxT2FrameEntry 13 }
+
+muxT2FrameT2Frames  OBJECT-TYPE
+	SYNTAX     Integer32 (-1|0..255)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Number of T2 frames for each super-frame
+		
+		-1: N/A (The multiplex is a Dummy)"
+	::= { muxT2FrameEntry 14 }
+
+muxT2FrameDataSymbol  OBJECT-TYPE
+	SYNTAX     Integer32 (-1|0..4095)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Number of symbols for frame
+		
+		-1: N/A (The multiplex is a Dummy)"
+	::= { muxT2FrameEntry 15 }
+
+muxT2plpTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MuxT2plpEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Physical Layer Pipe 1 configuration"
+	::= { dvbT2Tables 4 }
+
+muxT2plpEntry  OBJECT-TYPE
+	SYNTAX 	MuxT2plpEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Each row is the Multiplex information. 1 multiplex 
+		could be Gap Filler or Transmitter system."
+	INDEX { muxT2plpMuxIndex,
+		muxT2plpIndex}
+	::= { muxT2plpTable 1 }
+
+MuxT2plpEntry ::= SEQUENCE {
+	muxT2plpMuxIndex
+		Integer32,
+	muxT2plpDescription
+		DisplayString,
+	muxT2plpCtrlAddress
+		Integer32,
+	muxT2plpRowIndex
+		Integer32,
+	muxT2plpChannelOut
+		Integer32,
+	muxT2plpType
+		INTEGER,
+	muxT2plpMode
+		INTEGER,
+	muxT2plpGroupID
+		Integer32,
+	muxT2plpConstellation
+		INTEGER,
+	muxT2plpRotCon
+		TruthValue,
+	muxT2plpFECtype
+		INTEGER,
+	muxT2plpCodeRate
+		INTEGER,
+	muxT2plpnBlocks
+		Integer32,
+	muxT2plpTiType
+		INTEGER,
+	muxT2plpTiLength
+		Integer32,
+	muxT2plpIndex
+		Integer32,
+	muxT2plpIbSignal
+		INTEGER,
+	muxT2plpId
+		Integer32,
+	muxT2plpTypePlp
+		INTEGER,
+	muxT2plpOk
+		INTEGER
+}
+
+muxT2plpMuxIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..36)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"MUX index"
+	::= { muxT2plpEntry 1 }
+
+muxT2plpDescription  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"MUX description. The module could be:
+		
+		GapFiller (REM)
+		Transmitter (MOD)
+		Profesional GapFiller (PRO)
+		Modualtor T/T2 (MT2)"
+	::= { muxT2plpEntry 2 }
+
+muxT2plpCtrlAddress  OBJECT-TYPE
+	SYNTAX     Integer32 (-1|1..18|101..118)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Control address:
+		
+		-1: N/A (The multiplex is a dummy)"
+	::= { muxT2plpEntry 3 }
+
+muxT2plpRowIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..36)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Input Channel:
+		
+		-1: N/A (The multiplex is a Transmitter/Dummy)"
+	::= { muxT2plpEntry 4 }
+
+muxT2plpChannelOut  OBJECT-TYPE
+	SYNTAX     Integer32 (-1|21..69)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Output Channel:
+		
+		-1: N/A (The multiplex is a Transmitter/Dummy)"
+	::= { muxT2plpEntry 5 }
+
+muxT2plpType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		dvbt (1),
+		dvbt2 (2),
+		unknown (3),
+		notApply (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"DVB-T / DVB-T2 selector
+		
+		1: DVB-T
+		2: DVB-T2
+		3: Unknown (Gap-Filler)
+		4: Not Apply (dummy)"
+	::= { muxT2plpEntry 6 }
+
+muxT2plpMode  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notApply (1),
+		hem (2),
+		nm (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"PLP Mode:
+		
+		1: not Apply
+		2: HEM (High Efificent Mode)
+		3: NM (Normal Mode)"
+	::= { muxT2plpEntry 7 }
+
+muxT2plpGroupID  OBJECT-TYPE
+	SYNTAX     Integer32 (-1|0..255)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The PLP group within the current PLP is associated
+		
+		-1: not Apply
+		0...255"
+	::= { muxT2plpEntry 8 }
+
+muxT2plpConstellation  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notApply (1),
+		qpsk (2),
+		qam16 (3),
+		qam64 (4),
+		qam256 (5)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Modulation used by this PLP
+		
+		1: not apply
+		2: QPSK
+		3: QAM16
+		4: QAM64
+		5: QAM256
+		"
+	::= { muxT2plpEntry 9 }
+
+muxT2plpRotCon  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Constellation rotation"
+	::= { muxT2plpEntry 10 }
+
+muxT2plpFECtype  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notApply (1),
+		ldpc16K (2),
+		ldpc64K (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"FEC type used
+		
+		1: not Apply
+		2: 16K LDPC
+		3: 64K LDPC
+		"
+	::= { muxT2plpEntry 11 }
+
+muxT2plpCodeRate  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notApply (1),
+		codeRate1div2 (2),
+		codeRate3div5 (3),
+		codeRate2div3 (4),
+		codeRate3div4 (5),
+		codeRate4div5 (6),
+		codeRate5div6 (7)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Code Rate used by this PLP
+		
+		1: not Apply
+		2: codeRate1div2
+		3: codeRate3div5
+		4: codeRate2div3
+		5: codeRate3div4
+		6: codeRate4div5
+		7: codeRate5div6
+		"
+	::= { muxT2plpEntry 12 }
+
+muxT2plpnBlocks  OBJECT-TYPE
+	SYNTAX     Integer32 (-1|0..1023)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Number of blocks FEC
+		
+		-1: N/A (The multiplex is a Transmitter/Dummy)"
+	::= { muxT2plpEntry 13 }
+
+muxT2plpTiType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notApply (1),
+		single (2),
+		multiple (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Type of time intervaling
+		
+		1: not apply
+		2: single
+		3: multiple
+		"
+	::= { muxT2plpEntry 14 }
+
+muxT2plpTiLength  OBJECT-TYPE
+	SYNTAX     Integer32 (-1|0..255)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Length of Interpretation depends on the value of plp1TimeInterleaverType.
+		
+		-1: N/A (The multiplex is a Transmitter/Dummy)"
+	::= { muxT2plpEntry 15 }
+
+muxT2plpIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..8)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"PLP index (multiPLP)"
+	::= { muxT2plpEntry 16 }
+
+muxT2plpIbSignal  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		null (1),
+		onlyB (2),
+		onlyA (3),
+		aAndB (4),
+		unknown (5),
+		notApply (6)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"In Band Signalling
+		
+		1: null
+		2: B
+		3: A
+		4: A & B
+		"
+	::= { muxT2plpEntry 17 }
+
+muxT2plpId  OBJECT-TYPE
+	SYNTAX     Integer32 (0..255)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Plp Identifier
+		
+		0...255"
+	::= { muxT2plpEntry 18 }
+
+muxT2plpTypePlp  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		typeCommon (1),
+		typeData1 (2),
+		typeData2 (3),
+		unknown (4),
+		notApply (5)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"PLP Type
+		
+		1: Common
+		2: Data 1 -> only this mode can be set
+		3: Data 2"
+	::= { muxT2plpEntry 19 }
+
+muxT2plpOk  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		ok (1),
+		nok (2)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"PLP information is OK or not
+		
+		1: Ok 
+		2: Nok
+		"
+	::= { muxT2plpEntry 20 }
+
+ucaTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF UcaEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table contains the basic information of each UCA connected to the system."
+	::= { uca 1 }
+
+ucaEntry  OBJECT-TYPE
+	SYNTAX 	UcaEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Each row is UCA information. There 1 UCA for each subrack."
+	INDEX { ucaIndex }
+	::= { ucaTable 1 }
+
+UcaEntry ::= SEQUENCE {
+	ucaIndex
+		Integer32,
+	ucaCtrlAddress
+		Integer32,
+	ucaMux1OnOffReset
+		INTEGER,
+	ucaMux2OnOffReset
+		INTEGER,
+	ucaMux3OnOffReset
+		INTEGER,
+	ucaStatusAlarm
+		BitsStates,
+	ucaHysteresis
+		Integer32,
+	ucaFirmware
+		DisplayString,
+	ucaTrapsConfiguration
+		BitsStates
+}
+
+ucaIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..6)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA index"
+	::= { ucaEntry 1 }
+
+ucaCtrlAddress  OBJECT-TYPE
+	SYNTAX     Integer32 (20..25)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Control address."
+	::= { ucaEntry 2 }
+
+ucaMux1OnOffReset  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		ucaMux1On (1),
+		ucaMux1Off (2),
+		ucaMux1Reset (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"MUX 1 Status. 
+		
+		1 = On
+		2 = Off
+		3 = This MUX will be reset"
+	::= { ucaEntry 3 }
+
+ucaMux2OnOffReset  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		ucaMux2On (1),
+		ucaMux2Off (2),
+		ucaMux2Reset (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"MUX 2 Status.
+		
+		1 = On
+		2 = Off
+		3 = This MUX will be reset"
+	::= { ucaEntry 4 }
+
+ucaMux3OnOffReset  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		ucaMux3On (1),
+		ucaMux3Off (2),
+		ucaMux3Reset (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"MUX 3 Status. 
+		
+		1 = On
+		2 = Off
+		3 = This MUX will be reset"
+	::= { ucaEntry 5 }
+
+ucaStatusAlarm  OBJECT-TYPE
+	SYNTAX     BitsStates
+	MAX-ACCESS read-only
+	STATUS     deprecated
+	DESCRIPTION 
+		"Alarm bits status for this UCA"
+	::= { ucaEntry 6 }
+
+ucaHysteresis  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"dsec"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Time to validate the alarm status."
+	::= { ucaEntry 7 }
+
+ucaFirmware  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"UCA Firmware version"
+	::= { ucaEntry 8 }
+
+ucaTrapsConfiguration  OBJECT-TYPE
+	SYNTAX     BitsStates
+	MAX-ACCESS read-write
+	STATUS     deprecated
+	DESCRIPTION 
+		"Bits array for enable/disable the traps from this module
+		
+		For each bit:
+		     False: disable
+		     true: enable
+		
+		The bits are represented in BitsStates convection"
+	::= { ucaEntry 9 }
+
+ucaAlarmsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF UcaAlarmsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table contains the alarm status of each mux."
+	::= { uca 2 }
+
+ucaAlarmsEntry  OBJECT-TYPE
+	SYNTAX 	UcaAlarmsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Each row is UCA information. There 1 UCA for each subrack."
+	INDEX { ucaAlarmsIndex }
+	::= { ucaAlarmsTable 1 }
+
+UcaAlarmsEntry ::= SEQUENCE {
+	ucaAlarmsIndex
+		Integer32,
+	ucaCtrlAddressAlarm
+		Integer32,
+	ucaMajorAlarm
+		TruthValue,
+	ucaMinorAlarm
+		TruthValue,
+	ucaPowerSupply1Alarm
+		TruthValue,
+	ucaPowerSupply2Alarm
+		TruthValue,
+	ucaPowerSuppliesAlarm
+		TruthValue,
+	ucaCommunicationAlarms
+		TruthValue
+}
+
+ucaAlarmsIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..6)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA index"
+	::= { ucaAlarmsEntry 1 }
+
+ucaCtrlAddressAlarm  OBJECT-TYPE
+	SYNTAX     Integer32 (20..25)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Control address for this module"
+	::= { ucaAlarmsEntry 2 }
+
+ucaMajorAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Major UCA status"
+	::= { ucaAlarmsEntry 3 }
+
+ucaMinorAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Minor UCA status"
+	::= { ucaAlarmsEntry 4 }
+
+ucaPowerSupply1Alarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Power supply 1 alarm status"
+	::= { ucaAlarmsEntry 5 }
+
+ucaPowerSupply2Alarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Power supply 2 alarm status"
+	::= { ucaAlarmsEntry 6 }
+
+ucaPowerSuppliesAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Power supplies alarm status"
+	::= { ucaAlarmsEntry 7 }
+
+ucaCommunicationAlarms  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Communication alarm status"
+	::= { ucaAlarmsEntry 8 }
+
+ucaEnableAlarmTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF UcaEnableAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table contains the alarm status of each mux."
+	::= { uca 3 }
+
+ucaEnableAlarmEntry  OBJECT-TYPE
+	SYNTAX 	UcaEnableAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Each row is UCA information. There 1 UCA for each subrack."
+	INDEX { ucaEnableAlarmIndex }
+	::= { ucaEnableAlarmTable 1 }
+
+UcaEnableAlarmEntry ::= SEQUENCE {
+	ucaEnableAlarmIndex
+		Integer32,
+	ucaCtrlAddressEnableAlarm
+		Integer32,
+	ucaPowerSupply1EnableAlarm
+		TruthValue,
+	ucaPowerSupply2EnableAlarm
+		TruthValue,
+	ucaPowerSuppliesEnableAlarm
+		TruthValue
+}
+
+ucaEnableAlarmIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..6)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA index"
+	::= { ucaEnableAlarmEntry 1 }
+
+ucaCtrlAddressEnableAlarm  OBJECT-TYPE
+	SYNTAX     Integer32 (20..25)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Control address for this module"
+	::= { ucaEnableAlarmEntry 2 }
+
+ucaPowerSupply1EnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: Power supply 1 alarm status"
+	::= { ucaEnableAlarmEntry 3 }
+
+ucaPowerSupply2EnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: Power supply 2 alarm status"
+	::= { ucaEnableAlarmEntry 4 }
+
+ucaPowerSuppliesEnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: Power supplies alarm status"
+	::= { ucaEnableAlarmEntry 5 }
+
+gpsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF GpsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table contains the basic information of each GPS connected to the system."
+	::= { gps 1 }
+
+gpsEntry  OBJECT-TYPE
+	SYNTAX 	GpsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Each row is GPS information."
+	INDEX { gpsIndex }
+	::= { gpsTable 1 }
+
+GpsEntry ::= SEQUENCE {
+	gpsIndex
+		Integer32,
+	gpsCtrlAddress
+		Integer32,
+	gpsSatellites
+		Integer32,
+	gpsStatusAlarm
+		BitsStates,
+	gpsHysteresis
+		Integer32,
+	gpsFirmware
+		DisplayString,
+	gpsTrapsConfiguration
+		BitsStates,
+	gpsLatitude
+		DisplayString,
+	gpsLongitude
+		DisplayString,
+	gpsAltitude
+		DisplayString,
+	gpsState
+		INTEGER,
+	gpsGMTdate
+		DisplayString,
+	gpsHardware
+		DisplayString,
+	gpsHoldoverDrift
+		Integer32
+}
+
+gpsIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..2)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"GPS index."
+	::= { gpsEntry 1 }
+
+gpsCtrlAddress  OBJECT-TYPE
+	SYNTAX     Integer32 (50..51)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Control address."
+	::= { gpsEntry 2 }
+
+gpsSatellites  OBJECT-TYPE
+	SYNTAX     Integer32 (0..8)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Number of locked satellites."
+	::= { gpsEntry 3 }
+
+gpsStatusAlarm  OBJECT-TYPE
+	SYNTAX     BitsStates
+	MAX-ACCESS read-only
+	STATUS     deprecated
+	DESCRIPTION 
+		"Alarm bits status for this GPS"
+	::= { gpsEntry 4 }
+
+gpsHysteresis  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"dsec"
+	MAX-ACCESS read-write
+	STATUS     deprecated
+	DESCRIPTION 
+		"Time to validate the alarm status."
+	::= { gpsEntry 5 }
+
+gpsFirmware  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"GPS Firmware version"
+	::= { gpsEntry 6 }
+
+gpsTrapsConfiguration  OBJECT-TYPE
+	SYNTAX     BitsStates
+	MAX-ACCESS read-write
+	STATUS     deprecated
+	DESCRIPTION 
+		"Bits array for enable/disable the traps from this module
+		
+		For each bit:
+		     False: disable
+		     true: enable
+		
+		The bits are represented in BitsStates convection"
+	::= { gpsEntry 7 }
+
+gpsLatitude  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Latitude of the GPS antenna"
+	::= { gpsEntry 8 }
+
+gpsLongitude  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Longitude of the GPS antenna"
+	::= { gpsEntry 9 }
+
+gpsAltitude  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Altitude of the GPS antenna"
+	::= { gpsEntry 10 }
+
+gpsState  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		gpsStarting (1),
+		gpsUnlocked (2),
+		gpsHoldover (3),
+		gpsLocked (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"GPS state:
+		
+		1: starting (before GPS module communication)
+		2: unlocked - it is not synchronized (error is higher thandrift configuration)
+		3: holdover - Synchronization error is lower than drift configuration
+		4: locked - boad is synchronized to the reference"
+	::= { gpsEntry 11 }
+
+gpsGMTdate  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Show GMT from GPS board (GMT when synchronized)"
+	::= { gpsEntry 12 }
+
+gpsHardware  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"GPS hardware information.
+		
+		Nowadays it could be:
+		EBO2 - EBO 2th version 
+		EBO3 - EBO 3th version"
+	::= { gpsEntry 13 }
+
+gpsHoldoverDrift  OBJECT-TYPE
+	SYNTAX     Integer32 (0..255)
+	UNITS 	"usec"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"GPS Drift in holdover mode in microsecond.
+		
+		"
+	::= { gpsEntry 14 }
+
+gpsAlarmsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF GpsAlarmsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table contains the alarm status of each gps."
+	::= { gps 2 }
+
+gpsAlarmsEntry  OBJECT-TYPE
+	SYNTAX 	GpsAlarmsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Each row is the GPS information."
+	INDEX { gpsAlarmsIndex }
+	::= { gpsAlarmsTable 1 }
+
+GpsAlarmsEntry ::= SEQUENCE {
+	gpsAlarmsIndex
+		Integer32,
+	gpsCtrlAddressAlarm
+		Integer32,
+	gpsMajorAlarm
+		TruthValue,
+	gpsMinorAlarm
+		TruthValue,
+	gpsAntennaAlarm
+		TruthValue,
+	gpsHoldoverAlarm
+		TruthValue,
+	gpsCommunicationAlarm
+		TruthValue,
+	gpsSyncAlarm
+		TruthValue
+}
+
+gpsAlarmsIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..2)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"GPS index"
+	::= { gpsAlarmsEntry 1 }
+
+gpsCtrlAddressAlarm  OBJECT-TYPE
+	SYNTAX     Integer32 (50..51)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Control address for this module"
+	::= { gpsAlarmsEntry 2 }
+
+gpsMajorAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"GPS Antenna status"
+	::= { gpsAlarmsEntry 3 }
+
+gpsMinorAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"GPS receiver status"
+	::= { gpsAlarmsEntry 4 }
+
+gpsAntennaAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"GPS Antenna status"
+	::= { gpsAlarmsEntry 5 }
+
+gpsHoldoverAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"GPS has holdover available
+		Alarm Code: AG104 (Phase-frequency WEB Tag)"
+	::= { gpsAlarmsEntry 6 }
+
+gpsCommunicationAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Communication alarm status"
+	::= { gpsAlarmsEntry 7 }
+
+gpsSyncAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"GPS is synchronized
+		Alarm Code: AG106 (Unlocked WEB Tag)"
+	::= { gpsAlarmsEntry 8 }
+
+gpsEnableAlarmTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF GpsEnableAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table contains the enable alarm of each gps."
+	::= { gps 3 }
+
+gpsEnableAlarmEntry  OBJECT-TYPE
+	SYNTAX 	GpsEnableAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Each row is the GPS information. "
+	INDEX { gpsEnableAlarmIndex }
+	::= { gpsEnableAlarmTable 1 }
+
+GpsEnableAlarmEntry ::= SEQUENCE {
+	gpsEnableAlarmIndex
+		Integer32,
+	gpsCtrlAddressEnableAlarm
+		Integer32,
+	gpsAntennaEnableAlarm
+		TruthValue,
+	gpsHoldoverEnableAlarm
+		TruthValue,
+	gpsSyncEnableAlarm
+		TruthValue
+}
+
+gpsEnableAlarmIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..2)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"GPS index"
+	::= { gpsEnableAlarmEntry 1 }
+
+gpsCtrlAddressEnableAlarm  OBJECT-TYPE
+	SYNTAX     Integer32 (50..51)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Control address for this module"
+	::= { gpsEnableAlarmEntry 2 }
+
+gpsAntennaEnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: GPS Antenna status"
+	::= { gpsEnableAlarmEntry 3 }
+
+gpsHoldoverEnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: GPS holdover status
+		Alarm Code: AG104 (Phase-frequency WEB Tag)"
+	::= { gpsEnableAlarmEntry 4 }
+
+gpsSyncEnableAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"GPS is synchronized Enable Alarm
+		Alarm Code: AG106 (Unlocked WEB Tag)"
+	::= { gpsEnableAlarmEntry 5 }
+
+gpsEnableTrapTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF GpsEnableTrapEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table contains the enable trap status for each GPS."
+	::= { gps 4 }
+
+gpsEnableTrapEntry  OBJECT-TYPE
+	SYNTAX 	GpsEnableTrapEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Each row is the GPS information."
+	INDEX { gpsEnableTrapIndex }
+	::= { gpsEnableTrapTable 1 }
+
+GpsEnableTrapEntry ::= SEQUENCE {
+	gpsEnableTrapIndex
+		Integer32,
+	gpsCtrlAddressEnableTrap
+		Integer32,
+	gpsAntennaEnableTrap
+		TruthValue,
+	gpsHoldoverEnableTrap
+		TruthValue,
+	gpsCommunicationEnableTrap
+		TruthValue,
+	gpsSyncEnableTrap
+		TruthValue
+}
+
+gpsEnableTrapIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..2)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"GPS index"
+	::= { gpsEnableTrapEntry 1 }
+
+gpsCtrlAddressEnableTrap  OBJECT-TYPE
+	SYNTAX     Integer32 (50..51)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Control address for this module"
+	::= { gpsEnableTrapEntry 2 }
+
+gpsAntennaEnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: GPS Antenna enable/disable trap"
+	::= { gpsEnableTrapEntry 3 }
+
+gpsHoldoverEnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: GPS holdover enable/disable trap
+		Alarm Code: AG104 (Phase-frequency WEB Tag)"
+	::= { gpsEnableTrapEntry 4 }
+
+gpsCommunicationEnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable trap: GPS communication enable/disable trap"
+	::= { gpsEnableTrapEntry 5 }
+
+gpsSyncEnableTrap  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"GPS Synchronization enable/disable trap
+		Alarm Code: AG106 (Unlocked WEB Tag)"
+	::= { gpsEnableTrapEntry 6 }
+
+gpsSatellitesTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF GpsSatellitesEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table contains the satellites information for GPSs modules."
+	::= { gps 5 }
+
+gpsSatellitesEntry  OBJECT-TYPE
+	SYNTAX 	GpsSatellitesEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Each row is the Satellite information. 
+		
+		Can be 8 locked satellites for each GPS."
+	INDEX { gpsSatellitesIndex }
+	::= { gpsSatellitesTable 1 }
+
+GpsSatellitesEntry ::= SEQUENCE {
+	gpsSatellitesIndex
+		Integer32,
+	gps1IdSatellite
+		Integer32,
+	gps1LockedSatellite
+		TruthValue,
+	gps1SnrSatellite
+		Integer32,
+	gps2IdSatellite
+		Integer32,
+	gps2LockedSatellite
+		TruthValue,
+	gps2SnrSatellite
+		Integer32
+}
+
+gpsSatellitesIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..8)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"GPS index.
+		
+		There are 8 satellite information for each GPS."
+	::= { gpsSatellitesEntry 1 }
+
+gps1IdSatellite  OBJECT-TYPE
+	SYNTAX     Integer32 (-1|0..127)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"ID Satellite (GPS1)
+		
+		-1: GPS 1 not connected
+		0...127: ID Satellite"
+	::= { gpsSatellitesEntry 2 }
+
+gps1LockedSatellite  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This Satellite is 
+		
+		True: Locked
+		False: Unlocked
+		
+		This value will be false if GPS 1 is not connected."
+	::= { gpsSatellitesEntry 3 }
+
+gps1SnrSatellite  OBJECT-TYPE
+	SYNTAX     Integer32 (-1|0..255)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"SNR Satellite (GPS1)
+		
+		-1: GPS 1 not connected
+		0...255: SNR Satellite"
+	::= { gpsSatellitesEntry 4 }
+
+gps2IdSatellite  OBJECT-TYPE
+	SYNTAX     Integer32 (-1|0..127)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"ID Satellite (GPS2)
+		
+		-1: GPS 2 not connected
+		0...127: ID Satellite"
+	::= { gpsSatellitesEntry 5 }
+
+gps2LockedSatellite  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This Satellite is 
+		
+		True: Locked
+		False: Unlocked
+		
+		This value will be false if GPS 2 is not connected."
+	::= { gpsSatellitesEntry 6 }
+
+gps2SnrSatellite  OBJECT-TYPE
+	SYNTAX     Integer32 (-1|0..255)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"SNR Satellite (GPS2)
+		
+		-1: GPS 2 not connected
+		0...255: SNR Satellite"
+	::= { gpsSatellitesEntry 7 }
+
+gpsSplitterTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF GpsSplitterEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table contains the alarm status of each gps."
+	::= { gps 6 }
+
+gpsSplitterEntry  OBJECT-TYPE
+	SYNTAX 	GpsSplitterEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Each row is the GPS splitter information."
+	INDEX { gpsSplitterIndex }
+	::= { gpsSplitterTable 1 }
+
+GpsSplitterEntry ::= SEQUENCE {
+	gpsSplitterIndex
+		Integer32,
+	gpsSplitterCtrlAddress
+		Integer32,
+	gpsSplitterActivedOutput
+		INTEGER,
+	gpsSplitterCommunicationAlarm
+		TruthValue,
+	gpsSplitterGPS1Status
+		INTEGER,
+	gpsSplitterGPS2Status
+		INTEGER
+}
+
+gpsSplitterIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..255)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"GPS index"
+	::= { gpsSplitterEntry 1 }
+
+gpsSplitterCtrlAddress  OBJECT-TYPE
+	SYNTAX     Integer32 (1..255)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Control address for this module"
+	::= { gpsSplitterEntry 2 }
+
+gpsSplitterActivedOutput  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		splitterNullOutput (1),
+		splitterGPS1Ouput (2),
+		splitterGPS2Ouput (3),
+		splitterExternalOutput (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Actived output
+		
+		1: Output Null
+		2: GPS 1
+		3: GPS 2
+		4: External output"
+	::= { gpsSplitterEntry 3 }
+
+gpsSplitterCommunicationAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"GPS splitter Commnication 
+		
+		False: there is communication
+		True: there is not communication, so module is alarmed"
+	::= { gpsSplitterEntry 4 }
+
+gpsSplitterGPS1Status  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		gpsDisconnected (1),
+		gpsDetected (2),
+		gpsConnected (3),
+		gpsNotConfigured (4),
+		gpsUnlocked (5),
+		gpsLocked (6),
+		gpsHoldover (7),
+		gpsPostHoldover (8),
+		gpsBrokenDown (9),
+		gpsNotDetected (10),
+		gpsSfnNok (11)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"GPS 1 status
+		
+		1: Disconnect
+		2: Detected
+		3: Connected
+		4: Not configured
+		5: Unlocked
+		6: Locked
+		7: Holdover
+		8: Post-Holdover
+		9: Broken down
+		10: Not detected
+		11: SFN nok
+		"
+	::= { gpsSplitterEntry 5 }
+
+gpsSplitterGPS2Status  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		gpsDisconnected (1),
+		gpsDetected (2),
+		gpsConnected (3),
+		gpsNotConfigured (4),
+		gpsUnlocked (5),
+		gpsLocked (6),
+		gpsHoldover (7),
+		gpsPostHoldover (8),
+		gpsBrokenDown (9),
+		gpsNotDetected (10),
+		gpsSfnNok (11)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"GPS 2 status
+		
+		1: Disconnect
+		2: Detected
+		3: Connected
+		4: Not configured
+		5: Unlocked
+		6: Locked
+		7: Holdover
+		8: Post-Holdover
+		9: Broken down
+		10: Not detected
+		11: SFN nok
+		"
+	::= { gpsSplitterEntry 6 }
+
+contactsInputTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF ContactsInputEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table contains the basic information of realys module"
+	::= { contacts 1 }
+
+contactsInputEntry  OBJECT-TYPE
+	SYNTAX 	ContactsInputEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Inputs row"
+	INDEX { contactsInputIndex }
+	::= { contactsInputTable 1 }
+
+ContactsInputEntry ::= SEQUENCE {
+	contactsInputIndex
+		Integer32,
+	contactsInputState
+		Integer32,
+	contactsInputAction
+		Integer32,
+	contactsInputPulse
+		Integer32,
+	contactsInputDescription
+		DisplayString,
+	contactsInputSimulate
+		TruthValue
+}
+
+contactsInputIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..15)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Input index"
+	::= { contactsInputEntry 1 }
+
+contactsInputState  OBJECT-TYPE
+	SYNTAX     Integer32 (0|1)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The input state could be,
+		0 = open
+		1 = close
+		"
+	::= { contactsInputEntry 2 }
+
+contactsInputAction  OBJECT-TYPE
+	SYNTAX     Integer32 (-1|0..5)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The inputs could modifie the indicated output whenever this value is different to 0.
+		"
+	::= { contactsInputEntry 3 }
+
+contactsInputPulse  OBJECT-TYPE
+	SYNTAX     Integer32 (0|1..28800)
+	UNITS 	"seconds"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The input pulse duration to act on the indicated output.
+		If the action value is 0, this value (pulse) does not apply."
+	::= { contactsInputEntry 4 }
+
+contactsInputDescription  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Input description."
+	::= { contactsInputEntry 5 }
+
+contactsInputSimulate  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Simulate an input actuation."
+	::= { contactsInputEntry 6 }
+
+contactsOutputTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF ContactsOutputEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table contains the basic information of realys module"
+	::= { contacts 2 }
+
+contactsOutputEntry  OBJECT-TYPE
+	SYNTAX 	ContactsOutputEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Inputs row"
+	INDEX { contactsOutputIndex }
+	::= { contactsOutputTable 1 }
+
+ContactsOutputEntry ::= SEQUENCE {
+	contactsOutputIndex
+		Integer32,
+	contactsOutputState
+		Integer32,
+	contactsOutputRest
+		Integer32,
+	contactsOutputDuration
+		Integer32,
+	contactsOutputDescription
+		DisplayString
+}
+
+contactsOutputIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..21)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Output index"
+	::= { contactsOutputEntry 1 }
+
+contactsOutputState  OBJECT-TYPE
+	SYNTAX     Integer32 (0|1)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The output state could be,
+		0 = open
+		1 = close
+		"
+	::= { contactsOutputEntry 2 }
+
+contactsOutputRest  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The rest of this realy (the default output state)
+		0 = open
+		1 = close"
+	::= { contactsOutputEntry 3 }
+
+contactsOutputDuration  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Output duration.
+		0 = infinite state
+		otherwise, seconds of the output pulse"
+	::= { contactsOutputEntry 4 }
+
+contactsOutputDescription  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Output description."
+	::= { contactsOutputEntry 5 }
+
+contactsCtrlAddress  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     obsolete
+	DESCRIPTION 
+		"Control address."
+	::= { contacts 3 }
+
+contactsHysteresis  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     deprecated
+	DESCRIPTION 
+		"Time to validate the alarm status."
+	::= { contacts 4 }
+
+contactsFirmware  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Contacts firmware version"
+	::= { contacts 5 }
+
+ucanLocal  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 remote/local configuration.
+		
+		False: UCA n+1 could be remote-configurated 
+		Truth: UCA n+1 only could by local-configurated
+		"
+	::= { ucanStateConfiguration 1 }
+
+ucanManual  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 automatic/manuall configuration.
+		
+		False: UCA n+1 is in automatic mode.
+		Truth: UCA n+1 is in manual mode, there are manual commutations.
+		"
+	::= { ucanStateConfiguration 2 }
+
+ucanHysteresis  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 Hysteresis"
+	::= { ucanStateConfiguration 3 }
+
+ucanNoPriority  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 on/off priorities:
+		
+		False: the priority-list are on.
+		Truth: the priority-list are off.
+		"
+	::= { ucanStateConfiguration 4 }
+
+ucanAutoOff  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Auto-switch on!off the principal MUX when is switched"
+	::= { ucanStateConfiguration 5 }
+
+ucanAutoReturn  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"It is possible to return to principal MUX when the module is OK again"
+	::= { ucanStateConfiguration 6 }
+
+ucanInputTest  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The input alarm could be cause for switching"
+	::= { ucanStateConfiguration 7 }
+
+ucanReceiver  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The receiver alarms could be cause for switching"
+	::= { ucanStateConfiguration 8 }
+
+ucanReset  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Reset UCA n+1 Status"
+	::= { ucanStateConfiguration 9 }
+
+ucanFirmware  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 firmware version"
+	::= { ucanStateConfiguration 10 }
+
+ucanPrioritiesTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF UcanPrioritiesEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 priorities Table"
+	::= { ucanStateConfiguration 11 }
+
+ucanPrioritiesEntry  OBJECT-TYPE
+	SYNTAX 	UcanPrioritiesEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 Priorities Entry"
+	INDEX { ucanPrioritiesIndex }
+	::= { ucanPrioritiesTable 1 }
+
+UcanPrioritiesEntry ::= SEQUENCE {
+	ucanPrioritiesIndex
+		Integer32,
+	ucanPrioritiesMuxAddress
+		Integer32,
+	ucanPrioritiesMuxValue
+		Integer32
+}
+
+ucanPrioritiesIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..15)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 priorities index"
+	::= { ucanPrioritiesEntry 1 }
+
+ucanPrioritiesMuxAddress  OBJECT-TYPE
+	SYNTAX     Integer32 (1..15)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"MUX address priority"
+	::= { ucanPrioritiesEntry 2 }
+
+ucanPrioritiesMuxValue  OBJECT-TYPE
+	SYNTAX     Integer32 (0..6)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"MUX address priority value"
+	::= { ucanPrioritiesEntry 3 }
+
+ucanReserve  OBJECT-TYPE
+	SYNTAX     Integer32 (1..15)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Reservation address"
+	::= { ucanStateConfiguration 12 }
+
+ucanCommunication  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Reservation address"
+	::= { ucanStateConfiguration 13 }
+
+ucanStateCommutationTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF UcanStateCommutationEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 State Commutation Table"
+	::= { ucanStateCommutation 1 }
+
+ucanStateCommutationEntry  OBJECT-TYPE
+	SYNTAX 	UcanStateCommutationEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 State Commutation Entry"
+	INDEX { ucanStateCommutationIndex }
+	::= { ucanStateCommutationTable 1 }
+
+UcanStateCommutationEntry ::= SEQUENCE {
+	ucanStateCommutationIndex
+		Integer32,
+	ucanStateCommutationMuxAddress
+		Integer32,
+	ucanStateCommutationValue
+		TruthValue
+}
+
+ucanStateCommutationIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..15)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 State Commutation Index"
+	::= { ucanStateCommutationEntry 1 }
+
+ucanStateCommutationMuxAddress  OBJECT-TYPE
+	SYNTAX     Integer32 (1..15)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 State Commutation MUX Address"
+	::= { ucanStateCommutationEntry 2 }
+
+ucanStateCommutationValue  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 State Commutation Value"
+	::= { ucanStateCommutationEntry 3 }
+
+ucanStateTestTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF UcanStateTestEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 State Test Table"
+	::= { ucanStateCommutation 2 }
+
+ucanStateTestEntry  OBJECT-TYPE
+	SYNTAX 	UcanStateTestEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 State Test Entry"
+	INDEX { ucanStateTestIndex }
+	::= { ucanStateTestTable 1 }
+
+UcanStateTestEntry ::= SEQUENCE {
+	ucanStateTestIndex
+		Integer32,
+	ucanStateTestMuxAddress
+		Integer32,
+	ucanStateTestValue
+		TruthValue
+}
+
+ucanStateTestIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..15)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 State Test Index"
+	::= { ucanStateTestEntry 1 }
+
+ucanStateTestMuxAddress  OBJECT-TYPE
+	SYNTAX     Integer32 (1..15)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 State Test MUX Address"
+	::= { ucanStateTestEntry 2 }
+
+ucanStateTestValue  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 State Test Value"
+	::= { ucanStateTestEntry 3 }
+
+ucanSwitchedMux  OBJECT-TYPE
+	SYNTAX     Integer32 (0..15)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 Switched MUX"
+	::= { ucanStateCommutation 3 }
+
+ucanTestingMux  OBJECT-TYPE
+	SYNTAX     Integer32 (0..15)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 Switched MUX"
+	::= { ucanStateCommutation 4 }
+
+ucanGeneralAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 General Alarm"
+	::= { ucanAlarm 1 }
+
+ucanComunicationAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 Comunication Alarm"
+	::= { ucanAlarm 2 }
+
+ucanReservationAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Is not possible to switching the reservation module"
+	::= { ucanAlarm 3 }
+
+ucanCompactGeneralTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF UcanCompactGeneralEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA N+1 for Compact Serie General (state/configuration) table"
+	::= { ucanCompact 1 }
+
+ucanCompactGeneralEntry  OBJECT-TYPE
+	SYNTAX 	UcanCompactGeneralEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA N+1 for Compact Serie General (state/configuration) table"
+	INDEX { ucanCompactStateConfigIndex }
+	::= { ucanCompactGeneralTable 1 }
+
+UcanCompactGeneralEntry ::= SEQUENCE {
+	ucanCompactStateConfigIndex
+		Integer32,
+	ucanCControlAddress
+		Integer32,
+	ucanCLocal
+		TruthValue,
+	ucanCManual
+		TruthValue,
+	ucanCAntenna
+		INTEGER,
+	ucanCSwitchedMux
+		INTEGER,
+	ucanCTestingMux
+		INTEGER,
+	ucanCAutoOff
+		TruthValue,
+	ucanCVerification
+		TruthValue,
+	ucanCVerificationDuration
+		Integer32,
+	ucanCVerificationA
+		TruthValue,
+	ucanCVerificationATime
+		Integer32,
+	ucanCVerificationAInterval
+		INTEGER,
+	ucanCVerificationB
+		TruthValue,
+	ucanCVerificationBTime
+		OCTET STRING,
+	ucanCVerificationC
+		TruthValue,
+	ucanCVerificationRetries
+		Integer32,
+	ucanCInputSignalTest
+		Integer32,
+	ucanCRestoration
+		TruthValue,
+	ucanCRestorationPerDay
+		Integer32,
+	ucanCPriorities
+		TruthValue
+}
+
+ucanCompactStateConfigIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..254)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA N+1 for Compact Serie General (state/configuration) index table"
+	::= { ucanCompactGeneralEntry 1 }
+
+ucanCControlAddress  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"UCA N+1 Compact Serie Address Control"
+	::= { ucanCompactGeneralEntry 2 }
+
+ucanCLocal  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 remote/local configuration.
+		
+		False: UCA n+1 could be remote-configurated 
+		Truth: UCA n+1 only could by local-configurated
+		"
+	::= { ucanCompactGeneralEntry 3 }
+
+ucanCManual  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 automatic/manuall configuration.
+		
+		False: UCA n+1 is in automatic mode.
+		Truth: UCA n+1 is in manual mode, there are manual commutations.
+		"
+	::= { ucanCompactGeneralEntry 4 }
+
+ucanCAntenna  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		antenna1 (1),
+		antenna1and2 (3),
+		notApply (4)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Antenna 1: only connected antenna 1 is switched to output
+		Antenna 1 and 2: both antenna (1 and 2) are multiplexed to output"
+	::= { ucanCompactGeneralEntry 5 }
+
+ucanCSwitchedMux  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		relay1Switched (1),
+		relay2Switched (2),
+		relay3Switched (3),
+		relay4Switched (4),
+		relay5Switched (5),
+		relay6Switched (6),
+		notSwitched (7)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 Switched MUX"
+	::= { ucanCompactGeneralEntry 6 }
+
+ucanCTestingMux  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		relay1Testing (1),
+		relay2Testing (2),
+		relay3Testing (3),
+		relay4Testing (4),
+		relay5Testing (5),
+		relay6Testing (6),
+		notTesting (7)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"UCA n+1 Testing MUX. Only input is switched to reserve."
+	::= { ucanCompactGeneralEntry 7 }
+
+ucanCAutoOff  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Auto-switch on/off the principal MUX when is switched
+		
+		Truth (1): switch on and switch off the back-up module
+		
+		False (2): the back-up module is not switched on (off) when is is switched"
+	::= { ucanCompactGeneralEntry 8 }
+
+ucanCVerification  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Autoverification process will start when A,B or C event happens.
+		
+		Truth (1): auto-verification is enabled
+		
+		False (2): auto-verification is disabled"
+	::= { ucanCompactGeneralEntry 9 }
+
+ucanCVerificationDuration  OBJECT-TYPE
+	SYNTAX     Integer32 (2..65535)
+	UNITS 	"seconds"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Duration of verification process"
+	::= { ucanCompactGeneralEntry 10 }
+
+ucanCVerificationA  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Every ucanCVerificationATime verification process will start
+		
+		
+		
+		Truth (1): enable verification A
+		
+		False (2): disabled verification B"
+	::= { ucanCompactGeneralEntry 11 }
+
+ucanCVerificationATime  OBJECT-TYPE
+	SYNTAX     Integer32 (1..65535)
+	UNITS 	"seconds"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Time bettwen verification process (depends on ucanCVerificationAInterval)"
+	::= { ucanCompactGeneralEntry 12 }
+
+ucanCVerificationAInterval  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		simple (1),
+		double (2),
+		triple (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Factor for ucanCVerificationATime.
+		
+		Simple: Each ucanCVerificationAInterval.
+		Double: ucanCVerificationAInterval is doubled each test.
+		Triple: ucanCVerificationAInterval is tripled each test."
+	::= { ucanCompactGeneralEntry 13 }
+
+ucanCVerificationB  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable a day hour for verification process
+		
+		Truth (1): enabled daily verification
+		
+		False (2): disabled daily verification"
+	::= { ucanCompactGeneralEntry 14 }
+
+ucanCVerificationBTime  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Hour for daily verification process. Format - hh:mm"
+	::= { ucanCompactGeneralEntry 15 }
+
+ucanCVerificationC  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Verification process will start when an event happens
+		
+		True (1): enabled
+		
+		False (2): disabled"
+	::= { ucanCompactGeneralEntry 16 }
+
+ucanCVerificationRetries  OBJECT-TYPE
+	SYNTAX     Integer32 (0..255)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Number of verification retries for each MUXs"
+	::= { ucanCompactGeneralEntry 17 }
+
+ucanCInputSignalTest  OBJECT-TYPE
+	SYNTAX     Integer32 (1..65535)
+	UNITS 	"seconds"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Duration for input signal test"
+	::= { ucanCompactGeneralEntry 18 }
+
+ucanCRestoration  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"A principal MUX can be restored if it is OK and the reserve is necessary for other MUX
+		
+		True (1): enabled auto-restaoration
+		
+		False (2): disabled"
+	::= { ucanCompactGeneralEntry 19 }
+
+ucanCRestorationPerDay  OBJECT-TYPE
+	SYNTAX     Integer32 (0..255)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Quantity of restoration per day"
+	::= { ucanCompactGeneralEntry 20 }
+
+ucanCPriorities  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Relays Priorities system enabled/disabled
+		
+		True (1): priorities are enabled
+		
+		False (2): priorities are disabled"
+	::= { ucanCompactGeneralEntry 21 }
+
+ucanCompactRelaysMuxTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF UcanCompactRelaysMuxEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA N+1 for Compact Serie Realys & MUXs association table"
+	::= { ucanCompact 2 }
+
+ucanCompactRelaysMuxEntry  OBJECT-TYPE
+	SYNTAX 	UcanCompactRelaysMuxEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA N+1 for Compact Serie Realys & MUXs association table"
+	INDEX { ucanCompactRelaysMuxIndex }
+	::= { ucanCompactRelaysMuxTable 1 }
+
+UcanCompactRelaysMuxEntry ::= SEQUENCE {
+	ucanCompactRelaysMuxIndex
+		Integer32,
+	ucanCompactRelaysMuxCAddress
+		Integer32,
+	ucanCompactRelay1Mux
+		Integer32,
+	ucanCompactRelay2Mux
+		Integer32,
+	ucanCompactRelay3Mux
+		Integer32,
+	ucanCompactRelay4Mux
+		Integer32,
+	ucanCompactRelay5Mux
+		Integer32,
+	ucanCompactRelay6Mux
+		Integer32,
+	ucanCompactRelayReserve
+		Integer32
+}
+
+ucanCompactRelaysMuxIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..254)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA N+1 for Compact Serie Realys & MUXs association index"
+	::= { ucanCompactRelaysMuxEntry 1 }
+
+ucanCompactRelaysMuxCAddress  OBJECT-TYPE
+	SYNTAX     Integer32 (1..254)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"UCA N+1 for Compact Serie Realys & MUXs association.
+		UCA Control Address"
+	::= { ucanCompactRelaysMuxEntry 2 }
+
+ucanCompactRelay1Mux  OBJECT-TYPE
+	SYNTAX     Integer32 (1..254)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"MUX Control address connected to Relay 1"
+	::= { ucanCompactRelaysMuxEntry 3 }
+
+ucanCompactRelay2Mux  OBJECT-TYPE
+	SYNTAX     Integer32 (1..254)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"MUX Control address connected to Relay 2"
+	::= { ucanCompactRelaysMuxEntry 4 }
+
+ucanCompactRelay3Mux  OBJECT-TYPE
+	SYNTAX     Integer32 (1..254)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"MUX Control address connected to Relay 3"
+	::= { ucanCompactRelaysMuxEntry 5 }
+
+ucanCompactRelay4Mux  OBJECT-TYPE
+	SYNTAX     Integer32 (1..254)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"MUX Control address connected to Relay 4"
+	::= { ucanCompactRelaysMuxEntry 6 }
+
+ucanCompactRelay5Mux  OBJECT-TYPE
+	SYNTAX     Integer32 (1..254)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"MUX Control address connected to Relay 5"
+	::= { ucanCompactRelaysMuxEntry 7 }
+
+ucanCompactRelay6Mux  OBJECT-TYPE
+	SYNTAX     Integer32 (1..254)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"MUX Control address connected to Relay 6"
+	::= { ucanCompactRelaysMuxEntry 8 }
+
+ucanCompactRelayReserve  OBJECT-TYPE
+	SYNTAX     Integer32 (1..254)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Reserve Control address "
+	::= { ucanCompactRelaysMuxEntry 9 }
+
+ucanCompactRelaysPriorityTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF UcanCompactRelaysPriorityEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA N+1 for Compact Serie Realys Priority table"
+	::= { ucanCompact 3 }
+
+ucanCompactRelaysPriorityEntry  OBJECT-TYPE
+	SYNTAX 	UcanCompactRelaysPriorityEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA N+1 for Compact Serie Realys Priority table"
+	INDEX { ucanCompactRelaysPriorityIndex }
+	::= { ucanCompactRelaysPriorityTable 1 }
+
+UcanCompactRelaysPriorityEntry ::= SEQUENCE {
+	ucanCompactRelaysPriorityIndex
+		Integer32,
+	ucanCompactRelaysPriorityAddress
+		Integer32,
+	ucanCompactRelay1Priority
+		Integer32,
+	ucanCompactRelay2Priority
+		Integer32,
+	ucanCompactRelay3Priority
+		Integer32,
+	ucanCompactRelay4Priority
+		Integer32,
+	ucanCompactRelay5Priority
+		Integer32,
+	ucanCompactRelay6Priority
+		Integer32
+}
+
+ucanCompactRelaysPriorityIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..254)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA N+1 for Compact Serie Realys Priority Index"
+	::= { ucanCompactRelaysPriorityEntry 1 }
+
+ucanCompactRelaysPriorityAddress  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"UCA N+1 for Compact Serie Realys Priority.
+		UCA Control Address"
+	::= { ucanCompactRelaysPriorityEntry 2 }
+
+ucanCompactRelay1Priority  OBJECT-TYPE
+	SYNTAX     Integer32 (0|1..6)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Relay 1 Priority"
+	::= { ucanCompactRelaysPriorityEntry 3 }
+
+ucanCompactRelay2Priority  OBJECT-TYPE
+	SYNTAX     Integer32 (0|1..6)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Relay 2 Priority"
+	::= { ucanCompactRelaysPriorityEntry 4 }
+
+ucanCompactRelay3Priority  OBJECT-TYPE
+	SYNTAX     Integer32 (0|1..6)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Relay 3 Priority"
+	::= { ucanCompactRelaysPriorityEntry 5 }
+
+ucanCompactRelay4Priority  OBJECT-TYPE
+	SYNTAX     Integer32 (0|1..6)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Relay 4 Priority"
+	::= { ucanCompactRelaysPriorityEntry 6 }
+
+ucanCompactRelay5Priority  OBJECT-TYPE
+	SYNTAX     Integer32 (0|1..6)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Relay 5 Priority"
+	::= { ucanCompactRelaysPriorityEntry 7 }
+
+ucanCompactRelay6Priority  OBJECT-TYPE
+	SYNTAX     Integer32 (0|1..6)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Relay 6 Priority"
+	::= { ucanCompactRelaysPriorityEntry 8 }
+
+ucanCompactAlarmTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF UcanCompactAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA N+1 for Compact Serie Alarm Table"
+	::= { ucanCompact 4 }
+
+ucanCompactAlarmEntry  OBJECT-TYPE
+	SYNTAX 	UcanCompactAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA N+1 for Compact Serie Alarm Table"
+	INDEX { ucanCompactAlarmIndex }
+	::= { ucanCompactAlarmTable 1 }
+
+UcanCompactAlarmEntry ::= SEQUENCE {
+	ucanCompactAlarmIndex
+		Integer32,
+	ucanCompactAlarmAddress
+		Integer32,
+	ucanCompactAlarmFault
+		TruthValue,
+	ucanCompactAlarmWarning
+		TruthValue,
+	ucanCompactAlarmAlimentationFault
+		TruthValue,
+	ucanCompactAlarmHW
+		TruthValue
+}
+
+ucanCompactAlarmIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..254)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA N+1 for Compact Serie Alarm Index"
+	::= { ucanCompactAlarmEntry 1 }
+
+ucanCompactAlarmAddress  OBJECT-TYPE
+	SYNTAX     Integer32 (1..254)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"UCA N+1 for Compact Seire Alarm Table
+		UCA Control Address"
+	::= { ucanCompactAlarmEntry 2 }
+
+ucanCompactAlarmFault  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Fault Alarm"
+	::= { ucanCompactAlarmEntry 3 }
+
+ucanCompactAlarmWarning  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Warning Alarm"
+	::= { ucanCompactAlarmEntry 4 }
+
+ucanCompactAlarmAlimentationFault  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Alimentation Alarm"
+	::= { ucanCompactAlarmEntry 5 }
+
+ucanCompactAlarmHW  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Internal hardware Alarm"
+	::= { ucanCompactAlarmEntry 6 }
+
+uca1Table  OBJECT-TYPE
+	SYNTAX SEQUENCE OF Uca1Entry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table contains the basic information of each UCA connected to the system."
+	::= { uca1 1 }
+
+uca1Entry  OBJECT-TYPE
+	SYNTAX 	Uca1Entry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Each row is UCA 1+1 information."
+	INDEX { uca1Index }
+	::= { uca1Table 1 }
+
+Uca1Entry ::= SEQUENCE {
+	uca1Index
+		Integer32,
+	uca1CtrlAddress
+		Integer32,
+	uca1Mode
+		Integer32,
+	uca1Preferential
+		INTEGER,
+	uca1Antenna
+		INTEGER,
+	uca1TestDuration
+		Integer32,
+	uca1NoMute
+		TruthValue,
+	uca1Firmware
+		DisplayString,
+	uca1RowIndex
+		Integer32,
+	uca1Ready
+		TruthValue
+}
+
+uca1Index  OBJECT-TYPE
+	SYNTAX     Integer32 (1..15)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA 1+1 index"
+	::= { uca1Entry 1 }
+
+uca1CtrlAddress  OBJECT-TYPE
+	SYNTAX     Integer32 (71..85)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Control address."
+	::= { uca1Entry 2 }
+
+uca1Mode  OBJECT-TYPE
+	SYNTAX     Integer32 (0|1|2|3)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"UCA 1+1 operation mode
+		
+		0: Manual
+		1: Auto-return off
+		2: Auto
+		3: Auto-return on"
+	::= { uca1Entry 3 }
+
+uca1Preferential  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		uca1PreferentialA (1),
+		uca1PreferentialB (2)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"UCA 1+1 preferential MUX
+		
+		1: MUX A
+		2: MUX B
+		
+		Note: it is only possible to set this parameter if UCA 1+1 is in automatic mode."
+	::= { uca1Entry 4 }
+
+uca1Antenna  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		uca1AntennaA (1),
+		uca1AntennaB (2)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"MUX to antenna
+		
+		1: MUX A to antenna
+		2: MUX B to antenna
+		
+		Note: it is only possible set this parameter if UCA 1+1 is in manual mode."
+	::= { uca1Entry 5 }
+
+uca1TestDuration  OBJECT-TYPE
+	SYNTAX     Integer32 (0..60)
+	UNITS 	"Seconds"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Test duration of alternative MUX (seconds)
+		
+		Note: it is only possible set this parameter if UCA 1+1 is in automatic mode."
+	::= { uca1Entry 6 }
+
+uca1NoMute  OBJECT-TYPE
+	SYNTAX     TruthValue
+	UNITS 	"dsec"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The alternative MUX switched to load is not muted.
+		
+		Note: it is only possible set this parameter no Mute if UCA 1+1 is in manual mode"
+	::= { uca1Entry 7 }
+
+uca1Firmware  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"UCA Firmware version"
+	::= { uca1Entry 8 }
+
+uca1RowIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..15)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"UCA 1+1 index (readable)"
+	::= { uca1Entry 9 }
+
+uca1Ready  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"UCA 1+1 is ready for commutation process.
+		
+		"
+	::= { uca1Entry 10 }
+
+uca1MuxConmutationTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF Uca1MuxConmutationEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"With this table, It is possible select wich alarm is event switch."
+	::= { uca1 2 }
+
+uca1MuxConmutationEntry  OBJECT-TYPE
+	SYNTAX 	Uca1MuxConmutationEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Each row is UCA 1+1 information."
+	INDEX { uca1MuxConmutationIndex }
+	::= { uca1MuxConmutationTable 1 }
+
+Uca1MuxConmutationEntry ::= SEQUENCE {
+	uca1MuxConmutationIndex
+		Integer32,
+	uca1CtrlAddressConmutationAlarm
+		Integer32,
+	uca1MuxTransmittedPowerAlarm
+		INTEGER,
+	uca1MuxTrtCurrentsOutRangeAlarm
+		TruthValue,
+	uca1MuxReflectedPowerAlarm
+		TruthValue,
+	uca1MuxUnLockTSAlarm
+		TruthValue,
+	uca1MuxNoInputSignalAlarm
+		TruthValue,
+	uca1MuxAsiErrorAlarm
+		TruthValue,
+	uca1MuxMipErrorAlarm
+		TruthValue,
+	uca1MuxPpsAlarm
+		TruthValue,
+	uca1MuxIFDVBTSignalAlarm
+		TruthValue,
+	uca1MuxGps10MHzAlarm
+		TruthValue,
+	uca1MuxPowerAmplifierCommunAlarm
+		TruthValue,
+	uca1MuxTemperatureAlarm
+		TruthValue,
+	uca1MuxModuleCommunitacionAlarm
+		TruthValue,
+	uca1MuxCBerAlarm
+		TruthValue,
+	uca1MuxVBerAlarm
+		TruthValue,
+	uca1MuxConmutationRowIndex
+		Integer32
+}
+
+uca1MuxConmutationIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..15)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA 1+1 index"
+	::= { uca1MuxConmutationEntry 1 }
+
+uca1CtrlAddressConmutationAlarm  OBJECT-TYPE
+	SYNTAX     Integer32 (71..85)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Control address for this module (UCA 1+1)
+		
+		71 ---> MUX address 001 (A) and 101 (B)
+		...
+		85 ---> MUX address 015 (A) and 115 (B)
+		"
+	::= { uca1MuxConmutationEntry 2 }
+
+uca1MuxTransmittedPowerAlarm  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		disabled (1),
+		lessThan6dBs (2),
+		lessThan3dBs (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Transmitted Power lower than nominal
+		
+		1: disabled
+		2: less than 6 dBs
+		3: less than 3 dBs"
+	::= { uca1MuxConmutationEntry 3 }
+
+uca1MuxTrtCurrentsOutRangeAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Power amplifier firmware version"
+	::= { uca1MuxConmutationEntry 4 }
+
+uca1MuxReflectedPowerAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Reflected power alarm status"
+	::= { uca1MuxConmutationEntry 5 }
+
+uca1MuxUnLockTSAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Unlock Transport Stream alarm"
+	::= { uca1MuxConmutationEntry 6 }
+
+uca1MuxNoInputSignalAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"No input signal alarm"
+	::= { uca1MuxConmutationEntry 7 }
+
+uca1MuxAsiErrorAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"ASI error alarm"
+	::= { uca1MuxConmutationEntry 8 }
+
+uca1MuxMipErrorAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"MIP error alarm"
+	::= { uca1MuxConmutationEntry 9 }
+
+uca1MuxPpsAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"1 pps alarm status"
+	::= { uca1MuxConmutationEntry 10 }
+
+uca1MuxIFDVBTSignalAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"No DVBT IF signal alarm"
+	::= { uca1MuxConmutationEntry 11 }
+
+uca1MuxGps10MHzAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"10 MHz alarm"
+	::= { uca1MuxConmutationEntry 12 }
+
+uca1MuxPowerAmplifierCommunAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Power Amplifier communication"
+	::= { uca1MuxConmutationEntry 13 }
+
+uca1MuxTemperatureAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Temperature alarm"
+	::= { uca1MuxConmutationEntry 14 }
+
+uca1MuxModuleCommunitacionAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Communication alarm"
+	::= { uca1MuxConmutationEntry 15 }
+
+uca1MuxCBerAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Channel BER (pre-Viterbi) alarm status"
+	::= { uca1MuxConmutationEntry 16 }
+
+uca1MuxVBerAlarm  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"VBER (post-Viterbi) alarm status"
+	::= { uca1MuxConmutationEntry 17 }
+
+uca1MuxConmutationRowIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..15)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"UCA 1+1 index (readable)"
+	::= { uca1MuxConmutationEntry 18 }
+
+uca1AlarmsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF Uca1AlarmsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This table contains the alarm status for each UCA 1+1"
+	::= { uca1 3 }
+
+uca1AlarmsEntry  OBJECT-TYPE
+	SYNTAX 	Uca1AlarmsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Each row is UCA 1+1 information."
+	INDEX { uca1AlarmsIndex }
+	::= { uca1AlarmsTable 1 }
+
+Uca1AlarmsEntry ::= SEQUENCE {
+	uca1AlarmsIndex
+		Integer32,
+	uca1CtrlAddressAlarm
+		Integer32,
+	uca1BlockedA
+		TruthValue,
+	uca1BlockedB
+		TruthValue,
+	uca1UndeterminatedRelay
+		TruthValue,
+	uca1IncorrectConfiguration
+		TruthValue,
+	uca1ConmutationError
+		TruthValue,
+	uca1MuxA
+		TruthValue,
+	uca1MuxB
+		TruthValue,
+	uca1AlarmsRowIndex
+		Integer32
+}
+
+uca1AlarmsIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..6)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"UCA 1+1 index"
+	::= { uca1AlarmsEntry 1 }
+
+uca1CtrlAddressAlarm  OBJECT-TYPE
+	SYNTAX     Integer32 (20..25)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Control address for this module"
+	::= { uca1AlarmsEntry 2 }
+
+uca1BlockedA  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Relay is blocked in A position."
+	::= { uca1AlarmsEntry 3 }
+
+uca1BlockedB  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Relay is blocked in B position."
+	::= { uca1AlarmsEntry 4 }
+
+uca1UndeterminatedRelay  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Relay position is unknown."
+	::= { uca1AlarmsEntry 5 }
+
+uca1IncorrectConfiguration  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The MUX A type is not the same that MUX B type."
+	::= { uca1AlarmsEntry 6 }
+
+uca1ConmutationError  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"UCA 1+1 conmutation error. It was impossible to finish all conmutation process."
+	::= { uca1AlarmsEntry 7 }
+
+uca1MuxA  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"During conmutation process, it was not possible configure MUX A.
+		There are not communication with MUX A."
+	::= { uca1AlarmsEntry 8 }
+
+uca1MuxB  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"During conmutation process, it was not possible configure MUX B.
+		There are not communication with MUX B."
+	::= { uca1AlarmsEntry 9 }
+
+uca1AlarmsRowIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..15)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"UCA 1+1 index (readable)"
+	::= { uca1AlarmsEntry 10 }
+
+
+groupSystem  OBJECT-GROUP
+	OBJECTS { sysCycleDBTM, 
+		sysDescrDBTM, 
+		sysFileDateHourDBTM, 
+		sysNameDBTM, 
+		sysManagementVersionDBTM, 
+		sysKernelVersionDBTM, 
+		sysRedundanceDBTM, 
+		sysSnmpVersionDBTM }
+	STATUS     current
+	DESCRIPTION 
+		"Contains all the objects from system branch of the MIB"
+	::= { objectGroups 1 }
+
+groupAdmin  OBJECT-GROUP
+	OBJECTS { date, 
+		hour, 
+		status, 
+		networkIpAddress, 
+		networkMaskAddress, 
+		networkGatewayAddress, 
+		networkRoutingDestination, 
+		networkRoutingEnabled, 
+		networkRoutingGateway, 
+		networkRoutingInterfaz, 
+		networkRoutingMask, 
+		ntpServerIp, 
+		ntpServerOffset, 
+		ntpServerStatus, 
+		powerSupplyStatus, 
+		snmpFastTrapsSync, 
+		snmpInformAck, 
+		snmpInformRetries, 
+		snmpInformTimeout, 
+		snmpReadCommunity, 
+		snmpTrapsPeriodic, 
+		snmpWriteCommunity, 
+		snmpTrapControlRateStatus, 
+		snmpTrapControlPeriod, 
+		snmpTrapsDestionationEnable, 
+		snmpTrapsSync, 
+		snmpTrapsAuthTrapEnable, 
+		snmpTrapsCommunity, 
+		snmpTrapsDestinationIP, 
+		webserverAutoRefresh, 
+		webserverUser1, 
+		webserverUser2, 
+		webserverNewPass }
+	STATUS     current
+	DESCRIPTION 
+		"Contains all the objects from general branch of the MIB"
+	::= { objectGroups 2 }
+
+-- ===== Stub groups to satisfy compliance references =====
+groupAlarmsTraps OBJECT-GROUP
+  OBJECTS { snmpTrapsCommunity }
+  STATUS  current
+  DESCRIPTION "Stub to satisfy loader; vendor omitted real group."
+  ::= { objectGroups 3 }
+
+groupAlarmTrapTable OBJECT-GROUP
+  OBJECTS { snmpTrapsDestinationIP }
+  STATUS  current
+  DESCRIPTION "Stub"
+  ::= { objectGroups 4 }
+
+groupContacts OBJECT-GROUP
+  OBJECTS { webserverUser1 }
+  STATUS  current
+  DESCRIPTION "Stub"
+  ::= { objectGroups 5 }
+
+groupGPS OBJECT-GROUP
+  OBJECTS { sysFileDateHourDBTM }
+  STATUS  current
+  DESCRIPTION "Stub"
+  ::= { objectGroups 6 }
+
+groupMUX OBJECT-GROUP
+  OBJECTS { sysRedundanceDBTM }
+  STATUS  current
+  DESCRIPTION "Stub"
+  ::= { objectGroups 7 }
+
+groupUCA OBJECT-GROUP
+  OBJECTS { snmpTrapControlPeriod }
+  STATUS  current
+  DESCRIPTION "Stub"
+  ::= { objectGroups 8 }
+
+groupUcan OBJECT-GROUP
+  OBJECTS { snmpTrapControlRateStatus }
+  STATUS  current
+  DESCRIPTION "Stub"
+  ::= { objectGroups 9 }
+
+groupUca1 OBJECT-GROUP
+  OBJECTS { snmpTrapsPeriodic }
+  STATUS  current
+  DESCRIPTION "Stub"
+  ::= { objectGroups 10 }
+
+groupDeprecated OBJECT-GROUP
+  OBJECTS { sysKernelVersionDBTM }
+  STATUS  current
+  DESCRIPTION "Stub"
+  ::= { objectGroups 11 }
+
+groupDeprecatedTraps OBJECT-GROUP
+  OBJECTS { snmpTrapsAuthTrapEnable }
+  STATUS  current
+  DESCRIPTION "Stub"
+  ::= { objectGroups 12 }
+-- ===== End stubs =====
+
+
+dvbtBroadcastBasicCompilance  MODULE-COMPLIANCE
+	STATUS     current
+	DESCRIPTION 
+		"The compliance statement for dvbtBroadcastTredessMIB entities which
+		            implement the dvbtBroadcast-TRedess MIB."
+	MODULE
+		MANDATORY-GROUPS { groupAdmin,
+				groupAlarmsTraps,
+				groupAlarmTrapTable,
+				groupContacts,
+				groupGPS,
+				groupMUX,
+				groupSystem,
+				groupUCA,
+				groupUcan,
+					groupUca1 } 
+	::= { groupCompilance 1 }
+
+dvbtDeprecatedBasicCompilance  MODULE-COMPLIANCE
+	STATUS     deprecated
+	DESCRIPTION 
+		"The compliance statement for dvbtBroadcastTredessMIB entities which
+		implement the dvbtBroadcast-TRedess MIB.
+		Deprecated!"
+	MODULE
+		MANDATORY-GROUPS { groupDeprecated,
+						groupDeprecatedTraps } 
+	::= { groupCompilance 2 }
+END
