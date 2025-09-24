@@ -63,6 +63,7 @@ class EditPortsController extends TableController
         $do_we_care = ($port->ignore || $port->disabled) ? false : $is_port_bad;
         $out_of_sync = $do_we_care ? "class='red'" : '';
         $tune = $port->device->getAttrib('ifName_tune:' . $port->ifName) == 'true' ? 'checked' : '';
+        $ifAlias_override = $port->device->getAttrib('ifName:' . $port->ifName);
 
         $port_group_options = '';
         foreach ($port->groups as $group) {
@@ -80,7 +81,7 @@ class EditPortsController extends TableController
             'ignore' => '<input type="checkbox" class="ignore-check" data-size="small" name="ignore_' . $port->port_id . '"' . ($port->ignore ? 'checked' : '') . '>
                                <input type="hidden" name="oldign_' . $port->port_id . '" value="' . ($port->ignore ? 1 : 0) . '"">',
             'port_tune' => '<input type="checkbox" name="override_config" data-attrib="ifName_tune:' . htmlentities($port->ifName) . '" data-device_id="' . $port->device_id . '" data-size="small" ' . $tune . '>',
-            'ifAlias' => '<div class="form-group"><input class="form-control input-sm" name="if-alias" data-device_id="' . $port->device_id . '" data-port_id="' . $port->port_id . '" data-ifName="' . htmlentities($port->ifName) . '" value="' . htmlentities($port->ifAlias) . '"><span class="form-control-feedback"><i class="fa" aria-hidden="true"></i></span></div>',
+            'ifAlias' => '<div class="form-group has-feedback"><input class="form-control input-sm" name="if-alias" data-device_id="' . $port->device_id . '" data-port_id="' . $port->port_id . '" data-ifName="' . htmlentities($port->ifName) . '" value="' . htmlentities($port->ifAlias) . '"><span class="form-control-feedback"><i class="fa ' . ($ifAlias_override ? 'fa-pencil' : '') . '" aria-hidden="true"></i></span></div>',
             'ifSpeed' => '<div class="form-group has-feedback"><input type="text" pattern="[0-9]*" inputmode="numeric" class="form-control input-sm" name="if-speed" data-device_id="' . $port->device_id . '" data-port_id="' . $port->port_id . '" data-ifName="' . htmlentities($port->ifName) . '" value="' . $port->ifSpeed . '"><span class="form-control-feedback"><i class="fas" aria-hidden="true"></i></span></div>',
             'portGroup' => '<div class="form-group has-feedback"><select class="input-sm port_group_select" name="port_group_' . $port->port_id . '[]"  data-port_id="' . $port->port_id . '" multiple>' . $port_group_options . '</select></div>',
         ];
