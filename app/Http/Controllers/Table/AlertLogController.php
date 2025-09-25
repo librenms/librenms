@@ -48,20 +48,19 @@ class AlertLogController extends TableController
                 // Map the numeric values to the actual enum values based on severity
                 if (is_numeric($min_severity) && $min_severity !== '') {
                     $min_severity = (int) $min_severity;
-                    switch ($min_severity) {
-                        case 1:
-                            return $query->whereIn('alert_rules.severity', ['ok', 'warning', 'critical']);
-                        case 2:
-                            return $query->whereIn('alert_rules.severity', ['warning', 'critical']);
-                        case 3:
-                            return $query->where('alert_rules.severity', 'critical');
-                        case 4:
-                            return $query->where('alert_rules.severity', 'ok');
-                        case 5:
-                            return $query->where('alert_rules.severity', 'warning');
-                        default:
-                            return $query;
+                    $severityEnum = AlertLogSeverity::tryFrom($min_severity);
+
+                    if ($severityEnum === null) {
+                        return $query;
                     }
+
+                    $severities = $severityEnum->getSeverities();
+
+                    return match (true) {
+                        is_array($severities) => $query->whereIn('alert_rules.severity', $severities),
+                        is_string($severities) => $query->where('alert_rules.severity', $severities),
+                        default => $query,
+                    };
                 }
                 return $query;
             },
