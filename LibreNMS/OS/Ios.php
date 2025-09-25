@@ -51,7 +51,7 @@ class Ios extends Cisco implements
 {
     use CiscoCellular;
     use CiscoPortSecurity;
-    
+
     /**
      * @return WirelessSensor[] Sensors
      */

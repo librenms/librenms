@@ -61,7 +61,7 @@ class Iosxe extends Ciscowlc implements
     use SyncsModels;
     use CiscoCellular;
     use CiscoPortSecurity;
-    
+
     /**
      * Array of shortened ISIS codes
      *

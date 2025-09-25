@@ -19,9 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
- *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * 
  * @copyright  2023 Michael Adams
  * @author     Michael Adams <mradams@ilstu.edu>
  */
@@ -51,7 +49,7 @@ trait CiscoPortSecurity
             'CISCO-PORT-SECURITY-MIB::cpsIfViolationCount',
             'CISCO-PORT-SECURITY-MIB::cpsIfSecureLastMacAddress',
             'CISCO-PORT-SECURITY-MIB::cpsIfStickyEnable',
-            ])->table(1);
+        ])->table(1);
 
         // Storing all polled data into an array using ifIndex as the index
         // Getting all ports from device. Port has to exist in ports table to be populated in port_security
@@ -105,13 +103,12 @@ trait CiscoPortSecurity
             // Checking if entry exists in DB already. If true, compare polled to DB.
             // If no entry, insert new.
             if ($entry) {
-                dd($entry);
                 $entry = $entry->toArray();
                 unset($entry['id']);
                 unset($entry['laravel_through_key']);
 
                 // Remove null values from record for comparison
-                $record = array_filter($record, function($value) {
+                $record = array_filter($record, function ($value) {
                     return $value !== null;
                 });
 

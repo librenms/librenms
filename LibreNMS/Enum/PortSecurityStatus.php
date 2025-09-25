@@ -38,23 +38,23 @@ class PortSecurityStatus
     /**
      * Get the icon class for a given port security status
      *
-     * @param string $status
+     * @param  string  $status
      * @return string
      */
     public static function getIconClass(string $status): string
     {
         $color = self::COLORS[$status] ?? null;
-        
+
         if ($color === null) {
             return 'fa-shield';
         }
-        
+
         $colorMap = [
             'green' => 'tw:text-green-600',
             'orange' => 'tw:text-orange-600',
             'red' => 'tw:text-red-600',
         ];
-        
+
         return 'fa-shield ' . ($colorMap[$color] ?? '');
     }
 }

@@ -569,7 +569,7 @@ class Port extends DeviceRelatedModel
     {
         return $this->hasOne(Vrf::class, 'vrf_id', 'ifVrf');
     }
-    
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\PortSecurity, $this>
      */
