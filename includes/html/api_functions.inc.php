@@ -1344,18 +1344,22 @@ function get_port_security(Illuminate\Http\Request $request)
     if ($port_id) {
         return check_port_permission($port_id, null, function ($port_id) {
             $port = PortSecurity::where('port_id', $port_id)->get()->toArray();
+
             return api_success($port, 'port');
         });
     } elseif ($hostname) {
         $device = DeviceCache::get($hostname);
+
         return check_device_permission($device->device_id, function () use ($device) {
             $port = PortSecurity::where('device_id', $device->device_id)->get()->toArray();
+
             return api_success($port, 'port');
         });
     } else {
         return check_device_permission($device->device_id, function () {
             // search port_security with no parameters
             $port = PortSecurity::get()->toArray();
+
             return api_success($port, 'port');
         });
     }
