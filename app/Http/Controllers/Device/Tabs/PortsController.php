@@ -30,6 +30,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Link;
 use App\Models\Port;
+use App\Models\PortSecurity;
 use App\Models\Pseudowire;
 use App\Models\UserPref;
 use Illuminate\Database\Eloquent\Builder;
@@ -97,6 +98,7 @@ class PortsController implements DeviceTab
             'links' => $this->linksData($device),
             'transceivers' => $this->transceiversData($device),
             'xdsl' => $this->xdslData($device),
+            'portsecurity' => $this->portSecurityData($device),
             'graphs', 'mini_graphs' => $this->graphData($device, $request),
             default => $this->portData($device, $request),
         };
@@ -279,6 +281,11 @@ class PortsController implements DeviceTab
         return ['links' => $device->links];
     }
 
+    private function portSecurityData(Device $device): array
+    {
+        return [];
+    }
+
     private function getTabs(Device $device): array
     {
         $tabs = [
@@ -308,6 +315,10 @@ class PortsController implements DeviceTab
 
         if ($device->portsAdsl()->exists() || $device->portsVdsl()->exists()) {
             $tabs[] = ['name' => __('port.tabs.xdsl'), 'url' => 'xdsl'];
+        }
+
+        if (PortSecurity::where('device_id', $device->device_id)->exists()) {
+            $tabs[] = ['name' => __('Port Security'), 'url' => 'portsecurity'];
         }
 
         return $tabs;

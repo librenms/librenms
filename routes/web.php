@@ -283,6 +283,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('outages', Table\OutagesController::class)->name('table.outages');
             Route::get('outages/export', [Table\OutagesController::class, 'export']);
             Route::post('port-nac', Table\PortNacController::class)->name('table.port-nac');
+            Route::post('port-security', Table\PortSecurityController::class)->name('table.port-security');
             Route::post('port-stp', Table\PortStpController::class);
             Route::post('ports', Table\PortsController::class)->name('table.ports');
             Route::get('ports/export', [Table\PortsController::class, 'export']);
