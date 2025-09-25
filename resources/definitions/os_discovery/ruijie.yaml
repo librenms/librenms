@@ -48,7 +48,7 @@ modules:
                             op: '='
                             value: -10000
                         - 
-                            oid: IF-MIB::ifAdminStatus
+                            oid: RUIJIE-INTERFACE-MIB::ruijieifAdminStatus
                             op: '='
                             value: 2
                 - 
@@ -72,7 +72,7 @@ modules:
                             op: '='
                             value: -10000
                         - 
-                            oid: IF-MIB::ifAdminStatus
+                            oid: RUIJIE-INTERFACE-MIB::ruijieifAdminStatus
                             op: '='
                             value: 2
         fanspeed:
