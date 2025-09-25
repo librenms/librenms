@@ -80,7 +80,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('device-groups', DeviceGroupController::class);
     Route::any('inventory', App\Http\Controllers\InventoryController::class)->name('inventory');
     Route::get('inventory/purge', [App\Http\Controllers\InventoryController::class, 'purge'])->name('inventory.purge');
-    Route::any('alert-log', App\Http\Controllers\AlertLogController::class)->name('alert-log');
+    Route::get('alert-log', App\Http\Controllers\AlertLogController::class)->name('alert-log');
     Route::resource('port', PortController::class)->only('update');
     Route::get('vlans', [App\Http\Controllers\VlansController::class, 'index'])->name('vlans.index');
     Route::prefix('poller')->group(function () {
