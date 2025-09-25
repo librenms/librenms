@@ -1356,12 +1356,8 @@ function get_port_security(Illuminate\Http\Request $request)
             return api_success($port, 'port');
         });
     } else {
-        return check_device_permission($device->device_id, function () {
-            // search port_security with no parameters
-            $port = PortSecurity::get()->toArray();
-
-            return api_success($port, 'port');
-        });
+        $port = PortSecurity::hasAccess(Auth::user())->get();
+        return api_success($port, 'port');
     }
 }
 
