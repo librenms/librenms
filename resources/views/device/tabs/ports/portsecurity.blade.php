@@ -1,8 +1,4 @@
 <x-panel body-class="tw:p-0!">
-    <x-slot name="title">
-        @lang('Port Security')
-    </x-slot>
-
     <table id="port-security-table" class="table table-hover table-condensed table-striped tw:mt-1 tw:mb-0!">
         <thead>
             <tr>
@@ -41,7 +37,7 @@
             },
             templates: {
                 header: "<div id=\"@{{ctx.id}}\" class=\"@{{css.header}}\"><div class=\"row\">" +
-                        "<div class=\"col-sm-8 actionBar\"><span class=\"pull-left\">@lang('Ports') » @lang('Port Security')</span></div>" +
+                        "<div class=\"col-sm-8 actionBar\"><span class=\"pull-left\"></span></div>" +
                         "<div class=\"col-sm-4 actionBar\"><p class=\"@{{css.search}}\"></p><p class=\"@{{css.actions}}\"></p></div></div></div>"
             }
         });
