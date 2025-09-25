@@ -41,18 +41,16 @@ $searchby = $vars['searchby'] ?? 'status';
 $searchPhrase = $vars['searchPhrase'] ?? '';
 
 // Select the devices only with port security configured
-use App\Models\PortSecurity;
-use App\Models\Device;
-
-$devices = Device::hasAccess(Auth::user())
+$devices = \App\Models\Device::hasAccess(Auth::user())
     ->whereHas('portSecurity')
     ->orderBy('hostname')
     ->get(['device_id', 'hostname', 'sysName', 'display']);
 
 foreach ($devices as $device) {
     $selected = ($device->device_id == $device_id) ? ' selected' : '';
+    $device_array = $device->toArray();
     echo '"<option value=\"' . $device->device_id . '\"' . $selected . '>' .
-         str_replace(['"', '\''], '', htmlentities(format_hostname($device))) . '</option>"+' . "\n";
+         str_replace(['"', '\''], '', htmlentities(format_hostname($device_array))) . '</option>"+' . "\n";
 }
 ?>
                 "</select>"+

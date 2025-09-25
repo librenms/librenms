@@ -172,7 +172,7 @@ class PortSecurityController extends TableController
         return [
             'device' => Blade::render('<x-device-link :device="$device"/>', ['device' => $portSecurity->device]),
             'interface' => $portSecurity->port ? Blade::render('<x-port-link :port="$port">{{ $port->getShortLabel() }}</x-port-link>', ['port' => $portSecurity->port]) : 'N/A',
-            'port_description' => $portSecurity->port ? $portSecurity->port->ifAlias : 'N/A',
+            'port_description' => $portSecurity->port?->ifAlias ?? 'N/A',
             'status' => '<i class="fa ' . $statusIcon . '" aria-hidden="true" title="' . $portSecurity->status . '"></i> ' . $portSecurity->status,
             'enable' => $portSecurity->port_security_enable ?? 'N/A',
             'max_secure' => $portSecurity->max_addresses ?? 'N/A',

@@ -1102,11 +1102,11 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\PortSecurity, \App\Models\Port, \App\Models\Device, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\PortSecurity, \App\Models\Port, $this>
      */
     public function portSecurity(): HasManyThrough
     {
-        return $this->hasManyThrough(\App\Models\PortSecurity::class, \App\Models\Port::class, 'device_id', 'port_id');
+        return $this->hasManyThrough(PortSecurity::class, Port::class, 'device_id', 'port_id');
     }
 
     /**

@@ -55,6 +55,6 @@ class PortSecurityStatus
             'red' => 'tw:text-red-600',
         ];
 
-        return 'fa-shield ' . ($colorMap[$color] ?? '');
+        return 'fa-shield ' . $colorMap[$color];
     }
 }
