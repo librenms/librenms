@@ -14,4 +14,15 @@ return [
         - Run alerts: Alerts are run as usual, users are notified. This option leads essentially to a 'cosmetic only' maintenance",
         ],
     ],
+    'alert_log' => [
+        'device_group_required' => 'Please select a device or device group to view all alerts.',
+        'severities' => [
+            1 => 'Ok, warning and critical',
+            2 => 'Warning and critical',
+            3 => 'Critical',
+            4 => 'OK',
+            5 => 'Warning',
+            6 => 'Critical',
+        ],
+    ],
 ];

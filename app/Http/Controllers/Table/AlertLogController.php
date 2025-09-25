@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Enum\AlertLogSeverity;
 use App\Models\AlertLog;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Util\Url;
 
 class AlertLogController extends TableController
@@ -19,9 +21,33 @@ class AlertLogController extends TableController
         return [
             'device_id' => 'nullable|int',
             'rule_id' => 'nullable|int',
+            'device_group' => 'nullable|int',
             'state' => 'nullable|int',
             'min_severity' => 'nullable',
+            'date_from' => 'nullable|date',
+            'date_to' => 'nullable|date|after_or_equal:date_from',
+            'rowCount' => 'nullable|int',
         ];
+    }
+
+    /**
+     * Validate the given request with the given rules and custom business logic.
+     *
+     * @param  Request  $request
+     * @param  array  $rules
+     * @param  array  $messages
+     * @param  array  $customAttributes
+     * @return array
+     */
+    public function validate(Request $request, array $rules = [], array $messages = [], array $customAttributes = [])
+    {
+        $result = parent::validate($request, $rules, $messages, $customAttributes);
+
+        if ($request->input('rowCount') == -1 && !$request->input('device_id') && !$request->input('device_group')) {
+            abort(422, __('Please select a specific device or device group before choosing to show all alerts.'));
+        }
+
+        return $result;
     }
 
     protected function searchFields(Request $request): array
@@ -38,6 +64,13 @@ class AlertLogController extends TableController
         return [
             'alert_log.device_id' => 'device_id',
             'alert_log.rule_id' => 'rule_id',
+            'device_group' => function ($query, $device_group) {
+                return $query->whereIn('devices.device_id', function ($subquery) use ($device_group) {
+                    $subquery->select('device_id')
+                        ->from('device_group_device')
+                        ->where('device_group_id', $device_group);
+                });
+            },
             'state' => function ($query, $state) {
                 if ($state !== '-1' && $state !== '' && $state !== null) {
                     return $query->where('alert_log.state', $state);
@@ -45,7 +78,6 @@ class AlertLogController extends TableController
                 return $query;
             },
             'min_severity' => function ($query, $min_severity) {
-                // Map the numeric values to the actual enum values based on severity
                 if (is_numeric($min_severity) && $min_severity !== '') {
                     $min_severity = (int) $min_severity;
                     $severityEnum = AlertLogSeverity::tryFrom($min_severity);
@@ -61,6 +93,22 @@ class AlertLogController extends TableController
                         is_string($severities) => $query->where('alert_rules.severity', $severities),
                         default => $query,
                     };
+                }
+                return $query;
+            },
+            'date_from' => function ($query, $date_from) {
+                if (!empty($date_from)) {
+                    $from_date = Carbon::parse($date_from, session('preferences.timezone'))->startOfDay()->utc()->toDateTimeString();
+                    Log::info('Filtering from date: ' . $date_from . ' (UTC: ' . $from_date . ')');
+                    return $query->where('alert_log.time_logged', '>=', $from_date);
+                }
+                return $query;
+            },
+            'date_to' => function ($query, $date_to) {
+                if (!empty($date_to)) {
+                    $to_date = Carbon::parse($date_to, session('preferences.timezone'))->endOfDay()->utc()->toDateTimeString();
+                    Log::info('Filtering to date: ' . $date_to . ' (UTC: ' . $to_date . ')');
+                    return $query->where('alert_log.time_logged', '<=', $to_date);
                 }
                 return $query;
             },
@@ -94,7 +142,9 @@ class AlertLogController extends TableController
 
 
         return $query;
-    }    /**
+    }
+
+    /**
      * @param  AlertLog  $alertlog
      */
     public function formatItem($alertlog): array

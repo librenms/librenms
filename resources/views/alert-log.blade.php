@@ -54,38 +54,97 @@
 
 @push('scripts')
     <script>
+        function validateDateRange() {
+            var dateFrom = $("#date_from").val();
+            var dateTo = $("#date_to").val();
+            var $dateFromInput = $("#date_from");
+            var $dateToInput = $("#date_to");
+            var $dateMessage = $("#date-validation-message");
+
+            $dateMessage.remove();
+
+            if (dateFrom && dateTo && new Date(dateFrom) > new Date(dateTo)) {
+                $dateToInput.after('<div id="date-validation-message" class="alert alert-warning tw:mt-2" role="alert">' +
+                    '<i class="fa fa-exclamation-triangle"></i> ' +
+                    '@lang("From date must be before or equal to To date.")' +
+                    '</div>');
+                return false;
+            }
+
+            return true;
+        }
+
         var grid = $("#alertlog").bootgrid({
             ajax: true,
             searchable: true,
-            rowCount: [25, 50, 100, 250, -1],
+            navigation: 3,
+            rowCount: [25, 50, 100, 250, 500, -1],
             templates: {
-                header: "<div class=\"alertlog-headers-table-menu\" style=\"padding:6px 6px 0px 0px;\"><div id=\"@{{ctx.id}}\" class=\"@{{css.header}} tw:flex tw:flex-wrap\">" +
-                    "<form method=\"post\" action=\"{{ route('alert-log') }}\" class=\"tw:flex tw:flex-wrap tw:items-center\" role=\"form\" id=\"alertlog_filter\">" +
-                    "{!! addslashes(csrf_field()) !!}" +
-                    "<div class=\"tw:flex tw:items-baseline tw:mr-3 tw:mt-2\">" +
-                    "<span class=\"tw:mr-1\">@lang('Device')</span>" +
-                    "<select name=\"device_id\" id=\"device_id\" class=\"form-control\"></select>" +
-                    "</div>" +
-                    "<div class=\"tw:flex tw:items-baseline tw:mr-3 tw:mt-2\">" +
-                    "<span class=\"tw:mr-1\">@lang('Alert Rule')</span>" +
-                    "<select name=\"rule_id\" id=\"rule_id\" class=\"form-control\"></select>" +
-                    "</div>" +
-                    "<div class=\"tw:flex tw:items-baseline tw:mr-3 tw:mt-2\">" +
-                    "<span class=\"tw:mr-1\">@lang('State')</span>" +
-                    "<select name=\"state\" id=\"state\" class=\"form-control\">" +
-                    "@foreach($alert_states as $name => $value)<option value='{{ $value }}' {{ $filter['state'] == $value ? 'selected' : '' }}>{{ $name }}</option>@endforeach" +
-                    "</select>" +
-                    "</div>" +
-                    "<div class=\"tw:flex tw:items-baseline tw:mr-3 tw:mt-2\">" +
-                    "<span class=\"tw:mr-1\">@lang('Severity')</span>" +
-                    "<select name=\"min_severity\" id=\"min_severity\" class=\"form-control\">" +
-                    "@foreach($alert_severities as $name => $value)<option value='{{ $value }}' {{ $filter['min_severity'] == $value ? 'selected' : '' }}>{{ $name }}</option>@endforeach" +
-                    "</select>" +
-                    "</div>" +
-                    "<button type=\"submit\" class=\"btn btn-default tw:mr-2 tw:mt-2\">@lang('Filter')</button>" +
-                    "</form>" +
+                header:
+                    "<div class=\"alertlog-headers-table-menu\" style=\"padding:6px 6px 0px 0px;\">" +
+                    "<div id=\"@{{ctx.id}}\" class=\"@{{css.header}} tw:flex tw:flex-wrap\">" +
+                        "<form method=\"post\" action=\"{{ route('alert-log') }}\" class=\"tw:flex tw:flex-wrap tw:items-center\" role=\"form\" id=\"alertlog_filter\">" +
+                        "{!! addslashes(csrf_field()) !!}" +
+                        "<div class=\"tw:flex tw:items-baseline tw:mr-3 tw:mt-2\">" +
+                        "<span class=\"tw:mr-1\">@lang('Device')</span>" +
+                        "<select name=\"device_id\" id=\"device_id\" class=\"form-control\"></select>" +
+                        "</div>" +
+                        "<div class=\"tw:flex tw:items-baseline tw:mr-3 tw:mt-2\">" +
+                        "<span class=\"tw:mr-1\">@lang('Alert Rule')</span>" +
+                        "<select name=\"rule_id\" id=\"rule_id\" class=\"form-control\"></select>" +
+                        "</div>" +
+                        "<div class=\"tw:flex tw:items-baseline tw:mr-3 tw:mt-2\">" +
+                        "<span class=\"tw:mr-1\">@lang('Device Group')</span>" +
+                        "<select name=\"device_group\" id=\"device_group\" class=\"form-control\"></select>" +
+                        "</div>" +
+                        "<div class=\"tw:flex tw:items-baseline tw:mr-3 tw:mt-2\">" +
+                        "<span class=\"tw:mr-1\">@lang('State')</span>" +
+                        "<select name=\"state\" id=\"state\" class=\"form-control\">" +
+                        "@foreach($alert_states as $name => $value)<option value='{{ $value }}' {{ $filter['state'] == $value ? 'selected' : '' }}>{{ $name }}</option>@endforeach" +
+                        "</select>" +
+                        "</div>" +
+                        "<div class=\"tw:flex tw:items-baseline tw:mr-3 tw:mt-2\">" +
+                        "<span class=\"tw:mr-1\">@lang('Severity')</span>" +
+                        "<select name=\"min_severity\" id=\"min_severity\" class=\"form-control\">" +
+                        "@foreach($alert_severities as $name => $value)<option value='{{ $value }}' {{ $filter['min_severity'] == $value ? 'selected' : '' }}>{{ $name }}</option>@endforeach" +
+                        "</select>" +
+                        "</div>" +
+                        "<div class=\"tw:flex tw:items-baseline tw:mr-3 tw:mt-2\">" +
+                        "<span class=\"tw:mr-1\">@lang('From Date')</span>" +
+                        "<input type=\"date\" name=\"date_from\" id=\"date_from\" class=\"form-control\" value=\"{{ $filter['date_from'] ?? '' }}\" style=\"width: 150px;\">" +
+                        "</div>" +
+                        "<div class=\"tw:flex tw:items-baseline tw:mr-3 tw:mt-2\">" +
+                        "<span class=\"tw:mr-1\">@lang('To Date')</span>" +
+                        "<input type=\"date\" name=\"date_to\" id=\"date_to\" class=\"form-control\" value=\"{{ $filter['date_to'] ?? '' }}\" style=\"width: 150px;\">" +
+                        "</div>" +
+                        "<button type=\"submit\" class=\"btn btn-default tw:mr-2 tw:mt-2\">@lang('Filter')</button>" +
+                        "</form>" +
                     "<div class=\"actionBar tw:ml-auto tw:relative tw:mt-2\"><div class=\"@{{css.actions}}\"></div></div>" +
-                    "</div></div>"
+                    "</div>" +
+                    "</div>"
+            },
+            requestHandler: function (request) {
+                // Prevent loading all entries without a device or device group selected
+                if (request.rowCount === -1) {
+                    var deviceSelected = $("#device_id").val();
+                    var deviceGroupSelected = $("#device_group").val();
+
+                    if ((!deviceSelected || deviceSelected === "") && (!deviceGroupSelected || deviceGroupSelected === "")) {
+                        var $alertlogContainer = $("#alertlog").closest('.panel');
+                        var $alertMessage = $("#alert-validation-message");
+
+                        $alertMessage.remove();
+
+                        $alertlogContainer.before('<div id="alert-validation-message" class="alert alert-warning tw:mt-2" role="alert">' +
+                            '<i class="fa fa-exclamation-triangle"></i> ' +
+                            '@lang("alerting.alert_log.device_group_required")' +
+                            '</div>');
+
+                        return null;
+                    }
+                }
+
+                return request;
             },
             post: function () {
                 return {!! json_encode($filter) !!};
@@ -153,6 +212,25 @@
 
         // Initialize alert rule selector
         init_select2("#rule_id", "alert-rules", {}, @json($rule_selected ?? ''), "@lang('All Alert Rules')");
+
+        // Initialize device group selector
+        init_select2("#device_group", "device-group", {}, @json($device_group_selected ?? ''), "@lang('All Device Groups')");
+
+        // Clear validation message when device or device group changes
+        $("#device_id, #device_group").on("change", function() {
+            $("#alert-validation-message").remove();
+        });
+
+        // Validate date range on change and form submit
+        $("#date_from, #date_to").on("change", function() {
+            validateDateRange();
+        });
+        $("#alertlog_filter").on("submit", function(e) {
+            if (!validateDateRange()) {
+                e.preventDefault();
+                return false;
+            }
+        });
     </script>
 @endpush
 
