@@ -7,13 +7,13 @@
                     "sysObjectID": ".1.3.6.1.4.1.4881.1.1.10.1.150",
                     "sysDescr": "Ruijie 10G Routing Switch(S6220-48XS4QXS) By Ruijie Networks",
                     "sysContact": "<private>",
-                    "version": null,
-                    "hardware": null,
+                    "version": "S6150-X_RGOS 12.6(3)B1303P1, Release(12192209)",
+                    "hardware": "2.00",
                     "features": null,
                     "location": "<private>",
                     "os": "ruijie",
                     "type": "network",
-                    "serial": null,
+                    "serial": "XXT12J9000011",
                     "icon": "ruijie.png"
                 }
             ]

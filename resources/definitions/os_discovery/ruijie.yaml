@@ -1,9 +1,8 @@
-mib: RUIJIE-SYSTEM-MIB:RUIJIE-MEMORY-MIB:RUIJIE-ENTITY-MIB:RUIJIE-PROCESS-MIB:RUIJIE-INTERFACE-MIB:RUIJIE-FIBER-MIB
 modules:
     os:
-        hardware: .1.3.6.1.4.1.4881.1.1.10.2.21.1.2.1.9.1
-        version: .1.3.6.1.4.1.4881.1.1.10.2.21.1.2.1.8.1
-        serial: .1.3.6.1.4.1.4881.1.1.10.2.21.1.2.1.10.1
+        hardware: RUIJIE-ENTITY-MIB::ruijieDeviceHWVersion.1
+        version: RUIJIE-ENTITY-MIB::ruijieDeviceSWVersion.1
+        serial: RUIJIE-ENTITY-MIB::ruijieDeviceSerialNumber.1
     mempools:
         data:
             -
@@ -15,123 +14,121 @@ modules:
                 descr: 'Memory Usage'
     processors:
         data:
-            -
-              oid: ruijieNodeCPUTotalTable
-              descr: '{{ $ruijieNodeCPUTotalName }}'
-              value: ruijieNodeCPUTotal5min
-              num_oid: '.1.3.6.1.4.1.4881.1.1.10.2.36.1.2.1.5.{{ $index }}'
-              # warn: ruijieNodeCPUTotalWarning
-              # crit: ruijieNodeCPUTotalCritical
+            - 
+                oid: RUIJIE-PROCESS-MIB::ruijieNodeCPUTotalTable
+                descr: '{{ $RUIJIE-PROCESS-MIB::ruijieNodeCPUTotalName }}'
+                value: RUIJIE-PROCESS-MIB::ruijieNodeCPUTotal5min
+                num_oid: '.1.3.6.1.4.1.4881.1.1.10.2.36.1.2.1.5.{{ $index }}'
+                warn_percent: RUIJIE-PROCESS-MIB::fsNodeCPUTotalCritical
     sensors:
         pre-cache:
             data:
-                -
-                    oid:
-                        - RUIJIE-INTERFACE-MIB::ruijieifAdminStatus
+                - 
+                    oid: RUIJIE-INTERFACE-MIB::ruijieifAdminStatus
         dbm:
             data:
-                -
-                    oid: ruijieFiberTable
-                    value: ruijieFiberRXpower
+                - 
+                    oid: RUIJIE-FIBER-MIB::ruijieFiberTable
+                    value: RUIJIE-FIBER-MIB::ruijieFiberRXpower
                     num_oid: '.1.3.6.1.4.1.4881.1.1.10.2.105.1.1.1.76.{{ $index }}'
-                    descr: "{{ $ruijieFiberPortDescr }} RX"
+                    descr: "{{ $RUIJIE-FIBER-MIB::ruijieFiberPortDescr }} RX"
                     divisor: 100
-                    low_warn_limit: ruijieFiberRXpowerLowWarnThreshold
-                    warn_limit: ruijieFiberRXpowerHighWarnThreshold
-                    low_limit: ruijieFiberRXpowerLowAlarmThreshold
-                    high_limit: ruijieFiberRXpowerHighAlarmThreshold
+                    low_warn_limit: RUIJIE-FIBER-MIB::ruijieFiberRXpowerLowWarnThreshold
+                    warn_limit: RUIJIE-FIBER-MIB::ruijieFiberRXpowerHighWarnThreshold
+                    low_limit: RUIJIE-FIBER-MIB::ruijieFiberRXpowerLowAlarmThreshold
+                    high_limit: RUIJIE-FIBER-MIB::ruijieFiberRXpowerHighAlarmThreshold
                     index: 'rx-{{ $index }}'
                     skip_values:
-                        -
-                            oid: ruijieFiberDDMSupportStatus
+                        - 
+                            oid: RUIJIE-FIBER-MIB::ruijieFiberDDMSupportStatus
                             op: '='
                             value: 2
-                        -
-                            oid: ruijieFiberRXpower
+                        - 
+                            oid: RUIJIE-FIBER-MIB::ruijieFiberRXpower
                             op: '='
                             value: -10000
-                        -
+                        - 
                             oid: IF-MIB::ifAdminStatus
                             op: '='
                             value: 2
-                -
-                    oid: ruijieFiberTable
-                    value: ruijieFiberTXpower
+                - 
+                    oid: RUIJIE-FIBER-MIB::ruijieFiberTable
+                    value: RUIJIE-FIBER-MIB::ruijieFiberTXpower
                     num_oid: '.1.3.6.1.4.1.4881.1.1.10.2.105.1.1.1.81.{{ $index }}'
-                    descr: "{{ $ruijieFiberPortDescr }} TX"
+                    descr: "{{ $RUIJIE-FIBER-MIB::ruijieFiberPortDescr }} TX"
                     divisor: 100
-                    low_warn_limit: ruijieFiberTXpowerLowWarnThreshold
-                    warn_limit: ruijieFiberTXpowerHighWarnThreshold
-                    low_limit: ruijieFiberTXpowerLowAlarmThreshold
-                    high_limit: ruijieFiberTXpowerHighAlarmThreshold
+                    low_warn_limit: RUIJIE-FIBER-MIB::ruijieFiberTXpowerLowWarnThreshold
+                    warn_limit: RUIJIE-FIBER-MIB::ruijieFiberTXpowerHighWarnThreshold
+                    low_limit: RUIJIE-FIBER-MIB::ruijieFiberTXpowerLowAlarmThreshold
+                    high_limit: RUIJIE-FIBER-MIB::ruijieFiberTXpowerHighAlarmThreshold
                     index: 'tx-{{ $index }}'
                     skip_values:
-                        -
-                            oid: ruijieFiberDDMSupportStatus
+                        - 
+                            oid: RUIJIE-FIBER-MIB::ruijieFiberDDMSupportStatus
                             op: '='
                             value: 2
-                        -
-                            oid: ruijieFiberTXpower
+                        - 
+                            oid: RUIJIE-FIBER-MIB::ruijieFiberRXpower
                             op: '='
                             value: -10000
-                        -
+                        - 
                             oid: IF-MIB::ifAdminStatus
                             op: '='
                             value: 2
         fanspeed:
             data:
                 -
-                    oid: ruijieSystemFanStatusTable
-                    value: ruijieSystemFanStatusSpeed
+                    oid: RUIJIE-SYSTEM-MIB::ruijieSystemFanStatusTable
+                    value: RUIJIE-SYSTEM-MIB::ruijieSystemFanStatusSpeed
                     num_oid: '.1.3.6.1.4.1.4881.1.1.10.2.1.1.43.1.6.{{ $index }}'
                     descr: 'Fan {{ $subindex0 }}/{{ $subindex1 }}'
         temperature:
             data:
                 -
-                    oid: ruijieSystemMultipleTemperatureTable
-                    value: ruijieSystemMultipleTemperatureCurrent
+                    oid: RUIJIE-SYSTEM-MIB::ruijieSystemMultipleTemperatureTable
+                    value: RUIJIE-SYSTEM-MIB::ruijieSystemMultipleTemperatureCurrent
                     num_oid: '.1.3.6.1.4.1.4881.1.1.10.2.1.1.44.1.5.{{ $index }}'
-                    warn_limit: ruijieSystemMultipleTemperatureWarning
-                    high_limit: ruijieSystemMultipleTemperatureCritical
-                    descr: "{{ $ruijieSystemMultipleTemperatureName }} {{ $subindex0 }}/{{ $subindex1 }}"
+                    warn_limit: RUIJIE-SYSTEM-MIB::ruijieSystemMultipleTemperatureWarning
+                    high_limit: RUIJIE-SYSTEM-MIB::ruijieSystemMultipleTemperatureCritical
+                    descr: "{{ $RUIJIE-SYSTEM-MIB::ruijieSystemMultipleTemperatureName }} {{ $subindex0 }}/{{ $subindex1 }}"
                 -
-                    oid: ruijieFiberTable
-                    value: ruijieFiberTemp
+                    oid: RUIJIE-FIBER-MIB::ruijieFiberTable
+                    value: RUIJIE-FIBER-MIB::ruijieFiberTemp
                     num_oid: '.1.3.6.1.4.1.4881.1.1.10.2.105.1.1.1.17.{{ $index }}'
-                    descr: "{{ $ruijieFiberPortDescr }}"
+                    descr: "{{ $RUIJIE-FIBER-MIB::ruijieFiberPortDescr }}"
                     index: 'temp-{{ $index }}'
                     group: Transceivers
                     skip_values:
-                        -
-                            oid: ruijieFiberDDMSupportStatus
+                        - 
+                            oid: RUIJIE-FIBER-MIB::ruijieFiberDDMSupportStatus
                             op: '='
                             value: 2
-                        -
-                            oid: ruijieFiberTemp
+                        - 
+                            oid: RUIJIE-FIBER-MIB::ruijieFiberTemp
                             op: '='
                             value: 0
         voltage:
             data:
                 -
-                    oid: ruijieSystemElectricalInformationTable
-                    value: ruijieSystemElectricalInformationInVoltage
+                    oid: RUIJIE-SYSTEM-MIB::ruijieSystemElectricalInformationTable
+                    value: RUIJIE-SYSTEM-MIB::ruijieSystemElectricalInformationInVoltage
                     num_oid: '.1.3.6.1.4.1.4881.1.1.10.2.1.1.41.1.11.{{ $index }}'
                     descr: 'Power supply {{ $subindex0 }}/{{ $subindex1 }}'
         power:
             data:
                 -
-                    oid: ruijieSystemElectricalInformationTable
-                    value: ruijieSystemElectricalInformationOutPower
+                    oid: RUIJIE-SYSTEM-MIB::ruijieSystemElectricalInformationTable
+                    value: RUIJIE-SYSTEM-MIB::ruijieSystemElectricalInformationOutPower
                     num_oid: '.1.3.6.1.4.1.4881.1.1.10.2.1.1.41.1.15.{{ $index }}'
                     descr: 'Power supply {{ $subindex0 }}/{{ $subindex1 }}'
         state:
             data:
                 -
-                    oid: ruijieSystemFanStatusTable
-                    value: ruijieSystemFanStatus
+                    oid: RUIJIE-SYSTEM-MIB::ruijieSystemFanStatusTable
+                    value: RUIJIE-SYSTEM-MIB::ruijieSystemFanStatus
                     num_oid: '.1.3.6.1.4.1.4881.1.1.10.2.1.1.43.1.4.{{ $index }}'
                     descr: 'Fan {{ $subindex0 }}/{{ $subindex1 }}'
-                    state_name: ruijieSystemFanStatus
+                    state_name: RUIJIE-SYSTEM-MIB::ruijieSystemFanStatus
                     index: 'fan-{{ $index }}'
                     group: Fans
                     states:
@@ -142,11 +139,11 @@ modules:
                         - { value: 5, generic: 2, graph: 0, descr: 'powerbutabnormal' }
                         - { value: 6, generic: 3, graph: 0, descr: 'unknown' }
                 -
-                    oid: ruijieFiberTable
-                    value: ruijieFiberTempStatus
+                    oid: RUIJIE-FIBER-MIB::ruijieFiberTable
+                    value: RUIJIE-FIBER-MIB::ruijieFiberTempStatus
                     num_oid: '.1.3.6.1.4.1.4881.1.1.10.2.105.1.1.1.18.{{ $index }}'
-                    descr: '{{ $ruijieFiberPortDescr }} Temperature'
-                    state_name: ruijieFiberTempStatus
+                    descr: '{{ $RUIJIE-FIBER-MIB::ruijieFiberPortDescr }} Temperature'
+                    state_name: RUIJIE-FIBER-MIB::ruijieFiberTempStatus
                     index: 'tempstat-{{ $index }}'
                     group: Transceivers
                     skip_values:
@@ -156,11 +153,11 @@ modules:
                         - { value: 3, generic: 1, graph: 0, descr: 'warning' }
                         - { value: 4, generic: 2, graph: 0, descr: 'alarm' }
                 -
-                    oid: ruijieSystemElectricalInformationTable
-                    value: ruijieSystemElectricalInformationStatus
+                    oid: RUIJIE-SYSTEM-MIB::ruijieSystemElectricalInformationTable
+                    value: RUIJIE-SYSTEM-MIB::ruijieSystemElectricalInformationStatus
                     num_oid: '.1.3.6.1.4.1.4881.1.1.10.2.1.1.41.1.3.{{ $index }}'
                     descr: 'Power supply {{ $subindex0 }}/{{ $subindex1 }}'
-                    state_name: ruijieSystemElectricalInformationStatus
+                    state_name: RUIJIE-SYSTEM-MIB::ruijieSystemElectricalInformationStatus
                     index: 'psu-{{ $index }}'
                     group: 'Power Supplies'
                     states:
@@ -170,25 +167,6 @@ modules:
                         - { value: 4, generic: 0, graph: 0, descr: 'normal' }
                         - { value: 5, generic: 2, graph: 0, descr: 'powerbutabnormal' }
                         - { value: 6, generic: 3, graph: 0, descr: 'unknown' }
-    # 新增设备流量监控模块
-    ports:
-        data:
-            -
-                oid: ifName
-                descr: 'Interface Name'  # 接口名称标识
-                index: 'ifName.{{ $index }}'
-            -
-                oid: ifInOctets
-                descr: '{{ $ifName }} Inbound Traffic'  # 入站流量图表名称
-                index: 'ifInOctets.{{ $index }}'
-                group: 'Traffic'
-                num_oid: '.1.3.6.1.2.1.31.1.1.1.6.{{ $index }}'  # 标准MIB入站字节OID
-                user_func: \LibreNMS\OS\ruijieSwitch::normalizeTrafficValues  # 流量数值标准化
-            -
-                oid: ifOutOctets
-                descr: '{{ $ifName }} Outbound Traffic'  # 出站流量图表名称
-                index: 'ifOutOctets.{{ $index }}'
-                group: 'Traffic'
-                num_oid: '.1.3.6.1.2.1.31.1.1.1.10.{{ $index }}'  # 标准MIB出站字节OID
-                user_func: \LibreNMS\OS\ruijieSwitch::normalizeTrafficValues
+
+
 
