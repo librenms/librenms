@@ -1357,6 +1357,7 @@ function get_port_security(Illuminate\Http\Request $request)
         });
     } else {
         $port = PortSecurity::hasAccess(Auth::user())->get();
+
         return api_success($port, 'port');
     }
 }
