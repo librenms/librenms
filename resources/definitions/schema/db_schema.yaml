@@ -721,6 +721,8 @@ device_outages:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_outages_device_id_going_down_unique: { Name: device_outages_device_id_going_down_unique, Columns: [device_id, going_down], Unique: true, Type: BTREE }
     device_outages_device_id_index: { Name: device_outages_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+    device_outages_going_down_index: { Name: device_outages_going_down_index, Columns: [going_down], Unique: false, Type: BTREE }
+    device_outages_up_again_index: { Name: device_outages_up_again_index, Columns: [up_again], Unique: false, Type: BTREE }
 device_relationships:
   Columns:
     - { Field: parent_device_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }

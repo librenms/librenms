@@ -26,8 +26,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class DeviceOutage extends DeviceRelatedModel
 {
+    use HasFactory;
+
     public $timestamps = false;
     protected $fillable = ['going_down', 'up_again'];
 }

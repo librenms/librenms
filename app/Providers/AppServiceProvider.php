@@ -234,6 +234,18 @@ class AppServiceProvider extends ServiceProvider
 
             return true;
         });
+
+        Validator::extend('date_or_relative', function ($attribute, $value, $parameters, $validator) {
+            if (is_string($value) && preg_match('/^\d{9,13}$/', $value)) {
+                return true;
+            }
+
+            if (is_string($value) && preg_match('/^[+-]?\d+[hdmwy]$/', $value)) {
+                return true;
+            }
+
+            return $validator->validateDate($attribute, $value);
+        });
     }
 
     public function bootAuth(): void
