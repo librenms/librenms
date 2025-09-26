@@ -1,0 +1,69 @@
+modules:
+  os:
+    hardware: SNMPv2-MIB::sysDescr.0
+    serial: TREDESS-FS-MIB::serialNumber.0
+    version: 
+      - TREDESS-FS-MIB::softwareVersion.0
+      - TREDESS-FS-MIB::softwareId.0
+    version_template: '{{ TREDESS-FS-MIB::softwareVersion.0 }} ({{ TREDESS-FS-MIB::softwareId.0 }})'
+  sensors:
+    bitrate:
+      data:
+        - oid: TREDESS-FS-MIB::socket1InputBitrate
+          num_oid: '.1.3.6.1.4.1.23180.2.1.1.2.2.1.1.13.{{ $index }}'
+          index: 'socket1InputBitrate.{{ $index }}'
+          descr: 'IP Socket 1 input bitrate (bps)'
+    count:
+      data:
+        - oid: TREDESS-FS-MIB::outputChannel
+          num_oid: '.1.3.6.1.4.1.23180.2.1.1.2.2.2.15.10.1.{{ $index }}'
+          index: 'outputChannel.{{ $index }}'
+          descr: 'Output Channel'
+        - oid: TREDESS-FS-MIB::modMer
+          num_oid: '.1.3.6.1.4.1.23180.2.1.1.2.2.2.10.20.6.6.{{ $index }}'
+          index: 'modMer.{{ $index }}'
+          descr: 'Modulator MER (dB)'
+    power:
+      data:
+        - oid: TREDESS-FS-MIB::forwardPower
+          num_oid: '.1.3.6.1.4.1.23180.2.1.1.2.2.4.3.{{ $index }}'
+          index: 'forwardPower.{{ $index }}'
+          descr: 'Forward power (W)'
+        - oid: TREDESS-FS-MIB::reversePower
+          num_oid: '.1.3.6.1.4.1.23180.2.1.1.2.2.4.4.{{ $index }}'
+          index: 'reversePower.{{ $index }}'
+          descr: 'Reverse power (W)'
+    temperature:
+      data:
+        - oid: TREDESS-FS-MIB::amplifierStageTemperature
+          num_oid: '.1.3.6.1.4.1.23180.2.1.1.2.2.4.8.{{ $index }}'
+          index: 'amplifierStageTemperature.{{ $index }}'
+          descr: 'Amplifier stage temperature (°C)'
+
+    state:
+      data:
+        - oid: TREDESS-FS-MIB::faultSummationStatus
+          num_oid: '.1.3.6.1.4.1.23180.2.1.1.2.3.1.0'
+          descr: 'Fault Summation Status'
+          states:
+            - { value: 0, generic: 0, graph: 0, descr: 'deactivatedAlarm' }
+            - { value: 1, generic: 1, graph: 0, descr: 'activatedAlarm' }
+            - { value: 2, generic: 1, graph: 0, descr: 'disabledAlarm' }
+            - { value: 3, generic: 1, graph: 0, descr: 'noApplyAlarm' }
+            - { value: 6, generic: 3, graph: 0, descr: 'uninitiatedAlarm' }
+        - oid: TREDESS-FS-MIB::warningSummationStatus
+          num_oid: '.1.3.6.1.4.1.23180.2.1.1.2.3.2.0'
+          descr: 'Warning Summation Status'
+          states:
+            - { value: 0, generic: 0, graph: 0, descr: 'deactivatedAlarm' }
+            - { value: 1, generic: 1, graph: 0, descr: 'activatedAlarm' }
+            - { value: 2, generic: 1, graph: 0, descr: 'disabledAlarm' }
+            - { value: 3, generic: 1, graph: 0, descr: 'noApplyAlarm' }
+            - { value: 6, generic: 3, graph: 0, descr: 'uninitiatedAlarm' }
+        - oid: TREDESS-FS-MIB::rNp1Mode
+          num_oid: '.1.3.6.1.4.1.23180.2.1.1.2.2.5.5.5.5.30.0'
+          descr: 'Redundancy N+1 Mode'
+          states:
+            - { value: 0, generic: 2, graph: 0, descr: 'manual' }
+            - { value: 1, generic: 0, graph: 0, descr: 'automatic' }
+            - { value: 2, generic: 1, graph: 0, descr: 'maintenance' }

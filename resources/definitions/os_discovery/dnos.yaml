@@ -1,7 +1,7 @@
 mib: DELL-NETWORKING-CHASSIS-MIB:DELL-NETWORKING-IF-EXTENSION-MIB:DELL-NETWORKING-VIRTUAL-LINK-TRUNK-MIB
 modules:
     mempools:
-        pre-cache:
+        additional_oids:
             snmp_flags: '-OQUs'
             oids:
                 - DELL-NETWORKING-CHASSIS-MIB::dellNetProcessorTable
@@ -215,7 +215,7 @@ modules:
                       oid: dellNetVLTDetailPeerStatus
                       op: '='
                       value: 0
-                    state_name: dellNetVLTDetailLocalStatus   
+                    state_name: dellNetVLTDetailLocalStatus
                     states:
                         - { value: 0, descr: down, graph: 1, generic: 2 }
                         - { value: 1, descr: up,   graph: 1, generic: 0 }
@@ -225,7 +225,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6027.3.17.1.1.1.20.{{ $index }}'
                     descr: 'ICL Bandwidth'
                     group: 'VIRTUAL-LINK-TRUNK'
-                    state_name: dellNetVLTIclBwStatus   
+                    state_name: dellNetVLTIclBwStatus
                     states:
                         - { value: 0, descr: '<80%', graph: 1, generic: 0 }
                         - { value: 1, descr: '>80%', graph: 1, generic: 1 }
@@ -235,7 +235,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6027.3.17.1.1.1.7.{{ $index }}'
                     descr: 'Link Status'
                     group: 'VIRTUAL-LINK-TRUNK'
-                    state_name: dellNetVLTIclStatus   
+                    state_name: dellNetVLTIclStatus
                     states:
                         - { value: 0, descr: 'not established', graph: 1, generic: 3 }
                         - { value: 1, descr: 'up', graph: 1, generic: 0 }
@@ -247,7 +247,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6027.3.17.1.1.1.5.{{ $index }}'
                     descr: 'Role'
                     group: 'VIRTUAL-LINK-TRUNK'
-                    state_name: dellNetVLTRole   
+                    state_name: dellNetVLTRole
                     states:
                         - { value: 0, descr: 'Standalone', graph: 1, generic: 3 }
                         - { value: 1, descr: 'Primary', graph: 1, generic: 0 }
