@@ -33,6 +33,7 @@ discovery_modules:
     cisco-vrf-lite: true
     cisco-qfp: true
     xdsl: true
+    port-security: false
 discovery:
     -
         sysDescr:
