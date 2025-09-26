@@ -218,14 +218,6 @@ if ($options['f'] === 'handle_notifiable') {
     }
 }
 
-if ($options['f'] === 'notifications') {
-    $lock = Cache::lock('notifications', 86000);
-    if ($lock->get()) {
-        Notifications::post();
-        $lock->release();
-    }
-}
-
 if ($options['f'] === 'bill_data') {
     // Deletes data older than XX months before the start of the last complete billing period
     $msg = "Deleting billing data more than %d month before the last completed billing cycle\n";
