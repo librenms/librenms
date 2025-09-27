@@ -66,7 +66,8 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         $connection = $this->getConnection();
 
         // check if user is member of the given group or nested groups
-        $search_filter = "(&(objectClass=group)(cn=$groupname))";
+        $ldap_group = ldap_escape($groupname, '', LDAP_ESCAPE_FILTER);
+        $search_filter = "(&(objectClass=group)(cn=$ldap_group))";
 
         // get DN for auth_ad_group
         $search = ldap_search(
