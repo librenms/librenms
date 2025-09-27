@@ -1,0 +1,99 @@
+mib: TREDESS-DVBT-MIB
+
+modules:
+  os:
+    sysName: TREDESS-DVBT-MIB::sysNameDBTM.0
+    sysName_replace:
+      - '/_+/'
+    sysName_fallback: TREDESS-DVBT-MIB::sysNameDBTM.0
+    sysDescr: TREDESS-DVBT-MIB::sysDescrDBTM.0
+    location: TREDESS-DVBT-MIB::sysNameDBTM.0
+    location_replace:
+      - '/_+/'
+    version: TREDESS-DVBT-MIB::sysManagementVersionDBTM.0
+  sensors:
+    frequency:
+      data:
+        - 
+          oid: TREDESS-DVBT-MIB::muxFreqIn
+          index: muxFreqIn.{{ $index }}
+          num_oid: '.1.3.6.1.4.1.23180.2.1.1.1.3.1.1.1.6.{{ $index }}'
+          descr: 'Slot {{ $index }}'
+          group: Frequency In
+        - 
+          oid: TREDESS-DVBT-MIB::muxFreqOut
+          index: muxFreqOut.{{ $index }}
+          num_oid: '.1.3.6.1.4.1.23180.2.1.1.1.3.1.1.1.7.{{ $index }}'
+          descr: 'Slot {{ $index }}'
+          group: Frequency Out
+    count:  
+      data:
+        - 
+          oid: TREDESS-DVBT-MIB::muxChannelIn
+          index: muxChannelIn.{{ $index }}
+          num_oid: '.1.3.6.1.4.1.23180.2.1.1.1.3.1.1.1.4.{{ $index }}'
+          group: Channel In
+          descr: 'Slot {{ $index }}'
+        - 
+          oid: TREDESS-DVBT-MIB::muxChannelOut
+          index: muxChannelOut.{{ $index }}
+          num_oid: '.1.3.6.1.4.1.23180.2.1.1.1.3.1.1.1.5.{{ $index }}'
+          group: Channel Out
+          descr: 'Slot {{ $index }}'
+        - 
+          oid: muxMeasurementTable
+          index: muxFan1ServiceTime.{{ $index }}
+          descr: 'Slot {{ $index }}'
+          value: muxFan1ServiceTime
+          group: Fan 1 Service Time
+          num_oid: '.1.3.6.1.4.1.23180.2.1.1.1.3.1.2.1.20.{{ $index }}'              
+    dbm:
+      data:
+        - 
+          oid: muxMeasurementTable
+          index: muxTransmittedPower.{{ $index }}
+          descr: 'Slot {{ $index }}'
+          value: muxTransmittedPower
+          group: Transmitted Power
+          num_oid: '.1.3.6.1.4.1.23180.2.1.1.1.3.1.2.1.5.{{ $index }}'
+    temperature:
+      data:
+        - 
+          oid: muxMeasurementTable
+          index: muxTemperature.{{ $index }}
+          descr: 'Slot {{ $index }}'
+          value: muxTemperature
+          group: Mux Temperature
+          num_oid: '.1.3.6.1.4.1.23180.2.1.1.1.3.1.2.1.7.{{ $index }}'          
+    state:
+      data:
+        - 
+          oid: TREDESS-DVBT-MIB::powerSupplyStatus
+          num_oid: '.1.3.6.1.4.1.23180.2.1.1.1.2.6.0'
+          descr: 'Managment Power Supply'
+          group: Power Supply
+          states:
+            - { value: 1, generic: 0, graph: 0, descr: 'AC' }
+            - { value: 2, generic: 1, graph: 0, descr: 'Battery' }
+            - { value: 3, generic: 1, graph: 0, descr: 'BatterySAE' }
+
+        - 
+          oid: TREDESS-DVBT-MIB::muxRfMute
+          num_oid: '.1.3.6.1.4.1.23180.2.1.1.1.3.1.1.1.29.{{ $index }}'
+          index: muxRfMute.{{ $index }}
+          descr: 'Slot {{ $index }}'
+          group: RF Mute
+          states:
+            - { value: 1, generic: 0, graph: 0, descr: 'Muted' }
+            - { value: 2, generic: 0, graph: 0, descr: 'Unmuted' }
+        - 
+          oid: contactsInputTable
+          value: contactsInputState
+          num_oid: '.1.3.6.1.4.1.23180.2.1.1.1.3.4.1.1.2.{{ $index }}'
+          descr: contactsInputDescription
+          index: contactsInputState.{{ $index }}
+          state_name: contactsInputDescription.{{ $index }}
+          group: Contact Inputs
+          states:
+            - { value: 0, generic: 0, graph: 0, descr: 'Open' }
+            - { value: 1, generic: 0, graph: 0, descr: 'Closed' }
