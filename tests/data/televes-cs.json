@@ -1,1 +1,23 @@
-[]
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": null,
+                    "sysObjectID": null,
+                    "sysDescr": null,
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "location": null,
+                    "os": "generic",
+                    "type": "server",
+                    "serial": null,
+                    "icon": "generic.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}
