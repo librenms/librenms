@@ -121,7 +121,7 @@ class Device extends BaseModel
 
     public function ipFamily(): AddressFamily
     {
-        return str_ends_with($this->family ?? '', '6') ? AddressFamily::IPv6 : AddressFamily::IPv4;
+        return str_ends_with($this->transport ?? '', '6') ? AddressFamily::IPv6 : AddressFamily::IPv4;
     }
 
     public static function findByIp(?string $ip): ?Device
