@@ -16,15 +16,11 @@ modules:
         data:
             - 
                 oid: RUIJIE-PROCESS-MIB::ruijieNodeCPUTotalTable
-                descr: '{{ $RUIJIE-PROCESS-MIB::ruijieNodeCPUTotalName }}'
+                descr: RUIJIE-PROCESS-MIB::ruijieNodeCPUTotalName
                 value: RUIJIE-PROCESS-MIB::ruijieNodeCPUTotal5min
                 num_oid: '.1.3.6.1.4.1.4881.1.1.10.2.36.1.2.1.5.{{ $index }}'
                 warn_percent: RUIJIE-PROCESS-MIB::fsNodeCPUTotalCritical
     sensors:
-        pre-cache:
-            data:
-                - 
-                    oid: RUIJIE-INTERFACE-MIB::ruijieifAdminStatus
         dbm:
             data:
                 - 
@@ -37,7 +33,7 @@ modules:
                     warn_limit: RUIJIE-FIBER-MIB::ruijieFiberRXpowerHighWarnThreshold
                     low_limit: RUIJIE-FIBER-MIB::ruijieFiberRXpowerLowAlarmThreshold
                     high_limit: RUIJIE-FIBER-MIB::ruijieFiberRXpowerHighAlarmThreshold
-                    index: 'rx-{{ $index }}'
+                    index: 'ruijieFiberRXpower.{{ $index }}'
                     skip_values:
                         - 
                             oid: RUIJIE-FIBER-MIB::ruijieFiberDDMSupportStatus
@@ -47,10 +43,6 @@ modules:
                             oid: RUIJIE-FIBER-MIB::ruijieFiberRXpower
                             op: '='
                             value: -10000
-                        - 
-                            oid: RUIJIE-INTERFACE-MIB::ruijieifAdminStatus
-                            op: '='
-                            value: 2
                 - 
                     oid: RUIJIE-FIBER-MIB::ruijieFiberTable
                     value: RUIJIE-FIBER-MIB::ruijieFiberTXpower
@@ -61,7 +53,7 @@ modules:
                     warn_limit: RUIJIE-FIBER-MIB::ruijieFiberTXpowerHighWarnThreshold
                     low_limit: RUIJIE-FIBER-MIB::ruijieFiberTXpowerLowAlarmThreshold
                     high_limit: RUIJIE-FIBER-MIB::ruijieFiberTXpowerHighAlarmThreshold
-                    index: 'tx-{{ $index }}'
+                    index: 'ruijieFiberTXpower.{{ $index }}'
                     skip_values:
                         - 
                             oid: RUIJIE-FIBER-MIB::ruijieFiberDDMSupportStatus
@@ -71,10 +63,6 @@ modules:
                             oid: RUIJIE-FIBER-MIB::ruijieFiberRXpower
                             op: '='
                             value: -10000
-                        - 
-                            oid: RUIJIE-INTERFACE-MIB::ruijieifAdminStatus
-                            op: '='
-                            value: 2
         fanspeed:
             data:
                 -
@@ -96,7 +84,7 @@ modules:
                     value: RUIJIE-FIBER-MIB::ruijieFiberTemp
                     num_oid: '.1.3.6.1.4.1.4881.1.1.10.2.105.1.1.1.17.{{ $index }}'
                     descr: "{{ $RUIJIE-FIBER-MIB::ruijieFiberPortDescr }}"
-                    index: 'temp-{{ $index }}'
+                    index: 'ruijieSystemMultipleTemperatureCurrent.{{ $index }}'
                     group: Transceivers
                     skip_values:
                         - 
@@ -129,7 +117,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.4881.1.1.10.2.1.1.43.1.4.{{ $index }}'
                     descr: 'Fan {{ $subindex0 }}/{{ $subindex1 }}'
                     state_name: RUIJIE-SYSTEM-MIB::ruijieSystemFanStatus
-                    index: 'fan-{{ $index }}'
+                    index: 'ruijieSystemFanStatus.{{ $index }}'
                     group: Fans
                     states:
                         - { value: 1, generic: 3, graph: 0, descr: 'noexist' }
@@ -142,9 +130,9 @@ modules:
                     oid: RUIJIE-FIBER-MIB::ruijieFiberTable
                     value: RUIJIE-FIBER-MIB::ruijieFiberTempStatus
                     num_oid: '.1.3.6.1.4.1.4881.1.1.10.2.105.1.1.1.18.{{ $index }}'
-                    descr: '{{ $RUIJIE-FIBER-MIB::ruijieFiberPortDescr }} Temperature'
+                    descr: '{{ RUIJIE-FIBER-MIB::ruijieFiberPortDescr }} Temperature'
                     state_name: RUIJIE-FIBER-MIB::ruijieFiberTempStatus
-                    index: 'tempstat-{{ $index }}'
+                    index: 'ruijieFiberTempStatus.{{ $index }}'
                     group: Transceivers
                     skip_values:
                         - 1
@@ -158,7 +146,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.4881.1.1.10.2.1.1.41.1.3.{{ $index }}'
                     descr: 'Power supply {{ $subindex0 }}/{{ $subindex1 }}'
                     state_name: RUIJIE-SYSTEM-MIB::ruijieSystemElectricalInformationStatus
-                    index: 'psu-{{ $index }}'
+                    index: 'ruijieSystemElectricalInformationStatus.{{ $index }}'
                     group: 'Power Supplies'
                     states:
                         - { value: 1, generic: 3, graph: 0, descr: 'noexist' }
