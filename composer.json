@@ -68,10 +68,12 @@
         "laravel/dusk": "^8.2.2",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
+        "pestphp/pest": "^3.8 || ^4.0",
+        "pestphp/pest-plugin-laravel": "^3.0 || ^4.0",
         "php-parallel-lint/php-parallel-lint": "^1.1",
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-mockery": "^2.0",
-        "phpunit/phpunit": "^11.5.3"
+        "phpunit/phpunit": "^11.5.33 || ^12.3.7"
     },
     "suggest": {
         "ext-gmp": "Used for browser push notifications",
@@ -87,6 +89,7 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "allow-plugins": {
+            "pestphp/pest-plugin": true,
             "php-http/discovery": false
         }
     },
