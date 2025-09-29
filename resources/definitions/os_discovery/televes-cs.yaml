@@ -42,7 +42,7 @@ modules:
           oid: TREDESS-DVBT-MIB::muxMeasurementTable
           index: muxFan1ServiceTime.{{ $index }}
           descr: 'Slot {{ $index }}'
-          value: muxFan1ServiceTime
+          value: TREDESS-DVBT-MIB::muxFan1ServiceTime
           group: Fan 1 Service Time
           num_oid: '.1.3.6.1.4.1.23180.2.1.1.1.3.1.2.1.20.{{ $index }}'              
     dbm:
@@ -51,7 +51,7 @@ modules:
           oid: TREDESS-DVBT-MIB::muxMeasurementTable
           index: muxTransmittedPower.{{ $index }}
           descr: 'Slot {{ $index }}'
-          value: muxTransmittedPower
+          value: TREDESS-DVBT-MIB::muxTransmittedPower
           group: Transmitted Power
           num_oid: '.1.3.6.1.4.1.23180.2.1.1.1.3.1.2.1.5.{{ $index }}'
     temperature:
@@ -85,9 +85,9 @@ modules:
             - { value: 2, generic: 0, graph: 0, descr: 'Unmuted' }
         - 
           oid: TREDESS-DVBT-MIB::contactsInputTable
-          value: contactsInputState
+          value: TREDESS-DVBT-MIB::contactsInputState
           num_oid: '.1.3.6.1.4.1.23180.2.1.1.1.3.4.1.1.2.{{ $index }}'
-          descr: contactsInputDescription
+          descr: TREDESS-DVBT-MIB::contactsInputDescription
           index: contactsInputState.{{ $index }}
           state_name: contactsInputDescription.{{ $index }}
           group: Contact Inputs
