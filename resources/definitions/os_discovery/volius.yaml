@@ -5,7 +5,7 @@ modules:
         version: VOLIUS-OR-MIB::vlsFirmwareVersion.0
         serial: VOLIUS-OR-MIB::vlsSerialNumber.0
     sensors:
-        pre-cache:
+        additional_oids:
                 data:
                      -
                         oid:

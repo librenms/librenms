@@ -4,7 +4,7 @@ modules:
         sysDescr_regex: '/v(?<version>[\d.]+) \(SN (?<serial>[^)]+)\)/'
         hardware: ATS-MIB::atsIdentGroupFirmwareRevision.0
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:
