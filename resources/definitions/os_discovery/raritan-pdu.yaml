@@ -21,6 +21,9 @@ modules:
                     - PDU2-MIB::inletConfigurationTable
                     - PDU2-MIB::overCurrentProtectorSensorConfigurationTable
                     - PDU2-MIB::overCurrentProtectorConfigurationTable
+                    - PDU2-MIB::externalSensorMeasurementsTable
+                    - PDU2-MIB::outletSensorMeasurementsTable
+                    - PDU2-MIB::inletSensorMeasurementsTable
                   snmp_flags: -OQUbe
         current:
             data:
