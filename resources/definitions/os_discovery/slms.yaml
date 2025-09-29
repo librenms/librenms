@@ -8,7 +8,7 @@ modules:
                   descr: 'Processor {{ $index }}'
                   type: slms
     mempools:
-        pre-cache:
+        additional_oids:
             oids:
                 - ZHONE-CARD-RESOURCES-MIB::cardResourceTable
 
