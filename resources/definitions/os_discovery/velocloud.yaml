@@ -3,7 +3,7 @@ modules:
     os:
         sysDescr_regex: '/^VeloCloud (?<hardware>EDGE.*)/'
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     snmp_flags: '-OQUsbe'

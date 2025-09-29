@@ -5,7 +5,7 @@ modules:
     serial: ENLOGIC-PDU2-MIB::pduNamePlateSerialNumber.1
     version: ENLOGIC-PDU2-MIB::pduNamePlateFirmwareVersion.1
   sensors:
-      pre-cache:
+      additional_oids:
         data:
           -
             oid:
@@ -48,6 +48,7 @@ modules:
           -
             oid: ENLOGIC-PDU2-MIB::pduInputPhaseStatusTable
             value: ENLOGIC-PDU2-MIB::pduInputPhaseStatusCurrent
+            divisor: 100
             num_oid: '.1.3.6.1.4.1.38446.1.3.4.1.5.{{ $index }}'
             low_limit: ENLOGIC-PDU2-MIB::pduInputPhaseConfigCurrentLowerCriticalThreshold
             low_warn_limit: ENLOGIC-PDU2-MIB::pduInputPhaseConfigCurrentLowerWarningThreshold
@@ -58,6 +59,7 @@ modules:
           -
             oid: ENLOGIC-PDU2-MIB::pduCircuitBreakerStatusTable
             value: ENLOGIC-PDU2-MIB::pduCircuitBreakerStatusCurrent
+            divisor: 100
             num_oid: '.1.3.6.1.4.1.38446.1.4.4.1.5.{{ $index }}'
             low_limit: ENLOGIC-PDU2-MIB::pduCircuitBreakerConfigLowerCriticalThreshold
             low_warn_limit: ENLOGIC-PDU2-MIB::pduCircuitBreakerConfigLowerWarningThreshold

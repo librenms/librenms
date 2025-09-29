@@ -1,7 +1,12 @@
-@extends('device.submenu')
+@extends('layouts.librenmsv1')
 
-@section('tabcontent')
-<div class="row">
+@section('content')
+    <x-device.page :device="$device">
+    @isset($data['submenu'])
+        <x-submenu :title="$title" :menu="$data['submenu']" :device-id="$device_id" :current-tab="$current_tab" :selected="$vars" />
+    @endisset
+
+    <div class="row">
     <div class="col-md-12">
 
     <x-panel title="{{ __('NAC') }}" id="nac-panel">
@@ -34,6 +39,7 @@
 
     </div>
 </div>
+    </x-device.page>
 @endsection
 
 @push('scripts')

@@ -305,7 +305,7 @@ if ($options['f'] === 'refresh_alert_rules') {
         $rules = dbFetchRows('SELECT `id`, `builder`, `extra` FROM `alert_rules`');
         foreach ($rules as $rule) {
             $rule_options = json_decode($rule['extra'], true);
-            if ($rule_options['options']['override_query'] !== 'on') {
+            if ($rule_options['options']['override_query'] !== 'on' && $rule_options['options']['override_query'] !== true) {
                 $data['query'] = QueryBuilderParser::fromJson($rule['builder'])->toSql();
                 if (! empty($data['query'])) {
                     dbUpdate($data, 'alert_rules', 'id=?', [$rule['id']]);
@@ -347,13 +347,6 @@ if ($options['f'] === 'peeringdb') {
     if ($lock->get()) {
         cache_peeringdb();
         $lock->release();
-    }
-}
-
-if ($options['f'] === 'refresh_os_cache') {
-    echo 'Clearing OS cache' . PHP_EOL;
-    if (is_file(LibrenmsConfig::get('install_dir') . '/cache/os_defs.cache')) {
-        unlink(LibrenmsConfig::get('install_dir') . '/cache/os_defs.cache');
     }
 }
 

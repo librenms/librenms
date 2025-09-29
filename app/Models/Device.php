@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
@@ -97,6 +98,12 @@ class Device extends BaseModel
             'last_polled' => 'datetime',
             'last_ping' => 'datetime',
             'status' => 'boolean',
+            'ignore' => 'boolean',
+            'ignore_status' => 'boolean',
+            'disabled' => 'boolean',
+            'snmp_disable' => 'boolean',
+            'disable_notify' => 'boolean',
+            'override_sysLocation' => 'boolean',
         ];
     }
 
@@ -107,30 +114,14 @@ class Device extends BaseModel
         return static::where('hostname', $hostname)->first();
     }
 
-    /**
-     * Returns IP/Hostname where polling will be targeted to
-     *
-     * @param  string|array  $device  hostname which will be triggered
-     *                                array  $device associative array with device data
-     * @return string IP/Hostname to which Device polling is targeted
-     */
-    public static function pollerTarget($device)
+    public function pollerTarget(): string
     {
-        if (! is_array($device)) {
-            $ret = static::where('hostname', $device)->first(['hostname', 'overwrite_ip']);
-            if (empty($ret)) {
-                return $device;
-            }
-            $overwrite_ip = $ret->overwrite_ip;
-            $hostname = $ret->hostname;
-        } elseif (array_key_exists('overwrite_ip', $device)) {
-            $overwrite_ip = $device['overwrite_ip'];
-            $hostname = $device['hostname'];
-        } else {
-            return $device['hostname'];
-        }
+        return $this->overwrite_ip ?: $this->hostname ?: '';
+    }
 
-        return $overwrite_ip ?: $hostname;
+    public function ipFamily(): AddressFamily
+    {
+        return str_ends_with($this->transport ?? '', '6') ? AddressFamily::IPv6 : AddressFamily::IPv4;
     }
 
     public static function findByIp(?string $ip): ?Device
@@ -475,16 +466,17 @@ class Device extends BaseModel
     /**
      * Update the location to the correct location and update GPS if needed
      *
-     * @param  Location|string  $new_location  location data
+     * @param  Location|string|null  $new_location  location data
      * @param  bool  $doLookup  try to lookup the GPS coordinates
+     * @param  bool  $user_override  Ignore user override and update the location anyway
      */
-    public function setLocation($new_location, bool $doLookup = false)
+    public function setLocation(Location|string|null $new_location, bool $doLookup = false, bool $user_override = false): void
     {
         $new_location = $new_location instanceof Location ? $new_location : new Location(['location' => $new_location]);
         $new_location->location = $new_location->location ? Rewrite::location($new_location->location) : null;
         $coord = array_filter($new_location->only(['lat', 'lng']));
 
-        if (! $this->override_sysLocation) {
+        if ($user_override || ! $this->override_sysLocation) {
             if (! $new_location->location) { // disassociate if the location name is empty
                 $this->location()->dissociate();
 
@@ -733,7 +725,7 @@ class Device extends BaseModel
      */
     public function alertSchedules(): MorphToMany
     {
-        return $this->morphToMany(AlertSchedule::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
+        return $this->morphToMany(AlertSchedule::class, 'alert_schedulable', 'alert_schedulables', 'alert_schedulable_id', 'schedule_id');
     }
 
     /**
