@@ -3,7 +3,7 @@ modules:
     os:
         version: SKYHIGHSECURITY-SWG-MIB::kProductVersion.0
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

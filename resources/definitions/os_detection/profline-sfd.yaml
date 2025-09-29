@@ -1,0 +1,11 @@
+os: profline-sfd
+text: 'PROFline SFD FM Receiver'
+type: appliance
+icon: profline
+group: profline
+over:
+    - { graph: device_frequency, text: 'Frequency' }
+    - { graph: device_dbm, text: 'dBm'  }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.21222.1.4

@@ -11,7 +11,7 @@ modules:
             - OG-STATUSv2-MIB::ogSerialNumber
             - OG-OMTELEM-MIB::ogOmSystemSerialNumber.0
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:
