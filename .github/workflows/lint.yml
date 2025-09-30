@@ -17,8 +17,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      -
-        name: Checkout Code
+      - name: Checkout Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -29,8 +28,7 @@ jobs:
             !/tests/snmpsim/
             !/mibs/
 
-      -
-        name: Lint Code Base
+      - name: Lint Code Base
         uses: docker://ghcr.io/github/super-linter:slim-v4
         env:
           VALIDATE_BASH: true
@@ -48,8 +46,7 @@ jobs:
     strategy:
       fail-fast: false
     steps:
-      -
-        name: Checkout Code
+      - name: Checkout Code
         uses: actions/checkout@v4
         with:
           sparse-checkout-cone-mode: false
@@ -60,27 +57,26 @@ jobs:
             !/mibs/
             !/doc/
 
-      -
-        name: Get composer cache directory
+      - name: Get composer cache directory
         id: composer-cache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
-      -
-        name: Cache composer
+      - name: Cache composer
         uses: actions/cache@v4
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-
 
-      -
-        name: Composer install
+      - name: Composer install
         run: composer install --prefer-dist --no-interaction --no-progress --no-scripts
 
-      -
-        name: Run PHPStan
+      - name: Run PHPStan
         run: ./vendor/bin/phpstan analyze --no-interaction --memory-limit=4G
 
-      -
-        name: Run PHPStan (Deprecated functions)
+      - name: Run PHPStan (Legacy codebase)
+        run: ./vendor/bin/phpstan analyze --no-interaction --memory-limit=4G --configuration=phpstan-legacy.neon
+
+      - name: Run PHPStan (Deprecated functions)
         run: ./vendor/bin/phpstan analyze --no-interaction --memory-limit=4G --configuration=phpstan-deprecated.neon
+

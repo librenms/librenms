@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Device;
 use Illuminate\Support\Facades\Cache;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -15,7 +14,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
     $agent_start = microtime(true);
     $agent = null;
     try {
-        $poller_target = \LibreNMS\Util\Rewrite::addIpv6Brackets(Device::pollerTarget($device['hostname']));
+        $poller_target = \LibreNMS\Util\Rewrite::addIpv6Brackets(DeviceCache::getPrimary()->pollerTarget());
         $agent = @fsockopen($poller_target, $agent_port, $errno, $errstr, \App\Facades\LibrenmsConfig::get('unix-agent.connection-timeout'));
     } catch (ErrorException $e) {
         echo $e->getMessage() . PHP_EOL; // usually connection timed out

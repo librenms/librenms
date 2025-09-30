@@ -11,7 +11,7 @@ Input (JSON):
 Examples:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devicegroups
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devicegroups
 ```
 
 Output:
@@ -58,7 +58,7 @@ Dynamic Example:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
-  -X POST https://librenms.org/api/v0/devicegroups \
+  -X POST https://foo.example/api/v0/devicegroups \
   --data-raw '
 {
  "name": "New Device Group", 
@@ -83,7 +83,7 @@ Static Example:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
-  -X POST https://librenms.org/api/v0/devicegroups \
+  -X POST https://foo.example/api/v0/devicegroups \
   -d '{"name":"New Device Group","type":"static","devices":[261,271]}'
 ```
 
@@ -122,7 +122,7 @@ Input (JSON):
 Examples:
 
 ```curl
-curl -X PATCH -d '{"name": "NewLinuxServers"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/LinuxServers
+curl -X PATCH -d '{"name": "NewLinuxServers"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/LinuxServers
 ```
 
 Output:
@@ -152,7 +152,7 @@ Input:
 Examples:
 
 ```curl
-curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/LinuxServers
+curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/LinuxServers
 ```
 
 Output:
@@ -182,7 +182,7 @@ Input (JSON):
 Examples:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devicegroups/LinuxServers
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devicegroups/LinuxServers
 ```
 
 Output:
@@ -229,7 +229,7 @@ Example with start time:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
-  -X POST https://librenms.org/api/v0/devicegroups/Cisco%20switches/maintenance/ \
+  -X POST https://foo.example/api/v0/devicegroups/Cisco%20switches/maintenance/ \
   --data-raw '
 {
  "title":"Device group Maintenance",
@@ -253,7 +253,7 @@ Example with no start time:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
-  -X POST https://librenms.org/api/v0/devicegroups/Cisco%20switches/maintenance/ \
+  -X POST https://foo.example/api/v0/devicegroups/Cisco%20switches/maintenance/ \
   --data-raw '
 {
  "title":"Device group Maintenance",
@@ -291,7 +291,7 @@ Example:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
-  -X POST https://librenms.org/api/v0/devicegroups/devices \
+  -X POST https://foo.example/api/v0/devicegroups/devices \
   --data-raw '{"devices":[261,271]}'
 ```
 
@@ -323,7 +323,7 @@ Example:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
-  -X DELETE https://librenms.org/api/v0/devicegroups/devices \
+  -X DELETE https://foo.example/api/v0/devicegroups/devices \
   --data-raw '{"devices":[261,271]}'
 ```
 
