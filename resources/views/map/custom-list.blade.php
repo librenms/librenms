@@ -32,3 +32,14 @@
     </x-panel>
 </div>
 @endsection
+
+@section('scripts')
+<script type="text/javascript">
+    $(document).ready(async function () {
+        scrollTo = document.getElementById("accordionCustomMapGroups").querySelector("div.accordion-header span.fa-minus");
+        if(scrollTo != null) {
+            scrollTo.scrollIntoView({block: "center"})
+        };
+    });
+</script>
+@endsection
