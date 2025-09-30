@@ -35,7 +35,7 @@ use PHPUnit\Framework\Attributes\Group;
 use Socket\Raw\Socket;
 
 #[Group('datastores')]
-class GraphiteStoreTest extends TestCase
+final class GraphiteStoreTest extends TestCase
 {
     protected int $timestamp = 1197464400;
 

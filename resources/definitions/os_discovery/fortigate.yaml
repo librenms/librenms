@@ -24,7 +24,7 @@ modules:
                 descr: 'CPU Core {{ $index }}'
                 type: fortigate-core
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

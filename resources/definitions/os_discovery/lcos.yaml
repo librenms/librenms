@@ -5,7 +5,7 @@ modules:
         serial: LCOS-MIB::lcsFirmwareVersionTableEntrySerialNumber.eIfc
         version: LCOS-MIB::lcsFirmwareVersionTableEntryVersion.eIfc
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

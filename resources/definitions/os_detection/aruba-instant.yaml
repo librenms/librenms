@@ -12,3 +12,4 @@ discovery:
         sysDescr: 
             - 'ArubaOS'
             - 'AOS-10'
+            - 'AOS-8'

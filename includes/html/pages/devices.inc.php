@@ -140,6 +140,7 @@ if ($format == 'graph') {
     echo '</div>';
     echo '<div class="panel-body">';
 
+    $where = '';
     $sql_param = [];
 
     if (isset($vars['state'])) {

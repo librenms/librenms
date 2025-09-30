@@ -27,7 +27,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
 
-class ApcOnBatteryTest extends SnmpTrapTestCase
+final class ApcOnBatteryTest extends SnmpTrapTestCase
 {
     /**
      * Test ApcOnBattery handle

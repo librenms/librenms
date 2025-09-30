@@ -20,7 +20,7 @@
  */
 
 // Sensors for license status
-$licenseOids = SnmpQuery::hideMIB()->walk('FORTINET-FORTIGATE-MIB::fgSystemInfoAdvanced')->table(1);
+$licenseOids = SnmpQuery::hideMib()->walk('FORTINET-FORTIGATE-MIB::fgSystemInfoAdvanced')->table(1);
 
 if (! empty($licenseOids)) {
     foreach ($licenseOids as $index => $entry) {

@@ -37,7 +37,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Group;
 
-class OSDiscoveryTest extends TestCase
+final class OSDiscoveryTest extends TestCase
 {
     private static $unchecked_files;
 

@@ -36,7 +36,7 @@ if (Auth::user()->hasGlobalRead()) {
     $sql = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id WHERE $where";
 } else {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
-    // @phpstan-ignore-next-line
+    // @phpstan-ignore function.deprecated
     $sql = " FROM `alert_log` AS E LEFT JOIN devices AS D ON E.device_id=D.device_id RIGHT JOIN alert_rules AS R ON E.rule_id=R.id WHERE $where AND E.device_id IN " . dbGenPlaceholders(count($device_ids));
     $param = array_merge($param, $device_ids);
 }

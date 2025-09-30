@@ -38,7 +38,7 @@ modules:
                 free_num_oid: '.1.3.6.1.4.1.2011.6.9.1.4.2.1.4.{{ $index }}'
                 units: 1024
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

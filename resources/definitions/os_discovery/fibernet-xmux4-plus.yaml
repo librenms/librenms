@@ -1,7 +1,7 @@
 mib: XMUX4-PLUS
 modules:
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

@@ -27,7 +27,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
 
-class ApcPowerRestoredTest extends SnmpTrapTestCase
+final class ApcPowerRestoredTest extends SnmpTrapTestCase
 {
     /**
      * Test ApcPowerRestored handle

@@ -70,7 +70,6 @@ if (isset($vars['pool'])) {
         'zfs_l2_d_to_m_ratio' => 'L2 Data To Meta Ratio',
         'zfs_l2_access_total' => 'L2 Total Hits And Misses Per Second',
         'zfs_l2_errors' => 'L2 Errors Per Second',
-        'zfs_l2_errors' => 'L2 Error Types Per Second',
         'zfs_l2_sizes' => 'L2 Sizes',
         'zfs_l2_asize' => 'L2 Asize',
         'zfs_l2_bufc_d_asize' => 'L2 BufC Data Asize',

@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
@@ -113,30 +114,14 @@ class Device extends BaseModel
         return static::where('hostname', $hostname)->first();
     }
 
-    /**
-     * Returns IP/Hostname where polling will be targeted to
-     *
-     * @param  string|array  $device  hostname which will be triggered
-     *                                array  $device associative array with device data
-     * @return string IP/Hostname to which Device polling is targeted
-     */
-    public static function pollerTarget($device)
+    public function pollerTarget(): string
     {
-        if (! is_array($device)) {
-            $ret = static::where('hostname', $device)->first(['hostname', 'overwrite_ip']);
-            if (empty($ret)) {
-                return $device;
-            }
-            $overwrite_ip = $ret->overwrite_ip;
-            $hostname = $ret->hostname;
-        } elseif (array_key_exists('overwrite_ip', $device)) {
-            $overwrite_ip = $device['overwrite_ip'];
-            $hostname = $device['hostname'];
-        } else {
-            return $device['hostname'];
-        }
+        return $this->overwrite_ip ?: $this->hostname ?: '';
+    }
 
-        return $overwrite_ip ?: $hostname;
+    public function ipFamily(): AddressFamily
+    {
+        return str_ends_with($this->transport ?? '', '6') ? AddressFamily::IPv6 : AddressFamily::IPv4;
     }
 
     public static function findByIp(?string $ip): ?Device

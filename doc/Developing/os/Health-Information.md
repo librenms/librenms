@@ -147,7 +147,7 @@ For `options:` you have the following available:
 
 Multiple variables can be used in the sensor's definition. The syntax
 is `{{ $variable }}`. Any oid in the current table can be used, as
-well as pre_cached data. The index ($index) and the sub_indexes (in
+well as pre-fetched data. The index ($index) and the sub_indexes (in
 case the oid is indexed multiple times) are also available: if
 $index="1.20", then $subindex0="1" and $subindex1="20".
 
@@ -254,11 +254,7 @@ sensors follows the same code format which is to collect sensor information
 via SNMP and then call the `discover_sensor()` function; except state
 sensors which requires additional code. Sensor information is commonly found in an ENTITY
 mib supplied by device's vendor in the form of a table. Other mib tables may be used as
-well. Sensor information is first collected by
-`includes/discovery/sensors/pre_cache/$os.inc.php`. This program will pull in data
-from mib tables into a `$pre_cache` array that can then be used in
-`includes/discovery/sensors/$class/$os.inc.php` to extract specific values which are
-then passed to `discover_sensor()`.
+well.
 
 `discover_sensor()` Accepts the following arguments:
 

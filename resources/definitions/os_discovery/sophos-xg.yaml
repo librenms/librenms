@@ -1,14 +1,14 @@
 mib: SFOS-FIREWALL-MIB
 modules:
    os:
-      version:  
+      version:
          - SFOS-FIREWALL-MIB::sfosDeviceFWVersion.0
-      hardware: 
+      hardware:
          - SFOS-FIREWALL-MIB::sfosDeviceType.0
-      serial:   
+      serial:
          - SFOS-FIREWALL-MIB::sfosDeviceAppKey.0
    sensors:
-      pre-cache:
+      additional_oids:
          data:
             -
                oid:

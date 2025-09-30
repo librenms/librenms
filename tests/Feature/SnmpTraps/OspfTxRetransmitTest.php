@@ -26,7 +26,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class OspfTxRetransmitTest extends SnmpTrapTestCase
+final class OspfTxRetransmitTest extends SnmpTrapTestCase
 {
     /**
      * Test OSPF lsUpdate packet type trap

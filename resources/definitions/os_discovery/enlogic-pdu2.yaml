@@ -5,7 +5,7 @@ modules:
     serial: ENLOGIC-PDU2-MIB::pduNamePlateSerialNumber.1
     version: ENLOGIC-PDU2-MIB::pduNamePlateFirmwareVersion.1
   sensors:
-      pre-cache:
+      additional_oids:
         data:
           -
             oid:

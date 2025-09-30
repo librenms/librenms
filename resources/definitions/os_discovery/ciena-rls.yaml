@@ -5,7 +5,7 @@ modules:
         version: CIENA-PRO-SOFTWARE-MIB::cienaProSoftwareRunningVersion.0
 
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

@@ -33,7 +33,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Component;
 use LibreNMS\Tests\DBTestCase;
 
-class ComponentTest extends DBTestCase
+final class ComponentTest extends DBTestCase
 {
     use DatabaseTransactions;
 

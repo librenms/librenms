@@ -6,7 +6,7 @@ modules:
         serial: OPTIX-RTN-ODU-MGR-MIB::optixRtnOduFactoryInfo.23.255
         sysDescr_regex: '/Huawei Optix RTN (?<version>\S+)/'   #Huawei Optix RTN V100R011C00SPC200
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

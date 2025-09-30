@@ -1,7 +1,7 @@
 mib: CERENT-ENVMON-MIB:ENTITY-MIB
 modules:
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

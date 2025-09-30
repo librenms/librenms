@@ -205,7 +205,7 @@ function get_nagios_state($descr)
 
 /**
  * @param  $state
- * @return int
+ * @return int|void
  */
 function apc_relay_state($state)
 {

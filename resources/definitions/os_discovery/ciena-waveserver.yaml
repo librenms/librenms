@@ -5,7 +5,7 @@ modules:
         version: CIENA-WS-SOFTWARE-MIB::cwsSoftwareStatusActiveVersion.0
         serial: ENTITY-MIB::entPhysicalSerialNum.1
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

@@ -1,4 +1,5 @@
+mib: ICT-PLATINUM-MIB
 modules:
-  os:
-    hardware: .1.3.6.1.4.1.39145.11.1.0
-    version: .1.3.6.1.4.1.39145.11.4.0
+    os:
+        hardware: ICT-PLATINUM-MIB::deviceModel.0
+        version: ICT-PLATINUM-MIB::deviceFirmware.0
