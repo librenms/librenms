@@ -157,15 +157,24 @@ class Links implements Module
                 if ($res) {
                     //collect the Management IP address from the OID
                     if ($matches[5] == 4) {
-                        $lldpRows[$matches[1]][$matches[2]][$matches[3]]['lldpRemManAddr'] = $matches[6];
+                        $addr = $matches[6];
                     } else {
                         $ipv6 = implode(':', array_map(function ($v) {
                             return sprintf('%02x', $v);
                         },
                             explode('.', $matches[6])
                         ));
-                        $ipv6 = preg_replace('/([^:]{2}):([^:]{2})/i', '$1$2', $ipv6);
-                        $lldpRows[$matches[1]][$matches[2]][$matches[3]]['lldpRemManAddr'] = $ipv6;
+                        $addr = preg_replace('/([^:]{2}):([^:]{2})/i', '$1$2', $ipv6);
+                    }
+
+                    foreach ($lldpRows as $lldpTimeMark => $tmp1) {
+                        foreach ($tmp1 as $lldpRemLocalPortNum => $tmp2) {
+                            foreach ($tmp2 as $lldpRemIndex => $tmp3) {
+                                if ($matches[2] == $lldpRemLocalPortNum && $matches[3] == $lldpRemIndex) {
+                                    $lldpRows[$lldpTimeMark][$lldpRemLocalPortNum][$lldpRemIndex]['lldpRemManAddr'] = $addr;
+                                }
+                            }
+                        }
                     }
                 }
             }
