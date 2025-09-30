@@ -2,10 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Actions\Device\DeviceIsPingable;
 use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use LibreNMS\Polling\ConnectivityHelper;
 use Symfony\Component\Console\Input\InputArgument;
 
 class DevicePing extends LnmsCommand
@@ -28,7 +28,7 @@ class DevicePing extends LnmsCommand
      *
      * @return int
      */
-    public function handle(): int
+    public function handle(DeviceIsPingable $deviceIsPingable): int
     {
         $spec = $this->argument('device spec');
         $devices = Device::whereDeviceSpec($spec)->get();
@@ -41,8 +41,7 @@ class DevicePing extends LnmsCommand
 
         /** @var Device $device */
         foreach ($devices as $device) {
-            $helper = new ConnectivityHelper($device);
-            $response = $helper->isPingable();
+            $response = $deviceIsPingable->execute($device);
 
             $this->line($device->displayName() . ' : ' . ($response->wasSkipped() ? 'skipped' : $response));
         }

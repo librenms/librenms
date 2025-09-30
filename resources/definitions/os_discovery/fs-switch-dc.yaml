@@ -22,7 +22,7 @@ modules:
                 descr: '{{ $fsNodeCPUTotalName }}'
                 warn_percent: fsNodeCPUTotalCritical
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

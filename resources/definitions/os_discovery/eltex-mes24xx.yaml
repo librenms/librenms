@@ -23,7 +23,7 @@ modules:
                 descr: Internal Flash
                 percent_used: ARICENT-ISS-MIB::issSwitchCurrentFlashUsage
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

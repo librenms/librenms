@@ -11,17 +11,16 @@ modules:
           - .1.3.6.1.4.1.13742.6.3.2.3.1.6.1.1.1
           - .1.3.6.1.4.1.13742.4.1.1.1.0
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 - oid:
-                    - PDU2-MIB::externalSensorMeasurementsTable
                     - PDU2-MIB::externalSensorConfigurationTable
-                    - PDU2-MIB::outletSensorMeasurementsTable
                     - PDU2-MIB::outletSensorConfigurationTable
                     - PDU2-MIB::outletConfigurationTable
-                    - PDU2-MIB::inletSensorMeasurementsTable
                     - PDU2-MIB::inletSensorConfigurationTable
                     - PDU2-MIB::inletConfigurationTable
+                    - PDU2-MIB::overCurrentProtectorSensorConfigurationTable
+                    - PDU2-MIB::overCurrentProtectorConfigurationTable
                   snmp_flags: -OQUbe
         current:
             data:
@@ -36,6 +35,7 @@ modules:
                   low_warn_limit: PDU2-MIB::inletSensorSignedLowerWarningThreshold
                   warn_limit: PDU2-MIB::inletSensorSignedUpperWarningThreshold
                   high_limit: PDU2-MIB::inletSensorSignedUpperCriticalThreshold
+                  snmp_flags: ["-OQUbe"]
                   skip_values:
                       - oid: index
                         op: not_ends
@@ -51,10 +51,28 @@ modules:
                   low_warn_limit: PDU2-MIB::outletSensorSignedLowerWarningThreshold
                   warn_limit: PDU2-MIB::outletSensorSignedUpperWarningThreshold
                   high_limit: PDU2-MIB::outletSensorSignedUpperCriticalThreshold
+                  snmp_flags: ["-OQUbe"]
                   skip_values:
                       - oid: index
                         op: not_ends
                         value: '.1'
+                - oid: PDU2-MIB::overCurrentProtectorSensorMeasurementsTable
+                  value: PDU2-MIB::measurementsOverCurrentProtectorSensorValue
+                  num_oid: '.1.3.6.1.4.1.13742.6.5.3.3.1.4.{{ $index }}'
+                  divisor: 1000
+                  descr: '{{ PDU2-MIB::overCurrentProtectorLabel:0-1 }} {{ PDU2-MIB::overCurrentProtectorName:0-1 }}'
+                  index: 'measurementsOverCurrentProtectorSensorValue.{{ $index }}'
+                  group: OverCurrentProtector
+                  low_limit: PDU2-MIB::overCurrentProtectorSensorSignedLowerCriticalThreshold
+                  low_warn_limit: PDU2-MIB::overCurrentProtectorSensorSignedLowerWarningThreshold
+                  warn_limit: PDU2-MIB::overCurrentProtectorSensorSignedUpperWarningThreshold
+                  high_limit: PDU2-MIB::overCurrentProtectorSensorSignedUpperCriticalThreshold
+                  snmp_flags: ["-OQUbe"]
+                  skip_values:
+                      - oid: index
+                        op: not_ends
+                        value: '.1'
+
         frequency:
             data:
                 - oid: PDU2-MIB::inletSensorMeasurementsTable
@@ -68,6 +86,7 @@ modules:
                   low_warn_limit: PDU2-MIB::inletSensorSignedLowerWarningThreshold
                   warn_limit: PDU2-MIB::inletSensorSignedUpperWarningThreshold
                   high_limit: PDU2-MIB::inletSensorSignedUpperCriticalThreshold
+                  snmp_flags: ["-OQUbe"]
                   skip_values:
                       - oid: index
                         op: not_ends
@@ -83,6 +102,7 @@ modules:
                   low_warn_limit: PDU2-MIB::outletSensorSignedLowerWarningThreshold
                   warn_limit: PDU2-MIB::outletSensorSignedUpperWarningThreshold
                   high_limit: PDU2-MIB::outletSensorSignedUpperCriticalThreshold
+                  snmp_flags: ["-OQUbe"]
                   skip_values:
                       - oid: index
                         op: not_ends
@@ -99,6 +119,7 @@ modules:
                   low_warn_limit: PDU2-MIB::externalSensorLowerWarningThreshold
                   warn_limit: PDU2-MIB::externalSensorUpperWarningThreshold
                   high_limit: PDU2-MIB::externalSensorUpperCriticalThreshold
+                  snmp_flags: ["-OQUbe"]
                   skip_values:
                       - oid: PDU2-MIB::externalSensorType
                         op: '!='
@@ -115,6 +136,7 @@ modules:
                   low_warn_limit: PDU2-MIB::inletSensorSignedLowerWarningThreshold
                   warn_limit: PDU2-MIB::inletSensorSignedUpperWarningThreshold
                   high_limit: PDU2-MIB::inletSensorSignedUpperCriticalThreshold
+                  snmp_flags: ["-OQUbe"]
                   skip_values:
                       - oid: index
                         op: not_ends
@@ -145,6 +167,7 @@ modules:
                   low_warn_limit: PDU2-MIB::inletSensorSignedLowerWarningThreshold
                   warn_limit: PDU2-MIB::inletSensorSignedUpperWarningThreshold
                   high_limit: PDU2-MIB::inletSensorSignedUpperCriticalThreshold
+                  snmp_flags: ["-OQUbe"]
                   skip_values:
                       - oid: index
                         op: not_ends
@@ -159,6 +182,7 @@ modules:
                   low_warn_limit: PDU2-MIB::outletSensorSignedLowerWarningThreshold
                   warn_limit: PDU2-MIB::outletSensorSignedUpperWarningThreshold
                   high_limit: PDU2-MIB::outletSensorSignedUpperCriticalThreshold
+                  snmp_flags: ["-OQUbe"]
                   skip_values:
                       - oid: index
                         op: not_ends
@@ -171,6 +195,7 @@ modules:
                   descr: '{{ PDU2-MIB::inletLabel:0-1 }} {{ PDU2-MIB::inletName:0-1 }}'
                   index: 'measurementsInletSensorValue.{{ $index }}'
                   group: Inlet
+                  snmp_flags: ["-OQUbe"]
                   states:
                       - { value: 0, descr: On, graph: 0, generic: 0 }
                       - { value: 1, descr: Off, graph: 0, generic: 1 }
@@ -184,6 +209,7 @@ modules:
                   index: 'measurementsOutletSensorValue.{{ $index }}'
                   descr: '{{ PDU2-MIB::outletLabel:0-1 }} {{ PDU2-MIB::outletName:0-1 }}'
                   group: Outlet
+                  snmp_flags: ["-OQUbe"]
                   states:
                       - { value: 0, descr: On, graph: 0, generic: 0 }
                       - { value: 1, descr: Off, graph: 0, generic: 1 }
@@ -197,6 +223,7 @@ modules:
                   descr: PDU2-MIB::externalSensorName
                   index: 'measurementsExternalSensorValue.{{ $index }}'
                   group: Door
+                  snmp_flags: ["-OQUbe"]
                   states:
                       - { value: 0, descr: Closed, graph: 0, generic: 0 }
                       - { value: 1, descr: Open, graph: 0, generic: 1 }
@@ -210,6 +237,7 @@ modules:
                   descr: PDU2-MIB::externalSensorName
                   index: 'measurementsExternalSensorValue.{{ $index }}'
                   group: Lock
+                  snmp_flags: ["-OQUbe"]
                   states:
                       - { value: 0, descr: Locked, graph: 0, generic: 0 }
                       - { value: 1, descr: Unlocked, graph: 0, generic: 1 }
@@ -223,6 +251,7 @@ modules:
                   descr: PDU2-MIB::externalSensorName
                   index: 'measurementsExternalSensorValue.{{ $index }}'
                   group: Door Handle
+                  snmp_flags: ["-OQUbe"]
                   states:
                       - { value: 0, descr: Locked, graph: 0, generic: 0 }
                       - { value: 1, descr: Unlocked, graph: 0, generic: 1 }
@@ -243,6 +272,7 @@ modules:
                   warn_limit: PDU2-MIB::externalSensorUpperWarningThreshold
                   high_limit: PDU2-MIB::externalSensorUpperCriticalThreshold
                   divisor: 10
+                  snmp_flags: ["-OQUbe"]
                   skip_values:
                       - oid: PDU2-MIB::externalSensorType
                         op: '!='
@@ -259,6 +289,7 @@ modules:
                   low_warn_limit: PDU2-MIB::inletSensorSignedLowerWarningThreshold
                   warn_limit: PDU2-MIB::inletSensorSignedUpperWarningThreshold
                   high_limit: PDU2-MIB::inletSensorSignedUpperCriticalThreshold
+                  snmp_flags: ["-OQUbe"]
                   skip_values:
                       - oid: index
                         op: not_ends
@@ -273,7 +304,43 @@ modules:
                   low_warn_limit: PDU2-MIB::outletSensorSignedLowerWarningThreshold
                   warn_limit: PDU2-MIB::outletSensorSignedUpperWarningThreshold
                   high_limit: PDU2-MIB::outletSensorSignedUpperCriticalThreshold
+                  snmp_flags: ["-OQUbe"]
                   skip_values:
                       - oid: index
                         op: not_ends
                         value: '.4'
+        power_consumed:
+            data:
+                - oid: PDU2-MIB::inletSensorMeasurementsTable
+                  value: PDU2-MIB::measurementsInletSensorValue
+                  num_oid: '.1.3.6.1.4.1.13742.6.5.2.3.1.4.{{ $index }}'
+                  divisor: 1000
+                  descr: '{{ PDU2-MIB::inletLabel:0-1 }} {{ PDU2-MIB::inletName:0-1 }}'
+                  index: 'measurementsInletSensorValue.{{ $index }}'
+                  group: Inlet
+                  low_limit: PDU2-MIB::inletSensorSignedLowerCriticalThreshold
+                  low_warn_limit: PDU2-MIB::inletSensorSignedLowerWarningThreshold
+                  warn_limit: PDU2-MIB::inletSensorSignedUpperWarningThreshold
+                  high_limit: PDU2-MIB::inletSensorSignedUpperCriticalThreshold
+                  snmp_flags: ["-OQUbe"]
+                  skip_values:
+                      - oid: index
+                        op: not_ends
+                        value: '.8'
+                - oid: PDU2-MIB::outletSensorMeasurementsTable
+                  value: PDU2-MIB::measurementsOutletSensorValue
+                  num_oid: '.1.3.6.1.4.1.13742.6.5.4.3.1.4.{{ $index }}'
+                  divisor: 1000
+                  descr: '{{ PDU2-MIB::outletLabel:0-1 }} {{ PDU2-MIB::outletName:0-1 }}'
+                  index: 'measurementsOutletSensorValue.{{ $index }}'
+                  group: Outlet
+                  low_limit: PDU2-MIB::outletSensorSignedLowerCriticalThreshold
+                  low_warn_limit: PDU2-MIB::outletSensorSignedLowerWarningThreshold
+                  warn_limit: PDU2-MIB::outletSensorSignedUpperWarningThreshold
+                  high_limit: PDU2-MIB::outletSensorSignedUpperCriticalThreshold
+                  snmp_flags: ["-OQUbe"]
+                  skip_values:
+                      - oid: index
+                        op: not_ends
+                        value: '.8'
+

@@ -12,6 +12,7 @@
  * See COPYING for more details.
  */
 
+use App\Actions\Device\CheckDeviceAvailability;
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
@@ -139,9 +140,7 @@ function discover_device(&$device, $force_module = false)
     // Start counting device poll time
     echo $device['hostname'] . ' ' . $device['device_id'] . ' ' . $device['os'] . ' ';
 
-    $helper = new \LibreNMS\Polling\ConnectivityHelper(DeviceCache::getPrimary());
-
-    if (! $helper->isUp()) {
+    if (! app(CheckDeviceAvailability::class)->execute(DeviceCache::getPrimary())) {
         Log::error('%RDOWN%n', ['color' => true]);
 
         return false;
@@ -533,6 +532,9 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     }
 
                     // process the limits
+                    // phpstan does not like $$var variables
+                    $low_limit = $low_warn_limit = $warn_limit = $high_limit = null;
+
                     $limits = ['low_limit', 'low_warn_limit', 'warn_limit', 'high_limit'];
                     foreach ($limits as $limit) {
                         if (isset($data[$limit]) && is_numeric($data[$limit])) {
