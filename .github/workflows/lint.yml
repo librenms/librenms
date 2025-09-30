@@ -69,7 +69,10 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-
 
       - name: Composer install
-        run: composer install --prefer-dist --no-interaction --no-progress --no-scripts
+        run: composer install --prefer-dist --no-interaction --no-progress --no-scripts --no-autoloader
+
+      - name: Composer dump
+        run: composer dump --strict-psr --strict-ambiguous --no-interaction --no-scripts
 
       - name: Run PHPStan
         run: ./vendor/bin/phpstan analyze --no-interaction --memory-limit=4G
