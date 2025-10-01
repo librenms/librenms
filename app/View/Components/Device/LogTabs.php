@@ -1,4 +1,5 @@
 <?php
+
 /**
  * LogTabs.php
  *
@@ -34,6 +35,7 @@ use Illuminate\View\Component;
 class LogTabs extends Component
 {
     public array $tabs = [];
+
     public function __construct(
         public readonly Device $device,
         public readonly ?string $tab = null,

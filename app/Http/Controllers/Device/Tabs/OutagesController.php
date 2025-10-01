@@ -1,4 +1,5 @@
 <?php
+
 /**
  * OutagesController.php
  *
