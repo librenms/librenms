@@ -64,7 +64,7 @@ jobs:
 
           printf "test-shard-matrix=[" >> "$GITHUB_OUTPUT"
 
-          printf '{"name":"Other", "php-version":"8.4", "database":"mariadb:11.7", "arguments":"--full --exclude-phpunit-group=browser,mibs,os"}, ' >> "$GITHUB_OUTPUT"
+          printf '{"name":"Other", "php-version":"8.4", "database":"mariadb:11.7", "arguments":"--full --exclude-phpunit-group=browser,mibs,external-dependencies,os"}, ' >> "$GITHUB_OUTPUT"
 
           for ((i=1;i<=${#SHARD_GROUPS[@]};i++)); do
             printf '{"name":"PHP 8.4 - OS (%i/%i)", "php-version":"8.4", "database":"mariadb:11.7", "arguments":"--os %s"}, ' $i ${#SHARD_GROUPS[@]} "${SHARD_GROUPS[$i]::-1}" >> "$GITHUB_OUTPUT"
