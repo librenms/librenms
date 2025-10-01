@@ -720,7 +720,7 @@ foreach ($ports as $port) {
                     $old = $port[$oid];
                     $new = $current_oid;
                 }
-                if (! is_null($old)) {
+                if (! is_null($old) || ($oid == 'ifSpeed' && $old != 0)) {
                     Eventlog::log($oid . ': ' . $old . ' -> ' . $new, $device['device_id'], 'interface', Severity::Notice, $port['port_id']);
                 }
                 if (Debug::isEnabled()) {
