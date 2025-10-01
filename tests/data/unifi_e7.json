@@ -11,10 +11,10 @@
                     "hardware": null,
                     "features": null,
                     "location": null,
-                    "os": "generic",
-                    "type": "server",
+                    "os": "unifi",
+                    "type": "wireless",
                     "serial": null,
-                    "icon": "generic.svg"
+                    "icon": "ubiquiti.svg"
                 }
             ]
         },
