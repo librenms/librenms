@@ -53,7 +53,7 @@ if (! empty($peers)) {
     } elseif ($device['os'] === 'dell-os10') {
         $peer_data_check = snmpwalk_cache_oid($device, 'os10bgp4V2PeerRemoteAs', [], 'DELLEMC-OS10-BGP4V2-MIB', 'dell'); // practically identical MIB as arista
     } elseif ($device['os'] === 'timos') {
-        d_echo("inside main timos");
+        d_echo("inside main timos"); //PASS
         $peer_data_check = SnmpQuery::enumStrings()->numericIndex()->abortOnFailure()->walk([
             'TIMETRA-BGP-MIB::tBgpPeerNgTable',
             'TIMETRA-BGP-MIB::tBgpPeerNgOperTable',
