@@ -40,7 +40,6 @@ use RegexIterator;
 #[Group('svg')]
 final class SVGTest extends TestCase
 {
-
     #[TestDox('SVG contains PNG')]
     public function testSVGContainsPNG(): void
     {
@@ -53,7 +52,6 @@ final class SVGTest extends TestCase
             );
         }
     }
-
 
     #[TestDox('SVG has length or width')]
     public function testSVGHasLengthWidth(): void
@@ -76,7 +74,6 @@ final class SVGTest extends TestCase
             );
         }
     }
-
 
     #[TestDox('SVG has viewBox')]
     public function testSVGHasViewBox(): void
