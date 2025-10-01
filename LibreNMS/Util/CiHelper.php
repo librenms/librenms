@@ -196,7 +196,7 @@ class CiHelper
         }
 
         if ($this->excludedPhpunitGroups) {
-            foreach($this->excludedPhpunitGroups as $group) {
+            foreach ($this->excludedPhpunitGroups as $group) {
                 array_push($phpunit_cmd, '--exclude-group', $group);
             }
         }
