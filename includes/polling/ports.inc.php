@@ -761,7 +761,7 @@ foreach ($ports as $port) {
                     }
 
                     $port['update'][$attrib_key] = $port_ifAlias[$attrib];
-                    if (! is_null($port[$attrib_key])) {
+                    if (! is_null($port[$attrib_key]) && ! $port_ifAlias[$attrib]) {
                         Eventlog::log($attrib . ': ' . $port[$attrib_key] . ' -> ' . $log_port, $device['device_id'], 'interface', Severity::Notice, $port['port_id']);
                     }
                     unset($log_port);
