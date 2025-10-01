@@ -456,7 +456,7 @@ class CiHelper
         $changed_files = trim(getenv('FILES')) ?:
             exec("git diff --diff-filter=d --name-only master | tr '\n' ' '|sed 's/,*$//g'");
 
-        $this->flags['full'] = $this->flags['full'] || empty($changed_files); // don't disable full if already set
+        $this->flags['full'] = empty($changed_files); // don't disable full if already set
         $files = $changed_files ? explode(' ', $changed_files) : [];
 
         $this->changed = (new FileCategorizer($files))->categorize();
