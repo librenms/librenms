@@ -37,6 +37,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Group;
 
+#[Group('os')]
 final class OSDiscoveryTest extends TestCase
 {
     private static $unchecked_files;
@@ -67,7 +68,6 @@ final class OSDiscoveryTest extends TestCase
      *
      * @param  string  $os_name
      */
-    #[Group('os')]
     #[DataProvider('osProvider')]
     public function testOSDetection($os_name): void
     {
