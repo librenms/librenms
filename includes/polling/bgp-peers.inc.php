@@ -53,6 +53,7 @@ if (! empty($peers)) {
     } elseif ($device['os'] === 'dell-os10') {
         $peer_data_check = snmpwalk_cache_oid($device, 'os10bgp4V2PeerRemoteAs', [], 'DELLEMC-OS10-BGP4V2-MIB', 'dell'); // practically identical MIB as arista
     } elseif ($device['os'] === 'timos') {
+        d_echo("inside main timos");
         $peer_data_check = SnmpQuery::enumStrings()->numericIndex()->abortOnFailure()->walk([
             'TIMETRA-BGP-MIB::tBgpPeerNgTable',
             'TIMETRA-BGP-MIB::tBgpPeerNgOperTable',
@@ -246,7 +247,9 @@ if (! empty($peers)) {
                     $peer_data['bgpPeerLastErrorSubCode'] = intval($error_data[1]);
                     unset($peer_data['bgpPeerLastError']);
                 } elseif ($device['os'] == 'timos') {
+                    d_echo("inside if timos");
                     if (! isset($bgpPeers)) {
+                        d_echo("inside if of timos");
                         $bgpPeers = [];
                         foreach ($peer_data_check as $key => $value) {
                             $oid = explode('.', (string) $key);
@@ -587,6 +590,7 @@ if (! empty($peers)) {
         // --- Populate cbgp data ---
         if ($device['os_group'] == 'vrp' || $device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os'] == 'aos7' || $device['os_group'] === 'arista' || $device['os'] == 'dell-os10' || $device['os'] == 'firebrick' || $device['os'] == 'timos') {
             // Poll each AFI/SAFI for this peer (using CISCO-BGP4-MIB or BGP4-V2-JUNIPER MIB)
+            d_echo("inside IF of device os");
             $peer_afis = dbFetchRows('SELECT * FROM bgpPeers_cbgp WHERE `device_id` = ? AND bgpPeerIdentifier = ?', [$device['device_id'], $peer['bgpPeerIdentifier']]);
             foreach ($peer_afis as $peer_afi) {
                 $afi = $peer_afi['afi'];
@@ -671,6 +675,7 @@ if (! empty($peers)) {
                 } //end if
 
                 if ($device['os'] == 'junos') {
+                    d_echo("inside junos");
                     $safis = [
                         'unicast' => 1,
                         'multicast' => 2,
