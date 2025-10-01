@@ -3402,13 +3402,13 @@ function maintenance_location(Illuminate\Http\Request $request)
         return api_error(400, 'No location was provided');
     }
 
+    if (empty($data['duration'])) {
+        return api_error(400, 'Duration not provided');
+    }
+
     $location = ctype_digit($loc) ? Location::find($loc) : Location::where('location', $loc)->first();
     if (empty($location)) {
         return api_error(404, "Location $loc does not exist");
-    }
-
-    if (empty($data['duration'])) {
-        return api_error(400, 'Duration not provided');
     }
 
     $notes = $data['notes'] ?? '';
