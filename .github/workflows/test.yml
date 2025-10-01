@@ -39,11 +39,11 @@ jobs:
           declare -r PER_SPLIT=$(( ${#INPUT_FILES[@]} / SHARDS ))
           declare -A FILE_LIST
 
-          # Loop through each input file, extract the first two characters as the key,
+          # Loop through each input file, extract the first three characters as the key,
           # and increment the count of files for each unique key in the FILE_LIST array.
           for FILE in "${INPUT_FILES[@]}"
           do
-            KEY=${FILE:0:2}
+            KEY=${FILE:0:3}
             FILE_LIST[$KEY]=$(( ${FILE_LIST[$KEY]:-0} + 1 ))
           done
 
