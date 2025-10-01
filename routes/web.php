@@ -118,7 +118,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::prefix('device/{device}')->name('device.')->group(function () {
-        Route::get('logs', Device\Tabs\EventlogController::class)->name('logs');
+        Route::redirect('logs', 'logs/eventlog')->name('logs');
         Route::get('logs/eventlog', Device\Tabs\EventlogController::class)->name('eventlog');
         Route::get('logs/graylog', Device\Tabs\GraylogController::class)->name('graylog');
         Route::get('logs/outages', Device\Tabs\OutagesController::class)->name('outages');
