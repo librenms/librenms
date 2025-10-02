@@ -20,7 +20,7 @@ discovery:
             op: '!='
             value: false
 poller_modules:
-    entity-physical: false
+    entity-physical: true
     hr-mib: false
     ipSystemStats: false
     netstats: false
@@ -30,7 +30,7 @@ poller_modules:
     stp: false
 discovery_modules:
     ports-stack: false
-    entity-physical: false
+    entity-physical: true
     processors: false
     mempools: false
     cisco-vrf-lite: false
