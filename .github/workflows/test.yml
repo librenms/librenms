@@ -25,25 +25,36 @@ jobs:
           sparse-checkout-cone-mode: false
           sparse-checkout: |
             resources/definitions/os_detection/*.yaml
+            tests/snmpsim/*.snmprec
 
       - name: Calculate shards
         id: shards
         run: |
-          cd resources/definitions/os_detection/
-
           declare -r SHARDS=8
           declare -A SHARD_GROUPS
           declare -i CURRENT_GROUP=1
 
-          declare -a INPUT_FILES=(*.yaml)
-          declare -r PER_SPLIT=$(( ${#INPUT_FILES[@]} / SHARDS ))
+          pushd resources/definitions/os_detection/
+          declare -a INPUT_FILES_OS_DETECTION=(*.yaml)
+          popd
+
+          pushd tests/snmpsim/
+          declare -a INPUT_FILES_SNMPSIM=(*.snmprec)
+          popd
+
+          declare -r PER_SPLIT=$(( ( ${#INPUT_FILES_OS_DETECTION[@]} + ${#INPUT_FILES_SNMPSIM[@]} ) / SHARDS ))
           declare -A FILE_LIST
 
           # Loop through each input file, extract the first three characters as the key,
           # and increment the count of files for each unique key in the FILE_LIST array.
-          for FILE in "${INPUT_FILES[@]}"
+          for FILE in "${INPUT_FILES_OS_DETECTION[@]}"
           do
-            KEY=${FILE:0:3}
+            KEY=${FILE:0:2}
+            FILE_LIST[$KEY]=$(( ${FILE_LIST[$KEY]:-0} + 1 ))
+          done
+          for FILE in "${INPUT_FILES_SNMPSIM[@]}"
+          do
+            KEY=${FILE:0:2}
             FILE_LIST[$KEY]=$(( ${FILE_LIST[$KEY]:-0} + 1 ))
           done
 
