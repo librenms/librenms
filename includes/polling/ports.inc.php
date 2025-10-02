@@ -196,6 +196,7 @@ $dot3_oids = [
 // Query known ports and mapping table in order of discovery to make sure
 // the latest discoverd/polled port is in the mapping tables.
 $ports_mapped = get_ports_mapped($device['device_id'], true);
+// If we are not running tests, and no ports are found, we need to run discovery first.
 if (!defined('PHPUNIT_RUNNING') && empty($ports_mapped['ports'])) {
     Log::info("No ports found for device {$device['hostname']}, discovery needs to be run first.");
 
