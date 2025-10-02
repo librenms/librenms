@@ -119,6 +119,11 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::prefix('device/{device}')->name('device.')->group(function () {
+        Route::redirect('logs', 'logs/eventlog')->name('logs');
+        Route::get('logs/eventlog', Device\Tabs\EventlogController::class)->name('eventlog');
+        Route::get('logs/graylog', Device\Tabs\GraylogController::class)->name('graylog');
+        Route::get('logs/outages', Device\Tabs\OutagesController::class)->name('outages');
+        Route::get('logs/syslog', Device\Tabs\SyslogController::class)->name('syslog');
         Route::get('popup', \App\Http\Controllers\DevicePopupController::class)->name('popup');
         Route::put('notes', [Device\Tabs\NotesController::class, 'update'])->name('notes.update');
         Route::put('module/{module}', [Device\Tabs\ModuleController::class, 'update'])->name('module.update');
@@ -274,9 +279,9 @@ Route::middleware(['auth'])->group(function () {
             Route::post('device', Table\DeviceController::class)->name('table.device');
             Route::get('device/export', [Table\DeviceController::class, 'export']);
             Route::post('edit-ports', Table\EditPortsController::class);
-            Route::post('eventlog', Table\EventlogController::class);
+            Route::post('eventlog', Table\EventlogController::class)->name('table.eventlog');
             Route::post('fdb-tables', Table\FdbTablesController::class);
-            Route::post('graylog', Table\GraylogController::class);
+            Route::post('graylog', Table\GraylogController::class)->name('table.graylog');
             Route::post('inventory', Table\InventoryController::class)->name('table.inventory');
             Route::get('inventory/export', [Table\InventoryController::class, 'export']);
             Route::post('location', Table\LocationController::class);
@@ -295,7 +300,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('sensors/export', [Table\SensorsController::class, 'export']);
             Route::post('storages', Table\StoragesController::class)->name('table.storages');
             Route::get('storages/export', [Table\StoragesController::class, 'export']);
-            Route::post('syslog', Table\SyslogController::class);
+            Route::post('syslog', Table\SyslogController::class)->name('table.syslog');
             Route::post('printer-supply', Table\PrinterSupplyController::class)->name('table.printer-supply');
             Route::post('tnmsne', Table\TnmsneController::class)->name('table.tnmsne');
             Route::post('wireless', Table\WirelessSensorController::class)->name('table.wireless');
