@@ -127,6 +127,13 @@ modules:
                         - { value: 9, descr: unsuppored, graph: 1, generic: 3 }
                         - { value: 10, descr: warning, graph: 1, generic: 1 }
                         - { value: 11, descr: init, graph: 1, generic: 3 }
+                        - { value: 12, descr: Empty, graph: 1, generic: 2 }
+                        - { value: 13, descr: Fault Airflow, graph: 1, generic: 2 }
+                        - { value: 14, descr: Fault Redundancy, graph: 1, generic: 2 }
+                        - { value: 15, descr: Fault Mixed Input, graph: 1, generic: 2 }
+                        - { value: 16, descr: Over Voltage, graph: 1, generic: 2 }
+                        - { value: 17, descr: Under Voltage, graph: 1, generic: 2 }
+
                 -
                     oid: arubaWiredVsxIslOperState
                     num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.7.2.1.1.{{ $index }}'
