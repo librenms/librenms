@@ -678,7 +678,6 @@ foreach ($ports as $port) {
 
             if ($port[$oid] != $current_oid && ! isset($current_oid)) {
                 $port['update'][$oid] = null;
-                Eventlog::log($oid . ': ' . $port[$oid] . ' -> NULL', $device['device_id'], 'interface', Severity::Warning, $port['port_id']);
                 d_echo($oid . ': ' . $port[$oid] . ' -> NULL ', $oid . ' ');
             } elseif ($port[$oid] != $current_oid) {
                 // if the value is different, update it
@@ -710,8 +709,9 @@ foreach ($ports as $port) {
                     $old = $port[$oid];
                     $new = $current_oid;
                 }
-
-                Eventlog::log($oid . ': ' . $old . ' -> ' . $new, $device['device_id'], 'interface', Severity::Notice, $port['port_id']);
+                if (! is_null($old) || ($oid == 'ifSpeed' && $old != 0)) {
+                    Eventlog::log($oid . ': ' . $old . ' -> ' . $new, $device['device_id'], 'interface', Severity::Notice, $port['port_id']);
+                }
                 if (Debug::isEnabled()) {
                     d_echo($oid . ': ' . $old . ' -> ' . $new . ' ');
                 } else {
@@ -750,7 +750,9 @@ foreach ($ports as $port) {
                     }
 
                     $port['update'][$attrib_key] = $port_ifAlias[$attrib];
-                    Eventlog::log($attrib . ': ' . $port[$attrib_key] . ' -> ' . $log_port, $device['device_id'], 'interface', Severity::Notice, $port['port_id']);
+                    if (! is_null($port[$attrib_key]) && ! $port_ifAlias[$attrib]) {
+                        Eventlog::log($attrib . ': ' . $port[$attrib_key] . ' -> ' . $log_port, $device['device_id'], 'interface', Severity::Notice, $port['port_id']);
+                    }
                     unset($log_port);
                 }
             }
