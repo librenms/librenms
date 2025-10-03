@@ -45,6 +45,12 @@ $vsfMemberTableStates = [
     ['value' => 15, 'generic' => 2, 'graph' => 0, 'descr' => 'In Other Fragment'],
 ];
 
+$vsfTopologyStates = [
+    ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'Standalone'],
+    ['value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'Chain'],
+    ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'Ring'],
+];
+
 $stateLookupTable = [
     // arubaWiredVsfv2OperStatus
     'no_split' => 0,
@@ -58,8 +64,29 @@ $stateLookupTable = [
     'version_mismatch' => 13,
     'communication_failure' => 14,
     'in_other_fragment' => 15,
+
+    //arubaWiredVsfv2Topology
+    'standalone' => 0,
+    'chain' => 1,
+    'ring' => 2,
 ];
 
+
+$temp = snmpwalk_cache_multi_oid($device, 'arubaWiredVsfv2Topology', [], 'ARUBAWIRED-VSFv2-MIB');
+if (is_array($temp)) {
+    echo 'ArubaOS-CX VSF Topology: ';
+    //Create State Index
+    $state_name = 'arubaWiredVsfv2Topology';
+    create_state_index($state_name, $vsfTopologyStates);
+
+    foreach ($temp as $index => $data) {
+        $sensor_value = $stateLookupTable[$data['arubaWiredVsfv2Topology']];
+
+        $descr = 'VSF Topology';
+        $oid = '.1.3.6.1.4.1.47196.4.1.1.3.15.1.1.2.' . $index;
+        discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $sensor_value, 'snmp', null, null, null, 'VSF');
+    }
+}
 $temp = snmpwalk_cache_multi_oid($device, 'arubaWiredVsfv2OperStatus', [], 'ARUBAWIRED-VSFv2-MIB');
 if (is_array($temp)) {
     echo 'ArubaOS-CX VSF Operational Status: ';
