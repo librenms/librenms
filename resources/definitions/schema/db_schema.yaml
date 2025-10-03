@@ -1937,6 +1937,23 @@ port_group_port:
   Constraints:
     port_group_port_port_group_id_foreign: { name: port_group_port_port_group_id_foreign, foreign_key: port_group_id, table: port_groups, key: id, extra: 'ON DELETE CASCADE' }
     port_group_port_port_id_foreign: { name: port_group_port_port_id_foreign, foreign_key: port_id, table: ports, key: port_id, extra: 'ON DELETE CASCADE' }
+port_security:
+  Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: port_security_enable, Type: varchar(5), 'Null': true, Extra: '' }
+    - { Field: status, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: max_addresses, Type: int, 'Null': true, Extra: '' }
+    - { Field: address_count, Type: int, 'Null': true, Extra: '' }
+    - { Field: violation_action, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: violation_count, Type: int, 'Null': true, Extra: '' }
+    - { Field: last_mac_address, Type: varchar(20), 'Null': true, Extra: '' }
+    - { Field: sticky_enable, Type: varchar(5), 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    port_security_device_id_index: { Name: port_security_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+    port_security_port_id_unique: { Name: port_security_port_id_unique, Columns: [port_id], Unique: true, Type: BTREE }
 printer_supplies:
   Columns:
     - { Field: supply_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
