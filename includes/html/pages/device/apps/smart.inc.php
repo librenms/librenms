@@ -11,7 +11,7 @@ $baseLink = [
 
 $disks = $app->data['disks'] ?? [];
 
-if (!empty($disks)) {
+if (! empty($disks)) {
     ksort($disks);
 }
 
@@ -39,7 +39,7 @@ print_optionbar_end();
 if (isset($vars['disk'])) {
     $currentDisk = $disks[$vars['disk']] ?? [];
 
-    if (!isset($app->data['legacy']) && !empty($currentDisk)) {
+    if (! isset($app->data['legacy']) && ! empty($currentDisk)) {
         print_optionbar_start();
 
         $diskFields = [
@@ -141,7 +141,7 @@ foreach ($graphs as $graphKey => $graphTitle) {
 
     include 'includes/html/print-graphrow.inc.php';
 
-    echo <<<HTML
+    echo <<<'HTML'
             </div>
         </div>
     </div>
