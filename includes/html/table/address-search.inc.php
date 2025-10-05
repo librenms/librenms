@@ -33,7 +33,6 @@ if ($search_type == 'ipv4') {
     }
 
     $sql .= ' group by ipv4_address_id';
-
 } elseif ($search_type == 'ipv6') {
     $sql = ' FROM `ipv6_addresses` AS A, `ports` AS I, `devices` AS D';
     $sql .= ' WHERE I.port_id = A.port_id AND I.device_id = D.device_id ' . $where . ' ';
@@ -49,7 +48,6 @@ if ($search_type == 'ipv4') {
     }
 
     $sql .= ' group by ipv6_address_id';
-
 } elseif ($search_type == 'mac') {
     $sql = ' FROM `ports` AS I, `devices` AS D';
     $sql .= " WHERE I.device_id = D.device_id  $where ";
