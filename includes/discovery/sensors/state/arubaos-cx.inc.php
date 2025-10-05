@@ -6,7 +6,7 @@
  * LibreNMS state sensor and translation/discovery module for ArubaOS-CX Switches
  *
  * ArubaOS-CX switches return certain operational status values as strings,
- * such as the VSF operational and member status. LibreNMS expects numeric
+ * such as the VSF operational, topology and member status. LibreNMS expects numeric
  * values.
  *
  * This discovery modules translates the string status representation to a
@@ -27,8 +27,7 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2024 CTNET BV
- * @author     Rudy Broersma <tozz@kijkt.tv>
+ * @author     Marshall Holis <russiansharpshot@gmail.com>
  */
 $vsfOpStatusStates = [
     ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'No Split'],
@@ -46,9 +45,9 @@ $vsfMemberTableStates = [
 ];
 
 $vsfTopologyStates = [
-    ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'Standalone'],
-    ['value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'Chain'],
-    ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'Ring'],
+    ['value' => 16, 'generic' => 0, 'graph' => 0, 'descr' => 'Standalone'],
+    ['value' => 17, 'generic' => 2, 'graph' => 0, 'descr' => 'Chain'],
+    ['value' => 18, 'generic' => 0, 'graph' => 0, 'descr' => 'Ring'],
 ];
 
 $stateLookupTable = [
@@ -66,36 +65,36 @@ $stateLookupTable = [
     'in_other_fragment' => 15,
 
     //arubaWiredVsfv2Topology
-    'standalone' => 0,
-    'chain' => 1,
-    'ring' => 2,
+    'standalone' => 16,
+    'chain' => 17,
+    'ring' => 18,
 ];
 
-
-$temp = snmpwalk_cache_multi_oid($device, 'arubaWiredVsfv2Topology', [], 'ARUBAWIRED-VSFv2-MIB');
-if (is_array($temp)) {
+$topologyEntries = SnmpQuery::enumStrings()->hideMib()->walk('ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2Topology')->valuesByIndex();
+if (is_array($topologyEntries)) {
     echo 'ArubaOS-CX VSF Topology: ';
     //Create State Index
     $state_name = 'arubaWiredVsfv2Topology';
     create_state_index($state_name, $vsfTopologyStates);
 
-    foreach ($temp as $index => $data) {
-        $sensor_value = $stateLookupTable[$data['arubaWiredVsfv2Topology']];
+    foreach ($topologyEntries as $index => $value) {
+        $sensor_value = $stateLookupTable[$value];
 
         $descr = 'VSF Topology';
         $oid = '.1.3.6.1.4.1.47196.4.1.1.3.15.1.1.2.' . $index;
         discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $sensor_value, 'snmp', null, null, null, 'VSF');
     }
 }
-$temp = snmpwalk_cache_multi_oid($device, 'arubaWiredVsfv2OperStatus', [], 'ARUBAWIRED-VSFv2-MIB');
-if (is_array($temp)) {
+
+$operStatusEntries = SnmpQuery::enumStrings()->hideMib()->walk('ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2OperStatus')->valuesByIndex();
+if (is_array($operStatusEntries)) {
     echo 'ArubaOS-CX VSF Operational Status: ';
     //Create State Index
     $state_name = 'arubaWiredVsfv2OperStatus';
     create_state_index($state_name, $vsfOpStatusStates);
 
-    foreach ($temp as $index => $data) {
-        $sensor_value = $stateLookupTable[$data['arubaWiredVsfv2OperStatus']];
+    foreach ($operStatusEntries as $index => $value) {
+        $sensor_value = $stateLookupTable[$value];
 
         $descr = 'VSF Status';
         $oid = '.1.3.6.1.4.1.47196.4.1.1.3.15.1.1.1.' . $index;
@@ -103,13 +102,13 @@ if (is_array($temp)) {
     }
 }
 
-$temp = snmpwalk_cache_multi_oid($device, 'arubaWiredVsfv2MemberTable', [], 'ARUBAWIRED-VSFv2-MIB');
-if (is_array($temp)) {
+$memberEntries = SnmpQuery::enumStrings()->hideMib()->walk('ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2MemberTable')->table(1);
+if (is_array($memberEntries)) {
     echo 'ArubaOS-CX VSF Member Status: ';
     //Create State Index
     $state_name = 'arubaWiredVsfv2MemberTable';
     create_state_index($state_name, $vsfMemberTableStates);
-    foreach ($temp as $index => $data) {
+    foreach ($memberEntries as $index => $data) {
         $sensor_value = $stateLookupTable[$data['arubaWiredVsfv2MemberStatus']];
 
         $descr = 'Member ' . $data['arubaWiredVsfv2MemberSerialNum'] . ' Status';
