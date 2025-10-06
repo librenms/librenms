@@ -29,7 +29,6 @@
  *
  * @author     Marshall Holis <russiansharpshot@gmail.com>
  */
-
 $vsfOpStatusStates = [
     ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'No Split'],
     ['value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'Fragment Active'],
@@ -52,12 +51,12 @@ $vsfTopologyStates = [
 ];
 
 $stateLookupTable = [
-    // arubaWiredVsfv2OperStatus
+    //arubaWiredVsfv2OperStatus
     'no_split' => 0,
     'fragment_active' => 1,
     'fragment_inactive' => 2,
 
-    // arubaWiredVsfv2MemberTable
+    //arubaWiredVsfv2MemberTable
     'not_present' => 10,
     'booting' => 11,
     'ready' => 12,
@@ -65,7 +64,7 @@ $stateLookupTable = [
     'communication_failure' => 14,
     'in_other_fragment' => 15,
 
-    // arubaWiredVsfv2Topology
+    //arubaWiredVsfv2Topology
     'standalone' => 16,
     'chain' => 17,
     'ring' => 18,
