@@ -45,9 +45,9 @@ $vsfMemberTableStates = [
 ];
 
 $vsfTopologyStates = [
-    ['value' => 16, 'generic' => 0, 'graph' => 0, 'descr' => 'Standalone'],
-    ['value' => 17, 'generic' => 2, 'graph' => 0, 'descr' => 'Chain'],
-    ['value' => 18, 'generic' => 0, 'graph' => 0, 'descr' => 'Ring'],
+    ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'Standalone'],
+    ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Ring'],
+    ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'Chain'],
 ];
 
 $stateLookupTable = [
@@ -65,9 +65,9 @@ $stateLookupTable = [
     'in_other_fragment' => 15,
 
     //arubaWiredVsfv2Topology
-    'standalone' => 16,
-    'chain' => 17,
-    'ring' => 18,
+    'standalone' => 0,
+    'ring' => 1,
+    'chain' => 2,
 ];
 
 $topologyEntries = SnmpQuery::enumStrings()->hideMib()
