@@ -450,7 +450,7 @@ class CiHelper
 
     public function detectChangedFiles(): void
     {
-        if ($this->flags['full']) {
+        if ($this->flags['full'] || $this->flags['ci']) {
             return;
         }
         $changed_files = trim(getenv('FILES')) ?:
