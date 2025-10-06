@@ -29,6 +29,7 @@
  *
  * @author     Marshall Holis <russiansharpshot@gmail.com>
  */
+
 $vsfOpStatusStates = [
     ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'No Split'],
     ['value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'Fragment Active'],
@@ -56,7 +57,7 @@ $stateLookupTable = [
     'fragment_active' => 1,
     'fragment_inactive' => 2,
 
-    //arubaWiredVsfv2MemberTable
+    // arubaWiredVsfv2MemberTable
     'not_present' => 10,
     'booting' => 11,
     'ready' => 12,
@@ -64,51 +65,72 @@ $stateLookupTable = [
     'communication_failure' => 14,
     'in_other_fragment' => 15,
 
-    //arubaWiredVsfv2Topology
+    // arubaWiredVsfv2Topology
     'standalone' => 16,
     'chain' => 17,
     'ring' => 18,
 ];
 
-$topologyEntries = SnmpQuery::enumStrings()->hideMib()->walk('ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2Topology')->valuesByIndex();
+$topologyEntries = SnmpQuery::enumStrings()->hideMib()
+    ->walk('ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2Topology')
+    ->valuesByIndex();
+
 if (is_array($topologyEntries)) {
     echo 'ArubaOS-CX VSF Topology: ';
     $state_name = 'arubaWiredVsfv2Topology';
     create_state_index($state_name, $vsfTopologyStates);
 
     foreach ($topologyEntries as $index => $value) {
-        if (is_array($value)) { $value = reset($value); }
+        if (is_array($value)) {
+            $value = reset($value);
+        }
         $value = (string) $value;
 
-        if (!isset($stateLookupTable[$value])) { continue; }
-        $sensor_value = $stateLookupTable[$value];
+        if (! isset($stateLookupTable[$value])) {
+            continue;
+        }
 
+        $sensor_value = $stateLookupTable[$value];
         $descr = 'VSF Topology';
         $oid = '.1.3.6.1.4.1.47196.4.1.1.3.15.1.1.2.' . $index;
-        discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $sensor_value, 'snmp', null, null, null, 'VSF');
+
+        discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1,
+            null, null, null, null, $sensor_value, 'snmp', null, null, null, 'VSF');
     }
 }
 
-$operStatusEntries = SnmpQuery::enumStrings()->hideMib()->walk('ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2OperStatus')->valuesByIndex();
+$operStatusEntries = SnmpQuery::enumStrings()->hideMib()
+    ->walk('ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2OperStatus')
+    ->valuesByIndex();
+
 if (is_array($operStatusEntries)) {
     echo 'ArubaOS-CX VSF Operational Status: ';
     $state_name = 'arubaWiredVsfv2OperStatus';
     create_state_index($state_name, $vsfOpStatusStates);
 
     foreach ($operStatusEntries as $index => $value) {
-        if (is_array($value)) { $value = reset($value); }
+        if (is_array($value)) {
+            $value = reset($value);
+        }
         $value = (string) $value;
 
-        if (!isset($stateLookupTable[$value])) { continue; }
-        $sensor_value = $stateLookupTable[$value];
+        if (! isset($stateLookupTable[$value])) {
+            continue;
+        }
 
+        $sensor_value = $stateLookupTable[$value];
         $descr = 'VSF Status';
         $oid = '.1.3.6.1.4.1.47196.4.1.1.3.15.1.1.1.' . $index;
-        discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $sensor_value, 'snmp', null, null, null, 'VSF');
+
+        discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1,
+            null, null, null, null, $sensor_value, 'snmp', null, null, null, 'VSF');
     }
 }
 
-$memberEntries = SnmpQuery::enumStrings()->hideMib()->walk('ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2MemberTable')->table(1);
+$memberEntries = SnmpQuery::enumStrings()->hideMib()
+    ->walk('ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2MemberTable')
+    ->table(1);
+
 if (is_array($memberEntries)) {
     echo 'ArubaOS-CX VSF Member Status: ';
     $state_name = 'arubaWiredVsfv2MemberTable';
@@ -116,14 +138,20 @@ if (is_array($memberEntries)) {
 
     foreach ($memberEntries as $index => $data) {
         $status = $data['arubaWiredVsfv2MemberStatus'] ?? null;
-        if (is_array($status)) { $status = reset($status); }
+        if (is_array($status)) {
+            $status = reset($status);
+        }
         $status = (string) $status;
 
-        if (!isset($stateLookupTable[$status])) { continue; }
-        $sensor_value = $stateLookupTable[$status];
+        if (! isset($stateLookupTable[$status])) {
+            continue;
+        }
 
+        $sensor_value = $stateLookupTable[$status];
         $descr = 'Member ' . $data['arubaWiredVsfv2MemberSerialNum'] . ' Status';
         $oid = '.1.3.6.1.4.1.47196.4.1.1.3.15.1.2.1.3.' . $index;
-        discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $sensor_value, 'snmp', null, null, null, 'VSF');
+
+        discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1,
+            null, null, null, null, $sensor_value, 'snmp', null, null, null, 'VSF');
     }
 }
