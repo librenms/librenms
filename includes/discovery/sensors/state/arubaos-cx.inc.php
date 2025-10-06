@@ -73,11 +73,14 @@ $stateLookupTable = [
 $topologyEntries = SnmpQuery::enumStrings()->hideMib()->walk('ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2Topology')->valuesByIndex();
 if (is_array($topologyEntries)) {
     echo 'ArubaOS-CX VSF Topology: ';
-    //Create State Index
     $state_name = 'arubaWiredVsfv2Topology';
     create_state_index($state_name, $vsfTopologyStates);
 
     foreach ($topologyEntries as $index => $value) {
+        if (is_array($value)) { $value = reset($value); }
+        $value = (string) $value;
+
+        if (!isset($stateLookupTable[$value])) { continue; }
         $sensor_value = $stateLookupTable[$value];
 
         $descr = 'VSF Topology';
@@ -89,11 +92,14 @@ if (is_array($topologyEntries)) {
 $operStatusEntries = SnmpQuery::enumStrings()->hideMib()->walk('ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2OperStatus')->valuesByIndex();
 if (is_array($operStatusEntries)) {
     echo 'ArubaOS-CX VSF Operational Status: ';
-    //Create State Index
     $state_name = 'arubaWiredVsfv2OperStatus';
     create_state_index($state_name, $vsfOpStatusStates);
 
     foreach ($operStatusEntries as $index => $value) {
+        if (is_array($value)) { $value = reset($value); }
+        $value = (string) $value;
+
+        if (!isset($stateLookupTable[$value])) { continue; }
         $sensor_value = $stateLookupTable[$value];
 
         $descr = 'VSF Status';
@@ -105,11 +111,16 @@ if (is_array($operStatusEntries)) {
 $memberEntries = SnmpQuery::enumStrings()->hideMib()->walk('ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2MemberTable')->table(1);
 if (is_array($memberEntries)) {
     echo 'ArubaOS-CX VSF Member Status: ';
-    //Create State Index
     $state_name = 'arubaWiredVsfv2MemberTable';
     create_state_index($state_name, $vsfMemberTableStates);
+
     foreach ($memberEntries as $index => $data) {
-        $sensor_value = $stateLookupTable[$data['arubaWiredVsfv2MemberStatus']];
+        $status = $data['arubaWiredVsfv2MemberStatus'] ?? null;
+        if (is_array($status)) { $status = reset($status); }
+        $status = (string) $status;
+
+        if (!isset($stateLookupTable[$status])) { continue; }
+        $sensor_value = $stateLookupTable[$status];
 
         $descr = 'Member ' . $data['arubaWiredVsfv2MemberSerialNum'] . ' Status';
         $oid = '.1.3.6.1.4.1.47196.4.1.1.3.15.1.2.1.3.' . $index;
