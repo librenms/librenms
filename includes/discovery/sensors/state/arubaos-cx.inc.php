@@ -51,12 +51,12 @@ $vsfTopologyStates = [
 ];
 
 $stateLookupTable = [
-    //arubaWiredVsfv2OperStatus
+    // arubaWiredVsfv2OperStatus
     'no_split' => 0,
     'fragment_active' => 1,
     'fragment_inactive' => 2,
 
-    //arubaWiredVsfv2MemberTable
+    // arubaWiredVsfv2MemberTable
     'not_present' => 10,
     'booting' => 11,
     'ready' => 12,
@@ -64,7 +64,7 @@ $stateLookupTable = [
     'communication_failure' => 14,
     'in_other_fragment' => 15,
 
-    //arubaWiredVsfv2Topology
+    // arubaWiredVsfv2Topology
     'standalone' => 0,
     'ring' => 1,
     'chain' => 2,
@@ -136,6 +136,7 @@ if (is_array($memberEntries)) {
     create_state_index($state_name, $vsfMemberTableStates);
 
     foreach ($memberEntries as $index => $data) {
+        // Status field
         $status = $data['arubaWiredVsfv2MemberStatus'] ?? null;
         if (is_array($status)) {
             $status = reset($status);
@@ -147,7 +148,14 @@ if (is_array($memberEntries)) {
         }
 
         $sensor_value = $stateLookupTable[$status];
-        $descr = 'Member ' . $data['arubaWiredVsfv2MemberSerialNum'] . ' Status';
+
+        // Safe handling of possibly missing serial number
+        $serial = $data['arubaWiredVsfv2MemberSerialNum'] ?? null;
+        if (is_array($serial)) {
+            $serial = reset($serial);
+        }
+        $descr = 'Member ' . ($serial !== null && $serial !== '' ? $serial : 'Unknown') . ' Status';
+
         $oid = '.1.3.6.1.4.1.47196.4.1.1.3.15.1.2.1.3.' . $index;
 
         discover_sensor(null, 'state', $device, $oid, $index, $state_name, $descr, 1, 1,
