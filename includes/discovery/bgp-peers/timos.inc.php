@@ -101,5 +101,56 @@ if ($device['os'] == 'timos') {
     }
 
     unset($bgpPeers);
+
+
+    // ---- 2️⃣ cbgp (AFI/SAFI) discovery for Nokia ----
+    echo ' TIMOS cbgp discovery ';
+
+    $afi_map = [
+        1 => 'ipv4',
+        2 => 'ipv6',
+    ];
+    $safi_map = [
+        1 => 'unicast',
+        2 => 'multicast',
+        128 => 'vpn',
+    ];
+
+    // Step 1: Gather peer table (for IP lookup)
+    $peer_table = snmpwalk_cache_multi_oid($device, 'tBgpPeerNgTable', [], 'TIMETRA-BGP-MIB', 'nokia', '-OQUsb');
+    d_echo($peer_table);
+
+    // Step 2: Gather AFI/SAFI combinations
+    $afisafi_table = snmpwalk_cache_multi_oid($device, 'tBgpPeerNgAfiSafiTable', [], 'TIMETRA-BGP-MIB', 'nokia', '-OQUsb');
+    d_echo($afisafi_table);
+
+    // Step 3: Gather prefix counters (using your confirmed OIDs)
+    $prefix_recv = snmpwalk_cache_multi_oid($device, 'tBgpPeerNgOperReceivedPrefixes', [], 'TIMETRA-BGP-MIB', 'nokia', '-OQUsb');
+    $prefix_sent = snmpwalk_cache_multi_oid($device, 'tBgpPeerNgOperSentPrefixes', [], 'TIMETRA-BGP-MIB', 'nokia', '-OQUsb');
+
+    foreach ($afisafi_table as $index => $entry) {
+        $parts = explode('.', $index);
+        if (count($parts) < 3) {
+            continue;
+        }
+
+        $safi = array_pop($parts);
+        $afi = array_pop($parts);
+        $peer_index = implode('.', $parts);
+
+        $afi_name = $afi_map[$afi] ?? "afi$afi";
+        $safi_name = $safi_map[$safi] ?? "safi$safi";
+
+        if (isset($peer_table[$peer_index])) {
+            $peer = $peer_table[$peer_index];
+
+            $pfxRcv = $prefix_recv[$index]['tBgpPeerNgOperReceivedPrefixes'] ?? 0;
+            $pfxSent = $prefix_sent[$index]['tBgpPeerNgOperSentPrefixes'] ?? 0;
+
+            d_echo("Adding cbgp for $peer_index ($afi_name/$safi_name): recv=$pfxRcv sent=$pfxSent\n");
+
+            add_cbgp_peer($device, $peer, $afi_name, $safi_name, $pfxRcv, $pfxSent);
+        }
+    }
     // No return statement here, so standard BGP mib will still be polled after this file is executed.
 }
