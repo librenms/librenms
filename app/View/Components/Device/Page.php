@@ -40,11 +40,14 @@ class Page extends Component
     public ?int $parentDeviceId;
     public ?string $typeIcon = null;
     public string $typeText = '';
+    public string $pagetitle;
 
     public function __construct(
         public readonly Device $device,
         public readonly array $dropdownLinks = [],
+        public readonly string $subtitle = '',
     ) {
+        $this->pagetitle = $subtitle ? ($device->displayName() . ': ' . $subtitle) : $device->displayName();
         $this->alertClass = $device->disabled ? 'alert-info' : ($device->status ? '' : 'alert-danger');
         $this->parentDeviceId = Vminfo::guessFromDevice($device)->value('device_id');
         $this->populateTypeFields();
