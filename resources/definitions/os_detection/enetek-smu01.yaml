@@ -1,0 +1,7 @@
+os: enetek-smu01
+text: 'Enetek SMU01'
+type: power
+icon: pulse
+discovery:
+  - sysObjectID:
+      - .1.3.6.1.4.1.53318.10

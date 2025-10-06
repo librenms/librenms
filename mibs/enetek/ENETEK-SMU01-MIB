@@ -1,0 +1,6309 @@
+Enetek DEFINITIONS ::= BEGIN
+
+IMPORTS
+   enterprises, IpAddress, Gauge, TimeTicks     FROM RFC1155-SMI
+   DisplayString                                FROM RFC1213-MIB
+   OBJECT-TYPE                                  FROM RFC-1212
+   TRAP-TYPE                                    FROM RFC-1215
+   NOTIFICATION-TYPE,Integer32					FROM SNMPv2-SMI;
+
+
+enetek											OBJECT IDENTIFIER ::=  { enterprises 53318 }
+sysinfo											OBJECT IDENTIFIER ::=  { enetek 100 }
+acinfo											OBJECT IDENTIFIER ::=  { enetek 1 }
+dcinfo											OBJECT IDENTIFIER ::=  { enetek 2 }
+rectifier										OBJECT IDENTIFIER ::=  { enetek 3 }
+control											OBJECT IDENTIFIER ::=  { enetek 4 }
+extrastate										OBJECT IDENTIFIER ::=  { enetek 5 }
+dcminfo											OBJECT IDENTIFIER ::=  { enetek 6 }
+peakinfo										OBJECT IDENTIFIER ::=  { enetek 7 }
+eventinfo   									OBJECT IDENTIFIER ::=  { enetek 8 }
+snmptraps										OBJECT IDENTIFIER ::=  { enetek 0 }
+acmainsmonitor1									OBJECT IDENTIFIER ::=  { acinfo 1 }
+acmainsmonitor2									OBJECT IDENTIFIER ::=  { acinfo 2 }
+acmainsmonitor1int								OBJECT IDENTIFIER ::=  { acmainsmonitor1 1 }
+acmainsmonitor2int								OBJECT IDENTIFIER ::=  { acmainsmonitor2 1 }
+dcmonitor										OBJECT IDENTIFIER ::=  { dcinfo 1 }
+dcmonitorinfo									OBJECT IDENTIFIER ::=  { dcmonitor 1 }
+dcbranchcurrent									OBJECT IDENTIFIER ::=  { dcmonitor 2 }
+dcmonitorkwh									OBJECT IDENTIFIER ::=  { dcinfo 2 }
+dcbatterydata									OBJECT IDENTIFIER ::=  { dcinfo 3 }
+dcbatterygroup1									OBJECT IDENTIFIER ::=  { dcbatterydata 1 }
+dcbatterygroup2									OBJECT IDENTIFIER ::=  { dcbatterydata 2 }
+rectifiers										OBJECT IDENTIFIER ::=  { rectifier 1 }
+rectifiersinfo									OBJECT IDENTIFIER ::=  { rectifier 2 }
+solar									      	OBJECT IDENTIFIER ::=  { rectifier 3 }
+systemcontrol									OBJECT IDENTIFIER ::=  { control 1 }
+batterycontrol									OBJECT IDENTIFIER ::=  { control 2 }
+rectifierscontrol								OBJECT IDENTIFIER ::=  { control 3 }
+alarmthresholds									OBJECT IDENTIFIER ::=  { control 4 }
+batteryconfig								OBJECT IDENTIFIER ::=  { control 5 }
+lvdcontrol									OBJECT IDENTIFIER ::=  { control 6 }
+generatorcontrol						OBJECT IDENTIFIER ::=  { control 7 }
+fueltankconfig						  OBJECT IDENTIFIER ::=  { control 8 }
+diconfig						        OBJECT IDENTIFIER ::=  { control 9 }
+bmsinfo								      OBJECT IDENTIFIER ::=  { control 10 }
+acalarmthresholds						OBJECT IDENTIFIER ::=  { alarmthresholds 1 }
+temperaturealarmthresholds	OBJECT IDENTIFIER ::=  { alarmthresholds 2 }
+voltagealarmthresholds			OBJECT IDENTIFIER ::=  { alarmthresholds 3 }
+lvdalarmthresholds					OBJECT IDENTIFIER ::=  { alarmthresholds 4 }
+fanalarmthresholds					OBJECT IDENTIFIER ::=  { alarmthresholds 5 }
+dormancyparameter						OBJECT IDENTIFIER ::=  { alarmthresholds 6 }
+lvd1control									OBJECT IDENTIFIER ::=  { lvdcontrol 1 }
+lvd2control									OBJECT IDENTIFIER ::=  { lvdcontrol 2 }
+lvd3control									OBJECT IDENTIFIER ::=  { lvdcontrol 3 }
+lvd4control									OBJECT IDENTIFIER ::=  { lvdcontrol 4 }
+lvd5control									OBJECT IDENTIFIER ::=  { lvdcontrol 5 }
+dcdbinfo										OBJECT IDENTIFIER ::=  { dcminfo 1 }
+peakst											OBJECT IDENTIFIER ::=  { peakinfo 1 }
+peakrecord									OBJECT IDENTIFIER ::=  { peakinfo 2 }
+eventlog   								  OBJECT IDENTIFIER ::=  { eventinfo 1 }
+traps   								  OBJECT IDENTIFIER ::=  { snmptraps 0 }
+
+--	ALARMS			::=   INTEGER { idle(0), active(1) }
+
+--batteryconfig	
+batterybanks OBJECT-TYPE
+   SYNTAX INTEGER (0.. 4)
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "No. of Banks"
+   ::= { batteryconfig 1 } 
+   
+battery1capacity OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "Ah"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "capacity of battery group 1"
+   ::= { batteryconfig 2 }
+
+battery2capacity OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "Ah"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "capacity of battery group 2"
+   ::= { batteryconfig 3 }
+   
+battery3capacity OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "Ah"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "capacity of battery group 3"
+   ::= { batteryconfig 4 }
+   
+battery4capacity OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "Ah"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "capacity of battery group 4"
+   ::= { batteryconfig 5 }
+	
+totalcapacity OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "Ah"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "total capacity of battery "
+   ::= { batteryconfig 6 }
+   
+batterytype OBJECT-TYPE
+   SYNTAX INTEGER { Lead-acid(1), nada(2), leoch(3), lithium(4), ZTT(5) }
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Battery Type"
+   ::= { batteryconfig 7 }
+
+batterylimit OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Battery current limit enable"
+   ::= { batteryconfig 8 }
+	
+batterychargelimit OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "%"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Battery charge current limit percent"
+   ::= { batteryconfig 9 }
+   
+--bmsinfo	
+
+bmsinfoTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF bmsinfoEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+ DESCRIPTION
+        "bms info Table"
+    ::= { bmsinfo 1 }
+
+bmsinfoEntry OBJECT-TYPE
+    SYNTAX RectifierEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+ DESCRIPTION
+        ""
+    INDEX {bmsmodulenumber  }
+     ::= { bmsinfoTable 1 }
+
+bmsinfoEntry ::=
+    SEQUENCE {
+    bmsmodulenumber
+			INTEGER,
+	batteryvoltage
+			INTEGER,
+    batterycurrent
+        	INTEGER,
+    batteryremaining
+        	INTEGER,
+	batterytemperature
+			INTEGER,
+	ambienttemperature
+         	INTEGER,
+    batterysoh
+            INTEGER,
+    batterysoc
+            INTEGER,
+    batterymode
+            INTEGER,
+    alarmstatus
+			INTEGER,
+	alarmvalue
+			INTEGER
+	}   
+
+bmsmodulenumber OBJECT-TYPE
+    SYNTAX INTEGER (1.. 11)
+	  UNITS ""
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "bms module number"
+    ::= { bmsinfoEntry 1 }	
+
+batteryvoltage OBJECT-TYPE
+    SYNTAX INTEGER 
+	  UNITS "V"
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "battery voltage"
+    ::= { bmsinfoEntry 2 }	
+
+batterycurrent OBJECT-TYPE
+    SYNTAX INTEGER 
+	  UNITS "A"
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "battery current"
+    ::= { bmsinfoEntry 3 }	
+
+batteryremaining OBJECT-TYPE
+    SYNTAX INTEGER 
+	  UNITS "AH"
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "battery remaining"
+    ::= { bmsinfoEntry 4 }
+
+batterytemperature OBJECT-TYPE
+    SYNTAX INTEGER 
+	  UNITS "DegC"
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "battery temperature"
+    ::= { bmsinfoEntry 5 }	
+
+ambienttemperature OBJECT-TYPE
+    SYNTAX INTEGER 
+	  UNITS "DegC"
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "ambient temperature"
+    ::= { bmsinfoEntry 6 }
+
+batterysoh OBJECT-TYPE
+    SYNTAX INTEGER 
+	  UNITS "%"
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "battery soh"
+    ::= { bmsinfoEntry 7 }	
+
+batterysoc OBJECT-TYPE
+    SYNTAX INTEGER 
+	  UNITS "%"
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "battery soc"
+    ::= { bmsinfoEntry 8 }	
+
+batterymode OBJECT-TYPE
+    SYNTAX INTEGER { charging(1), discharging(2), reserved(3) }
+	  UNITS ""
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "battery mode"
+    ::= { bmsinfoEntry 9 }	
+    
+ alarmstatus OBJECT-TYPE
+    SYNTAX INTEGER { alarm(1), normal(0) }
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+     "alarm status"
+    ::= { bmsinfoEntry 10 }	
+    
+ alarmvalue OBJECT-TYPE
+    SYNTAX INTEGER 
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+     "alarm status"
+    ::= { bmsinfoEntry 11 }	
+    
+--lvdcontrol
+lvd1reconnect OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "0.1V"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 1 reconnect voltage"
+   ::= { lvd1control 1 }
+   
+lvd1disconnect OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "0.1V"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 1 disconnect voltage"
+   ::= { lvd1control 2 }
+
+lvd1aconenable OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 1 AC connect dependent"
+   ::= { lvd1control 3 }
+  
+lvd1acontime OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "minute"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 1 AC connect confirmed time"
+   ::= { lvd1control 4 }
+      
+lvd1acoffenable OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 1 AC disconnect dependent"
+   ::= { lvd1control 5 }
+  
+lvd1acofftime OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "minute"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 1 AC disconnect confirmed time"
+   ::= { lvd1control 6 }
+
+lvd1temptenable OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 1 tempterature enable"
+   ::= { lvd1control 7 }
+
+lvd2reconnect OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "0.1V"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 2 reconnect voltage"
+   ::= { lvd2control 1 }
+   
+lvd2disconnect OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "0.1V"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 2 disconnect voltage"
+   ::= { lvd2control 2 }
+
+lvd2aconenable OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 2 AC connect dependent"
+   ::= { lvd2control 3 }
+  
+lvd2acontime OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "minute"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 2 AC connect confirmed time"
+   ::= { lvd2control 4 }
+      
+lvd2acoffenable OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 2 AC disconnect dependent"
+   ::= { lvd2control 5 }
+  
+lvd2acofftime OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "minute"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 2 AC disconnect confirmed time"
+   ::= { lvd2control 6 }
+
+lvd2temptenable OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 2 tempterature enable"
+   ::= { lvd2control 7 }
+
+lvd3reconnect OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "0.1V"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 3 reconnect voltage"
+   ::= { lvd3control 1 }
+   
+lvd3disconnect OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "0.1V"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 3 disconnect voltage"
+   ::= { lvd3control 2 }
+
+lvd3aconenable OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 3 AC connect dependent"
+   ::= { lvd3control 3 }
+  
+lvd3acontime OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "minute"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 3 AC connect confirmed time"
+   ::= { lvd3control 4 }
+      
+lvd3acoffenable OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 3 AC disconnect dependent"
+   ::= { lvd3control 5 }
+  
+lvd3acofftime OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "minute"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 3 AC disconnect confirmed time"
+   ::= { lvd3control 6 }
+
+lvd3temptenable OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 3 tempterature enable"
+   ::= { lvd3control 7 }
+
+lvd4reconnect OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "0.1V"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 4 reconnect voltage"
+   ::= { lvd4control 1 }
+   
+lvd4disconnect OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "0.1V"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 4 disconnect voltage"
+   ::= { lvd4control 2 }
+
+lvd4aconenable OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 4 AC connect dependent"
+   ::= { lvd4control 3 }
+  
+lvd4acontime OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "minute"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 4 AC connect confirmed time"
+   ::= { lvd4control 4 }
+      
+lvd4acoffenable OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 4 AC disconnect dependent"
+   ::= { lvd4control 5 }
+  
+lvd4acofftime OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "minute"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 4 AC disconnect confirmed time"
+   ::= { lvd4control 6 }
+
+lvd4temptenable OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 4 tempterature enable"
+   ::= { lvd4control 7 }
+   
+lvd5reconnect OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "0.1V"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 5 reconnect voltage"
+   ::= { lvd5control 1 }
+   
+lvd5disconnect OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "0.1V"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 5 disconnect voltage"
+   ::= { lvd5control 2 }
+
+lvd5aconenable OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 5 AC connect dependent"
+   ::= { lvd5control 3 }
+  
+lvd5acontime OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "minute"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 5 AC connect confirmed time"
+   ::= { lvd5control 4 }
+      
+lvd5acoffenable OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 5 AC disconnect dependent"
+   ::= { lvd5control 5 }
+  
+lvd5acofftime OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "minute"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 5 AC disconnect confirmed time"
+   ::= { lvd5control 6 }
+
+lvd5temptenable OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 5 tempterature enable"
+   ::= { lvd5control 7 }
+      
+--generatorcontrol
+generatorselection OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Generator selection"
+   ::= { generatorcontrol 1 }
+   
+batterycurrentlimit OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "%"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Battery current limit when generator is running"
+   ::= { generatorcontrol 2 }
+   
+batterycapacityenable OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Battery capacity to start or stop generator enable"
+   ::= { generatorcontrol 3 }
+   
+startsoc OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "%"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Battery soc start generator"
+   ::= { generatorcontrol 4 }
+
+stopsoc OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "%"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Battery soc stop generator"
+   ::= { generatorcontrol 5 }
+   
+lowvoltageenable OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Low voltage to start generator enable"
+   ::= { generatorcontrol 6 }
+   
+startvoltage OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "0.01V"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "low voltage to start generator"
+   ::= { generatorcontrol 7 }
+
+chargeduration OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS "0.1hour"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "charge duration generator"
+   ::= { generatorcontrol 8 }
+   
+inputsourcesetup OBJECT-TYPE
+   SYNTAX INTEGER { Disable(0), ACandGenset(1), Genset(2) }
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "input source setup"
+   ::= { generatorcontrol 9 }
+
+runninggenst OBJECT-TYPE
+   SYNTAX INTEGER 
+   UNITS ""
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "running genst"
+   ::= { generatorcontrol 10 }
+
+activatedby OBJECT-TYPE
+   SYNTAX INTEGER {  Not-Work(0), long-charge-pre(1), long-charge(2), day-charge-pre(3), day-charge(4), volatage-charge-pre(5), volatage-charge(6), volume-charge-pre(7), volume-charge(8), month-charge-pre(9), month-charge(10), manual-charge-pre(11), manual-charge(12) }
+   UNITS ""
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "activated by"
+   ::= { generatorcontrol 11 }
+
+extendedchargetime OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS ""
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "extended charge time"
+   ::= { generatorcontrol 12 }
+
+voltagechargetime OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS ""
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "voltage  charge time"
+   ::= { generatorcontrol 13 }  
+   
+--fueltankconfig  
+
+fueltankTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF fueltankEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+ DESCRIPTION
+        "fuel tank table"
+    ::= { fueltankconfig 1 }
+
+fueltankEntry OBJECT-TYPE
+    SYNTAX fueltankEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+ DESCRIPTION
+        ""
+    INDEX { fueltankconfignumber }
+     ::= { fueltankTable 1 }
+
+fueltankEntry ::=
+    SEQUENCE {
+	  fueltankconfignumber
+		INTEGER,
+	  fuletotalcapacity
+            INTEGER,
+    fulebarrelremcapacity
+            INTEGER,
+    levelindicator
+            INTEGER,
+    fuellowalarm
+            INTEGER 
+	}
+
+fueltankconfignumber  OBJECT-TYPE
+    SYNTAX INTEGER (1.. 2)
+    MAX-ACCESS not-accessible
+    STATUS current
+ DESCRIPTION
+        "fuel tankconf ignumber"
+    ::= { fueltankEntry 1 }
+
+
+fuletotalcapacity OBJECT-TYPE
+    SYNTAX INTEGER
+	  UNITS ""
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "fule total capacity"
+    ::= { fueltankEntry 2 }
+
+fulebarrelremcapacity OBJECT-TYPE
+    SYNTAX INTEGER
+	  UNITS ""
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "fule barrel remcapacity"
+    ::= { fueltankEntry 3 }
+
+levelindicator OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS "cm"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "level indicator"
+   ::= { fueltankEntry 4 }
+
+fuellowalarm OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS "%"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "fuel low alarm"
+   ::= { fueltankEntry 5 }
+        
+--diconfig
+
+diTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF diEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+ DESCRIPTION
+        "di control table"
+    ::= { diconfig 1 }
+
+diEntry OBJECT-TYPE
+    SYNTAX diEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+ DESCRIPTION
+        ""
+    INDEX { diconfignumber }
+     ::= { diTable 1 }
+
+diEntry ::=
+    SEQUENCE {
+	  diconfignumber
+		INTEGER,
+	  dilogicaltype
+            INTEGER,
+    difunction
+            INTEGER,
+    user_defined_name
+            DisplayString  
+	}
+
+diconfignumber  OBJECT-TYPE
+    SYNTAX INTEGER (1.. 16)
+    MAX-ACCESS not-accessible
+    STATUS current
+ DESCRIPTION
+        "di config number"
+    ::= { diEntry 1 }
+
+dilogicaltype OBJECT-TYPE
+    SYNTAX INTEGER { positive(0), negative(1) }
+	  UNITS ""
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "di logical type"
+    ::= { diEntry 2 }
+
+difunction OBJECT-TYPE
+   SYNTAX INTEGER { Di-self-function(0), MOV1-fault(1),MOV2-fault(2),Battery-test(3),Boost-charge-start(4),Generator1-run(5),Generator2-run(6),AC1-relay-status(7),AC2-relay-status(8),Battery-fuse1-fault(9), Battery-fuse2-fault(10),Battery-fuse3-fault(11),Battery-fuse4-fault(12),Battery-fuse5-fault(13),Battery-fuse6-fault(14),Battery-fuse7-fault(15),Battery-fuse8-fault(16),Load-fuse-VE-fault(17),Load-fuse-VE-fault(18),ACD-fault(19),LVD1-Status(20),LVD2-Status(21),User-def-ac-fail(22)}
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "di function"
+    ::= { diEntry 3 }
+    
+userdefinedname OBJECT-TYPE
+   SYNTAX DisplayString
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "user_defined_name"
+   ::= { diEntry 4 }
+
+--SYSTEM INFORMATION
+systemsiteid OBJECT-TYPE
+   SYNTAX DisplayString
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "System Site ID"
+   ::= { sysinfo 1 }
+   
+systemsernum OBJECT-TYPE
+   SYNTAX DisplayString
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "System Serial Number"
+   ::= { sysinfo 2 }
+
+controllersn OBJECT-TYPE
+   SYNTAX DisplayString
+   UNITS ""
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "controller Serial number"
+   ::= { sysinfo 3 }
+
+systemrunstate OBJECT-TYPE
+   SYNTAX Integer32 { alarm(1), normal(0) }
+   UNITS " "
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "System run state
+      0x00:Nolmal operation of system
+      0x01:System operation failure"
+   ::= { sysinfo 5 } 
+   
+ systemgps OBJECT-TYPE
+   SYNTAX DisplayString
+   UNITS " "
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "System Gps"
+   ::= { sysinfo 6 }  
+
+systemDateTime OBJECT-TYPE 
+   SYNTAX DisplayString (SIZE(19))
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "YYYY-MM-DDThh:mm:ss"
+   ::= { sysinfo 7 }  
+      
+-- DCDB INFORMATION
+dcdbTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DcdbEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+ DESCRIPTION
+        "dcdb information table"
+    ::= { dcdbinfo 1 }
+
+dcdbEntry OBJECT-TYPE
+    SYNTAX DcdbEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+ DESCRIPTION
+        ""
+    INDEX { dcdbnumber }
+     ::= { dcdbTable 1 }
+
+DcdbEntry ::=
+    SEQUENCE {
+	dcdbnumber
+		INTEGER,
+	dcdbvoltage
+		INTEGER,
+  dcdbloadcurrent
+    INTEGER,
+  dcdbtotalcurrent
+    INTEGER
+}
+
+dcdbnumber  OBJECT-TYPE
+    SYNTAX INTEGER (0.. 255)
+    MAX-ACCESS not-accessible
+    STATUS current
+ DESCRIPTION
+        "number of dcdb"
+    ::= { dcdbEntry 1 }
+
+dcdbvoltage OBJECT-TYPE
+    SYNTAX INTEGER
+		UNITS "V"
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "dcdb bus voltage"
+    ::= { dcdbEntry 2 }
+
+dcdbloadcurrent OBJECT-TYPE
+    SYNTAX INTEGER
+    UNITS "A"
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "dcdb load current"
+    ::= { dcdbEntry 3 }
+
+dcdbtotalcurrent OBJECT-TYPE
+    SYNTAX INTEGER
+    UNITS "A"
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "dcdb total current"
+    ::= { dcdbEntry 4 }
+   
+-- PEAK INFORMATION
+peakstatus OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS ""
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "Peak Status"
+   ::= { peakst 1 }
+
+peakmoney OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS ""
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "Peak Total Money"
+   ::= { peakst 2 }
+   
+peakrecordTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PeakrecordEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+ DESCRIPTION
+        "peak load records table"
+    ::= { peakrecord 1 }
+
+peakrecordEntry OBJECT-TYPE
+    SYNTAX PeakrecordEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+ DESCRIPTION
+        ""
+    INDEX { peakrecordnumber }
+     ::= { peakrecordTable 1 }
+
+PeakrecordEntry ::=
+    SEQUENCE {
+	peakrecordnumber
+		INTEGER,
+	peakloadtotalenergy
+		INTEGER,
+  peaksavebill
+    INTEGER
+	}
+
+peakrecordnumber  OBJECT-TYPE
+    SYNTAX INTEGER (0.. 255)
+    MAX-ACCESS not-accessible
+    STATUS current
+ DESCRIPTION
+        "number of peak load record"
+    ::= { peakrecordEntry 1 }
+
+peakloadtotalenergy OBJECT-TYPE
+    SYNTAX INTEGER
+		UNITS "Wh"
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "Peak Load Total Energy"
+    ::= { peakrecordEntry 2 }
+
+peaksavebill OBJECT-TYPE
+    SYNTAX INTEGER
+    UNITS ""
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "Peak Saved Bill"
+    ::= { peakrecordEntry 3 }
+   
+-- AC MONITORING
+ac1voltagephaseaint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Volts"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 1 Way A Phase Voltage (UNITS 0.1Volts)"
+   ::= { acmainsmonitor1int 1 }
+
+ac1voltagephasebint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Volts"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 1 Way B Phase Voltage (UNITS 0.1Volts)"
+   ::= { acmainsmonitor1int 2 }
+
+ac1voltagephasecint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Volts"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 1 Way C Phase Voltage (UNITS 0.1Volts)"
+   ::= { acmainsmonitor1int 3 }
+
+ac1currentphaseaint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 1 Way A Phase Current (UNITS 0.1Amps)"
+   ::= { acmainsmonitor1int 4 }
+
+ac1currentphasebint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 1 Way B Phase Current (UNITS 0.1Amps)"
+   ::= { acmainsmonitor1int 5 }
+
+ac1currentphasecint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 1 Way C Phase Current (UNITS 0.1Amps)"
+   ::= { acmainsmonitor1int 6 }
+
+ac1frequencyint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Hz"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 1 Way Frequency (UNITS 0.1Hz)"
+   ::= { acmainsmonitor1int 7 }
+
+ac1pfcphaseaint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS ""
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 1 Way A Phase power factor "
+   ::= { acmainsmonitor1int 8 }
+
+ac1pfcphasebint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS ""
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 1 Way B Phase power factor "
+   ::= { acmainsmonitor1int 9 }
+   
+ac1pfcphasecint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS ""
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 1 Way C Phase power factor "
+   ::= { acmainsmonitor1int 10 }
+   
+ac1pfcTotalint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS ""
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 1 Way total power factor "
+   ::= { acmainsmonitor1int 11 }
+
+ac1powerphaseaint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1W"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 1 Way A Phase power (UNITS 0.1W)"
+   ::= { acmainsmonitor1int 12 }
+   
+ac1powerphasebint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1W"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 1 Way B Phase power (UNITS 0.1W)"
+   ::= { acmainsmonitor1int 13 }
+   
+ac1powerphasecint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1W"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 1 Way C Phase power (UNITS 0.1W)"
+   ::= { acmainsmonitor1int 14 }
+   
+ac1powertotalint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1W"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 1 Way Total power (UNITS 0.1W)"
+   ::= { acmainsmonitor1int 15 }
+   
+ac1energyphaseaint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1kWh"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 1 Way A Phase energy (UNITS 0.1kWh)"
+   ::= { acmainsmonitor1int 16 }
+   
+ac1energyphasebint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1kWh"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 1 Way B Phase energy (UNITS 0.1kWh)"
+   ::= { acmainsmonitor1int 17 }
+   
+ac1energyphasecint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1kWh"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 1 Way C Phase energy (UNITS 0.1kWh)"
+   ::= { acmainsmonitor1int 18 }
+   
+ac1energytotalint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1kWh"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 1 Way Total energy (UNITS 0.1kWh)"
+   ::= { acmainsmonitor1int 19 }
+
+ac2voltagephaseaint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Volts"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 2 Way A Phase Voltage (UNITS 0.1Volts)"
+   ::= { acmainsmonitor2int 1 }
+
+ac2voltagephasebint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Volts"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 2 Way B Phase Voltage (UNITS 0.1Volts)"
+   ::= { acmainsmonitor2int 2 }
+
+ac2voltagephasecint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Volts"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 2 Way C Phase Voltage (UNITS 0.1Volts)"
+   ::= { acmainsmonitor2int 3 }
+
+ac2currentphaseaint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 2 Way A Phase Current (UNITS 0.1Amps)"
+   ::= { acmainsmonitor2int 4 }
+
+ac2currentphasebint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 2 Way B Phase Current (UNITS 0.1Amps)"
+   ::= { acmainsmonitor2int 5 }
+
+ac2currentphasecint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 2 Way C Phase Current (UNITS 0.1Amps)"
+   ::= { acmainsmonitor2int 6 }
+
+ac2frequencyint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Hz"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 2 Way Frequency (UNITS 0.1Hz)"
+   ::= { acmainsmonitor2int 7 }
+
+ac2pfcphaseaint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS ""
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 2 Way A Phase power factor "
+   ::= { acmainsmonitor2int 8 }
+
+ac2pfcphasebint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS ""
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 2 Way B Phase power factor "
+   ::= { acmainsmonitor2int 9 }
+   
+ac2pfcphasecint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS ""
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 2 Way C Phase power factor "
+   ::= { acmainsmonitor2int 10 }
+   
+ac2pfcTotalint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS ""
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 2 Way total power factor "
+   ::= { acmainsmonitor2int 11 }
+
+ac2powerphaseaint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1W"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 2 Way A Phase power (UNITS 0.1W)"
+   ::= { acmainsmonitor2int 12 }
+   
+ac2powerphasebint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1W"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 2 Way B Phase power (UNITS 0.1W)"
+   ::= { acmainsmonitor2int 13 }
+   
+ac2powerphasecint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1W"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 2 Way C Phase power (UNITS 0.1W)"
+   ::= { acmainsmonitor2int 14 }
+   
+ac2powertotalint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1W"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 2 Way Total power (UNITS 0.1W)"
+   ::= { acmainsmonitor2int 15 }
+   
+ac2energyphaseaint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1kWh"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 2 Way A Phase energy (UNITS 0.1kWh)"
+   ::= { acmainsmonitor2int 16 }
+   
+ac2energyphasebint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1kWh"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 2 Way B Phase energy (UNITS 0.1kWh)"
+   ::= { acmainsmonitor2int 17 }
+   
+ac2energyphasecint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1kWh"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 2 Way C Phase energy (UNITS 0.1kWh)"
+   ::= { acmainsmonitor2int 18 }
+   
+ac2energytotalint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1kWh"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "AC 2 Way Total energy (UNITS 0.1kWh)"
+   ::= { acmainsmonitor2int 19 }
+
+-- DC MONITORING
+systembusvoltageint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Volts"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "System Bus Voltage (UNITS 0.1Volts)"
+   ::= { dcmonitorinfo 1 }
+
+rectifiervoltageint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Volts"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "Rectifier Voltage (UNITS 0.1Volts)"
+   ::= { dcmonitorinfo 2 }
+
+rectifiercurrentint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "Rectifier Current (UNITS 0.1Amps)"
+   ::= { dcmonitorinfo 3 }
+
+loadcurrentint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "Load Total Current (UNITS 0.1Amps)"
+   ::= { dcmonitorinfo 4 }
+
+systempowerint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.01KW"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "System Total Power (UNITS 0.01KW)"
+   ::= { dcmonitorinfo 5 }
+
+batterycurrentint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "Battery Current (UNITS 0.1Amps)"
+   ::= { dcmonitorinfo 6 }
+
+batteryworkstate OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS ""
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "Battery Work State
+      0x00:floating charge
+      0x01:equalizing charge
+      0x02:test
+      0x03:discharge"
+   ::= { dcmonitorinfo 7 }
+   
+batterytemperatureint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1 DegC"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "Battery Temperature (UNITS 0.1 DegC)"
+   ::= { dcmonitorinfo 8 }
+
+ambienttemperatureint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1 DegC"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "Ambient Temperature (UNITS 0.1 DegC)"
+   ::= { dcmonitorinfo 9 }
+
+batterysurpluscapacityint OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "AH"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "Battery Surplus Capacity (UNITS AH)"
+   ::= { dcmonitorinfo 10 }
+
+batterygroup1current OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "Battery Group 1 Current (UNITS 0.1Amps)"
+   ::= { dcmonitorinfo 11 }
+
+batterygroup2current OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "Battery Group 2 Current (UNITS 0.1Amps)"
+   ::= { dcmonitorinfo 12 }
+
+batterygroup3current OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "Battery Group 1 Current (UNITS 0.1Amps)"
+   ::= { dcmonitorinfo 13 }
+
+batterygroup4current OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "Battery Group 1 Current (UNITS 0.1Amps)"
+   ::= { dcmonitorinfo 14 }
+
+battery1halfvoltage OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Volt"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "Battery Group 1 Half Point Voltage (UNITS 0.1Volts)"
+   ::= { dcmonitorinfo 15 }
+
+battery2halfvoltage OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Volt"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "Battery Group 2 Half Point Voltage (UNITS 0.1Volts)"
+   ::= { dcmonitorinfo 16 }
+
+battery3halfvoltage OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Volt"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "Battery Group 1 Half Point Voltage (UNITS 0.1Volts)"
+   ::= { dcmonitorinfo 17 }
+
+battery4halfvoltage OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Volt"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "Battery Group 1 Half Point Voltage (UNITS 0.1Volts)"
+   ::= { dcmonitorinfo 18 }
+
+loadcurrent1 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load Current 1 (UNITS 0.1Amps)"
+   ::= { dcbranchcurrent 1 }
+   
+loadcurrent2 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load Current 2 (UNITS 0.1Amps)"
+   ::= { dcbranchcurrent 2 }
+   
+loadcurrent3 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load Current 3 (UNITS 0.1Amps)"
+   ::= { dcbranchcurrent 3 }
+   
+loadcurrent4 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load Current 4 (UNITS 0.1Amps)"
+   ::= { dcbranchcurrent 4 }
+   
+loadcurrent5 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load Current 5 (UNITS 0.1Amps)"
+   ::= { dcbranchcurrent 5 }
+   
+loadcurrent6 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load Current 6 (UNITS 0.1Amps)"
+   ::= { dcbranchcurrent 6 }
+   
+loadcurrent7 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load Current 7 (UNITS 0.1Amps)"
+   ::= { dcbranchcurrent 7 }
+   
+loadcurrent8 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load Current 8 (UNITS 0.1Amps)"
+   ::= { dcbranchcurrent 8 }
+   
+loadcurrent9 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load Current 9 (UNITS 0.1Amps)"
+   ::= { dcbranchcurrent 9 }
+   
+loadcurrent10 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load Current 10 (UNITS 0.1Amps)"
+   ::= { dcbranchcurrent 10 }
+   
+loadcurrent11 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load Current 11 (UNITS 0.1Amps)"
+   ::= { dcbranchcurrent 11 }
+   
+loadcurrent12 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load Current 12 (UNITS 0.1Amps)"
+   ::= { dcbranchcurrent 12 }
+   
+loadcurrent13 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load Current 13 (UNITS 0.1Amps)"
+   ::= { dcbranchcurrent 13 }
+   
+loadcurrent14 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load Current 14 (UNITS 0.1Amps)"
+   ::= { dcbranchcurrent 14 }
+   
+loadcurrent15 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load Current 15 (UNITS 0.1Amps)"
+   ::= { dcbranchcurrent 15 }
+   
+loadcurrent16 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load Current 16 (UNITS 0.1Amps)"
+   ::= { dcbranchcurrent 16 }
+
+loadtotalkwh OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.01kwh"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load Total POWER (UNITS 0.01kwh)"
+   ::= { dcmonitorkwh 1 }
+   
+loadkwh1 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.01kwh"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load POWER 1 (UNITS 0.01kwh)"
+   ::= { dcmonitorkwh 2 }
+
+loadkwh2 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.01kwh"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load POWER 2 (UNITS 0.01kwh)"
+   ::= { dcmonitorkwh 3 }
+   
+loadkwh3 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.01kwh"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load POWER 3 (UNITS 0.01kwh)"
+   ::= { dcmonitorkwh 4 }
+   
+loadkwh4 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.01kwh"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load POWER 4 (UNITS 0.01kwh)"
+   ::= { dcmonitorkwh 5 }
+   
+loadkwh5 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.01kwh"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load POWER 5 (UNITS 0.01kwh)"
+   ::= { dcmonitorkwh 6 }
+   
+loadkwh6 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.01kwh"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load POWER 6 (UNITS 0.01kwh)"
+   ::= { dcmonitorkwh 7 }
+   
+loadkwh7 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.01kwh"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load POWER 7 (UNITS 0.01kwh)"
+   ::= { dcmonitorkwh 8 }
+   
+loadkwh8 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.01kwh"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load POWER 8 (UNITS 0.01kwh)"
+   ::= { dcmonitorkwh 9 }
+   
+loadkwh9 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.01kwh"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load POWER 9 (UNITS 0.01kwh)"
+   ::= { dcmonitorkwh 10 }
+   
+loadkwh10 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.01kwh"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load POWER 10 (UNITS 0.01kwh)"
+   ::= { dcmonitorkwh 11 }
+   
+loadkwh11 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.01kwh"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load POWER 11 (UNITS 0.01kwh)"
+   ::= { dcmonitorkwh 12 }
+   
+loadkwh12 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.01kwh"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load POWER 12 (UNITS 0.01kwh)"
+   ::= { dcmonitorkwh 13 }
+   
+loadkwh13 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.01kwh"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load POWER 13 (UNITS 0.01kwh)"
+   ::= { dcmonitorkwh 14 }
+   
+loadkwh14 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.01kwh"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load POWER 14 (UNITS 0.01kwh)"
+   ::= { dcmonitorkwh 15 }
+   
+loadkwh15 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.01kwh"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load POWER 15 (UNITS 0.01kwh)"
+   ::= { dcmonitorkwh 16 }
+   
+loadkwh16 OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.01kwh"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Load POWER 16 (UNITS 0.01kwh)"
+   ::= { dcmonitorkwh 17 }
+   
+   
+--batterygroup
+
+batt1amps OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 1 Current (UNITS 0.1Amps)"
+   ::= { dcbatterygroup1 1 }
+   
+batt1temp OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1 DegC"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String Temperature (UNITS 0.1 DegC)"
+   ::= { dcbatterygroup1 2 }
+      
+batt1bloc1v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+			"Battery String 1 Bloc 1 Voltage (UNITS mV)"
+   ::= { dcbatterygroup1 3 }
+      
+batt1bloc2v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 1 Bloc 2 Voltage (UNITS mV)"
+   ::= { dcbatterygroup1 4 }
+         
+batt1bloc3v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 1 Bloc 3 Voltage (UNITS mV)"
+   ::= { dcbatterygroup1 5 }
+      
+batt1bloc4v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 1 Bloc 4 Voltage (UNITS mV)"
+   ::= { dcbatterygroup1 6 }
+        
+batt1bloc5v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 1 Bloc 5 Voltage (UNITS mV)"
+   ::= { dcbatterygroup1 7 }
+      
+batt1bloc6v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 1 Bloc 6 Voltage (UNITS mV)"
+   ::= { dcbatterygroup1 8 }
+        
+batt1bloc7v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 1 Bloc 7 Voltage (UNITS mV)"
+   ::= { dcbatterygroup1 9 }
+      
+batt1bloc8v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 1 Bloc 8 Voltage (UNITS mV)"
+   ::= { dcbatterygroup1 10 }
+        
+batt1bloc9v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 1 Bloc 9 Voltage (UNITS mV)"
+   ::= { dcbatterygroup1 11 }
+      
+batt1bloc10v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 1 Bloc 10 Voltage (UNITS mV)"
+   ::= { dcbatterygroup1 12 }
+        
+batt1bloc11v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 1 Bloc 11 Voltage (UNITS mV)"
+   ::= { dcbatterygroup1 13 }
+      
+batt1bloc12v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 1 Bloc 12 Voltage (UNITS mV)"
+   ::= { dcbatterygroup1 14 }
+        
+batt1bloc13v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 1 Bloc 13 Voltage (UNITS mV)"
+   ::= { dcbatterygroup1 15 }
+      
+batt1bloc14v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 1 Bloc 14 Voltage (UNITS mV)"
+   ::= { dcbatterygroup1 16 }
+        
+batt1bloc15v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 1 Bloc 15 Voltage (UNITS mV)"
+   ::= { dcbatterygroup1 17 }
+      
+batt1bloc16v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 1 Bloc 16 Voltage (UNITS mV)"
+   ::= { dcbatterygroup1 18 }
+        
+batt1bloc17v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 1 Bloc 17 Voltage (UNITS mV)"
+   ::= { dcbatterygroup1 19 }
+      
+batt1bloc18v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 1 Bloc 18 Voltage (UNITS mV)"
+   ::= { dcbatterygroup1 20 }
+        
+batt1bloc19v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 1 Bloc 19 Voltage (UNITS mV)"
+   ::= { dcbatterygroup1 21 }
+      
+batt1bloc20v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 1 Bloc 20 Voltage (UNITS mV)"
+   ::= { dcbatterygroup1 22 }
+        
+batt1bloc21v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 1 Bloc 21 Voltage (UNITS mV)"
+   ::= { dcbatterygroup1 23 }
+      
+batt1bloc22v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 1 Bloc 22 Voltage (UNITS mV)"
+   ::= { dcbatterygroup1 24 }
+        
+batt1bloc23v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 1 Bloc 23 Voltage (UNITS mV)"
+   ::= { dcbatterygroup1 25 }
+      
+batt1bloc24v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 1 Bloc 24 Voltage (UNITS mV)"
+   ::= { dcbatterygroup1 26 }
+        
+        
+batt2amps OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Amps"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+     "Battery String 2 Current (UNITS 0.1Amps)"
+   ::= { dcbatterygroup2 1 }
+   
+batt2temp OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1 DegC"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+       "Battery String Temperature (UNITS 0.1 DegC)"
+   ::= { dcbatterygroup2 2 }
+      
+batt2bloc1v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 2 Bloc 1 Voltage (UNITS mV)"
+   ::= { dcbatterygroup2 3 }
+      
+batt2bloc2v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 2 Bloc 2 Voltage (UNITS mV)"
+   ::= { dcbatterygroup2 4 }
+         
+batt2bloc3v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 2 Bloc 3 Voltage (UNITS mV)"
+   ::= { dcbatterygroup2 5 }
+      
+batt2bloc4v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 2 Bloc 4 Voltage (UNITS mV)"
+   ::= { dcbatterygroup2 6 }
+        
+batt2bloc5v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 2 Bloc 5 Voltage (UNITS mV)"
+   ::= { dcbatterygroup2 7 }
+      
+batt2bloc6v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 2 Bloc 6 Voltage (UNITS mV)"
+   ::= { dcbatterygroup2 8 }
+        
+batt2bloc7v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 2 Bloc 7 Voltage (UNITS mV)"
+   ::= { dcbatterygroup2 9 }
+      
+batt2bloc8v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 2 Bloc 8 Voltage (UNITS mV)"
+   ::= { dcbatterygroup2 10 }
+        
+batt2bloc9v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 2 Bloc 9 Voltage (UNITS mV)"
+   ::= { dcbatterygroup2 11 }
+      
+batt2bloc10v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 2 Bloc 10 Voltage (UNITS mV)"
+   ::= { dcbatterygroup2 12 }
+        
+batt2bloc11v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 2 Bloc 11 Voltage (UNITS mV)"
+   ::= { dcbatterygroup2 13 }
+      
+batt2bloc12v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 2 Bloc 12 Voltage (UNITS mV)"
+   ::= { dcbatterygroup2 14 }
+        
+batt2bloc13v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 2 Bloc 13 Voltage (UNITS mV)"
+   ::= { dcbatterygroup2 15 }
+      
+batt2bloc14v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 2 Bloc 14 Voltage (UNITS mV)"
+   ::= { dcbatterygroup2 16 }
+        
+batt2bloc15v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 2 Bloc 15 Voltage (UNITS mV)"
+   ::= { dcbatterygroup2 17 }
+      
+batt2bloc16v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 2 Bloc 16 Voltage (UNITS mV)"
+   ::= { dcbatterygroup2 18 }
+        
+batt2bloc17v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 2 Bloc 17 Voltage (UNITS mV)"
+   ::= { dcbatterygroup2 19 }
+      
+batt2bloc18v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 2 Bloc 18 Voltage (UNITS mV)"
+   ::= { dcbatterygroup2 20 }
+        
+batt2bloc19v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 2 Bloc 19 Voltage (UNITS mV)"
+   ::= { dcbatterygroup2 21 }
+      
+batt2bloc20v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 2 Bloc 20 Voltage (UNITS mV)"
+   ::= { dcbatterygroup2 22 }
+        
+batt2bloc21v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 2 Bloc 21 Voltage (UNITS mV)"
+   ::= { dcbatterygroup2 23 }
+      
+batt2bloc22v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 2 Bloc 22 Voltage (UNITS mV)"
+   ::= { dcbatterygroup2 24 }
+        
+batt2bloc23v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 2 Bloc 23 Voltage (UNITS mV)"
+   ::= { dcbatterygroup2 25 }
+      
+batt2bloc24v OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Battery String 2 Bloc 24 Voltage (UNITS mV)"
+   ::= { dcbatterygroup2 26 }
+
+   
+rectifierTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RectifierEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+ DESCRIPTION
+        "power modules table"
+    ::= { rectifiers 1 }
+
+rectifierEntry OBJECT-TYPE
+    SYNTAX RectifierEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+ DESCRIPTION
+        ""
+    INDEX { rectifiernumber }
+     ::= { rectifierTable 1 }
+
+RectifierEntry ::=
+    SEQUENCE {
+	rectifiernumber
+		INTEGER,
+	rectifierid
+		DisplayString,
+    rectifiershutdown
+            INTEGER,
+    rectifieroutputvoltage
+            INTEGER,
+	  rectifieroutputcurrent
+						INTEGER,
+	  rectifieroutputpower
+            INTEGER,
+    rectifiertemperature
+            INTEGER,
+    rectifieralarmstatus
+            INTEGER
+    moduletype
+            INTEGER
+	}
+
+rectifiernumber  OBJECT-TYPE
+    SYNTAX INTEGER (0.. 255)
+    MAX-ACCESS not-accessible
+    STATUS current
+ DESCRIPTION
+        "Address of power module"
+    ::= { rectifierEntry 1 }
+
+rectifierid OBJECT-TYPE
+    SYNTAX DisplayString
+	UNITS ""
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "Power Module ID"
+    ::= { rectifierEntry 2 }
+
+rectifiershutdown OBJECT-TYPE
+    SYNTAX INTEGER { yes(1), no(0) }
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "Power Module Shutdown Command"
+    ::= { rectifierEntry 3 }
+
+rectifieroutputvoltage OBJECT-TYPE
+    SYNTAX INTEGER
+		UNITS "Volt"
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "Power Module Output Voltage"
+    ::= { rectifierEntry 4 }
+
+rectifieroutputcurrent OBJECT-TYPE
+    SYNTAX INTEGER
+	  UNITS "A"
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "Power Module Output Current"
+    ::= { rectifierEntry 5 }
+
+rectifieroutputpower OBJECT-TYPE
+    SYNTAX INTEGER
+	  UNITS "W"
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "Power Module Output Power"
+    ::= { rectifierEntry 6 }
+
+rectifiertemperature OBJECT-TYPE
+    SYNTAX INTEGER
+	  UNITS "DegC"
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "Power Module Temperature Measurment"
+    ::= { rectifierEntry 7 }
+
+rectifieralarmstatus OBJECT-TYPE
+    SYNTAX INTEGER
+	  UNITS ""
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "Power Module Alarm status word"
+    ::= { rectifierEntry 8 }
+    
+moduletype OBJECT-TYPE
+    SYNTAX INTEGER { solarmodule(1), acmodule(0) }
+	  UNITS ""
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "module type"
+    ::= { rectifierEntry 9 }
+    
+sprenwvbias OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Renewables Voltage Setpoint Bias"
+   ::= { rectifiersinfo 1 }	
+     
+solaroffset OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.01"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Solar Conv.Offset Voltage"
+   ::= { solar 1 }
+   
+solartotalcurrent OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS "A"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "Solar Total Current"
+   ::= { solar 2 }
+ 
+solartotalenergy OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS "KWH"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "Solar Total Energy"
+   ::= { solar 3 }
+   
+solartotalpower OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS "W"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "Solar Total Power"
+   ::= { solar 4 }
+
+solaraverageratio OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS "%"
+   MAX-ACCESS read-only
+   STATUS current
+DESCRIPTION
+      "Solar Average Ratio"
+   ::= { solar 5 }
+   	
+-- control
+
+systemlanguage OBJECT-TYPE
+   SYNTAX Integer32
+   
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "System Language
+      0x00:Simplified Chinese
+      0x01:English
+      0x02:Traditional Chinese"
+   ::= { systemcontrol 1 }
+
+systembuzzer OBJECT-TYPE
+   SYNTAX INTEGER { yes(1), no(0) }
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "System Buzzer"
+   ::= { systemcontrol 2 }
+
+systemaddress OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "System Address"
+   ::= { systemcontrol 3 }
+
+screendirection OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "System Screen Direction
+      0x00:level
+      0x01:vertical"
+   ::= { systemcontrol 4 }
+
+backlighttimer OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "minutes"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "System Back Light Timer (UNITS minutes)"
+   ::= { systemcontrol 5 }
+   
+systemreboottrigger OBJECT-TYPE
+   SYNTAX INTEGER { trigger(1), none(0) }
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "System Reboot Trigger
+      0x00:no trigger
+      0x01:trigger"
+   ::= { systemcontrol 6 }
+
+toboostvoltage  OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Volts"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "ToBoost Start Threshold Voltage (UNITS 0.1Volts)"
+   ::= { batterycontrol 1 }
+
+toboostcurlmtenable OBJECT-TYPE
+    SYNTAX INTEGER { yes(1), no(0) }
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "Floating charge to turn average charge flow enable"
+    ::= { batterycontrol 2 }
+
+toboostcurrat  OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "%"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Floating charge to turn average charge flow (UNITS %)"
+   ::= { batterycontrol 3 }
+
+regularchargingenable OBJECT-TYPE
+    SYNTAX INTEGER { yes(1), no(0) }
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "Regular Equalizing charging time enable"
+    ::= { batterycontrol 4 }
+
+regularchargingtimer OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "Hour"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Regular Equalizing charging time (UNITS Hour)"
+   ::= { batterycontrol 5 }
+
+floatvoltage OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Volts"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Floating charge voltage (UNITS 0.1Volts)"
+   ::= { batterycontrol 6 }
+
+floatcurrentlimitrat OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "%"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Floating charge current limiting percentage (UNITS %)"
+   ::= { batterycontrol 7 }
+   
+boostenable OBJECT-TYPE
+    SYNTAX INTEGER { yes(1), no(0) }
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "Boost charge enable"
+    ::= { batterycontrol 8 }
+
+boostduration OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "Minutes"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Time limit of boost process (UNITS Minutes)"
+   ::= { batterycontrol 9 }
+
+boosttofloatcurrentrat OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "%"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Boost to turn floating charge flow (UNITS %)"
+   ::= { batterycontrol 10 }
+
+boostdelaytimer OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "Minutes"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Boost delay timer (UNITS Minutes)"
+   ::= { batterycontrol 11 }
+
+boostvoltage OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1 Volts"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Boost voltage (UNITS 0.1Volts)"
+   ::= { batterycontrol 12 }
+
+boostcurlimitrat OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "%"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Boost current limiting percentage (UNITS %)"
+   ::= { batterycontrol 13 }
+
+boostlocktimer OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "Minutes"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Boost lock out timer (UNITS Minutes)"
+   ::= { batterycontrol 14 }
+
+batterytestenable OBJECT-TYPE
+    SYNTAX INTEGER { yes(1), no(0) }
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "Initiate/start a battery test procedure"
+    ::= { batterycontrol 15 }
+
+batterytestprocesstimer OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "Minutes"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Battery test process deal timer (UNITS Minutes)"
+   ::= { batterycontrol 16 }
+
+batterytestlocktimer OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "Minutes"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Battery test process locking timer (UNITS Minutes)"
+   ::= { batterycontrol 17 }
+
+batterytestcycleenable OBJECT-TYPE
+   SYNTAX INTEGER { yes(1), no(0) }
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Battery test discharge cycle enable"
+   ::= { batterycontrol 18 }
+ 
+batterytestcycletimer OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "Days"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Battery test discharge cycle timer (UNITS Days)"
+   ::= { batterycontrol 19 }   
+   
+batterytestvoltage OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1 Volts"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Battery test discharge voltage (UNITS 0.1Volts)"
+   ::= { batterycontrol 20 }     
+   
+batterytestlimitrat OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "%"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Battery test limiting percentage rat (UNITS %)"
+   ::= { batterycontrol 21 }
+
+batterycurrentlimitenable OBJECT-TYPE
+    SYNTAX INTEGER { yes(1), no(0) }
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "Initiate/start a battery current limit procedure"
+    ::= { batterycontrol 22 }
+
+batterymendingenergyenable OBJECT-TYPE
+    SYNTAX INTEGER { yes(1), no(0) }
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "Battery mending energy enable"
+    ::= { batterycontrol 23 }
+
+batterymendingenergytemperature OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1 DegC"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Battery mending energy temperature (UNITS 0.1DegC)"
+   ::= { batterycontrol 24 } 
+  
+batterymendingenergyrate OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "mV/DegC"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Battery mending energy rate (UNITS mV/DegC)"
+   ::= { batterycontrol 25 } 
+      
+systemavcenable OBJECT-TYPE
+    SYNTAX INTEGER { yes(1), no(0) }
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "System avc enable"
+    ::= { batterycontrol 26 }
+    
+boosttrigger OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS " "
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Boost charge trigger
+      0x01:trap
+      0x02:stop"
+   ::= { batterycontrol 27 }
+   
+batterytesttriger OBJECT-TYPE
+   SYNTAX INTEGER { yes(1), no(0) }
+   UNITS " "
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Battery Test Triger"
+   ::= { batterycontrol 28 }
+
+batterytestcapacityenable OBJECT-TYPE
+   SYNTAX INTEGER { yes(1), no(0) }
+   UNITS " "
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Battery Test capacity enable"
+   ::= { batterycontrol 29 }
+
+batterytestcapacity OBJECT-TYPE
+   SYNTAX INTEGER (1.. 100)
+   UNITS "%"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Battery Test capacity "
+   ::= { batterycontrol 30 }
+   
+batterytesttotalcapacityenable OBJECT-TYPE
+   SYNTAX INTEGER { yes(1), no(0) }
+   UNITS " "
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Battery Test total capacity enable"
+   ::= { batterycontrol 31 }
+
+batterytesttotalcapacity OBJECT-TYPE
+   SYNTAX INTEGER (1.. 100)
+   UNITS "%"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Battery Test total capacity "
+   ::= { batterycontrol 32 }
+   
+batterytestfailflag OBJECT-TYPE
+   SYNTAX INTEGER { yes(1), no(0) }
+   UNITS " "
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Battery Test fail flag "
+   ::= { batterycontrol 33 }
+    
+rectifierfloatvoltagesetpoint OBJECT-TYPE
+    SYNTAX INTEGER
+	  UNITS "0.1 Volts"
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "rectifier float voltage set point (UNITS 0.1Volts)"
+    ::= { rectifierscontrol 1 }
+
+rectifiercurrentlimitsetpoint OBJECT-TYPE
+    SYNTAX INTEGER
+	  UNITS "0.1 Amps"
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "rectifier limit current set point (UNITS 0.1Amps)"
+    ::= { rectifierscontrol 2 }
+    
+rectifieraccurrentlimitsetpoint OBJECT-TYPE
+    SYNTAX INTEGER
+	  UNITS "0.1 Amps"
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "rectifier limit AC current set point (UNITS 0.1Amps)"
+    ::= { rectifierscontrol 3 }
+    
+rectifiercount OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS ""
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "Count of rectifiers"
+   ::= { rectifierscontrol 4 }
+
+batterytemperaturelowalarmsetpoint OBJECT-TYPE
+   SYNTAX INTEGER
+	 UNITS "DegC"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+       "Battery Temperature Low Alarm Setpoint (UNITS 0.01DegC)"
+   ::= { temperaturealarmthresholds 1 }
+
+batterytemperaturehighalarmsetpoint OBJECT-TYPE
+   SYNTAX INTEGER
+	 UNITS "DegC"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+       "Battery Temperature High Alarm Setpoint (UNITS 0.01DegC)"
+   ::= { temperaturealarmthresholds 2 }
+
+ambienttemperaturelowalarmsetpoint OBJECT-TYPE
+   SYNTAX INTEGER
+	 UNITS "DegC"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+       "Ambient Temperature Low Alarm Setpoint (UNITS 0.01DegC)"
+   ::= { temperaturealarmthresholds 3 }
+
+ambienttemperaturehighalarmsetpoint OBJECT-TYPE
+   SYNTAX INTEGER
+	 UNITS "DegC"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+       "Ambient Temperature High Alarm Setpoint (UNITS 0.01DegC)"
+   ::= { temperaturealarmthresholds 4 }
+
+acvoltagehighalarmsetpoint OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS "V"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "AC Voltage High Alarm Setpoint (UNITS V)"
+   ::= { acalarmthresholds 1 }
+
+acvoltagelowalarmsetpoint OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS "mV"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "AC Voltage Low Alarm Setpoint (UNITS V)"
+   ::= { acalarmthresholds 2 }
+
+accurrenthighalarmsetpoint OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS "A"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "AC Current High Alarm Setpoint (UNITS A)"
+   ::= { acalarmthresholds 3 }
+
+acfrequencyhighalarmsetpoint OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS "Hz"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "AC Frequency High Alarm Setpoint (UNITS Hz)"
+   ::= { acalarmthresholds 4 }
+
+acfrequencylowalarmsetpoint OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS "Hz"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "AC Frequency Low Alarm Setpoint (UNITS Hz)"
+   ::= { acalarmthresholds 5 }
+
+systemmaxvoltage OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Volts"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "System Max Voltage (UNITS 0.1Volts)"
+   ::= { voltagealarmthresholds 1 }
+
+systemminvoltage OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Volts"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "System Min Voltage (UNITS 0.1Volts)"
+   ::= { voltagealarmthresholds 2 }
+
+systemhighfloatingvoltage OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Volts"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "System High Floating Voltage (UNITS 0.1Volts)"
+   ::= { voltagealarmthresholds 3 }
+
+systemlowfloatingvoltage OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Volts"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "System Low Floating Voltage (UNITS 0.1Volts)"
+   ::= { voltagealarmthresholds 4 }
+
+systemhighloadvoltage OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Volts"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "System High Load Voltage (UNITS 0.1Volts)"
+   ::= { voltagealarmthresholds 5 }
+
+systemlowloadvoltage OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "0.1Volts"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "System Low Load Voltage (UNITS 0.1Volts)"
+   ::= { voltagealarmthresholds 6 }
+
+systemoverloadrate OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "%"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "System Over Load Rate (UNITS %)"
+   ::= { voltagealarmthresholds 7 }
+
+lvd1controlpattern OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS " "
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 1 Control Pattern
+      0x14:auto
+      0x15:prohibit
+      0x16:manual connection
+      0x17:manual disconnection"
+   ::= { lvdalarmthresholds 1 }
+   
+lvd1disconnectsetpoint OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS "0.1 Volts"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 1 Disconnect Setpoint (UNITS 0.1Volts)"
+   ::= { lvdalarmthresholds 2 }
+
+lvd1reconnectsetpoint OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS "0.1 Volts"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 1 Reconnect Setpoint (UNITS 0.1Volts)"
+   ::= { lvdalarmthresholds 3 }
+
+lvd2controlpattern OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS " "
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 2 Control Pattern
+      0x14:auto
+      0x15:prohibit
+      0x16:manual connection
+      0x17:manual disconnection"
+   ::= { lvdalarmthresholds 4 }
+
+lvd2disconnectsetpoint OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS "0.1 Volts"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 2 Disconnect Setpoint (UNITS 0.1Volts)"
+   ::= { lvdalarmthresholds 5 }
+
+lvd2reconnectsetpoint OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS "0.1 Volts"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 2 Reconnect Setpoint (UNITS 0.1Volts)"
+   ::= { lvdalarmthresholds 6 }
+
+lvd3controlpattern OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS " "
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 3 Control Pattern
+      0x14:auto
+      0x15:prohibit
+      0x16:manual connection
+      0x17:manual disconnection"
+   ::= { lvdalarmthresholds 7 }
+   
+lvd3disconnectsetpoint OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS "0.1 Volts"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 3 Disconnect Setpoint (UNITS 0.1Volts)"
+   ::= { lvdalarmthresholds 8 }
+
+lvd3reconnectsetpoint OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS "0.1 Volts"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 3 Reconnect Setpoint (UNITS 0.1Volts)"
+   ::= { lvdalarmthresholds 9 }   
+   
+lvd4controlpattern OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS " "
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 4 Control Pattern
+      0x14:auto
+      0x15:prohibit
+      0x16:manual connection
+      0x17:manual disconnection"
+   ::= { lvdalarmthresholds 10 }
+   
+lvd4disconnectsetpoint OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS "0.1 Volts"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 4 Disconnect Setpoint (UNITS 0.1Volts)"
+   ::= { lvdalarmthresholds 11 }
+
+lvd4reconnectsetpoint OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS "0.1 Volts"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 4 Reconnect Setpoint (UNITS 0.1Volts)"
+   ::= { lvdalarmthresholds 12 }   
+
+lvd5controlpattern OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS " "
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 5 Control Pattern
+      0x14:auto
+      0x15:prohibit
+      0x16:manual connection
+      0x17:manual disconnection"
+   ::= { lvdalarmthresholds 13 }
+   
+lvd5disconnectsetpoint OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS "0.1 Volts"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 5 Disconnect Setpoint (UNITS 0.1Volts)"
+   ::= { lvdalarmthresholds 14 }
+
+lvd5reconnectsetpoint OBJECT-TYPE
+   SYNTAX INTEGER
+   UNITS "0.1 Volts"
+   MAX-ACCESS read-write
+   STATUS current
+DESCRIPTION
+      "LVD 5 Reconnect Setpoint (UNITS 0.1Volts)"
+   ::= { lvdalarmthresholds 15 }
+
+fan1workenable OBJECT-TYPE
+    SYNTAX INTEGER { yes(1), no(0) }
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "Fan1 work enable"
+    ::= { fanalarmthresholds 1 }
+    
+fan1lowtempautoenable OBJECT-TYPE
+    SYNTAX INTEGER { yes(1), no(0) }
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "Fan1 low temperature automatic shutdown "
+    ::= { fanalarmthresholds 2 }
+
+fan1lowtempclosesetpoint OBJECT-TYPE
+    SYNTAX INTEGER
+	  UNITS "0.1 DegC"
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "Fan low temperature automatic chose point (UNITS 0.1DegC)"
+    ::= { fanalarmthresholds 3 }
+
+fan1hightempopensetpoint OBJECT-TYPE
+    SYNTAX INTEGER
+	  UNITS "0.1 DegC"
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "Fan high temperature automatic open point (UNITS 0.1DegC)"
+    ::= { fanalarmthresholds 4 }
+
+fan1returndifferencesetpoint OBJECT-TYPE
+    SYNTAX INTEGER
+	  UNITS "0.1 DegC"
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "Fan start stop return difference value (UNITS 0.1DegC)"
+    ::= { fanalarmthresholds 5 }
+
+fan1minspeedsetpoint OBJECT-TYPE
+    SYNTAX INTEGER
+	  UNITS "%"
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "Fan min speed set point"
+    ::= { fanalarmthresholds 6 }
+    
+fan2workenable OBJECT-TYPE
+    SYNTAX INTEGER { yes(1), no(0) }
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "Fan work enable"
+    ::= { fanalarmthresholds 7 }
+    
+fan2lowtempautoenable OBJECT-TYPE
+    SYNTAX INTEGER { yes(1), no(0) }
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "Fan low temperature automatic shutdown "
+    ::= { fanalarmthresholds 8 }
+
+fan2lowtempclosesetpoint OBJECT-TYPE
+    SYNTAX INTEGER
+	  UNITS "0.1 DegC"
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "Fan low temperature automatic chose point (UNITS 0.1DegC)"
+    ::= { fanalarmthresholds 9 }
+
+fan2hightempopensetpoint OBJECT-TYPE
+    SYNTAX INTEGER
+	  UNITS "0.1 DegC"
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "Fan high temperature automatic open point (UNITS 0.1DegC)"
+    ::= { fanalarmthresholds 10 }
+
+fan2returndifferencesetpoint OBJECT-TYPE
+    SYNTAX INTEGER
+	  UNITS "0.1 DegC"
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "Fan start stop return difference value (UNITS 0.1DegC)"
+    ::= { fanalarmthresholds 11 }
+
+fan2minspeedsetpoint OBJECT-TYPE
+    SYNTAX INTEGER
+	  UNITS "%"
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "Fan min speed set point"
+    ::= { fanalarmthresholds 12 }
+    
+lbrsenable OBJECT-TYPE
+    SYNTAX INTEGER { yes(1), no(0) }
+    MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "LBRS enable"
+    ::= { dormancyparameter 1 }
+
+lbrsmodulenummode OBJECT-TYPE
+    SYNTAX INTEGER
+	  UNITS " "
+	  MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "LBRS module number mode
+        0x00:N+0
+        0x01:N+1"
+    ::= { dormancyparameter 2 }
+
+lbrspowerupperlimit OBJECT-TYPE
+    SYNTAX INTEGER
+	  UNITS "%"
+	  MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "LBRS power upper limit"
+    ::= { dormancyparameter 3 }
+
+lbrspowerlowerlimit OBJECT-TYPE
+    SYNTAX INTEGER
+	  UNITS "%"
+	  MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "LBRS power lower limit"
+    ::= { dormancyparameter 4 }
+
+lbrsefficientworkpoint OBJECT-TYPE
+    SYNTAX INTEGER
+	  UNITS "%"
+	  MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "LBRS efficient work point"
+    ::= { dormancyparameter 5 }
+
+lbrsroundtimer OBJECT-TYPE
+    SYNTAX INTEGER
+	  UNITS "minute"
+	  MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "LBRS Round time (UNITS minute)"
+    ::= { dormancyparameter 6 }    
+    
+lbrshandovertimer OBJECT-TYPE
+    SYNTAX INTEGER
+	  UNITS "sencond"
+	  MAX-ACCESS read-write
+    STATUS current
+ DESCRIPTION
+        "LBRS handover timer (UNITS sencond)"
+    ::= { dormancyparameter 7 } 
+        
+lbrsstate OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS " "
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "LBRS State
+      0x00:stop
+      0x01:run
+      0x02:handover
+      0x03:suspend
+      0x04:battery test"
+   ::= { extrastate 1 }
+
+lvd1runstate OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS " "
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "LVD1 Run State
+      0x00:auto connect normal
+      0x01:auto disconnect normal
+      0x02:auto disconnect ready
+      0x03:auto connect ready
+      0x04:auto connect early warning
+      0x05:auto connect restore
+      0x06:auto connect warning
+      0x07:auto disconnect early warning
+      0x08:auto disconnect restore
+      0x09:auto disconnect warning
+      0x0A:manual disconnect normal
+      0x0B:manual disconnect early warning
+      0x0C:manual disconnect restore
+      0x0D:manual disconnect warning
+      0x0E:manual connect normal
+      0x0F:manual connect early warning
+      0x10:manual connect restore
+      0x11:manual connect warning
+      0x12:prohibit"
+   ::= { extrastate 2 }
+
+lvd2runstate OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS " "
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "LVD2 Run State
+      0x00:auto connect normal
+      0x01:auto disconnect normal
+      0x02:auto disconnect ready
+      0x03:auto connect ready
+      0x04:auto connect early warning
+      0x05:auto connect restore
+      0x06:auto connect warning
+      0x07:auto disconnect early warning
+      0x08:auto disconnect restore
+      0x09:auto disconnect warning
+      0x0A:manual disconnect normal
+      0x0B:manual disconnect early warning
+      0x0C:manual disconnect restore
+      0x0D:manual disconnect warning
+      0x0E:manual connect normal
+      0x0F:manual connect early warning
+      0x10:manual connect restore
+      0x11:manual connect warning
+      0x12:prohibit"
+   ::= { extrastate 3 }
+   
+fan1runstate OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS " "
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Fan1 Run State
+      0x00:normal
+      0x01:alarm"
+   ::= { extrastate 4 }
+     
+fan1runspeed OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "%"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Fan1 Run Speed"
+   ::= { extrastate 5 }
+     
+   
+fan2runstate OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS " "
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Fan2 Run State
+      0x00:normal
+      0x01:alarm"
+   ::= { extrastate 6 }
+     
+fan2runspeed OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "%"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Fan2 Run Speed"
+   ::= { extrastate 7 }
+        
+fan3runstate OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS " "
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Fan3 Run State
+      0x00:normal
+      0x01:alarm"
+   ::= { extrastate 8 }
+     
+fan3runspeed OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "%"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Fan3 Run Speed"
+   ::= { extrastate 9 }
+        
+fan4runstate OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS " "
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Fan4 Run State
+      0x00:normal
+      0x01:alarm"
+   ::= { extrastate 10 }
+     
+fan4runspeed OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "%"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Fan4 Run Speed"
+   ::= { extrastate 11 }
+     
+outputstate OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS "Amps"
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "Output State:
+       "
+   ::= { extrastate 12 }
+
+lvd3runstate OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS " "
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "LVD3 Run State
+      0x00:auto connect normal
+      0x01:auto disconnect normal
+      0x02:auto disconnect ready
+      0x03:auto connect ready
+      0x04:auto connect early warning
+      0x05:auto connect restore
+      0x06:auto connect warning
+      0x07:auto disconnect early warning
+      0x08:auto disconnect restore
+      0x09:auto disconnect warning
+      0x0A:manual disconnect normal
+      0x0B:manual disconnect early warning
+      0x0C:manual disconnect restore
+      0x0D:manual disconnect warning
+      0x0E:manual connect normal
+      0x0F:manual connect early warning
+      0x10:manual connect restore
+      0x11:manual connect warning
+      0x12:prohibit"
+   ::= { extrastate 13 }
+
+lvd4runstate OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS " "
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "LVD4 Run State
+      0x00:auto connect normal
+      0x01:auto disconnect normal
+      0x02:auto disconnect ready
+      0x03:auto connect ready
+      0x04:auto connect early warning
+      0x05:auto connect restore
+      0x06:auto connect warning
+      0x07:auto disconnect early warning
+      0x08:auto disconnect restore
+      0x09:auto disconnect warning
+      0x0A:manual disconnect normal
+      0x0B:manual disconnect early warning
+      0x0C:manual disconnect restore
+      0x0D:manual disconnect warning
+      0x0E:manual connect normal
+      0x0F:manual connect early warning
+      0x10:manual connect restore
+      0x11:manual connect warning
+      0x12:prohibit"
+   ::= { extrastate 14 } 
+
+lvd5runstate OBJECT-TYPE
+   SYNTAX Integer32
+   UNITS " "
+   MAX-ACCESS read-only
+   STATUS obsolete
+DESCRIPTION
+      "LVD5 Run State
+      0x00:auto connect normal
+      0x01:auto disconnect normal
+      0x02:auto disconnect ready
+      0x03:auto connect ready
+      0x04:auto connect early warning
+      0x05:auto connect restore
+      0x06:auto connect warning
+      0x07:auto disconnect early warning
+      0x08:auto disconnect restore
+      0x09:auto disconnect warning
+      0x0A:manual disconnect normal
+      0x0B:manual disconnect early warning
+      0x0C:manual disconnect restore
+      0x0D:manual disconnect warning
+      0x0E:manual connect normal
+      0x0F:manual connect early warning
+      0x10:manual connect restore
+      0x11:manual connect warning
+      0x12:prohibit"
+   ::= { extrastate 15 }  
+   
+eventTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF eventEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+ DESCRIPTION
+        "event log table"
+    ::= { eventlog 1 }
+
+eventEntry OBJECT-TYPE
+    SYNTAX EventEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+ DESCRIPTION
+        ""
+    INDEX { eventnumber }
+     ::= { eventTable 1 }
+
+EventEntry ::=
+    SEQUENCE {
+	eventnumber
+		INTEGER,
+	eventaction
+		DisplayString,
+  eventname
+    DisplayString,
+  eventid
+  	INTEGER,
+	 eventtime		
+		DisplayString,
+	 eventremark
+    DisplayString
+	}
+
+eventnumber  OBJECT-TYPE
+    SYNTAX INTEGER (0.. 255)
+    MAX-ACCESS not-accessible
+    STATUS current
+ DESCRIPTION
+        "SN of eventlog"
+    ::= { eventEntry 1 }
+
+evenaction OBJECT-TYPE
+    SYNTAX DisplayString
+	UNITS ""
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "Event Action"
+    ::= { eventEntry 2 }
+
+eventname OBJECT-TYPE
+    SYNTAX DisplayString
+	UNITS ""
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "Event Name"
+    ::= { eventEntry 3 }
+
+eventid OBJECT-TYPE
+    SYNTAX INTEGER (0.. 255)
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "Event Type ID"
+    ::= { eventEntry 4 }
+
+eventtime OBJECT-TYPE
+    SYNTAX DisplayString
+	UNITS ""
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "Event Time"
+    ::= { eventEntry 5 }
+
+eventremark OBJECT-TYPE
+    SYNTAX DisplayString
+	UNITS ""
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "Remark"
+    ::= { eventEntry 6 }
+    
+alarmTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF alarmEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+ DESCRIPTION
+        "alarm info table"
+    ::= { eventlog 2 }
+
+alarmEntry OBJECT-TYPE
+    SYNTAX AlarmEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+ DESCRIPTION
+        ""
+    INDEX { alarmnumber }
+     ::= { alarmTable 1 }
+
+AlarmEntry ::=
+    SEQUENCE {
+	alarmnumber
+		INTEGER,
+	alarmstatus
+		INTEGER,
+  	alarmname
+    	DisplayString
+	}
+
+alarmnumber  OBJECT-TYPE
+    SYNTAX INTEGER (0.. 200)
+    MAX-ACCESS not-accessible
+    STATUS current
+ DESCRIPTION
+        "id of alarm"
+    ::= { alarmEntry 1 }
+
+alarmstatus OBJECT-TYPE
+    SYNTAX INTEGER
+	UNITS ""
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "alarm status"
+    ::= { alarmEntry 2 }
+
+alarmname OBJECT-TYPE
+    SYNTAX DisplayString
+	UNITS ""
+    MAX-ACCESS read-only
+    STATUS current
+ DESCRIPTION
+        "Alarm Name"
+    ::= { alarmEntry 3 }
+   
+-- ALARMS SNMPv2 and SNMPv3 Trap definitions
+
+trapSeverity OBJECT-TYPE		
+	SYNTAX INTEGER	{ Disable(0),Event(1),Minor(2),Major(3) }
+	MAX-ACCESS read-only	
+	STATUS current	
+	DESCRIPTION	
+		"The trap severity"
+	::= { traps 1 }	
+		
+trapStatus OBJECT-TYPE		
+	SYNTAX INTEGER	{ Off(0),On(1) }
+	MAX-ACCESS read-only	
+	STATUS current	
+	DESCRIPTION	
+		"The trap status 0-added, 1-recovered"
+	::= { traps 2 }	
+		
+trapDescription OBJECT-TYPE		
+	SYNTAX DisplayString (SIZE (0..80))	
+	MAX-ACCESS read-only	
+	STATUS current	
+	DESCRIPTION	
+		"The trap description"
+	::= { traps 3 }	
+		
+trapTime OBJECT-TYPE		
+	SYNTAX DisplayString (SIZE (0..32))	
+	MAX-ACCESS read-only	
+	STATUS current	
+	DESCRIPTION	
+		"The trap occurrence time"
+	::= { traps 4 }	
+		
+trapData OBJECT-TYPE		
+	SYNTAX Integer32	
+	MAX-ACCESS read-only	
+	STATUS current	
+	DESCRIPTION	
+		"The trap data"
+	::= { traps 5 }	
+		
+trapThres OBJECT-TYPE		
+	SYNTAX Integer32	
+	MAX-ACCESS read-only	
+	STATUS current	
+	DESCRIPTION	
+		"The trap threshold data"
+	::= { traps 6 }	
+		
+acmain1fail NOTIFICATION-TYPE		
+  OBJECTS { trapStatus, 		
+  	trapDescription,	
+  	trapSeverity,	
+  	trapTime,	
+  	trapData,	
+	trapThres	
+  	}	
+   STATUS current		
+DESCRIPTION		
+      " AC Mains 1 Fail"		
+  ::= { snmptraps 1 }		
+   		
+acmain2fail NOTIFICATION-TYPE		
+  OBJECTS { trapStatus, 		
+	trapDescription,	
+	trapSeverity,	
+	trapTime,	
+	trapData,	
+	trapThres	
+	}	
+   STATUS current		
+DESCRIPTION		
+"AC Mains 2 Fail		"
+  ::= { snmptraps 2 }		
+		
+acphaserecmissing NOTIFICATION-TYPE		
+  OBJECTS { trapStatus, 		
+	trapDescription,	
+	trapSeverity,	
+	trapTime,	
+	trapData,	
+	trapThres	
+	}	
+   STATUS current		
+DESCRIPTION		
+"AC Phase Rec Missing		"
+  ::= { snmptraps 3 }		
+		
+acmain1phaseahigh NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 1#Phase A High"	
+  ::= { snmptraps 4 }	
+	
+acmain1phasebhigh NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 1#Phase B High"	
+  ::= { snmptraps 5 }	
+	
+acmain1phasechigh NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 1#Phase C High"	
+  ::= { snmptraps 6 }	
+	
+acmain1phasealow NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 1#Phase A Low"	
+  ::= { snmptraps 7 }	
+	
+acmain1phaseblow NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 1#Phase B Low"	
+  ::= { snmptraps 8 }	
+	
+acmain1phaseclow NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 1#Phase C Low"	
+  ::= { snmptraps 9 }	
+	
+acmain1phaseamiss NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 1#Phase A Miss"	
+  ::= { snmptraps 10 }	
+	
+acmain1phasebmiss NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 1#Phase B Miss"	
+  ::= { snmptraps 11 }	
+	
+acmain1phasecmiss NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 1#Phase C Miss"	
+  ::= { snmptraps 12 }	
+	
+acmain1phaseaovercurrent NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 1#Phase A OverCurrent"	
+  ::= { snmptraps 13 }	
+	
+acmain1phasebovercurrent NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 1#Phase B OverCurrent"	
+  ::= { snmptraps 14 }	
+	
+acmain1phasecovercurrent NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 1#Phase C OverCurrent"	
+  ::= { snmptraps 15 }	
+	
+acmain1frequencyhigh NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 1#Frequency High"	
+  ::= { snmptraps 16 }	
+	
+acmain1frequencylow NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 1#Frequency Low"	
+  ::= { snmptraps 17 }	
+	
+acmains2phaseahigh NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 2#Phase A High"	
+  ::= { snmptraps 18 }	
+	
+acmains2phasebhighono NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 2#Phase B High"	
+  ::= { snmptraps 19 }	
+	
+acmains2phasechigh NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 2#Phase C High"	
+  ::= { snmptraps 20 }	
+	
+acmains2phasealow NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 2#Phase A Low"	
+  ::= { snmptraps 21 }	
+	
+acmains2phaseblow NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 2#Phase B Low"	
+  ::= { snmptraps 22 }	
+	
+acmains2phaseclow NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 2#Phase C Low"	
+  ::= { snmptraps 23 }	
+	
+acmains2phaseamiss NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 2#Phase A Miss"	
+  ::= { snmptraps 24 }	
+	
+acmains2phasebmiss NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 2#Phase B Miss"	
+  ::= { snmptraps 25 }	
+	
+acmains2phasecmiss NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 2#Phase C Miss"	
+  ::= { snmptraps 26 }	
+	
+acmains2phaseaovercurrent NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 2 Phase A OverCurrent"	
+  ::= { snmptraps 27 }	
+	
+acmains2phasebovercurrent NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 2 Phase B OverCurrent"	
+  ::= { snmptraps 28 }	
+	
+acmains2phasecovercurrent NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 2 Phase C OverCurrent"	
+  ::= { snmptraps 29 }	
+	
+acmains2frequencyhigh NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 2 Frequency High"	
+  ::= { snmptraps 30 }	
+	
+acmains2frequencylow NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 2 Frequency Low"	
+  ::= { snmptraps 31 }	
+	
+busvoltage1low NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Bus Voltage 1 Low"	
+  ::= { snmptraps 32 }	
+	
+busvoltage2low NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Bus Voltage 2 Low"	
+  ::= { snmptraps 33 }	
+	
+busvoltage1high NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Bus Voltage 1 High"	
+  ::= { snmptraps 34 }	
+	
+busvoltage2high NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Bus Voltage 2 High"	
+  ::= { snmptraps 35 }	
+	
+systemoverload NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"System load current is too high"	
+  ::= { snmptraps 36 }	
+	
+singlerectifierfault NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Single rectifier is warning"	
+  ::= { snmptraps 37 }	
+	
+multiplerectifiersfault NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Multiple rectifiers are warning"	
+  ::= { snmptraps 38 }	
+	
+singlerectifierloss NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Single rectifier has been lost"	
+  ::= { snmptraps 39 }	
+	
+multiplerectifiersloss NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Multiple rectifiers have been lost"	
+  ::= { snmptraps 40 }	
+	
+rectifiersnoload NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Rectifiers are not loaded"	
+  ::= { snmptraps 41 }	
+	
+rectifierslimiting NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Rectifiers current are limiting"	
+  ::= { snmptraps 42 }	
+	
+rectifiersovertemp NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Rectifiers are over temperature"	
+  ::= { snmptraps 43 }	
+	
+rectifiersshutdown NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Rectifiers are all shutdown"	
+  ::= { snmptraps 44 }	
+	
+ rectifierfanfail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Rectifier Fan Fail"	
+  ::= { snmptraps 45 }	
+	
+batterytestfail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Battery test is failed"	
+  ::= { snmptraps 46 }	
+	
+batteryovercurrent NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Battery is over current"	
+  ::= { snmptraps 47 }	
+	
+batterydischarging NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Battery is discharging"	
+  ::= { snmptraps 48 }	
+	
+siglecellvolthigh NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Sigle cell voltage is too high"	
+  ::= { snmptraps 49 }	
+	
+siglecellvoltlow NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Sigle cell voltage is too low"	
+  ::= { snmptraps 50 }	
+	
+batteryasymmetry NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Battery Asymmetry"	
+  ::= { snmptraps 51 }	
+	
+lvd1disconnect NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Lvd 1 is disconnect"	
+  ::= { snmptraps 52 }	
+	
+lvd2disconnect NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Lvd 2 is disconnect"	
+  ::= { snmptraps 53 }	
+	
+lvd1fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Lvd 1 is fail"	
+  ::= { snmptraps 54 }	
+	
+lvd2fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Lvd 2 is fail"	
+  ::= { snmptraps 55 }	
+	
+sensorfail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Sensor is fail"	
+  ::= { snmptraps 56 }	
+	
+busvoltagesensorfail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Bus voltage sensing is fail"	
+  ::= { snmptraps 57 }	
+	
+currentsensorfail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Current sensing is fail"	
+  ::= { snmptraps 58 }	
+	
+temperaturesensor1fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Temperature sensing1 is fail"	
+  ::= { snmptraps 59 }	
+	
+temperaturesensor2fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Temperature sensing2 is fail"	
+  ::= { snmptraps 60 }	
+	
+batterytemperaturelow NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Temperature of battery is too low"	
+  ::= { snmptraps 61 }	
+	
+batterytemperaturehigh NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Temperature of battery is too high"	
+  ::= { snmptraps 62 }	
+	
+ambienttemperaturelow NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Temperature of ambient is too low"	
+  ::= { snmptraps 63 }	
+	
+ambienttemperaturehigh NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Temperature of ambient is too high"	
+  ::= { snmptraps 64 }	
+	
+boostcharge NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Battery is boost charge"	
+  ::= { snmptraps 65 }	
+	
+batterytest NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Battery is testing"	
+  ::= { snmptraps 66 }	
+	
+batterylimiting NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Battery current is limiting"	
+  ::= { snmptraps 67 }	
+	
+batteryfuse1fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Battery fuse 1 fail"	
+  ::= { snmptraps 68 }	
+	
+batteryfuse2fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Battery fuse 2 fail"	
+  ::= { snmptraps 69 }	
+	
+batteryfuse3fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Battery fuse 3 fail"	
+  ::= { snmptraps 70 }	
+	
+batteryfuse4fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Battery fuse 4 fail"	
+  ::= { snmptraps 71 }	
+	
+batteryfuse5fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Battery fuse 5 fail"	
+  ::= { snmptraps 72 }	
+	
+batteryfuse6fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Battery fuse 6 fail"	
+  ::= { snmptraps 73 }	
+	
+batteryfuse7fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Battery fuse 7 fail"	
+  ::= { snmptraps 74 }	
+	
+batteryfuse8fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Battery fuse 8 fail"	
+  ::= { snmptraps 75 }	
+	
+loadfuse1fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Load fuse A fail"	
+  ::= { snmptraps 76 }	
+	
+loadfuse2fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Load fuse B fail"	
+  ::= { snmptraps 77 }	
+	
+mov1fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Mov 1 fail"	
+  ::= { snmptraps 78 }	
+	
+mov2fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Mov 2 fail"	
+  ::= { snmptraps 79 }	
+	
+adcfail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Adc fail"	
+  ::= { snmptraps 80 }	
+	
+customacfail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Custom AC fail"	
+  ::= { snmptraps 81 }	
+	
+acmain1mcbtrip NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 1 MCB Trip"	
+  ::= { snmptraps 82 }	
+	
+acmain2mcbtrip NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"AC Mains 2 MCB Trip"	
+  ::= { snmptraps 83 }	
+	
+digital1input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 1 state"	
+  ::= { snmptraps 84 }	
+	
+digital2input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 2 state"	
+  ::= { snmptraps 85 }	
+	
+digital3input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 3 state"	
+  ::= { snmptraps 86 }	
+	
+digital4input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 4 state"	
+  ::= { snmptraps 87 }	
+	
+digital5input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 5 state"	
+  ::= { snmptraps 88 }	
+	
+digital6input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 6 state"	
+  ::= { snmptraps 89 }	
+	
+digital7input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 7 state"	
+  ::= { snmptraps 90 }	
+	
+digital8input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 8 state"	
+  ::= { snmptraps 91 }	
+	
+digital9input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 9 state"	
+  ::= { snmptraps 92 }	
+	
+digital10input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 10 state"	
+  ::= { snmptraps 93 }	
+	
+digital11input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 11 state"	
+  ::= { snmptraps 94 }	
+	
+digital12input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 12 state"	
+  ::= { snmptraps 95 }	
+	
+digital13input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 13 state"	
+  ::= { snmptraps 96 }	
+	
+digital14input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 14 state"	
+  ::= { snmptraps 97 }	
+	
+digital15input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 15 state"	
+  ::= { snmptraps 98 }	
+	
+digital16input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 16 statet"	
+  ::= { snmptraps 99 }	
+	
+digital17input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 17 state"	
+  ::= { snmptraps 100 }	
+	
+digital18input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 18 state"	
+  ::= { snmptraps 101 }	
+	
+digital19input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 19 state"	
+  ::= { snmptraps 102 }	
+	
+digital20input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 20 state"	
+  ::= { snmptraps 103 }	
+	
+digital21input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 21 state"	
+  ::= { snmptraps 104 }	
+	
+digital22input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 22 state"	
+  ::= { snmptraps 105 }	
+	
+digital23input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 23 state"	
+  ::= { snmptraps 106 }	
+	
+digital24input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 24 state"	
+  ::= { snmptraps 107 }	
+	
+digital25input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 25 state"	
+  ::= { snmptraps 108 }	
+	
+digital26input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 26 state"	
+  ::= { snmptraps 109 }	
+	
+digital27input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 27 state"	
+  ::= { snmptraps 110 }	
+	
+digital28input NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Digital input 28 state"	
+  ::= { snmptraps 111 }	
+	
+fan1fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Fan 1 fail"	
+  ::= { snmptraps 112 }	
+	
+fan2fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Fan 2 fail"	
+  ::= { snmptraps 113 }	
+	
+fan3fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Fan 3 fail "	
+  ::= { snmptraps 114 }	
+	
+fan4fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Fan 4 fail"	
+  ::= { snmptraps 115 }	
+	
+batsampling1communicateloss NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Bat sampling 1 communicate is lost"	
+  ::= { snmptraps 116 }	
+	
+batsampling2communicateloss NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Bat sampling 2 communicate is lost"	
+  ::= { snmptraps 117 }	
+	
+batsampling3communicateloss NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Bat sampling 3 communicate is lost"	
+  ::= { snmptraps 118 }	
+	
+batsampling4communicateloss NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Bat sampling 4 communicate is lost"	
+  ::= { snmptraps 119 }	
+	
+batsampling5communicateloss NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Bat sampling 5 communicate is lost"	
+  ::= { snmptraps 120 }	
+	
+batsampling6communicateloss NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Bat sampling 6 communicate is lost"	
+  ::= { snmptraps 121 }	
+	
+batsampling7communicateloss NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Bat sampling 7 communicate is lost"	
+  ::= { snmptraps 122 }	
+	
+batsampling8communicateloss NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Bat sampling 8 communicate is lost"	
+  ::= { snmptraps 123 }	
+	
+batsampling1fault NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Bat sampling 1 is fault"	
+  ::= { snmptraps 124 }	
+	
+batsampling2fault NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Bat sampling 2 is fault"	
+  ::= { snmptraps 125 }	
+	
+batsampling3fault NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Bat sampling 3 is fault"	
+  ::= { snmptraps 126 }	
+	
+batsampling4fault NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Bat sampling 4 is fault"	
+  ::= { snmptraps 127 }	
+	
+batsampling5fault NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Bat sampling 5 is fault"	
+  ::= { snmptraps 128 }	
+	
+batsampling6fault NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Bat sampling 6 is fault"	
+  ::= { snmptraps 129 }	
+	
+batsampling7fault NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Bat sampling 7 is fault"	
+  ::= { snmptraps 130 }	
+	
+batsampling8fault NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Bat sampling 8 is fault"	
+  ::= { snmptraps 131 }	
+	
+acsampling1communicateloss NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Ac sampling 1 communicate is lost"	
+  ::= { snmptraps 132 }	
+	
+acsampling2communicateloss NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Ac sampling 2 communicate is lost"	
+  ::= { snmptraps 133 }	
+	
+acsampling1fault NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Ac sampling 1 is fault"	
+  ::= { snmptraps 134 }	
+	
+acsampling2fault NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Ac sampling 2 is fault"	
+  ::= { snmptraps 135 }	
+	
+dcsampling1communicateloss NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Dc sampling 1 communicate is lost"	
+  ::= { snmptraps 136 }	
+	
+dcsampling2communicateloss NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Dc sampling 2 communicate is lost"	
+  ::= { snmptraps 137 }	
+	
+ dcsampling3communicateloss NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Dc sampling 3 communicate is lost"	
+  ::= { snmptraps 138 }	
+	
+ dcsampling4communicateloss NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Dc sampling 4 communicate is lost"	
+  ::= { snmptraps 139 }	
+	
+ dcsampling5communicateloss NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Dc sampling 5 communicate is lost"	
+  ::= { snmptraps 140 }	
+	
+dcsampling1fault NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Dc sampling 1 is fault"	
+  ::= { snmptraps 141 }	
+	
+dcsampling2fault NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Dc sampling 2 is fault"	
+  ::= { snmptraps 142 }	
+	
+dcsampling3fault NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Dc sampling 3 is fault"	
+  ::= { snmptraps 143 }	
+	
+dcsampling4fault NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Dc sampling 4 is fault"	
+  ::= { snmptraps 144 }	
+	
+dcsampling5fault NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Dc sampling 5 is fault"	
+  ::= { snmptraps 145 }	
+	
+ioextensionunit1lost NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"IO Extension Unit 1 Lost"	
+  ::= { snmptraps 146 }	
+	
+ioextensionunit2lost NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"IO Extension Unit 2 Lost"	
+  ::= { snmptraps 147 }	
+	
+ioextensionunit1fault NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"IO Extension Unit 1 fault"	
+  ::= { snmptraps 148 }	
+	
+ioextensionunit2fault NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"IO Extension Unit 2 fault"	
+  ::= { snmptraps 149 }	
+	
+generator1start NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Generator 1 Start"	
+  ::= { snmptraps 150 }	
+	
+generator2start NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Generator 2 Start"	
+  ::= { snmptraps 151 }	
+	
+generator1fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Generator 1 Fail"	
+  ::= { snmptraps 152 }	
+	
+generator2fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Generator 2 Fail"	
+  ::= { snmptraps 153 }	
+	
+fuel1capacitylow NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Fuel 1 Low"	
+  ::= { snmptraps 154 }	
+	
+fuel2capacitylow NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Fuel 2 Low"	
+  ::= { snmptraps 155 }	
+	
+solarconverterinputhigh NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Solar converter PV Input High"	
+  ::= { snmptraps 156 }	
+	
+solarconverterinputlow NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Solar converter PV Input Low"	
+  ::= { snmptraps 157 }	
+	
+solarconverterfault NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Solar converter Failure"	
+  ::= { snmptraps 158 }	
+	
+solarconverterovercurrent NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Solar converter overcurrent"	
+  ::= { snmptraps 159 }	
+	
+lvd3disconnect NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Lvd 3 is disconnect"	
+  ::= { snmptraps 160 }	
+	
+lvd4disconnect NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Lvd 4 is disconnect"	
+  ::= { snmptraps 161 }	
+	
+lvd5disconnect NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Lvd 5 is disconnect"	
+  ::= { snmptraps 162 }	
+	
+lvd3fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Lvd 3 is fail"	
+  ::= { snmptraps 163 }	
+	
+lvd4fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Lvd 4 is fail"	
+  ::= { snmptraps 164 }	
+	
+lvd5fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Lvd 5 is fail"	
+  ::= { snmptraps 165 }	
+	
+bms1lost NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"BMS 1 lost"	
+  ::= { snmptraps 166 }	
+	
+bms2lost NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"BMS 2 lost"	
+  ::= { snmptraps 167 }	
+	
+bms3lost NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"BMS 3 lost"	
+  ::= { snmptraps 168 }	
+	
+bms4lost NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"BMS 4 lost"	
+  ::= { snmptraps 169 }	
+	
+bms5lost NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"BMS 5 lost"	
+  ::= { snmptraps 170 }	
+	
+bms6lost NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"BMS 6 lost"	
+  ::= { snmptraps 171 }	
+	
+bms7lost NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"BMS 7 lost"	
+  ::= { snmptraps 172 }	
+	
+bms8lost NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"BMS 8 lost"	
+  ::= { snmptraps 173 }	
+	
+bms9lost NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"BMS 9 lost"	
+  ::= { snmptraps 174 }	
+	
+bms10lost NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"BMS 10 lost"	
+  ::= { snmptraps 175 }	
+	
+bms1fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"BMS 1 fail"	
+  ::= { snmptraps 176 }	
+	
+bms2fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"BMS 2 fail"	
+  ::= { snmptraps 177 }	
+	
+bms3fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"BMS 3 fail"	
+  ::= { snmptraps 178 }	
+	
+bms4fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"BMS 4 fail"	
+  ::= { snmptraps 179 }	
+	
+bms5fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"BMS 5 fail"	
+  ::= { snmptraps 180 }	
+	
+bms6fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"BMS 6 fail"	
+  ::= { snmptraps 181 }	
+	
+bms7fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"BMS 7 fail"	
+  ::= { snmptraps 182 }	
+	
+bms8fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"BMS 8 fail"	
+  ::= { snmptraps 183 }	
+	
+bms9fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"BMS 9 fail"	
+  ::= { snmptraps 184 }	
+	
+bms10fail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"BMS 10 fail"	
+  ::= { snmptraps 185 }	
+	
+
+	
+singlesolarnoinput NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Single solar coverter has no input over time"	
+  ::= { snmptraps 186 }	
+	
+multisolarnoinput NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Multi solar converter have no input over time"	
+  ::= { snmptraps 187 }	
+
+solarconovertempfail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"solar converter over temperature fail"	
+  ::= { snmptraps 188 }	
+	
+solarconverterfanfail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"solar converter Fan Fail"	
+  ::= { snmptraps 189 }	
+
+singlesolarlostfail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Single Solar Lost"	
+  ::= { snmptraps 190 }	
+  
+mulsolarlostfail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime,
+	trapData,
+	trapThres
+	}
+   STATUS current	
+DESCRIPTION	
+"Multiple Solar Lost"	
+  ::= { snmptraps 191 }	
+
+armstmcomfail NOTIFICATION-TYPE	
+  OBJECTS { trapStatus, 	
+	trapDescription,
+	trapSeverity,
+	trapTime
+	}
+   STATUS current	
+DESCRIPTION	
+"ARM Can't communicate with STM"	
+  ::= { snmptraps 901 }	
+
+	
+
+heartbeatNotification NOTIFICATION-TYPE
+--	OBJECTS { trapDescription }
+ 	STATUS current
+	DESCRIPTION
+      "INFORMATION: Heart Beat notifications "
+	::= { snmptraps 999 }
+
+
+END
+
+
