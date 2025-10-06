@@ -148,7 +148,6 @@ if (is_array($memberEntries)) {
 
         $sensor_value = $stateLookupTable[$status];
 
-
         $serial = $data['arubaWiredVsfv2MemberSerialNum'] ?? '';
         if (is_array($serial)) {
             $serial = reset($serial);
