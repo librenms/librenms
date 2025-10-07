@@ -14,7 +14,8 @@ modules:
         hardware:
             - ENTITY-MIB::entPhysicalModelName.1
             - SNMPv2-MIB::sysObjectID.0
-        hardware_regex: '/::(?<hardware>fmg[0-9A-Za-z]+)$/i'
+        hardware_regex: '/::(?<hardware>[fmg|faz][0-9A-Za-z]+)$/i'
         hardware_replace:
             - ['/^fmg/', 'FMG ']
+            - ['/^faz/', 'FAZ ']
             - ['/vm$/', 'VM']
