@@ -8,7 +8,7 @@
                     "sysDescr": "ALG-FAZ",
                     "sysContact": "<private>",
                     "version": "v7.4.8-build2744 250926 (GA.M)",
-                    "hardware": "FAZ VM",
+                    "hardware": "FortiAnalyzer (FAZ) VM",
                     "features": null,
                     "location": "<private>",
                     "os": "fortios",
