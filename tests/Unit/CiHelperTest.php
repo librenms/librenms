@@ -87,7 +87,7 @@ final class CiHelperTest extends TestCase
 
         $first = CiHelper::shardList($list);
 
-        $midpoint = (int)(count($list) / 2);
+        $midpoint = (int) (count($list) / 2);
         $reordered = array_merge(array_slice($list, $midpoint), array_slice($list, 0, $midpoint));
         $second = CiHelper::shardList($reordered);
         $this->assertSame($first, $second);

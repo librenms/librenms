@@ -82,7 +82,8 @@ class CiHelper
      * If TEST_SHARD_TOTAL/INDEX are not set correctly, the original array is returned.
      *
      * @template T
-     * @param array<string|int, T> $items
+     *
+     * @param  array<string|int, T>  $items
      * @return array<string|int, T>
      */
     public static function shardList(array $items): array
