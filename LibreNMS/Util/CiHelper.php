@@ -77,6 +77,35 @@ class CiHelper
         'os-modules-only' => false,
     ];
 
+    /**
+     * Shard a list or associative array deterministically across CI shards.
+     * If TEST_SHARD_TOTAL/INDEX are not set correctly, the original array is returned.
+     *
+     * @template T
+     * @param array<string|int, T> $items
+     * @return array<string|int, T>
+     */
+    public static function shardList(array $items): array
+    {
+        $shardIndex = (int) getenv('TEST_SHARD_INDEX');
+        $shardTotal = (int) getenv('TEST_SHARD_TOTAL');
+
+        if ($shardTotal <= 0 || $shardIndex < 0 || $shardIndex >= $shardTotal) {
+            return $items;
+        }
+
+        $isList = array_is_list($items);
+        $isList ? sort($items) : ksort($items);
+
+        $total = count($items);
+        $chunkSize = (int) ceil($total / $shardTotal);
+        $offset = $shardIndex * $chunkSize;
+
+        $chunk = array_slice($items, $offset, $chunkSize, ! $isList);
+
+        return $isList ? array_values($chunk) : $chunk;
+    }
+
     public function enable($check, $enabled = true): void
     {
         $this->flags["{$check}_enable"] = $enabled;

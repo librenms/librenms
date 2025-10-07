@@ -251,7 +251,10 @@ class ModuleTestHelper
     {
         $os_list = [];
 
-        foreach (glob(LibrenmsConfig::get('install_dir') . '/tests/data/*.json') as $file) {
+        $files = glob(LibrenmsConfig::get('install_dir') . '/tests/data/*.json');
+        $files = CiHelper::shardList($files);
+
+        foreach ($files as $file) {
             $base_name = basename($file, '.json');
             [$os, $variant] = self::extractVariant($file);
 

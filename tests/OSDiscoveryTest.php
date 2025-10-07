@@ -32,6 +32,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Modules\Core;
 use LibreNMS\Tests\Mocks\SnmpQueryMock;
+use LibreNMS\Util\CiHelper;
 use LibreNMS\Util\Debug;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
@@ -177,6 +178,6 @@ final class OSDiscoveryTest extends TestCase
             $all_os[$os] = [$os];
         }
 
-        return $all_os;
+        return CiHelper::shardList($all_os);
     }
 }

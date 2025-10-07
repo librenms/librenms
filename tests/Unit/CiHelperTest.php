@@ -31,6 +31,72 @@ use LibreNMS\Util\CiHelper;
 
 final class CiHelperTest extends TestCase
 {
+    public function testShardListNoEnvReturnsOriginal(): void
+    {
+        putenv('TEST_SHARD_INDEX');
+        putenv('TEST_SHARD_TOTAL');
+
+        $list = ['d', 'b', 'a', 'c'];
+        $this->assertSame($list, CiHelper::shardList($list));
+
+        $assoc = ['z' => 1, 'a' => 2, 'm' => 3, 'b' => 4];
+        $this->assertSame($assoc, CiHelper::shardList($assoc));
+    }
+
+    public function testShardListOnList(): void
+    {
+        $list = ['d', 'b', 'a', 'c'];
+
+        putenv('TEST_SHARD_TOTAL=3');
+
+        putenv('TEST_SHARD_INDEX=0');
+        $this->assertSame(['a', 'b'], CiHelper::shardList($list));
+
+        putenv('TEST_SHARD_INDEX=1');
+        $this->assertSame(['c', 'd'], CiHelper::shardList($list));
+
+        // offset is beyond list length with ceil chunking -> empty result
+        putenv('TEST_SHARD_INDEX=2');
+        $this->assertSame([], CiHelper::shardList($list));
+
+        putenv('TEST_SHARD_INDEX');
+        putenv('TEST_SHARD_TOTAL');
+    }
+
+    public function testShardListOnAssoc(): void
+    {
+        $assoc = ['z' => 1, 'a' => 2, 'm' => 3, 'b' => 4];
+
+        putenv('TEST_SHARD_TOTAL=2');
+
+        putenv('TEST_SHARD_INDEX=0');
+        $this->assertSame(['a' => 2, 'b' => 4], CiHelper::shardList($assoc));
+
+        putenv('TEST_SHARD_INDEX=1');
+        $this->assertSame(['m' => 3, 'z' => 1], CiHelper::shardList($assoc));
+
+        putenv('TEST_SHARD_INDEX');
+        putenv('TEST_SHARD_TOTAL');
+    }
+
+    public function testShardListDeterministic(): void
+    {
+        $list = ['x', 'a', 'm', 'b', 'd', 'n', 't', 'e', 'n', 'no'];
+        putenv('TEST_SHARD_TOTAL=3');
+        putenv('TEST_SHARD_INDEX=1');
+
+        $first = CiHelper::shardList($list);
+
+        $midpoint = (int)(count($list) / 2);
+        $reordered = array_merge(array_slice($list, $midpoint), array_slice($list, 0, $midpoint));
+        $second = CiHelper::shardList($reordered);
+        $this->assertSame($first, $second);
+
+        // cleanup
+        putenv('TEST_SHARD_INDEX');
+        putenv('TEST_SHARD_TOTAL');
+    }
+
     public function testSetFlags(): void
     {
         $helper = new CiHelper();
