@@ -1,5 +1,3 @@
-mib_dir: enetek
-mib: ENETEK-SMU01-MIB
 modules:
     sensors:
         voltage:

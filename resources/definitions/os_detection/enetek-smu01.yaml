@@ -1,3 +1,4 @@
+mib_dir: enetek
 os: enetek-smu01
 text: 'Enetek SMU01'
 type: power
