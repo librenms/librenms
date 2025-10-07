@@ -15,6 +15,8 @@ if (! Auth::user()->hasGlobalRead()) {
 $search_type = $vars['search_type'] ?? 'ipv4';
 $address = $vars['address'] ?? '';
 $prefix = '';
+$sort = trim($sort);
+
 if (str_contains($address, '/')) {
     [$address, $prefix] = explode('/', $address, 2);
 }
@@ -32,6 +34,10 @@ if ($search_type == 'ipv4') {
         $sql .= " AND ipv4_prefixlen='$prefix'";
     }
 
+    if (str_contains($sort, 'address')) {
+        $order = explode(' ', $sort)[1];
+        $sort = 'INET_ATON(ipv4_address) ' . $order;
+    }
 } elseif ($search_type == 'ipv6') {
     $sql = ' FROM `ipv6_addresses` AS A, `ports` AS I, `devices` AS D';
     $sql .= ' WHERE I.port_id = A.port_id AND I.device_id = D.device_id ' . $where . ' ';
@@ -46,6 +52,10 @@ if ($search_type == 'ipv4') {
         $sql .= " AND ipv6_prefixlen = '$prefix'";
     }
 
+    if (str_contains($sort, 'address')) {
+        $order = explode(' ', $sort)[1];
+        $sort = 'INET6_ATON(ipv6_address) ' . $order;
+    }
 } elseif ($search_type == 'mac') {
     $sql = ' FROM `ports` AS I, `devices` AS D';
     $sql .= " WHERE I.device_id = D.device_id  $where ";
