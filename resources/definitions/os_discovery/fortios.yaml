@@ -16,6 +16,6 @@ modules:
             - SNMPv2-MIB::sysObjectID.0
         hardware_regex: '/::(?<hardware>[fmg|faz][0-9A-Za-z]+)$/i'
         hardware_replace:
-            - ['/^fmg/', 'FMG ']
-            - ['/^faz/', 'FAZ ']
+            - ['/^fmg/', 'FortiManager (FMG) ']
+            - ['/^faz/', 'FortiAnalyzer (FAZ) ']
             - ['/vm$/', 'VM']
