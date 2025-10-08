@@ -1,6 +1,6 @@
 os: cimc
 text: 'Cisco Integrated Management Controller'
-type: server
+type: 'OOB Management'
 icon: cisco
 group: cisco
 over:
