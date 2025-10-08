@@ -3440,6 +3440,62 @@ function del_location(Illuminate\Http\Request $request)
     return api_error(500, "Failed to delete the location $location");
 }
 
+function maintenance_location(Illuminate\Http\Request $request)
+{
+    $data = $request->json()->all();
+
+    if (empty($data)) {
+        return api_error(400, 'No information has been provided to set this location into maintenance');
+    }
+
+    $loc = $request->route('location');
+    if (! $loc) {
+        return api_error(400, 'No location was provided');
+    }
+
+    if (empty($data['duration'])) {
+        return api_error(400, 'Duration not provided');
+    }
+
+    $location = ctype_digit($loc) ? Location::find($loc) : Location::where('location', $loc)->first();
+    if (empty($location)) {
+        return api_error(404, "Location $loc does not exist");
+    }
+
+    $notes = $data['notes'] ?? '';
+    $title = $data['title'] ?? $location->location;
+    $behavior = MaintenanceBehavior::tryFrom((int) ($data['behavior'] ?? -1))
+        ?? LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior');
+
+    $alert_schedule = new \App\Models\AlertSchedule([
+        'title' => $title,
+        'notes' => $notes,
+        'behavior' => $behavior,
+        'recurring' => 0,
+    ]);
+
+    $start = $data['start'] ?? \Carbon\Carbon::now()->format('Y-m-d H:i:00');
+    $alert_schedule->start = $start;
+
+    $duration = $data['duration'];
+
+    if (Str::contains($duration, ':')) {
+        [$duration_hour, $duration_min] = explode(':', $duration);
+        $alert_schedule->end = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $start)
+            ->addHours((float) $duration_hour)->addMinutes((float) $duration_min)
+            ->format('Y-m-d H:i:00');
+    }
+
+    $alert_schedule->save();
+    $alert_schedule->locations()->attach($location);
+
+    if (isset($data['start'])) {
+        return api_success_noresult(201, "Location {$location->location} ({$location->id}) will begin maintenance mode at $start" . ($duration ? " for {$duration}h" : ''));
+    } else {
+        return api_success_noresult(201, "Location {$location->location} ({$location->id}) moved into maintenance mode" . ($duration ? " for {$duration}h" : ''));
+    }
+}
+
 function get_poller_group(Illuminate\Http\Request $request)
 {
     $poller_group = $request->route('poller_group_id_or_name');

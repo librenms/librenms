@@ -1,6 +1,6 @@
 os: dantherm-os
 text: 'Dantherm'
-type: network
+type: environment
 icon: dantherm
 group: dantherm
 over:

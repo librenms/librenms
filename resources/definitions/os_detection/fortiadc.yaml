@@ -1,6 +1,6 @@
 os: fortiadc
 text: 'Fortinet Application Deliver Controller'
-type: appliance
+type: loadbalancer
 icon: fortinet
 mib_dir: fortinet
 empty_ifdescr: true

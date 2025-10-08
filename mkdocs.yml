@@ -291,6 +291,7 @@ nav:
       - Sensor State Support: Developing/Sensor-State-Support.md
     - SNMP Traps: Developing/SNMP-Traps.md
     - Dynamic Config: Developing/Dynamic-Config.md
+    - Localization: Developing/Localization.md
     - Plugin System: Extensions/Plugin-System.md
     - Developer notes:
       - Merging Pull Requests: Developing/Merging-Pull-Requests.md
