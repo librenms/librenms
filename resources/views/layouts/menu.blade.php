@@ -119,7 +119,7 @@
                         <li><a href="{{ url('search/search=fdb') }}"><i class="fa fa-search fa-fw fa-lg"
                                                                         aria-hidden="true"></i> {{ __('FDB Tables') }}</a>
                         </li>
-                        <li><a href="{{ url('search/search=secureports') }}"><i class="fa fa-shield fa-fw fa-lg"
+                        <li><a href="{{ url('search/secureports') }}"><i class="fa fa-shield fa-fw fa-lg"
                                                                         aria-hidden="true"></i> {{ __('Port Security') }}</a>
                         </li>
                     </ul>
