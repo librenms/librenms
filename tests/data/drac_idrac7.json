@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "drac",
-                    "type": "appliance",
+                    "type": "OOB Management",
                     "serial": "5GC8H32",
                     "icon": "dell.svg"
                 }
