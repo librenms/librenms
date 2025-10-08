@@ -1,7 +1,7 @@
 os: drac
 text: 'Dell DRAC'
 icon: dell
-type: appliance
+type: 'OOB Management'
 mib_dir: dell
 discovery:
     -
