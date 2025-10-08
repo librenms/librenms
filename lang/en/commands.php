@@ -118,7 +118,7 @@ return [
             'device spec' => 'Device to ping one of: <Device ID>, <Hostname/IP>, all, fast ("fast" will ping all devices and update graphs and status)',
         ],
         'options' => [
-            'groups' => 'Group ID(s) to ping. Specify multiple times for multiple groups. (only valid with fast)'
+            'groups' => 'Group ID(s) to ping. Specify multiple times for multiple groups. (only valid with fast)',
         ],
         'errors' => [
             'groups_without_fast' => 'The --groups (-g) option is only supported with "fast" device spec.',
