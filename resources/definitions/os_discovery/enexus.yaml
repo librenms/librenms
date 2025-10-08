@@ -304,7 +304,7 @@ modules:
                     oid: SP2-MIB::inputControlUnitInputTable
                     value: SP2-MIB::inputControlUnitInputStatus
                     num_oid: '.1.3.6.1.4.1.12148.10.11.2.1.2.{{ $index }}'
-                    descr: 'Input {{ $inputControlUnitInputDescription }}'
+                    descr: 'Input {{ SP2-MIB::inputControlUnitInputDescription }}'
                     state_name: inputStatus
                     group: Alarm Input
                     states:
@@ -333,7 +333,7 @@ modules:
                     oid: SP2-MIB::outputControlUnitOutputTable
                     value: SP2-MIB::outputControlUnitOutputStatus
                     num_oid: '.1.3.6.1.4.1.12148.10.12.2.1.2.{{ $index }}'
-                    descr: 'Output {{ $outputControlUnitOutputDescription }}'
+                    descr: 'Output {{ SP2-MIB::outputControlUnitOutputDescription }}'
                     state_name: outputStatus
                     group: Alarm Output
                     states:
@@ -357,7 +357,7 @@ modules:
                     oid: SP2-MIB::inputIoUnitProgInputTable
                     value: SP2-MIB::inputIoUnitProgInputStatus
                     num_oid: '.1.3.6.1.4.1.12148.10.11.4.1.2.{{ $index }}'
-                    descr: 'IO Input {{ $inputIoUnitProgInputDescription }}'
+                    descr: 'IO Input {{ SP2-MIB::inputIoUnitProgInputDescription }}'
                     state_name: ioInputStatus
                     group: IO Alarm Input
                     states:
@@ -400,7 +400,7 @@ modules:
                     oid: SP2-MIB::rectifierTable
                     value: SP2-MIB::rectifierInputVoltageValue
                     num_oid: '.1.3.6.1.4.1.12148.10.5.6.1.4.{{ $index }}'
-                    descr:  '{{ $rectifierType }} {{ $index }} Input Voltage'
+                    descr:  '{{ SP2-MIB::rectifierType }} {{ $index }} Input Voltage'
                     index: 'input.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
                     group: Rectifier
@@ -484,7 +484,7 @@ modules:
                     oid: SP2-MIB::rectifierTable
                     value: SP2-MIB::rectifierOutputCurrentValue
                     num_oid: '.1.3.6.1.4.1.12148.10.5.6.1.3.{{ $index }}'
-                    descr: '{{ $rectifierType }} {{ $index }} Output Current'
+                    descr: '{{ SP2-MIB::rectifierType }} {{ $index }} Output Current'
                     index: 'output.{{ $index }}'
                     entPhysicalIndex: '{{ $index }}'
                     group: Rectifier
