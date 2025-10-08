@@ -1,14 +1,15 @@
 <?php
 
-if (is_array($pre_cache['enexus_battery_test_result_table'])) {
-    $numeric_results = array_filter($pre_cache['enexus_battery_test_result_table'], function ($key) {
+$battery_test_result_table = SnmpQuery::walk('batteryTestResultTable')->table(1);
+if (! empty($battery_test_result_table)) {
+    $numeric_results = array_filter($battery_test_result_table, function ($key) {
         return is_int($key);
     }, ARRAY_FILTER_USE_KEY);
     if (empty($numeric_results)) {
         return;
     }
     $last_index = max(array_keys($numeric_results));
-    $batteryQualityResult = $numeric_results[$last_index]['batteryTestResultDuration'];
+    $batteryResultDuration = $numeric_results[$last_index]['batteryTestResultDuration'];
     discover_sensor(
         null,
         'runtime',
@@ -32,5 +33,5 @@ if (is_array($pre_cache['enexus_battery_test_result_table'])) {
         'gauge'
     );
 
-    unset($lastResult, $batteryResultDuration);
+    unset($numeric_results, $last_index, $batteryResultDuration);
 }

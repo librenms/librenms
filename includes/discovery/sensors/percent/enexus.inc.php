@@ -1,7 +1,8 @@
 <?php
 
-if (is_array($pre_cache['enexus_battery_test_result_table'])) {
-    $numeric_results = array_filter($pre_cache['enexus_battery_test_result_table'], function ($key) {
+$battery_test_result_table = SnmpQuery::walk('batteryTestResultTable')->table(1);
+if (! empty($battery_test_result_table)) {
+    $numeric_results = array_filter($battery_test_result_table, function ($key) {
         return is_int($key);
     }, ARRAY_FILTER_USE_KEY);
     if (empty($numeric_results)) {
