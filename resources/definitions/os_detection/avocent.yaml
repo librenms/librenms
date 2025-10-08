@@ -1,6 +1,6 @@
 os: avocent
 text: Avocent
-type: network
+type: 'OOB Management'
 icon: avocent
 rfc1628_compat: true
 discovery:
