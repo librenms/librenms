@@ -6,7 +6,6 @@ use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\Location;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
 use SnmpQuery;
