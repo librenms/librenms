@@ -202,6 +202,7 @@ modules:
                     value: SP2-MIB::loadFuseStatus
                     num_oid: '.1.3.6.1.4.1.12148.10.9.7.1.1.{{ $index }}'
                     descr: SP2-MIB::loadFuseDescription
+                    entPhysicalIndex: '4{{ $index }}'
                     state_name: loadFuseStatus
                     group: Load Fuse
                     states:
@@ -252,6 +253,7 @@ modules:
                     value: SP2-MIB::batteryBankStatus
                     num_oid: '.1.3.6.1.4.1.12148.10.10.18.2.1.2.{{ $index }}'
                     descr: Battery Bank {{ $index }} Status
+                    entPhysicalIndex: '3{{ $index }}'
                     state_name: batteryBankStatus
                     group: Battery
                     states:
@@ -419,6 +421,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.12148.10.10.5.5.{{ $index }}'
                     descr: SP2-MIB::batteryVoltageDescription
                     index: 'battery.{{ $index }}'
+                    entPhysicalIndex: '100'
                     group: Battery
                     divisor: 100
                     low_limit: SP2-MIB::batteryVoltageMajorLowLevel
@@ -431,6 +434,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.12148.10.10.18.6.1.6.{{ $index }}'
                     descr: SP2-MIB::batteryBankSymmetryDescription
                     index: 'battery.{{ $index }}'
+                    entPhysicalIndex: '3{{ $index }}'
                     group: Battery
                     divisor: 100
                     warn_limit: SP2-MIB::batteryBankSymmetryMinorAlarmLevel
@@ -500,6 +504,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.12148.10.10.6.5.{{ $index }}'
                     descr: Overal Battery Current
                     index: 'battery.{{ $index }}'
+                    entPhysicalIndex: '100'
                     group: Battery
                     divisor: 10
                     low_limit: SP2-MIB::batteryCurrentsMinorLowLevel
@@ -512,6 +517,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.12148.10.10.18.4.1.6.{{ $index }}'
                     descr: batteryCurrentDescription
                     index: 'battery.{{ $index }}'
+                    entPhysicalIndex: '3{{ $index }}'
                     group: Battery
                     divisor: 10
                     low_limit: SP2-MIB::batteryCurrentMinorLowLevel
@@ -536,6 +542,7 @@ modules:
                     value: SP2-MIB::batteryTemperaturesValue
                     num_oid: '.1.3.6.1.4.1.12148.10.10.7.5.{{ $index }}'
                     descr: Overal Battery Temperature
+                    entPhysicalIndex: '100'
                     low_limit: SP2-MIB::batteryTemperaturesMinorLowLevel
                     low_warn_limit: SP2-MIB::batteryTemperaturesMinorLowLevel
                     warn_limit: SP2-MIB::batteryTemperaturesMinorHighLevel
@@ -545,6 +552,7 @@ modules:
                     value: SP2-MIB::batteryTemperatureValue
                     num_oid: '.1.3.6.1.4.1.12148.10.10.18.3.1.6.{{ $index }}'
                     descr: SP2-MIB::batteryTemperatureDescription
+                    entPhysicalIndex: '3{{ $index }}'
                     low_limit: SP2-MIB::batteryTemperatureMinorLowLevel
                     low_warn_limit: SP2-MIB::batteryTemperatureMinorLowLevel
                     warn_limit: SP2-MIB::batteryTemperatureMinorHighLevel
@@ -576,17 +584,23 @@ modules:
                     value: SP2-MIB::batteryTimeLeftValue
                     num_oid: '.1.3.6.1.4.1.12148.10.10.8.5.{{ $index }}'
                     descr: SP2-MIB::batteryTimeLeftDescription
+                    entPhysicalIndex: '100'
                     low_warn_limit: SP2-MIB::batteryTimeLeftMinorAlarmLevel
                     low_limit: SP2-MIB::batteryTimeLeftMajorAlarmLevel
+                    warn_limit: ~
+                    high_limit: ~
         load:
             data:
                 -
                     oid: SP2-MIB::batteryRemainingCapacity
                     value: SP2-MIB::batteryRemainingCapacityValue
                     num_oid: '.1.3.6.1.4.1.12148.10.10.9.5.{{ $index }}'
-                    descr: Battery remaining capacity (Ah)
+                    descr: SP2-MIB::batteryRemainingCapacityDescription
+                    entPhysicalIndex: '100'
                     low_warn_limit: SP2-MIB::batteryRemainingCapacityMinorLowLevel
                     low_limit: SP2-MIB::batteryRemainingCapacityMajorLowLevel
+                    warn_limit: ~
+                    high_limit: ~
                 -
                     oid: SP2-MIB::rectifiersCapacity
                     value: SP2-MIB::rectifiersCapacityValue

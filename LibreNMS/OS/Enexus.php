@@ -119,6 +119,44 @@ class Enexus extends OS implements OSDiscovery
             'entPhysicalIsFRU' => 'true',
         ]));
 
+        $batteryBanks = SnmpQuery::walk('SP2-MIB::batteryBankTable')->table(1);
+        foreach ($batteryBanks as $batteryBankIndex => $batteryBank) {
+            $inventory->push(new EntPhysical([
+                'entPhysicalIndex' => (int)('3' . $batteryBankIndex),
+                'entPhysicalDescr' => 'Battery Bank ' . $batteryBankIndex,
+                'entPhysicalClass' => 'module',
+                'entPhysicalName' => 'Battery Bank ' . $batteryBankIndex,
+                'entPhysicalModelName' => $batteryInstalledType,
+                'entPhysicalSerialNum' => null,
+                'entPhysicalContainedIn' => 100,  // Contained in main Battery module
+                'entPhysicalMfgName' => 'Eltek',
+                'entPhysicalParentRelPos' => $batteryBankIndex,
+                'entPhysicalHardwareRev' => null,
+                'entPhysicalSoftwareRev' => null,
+                'entPhysicalFirmwareRev' => null,
+                'entPhysicalIsFRU' => 'true',
+            ]));
+        }
+
+        $loadFuses = SnmpQuery::walk('SP2-MIB::loadFuseTable')->table(1);
+        foreach ($loadFuses as $loadFuseIndex => $loadFuse) {
+            $inventory->push(new EntPhysical([
+                'entPhysicalIndex' => (int)('4' . $loadFuseIndex),
+                'entPhysicalDescr' => $loadFuse['SP2-MIB::loadFuseDescription'] ?? 'Load Fuse ' . $loadFuseIndex,
+                'entPhysicalClass' => 'module',
+                'entPhysicalName' => $loadFuse['SP2-MIB::loadFuseDescription'] ?? 'Load Fuse ' . $loadFuseIndex,
+                'entPhysicalModelName' => 'Load Fuse',
+                'entPhysicalSerialNum' => null,
+                'entPhysicalContainedIn' => 10,  // Contained in Chassis
+                'entPhysicalMfgName' => 'Eltek',
+                'entPhysicalParentRelPos' => $loadFuseIndex,
+                'entPhysicalHardwareRev' => null,
+                'entPhysicalSoftwareRev' => null,
+                'entPhysicalFirmwareRev' => null,
+                'entPhysicalIsFRU' => 'true',
+            ]));
+        }
+
         return $inventory;
     }
 }
