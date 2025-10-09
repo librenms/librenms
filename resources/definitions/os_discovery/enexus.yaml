@@ -606,5 +606,70 @@ modules:
                     value: SP2-MIB::rectifiersCapacityValue
                     num_oid: '.1.3.6.1.4.1.12148.10.5.3.5.{{ $index }}'
                     descr: SP2-MIB::rectifiersCapacityDescription
+                    low_warn_limit: ~
+                    low_limit: ~
                     high_warn_limit: SP2-MIB::rectifiersCapacityMinorAlarmLevel
                     high_limit: SP2-MIB::rectifiersCapacityMajorAlarmLevel
+                -
+                    oid: SP2-MIB::batteryQuality
+                    value: SP2-MIB::batteryQualityValue
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.12.5.{{ $index }}'
+                    descr: SP2-MIB::batteryQualityDescription
+                    entPhysicalIndex: '100'
+                    low_warn_limit: SP2-MIB::batteryQualityMinorAlarmLevel
+                    low_limit: SP2-MIB::batteryQualityMajorAlarmLevel
+                    warn_limit: ~
+                    high_limit: ~
+                -
+                    oid: SP2-MIB::batteryUsedCapacity
+                    value: SP2-MIB::batteryUsedCapacityValue
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.10.5.{{ $index }}'
+                    descr: SP2-MIB::batteryUsedCapacityDescription
+                    entPhysicalIndex: '100'
+                    low_warn_limit: ~
+                    low_limit: ~
+                    warn_limit: SP2-MIB::batteryUsedCapacityMinorAlarmLevel
+                    high_limit: SP2-MIB::batteryUsedCapacityMajorAlarmLevel
+        count:
+            data:
+                -
+                    oid: SP2-MIB::batteryAhCharged
+                    value: SP2-MIB::batteryAhChargedValue
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.23.5.{{ $index }}'
+                    descr: SP2-MIB::batteryAhChargedDescription
+                    entPhysicalIndex: '100'
+                    divisor: 100
+                    low_warn_limit: ~
+                    low_limit: ~
+                    warn_limit: SP2-MIB::batteryAhChargedMinorHighLevel
+                    high_limit: SP2-MIB::batteryAhChargedMajorHighLevel
+                -
+                    oid: SP2-MIB::batteryTotalCapacity
+                    value: SP2-MIB::batteryTotalCapacityValue
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.11.5.{{ $index }}'
+                    descr: SP2-MIB::batteryTotalCapacityDescription
+                    entPhysicalIndex: '100'
+                    low_warn_limit: SP2-MIB::batteryTotalCapacityMinorLowLevel
+                    low_limit: SP2-MIB::batteryTotalCapacityMajorLowLevel
+                    warn_limit: ~
+                    high_limit: ~
+                -
+                    oid: SP2-MIB::batteryBankNumberOfBanks
+                    index: 'batteryBankNumberOfBanks.0'
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.18.1.0'
+                    descr: Battery bank number of banks
+                -
+                    oid: SP2-MIB::mainsNumberOfPhases
+                    index: 'mainsNumberOfPhases.0'
+                    num_oid: '.1.3.6.1.4.1.12148.10.3.3.0'
+                    descr: Mains number of phases
+                -
+                    oid: SP2-MIB::rectifiersNumberOfRectifiers
+                    index: 'rectifiersNumberOfRectifiers.0'
+                    num_oid: '.1.3.6.1.4.1.12148.10.5.5.0'
+                    descr: Rectifiers number of rectifiers
+                -
+                    oid: SP2-MIB::batteryTestNumberOfResults
+                    index: 'batteryTestNumberOfResults.0'
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.16.3.0'
+                    descr: Battery test number of results
