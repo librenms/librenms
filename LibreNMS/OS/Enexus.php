@@ -86,7 +86,7 @@ class Enexus extends OS implements OSDiscovery
         $rectifiers = SnmpQuery::walk('SP2-MIB::rectifierTable')->table(1);
         foreach ($rectifiers as $rectifierIndex => $rectifier) {
             $inventory->push(new EntPhysical([
-                'entPhysicalIndex' => $rectifierIndex,
+                'entPhysicalIndex' => (int)('2' . $rectifierIndex),
                 'entPhysicalDescr' => 'Rectifier ' . ($rectifier['SP2-MIB::rectifierType'] ?? $rectifierIndex),
                 'entPhysicalClass' => 'module',
                 'entPhysicalName' => $rectifier['SP2-MIB::rectifierType'] ?? null,
