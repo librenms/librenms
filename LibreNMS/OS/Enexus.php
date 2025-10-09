@@ -86,7 +86,7 @@ class Enexus extends OS implements OSDiscovery
         $rectifiers = SnmpQuery::walk('SP2-MIB::rectifierTable')->table(1);
         foreach ($rectifiers as $rectifierIndex => $rectifier) {
             $inventory->push(new EntPhysical([
-                'entPhysicalIndex' => (int)('2' . $rectifierIndex),
+                'entPhysicalIndex' => (int) ('2' . $rectifierIndex),
                 'entPhysicalDescr' => 'Rectifier ' . ($rectifier['SP2-MIB::rectifierType'] ?? $rectifierIndex),
                 'entPhysicalClass' => 'module',
                 'entPhysicalName' => $rectifier['SP2-MIB::rectifierType'] ?? null,
@@ -122,7 +122,7 @@ class Enexus extends OS implements OSDiscovery
         $batteryBanks = SnmpQuery::walk('SP2-MIB::batteryBankTable')->table(1);
         foreach ($batteryBanks as $batteryBankIndex => $batteryBank) {
             $inventory->push(new EntPhysical([
-                'entPhysicalIndex' => (int)('3' . $batteryBankIndex),
+                'entPhysicalIndex' => (int) ('3' . $batteryBankIndex),
                 'entPhysicalDescr' => 'Battery Bank ' . $batteryBankIndex,
                 'entPhysicalClass' => 'module',
                 'entPhysicalName' => 'Battery Bank ' . $batteryBankIndex,
@@ -141,7 +141,7 @@ class Enexus extends OS implements OSDiscovery
         $loadFuses = SnmpQuery::walk('SP2-MIB::loadFuseTable')->table(1);
         foreach ($loadFuses as $loadFuseIndex => $loadFuse) {
             $inventory->push(new EntPhysical([
-                'entPhysicalIndex' => (int)('4' . $loadFuseIndex),
+                'entPhysicalIndex' => (int) ('4' . $loadFuseIndex),
                 'entPhysicalDescr' => $loadFuse['SP2-MIB::loadFuseDescription'] ?? 'Load Fuse ' . $loadFuseIndex,
                 'entPhysicalClass' => 'module',
                 'entPhysicalName' => $loadFuse['SP2-MIB::loadFuseDescription'] ?? 'Load Fuse ' . $loadFuseIndex,
