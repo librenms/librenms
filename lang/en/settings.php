@@ -1767,6 +1767,9 @@ return [
             'printer-supplies' => [
                 'description' => 'Printer Supplies',
             ],
+            'port-security' => [
+                'description' => 'Port Security',
+            ],
         ],
         'polling.selected_ports' => [
             'description' => 'Selected Port Polling',
