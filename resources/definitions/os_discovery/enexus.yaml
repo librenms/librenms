@@ -587,8 +587,6 @@ modules:
                     entPhysicalIndex: '100'
                     low_warn_limit: SP2-MIB::batteryTimeLeftMinorAlarmLevel
                     low_limit: SP2-MIB::batteryTimeLeftMajorAlarmLevel
-                    warn_limit: ~
-                    high_limit: ~
         load:
             data:
                 -
@@ -599,15 +597,11 @@ modules:
                     entPhysicalIndex: '100'
                     low_warn_limit: SP2-MIB::batteryRemainingCapacityMinorLowLevel
                     low_limit: SP2-MIB::batteryRemainingCapacityMajorLowLevel
-                    warn_limit: ~
-                    high_limit: ~
                 -
                     oid: SP2-MIB::rectifiersCapacity
                     value: SP2-MIB::rectifiersCapacityValue
                     num_oid: '.1.3.6.1.4.1.12148.10.5.3.5.{{ $index }}'
                     descr: SP2-MIB::rectifiersCapacityDescription
-                    low_warn_limit: ~
-                    low_limit: ~
                     high_warn_limit: SP2-MIB::rectifiersCapacityMinorAlarmLevel
                     high_limit: SP2-MIB::rectifiersCapacityMajorAlarmLevel
                 -
@@ -618,16 +612,12 @@ modules:
                     entPhysicalIndex: '100'
                     low_warn_limit: SP2-MIB::batteryQualityMinorAlarmLevel
                     low_limit: SP2-MIB::batteryQualityMajorAlarmLevel
-                    warn_limit: ~
-                    high_limit: ~
                 -
                     oid: SP2-MIB::batteryUsedCapacity
                     value: SP2-MIB::batteryUsedCapacityValue
                     num_oid: '.1.3.6.1.4.1.12148.10.10.10.5.{{ $index }}'
                     descr: SP2-MIB::batteryUsedCapacityDescription
                     entPhysicalIndex: '100'
-                    low_warn_limit: ~
-                    low_limit: ~
                     warn_limit: SP2-MIB::batteryUsedCapacityMinorAlarmLevel
                     high_limit: SP2-MIB::batteryUsedCapacityMajorAlarmLevel
         count:
@@ -639,8 +629,6 @@ modules:
                     descr: SP2-MIB::batteryAhChargedDescription
                     entPhysicalIndex: '100'
                     divisor: 100
-                    low_warn_limit: ~
-                    low_limit: ~
                     warn_limit: SP2-MIB::batteryAhChargedMinorHighLevel
                     high_limit: SP2-MIB::batteryAhChargedMajorHighLevel
                 -
@@ -651,8 +639,6 @@ modules:
                     entPhysicalIndex: '100'
                     low_warn_limit: SP2-MIB::batteryTotalCapacityMinorLowLevel
                     low_limit: SP2-MIB::batteryTotalCapacityMajorLowLevel
-                    warn_limit: ~
-                    high_limit: ~
                 -
                     oid: SP2-MIB::batteryBankNumberOfBanks
                     index: 'batteryBankNumberOfBanks.0'
