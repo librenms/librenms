@@ -673,3 +673,9 @@ modules:
                     index: 'batteryTestNumberOfResults.0'
                     num_oid: '.1.3.6.1.4.1.12148.10.10.16.3.0'
                     descr: Battery test number of results
+                -
+                    oid: SP2-MIB::batteryTest.5.0
+                    value: SP2-MIB::batteryTest
+                    index: 'batteryTest.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.16.5.{{ $index }}'
+                    descr: Battery Test Max Duration (minutes)
