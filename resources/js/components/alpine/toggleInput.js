@@ -10,10 +10,12 @@ export default function toggleInput() {
             // Create the toggle element
             this.createToggle();
 
-            // Watch for changes to sync with checkbox
+            // Watch for changes to sync with checkbox and emit model updates
             this.$watch('checked', (value) => {
                 this.$el.checked = value;
                 this.updateToggleAppearance();
+                // Emit input event so x-modelable can sync with parent scope
+                this.$dispatch('input', value);
             });
         },
 
