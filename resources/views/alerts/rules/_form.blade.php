@@ -51,7 +51,7 @@
         <div class='form-group'>
             <label for='invert' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.setup.invert_match.label') }} </label>
             <div class='form col-sm-9 col-md-10'>
-                <input type="checkbox" name="invert" id="invert">
+                <input type="checkbox" name="invert" id="invert" x-data="toggleInput()" x-modelable="checked" x-model="rule.extra.invert">
                 <span class="help-block">{{ __('alerting.rules.setup.invert_match.help') }}</span>
             </div>
         </div>
@@ -69,7 +69,7 @@
         <div class="form-group">
             <label for='invert_map' class='col-sm-3 col-md-2 control-label' text-align="left">{{ __('alerting.rules.targeting.invert_map.label') }} </label>
             <div class="col-sm-9 col-md-10">
-                <input type='checkbox' name='invert_map' id='invert_map'>
+                <input type='checkbox' name='invert_map' id='invert_map' x-data="toggleInput()" x-modelable="checked" x-model="rule.invert_map">
                 <span class="help-block">{{ __('alerting.rules.targeting.invert_map.help') }}</span>
             </div>
         </div>
@@ -110,21 +110,21 @@
         <div class='form-group'>
             <label for='mute' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.mute.label') }}</label>
             <div class='col-sm-9 col-md-10'>
-                <input type="checkbox" x-data="toggleInput()" x-model="rule.extra.mute">
+                <input type="checkbox" x-data="toggleInput()" x-modelable="checked" x-model="rule.extra.mute">
                 <span class="help-block">{{ __('alerting.rules.notifications.mute.help') }}</span>
             </div>
         </div>
         <div class='form-group'>
             <label for='recovery' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.recovery.label') }}</label>
             <div class='col-sm-9 col-md-10'>
-                <input type="checkbox" name="recovery" id="recovery" x-model="rule.extra.recovery">
+                <input type="checkbox" name="recovery" id="recovery" x-data="toggleInput()" x-modelable="checked" x-model="rule.extra.recovery">
                 <span class="help-block">{{ __('alerting.rules.notifications.recovery.help') }}</span>
             </div>
         </div>
         <div class='form-group'>
             <label for='acknowledgement' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.acknowledgement.label') }}</label>
             <div class='col-sm-9 col-md-10'>
-                <input type="checkbox" name="acknowledgement" id="acknowledgement" x-model="rule.extra.acknowledgement">
+                <input type="checkbox" name="acknowledgement" id="acknowledgement" x-data="toggleInput()" x-modelable="checked" x-model="rule.extra.acknowledgement">
                 <span class="help-block">{{ __('alerting.rules.notifications.acknowledgement.help') }}</span>
             </div>
         </div>
@@ -387,17 +387,17 @@
             }
 
             // Set switches
-            if (typeof extra.mute !== 'undefined') { $("[name='mute']").bootstrapSwitch('state', !!extra.mute); }
-            if (typeof extra.invert !== 'undefined') { $("[name='invert']").bootstrapSwitch('state', !!extra.invert); }
+            // if (typeof extra.mute !== 'undefined') { $("[name='mute']").bootstrapSwitch('state', !!extra.mute); }
+            // if (typeof extra.invert !== 'undefined') { $("[name='invert']").bootstrapSwitch('state', !!extra.invert); }
 
             var recovery = (typeof extra.recovery !== 'undefined') ? !!extra.recovery : {{ ($default_recovery_alerts ?? false) ? 'true' : 'false' }};
             var acknowledgement = (typeof extra.acknowledgement !== 'undefined') ? !!extra.acknowledgement : {{ ($default_acknowledgement_alerts ?? false) ? 'true' : 'false' }};
             var override = (extra.options && typeof extra.options.override_query !== 'undefined') ? !!extra.options.override_query : false;
 
-            $("[name='recovery']").bootstrapSwitch('state', recovery);
-            $("[name='acknowledgement']").bootstrapSwitch('state', acknowledgement);
-            $("[name='invert_map']").bootstrapSwitch('state', (rule.invert_map == 1));
-            $("[name='override_query']").bootstrapSwitch('state', override);
+            // $("[name='recovery']").bootstrapSwitch('state', recovery);
+            // $("[name='acknowledgement']").bootstrapSwitch('state', acknowledgement);
+            // $("[name='invert_map']").bootstrapSwitch('state', (rule.invert_map == 1));
+            // $("[name='override_query']").bootstrapSwitch('state', override);
         } catch (e) {
             console.error('Failed to load rule into form', e);
         }
@@ -412,12 +412,12 @@
 
         $(function() {
             // Initialize switches
-            $('#mute').bootstrapSwitch();
-            $('#invert').bootstrapSwitch();
-            $('#recovery').bootstrapSwitch();
-            $('#acknowledgement').bootstrapSwitch();
-            $('#override_query').bootstrapSwitch();
-            $('#invert_map').bootstrapSwitch();
+            // $('#mute').bootstrapSwitch();
+            // $('#invert').bootstrapSwitch();
+            // $('#recovery').bootstrapSwitch();
+            // $('#acknowledgement').bootstrapSwitch();
+            // $('#override_query').bootstrapSwitch();
+            // $('#invert_map').bootstrapSwitch();
 
             // Initialize select2 for maps and transports
             window.setRuleDevice = function() {
@@ -492,12 +492,12 @@
                 $('#rule_id').val('');
                 var $severity = $('#severity');
                 if (!$severity.find('option:selected').length) { $severity.val($severity.find("option[selected]").val()); }
-                $("#mute").bootstrapSwitch('state', {{ ($default_mute_alerts ?? false) ? 'true' : 'false' }});
-                $("#invert").bootstrapSwitch('state', {{ ($default_invert_rule_match ?? false) ? 'true' : 'false' }});
-                $("#recovery").bootstrapSwitch('state', {{ ($default_recovery_alerts ?? false) ? 'true' : 'false' }});
-                $("#acknowledgement").bootstrapSwitch('state', {{ ($default_acknowledgement_alerts ?? false) ? 'true' : 'false' }});
-                $("#override_query").bootstrapSwitch('state', false);
-                $("#invert_map").bootstrapSwitch('state', {{ ($default_invert_map ?? false) ? 'true' : 'false' }});
+                // $("#mute").bootstrapSwitch('state', {{ ($default_mute_alerts ?? false) ? 'true' : 'false' }});
+{{--                $("#invert").bootstrapSwitch('state', {{ ($default_invert_rule_match ?? false) ? 'true' : 'false' }});--}}
+{{--                $("#recovery").bootstrapSwitch('state', {{ ($default_recovery_alerts ?? false) ? 'true' : 'false' }});--}}
+{{--                $("#acknowledgement").bootstrapSwitch('state', {{ ($default_acknowledgement_alerts ?? false) ? 'true' : 'false' }});--}}
+//                 $("#override_query").bootstrapSwitch('state', false);
+{{--                $("#invert_map").bootstrapSwitch('state', {{ ($default_invert_map ?? false) ? 'true' : 'false' }});--}}
                 $('#proc').val(''); $('#notes').val(''); $('#maps').val(null).trigger('change'); $('#transports').val(null).trigger('change');
                 if (typeof window.setRuleDevice === 'function') { setRuleDevice(); }
             } else if (MODE === 'edit' && LOAD_URL) {
