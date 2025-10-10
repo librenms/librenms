@@ -596,7 +596,7 @@ Output:
 Output is an image.
 
 
-### `get_port_graphs`
+### `get_device_ports`
 
 Get a list of ports for a particular device.
 
@@ -1018,7 +1018,7 @@ Route: `/api/v0/devices/:hostname/ports/:ifname`
 - hostname can be either the device hostname or id
 - ifname can be any of the interface names for the device which can be
   obtained using
-  [`get_port_graphs`](#get_port_graphs). Please ensure that
+  [`get_device_ports`](#get_device_ports). Please ensure that
   the ifname is urlencoded if it needs to be (i.e Gi0/1/0 would need to be urlencoded.
 
 Input:

@@ -1117,7 +1117,7 @@ function list_available_wireless_graphs(Illuminate\Http\Request $request)
 /**
  * @throws \LibreNMS\Exceptions\ApiException
  */
-function get_port_graphs(Illuminate\Http\Request $request): JsonResponse
+function get_device_ports(Illuminate\Http\Request $request): JsonResponse
 {
     $device = DeviceCache::get($request->route('hostname'));
     $columns = validate_column_list($request->get('columns'), 'ports', ['ifName']);
