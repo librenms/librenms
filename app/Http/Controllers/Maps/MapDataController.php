@@ -192,7 +192,7 @@ class MapDataController extends Controller
             // Apply device level filter to the port list so we exclude ports that are not connected to devices we want to display
             $linkQuery->whereHas('device', function (Builder $q) use ($user, $disabled, $disabled_alerts, $group_id) {
                 if (! $user->hasGlobalRead()) {
-                    $q->whereIntegerInRaw('device_id', \Permissions::devicesForUser($user));
+                    $q->whereIntegerInRaw($q->qualifyColumn('device_id'), \Permissions::devicesForUser($user));
                 }
 
                 if (! is_null($disabled)) {

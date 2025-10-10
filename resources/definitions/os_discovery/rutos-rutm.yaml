@@ -7,7 +7,7 @@ modules:
         lat: TELTONIKA-RUTM-MIB::latitude.0
         long: TELTONIKA-RUTM-MIB::longtitude.0
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

@@ -16,7 +16,7 @@ modules:
                 index: '{{ $index }}'
                 descr: 'Proc #{{ $index }}'
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

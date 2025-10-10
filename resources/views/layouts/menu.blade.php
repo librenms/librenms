@@ -95,8 +95,6 @@
 
                         <li><a href="{{ route('inventory') }}"><i class="fa fa-cube fa-fw fa-lg"
                                                                 aria-hidden="true"></i> {{ __('Inventory') }}</a></li>
-                        <li><a href="{{ url('outages') }}"><i class="fa fa-bar-chart fa-fw fa-lg"
-                                                               aria-hidden="true"></i> {{ __('Outages') }}</a></li>
                         @if($package_count)
                             <li><a href="{{ url('search/search=packages') }}"><i class="fa fa-archive fa-fw fa-lg"
                                                                                  aria-hidden="true"></i> {{ __('Packages') }}
@@ -152,9 +150,7 @@
                             </ul>
                         </li>
                     @endif
-
                     @if($locations->isNotEmpty())
-                        <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
                             <a href="{{ url('locations') }}"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> {{ __('Geo Locations') }}</a>
                             <ul class="dropdown-menu scrollable-menu">
@@ -165,7 +161,11 @@
                             </ul>
                         </li>
                     @endif
-                    @admin
+                        <li role="presentation" class="divider"></li>
+                        <li><a href="{{ url('outages') }}"><i class="fa fa-bar-chart fa-fw fa-lg"
+                                                              aria-hidden="true"></i> {{ __('Outages') }}</a></li>
+
+                        @admin
                         <li role="presentation" class="divider"></li>
                         @can('manage', \App\Models\DeviceGroup::class)
                             <li><a href="{{ url('device-groups') }}"><i class="fa fa-th fa-fw fa-lg"
@@ -234,28 +234,42 @@
 
                         @if($custommaps->isNotEmpty())
                             <li role="presentation" class="divider"></li>
-                                @if($custommaps->count() == 1)
-                                <li class="dropdown-submenu"><a><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{__('Custom Maps') }}</a>
-                                    <ul class="dropdown-menu scrollable-menu">
-                                @endif
-                                        @foreach($custommaps as $map_group => $group_maps)
-                                            @if($map_group && $custommaps->count() > 1)
-                                            <li class="dropdown-submenu">
-                                            <a><i class="fa fa-map-marked fa-fw fa-lg"aria-hidden="true"></i> {{ $map_group  }}
-                                            </a>
-                                                <ul class="dropdown-menu scrollable-menu">
-                                            @endif
-                                            @foreach($group_maps as $map)
-                                            <li><a href="{{ route('maps.custom.show', ['map' => $map->custom_map_id]) }}"><i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
-                                                    {{ ucfirst($map->name) }}
-                                                </a></li>
-                                            @endforeach
-                                            @if($map_group && $custommaps->count() > 1)</ul></li>@endif
+                            @if($custommaps->count() == 1)
+                            <li class="dropdown-submenu"><a><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{__('Custom Maps') }}</a>
+                                <ul class="dropdown-menu scrollable-menu">
+                                    @foreach($custommaps as $map_group => $group_maps)
+                                        @foreach($group_maps as $map)
+                                        <li><a href="{{ route('maps.custom.show', ['map' => $map->custom_map_id]) }}"><i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
+                                            {{ ucfirst($map->name) }}
+                                        </a></li>
                                         @endforeach
-                                @if($custommaps->count() == 1)
+                                    @endforeach
+                                </ul>
+                            </li>
+                            @elseif($custommaps->count() < 20)
+                                @foreach($custommaps as $map_group => $group_maps)
+                                <li class="dropdown-submenu">
+                                    <a><i class="fa fa-map-marked fa-fw fa-lg"aria-hidden="true"></i> {{ $map_group  }}</a>
+                                    <ul class="dropdown-menu scrollable-menu">
+                                    @foreach($group_maps as $map)
+                                    <li><a href="{{ route('maps.custom.show', ['map' => $map->custom_map_id]) }}"><i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
+                                        {{ ucfirst($map->name) }}
+                                    </a></li>
+                                    @endforeach
                                     </ul>
                                 </li>
-                                @endif
+                                @endforeach
+                            @else
+                            <li class="dropdown-submenu"><a href="{{ route('maps.custom.list') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{__('Custom Maps') }}</a>
+                                <ul class="dropdown-menu scrollable-menu">
+                                    @foreach($custommaps as $map_group => $group_maps)
+                                        <li><a href="{{ route('maps.custom.list', ['group' => $map_group]) }}"><i class="fa fa-map-marked fa-fw fa-lg" aria-hidden="true"></i>
+                                            {{ ucfirst($map_group) }}
+                                        </a></li>
+                                    @endforeach
+                                </ul>
+                            </li>
+                            @endif
                         @endif
                         @admin
                         <li role="presentation" class="divider"></li>

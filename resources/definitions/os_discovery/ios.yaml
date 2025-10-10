@@ -1,7 +1,7 @@
 mib: POWER-ETHERNET-MIB:CISCO-POWER-ETHERNET-EXT-MIB:CISCO-ENTITY-FRU-CONTROL-MIB:CISCO-HSRP-MIB
 modules:
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:
@@ -19,7 +19,7 @@ modules:
                     oid: pethMainPseTable
                     value: pethMainPseConsumptionPower
                     num_oid: '.1.3.6.1.2.1.105.1.3.1.1.4.{{ $index }}'
-                    index: 'pethMainPseConsumptionPower.{{ $index }}' 
+                    index: 'pethMainPseConsumptionPower.{{ $index }}'
                     high_limit: pethMainPsePower
                     group: "PoE"
                     descr: "PoE Budget Consumed - ID {{ $index }}"
