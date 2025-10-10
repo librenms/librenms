@@ -1,7 +1,8 @@
-
 export default function toggleInput() {
     return {
         checked: false,
+        toggleBg: null,
+        toggleHandle: null,
 
         init() {
             // Initialize checked state from the actual checkbox
@@ -10,12 +11,14 @@ export default function toggleInput() {
             // Create the toggle element
             this.createToggle();
 
-            // Watch for changes to sync with checkbox and emit model updates
+            // Watch for changes to sync with checkbox and trigger Alpine's x-model update
             this.$watch('checked', (value) => {
                 this.$el.checked = value;
                 this.updateToggleAppearance();
-                // Emit input event so x-modelable can sync with parent scope
-                this.$dispatch('input', value);
+
+                // Trigger both input and change events for x-model
+                this.$el.dispatchEvent(new Event('input', { bubbles: true }));
+                this.$el.dispatchEvent(new Event('change', { bubbles: true }));
             });
         },
 
