@@ -3,12 +3,12 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "FortiManager",
+                    "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.12356.103.1.64",
-                    "sysDescr": "",
+                    "sysDescr": "FortiManager",
                     "sysContact": "<private>",
                     "version": "v5.6.0-build1557 170727 (GA)",
-                    "hardware": null,
+                    "hardware": "FortiManager (FMG) VM",
                     "features": "with Analyzer features",
                     "location": "<private>",
                     "os": "fortios",
