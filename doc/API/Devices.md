@@ -596,7 +596,7 @@ Output:
 Output is an image.
 
 
-### `get_port_graphs`
+### `get_device_ports`
 
 Get a list of ports for a particular device.
 
