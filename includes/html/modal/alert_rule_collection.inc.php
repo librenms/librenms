@@ -82,7 +82,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
                                 var template_rule_id = $(this).data("rule_id");
                                 $.ajax({
                                     type: "GET",
-                                    url: "<?php echo route('alert-rule-template', ':template_id') ?>".replace(':template_id', template_rule_id),
+                                    url: "<?php echo route('alert-rule-template.show', ':template_id') ?>".replace(':template_id', template_rule_id),
                                     dataType: "json",
                                     success: function (data) {
                                         if (data.status == 'ok') {
