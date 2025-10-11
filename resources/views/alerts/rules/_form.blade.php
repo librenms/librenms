@@ -95,42 +95,43 @@
                 <span class="help-block">{{ __('alerting.rules.notifications.severity.help') }}</span>
             </div>
         </div>
-        <div class="form-group">
+            <div class='form-group'>
+                <label for='mute' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.mute.label') }}</label>
+                <div class='col-sm-9 col-md-10'>
+                    <input type="checkbox" x-data="toggleInput()" x-model="rule.extra.mute">
+                    <span class="help-block">{{ __('alerting.rules.notifications.mute.help') }}</span>
+                </div>
+            </div>
+        <div class="form-group" x-show="! rule.extra.mute">
             <label for='delay' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.delay.label') }}</label>
             <div class="col-sm-9 col-md-10">
                 <input type='text' id='delay' name='delay' class='form-control' style="max-width: 7.5em" value="{{ $default_delay ?? '' }}" x-model="rule.extra.delay">
                 <span class="help-block">{{ __('alerting.rules.notifications.delay.help') }}</span>
             </div>
         </div>
-        <div class="form-group">
-            <label for='count' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.count.label') }}</label>
-            <div class="col-sm-9 col-md-10">
-                <input type='text' id='count' name='count' class='form-control' style="max-width: 7.5em" value="{{ $default_max_alerts ?? '' }}" x-model="rule.extra.count">
-                <span class="help-block">{{ __('alerting.rules.notifications.count.help') }}</span>
-            </div>
-        </div>
-        <div class="form-group">
+        <div class="form-group" x-show="! rule.extra.mute">
             <label for='interval' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.interval.label') }}</label>
             <div class="col-sm-9 col-md-10">
                 <input type='text' id='interval' name='interval' class='form-control' style="max-width: 7.5em" value="{{ $default_interval ?? '' }}" x-model="rule.extra.interval">
                 <span class="help-block">{{ __('alerting.rules.notifications.interval.help') }}</span>
             </div>
         </div>
-        <div class='form-group'>
-            <label for='mute' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.mute.label') }}</label>
-            <div class='col-sm-9 col-md-10'>
-                <input type="checkbox" x-data="toggleInput()" x-model="rule.extra.mute">
-                <span class="help-block">{{ __('alerting.rules.notifications.mute.help') }}</span>
+            <div class="form-group" x-show="! rule.extra.mute">
+                <label for='count' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.count.label') }}</label>
+                <div class="col-sm-9 col-md-10">
+                    <input type='text' id='count' name='count' class='form-control' style="max-width: 7.5em" value="{{ $default_max_alerts ?? '' }}" x-model="rule.extra.count">
+                    <span class="help-block">{{ __('alerting.rules.notifications.count.help') }}</span>
+                </div>
             </div>
-        </div>
-        <div class='form-group'>
+
+        <div class='form-group' x-show="! rule.extra.mute">
             <label for='recovery' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.recovery.label') }}</label>
             <div class='col-sm-9 col-md-10'>
                 <input type="checkbox" name="recovery" id="recovery" x-data="toggleInput()" x-model="rule.extra.recovery">
                 <span class="help-block">{{ __('alerting.rules.notifications.recovery.help') }}</span>
             </div>
         </div>
-        <div class='form-group'>
+        <div class='form-group' x-show="! rule.extra.mute">
             <label for='acknowledgement' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.notifications.acknowledgement.label') }}</label>
             <div class='col-sm-9 col-md-10'>
                 <input type="checkbox" name="acknowledgement" id="acknowledgement" x-data="toggleInput()" x-model="rule.extra.acknowledgement">
@@ -138,6 +139,7 @@
             </div>
         </div>
 
+            <div x-show="! rule.extra.mute">
         <legend>{{ __('alerting.rules.notifications.delivery.legend') }}</legend>
         <div class="form-group">
             <label for="transports" class="col-sm-3 col-md-2 control-label">{{ __('alerting.rules.notifications.delivery.label') }}</label>
@@ -146,7 +148,9 @@
                 <span class="help-block">{{ __('alerting.rules.notifications.delivery.help') }}</span>
             </div>
         </div>
+            </div>
 
+            <div x-show="! rule.extra.mute">
         <legend>{{ __('alerting.rules.templates.legend') }}</legend>
         <div class="form-group">
             <label for='template_id' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.templates.label') }}</label>
@@ -167,6 +171,7 @@
                 <span class="help-block">{{ __('alerting.rules.templates.per_transport.help') }}</span>
             </div>
         </div>
+            </div>
 
         <legend>{{ __('alerting.rules.notes.legend') }}</legend>
         <div class='form-group'>
@@ -222,6 +227,9 @@
                     acknowledgement: {{ ($default_acknowledgement_alerts ?? false) ? 'true' : 'false' }},
                     override_query: {{ ($default_invert_map ?? false) ? 'true' : 'false' }},
                     adv_query: '',
+                    count: 1,
+                    delay: 0,
+                    interval: 0,
                 },
                 invert_map: false,
                 maps: [],
