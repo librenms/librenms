@@ -11,15 +11,9 @@
         </h3>
     </div>
     <div class="panel-body">
-        <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active"><a href="#main" aria-controls="main" role="tab" data-toggle="tab">{{ __('Main') }}&nbsp;</a></li>
-            <li role="presentation"><a href="#advanced" aria-controls="advanced" role="tab" data-toggle="tab">{{ __('Advanced') }}&nbsp;</a></li>
-        </ul>
         <form method="post" role="form" id="rules" class="form-horizontal alerts-form">
             @csrf
 
-            <div class="tab-content" style="margin-top: 15px;">
-    <div role="tabpanel" class="tab-pane active" id="main">
         <legend>{{ __('alerting.rules.setup.legend') }}</legend>
         <div class='form-group'>
             <label for='rule_name' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.setup.name.label') }}</label>
@@ -28,7 +22,7 @@
                 <span class="help-block">{{ __('alerting.rules.setup.name.help') }}</span>
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group"  x-show="! rule.extra.override_query">
             <div class="col-sm-3 col-md-2">
                 <div class="dropdown">
                     <button class="btn btn-default dropdown-toggle" type="button" id="import-from" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -46,6 +40,21 @@
             <div class="col-sm-9 col-md-10">
                 <div id="builder"></div>
                 <span class="help-block">{{ __('alerting.rules.setup.builder.help') }}</span>
+            </div>
+        </div>
+
+        <div class='form-group' x-show="rule.extra.override_query">
+            <label for='adv_query' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.setup.sql.label') }}</label>
+            <div class='col-sm-9 col-md-10'>
+                <textarea id='adv_query' name='adv_query' class='form-control' rows="4" x-model="rule.extra.adv_query"></textarea>
+                <span class="help-block">{{ __('alerting.rules.setup.sql.help') }}</span>
+            </div>
+        </div>
+        <div class='form-group'>
+            <label for='override_query' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.setup.override_sql.label') }}</label>
+            <div class='col-sm-9 col-md-10'>
+                <input type='checkbox' name='override_query' id='override_query' x-data="toggleInput()" x-model="rule.extra.override_query">
+                <span class="help-block">{{ __('alerting.rules.setup.override_sql.help') }}</span>
             </div>
         </div>
         <div class='form-group'>
@@ -174,30 +183,13 @@
                 <span class="help-block">{{ __('alerting.rules.notes.notes.help') }}</span>
             </div>
         </div>
-    </div>
-    <div role="tabpanel" class="tab-pane" id="advanced">
-        <div class='form-group'>
-            <label for='override_query' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.advanced.override_sql.label') }}</label>
-            <div class='col-sm-9 col-md-10'>
-                <input type='checkbox' name='override_query' id='override_query' x-model="rule.extra.override_query">
-            </div>
-        </div>
-        <div class='form-group'>
-            <label for='adv_query' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.advanced.sql.label') }}</label>
-            <div class='col-sm-9 col-md-10'>
-                <textarea id='adv_query' name='adv_query' class='form-control' rows="3" x-model="rule.extra.adv_query"></textarea>
-                <span class="help-block">{{ __('alerting.rules.advanced.sql.help') }}</span>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="form-group">
-    <div class="col-sm-offset-3 col-sm-9 col-md-offset-2 col-md-10">
-        <button @click.prevent="save" class="btn btn-primary">{{ __('Save') }}</button>
-        <a href="javascript:void(0);" onclick="window.history.back();" class="btn btn-default">{{ __('Cancel') }}</a>
-    </div>
-</div>
+        <div class="form-group">
+            <div class="col-sm-offset-3 col-sm-9 col-md-offset-2 col-md-10">
+                <button @click.prevent="save" class="btn btn-primary">{{ __('Save') }}</button>
+                <a href="javascript:void(0);" onclick="window.history.back();" class="btn btn-default">{{ __('Cancel') }}</a>
+            </div>
+        </div>
 
         </form>
     </div>
@@ -228,9 +220,10 @@
                     invert: {{ ($default_invert_rule_match ?? false) ? 'true' : 'false' }},
                     recovery: {{ ($default_recovery_alerts ?? false) ? 'true' : 'false' }},
                     acknowledgement: {{ ($default_acknowledgement_alerts ?? false) ? 'true' : 'false' }},
-                    override_query: false,
+                    override_query: {{ ($default_invert_map ?? false) ? 'true' : 'false' }},
                     adv_query: '',
                 },
+                invert_map: false,
                 maps: [],
                 transports: [],
             },
@@ -492,7 +485,7 @@
                 $('#rule_id').val('');
                 var $severity = $('#severity');
                 if (!$severity.find('option:selected').length) { $severity.val($severity.find("option[selected]").val()); }
-                // $("#mute").bootstrapSwitch('state', {{ ($default_mute_alerts ?? false) ? 'true' : 'false' }});
+                 {{--$("#mute").bootstrapSwitch('state', {{ ($default_mute_alerts ?? false) ? 'true' : 'false' }});--}}
 {{--                $("#invert").bootstrapSwitch('state', {{ ($default_invert_rule_match ?? false) ? 'true' : 'false' }});--}}
 {{--                $("#recovery").bootstrapSwitch('state', {{ ($default_recovery_alerts ?? false) ? 'true' : 'false' }});--}}
 {{--                $("#acknowledgement").bootstrapSwitch('state', {{ ($default_acknowledgement_alerts ?? false) ? 'true' : 'false' }});--}}
