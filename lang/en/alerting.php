@@ -31,6 +31,14 @@ return [
             'builder' => [
                 'help' => 'Build an SQL query to match rows from the database. If the query returns row(s) this alert will trigger.',
             ],
+            'override_sql' => [
+                'label' => 'Override SQL',
+                'help' => 'Override the SQL query above with a custom SQL query.',
+            ],
+            'sql' => [
+                'label' => 'SQL',
+                'help' => 'Optional: Provide a raw SQL WHERE clause to override the builder. Must include one ? for device_id.',
+            ],
             'invert_match' => [
                 'label' => 'Invert match result',
                 'help' => 'Invert the match. If the rule matches, the alert is considered OK.',
@@ -108,15 +116,6 @@ return [
             'notes' => [
                 'label' => 'Notes',
                 'help' => 'A brief description for this alert rule',
-            ],
-        ],
-        'advanced' => [
-            'override_sql' => [
-                'label' => 'Override SQL',
-            ],
-            'sql' => [
-                'label' => 'SQL',
-                'help' => 'Optional: Provide a raw SQL WHERE clause to override the builder.',
             ],
         ],
         'placeholders' => [
