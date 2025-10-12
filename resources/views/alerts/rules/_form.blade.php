@@ -30,8 +30,8 @@
                         <span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="import-from" id="import-dropdown">
-                        <li><a href="#" name="import-query" id="import-query">{{ __('alerting.rules.setup.import.sql_query') }}</a></li>
-                        <li><a href="#" name="import-old-format" id="import-old-format">{{ __('alerting.rules.setup.import.old_format') }}</a></li>
+                        <li><a href="#" x-on:click.prevent="importSql">{{ __('alerting.rules.setup.import.sql_query') }}</a></li>
+                        <li><a href="#" x-on:click.prevent="importOld">{{ __('alerting.rules.setup.import.old_format') }}</a></li>
                         <li><a href="#" name="import-collection" id="import-collection">{{ __('alerting.rules.setup.import.collection') }}</a></li>
                         <li><a href="#" name="import-alert_rule" id="import-alert_rule">{{ __('alerting.rules.setup.import.alert_rule') }}</a></li>
                     </ul>
@@ -522,26 +522,26 @@
             });
 
             // Import helpers
-            $('#import-query').on('click', function (e) {
-                e.preventDefault();
-                var sql_import = window.prompt(@json(__('alerting.rules.messages.prompt_sql_query')));
-                if (sql_import) { try { $("#builder").queryBuilder("setRulesFromSQL", sql_import); } catch (e) { alert(@json(__('alerting.rules.messages.query_not_parsed'))); } }
-            });
-            $('#import-old-format').on('click', function (e) {
-                e.preventDefault();
-                var old_import = window.prompt(@json(__('alerting.rules.messages.prompt_old_rule')));
-                if (old_import) {
-                    try {
-                        old_import = old_import.replace(/&&/g, 'AND');
-                        old_import = old_import.replace(/\|\|/g, 'OR');
-                        old_import = old_import.replace(/%/g, '');
-                        old_import = old_import.replace(/"/g, "'");
-                        old_import = old_import.replace(/~/g, 'REGEXP');
-                        old_import = old_import.replace(/@/g, '.*');
-                        $("#builder").queryBuilder("setRulesFromSQL", old_import);
-                    } catch (e) { alert('Your query could not be parsed'); }
-                }
-            });
+            {{--$('#import-query').on('click', function (e) {--}}
+            {{--    e.preventDefault();--}}
+            {{--    var sql_import = window.prompt(@json(__('alerting.rules.messages.prompt_sql_query')));--}}
+            {{--    if (sql_import) { try { $("#builder").queryBuilder("setRulesFromSQL", sql_import); } catch (e) { alert(@json(__('alerting.rules.messages.query_not_parsed'))); } }--}}
+            {{--});--}}
+            {{--$('#import-old-format').on('click', function (e) {--}}
+            {{--    e.preventDefault();--}}
+            {{--    var old_import = window.prompt(@json(__('alerting.rules.messages.prompt_old_rule')));--}}
+            {{--    if (old_import) {--}}
+            {{--        try {--}}
+            {{--            old_import = old_import.replace(/&&/g, 'AND');--}}
+            {{--            old_import = old_import.replace(/\|\|/g, 'OR');--}}
+            {{--            old_import = old_import.replace(/%/g, '');--}}
+            {{--            old_import = old_import.replace(/"/g, "'");--}}
+            {{--            old_import = old_import.replace(/~/g, 'REGEXP');--}}
+            {{--            old_import = old_import.replace(/@/g, '.*');--}}
+            {{--            $("#builder").queryBuilder("setRulesFromSQL", old_import);--}}
+            {{--        } catch (e) { alert('Your query could not be parsed'); }--}}
+            {{--    }--}}
+            {{--});--}}
             $('#import-collection').on('click', function (e) { e.preventDefault(); $("#search_rule_modal").modal('show'); });
             $('#import-alert_rule').on('click', function (e) { e.preventDefault(); $("#search_alert_rule_modal").modal('show'); });
         });

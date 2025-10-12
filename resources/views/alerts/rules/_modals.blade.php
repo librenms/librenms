@@ -64,7 +64,7 @@
 </div>
 
 <script>
-    (function() {
+    document.addEventListener("DOMContentLoaded", () => {
         var grid = $("#rule_collection").bootgrid({
             caseSensitive: false,
             formatters: {
@@ -115,5 +115,5 @@
                     });
             }).end();
         });
-    })();
+    });
 </script>
