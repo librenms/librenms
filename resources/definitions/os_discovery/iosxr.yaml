@@ -6,6 +6,7 @@ modules:
                 -
                     oid: CISCO-GNSS-MIB::cGnssModuleSatelliteCount
                     value:  CISCO-GNSS-MIB::cGnssModuleSatelliteCount
+                    index: 'cGnssModuleSatelliteCount.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.9.9.862.1.6.{{ $index }}'
                     group: "GNSS"
                     descr: "Number of Satellites Tracked"
@@ -36,7 +37,7 @@ modules:
                     value: CISCO-GNSS-MIB::cGnssSatelliteVisibilityStatus
                     num_oid: '.1.3.6.1.4.1.9.9.862.1.5.{{ $index }}'
                     descr: 'GNSS Visibility Status'
-                    index: 0
+                    index: 'cGnssSatelliteVisibilityStatus.{{ $index }}'
                     group: 'GNSS'
                     states:
                         - { value:  1, generic: 1, graph: 0, descr: 'bad' }
@@ -46,7 +47,7 @@ modules:
                     value: CISCO-GNSS-MIB::cGnssModuleLockStatus
                     num_oid: '.1.3.6.1.4.1.9.9.862.1.1.{{ $index }}'
                     descr: 'GNSS Module Lock Status'
-                    index: 0
+                    index: 'cGnssModuleLockStatus.{{ $index }}'
                     group: 'GNSS'
                     states:
                         - { value:  1, generic: 1, graph: 0, descr: 'bad' }
@@ -56,7 +57,7 @@ modules:
                     value: CISCO-GNSS-MIB::cGnssModuleSCAlarmStatus
                     num_oid: '.1.3.6.1.4.1.9.9.862.1.8.{{ $index }}'
                     descr: 'GNSS Module Short-Circuit Alarm'
-                    index: 0
+                    index: 'cGnssModuleSCAlarmStatus.{{ $index }}'
                     group: 'GNSS'
                     states:
                         - { value:  1, generic: 1, graph: 0, descr: 'alarm' }
@@ -66,7 +67,7 @@ modules:
                     value: CISCO-GNSS-MIB::cGnssModuleOCAlarmStatus
                     num_oid: '.1.3.6.1.4.1.9.9.862.1.9.{{ $index }}'
                     descr: 'GNSS Module Open-Circuit Alarm'
-                    index: 0
+                    index: 'cGnssModuleOCAlarmStatus.{{ $index }}'
                     group: 'GNSS'
                     states:
                         - { value:  1, generic: 1, graph: 0, descr: 'alarm' }
