@@ -68,7 +68,7 @@ return [
             ],
             'delay' => [
                 'label' => 'Delay',
-                'help' => 'How long to wait before issuing a notification. If the alert clears before the delay, no notification will be issued. (s,m,h,d)',
+                'help' => 'How long to wait before issuing a notification. If the alert clears before the delay, no notification will be issued. Note that generally, data is only updated when the poller runs. (s,m,h,d)',
             ],
             'count' => [
                 'label' => 'Max alerts',
