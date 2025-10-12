@@ -10,7 +10,9 @@ modules:
     os:
         version: FORTINET-FORTIGATE-MIB::fgSysVersion.0
         serial: ENTITY-MIB::entPhysicalSerialNum.1
-        hardware: ENTITY-MIB::entPhysicalModelName.1
+        hardware:
+                    - SNMPv2-MIB::sysObjectID.0
+                    - ENTITY-MIB::entPhysicalModelName.1
     processors:
         data:
             -
