@@ -10,7 +10,7 @@ modules:
         charge:
             data:
                 -
-                    oid: UPS-MIB:;upsEstimatedChargeRemaining
+                    oid: UPS-MIB::upsEstimatedChargeRemaining
                     value: UPS-MIB::upsEstimatedChargeRemaining
                     num_oid: '.1.3.6.1.2.1.33.1.2.4.{{ $index }}'
                     index: 'upsEstimatedChargeRemaining.{{ $index }}'
