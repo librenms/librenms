@@ -26,6 +26,7 @@
 
 namespace LibreNMS;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\ValidationGroup;
 use LibreNMS\Util\Laravel;
@@ -300,7 +301,7 @@ class Validator
      */
     public function getBaseURL(): string
     {
-        $url = function_exists('get_url') ? get_url() : Config::get('base_url');
+        $url = function_exists('get_url') ? get_url() : LibrenmsConfig::get('base_url');
 
         return rtrim(str_replace('validate', '', $url), '/');  // get base_url from current url
     }

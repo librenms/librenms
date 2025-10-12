@@ -26,16 +26,16 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Carbon\Carbon;
-use LibreNMS\Config;
 use LibreNMS\Data\Store\Graphite;
 use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Group;
 use Socket\Raw\Socket;
 
 #[Group('datastores')]
-class GraphiteStoreTest extends TestCase
+final class GraphiteStoreTest extends TestCase
 {
     protected int $timestamp = 1197464400;
 
@@ -45,14 +45,14 @@ class GraphiteStoreTest extends TestCase
 
         // fix the date
         Carbon::setTestNow(Carbon::createFromTimestampUTC($this->timestamp));
-        Config::set('graphite.enable', true);
+        LibrenmsConfig::set('graphite.enable', true);
     }
 
     protected function tearDown(): void
     {
         // restore Carbon:now() to normal
         Carbon::setTestNow();
-        Config::set('graphite.enable', false);
+        LibrenmsConfig::set('graphite.enable', false);
 
         parent::tearDown();
     }

@@ -24,11 +24,11 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use App\Facades\LibrenmsConfig;
 use Exception;
 use Illuminate\Support\Str;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alert\Transport;
-use LibreNMS\Config;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use Spatie\Permission\Models\Role;
 
@@ -43,7 +43,7 @@ class Mail extends Transport
             default => $this->config['email'] ?? $alert_data['contacts'] ?? [], // contacts is only used by legacy synthetic transport
         };
 
-        $html = Config::get('email_html');
+        $html = LibrenmsConfig::get('email_html');
 
         if ($html && ! $this->isHtmlContent($alert_data['msg'])) {
             // if there are no html tags in the content, but we are sending an html email, use br for line returns instead

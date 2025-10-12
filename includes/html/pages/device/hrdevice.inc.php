@@ -2,26 +2,26 @@
 
 echo '<h3>Inventory</h3>';
 echo '<hr>';
-echo '<table class="table table-condensed">';
+echo '<table class="table table-hover">';
 
-echo "<tr class='list'><th>Index</th><th>Description</th><th></th><th>Type</th><th>Status</th><th>Errors</th><th>Load</th></tr>";
+echo '<tr><th>Index</th><th>Description</th><th></th><th>Type</th><th>Status</th><th>Errors</th><th>Load</th></tr>';
 foreach (dbFetchRows('SELECT * FROM `hrDevice` WHERE `device_id` = ? ORDER BY `hrDeviceIndex`', [$device['device_id']]) as $hrdevice) {
-    echo "<tr class='list'><td>" . $hrdevice['hrDeviceIndex'] . '</td>';
+    echo "<tr><td>{$hrdevice['hrDeviceIndex']}</td>";
 
     if ($hrdevice['hrDeviceType'] == 'hrDeviceProcessor') {
         $proc_id = dbFetchCell("SELECT processor_id FROM processors WHERE device_id = '" . $device['device_id'] . "' AND hrDeviceIndex = '" . $hrdevice['hrDeviceIndex'] . "'");
         $proc_url = 'device/device=' . $device['device_id'] . '/tab=health/metric=processor/';
         $proc_popup = "onmouseover=\"return overlib('<div class=list-large>" . $device['hostname'] . ' - ' . $hrdevice['hrDeviceDescr'];
-        $proc_popup .= "</div><img src=\'graph.php?id=" . $proc_id . '&amp;type=processor_usage&amp;from=' . \LibreNMS\Config::get('time.month') . '&amp;to=' . \LibreNMS\Config::get('time.now') . "&amp;width=400&amp;height=125\'>";
-        $proc_popup .= "', RIGHT" . \LibreNMS\Config::get('overlib_defaults') . ');" onmouseout="return nd();"';
+        $proc_popup .= "</div><img src=\'graph.php?id=" . $proc_id . '&amp;type=processor_usage&amp;from=' . \App\Facades\LibrenmsConfig::get('time.month') . '&amp;to=' . \App\Facades\LibrenmsConfig::get('time.now') . "&amp;width=400&amp;height=125\'>";
+        $proc_popup .= "', RIGHT" . \App\Facades\LibrenmsConfig::get('overlib_defaults') . ');" onmouseout="return nd();"';
         echo "<td><a href='$proc_url' $proc_popup>" . $hrdevice['hrDeviceDescr'] . '</a></td>';
 
         $graph_array['height'] = '20';
         $graph_array['width'] = '100';
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
         $graph_array['id'] = $proc_id;
         $graph_array['type'] = 'processor_usage';
-        $graph_array['from'] = \LibreNMS\Config::get('time.day');
+        $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
         $graph_array_zoom = $graph_array;
         $graph_array_zoom['height'] = '150';
         $graph_array_zoom['width'] = '400';
@@ -43,10 +43,10 @@ foreach (dbFetchRows('SELECT * FROM `hrDevice` WHERE `device_id` = ? ORDER BY `h
 
             $graph_array['height'] = '20';
             $graph_array['width'] = '100';
-            $graph_array['to'] = \LibreNMS\Config::get('time.now');
+            $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
             $graph_array['id'] = $interface['port_id'];
             $graph_array['type'] = 'port_bits';
-            $graph_array['from'] = \LibreNMS\Config::get('time.day');
+            $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
             $graph_array_zoom = $graph_array;
             $graph_array_zoom['height'] = '150';
             $graph_array_zoom['width'] = '400';

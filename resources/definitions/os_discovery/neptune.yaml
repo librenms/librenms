@@ -1,3 +1,150 @@
 modules:
     os:
         sysDescr_regex: '/(?<hardware>NPT.+), V(?<version>[\d.-]+)/'
+    processors:
+        data:
+            -
+                oid: NPT-SYSTEM-MIB::nptCpuInfoTable
+                value: NPT-SYSTEM-MIB::nptIdle
+                num_oid: '.1.3.6.1.4.1.1286.5.1.1.2.1.5.1.18.{{ $index }}'
+                descr: '{{ NPT-SYSTEM-MIB::nptCpuPhysicalBoardType }}: {{ NPT-SYSTEM-MIB::nptCpuType }}'
+                precision: -10
+    mempools:
+        data:
+            -
+                total: NPT-SYSTEM-MIB::nptMemoryTotaly
+                free: NPT-SYSTEM-MIB::nptMemoryFree
+                descr: '{{ NPT-SYSTEM-MIB::nptMemoryPhysicalBoardType }} Memory'
+                precision: 1000
+    sensors:
+        voltage:
+            data:
+                -
+                    oid: NPT-SYSTEM-MIB::nptChassisPowerTable
+                    value: NPT-SYSTEM-MIB::nptChassisPowerCurrentInputDCVoltage
+                    num_oid: '.1.3.6.1.4.1.1286.5.1.1.2.1.9.1.1.3.{{ $index }}'
+                    divisor: 100
+                    index: 'psu-{{ $index }}'
+                    descr: '{{ NPT-SYSTEM-MIB::nptChassisPowerObjectName }} Voltage'
+                -
+                    oid: NPT-SYSTEM-MIB::nptTransceiverPowerTable
+                    value: NPT-SYSTEM-MIB::nptLaservoltage
+                    num_oid: '.1.3.6.1.4.1.1286.5.1.1.2.1.8.4.1.1.3.{{ $index }}'
+                    divisor: 10
+                    descr: Laser Voltage
+                    group: transceiver
+                    index: 'optic-{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    entPhysicalIndex: '{{ $index }}'
+        current:
+            data:
+                -
+                    oid: NPT-SYSTEM-MIB::nptChassisPowerTable
+                    value: NPT-SYSTEM-MIB::nptChassisPowerCurrentInputDCCurrent
+                    num_oid: '.1.3.6.1.4.1.1286.5.1.1.2.1.9.1.1.4.{{ $index }}'
+                    divisor: 100
+                    index: 'psu-{{ $index }}'
+                    descr: '{{ NPT-SYSTEM-MIB::nptChassisPowerObjectName }} Current'
+                -
+                    oid: NPT-SYSTEM-MIB::nptTransceiverPowerTable
+                    value: NPT-SYSTEM-MIB::nptLaserbiascurrent
+                    num_oid: '.1.3.6.1.4.1.1286.5.1.1.2.1.8.4.1.1.4.{{ $index }}'
+                    divisor: 10000
+                    index: 'optic-{{ $index }}'
+                    descr: '{{ NPT-SYSTEM-MIB::nptTransceiverPowerName }} Laser Bias'
+                    group: transceiver
+                    entPhysicalIndex_measured: ports
+                    entPhysicalIndex: '{{ $index }}'
+                -
+                    oid: NPT-SYSTEM-MIB::nptTransceiverPowerMultilaneTable
+                    value: NPT-SYSTEM-MIB::nptLaneLaserBiasCur
+                    num_oid: '.1.3.6.1.4.1.1286.5.1.1.2.1.8.4.2.1.6.{{ $index }}'
+                    divisor: 10000
+                    index: 'optic-{{ $index }}'
+                    descr: "{{ NPT-SYSTEM-MIB::nptTransceiverPowerMultilaneName|replace('//object=transceiver//port-name=','') }} Channel {{ NPT-SYSTEM-MIB::nptLaneNum }} Laser Bias"
+                    group: transceiver
+                    entPhysicalIndex_measured: ports
+                    entPhysicalIndex: '{{ $subindex0 }}'
+
+        temperature:
+            data:
+                -
+                    oid: NPT-SYSTEM-MIB::nptCardTemperatureTable
+                    value: NPT-SYSTEM-MIB::nptTemperature
+                    num_oid: '.1.3.6.1.4.1.1286.5.1.1.2.1.10.3.1.4.{{ $index }}'
+                    divisor: 10
+                    index: 'card-{{ $index }}'
+                    descr: '{{ NPT-SYSTEM-MIB::nptCardName }} Temperature'
+                    high_limit: NPT-SYSTEM-MIB::nptHighAlarmThreshold
+                    warn_limit: NPT-SYSTEM-MIB::nptHighWarnThreshold
+                    low_warn_limit: NPT-SYSTEM-MIB::nptLowWarnThreshold
+                    low_limit: NPT-SYSTEM-MIB::nptLowAlarmThreshold
+                -
+                    oid: NPT-SYSTEM-MIB::nptTransceiverPowerTable
+                    value: NPT-SYSTEM-MIB::nptLasertemperature
+                    num_oid: '.1.3.6.1.4.1.1286.5.1.1.2.1.8.4.1.1.5.{{ $index }}'
+                    divisor: 10
+                    index: 'optic-{{ $index }}'
+                    descr: '{{ NPT-SYSTEM-MIB::nptTransceiverPowerName }} Temperature'
+                    group: transceiver
+                    entPhysicalIndex_measured: ports
+                    entPhysicalIndex: '{{ $index }}'
+        dbm:
+            data:
+                -
+                    oid: NPT-SYSTEM-MIB::nptTransceiverPowerTable
+                    value: NPT-SYSTEM-MIB::nptRxlaserpower
+                    num_oid: '.1.3.6.1.4.1.1286.5.1.1.2.1.8.4.1.1.7.{{ $index }}'
+                    divisor: 10
+                    index: 'optic-rx-{{ $index }}'
+                    descr: "{{ NPT-SYSTEM-MIB::nptTransceiverPowerName|replace('//object=transceiver//port-name=','') }} RX Power"
+                    group: transceiver
+                    entPhysicalIndex_measured: ports
+                    entPhysicalIndex: '{{ $index }}'
+                -
+                    oid: NPT-SYSTEM-MIB::nptTransceiverPowerTable
+                    value: NPT-SYSTEM-MIB::nptTxlaserpower
+                    num_oid: '.1.3.6.1.4.1.1286.5.1.1.2.1.8.4.1.1.6.{{ $index }}'
+                    divisor: 10
+                    index: 'optic-tx-{{ $index }}'
+                    descr: "{{ NPT-SYSTEM-MIB::nptTransceiverPowerName|replace('//object=transceiver//port-name=','') }} TX Power"
+                    group: transceiver
+                    entPhysicalIndex_measured: ports
+                    entPhysicalIndex: '{{ $index }}'
+                -
+                    oid: NPT-SYSTEM-MIB::nptTransceiverPowerMultilaneTable
+                    value: NPT-SYSTEM-MIB::nptLaneRxLaserPower
+                    num_oid: '.1.3.6.1.4.1.1286.5.1.1.2.1.8.4.2.1.5.{{ $index }}'
+                    divisor: 10
+                    index: 'optic-rx-{{ $index }}'
+                    descr: "{{ NPT-SYSTEM-MIB::nptTransceiverPowerMultilaneName|replace('//object=transceiver//port-name=','') }} Channel {{ NPT-SYSTEM-MIB::nptLaneNum }} RX Power"
+                    group: transceiver
+                    entPhysicalIndex_measured: ports
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                -
+                    oid: NPT-SYSTEM-MIB::nptTransceiverPowerMultilaneTable
+                    value: NPT-SYSTEM-MIB::nptLaneTxLaserPower
+                    num_oid: '.1.3.6.1.4.1.1286.5.1.1.2.1.8.4.2.1.4.{{ $index }}'
+                    divisor: 10
+                    descr: "{{ NPT-SYSTEM-MIB::nptTransceiverPowerMultilaneName|replace('//object=transceiver//port-name=','') }} Channel {{ NPT-SYSTEM-MIB::nptLaneNum }} TX Power"
+                    group: transceiver
+                    index: 'optic-tx-{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    entPhysicalIndex: '{{ $subindex0 }}'
+        power:
+            data:
+                -
+                    oid: NPT-SYSTEM-MIB::nptChassisPowerTable
+                    value: NPT-SYSTEM-MIB::nptChassisPowerCurrentPowerConsumption
+                    num_oid: '.1.3.6.1.4.1.1286.5.1.1.2.1.9.1.1.9.{{ $index }}'
+                    divisor: 100
+                    index: 'psu-{{ $index }}'
+                    descr: "{{ NPT-SYSTEM-MIB::nptChassisPowerObjectName }} Current"
+                -
+                    oid: NPT-SYSTEM-MIB::nptChassisPowerTable
+                    value: NPT-SYSTEM-MIB::nptChassisPowerShelfPowerConsumption
+                    num_oid: '.1.3.6.1.4.1.1286.5.1.1.2.1.9.1.1.9.{{ $index }}'
+                    divisor: 100
+                    index: 'psu-shelf-{{ $index }}'
+                    descr: "{{ NPT-SYSTEM-MIB::nptChassisPowerObjectName }} Current"
+

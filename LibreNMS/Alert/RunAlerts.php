@@ -32,12 +32,13 @@
 namespace LibreNMS\Alert;
 
 use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Models\AlertTransport;
 use App\Models\Eventlog;
 use LibreNMS\Alerting\QueryBuilderParser;
-use LibreNMS\Config;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Polling\ConnectivityHelper;
@@ -119,7 +120,7 @@ class RunAlerts
         $obj['proc'] = $alert['proc'];
         $obj['status'] = $device->status;
         $obj['status_reason'] = $device->status_reason;
-        if ((new ConnectivityHelper($device))->canPing()) {
+        if (ConnectivityHelper::pingIsAllowed($device)) {
             $last_ping = Rrd::lastUpdate(Rrd::name($device->hostname, 'icmp-perf'));
             if ($last_ping) {
                 $obj['ping_timestamp'] = $last_ping->timestamp;
@@ -197,7 +198,7 @@ class RunAlerts
         $obj['uid'] = $alert['id'];
         $obj['alert_id'] = $alert['alert_id'];
         $obj['severity'] = $alert['severity'];
-        $obj['rule'] = $alert['rule'] ?: json_encode($alert['builder']);
+        $obj['rule'] = $alert['builder']; //Backwards compatibility for old rule
         $obj['name'] = $alert['name'];
         $obj['timestamp'] = $alert['time_logged'];
         $obj['contacts'] = $extra['contacts'];
@@ -250,7 +251,7 @@ class RunAlerts
      */
     public function issueAlert($alert)
     {
-        if (Config::get('alert.fixed-contacts') == false) {
+        if (LibrenmsConfig::get('alert.fixed-contacts') == false) {
             if (empty($alert['query'])) {
                 $alert['query'] = QueryBuilderParser::fromJson($alert['builder'])->toSql();
             }
@@ -262,7 +263,7 @@ class RunAlerts
         $obj = $this->describeAlert($alert);
         if (is_array($obj)) {
             echo 'Issuing Alert-UID #' . $alert['id'] . '/' . $alert['state'] . ':' . PHP_EOL;
-            if ($alert['state'] != AlertState::ACKNOWLEDGED || Config::get('alert.acknowledged') === true) {
+            if ($alert['state'] != AlertState::ACKNOWLEDGED || LibrenmsConfig::get('alert.acknowledged') === true) {
                 $this->extTransports($obj);
             }
             echo "\r\n";
@@ -496,7 +497,7 @@ class RunAlerts
                 $noiss = true;
             }
 
-            $tolerence_window = Config::get('alert.tolerance_window');
+            $tolerence_window = LibrenmsConfig::get('alert.tolerance_window');
             if (! empty($rextra['count']) && empty($rextra['interval'])) {
                 // This check below is for compat-reasons
                 if (! empty($rextra['delay']) && $alert['state'] != AlertState::RECOVERED) {
@@ -548,7 +549,15 @@ class RunAlerts
                 $noacc = false;
             }
 
-            if (AlertUtil::isMaintenance($alert['device_id'])) {
+            $maintenance_status = AlertUtil::getMaintenanceStatus($alert['device_id']);
+            // Do not send alert notifications for these types of scheduled maintenance
+            if ($maintenance_status == MaintenanceStatus::MUTE_ALERTS) {
+                $noiss = true;
+            }
+
+            // If alert rule checks are to be skipped, ensure that this alert is
+            // not to be handled again by this method again (by changing open to 0 later)
+            if ($maintenance_status == MaintenanceStatus::SKIP_ALERTS) {
                 $noiss = true;
                 $noacc = true;
             }
@@ -601,10 +610,11 @@ class RunAlerts
         }
 
         // alerting for default contacts, etc
-        if (Config::get('alert.transports.mail') === true && ! empty($obj['contacts'])) {
+        if (LibrenmsConfig::get('alert.transports.mail') === true && ! empty($obj['contacts'])) {
             $transport_maps[] = [
                 'transport_id' => null,
                 'transport_type' => 'mail',
+                'transport_name' => 'Default Mail',
             ];
         }
 

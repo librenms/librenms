@@ -26,11 +26,11 @@
 
 namespace LibreNMS\Device;
 
+use App\Facades\LibrenmsConfig;
 use App\View\SimpleTemplate;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
 use LibreNMS\Util\Compare;
@@ -59,7 +59,7 @@ class YamlDiscovery
         d_echo($yaml_data);
 
         foreach ($yaml_data as $first_key => $first_yaml) {
-            if ($first_key == 'pre-cache') {
+            if ($first_key == 'pre-cache' || $first_key == 'additional_oids') {
                 continue;
             }
 
@@ -198,6 +198,13 @@ class YamlDiscovery
             foreach (explode('.', $index) as $pos => $subindex) {
                 $variables['subindex' . $pos] = $subindex;
             }
+
+            // try simple replacement first
+            if (isset($def['oid']) && isset($pre_cache[$def['oid']][$index]) && is_array($pre_cache[$def['oid']][$index])) {
+                $variables = array_merge($variables, $pre_cache[$def['oid']][$index]);
+            }
+
+//            if($pre_cache) dd($pre_cache, $def);
             $value = (string) (new SimpleTemplate($def[$name] ?? '', $variables))->keepEmptyTemplates();
 
             // search discovery data for values
@@ -236,18 +243,18 @@ class YamlDiscovery
      * @param  string  $name  The name of the field from the discovery data or just an oid
      * @param  string|int  $index  The index of the current sensor
      * @param  array  $discovery_data  The discovery data for the current sensor
-     * @param  array  $pre_cache  all pre-cached snmp data
+     * @param  array  $pre_fetched  all pre-fetched snmp data
      * @param  mixed  $default  The default value to return if data is not found
      * @return mixed
      */
-    public static function getValueFromData($name, $index, $discovery_data, $pre_cache, $default = null)
+    public static function getValueFromData($name, $index, $discovery_data, $pre_fetched, $default = null)
     {
         if (isset($discovery_data[$name])) {
             $name = $discovery_data[$name];
         }
 
-        if (isset($discovery_data['oid']) && ! is_array($discovery_data['oid']) && isset($pre_cache[$discovery_data['oid']][$index]) && isset($pre_cache[$discovery_data['oid']][$index][$name])) {
-            $value = $pre_cache[$discovery_data['oid']][$index][$name];
+        if (isset($discovery_data['oid']) && ! is_array($discovery_data['oid']) && isset($pre_fetched[$discovery_data['oid']][$index]) && isset($pre_fetched[$discovery_data['oid']][$index][$name])) {
+            $value = $pre_fetched[$discovery_data['oid']][$index][$name];
             Log::debug("Using $value from \$pre_cache[\$discovery_data['oid']][$index][$name] for $name");
 
             return $value;
@@ -258,8 +265,8 @@ class YamlDiscovery
             $name = substr($name, 0, -2);
         }
 
-        if (isset($pre_cache[$index][$name])) {
-            $value = $pre_cache[$index][$name];
+        if (isset($pre_fetched[$index][$name])) {
+            $value = $pre_fetched[$index][$name];
             Log::debug("Using $value from \$pre_cache[$index][$name] for $name");
 
             return $value;
@@ -275,31 +282,31 @@ class YamlDiscovery
 
             // if subindex is a range, get them all, otherwise just get the first
             $index = isset($matches[3])
-                ? implode('.', array_slice($sub_indexes, (int) $matches[2], (int) ($matches[3] - $matches[2] + 1)))
+                ? implode('.', array_slice($sub_indexes, (int) $matches[2], ((int) $matches[3]) - ((int) $matches[2]) + 1))
                 : $sub_indexes[(int) $matches[2]];
         }
 
         // look for the data in pre_cache
-        if (isset($pre_cache[$name]) && ! is_numeric($name)) {
-            if (is_array($pre_cache[$name])) {
-                if (isset($pre_cache[$name][$index][$name])) {
-                    $value = $pre_cache[$name][$index][$name];
+        if (isset($pre_fetched[$name]) && ! is_numeric($name)) {
+            if (is_array($pre_fetched[$name])) {
+                if (isset($pre_fetched[$name][$index][$name])) {
+                    $value = $pre_fetched[$name][$index][$name];
                     Log::debug("Using $value from \$pre_cache[$name][$index][$name] for $name");
 
                     return $value;
-                } elseif (isset($pre_cache[$name][$index])) {
-                    $value = $pre_cache[$name][$index];
+                } elseif (isset($pre_fetched[$name][$index])) {
+                    $value = $pre_fetched[$name][$index];
                     Log::debug("Using $value from \$pre_cache[$name][$index] for $name");
 
                     return $value;
-                } elseif (count($pre_cache[$name]) === 1 && ! is_array(current($pre_cache[$name]))) {
-                    $value = current($pre_cache[$name]);
+                } elseif (count($pre_fetched[$name]) === 1 && ! is_array(current($pre_fetched[$name]))) {
+                    $value = current($pre_fetched[$name]);
                     Log::debug("Using sole entry $value from \$pre_cache[$name] array for $name");
 
                     return $value;
                 }
             } else {
-                $value = $pre_cache[$name];
+                $value = $pre_fetched[$name];
                 Log::debug("Using $value from from \$pre_cache[$name] for $name");
 
                 return $value;
@@ -308,7 +315,7 @@ class YamlDiscovery
 
         // search for name inside walked tables if oid is fully qualified
         if (str_contains($name, '::')) {
-            foreach ($pre_cache as $table_name => $table) {
+            foreach ($pre_fetched as $table_name => $table) {
                 if (is_array($table) && isset($table[$index][$name])) {
                     $value = $table[$index][$name];
                     Log::debug("Using $value from walked {$table_name}[$index][$name] for $name");
@@ -321,7 +328,7 @@ class YamlDiscovery
         return $default;
     }
 
-    public static function preCache(OS $os)
+    public static function preCache(OS $os): array
     {
         // Pre-cache data for later use
         $pre_cache = [];
@@ -352,7 +359,7 @@ class YamlDiscovery
                         continue;
                     }
 
-                    $saved_nobulk = Config::getOsSetting($os->getName(), 'snmp_bulk', true);
+                    $saved_nobulk = LibrenmsConfig::getOsSetting($os->getName(), 'snmp_bulk', true);
 
                     foreach ($data_array as $data) {
                         foreach (Arr::wrap($data['oid'] ?? []) as $oid) {
@@ -371,13 +378,13 @@ class YamlDiscovery
 
                                 // disable bulk request for specific data
                                 if (isset($data['snmp_bulk'])) {
-                                    Config::set('os.' . $os->getName() . '.snmp_bulk', (bool) $data['snmp_bulk']);
+                                    LibrenmsConfig::set('os.' . $os->getName() . '.snmp_bulk', (bool) $data['snmp_bulk']);
                                 }
 
                                 $mib = $os->getDiscovery()['mib'] ?? null;
                                 $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid] ?? [], $mib, null, $snmp_flag);
 
-                                Config::set('os.' . $os->getName() . '.snmp_bulk', $saved_nobulk);
+                                LibrenmsConfig::set('os.' . $os->getName() . '.snmp_bulk', $saved_nobulk);
                             }
                         }
                     }
@@ -396,15 +403,15 @@ class YamlDiscovery
      * @param  int|string  $index
      * @param  array  $yaml_item_data  The data key from this item
      * @param  array  $group_options  The options key from this group of items
-     * @param  array  $pre_cache  The pre-cache data array
+     * @param  array  $pre_fetched  The pre-fetched data array
      * @return bool
      */
-    public static function canSkipItem($value, $index, array $yaml_item_data, array $group_options, array $pre_cache = []): bool
+    public static function canSkipItem($value, $index, array $yaml_item_data, array $group_options, array $pre_fetched = []): bool
     {
         $skip_values = array_replace((array) ($group_options['skip_values'] ?? []), (array) ($yaml_item_data['skip_values'] ?? []));
 
         foreach ($skip_values as $skip_value) {
-            if (is_array($skip_value) && $pre_cache) {
+            if (is_array($skip_value) && $pre_fetched) {
                 // Dynamic skipping of data
                 $op = $skip_value['op'] ?? '!=';
 
@@ -415,10 +422,10 @@ class YamlDiscovery
                     $tmp_value = $index;
                 } else {
                     // oid previously fetched from the device
-                    $tmp_value = static::getValueFromData($skip_value['oid'], $index, $yaml_item_data, $pre_cache);
+                    $tmp_value = static::getValueFromData($skip_value['oid'], $index, $yaml_item_data, $pre_fetched);
                     if (str_contains($skip_value['oid'], '.')) {
                         [$skip_value['oid'], $targeted_index] = explode('.', $skip_value['oid'], 2);
-                        $tmp_value = static::getValueFromData($skip_value['oid'], $targeted_index, $yaml_item_data, $pre_cache);
+                        $tmp_value = static::getValueFromData($skip_value['oid'], $targeted_index, $yaml_item_data, $pre_fetched);
                     }
                 }
 

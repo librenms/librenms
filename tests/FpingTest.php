@@ -26,12 +26,12 @@
 
 namespace LibreNMS\Tests;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Source\FpingResponse;
 use Symfony\Component\Process\Process;
 
-class FpingTest extends TestCase
+final class FpingTest extends TestCase
 {
     public function testUpPing(): void
     {
@@ -139,7 +139,7 @@ OUT;
         $hosts = array_keys($expected);
 
         $process = \Mockery::mock(Process::class);
-        $process->shouldReceive('setTimeout')->with(Config::get('rrd.step', 300) * 2);
+        $process->shouldReceive('setTimeout')->with(LibrenmsConfig::get('rrd.step', 300) * 2);
         $process->shouldReceive('setInput')->with(implode("\n", $hosts) . "\n");
         $process->shouldReceive('getCommandLine');
         $process->shouldReceive('run')->withArgs(function ($callback) {

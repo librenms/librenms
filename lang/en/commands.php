@@ -13,6 +13,13 @@ return [
             'dump' => 'Output the entire config as json',
         ],
     ],
+    'config:list' => [
+        'description' => 'List and search configuration settings',
+        'arguments' => [
+            'search' => 'Search for a setting, matching config name or description',
+        ],
+        'not_found' => 'No settings found matching \':search\'',
+    ],
     'config:set' => [
         'description' => 'Set configuration value (or unset)',
         'arguments' => [
@@ -165,6 +172,9 @@ return [
             'optionValue' => 'Selected :option is invalid. Should be one of: :values',
         ],
     ],
+    'maintenance:cleanup-networks' => [
+        'delete' => 'Deleting :count unused networks',
+    ],
     'maintenance:fetch-ouis' => [
         'description' => 'Fetch MAC OUIs and cache them to display vendor names for MAC addresses',
         'options' => [
@@ -200,6 +210,15 @@ return [
         'already_enabled' => 'Plugin already enabled',
         'enabled' => ':count plugin enabled|:count plugins enabled',
         'failed' => 'Failed to enable plugin(s)',
+    ],
+    'port:tune' => [
+        'description' => 'Tune port rrd files to limit the max transfer rate based on ifSpeed',
+        'arguments' => [
+            'device spec' => 'Device spec to tune: device_id, hostname, wildcard (*), odd, even, all',
+            'ifname' => 'Port ifName to match can use all or * for a wildcard',
+        ],
+        'device' => 'Device :device:',
+        'port' => 'Tuning port :port',
     ],
     'report:devices' => [
         'description' => 'Print out data from devices',

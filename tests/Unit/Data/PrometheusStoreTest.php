@@ -26,22 +26,22 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Facades\Http as LaravelHttp;
-use LibreNMS\Config;
 use LibreNMS\Data\Store\Prometheus;
 use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('datastores')]
-class PrometheusStoreTest extends TestCase
+final class PrometheusStoreTest extends TestCase
 {
     protected function setUp(): void
     {
         parent::setUp();
 
-        Config::set('prometheus.enable', true);
-        Config::set('prometheus.url', 'http://fake:9999');
+        LibrenmsConfig::set('prometheus.enable', true);
+        LibrenmsConfig::set('prometheus.url', 'http://fake:9999');
     }
 
     public function testFailWrite(): void

@@ -42290,5 +42290,291 @@
                 }
             ]
         }
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 2,
+                    "low_ifIndex": 770,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 3,
+                    "low_ifIndex": 771,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 772,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 5,
+                    "low_ifIndex": 773,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 6,
+                    "low_ifIndex": 774,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 7,
+                    "low_ifIndex": 775,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 8,
+                    "low_ifIndex": 776,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 777,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 778,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 11,
+                    "low_ifIndex": 779,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 12,
+                    "low_ifIndex": 780,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 13,
+                    "low_ifIndex": 781,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 14,
+                    "low_ifIndex": 782,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 15,
+                    "low_ifIndex": 783,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 16,
+                    "low_ifIndex": 784,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 17,
+                    "low_ifIndex": 785,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 18,
+                    "low_ifIndex": 786,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 19,
+                    "low_ifIndex": 787,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 20,
+                    "low_ifIndex": 788,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 21,
+                    "low_ifIndex": 789,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 22,
+                    "low_ifIndex": 790,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 23,
+                    "low_ifIndex": 791,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 792,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 25,
+                    "low_ifIndex": 793,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 26,
+                    "low_ifIndex": 794,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 27,
+                    "low_ifIndex": 795,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 28,
+                    "low_ifIndex": 796,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 29,
+                    "low_ifIndex": 797,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 30,
+                    "low_ifIndex": 798,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 32,
+                    "low_ifIndex": 800,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 33,
+                    "low_ifIndex": 801,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 34,
+                    "low_ifIndex": 802,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 35,
+                    "low_ifIndex": 803,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 36,
+                    "low_ifIndex": 804,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 37,
+                    "low_ifIndex": 805,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 38,
+                    "low_ifIndex": 806,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 39,
+                    "low_ifIndex": 807,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 40,
+                    "low_ifIndex": 808,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 41,
+                    "low_ifIndex": 809,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 54,
+                    "low_ifIndex": 822,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 55,
+                    "low_ifIndex": 1024,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 56,
+                    "low_ifIndex": 1024,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
+    },
+    "hr-device": {
+        "discovery": {
+            "hrDevice": [
+                {
+                    "hrDeviceIndex": 196608,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) CPU D-1518 @ 2.20GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 14
+                },
+                {
+                    "hrDeviceIndex": 196609,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) CPU D-1518 @ 2.20GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 10
+                },
+                {
+                    "hrDeviceIndex": 196610,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) CPU D-1518 @ 2.20GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 18
+                },
+                {
+                    "hrDeviceIndex": 196611,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) CPU D-1518 @ 2.20GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 13
+                },
+                {
+                    "hrDeviceIndex": 196612,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) CPU D-1518 @ 2.20GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 10
+                },
+                {
+                    "hrDeviceIndex": 196613,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) CPU D-1518 @ 2.20GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 14
+                },
+                {
+                    "hrDeviceIndex": 196614,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) CPU D-1518 @ 2.20GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 14
+                },
+                {
+                    "hrDeviceIndex": 196615,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) CPU D-1518 @ 2.20GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 12
+                }
+            ]
+        }
     }
 }

@@ -26,102 +26,124 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\DeviceOutage;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Blade;
-use LibreNMS\Config;
+use Carbon\CarbonInterval;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
+use LibreNMS\Util\Time;
+use LibreNMS\Util\Url;
 
 class OutagesController extends TableController
 {
     protected $model = DeviceOutage::class;
 
-    public function rules()
+    public function rules(): array
     {
         return [
             'device' => 'nullable|int',
-            'to' => 'nullable|date',
-            'from' => 'nullable|date',
+            'from' => 'nullable|date_or_relative',
+            'to' => 'nullable|date_or_relative',
+            'status' => 'nullable|in:current,previous,all',
         ];
     }
 
-    protected function filterFields($request)
+    protected function filterFields($request): array
     {
         return [
             'device_id' => 'device',
         ];
     }
 
-    protected function sortFields($request)
+    protected function sortFields($request): array
     {
         return ['going_down', 'up_again', 'device_id'];
     }
 
     /**
      * Defines the base query for this resource
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
-    public function baseQuery($request)
+    public function baseQuery(Request $request): Builder
     {
+        $from_ts = Time::parseInput($request->from);
+        $to_ts = Time::parseInput($request->to);
+
         return DeviceOutage::hasAccess($request->user())
             ->with('device')
-            ->when($request->from, function ($query) use ($request) {
-                $query->where('going_down', '>=', Carbon::parse($request->from, session('preferences.timezone'))->getTimestamp());
+            ->whereHas('device', function ($query) {
+                $query->where('disabled', 0);
             })
-            ->when($request->to, function ($query) use ($request) {
-                $query->where('going_down', '<=', Carbon::parse($request->to, session('preferences.timezone'))->getTimestamp());
+            ->when($from_ts || $to_ts, function ($query) use ($from_ts, $to_ts) {
+                $query->where(function ($q) use ($from_ts, $to_ts) {
+                    // Outage starts within range
+                    $this->applyDateRangeCondition($q, 'going_down', $from_ts, $to_ts);
+
+                    // OR outage ends within range (if it has ended)
+                    $q->orWhere(function ($subQuery) use ($from_ts, $to_ts) {
+                        $subQuery->whereNotNull('up_again');
+                        $this->applyDateRangeCondition($subQuery, 'up_again', $from_ts, $to_ts);
+                    });
+
+                    // OR outage spans the entire range (started before, still ongoing or ended after)
+                    $q->orWhere(function ($subQuery) use ($from_ts, $to_ts) {
+                        if ($from_ts) {
+                            $subQuery->where('going_down', '<', $from_ts);
+                        }
+                        if ($to_ts) {
+                            $subQuery->where(function ($q) use ($to_ts) {
+                                $q->whereNotNull('up_again') // Still ongoing
+                                ->orWhere('up_again', '>', $to_ts); // Ended after range
+                            });
+                        }
+                    });
+                });
+            })
+            ->when($request->status === 'current', function ($query) {
+                $query->whereNull('up_again');
+            })
+            ->when($request->status === 'previous', function ($query) {
+                $query->whereNotNull('up_again');
             });
     }
 
     /**
      * @param  DeviceOutage  $outage
      */
-    public function formatItem($outage)
+    public function formatItem($outage): array
     {
         $start = $this->formatDatetime($outage->going_down);
         $end = $outage->up_again ? $this->formatDatetime($outage->up_again) : '-';
-        $duration = ($outage->up_again ?: time()) - $outage->going_down;
 
         return [
             'status' => $this->statusLabel($outage),
             'going_down' => $start,
             'up_again' => $end,
-            'device_id' => Blade::render('<x-device-link :device="$device"/>', ['device' => $outage->device]),
-            'duration' => $this->formatTime($duration),
+            'device_id' => Url::modernDeviceLink($outage->device),
+            'duration' => $this->asDuration($outage)->forHumans(['parts' => 2]),
         ];
     }
 
-    private function formatTime($duration)
+    private function asDuration(DeviceOutage $outage): CarbonInterval
     {
-        $day_seconds = 86400;
+        $start = Carbon::createFromTimestamp($outage->going_down);
+        $end = $outage->up_again ? Carbon::createFromTimestamp($outage->up_again) : Carbon::now();
 
-        $duration_days = (int) ($duration / $day_seconds);
-
-        $output = "<span style='display:inline;'>";
-        if ($duration_days) {
-            $output .= $duration_days . 'd ';
-        }
-        $output .= (new Carbon($duration))->format(Config::get('dateformat.time'));
-        $output .= '</span>';
-
-        return $output;
+        return $end->diffAsCarbonInterval($start);
     }
 
-    private function formatDatetime($timestamp)
+    private function formatDatetime(?int $timestamp): string
     {
         if (! $timestamp) {
-            $timestamp = 0;
+            return '';
         }
 
-        $output = "<span style='display:inline;'>";
-        $output .= Carbon::createFromTimestamp($timestamp, session('preferences.timezone'))->format(Config::get('dateformat.compact')); // Convert epoch to local time
-        $output .= '</span>';
-
-        return $output;
+        // Convert epoch to local time
+        return Carbon::createFromTimestamp($timestamp, session('preferences.timezone'))
+            ->format(LibrenmsConfig::get('dateformat.compact'));
     }
 
-    private function statusLabel($outage)
+    private function statusLabel(DeviceOutage $outage): string
     {
         if (empty($outage->up_again)) {
             $label = 'label-danger';
@@ -139,7 +161,7 @@ class OutagesController extends TableController
      *
      * @return array
      */
-    protected function getExportHeaders()
+    protected function getExportHeaders(): array
     {
         return [
             'Device Hostname',
@@ -155,13 +177,24 @@ class OutagesController extends TableController
      * @param  DeviceOutage  $outage
      * @return array
      */
-    protected function formatExportRow($outage)
+    protected function formatExportRow($outage): array
     {
         return [
             $outage->device ? $outage->device->displayName() : '',
-            $this->formatDatetime($outage->going_down),
-            $outage->up_again ? $this->formatDatetime($outage->up_again) : '-',
-            $this->formatTime(($outage->up_again ?: time()) - $outage->going_down),
+            Carbon::createFromTimestamp($outage->going_down)->toISOString(),
+            $outage->up_again ? Carbon::createFromTimestamp($outage->up_again)->toISOString() : '-',
+            $this->asDuration($outage)->format('%H:%I:%S'),
         ];
+    }
+
+    private function applyDateRangeCondition(Builder $query, string $column, ?int $from_ts, ?int $to_ts): void
+    {
+        if ($from_ts && $to_ts) {
+            $query->whereBetween($column, [$from_ts, $to_ts]);
+        } elseif ($from_ts) {
+            $query->where($column, '>=', $from_ts);
+        } elseif ($to_ts) {
+            $query->where($column, '<=', $to_ts);
+        }
     }
 }

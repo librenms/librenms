@@ -1,6 +1,6 @@
 mib: ONEACCESS-GLOBAL-REG:ONEACCESS-SYS-MIB:ONEACCESS-SHDSL-MIB:ONEACCESS-CELLULAR-MIB
 modules:
-    pre-cache:
+    additional_oids:
         data:
             -
                 oid:

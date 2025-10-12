@@ -1,9 +1,8 @@
 <?php
 
-use App\Models\Device;
+use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use LibreNMS\Alert\AlertRules;
-use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Clean;
@@ -43,15 +42,13 @@ function get_service_status($device = null)
 
 function add_service($device, $type, $desc, $ip = '', $param = '', $ignore = 0, $disabled = 0, $template_id = '', $name = '')
 {
-    if (! is_array($device)) {
-        $device = device_by_id_cache($device);
-    }
+    $device = DeviceCache::get(is_array($device) ? $device['device_id'] : $device);
 
     if (empty($ip)) {
-        $ip = Device::pollerTarget($device['hostname']);
+        $ip = $device->pollerTarget();
     }
 
-    $insert = ['device_id' => $device['device_id'], 'service_ip' => $ip, 'service_type' => $type, 'service_changed' => ['UNIX_TIMESTAMP(NOW())'], 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked', 'service_ds' => '{}', 'service_disabled' => $disabled, 'service_template_id' => $template_id, 'service_name' => $name];
+    $insert = ['device_id' => $device->device_id, 'service_ip' => $ip, 'service_type' => $type, 'service_changed' => ['UNIX_TIMESTAMP(NOW())'], 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked', 'service_ds' => '{}', 'service_disabled' => $disabled, 'service_template_id' => $template_id, 'service_name' => $name];
 
     return dbInsert($insert, 'services');
 }
@@ -131,14 +128,14 @@ function poll_service($service)
     $check_cmd = '';
 
     // if we have a script for this check, use it.
-    $check_script = Config::get('install_dir') . '/includes/services/check_' . strtolower($service['service_type']) . '.inc.php';
+    $check_script = LibrenmsConfig::get('install_dir') . '/includes/services/check_' . strtolower($service['service_type']) . '.inc.php';
     if (is_file($check_script)) {
         include $check_script;
     }
 
     // If we do not have a cmd from the check script, build one.
     if ($check_cmd == '') {
-        $check_cmd = Config::get('nagios_plugins') . '/check_' . $service['service_type'] . ' -H ' . ($service['service_ip'] ?: $service['hostname']);
+        $check_cmd = LibrenmsConfig::get('nagios_plugins') . '/check_' . $service['service_type'] . ' -H ' . ($service['service_ip'] ?: $service['hostname']);
         $check_cmd .= ' ' . $service['service_param'];
     }
 
@@ -184,7 +181,7 @@ function poll_service($service)
 
         $tags = ['service_id' => $service_id, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
         //TODO not sure if we have $device at this point, if we do replace faked $device
-        app('Datastore')->put(['hostname' => $service['hostname']], 'services', $tags, $fields);
+        app('Datastore')->put($service, 'services', $tags, $fields);
     }
 
     if ($old_status != $new_status) {
@@ -247,7 +244,7 @@ function check_service($command)
     $response_string = implode("\n", $response_array);
 
     // Split out the response and the performance data.
-    [$response, $perf] = explode('|', $response_string);
+    [$response, $perf] = explode('|', $response_string, 2) + ['', ''];
 
     // Split performance metrics into an array
     preg_match_all('/\'[^\']*\'\S*|\S+/', $perf, $perf_arr);
@@ -260,7 +257,7 @@ function check_service($command)
     // Loop through the perf string extracting our metric data
     foreach ($perf_arr as $string) {
         // Separate the DS and value: DS=value
-        [$ds,$values] = explode('=', trim($string));
+        [$ds,$values] = array_pad(explode('=', trim($string)), 2, '');
 
         // Keep the first value, discard the others.
         $value = $values ? explode(';', trim($values)) : [];

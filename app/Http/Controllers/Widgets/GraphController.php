@@ -26,6 +26,7 @@
 
 namespace App\Http\Controllers\Widgets;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Application;
 use App\Models\Bill;
 use App\Models\Device;
@@ -35,7 +36,6 @@ use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use LibreNMS\Config;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\Time;
 
@@ -200,8 +200,8 @@ class GraphController extends WidgetController
             } else {
                 $port_types = collect((array) $aggregate_type)->map(function ($type) {
                     // check for config definitions
-                    if (Config::has("{$type}_descr")) {
-                        return Config::get("{$type}_descr", []);
+                    if (LibrenmsConfig::has("{$type}_descr")) {
+                        return LibrenmsConfig::get("{$type}_descr", []);
                     }
 
                     return $type;
@@ -232,7 +232,13 @@ class GraphController extends WidgetController
 
     private function getGraphType($summarize = true)
     {
-        $type = explode('_', $this->getSettings()['graph_type'], 2)[0];
+        $graph_type = $this->getSettings()['graph_type'];
+
+        if (empty($graph_type)) {
+            return $graph_type;
+        }
+
+        $type = explode('_', $graph_type, 2)[0];
 
         if ($summarize && in_array($type, ['transit', 'peering', 'core', 'ports', 'custom'])) {
             return 'aggregate';

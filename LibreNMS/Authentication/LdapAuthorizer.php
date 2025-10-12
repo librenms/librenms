@@ -2,9 +2,9 @@
 
 namespace LibreNMS\Authentication;
 
+use App\Facades\LibrenmsConfig;
 use ErrorException;
 use LDAP\Connection;
-use LibreNMS\Config;
 use LibreNMS\Enum\LegacyAuthLevel;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Exceptions\LdapMissingException;
@@ -21,18 +21,18 @@ class LdapAuthorizer extends AuthorizerBase
         if (! empty($credentials['username'])) {
             $username = $credentials['username'];
             $this->userloginname = $username;
-            if (Config::get('auth_ldap_wildcard_ou', false)) {
+            if (LibrenmsConfig::get('auth_ldap_wildcard_ou', false)) {
                 $this->setAuthLdapSuffixOu($username);
             }
 
             if (! empty($credentials['password']) && ldap_bind($connection, $this->getFullDn($username), $credentials['password'])) {
                 // ldap_bind has done a bind with the user credentials. If binduser is configured, rebind with the auth_ldap_binduser
                 // normal user has restricted right to search in ldap. auth_ldap_binduser has full search rights
-                if ((Config::has('auth_ldap_binduser') || Config::has('auth_ldap_binddn')) && Config::has('auth_ldap_bindpassword')) {
+                if ((LibrenmsConfig::has('auth_ldap_binduser') || LibrenmsConfig::has('auth_ldap_binddn')) && LibrenmsConfig::has('auth_ldap_bindpassword')) {
                     $this->bind();
                 }
 
-                if (Config::get('auth_ldap_require_groupmembership') === false) {
+                if (LibrenmsConfig::get('auth_ldap_require_groupmembership') === false) {
                     // skip group check if the server does not support ldap_compare (hint: google gsuite ldap)
                     return true;
                 }
@@ -43,18 +43,18 @@ class LdapAuthorizer extends AuthorizerBase
                     return true;
                 } else {
                     foreach ($ldap_groups as $ldap_group) {
-                        if (Config::get('auth_ldap_userdn') === true) {
+                        if (LibrenmsConfig::get('auth_ldap_userdn') === true) {
                             $ldap_comparison = ldap_compare(
                                 $connection,
                                 $ldap_group,
-                                Config::get('auth_ldap_groupmemberattr', 'memberUid'),
+                                LibrenmsConfig::get('auth_ldap_groupmemberattr', 'memberUid'),
                                 $this->getFullDn($username)
                             );
                         } else {
                             $ldap_comparison = ldap_compare(
                                 $connection,
                                 $ldap_group,
-                                Config::get('auth_ldap_groupmemberattr', 'memberUid'),
+                                LibrenmsConfig::get('auth_ldap_groupmemberattr', 'memberUid'),
                                 $this->getMembername($username)
                             );
                         }
@@ -80,8 +80,8 @@ class LdapAuthorizer extends AuthorizerBase
         try {
             $connection = $this->getLdapConnection();
 
-            $filter = '(' . Config::get('auth_ldap_prefix') . $username . ')';
-            $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
+            $filter = '(' . LibrenmsConfig::get('auth_ldap_prefix') . $username . ')';
+            $search = ldap_search($connection, trim(LibrenmsConfig::get('auth_ldap_suffix'), ','), $filter);
             $entries = ldap_get_entries($connection, $search);
             if ($entries['count']) {
                 return true;
@@ -107,7 +107,7 @@ class LdapAuthorizer extends AuthorizerBase
     {
         try {
             $connection = $this->getLdapConnection();
-            $groups = Config::get('auth_ldap_groups');
+            $groups = LibrenmsConfig::get('auth_ldap_groups');
 
             // Find all defined groups $username is in
             $group_names = array_keys($groups);
@@ -118,12 +118,12 @@ class LdapAuthorizer extends AuthorizerBase
             if (count($group_names) > 1) {
                 $ldap_group_filter = "(|{$ldap_group_filter})";
             }
-            if (Config::get('auth_ldap_userdn') === true) {
-                $filter = "(&{$ldap_group_filter}(" . trim(Config::get('auth_ldap_groupmemberattr', 'memberUid')) . '=' . $this->getFullDn($username) . '))';
+            if (LibrenmsConfig::get('auth_ldap_userdn') === true) {
+                $filter = "(&{$ldap_group_filter}(" . trim(LibrenmsConfig::get('auth_ldap_groupmemberattr', 'memberUid')) . '=' . $this->getFullDn($username) . '))';
             } else {
-                $filter = "(&{$ldap_group_filter}(" . trim(Config::get('auth_ldap_groupmemberattr', 'memberUid')) . '=' . $this->getMembername($username) . '))';
+                $filter = "(&{$ldap_group_filter}(" . trim(LibrenmsConfig::get('auth_ldap_groupmemberattr', 'memberUid')) . '=' . $this->getMembername($username) . '))';
             }
-            $search = ldap_search($connection, Config::get('auth_ldap_groupbase'), $filter);
+            $search = ldap_search($connection, LibrenmsConfig::get('auth_ldap_groupbase'), $filter);
             $entries = ldap_get_entries($connection, $search);
 
             $roles = [];
@@ -156,12 +156,12 @@ class LdapAuthorizer extends AuthorizerBase
         try {
             $connection = $this->getLdapConnection();
 
-            $filter = '(' . Config::get('auth_ldap_prefix') . $username . ')';
-            $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
+            $filter = '(' . LibrenmsConfig::get('auth_ldap_prefix') . $username . ')';
+            $search = ldap_search($connection, trim(LibrenmsConfig::get('auth_ldap_suffix'), ','), $filter);
             $entries = ldap_get_entries($connection, $search);
 
             if ($entries['count']) {
-                $uid_attr = strtolower(Config::get('auth_ldap_uid_attribute', 'uidnumber'));
+                $uid_attr = strtolower(LibrenmsConfig::get('auth_ldap_uid_attribute', 'uidnumber'));
 
                 return $entries[0][$uid_attr][0];
             }
@@ -176,14 +176,22 @@ class LdapAuthorizer extends AuthorizerBase
     {
         $connection = $this->getLdapConnection();
 
-        $filter = '(' . Config::get('auth_ldap_prefix') . $this->userloginname . ')';
-        if (Config::get('auth_ldap_userlist_filter') != null) {
-            $filter = '(' . Config::get('auth_ldap_userlist_filter') . ')';
+        $filter = '(' . LibrenmsConfig::get('auth_ldap_prefix') . $this->userloginname . ')';
+        if (LibrenmsConfig::get('auth_ldap_userlist_filter') != null) {
+            $filter = '(' . LibrenmsConfig::get('auth_ldap_userlist_filter') . ')';
         }
 
-        $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
+        $search = ldap_search($connection, trim(LibrenmsConfig::get('auth_ldap_suffix'), ','), $filter);
         $entries = ldap_get_entries($connection, $search);
-        foreach ($entries as $entry) {
+        if (! $entries) {
+            return false;
+        }
+
+        foreach ($entries as $key => $entry) {
+            if ($key == 'count') {
+                continue;
+            }
+
             $user = $this->ldapToUser($entry);
             if ($user['user_id'] != $user_id) {
                 continue;
@@ -197,7 +205,7 @@ class LdapAuthorizer extends AuthorizerBase
 
     protected function getMembername($username)
     {
-        $type = Config::get('auth_ldap_groupmembertype');
+        $type = LibrenmsConfig::get('auth_ldap_groupmembertype');
 
         if ($type == 'fulldn') {
             return $this->getFullDn($username);
@@ -206,8 +214,8 @@ class LdapAuthorizer extends AuthorizerBase
         if ($type == 'puredn') {
             try {
                 $connection = $this->getLdapConnection();
-                $filter = '(' . Config::get('auth_ldap_attr.uid') . '=' . $username . ')';
-                $search = ldap_search($connection, Config::get('auth_ldap_groupbase'), $filter);
+                $filter = '(' . LibrenmsConfig::get('auth_ldap_attr.uid') . '=' . $username . ')';
+                $search = ldap_search($connection, LibrenmsConfig::get('auth_ldap_groupbase'), $filter);
                 $entries = ldap_get_entries($connection, $search);
 
                 return $entries[0]['dn'];
@@ -224,12 +232,12 @@ class LdapAuthorizer extends AuthorizerBase
         $ldap_groups = [];
 
         $default_group = 'cn=groupname,ou=groups,dc=example,dc=com';  // in the documentation
-        if (Config::get('auth_ldap_group', $default_group) !== $default_group) {
-            $ldap_groups[] = Config::get('auth_ldap_group');
+        if (LibrenmsConfig::get('auth_ldap_group', $default_group) !== $default_group) {
+            $ldap_groups[] = LibrenmsConfig::get('auth_ldap_group');
         }
 
-        foreach (Config::get('auth_ldap_groups') as $key => $value) {
-            $ldap_groups[] = "cn=$key," . Config::get('auth_ldap_groupbase');
+        foreach (LibrenmsConfig::get('auth_ldap_groups') as $key => $value) {
+            $ldap_groups[] = "cn=$key," . LibrenmsConfig::get('auth_ldap_groupbase');
         }
 
         return $ldap_groups;
@@ -244,12 +252,12 @@ class LdapAuthorizer extends AuthorizerBase
      */
     protected function getFullDn($username): string
     {
-        return Config::get('auth_ldap_prefix', '') . $username . Config::get('auth_ldap_suffix', '');
+        return LibrenmsConfig::get('auth_ldap_prefix', '') . $username . LibrenmsConfig::get('auth_ldap_suffix', '');
     }
 
     /**
      * Set auth_ldap_suffix ou according to $username dn
-     * useful if Config::get('auth_ldap_wildcard_ou) is set
+     * useful if LibrenmsConfig::get('auth_ldap_wildcard_ou) is set
      *
      * @internal
      *
@@ -258,16 +266,21 @@ class LdapAuthorizer extends AuthorizerBase
     protected function setAuthLdapSuffixOu($username): bool
     {
         $connection = $this->getLdapConnection();
-        $filter = '(' . Config::get('auth_ldap_attr.uid') . '=' . $username . ')';
-        $base_dn = preg_replace('/,ou=[^,]+,/', ',', Config::get('auth_ldap_suffix'));
+        $filter = '(' . LibrenmsConfig::get('auth_ldap_attr.uid') . '=' . $username . ')';
+        $base_dn = preg_replace('/,ou=[^,]+,/', ',', LibrenmsConfig::get('auth_ldap_suffix'));
         $base_dn = trim($base_dn, ',');
         $search = ldap_search($connection, $base_dn, $filter);
-        foreach (ldap_get_entries($connection, $search) as $entry) {
+        $results = ldap_get_entries($connection, $search);
+        if (! $results) {
+            return false;
+        }
+
+        foreach ($results as $entry) {
             if (isset($entry['uid'][0]) && $entry['uid'][0] == $username) {
                 preg_match('~,ou=([^,]+),~', $entry['dn'], $matches);
                 $user_ou = $matches[1] ?? '';
-                $new_auth_ldap_suffix = preg_replace('/,ou=[^,]+,/', ',ou=' . $user_ou . ',', Config::get('auth_ldap_suffix'));
-                Config::set('auth_ldap_suffix', $new_auth_ldap_suffix);
+                $new_auth_ldap_suffix = preg_replace('/,ou=[^,]+,/', ',ou=' . $user_ou . ',', LibrenmsConfig::get('auth_ldap_suffix'));
+                LibrenmsConfig::set('auth_ldap_suffix', $new_auth_ldap_suffix);
 
                 return true;
             }
@@ -305,15 +318,15 @@ class LdapAuthorizer extends AuthorizerBase
      * @param  array  $entry  ldap entry array
      * @return array
      */
-    private function ldapToUser($entry): array
+    private function ldapToUser(array $entry): array
     {
-        $uid_attr = strtolower(Config::get('auth_ldap_uid_attribute', 'uidnumber'));
+        $uid_attr = strtolower(LibrenmsConfig::get('auth_ldap_uid_attribute', 'uidnumber'));
 
         return [
             'username' => $entry['uid'][0] ?? null,
             'realname' => $entry['cn'][0] ?? null,
             'user_id' => $entry[$uid_attr][0] ?? null,
-            'email' => $entry[Config::get('auth_ldap_emailattr', 'mail')][0] ?? null,
+            'email' => $entry[LibrenmsConfig::get('auth_ldap_emailattr', 'mail')][0] ?? null,
         ];
     }
 
@@ -327,8 +340,8 @@ class LdapAuthorizer extends AuthorizerBase
             throw new LdapMissingException();
         }
 
-        $port = Config::get('auth_ldap_port');
-        $uri = Config::get('auth_ldap_server');
+        $port = LibrenmsConfig::get('auth_ldap_port');
+        $uri = LibrenmsConfig::get('auth_ldap_server');
         if ($port && ! str_contains($uri, '://')) {
             $scheme = $port == 636 ? 'ldaps://' : 'ldap://';
             $uri = $scheme . $uri . ':' . $port;
@@ -340,9 +353,9 @@ class LdapAuthorizer extends AuthorizerBase
             throw new AuthenticationException('Fatal error while connecting to LDAP server, uri not valid: ' . $uri);
         }
 
-        ldap_set_option($this->ldap_connection, LDAP_OPT_PROTOCOL_VERSION, Config::get('auth_ldap_version', 3));
+        ldap_set_option($this->ldap_connection, LDAP_OPT_PROTOCOL_VERSION, LibrenmsConfig::get('auth_ldap_version', 3));
 
-        $use_tls = Config::get('auth_ldap_starttls');
+        $use_tls = LibrenmsConfig::get('auth_ldap_starttls');
         if ($use_tls == 'optional' || $use_tls == 'required') {
             $tls_success = ldap_start_tls($this->ldap_connection);
             if ($use_tls == 'required' && $tls_success === false) {
@@ -354,17 +367,17 @@ class LdapAuthorizer extends AuthorizerBase
 
     public function bind($credentials = []): void
     {
-        if (Config::get('auth_ldap_debug')) {
+        if (LibrenmsConfig::get('auth_ldap_debug')) {
             ldap_set_option(null, LDAP_OPT_DEBUG_LEVEL, 7);
         }
         /*
          * Due to https://bugs.php.net/bug.php?id=78029 these set options are done at this stage otherwise they
          * will not take effect after the first bind is performed.
          */
-        if (Config::get('auth_ldap_cacertfile')) {
-            ldap_set_option($this->ldap_connection, LDAP_OPT_X_TLS_CACERTFILE, Config::get('auth_ldap_cacertfile'));
+        if (LibrenmsConfig::get('auth_ldap_cacertfile')) {
+            ldap_set_option($this->ldap_connection, LDAP_OPT_X_TLS_CACERTFILE, LibrenmsConfig::get('auth_ldap_cacertfile'));
         }
-        if (Config::get('auth_ldap_ignorecert')) {
+        if (LibrenmsConfig::get('auth_ldap_ignorecert')) {
             ldap_set_option($this->ldap_connection, LDAP_OPT_X_TLS_REQUIRE_CERT, 0);
         }
 
@@ -373,22 +386,22 @@ class LdapAuthorizer extends AuthorizerBase
         $username = $credentials['username'] ?? null;
         $password = $credentials['password'] ?? null;
 
-        if ((Config::has('auth_ldap_binduser') || Config::has('auth_ldap_binddn')) && Config::has('auth_ldap_bindpassword')) {
-            if (Config::get('auth_ldap_binddn') == null) {
-                Config::set('auth_ldap_binddn', $this->getFullDn(Config::get('auth_ldap_binduser')));
+        if ((LibrenmsConfig::has('auth_ldap_binduser') || LibrenmsConfig::has('auth_ldap_binddn')) && LibrenmsConfig::has('auth_ldap_bindpassword')) {
+            if (LibrenmsConfig::get('auth_ldap_binddn') == null) {
+                LibrenmsConfig::set('auth_ldap_binddn', $this->getFullDn(LibrenmsConfig::get('auth_ldap_binduser')));
             }
-            $username = Config::get('auth_ldap_binddn');
-            $password = Config::get('auth_ldap_bindpassword');
+            $username = LibrenmsConfig::get('auth_ldap_binddn');
+            $password = LibrenmsConfig::get('auth_ldap_bindpassword');
         } elseif (! empty($credentials['username'])) {
             $username = $this->getFullDn($credentials['username']);
         }
 
         // With specified bind user
-        ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, Config::get('auth_ldap_timeout', 5));
+        ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, LibrenmsConfig::get('auth_ldap_timeout', 5));
         $bind_result = ldap_bind($this->ldap_connection, $username, $password);
         ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout
 
-        if (Config::get('auth_ldap_debug')) {
+        if (LibrenmsConfig::get('auth_ldap_debug')) {
             echo 'Bind result: ' . ldap_error($this->ldap_connection) . PHP_EOL;
         }
 
@@ -397,11 +410,11 @@ class LdapAuthorizer extends AuthorizerBase
         }
 
         // Anonymous
-        ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, Config::get('auth_ldap_timeout', 5));
+        ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, LibrenmsConfig::get('auth_ldap_timeout', 5));
         ldap_bind($this->ldap_connection);
         ldap_set_option($this->ldap_connection, LDAP_OPT_NETWORK_TIMEOUT, -1); // restore timeout
 
-        if (Config::get('auth_ldap_debug')) {
+        if (LibrenmsConfig::get('auth_ldap_debug')) {
             echo 'Anonymous bind result: ' . ldap_error($this->ldap_connection) . PHP_EOL;
         }
     }

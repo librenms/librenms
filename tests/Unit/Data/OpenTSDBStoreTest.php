@@ -27,15 +27,15 @@
 namespace LibreNMS\Tests\Unit\Data;
 
 use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Carbon\Carbon;
-use LibreNMS\Config;
 use LibreNMS\Data\Store\OpenTSDB;
 use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('datastores')]
-class OpenTSDBStoreTest extends TestCase
+final class OpenTSDBStoreTest extends TestCase
 {
     protected $timestamp = 1190464400;
 
@@ -45,14 +45,14 @@ class OpenTSDBStoreTest extends TestCase
 
         // fix the date
         Carbon::setTestNow(Carbon::createFromTimestampUTC($this->timestamp));
-        Config::set('opentsdb.enable', true);
+        LibrenmsConfig::set('opentsdb.enable', true);
     }
 
     protected function tearDown(): void
     {
         // restore Carbon:now() to normal
         Carbon::setTestNow();
-        Config::set('opentsdb.enable', false);
+        LibrenmsConfig::set('opentsdb.enable', false);
 
         parent::tearDown();
     }

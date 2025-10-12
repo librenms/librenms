@@ -1,8 +1,8 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 
 // IPMI - We can discover this on poll!
 if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
@@ -11,24 +11,32 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     $ipmi['user'] = get_dev_attrib($device, 'ipmi_username');
     $ipmi['password'] = get_dev_attrib($device, 'ipmi_password');
     $ipmi['kg_key'] = get_dev_attrib($device, 'ipmi_kg_key');
+    $ipmi['ciphersuite'] = get_dev_attrib($device, 'ipmi_ciphersuite');
+    $ipmi['timeout'] = filter_var(get_dev_attrib($device, 'ipmi_timeout'), FILTER_VALIDATE_INT) ?: '3';
 
-    $cmd = [Config::get('ipmitool', 'ipmitool')];
-    if (Config::get('own_hostname') != $device['hostname'] || $ipmi['host'] != 'localhost') {
+    $cmd = [LibrenmsConfig::get('ipmitool', 'ipmitool')];
+    if (LibrenmsConfig::get('own_hostname') != $device['hostname'] || $ipmi['host'] != 'localhost') {
         if (empty($ipmi['kg_key']) || is_null($ipmi['kg_key'])) {
             array_push($cmd, '-H', $ipmi['host'], '-p', $ipmi['port'], '-U', $ipmi['user'], '-P', $ipmi['password'], '-L', 'USER');
         } else {
             array_push($cmd, '-H', $ipmi['host'], '-p', $ipmi['port'], '-U', $ipmi['user'], '-P', $ipmi['password'], '-y', $ipmi['kg_key'], '-L', 'USER');
         }
+        if (! empty($ipmi['ciphersuite'])) {
+            array_push($cmd, '-C', $ipmi['ciphersuite']);
+        }
+        if (! empty($ipmi['timeout'])) {
+            array_push($cmd, '-N', $ipmi['timeout']);
+        }
     }
 
-    foreach (Config::get('ipmi.type', []) as $ipmi_type) {
+    foreach (LibrenmsConfig::get('ipmi.type', []) as $ipmi_type) {
         // Check if the IPMI type is available, catch segfaults of ipmitool/freeipmi.
         try {
             Log::debug('Trying IPMI type: ' . $ipmi_type);
             $results = explode(PHP_EOL, external_exec(array_merge($cmd, ['-I', $ipmi_type, 'sensor'])));
 
             $results = array_values(array_filter($results, function ($line) {
-                return ! Str::contains($line, 'discrete');
+                return ! Str::contains($line, 'discrete') && trim($line) !== '';
             }));
 
             if (! empty($results)) {
@@ -50,10 +58,10 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
         [$desc,$current,$unit,$state,$low_nonrecoverable,$low_limit,$low_warn,$high_warn,$high_limit,$high_nonrecoverable] = $values;
 
         $index++;
-        if ($current != 'na' && Config::has("ipmi_unit.$unit")) {
+        if ($current != 'na' && LibrenmsConfig::has("ipmi_unit.$unit")) {
             discover_sensor(
                 null,
-                Config::get("ipmi_unit.$unit"),
+                LibrenmsConfig::get("ipmi_unit.$unit"),
                 $device,
                 $desc,
                 $index,
@@ -79,3 +87,5 @@ $sensorDiscovery->sync(sensor_class: 'voltage', poller_type: 'ipmi');
 $sensorDiscovery->sync(sensor_class: 'temperature', poller_type: 'ipmi');
 $sensorDiscovery->sync(sensor_class: 'fanspeed', poller_type: 'ipmi');
 $sensorDiscovery->sync(sensor_class: 'power', poller_type: 'ipmi');
+$sensorDiscovery->sync(sensor_class: 'current', poller_type: 'ipmi');
+$sensorDiscovery->sync(sensor_class: 'load', poller_type: 'ipmi');

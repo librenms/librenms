@@ -742,35 +742,24 @@ function applySiteStyle(newStyle) {
     }
 }
 
-// popup component javascript.  Hopefully temporary.
-document.addEventListener("alpine:init", () => {
-    Alpine.data("popup", () => ({
-        popupShow: false,
-        showTimeout: null,
-        hideTimeout: null,
-        ignoreNextShownEvent: false,
-        delay: 300,
-        show(timeout) {
-            clearTimeout(this.hideTimeout);
-            this.showTimeout = setTimeout(() => {
-                this.popupShow = true;
-                Popper.createPopper(this.$refs.targetRef, this.$refs.popupRef, {
-                    padding: 8
-                });
+// prevent dropdown menus from overflowing the viewport
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.dropdown-submenu').forEach(function (submenuParent) {
+        const submenu = submenuParent.querySelector('.dropdown-menu');
+        if (!submenu) return;
 
-                // close other popups, except this one
-                this.ignoreNextShownEvent = true;
-                this.$dispatch('librenms-popup-shown', this.$el);
-            }, timeout);
-        },
-        hide(timeout) {
-            if (this.ignoreNextShownEvent) {
-                this.ignoreNextShownEvent = false;
-                return;
-            }
+        submenuParent.addEventListener('mouseenter', function () {
+            submenu.style.maxHeight = '';
+            submenu.style.overflowY = 'auto';
 
-            clearTimeout(this.showTimeout);
-            this.hideTimeout = setTimeout(() => this.popupShow = false, timeout)
-        }
-    }));
+            const rect = submenu.getBoundingClientRect();
+            const availableHeight = window.innerHeight - rect.top - 10;
+            submenu.style.maxHeight = availableHeight + 'px';
+        });
+
+        submenuParent.addEventListener('mouseleave', function () {
+            submenu.style.maxHeight = '';
+        });
+    });
 });
+

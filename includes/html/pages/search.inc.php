@@ -10,6 +10,7 @@ $sections = [
     'mac' => 'MAC Address',
     'arp' => 'ARP Table',
     'fdb' => 'FDB Table',
+    'secureports' => 'Port Security',
 ];
 
 if (dbFetchCell('SELECT 1 from `packages` LIMIT 1')) {
@@ -44,5 +45,5 @@ print_optionbar_end();
 if (file_exists("includes/html/pages/search/$search_type.inc.php")) {
     include "includes/html/pages/search/$search_type.inc.php";
 } else {
-    echo report_this('Unknown search type ' . htmlspecialchars($search_type));
+    echo 'Unknown search type';
 }

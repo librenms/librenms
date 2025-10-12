@@ -120,7 +120,7 @@ enable support to limit this to the actual port speed.
 
 rrdtool tune will change the max value when the interface speed is
 detected as being changed (min value will be set for anything 10M or
-over) or when you run the included script (./scripts/tune_port.php) -
+over) or when you run the included script (lnms port:tune) -
 see [RRDTune doc](../Extensions/RRDTune.md)
 
  SNMP ifInOctets and ifOutOctets are counters, which means they start
