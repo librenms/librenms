@@ -13,6 +13,10 @@ modules:
         hardware:
                     - SNMPv2-MIB::sysObjectID.0
                     - ENTITY-MIB::entPhysicalModelName.1
+        hardware_replace:
+            - ['/^FORTINET-FORTIGATE-MIB::fgt?/', 'FortiGate ']
+            - ['/vm/', 'VM']
+
     processors:
         data:
             -
