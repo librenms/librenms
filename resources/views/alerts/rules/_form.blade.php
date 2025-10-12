@@ -144,7 +144,7 @@
         <div class="form-group">
             <label for="transports" class="col-sm-3 col-md-2 control-label">{{ __('alerting.rules.notifications.delivery.label') }}</label>
             <div class="col-sm-9 col-md-10">
-                <select id="transports" name="transports[]" class="form-control" multiple="multiple" x-model="rule.template"></select>
+                <select id="transports" name="transports[]" class="form-control" multiple="multiple"></select>
                 <span class="help-block">{{ __('alerting.rules.notifications.delivery.help') }}</span>
             </div>
         </div>
@@ -155,7 +155,7 @@
         <div class="form-group">
             <label for='template_id' class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.templates.label') }}</label>
             <div class='col-sm-9 col-md-10'>
-                <select id="template_id" name="template_id" class="form-control">
+                <select id="template_id" name="template_id" class="form-control" x-model="rule.template">
                     <option value="">{{ __('alerting.rules.templates.use_default') }}</option>
                     @foreach(($templates ?? []) as $tpl)
                         <option value="{{ $tpl->id }}">{{ $tpl->name }}</option>
@@ -167,7 +167,19 @@
         <div class="form-group" id="per-transport-templates">
             <label class='col-sm-3 col-md-2 control-label'>{{ __('alerting.rules.templates.per_transport.label') }}</label>
             <div class='col-sm-9 col-md-10'>
-                <div id="transport-template-list"></div>
+                <div id="transport-template-list">
+                    <template x-for="id in rule.transports" :key="id">
+                        <div class="form-inline" style="margin-bottom:6px;">
+                            <label class="control-label" style="min-width:220px; margin-right:8px;" x-text="transportLabels[id] ?? ('Transport #' + id)"></label>
+                            <select class="form-control" style="min-width:260px;" :name="'template_transports[' + id + ']'">
+                                <option value="" x-text="perTransportNoOverride"></option>
+                                <template x-for="opt in templateOptions" :key="opt.id">
+                                    <option :value="opt.id" x-text="opt.name"></option>
+                                </template>
+                            </select>
+                        </div>
+                    </template>
+                </div>
                 <span class="help-block">{{ __('alerting.rules.templates.per_transport.help') }}</span>
             </div>
         </div>
@@ -234,10 +246,11 @@
                 invert_map: false,
                 maps: [],
                 transports: [],
+                template: null,
             },
             templateOptions: @json(($templates ?? collect())->toArray()),
             perTransportNoOverride: @json(__('alerting.rules.templates.per_transport.no_override')),
-            transportGroupMembersRoute: @json(route('alert.transport-groups.members', ':group_id')),
+            transportLabels: {},
 
             init() {
                 // expose Alpine component globally so external scripts (like modals) can interact
@@ -288,46 +301,17 @@
                         data: params => ({ type, search: params.term })
                     }
                 }).on('change', () => {
-                    callback($(el).val());
+                    const val = $(el).val();
+                    callback(val);
                     if (el === '#transports') {
-                        this.renderPerTransportTemplates();
+                        const data = ($(el).data('select2') ? $(el).select2('data') : []) || [];
+                        const labels = {};
+                        data.forEach(i => { if (i && i.id != null) { labels[i.id] = i.text; } });
+                        this.transportLabels = labels;
                     }
                 });
             },
 
-            renderPerTransportTemplates() {
-                var $list = $('#transport-template-list');
-                $list.empty();
-                var data = ($('#transports').data('select2') ? $('#transports').select2('data') : []) || [];
-                if (!data.length) { return; }
-                var added = {}; var rows = [];
-                var self = this;
-                function addRow(id, text) {
-                    if (!id || added[id]) { return; }
-                    added[id] = true;
-                    var labelText = text || ('Transport #' + id);
-                    var row = $('<div class="form-inline" style="margin-bottom:6px;"></div>');
-                    var label = $('<label class="control-label" style="min-width:220px; margin-right:8px;"></label>').text(labelText);
-                    var select = $('<select class="form-control" style="min-width:260px;"></select>').attr('name', 'template_transports[' + id + ']');
-                    select.append($('<option value=""></option>').text(self.perTransportNoOverride));
-                    (self.templateOptions || []).forEach(function(opt){ select.append($('<option></option>').attr('value', opt.id).text(opt.name)); });
-                    row.append(label).append(select);
-                    rows.push(row);
-                }
-                var ajaxCalls = [];
-                data.forEach(function(item) {
-                    var key = item.id;
-                    if (String(key).startsWith('g')) {
-                        var groupId = String(key).substring(1);
-                        var url = self.transportGroupMembersRoute.replace(':group_id', groupId);
-                        var call = $.getJSON(url)
-                            .done(function(resp){ if (resp && resp.members && resp.members.length) { resp.members.forEach(function(member){ addRow(member.id, member.text); }); } })
-                            .fail(function(){});
-                        ajaxCalls.push(call);
-                    } else { addRow(key, item.text); }
-                });
-                $.when.apply($, ajaxCalls).always(function(){ rows.forEach(function(r){ $list.append(r); }); });
-            },
 
             loadRule(rule) {
                 const r = rule || {};
@@ -377,7 +361,6 @@
                 $('#builder').queryBuilder('setRules', this.rule.builder || {});
                 $('#maps').val(this.rule.maps).trigger('change');
                 $('#transports').val(this.rule.transports).trigger('change');
-                this.renderPerTransportTemplates();
             },
 
             async save() {
