@@ -48,7 +48,7 @@ class DevicePing extends LnmsCommand
 
                 return 1;
             }
-       }
+        }
 
         if ($this->option('groups')) {
             $this->error('The --groups (-g) option is only supported with "fast" device spec.');
