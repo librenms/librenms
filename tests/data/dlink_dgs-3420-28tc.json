@@ -7898,7 +7898,7 @@
                     "protocol": "lldp",
                     "remote_hostname": "Gigabit Ethernet Switch",
                     "remote_port": "00 1E 58 5C 09 FF (001e585c09ff)",
-                    "remote_platform": null,
+                    "remote_platform": "",
                     "remote_version": "Gigabit Ethernet Switch",
                     "ifAlias": "D-Link DGS-3420-28TC R1.50.018 Port 25 on Unit 1",
                     "ifDescr": "D-Link DGS-3420-28TC R1.50.018 Port 25 on Unit 1",

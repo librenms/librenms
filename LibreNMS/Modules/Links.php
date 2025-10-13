@@ -252,7 +252,7 @@ class Links implements Module
                     if ($data['lldpRemPortIdSubtype'] == 'interfaceName'
                         || $data['lldpRemPortIdSubtype'] == 'interfaceAlias'
                         || $data['lldpRemPortIdSubtype'] == 'portComponent') {
-                        $tmpName = $data['lldpRemPortDescr'] ?? $data['lldpRemPortId'];
+                        $tmpName = $data['lldpRemPortDesc'] ?? $data['lldpRemPortId'];
                         $remotePortName = StringHelpers::linksRemPortName($data['lldpRemSysDesc'] ?? '', $tmpName ?? '');
                     }
 
@@ -284,7 +284,7 @@ class Links implements Module
                     $remoteDeviceIp = $data['lldpRemManAddr'] ?? '';
                     $remoteDeviceId = find_device_id($remoteSysName, $remoteDeviceIp, $remoteMac);
 
-                    $remotePortId = find_port_id($data['lldpRemPortDescr'] ?? null, $data['lldpRemPortId'], $remoteDeviceId);
+                    $remotePortId = find_port_id($data['lldpRemPortDesc'] ?? null, $data['lldpRemPortId'], $remoteDeviceId);
                     $remotePortName = (empty($remotePortId)) ? $remotePortName . ' (' . $remoteMac . ')' : $remotePortName;
 
                     if (! empty($data['localPortId']) && (! empty($remoteSysName))) {

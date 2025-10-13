@@ -7854,7 +7854,7 @@
                     "protocol": "lldp",
                     "remote_hostname": "PCM F-blok-RTR3",
                     "remote_port": "00 1E 58 5C 09 FF (001e585c09ff)",
-                    "remote_platform": null,
+                    "remote_platform": "",
                     "remote_version": "Gigabit Ethernet Switch",
                     "ifAlias": "D-Link DGS-1510-28XMP/ME R1.10.010 Port 25",
                     "ifDescr": "D-Link DGS-1510-28XMP/ME R1.10.010 Port 25",

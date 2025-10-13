@@ -8647,7 +8647,7 @@
                     "protocol": "lldp",
                     "remote_hostname": "Kos16c",
                     "remote_port": "eth1/0/24 (10bef5ac87a0)",
-                    "remote_platform": null,
+                    "remote_platform": "",
                     "remote_version": "Gigabit Ethernet SmartPro Switch",
                     "ifAlias": "D-Link Corporation DGS-1510-28 HW A1 firmware 1.50.021 Port 24 on Unit 1",
                     "ifDescr": "D-Link Corporation DGS-1510-28 HW A1 firmware 1.50.021 Port 24 on Unit 1",
