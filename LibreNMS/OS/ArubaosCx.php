@@ -75,10 +75,14 @@ class ArubaosCx extends \LibreNMS\OS implements NacPolling, TransceiverDiscovery
     public function discoverTransceivers(): Collection
     {
         return SnmpQuery::cache()->walk('ARUBAWIRED-PM-MIB::arubaWiredPmXcvrTable')->mapTable(function ($data, $ifIndex) {
+            $type = !empty($data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDescription']) ?
+                    $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDescription'] :
+                    ($data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrCableType'] . " (" . $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrConnectorType'] . ")" );
+
             return new Transceiver([
                 'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                 'index' => $ifIndex,
-                'type' => $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDescription'] ?? null,
+                'type' => $type,
                 'revision' => $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrPartNum'] ?? null,
                 'model' => $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrProductNum'] ?? null,
                 'serial' => $data['ARUBAWIRED-PM-MIB::arubaWiredPmXcvrSerialNum'] ?? null,
