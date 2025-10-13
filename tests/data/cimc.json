@@ -1965,7 +1965,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "cimc",
-                    "type": "OOB Management",
+                    "type": "management",
                     "serial": "FCH2126720R",
                     "icon": "cisco.svg"
                 }
