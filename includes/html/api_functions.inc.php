@@ -13,6 +13,7 @@
  */
 
 use App\Actions\Device\ValidateDeviceAndCreate;
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Availability;
 use App\Models\Device;
@@ -33,6 +34,7 @@ use App\Models\Ospfv3Port;
 use App\Models\PollerGroup;
 use App\Models\Port;
 use App\Models\PortGroup;
+use App\Models\PortSecurity;
 use App\Models\PortsFdb;
 use App\Models\PortsNac;
 use App\Models\Sensor;
@@ -622,7 +624,7 @@ function device_outages(Illuminate\Http\Request $request)
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
 
     return check_device_permission($device_id, function ($device_id) {
-        $outages = DeviceOutage::select('going_down', 'up_again')
+        $outages = DeviceOutage::select(['going_down', 'up_again'])
                    ->where('device_id', '=', $device_id)
                    ->orderBy('going_down', 'DESC');
 
@@ -1117,7 +1119,7 @@ function list_available_wireless_graphs(Illuminate\Http\Request $request)
 /**
  * @throws \LibreNMS\Exceptions\ApiException
  */
-function get_port_graphs(Illuminate\Http\Request $request): JsonResponse
+function get_device_ports(Illuminate\Http\Request $request): JsonResponse
 {
     $device = DeviceCache::get($request->route('hostname'));
     $columns = validate_column_list($request->get('columns'), 'ports', ['ifName']);
@@ -1332,6 +1334,32 @@ function get_port_stack(Illuminate\Http\Request $request)
     return check_device_permission($device->device_id, function () use ($device) {
         return api_success($device->portsStack, 'mappings');
     });
+}
+
+function get_port_security(Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname') ?? null;
+    $port_id = $request->route('portid') ?? null;
+
+    if ($port_id) {
+        return check_port_permission($port_id, null, function ($port_id) {
+            $port = PortSecurity::where('port_id', $port_id)->get()->toArray();
+
+            return api_success($port, 'port');
+        });
+    } elseif ($hostname) {
+        $device = DeviceCache::get($hostname);
+
+        return check_device_permission($device->device_id, function () use ($device) {
+            $port = PortSecurity::where('device_id', $device->device_id)->get()->toArray();
+
+            return api_success($port, 'port');
+        });
+    } else {
+        $port = PortSecurity::hasAccess(Auth::user())->get();
+
+        return api_success($port, 'port');
+    }
 }
 
 function update_device_port_notes(Illuminate\Http\Request $request): JsonResponse

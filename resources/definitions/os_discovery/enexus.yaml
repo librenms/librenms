@@ -9,15 +9,22 @@ modules:
             - SP2-MIB::controlUnitSwVersion.2
         serial: SP2-MIB::powerSystemSerialNumber.0
         location: SP2-MIB::powerSystemSite.0
+        features:
+            - SP2-MIB::powerSystemType.0
+            - SP2-MIB::powerSystemModel.0
+            - SP2-MIB::batteryDescription.0
+        features_template: 'Rectifier type: {{ SP2-MIB::powerSystemType.0 }}, Rectifier model: {{ SP2-MIB::powerSystemModel.0 }}, Battery: {{ SP2-MIB::batteryDescription.0 }}'
     sensors:
         state:
             data:
                 -
-                    oid: powerSystem
-                    value: powerSystemStatus
+                    oid: SP2-MIB::powerSystem
+                    value: SP2-MIB::powerSystemStatus
                     num_oid: '.1.3.6.1.4.1.12148.10.2.1.{{ $index }}'
                     descr: System Status
+                    entPhysicalIndex: '10'
                     state_name: powerSystemStatus
+                    group: System
                     states:
                         - { descr: error, graph: 0, value: 0, generic: 2 }
                         - { descr: normal, graph: 0, value: 1, generic: 0 }
@@ -41,11 +48,43 @@ modules:
                         - { descr: warning, graph: 0, value: 19, generic: 1 }
                     skip_values: 4
                 -
-                    oid: mains
-                    value: mainsStatus
+                    oid: SP2-MIB::mains
+                    value: SP2-MIB::mainsStatus
                     num_oid: '.1.3.6.1.4.1.12148.10.3.1.{{ $index }}'
                     descr: Mains Status
+                    entPhysicalIndex: '10'
                     state_name: mainsStatus
+                    group: System
+                    states:
+                        - { descr: error, graph: 0, value: 0, generic: 2 }
+                        - { descr: normal, graph: 0, value: 1, generic: 0 }
+                        - { descr: minorAlarm, graph: 0, value: 2, generic: 1 }
+                        - { descr: majorAlarm, graph: 0, value: 3, generic: 2 }
+                        - { descr: disabled, graph: 0, value: 4, generic: 3 }
+                        - { descr: disconnected, graph: 0, value: 5, generic: 3 }
+                        - { descr: notPresent, graph: 0, value: 6, generic: 3 }
+                        - { descr: minorAndMajor, graph: 0, value: 7, generic: 2 }
+                        - { descr: majorLow, graph: 0, value: 8, generic: 2 }
+                        - { descr: minorLow, graph: 0, value: 9, generic: 1 }
+                        - { descr: majorHigh, graph: 0, value: 10, generic: 2 }
+                        - { descr: minorHigh, graph: 0, value: 11, generic: 1 }
+                        - { descr: event, graph: 0, value: 12, generic: 1 }
+                        - { descr: valueVolt, graph: 0, value: 13, generic: 1 }
+                        - { descr: valueAmp, graph: 0, value: 14, generic: 1 }
+                        - { descr: valueTemp, graph: 0, value: 15, generic: 1 }
+                        - { descr: valueUnit, graph: 0, value: 16, generic: 1 }
+                        - { descr: valuePerCent, graph: 0, value: 17, generic: 1 }
+                        - { descr: critical, graph: 0, value: 18, generic: 2 }
+                        - { descr: warning, graph: 0, value: 19, generic: 1 }
+                    skip_values: 4
+
+                -
+                    oid: SP2-MIB::mainsMainsFailure
+                    value: SP2-MIB::mainsMainsFailureStatus
+                    num_oid: '.1.3.6.1.4.1.12148.10.3.2.5.{{ $index }}'
+                    descr: SP2-MIB::mainsMainsFailureDescription
+                    state_name: mainsMainsFailureStatus
+                    group: System
                     states:
                         - { descr: error, graph: 0, value: 0, generic: 2 }
                         - { descr: normal, graph: 0, value: 1, generic: 0 }
@@ -69,10 +108,11 @@ modules:
                         - { descr: warning, graph: 0, value: 19, generic: 1 }
                     skip_values: 4
                 -
-                    oid: rectifierTable
-                    value: rectifierStatus
+                    oid: SP2-MIB::rectifierTable
+                    value: SP2-MIB::rectifierStatus
                     num_oid: '.1.3.6.1.4.1.12148.10.5.6.1.2.{{ $index }}'
-                    descr: '{{ $rectifierType }} {{ $index }} Status'
+                    descr: '{{ SP2-MIB::rectifierType }} {{ $index }} Status'
+                    entPhysicalIndex: '2{{ $index }}'
                     state_name: rectifierStatus
                     group: Rectifier
                     states:
@@ -98,10 +138,42 @@ modules:
                         - { descr: warning, graph: 0, value: 19, generic: 1 }
                     skip_values: 4
                 -
-                    oid: load
-                    value: loadFusesStatus
+                    oid: SP2-MIB::rectifiers
+                    value: SP2-MIB::rectifiersStatus
+                    num_oid: '.1.3.6.1.4.1.12148.10.5.1.{{ $index }}'
+                    descr: Overall Rectifier Status
+                    entPhysicalIndex: '10'
+                    state_name: rectifiersStatus
+                    group: Rectifier
+                    states:
+                        - { descr: error, graph: 0, value: 0, generic: 2 }
+                        - { descr: normal, graph: 0, value: 1, generic: 0 }
+                        - { descr: minorAlarm, graph: 0, value: 2, generic: 1 }
+                        - { descr: majorAlarm, graph: 0, value: 3, generic: 2 }
+                        - { descr: disabled, graph: 0, value: 4, generic: 3 }
+                        - { descr: disconnected, graph: 0, value: 5, generic: 3 }
+                        - { descr: notPresent, graph: 0, value: 6, generic: 3 }
+                        - { descr: minorAndMajor, graph: 0, value: 7, generic: 2 }
+                        - { descr: majorLow, graph: 0, value: 8, generic: 2 }
+                        - { descr: minorLow, graph: 0, value: 9, generic: 1 }
+                        - { descr: majorHigh, graph: 0, value: 10, generic: 2 }
+                        - { descr: minorHigh, graph: 0, value: 11, generic: 1 }
+                        - { descr: event, graph: 0, value: 12, generic: 1 }
+                        - { descr: valueVolt, graph: 0, value: 13, generic: 1 }
+                        - { descr: valueAmp, graph: 0, value: 14, generic: 1 }
+                        - { descr: valueTemp, graph: 0, value: 15, generic: 1 }
+                        - { descr: valueUnit, graph: 0, value: 16, generic: 1 }
+                        - { descr: valuePerCent, graph: 0, value: 17, generic: 1 }
+                        - { descr: critical, graph: 0, value: 18, generic: 2 }
+                        - { descr: warning, graph: 0, value: 19, generic: 1 }
+                    skip_values: 4
+
+                -
+                    oid: SP2-MIB::load
+                    value: SP2-MIB::loadFusesStatus
                     num_oid: '.1.3.6.1.4.1.12148.10.9.3.{{ $index }}'
                     descr: Overal Load Fuses Status
+                    entPhysicalIndex: '10'
                     state_name: loadFusesStatus
                     group: Load Fuse
                     states:
@@ -126,10 +198,11 @@ modules:
                         - { descr: critical, graph: 0, value: 18, generic: 2 }
                         - { descr: warning, graph: 0, value: 19, generic: 1 }
                 -
-                    oid: loadFuseTable
-                    value: loadFuseStatus
+                    oid: SP2-MIB::loadFuseTable
+                    value: SP2-MIB::loadFuseStatus
                     num_oid: '.1.3.6.1.4.1.12148.10.9.7.1.1.{{ $index }}'
-                    descr: loadFuseDescription
+                    descr: SP2-MIB::loadFuseDescription
+                    entPhysicalIndex: '4{{ $index }}'
                     state_name: loadFuseStatus
                     group: Load Fuse
                     states:
@@ -147,10 +220,11 @@ modules:
                         - { descr: minorHigh, graph: 0, value: 11, generic: 1 }
                     skip_values: 4
                 -
-                    oid: battery
-                    value: batteryStatus
+                    oid: SP2-MIB::battery
+                    value: SP2-MIB::batteryStatus
                     num_oid: '.1.3.6.1.4.1.12148.10.10.1.{{ $index }}'
                     descr: Overal Battery Status
+                    entPhysicalIndex: '10'
                     state_name: batteryStatus
                     group: Battery
                     states:
@@ -175,10 +249,11 @@ modules:
                         - { descr: critical, graph: 0, value: 18, generic: 2 }
                         - { descr: warning, graph: 0, value: 19, generic: 1 }
                 -
-                    oid: batteryBankTable
-                    value: batteryBankStatus
+                    oid: SP2-MIB::batteryBankTable
+                    value: SP2-MIB::batteryBankStatus
                     num_oid: '.1.3.6.1.4.1.12148.10.10.18.2.1.2.{{ $index }}'
                     descr: Battery Bank {{ $index }} Status
+                    entPhysicalIndex: '3{{ $index }}'
                     state_name: batteryBankStatus
                     group: Battery
                     states:
@@ -204,10 +279,10 @@ modules:
                         - { descr: warning, graph: 0, value: 19, generic: 1 }
                     skip_values: 4
                 -
-                    oid: batteryBankFuseTable
-                    value: batteryFuseStatus
+                    oid: SP2-MIB::batteryBankFuseTable
+                    value: SP2-MIB::batteryFuseStatus
                     num_oid: '.1.3.6.1.4.1.12148.10.10.18.5.1.2.{{ $index }}'
-                    descr: batteryFuseDescription
+                    descr: SP2-MIB::batteryFuseDescription
                     state_name: batteryFuseStatus
                     group: Battery
                     states:
@@ -233,10 +308,10 @@ modules:
                         - { descr: warning, graph: 0, value: 19, generic: 1 }
                     skip_values: 4
                 -
-                    oid: inputControlUnitInputTable
-                    value: inputControlUnitInputStatus
+                    oid: SP2-MIB::inputControlUnitInputTable
+                    value: SP2-MIB::inputControlUnitInputStatus
                     num_oid: '.1.3.6.1.4.1.12148.10.11.2.1.2.{{ $index }}'
-                    descr: 'Input {{ $inputControlUnitInputDescription }} = {{ $inputControlUnitInputValue }}'
+                    descr: 'Input {{ SP2-MIB::inputControlUnitInputDescription }}'
                     state_name: inputStatus
                     group: Alarm Input
                     states:
@@ -262,10 +337,10 @@ modules:
                         - { descr: warning, graph: 0, value: 19, generic: 1 }
                     skip_values: 4
                 -
-                    oid: outputControlUnitOutputTable
-                    value: outputControlUnitOutputStatus
+                    oid: SP2-MIB::outputControlUnitOutputTable
+                    value: SP2-MIB::outputControlUnitOutputStatus
                     num_oid: '.1.3.6.1.4.1.12148.10.12.2.1.2.{{ $index }}'
-                    descr: 'Output {{ $outputControlUnitOutputDescription }}'
+                    descr: 'Output {{ SP2-MIB::outputControlUnitOutputDescription }}'
                     state_name: outputStatus
                     group: Alarm Output
                     states:
@@ -274,52 +349,126 @@ modules:
                         - { descr: disconnected, graph: 0, value: 2, generic: 3 }
                         - { descr: connected, graph: 0, value: 3, generic: 3 }
                     skip_values: 4
+                -
+                    oid: SP2-MIB::powerSystem
+                    value: SP2-MIB::powerSystemMode
+                    num_oid: '.1.3.6.1.4.1.12148.10.2.3.{{ $index }}'
+                    descr: System Mode
+                    state_name: powerSystemMode
+                    states:
+                        - { descr: off, graph: 0, value: 0, generic: 0 }
+                        - { descr: test, graph: 0, value: 1, generic: 0 }
+                        - { descr: boost, graph: 0, value: 2, generic: 0 }
+                        - { descr: float, graph: 0, value: 3, generic: 0 }
+                -
+                    oid: SP2-MIB::inputIoUnitProgInputTable
+                    value: SP2-MIB::inputIoUnitProgInputStatus
+                    num_oid: '.1.3.6.1.4.1.12148.10.11.4.1.2.{{ $index }}'
+                    descr: 'IO Input {{ SP2-MIB::inputIoUnitProgInputDescription }}'
+                    state_name: ioInputStatus
+                    group: IO Alarm Input
+                    states:
+                        - { descr: error, graph: 0, value: 0, generic: 2 }
+                        - { descr: normal, graph: 0, value: 1, generic: 0 }
+                        - { descr: minorAlarm, graph: 0, value: 2, generic: 1 }
+                        - { descr: majorAlarm, graph: 0, value: 3, generic: 2 }
+                        - { descr: disabled, graph: 0, value: 4, generic: 3 }
+                        - { descr: disconnected, graph: 0, value: 5, generic: 3 }
+                        - { descr: notPresent, graph: 0, value: 6, generic: 3 }
+                        - { descr: minorAndMajor, graph: 0, value: 7, generic: 2 }
+                        - { descr: majorLow, graph: 0, value: 8, generic: 2 }
+                        - { descr: minorLow, graph: 0, value: 9, generic: 1 }
+                        - { descr: majorHigh, graph: 0, value: 10, generic: 2 }
+                        - { descr: minorHigh, graph: 0, value: 11, generic: 1 }
+                        - { descr: event, graph: 0, value: 12, generic: 1 }
+                        - { descr: valueVolt, graph: 0, value: 13, generic: 1 }
+                        - { descr: valueAmp, graph: 0, value: 14, generic: 1 }
+                        - { descr: valueTemp, graph: 0, value: 15, generic: 1 }
+                        - { descr: valueUnit, graph: 0, value: 16, generic: 1 }
+                        - { descr: valuePerCent, graph: 0, value: 17, generic: 1 }
+                        - { descr: critical, graph: 0, value: 18, generic: 2 }
+                        - { descr: warning, graph: 0, value: 19, generic: 1 }
+                    skip_values: 4
+
         voltage:
             data:
                 -
-                    oid: mainsVoltageTable
-                    value: mainsVoltageValue
+                    oid: SP2-MIB::mainsVoltageTable
+                    value: SP2-MIB::mainsVoltageValue
                     num_oid: '.1.3.6.1.4.1.12148.10.3.4.1.6.{{ $index }}'
-                    descr: mainsVoltageDescription
+                    descr: SP2-MIB::mainsVoltageDescription
                     index: 'mains.{{ $index }}'
                     group: Mains
-                    low_limit: mainsVoltageMajorLowLevel
-                    low_warn_limit: mainsVoltageMinorLowLevel
-                    warn_limit: mainsVoltageMinorHighLevel
-                    high_limit: mainsVoltageMajorHighLevel
+                    low_limit: SP2-MIB::mainsVoltageMajorLowLevel
+                    low_warn_limit: SP2-MIB::mainsVoltageMinorLowLevel
+                    warn_limit: SP2-MIB::mainsVoltageMinorHighLevel
+                    high_limit: SP2-MIB::mainsVoltageMajorHighLevel
                 -
-                    oid: rectifierTable
-                    value: rectifierInputVoltageValue
+                    oid: SP2-MIB::rectifierTable
+                    value: SP2-MIB::rectifierInputVoltageValue
                     num_oid: '.1.3.6.1.4.1.12148.10.5.6.1.4.{{ $index }}'
-                    descr:  '{{ $rectifierType }} {{ $index }} Input Voltage'
+                    descr:  '{{ SP2-MIB::rectifierType }} {{ $index }} Input Voltage'
                     index: 'input.{{ $index }}'
+                    entPhysicalIndex: '2{{ $index }}'
                     group: Rectifier
                     low_limit: 80
                     low_warn_limit: 100
                     warn_limit: 260
                     high_limit: 280
                 -
-                    oid: batteryVoltage
-                    value: batteryVoltageValue
+                    oid: SP2-MIB::batteryVoltage
+                    value: SP2-MIB::batteryVoltageValue
                     num_oid: '.1.3.6.1.4.1.12148.10.10.5.5.{{ $index }}'
-                    descr: batteryVoltageDescription
+                    descr: SP2-MIB::batteryVoltageDescription
+                    index: 'battery.{{ $index }}'
+                    entPhysicalIndex: '100'
+                    group: Battery
+                    divisor: 100
+                    low_limit: SP2-MIB::batteryVoltageMajorLowLevel
+                    low_warn_limit: SP2-MIB::batteryVoltageMinorLowLevel
+                    warn_limit: SP2-MIB::batteryVoltageMinorHighLevel
+                    high_limit: SP2-MIB::batteryVoltageMajorHighLevel
+                -
+                    oid: SP2-MIB::batteryBankSymmetryTable
+                    value: SP2-MIB::batteryBankSymmetryMeasureValue
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.18.6.1.6.{{ $index }}'
+                    descr: SP2-MIB::batteryBankSymmetryDescription
+                    index: 'battery.{{ $index }}'
+                    entPhysicalIndex: '3{{ $index }}'
+                    group: Battery
+                    divisor: 100
+                    warn_limit: SP2-MIB::batteryBankSymmetryMinorAlarmLevel
+                    high_limit: SP2-MIB::batteryBankSymmetryMajorAlarmLevel
+                    skip_values:
+                        -
+                            oid: SP2-MIB::batteryBankSymmetryStatus
+                            op: '='
+                            value: 4
+                -
+                    oid: SP2-MIB::batteryMonitorSymmetryTable
+                    value: SP2-MIB::batteryMonitorSymmetryDeltaValue
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.19.6.1.7.{{ $index }}'
+                    descr: SP2-MIB::batteryMonitorSymmetryDescription
                     index: 'battery.{{ $index }}'
                     group: Battery
                     divisor: 100
-                    low_limit: batteryVoltageMajorLowLevel
-                    low_warn_limit: batteryVoltageMinorLowLevel
-                    warn_limit: batteryVoltageMinorHighLevel
-                    high_limit: batteryVoltageMajorHighLevel
+                    warn_limit: SP2-MIB::batteryMonitorSymmetryMinorAlarmLevel
+                    high_limit: SP2-MIB::batteryMonitorSymmetryMajorAlarmLevel
+                    skip_values:
+                        -
+                            oid: SP2-MIB::batteryMonitorSymmetryStatus
+                            op: '='
+                            value: 4
         current:
             data:
                 -
-                    oid: rectifiersCurrent
-                    value: rectifiersCurrentValue
+                    oid: SP2-MIB::rectifiersCurrent
+                    value: SP2-MIB::rectifiersCurrentValue
                     num_oid: '.1.3.6.1.4.1.12148.10.5.2.5.{{ $index }}'
                     descr: Rectifier Output Current
                     index: 'current.{{ $index }}'
                     group: Rectifier
-                    warn_limit: rectifiersCurrentMinorAlarmLevel
+                    warn_limit: SP2-MIB::rectifiersCurrentMinorAlarmLevel
                     high_limit: rectifiersCurrentMajorAlarmLevel
                     skip_values:
                         -
@@ -327,82 +476,192 @@ modules:
                             op: 'regex'
                             value: '/^Smart[Pp]ack S.*/'
                 -  # Smartpack S returns 10ths of an amp
-                    oid: rectifiersCurrent
-                    value: rectifiersCurrentValue
+                    oid: SP2-MIB::rectifiersCurrent
+                    value: SP2-MIB::rectifiersCurrentValue
                     num_oid: '.1.3.6.1.4.1.12148.10.5.2.5.{{ $index }}'
                     descr: System Output Current
                     index: 'current.{{ $index }}'
                     group: Rectifier
                     divisor: 10
-                    warn_limit: rectifiersCurrentMinorAlarmLevel
-                    high_limit: rectifiersCurrentMajorAlarmLevel
+                    warn_limit: SP2-MIB::rectifiersCurrentMinorAlarmLevel
+                    high_limit: SP2-MIB::rectifiersCurrentMajorAlarmLevel
                     skip_values:
                         - device: hardware
                           op: 'not_regex'
                           value: '/^Smart[Pp]ack S.*/'
                 -
-                    oid: rectifierTable
-                    value: rectifierOutputCurrentValue
+                    oid: SP2-MIB::rectifierTable
+                    value: SP2-MIB::rectifierOutputCurrentValue
                     num_oid: '.1.3.6.1.4.1.12148.10.5.6.1.3.{{ $index }}'
-                    descr: '{{ $rectifierType }} {{ $index }} Output Current'
+                    descr: '{{ SP2-MIB::rectifierType }} {{ $index }} Output Current'
                     index: 'output.{{ $index }}'
+                    entPhysicalIndex: '2{{ $index }}'
                     group: Rectifier
                     divisor: 10
                 -
-                    oid: batteryCurrents
-                    value: batteryCurrentsValue
+                    oid: SP2-MIB::batteryCurrents
+                    value: SP2-MIB::batteryCurrentsValue
                     num_oid: '.1.3.6.1.4.1.12148.10.10.6.5.{{ $index }}'
                     descr: Overal Battery Current
                     index: 'battery.{{ $index }}'
+                    entPhysicalIndex: '100'
                     group: Battery
                     divisor: 10
-                    low_limit: batteryCurrentsMinorLowLevel
-                    low_warn_limit: batteryCurrentsMinorLowLevel
-                    warn_limit: batteryCurrentsMinorHighLevel
-                    high_limit: batteryCurrentsMajorHighLevel
+                    low_limit: SP2-MIB::batteryCurrentsMinorLowLevel
+                    low_warn_limit: SP2-MIB::batteryCurrentsMinorLowLevel
+                    warn_limit: SP2-MIB::batteryCurrentsMinorHighLevel
+                    high_limit: SP2-MIB::batteryCurrentsMajorHighLevel
                 -
-                    oid: batteryBankCurrentTable
-                    value: batteryCurrentValue
+                    oid: SP2-MIB::batteryBankCurrentTable
+                    value: SP2-MIB::batteryCurrentValue
                     num_oid: '.1.3.6.1.4.1.12148.10.10.18.4.1.6.{{ $index }}'
                     descr: batteryCurrentDescription
                     index: 'battery.{{ $index }}'
+                    entPhysicalIndex: '3{{ $index }}'
                     group: Battery
                     divisor: 10
-                    low_limit: batteryCurrentMinorLowLevel
-                    low_warn_limit: batteryCurrentMinorLowLevel
-                    warn_limit: batteryCurrentMinorHighLevel
-                    high_limit: batteryCurrentMajorHighLevel
+                    low_limit: SP2-MIB::batteryCurrentMinorLowLevel
+                    low_warn_limit: SP2-MIB::batteryCurrentMinorLowLevel
+                    warn_limit: SP2-MIB::batteryCurrentMinorHighLevel
+                    high_limit: SP2-MIB::batteryCurrentMajorHighLevel
+                -
+                    oid: SP2-MIB::loadCurrent
+                    value: SP2-MIB::loadCurrentValue
+                    num_oid: '.1.3.6.1.4.1.12148.10.9.2.5.{{ $index }}'
+                    descr: SP2-MIB::loadCurrentDescription
+                    entPhysicalIndex: '10'
+                    index: 'load.{{ $index }}'
+                    group: Load
+                    divisor: 10
+                    warn_limit: SP2-MIB::loadCurrentMinorHighLevel
+                    high_limit: SP2-MIB::loadCurrentMajorHighLevel
         temperature:
             data:
                 -
-                    oid: batteryTemperatures
-                    value: batteryTemperaturesValue
+                    oid: SP2-MIB::batteryTemperatures
+                    value: SP2-MIB::batteryTemperaturesValue
                     num_oid: '.1.3.6.1.4.1.12148.10.10.7.5.{{ $index }}'
                     descr: Overal Battery Temperature
-                    low_limit: batteryTemperaturesMinorLowLevel
-                    low_warn_limit: batteryTemperaturesMinorLowLevel
-                    warn_limit: batteryTemperaturesMinorHighLevel
-                    high_limit: batteryTemperaturesMajorHighLevel
+                    entPhysicalIndex: '100'
+                    low_limit: SP2-MIB::batteryTemperaturesMinorLowLevel
+                    low_warn_limit: SP2-MIB::batteryTemperaturesMinorLowLevel
+                    warn_limit: SP2-MIB::batteryTemperaturesMinorHighLevel
+                    high_limit: SP2-MIB::batteryTemperaturesMajorHighLevel
                 -
-                    oid: batteryBankTemperatureTable
-                    value: batteryTemperatureValue
+                    oid: SP2-MIB::batteryBankTemperatureTable
+                    value: SP2-MIB::batteryTemperatureValue
                     num_oid: '.1.3.6.1.4.1.12148.10.10.18.3.1.6.{{ $index }}'
-                    descr: batteryTemperatureDescription
-                    low_limit: batteryTemperatureMinorLowLevel
-                    low_warn_limit: batteryTemperatureMinorLowLevel
-                    warn_limit: batteryTemperatureMinorHighLevel
-                    high_limit: batteryTemperatureMajorHighLevel
+                    descr: SP2-MIB::batteryTemperatureDescription
+                    entPhysicalIndex: '3{{ $index }}'
+                    low_limit: SP2-MIB::batteryTemperatureMinorLowLevel
+                    low_warn_limit: SP2-MIB::batteryTemperatureMinorLowLevel
+                    warn_limit: SP2-MIB::batteryTemperatureMinorHighLevel
+                    high_limit: SP2-MIB::batteryTemperatureMajorHighLevel
                     skip_values:
                         -
-                            oid: batteryTemperatureStatus
+                            oid: SP2-MIB::batteryTemperatureStatus
+                            op: '='
+                            value: 4
+                -
+                    oid: SP2-MIB::ambientTemperature
+                    value: SP2-MIB::ambientTemperatureValue
+                    num_oid: '.1.3.6.1.4.1.12148.10.13.13.5.{{ $index }}'
+                    descr: SP2-MIB::ambientTemperatureDescription
+                    entPhysicalIndex: '10'
+                    low_limit: SP2-MIB::ambientTemperatureMinorLowLevel
+                    low_warn_limit: SP2-MIB::ambientTemperatureMinorLowLevel
+                    warn_limit: SP2-MIB::ambientTemperatureMinorHighLevel
+                    high_limit: SP2-MIB::ambientTemperatureMajorHighLevel
+                    skip_values:
+                        -
+                            oid: SP2-MIB::ambientTemperatureStatus
                             op: '='
                             value: 4
         runtime:
             data:
                 -
-                    oid: batteryTimeLeft
-                    value: batteryTimeLeftValue
+                    oid: SP2-MIB::batteryTimeLeft
+                    value: SP2-MIB::batteryTimeLeftValue
                     num_oid: '.1.3.6.1.4.1.12148.10.10.8.5.{{ $index }}'
-                    descr: batteryTimeLeftDescription
-                    low_warn_limit: batteryTimeLeftMinorAlarmLevel
-                    low_limit: batteryTimeLeftMajorAlarmLevel
+                    descr: SP2-MIB::batteryTimeLeftDescription
+                    entPhysicalIndex: '100'
+                    low_warn_limit: SP2-MIB::batteryTimeLeftMinorAlarmLevel
+                    low_limit: SP2-MIB::batteryTimeLeftMajorAlarmLevel
+        load:
+            data:
+                -
+                    oid: SP2-MIB::batteryRemainingCapacity
+                    value: SP2-MIB::batteryRemainingCapacityValue
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.9.5.{{ $index }}'
+                    descr: SP2-MIB::batteryRemainingCapacityDescription
+                    entPhysicalIndex: '100'
+                    low_warn_limit: SP2-MIB::batteryRemainingCapacityMinorLowLevel
+                    low_limit: SP2-MIB::batteryRemainingCapacityMajorLowLevel
+                -
+                    oid: SP2-MIB::rectifiersCapacity
+                    value: SP2-MIB::rectifiersCapacityValue
+                    num_oid: '.1.3.6.1.4.1.12148.10.5.3.5.{{ $index }}'
+                    descr: SP2-MIB::rectifiersCapacityDescription
+                    warn_limit: SP2-MIB::rectifiersCapacityMinorAlarmLevel
+                    high_limit: SP2-MIB::rectifiersCapacityMajorAlarmLevel
+                -
+                    oid: SP2-MIB::batteryQuality
+                    value: SP2-MIB::batteryQualityValue
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.12.5.{{ $index }}'
+                    descr: SP2-MIB::batteryQualityDescription
+                    entPhysicalIndex: '100'
+                    low_warn_limit: SP2-MIB::batteryQualityMinorAlarmLevel
+                    low_limit: SP2-MIB::batteryQualityMajorAlarmLevel
+                -
+                    oid: SP2-MIB::batteryUsedCapacity
+                    value: SP2-MIB::batteryUsedCapacityValue
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.10.5.{{ $index }}'
+                    descr: SP2-MIB::batteryUsedCapacityDescription
+                    entPhysicalIndex: '100'
+                    warn_limit: SP2-MIB::batteryUsedCapacityMinorAlarmLevel
+                    high_limit: SP2-MIB::batteryUsedCapacityMajorAlarmLevel
+        count:
+            data:
+                -
+                    oid: SP2-MIB::batteryAhCharged
+                    value: SP2-MIB::batteryAhChargedValue
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.23.5.{{ $index }}'
+                    descr: SP2-MIB::batteryAhChargedDescription
+                    entPhysicalIndex: '100'
+                    divisor: 100
+                    warn_limit: SP2-MIB::batteryAhChargedMinorHighLevel
+                    high_limit: SP2-MIB::batteryAhChargedMajorHighLevel
+                -
+                    oid: SP2-MIB::batteryTotalCapacity
+                    value: SP2-MIB::batteryTotalCapacityValue
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.11.5.{{ $index }}'
+                    descr: SP2-MIB::batteryTotalCapacityDescription
+                    entPhysicalIndex: '100'
+                    low_warn_limit: SP2-MIB::batteryTotalCapacityMinorLowLevel
+                    low_limit: SP2-MIB::batteryTotalCapacityMajorLowLevel
+                -
+                    oid: SP2-MIB::batteryBankNumberOfBanks
+                    index: 'batteryBankNumberOfBanks.0'
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.18.1.0'
+                    descr: Battery bank number of banks
+                -
+                    oid: SP2-MIB::mainsNumberOfPhases
+                    index: 'mainsNumberOfPhases.0'
+                    num_oid: '.1.3.6.1.4.1.12148.10.3.3.0'
+                    descr: Mains number of phases
+                -
+                    oid: SP2-MIB::rectifiersNumberOfRectifiers
+                    index: 'rectifiersNumberOfRectifiers.0'
+                    num_oid: '.1.3.6.1.4.1.12148.10.5.5.0'
+                    descr: Rectifiers number of rectifiers
+                -
+                    oid: SP2-MIB::batteryTestNumberOfResults
+                    index: 'batteryTestNumberOfResults.0'
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.16.3.0'
+                    descr: Battery test number of results
+                -
+                    oid: SP2-MIB::batteryTest.5.0
+                    value: SP2-MIB::batteryTest
+                    index: 'batteryTest.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.12148.10.10.16.5.{{ $index }}'
+                    descr: Battery Test Max Duration (minutes)

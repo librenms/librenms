@@ -95,8 +95,6 @@
 
                         <li><a href="{{ route('inventory') }}"><i class="fa fa-cube fa-fw fa-lg"
                                                                 aria-hidden="true"></i> {{ __('Inventory') }}</a></li>
-                        <li><a href="{{ url('outages') }}"><i class="fa fa-bar-chart fa-fw fa-lg"
-                                                               aria-hidden="true"></i> {{ __('Outages') }}</a></li>
                         @if($package_count)
                             <li><a href="{{ url('search/search=packages') }}"><i class="fa fa-archive fa-fw fa-lg"
                                                                                  aria-hidden="true"></i> {{ __('Packages') }}
@@ -118,6 +116,9 @@
                         </li>
                         <li><a href="{{ url('search/search=fdb') }}"><i class="fa fa-search fa-fw fa-lg"
                                                                         aria-hidden="true"></i> {{ __('FDB Tables') }}</a>
+                        </li>
+                        <li><a href="{{ url('search/secureports') }}"><i class="fa fa-shield fa-fw fa-lg"
+                                                                        aria-hidden="true"></i> {{ __('Port Security') }}</a>
                         </li>
                     </ul>
                 </li>
@@ -152,9 +153,7 @@
                             </ul>
                         </li>
                     @endif
-
                     @if($locations->isNotEmpty())
-                        <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
                             <a href="{{ url('locations') }}"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> {{ __('Geo Locations') }}</a>
                             <ul class="dropdown-menu scrollable-menu">
@@ -165,7 +164,11 @@
                             </ul>
                         </li>
                     @endif
-                    @admin
+                        <li role="presentation" class="divider"></li>
+                        <li><a href="{{ url('outages') }}"><i class="fa fa-bar-chart fa-fw fa-lg"
+                                                              aria-hidden="true"></i> {{ __('Outages') }}</a></li>
+
+                        @admin
                         <li role="presentation" class="divider"></li>
                         @can('manage', \App\Models\DeviceGroup::class)
                             <li><a href="{{ url('device-groups') }}"><i class="fa fa-th fa-fw fa-lg"

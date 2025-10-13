@@ -18,6 +18,7 @@ use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\AddressFamily;
+use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
@@ -275,6 +276,23 @@ class Device extends BaseModel
         return $this->maintenanceStatus;
     }
 
+    public function getDeviceStatus(): DeviceStatus
+    {
+        if ($this->disabled) {
+            return DeviceStatus::DISABLED;
+        }
+
+        if ($this->ignore) {
+            return $this->status ? DeviceStatus::IGNORED_UP : DeviceStatus::IGNORED_DOWN;
+        }
+
+        if ($this->status) {
+            return DeviceStatus::UP;
+        }
+
+        return $this->last_polled ? DeviceStatus::DOWN : DeviceStatus::NEVER_POLLED;
+    }
+
     /**
      * Get the shortened display name of this device.
      * Length is always overridden by shorthost_target_length.
@@ -306,9 +324,11 @@ class Device extends BaseModel
      */
     public function getCurrentOutage(): ?DeviceOutage
     {
-        return $this->relationLoaded('outages')
-            ? $this->outages->whereNull('up_again')->sortBy('going_down', descending: true)->first()
-            : $this->outages()->whereNull('up_again')->orderBy('going_down', 'desc')->first();
+        if ($this->relationLoaded('outages')) {
+            return $this->outages->whereNull('up_again')->sortBy('going_down', descending: true)->first();
+        }
+
+        return $this->outages()->whereNull('up_again')->orderBy('going_down', 'desc')->first();
     }
 
     /**
@@ -1084,6 +1104,14 @@ class Device extends BaseModel
     public function portsStp(): HasMany
     {
         return $this->hasMany(PortStp::class, 'device_id', 'device_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\PortSecurity, \App\Models\Port, $this>
+     */
+    public function portSecurity(): HasManyThrough
+    {
+        return $this->hasManyThrough(PortSecurity::class, Port::class, 'device_id', 'port_id');
     }
 
     /**

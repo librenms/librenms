@@ -26,6 +26,7 @@ use App\Http\Controllers\Maps\CustomMapNodeImageController;
 use App\Http\Controllers\Maps\DeviceDependencyController;
 use App\Http\Controllers\NacController;
 use App\Http\Controllers\OuiLookupController;
+use App\Http\Controllers\OutagesController;
 use App\Http\Controllers\OverviewController;
 use App\Http\Controllers\PluginLegacyController;
 use App\Http\Controllers\PluginPageController;
@@ -36,6 +37,7 @@ use App\Http\Controllers\PollerSettingsController;
 use App\Http\Controllers\PortController;
 use App\Http\Controllers\PortGroupController;
 use App\Http\Controllers\PushNotificationController;
+use App\Http\Controllers\Search\PortSecuritySearchController;
 use App\Http\Controllers\Select;
 use App\Http\Controllers\SensorController;
 use App\Http\Controllers\ServiceTemplateController;
@@ -83,6 +85,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('device-groups', DeviceGroupController::class);
     Route::any('inventory', App\Http\Controllers\InventoryController::class)->name('inventory');
     Route::get('inventory/purge', [App\Http\Controllers\InventoryController::class, 'purge'])->name('inventory.purge');
+    Route::get('outages', [OutagesController::class, 'index'])->name('outages');
     Route::resource('port', PortController::class)->only('update');
     Route::get('vlans', [App\Http\Controllers\VlansController::class, 'index'])->name('vlans.index');
     Route::prefix('poller')->group(function () {
@@ -207,6 +210,9 @@ Route::middleware(['auth'])->group(function () {
     Route::any('plugin/v1/{plugin:plugin_name}/{other?}', PluginLegacyController::class)->where('other', '(.*)')->name('plugin.legacy');
     Route::get('plugin/{plugin:plugin_name}', PluginPageController::class)->name('plugin.page');
 
+    // Search pages
+    Route::get('search/secureports', [PortSecuritySearchController::class, 'index'])->name('search.secureports');
+
     Route::get('health/{metric?}/{legacyview?}', [SensorController::class, 'index'])->name('sensor.index');
     Route::get('wireless/{metric}/{legacyview?}', [WirelessSensorController::class, 'index'])->name('wireless.index');
 
@@ -290,6 +296,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('outages', Table\OutagesController::class)->name('table.outages');
             Route::get('outages/export', [Table\OutagesController::class, 'export']);
             Route::post('port-nac', Table\PortNacController::class)->name('table.port-nac');
+            Route::post('port-security', Table\PortSecurityController::class)->name('table.port-security');
             Route::post('port-stp', Table\PortStpController::class);
             Route::post('ports', Table\PortsController::class)->name('table.ports');
             Route::get('ports/export', [Table\PortsController::class, 'export']);
