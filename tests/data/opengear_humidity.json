@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "opengear",
-                    "type": "OOB Management",
+                    "type": "management",
                     "serial": "12345678954321",
                     "icon": "opengear.svg"
                 }
