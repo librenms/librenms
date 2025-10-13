@@ -4,7 +4,7 @@ modules:
         serial: SNMPv2-SMI::enterprises.18837.3.2.2.1.16.0
         version: SNMPv2-SMI::enterprises.18837.3.2.2.1.11.0
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:
@@ -213,11 +213,11 @@ modules:
                     states:
                         - { value: 0, descr: none, graph: 1, generic: 3 }
                         - { value: 1, descr: warmup, graph: 1, generic: 0 }
-                        - { value: 2, descr: calibration, graph: 1, generic: 1 }                        
-                        - { value: 3, descr: trackSetup, graph: 1, generic: 1 }                       
-                        - { value: 4, descr: trackLock, graph: 1, generic: 0 }  
-                        - { value: 5, descr: freerun, graph: 1, generic: 2 }  
-                        - { value: 6, descr: fault, graph: 1, generic: 2 }  
+                        - { value: 2, descr: calibration, graph: 1, generic: 1 }
+                        - { value: 3, descr: trackSetup, graph: 1, generic: 1 }
+                        - { value: 4, descr: trackLock, graph: 1, generic: 0 }
+                        - { value: 5, descr: freerun, graph: 1, generic: 2 }
+                        - { value: 6, descr: fault, graph: 1, generic: 2 }
                 -
                     oid: ssGpsRefTimeValid
                     value: ssGpsRefTimeValid
@@ -254,15 +254,15 @@ modules:
                         - { value: 1, descr: unknown, graph: 1, generic: 3 }
                         - { value: 2, descr: notRunning, graph: 1, generic: 2 }
                         - { value: 3, descr: notSynchonized, graph: 1, generic: 2 }
-                        - { value: 4, descr: synchronized, graph: 1, generic: 0 } 
+                        - { value: 4, descr: synchronized, graph: 1, generic: 0 }
                 -
                     oid: ptpbaseClockParentDSEntry
                     value: ptpbaseClockParentDSGMClockQualityAccuracy
                     num_oid: '.1.3.6.1.4.1.18837.3.5.1.2.2.1.12.{{ $index }}'
                     descr: '{{ $ptpbaseClockParentDSGMClockIdentity }} Master accuracy'
-                    snmp_flags: '-OQUsbe'                    
+                    snmp_flags: '-OQUsbe'
                     group: PTP
-                    index: 'ptpbaseQualityAccuracy.{{ $index }}'        
+                    index: 'ptpbaseQualityAccuracy.{{ $index }}'
                     states:
                         - { value: 254, descr: ok, graph: 1, generic: 3 }
                         - { value: 32, descr: <25ns, graph: 1, generic: 0 }

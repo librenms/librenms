@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Actions\Device\DeviceIsPingable;
 use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
 use App\Jobs\PingCheck;
@@ -32,7 +33,7 @@ class DevicePing extends LnmsCommand
      *
      * @return int
      */
-    public function handle(): int
+    public function handle(DeviceIsPingable $deviceIsPingable): int
     {
         $this->configureOutputOptions();
         $spec = $this->argument('device spec');
@@ -66,8 +67,7 @@ class DevicePing extends LnmsCommand
 
         /** @var Device $device */
         foreach ($devices as $device) {
-            $helper = new ConnectivityHelper($device);
-            $response = $helper->isPingable();
+            $response = $deviceIsPingable->execute($device);
 
             $this->line($device->displayName() . ' : ' . ($response->wasSkipped() ? 'skipped' : $response));
         }

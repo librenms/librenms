@@ -1,7 +1,7 @@
 mib: ARRIS-C3-FPD-MIB
 modules:
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

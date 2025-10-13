@@ -34,11 +34,35 @@ use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL as LaravelUrl;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\DeviceStatus;
 use Request;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 class Url
 {
+    /**
+     * Provisional device link generation
+     */
+    public static function modernDeviceLink(?Device $device, string $text = '', string $extra = ''): string
+    {
+        if ($device === null) {
+            return e($text);
+        }
+
+        $class = match ($device->getDeviceStatus()) {
+            DeviceStatus::UP, DeviceStatus::IGNORED_UP => 'device-link-up',
+            DeviceStatus::DOWN, DeviceStatus::NEVER_POLLED, DeviceStatus::IGNORED_DOWN => 'device-link-down',
+            DeviceStatus::DISABLED => 'device-link-disabled',
+        };
+
+        return sprintf('<a href="%s" class="%s" x-data="deviceLink()">%s</a>%s',
+            route('device', $device->device_id),
+            $class,
+            e($text ?: $device->displayName()),
+            $extra ? '<br />' . e($extra) : $extra
+        );
+    }
+
     /**
      * @param  Device|null  $device
      * @param  string|null  $text
@@ -475,15 +499,13 @@ class Url
      */
     private static function deviceLinkDisplayClass($device)
     {
-        if ($device->disabled) {
-            return 'list-device-disabled';
-        }
-
-        if ($device->ignore) {
-            return $device->status ? 'list-device-ignored-up' : 'list-device-ignored';
-        }
-
-        return $device->status ? 'list-device' : 'list-device-down';
+        return match ($device->getDeviceStatus()) {
+            DeviceStatus::DISABLED => 'list-device-disabled',
+            DeviceStatus::DOWN, DeviceStatus::NEVER_POLLED => 'list-device-down',
+            DeviceStatus::UP => 'list-device',
+            DeviceStatus::IGNORED_DOWN => 'list-device-ignored',
+            DeviceStatus::IGNORED_UP => 'list-device-ignored-up',
+        };
     }
 
     /**
