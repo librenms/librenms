@@ -13,6 +13,7 @@
  */
 
 use App\Actions\Device\ValidateDeviceAndCreate;
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Availability;
 use App\Models\Device;
@@ -33,6 +34,7 @@ use App\Models\Ospfv3Port;
 use App\Models\PollerGroup;
 use App\Models\Port;
 use App\Models\PortGroup;
+use App\Models\PortSecurity;
 use App\Models\PortsFdb;
 use App\Models\PortsNac;
 use App\Models\Sensor;
@@ -622,7 +624,7 @@ function device_outages(Illuminate\Http\Request $request)
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
 
     return check_device_permission($device_id, function ($device_id) {
-        $outages = DeviceOutage::select('going_down', 'up_again')
+        $outages = DeviceOutage::select(['going_down', 'up_again'])
                    ->where('device_id', '=', $device_id)
                    ->orderBy('going_down', 'DESC');
 
@@ -1117,7 +1119,7 @@ function list_available_wireless_graphs(Illuminate\Http\Request $request)
 /**
  * @throws \LibreNMS\Exceptions\ApiException
  */
-function get_port_graphs(Illuminate\Http\Request $request): JsonResponse
+function get_device_ports(Illuminate\Http\Request $request): JsonResponse
 {
     $device = DeviceCache::get($request->route('hostname'));
     $columns = validate_column_list($request->get('columns'), 'ports', ['ifName']);
@@ -1332,6 +1334,32 @@ function get_port_stack(Illuminate\Http\Request $request)
     return check_device_permission($device->device_id, function () use ($device) {
         return api_success($device->portsStack, 'mappings');
     });
+}
+
+function get_port_security(Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname') ?? null;
+    $port_id = $request->route('portid') ?? null;
+
+    if ($port_id) {
+        return check_port_permission($port_id, null, function ($port_id) {
+            $port = PortSecurity::where('port_id', $port_id)->get()->toArray();
+
+            return api_success($port, 'port');
+        });
+    } elseif ($hostname) {
+        $device = DeviceCache::get($hostname);
+
+        return check_device_permission($device->device_id, function () use ($device) {
+            $port = PortSecurity::where('device_id', $device->device_id)->get()->toArray();
+
+            return api_success($port, 'port');
+        });
+    } else {
+        $port = PortSecurity::hasAccess(Auth::user())->get();
+
+        return api_success($port, 'port');
+    }
 }
 
 function update_device_port_notes(Illuminate\Http\Request $request): JsonResponse
@@ -3410,6 +3438,62 @@ function del_location(Illuminate\Http\Request $request)
     }
 
     return api_error(500, "Failed to delete the location $location");
+}
+
+function maintenance_location(Illuminate\Http\Request $request)
+{
+    $data = $request->json()->all();
+
+    if (empty($data)) {
+        return api_error(400, 'No information has been provided to set this location into maintenance');
+    }
+
+    $loc = $request->route('location');
+    if (! $loc) {
+        return api_error(400, 'No location was provided');
+    }
+
+    if (empty($data['duration'])) {
+        return api_error(400, 'Duration not provided');
+    }
+
+    $location = ctype_digit($loc) ? Location::find($loc) : Location::where('location', $loc)->first();
+    if (empty($location)) {
+        return api_error(404, "Location $loc does not exist");
+    }
+
+    $notes = $data['notes'] ?? '';
+    $title = $data['title'] ?? $location->location;
+    $behavior = MaintenanceBehavior::tryFrom((int) ($data['behavior'] ?? -1))
+        ?? LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior');
+
+    $alert_schedule = new \App\Models\AlertSchedule([
+        'title' => $title,
+        'notes' => $notes,
+        'behavior' => $behavior,
+        'recurring' => 0,
+    ]);
+
+    $start = $data['start'] ?? \Carbon\Carbon::now()->format('Y-m-d H:i:00');
+    $alert_schedule->start = $start;
+
+    $duration = $data['duration'];
+
+    if (Str::contains($duration, ':')) {
+        [$duration_hour, $duration_min] = explode(':', $duration);
+        $alert_schedule->end = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $start)
+            ->addHours((float) $duration_hour)->addMinutes((float) $duration_min)
+            ->format('Y-m-d H:i:00');
+    }
+
+    $alert_schedule->save();
+    $alert_schedule->locations()->attach($location);
+
+    if (isset($data['start'])) {
+        return api_success_noresult(201, "Location {$location->location} ({$location->id}) will begin maintenance mode at $start" . ($duration ? " for {$duration}h" : ''));
+    } else {
+        return api_success_noresult(201, "Location {$location->location} ({$location->id}) moved into maintenance mode" . ($duration ? " for {$duration}h" : ''));
+    }
 }
 
 function get_poller_group(Illuminate\Http\Request $request)

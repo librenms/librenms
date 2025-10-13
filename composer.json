@@ -120,7 +120,8 @@
         "exclude-from-classmap": [
             "/vendor/laravel/laravel/database/",
             "/vendor/laravel/laravel/app/",
-            "/html/plugins"
+            "/html/plugins",
+            "/vendor/marc-mabe/php-enum/stubs/Stringable.php"
         ]
     },
     "scripts": {
