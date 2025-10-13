@@ -16,7 +16,7 @@ modules:
         hardware_replace:
             - ['/^FORTINET-FORTIGATE-MIB::fgvm/', 'FortiGate VM ']
             - ['/^FORTINET-FORTIGATE-MIB::fgr/', 'FortiGate Rugged ']
-            - ['/^FORTINET-FORTIGATE-MIB::fw/', 'FortiWiFi ']
+            - ['/^FORTINET-FORTIGATE-MIB::fwf?/', 'FortiWiFi ']
             - ['/^FORTINET-FORTIGATE-MIB::fgt/', 'FortiGate ']
 
             - ['/(POE)$/', ' PoE']
