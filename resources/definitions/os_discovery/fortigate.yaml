@@ -14,8 +14,14 @@ modules:
                     - SNMPv2-MIB::sysObjectID.0
                     - ENTITY-MIB::entPhysicalModelName.1
         hardware_replace:
-            - ['/^FORTINET-FORTIGATE-MIB::fgt?/', 'FortiGate ']
-            - ['/vm/', 'VM']
+            - ['/^FORTINET-FORTIGATE-MIB::fgvm/', 'FortiGate VM ']
+            - ['/^FORTINET-FORTIGATE-MIB::fgr/', 'FortiGate Rugged ']
+            - ['/^FORTINET-FORTIGATE-MIB::fw/', 'FortiWiFi ']
+            - ['/^FORTINET-FORTIGATE-MIB::fgt/', 'FortiGate ']
+
+            - ['/(POE)$/', ' PoE']
+            - ['/(LTE)$/', ' LTE']
+            - ['/(I)$/', ' 3G/4G']
 
     processors:
         data:
