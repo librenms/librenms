@@ -26,6 +26,7 @@
 
 namespace App\View\Components\Device;
 
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Vminfo;
@@ -47,6 +48,7 @@ class Page extends Component
         public readonly array $dropdownLinks = [],
         public readonly string $subtitle = '',
     ) {
+        DeviceCache::setPrimary($device->device_id); // set primary device in case it was not set by controller
         $this->pagetitle = $subtitle ? ($device->displayName() . ': ' . $subtitle) : $device->displayName();
         $this->alertClass = $device->disabled ? 'alert-info' : ($device->status ? '' : 'alert-danger');
         $this->parentDeviceId = Vminfo::guessFromDevice($device)->value('device_id');
