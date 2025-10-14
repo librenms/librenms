@@ -22,6 +22,7 @@ modules:
             - ['/(POE)$/', ' PoE']
             - ['/(LTE)$/', ' LTE']
             - ['/(I)$/', ' 3G/4G']
+            - ['/(ev)$/', 'Evaluation']
 
     processors:
         data:
