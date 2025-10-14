@@ -754,6 +754,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (rect.bottom > window.innerHeight) {
                 submenu.style.maxHeight = availableHeight + 'px';
+                submenu.style.overflowY = 'auto';
             }
         });
 
