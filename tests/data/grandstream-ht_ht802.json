@@ -8,12 +8,12 @@
                     "sysDescr": "Linux HT8XX 3.4.20-rt31-dvf-v1.2.6.1-rc2 #577 PREEMPT Wed Apr 23 19:59:15 CST 2025 armv5tejl",
                     "sysContact": "helpdesk.grandstream.com",
                     "version": "Core: 1.0.63.1, Base: 1.0.63.3",
-                    "hardware": "9610003725A",
+                    "hardware": null,
                     "features": null,
                     "location": "HT802",
                     "os": "grandstream-ht",
                     "type": "network",
-                    "serial": null,
+                    "serial": "9610003725A",
                     "icon": "grandstream.png"
                 }
             ]
