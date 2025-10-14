@@ -27,15 +27,15 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
-use SnmpQuery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class GrandstreamHt extends OS implements OSDiscovery
 {
     public function discoverOS(Device $device): void
     {
-        $statuses = SnmpQuery::hideMib()->get(['GS-HT8XX-MIB::versionCore.0','GS-HT8XX-MIB::versionCore.0.0', 'GS-HT8XX-MIB::versionBase.0', 'GS-HT8XX-MIB::versionBase.0.0', 'GS-HT8XX-MIB::PartNo.0', 'GS-HT8XX-MIB::PartNo.0.0'])->values();
+        $statuses = SnmpQuery::hideMib()->get(['GS-HT8XX-MIB::versionCore.0', 'GS-HT8XX-MIB::versionCore.0.0', 'GS-HT8XX-MIB::versionBase.0', 'GS-HT8XX-MIB::versionBase.0.0', 'GS-HT8XX-MIB::PartNo.0', 'GS-HT8XX-MIB::PartNo.0.0'])->values();
         if (isset($statuses['versionCore.0']) && isset($statuses['versionBase.0'])) {
             $device->version = "Core: {$statuses['versionCore.0']}, Base: {$statuses['versionBase.0']}";
         }
