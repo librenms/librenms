@@ -63,6 +63,7 @@ use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
 class Cisco extends OS implements
@@ -994,6 +995,24 @@ class Cisco extends OS implements
         $ports = parent::discoverVlanPorts($vlans); // Q-BRIDGE-MIB
         if ($ports->isNotEmpty()) {
             return $ports;
+        }
+
+        $trunkTable = SnmpQuery::walk([
+            'CISCO-VTP-MIB::vlanTrunkPortTable',
+        ])->table(1);
+
+        foreach ($trunkTable as $ifIndex => $data) {
+            if (isset($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined'])) {
+                $vlanIds = StringHelpers::bitsToIndices($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined']);
+                foreach ($vlanIds as $tmp => $vlan_id) {
+                    $ports->push(new PortVlan([
+                        'vlan' => $vlan_id - 1,
+                        'baseport' => $this->bridgePortFromIfIndex($ifIndex),
+                        'untagged' => 0,
+                        'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0,
+                    ]));
+                }
+            }
         }
 
         // Only returns 'untagged' vlan for each port (either access ports, or native vlan of a trunk)
