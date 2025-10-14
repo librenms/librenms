@@ -39,14 +39,14 @@ $state_lookup = array_column($states, 'value', 'descr');
 $status_oid = '.1.3.6.1.4.1.42397.1.1.2.1'; // GS-GXW42XX-MIB::hookStatus
 $statuses = SnmpQuery::hideMib()->walk([
     'GS-GXW42XX-MIB::hookStatus',
-])->values(); // Results from a walk are hookStatus.1.0.0 or hookStatus1.0!
+])->table(2)[0][0]; // Results from a walk are hookStatus.1.0.0!
 
 if (is_array($statuses)) {
     foreach ($statuses as $index => $entry) {
         $status = $entry;
         $numeric_value = isset($state_lookup[$status]) ? $state_lookup[$status] : $status;
-        preg_match('/(\d+).([0\.]+)/', $index, $matches);
-        $oid = "$status_oid.{$matches[1]}.{$matches[2]}";
+        preg_match('/(\d+)/', $index, $matches);
+        $oid = "$status_oid.{$matches[1]}.0.0";
         $descr = "Port {$matches[1]} Hook Status";
 
         discover_sensor(
@@ -87,14 +87,14 @@ $state_lookup = array_column($states, 'value', 'descr');
 $status_oid = '.1.3.6.1.4.1.42397.1.1.2.2'; // GS-GXW42XX-MIB::regStatus
 $statuses = SnmpQuery::hideMib()->walk([
     'GS-GXW42XX-MIB::regStatus',
-])->values(); // Results from a walk are regStatus.1.0.0 or regStatus1.0!
+])->table(2)[0][0]; // Results from a walk are regStatus.1.0.0!
 
 if (is_array($statuses)) {
     foreach ($statuses as $index => $entry) {
         $status = $entry;
         $numeric_value = isset($state_lookup[$status]) ? $state_lookup[$status] : $status;
-        preg_match('/(\d+).([0\.]+)/', $index, $matches);
-        $oid = "$status_oid.{$matches[1]}.{$matches[2]}";
+        preg_match('/(\d+)/', $index, $matches);
+        $oid = "$status_oid.{$matches[1]}.0.0";
         $descr = "Port {$matches[1]} Reg Status";
 
         discover_sensor(
