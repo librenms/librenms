@@ -8,7 +8,7 @@ class MetricsController
 {
     public function devices(Request $request)
     {
-        // Forward to the new MetricsApi controller for implementation
+        // Forward to the MetricsApi controller for implementation
         return app()->call([\App\Api\Controllers\MetricsApi\Controller::class, 'devices'], ['request' => $request]);
     }
 }
