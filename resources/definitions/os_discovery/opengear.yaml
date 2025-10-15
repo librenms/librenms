@@ -131,7 +131,7 @@ modules:
                         -
                             oid: 'OG-STATUSv2-MIB::ogCellModemEnabled'
                             op: '='
-                            value: 1
+                            value: 2
                 -
                     oid: OG-STATUSv2-MIB::ogCellModemTable
                     value: OG-STATUSv2-MIB::ogCellModemRadioTechnology
