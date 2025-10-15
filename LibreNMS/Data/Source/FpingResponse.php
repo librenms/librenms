@@ -31,7 +31,6 @@ use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\DeviceStats;
 use Carbon\Carbon;
-use LibreNMS\Config;
 use LibreNMS\Exceptions\FpingUnparsableLine;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -151,14 +150,14 @@ class FpingResponse implements \Stringable
                 $stats->ping_rtt_prev = $stats->ping_rtt_last ?: $this->avg_latency;
                 $stats->ping_rtt_last = $this->avg_latency;
                 // Average is calcualted as the exponential weighted moving average
-                $stats->ping_rtt_avg = $stats->ping_rtt_avg ? $stats->ping_rtt_avg + (($stats->ping_rtt_last - $stats->ping_rtt_avg) * Config::get('device_stats_avg_factor')) : $stats->ping_rtt_last;
+                $stats->ping_rtt_avg = $stats->ping_rtt_avg ? $stats->ping_rtt_avg + (($stats->ping_rtt_last - $stats->ping_rtt_avg) * LibrenmsConfig::get('device_stats_avg_factor')) : $stats->ping_rtt_last;
             }
             // Only update loss if we transmitted a packet
             if ($this->transmitted) {
                 $stats->ping_loss_prev = $stats->ping_loss_last ?: 100 * ($this->transmitted - $this->received) / $this->transmitted;
                 $stats->ping_loss_last = 100 * ($this->transmitted - $this->received) / $this->transmitted;
                 // Average is calcualted as the exponential weighted moving average
-                $stats->ping_loss_avg = $stats->ping_loss_avg ? $stats->ping_loss_avg + (($stats->ping_loss_last - $stats->ping_loss_avg) * Config::get('device_stats_avg_factor')) : $stats->ping_loss_last;
+                $stats->ping_loss_avg = $stats->ping_loss_avg ? $stats->ping_loss_avg + (($stats->ping_loss_last - $stats->ping_loss_avg) * LibrenmsConfig::get('device_stats_avg_factor')) : $stats->ping_loss_last;
             }
 
             $stats->save();
