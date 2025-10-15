@@ -4,6 +4,7 @@ modules:
         hardware: IMCO-LSPS-MIB::sdsModel.0
         serial: IMCO-LSPS-MIB::sdsSerialNumber.0
         version: IMCO-LSPS-MIB::sdsSoftware.0
+        sysName: IMCO-LSPS-MIB::sdsName.0
     sensors:
         temperature:
             data:

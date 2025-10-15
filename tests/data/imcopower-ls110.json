@@ -3,7 +3,7 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "<private>",
+                    "sysName": "plecnikova",
                     "sysObjectID": ".1.3.6.1.4.1.33283.1.30",
                     "sysDescr": "SDS_BIG_STSW www.AN-D.cz",
                     "sysContact": "<private>",
@@ -455,6 +455,20 @@
                     "context_name": "",
                     "ipv4_network": "10.37.13.248/29",
                     "ifIndex": 1
+                }
+            ]
+        }
+    },
+    "hr-device": {
+        "discovery": {
+            "hrDevice": [
+                {
+                    "hrDeviceIndex": 1,
+                    "hrDeviceDescr": "CPU ARM",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": 1
                 }
             ]
         }
