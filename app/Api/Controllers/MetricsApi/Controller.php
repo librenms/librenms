@@ -33,9 +33,8 @@ class Controller
 
         // Per-device metrics
         $header = TRUE;
-        foreach (Device::select('device_id', 'hostname', 'status', 'last_polled', 'uptime')->cursor() as $device) {
+        foreach (Device::select('device_id', 'hostname', 'sysName', 'type', 'status', 'last_polled_timetaken', 'uptime')->cursor() as $device) {
             $labels = sprintf('device_id="%s",hostname="%s"', $device->device_id, $this->escapeLabel((string) $device->hostname));
-
 
             if ($header) {
                 $lines[] = '# HELP librenms_device_up Whether a device is up (1) or not (0)';
@@ -44,20 +43,34 @@ class Controller
             $lines[] = "librenms_device_up{{$labels}} " . ($device->status ? '1' : '0');
 
             if ($header) {
-                $lines[] = '# HELP librenms_device_last_polled_seconds Last polled time as Unix timestamp';
-                $lines[] = '# TYPE librenms_device_last_polled_seconds gauge';
+                $lines[] = '# HELP librenms_last_polled_timetaken Last polled time taken in seconds';
+                $lines[] = '# TYPE librenms_last_polled_timetaken gauge';
             }
-            $lastPolled = $device->last_polled ? $device->last_polled->getTimestamp() : 0;
-            $lines[] = "librenms_device_last_polled_seconds{{$labels}} {$lastPolled}";
+            $lastPolledTimeTaken = $device->status ? ((int) $device->last_polled_timetaken ?: 0) : 0;
+            $lines[] = "librenms_last_polled_timetaken_seconds{{$labels}} {$lastPolledTimeTaken}";
+
+            if ($header) {
+                $lines[] = '# HELP librenms_last_discovered_timetaken Last discovered time taken in seconds';
+                $lines[] = '# TYPE librenms_last_discovered_timetaken gauge';
+            }
+            $lastDiscoveredTimeTaken = $device->status ? ((int) $device->last_discovered_timetaken ?: 0) : 0;
+            $lines[] = "librenms_last_discovered_timetaken_seconds{{$labels}} {$lastDiscoveredTimeTaken}";
+
+            if ($header) {
+                $lines[] = '# HELP librenms_last_ping_timetaken Last ping time taken in seconds';
+                $lines[] = '# TYPE librenms_last_ping_timetaken gauge';
+            }
+            $lastPingTimeTaken = $device->status ? ((int) $device->last_ping_timetaken ?: 0) : 0;
+            $lines[] = "librenms_last_ping_timetaken_seconds{{$labels}} {$lastPingTimeTaken}";
 
             if ($header) {
                 $lines[] = '# HELP librenms_device_uptime_seconds Device uptime in seconds (0 if down)';
                 $lines[] = '# TYPE librenms_device_uptime_seconds gauge';
-                $header = FALSE;
             }
             $uptime = $device->status ? ((int) $device->uptime ?: 0) : 0;
             $lines[] = "librenms_device_uptime_seconds{{$labels}} {$uptime}";
         }
+        $header = FALSE;
 
         $body = implode("\n", $lines) . "\n";
 
