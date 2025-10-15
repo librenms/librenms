@@ -54,6 +54,11 @@ Route::prefix('v0')->group(function () {
             Route::get('alertlog/{hostname?}', [App\Api\Controllers\LegacyApiController::class, 'list_logs'])->name('list_alertlog');
             Route::get('authlog', [App\Api\Controllers\LegacyApiController::class, 'list_logs'])->name('list_authlog');
         });
+
+        // Prometheus Metrics endpoints
+        Route::prefix('metrics')->group(function () {
+            Route::get('devices', [App\Api\Controllers\MetricsApi\Controller::class, 'devices'])->name('metrics_devices');
+        });
     });
 
     // admin required
