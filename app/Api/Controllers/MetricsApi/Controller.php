@@ -32,23 +32,29 @@ class Controller
         $lines[] = "librenms_devices_down {$down}";
 
         // Per-device metrics
-        $lines[] = '# HELP librenms_device_up Whether a device is up (1) or not (0)';
-        $lines[] = '# TYPE librenms_device_up gauge';
-
-        $lines[] = '# HELP librenms_device_last_polled_seconds Last polled time as Unix timestamp';
-        $lines[] = '# TYPE librenms_device_last_polled_seconds gauge';
-
-        $lines[] = '# HELP librenms_device_uptime_seconds Device uptime in seconds (0 if down)';
-        $lines[] = '# TYPE librenms_device_uptime_seconds gauge';
-
+        $header = TRUE;
         foreach (Device::select('device_id', 'hostname', 'status', 'last_polled', 'uptime')->cursor() as $device) {
             $labels = sprintf('device_id="%s",hostname="%s"', $device->device_id, $this->escapeLabel((string) $device->hostname));
 
+
+            if ($header) {
+                $lines[] = '# HELP librenms_device_up Whether a device is up (1) or not (0)';
+                $lines[] = '# TYPE librenms_device_up gauge';
+            }
             $lines[] = "librenms_device_up{{$labels}} " . ($device->status ? '1' : '0');
 
+            if ($header) {
+                $lines[] = '# HELP librenms_device_last_polled_seconds Last polled time as Unix timestamp';
+                $lines[] = '# TYPE librenms_device_last_polled_seconds gauge';
+            }
             $lastPolled = $device->last_polled ? $device->last_polled->getTimestamp() : 0;
             $lines[] = "librenms_device_last_polled_seconds{{$labels}} {$lastPolled}";
 
+            if ($header) {
+                $lines[] = '# HELP librenms_device_uptime_seconds Device uptime in seconds (0 if down)';
+                $lines[] = '# TYPE librenms_device_uptime_seconds gauge';
+                $header = FALSE;
+            }
             $uptime = $device->status ? ((int) $device->uptime ?: 0) : 0;
             $lines[] = "librenms_device_uptime_seconds{{$labels}} {$uptime}";
         }
