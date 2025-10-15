@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ServiceTemplateController.php
+ * AlertTransportController.php
  *
  * -Description-
  *
@@ -20,34 +20,36 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2020 Anthony F McInerney <bofh80>
- * @author     Anthony F McInerney <afm404@gmail.com>
+ * © 2025 Tony Murray
+ *
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace App\Http\Controllers\Select;
 
-use App\Models\ServiceTemplate;
+use App\Models\AlertTransport;
+use Illuminate\Http\Request;
 
-class ServiceTemplateController extends SelectController
+class AlertTransportController extends SelectController
 {
-    protected function searchFields($request)
+    protected function searchFields(Request $request)
     {
-        return ['name'];
+        return ['transport_type', 'transport_name'];
     }
 
-    protected function baseQuery($request)
+    public function baseQuery(Request $request)
     {
-        return ServiceTemplate::hasAccess($request->user())->select(['id', 'name']);
+        return AlertTransport::query()
+            ->select(['transport_id', 'transport_type', 'transport_name'])
+            ->orderBy('transport_type')
+            ->orderBy('transport_name');
     }
 
-    /**
-     * @param  ServiceTemplate  $template
-     */
-    public function formatItem($template)
+    public function formatItem($model)
     {
         return [
-            'id' => $template->id,
-            'text' => $template->name,
+            'id' => $model->transport_id,
+            'text' => ucfirst((string) $model->transport_type) . ': ' . $model->transport_name,
         ];
     }
 }
