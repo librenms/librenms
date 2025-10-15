@@ -131,7 +131,7 @@ modules:
                         -
                             oid: 'ogCellModemEnabled.{{ $index }}'
                             op: '!='
-                            value: enabled
+                            value: 1
                 -
                     oid: OG-STATUSv2-MIB::ogCellModemTable
                     value: OG-STATUSv2-MIB::ogCellModemRadioTechnology
