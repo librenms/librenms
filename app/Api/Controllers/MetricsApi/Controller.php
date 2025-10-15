@@ -33,8 +33,8 @@ class Controller
 
         // Per-device metrics
         $header = TRUE;
-        foreach (Device::select('device_id', 'hostname', 'sysName', 'type', 'status', 'last_polled_timetaken', 'uptime')->cursor() as $device) {
-            $labels = sprintf('device_id="%s",hostname="%s"', $device->device_id, $this->escapeLabel((string) $device->hostname));
+        foreach (Device::select('device_id', 'hostname', 'sysName', 'type', 'status', 'last_polled_timetaken', 'last_discovered_timetaken', 'last_ping_timetaken', 'uptime')->cursor() as $device) {
+            $labels = sprintf('device_id="%s",hostname="%s",sysName="%s",type="%s",', $device->device_id, $this->escapeLabel((string) $device->hostname), $this->escapeLabel((string) $device->sysName), $this->escapeLabel((string) $device->type));
 
             if ($header) {
                 $lines[] = '# HELP librenms_device_up Whether a device is up (1) or not (0)';
