@@ -78,8 +78,8 @@ class AppServiceProvider extends ServiceProvider
         $this->bootObservers();
         Version::registerAboutCommand();
         Password::defaults(function () {
-           return Password::min(LibrenmsConfig::get('password.min_length', 8))
-            ->uncompromised();
+            return Password::min(LibrenmsConfig::get('password.min_length', 8))
+             ->uncompromised();
         });
 
         $this->bootAuth();

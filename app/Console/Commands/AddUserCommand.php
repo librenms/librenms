@@ -36,6 +36,7 @@ use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+
 use function Laravel\Prompts\form;
 
 class AddUserCommand extends LnmsCommand
