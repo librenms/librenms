@@ -5,11 +5,11 @@
                 {
                     "mac_address": "28c0da40e701",
                     "ipv4_address": "192.168.0.1",
-                    "context_name": null
+                    "context_name": ""
                 }
             ]
         },
-        "poller": null
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
@@ -686,6 +686,26 @@
                     "state_draw_graph": 1,
                     "state_value": 6,
                     "state_generic_value": 2
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "192.168.0.14",
+                    "ipv4_prefixlen": 26,
+                    "context_name": "",
+                    "ipv4_network": "192.168.0.0/26",
+                    "ifIndex": 2
                 }
             ]
         }

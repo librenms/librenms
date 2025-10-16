@@ -2,11 +2,7 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$ceph_pool_rrd = Rrd::name($device['hostname'], ['app', 'ceph', $app->app_id, 'df', $vars['pool']]);
-
-if (Rrd::checkRrdExists($ceph_pool_rrd)) {
-    $rrd_filename = $ceph_pool_rrd;
-}
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'ceph', $app->app_id, 'df', $vars['pool']]);
 
 $rrd_options .= ' -l 0 -b 1024 ';
 $rrd_options .= " 'COMMENT:Bytes         Min         Cur        Max\\n'";

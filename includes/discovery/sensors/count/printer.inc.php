@@ -22,7 +22,7 @@ foreach ($walk as $index => $data) {
         '.1.3.6.1.2.1.43.10.2.1.4.' . $index, // Printer-MIB::prtMarkerLifeCount.1.1
         'prtMarkerLifeCount',
         $device['os'],
-        'Life time ' . $data['prtMarkerCounterUnit'],
+        'Life time ' . ($data['prtMarkerCounterUnit'] ?? '?'),
         1,
         1,
         null,
@@ -39,7 +39,7 @@ foreach ($walk as $index => $data) {
         '.1.3.6.1.2.1.43.10.2.1.5.' . $index, // Printer-MIB::prtMarkerPowerOnCount.1.1
         'prtMarkerPowerOnCount',
         $device['os'],
-        ucfirst($data['prtMarkerCounterUnit']) . ' since powered on',
+        ucfirst($data['prtMarkerCounterUnit'] ?? '?') . ' since powered on',
         1,
         1,
         null,

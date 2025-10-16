@@ -38,7 +38,6 @@ class Fortios extends Fortinet implements OSPolling
     {
         parent::discoverOS($device); // yaml
 
-        $device->hardware = $device->hardware ?: $this->getHardwareName();
         $device->features = snmp_get($this->getDeviceArray(), 'fmDeviceEntMode.1', '-OQv', 'FORTINET-FORTIMANAGER-FORTIANALYZER-MIB') == 'fmg-faz' ? 'with Analyzer features' : null;
     }
 
@@ -50,7 +49,7 @@ class Fortios extends Fortinet implements OSPolling
             $log_rate = str_replace(' logs per second', '', $log_rate);
             $rrd_def = RrdDefinition::make()->addDataset('lograte', 'GAUGE', 0, 100000000);
             $fields = ['lograte' => $log_rate];
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'fortios_lograte', $tags, $fields);
             $this->enableGraph('fortios_lograte');
         }

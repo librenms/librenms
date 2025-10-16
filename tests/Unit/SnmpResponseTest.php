@@ -26,11 +26,11 @@
 
 namespace LibreNMS\Tests\Unit;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Tests\TestCase;
 
-class SnmpResponseTest extends TestCase
+final class SnmpResponseTest extends TestCase
 {
     public function testSimple(): void
     {
@@ -54,7 +54,7 @@ class SnmpResponseTest extends TestCase
         $response = new SnmpResponse("Q-BRIDGE-MIB::dot1qVlanStaticName[1] = \"\\default\\\"\nQ-BRIDGE-MIB::dot1qVlanStaticName[6] = \\single\\\nQ-BRIDGE-MIB::dot1qVlanStaticName[9] = \\\\double\\\\\n");
         $this->assertTrue($response->isValid());
         $this->assertEquals('default', $response->value());
-        Config::set('snmp.unescape', false);
+        LibrenmsConfig::set('snmp.unescape', false);
         $this->assertEquals([
             'Q-BRIDGE-MIB::dot1qVlanStaticName[1]' => 'default',
             'Q-BRIDGE-MIB::dot1qVlanStaticName[6]' => '\\single\\',
@@ -66,7 +66,7 @@ class SnmpResponseTest extends TestCase
             9 => '\\\\double\\\\',
         ]], $response->table());
 
-        Config::set('snmp.unescape', true); // for buggy versions of net-snmp
+        LibrenmsConfig::set('snmp.unescape', true); // for buggy versions of net-snmp
         $response = new SnmpResponse("Q-BRIDGE-MIB::dot1qVlanStaticName[1] = \"\\default\\\"\nQ-BRIDGE-MIB::dot1qVlanStaticName[6] = \\single\\\nQ-BRIDGE-MIB::dot1qVlanStaticName[9] = \\\\double\\\\\n");
         $this->assertEquals([
             'Q-BRIDGE-MIB::dot1qVlanStaticName[1]' => 'default',
@@ -348,5 +348,13 @@ HOST-RESOURCES-MIB::hrStorageUsed.36 = 127044934
         $response = new SnmpResponse(".1.3.6.1.2.1.2.2.1.1.1 = INTEGER: 1\n", "Error: OID not increasing: .1.3.6.1.2.100.2.2.1.1\n >= .1.3.6.1.2.1.2.2.1.1.1\n", 1);
         $this->assertFalse($response->isValid());
         $this->assertEquals('Error: OID not increasing: .1.3.6.1.2.100.2.2.1.1', $response->getErrorMessage());
+
+        // NULL return
+        $response = new SnmpResponse("hrDeviceTable = NULL\n", '', 0);
+        $this->assertTrue($response->isValid());
+        $this->assertEquals('', $response->getRawWithoutBadLines());
+        $response->mapTable(function () {
+            $this->fail('There should be no data in the array.');
+        });
     }
 }

@@ -28,9 +28,9 @@ if (isset($_SESSION['stage']) && $_SESSION['stage'] == 2) {
     }
 }
 
-Debug::set($_REQUEST['debug']);
+Debug::set($_REQUEST['debug'] ?? false);
 $id = basename($_REQUEST['id']);
 
-if ($id && is_file(\LibreNMS\Config::get('install_dir') . "/includes/html/output/$id.inc.php")) {
-    require \LibreNMS\Config::get('install_dir') . "/includes/html/output/$id.inc.php";
+if ($id && is_file(\App\Facades\LibrenmsConfig::get('install_dir') . "/includes/html/output/$id.inc.php")) {
+    require \App\Facades\LibrenmsConfig::get('install_dir') . "/includes/html/output/$id.inc.php";
 }

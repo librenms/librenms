@@ -17,6 +17,8 @@ if ($printtotal === 1) {
 
 $unit_text = Rrd::fixedSafeDescr($unit_text, $unitlen);
 
+$stack = '';
+
 if ($width > '500') {
     $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, $descr_len + 10), 0, $descr_len + 10) . "Now         Min         Max        Avg\l'";
     if ($printtotal === 1) {
@@ -31,11 +33,11 @@ foreach ($rrd_list as $rrd) {
     if ($rrd['colour']) {
         $colour = $rrd['colour'];
     } else {
-        if (! \LibreNMS\Config::get("graph_colours.$colours.$colour_iter")) {
+        if (! \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$colour_iter")) {
             $colour_iter = 0;
         }
 
-        $colour = \LibreNMS\Config::get("graph_colours.$colours.$colour_iter");
+        $colour = \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$colour_iter");
         $colour_iter++;
     }
 
@@ -47,7 +49,7 @@ foreach ($rrd_list as $rrd) {
 
     $rrd_options .= ' DEF:' . $rrd['ds'] . $i . '=' . $rrd['filename'] . ':' . $rrd['ds'] . ':AVERAGE ';
 
-    if ($simple_rrd) {
+    if (isset($simple_rrd) && $simple_rrd) {
         $rrd_options .= ' CDEF:' . $rrd['ds'] . $i . 'min=' . $rrd['ds'] . $i . ' ';
         $rrd_options .= ' CDEF:' . $rrd['ds'] . $i . 'max=' . $rrd['ds'] . $i . ' ';
     } else {
@@ -69,12 +71,12 @@ foreach ($rrd_list as $rrd) {
     }
 
     $g_defname = $rrd['ds'];
-    if (is_numeric($multiplier)) {
+    if (isset($multiplier) && is_numeric($multiplier)) {
         $g_defname = $rrd['ds'] . '_cdef';
         $rrd_options .= ' CDEF:' . $g_defname . $i . '=' . $rrd['ds'] . $i . ',' . $multiplier . ',*';
         $rrd_options .= ' CDEF:' . $g_defname . $i . 'min=' . $rrd['ds'] . $i . 'min,' . $multiplier . ',*';
         $rrd_options .= ' CDEF:' . $g_defname . $i . 'max=' . $rrd['ds'] . $i . 'max,' . $multiplier . ',*';
-    } elseif (is_numeric($divider)) {
+    } elseif (isset($divider) && is_numeric($divider)) {
         $g_defname = $rrd['ds'] . '_cdef';
         $rrd_options .= ' CDEF:' . $g_defname . $i . '=' . $rrd['ds'] . $i . ',' . $divider . ',/';
         $rrd_options .= ' CDEF:' . $g_defname . $i . 'min=' . $rrd['ds'] . $i . 'min,' . $divider . ',/';

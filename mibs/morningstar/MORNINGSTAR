@@ -1,0 +1,32 @@
+MORNINGSTAR DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises                        FROM RFC1155-SMI
+    TEXTUAL-CONVENTION                 FROM SNMPv2-TC
+    MODULE-IDENTITY                    FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP    FROM SNMPv2-CONF;
+
+morningstar MODULE-IDENTITY
+    LAST-UPDATED  "201904080000Z" -- April 8th, 2019
+
+    ORGANIZATION  "morningstar"
+    CONTACT-INFO  "Morningstar Corporation
+                  Postal: Morningstar Corporation
+                          8 Pheasant Run
+                          Newtown, PA 18940
+                          United States of America
+
+                  Tel:    +1 215 321 4457
+                  E-Mail: info@morningstarcorp.com"
+
+    DESCRIPTION   "TODO: Describe this module. See IANA-PRINTER-MIB for an example
+
+                  Copyright (C) Morningstar Corporation (2019).
+                  All Rights Reserved"
+
+    REVISION      "201904080000Z"  -- April 8th, 2019
+    DESCRIPTION   "PoC. TODO: Update revision before release"
+
+    ::= { enterprises 33333 }
+
+END

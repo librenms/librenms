@@ -1,0 +1,12 @@
+os: packetlight
+text: 'Packetlight'
+type: network
+icon: packetlight
+group: packetlight
+over:
+    - { graph: device_temperature, text: 'Temperature' }
+    - { graph: device_dbm, text: 'Interface Power' }
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.4515.100.1.
+        sysDescr_regex: '/^[Pp][Ll]/'

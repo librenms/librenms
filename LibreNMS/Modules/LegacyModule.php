@@ -106,13 +106,10 @@ class LegacyModule implements Module
         }
 
         $device = &$os->getDeviceArray();
-        Debug::disableErrorReporting(); // ignore errors in legacy code
 
         include_once base_path('includes/dbFacile.php');
         include_once base_path('includes/rewrites.php');
         include base_path("includes/polling/$this->name.inc.php");
-
-        Debug::enableErrorReporting(); // and back to normal
     }
 
     public function dataExists(Device $device): bool

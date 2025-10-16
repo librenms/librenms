@@ -1,0 +1,68 @@
+modules:
+    os:
+        sysDescr_regex: '/Netonix (?<hardware>.*)/'
+        version: NETONIX-SWITCH-MIB::firmwareVersion.0
+        version_regex: '/(?<version>.*\d)/' # version display bug in 1.3.9
+    sensors:
+        state:
+            data:
+                -
+                    oid: NETONIX-SWITCH-MIB::poeStatusTable
+                    value: NETONIX-SWITCH-MIB::poeStatus
+                    num_oid: '.1.3.6.1.4.1.46242.5.1.2.{{ $index }}'
+                    descr: Port {{ $index }} PoE
+                    index: '{{ $index }}'
+                    state_name: netonixPoeStatus
+                    states:
+                        - { descr: Off, graph: 0, value: 1, generic: -1 }
+                        - { descr: 24V, graph: 0, value: 2, generic: 0 }
+                        - { descr: 48V, graph: 0, value: 3, generic: 0 }
+                        - { descr: 24VH, graph: 0, value: 4, generic: 0 }
+                        - { descr: 48VH, graph: 0, value: 5, generic: 0 }
+        voltage:
+            data:
+                -
+                    oid: NETONIX-SWITCH-MIB::voltageTable
+                    value: NETONIX-SWITCH-MIB::voltage
+                    num_oid: '.1.3.6.1.4.1.46242.4.1.3.{{ $index }}'
+                    index: '{{ $index }}'
+                    descr: '{{ $NETONIX-SWITCH-MIB::voltageDescription }}'
+                    divisor: 100
+        temperature:
+            data:
+                -
+                    oid: NETONIX-SWITCH-MIB::tempTable
+                    value: NETONIX-SWITCH-MIB::temp
+                    num_oid: '.1.3.6.1.4.1.46242.3.1.3.{{ $index }}'
+                    index: '{{ $index }}'
+                    descr: '{{ $NETONIX-SWITCH-MIB::tempDescription }}'
+                    divisor: 1
+        fanspeed:
+            data:
+                -
+                    oid: NETONIX-SWITCH-MIB::fanTable
+                    value: NETONIX-SWITCH-MIB::fanSpeed
+                    num_oid: '.1.3.6.1.4.1.46242.2.1.2.{{ $index }}'
+                    index: '{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    divisor: 1
+                    warn_limit: 8000
+                    high_limit: 9000
+                    low_warn_limit: 0
+
+        power:
+            data:
+                -
+                    oid: NETONIX-SWITCH-MIB::totalPowerConsumption
+                    num_oid: '.1.3.6.1.4.1.46242.6.0'
+                    index: '0'
+                    descr: 'Total Consumption'
+                    divisor: 10
+        current:
+            data:
+                -
+                    oid: NETONIX-SWITCH-MIB::dcdcInputCurrent
+                    num_oid: '.1.3.6.1.4.1.46242.7.0'
+                    index: '0'
+                    descr: 'DC Input Current'
+                    divisor: 10

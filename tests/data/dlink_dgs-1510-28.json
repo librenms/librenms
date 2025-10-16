@@ -7238,42 +7238,42 @@
                     "vlan_domain": 1,
                     "vlan_name": "default",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 211,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0211",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 430,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0430",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 990,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0990",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 991,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0991",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2011,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN2011",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -8652,6 +8652,19 @@
                     "ifAlias": "D-Link Corporation DGS-1510-28 HW A1 firmware 1.50.021 Port 24 on Unit 1",
                     "ifDescr": "D-Link Corporation DGS-1510-28 HW A1 firmware 1.50.021 Port 24 on Unit 1",
                     "ifName": "eth1/0/24"
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.20.11.5",
+                    "ipv4_prefixlen": 26,
+                    "context_name": "",
+                    "ipv4_network": "10.20.11.0/26",
+                    "ifIndex": 5121
                 }
             ]
         }

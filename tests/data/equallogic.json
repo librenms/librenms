@@ -1769,7 +1769,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0,
+                    "sensor_current": 1,
                     "sensor_limit": 1.5,
                     "sensor_limit_warn": 1.5,
                     "sensor_limit_low": 0.5,
@@ -1794,7 +1794,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0,
+                    "sensor_current": 1,
                     "sensor_limit": 1.5,
                     "sensor_limit_warn": 1.5,
                     "sensor_limit_low": 0.5,
@@ -3200,6 +3200,96 @@
                     "state_draw_graph": 1,
                     "state_value": 3,
                     "state_generic_value": 2
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.78.0.61",
+                    "ipv4_prefixlen": 16,
+                    "context_name": "",
+                    "ipv4_network": "10.78.0.0/16",
+                    "ifIndex": 6
+                },
+                {
+                    "ipv4_address": "172.16.0.100",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "172.16.0.0/24",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "172.16.0.110",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "172.16.0.0/24",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "18.18.2.0",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "18.0.0.0/8",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "18.18.3.0",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "18.0.0.0/8",
+                    "ifIndex": 3
+                },
+                {
+                    "ipv4_address": "18.18.4.0",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "18.0.0.0/8",
+                    "ifIndex": 4
+                },
+                {
+                    "ipv4_address": "18.18.5.0",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "18.0.0.0/8",
+                    "ifIndex": 5
+                },
+                {
+                    "ipv4_address": "18.18.6.0",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "18.0.0.0/8",
+                    "ifIndex": 6
+                },
+                {
+                    "ipv4_address": "192.168.102.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.102.0/24",
+                    "ifIndex": 4
+                },
+                {
+                    "ipv4_address": "192.168.104.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.104.0/24",
+                    "ifIndex": 5
+                },
+                {
+                    "ipv4_address": "192.168.105.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.105.0/24",
+                    "ifIndex": 3
+                },
+                {
+                    "ipv4_address": "28.24.0.0",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "28.0.0.0/8",
+                    "ifIndex": 6
                 }
             ]
         }

@@ -20,8 +20,8 @@ foreach (dbFetchRows('SELECT * FROM ports WHERE `device_id` = ? AND `ifVrf` = ?'
     <a href='device/" . $device['device_id'] . '/port/' . $port['port_id'] . "/' onmouseover=\"return overlib('\
     <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #e5e5e5;\'>" . $device['hostname'] . ' - ' . $port['ifDescr'] . '</div>\
     ' . $port['ifAlias'] . " \
-    <img src=\'graph.php?type=$graph_type&amp;id=" . $port['port_id'] . '&amp;from=' . \LibreNMS\Config::get('time.twoday') . '&amp;to=' . \LibreNMS\Config::get('time.now') . "&amp;width=450&amp;height=150\'>\
-    ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >" . "<img src='graph.php?type=$graph_type&amp;id=" . $port['port_id'] . '&amp;from=' . \LibreNMS\Config::get('time.twoday') . '&amp;to=' . \LibreNMS\Config::get('time.now') . "&amp;width=132&amp;height=40&amp;legend=no'>
+    <img src=\'graph.php?type=$graph_type&amp;id=" . $port['port_id'] . '&amp;from=' . \App\Facades\LibrenmsConfig::get('time.twoday') . '&amp;to=' . \App\Facades\LibrenmsConfig::get('time.now') . "&amp;width=450&amp;height=150\'>\
+    ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >" . "<img src='graph.php?type=$graph_type&amp;id=" . $port['port_id'] . '&amp;from=' . \App\Facades\LibrenmsConfig::get('time.twoday') . '&amp;to=' . \App\Facades\LibrenmsConfig::get('time.now') . "&amp;width=132&amp;height=40&amp;legend=no'>
     </a>
     <div style='font-size: 9px;'>" . substr(short_port_descr($port['ifAlias']), 0, 22) . '</div>
    </div>';

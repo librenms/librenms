@@ -1,7 +1,5 @@
 <?php
 
-use LibreNMS\Util\Rewrite;
-
 /*
  * LibreNMS
  *
@@ -28,7 +26,7 @@ if (! empty($entphydata)) {
     foreach ($entphydata as $index) {
         foreach ($tempdata as $tempindex => $value) {
             if ($index['entPhysicalIndex'] == $tempindex && $value['hh3cEntityExtTemperature'] != 65535) {
-                if ($value['hh3cEntityExtTemperatureThreshold'] != 65535) {
+                if (isset($value['hh3cEntityExtTemperatureThreshold']) && $value['hh3cEntityExtTemperatureThreshold'] != 65535) {
                     $hightemp = $value['hh3cEntityExtTemperatureThreshold'];
                 } else {
                     $hightemp = null;
@@ -63,8 +61,8 @@ $divisor_alarm = 1000;
 $hh3cTransceiverInfoTable = SnmpQuery::cache()->enumStrings()->walk('HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverInfoTable')->table(1);
 foreach ($hh3cTransceiverInfoTable as $index => $entry) {
     if (is_numeric($entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverTemperature']) && $entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverTemperature'] != 2147483647 && isset($entry['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverDiagnostic'])) {
-        $interface = get_port_by_index_cache($device['device_id'], $index);
-        if ($interface['ifAdminStatus'] != 'up') {
+        $port = PortCache::getByIfIndex($index, $device['device_id']);
+        if ($port?->ifAdminStatus != 'up') {
             continue;
         }
 
@@ -77,7 +75,7 @@ foreach ($hh3cTransceiverInfoTable as $index => $entry) {
         $entPhysicalIndex = $index;
         $entPhysicalIndex_measured = 'ports';
 
-        $descr = Rewrite::shortenIfName($interface['ifDescr']) . ' Module';
+        $descr = $port->getShortLabel() . ' Module';
         discover_sensor(null, 'temperature', $device, $oid, 'temp-trans-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, group: 'transceiver');
     }
 }

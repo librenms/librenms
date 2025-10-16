@@ -24,10 +24,6 @@ $services = service_get($device['device_id']);
 require_once 'includes/html/modal/new_service.inc.php';
 require_once 'includes/html/modal/delete_service.inc.php';
 
-if (! $vars['view']) {
-    $vars['view'] = 'basic';
-}
-
 $menu_options = [
     'basic' => 'Basic',
     'details' => 'Details',
@@ -68,38 +64,49 @@ if (count($services) > '0') {
     // Loop over each service, pulling out the details.
 
     echo '<table class="table table-hover table-condensed">';
+    echo '<thead>';
+    echo '<td class="col-sm-2"><strong>Name</strong></td>';
+    echo '<td class="col-sm-1"><strong>Check Type</strong></td>';
+    echo '<td class="col-sm-1"><strong>Remote Host</strong></td>';
+    echo '<td class="col-sm-4"><strong>Message</strong></td>';
+    echo '<td class="col-sm-2"><strong>Description</strong></td>';
+    echo '<td class="col-sm-1"><strong>Last Changed</strong></td>';
+    echo '<td class="col-sm-1"></td>';
+    echo '</thead>';
 
     foreach ($services as $service) {
         $service['service_ds'] = htmlspecialchars_decode($service['service_ds']);
         if ($service['service_status'] == '2') {
-            $status = '<span class="alert-status label-danger"><span class="device-services-page">' . htmlentities($service['service_type']) . '</span></span>';
+            $status_label = 'label-danger';
         } elseif ($service['service_status'] == '1') {
-            $status = '<span class="alert-status label-warning"><span class="device-services-page">' . htmlentities($service['service_type']) . '</span></span>';
+            $status_label = 'label-warning';
         } elseif ($service['service_status'] == '0') {
-            $status = '<span class="alert-status label-success"><span class="device-services-page">' . htmlentities($service['service_type']) . '</span></span>';
+            $status_label = 'label-success';
         } else {
-            $status = '<span class="alert-status label-info"><span class="device-services-page">' . htmlentities($service['service_type']) . '</span></span>';
+            $status_label = 'label-info';
         }
 
         echo '<tr id="row_' . $service['service_id'] . '">';
-        echo '<td class="col-sm-12">';
-        echo '<div class="col-sm-1">' . $status . '</div>';
-        echo '<div class="col-sm-2 text-muted">' . \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) . '</div>';
-        echo '<div class="col-sm-2 text-muted">' . htmlentities($service['service_desc']) . '</div>';
-        echo '<div class="col-sm-5">' . nl2br(htmlentities(trim($service['service_message']))) . '</div>';
-        echo '<div class="col-sm-2">';
-        echo '<div class="pull-right">';
+        echo '<td class="col-sm-2"><span class="alert-status ' . $status_label . '"><span class="device-services-page text-nowrap">' . htmlentities($service['service_name']) . '</span></span></td>';
+        echo '<td class="col-sm-1 text-muted">' . htmlentities($service['service_type']) . '</td>';
+        echo '<td class="col-sm-1 text-muted">' . nl2br(htmlentities($service['service_ip'])) . '</td>';
+        echo '<td class="col-sm-4">' . nl2br(htmlentities(trim($service['service_message']))) . '</td>';
+        echo '<td class="col-sm-2 text-muted">' . htmlentities($service['service_desc']) . '</td>';
+        echo '<td class="col-sm-1 text-muted">' . \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) . '</td>';
+        echo '<td class="col-sm-1">';
         if (Auth::user()->hasGlobalAdmin()) {
-            echo "<button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='{$service['service_id']}' name='edit-service'><i class='fa fa-pencil' aria-hidden='true'></i></button>
-        <button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='{$service['service_id']}' name='delete-service'><i class='fa fa-trash' aria-hidden='true'></i></button";
+            echo '<div class="pull-right">';
+            echo "<button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='{$service['service_id']}' name='edit-service'><i class='fa fa-pencil' aria-hidden='true'></i></button>";
+            echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='{$service['service_id']}' name='delete-service'><i class='fa fa-trash' aria-hidden='true'></i></button";
+            echo '</div>';
         }
-        echo '</div>';
-        echo '</div>';
+        echo '</td>';
+        echo '</tr>';
 
         if ($vars['view'] == 'details') {
             // if we have a script for this check, use it.
             $check_ds = null;
-            $check_script = \LibreNMS\Config::get('install_dir') . '/includes/services/check_' . strtolower($service['service_type']) . '.inc.php';
+            $check_script = \App\Facades\LibrenmsConfig::get('install_dir') . '/includes/services/check_' . strtolower($service['service_type']) . '.inc.php';
             if (is_file($check_script)) {
                 include $check_script;
 
@@ -117,11 +124,11 @@ if (count($services) > '0') {
                 $graph_array['ds'] = $k;
 
                 echo '<tr>';
-                echo '<td colspan="5"><div class="col-sm-12">';
+                echo '<td colspan="7">';
 
                 include 'includes/html/print-graphrow.inc.php';
 
-                echo '</div></td>';
+                echo '</td>';
                 echo '</tr>';
             }
         }

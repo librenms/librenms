@@ -16707,8 +16707,8 @@
                     "vlan_vlan": 1,
                     "vlan_domain": 1,
                     "vlan_name": "default",
-                    "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_type": "",
+                    "vlan_state": 1
                 }
             ]
         }
@@ -16733,6 +16733,19 @@
                     "ospfExitOverflowInterval": 0,
                     "ospfDemandExtensions": "false",
                     "context_name": ""
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.126.129.224",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.126.129.0/24",
+                    "ifIndex": 194
                 }
             ]
         }

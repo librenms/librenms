@@ -6715,28 +6715,28 @@
                     "vlan_domain": 1,
                     "vlan_name": "default",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2002,
                     "vlan_domain": 1,
                     "vlan_name": "dienste",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3040,
                     "vlan_domain": 1,
                     "vlan_name": "prod",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3972,
                     "vlan_domain": 1,
                     "vlan_name": "remed",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -7903,6 +7903,19 @@
                     "ifAlias": "D-Link DGS-3420-28TC R1.50.018 Port 25 on Unit 1",
                     "ifDescr": "D-Link DGS-3420-28TC R1.50.018 Port 25 on Unit 1",
                     "ifName": "1/25"
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "143.160.121.132",
+                    "ipv4_prefixlen": 27,
+                    "context_name": "",
+                    "ipv4_network": "143.160.121.128/27",
+                    "ifIndex": 5121
                 }
             ]
         }

@@ -70,7 +70,7 @@ class EltexMes24xx extends OS implements TransceiverDiscovery, Ipv6AddressDiscov
 
     public function discoverIpv6Addresses(): Collection
     {
-        return \SnmpQuery::allowUnordered()->enumStrings()->walk('IP-MIB::ipAddressPrefixTable')
+        return SnmpQuery::allowUnordered()->enumStrings()->walk('IP-MIB::ipAddressPrefixTable')
             ->mapTable(function ($data, $ifIndex, $addrType, $address, $prefixLen) {
                 if ($addrType == 'ipv6') {
                     try {

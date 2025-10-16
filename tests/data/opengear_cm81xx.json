@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "opengear",
-                    "type": "OOB Management",
+                    "type": "management",
                     "serial": "81162310001039",
                     "icon": "opengear.svg"
                 }
@@ -1535,6 +1535,33 @@
                     "context_name": "",
                     "ipv6_network": null,
                     "ifIndex": 4
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.137.75.165",
+                    "ipv4_prefixlen": 28,
+                    "context_name": "",
+                    "ipv4_network": "10.137.75.160/28",
+                    "ifIndex": 4
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "172.17.0.1",
+                    "ipv4_prefixlen": 16,
+                    "context_name": "",
+                    "ipv4_network": "172.17.0.0/16",
+                    "ifIndex": 5
                 }
             ]
         }

@@ -48,6 +48,10 @@ if (isset($sneck_data)) {
                 }
             }
         }
+        // run time
+        if (isset($app->data['data']['run_time'])) {
+            echo '<b>Runtime:</b> ' . htmlspecialchars($app->data['data']['run_time']) . " seconds<br>\n";
+        }
         print_optionbar_end();
     }
 }
@@ -69,6 +73,10 @@ if ((isset($vars['sneck_check']) && isset($app->data['data']['checks'][$vars['sn
     // what was ran post templating
     if (isset($app->data['data'][$type][$type_name]['ran'])) {
         echo '<b>Ran:</b> ' . htmlspecialchars($app->data['data'][$type][$type_name]['ran']) . "<br>\n";
+    }
+    // run time
+    if (isset($app->data['data'][$type][$type_name]['run_time'])) {
+        echo '<b>Runtime:</b> ' . htmlspecialchars($app->data['data'][$type][$type_name]['run_time']) . " seconds<br>\n";
     }
     // exit code
     if (isset($app->data['data'][$type][$type_name]['exit'])) {
@@ -93,11 +101,15 @@ if ((isset($vars['sneck_check']) && isset($app->data['data']['checks'][$vars['sn
         'sneck_time' => 'Time Difference',
     ];
 
+    if (isset($app->data['data']['checks'])) {
+        $graphs['sneck_runtime'] = 'Runtime';
+    }
+
     foreach ($graphs as $key => $text) {
         $graph_type = $key;
         $graph_array['height'] = '100';
         $graph_array['width'] = '215';
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
         $graph_array['id'] = $app->app_id;
         $graph_array['type'] = 'application_' . $key;
 

@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "drac",
-                    "type": "appliance",
+                    "type": "management",
                     "serial": "5GC8H32",
                     "icon": "dell.svg"
                 }
@@ -3342,5 +3342,25 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "172.25.5.171",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "172.25.5.0/24",
+                    "ifIndex": 6
+                }
+            ]
+        }
     }
 }

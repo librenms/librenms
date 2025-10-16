@@ -26,9 +26,9 @@
 
 namespace LibreNMS\Tests;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Modules\Core;
 use LibreNMS\Tests\Mocks\SnmpQueryMock;
@@ -37,7 +37,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Group;
 
-class OSDiscoveryTest extends TestCase
+final class OSDiscoveryTest extends TestCase
 {
     private static $unchecked_files;
 
@@ -52,6 +52,31 @@ class OSDiscoveryTest extends TestCase
         }, glob($glob)), function ($file) {
             return ! Str::contains($file, '@');
         }));
+    }
+
+    public function testValidOSNames(): void
+    {
+        $os = array_keys(self::osProvider());
+
+        $invalid_os_name = array_filter($os, function ($os_name) {
+            return preg_match('/[^a-z0-9\-]/', $os_name);
+        });
+
+        // DO NOT ADD ANY OS HERE!
+        $exceptions = [
+            'adva_fsp150',
+            'adva_fsp3kr7',
+            'adva_xg300',
+            'allworx_voip',
+            'arista_eos',
+            'xirrus_aos',
+            'fujitsuiRMC',
+            'ies52xxM',
+            'polycomLens',
+        ];
+        $invalid_os_name = array_diff($invalid_os_name, $exceptions);
+
+        $this->assertEmpty($invalid_os_name, 'Invalid OS name found: ' . implode(', ', $invalid_os_name));
     }
 
     /**
@@ -75,7 +100,7 @@ class OSDiscoveryTest extends TestCase
             $this->app->bind(NetSnmpQuery::class, SnmpQueryMock::class);
         }
 
-        $glob = Config::get('install_dir') . "/tests/snmpsim/$os_name*.snmprec";
+        $glob = LibrenmsConfig::get('install_dir') . "/tests/snmpsim/$os_name*.snmprec";
         $files = array_map(function ($file) {
             return basename($file, '.snmprec');
         }, glob($glob));
@@ -160,9 +185,9 @@ class OSDiscoveryTest extends TestCase
     public static function osProvider(): array
     {
         // make sure all OS are loaded
-        $config_os = array_keys(Config::get('os'));
-        if (count($config_os) < count(glob(Config::get('install_dir') . '/includes/definitions/*.yaml'))) {
-            $config_os = array_keys(Config::get('os'));
+        $config_os = array_keys(LibrenmsConfig::get('os'));
+        if (count($config_os) < count(glob(resource_path('definitions/os_detection/*.yaml')))) {
+            $config_os = array_keys(LibrenmsConfig::get('os'));
         }
 
         $excluded_os = [
