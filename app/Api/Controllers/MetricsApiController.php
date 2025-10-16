@@ -23,4 +23,10 @@ class MetricsApiController
     // Forward to the MetricsApi controller for implementation (resolve instance to avoid static call)
     return app()->call([app(\App\Api\Controllers\MetricsApi\Controller::class), 'ports'], ['request' => $request]);
     }
+
+    public function portsStatistics(Request $request)
+    {
+    // Forward to the MetricsApi controller for implementation (resolve instance to avoid static call)
+    return app()->call([app(\App\Api\Controllers\MetricsApi\Controller::class), 'portsStatistics'], ['request' => $request]);
+    }
 }
