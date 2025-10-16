@@ -87,7 +87,7 @@ class CustomMapNodeImageController extends Controller
         return response()->json([
             'result' => 'success',
             'id' => $image->custom_map_node_image_id,
-            'name' => $image->name,
+            'name' => htmlentities($image->name),
             'version' => $image->version,
         ]);
     }
@@ -105,7 +105,7 @@ class CustomMapNodeImageController extends Controller
 
         return response()->json([
             'result' => 'success',
-            'name' => $request['name'],
+            'name' => htmlentities($image->name),
             'version' => $image->version,
         ]);
     }
