@@ -4,14 +4,16 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Html;
 
 $row = 0;
+$unit = $unit ?? \LibreNMS\Enum\Sensor::from($class)->unit();
+$graph_type = $graph_type ?? 'sensor_' . $class;
 
 $sensors = \App\Models\Sensor::where('sensor_class', $class)->where('device_id', $device['device_id'])->orderBy('sensor_descr')->get();
 
 foreach ($sensors as $sensor) {
     if (! is_integer($row++ / 2)) {
-        $row_colour = \LibreNMS\Config::get('list_colour.even');
+        $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
     } else {
-        $row_colour = \LibreNMS\Config::get('list_colour.odd');
+        $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
     }
 
     if ($sensor['poller_type'] == 'ipmi') {

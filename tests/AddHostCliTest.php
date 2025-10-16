@@ -3,7 +3,7 @@
 /**
  * addhostCliTest.php
  *
- * Tests for addhost.php cli tool
+ * Tests for lnms device:add cli tool
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ namespace LibreNMS\Tests;
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class AddHostCliTest extends DBTestCase
+final class AddHostCliTest extends DBTestCase
 {
     use DatabaseTransactions;
 

@@ -1,0 +1,8 @@
+modules:
+    os:
+        serial:
+            - GS-GXW42XX-MIB::partNo.0.0
+        version:
+            - GS-GXW42XX-MIB::versionCore.0.0
+            - GS-GXW42XX-MIB::versionBase.0.0
+        version_template: 'Core: {{ GS-GXW42XX-MIB::versionCore.0.0 }}, Base: {{ GS-GXW42XX-MIB::versionBase.0.0 }}'

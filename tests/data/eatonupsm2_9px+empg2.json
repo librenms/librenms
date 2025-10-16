@@ -1520,7 +1520,7 @@
                     "inetCidrRouteType": 4,
                     "inetCidrRouteProto": 2,
                     "inetCidrRouteNextHopAS": 0,
-                    "inetCidrRouteMetric1": 0,
+                    "inetCidrRouteMetric1": 1,
                     "inetCidrRouteDestType": "ipv4",
                     "inetCidrRouteDest": "0.0.0.0",
                     "inetCidrRouteNextHopType": "ipv4",
@@ -1553,7 +1553,7 @@
                     "inetCidrRouteDest": "10.120.251.192",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "zeroDotZero.3",
+                    "inetCidrRoutePolicy": "zeroDotZero",
                     "inetCidrRoutePfxLen": 27
                 },
                 {
@@ -1567,22 +1567,8 @@
                     "inetCidrRouteDest": "169.254.0.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "zeroDotZero.4",
+                    "inetCidrRoutePolicy": "zeroDotZero",
                     "inetCidrRoutePfxLen": 16
-                },
-                {
-                    "context_name": "",
-                    "inetCidrRouteIfIndex": 4,
-                    "inetCidrRouteType": 3,
-                    "inetCidrRouteProto": 2,
-                    "inetCidrRouteNextHopAS": 0,
-                    "inetCidrRouteMetric1": 256,
-                    "inetCidrRouteDestType": "ipv6",
-                    "inetCidrRouteDest": "fe80:0000:0000:0000:0000:0000:0000:0000",
-                    "inetCidrRouteNextHopType": "ipv6",
-                    "inetCidrRouteNextHop": "0000:0000:0000:0000:0000:0000:0000:0000",
-                    "inetCidrRoutePolicy": "zeroDotZero.6",
-                    "inetCidrRoutePfxLen": 64
                 },
                 {
                     "context_name": "",
@@ -1625,6 +1611,33 @@
                     "ipv6_origin": "linklayer",
                     "context_name": "",
                     "ipv6_network": null,
+                    "ifIndex": 4
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.120.251.198",
+                    "ipv4_prefixlen": 27,
+                    "context_name": "",
+                    "ipv4_network": "10.120.251.192/27",
+                    "ifIndex": 3
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "169.254.0.1",
+                    "ipv4_prefixlen": 16,
+                    "context_name": "",
+                    "ipv4_network": "169.254.0.0/16",
                     "ifIndex": 4
                 }
             ]

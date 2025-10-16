@@ -1837,8 +1837,8 @@
                     "ifName": "IF1",
                     "portName": null,
                     "ifIndex": 1002,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -2070,14 +2070,14 @@
                     "vlan_domain": 1,
                     "vlan_name": "Default",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 200,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 200",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -2181,5 +2181,18 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.0.201.14",
+                    "ipv4_prefixlen": 21,
+                    "context_name": "",
+                    "ipv4_network": "10.0.200.0/21",
+                    "ifIndex": 1001
+                }
+            ]
+        }
     }
 }

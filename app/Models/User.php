@@ -38,12 +38,18 @@ class User extends Authenticatable
         'created' => UserCreated::class,
     ];
 
-    protected $casts = [
-        'realname' => 'string',
-        'descr' => 'string',
-        'email' => 'string',
-        'can_modify_passwd' => 'integer',
-    ];
+    /**
+     * @return array{realname: 'string', descr: 'string', email: 'string', can_modify_passwd: 'integer'}
+     */
+    protected function casts(): array
+    {
+        return [
+            'realname' => 'string',
+            'descr' => 'string',
+            'email' => 'string',
+            'can_modify_passwd' => 'integer',
+        ];
+    }
 
     public function toFlare(): array
     {
@@ -130,7 +136,7 @@ class User extends Authenticatable
             'total' => $this->notifications()->count(),
             'read' => $this->notifications()->wherePivot('key', $type)->wherePivot('value', 1)->get(),
             'unread' => Notification::whereNotIn('notifications_id', fn ($q) => $q->select('notifications_id')->from('notifications_attribs')->where('user_id', $this->user_id)->where('key', 'read')->where('value', 1))->get(),
-            'sticky' => Notification::whereIn('notifications_id', fn ($q) => $q->select('notifications_id')->from('notifications_attribs')->where('key', 'sticky')->where('value', 1))->get(),
+            'sticky' => Notification::leftJoin('notifications_attribs', 'notifications_attribs.notifications_id', '=', 'notifications.notifications_id')->where('key', 'sticky')->where('value', 1)->get(),
             'sticky_count' => Notification::whereIn('notifications_id', fn ($q) => $q->select('notifications_id')->from('notifications_attribs')->where('key', 'sticky')->where('value', 1)->select('notifications_id'))->count(),
             default => $this->notifications,
         };
@@ -147,7 +153,10 @@ class User extends Authenticatable
 
         return AlertTransport::query()
             ->where('transport_type', 'browserpush')
-            ->where('transport_config', 'regexp', "\"user\":\"(0|$user_id)\"")
+            ->where(function ($query) use ($user_id) {
+                $query->whereJsonContains('transport_config->user', '0')
+                      ->orWhereJsonContains('transport_config->user', "$user_id");
+            })
             ->exists();
     }
 
@@ -215,12 +224,17 @@ class User extends Authenticatable
     }
 
     // ---- Define Relationships ----
-
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\ApiToken, $this>
+     */
     public function apiTokens(): HasMany
     {
         return $this->hasMany(ApiToken::class, 'user_id', 'user_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Bill, $this>
+     */
     public function bills(): BelongsToMany
     {
         return $this->belongsToMany(Bill::class, 'bill_perms', 'user_id', 'bill_id');
@@ -234,11 +248,17 @@ class User extends Authenticatable
         });
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Device, $this>
+     */
     public function devicesOwned(): BelongsToMany
     {
         return $this->belongsToMany(Device::class, 'devices_perms', 'user_id', 'device_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\DeviceGroup, $this>
+     */
     public function deviceGroups(): BelongsToMany
     {
         return $this->belongsToMany(DeviceGroup::class, 'devices_group_perms', 'user_id', 'device_group_id');
@@ -254,31 +274,49 @@ class User extends Authenticatable
         }
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Port, $this>
+     */
     public function portsOwned(): BelongsToMany
     {
         return $this->belongsToMany(Port::class, 'ports_perms', 'user_id', 'port_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Dashboard, $this>
+     */
     public function dashboards(): HasMany
     {
         return $this->hasMany(Dashboard::class, 'user_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<\App\Models\Notification, $this>
+     */
     public function notifications(): BelongsToMany
     {
         return $this->belongsToMany(Notification::class, 'notifications_attribs', 'user_id', 'notifications_id', 'user_id', 'notifications_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\NotificationAttrib, $this>
+     */
     public function notificationAttribs(): HasMany
     {
         return $this->hasMany(NotificationAttrib::class, 'user_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UserPref, $this>
+     */
     public function preferences(): HasMany
     {
         return $this->hasMany(UserPref::class, 'user_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\UserWidget, $this>
+     */
     public function widgets(): HasMany
     {
         return $this->hasMany(UserWidget::class, 'user_id');

@@ -43,6 +43,7 @@ use App\Models\Service;
 use App\Models\Vrf;
 use Cache;
 use Illuminate\Support\Collection;
+use LibreNMS\Enum\Sensor as SensorEnum;
 
 class ObjectCache
 {
@@ -85,7 +86,7 @@ class ObjectCache
     {
         return Cache::remember('ObjectCache:sensor_list:' . auth()->id(), self::$cache_time, function () {
             $user = auth()->user(); /** @var \App\Models\User $user */
-            $sensor_classes = Sensor::hasAccess($user)->select('sensor_class')->groupBy('sensor_class')->orderBy('sensor_class')->get();
+            $sensor_classes = Sensor::hasAccess($user)->select('sensor_class')->distinct()->orderBy('sensor_class')->get();
 
             $sensor_menu = [];
             foreach ($sensor_classes as $sensor_model) {
@@ -104,7 +105,7 @@ class ObjectCache
 
                 $sensor_menu[$group][] = [
                     'class' => $class,
-                    'icon' => $sensor_model->icon(),
+                    'icon' => SensorEnum::from($class)->icon(),
                     'descr' => $sensor_model->classDescr(),
                 ];
             }
@@ -112,9 +113,9 @@ class ObjectCache
             if (PrinterSupply::hasAccess($user)->exists()) {
                 $sensor_menu[3] = [
                     [
-                        'class' => 'toner',
+                        'class' => 'printer-supply',
                         'icon' => 'print',
-                        'descr' => __('Toner'),
+                        'descr' => __('sensors.printer-supply.long'),
                     ],
                 ];
             }
@@ -222,7 +223,7 @@ class ObjectCache
 
     private static function getServiceCount($field, $device_id)
     {
-        return Cache::remember("ObjectCache:service_{$field}_count:" . auth()->id(), self::$cache_time, function () use ($field, $device_id) {
+        return Cache::remember("ObjectCache:service_{$field}_count:$device_id:" . auth()->id(), self::$cache_time, function () use ($field, $device_id) {
             $query = Service::hasAccess(auth()->user())->when($device_id, function ($query) use ($device_id) {
                 $query->where('device_id', $device_id);
             });
@@ -260,7 +261,7 @@ class ObjectCache
 
     private static function getSensorCount($field, $device_id)
     {
-        return Cache::remember("ObjectCache:sensor_{$field}_count:" . auth()->id(), self::$cache_time, function () use ($field, $device_id) {
+        return Cache::remember("ObjectCache:sensor_{$field}_count:$device_id:" . auth()->id(), self::$cache_time, function () use ($field, $device_id) {
             $query = Sensor::hasAccess(auth()->user())->when($device_id, function ($query) use ($device_id) {
                 $query->where('device_id', $device_id);
             });

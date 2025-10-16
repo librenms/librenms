@@ -83,8 +83,6 @@ if (! Auth::user()->hasGlobalRead()) {
             $color = 'red';
         }
 
-        $interface_name = $adj->port->ifName;
-
         echo '
           <tbody>
           <tr>

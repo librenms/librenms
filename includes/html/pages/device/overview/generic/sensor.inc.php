@@ -1,5 +1,6 @@
 <?php
 
+use LibreNMS\Enum\Sensor as SensorEnum;
 use LibreNMS\Util\Html;
 
 $sensors = DeviceCache::getPrimary()->sensors->where('sensor_class', $sensor_class)->where('group', '!=', 'transceiver')->sortBy([
@@ -8,8 +9,7 @@ $sensors = DeviceCache::getPrimary()->sensors->where('sensor_class', $sensor_cla
 ]); // cache all sensors on device and exclude transceivers
 
 if ($sensors->isNotEmpty()) {
-    $icons = \App\Models\Sensor::getIconMap();
-    $sensor_fa_icon = 'fa-' . (isset($icons[$sensor_class]) ? $icons[$sensor_class] : 'delicious');
+    $sensor_fa_icon = 'fa-' . SensorEnum::from($sensor_class)->icon();
 
     echo '
         <div class="row">
@@ -32,10 +32,10 @@ if ($sensors->isNotEmpty()) {
         $graph_array = [];
         $graph_array['height'] = '100';
         $graph_array['width'] = '210';
-        $graph_array['to'] = \LibreNMS\Config::get('time.now');
+        $graph_array['to'] = \App\Facades\LibrenmsConfig::get('time.now');
         $graph_array['id'] = $sensor->sensor_id;
         $graph_array['type'] = $graph_type;
-        $graph_array['from'] = \LibreNMS\Config::get('time.day');
+        $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
         $graph_array['legend'] = 'no';
 
         $link_array = $graph_array;
@@ -51,7 +51,7 @@ if ($sensors->isNotEmpty()) {
 
         $overlib_content = '<div class=overlib><span class=overlib-text>' . $device['hostname'] . ' - ' . $sensor->sensor_descr . '</span><br />';
         foreach (['day', 'week', 'month', 'year'] as $period) {
-            $graph_array['from'] = \LibreNMS\Config::get("time.$period");
+            $graph_array['from'] = \App\Facades\LibrenmsConfig::get("time.$period");
             $overlib_content .= str_replace('"', "\'", \LibreNMS\Util\Url::graphTag($graph_array));
         }
 
@@ -61,7 +61,7 @@ if ($sensors->isNotEmpty()) {
         $graph_array['height'] = 20;
         $graph_array['bg'] = 'ffffff00';
         // the 00 at the end makes the area transparent.
-        $graph_array['from'] = \LibreNMS\Config::get('time.day');
+        $graph_array['from'] = \App\Facades\LibrenmsConfig::get('time.day');
         $sensor_minigraph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
 
         $sensor_current = Html::severityToLabel($sensor->currentStatus(), $sensor->formatValue());

@@ -38,6 +38,7 @@ the values we expect to see the data in:
 | voltage                         | V                           |
 | waterflow                       | l/m                         |
 | percent                         | %                           |
+| signal_loss                       | dB                          |
 
 ### Simple health discovery
 
@@ -48,13 +49,13 @@ files so that you don't need to know how to write PHP.
 > correct divisor / multiplier if applicable.
 
 All yaml files are located in
-`includes/definitions/discovery/$os.yaml`. Defining the information
+`resources/definitions/os_discovery/$os.yaml`. Defining the information
 here is not always possible and is heavily reliant on vendors being
 sensible with the MIBs they generate. Only snmp walks are supported,
 and you must provide a sane table that can be traversed and contains
 all the data you need. We will use netbotz as an example here.
 
-`includes/definitions/discovery/netbotz.yaml`
+`resources/definitions/os_discovery/netbotz.yaml`
 
 ```yaml
 mib: NETBOTZV2-MIB
@@ -146,7 +147,7 @@ For `options:` you have the following available:
 
 Multiple variables can be used in the sensor's definition. The syntax
 is `{{ $variable }}`. Any oid in the current table can be used, as
-well as pre_cached data. The index ($index) and the sub_indexes (in
+well as pre-fetched data. The index ($index) and the sub_indexes (in
 case the oid is indexed multiple times) are also available: if
 $index="1.20", then $subindex0="1" and $subindex1="20".
 
@@ -253,11 +254,7 @@ sensors follows the same code format which is to collect sensor information
 via SNMP and then call the `discover_sensor()` function; except state
 sensors which requires additional code. Sensor information is commonly found in an ENTITY
 mib supplied by device's vendor in the form of a table. Other mib tables may be used as
-well. Sensor information is first collected by
-`includes/discovery/sensors/pre_cache/$os.inc.php`. This program will pull in data
-from mib tables into a `$pre_cache` array that can then be used in
-`includes/discovery/sensors/$class/$os.inc.php` to extract specific values which are
-then passed to `discover_sensor()`.
+well.
 
 `discover_sensor()` Accepts the following arguments:
 
@@ -314,19 +311,14 @@ required or supported.
 
 You will need to add code for your new sensor class in the following existing files:
 
-- `app/Models/Sensor.php`: add a free icon from [Font Awesome](https://fontawesome.com/icons?d=gallery&m=free)
-in the $icons array.
+- `LibreNMS/Enum/Sensor.php`: add accordingly, find free icon from [Font Awesome](https://fontawesome.com/icons?d=gallery&m=free)
 - `doc/Developing/os/Health-Information.md`: documentation for every sensor class is mandatory.
-- `includes/discovery/sensors.inc.php`: add the sensor class to the $run_sensors array.
 - `includes/discovery/functions.inc.php`: optional - if sensible low_limit and high_limit values
 are guessable when a SNMP-retrievable threshold is not available, add a case for the sensor class
 to the sensor_limit() and/or sensor_low_limit() functions.
 - `LibreNMS/Util/ObjectCache.php`: optional - choose menu grouping for the sensor class.
-- `includes/html/pages/device/health.inc.php`: add a dbFetchCell(), $datas[], and $type_text[]
-entry for the sensor class.
 - `includes/html/pages/device/overview.inc.php`: add `require 'overview/sensors/$class.inc.php'`
 in the desired order for the device overview page.
-- `includes/html/pages/health.inc.php`: add a $type_text[] entry for the sensor class.
 - `lang/en/sensors.php`: add human-readable names and units for the sensor class
 in English, feel free to do so for other languages as well.
 
@@ -335,10 +327,8 @@ Create and populate new files for the sensor class in the following places:
 - `includes/discovery/sensors/$class/`: create the folder where advanced php-based discovery
 files are stored. Not used for yaml discovery.
 =======
-- `includes/html/pages/device/health.inc.php`: add a dbFetchCell(), $datas[], and $type_text[] entry for the sensor class.
 - `includes/html/pages/device/overview.inc.php`: add `require 'overview/sensors/$class.inc.php'` in the desired
 order for the device overview page.
-- `includes/html/pages/health.inc.php`: add a $type_text[] entry for the sensor class.
 - `lang/en/sensors.php`: add human-readable names and units for the sensor class in English, feel
 free to do so for other languages as well.
 
@@ -388,7 +378,7 @@ foreach ($data as $index => $entry) {
 
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => $poller_type,
-                'sensor_class' => 'dbm,
+                'sensor_class' => 'dbm',
                 'device_id' => $device['device_id'],
                 'sensor_oid' => $oidRx,
                 'sensor_index' => 'cmEthernetTrafficPortStatsOPR.' . $index,
@@ -407,7 +397,7 @@ foreach ($data as $index => $entry) {
 
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => $poller_type,
-                'sensor_class' => 'dbm,
+                'sensor_class' => 'dbm',
                 'device_id' => $device['device_id'],
                 'sensor_oid' => $oidRx,
                 'sensor_index' => 'cmEthernetTrafficPortStatsOPT.' . $index,
@@ -439,7 +429,7 @@ media won't have optical readings, so if the media type isn't fiber we skip disc
 The next two lines build the OIDs for getting the optical receive and transmit values using the
 `$index` for the port. Using the OIDs the program gets the current receive and transmit values
 ($currentRx and $currentTx repectively) to verify the values are not 0. Not all SFPs collect digital
-optical monitoring (DOM) data, in the case of Adva the value of both transmit and recieve will be
+optical monitoring (DOM) data, in the case of Adva the value of both transmit and receive will be
 0 if DOM is not available. While 0 is a valid value for optical power, its extremely unlikely that
 both will be 0 if DOM is present. If DOM is not available, then the program stops discovery for
 that port. Note that while this is the case with Adva, other vendors may differ in how they handle
@@ -508,6 +498,7 @@ Ber:
 Eer:
 Waterflow:
 Percent:
+Signal_loss:
 
 >> Runtime for discovery module 'sensors': 3.9340 seconds with 190024 bytes
 >> SNMP: [16/3.89s] MySQL: [36/0.03s] RRD: [0/0.00s]

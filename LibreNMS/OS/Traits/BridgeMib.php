@@ -20,7 +20,7 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2021 Tony Murray
+ * @copyright  2025 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
@@ -31,10 +31,13 @@ use App\Models\PortStp;
 use App\Models\Stp;
 use Illuminate\Support\Collection;
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
 trait BridgeMib
 {
+    private ?array $ifIndexToBridgePort = null;
+
     public function discoverStpInstances(?string $vlan = null): Collection
     {
         $protocol = SnmpQuery::get('BRIDGE-MIB::dot1dStpProtocolSpecification.0')->value();
@@ -210,6 +213,32 @@ trait BridgeMib
         // Port saved in format priority+port (ieee 802.1d-1998: clause 8.5.5.1)
         $dp = substr($dp, -2); //discard the first octet (priority part)
 
+        if (! is_numeric($dp) && ! StringHelpers::isHex($dp)) {
+            return 0;
+        }
+
         return (int) hexdec($dp);
+    }
+
+    public function bridgePortFromIfIndex(int|string|null $ifIndex): int
+    {
+        if (! $ifIndex) {
+            return 0;
+        }
+
+        $this->ifIndexToBridgePort ??= SnmpQuery::walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
+
+        return (int) (array_flip($this->ifIndexToBridgePort)[$ifIndex] ?? 0);
+    }
+
+    public function ifIndexFromBridgePort(int|string|null $bridgePort): int
+    {
+        if (! $bridgePort) {
+            return 0;
+        }
+
+        $this->ifIndexToBridgePort ??= SnmpQuery::walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
+
+        return (int) ($this->ifIndexToBridgePort[$bridgePort] ?? 0);
     }
 }

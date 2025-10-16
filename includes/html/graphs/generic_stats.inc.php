@@ -17,6 +17,12 @@
 require 'includes/html/graphs/common.inc.php';
 
 $stacked = generate_stacked_graphs();
+$filename ??= $rrd_filename; // use $rrd_filename
+$units ??= '';
+$unit_text ??= '';
+$unitlen ??= 0;
+$rrd_optionsb = '';
+$float_precision ??= 0;
 
 if (! isset($munge)) {
     $munge = false;
@@ -64,7 +70,7 @@ $i = 0;
 $iter = 0;
 
 if (! isset($colour)) {
-    $colour = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $colour = \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter");
     $iter++;
 }
 
@@ -77,56 +83,56 @@ if (! isset($colourAalpha)) {
 }
 
 if (! isset($colour25th)) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+    if (! \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
-    $colour25th = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $colour25th = \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter");
     $iter++;
 }
 
 if (! isset($colour50th)) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+    if (! \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
-    $colour50th = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $colour50th = \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter");
     $iter++;
 }
 
 if (! isset($colour75th)) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+    if (! \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
-    $colour75th = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $colour75th = \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter");
     $iter++;
 }
 
 if (! isset($colour1h)) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+    if (! \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
-    $colour1h = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $colour1h = \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter");
     $iter++;
 }
 
 if (! isset($colour1d)) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+    if (! \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
-    $colour1d = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $colour1d = \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter");
     $iter++;
 }
 
 if (! isset($colour1w)) {
-    if (! \LibreNMS\Config::get("graph_colours.$colours.$iter")) {
+    if (! \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter")) {
         $iter = 0;
     }
-    $colour1w = \LibreNMS\Config::get("graph_colours.$colours.$iter");
+    $colour1w = \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter");
     $iter++;
 }
 
-$graph_stat_percentile_disable = \LibreNMS\Config::get('graph_stat_percentile_disable');
+$graph_stat_percentile_disable = \App\Facades\LibrenmsConfig::get('graph_stat_percentile_disable');
 
-$descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($descr, $descr_len);
+$descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($descr ?? '', $descr_len);
 
 if ($height > 25) {
     if (! $no_hourly) {
@@ -182,7 +188,7 @@ if ($height > 25) {
 
     // the if is needed as with out it the group page will case an error
     // devices/group=1/format=graph_poller_perf/from=-24hour/to=now/
-    if (is_numeric($vars['to']) && is_numeric($vars['from'])) {
+    if (isset($vars['to']) && is_numeric($vars['to']) && isset($vars['from']) && is_numeric($vars['from'])) {
         $time_diff = $vars['to'] - $vars['from'];
     } else {
         $time_diff = 1;

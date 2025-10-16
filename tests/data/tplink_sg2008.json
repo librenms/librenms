@@ -1537,8 +1537,8 @@
                     "ifName": "port 5: Gigabit Copper",
                     "portName": null,
                     "ifIndex": 5,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -1937,8 +1937,8 @@
                     "ifName": "AUX",
                     "portName": null,
                     "ifIndex": 52800,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -2037,8 +2037,8 @@
                     "ifName": "Loopback",
                     "portName": null,
                     "ifIndex": 52801,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -2137,8 +2137,8 @@
                     "ifName": "Vlan-interface99",
                     "portName": null,
                     "ifIndex": 52802,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -2238,42 +2238,42 @@
                     "vlan_domain": 1,
                     "vlan_name": "Default VLAN",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 10,
                     "vlan_domain": 1,
                     "vlan_name": "Mon",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 11,
                     "vlan_domain": 1,
                     "vlan_name": "Ser",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 12,
                     "vlan_domain": 1,
                     "vlan_name": "FPetit",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 99,
                     "vlan_domain": 1,
                     "vlan_name": "mgmt",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 855,
                     "vlan_domain": 1,
                     "vlan_name": "FLarge",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -2725,5 +2725,25 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 52801
+                },
+                {
+                    "ipv4_address": "192.168.0.240",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.0.0/24",
+                    "ifIndex": 52802
+                }
+            ]
+        }
     }
 }

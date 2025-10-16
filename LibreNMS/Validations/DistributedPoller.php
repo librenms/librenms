@@ -26,7 +26,7 @@
 
 namespace LibreNMS\Validations;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
 class DistributedPoller extends BaseValidation
 {
@@ -36,6 +36,6 @@ class DistributedPoller extends BaseValidation
     public function isDefault(): bool
     {
         // run by default if distributed polling is enabled
-        return Config::get('distributed_poller');
+        return LibrenmsConfig::get('distributed_poller');
     }
 }

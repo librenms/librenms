@@ -75,7 +75,7 @@ class ConfigRepository
      */
     public function getDefinitions(): array
     {
-        return json_decode(file_get_contents($this->get('install_dir') . '/misc/config_definitions.json'), true)['config'];
+        return json_decode(file_get_contents($this->get('install_dir') . '/resources/definitions/config_definitions.json'), true)['config'];
     }
 
     /**
@@ -150,7 +150,7 @@ class ConfigRepository
     /**
      * Get a setting from the $config['os'] array using the os of the given device
      *
-     * @param  string  $os  The os name
+     * @param  string|null  $os  The os name
      * @param  string  $key  period separated config variable name
      * @param  mixed  $default  optional value to return if the setting is not set
      * @return mixed
@@ -382,7 +382,7 @@ class ConfigRepository
         }
 
         // load macros from json
-        $macros = json_decode(file_get_contents($this->get('install_dir') . '/misc/macros.json'), true);
+        $macros = json_decode(file_get_contents($this->get('install_dir') . '/resources/definitions/macros.json'), true);
         Arr::set($this->config, 'alert.macros.rule', $macros);
 
         Arr::set($this->config, 'log_dir', $this->get('install_dir') . '/logs');
@@ -583,7 +583,7 @@ class ConfigRepository
      */
     private function loadAllOsDefinitions(): void
     {
-        $os_list = glob($this->get('install_dir') . '/includes/definitions/*.yaml');
+        $os_list = glob($this->get('install_dir') . '/resources/definitions/os_detection/*.yaml');
 
         foreach ($os_list as $yaml_file) {
             $os = basename($yaml_file, '.yaml');

@@ -41,10 +41,15 @@ class Stats
         if ($stats->isEnabled()) {
             Http::client()
                 ->asForm()
-                ->post(\LibreNMS\Config::get('callback_post'), [
+                ->post(\App\Facades\LibrenmsConfig::get('callback_post'), [
                     'data' => json_encode($stats->collectData()),
                 ]);
         }
+    }
+
+    public function dump(): array
+    {
+        return $this->collectData();
     }
 
     public function isEnabled(): bool
@@ -66,7 +71,7 @@ class Stats
 
         $response = Http::client()
             ->asForm()
-            ->post(\LibreNMS\Config::get('callback_clear'), ['uuid' => $uuid]);
+            ->post(\App\Facades\LibrenmsConfig::get('callback_clear'), ['uuid' => $uuid]);
 
         if ($response->successful()) {
             Callback::where('name', 'uuid')->delete();
@@ -127,6 +132,7 @@ class Stats
             'ospfv3_links' => $this->selectTotal('ospfv3_ports', ['ospfv3IfType']),
             'arch' => $this->selectTotal('packages', ['arch']),
             'pollers' => $this->selectTotal('pollers'),
+            'port_assoc' => $this->selectTotal('devices', ['port_association_mode']),
             'port_type' => $this->selectTotal('ports', ['ifType']),
             'port_ifspeed' => DB::table('ports')->select([DB::raw('COUNT(*) AS `total`'), DB::raw('ROUND(`ifSpeed`/1000/1000) as ifSpeed')])->groupBy(['ifSpeed'])->get(),
             'port_vlans' => $this->selectTotal('ports_vlans', ['state']),

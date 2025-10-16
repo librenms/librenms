@@ -68,6 +68,7 @@ plugins:
         'Extensions/Graphite.md': 'Extensions/metrics/Graphite.md'
         'Extensions/InfluxDB.md': 'Extensions/metrics/InfluxDB.md'
         'Extensions/InfluxDBv2.md': 'Extensions/metrics/InfluxDBv2.md'
+        'Extensions/Kafka.md': 'Extensions/metrics/Kafka.md'
         'Extensions/OpenTSDB.md': 'Extensions/metrics/OpenTSDB.md'
         'Extensions/Poller-Service.md': 'Extensions/Dispatcher-Service.md'
         'Extensions/Port-Description-Parser.md': 'Extensions/Interface-Description-Parsing.md'
@@ -220,6 +221,7 @@ nav:
       - InfluxDBv2: Extensions/metrics/InfluxDBv2.md
       - OpenTSDB: Extensions/metrics/OpenTSDB.md
       - Prometheus: Extensions/metrics/Prometheus.md
+      - Kafka: Extensions/metrics/Kafka.md
 
   - Alerting:
     - Introduction: Alerting/index.md
@@ -232,6 +234,7 @@ nav:
     - Macros: Alerting/Macros.md
     - Testing: Alerting/Testing.md
     - Device Dependencies: Alerting/Device-Dependencies.md
+    - Scheduled Maintenances: Alerting/Scheduled-Maintenances.md
 
   - API:
     - Using the API: API/index.md
@@ -247,6 +250,7 @@ nav:
       - PollerGroups: API/PollerGroups.md
       - Port_Groups: API/Port_Groups.md
       - PortGroups: API/PortGroups.md
+      - PortSecurity: API/PortSecurity.md
       - Ports: API/Ports.md
       - Routing: API/Routing.md
       - Services: API/Services.md
@@ -287,6 +291,7 @@ nav:
       - Sensor State Support: Developing/Sensor-State-Support.md
     - SNMP Traps: Developing/SNMP-Traps.md
     - Dynamic Config: Developing/Dynamic-Config.md
+    - Localization: Developing/Localization.md
     - Plugin System: Extensions/Plugin-System.md
     - Developer notes:
       - Merging Pull Requests: Developing/Merging-Pull-Requests.md
@@ -302,5 +307,6 @@ nav:
       - Dell OpenManage: Extensions/Dell-OpenManage.md
       - Fortigate: Support/Device-Notes/Fortigate.md
       - OpenWRT: Support/Device-Notes/Openwrt.md
+      - Raritan: Support/Device-Notes/Raritan.md
       - RouterOS: Support/Device-Notes/Routeros.md
       - Supermicro: Extensions/Supermicro.md

@@ -26,7 +26,7 @@
 
 namespace LibreNMS\Validations;
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\RRDRecursiveFilterIterator;
 use LibreNMS\Validator;
 use RecursiveDirectoryIterator;
@@ -45,14 +45,14 @@ class RrdCheck extends BaseValidation
     public function validate(Validator $validator): void
     {
         // Loop through the rrd_dir
-        $rrd_directory = new RecursiveDirectoryIterator(Config::get('rrd_dir'));
+        $rrd_directory = new RecursiveDirectoryIterator(LibrenmsConfig::get('rrd_dir'));
         // Filter out any non rrd files
         $rrd_directory_filter = new RRDRecursiveFilterIterator($rrd_directory);
         $rrd_iterator = new RecursiveIteratorIterator($rrd_directory_filter);
         $rrd_total = iterator_count($rrd_iterator);
         $rrd_iterator->rewind(); // Rewind iterator in case iterator_count left iterator in unknown state
 
-        echo "\nScanning " . $rrd_total . ' rrd files in ' . Config::get('rrd_dir') . "...\n";
+        echo "\nScanning " . $rrd_total . ' rrd files in ' . LibrenmsConfig::get('rrd_dir') . "...\n";
 
         // Count loops so we can push status to the user
         $loopcount = 0;
@@ -94,7 +94,7 @@ class RrdCheck extends BaseValidation
     private function test($path, &$stdOutput, &$stdError)
     {
         //rrdtool info <escaped rrd path>
-        $command = Config::get('rrdtool') . ' info ' . escapeshellarg($path);
+        $command = LibrenmsConfig::get('rrdtool') . ' info ' . escapeshellarg($path);
         $process = proc_open(
             $command,
             [
@@ -115,8 +115,12 @@ class RrdCheck extends BaseValidation
             $status = proc_get_status($process);
         }
 
-        $stdOutput = stream_get_contents($pipes[1]);
-        $stdError = stream_get_contents($pipes[2]);
+        if (($out = stream_get_contents($pipes[1])) !== false) {
+            $stdOutput = $out;
+        }
+        if (($err = stream_get_contents($pipes[2])) !== false) {
+            $stdError = $err;
+        }
         proc_close($process);
 
         return $status['exitcode'];

@@ -29,7 +29,7 @@ namespace LibreNMS\Tests\Unit;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\CiHelper;
 
-class CiHelperTest extends TestCase
+final class CiHelperTest extends TestCase
 {
     public function testSetFlags(): void
     {
@@ -102,7 +102,7 @@ class CiHelperTest extends TestCase
             'lint_skip_bash' => true,
         ]);
 
-        putenv('FILES=includes/definitions/ios.yaml tests/data/fxos.json');
+        putenv('FILES=resources/definitions/os_detection/ios.yaml tests/data/fxos.json');
         $helper = new CiHelper();
         $helper->detectChangedFiles();
         $this->assertFlagsSet($helper, [
@@ -157,7 +157,7 @@ class CiHelperTest extends TestCase
             'lint_skip_bash' => true,
         ]);
 
-        putenv('FILES=includes/definitions/ios.yaml tests/data/fxos.json');
+        putenv('FILES=resources/definitions/os_detection/ios.yaml tests/data/fxos.json');
         $helper = new CiHelper();
         $helper->detectChangedFiles();
         $this->assertFlagsSet($helper, [
@@ -171,7 +171,7 @@ class CiHelperTest extends TestCase
             'lint_skip_bash' => true,
         ]);
 
-        putenv('FILES=includes/definitions/ios.yaml tests/data/fxos.json');
+        putenv('FILES=resources/definitions/os_detection/ios.yaml tests/data/fxos.json');
         $helper = new CiHelper();
         $helper->detectChangedFiles();
         $this->assertFlagsSet($helper, [

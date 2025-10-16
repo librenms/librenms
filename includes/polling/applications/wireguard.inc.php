@@ -176,11 +176,11 @@ if (count($added_interfaces) > 0 || count($removed_interfaces) > 0) {
     $log_message = 'Wireguard Interfaces Change:';
     $log_message .=
         count($added_interfaces) > 0
-            ? ' Added ' . implode(',', $added_interfaces)
+            ? ' Added ' . implode(',', array_keys($added_interfaces))
             : '';
     $log_message .=
         count($removed_interfaces) > 0
-            ? ' Removed ' . implode(',', $removed_interfaces)
+            ? ' Removed ' . implode(',', array_keys($removed_interfaces))
             : '';
     Eventlog::log($log_message, $device['device_id'], 'application');
 }

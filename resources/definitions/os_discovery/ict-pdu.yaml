@@ -1,0 +1,5 @@
+mib: ICT-PDU-MIB
+modules:
+    os:
+        hardware: ICT-PDU-MIB::deviceModel.0
+        version: ICT-PDU-MIB::deviceFirmware.0
