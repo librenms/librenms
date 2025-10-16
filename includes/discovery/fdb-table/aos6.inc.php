@@ -59,6 +59,11 @@ if (! empty($fdbPort_table)) {
                 Log::debug("No port known for $mac\n");
                 continue;
             }
+
+            if (! isset($portid_dict[$dot1dBasePort])) {
+                continue;
+            }
+
             $mac_address = Mac::parse($mac)->hex();
             if (strlen($mac_address) != 12) {
                 Log::debug("MAC address padding failed for $mac\n");

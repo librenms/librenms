@@ -315,7 +315,7 @@ if (! empty($f5CertEntry) || ! empty($ltmBwcEntry) || ! empty($ltmVirtualServEnt
     }
 
     // Process the Pool Members
-    if (is_array($ltmPoolMemberEntry['name'])) {
+    if (isset($ltmPoolMemberEntry['name']) && is_array($ltmPoolMemberEntry['name'])) {
         foreach ($ltmPoolMemberEntry['name'] as $oid => $value) {
             $result = [];
 

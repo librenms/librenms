@@ -22,6 +22,7 @@ return [
             'general' => ['name' => 'General Alert Settings'],
             'email' => ['name' => 'Email Options'],
             'rules' => ['name' => 'Alert Rule Default Settings'],
+            'scheduled-maintenance' => ['name' => 'Scheduled Maintenance'],
         ],
         'api' => [
             'cors' => ['name' => 'CORS'],
@@ -44,6 +45,7 @@ return [
             'autodiscovery' => ['name' => 'Network Discovery'],
             'ports' => ['name' => 'Ports Module'],
             'storage' => ['name' => 'Storage Module'],
+            'processor' => ['name' => 'Processor Module'],
             'ipmi' => ['name' => 'IPMI Module'],
             'sensors' => ['name' => 'Sensors Module'],
             'virtualization' => ['name' => 'Virtualization Module'],
@@ -68,6 +70,7 @@ return [
             'graphite' => ['name' => 'Datastore: Graphite'],
             'influxdb' => ['name' => 'Datastore: InfluxDB'],
             'influxdbv2' => ['name' => 'Datastore: InfluxDBv2'],
+            'kafka' => ['name' => 'Datastore: Kafka'],
             'opentsdb' => ['name' => 'Datastore: OpenTSDB'],
             'ping' => ['name' => 'Ping'],
             'prometheus' => ['name' => 'Datastore: Prometheus'],
@@ -99,6 +102,7 @@ return [
             'general' => ['name' => 'General Web UI Settings'],
             'front-page' => ['name' => 'Front Page Settings'],
             'menu' => ['name' => 'Menu Settings'],
+            'scheduled-maintenance' => ['name' => 'Scheduled Maintenance'],
         ],
     ],
     'settings' => [
@@ -194,6 +198,15 @@ return [
             'globals' => [
                 'description' => 'Issue alerts to read only users (deprecated)',
                 'help' => 'Deprecated, use the mail alert transport instead.',
+            ],
+            'scheduled_maintenance_default_behavior' => [
+                'description' => 'Default behavior for scheduled maintenance',
+                'help' => 'Default behavior for scheduled maintenance',
+                'options' => [
+                    '1' => 'Skip alerts',
+                    '2' => 'Mute alerts',
+                    '3' => 'Run alerts',
+                ],
             ],
             'syscontact' => [
                 'description' => 'Issue alerts to sysContact (deprecated)',
@@ -767,7 +780,7 @@ return [
                 'description' => 'UCD DiskIO',
             ],
             'vlans' => [
-                'description' => 'VLans',
+                'description' => 'VLANs',
             ],
             'vminfo' => [
                 'description' => 'Hypervisor VM Info',
@@ -1154,9 +1167,21 @@ return [
                 'description' => 'Username',
                 'help' => 'Username to connect to InfluxDB, if required',
             ],
+            'batch_size' => [
+                'description' => 'Batch Size',
+                'help' => 'Number of metrics to send in a single batch, 0 means no batching',
+            ],
+            'measurements' => [
+                'description' => 'Measurements',
+                'help' => 'List of measurements to send to InfluxDB, leave empty to send all',
+            ],
             'verifySSL' => [
                 'description' => 'Verify SSL',
                 'help' => 'Verify the SSL certificate is valid and trusted',
+            ],
+            'debug' => [
+                'description' => 'Debug',
+                'help' => 'To enable or disable verbose output to CLI',
             ],
         ],
         'influxdbv2' => [
@@ -1223,6 +1248,122 @@ return [
             'max_retry' => [
                 'description' => 'Max retry',
                 'help' => 'How many reties we should try',
+            ],
+        ],
+        'kafka' => [
+            'enable' => [
+                'description' => 'Enable',
+                'help' => 'Exports metrics to Kafka using the idealo/php-rdkafka-ffi',
+            ],
+            'groups-exclude' => [
+                'description' => 'Excluded device groups id',
+                'help' => 'Device groups ids excluded from sending data to Kafka',
+            ],
+            'measurement-exclude' => [
+                'description' => 'Excluded measurements',
+                'help' => 'Discovery modules to be excluded from sending to kafka',
+            ],
+            'debug' => [
+                'description' => 'Debug',
+                'help' => 'Enable detailed logs about internal kafka store process',
+            ],
+            'security' => [
+                'debug' => [
+                    'description' => 'Security Debug',
+                    'help' => 'Show more detailed info about security comunication with Kafka brokers',
+                ],
+            ],
+            'broker' => [
+                'list' => [
+                    'description' => 'List of Kafka Brokers servers in format of host!:port',
+                    'help' => 'List of kafka brokers in format of host!:port. https://github.com/confluentinc/librdkafka/blob/master/CONFIGURATION.md',
+                ],
+            ],
+            'idempotence' => [
+                'description' => 'Idempotence',
+                'help' => 'When set to true, the producer will ensure that messages are successfully produced exactly once and in the original produce order',
+            ],
+            'topic' => [
+                'description' => 'Topic',
+                'help' => 'The categories used to organize messages',
+            ],
+            'ssl' => [
+                'enable' => [
+                    'description' => 'SSL Enable',
+                    'help' => 'Enable SSL support in Kafka',
+                ],
+                'protocol' => [
+                    'description' => 'SSL Protocol',
+                    'help' => 'Protocol used to communicate with brokers',
+                ],
+                'ca' => [
+                    'location' => [
+                        'description' => 'SSL Certificate Authority Location',
+                        'help' => 'File or directory path to CA certificate(s) for verifying the broker\'s key.',
+                    ],
+                ],
+                'certificate' => [
+                    'location' => [
+                        'description' => 'SSL Certificate Location',
+                        'help' => 'Path to client\'s public key (PEM) used for authentication.',
+                    ],
+                ],
+                'key' => [
+                    'location' => [
+                        'description' => 'SSL Certificate Key Location',
+                        'help' => 'Path to client\'s private key (PEM) used for authentication.',
+                    ],
+                    'password' => [
+                        'description' => 'SSL Certificate Key Password',
+                        'help' => 'Private key passphrase (to be used with kafka.ssl.key.location).',
+                    ],
+                ],
+                'keystore' => [
+                    'location' => [
+                        'description' => 'SSL Keystore Certificate Location',
+                        'help' => 'Path to client\'s keystore (PKCS#12) used for authentication.',
+                    ],
+                    'password' => [
+                        'description' => 'SSL Keystore Key Password',
+                        'help' => 'Client\'s keystore (PKCS#12) password.',
+                    ],
+                ],
+            ],
+            'flush' => [
+                'timeout' => [
+                    'description' => 'Kafka Flush Timeout',
+                    'help' => 'Kafka wait this timeout to flush messages in queue',
+                ],
+            ],
+            'buffer' => [
+                'max' => [
+                    'message' => [
+                        'description' => 'Kafka buffer maximum number of messages hold in poller memory',
+                        'help' => 'Kafka buffer maximum number of allowed messages hold in poller memory',
+                    ],
+                ],
+            ],
+            'batch' => [
+                'max' => [
+                    'message' => [
+                        'description' => 'Kafka batch maximum number of messages sent each call to kafka servers',
+                        'help' => 'Kafka batch maximum number of messages sent each call to kafka servers',
+                    ],
+                ],
+            ],
+            'linger' => [
+                'ms' => [
+                    'description' => 'Kafka wait time in ms to acumulate messages in poller memory before sending the batch',
+                    'help' => 'Kafka wait time in ms to acumulate messages in poller memory before sending the batch',
+                ],
+            ],
+            'request' => [
+                'required' => [
+                    'acks' => [
+                        'description' => 'Kafka request required acks',
+                        'help' => 'Kafka request required acks',
+                    ],
+                ],
             ],
         ],
         'int_core' => [
@@ -1527,6 +1668,9 @@ return [
             'bgp-peers' => [
                 'description' => 'BGP Peers',
             ],
+            'vlans' => [
+                'description' => 'VLANs',
+            ],
             'junose-atm-vp' => [
                 'description' => 'JunOS ATM VP',
             ],
@@ -1623,6 +1767,9 @@ return [
             'printer-supplies' => [
                 'description' => 'Printer Supplies',
             ],
+            'port-security' => [
+                'description' => 'Port Security',
+            ],
         ],
         'polling.selected_ports' => [
             'description' => 'Selected Port Polling',
@@ -1639,6 +1786,10 @@ return [
         'ports_purge' => [
             'description' => 'Purge ports deleted',
             'help' => 'Cleanup done by daily.sh',
+        ],
+        'processor.default_perc_warn' => [
+            'description' => 'Default Processor Percentage Warning',
+            'help' => 'Default Percentage of processor used before a warning is raised.',
         ],
         'prometheus' => [
             'enable' => [
@@ -1952,6 +2103,7 @@ return [
         'site_style' => [
             'description' => 'Default Theme',
             'options' => [
+                'device' => 'Device',
                 'blue' => 'Blue',
                 'dark' => 'Dark',
                 'light' => 'Light',
@@ -2047,8 +2199,8 @@ return [
             'description' => 'Path to snmpwalk',
         ],
         'storage_perc_warn' => [
-            'description' => 'Storage Percentage Warning',
-            'help' => 'Percentage of storage used before a warning is raised. 0 disables warning.',
+            'description' => 'Default Storage Percentage Warning',
+            'help' => 'Default Percentage of storage used before a warning is raised. 0 disables warning.',
         ],
         'syslog_filter' => [
             'description' => 'Filter syslog messages containing',
@@ -2059,7 +2211,7 @@ return [
         ],
         'title_image' => [
             'description' => 'Title Image',
-            'help' => 'Overrides the default Title Image.',
+            'help' => 'Overrides the default Title Image. SVG from the same server will be include and can use currentColor to match the current theme dynamically.',
         ],
         'traceroute' => [
             'description' => 'Path to traceroute',
@@ -2106,6 +2258,10 @@ return [
             'help' => 'Enables the mouseover graphs in the web interface',
         ],
         'webui' => [
+            'scheduled_maintenance_default_behavior' => [
+                'description' => 'Default Behaviour',
+                'help' => 'When managing scheduled maintenances, this will be the default option for the Behavior option.',
+            ],
             'availability_map_box_size' => [
                 'description' => 'Availability box width',
                 'help' => 'Input desired tile width in pixels for box size in full view',

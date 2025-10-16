@@ -71,7 +71,7 @@ class Ciscowlc extends Cisco implements
             'NUMCLIENTS' => $numClients,
         ];
 
-        $tags = compact('rrd_def');
+        $tags = ['rrd_def' => $rrd_def];
         $datastore->put($device, 'ciscowlc', $tags, $fields);
 
         $db_aps = $this->getDevice()->accessPoints->keyBy->getCompositeKey();

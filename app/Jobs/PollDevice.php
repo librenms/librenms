@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Actions\Device\CheckDeviceAvailability;
 use App\Events\DevicePolled;
 use App\Events\PollingDevice;
 use App\Facades\LibrenmsConfig;
@@ -15,7 +16,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 use LibreNMS\OS;
 use LibreNMS\Polling\ConnectivityHelper;
@@ -57,9 +57,8 @@ class PollDevice implements ShouldQueue
         $measurement = Measurement::start('poll');
         $measurement->manager()->checkpoint(); // don't count previous stats
 
-        $helper = new ConnectivityHelper($this->device);
-        $helper->saveMetrics();
-        $helper->isUp(); // check and save status
+        // check and save status
+        app(CheckDeviceAvailability::class)->execute($this->device, true);
 
         $this->pollModules();
 
@@ -71,7 +70,7 @@ class PollDevice implements ShouldQueue
                 $this->recordPerformance($measurement);
             }
 
-            if ($helper->canPing()) {
+            if (ConnectivityHelper::pingIsAllowed($this->device)) {
                 $this->os->enableGraph('ping_perf');
             }
 
@@ -91,14 +90,14 @@ class PollDevice implements ShouldQueue
             $measurement->getDuration()));
 
         // add log file line, this is used by the simple python dispatcher watchdog
-        Log::channel('single')->alert(sprintf('INFO: device:poll %s (%s) polled in %0.3fs',
+        Log::channel('log_file')->alert(sprintf('INFO: device:poll %s (%s) polled in %0.3fs',
             $this->device->hostname,
             $this->device->device_id,
             $measurement->getDuration()));
 
         // check if the poll took too long and log an event
-        if ($measurement->getDuration() > Config::get('rrd.step')) {
-            Eventlog::log('Polling took longer than ' . round(Config::get('rrd.step') / 60, 2) .
+        if ($measurement->getDuration() > LibrenmsConfig::get('rrd.step')) {
+            Eventlog::log('Polling took longer than ' . round(LibrenmsConfig::get('rrd.step') / 60, 2) .
                 ' minutes!  This will cause gaps in graphs.', $this->device, 'system', Severity::Error);
         }
 
@@ -134,7 +133,7 @@ class PollDevice implements ShouldQueue
                     Log::debug($module_status);
 
                     if (is_array($status)) {
-                        Config::set('poller_submodules.' . $module, $status);
+                        LibrenmsConfig::set('poller_submodules.' . $module, $status);
                     }
 
                     $instance->poll($this->os, $datastore);
@@ -183,7 +182,7 @@ class PollDevice implements ShouldQueue
         $this->device->ip = $this->device->overwrite_ip ?: Dns::lookupIp($this->device) ?: $this->device->ip;
 
         $this->deviceArray = $this->device->toArray();
-        if ($os_group = Config::get("os.{$this->device->os}.group")) {
+        if ($os_group = LibrenmsConfig::get("os.{$this->device->os}.group")) {
             $this->deviceArray['os_group'] = $os_group;
         }
 
@@ -194,7 +193,7 @@ class PollDevice implements ShouldQueue
     private function initRrdDirectory(): void
     {
         $host_rrd = \Rrd::name($this->device->hostname, '', '');
-        if (Config::get('rrd.enable', true) && ! is_dir($host_rrd)) {
+        if (LibrenmsConfig::get('rrd.enable', true) && ! is_dir($host_rrd)) {
             try {
                 mkdir($host_rrd);
                 Log::info("Created directory : $host_rrd");
@@ -208,12 +207,12 @@ class PollDevice implements ShouldQueue
     private function printDeviceInfo(?string $group): void
     {
         Log::info(sprintf(<<<'EOH'
-Hostname:  %s %s
+Hostname:  %s %s %s
 ID:        %s
 OS:        %s
 IP:        %s
 
-EOH, $this->device->hostname, $group ? " ($group)" : '', $this->device->device_id, $this->device->os, $this->device->ip));
+EOH, $this->device->hostname, $group ? "($group)" : '', $this->device->status ? '' : '%RDOWN%n', $this->device->device_id, $this->device->os, $this->device->ip), ['color' => true]);
     }
 
     private function recordPerformance(Measurement $measurement): void

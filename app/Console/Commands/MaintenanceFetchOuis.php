@@ -3,9 +3,9 @@
 namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use LibreNMS\Config;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -38,14 +38,14 @@ class MaintenanceFetchOuis extends LnmsCommand
     {
         $force = $this->option('force');
 
-        if (Config::get('mac_oui.enabled') !== true && ! $force) {
+        if (LibrenmsConfig::get('mac_oui.enabled') !== true && ! $force) {
             $this->line(trans('commands.maintenance:fetch-ouis.disabled', ['setting' => 'mac_oui.enabled']));
 
             if (! $this->confirm(trans('commands.maintenance:fetch-ouis.enable_question'))) {
                 return 0;
             }
 
-            Config::persist('mac_oui.enabled', true);
+            LibrenmsConfig::persist('mac_oui.enabled', true);
         }
 
         // We want to refresh after at least 6 days

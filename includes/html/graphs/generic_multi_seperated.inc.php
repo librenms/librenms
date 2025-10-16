@@ -14,7 +14,7 @@
  * @author     LibreNMS Contributors
 */
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
 require 'includes/html/graphs/common.inc.php';
 
@@ -81,7 +81,7 @@ if ($width > '500') {
 }
 
 if ($previous) {
-    $rrd_options .= sprintf(" COMMENT:'\t'", '');
+    $rrd_options .= sprintf(" COMMENT:'\t'");
     $rrd_options .= sprintf(" COMMENT:'%10s'", 'P Avg');
     $rrd_options .= sprintf(" COMMENT:'%10s'", 'P Max');
     if (! $nototal) {
@@ -93,12 +93,12 @@ $rrd_options .= " COMMENT:'\\n'";
 
 $iter = 0;
 foreach ($rrd_list ?? [] as $rrd) {
-    if (! Config::get("graph_colours.$colours_in.$iter") || ! Config::get("graph_colours.$colours_out.$iter")) {
+    if (! LibrenmsConfig::get("graph_colours.$colours_in.$iter") || ! LibrenmsConfig::get("graph_colours.$colours_out.$iter")) {
         $iter = 0;
     }
 
-    $colour_in = $rrd['colour_area_in'] ?? Config::get("graph_colours.$colours_in.$iter");
-    $colour_out = $rrd['colour_area_out'] ?? Config::get("graph_colours.$colours_out.$iter");
+    $colour_in = $rrd['colour_area_in'] ?? LibrenmsConfig::get("graph_colours.$colours_in.$iter");
+    $colour_out = $rrd['colour_area_out'] ?? LibrenmsConfig::get("graph_colours.$colours_out.$iter");
 
     $rrd_options .= ' DEF:inB' . $i . '=' . $rrd['filename'] . ':' . $rrd['ds_in'] . ':AVERAGE ';
     $rrd_options .= ' DEF:outB' . $i . '=' . $rrd['filename'] . ':' . $rrd['ds_out'] . ':AVERAGE ';
@@ -203,10 +203,10 @@ if ($previous) {
     $rrd_options .= ' CDEF:outbitsX=outBX,8,*';
     $rrd_options .= ' CDEF:bitsX=inbitsX,outbitsX,+';
     $rrd_options .= ' CDEF:doutbitsX=doutBX,8,*';
-    $rrd_options .= ' VDEF:percentile_inX=inbitsX,' . Config::get('percentile_value') . ',PERCENT';
-    $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . Config::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_inX=inbitsX,' . LibrenmsConfig::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_outX=outbitsX,' . LibrenmsConfig::get('percentile_value') . ',PERCENT';
     $rrd_options .= ' CDEF:dpercentile_outXn=doutbitsX,' . $stacked['stacked'] . ',*';
-    $rrd_options .= ' VDEF:dpercentile_outXperc=dpercentile_outXn,' . Config::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:dpercentile_outXperc=dpercentile_outXn,' . LibrenmsConfig::get('percentile_value') . ',PERCENT';
     $rrd_options .= ' CDEF:dpercentile_outXnd=doutbitsX,doutbitsX,-,dpercentile_outXperc,-1,*,+';
     $rrd_options .= ' VDEF:dpercentile_outXpercn=dpercentile_outXnd,FIRST';
     $rrd_options .= ' VDEF:totinX=inBX,TOTAL';
@@ -232,10 +232,10 @@ if (! $nototal && ! empty($rrd_list)) {
     $rrd_options .= ' CDEF:outbits=outB,8,*';
     $rrd_options .= ' CDEF:bits=inbits,outbits,+';
     $rrd_options .= ' CDEF:doutbits=doutB,8,*';
-    $rrd_options .= ' VDEF:percentile_in=inbits,' . Config::get('percentile_value') . ',PERCENT';
-    $rrd_options .= ' VDEF:percentile_out=outbits,' . Config::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_in=inbits,' . LibrenmsConfig::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:percentile_out=outbits,' . LibrenmsConfig::get('percentile_value') . ',PERCENT';
     $rrd_options .= ' CDEF:dpercentile_outn=doutbits,' . $stacked['stacked'] . ',*';
-    $rrd_options .= ' VDEF:dpercentile_outnp=dpercentile_outn,' . Config::get('percentile_value') . ',PERCENT';
+    $rrd_options .= ' VDEF:dpercentile_outnp=dpercentile_outn,' . LibrenmsConfig::get('percentile_value') . ',PERCENT';
     $rrd_options .= ' CDEF:dpercentile_outnpn=doutbits,doutbits,-,dpercentile_outnp,' . $stacked['stacked'] . ',*,+';
     $rrd_options .= ' VDEF:dpercentile_out=dpercentile_outnpn,FIRST';
     $rrd_options .= ' VDEF:totin=inB,TOTAL';

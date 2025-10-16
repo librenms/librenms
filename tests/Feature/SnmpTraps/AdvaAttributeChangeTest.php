@@ -26,7 +26,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class AdvaAttributeChangeTest extends SnmpTrapTestCase
+final class AdvaAttributeChangeTest extends SnmpTrapTestCase
 {
     public function testSyslogIPVersionModified(): void
     {

@@ -1,6 +1,7 @@
 <?php
 
-use LibreNMS\Config;
+use App\Actions\Device\DeviceIsSnmpable;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\PortAssociationMode;
 
 $device = DeviceCache::getPrimary();
@@ -14,7 +15,7 @@ if (isset($_POST['editing'])) {
         if ($snmp_enabled) {
             $device->snmp_disable = 0;
             $device->snmpver = $_POST['snmpver'];
-            $device->port = $_POST['port'] ?: Config::get('snmp.port');
+            $device->port = $_POST['port'] ?: LibrenmsConfig::get('snmp.port');
             $device->transport = $_POST['transport'] ?: $transport = 'udp';
             $device->port_association_mode = $_POST['port_assoc_mode'];
             $max_repeaters = $_POST['max_repeaters'] ?? '';
@@ -48,8 +49,7 @@ if (isset($_POST['editing'])) {
         $device_updated = false;
 
         if ($force_save !== true && $snmp_enabled) {
-            $helper = new \LibreNMS\Polling\ConnectivityHelper($device);
-            $device_is_snmpable = $helper->isSNMPable();
+            $device_is_snmpable = app(DeviceIsSnmpable::class)->execute($device);
         }
 
         if ($force_save === true || ! $snmp_enabled || $device_is_snmpable) {
@@ -89,7 +89,7 @@ if (isset($_POST['editing'])) {
                 }
 
                 $get_devices_attrib = get_dev_attrib($device, $devices_attrib);
-                
+
                 $set_devices_attrib = false; // testing $set_devices_attrib === false is not a true indicator of a failure
 
                 if ($form_value != $get_devices_attrib && $form_value_is_numeric && is_numeric($form_value) && $form_value != 0) {
@@ -209,7 +209,7 @@ echo "
     <div class='form-group'>
     <label for='os' class='col-sm-2 control-label'>OS (optional)</label>
     <div class='col-sm-4'>
-    <input id='os' class='form-control' name='os' value='" . htmlspecialchars(Config::get("os.{$device->os}.text")) . "'/>
+    <input id='os' class='form-control' name='os' value='" . htmlspecialchars(LibrenmsConfig::get("os.{$device->os}.text")) . "'/>
     <input type='hidden' id='os_id' class='form-control' name='os_id' value='" . htmlspecialchars($device->os) . "'/>
     </div>
     </div>
@@ -226,11 +226,11 @@ echo "
     </select>
     </div>
     <div class='col-sm-2'>
-    <input type='number' name='port' placeholder='port' class='form-control input-sm' value='" . htmlspecialchars($device->port == Config::get('snmp.port') ? '' : $device->port) . "'>
+    <input type='number' name='port' placeholder='port' class='form-control input-sm' value='" . htmlspecialchars($device->port == LibrenmsConfig::get('snmp.port') ? '' : $device->port) . "'>
     </div>
     <div class='col-sm-1'>
     <select name='transport' id='transport' class='form-control input-sm'>";
-foreach (Config::get('snmp.transports') as $transport) {
+foreach (LibrenmsConfig::get('snmp.transports') as $transport) {
     echo "<option value='" . $transport . "'";
     if ($transport == $device->transport) {
         echo " selected='selected'";
@@ -363,7 +363,7 @@ if (! \LibreNMS\SNMPCapabilities::supportsAES256()) {
 </div>
 <?php
 
-if (Config::get('distributed_poller') === true) {
+if (LibrenmsConfig::get('distributed_poller') === true) {
     echo '
         <div class="form-group">
         <label for="poller_group" class="col-sm-2 control-label">Poller Group</label>

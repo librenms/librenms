@@ -1640,15 +1640,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: html/ajax_listports.php
-
-		-
-			message: '''
 				#^Call to deprecated function snmp_get\(\)\:
 				Please use SnmpQuery instead$#
 			'''
@@ -6767,24 +6758,6 @@ parameters:
 			identifier: function.deprecated
 			count: 4
 			path: includes/html/forms/notifications.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRow\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/forms/parse-alert-rule.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 5
-			path: includes/html/forms/parse-alert-rule.inc.php
 
 		-
 			message: '''

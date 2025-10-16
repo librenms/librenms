@@ -29,12 +29,13 @@ namespace LibreNMS\Tests;
 use Illuminate\Support\Str;
 use JsonSchema\Constraints\Constraint;
 use JsonSchema\Exception\JsonDecodingException;
+use JsonSchema\Exception\ValidationException;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
-class YamlSchemaTest extends TestCase
+final class YamlSchemaTest extends TestCase
 {
     private array $excluded = [
         '/os_detection/default.yaml',
@@ -117,10 +118,14 @@ class YamlSchemaTest extends TestCase
                 $schema,
                 Constraint::CHECK_MODE_TYPE_CAST | Constraint::CHECK_MODE_VALIDATE_SCHEMA | Constraint::CHECK_MODE_EXCEPTIONS
             );
-        } catch (JsonDecodingException $e) {
+        } catch (JsonDecodingException|ValidationException $e) {
             // Output the filename so we know what file failed
-            echo "Json format invalid in $schema_file\n";
-            throw $e;
+            $error = $e->getMessage();
+            if (str_contains($error, 'Error validating /discovery/')) {
+                $error = 'Discovery must contain an identifier sysObjectID or sysDescr';
+            }
+
+            $this->fail("$filename failed to validate against $schema_file\n\n$error");
         }
 
         $errors = collect($validator->getErrors())

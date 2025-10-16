@@ -20,9 +20,11 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2018 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
  * @copyright  2018 Jose Augusto Cardoso
+ * @copyright  2025 Peca Nesovanovic
+ * @copyright  2025 Tony Murray
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\OS\Shared;
@@ -33,10 +35,12 @@ use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\Mempool;
 use App\Models\PortsNac;
+use App\Models\PortVlan;
 use App\Models\Qos;
 use App\Models\Sla;
 use App\Models\Storage;
 use App\Models\Transceiver;
+use App\Models\Vlan;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -49,6 +53,8 @@ use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Discovery\StorageDiscovery;
 use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\QosPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
@@ -70,7 +76,9 @@ class Cisco extends OS implements
     QosPolling,
     SlaPolling,
     StorageDiscovery,
-    TransceiverDiscovery
+    TransceiverDiscovery,
+    VlanDiscovery,
+    VlanPortDiscovery
 {
     use YamlOSDiscovery {
         YamlOSDiscovery::discoverOS as discoverYamlOS;
@@ -447,6 +455,7 @@ class Cisco extends OS implements
                 return $data['rttMonEchoAdminURL'] ?? '';
             case 'dns':
                 return $data['rttMonEchoAdminTargetAddressString'] ?? '';
+            case 'icmpjitter':
             case 'echo':
                 return IP::fromHexString($data['rttMonEchoAdminTargetAddress'], true) ?? '';
             case 'jitter':
@@ -599,7 +608,7 @@ class Cisco extends OS implements
                         ->addDataset('OWAvgDS', 'GAUGE', 0)
                         ->addDataset('AvgSDJ', 'GAUGE', 0)
                         ->addDataset('AvgDSJ', 'GAUGE', 0);
-                    $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
+                    $tags = ['rrd_name' => $rrd_name, 'rrd_def' => $rrd_def, 'sla_nr' => $sla_nr, 'rtt_type' => $rtt_type];
                     app('Datastore')->put($device, 'sla', $tags, $jitter);
                     $collected = array_merge($collected, $jitter);
                     // Additional rrd for total number packet in sla
@@ -609,7 +618,7 @@ class Cisco extends OS implements
                     $rrd_name = ['sla', $sla_nr, 'NumPackets'];
                     $rrd_def = RrdDefinition::make()
                         ->addDataset('NumPackets', 'GAUGE', 0);
-                    $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
+                    $tags = ['rrd_name' => $rrd_name, 'rrd_def' => $rrd_def, 'sla_nr' => $sla_nr, 'rtt_type' => $rtt_type];
                     app('Datastore')->put($device, 'sla', $tags, $numPackets);
                     $collected = array_merge($collected, $numPackets);
                     break;
@@ -643,7 +652,7 @@ class Cisco extends OS implements
                         ->addDataset('LatencyOWAvgDS', 'GAUGE', 0)
                         ->addDataset('JitterIAJOut', 'GAUGE', 0)
                         ->addDataset('JitterIAJIn', 'GAUGE', 0);
-                    $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
+                    $tags = ['rrd_name' => $rrd_name, 'rrd_def' => $rrd_def, 'sla_nr' => $sla_nr, 'rtt_type' => $rtt_type];
                     app('Datastore')->put($device, 'sla', $tags, $icmpjitter);
                     $collected = array_merge($collected, $icmpjitter);
                     break;
@@ -947,5 +956,109 @@ class Cisco extends OS implements
                 d_echo('Cisco CBQoS ' . $thisQos->type . ' not implemented in LibreNMS/OS/Shared/Cisco.php');
             }
         }
+    }
+
+    public function discoverVlans(): Collection
+    {
+        if (($QBridgeMibVlans = parent::discoverVlans())->isNotEmpty()) {
+            return $QBridgeMibVlans;
+        }
+
+        $vtpversion = SnmpQuery::enumStrings()->get('CISCO-VTP-MIB::vtpVersion.0')->value();
+        if (! in_array($vtpversion, ['1', '2', '3', 'one', 'two', 'three', 'none'])) {
+            return new Collection;
+        }
+
+        $vtpdomains = SnmpQuery::walk('CISCO-VTP-MIB::managementDomainName')->pluck();
+        $current_domain = 0;
+
+        return SnmpQuery::enumStrings()->walk('CISCO-VTP-MIB::vtpVlanTable')
+            ->mapTable(function ($vlan, $vtpdomain_id, $vlan_id) use ($vtpdomains, &$current_domain) {
+                if ($current_domain != $vtpdomain_id) {
+                    $current_domain = $vtpdomain_id;
+                    Log::info('VTP Domain ' . $vtpdomain_id . ' ' . ($vtpdomains[$vtpdomain_id] ?? 'none'));
+                }
+
+                return new Vlan([
+                    'vlan_vlan' => $vlan_id,
+                    'vlan_name' => $vlan['CISCO-VTP-MIB::vtpVlanName'] ?? '',
+                    'vlan_domain' => $vtpdomain_id,
+                    'vlan_type' => $vlan['CISCO-VTP-MIB::vtpVlanType'] ?? '',
+                    'vlan_state' => isset($vlan['CISCO-VTP-MIB::vtpVlanState']) && $vlan['CISCO-VTP-MIB::vtpVlanState'] == 'operational',
+                ]);
+            });
+    }
+
+    public function discoverVlanPorts(Collection $vlans): Collection
+    {
+        $ports = parent::discoverVlanPorts($vlans); // Q-BRIDGE-MIB
+        if ($ports->isNotEmpty()) {
+            return $ports;
+        }
+
+        // Only returns 'untagged' vlan for each port (either access ports, or native vlan of a trunk)
+        // stored for use in below loop
+        $native_vlans_raw = SnmpQuery::abortOnFailure()->walk([
+            'CISCO-VTP-MIB::vlanTrunkPortNativeVlan',
+            'CISCO-VLAN-MEMBERSHIP-MIB::vmVlan',
+        ])->table(1);
+
+        // Hash Table indexed by vlans and ifIndexes
+        foreach ($native_vlans_raw as $ifindex => $data) {
+            $vlan_id = $data['CISCO-VLAN-MEMBERSHIP-MIB::vmVlan'] ?? $data['CISCO-VTP-MIB::vlanTrunkPortNativeVlan'] ?? 0;
+            $isNative[$vlan_id][$ifindex] = 1;
+        }
+
+        // process all the discovered vlans
+        foreach ($vlans as $vlan) {
+            $vlan_id = (int) $vlan->vlan_vlan;
+
+            // Ignore reserved VLAN IDs
+            if ($vlan->vlan_state && $vlan_id && ($vlan_id < 1002 || $vlan_id > 1005)) {
+                // collect BRIDGE-MIB in vlan context
+                $tmp_vlan_data = SnmpQuery::context($vlan_id === 1 ? '' : (string) $vlan_id, 'vlan-')
+                    ->enumStrings()
+                    ->abortOnFailure()
+                    ->walk([
+                        'BRIDGE-MIB::dot1dStpPortState',
+                        'BRIDGE-MIB::dot1dStpPortPriority',
+                        'BRIDGE-MIB::dot1dStpPortPathCost',
+                    ])->table(1);
+
+                foreach ($tmp_vlan_data as $baseport => $data) {
+                    // use the collected untagged vlan info
+                    $ifindex = $this->ifIndexFromBridgePort($baseport);
+                    $alreadyProcessed[$vlan_id][$ifindex] = 1; // We don't want to override it later
+                    $ports->push(new PortVlan([
+                        'vlan' => $vlan_id,
+                        'baseport' => $baseport,
+                        'priority' => $data['BRIDGE-MIB::dot1dStpPortPriority'] ?? 0,
+                        'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown',
+                        'cost' => $data['BRIDGE-MIB::dot1dStpPortPathCost'] ?? 0,
+                        'untagged' => isset($isNative[$vlan_id][$ifindex]),
+                        'port_id' => PortCache::getIdFromIfIndex($ifindex, $this->getDeviceId()) ?? 0, // ifIndex from device
+                    ]));
+                }
+            }
+
+            // Let's do the native/access that were not processed above
+            // if we have isNative for this vlan, then we check which ifindexes are not yet processed and we add them.
+            if (isset($isNative[$vlan_id])) {
+                foreach ($isNative[$vlan_id] as $ifindex => $value) {
+                    if (isset($alreadyProcessed[$vlan_id][$ifindex])) {
+                        continue;
+                    }
+                    $ports->push(new PortVlan([
+                        'vlan' => $vlan_id,
+                        'baseport' => $this->bridgePortFromIfIndex($ifindex),
+                        'untagged' => 1,
+                        'state' => 'unknown',
+                        'port_id' => PortCache::getIdFromIfIndex($ifindex, $this->getDeviceId()) ?? 0, // ifIndex from device,
+                    ]));
+                }
+            }
+        }
+
+        return $ports;
     }
 }

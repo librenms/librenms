@@ -1,5 +1,5 @@
 {
-    "Warning!": "Please don't edit this file -- make changes to the config database table or the configuration array in config.php",
+    "Warning!": "Please don't edit this file for the purpose of changing your local config -- make changes to the config database table or the configuration array in config.php",
     "config": {
         "active_directory.users_purge": {
             "default": 0,
@@ -36,6 +36,18 @@
                  "value": "array",
                  "value.*": "string"
              }
+        },
+        "alert.scheduled_maintenance_default_behavior": {
+            "default": "1",
+            "order": 5,
+            "type": "select",
+            "group": "alerting",
+            "section": "scheduled-maintenance",
+            "options": {
+                "1": "Skip alerts",
+                "2": "Mute alerts",
+                "3": "Run alerts"
+            }
         },
         "alert_colour.ok": {
             "default": "#00ff00",
@@ -393,6 +405,30 @@
         "apps.oslv_monitor.seen_age": {
             "default": 604800,
             "type": "integer"
+        },
+        "apps.oslv_monitor.linux_pg_memory_stats": {
+            "default": true,
+            "type": "boolean"
+        },
+        "apps.oslv_monitor.misc_linux_memory_stats": {
+            "default": true,
+            "type": "boolean"
+        },
+        "apps.oslv_monitor.zswap_size": {
+            "default": true,
+            "type": "boolean"
+        },
+        "apps.oslv_monitor.zswap_activity": {
+            "default": true,
+            "type": "boolean"
+        },
+        "apps.oslv_monitor.workingset_stats": {
+            "default": true,
+            "type": "boolean"
+        },
+        "apps.oslv_monitor.thp_activity": {
+            "default": true,
+            "type": "boolean"
         },
         "apps.sneck.polling_time_diff": {
             "default": false,
@@ -1440,67 +1476,78 @@
         "device_types": {
             "default": [
                 {
-                    "icon": "appliance.png",
+                    "icon": "hard-drive",
                     "text": "Appliance",
                     "type": "appliance"
                 },
                 {
-                    "icon": "collaboration.png",
+                    "icon": "people-arrows",
                     "text": "Collaboration",
                     "type": "collaboration"
                 },
                 {
-                    "icon": "environment.png",
+                    "icon": "temperature-full",
                     "text": "Environment",
                     "type": "environment"
                 },
                 {
-                    "icon": "firewall.png",
+                    "icon": "shield",
                     "text": "Firewalls",
                     "type": "firewall"
                 },
                 {
-                    "icon": "loadbalancer.png",
+                    "icon": "scale-balanced",
                     "text": "Load Balancers",
                     "type": "loadbalancer"
                 },
                 {
-                    "icon": "network.png",
+                    "icon": "door-open",
+                    "text": "Management",
+                    "type": "management"
+                },
+                {
+                    "icon": "network-wired",
                     "text": "Network",
                     "type": "network"
                 },
                 {
-                    "icon": "printer.png",
+                    "icon": "print",
                     "text": "Printers",
                     "type": "printer"
                 },
                 {
-                    "icon": "power.png",
+                    "icon": "plug",
                     "text": "Power",
                     "type": "power"
                 },
                 {
-                    "icon": "server.png",
+                    "icon": "server",
                     "text": "Servers",
                     "type": "server"
                 },
                 {
-                    "icon": "storage.png",
+                    "icon": "database",
                     "text": "Storage",
                     "type": "storage"
                 },
                 {
-                    "icon": "wireless.png",
+                    "icon": "wifi",
                     "text": "Wireless",
                     "type": "wireless"
                 },
                 {
-                    "icon": "workstation.png",
+                    "icon": "computer",
                     "text": "Workstation",
                     "type": "workstation"
                 }
             ],
-            "type": "array"
+            "type": "array",
+            "validate": {
+                "value": "array",
+                "value.*.icon": "required|string",
+                "value.*.text": "required|string",
+                "value.*.type": "required|string"
+            }
         },
         "disabled_sensors": {
             "default": null,
@@ -4096,7 +4143,7 @@
             "default": {
                 "section": "system",
                 "order": 0,
-                "descr": "I/0 Wait"
+                "descr": "I/O Wait"
             },
             "type": "graph"
         },
@@ -4588,7 +4635,32 @@
             "section": "influxdb",
             "order": 8
         },
-	"influxdbv2.enable": {
+        "influxdb.batch_size": {
+            "default": 0,
+            "type": "integer",
+            "group": "poller",
+            "section": "influxdb",
+            "order": 9
+        },
+        "influxdb.measurements": {
+            "default": [],
+            "type": "array",
+            "validate": {
+                "value": "array",
+                "value.*": "string"
+            },
+            "group": "poller",
+            "section": "influxdb",
+            "order": 10
+        },
+        "influxdb.debug": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "influxdb",
+            "order": 11
+        },
+        "influxdbv2.enable": {
             "default": false,
             "type": "boolean",
             "group": "poller",
@@ -4670,6 +4742,163 @@
             "type": "array",
             "default": [
             ]
+        },
+        "kafka.enable": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "kafka",
+            "order": 0
+        },
+        "kafka.groups-exclude": {
+            "type": "array",
+            "group": "poller",
+            "section": "kafka",
+            "validate": {
+                 "value": "array",
+                 "value.*": "int"
+             },
+            "order": 1
+        },
+        "kafka.measurement-exclude": {
+            "type": "array",
+            "group": "poller",
+            "section": "kafka",
+            "validate": {
+                 "value": "array",
+                 "value.*": "string"
+             },
+            "order": 2
+        },
+        "kafka.debug": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "kafka",
+            "order": 3
+        },
+        "kafka.security.debug": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 4
+        },
+        "kafka.broker.list": {
+            "default": "127.0.2.2:9092",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 5
+        },
+        "kafka.idempotence": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "kafka",
+            "order": 6
+        },
+        "kafka.topic": {
+            "default": "librenms",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 7
+        },
+        "kafka.ssl.enable": {
+            "default": false,
+            "type": "boolean",
+            "group": "poller",
+            "section": "kafka",
+            "order": 8
+        },
+        "kafka.ssl.protocol": {
+            "default": "ssl",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 9
+        },
+        "kafka.ssl.ca.location": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 10
+        },
+        "kafka.ssl.certificate.location": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 11
+        },
+        "kafka.ssl.key.location": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 12
+        },
+        "kafka.ssl.key.password": {
+            "default": "",
+            "type": "password",
+            "group": "poller",
+            "section": "kafka",
+            "order": 13
+        },
+        "kafka.ssl.keystore.location": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "kafka",
+            "order": 14
+        },
+        "kafka.ssl.keystore.password": {
+            "default": "",
+            "type": "password",
+            "group": "poller",
+            "section": "kafka",
+            "order": 15
+        },
+        "kafka.flush.timeout": {
+            "default": 1,
+            "type": "integer",
+            "group": "poller",
+            "section": "kafka",
+            "order": 16
+        },
+        "kafka.buffer.max.message": {
+            "default": 1000,
+            "type": "integer",
+            "group": "poller",
+            "section": "kafka",
+            "order": 17
+        },
+        "kafka.batch.max.message": {
+            "default": 100,
+            "type": "integer",
+            "group": "poller",
+            "section": "kafka",
+            "order": 18
+        },
+        "kafka.linger.ms": {
+            "default": 50,
+            "type": "integer",
+            "group": "poller",
+            "section": "kafka",
+            "order": 19
+        },
+        "kafka.request.required.acks": {
+            "default": "0",
+            "type": "select",
+            "options": {
+                "0": "Dont wait for ack",
+                "all": "Wait for ack from all replicas"
+            },
+            "group": "poller",
+            "section": "kafka",
+            "order": 20
         },
         "influxdbv2.timeout": {
             "default": 1,
@@ -4990,6 +5219,13 @@
             "group": "discovery",
             "section": "autodiscovery",
             "order": 1
+        },
+        "networks_purge": {
+            "group": "system",
+            "section": "cleanup",
+            "order": 10,
+            "default": false,
+            "type": "boolean"
         },
         "network_map_dependencymap_vis_options": {
             "default": null,
@@ -5408,7 +5644,7 @@
             "type": "oxidized-maps",
             "validate": {
                 "value": "array",
-                "value.*": "array:hostname,sysName,sysDescr,sysObjectID,hardware,os,location,ip,purpose,notes,poller_group",
+                "value.*": "array:hostname,sysName,sysDescr,sysObjectID,hardware,type,os,location,ip,purpose,notes,poller_group",
                 "value.*.*": "array|min:1",
                 "value.*.*.*": "array:match,regex,value|size:2",
                 "value.*.*.*.value": "required|string",
@@ -5701,6 +5937,13 @@
             "default": true,
             "type": "boolean"
         },
+        "poller_modules.vlans": {
+            "order": 340,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
         "poller_modules.junose-atm-vp": {
             "order": 220,
             "group": "poller",
@@ -5918,6 +6161,13 @@
             "default": true,
             "type": "boolean"
         },
+        "poller_modules.port-security": {
+            "order": 460,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
         "polling.selected_ports": {
             "default": false,
             "type": "boolean",
@@ -5961,6 +6211,16 @@
             "order": 9,
             "default": true,
             "type": "boolean"
+        },
+        "processor.default_perc_warn": {
+            "default": 75,
+            "type": "integer",
+            "validate": {
+                "value": "integer|between:0,100"
+            },
+            "group": "discovery",
+            "section": "processor",
+            "order": 1
         },
         "project_home": {
             "default": "https://www.librenms.org/",

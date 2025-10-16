@@ -17,7 +17,12 @@ class MysqlAuthorizer extends AuthorizerBase
         $username = $credentials['username'] ?? null;
         $password = $credentials['password'] ?? null;
 
-        $user_data = User::whereNotNull('password')->firstWhere(['username' => $username]);
+        $user_data = User::thisAuth()->whereNotNull('password')->firstWhere(['username' => $username]);
+
+        if (! $user_data) {
+            throw new AuthenticationException();
+        }
+
         $hash = $user_data->password;
         $enabled = $user_data->enabled;
 

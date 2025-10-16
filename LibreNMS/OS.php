@@ -26,6 +26,7 @@
 
 namespace LibreNMS;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DeviceGraph;
 use DeviceCache;
@@ -40,6 +41,8 @@ use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\StorageDiscovery;
 use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
 use LibreNMS\Interfaces\Discovery\StpPortDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\Interfaces\Polling\Netstats\IcmpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpForwardNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpNetstatsPolling;
@@ -53,6 +56,7 @@ use LibreNMS\OS\Traits\BridgeMib;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\OS\Traits\HostResources;
 use LibreNMS\OS\Traits\NetstatsPolling;
+use LibreNMS\OS\Traits\QBridgeMib;
 use LibreNMS\OS\Traits\UcdResources;
 use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
@@ -74,7 +78,9 @@ class OS implements
     StpInstancePolling,
     StpPortPolling,
     TcpNetstatsPolling,
-    UdpNetstatsPolling
+    UdpNetstatsPolling,
+    VlanDiscovery,
+    VlanPortDiscovery
 {
     use HostResources {
         HostResources::discoverProcessors as discoverHrProcessors;
@@ -92,6 +98,7 @@ class OS implements
     use NetstatsPolling;
     use BridgeMib;
     use EntityMib;
+    use QBridgeMib;
 
     /**
      * @var float|null
@@ -249,7 +256,7 @@ class OS implements
     {
         if (isset($device['os'])) {
             // Populate os_group
-            $device['os_group'] = Config::get("os.{$device['os']}.group");
+            $device['os_group'] = LibrenmsConfig::get("os.{$device['os']}.group");
 
             $class = StringHelpers::toClass($device['os'], 'LibreNMS\\OS\\');
             d_echo('Attempting to initialize OS: ' . $device['os'] . PHP_EOL);
@@ -260,7 +267,7 @@ class OS implements
             }
 
             // If not a specific OS, check for a group one.
-            if ($os_group = Config::get("os.{$device['os']}.group")) {
+            if ($os_group = LibrenmsConfig::get("os.{$device['os']}.group")) {
                 $class = StringHelpers::toClass($os_group, 'LibreNMS\\OS\\Shared\\');
                 d_echo("Attempting to initialize Group OS: $os_group\n");
                 if (class_exists($class)) {
@@ -390,5 +397,31 @@ class OS implements
     public function hasYamlDiscovery(?string $module = null): bool
     {
         return $module ? isset($this->getDiscovery()['modules'][$module]) : ! empty($this->getDiscovery());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function discoverVlans(): Collection
+    {
+        $vlans = $this->discoverIetfQBridgeMibVlans();
+        if ($vlans->isNotEmpty()) {
+            return $vlans;
+        }
+
+        return $this->discoverIeeeQBridgeMibVlans();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function discoverVlanPorts(Collection $vlans): Collection
+    {
+        $vlans = $this->discoverIetfQBridgeMibPorts();
+        if ($vlans->isNotEmpty()) {
+            return $vlans;
+        }
+
+        return $this->discoverIeeeQBridgeMibPorts();
     }
 }

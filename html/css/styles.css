@@ -1299,11 +1299,9 @@ tr.search:nth-child(odd) {
 
 
 .scrollable-menu {
-    height: auto;
-    max-height: 600px;
+    overflow-y: auto;
     overflow-x: hidden;
 }
-
 
 .ui-autocomplete {
     max-height: 100px;
@@ -1947,6 +1945,8 @@ label {
 .device-icon img {
     max-height: 32px;
     max-width: 40px;
+    position: relative;
+    z-index: -1;
 }
 
 .device-icon {

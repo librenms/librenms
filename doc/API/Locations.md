@@ -11,7 +11,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/locations
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/locations
 ```
 
 Output:
@@ -49,7 +49,7 @@ Input:
 Example:
 
 ```curl
-curl -X POST -d '{"location":"Google", "lat":"37.4220041","lng":"-122.0862462"}' -H 'X-Auth-Token:YOUR-API-TOKEN' https://librenms.org/api/v0/locations
+curl -X POST -d '{"location":"Google", "lat":"37.4220041","lng":"-122.0862462"}' -H 'X-Auth-Token:YOUR-API-TOKEN' https://foo.example/api/v0/locations
 ```
 
 Output:
@@ -72,7 +72,7 @@ Route: `/api/v0/locations/:location`
 Example:
 
 ```curl
-curl -X DELETE -H 'X-Auth-Token:YOUR-API-TOKEN' https://librenms.org/api/v0/locations/Google
+curl -X DELETE -H 'X-Auth-Token:YOUR-API-TOKEN' https://foo.example/api/v0/locations/Google
 ```
 
 Output:
@@ -101,7 +101,7 @@ Input:
 Example:
 
 ```curl
-curl -X PATCH -d '{"lng":"100.0862462"}' -H 'X-Auth-Token:YOUR-API-TOKEN' https://librenms.org/api/v0/locations/Google
+curl -X PATCH -d '{"lng":"100.0862462"}' -H 'X-Auth-Token:YOUR-API-TOKEN' https://foo.example/api/v0/locations/Google
 ```
 
 Output:
@@ -137,5 +137,72 @@ Output:
         }
     ],
     "count": 1
+}
+```
+
+### `maintenance_location`
+
+Set a location into maintenance mode.
+
+Route: `/api/v0/locations/:location/maintenance`
+
+- location: name or id of the location to set
+
+Input (JSON):
+
+- `title`: *optional* -  Some title for the Maintenance
+  Will be replaced with location name if omitted
+- `notes`: *optional* -  Some description for the Maintenance
+  Will also be added to location notes if user prefs "Add schedule notes to locations notes" is set
+- `start`: *optional* - start time of Maintenance in full format `Y-m-d H:i:00`
+  eg: 2022-08-01 22:45:00
+  Current system time `now()` will be used if omitted
+- `duration`: *required* - Duration of Maintenance in format `H:i` / `Hrs:Mins`
+  eg: 02:00
+
+Example with start time:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
+  -X POST https://librenms.org/api/v0/locations/Mcewen/maintenance/ \
+  --data-raw '
+{
+  "title":"Location Mcewen Maintenance",
+  "notes":"A 2 hour Maintenance triggered via API with start time",
+  "start":"2022-08-01 08:00:00",
+  "duration":"2:00"
+}
+'
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "Location Mcewen (37101) will begin maintenance mode at 2022-08-01 22:45:00 for 2:00h"
+}
+```
+
+Example with no start time and using location id:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
+  -X POST https://librenms.org/api/v0/locations/37101/maintenance/ \
+  --data-raw '
+{
+  "title":"Location Mcewen Maintenance",
+  "notes":"A 2 hour Maintenance triggered via API with no start time",
+  "duration":"2:00"
+}
+'
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "Location Mcewen (37101) moved into maintenance mode for 2:00h"
 }
 ```

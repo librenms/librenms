@@ -1,7 +1,7 @@
 mib: SMARTNODE-MIB
 modules:
     mempools:
-        pre-cache:
+        additional_oids:
             oids:
                 - SMARTNODE-MIB::memDescr
         data:

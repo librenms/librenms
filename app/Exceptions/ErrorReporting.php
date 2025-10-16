@@ -38,6 +38,8 @@ use Throwable;
 
 class ErrorReporting
 {
+    private const MAX_PROD_ERRORS = 4;
+    private int $errorCount = 0;
     private ?bool $reportingEnabled = null;
     protected array $upgradable = [
         \LibreNMS\Exceptions\FilePermissionsException::class,
@@ -157,42 +159,50 @@ class ErrorReporting
 
     private function adjustErrorHandlingForAppEnv(string $environment): void
     {
-        // TODO remove testing and then APP_DEBUG requirement when issues are cleaned up
-        if ($environment == 'production' || $environment == 'testing' || ! config('app.debug')) {
-            // in production, don't halt execution on non-fatal errors
-            set_error_handler(function ($severity, $message, $file, $line) {
-                // If file is from a package, find the first non-vendor frame
-                if (str_contains($file, '/vendor/')) {
-                    // add vendor file to message
-                    $message .= ' from ' . strstr($file, 'vendor') . ':' . $line;
-                    [$file, $line] = self::findFirstNonVendorFrame();
-                }
-
-                error_log("\e[31mPHP Error($severity)\e[0m: $message in $file:$line");
-
-                // For notices and warnings, prevent conversion to exceptions
-                if (in_array($severity, [E_NOTICE, E_WARNING, E_USER_NOTICE, E_USER_WARNING, E_DEPRECATED])) {
-                    return true; // Prevent the standard error handler from running
-                }
-
-                return false; // For other errors, let Laravel handle them
-            });
-        } else {
-            // non-prod, show deprecations
+        // throw exceptions and deprecations in testing and non-prod when APP_DEBUG is set.
+        if ($environment == 'testing' || ($environment !== 'production' && config('app.debug'))) {
             app()->booted(function () {
                 config([
                     'logging.deprecations.channel' => 'deprecations_channel',
                     'logging.deprecations.trace' => true,
                 ]);
             });
+
+            return; // do not override error handler below
         }
+
+        // in production, don't halt execution on non-fatal errors
+        set_error_handler(function ($severity, $message, $file, $line) {
+            // If file is from a package, find the first non-vendor frame
+            if (self::isUndesirableTracePath($file)) {
+                // add vendor file to message
+                $message .= ' from ' . strstr($file, 'vendor') . ':' . $line;
+                [$file, $line] = self::findFirstNonVendorFrame();
+            }
+
+            if ((error_reporting() & $severity) !== 0) { // this check primarily allows @ to suppress errors
+                if ($this->errorCount++ < self::MAX_PROD_ERRORS) {
+                    // limit reported errors so php-fpm headers don't get too large
+                    $max_errors = $this->errorCount == self::MAX_PROD_ERRORS ? ' (max reported errors reached)' : '';
+
+                    error_log("\e[31mPHP Error($severity)\e[0m: $message in $file:$line$max_errors");
+                }
+            }
+
+            // For notices and warnings, prevent conversion to exceptions
+            if (($severity & (E_NOTICE | E_WARNING | E_USER_NOTICE | E_USER_WARNING | E_DEPRECATED)) !== 0) {
+                return true; // Prevent the standard error handler from running
+            }
+
+            return false; // For other errors, let Laravel handle them
+        });
     }
 
     private static function findFirstNonVendorFrame(): array
     {
         foreach (debug_backtrace() as $trace) {
             // not vendor frames
-            if (isset($trace['file']) && str_contains($trace['file'], '/vendor/')) {
+            if (isset($trace['file']) && self::isUndesirableTracePath($trace['file'])) {
                 continue;
             }
             // not this class
@@ -204,5 +214,13 @@ class ErrorReporting
         }
 
         return ['', ''];
+    }
+
+    private static function isUndesirableTracePath(string $path): bool
+    {
+        return Str::contains($path, [
+            '/vendor/',
+            '/storage/framework/views/',
+        ]);
     }
 }

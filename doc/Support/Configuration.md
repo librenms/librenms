@@ -141,7 +141,7 @@ lnms config:get snmp.community | jq -c
 ["public","testing"]
 ```
 
-Alernatively, if leaving multi-line items exactly as returned by `lnms config:get` for easier reading, you can use the following format:
+Alternatively, if leaving multi-line items exactly as returned by `lnms config:get` for easier reading, you can use the following format:
 ```bash
 lnms config:set snmp.community \
 '
@@ -1089,6 +1089,16 @@ lnms config:set os.vrp.disabled_sensors.current true
 ```bash
 lnms config:set os.iosxe.disabled_sensors_regex '/PEM Iout/'
 ```
+
+## Processor configuration
+
+Custom processor warning percentage which will be set when processor information
+is discovered and the perc
+
+!!! setting "discovery/processor"
+    ```bash
+    lnms config:set processor.default_perc_warn 75
+    ```
 
 ## Storage configuration
 
