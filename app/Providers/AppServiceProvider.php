@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 use LibreNMS\Cache\PermissionsCache;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
@@ -76,6 +77,10 @@ class AppServiceProvider extends ServiceProvider
         $this->configureMorphAliases();
         $this->bootObservers();
         Version::registerAboutCommand();
+        Password::defaults(function () {
+           return Password::min(LibrenmsConfig::get('password.min_length', 8))
+            ->uncompromised();
+        });
 
         $this->bootAuth();
     }
