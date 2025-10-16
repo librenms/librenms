@@ -534,9 +534,9 @@ function maintenance_device(Illuminate\Http\Request $request)
     $alert_schedule = new \App\Models\AlertSchedule([
         'title' => $title,
         'notes' => $notes,
+        'behavior' => $behavior,
         'recurring' => 0,
     ]);
-    $alert_schedule->behavior = $behavior;
 
     $start = $data['start'] ?? \Carbon\Carbon::now()->format('Y-m-d H:i:00');
     $alert_schedule->start = $start;
@@ -2577,9 +2577,9 @@ function maintenance_devicegroup(Illuminate\Http\Request $request)
     $alert_schedule = new \App\Models\AlertSchedule([
         'title' => $title,
         'notes' => $notes,
+        'behavior' => $behavior,
         'recurring' => 0,
     ]);
-    $alert_schedule->behavior = $behavior;
 
     $start = $data['start'] ?? \Carbon\Carbon::now()->format('Y-m-d H:i:00');
     $alert_schedule->start = $start;
@@ -3470,9 +3470,9 @@ function maintenance_location(Illuminate\Http\Request $request)
     $alert_schedule = new \App\Models\AlertSchedule([
         'title' => $title,
         'notes' => $notes,
+        'behavior' => $behavior,
         'recurring' => 0,
     ]);
-    $alert_schedule->behavior = $behavior;
 
     $start = $data['start'] ?? \Carbon\Carbon::now()->format('Y-m-d H:i:00');
     $alert_schedule->start = $start;
