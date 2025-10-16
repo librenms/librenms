@@ -217,12 +217,12 @@ class Controller
         $admin_lines = [];
         $oper_lines = [];
         $speed_lines = [];
-        $in_octets_rate_lines = [];
-        $out_octets_rate_lines = [];
+        $in_octets_lines = [];
+        $out_octets_lines = [];
         $in_ucast_pkt_lines = [];
         $out_ucast_pkt_lines = [];
-        $in_errors_rate_lines = [];
-        $out_errors_rate_lines = [];
+        $in_errors_lines = [];
+        $out_errors_lines = [];
         $poll_time_lines = [];
 
         // Gather device info mapping only for referenced devices
@@ -230,13 +230,13 @@ class Controller
         $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
 
         // Gather per-port metrics
-        foreach (Port::select('port_id', 'device_id', 'ifName', 'ifDescr', 'ifIndex', 'ifPhysAddress', 'ifAdminStatus', 'ifOperStatus', 'ifSpeed', 'ifInOctets_rate', 'ifOutOctets_rate', 'ifInUcastPkts_rate', 'ifOutUcastPkts_rate', 'ifInErrors_rate', 'ifOutErrors_rate', 'poll_time')->cursor() as $p) {
+        foreach (Port::select('port_id', 'device_id', 'ifName', 'ifDescr', 'ifIndex', 'ifType', 'ifAlias', 'ifAdminStatus', 'ifOperStatus', 'ifSpeed', 'ifInOctets', 'ifOutOctets', 'ifInUcastPkts', 'ifOutUcastPkts', 'ifInErrors', 'ifOutErrors', 'poll_time')->cursor() as $p) {
             $dev = $devices->get($p->device_id);
             $device_hostname = $dev ? $this->escapeLabel((string) $dev->hostname) : '';
             $device_sysName = $dev ? $this->escapeLabel((string) $dev->sysName) : '';
             $device_type = $dev ? $this->escapeLabel((string) $dev->type) : '';
 
-            $labels = sprintf('port_id="%s",device_id="%s",device_hostname="%s",device_sysName="%s",device_type="%s",ifName="%s",ifDescr="%s",ifIndex="%s",ifPhysAddress="%s"',
+            $labels = sprintf('port_id="%s",device_id="%s",device_hostname="%s",device_sysName="%s",device_type="%s",ifName="%s",ifDescr="%s",ifIndex="%s",ifType="%s",ifAlias="%s"',
                 $p->port_id,
                 $p->device_id,
                 $device_hostname,
@@ -252,12 +252,12 @@ class Controller
             $admin_lines[] = "librenms_port_admin_up{{$labels}} " . ($p->ifAdminStatus === 'up' ? '1' : '0');
             $oper_lines[] = "librenms_port_oper_up{{$labels}} " . ($p->ifOperStatus === 'up' ? '1' : '0');
             $speed_lines[] = "librenms_port_speed_bits_per_second{{$labels}} " . ((int) $p->ifSpeed ?: 0);
-            $in_octets_rate_lines[] = "librenms_port_ifInOctets_rate_bytes_per_second{{$labels}} " . ((int) $p->ifInOctets_rate ?: 0);
-            $out_octets_rate_lines[] = "librenms_port_ifOutOctets_rate_bytes_per_second{{$labels}} " . ((int) $p->ifOutOctets_rate ?: 0);
-            $in_ucast_pkt_lines[] = "librenms_port_ifInUcastPkts_rate_packets_per_second{{$labels}} " . ((int) $p->ifInUcastPkts_rate ?: 0);
-            $out_ucast_pkt_lines[] = "librenms_port_ifOutUcastPkts_rate_packets_per_second{{$labels}} " . ((int) $p->ifOutUcastPkts_rate ?: 0);
-            $in_errors_rate_lines[] = "librenms_port_ifInErrors_rate{{$labels}} " . ((int) $p->ifInErrors_rate ?: 0);
-            $out_errors_rate_lines[] = "librenms_port_ifOutErrors_rate{{$labels}} " . ((int) $p->ifOutErrors_rate ?: 0);
+            $in_octets_rate_lines[] = "librenms_port_ifInOctets{{$labels}} " . ((int) $p->ifInOctets ?: 0);
+            $out_octets_rate_lines[] = "librenms_port_ifOutOctets{{$labels}} " . ((int) $p->ifOutOctets ?: 0);
+            $in_ucast_pkt_lines[] = "librenms_port_ifInUcastPkts{{$labels}} " . ((int) $p->ifInUcastPkts ?: 0);
+            $out_ucast_pkt_lines[] = "librenms_port_ifOutUcastPkts{{$labels}} " . ((int) $p->ifOutUcastPkts ?: 0);
+            $in_errors_rate_lines[] = "librenms_port_ifInErrors{{$labels}} " . ((int) $p->ifInErrors ?: 0);
+            $out_errors_rate_lines[] = "librenms_port_ifOutErrors{{$labels}} " . ((int) $p->ifOutErrors ?: 0);
         }
 
         // Append metrics
@@ -273,33 +273,29 @@ class Controller
         $lines[] = '# TYPE librenms_port_speed_bits_per_second gauge';
         $lines = array_merge($lines, $speed_lines);
 
-        $lines[] = '# HELP librenms_port_ifInOctets_rate_bytes_per_second In octets rate in bytes per second';
-        $lines[] = '# TYPE librenms_port_ifInOctets_rate_bytes_per_second gauge';
-        $lines = array_merge($lines, $in_octets_rate_lines);
+        $lines[] = '# HELP librenms_port_ifInOctets In octets';
+        $lines[] = '# TYPE librenms_port_ifInOctets counter';
+        $lines = array_merge($lines, $in_octets_lines);
 
-        $lines[] = '# HELP librenms_port_ifOutOctets_rate_bytes_per_second Out octets rate in bytes per second';
-        $lines[] = '# TYPE librenms_port_ifOutOctets_rate_bytes_per_second gauge';
-        $lines = array_merge($lines, $out_octets_rate_lines);
+        $lines[] = '# HELP librenms_port_ifOutOctets Out octets';
+        $lines[] = '# TYPE librenms_port_ifOutOctets counter';
+        $lines = array_merge($lines, $out_octets_lines);
 
-        $lines[] = '# HELP librenms_port_ifInUcastPkts_rate_packets_per_second In unicast packets rate in packets per second';
-        $lines[] = '# TYPE librenms_port_ifInUcastPkts_rate_packets_per_second gauge';
+        $lines[] = '# HELP librenms_port_ifInUcastPkts In unicast packets';
+        $lines[] = '# TYPE librenms_port_ifInUcastPkts counter';
         $lines = array_merge($lines, $in_ucast_pkt_lines);
 
-        $lines[] = '# HELP librenms_port_ifOutUcastPkts_rate_packets_per_second Out unicast packets rate in packets per second';
-        $lines[] = '# TYPE librenms_port_ifOutUcastPkts_rate_packets_per_second gauge';
+        $lines[] = '# HELP librenms_port_ifOutUcastPkts Out unicast packets';
+        $lines[] = '# TYPE librenms_port_ifOutUcastPkts counter';
         $lines = array_merge($lines, $out_ucast_pkt_lines);
 
-        $lines[] = '# HELP librenms_port_ifInErrors_rate In errors rate per second';
-        $lines[] = '# TYPE librenms_port_ifInErrors_rate gauge';
-        $lines = array_merge($lines, $in_errors_rate_lines);
+        $lines[] = '# HELP librenms_port_ifInErrors In errors';
+        $lines[] = '# TYPE librenms_port_ifInErrors counter';
+        $lines = array_merge($lines, $in_errors_lines);
 
-        $lines[] = '# HELP librenms_port_ifOutErrors_rate Out errors rate per second';
-        $lines[] = '# TYPE librenms_port_ifOutErrors_rate gauge';
-        $lines = array_merge($lines, $out_errors_rate_lines);
-
-        $lines[] = '# HELP librenms_port_poll_time_seconds Last poll time in seconds';
-        $lines[] = '# TYPE librenms_port_poll_time_seconds gauge';
-        $lines = array_merge($lines, $poll_time_lines);
+        $lines[] = '# HELP librenms_port_ifOutErrors Out errors';
+        $lines[] = '# TYPE librenms_port_ifOutErrors counter';
+        $lines = array_merge($lines, $out_errors_lines);
 
         // Combine all lines into the response body
         $body = implode("\n", $lines) . "\n";
@@ -336,7 +332,7 @@ class Controller
 
         // Preload device/port labels mapping
         $portIds = PortStatistic::select('port_id')->pluck('port_id');
-        $ports = Port::select('port_id', 'device_id', 'ifName', 'ifDescr', 'ifIndex', 'ifPhysAddress')->whereIn('port_id', $portIds)->get()->keyBy('port_id');
+        $ports = Port::select('port_id', 'device_id', 'ifName', 'ifDescr', 'ifIndex', 'ifType', 'ifAlias')->whereIn('port_id', $portIds)->get()->keyBy('port_id');
         $deviceIds = $ports->pluck('device_id')->unique();
         $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
 
@@ -347,7 +343,7 @@ class Controller
             $device_sysName = $dev ? $this->escapeLabel((string) $dev->sysName) : '';
             $device_type = $dev ? $this->escapeLabel((string) $dev->type) : '';
 
-            $labels = sprintf('port_id="%s",device_id="%s",device_hostname="%s",device_sysName="%s",device_type="%s",ifName="%s",ifDescr="%s",ifIndex="%s"',
+            $labels = sprintf('port_id="%s",device_id="%s",device_hostname="%s",device_sysName="%s",device_type="%s",ifName="%s",ifDescr="%s",ifIndex="%s",ifType="%s",ifAlias="%s"',
                 $ps->port_id,
                 $p ? $p->device_id : '',
                 $device_hostname,
@@ -355,54 +351,56 @@ class Controller
                 $device_type,
                 $this->escapeLabel((string) ($p->ifName ?? '')),
                 $this->escapeLabel((string) ($p->ifDescr ?? '')),
-                $this->escapeLabel((string) ($p->ifIndex ?? ''))
+                $this->escapeLabel((string) ($p->ifIndex ?? '')),
+                $this->escapeLabel((string) ($p->ifType ?? '')),
+                $this->escapeLabel((string) ($p->ifAlias ?? ''))
             );
 
-            $in_nucast_lines[] = "librenms_port_ifInNUcastPkts_rate_packets_per_second{{$labels}} " . ((int) $ps->ifInNUcastPkts_rate ?: 0);
-            $out_nucast_lines[] = "librenms_port_ifOutNUcastPkts_rate_packets_per_second{{$labels}} " . ((int) $ps->ifOutNUcastPkts_rate ?: 0);
-            $in_discards_lines[] = "librenms_port_ifInDiscards_rate_packets_per_second{{$labels}} " . ((int) $ps->ifInDiscards_rate ?: 0);
-            $out_discards_lines[] = "librenms_port_ifOutDiscards_rate_packets_per_second{{$labels}} " . ((int) $ps->ifOutDiscards_rate ?: 0);
-            $in_unknown_proto_lines[] = "librenms_port_ifInUnknownProtos_rate_packets_per_second{{$labels}} " . ((int) $ps->ifInUnknownProtos_rate ?: 0);
-            $in_broadcast_lines[] = "librenms_port_ifInBroadcastPkts_rate_packets_per_second{{$labels}} " . ((int) $ps->ifInBroadcastPkts_rate ?: 0);
-            $out_broadcast_lines[] = "librenms_port_ifOutBroadcastPkts_rate_packets_per_second{{$labels}} " . ((int) $ps->ifOutBroadcastPkts_rate ?: 0);
-            $in_multicast_lines[] = "librenms_port_ifInMulticastPkts_rate_packets_per_second{{$labels}} " . ((int) $ps->ifInMulticastPkts_rate ?: 0);
-            $out_multicast_lines[] = "librenms_port_ifOutMulticastPkts_rate_packets_per_second{{$labels}} " . ((int) $ps->ifOutMulticastPkts_rate ?: 0);
+            $in_nucast_lines[] = "librenms_port_ifInNUcastPkts{{$labels}} " . ((int) $ps->ifInNUcastPkts ?: 0);
+            $out_nucast_lines[] = "librenms_port_ifOutNUcastPkts{{$labels}} " . ((int) $ps->ifOutNUcastPkts ?: 0);
+            $in_discards_lines[] = "librenms_port_ifInDiscards{{$labels}} " . ((int) $ps->ifInDiscards ?: 0);
+            $out_discards_lines[] = "librenms_port_ifOutDiscards{{$labels}} " . ((int) $ps->ifOutDiscards ?: 0);
+            $in_unknown_proto_lines[] = "librenms_port_ifInUnknownProtos{{$labels}} " . ((int) $ps->ifInUnknownProtos ?: 0);
+            $in_broadcast_lines[] = "librenms_port_ifInBroadcastPkts{{$labels}} " . ((int) $ps->ifInBroadcastPkts ?: 0);
+            $out_broadcast_lines[] = "librenms_port_ifOutBroadcastPkts{{$labels}} " . ((int) $ps->ifOutBroadcastPkts ?: 0);
+            $in_multicast_lines[] = "librenms_port_ifInMulticastPkts{{$labels}} " . ((int) $ps->ifInMulticastPkts ?: 0);
+            $out_multicast_lines[] = "librenms_port_ifOutMulticastPkts{{$labels}} " . ((int) $ps->ifOutMulticastPkts ?: 0);
         }
 
-        $lines[] = '# HELP librenms_port_ifInNUcastPkts_rate_packets_per_second In non-unicast packets rate';
-        $lines[] = '# TYPE librenms_port_ifInNUcastPkts_rate_packets_per_second gauge';
+        $lines[] = '# HELP librenms_port_ifInNUcastPkts In non-unicast packets';
+        $lines[] = '# TYPE librenms_port_ifInNUcastPkts counter';
         $lines = array_merge($lines, $in_nucast_lines);
 
-        $lines[] = '# HELP librenms_port_ifOutNUcastPkts_rate_packets_per_second Out non-unicast packets rate';
-        $lines[] = '# TYPE librenms_port_ifOutNUcastPkts_rate_packets_per_second gauge';
+        $lines[] = '# HELP librenms_port_ifOutNUcastPkts Out non-unicast packets';
+        $lines[] = '# TYPE librenms_port_ifOutNUcastPkts counter';
         $lines = array_merge($lines, $out_nucast_lines);
 
-        $lines[] = '# HELP librenms_port_ifInDiscards_rate_packets_per_second In discards rate';
-        $lines[] = '# TYPE librenms_port_ifInDiscards_rate_packets_per_second gauge';
+        $lines[] = '# HELP librenms_port_ifInDiscards In discards';
+        $lines[] = '# TYPE librenms_port_ifInDiscards counter';
         $lines = array_merge($lines, $in_discards_lines);
 
-        $lines[] = '# HELP librenms_port_ifOutDiscards_rate_packets_per_second Out discards rate';
-        $lines[] = '# TYPE librenms_port_ifOutDiscards_rate_packets_per_second gauge';
+        $lines[] = '# HELP librenms_port_ifOutDiscards Out discards';
+        $lines[] = '# TYPE librenms_port_ifOutDiscards counter';
         $lines = array_merge($lines, $out_discards_lines);
 
-        $lines[] = '# HELP librenms_port_ifInUnknownProtos_rate_packets_per_second In unknown protos rate';
-        $lines[] = '# TYPE librenms_port_ifInUnknownProtos_rate_packets_per_second gauge';
+        $lines[] = '# HELP librenms_port_ifInUnknownProtos In unknown protocols';
+        $lines[] = '# TYPE librenms_port_ifInUnknownProtos counter';
         $lines = array_merge($lines, $in_unknown_proto_lines);
 
-        $lines[] = '# HELP librenms_port_ifInBroadcastPkts_rate_packets_per_second In broadcast packets rate';
-        $lines[] = '# TYPE librenms_port_ifInBroadcastPkts_rate_packets_per_second gauge';
+        $lines[] = '# HELP librenms_port_ifInBroadcastPkts In broadcast packets';
+        $lines[] = '# TYPE librenms_port_ifInBroadcastPkts counter';
         $lines = array_merge($lines, $in_broadcast_lines);
 
-        $lines[] = '# HELP librenms_port_ifOutBroadcastPkts_rate_packets_per_second Out broadcast packets rate';
-        $lines[] = '# TYPE librenms_port_ifOutBroadcastPkts_rate_packets_per_second gauge';
+        $lines[] = '# HELP librenms_port_ifOutBroadcastPkts Out broadcast packets';
+        $lines[] = '# TYPE librenms_port_ifOutBroadcastPkts counter';
         $lines = array_merge($lines, $out_broadcast_lines);
 
-        $lines[] = '# HELP librenms_port_ifInMulticastPkts_rate_packets_per_second In multicast packets rate';
-        $lines[] = '# TYPE librenms_port_ifInMulticastPkts_rate_packets_per_second gauge';
+        $lines[] = '# HELP librenms_port_ifInMulticastPkts In multicast packets';
+        $lines[] = '# TYPE librenms_port_ifInMulticastPkts counter';
         $lines = array_merge($lines, $in_multicast_lines);
 
-        $lines[] = '# HELP librenms_port_ifOutMulticastPkts_rate_packets_per_second Out multicast packets rate';
-        $lines[] = '# TYPE librenms_port_ifOutMulticastPkts_rate_packets_per_second gauge';
+        $lines[] = '# HELP librenms_port_ifOutMulticastPkts Out multicast packets';
+        $lines[] = '# TYPE librenms_port_ifOutMulticastPkts counter';
         $lines = array_merge($lines, $out_multicast_lines);
 
         $body = implode("\n", $lines) . "\n";
