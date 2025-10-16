@@ -5,6 +5,7 @@ namespace App\Api\Controllers\MetricsApi;
 use App\Models\Device;
 use App\Models\AccessPoint;
 use App\Models\Port;
+use App\Models\PortStatistic;
 use Illuminate\Http\Request;
 
 class Controller
@@ -313,7 +314,7 @@ class Controller
         $lines = [];
 
         // Gather global metrics
-        $total = portsStatistics::count();
+        $total = PortStatistic::count();
 
         $lines[] = '# HELP librenms_ports_statistics_total Total number of ports_statistics rows';
         $lines[] = '# TYPE librenms_ports_statistics_total gauge';
@@ -331,12 +332,12 @@ class Controller
         $out_multicast_lines = [];
 
         // Preload device/port labels mapping
-        $portIds = portsStatistics::select('port_id')->pluck('port_id');
+        $portIds = PortStatistic::select('port_id')->pluck('port_id');
         $ports = Port::select('port_id', 'device_id', 'ifName', 'ifDescr', 'ifIndex', 'ifType', 'ifAlias')->whereIn('port_id', $portIds)->get()->keyBy('port_id');
         $deviceIds = $ports->pluck('device_id')->unique();
         $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
 
-        foreach (portsStatistics::cursor() as $ps) {
+        foreach (PortStatistic::cursor() as $ps) {
             $p = $ports->get($ps->port_id);
             $dev = $p ? $devices->get($p->device_id) : null;
             $device_hostname = $dev ? $this->escapeLabel((string) $dev->hostname) : '';
