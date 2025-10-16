@@ -129,9 +129,9 @@ modules:
                         - { value: 2, descr: Disconnected, graph: 2, generic: 2 }
                     skip_values:
                         -
-                            oid: 'ogCellModemEnabled.{{ $index }}'
-                            op: '!='
-                            value: enabled
+                            oid: 'OG-STATUSv2-MIB::ogCellModemEnabled'
+                            op: '='
+                            value: 2
                 -
                     oid: OG-STATUSv2-MIB::ogCellModemTable
                     value: OG-STATUSv2-MIB::ogCellModemRadioTechnology
