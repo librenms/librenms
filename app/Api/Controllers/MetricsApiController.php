@@ -4,7 +4,7 @@ namespace App\Api\Controllers;
 
 use Illuminate\Http\Request;
 
-class MetricsController
+class MetricsApiController
 {
     public function devices(Request $request)
     {
