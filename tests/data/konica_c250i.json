@@ -471,7 +471,7 @@
                     "inetCidrRouteDest": "0.0.0.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "192.168.100.1",
-                    "inetCidrRoutePolicy": "ccitt.0",
+                    "inetCidrRoutePolicy": "zeroDotZero",
                     "inetCidrRoutePfxLen": 0
                 },
                 {
@@ -485,7 +485,7 @@
                     "inetCidrRouteDest": "169.254.0.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "192.168.100.121",
-                    "inetCidrRoutePolicy": "ccitt.0",
+                    "inetCidrRoutePolicy": "zeroDotZero",
                     "inetCidrRoutePfxLen": 16
                 },
                 {
@@ -499,7 +499,7 @@
                     "inetCidrRouteDest": "192.168.100.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "192.168.100.121",
-                    "inetCidrRoutePolicy": "ccitt.0",
+                    "inetCidrRoutePolicy": "zeroDotZero",
                     "inetCidrRoutePfxLen": 24
                 },
                 {
@@ -513,7 +513,7 @@
                     "inetCidrRouteDest": "224.0.0.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "ccitt.0",
+                    "inetCidrRoutePolicy": "zeroDotZero",
                     "inetCidrRoutePfxLen": 4
                 }
             ]
@@ -529,7 +529,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.43.10.2.1.4.1.1",
                     "sensor_index": "prtMarkerLifeCount",
                     "sensor_type": "konica",
-                    "sensor_descr": "Life time ",
+                    "sensor_descr": "Life time ?",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -554,7 +554,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.43.10.2.1.5.1.1",
                     "sensor_index": "prtMarkerPowerOnCount",
                     "sensor_type": "konica",
-                    "sensor_descr": " since powered on",
+                    "sensor_descr": "? since powered on",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -897,7 +897,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.43.10.2.1.4.1.1",
                     "sensor_index": "prtMarkerLifeCount",
                     "sensor_type": "konica",
-                    "sensor_descr": "Life time ",
+                    "sensor_descr": "Life time ?",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -922,7 +922,7 @@
                     "sensor_oid": ".1.3.6.1.2.1.43.10.2.1.5.1.1",
                     "sensor_index": "prtMarkerPowerOnCount",
                     "sensor_type": "konica",
-                    "sensor_descr": " since powered on",
+                    "sensor_descr": "? since powered on",
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -1367,6 +1367,26 @@
                     "ipv6_origin": "other",
                     "context_name": "",
                     "ipv6_network": null,
+                    "ifIndex": 1
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 2
+                },
+                {
+                    "ipv4_address": "192.168.100.121",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.100.0/24",
                     "ifIndex": 1
                 }
             ]

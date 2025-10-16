@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\AlertScheduleStatus;
+use LibreNMS\Enum\MaintenanceBehavior;
 
 /**
  * @method static \Database\Factories\AlertScheduleFactory factory(...$parameters)
@@ -58,6 +59,9 @@ class AlertSchedule extends Model
         'Fr' => 5,
         'Sa' => 6,
         'Su' => 7,
+    ];
+    protected $casts = [
+        'behaviour' => MaintenanceBehavior::class,
     ];
 
     public function __construct(array $attributes = [])

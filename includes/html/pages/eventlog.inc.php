@@ -48,7 +48,7 @@ $pagetitle[] = 'Eventlog';
         '<select name="device" id="device" class="form-control">' +
         '<option value="">All Devices</option>' +
             <?php
-            if ($device instanceof Device) {
+            if (isset($device) && $device instanceof Device) {
                 echo "'<option value=$device->device_id>" . $device->displayName() . "</option>' +";
             } ?>
         '</select>' +

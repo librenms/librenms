@@ -26,22 +26,21 @@
 
 namespace LibreNMS\Tests;
 
+use App\Facades\LibrenmsConfig;
 use DeviceCache;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Arr;
-use LibreNMS\Config;
 use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Source\FpingResponse;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
-use LibreNMS\Util\Debug;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Number;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Util\Color;
 
-class OSModulesTest extends DBTestCase
+final class OSModulesTest extends DBTestCase
 {
     use DatabaseTransactions;
 
@@ -53,15 +52,15 @@ class OSModulesTest extends DBTestCase
         parent::setUp();
 
         // backup modules
-        $this->discoveryModules = Config::get('discovery_modules');
-        $this->pollerModules = Config::get('poller_modules');
+        $this->discoveryModules = LibrenmsConfig::get('discovery_modules');
+        $this->pollerModules = LibrenmsConfig::get('poller_modules');
     }
 
     protected function tearDown(): void
     {
         // restore modules
-        Config::set('discovery_modules', $this->discoveryModules);
-        Config::set('poller_modules', $this->pollerModules);
+        LibrenmsConfig::set('discovery_modules', $this->discoveryModules);
+        LibrenmsConfig::set('poller_modules', $this->pollerModules);
 
         parent::tearDown();
     }
@@ -99,7 +98,6 @@ class OSModulesTest extends DBTestCase
         $this->stubClasses();
 
         try {
-            Debug::set(false); // avoid all undefined index errors in the legacy code
             $helper = new ModuleTestHelper($modules, $os, $variant);
             $helper->setQuiet();
 

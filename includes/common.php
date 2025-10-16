@@ -17,7 +17,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\Debug;
@@ -36,7 +36,7 @@ function external_exec($command)
     $device = DeviceCache::getPrimary();
 
     $proc = new Process($command);
-    $proc->setTimeout(Config::get('snmp.exec_timeout', 1200));
+    $proc->setTimeout(LibrenmsConfig::get('snmp.exec_timeout', 1200));
 
     if (Debug::isEnabled() && ! Debug::isVerbose()) {
         $patterns = [
@@ -99,7 +99,7 @@ function shorthost($hostname, $len = 12)
     if (filter_var($hostname, FILTER_VALIDATE_IP)) {
         return $hostname;
     }
-    $len = Config::get('shorthost_target_length', $len);
+    $len = LibrenmsConfig::get('shorthost_target_length', $len);
 
     $parts = explode('.', $hostname);
     $shorthost = $parts[0];
@@ -138,7 +138,7 @@ function get_sensor_rrd($device, $sensor)
 function get_sensor_rrd_name($device, $sensor)
 {
     // For IPMI, sensors tend to change order, and there is no index, so we prefer to use the description as key here.
-    if (Config::getOsSetting($device['os'], 'sensor_descr') || $sensor['poller_type'] == 'ipmi') {
+    if (LibrenmsConfig::getOsSetting($device['os'], 'sensor_descr') || $sensor['poller_type'] == 'ipmi') {
         return ['sensor', $sensor['sensor_class'], $sensor['sensor_type'], $sensor['sensor_descr']];
     } else {
         return ['sensor', $sensor['sensor_class'], $sensor['sensor_type'], $sensor['sensor_index']];
@@ -148,20 +148,6 @@ function get_sensor_rrd_name($device, $sensor)
 function get_port_rrdfile_path($hostname, $port_id, $suffix = '')
 {
     return Rrd::name($hostname, Rrd::portName($port_id, $suffix));
-}
-
-function get_port_by_index_cache($device_id, $ifIndex)
-{
-    global $port_index_cache;
-
-    if (isset($port_index_cache[$device_id][$ifIndex]) && is_array($port_index_cache[$device_id][$ifIndex])) {
-        $port = $port_index_cache[$device_id][$ifIndex];
-    } else {
-        $port = get_port_by_ifIndex($device_id, $ifIndex);
-        $port_index_cache[$device_id][$ifIndex] = $port;
-    }
-
-    return $port;
 }
 
 function get_port_by_ifIndex($device_id, $ifIndex)
@@ -281,13 +267,13 @@ function c_echo($string, $enabled = true)
  */
 function is_client_authorized($clientip)
 {
-    if (Config::get('allow_unauth_graphs', false)) {
+    if (LibrenmsConfig::get('allow_unauth_graphs', false)) {
         d_echo("Unauthorized graphs allowed\n");
 
         return true;
     }
 
-    foreach (Config::get('allow_unauth_graphs_cidr', []) as $range) {
+    foreach (LibrenmsConfig::get('allow_unauth_graphs_cidr', []) as $range) {
         try {
             if (IP::parse($clientip)->inNetwork($range)) {
                 d_echo("Unauthorized graphs allowed from $range\n");
@@ -311,7 +297,7 @@ function get_graph_subtypes($type, $device = null)
     $types = [];
 
     // find the subtypes defined in files
-    if ($handle = opendir(Config::get('install_dir') . "/includes/html/graphs/$type/")) {
+    if ($handle = opendir(LibrenmsConfig::get('install_dir') . "/includes/html/graphs/$type/")) {
         while (false !== ($file = readdir($handle))) {
             if ($file != '.' && $file != '..' && $file != 'auth.inc.php' && strstr($file, '.inc.php')) {
                 $types[] = str_replace('.inc.php', '', $file);
@@ -331,23 +317,6 @@ function generate_smokeping_file($device, $file = '')
 
     return $smokeping->generateFileName($file);
 }
-
-/*
- * @return rounded value to 10th/100th/1000th depending on input (valid: 10, 100, 1000)
- */
-function round_Nth($val, $round_to)
-{
-    if (($round_to == '10') || ($round_to == '100') || ($round_to == '1000')) {
-        $diff = $val % $round_to;
-        if ($diff >= ($round_to / 2)) {
-            $ret = $val + ($round_to - $diff);
-        } else {
-            $ret = $val - $diff;
-        }
-
-        return $ret;
-    }
-} // end round_Nth
 
 function is_customoid_graph($type, $subtype)
 {
@@ -387,7 +356,7 @@ function format_hostname($device): string
     $hostname_is_ip = IP::isValid($hostname);
     $sysName = empty($device['sysName']) ? $hostname : $device['sysName'];
 
-    return \App\View\SimpleTemplate::parse(empty($device['display']) ? Config::get('device_display_default', '{{ $hostname }}') : $device['display'], [
+    return \App\View\SimpleTemplate::parse(empty($device['display']) ? LibrenmsConfig::get('device_display_default', '{{ $hostname }}') : $device['display'], [
         'hostname' => $hostname,
         'sysName' => $sysName,
         'sysName_fallback' => $hostname_is_ip ? $sysName : $hostname,
@@ -723,7 +692,7 @@ function get_vm_parent_id($device)
         return false;
     }
 
-    return dbFetchCell('SELECT `device_id` FROM `vminfo` WHERE `vmwVmDisplayName` = ? OR `vmwVmDisplayName` = ?', [$device['hostname'], $device['hostname'] . '.' . Config::get('mydomain')]);
+    return dbFetchCell('SELECT `device_id` FROM `vminfo` WHERE `vmwVmDisplayName` = ? OR `vmwVmDisplayName` = ?', [$device['hostname'], $device['hostname'] . '.' . LibrenmsConfig::get('mydomain')]);
 }
 
 /**

@@ -4,6 +4,7 @@ use LibreNMS\Util\IP;
 use LibreNMS\Util\Mac;
 
 $param = [];
+$where = '';
 
 if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
@@ -11,22 +12,36 @@ if (! Auth::user()->hasGlobalRead()) {
     $param = array_merge($param, $device_ids);
 }
 
-[$address,$prefix] = explode('/', $vars['address']);
-if ($vars['search_type'] == 'ipv4') {
-    $sql = ' FROM `ipv4_addresses` AS A, `ports` AS I, `ipv4_networks` AS N, `devices` AS D';
-    $sql .= " WHERE I.port_id = A.port_id AND I.device_id = D.device_id AND N.ipv4_network_id = A.ipv4_network_id $where ";
+$search_type = $vars['search_type'] ?? 'ipv4';
+$address = $vars['address'] ?? '';
+$prefix = '';
+$sort = trim($sort);
+
+if (str_contains($address, '/')) {
+    [$address, $prefix] = explode('/', $address, 2);
+}
+
+if ($search_type == 'ipv4') {
+    $sql = ' FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D';
+    $sql .= ' WHERE I.port_id = A.port_id AND I.device_id = D.device_id ' . $where . ' ';
+
     if (! empty($address)) {
         $sql .= ' AND ipv4_address LIKE ?';
         $param[] = "%$address%";
     }
 
     if (! empty($prefix)) {
-        $sql .= " AND ipv4_prefixlen='?'";
-        $param[] = [$prefix];
+        $sql .= " AND ipv4_prefixlen='$prefix'";
     }
-} elseif ($vars['search_type'] == 'ipv6') {
-    $sql = ' FROM `ipv6_addresses` AS A, `ports` AS I, `ipv6_networks` AS N, `devices` AS D';
-    $sql .= " WHERE I.port_id = A.port_id AND I.device_id = D.device_id AND N.ipv6_network_id = A.ipv6_network_id $where ";
+
+    if (str_contains($sort, 'address')) {
+        $order = explode(' ', $sort)[1];
+        $sort = 'INET_ATON(ipv4_address) ' . $order;
+    }
+} elseif ($search_type == 'ipv6') {
+    $sql = ' FROM `ipv6_addresses` AS A, `ports` AS I, `devices` AS D';
+    $sql .= ' WHERE I.port_id = A.port_id AND I.device_id = D.device_id ' . $where . ' ';
+
     if (! empty($address)) {
         $sql .= ' AND (ipv6_address LIKE ? OR ipv6_compressed LIKE ?)';
         $param[] = "%$address%";
@@ -36,26 +51,34 @@ if ($vars['search_type'] == 'ipv4') {
     if (! empty($prefix)) {
         $sql .= " AND ipv6_prefixlen = '$prefix'";
     }
-} elseif ($vars['search_type'] == 'mac') {
+
+    if (str_contains($sort, 'address')) {
+        $order = explode(' ', $sort)[1];
+        $sort = 'INET6_ATON(ipv6_address) ' . $order;
+    }
+} elseif ($search_type == 'mac') {
     $sql = ' FROM `ports` AS I, `devices` AS D';
-    $sql .= " WHERE I.device_id = D.device_id AND `ifPhysAddress` LIKE ? $where ";
-    $param[] = '%' . trim(str_replace([':', ' ', '-', '.', '0x'], '', $vars['address'])) . '%';
+    $sql .= " WHERE I.device_id = D.device_id  $where ";
+    if (! empty($address)) {
+        $sql .= ' AND `ifPhysAddress` LIKE ?';
+        $param[] = '%' . trim(str_replace([':', ' ', '-', '.', '0x'], '', $vars['address'])) . '%';
+    }
 }//end if
-if (is_numeric($vars['device_id'])) {
+if (isset($vars['device_id']) && is_numeric($vars['device_id'])) {
     $sql .= ' AND I.device_id = ?';
     $param[] = $vars['device_id'];
 }
 
-if ($vars['interface']) {
+if (isset($vars['interface']) && $vars['interface']) {
     $sql .= ' AND I.ifDescr LIKE ?';
     $param[] = $vars['interface'];
 }
 
-if ($vars['search_type'] == 'ipv4') {
+if ($search_type == 'ipv4') {
     $count_sql = "SELECT COUNT(`ipv4_address_id`) $sql";
-} elseif ($vars['search_type'] == 'ipv6') {
+} elseif ($search_type == 'ipv6') {
     $count_sql = "SELECT COUNT(`ipv6_address_id`) $sql";
-} elseif ($vars['search_type'] == 'mac') {
+} elseif ($search_type == 'mac') {
     $count_sql = "SELECT COUNT(`port_id`) $sql";
 }
 
@@ -85,9 +108,9 @@ foreach (dbFetchRows($sql, $param) as $interface) {
     $speed = \LibreNMS\Util\Number::formatSi($interface['ifSpeed'], 2, 0, 'bps');
     $type = \LibreNMS\Util\Rewrite::normalizeIfType($interface['ifType']);
 
-    if ($vars['search_type'] == 'ipv6') {
+    if ($search_type == 'ipv6') {
         $address = (string) IP::parse($interface['ipv6_address'], true) . '/' . $interface['ipv6_prefixlen'];
-    } elseif ($vars['search_type'] == 'mac') {
+    } elseif ($search_type == 'mac') {
         $mac = Mac::parse($interface['ifPhysAddress']);
         $address = $mac->readable();
         $mac_oui = $mac->vendor();
@@ -95,7 +118,7 @@ foreach (dbFetchRows($sql, $param) as $interface) {
         $address = (string) IP::parse($interface['ipv4_address'], true) . '/' . $interface['ipv4_prefixlen'];
     }
 
-    if ($interface['in_errors'] > 0 || $interface['out_errors'] > 0) {
+    if (isset($interface['in_errors'], $interface['out_errors']) && ($interface['in_errors'] > 0 || $interface['out_errors'] > 0)) {
         $error_img = generate_port_link($interface, "<i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", 'errors');
     } else {
         $error_img = '';
@@ -109,7 +132,7 @@ foreach (dbFetchRows($sql, $param) as $interface) {
             'address' => $address,
             'description' => $interface['ifAlias'],
         ];
-        if ($vars['search_type'] == 'mac') {
+        if ($search_type == 'mac') {
             $row['mac_oui'] = $mac_oui;
         }
         $response[] = $row;

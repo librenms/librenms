@@ -13,6 +13,10 @@ return [
         'view' => [
             'loading' => 'Loading data',
             'no_devices' => 'No devices found',
+            'legend' => 'Legend',
+            'invalid_link' => 'Link is down or link speed is not defined',
+            'go_to' => 'Go to',
+            'unknown' => '???',
         ],
         'nodeimage' => [
             'delete' => 'Delete Image',

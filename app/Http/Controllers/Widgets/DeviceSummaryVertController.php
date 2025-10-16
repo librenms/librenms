@@ -26,17 +26,7 @@
 
 namespace App\Http\Controllers\Widgets;
 
-use Illuminate\Http\Request;
-use Illuminate\View\View;
-
 class DeviceSummaryVertController extends DeviceSummaryController
 {
-    /**
-     * @param  Request  $request
-     * @return View
-     */
-    public function getView(Request $request)
-    {
-        return view('widgets.device-summary-vert', $this->getData($request));
-    }
+    protected string $name = 'device-summary-vert';
 }

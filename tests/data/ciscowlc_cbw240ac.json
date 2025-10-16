@@ -315,7 +315,7 @@
                     "vlan_domain": 1,
                     "vlan_name": "Default",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -791,5 +791,18 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.1.1.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.1.1.0/24",
+                    "ifIndex": 1
+                }
+            ]
+        }
     }
 }

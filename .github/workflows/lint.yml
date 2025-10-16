@@ -17,14 +17,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      -
-        name: Checkout Code
+      - name: Checkout Code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/tests/data/
+            !/tests/snmpsim/
+            !/mibs/
 
-      -
-        name: Lint Code Base
+      - name: Lint Code Base
         uses: docker://ghcr.io/github/super-linter:slim-v4
         env:
           VALIDATE_BASH: true
@@ -41,50 +45,41 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        php: [8.3]
     steps:
-      -
-        name: Checkout Code
+      - name: Checkout Code
         uses: actions/checkout@v4
-
-      -
-        name: Set up PHP
-        uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
-          tools: composer
-          coverage: none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/tests/data/
+            !/tests/snmpsim/
+            !/mibs/
+            !/doc/
 
-      -
-        name: Get composer cache directory
+      - name: Get composer cache directory
         id: composer-cache
         run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
-      -
-        name: Cache composer
+      - name: Cache composer
         uses: actions/cache@v4
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ matrix.php }}-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-${{ matrix.php }}-${{ secrets.CACHE_VERSION }}-
+          key: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-
 
-      -
-        name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: ${{ runner.os }}-pip-${{ secrets.CACHE_VERSION }}-
+      - name: Composer install
+        run: composer install --prefer-dist --no-interaction --no-progress --no-scripts --no-autoloader
 
-      -
-        name: Composer install
-        run: composer install --prefer-dist --no-interaction --no-progress
+      - name: Composer dump
+        run: composer dump --strict-psr --strict-ambiguous --no-interaction --no-scripts
 
-      -
-        name: Run PHPStan (Deprecated functions)
-        run: ./vendor/bin/phpstan analyze --no-interaction --no-progress --memory-limit=4G --configuration=phpstan-deprecated.neon
+      - name: Run PHPStan
+        run: ./vendor/bin/phpstan analyze --no-interaction --memory-limit=4G
 
-      -
-        name: Run PHPStan
-        run: ./vendor/bin/phpstan analyze --no-interaction --no-progress --memory-limit=4G
+      - name: Run PHPStan (Legacy codebase)
+        run: ./vendor/bin/phpstan analyze --no-interaction --memory-limit=4G --configuration=phpstan-legacy.neon
+
+      - name: Run PHPStan (Deprecated functions)
+        run: ./vendor/bin/phpstan analyze --no-interaction --memory-limit=4G --configuration=phpstan-deprecated.neon
+

@@ -12953,43 +12953,59 @@
             "vlans": [
                 {
                     "vlan_vlan": 1,
-                    "vlan_domain": 1,
+                    "vlan_domain": 3,
                     "vlan_name": "default",
-                    "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_type": "static",
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2,
-                    "vlan_domain": 1,
+                    "vlan_domain": 5,
                     "vlan_name": "servers",
-                    "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_type": "static",
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 5,
-                    "vlan_domain": 1,
+                    "vlan_domain": 6,
                     "vlan_name": "voip",
-                    "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_type": "static",
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 10,
-                    "vlan_domain": 1,
+                    "vlan_domain": 4,
                     "vlan_name": "lan",
-                    "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_type": "static",
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 112,
-                    "vlan_domain": 1,
+                    "vlan_domain": 2,
                     "vlan_name": "colo",
-                    "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_type": "static",
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
                 {
                     "vlan": 1,
+                    "baseport": 0,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 0,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2,
                     "baseport": 0,
                     "priority": 0,
                     "state": "unknown",
@@ -13013,7 +13029,31 @@
                     "untagged": 0
                 },
                 {
+                    "vlan": 5,
+                    "baseport": 0,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
                     "vlan": 10,
+                    "baseport": 0,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 10,
+                    "baseport": 0,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 112,
                     "baseport": 0,
                     "priority": 0,
                     "state": "unknown",
@@ -13411,6 +13451,145 @@
                     "ifAlias": "ge-0/0/1.0",
                     "ifDescr": "ge-0/0/1.0",
                     "ifName": "ge-0/0/1.0"
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.0.0.1",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 22
+                },
+                {
+                    "ipv4_address": "10.0.0.16",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 22
+                },
+                {
+                    "ipv4_address": "10.0.0.6",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 545
+                },
+                {
+                    "ipv4_address": "10.0.251.14",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "10.0.251.12/30",
+                    "ifIndex": 512
+                },
+                {
+                    "ipv4_address": "10.0.251.18",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "10.0.251.16/30",
+                    "ifIndex": 510
+                },
+                {
+                    "ipv4_address": "10.0.251.26",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "10.0.251.24/30",
+                    "ifIndex": 511
+                },
+                {
+                    "ipv4_address": "10.0.251.30",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "10.0.251.28/30",
+                    "ifIndex": 508
+                },
+                {
+                    "ipv4_address": "10.1.10.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.1.10.0/24",
+                    "ifIndex": 516
+                },
+                {
+                    "ipv4_address": "10.1.112.1",
+                    "ipv4_prefixlen": 23,
+                    "context_name": "",
+                    "ipv4_network": "10.1.112.0/23",
+                    "ifIndex": 517
+                },
+                {
+                    "ipv4_address": "10.1.2.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.1.2.0/24",
+                    "ifIndex": 513
+                },
+                {
+                    "ipv4_address": "10.1.5.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.1.5.0/24",
+                    "ifIndex": 515
+                },
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 16
+                },
+                {
+                    "ipv4_address": "128.0.0.1",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 22
+                },
+                {
+                    "ipv4_address": "128.0.0.4",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 22
+                },
+                {
+                    "ipv4_address": "128.0.0.6",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 545
+                },
+                {
+                    "ipv4_address": "128.0.1.16",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 22
+                },
+                {
+                    "ipv4_address": "172.16.97.1",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 16
+                },
+                {
+                    "ipv4_address": "192.168.1.64",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.1.0/24",
+                    "ifIndex": 529
+                },
+                {
+                    "ipv4_address": "82.74.139.167",
+                    "ipv4_prefixlen": 23,
+                    "context_name": "",
+                    "ipv4_network": "82.74.138.0/23",
+                    "ifIndex": 530
                 }
             ]
         }

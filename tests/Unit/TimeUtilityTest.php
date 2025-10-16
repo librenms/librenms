@@ -6,7 +6,7 @@ use Illuminate\Support\Carbon;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\Time;
 
-class TimeUtilityTest extends TestCase
+final class TimeUtilityTest extends TestCase
 {
     /**
      * A basic unit test example.
@@ -61,5 +61,27 @@ class TimeUtilityTest extends TestCase
         $this->assertEquals(0, Time::parseAt('invalid'));
         $this->assertEquals(606614400, Time::parseAt('March 23 1989 UTC'));
         $this->assertEquals(time() + 86400, Time::parseAt('+1 day'));
+    }
+
+    public function testParseInput(): void
+    {
+        $this->assertNull(Time::parseInput(null));
+        $this->assertNull(Time::parseInput(''));
+
+        $this->assertSame(315532800, Time::parseInput(315532800));
+
+        $this->travelTo(Carbon::createFromTimestampUTC(1700000000), function () {
+            $now = 1700000000;
+            $this->assertSame($now - 600, Time::parseInput('10m'));
+            $this->assertSame($now + 3600, Time::parseInput('+1h'));
+            $this->assertSame($now - 86400, Time::parseInput('-1d'));
+            $this->assertSame($now - 604800, Time::parseInput('-1w'));
+            $this->assertSame($now + 31622400, Time::parseInput('+1y'));
+        });
+
+        $expected = Carbon::parse('2023-01-02 03:04:05 UTC')->getTimestamp();
+        $this->assertSame($expected, Time::parseInput('2023-01-02 03:04:05 UTC'));
+
+        $this->assertNull(Time::parseInput('not a date'));
     }
 }

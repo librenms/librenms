@@ -150,6 +150,12 @@ return [
         'unit' => 'dBmV',
         'unit_long' => 'Decibel-Millivolts',
     ],
+    'printer-supply' => [
+        'short' => 'Printer',
+        'long' => 'Printer Supplies',
+        'unit' => '%',
+        'unit_long' => 'Percent',
+    ],
     'bitrate' => [
         'short' => 'Bitrate',
         'long' => 'Bitrate',
@@ -190,5 +196,11 @@ return [
         'long' => 'Percent',
         'unit' => '%',
         'unit_long' => 'Percent',
+    ],
+    'signal_loss' => [
+        'short' => 'SL',
+        'long' => 'Signal Loss',
+        'unit' => 'dB',
+        'unit_long' => 'Decibels',
     ],
 ];

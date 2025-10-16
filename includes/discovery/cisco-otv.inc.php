@@ -63,7 +63,7 @@ if ($device['os_group'] == 'cisco') {
     $components = $component->getComponents($device['device_id'], ['type' => $module]);
 
     // We only care about our device id.
-    $components = $components[$device['device_id']];
+    $components = $components[$device['device_id']] ?? [];
 
     // Begin our master array, all other values will be processed into this array.
     $tblOTV = [];
@@ -85,7 +85,7 @@ if ($device['os_group'] == 'cisco') {
         // No Error, lets process things.
 
         // Add each overlay to the array.
-        foreach ((array) $tblOverlayEntry['1.3.6.1.4.1.9.9.810.1.2.1.1.2'] as $index => $name) {
+        foreach ((array) ($tblOverlayEntry['1.3.6.1.4.1.9.9.810.1.2.1.1.2'] ?? []) as $index => $name) {
             $result = [];
             $message = false;
             $result['index'] = $index;

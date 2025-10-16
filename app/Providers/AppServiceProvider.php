@@ -12,11 +12,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use LibreNMS\Cache\PermissionsCache;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
+use LibreNMS\Util\Version;
 use Validator;
 
 class AppServiceProvider extends ServiceProvider
@@ -75,6 +75,7 @@ class AppServiceProvider extends ServiceProvider
         $this->bootCustomValidators();
         $this->configureMorphAliases();
         $this->bootObservers();
+        Version::registerAboutCommand();
 
         $this->bootAuth();
     }
@@ -118,10 +119,10 @@ class AppServiceProvider extends ServiceProvider
         });
     }
 
-    private function configureMorphAliases()
+    private function configureMorphAliases(): void
     {
         $sensor_types = [];
-        foreach (Sensor::getTypes() as $sensor_type) {
+        foreach (\LibreNMS\Enum\Sensor::values() as $sensor_type) {
             $sensor_types[$sensor_type] = Sensor::class;
         }
         Relation::morphMap(array_merge([
@@ -192,19 +193,6 @@ class AppServiceProvider extends ServiceProvider
             return @preg_match($value, '') !== false;
         });
 
-        Validator::extend('keys_in', function ($attribute, $value, $parameters, $validator) {
-            $extra_keys = is_array($value) ? array_diff(array_keys($value), $parameters) : [];
-
-            $validator->addReplacer('keys_in', function ($message, $attribute, $rule, $parameters) use ($extra_keys) {
-                return str_replace(
-                    [':extra', ':values'],
-                    [implode(',', $extra_keys), implode(',', $parameters)],
-                    $message);
-            });
-
-            return is_array($value) && empty($extra_keys);
-        });
-
         Validator::extend('zero_or_exists', function ($attribute, $value, $parameters, $validator) {
             if ($value === 0 || $value === '0') {
                 return true;
@@ -231,6 +219,32 @@ class AppServiceProvider extends ServiceProvider
             }
 
             return false;
+        });
+
+        Validator::extend('array_keys_not_empty', function ($attribute, $value): bool {
+            if (! is_array($value)) {
+                return false;
+            }
+
+            foreach ($value as $key => $_) {
+                if (is_string($key) && strlen(trim($key)) == 0) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+
+        Validator::extend('date_or_relative', function ($attribute, $value, $parameters, $validator) {
+            if (is_string($value) && preg_match('/^\d{9,13}$/', $value)) {
+                return true;
+            }
+
+            if (is_string($value) && preg_match('/^[+-]?\d+[hdmwy]$/', $value)) {
+                return true;
+            }
+
+            return $validator->validateDate($attribute, $value);
         });
     }
 

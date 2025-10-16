@@ -7,7 +7,7 @@ use LibreNMS\Util\Mac;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 
-class MacUtilTest extends TestCase
+final class MacUtilTest extends TestCase
 {
     public function testMacOutput(): void
     {

@@ -139,7 +139,7 @@ function resizeend() {
         newW=$(window).width();
         timeout = false;
         if(Math.abs(oldW - newW) >= 200)
-        {
+{
             refresh = true;
         }
         else {
@@ -237,6 +237,105 @@ $(document).ready(function () {
             $(this).bootgrid('reload');
         });
     }, 300000);
+});
+
+// Add export button to bootgrid tables
+$(document).on('initialized.rs.jquery.bootgrid', function (e, b) {
+    var grid = $(e.target);
+    var tableId = grid.attr('id');
+
+    if ($('#' + tableId + '-export-button').length === 0) {
+        var ajaxUrl = grid.data('url');
+        var params = grid.data('params');
+
+        if (ajaxUrl) {
+            var exportUrl = ajaxUrl + '/export' + (params ? '?' + params : '');
+            var actionsContainer = null;
+
+            var panel = grid.closest('div.panel');
+            if (panel.length) {
+                actionsContainer = panel.find('div.actions');
+            }
+
+            if (actionsContainer && actionsContainer.length) {
+                var exportButton = $(
+                    '<div id="' + tableId + '-export-button" class="btn-group mr-2 bootgrid-export-button">' +
+                    '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+                    '<i class="fa fa-download"></i> <span class="caret"></span>' +
+                    '</button>' +
+                    '<ul class="dropdown-menu">' +
+                    '<li><a href="' + exportUrl + '" class="export-link" data-grid-id="' + tableId + '"><i class="fa fa-file-text-o"></i> Export to CSV</a></li>' +
+                    '</ul>' +
+                    '</div>'
+                );
+
+                actionsContainer.prepend(exportButton);
+
+                // onclick event for export button
+                // to handle filtering and sorting
+                exportButton.find('.export-link').on('click', function(e) {
+                    e.preventDefault();
+
+                    var gridId = $(this).data('grid-id');
+                    var grid = $('#' + gridId);
+                    var currentUrl = $(this).attr('href');
+                    var urlParams = [];
+
+                    var searchPhrase = $('.search-field').val();
+                    if (searchPhrase) {
+                        urlParams.push('searchPhrase=' + encodeURIComponent(searchPhrase));
+                    }
+
+                    // pagination and row count
+                    var currentPage = grid.bootgrid('getCurrentPage');
+                    var rowCount = grid.bootgrid('getRowCount');
+                    urlParams.push('current=' + currentPage);
+                    urlParams.push('rowCount=' + rowCount);
+
+                    // get all filters from the header
+                    var headerContainer = $('.' + gridId + '-headers-table-menu');
+                    if (headerContainer.length) {
+                        headerContainer.find('input[name]').each(function() {
+                            var field = $(this);
+                            var name = field.attr('name');
+                            var value = field.val();
+                            if (name === '_token') {
+                                return;
+                            }
+
+                            if (value !== null && value !== '' && value !== '1') {
+                                urlParams.push(name + '=' + encodeURIComponent(value));
+                            }
+                        });
+
+                        headerContainer.find('select[name]').each(function() {
+                            var select = $(this);
+                            var name = select.attr('name');
+                            var selectedOption = select.find(':selected');
+                            if (selectedOption.length) {
+                                urlParams.push(name + '=' + encodeURIComponent(selectedOption.val()));
+                            }
+                        });
+                    }
+
+                    var sorting = grid.bootgrid('getSortDictionary');
+                    if (sorting && Object.keys(sorting).length > 0) {
+                        for (var sortKey in sorting) {
+                            if (sorting.hasOwnProperty(sortKey)) {
+                                urlParams.push('sort[' + sortKey + ']=' + sorting[sortKey]);
+                            }
+                        }
+                    }
+
+                    if (urlParams.length > 0) {
+                        currentUrl += (currentUrl.indexOf('?') > -1 ? '&' : '?') + urlParams.join('&');
+                    }
+
+                    window.open(currentUrl, '_blank');
+                });
+            }
+        }
+    }
 });
 
 var jsFilesAdded = [];
@@ -549,24 +648,22 @@ function http_fallback(link) {
 }
 
 function init_select2(selector, type, data, selected, placeholder, config) {
-    var $select = $(selector);
+    const $select = $(selector);
 
     // allow function to be assigned to pass data
-    var data_function = function(params) {
+    const data_function = $.isFunction(data) ? data : function (params) {
         data.term = params.term;
         data.page = params.page || 1;
         return data;
     };
-    if ($.isFunction(data)) {
-        data_function = data;
-    }
 
-    var init = {
+    const init = {
         theme: "bootstrap",
-        dropdownAutoWidth : true,
+        dropdownAutoWidth: true,
         width: "auto",
         placeholder: placeholder,
         allowClear: true,
+        containerCssClass: ":all:",
         ajax: {
             url: ajax_url + '/select/' + type,
             delay: 150,
@@ -628,35 +725,43 @@ function popUp(URL)
     window.open(URL, '_blank', 'toolbar=0,scrollbars=1,location=0,statusbar=0,menubar=0,resizable=1,width=550,height=600');
 }
 
-// popup component javascript.  Hopefully temporary.
-document.addEventListener("alpine:init", () => {
-    Alpine.data("popup", () => ({
-        popupShow: false,
-        showTimeout: null,
-        hideTimeout: null,
-        ignoreNextShownEvent: false,
-        delay: 300,
-        show(timeout) {
-            clearTimeout(this.hideTimeout);
-            this.showTimeout = setTimeout(() => {
-                this.popupShow = true;
-                Popper.createPopper(this.$refs.targetRef, this.$refs.popupRef, {
-                    padding: 8
-                });
+function applySiteStyle(newStyle) {
+    // translate device to actual style
+    if (newStyle === 'device') {
+        newStyle = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
 
-                // close other popups, except this one
-                this.ignoreNextShownEvent = true;
-                this.$dispatch('librenms-popup-shown', this.$el);
-            }, timeout);
-        },
-        hide(timeout) {
-            if (this.ignoreNextShownEvent) {
-                this.ignoreNextShownEvent = false;
-                return;
+    document.documentElement.classList.toggle('dark', newStyle === 'dark');
+
+    if (window.siteStyle !== newStyle) {
+        window.siteStyle = newStyle;
+        $.post(ajax_url + '/set_style', { style: newStyle });
+        document.querySelectorAll('img.graph-image').forEach(img => {
+            img.src = img.src.replace(/&style=\w+/g, '') + '&style=' + newStyle;
+        });
+    }
+}
+
+// prevent dropdown menus from overflowing the viewport
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.dropdown-submenu:not(:has(.dropdown-submenu))').forEach(function (submenuParent) {
+        const submenu = submenuParent.querySelector('.dropdown-menu');
+        if (!submenu) return;
+
+        submenuParent.addEventListener('mouseenter', function () {
+            const rect = submenu.getBoundingClientRect();
+            const availableHeight = window.innerHeight - rect.top - 10;
+
+            if (rect.bottom > window.innerHeight) {
+                submenu.style.maxHeight = availableHeight + 'px';
+                submenu.style.overflowY = 'auto';
             }
+        });
 
-            clearTimeout(this.showTimeout);
-            this.hideTimeout = setTimeout(() => this.popupShow = false, timeout)
-        }
-    }));
+        submenuParent.addEventListener('mouseleave', function () {
+            submenu.style.maxHeight = '';
+        });
+    });
 });
+
+

@@ -38,8 +38,9 @@ use Throwable;
 
 class ErrorReporting
 {
+    private const MAX_PROD_ERRORS = 4;
+    private int $errorCount = 0;
     private ?bool $reportingEnabled = null;
-    private ?bool $dumpErrors = null;
     protected array $upgradable = [
         \LibreNMS\Exceptions\FilePermissionsException::class,
         \LibreNMS\Exceptions\DatabaseConnectException::class,
@@ -51,42 +52,33 @@ class ErrorReporting
 
     public function __construct(Exceptions $exceptions)
     {
+        $this->adjustErrorHandlingForAppEnv(app()->environment());
+
+        $exceptions->dontReportDuplicates();
+        $exceptions->throttle(fn (Throwable $e) => Limit::perMinute(LibrenmsConfig::get('reporting.throttle', 30)));
+        $exceptions->reportable([$this, 'reportable']);
+        $exceptions->report([$this, 'report']);
+        $exceptions->render([$this, 'render']);
+
         Flare::determineVersionUsing(function () {
             return \LibreNMS\Util\Version::VERSION;
         });
+    }
 
-        $exceptions->dontReportDuplicates();
-        $exceptions->throttle(function (Throwable $e) {
-            return Limit::perMinute(LibrenmsConfig::get('reporting.throttle', 30));
-        });
+    public function reportable(Throwable $e): bool
+    {
+        \Log::critical('%RException: ' . get_class($e) . ' ' . $e->getMessage() . '%n @ %G' . $e->getFile() . ':' . $e->getLine() . '%n' . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
 
-        app()->booted(function () {
-            $this->dumpErrors = LibrenmsConfig::get('reporting.dump_errors', false);
-            if ($this->dumpErrors) {
-                config([
-                    'logging.deprecations.channel' => 'deprecations_channel',
-                    'logging.deprecations.trace' => true,
-                ]);
-            }
-        });
-
-        // handle exceptions
-        $exceptions->report([$this, 'report']);
-        $exceptions->render([$this, 'render']);
+        return false; // false = block default log message
     }
 
     public function report(Throwable $e): bool
     {
-        if ($this->dumpErrors) {
-            \Log::critical('%RException: ' . get_class($e) . ' ' . $e->getMessage() . '%n @ %G' . $e->getFile() . ':' . $e->getLine() . '%n' . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
-        }
-
         if ($this->isReportingEnabled()) {
             Flare::report($e);
         }
 
-        // block logging errors if in a legacy entry point (init.php)
-        return ! defined('IGNORE_ERRORS');
+        return true;
     }
 
     public function render(Throwable $exception, Request $request): ?Response
@@ -133,7 +125,7 @@ class ErrorReporting
 
         // Only run in production
         if (! app()->isProduction()) {
-            \Log::debug('Reporting disabled because app is not in production');
+            \Log::debug('Reporting disabled because app is not in production mode');
 
             return false;
         }
@@ -153,7 +145,7 @@ class ErrorReporting
                 return false;
             }
 
-            if (! $git->isOfficialCommit()) {
+            if (! $git->isOfficialCommits()) {
                 \Log::debug('Reporting disabled due to local modifications');
 
                 return false;
@@ -163,5 +155,72 @@ class ErrorReporting
         $this->reportingEnabled = true;
 
         return true;
+    }
+
+    private function adjustErrorHandlingForAppEnv(string $environment): void
+    {
+        // throw exceptions and deprecations in testing and non-prod when APP_DEBUG is set.
+        if ($environment == 'testing' || ($environment !== 'production' && config('app.debug'))) {
+            app()->booted(function () {
+                config([
+                    'logging.deprecations.channel' => 'deprecations_channel',
+                    'logging.deprecations.trace' => true,
+                ]);
+            });
+
+            return; // do not override error handler below
+        }
+
+        // in production, don't halt execution on non-fatal errors
+        set_error_handler(function ($severity, $message, $file, $line) {
+            // If file is from a package, find the first non-vendor frame
+            if (self::isUndesirableTracePath($file)) {
+                // add vendor file to message
+                $message .= ' from ' . strstr($file, 'vendor') . ':' . $line;
+                [$file, $line] = self::findFirstNonVendorFrame();
+            }
+
+            if ((error_reporting() & $severity) !== 0) { // this check primarily allows @ to suppress errors
+                if ($this->errorCount++ < self::MAX_PROD_ERRORS) {
+                    // limit reported errors so php-fpm headers don't get too large
+                    $max_errors = $this->errorCount == self::MAX_PROD_ERRORS ? ' (max reported errors reached)' : '';
+
+                    error_log("\e[31mPHP Error($severity)\e[0m: $message in $file:$line$max_errors");
+                }
+            }
+
+            // For notices and warnings, prevent conversion to exceptions
+            if (($severity & (E_NOTICE | E_WARNING | E_USER_NOTICE | E_USER_WARNING | E_DEPRECATED)) !== 0) {
+                return true; // Prevent the standard error handler from running
+            }
+
+            return false; // For other errors, let Laravel handle them
+        });
+    }
+
+    private static function findFirstNonVendorFrame(): array
+    {
+        foreach (debug_backtrace() as $trace) {
+            // not vendor frames
+            if (isset($trace['file']) && self::isUndesirableTracePath($trace['file'])) {
+                continue;
+            }
+            // not this class
+            if (isset($trace['class']) && $trace['class'] === self::class) {
+                continue;
+            }
+
+            return [$trace['file'], $trace['line']];
+        }
+
+        return ['', ''];
+    }
+
+    private static function isUndesirableTracePath(string $path): bool
+    {
+        return Str::contains($path, [
+            '/vendor/',
+            '/storage/framework/views/',
+        ]);
     }
 }

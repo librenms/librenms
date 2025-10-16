@@ -1,0 +1,116 @@
+mib: ENLOGIC-PDU2-MIB
+modules:
+  os:
+    hardware: ENLOGIC-PDU2-MIB::pduNamePlatePartNumber.1
+    serial: ENLOGIC-PDU2-MIB::pduNamePlateSerialNumber.1
+    version: ENLOGIC-PDU2-MIB::pduNamePlateFirmwareVersion.1
+  sensors:
+      additional_oids:
+        data:
+          -
+            oid:
+              - ENLOGIC-PDU2-MIB::pduCircuitBreakerLabel
+              - ENLOGIC-PDU2-MIB::pduInputPhaseConfigVoltageLowerCriticalThreshold
+              - ENLOGIC-PDU2-MIB::pduInputPhaseConfigVoltageLowerWarningThreshold
+              - ENLOGIC-PDU2-MIB::pduInputPhaseConfigVoltageUpperWarningThreshold
+              - ENLOGIC-PDU2-MIB::pduInputPhaseConfigVoltageUpperCriticalThreshold
+              - ENLOGIC-PDU2-MIB::pduInputPhaseConfigCurrentLowerCriticalThreshold
+              - ENLOGIC-PDU2-MIB::pduInputPhaseConfigCurrentLowerWarningThreshold
+              - ENLOGIC-PDU2-MIB::pduInputPhaseConfigCurrentUpperWarningThreshold
+              - ENLOGIC-PDU2-MIB::pduInputPhaseConfigCurrentUpperCriticalThreshold
+      power:
+        data:
+          -
+            oid: ENLOGIC-PDU2-MIB::pduUnitStatusTable
+            value: ENLOGIC-PDU2-MIB::pduUnitStatusActivePower
+            num_oid: '.1.3.6.1.4.1.38446.1.2.4.1.4.1.{{ $index }}'
+            descr: "Active power #{{ $index }}"
+          -
+            oid: ENLOGIC-PDU2-MIB::pduInputPhaseStatusTable
+            value: ENLOGIC-PDU2-MIB::pduInputPhaseStatusActivePower
+            num_oid: '.1.3.6.1.4.1.38446.1.3.4.1.7.1.{{ $index }}'
+            index: 'pduInputPhaseStatusActivePower.{{ $index }}'
+            descr: "Input Phase #{{ $index }}"
+      voltage:
+        data:
+          -
+            oid: ENLOGIC-PDU2-MIB::pduInputPhaseStatusTable
+            value: ENLOGIC-PDU2-MIB::pduInputPhaseStatusVoltage
+            num_oid: '.1.3.6.1.4.1.38446.1.3.4.1.6.{{ $index }}'
+            low_limit: ENLOGIC-PDU2-MIB::pduInputPhaseConfigVoltageLowerCriticalThreshold
+            low_warn_limit: ENLOGIC-PDU2-MIB::pduInputPhaseConfigVoltageLowerWarningThreshold
+            warn_limit: ENLOGIC-PDU2-MIB::pduInputPhaseConfigVoltageUpperWarningThreshold
+            high_limit: ENLOGIC-PDU2-MIB::pduInputPhaseConfigVoltageUpperCriticalThreshold
+            index: 'pduInputPhaseStatusVoltage.{{ $index }}'
+            descr: "Input Phase {{ $index }}"
+      current:
+        data:
+          -
+            oid: ENLOGIC-PDU2-MIB::pduInputPhaseStatusTable
+            value: ENLOGIC-PDU2-MIB::pduInputPhaseStatusCurrent
+            divisor: 100
+            num_oid: '.1.3.6.1.4.1.38446.1.3.4.1.5.{{ $index }}'
+            low_limit: ENLOGIC-PDU2-MIB::pduInputPhaseConfigCurrentLowerCriticalThreshold
+            low_warn_limit: ENLOGIC-PDU2-MIB::pduInputPhaseConfigCurrentLowerWarningThreshold
+            warn_limit: ENLOGIC-PDU2-MIB::pduInputPhaseConfigCurrentUpperWarningThreshold
+            high_limit: ENLOGIC-PDU2-MIB::pduInputPhaseConfigCurrentUpperCriticalThreshold
+            index: 'pduInputPhaseStatusCurrent.{{ $index }}'
+            descr: "Input Phase {{ $index }}"
+          -
+            oid: ENLOGIC-PDU2-MIB::pduCircuitBreakerStatusTable
+            value: ENLOGIC-PDU2-MIB::pduCircuitBreakerStatusCurrent
+            divisor: 100
+            num_oid: '.1.3.6.1.4.1.38446.1.4.4.1.5.{{ $index }}'
+            low_limit: ENLOGIC-PDU2-MIB::pduCircuitBreakerConfigLowerCriticalThreshold
+            low_warn_limit: ENLOGIC-PDU2-MIB::pduCircuitBreakerConfigLowerWarningThreshold
+            warn_limit: ENLOGIC-PDU2-MIB::pduCircuitBreakerConfigUpperWarningThreshold
+            high_limit: ENLOGIC-PDU2-MIB::pduCircuitBreakerConfigUpperCriticalThreshold
+            descr: "Input Phase {{ ENLOGIC-PDU2-MIB::pduCircuitBreakerLabel }}"
+            skip_values: 0
+      state:
+        data:
+          -
+            oid: ENLOGIC-PDU2-MIB::pduUnitStatusTable
+            value: ENLOGIC-PDU2-MIB::pduUnitStatusLoadState
+            num_oid: '.1.3.6.1.4.1.38446.1.2.4.1.3.{{ $index }}'
+            descr: "Load state #{{ $index }}"
+            states:
+              - { value: 1, graph: 1, descr: 'upperCritical', generic: 2 }
+              - { value: 2, graph: 1, descr: 'upperWarning', generic: 1 }
+              - { value: 3, graph: 1, descr: 'lowerWarning', generic: 1 }
+              - { value: 4, graph: 1, descr: 'lowerCritical', generic: 2 }
+              - { value: 5, graph: 1, descr: 'normal', generic: 0 }
+          -
+            oid: ENLOGIC-PDU2-MIB::pduInputPhaseStatusCurrentState
+            value: ENLOGIC-PDU2-MIB::pduInputPhaseStatusCurrentState
+            num_oid: '.1.3.6.1.4.1.38446.1.3.4.1.3.{{ $index }}'
+            descr: "Current state #{{ $index }}"
+            states:
+              - { value: 1, graph: 1, descr: 'upperCritical', generic: 2 }
+              - { value: 2, graph: 1, descr: 'upperWarning', generic: 1 }
+              - { value: 3, graph: 1, descr: 'lowerWarning', generic: 1 }
+              - { value: 4, graph: 1, descr: 'lowerCritical', generic: 2 }
+              - { value: 5, graph: 1, descr: 'normal', generic: 0 }
+          -
+            oid: ENLOGIC-PDU2-MIB::pduInputPhaseStatusVoltageState
+            value: ENLOGIC-PDU2-MIB::pduInputPhaseStatusVoltageState
+            num_oid: '.1.3.6.1.4.1.38446.1.3.4.1.4.{{ $index }}'
+            descr: "Voltage state #{{ $index }}"
+            states:
+              - { value: 1, graph: 1, descr: 'upperCritical', generic: 2 }
+              - { value: 2, graph: 1, descr: 'upperWarning', generic: 1 }
+              - { value: 3, graph: 1, descr: 'lowerWarning', generic: 1 }
+              - { value: 4, graph: 1, descr: 'lowerCritical', generic: 2 }
+              - { value: 5, graph: 1, descr: 'normal', generic: 0 }
+          -
+            oid: ENLOGIC-PDU2-MIB::pduCircuitBreakerStatusTable
+            value: ENLOGIC-PDU2-MIB::pduCircuitBreakerStatusLoadState
+            num_oid: '.1.3.6.1.4.1.38446.1.4.4.1.4.{{ $index }}'
+            descr: "Circuit breaker state {{ ENLOGIC-PDU2-MIB::pduCircuitBreakerLabel }}"
+            skip_values: 0
+            states:
+              - { value: 1, graph: 1, descr: 'upperCritical', generic: 2 }
+              - { value: 2, graph: 1, descr: 'upperWarning', generic: 1 }
+              - { value: 3, graph: 1, descr: 'lowerWarning', generic: 1 }
+              - { value: 4, graph: 1, descr: 'lowerCritical', generic: 2 }
+              - { value: 5, graph: 1, descr: 'normal', generic: 0 }

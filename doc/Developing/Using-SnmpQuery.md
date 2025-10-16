@@ -10,6 +10,7 @@ SnmpResponse holding the returned data. SnmpResponse has many options for
 manipulating and indexing the returned data.
 
 There are 4 primary actions you can execute with SnmpQuery.
+
  - get - fetch one or more full oids from the device
  - walk - walk an oid most useful with tables or columns from tables
  - next - get the next oid after the specified oid
@@ -222,6 +223,7 @@ and call pluck, we get a nice mapping of ifIndex to ifName
 ## Handling errors
 
 Functions for checking the results of the SNMP query.
+
  - isValid - check for issues such as aborted SNMP walks (such as network disconnect) and other things.
  - getExitCode - will get the exit code of the snmp process
  - getErrorMessage - will return the stderr output from the process.

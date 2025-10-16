@@ -5,11 +5,11 @@
                 {
                     "mac_address": "00900b2a11ad",
                     "ipv4_address": "10.37.105.100",
-                    "context_name": null
+                    "context_name": ""
                 }
             ]
         },
-        "poller": null
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
@@ -10128,8 +10128,8 @@
                     "ifName": "1",
                     "portName": null,
                     "ifIndex": 100000,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "false",
                     "ifOperStatus": "up",
                     "ifOperStatus_prev": "up",
@@ -10304,15 +10304,6 @@
     },
     "vlans": {
         "discovery": {
-            "vlans": [
-                {
-                    "vlan_vlan": 1,
-                    "vlan_domain": 1,
-                    "vlan_name": "VLAN 1",
-                    "vlan_type": null,
-                    "vlan_mtu": null
-                }
-            ],
             "ports_vlans": [
                 {
                     "vlan": 1,
@@ -10517,14 +10508,6 @@
                 {
                     "vlan": 1,
                     "baseport": 50,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 1003,
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
@@ -11945,5 +11928,25 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.37.105.91",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.37.105.0/25",
+                    "ifIndex": 100000
+                },
+                {
+                    "ipv4_address": "10.37.105.92",
+                    "ipv4_prefixlen": 25,
+                    "context_name": "",
+                    "ipv4_network": "10.37.105.0/25",
+                    "ifIndex": 100000
+                }
+            ]
+        }
     }
 }

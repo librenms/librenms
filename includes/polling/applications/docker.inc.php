@@ -68,9 +68,9 @@ foreach ($docker_data as $data) {
         'mem_perc' => (float) $data['memory']['perc'],
         'mem_used' => (int) Number::toBytes($data['memory']['used']),
         'mem_limit' => (int) Number::toBytes($data['memory']['limit']),
-        'uptime' => $data['state']['uptime'],
-        'size_rw' => $data['size']['size_rw'],
-        'size_root_fs' => $data['size']['size_root_fs'],
+        'uptime' => $data['state']['uptime'] ?? null,
+        'size_rw' => $data['size']['size_rw'] ?? null,
+        'size_root_fs' => $data['size']['size_root_fs'] ?? null,
     ];
 
     $rrd_name = ['app', $name, $app->app_id, $container];

@@ -1,24 +1,13 @@
 <table class="table table-condensed table-hover table-striped">
 <?php
 
-if ($bg == '#ffffff') {
-    $bg = '#e5e5e5';
-} else {
-    $bg = '#ffffff';
-}
-
 $types_array = explode(',', strip_tags($vars['type']));
 $ports = get_ports_from_type($types_array);
 
-foreach ($ports as $port) {
-    $if_list .= $seperator . $port['port_id'];
-    $seperator = ',';
-}
-
-unset($seperator);
+$if_list = implode(',', array_map(fn ($port) => $port['port_id'], $ports));
 
 // show title from config file (but ucwords it)
-$ctypes = collect(\LibreNMS\Config::get('custom_descr', []))->keyBy(function ($descr) {
+$ctypes = collect(\App\Facades\LibrenmsConfig::get('custom_descr', []))->keyBy(function ($descr) {
     if (is_array($descr)) {
         return strtolower($descr[0]);
     }
@@ -50,11 +39,6 @@ if ($if_list) {
         $port['ifAlias'] = str_ireplace($port['type'] . ': ', '', $port['ifAlias']);
         $port['ifAlias'] = str_ireplace('[PNI]', 'Private', $port['ifAlias']);
         $ifclass = ifclass($port['ifOperStatus'], $port['ifAdminStatus']);
-        if ($bg == '#ffffff') {
-            $bg = '#e5e5e5';
-        } else {
-            $bg = '#ffffff';
-        }
 
         echo "<tr class='iftype'>
             <td><span class=list-large>" . generate_port_link($port, $port['port_descr_descr']) . "</span><br />

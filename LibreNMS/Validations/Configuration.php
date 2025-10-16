@@ -26,8 +26,8 @@
 
 namespace LibreNMS\Validations;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Contracts\Encryption\DecryptException;
-use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Validator;
 
@@ -42,7 +42,7 @@ class Configuration extends BaseValidation
     public function validate(Validator $validator): void
     {
         // Test transports
-        if (Config::get('alerts.email.enable') == true) {
+        if (LibrenmsConfig::get('alerts.email.enable') == true) {
             $validator->warn('You have the old alerting system enabled - this is to be deprecated on the 1st of June 2015: https://groups.google.com/forum/#!topic/librenms-project/1llxos4m0p4');
         }
 
@@ -54,16 +54,16 @@ class Configuration extends BaseValidation
             $validator->warn('You have no devices.', 'Consider adding a device such as localhost: ' . $validator->getBaseURL() . '/addhost');
         }
 
-        if (Config::has('validation.encryption.test')) {
+        if (LibrenmsConfig::has('validation.encryption.test')) {
             try {
-                if (\Crypt::decryptString(Config::get('validation.encryption.test')) !== 'librenms') {
+                if (\Crypt::decryptString(LibrenmsConfig::get('validation.encryption.test')) !== 'librenms') {
                     $this->failKeyChanged($validator);
                 }
             } catch (DecryptException $e) {
                 $this->failKeyChanged($validator);
             }
         } else {
-            Config::persist('validation.encryption.test', \Crypt::encryptString('librenms'));
+            LibrenmsConfig::persist('validation.encryption.test', \Crypt::encryptString('librenms'));
         }
     }
 

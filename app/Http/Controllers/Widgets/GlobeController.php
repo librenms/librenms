@@ -26,39 +26,34 @@
 
 namespace App\Http\Controllers\Widgets;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
-use LibreNMS\Config;
 use LibreNMS\Util\Number;
 
 class GlobeController extends WidgetController
 {
-    protected $title = 'Globe';
+    protected string $name = 'globe';
 
     public function __construct()
     {
         // init defaults we need to check config, so do it in construct
         $this->defaults = [
             'title' => null,
-            'markers' => Config::get('frontpage_globe.markers', 'devices'),
-            'region' => Config::get('frontpage_globe.region', 'world'),
-            'resolution' => Config::get('frontpage_globe.resolution', 'countries'),
+            'markers' => LibrenmsConfig::get('frontpage_globe.markers', 'devices'),
+            'region' => LibrenmsConfig::get('frontpage_globe.region', 'world'),
+            'resolution' => LibrenmsConfig::get('frontpage_globe.resolution', 'countries'),
             'device_group' => null,
         ];
-    }
-
-    public function getSettingsView(Request $request)
-    {
-        return view('widgets.settings.globe', $this->getSettings(true));
     }
 
     /**
      * @param  Request  $request
      * @return View
      */
-    public function getView(Request $request)
+    public function getView(Request $request): string|View
     {
         $data = $this->getSettings();
         $locations = new Collection();

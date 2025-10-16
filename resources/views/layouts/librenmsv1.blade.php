@@ -4,17 +4,17 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{{ $pagetitle }}</title>
-    <base href="{{ LibreNMS\Config::get('base_url') }}">
+    <base href="{{ LibrenmsConfig::get('base_url') }}">
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    @if(!LibreNMS\Config::get('favicon', false))
+    @if(!LibrenmsConfig::get('favicon', false))
         <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
         <link rel="icon" type="image/png" href="{{ asset('images/favicon-32x32.png') }}" sizes="32x32">
         <link rel="icon" type="image/png" href="{{ asset('images/favicon-16x16.png') }}" sizes="16x16">
         <link rel="mask-icon" href="{{ asset('images/safari-pinned-tab.svg') }}" color="#5bbad5">
         <link rel="shortcut icon" href="{{ asset('images/favicon.ico') }}">
     @else
-        <link rel="shortcut icon" href="{{ LibreNMS\Config::get('favicon') }}">
+        <link rel="shortcut icon" href="{{ LibrenmsConfig::get('favicon') }}">
     @endif
 
     <link rel="manifest" href="{{ asset('images/manifest.json') }}" crossorigin="use-credentials">
@@ -41,16 +41,18 @@
     <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/select2-bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/query-builder.default.min.css') }}" rel="stylesheet">
-    <link href="{{ asset(LibreNMS\Config::get('stylesheet', 'css/styles.css')) }}?ver=16042501" rel="stylesheet">
-    <link href="{{ asset('css/' . LibreNMS\Config::get('applied_site_style', 'light') . '.css?ver=632417643') }}" rel="stylesheet">
-    @foreach(LibreNMS\Config::get('webui.custom_css', []) as $custom_css)
+    <link href="{{ asset(LibrenmsConfig::get('stylesheet', 'css/styles.css')) }}?ver=10092025" rel="stylesheet">
+    <link href="{{ asset('css/tw_dark.css?ver=31072025') }}" rel="stylesheet">
+    @if(!in_array(session('applied_site_style', 'light'), ['light', 'dark']))
+    <link href="{{ asset('css/' . session('applied_site_style') . '.css?ver=732417643') }}" rel="stylesheet">
+    @endif
+    @foreach(LibrenmsConfig::get('webui.custom_css', []) as $custom_css)
         <link href="{{ $custom_css }}" rel="stylesheet">
     @endforeach
     @yield('css')
     @stack('styles')
 
     <script src="{{ asset('js/polyfill.min.js') }}"></script>
-    <script src="{{ asset('js/alpine.min.js') }}" defer></script>
     <script src="{{ asset('js/popper.min.js') }}"></script>
     <script src="{{ asset('js/jquery.min.js?ver=05072021') }}"></script>
     <script src="{{ asset('js/bootstrap.min.js?ver=05072021') }}"></script>
@@ -66,7 +68,7 @@
     <script src="{{ asset('js/handlebars.min.js') }}"></script>
     <script data-pace-options='{ "eventLag": { "lagThreshold": 30 } }' src="{{ asset('js/pace.min.js') }}"></script>
     <script src="{{ asset('js/qrcode.min.js') }}"></script>
-    <script src="{{ asset('js/select2.min.js') }}"></script>
+    <script src="{{ asset('js/select2.full.min.js') }}"></script>
     <script>
         $.ajaxSetup({
             headers: {
@@ -75,17 +77,23 @@
         });
         var ajax_url = "{{ url('/ajax') }}";
     </script>
-    <script src="{{ asset('js/librenms.js?ver=29092024') }}"></script>
+    <script src="{{ asset('js/librenms.js?ver=14102025') }}"></script>
     <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/toastr.min.js?ver=05072021') }}"></script>
     <script type="text/javascript" src="{{ asset('js/boot.js?ver=10272021') }}"></script>
     <script>
+        window.siteStyle = '{{ session('applied_site_style') }}';
+        window.siteStylePreference = '{{ session('preferences.site_style') ?? session('applied_site_style', 'device') }}';
+
         // Apply color scheme
-        if ('{{ LibreNMS\Config::get('applied_site_style') }}' === 'dark') {
-            document.documentElement.classList.add('tw:dark')
-        } else {
-            document.documentElement.classList.remove('tw:dark')
-        }
+        applySiteStyle(window.siteStylePreference);
+
+        // Listen for system theme changes in device mode
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (event) => {
+            if (window.siteStylePreference === 'device') {
+                applySiteStyle(event.matches ? 'dark' : 'light');
+            }
+        });
     </script>
     @auth
         @if(session('preferences.timezone_static') == null || ! session('preferences.timezone_static'))
@@ -102,7 +110,12 @@
 </head>
 <body>
 @if(Auth::check())
-    <script>updateResolution();</script>
+    <script>
+        // only update resolution if it doesn't match what is stored in the session
+        if (document.documentElement.clientWidth !== {{ (int) session('screen_width') }} || document.documentElement.clientHeight !== {{ (int) session('screen_height') }}) {
+            updateResolution(false);
+        }
+    </script>
 @endif
 
 @if(Request::get('bare') == 'yes')

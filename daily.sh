@@ -264,15 +264,9 @@ main () {
 
     # if not running as $LIBRENMS_USER (unless $LIBRENMS_USER = root), relaunch
     if [[ "$LIBRENMS_USER" != "root" ]]; then
-        # only try to su if we are root (or sudo)
-        if [[ "$EUID" -eq 0 ]]; then
-            echo "Re-running ${DAILY_SCRIPT} as ${LIBRENMS_USER} user"
-            sudo -u "$LIBRENMS_USER" "$DAILY_SCRIPT" "$@"
-            exit
-        fi
-
         if [[ "$EUID" -ne "$LIBRENMS_USER_ID" ]]; then
-            printf "\\033[0;93mWARNING\\033[0m: You should run this script as %s\\n" "${LIBRENMS_USER}"
+            printf "\\033[0;91mERROR\\033[0m: You must run this script as %s\\n" "${LIBRENMS_USER}"
+            exit 1
         fi
     fi
 
@@ -383,7 +377,6 @@ main () {
             cleanup)
                 # Cleanups
                 options=("refresh_alert_rules"
-                               "refresh_os_cache"
                                "refresh_device_groups"
                                "recalculate_device_dependencies"
                                "syslog"

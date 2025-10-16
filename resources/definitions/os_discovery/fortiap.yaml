@@ -1,0 +1,50 @@
+mib: FORTINET-FORTIAP-MIB
+modules:
+    os:
+        version: FORTINET-FORTIAP-MIB::fapVersion.0
+        serial: FORTINET-FORTIAP-MIB::fapSerialNum.0
+    mempools:
+        data:
+            -
+                percent_used: FORTINET-FORTIAP-MIB::fapMemoryUsage
+                index: 0
+    processors:
+        data:
+            -
+                oid: FORTINET-FORTIAP-MIB::fapCpuUsage
+                num_oid: '.1.3.6.1.4.1.12356.120.3.41.{{ $index }}'
+                type: fortiap
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: fapTemperature
+                    num_oid: '.1.3.6.1.4.1.12356.120.3.44.0'
+                    index: fapTemperature
+                    descr: Temperature
+                    value: fapTemperature
+        count:
+            data:
+                -
+                    oid: fapStationCount
+                    num_oid: '.1.3.6.1.4.1.12356.120.3.43.0'
+                    index: fapStationCount
+                    descr: 'Station Count'
+                    value: fapStationCount
+        state:
+            data:
+                -
+                    oid: fapPoeModeOper
+                    num_oid: '.1.3.6.1.4.1.12356.120.3.4.0'
+                    index: fapPoeModeOper
+                    descr: 'Operating PoE Mode'
+                    value: fapPoeModeOper
+                    states:
+                        - { value: 0, descr: 'Autodetect', graph: 1, generic: 0 }
+                        - { value: 1, descr: '802.3af', graph: 1, generic: 1 }
+                        - { value: 2, descr: '802.3at', graph: 1, generic: 0 }
+                        - { value: 3, descr: 'Power Adapter', graph: 1, generic: 0 }
+                        - { value: 4, descr: 'Controlled by AC', graph: 1, generic: 0 }
+                        - { value: 5, descr: 'Full Power', graph: 1, generic: 0 }
+                        - { value: 6, descr: 'High Power', graph: 1, generic: 0 }
+                        - { value: 7, descr: 'Low Power', graph: 1, generic: 2 }

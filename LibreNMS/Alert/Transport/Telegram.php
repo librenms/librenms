@@ -61,40 +61,42 @@ class Telegram extends Transport
             $base_params['parse_mode'] = $this->config['telegram-format'];
         }
 
-        if (isset($this->message['images'])) {
-            foreach ($this->message['images'] as $image) {
-                $mime_type = finfo_buffer(finfo_open(), $image, FILEINFO_MIME_TYPE);
-                $file_name = 'default';
-
-                if ($mime_type == 'image/svg+xml') {
-                    $file_name = 'graph.svg';
-                    $send_mode = 'file';
-                }
-
-                if ($mime_type == 'image/png') {
-                    $file_name = 'graph.png';
-                }
-
-                switch ($send_as) {
-                    case 'photo':
-                        $res = Http::client()->attach('photo', $image, $file_name)
-                            ->post($url_send_photo . '?chat_id=' . $base_params['chat_id']);
-                        break;
-                    case 'file':
-                        $res = Http::client()->attach('document', $image, $file_name)
-                            ->post($url_send_file . '?chat_id=' . $base_params['chat_id']);
-                        break;
-                }
-            }
-        }
-
         $params = $base_params;
         $params['text'] = $this->message['text'];
 
         $res = Http::client()->get($url_send_message, $params);
 
         if ($res->successful()) {
-            return true;
+            if (isset($this->message['images'])) {
+                foreach ($this->message['images'] as $image) {
+                    $mime_type = finfo_buffer(finfo_open(), $image, FILEINFO_MIME_TYPE);
+                    $file_name = 'default';
+
+                    if ($mime_type == 'image/svg+xml') {
+                        $file_name = 'graph.svg';
+                        $send_mode = 'file';
+                    }
+
+                    if ($mime_type == 'image/png') {
+                        $file_name = 'graph.png';
+                    }
+
+                    switch ($send_as) {
+                        case 'photo':
+                            $res = Http::client()->attach('photo', $image, $file_name)
+                                ->withQueryParameters($base_params)
+                                ->post($url_send_photo);
+                            break;
+                        case 'file':
+                            $res = Http::client()->attach('document', $image, $file_name)
+                                ->withQueryParameters($base_params)
+                                ->post($url_send_file);
+                            break;
+                    }
+                }
+            }
+
+            return $res->successful();
         }
 
         throw new AlertTransportDeliveryException(

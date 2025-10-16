@@ -13,7 +13,7 @@ Input:
 Example:
 
 ```curl
-curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost
+curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost
 ```
 
 Output:
@@ -49,7 +49,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost
 ```
 
 Output:
@@ -84,7 +84,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/discover
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/discover
 ```
 
 Output:
@@ -115,7 +115,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/availability
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/availability
 ```
 
 Output:
@@ -160,7 +160,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/outages
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/outages
 ```
 
 Output:
@@ -209,7 +209,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/graphs
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/graphs
 ```
 
 Output:
@@ -257,7 +257,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/health
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/health
 ```
 
 Output:
@@ -283,7 +283,7 @@ Output:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/health/device_voltage
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/health/device_voltage
 ```
 
 Output:
@@ -309,7 +309,7 @@ Output:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/health/device_voltage/1
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/health/device_voltage/1
 ```
 
 Output:
@@ -369,7 +369,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/wireless
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/wireless
 ```
 
 Output:
@@ -394,7 +394,7 @@ Output:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/wireless/device_wireless_ccq
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/wireless/device_wireless_ccq
 ```
 
 Output:
@@ -419,7 +419,7 @@ Output:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/health/device_wireless_ccq/1
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/health/device_wireless_ccq/1
 ```
 
 Output:
@@ -477,7 +477,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/graphs/health/device_voltage
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/graphs/health/device_voltage
 ```
 
 Output:
@@ -487,7 +487,7 @@ Output is a stacked graph for the health type provided.
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/graphs/health/device_voltage/1
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/graphs/health/device_voltage/1
 ```
 
 Output:
@@ -514,7 +514,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/graphs/wireless/device_wireless_ccq
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/graphs/wireless/device_wireless_ccq
 ```
 
 Output:
@@ -524,7 +524,7 @@ Output is a stacked graph for the wireless type provided.
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/graphs/wireless/device_wireless_ccq/1
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/graphs/wireless/device_wireless_ccq/1
 ```
 
 Output:
@@ -557,7 +557,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/device_poller_perf
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/device_poller_perf
 ```
 
 Output:
@@ -588,7 +588,7 @@ Input:
   Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services/localhost/35/graphs/loss
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/services/localhost/35/graphs/loss
 ```
 
 Output:
@@ -596,7 +596,7 @@ Output:
 Output is an image.
 
 
-### `get_port_graphs`
+### `get_device_ports`
 
 Get a list of ports for a particular device.
 
@@ -611,7 +611,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/ports
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/ports
 ```
 
 Output:
@@ -646,7 +646,7 @@ Route: `/api/v0/devices/:hostname/fdb`
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/fdb
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/fdb
 ```
 
 Output:
@@ -666,6 +666,52 @@ Output:
 }
 ```
 
+### `get_device_nac`
+
+Get a list of NAC entries associated with a device.
+
+Route: `/api/v0/devices/:hostname/nac`
+
+- hostname can be either the device hostname or id
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/nac
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "ports_nac": [
+        {
+            "ports_nac_id": 1,
+            "auth_id": "0000000000000AAAABBBB8CC",
+            "device_id": 3,
+            "port_id": 6,
+            "domain": "data",
+            "username": "hostname.foo.example",
+            "mac_address": "1aaa2bbb3ccc",
+            "ip_address": "192.0.2.2",
+            "host_mode": "singleHost",
+            "authz_status": "authorizationSuccess",
+            "authz_by": "Authentication Server",
+            "authc_status": "authcSuccess",
+            "method": "dot1x",
+            "timeout": "0",
+            "time_left": "0",
+            "vlan": 0,
+            "time_elapsed": null,
+            "created_at": "2025-05-08T08:55:06.000000Z",
+            "updated_at": "2025-05-08T08:55:06.000000Z",
+            "historical": 0
+        }
+    ]
+}
+```
+
 ### `get_device_ip_addresses`
 
 Get a list of IP addresses (v4 and v6) associated with a device.
@@ -677,7 +723,7 @@ Route: `/api/v0/devices/:hostname/ip`
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/ip
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/ip
 ```
 
 Output:
@@ -716,7 +762,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/port_stack?valid_mappings
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/port_stack?valid_mappings
 ```
 
 Output:
@@ -754,7 +800,7 @@ Route: `/api/v0/devices/:hostname/transceivers`
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/transceivers
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/transceivers
 ```
 
 Output:
@@ -832,7 +878,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/components
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/components
 ```
 
 Output:
@@ -889,7 +935,7 @@ Route: `/api/v0/devices/:hostname/components/:type`
 Example:
 
 ```curl
-curl -X POST -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/components/APITEST
+curl -X POST -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/components/APITEST
 ```
 
 Output:
@@ -923,7 +969,7 @@ Route: `/api/v0/devices/:hostname/components`
 In this example we set the label and add a new field: TestField:
 
 ```curl
-curl -X PUT -d '{"4459": {"type": "APITEST","label": "This is a test label","status": 1,"ignore": 0,"disabled": 0,"error": "","TestField": "TestData"}}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/components
+curl -X PUT -d '{"4459": {"type": "APITEST","label": "This is a test label","status": 1,"ignore": 0,"disabled": 0,"error": "","TestField": "TestData"}}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/components
 ```
 
 Output:
@@ -951,7 +997,7 @@ Route: `/api/v0/devices/:hostname/components/:component`
 Example:
 
 ```curl
-curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/components/4459
+curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/components/4459
 ```
 
 Output:
@@ -972,7 +1018,7 @@ Route: `/api/v0/devices/:hostname/ports/:ifname`
 - hostname can be either the device hostname or id
 - ifname can be any of the interface names for the device which can be
   obtained using
-  [`get_port_graphs`](#get_port_graphs). Please ensure that
+  [`get_device_ports`](#get_device_ports). Please ensure that
   the ifname is urlencoded if it needs to be (i.e Gi0/1/0 would need to be urlencoded.
 
 Input:
@@ -982,7 +1028,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/ports/eth0
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/ports/eth0
 ```
 
 Output:
@@ -1032,7 +1078,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/ports/eth0/port_bits
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/ports/eth0/port_bits
 ```
 
 Output:
@@ -1052,7 +1098,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/resources/sensors
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/resources/sensors
 ```
 
 Output:
@@ -1104,29 +1150,33 @@ Input:
 - order: How to order the output, default is by hostname. Can be
   prepended by DESC or ASC to change the order.
 - type: can be one of the following to filter or search by:
-  - all: All devices
-  - active: Only not ignored and not disabled devices
-  - ignored: Only ignored devices
-  - up: Only devices that are up
-  - down: Only devices that are down
-  - disabled: Disabled devices
-  - os: search by os type
-  - mac: search by mac address
-  - ipv4: search by IPv4 address
-  - ipv6: search by IPv6 address (compressed or uncompressed)
-  - location: search by location
-  - location_id: search by location_id
-  - hostname: search by hostname
-  - sysName: search by sysName
-  - display: search by display name
-  - device_id: exact match by device-id
-  - type: search by device type
+    - all: All devices
+    - active: Only not ignored and not disabled devices
+    - ignored: Only ignored devices
+    - up: Only devices that are up
+    - down: Only devices that are down
+    - disabled: Disabled devices
+    - os: search by os type
+    - mac: search by mac address
+    - ipv4: search by IPv4 address
+    - ipv6: search by IPv6 address (compressed or uncompressed)
+    - location: search by location
+    - location_id: search by location_id
+    - hostname: search by hostname
+    - sysName: search by sysName
+    - display: search by display name
+    - device_id: exact match by device-id
+    - type: search by device type
+    - serial: Serial number of the device (wildcard)
+    - version: Software version of the device (wildcard)
+    - hardware: The model of the device (wildcard)
+    - features: Software license features (wildcard)
 - query: If searching by, then this will be used as the input.
 
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices?order=hostname%20DESC&type=down
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices?order=hostname%20DESC&type=down
 ```
 
 Output:
@@ -1150,7 +1200,7 @@ Output:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices?type=mac&query=00000c9ff013
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices?type=mac&query=00000c9ff013
 ```
 
 Output:
@@ -1184,7 +1234,7 @@ Input:
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/maintenance
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/maintenance
 ```
 
 Output:
@@ -1218,7 +1268,7 @@ Example with start time:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
-  -X POST https://librenms.org/api/v0/devices/localhost/maintenance/ \
+  -X POST https://foo.example/api/v0/devices/localhost/maintenance/ \
   --data-raw '
  "title":"Device Maintenance",
   "notes":"A 2 hour Maintenance triggered via API with start time",
@@ -1241,7 +1291,7 @@ Example with no start time:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
-  -X POST https://librenms.org/api/v0/devices/localhost/maintenance/ \
+  -X POST https://foo.example/api/v0/devices/localhost/maintenance/ \
   --data-raw '
  "title":"Device Maintenance",
   "notes":"A 2 hour Maintenance triggered via API with no start time",
@@ -1315,7 +1365,7 @@ For ICMP only:
 Example:
 
 ```curl
-curl -X POST -d '{"hostname":"localhost.localdomain","version":"v1","community":"public"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices
+curl -X POST -d '{"hostname":"localhost.localdomain","version":"v1","community":"public"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices
 ```
 
 Output:
@@ -1352,7 +1402,7 @@ Input (JSON):
 Examples:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/oxidized
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/oxidized
 ```
 
 Output:
@@ -1386,7 +1436,7 @@ Input (JSON):
 Examples:
 
 ```curl
-curl -X PATCH -d '{"field": "notes", "data": "This server should be kept online"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost
+curl -X PATCH -d '{"field": "notes", "data": "This server should be kept online"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost
 ```
 
 Output:
@@ -1415,7 +1465,7 @@ Input (JSON):
 Examples:
 
 ```curl
-curl -X PATCH -d '{"notes": "This port is in a scheduled maintenance with the provider."}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/port/5
+curl -X PATCH -d '{"notes": "This port is in a scheduled maintenance with the provider."}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/port/5
 ```
 
 Output:
@@ -1430,7 +1480,7 @@ Output:
 ```
 
 ```curl
-curl -X PATCH -d '{"field": ["notes","purpose"], "data": ["This server should be kept online", "For serving web traffic"]}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost
+curl -X PATCH -d '{"field": ["notes","purpose"], "data": ["This server should be kept online", "For serving web traffic"]}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost
 ```
 
 Output:
@@ -1459,7 +1509,7 @@ Input:
 Examples:
 
 ```curl
-curl -X PATCH  -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/rename/localhost2
+curl -X PATCH  -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/rename/localhost2
 ```
 
 Output:
@@ -1488,7 +1538,7 @@ Input (JSON):
 Examples:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/groups
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/localhost/groups
 ```
 
 Output:
@@ -1526,7 +1576,7 @@ Input:
 
 Example:
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/oxidized/config/search/vlan10
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/oxidized/config/search/vlan10
 ```
 
 Output:
@@ -1535,12 +1585,12 @@ Output:
     "status": "ok",
     "nodes": [
         {
-            "node": "asr9k.librenms.org",
-            "full_name": "cisco\/ASR9K.Librenms.org"
+            "node": "asr9k.foo.example",
+            "full_name": "cisco\/ASR9K.foo.example"
         },
         {
-            "node": "ios.Librenms.org",
-            "full_name": "cisco\/ios.Librenms.org"
+            "node": "ios.foo.example",
+            "full_name": "cisco\/ios.foo.example"
         }
     ],
     "count": 2
@@ -1561,7 +1611,7 @@ Input:
 
 Example:
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/oxidized/config/router.corp.com
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/oxidized/config/router.corp.com
 ```
 
 Output:
@@ -1584,7 +1634,7 @@ Input (JSON):
 
 Example:
 ```curl
-curl -X POST -d '{"parent_ids":"15,16,17"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/1/parents
+curl -X POST -d '{"parent_ids":"15,16,17"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/1/parents
 ```
 
 Output:
@@ -1607,7 +1657,7 @@ Input (JSON):
 
 Example:
 ```curl
-curl -X DELETE -d '{"parent_ids":"15,16,17"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/1/parents
+curl -X DELETE -d '{"parent_ids":"15,16,17"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/1/parents
 ```
 
 Output:
@@ -1620,13 +1670,13 @@ Output:
 
 ### `list_parents_of_host`
 
-This is not a seperate API call.  Instead, you obtain the list of parents
+This is not a separate API call.  Instead, you obtain the list of parents
 from `list_devices`.  See that entry point for more detailed information.
 
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' 'http://librenms.org/api/v0/devices?type=device_id&query=34'
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' 'http://foo.example/api/v0/devices?type=device_id&query=34'
 ```
 
 Output:

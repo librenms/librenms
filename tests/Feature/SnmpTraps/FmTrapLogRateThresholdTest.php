@@ -28,7 +28,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
 
-class FmTrapLogRateThresholdTest extends SnmpTrapTestCase
+final class FmTrapLogRateThresholdTest extends SnmpTrapTestCase
 {
     public function testAvOversize(): void
     {

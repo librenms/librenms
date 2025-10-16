@@ -4,17 +4,22 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
-import '../css/app.css';
-import './bootstrap';
+import "../css/app.css";
+import "./bootstrap";
 
-import Vue from 'vue';
+import Vue from "vue";
 import {i18n} from "./plugins/i18n.js"; // translation
-import ToggleButton from 'vue-js-toggle-button'
-import VTooltip from 'v-tooltip'
-import vSelect from 'vue-select'
-import Multiselect from 'vue-multiselect'
-import VueTabs from 'vue-nav-tabs'
-import VModal from 'vue-js-modal'
+import ToggleButton from "vue-js-toggle-button";
+import VTooltip from "v-tooltip";
+import vSelect from "vue-select";
+import Multiselect from "vue-multiselect";
+import VueTabs from "vue-nav-tabs";
+import VModal from "vue-js-modal";
+// // Alpine Components
+import Alpine from "alpinejs";
+// import popup from './components/alpine/popup.js'
+import popup from "./components/alpine/oldpopup.js";
+import deviceLink from "./components/alpine/deviceLink.js";
 
 /**
  * The following block of code may be used to automatically register your
@@ -63,3 +68,9 @@ const app = new Vue({
     el: '#app',
     i18n,
 });
+
+Alpine.data('popup', popup);
+Alpine.data('deviceLink', deviceLink);
+
+window.Alpine = Alpine;
+Alpine.start();
