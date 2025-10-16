@@ -1,0 +1,194 @@
+mib: PROSTAR-PWM:TRISTAR
+modules:
+    os:
+        hardware: 
+            - PROSTAR-PWM::subModel.0
+            - TRISTAR::subModel.0
+        serial:
+            - PROSTAR-PWM::serialNumber.0
+            - TRISTAR::serialNumber.0
+        version:
+            - ROSTAR-PWM::deviceVersion.0
+            - TRISTAR::deviceVersion.0
+    sensors:
+        voltage:
+            data:
+                -
+                    oid: PROSTAR-PWM::batteryTerminalVoltage
+                    value: PROSTAR-PWM::batteryTerminalVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.6.30.{{ $index }}'
+                    descr: 'Battery Terminal Voltage'
+                    index: 'batteryTerminalVoltage.{{ $index }}'
+                -
+                    oid: PROSTAR-PWM::arrayVoltage
+                    value: PROSTAR-PWM::arrayVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.6.31.{{ $index }}'
+                    descr: 'Array Voltage'
+                    index: 'arrayVoltage.{{ $index }}'
+                -
+                    oid: PROSTAR-PWM::loadVoltage
+                    value: PROSTAR-PWM::loadVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.6.32.{{ $index }}'
+                    descr: 'Load Voltage'
+                    index: 'loadVoltage.{{ $index }}'
+                -
+                    oid: PROSTAR-PWM::batterySenseVoltage
+                    value: PROSTAR-PWM::batterySenseVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.6.36.{{ $index }}'
+                    descr: 'Battery Sense Voltage'
+                    index: 'batterySenseVoltage.{{ $index }}'
+                -
+                    oid: PROSTAR-PWM::meterBusVoltage
+                    value: PROSTAR-PWM::meterBusVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.6.37.{{ $index }}'
+                    descr: 'Meter Bus Voltage'
+                    index: 'meterBusVoltage.{{ $index }}'
+                -
+                    oid: PROSTAR-PWM::fp10Voltage
+                    value: PROSTAR-PWM::fp10Voltage
+                    num_oid: '.1.3.6.1.4.1.33333.6.42.{{ $index }}'
+                    descr: 'FP10 Voltage'
+                    index: 'fp10Voltage.{{ $index }}'
+                -
+                    oid: PROSTAR-PWM::p3Supply
+                    value: PROSTAR-PWM::p3Supply
+                    num_oid: '.1.3.6.1.4.1.33333.6.43.{{ $index }}'
+                    descr: 'P3 Supply'
+                    index: 'p3Supply.{{ $index }}'
+                -
+                    oid: PROSTAR-PWM::meterVoltage
+                    value: PROSTAR-PWM::meterVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.6.44.{{ $index }}'
+                    descr: 'Meter Voltage'
+                    index: 'meterVoltage.{{ $index }}'
+                -
+                    oid: PROSTAR-PWM::batteryVoltageSlow
+                    value: PROSTAR-PWM::batteryVoltageSlow
+                    num_oid: '.1.3.6.1.4.1.33333.6.47.{{ $index }}'
+                    descr: 'Battery Voltage (Slow)'
+                    index: 'batteryVoltageSlow.{{ $index }}'
+                -
+                    oid: PROSTAR-PWM::targetVoltage
+                    value: PROSTAR-PWM::targetVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.6.48.{{ $index }}'
+                    descr: 'Target Voltage'
+                    index: 'targetVoltage.{{ $index }}'
+                -
+                    oid: TRISTAR::batteryVoltage
+                    value: TRISTAR::batteryVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.8.30.{{ $index }}'
+                    descr: 'Battery Voltage'
+                    index: 'batteryVoltage.{{ $index }}'
+                    multiplier: 0.00966400146484375
+                -
+                    oid: TRISTAR::batterySenseVoltage
+                    value: TRISTAR::batterySenseVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.8.31.{{ $index }}'
+                    descr: 'Battery Sense Voltage'
+                    index: 'batterySenseVoltage.{{ $index }}'
+                    multiplier: 0.002950042724609375
+                -
+                    oid: TRISTAR::arrayLoadVoltage
+                    value: TRISTAR::arrayLoadVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.8.32.{{ $index }}'
+                    descr: 'Array Load Voltage'
+                    index: 'arrayLoadVoltage.{{ $index }}'
+                    multiplier: 0.002950042724609375
+                -
+                    oid: TRISTAR::targetVoltage
+                    value: TRISTAR::targetVoltage
+                    num_oid: '.1.3.6.1.4.1.33333.8.38.{{ $index }}'
+                    descr: 'Target Voltage'
+                    index: 'targetVoltage.{{ $index }}'
+                    multiplier: 0.002950042724609375
+        current:
+            data:
+                -
+                    oid: PROSTAR-PWM::chargeCurrent
+                    value: PROSTAR-PWM::chargeCurrent
+                    num_oid: '.1.3.6.1.4.1.33333.6.33.{{ $index }}'
+                    descr: 'Charge Current'
+                    index: 'chargeCurrent.{{ $index }}'
+                -
+                    oid: PROSTAR-PWM::loadCurrent
+                    value: PROSTAR-PWM::loadCurrent
+                    num_oid: '.1.3.6.1.4.1.33333.6.34.{{ $index }}'
+                    descr: 'Load Current'
+                    index: 'loadCurrent.{{ $index }}'
+                -
+                    oid: PROSTAR-PWM::batteryCurrentNet
+                    value: PROSTAR-PWM::batteryCurrentNet
+                    num_oid: '.1.3.6.1.4.1.33333.6.35.{{ $index }}'
+                    descr: 'Battery Current Net'
+                    index: 'batteryCurrentNet.{{ $index }}'
+                -
+                    oid: TRISTAR::chargeCurrent
+                    value: TRISTAR::chargeCurrent
+                    num_oid: '.1.3.6.1.4.1.33333.8.33.{{ $index }}'
+                    descr: 'Charge Current'
+                    index: 'chargeCurrent.{{ $index }}'
+                    multiplier: 0.002034515380859375
+                -
+                    oid: TRISTAR::loadCurrent
+                    value: TRISTAR::loadCurrent
+                    num_oid: '.1.3.6.1.4.1.33333.8.34.{{ $index }}'
+                    descr: 'Load Current'
+                    index: 'loadCurrent.{{ $index }}'
+                    multiplier: 0.00966400146484375
+        temperature:
+            data:
+                -
+                    oid: PROSTAR-PWM::heatsinkTemperature
+                    value: PROSTAR-PWM::heatsinkTemperature
+                    num_oid: '.1.3.6.1.4.1.33333.6.38.{{ $index }}'
+                    descr: 'Heatsink Temperature'
+                    index: 'heatsinkTemperature.{{ $index }}'
+                -
+                    oid: PROSTAR-PWM::batteryTemperature
+                    value: PROSTAR-PWM::batteryTemperature
+                    num_oid: '.1.3.6.1.4.1.33333.6.39.{{ $index }}'
+                    descr: 'Battery Temperature'
+                    index: 'batteryTemperature.{{ $index }}'
+                -
+                    oid: PROSTAR-PWM::ambientTemperature
+                    value: PROSTAR-PWM::ambientTemperature
+                    num_oid: '.1.3.6.1.4.1.33333.6.40.{{ $index }}'
+                    descr: 'Ambient Temperature'
+                    index: 'ambientTemperature.{{ $index }}'
+                -
+                    oid: PROSTAR-PWM::rtsTemperature
+                    value: PROSTAR-PWM::rtsTemperature
+                    num_oid: '.1.3.6.1.4.1.33333.6.41.{{ $index }}'
+                    descr: 'RTS Temperature'
+                    index: 'rtsTemperature.{{ $index }}'
+                -
+                    oid: TRISTAR::heatsinkTemperature
+                    value: TRISTAR::heatsinkTemperature
+                    num_oid: '.1.3.6.1.4.1.33333.8.36.{{ $index }}'
+                    descr: 'Heatsink Temperature'
+                    index: 'heatsinkTemperature.{{ $index }}'
+                -
+                    oid: TRISTAR::batteryTemperature
+                    value: TRISTAR::batteryTemperature
+                    num_oid: '.1.3.6.1.4.1.33333.8.37.{{ $index }}'
+                    descr: 'Battery Temperature'
+                    index: 'batteryTemperature.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: TRISTAR-MPPT::chargeState
+                    value: TRISTAR-MPPT::chargeState
+                    num_oid: '.1.3.6.1.4.1.33333.6.45.{{ $index }}'
+                    index: 'chargeState.{{ $index }}'
+                    descr: 'Charge State'
+                    state_name: chargeState
+                    states:
+                        - { value: 0, generic: 1, graph: 1, descr: Start }
+                        - { value: 1, generic: 0, graph: 1, descr: 'Night Check' }
+                        - { value: 2, generic: 1, graph: 1, descr: 'Disconnect' }
+                        - { value: 3, generic: 2, graph: 1, descr: 'Night' }
+                        - { value: 4, generic: 2, graph: 1, descr: 'Fault' }
+                        - { value: 5, generic: 3, graph: 1, descr: 'Bulk' }
+                        - { value: 6, generic: 3, graph: 1, descr: 'PWM' }
+                        - { value: 7, generic: 3, graph: 1, descr: 'Float' }
+                        - { value: 8, generic: 3, graph: 1, descr: 'Equalize' }

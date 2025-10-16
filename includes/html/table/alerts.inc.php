@@ -28,35 +28,35 @@ $alert_states = [
 
 $show_recovered = false;
 
-if (is_numeric($vars['rule_id']) && $vars['rule_id'] > 0) {
+if (isset($vars['rule_id']) && is_numeric($vars['rule_id']) && $vars['rule_id'] > 0) {
     $where .= ' AND `alerts`.`rule_id` = ?';
     $param[] = $vars['rule_id'];
 }
 
-if (is_numeric($vars['alert_id']) && $vars['alert_id'] > 0) {
+if (isset($vars['alert_id']) && is_numeric($vars['alert_id']) && $vars['alert_id'] > 0) {
     $where .= ' AND `alerts`.`id` = ?';
     $param[] = $vars['alert_id'];
 }
 
-if (is_numeric($vars['device_id']) && $vars['device_id'] > 0) {
+if (isset($vars['device_id']) && is_numeric($vars['device_id']) && $vars['device_id'] > 0) {
     $where .= ' AND `alerts`.`device_id`=' . $vars['device_id'];
 }
 
-if (is_numeric($vars['acknowledged'])) {
-    // I assume that if we are searching for acknowleged/not, we aren't interested in recovered
+if (isset($vars['acknowledged']) && is_numeric($vars['acknowledged'])) {
+    // I assume that if we are searching for acknowledged/not, we aren't interested in recovered
     $where .= ' AND `alerts`.`state`' . ($vars['acknowledged'] ? '=' : '!=') . $alert_states['acknowledged'];
 }
 
-if (is_numeric($vars['fired'])) {
+if (isset($vars['fired']) && is_numeric($vars['fired'])) {
     $where .= ' AND `alerts`.`alerted`=' . $alert_states['alerted'];
 }
 
-if (is_numeric($vars['unreachable'])) {
+if (isset($vars['unreachable']) && is_numeric($vars['unreachable'])) {
     // Sub-select to flag if at least one parent is set, and all parents are offline
     $where .= ' AND (SELECT IF(COUNT(`dr`.`parent_device_id`) > 0 AND COUNT(`dr`.`parent_device_id`)=count(`d`.`device_id`),1,0) FROM `device_relationships` `dr` LEFT JOIN `devices` `d` ON `dr`.`parent_device_id`=`d`.`device_id` AND `d`.`status`=0 WHERE `dr`.`child_device_id`=`devices`.`device_id`)=' . $vars['unreachable'];
 }
 
-if (is_numeric($vars['state'])) {
+if (isset($vars['state']) && is_numeric($vars['state'])) {
     $where .= ' AND `alerts`.`state`=' . $vars['state'];
     if ($vars['state'] == $alert_states['recovered']) {
         $show_recovered = true;
@@ -67,7 +67,7 @@ if (isset($vars['min_severity'])) {
     $where .= get_sql_filter_min_severity($vars['min_severity'], 'alert_rules');
 }
 
-if (is_numeric($vars['group'])) {
+if (isset($vars['group']) && is_numeric($vars['group'])) {
     $where .= ' AND devices.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)';
     $param[] = $vars['group'];
 }
@@ -76,8 +76,8 @@ if (! $show_recovered) {
     $where .= ' AND `alerts`.`state`!=' . $alert_states['recovered'];
 }
 
-if (isset($searchPhrase) && ! empty($searchPhrase)) {
-    $where .= ' AND (`alerts`.`timestamp` LIKE ? OR `rule` LIKE ? OR `name` LIKE ? OR `hostname` LIKE ? OR `sysName` LIKE ?)';
+if (! empty($searchPhrase)) {
+    $where .= ' AND (`alerts`.`timestamp` LIKE ? OR `builder` LIKE ? OR `name` LIKE ? OR `hostname` LIKE ? OR `sysName` LIKE ?)';
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
     $param[] = "%$searchPhrase%";
@@ -103,7 +103,7 @@ if (empty($total)) {
     $total = 0;
 }
 
-if (! isset($vars['sort']) || empty($vars['sort'])) {
+if (empty($vars['sort'])) {
     $sort = 'timestamp DESC';
 } else {
     $sort = '`alert_rules`.`severity` DESC, timestamp DESC';
@@ -121,14 +121,13 @@ if ($rowCount != -1) {
 }
 
 if (session('preferences.timezone')) {
-    $sql = "SELECT `alerts`.*, IFNULL(CONVERT_TZ(`alerts`.`timestamp`, @@global.time_zone, ?),`alerts`.`timestamp`) AS timestamp_display, `devices`.`hostname`, `devices`.`sysName`, `devices`.`display`, `devices`.`os`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`rule`, `alert_rules`.`name`, `alert_rules`.`severity` $sql";
+    $sql = "SELECT `alerts`.*, IFNULL(CONVERT_TZ(`alerts`.`timestamp`, @@global.time_zone, ?),`alerts`.`timestamp`) AS timestamp_display, `devices`.`hostname`, `devices`.`sysName`, `devices`.`display`, `devices`.`os`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`name`, `alert_rules`.`severity`, `alert_rules`.`builder` $sql";
     $param = array_merge([session('preferences.timezone')], $param);
 } else {
-    $sql = "SELECT `alerts`.*, `alerts`.`timestamp` AS timestamp_display, `devices`.`hostname`, `devices`.`sysName`, `devices`.`display`, `devices`.`os`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`rule`, `alert_rules`.`name`, `alert_rules`.`severity` $sql";
+    $sql = "SELECT `alerts`.*, `alerts`.`timestamp` AS timestamp_display, `devices`.`hostname`, `devices`.`sysName`, `devices`.`display`, `devices`.`os`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`name`, `alert_rules`.`severity`, `alert_rules`.`builder` $sql";
 }
 
 $rulei = 0;
-$format = $vars['format'];
 foreach (dbFetchRows($sql, $param) as $alert) {
     $log = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alert['rule_id'], $alert['device_id']]);
     $alert_log_id = dbFetchCell('SELECT id FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alert['rule_id'], $alert['device_id']]);
@@ -159,8 +158,8 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         }
     }
 
-    $hostname = '<div class="incident">' . generate_device_link($alert, shorthost(format_hostname($alert))) . '<div id="incident' . $alert['id'] . '"';
-    if (is_numeric($vars['uncollapse_key_count'])) {
+    $hostname = '<div class="incident">' . \LibreNMS\Util\Url::modernDeviceLink(DeviceCache::get($alert['device_id'] ?? null)) . '<div id="incident' . $alert['id'] . '"';
+    if (isset($vars['uncollapse_key_count']) && is_numeric($vars['uncollapse_key_count'])) {
         $hostname .= $max_row_length < (int) $vars['uncollapse_key_count'] ? '' : ' class="collapse"';
     } else {
         $hostname .= ' class="collapse"';
@@ -184,7 +183,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
     if (($proc == '') || ($proc == 'NULL')) {
         $has_proc = '';
     } else {
-        if (! preg_match('/^http[s]*:\/\//', $proc)) {
+        if (! preg_match('#^https?://#', $proc)) {
             $has_proc = '';
         } else {
             $has_proc = '<a href="' . $proc . '" target="_blank"><button type="button" class="btn btn-info fa fa-external-link" aria-hidden="true"></button></a>';
@@ -199,11 +198,11 @@ foreach (dbFetchRows($sql, $param) as $alert) {
 
     $response[] = [
         'id' => $rulei++,
-        'rule' => '<i title="' . htmlentities($alert['rule']) . '"><a href="' . \LibreNMS\Util\Url::generate(['page' => 'alert-rules']) . '">' . htmlentities($alert['name']) . '</a></i>',
+        'rule' => '<i title="' . htmlentities($alert['builder']) . '"><a href="' . \LibreNMS\Util\Url::generate(['page' => 'alert-rules']) . '">' . htmlentities($alert['name']) . '</a></i>',
         'details' => '<a class="fa-solid fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . $alert['id'] . '" data-parent="#alerts"></a>',
         'verbose_details' => "<button type='button' class='btn btn-alert-details command-alert-details' aria-label='Details' id='alert-details' data-alert_log_id='{$alert_log_id}'><i class='fa-solid fa-circle-info'></i></button>",
         'hostname' => $hostname,
-        'location' => generate_link(htmlspecialchars($alert['location']), ['page' => 'devices', 'location' => $alert['location']]),
+        'location' => generate_link(htmlspecialchars($alert['location'] ?? 'N/A'), ['page' => 'devices', 'location' => $alert['location'] ?? '']),
         'timestamp' => ($alert['timestamp_display'] ? $alert['timestamp_display'] : 'N/A'),
         'severity' => $severity_ico,
         'state' => $alert['state'],

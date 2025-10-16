@@ -179,10 +179,10 @@ class CiHelper
      */
     public function checkUnit(): int
     {
-        $phpunit_cmd = [$this->checkPhpExec('phpunit'), '--colors=always'];
+        $phpunit_cmd = [$this->checkPhpExec('phpunit'), '--colors=always', '--fail-on-all-issues'];
 
         if ($this->flags['fail-fast']) {
-            array_push($phpunit_cmd, '--stop-on-error', '--stop-on-failure');
+            $phpunit_cmd[] = '--stop-on-defect';
         }
 
         if (Debug::isVerbose()) {
@@ -393,14 +393,14 @@ class CiHelper
         if (! ($silence || $quiet)) {
             echo PHP_EOL;
 
-            if (Process::isTtySupported()) {
-                $proc->setTty(true);
-                $proc->run();
-            } else {
-                $proc->run(function ($type, $buffer) {
+            // Run the process synchronously with a callback to handle output
+            $proc->run(function ($type, $buffer) {
+                if (Process::ERR === $type) {
+                    fwrite(STDERR, $buffer);
+                } else {
                     echo $buffer;
-                });
-            }
+                }
+            });
         } else {
             $proc->run();
         }

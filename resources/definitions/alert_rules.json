@@ -1,0 +1,988 @@
+[
+  {
+    "name": "Devices up/down",
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_down","field":"macros.device_down","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_down","field":"macros.device_down","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"devices.status_reason","field":"devices.status_reason","type":"string","input":"text","operator":"equal","value":"icmp"}],"valid":true},
+    "name": "Device Down! Due to no ICMP response.",
+    "default": true
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"id":"macros.device_down","field":"macros.device_down","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"devices.status_reason","field":"devices.status_reason","type":"string","input":"text","operator":"equal","value":"snmp"}],"valid":true},
+    "name": "Device Down (SNMP unreachable)",
+    "default": true,
+    "notes": "Device may responds on ICMP but not on SNMP."
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"id":"devices.uptime","field":"devices.uptime","type":"string","input":"text","operator":"less","value":"300"},{"id":"macros.device","field":"macros.device","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
+    "name": "Device rebooted",
+    "extra": "{\"count\": 1}",
+    "default": true
+  },
+  {
+    "name": "BGP Session down",
+    "extra": "{\"count\": 1}",
+    "builder": {"condition":"AND","rules":[{"id":"bgpPeers.bgpPeerState","field":"bgpPeers.bgpPeerState","type":"string","input":"text","operator":"not_equal","value":"established"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"bgpPeers.bgpPeerAdminStatus","field":"bgpPeers.bgpPeerAdminStatus","type":"string","input":"text","operator":"not_equal","value":"stop"}],"valid":true}
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"id":"isis_adjacencies.isisISAdjState","field":"isis_adjacencies.isisISAdjState","type":"string","input":"text","operator":"equal","value":"down"},{"condition":"AND","rules":[{"id":"component.type","field":"component.type","type":"string","input":"text","operator":"equal","value":"ISIS"},{"condition":"AND","rules":[{"id":"component.ignore","field":"component.ignore","type":"string","input":"text","operator":"equal","value":"0"},{"id":"component.disabled","field":"component.disabled","type":"string","input":"text","operator":"equal","value":"0"}]}]},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
+    "name": "ISIS Adjacency down"
+  },
+  {
+    "name": "BGP Session established",
+    "extra": "{\"count\": 1}",
+    "builder": {"condition":"AND","rules":[{"id":"bgpPeers.bgpPeerFsmEstablishedTime","field":"bgpPeers.bgpPeerFsmEstablishedTime","type":"string","input":"text","operator":"less","value":"300"},{"id":"bgpPeers.bgpPeerState","field":"bgpPeers.bgpPeerState","type":"string","input":"text","operator":"equal","value":"established"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"id":"macros.port_down","field":"macros.port_down","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
+    "name": "Port status up/down",
+    "extra": "{\"count\": 1}",
+    "default": true
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"id":"devices.last_ping_timetaken","field":"devices.last_ping_timetaken","type":"string","input":"text","operator":"greater","value":"10"}],"valid":true},
+    "name": "Ping Latency",
+    "default": true
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"id":"macros.port_usage_perc","field":"macros.port_usage_perc","type":"integer","input":"text","operator":"greater_or_equal","value":"80"},{"id":"macros.port_up","field":"macros.port_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
+    "name": "Port utilisation over threshold",
+    "default": true
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"greater","value":"`sensors.sensor_limit`"},{"id":"sensors.sensor_alert","field":"sensors.sensor_alert","type":"string","input":"text","operator":"equal","value":"1"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
+    "name": "Sensor over limit - Check Device Health Settings",
+    "default": true
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"less","value":"`sensors.sensor_limit_low`"},{"id":"sensors.sensor_alert","field":"sensors.sensor_alert","type":"string","input":"text","operator":"equal","value":"1"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
+    "name": "Sensor under limit - Check Device Health Settings",
+    "default": true
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"id":"services.service_status","field":"services.service_status","type":"string","input":"text","operator":"not_equal","value":"0"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
+    "name": "Service up/down",
+    "default": true
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"id":"wireless_sensors.sensor_current","field":"wireless_sensors.sensor_current","type":"string","input":"text","operator":"greater_or_equal","value":"`wireless_sensors.sensor_limit`"},{"id":"wireless_sensors.sensor_alert","field":"wireless_sensors.sensor_alert","type":"string","input":"text","operator":"equal","value":"1"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
+    "name": "Wireless Sensor over limit",
+    "default": true
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"id":"wireless_sensors.sensor_current","field":"wireless_sensors.sensor_current","type":"string","input":"text","operator":"less_or_equal","value":"`wireless_sensors.sensor_limit_low`"},{"id":"wireless_sensors.sensor_alert","field":"wireless_sensors.sensor_alert","type":"string","input":"text","operator":"equal","value":"1"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
+    "name": "Wireless Sensor under limit",
+    "default": true
+  },
+  {
+    "name": "Aruba Wireless AP Count Low Warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"wireless_sensors.sensor_type","field":"wireless_sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"arubaos"},{"id":"wireless_sensors.sensor_class","field":"wireless_sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"ap-count"},{"id":"wireless_sensors.sensor_alert","field":"wireless_sensors.sensor_alert","type":"string","input":"text","operator":"equal","value":"1"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"wireless_sensors.sensor_current","field":"wireless_sensors.sensor_current","type":"string","input":"text","operator":"less_or_equal","value":"`wireless_sensors.sensor_limit_low_warn`"},{"id":"wireless_sensors.sensor_current","field":"wireless_sensors.sensor_current","type":"string","input":"text","operator":"greater","value":"`wireless_sensors.sensor_limit_low`"}],"valid":true}
+  },
+  {
+    "name": "Aruba Wireless AP Count Low Critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"wireless_sensors.sensor_type","field":"wireless_sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"arubaos"},{"id":"wireless_sensors.sensor_class","field":"wireless_sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"ap-count"},{"id":"wireless_sensors.sensor_alert","field":"wireless_sensors.sensor_alert","type":"string","input":"text","operator":"equal","value":"1"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"wireless_sensors.sensor_current","field":"wireless_sensors.sensor_current","type":"string","input":"text","operator":"less_or_equal","value":"`wireless_sensors.sensor_limit_low`"}],"valid":true}
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"id":"macros.state_sensor_critical","field":"macros.state_sensor_critical","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"sensors.sensor_alert","field":"sensors.sensor_alert","type":"string","input":"text","operator":"equal","value":"1"}],"valid":true},
+    "name": "State Sensor Critical",
+    "default": true
+  },
+  {
+    "name": "State Sensor Warning",
+    "builder": {"condition":"AND","rules":[{"id":"macros.state_sensor_warning","field":"macros.state_sensor_warning","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"sensors.sensor_alert","field":"sensors.sensor_alert","type":"string","input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Quota bills over 75% used",
+    "builder": {"condition":"AND","rules":[{"id":"macros.bill_quota_over_quota","field":"macros.bill_quota_over_quota","type":"integer","input":"radio","operator":"greater_or_equal","value":"75"}],"valid":true}
+  },
+  {
+    "name": "CDR bills over 75% used",
+    "builder": {"condition":"AND","rules":[{"id":"macros.bill_cdr_over_quota","field":"macros.bill_cdr_over_quota","type":"integer","input":"radio","operator":"greater_or_equal","value":"75"}],"valid":true}
+  },
+  {
+    "name": "IPSec tunnels down",
+    "builder": {"condition":"AND","rules":[{"id":"ipsec_tunnels.tunnel_status","field":"ipsec_tunnels.tunnel_status","type":"string","input":"text","operator":"not_equal","value":"active"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Device took too long to poll",
+    "builder": {"condition":"AND","rules":[{"id":"devices.last_polled_timetaken","field":"devices.last_polled_timetaken","type":"string","input":"text","operator":"greater_or_equal","value":"290"}],"valid":true}
+  },
+  {
+    "name": "Processor usage over 85%",
+    "builder": {"condition":"AND","rules":[{"id":"processors.processor_usage","field":"processors.processor_usage","type":"string","input":"text","operator":"greater","value":"85"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Cisco ASA Primary unit changed to standby",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_descr","field":"sensors.sensor_descr","type":"string","input":"text","operator":"equal","value":"Primary Unit.*"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"10"},{"id":"sensors.sensor_prev","field":"sensors.sensor_prev","type":"string","input":"text","operator":"equal","value":"9"}],"valid":true}
+  },
+  {
+    "name": "Port status change from up to down",
+    "builder": {"condition":"AND","rules":[{"id":"ports.ifOperStatus","field":"ports.ifOperStatus","type":"string","input":"text","operator":"equal","value":"down"},{"id":"ports.ifOperStatus_prev","field":"ports.ifOperStatus_prev","type":"string","input":"text","operator":"equal","value":"up"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Interface Errors Rate greater than 100",
+    "builder": {"condition":"OR","rules":[{"id":"ports.ifOutErrors_rate","field":"ports.ifOutErrors_rate","type":"string","input":"text","operator":"greater_or_equal","value":"100"},{"id":"ports.ifInErrors_rate","field":"ports.ifInErrors_rate","type":"string","input":"text","operator":"greater_or_equal","value":"100"}],"valid":true}
+  },
+  {
+    "name": "Device added within the last 60 minutes",
+    "builder": {"condition":"AND","rules":[{"id":"devices.inserted","field":"devices.inserted","type":"datetime","input":"text","operator":"greater_or_equal","value":"`macros.past_60m`"}],"valid":true}
+  },
+  {
+    "name": "Device discovered within the last 60 minutes",
+    "builder": {"condition":"AND","rules":[{"id":"eventlog.type","field":"eventlog.type","type":"string","input":"text","operator":"equal","value":"discovery"},{"id":"eventlog.message","field":"eventlog.message","type":"string","input":"text","operator":"regex","value":".*autodiscovered.*"},{"id":"eventlog.datetime","field":"eventlog.datetime","type":"datetime","input":"text","operator":"greater_or_equal","value":"`macros.past_60m`"}],"valid":true}
+  },
+  {
+    "name": "Too many wireless clients",
+    "builder": {"condition":"AND","rules":[{"id":"wireless_sensors.sensor_class","field":"wireless_sensors.sensor_class","type":"string","input":"text","operator":"equal","value":"clients"},{"id":"wireless_sensors.sensor_current","field":"wireless_sensors.sensor_current","type":"string","input":"text","operator":"greater_or_equal","value":"`wireless_sensors.sensor_limit`"},{"id":"wireless_sensors.sensor_alert","field":"wireless_sensors.sensor_alert","type":"string","input":"text","operator":"equal","value":"1"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Syslog, Authentication failure on Device",
+    "builder": {"condition":"AND","rules":[{"id":"syslog.timestamp","field":"syslog.timestamp","type":"datetime","input":"text","operator":"greater_or_equal","value":"`macros.past_5m`"},{"id":"syslog.msg","field":"syslog.msg","type":"string","input":"text","operator":"regex","value":".*authentication failure.*"}],"valid":true}
+  },
+  {
+    "name": "Service warning",
+    "builder": {"condition":"AND","rules":[{"id":"services.service_status","field":"services.service_status","type":"string","input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Service critical",
+    "builder": {"condition":"AND","rules":[{"id":"services.service_status","field":"services.service_status","type":"string","input":"text","operator":"equal","value":"2"}],"valid":true}
+  },
+  {
+    "name": "Syslog, received Alert Priority Message",
+    "builder": {"condition":"AND","rules":[{"id":"syslog.timestamp","field":"syslog.timestamp","type":"datetime","input":"text","operator":"greater_or_equal","value":"`macros.past_5m`"},{"id":"syslog.priority","field":"syslog.priority","type":"string","input":"text","operator":"regex","value":"alert"}],"valid":true}
+  },
+  {
+    "name": "Syslog, received Emergency Priority Message",
+    "builder": {"condition":"AND","rules":[{"id":"syslog.timestamp","field":"syslog.timestamp","type":"datetime","input":"text","operator":"greater_or_equal","value":"`macros.past_5m`"},{"id":"syslog.priority","field":"syslog.priority","type":"string","input":"text","operator":"regex","value":"emergency"}],"valid":true}
+  },
+  {
+    "name": "Syslog, ARP table is full check on device ",
+    "builder": {"condition":"AND","rules":[{"id":"syslog.timestamp","field":"syslog.timestamp","type":"datetime","input":"text","operator":"greater_or_equal","value":"`macros.past_5m`"},{"id":"syslog.msg","field":"syslog.msg","type":"string","input":"text","operator":"regex","value":".*arp table is full.*"}],"valid":true}
+  },
+  {
+    "name": "APC UPS Battery Needs Replacement",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsAdvBatteryReplaceIndicator"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"2"}],"valid":true}
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsAdvTestDiagnosticsResults"},{"condition":"OR","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"2"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"3"}]}],"valid":true},
+    "name": "APC UPS Diagonstics Test Result"
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"3"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsBasicOutputStatus"}]}],"valid":true},
+    "name": "APC UPS Switched to Battery Power"
+  },
+  {
+    "name": "APC UPS in Hardware Failure Bypass Mode",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"10"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsBasicOutputStatus"}],"valid":true}
+  },
+  {
+    "name": "APC UPS in Emergency Static Bypass Mode",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"16"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsBasicOutputStatus"}],"valid":true}
+  },
+  {
+    "name": "APC UPS in Smart Trim Mode",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"12"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsBasicOutputStatus"}],"valid":true}
+  },
+  {
+    "name": "HP Procurve Bad Power Supply",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_oid","field":"sensors.sensor_oid","type":"string","input":"text","operator":"regex","value":".1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.[2-5]"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"2"}],"valid":true}
+  },
+  {
+    "name": "HP Procurve Fan Fault",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_oid","field":"sensors.sensor_oid","type":"string","input":"text","operator":"equal","value":".1.3.6.1.4.1.11.2.14.11.1.2.6.1.4.1"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"2"}],"valid":true}
+  },
+  {
+    "name": "Sensor over limit with linked port",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"greater","value":"`sensors.sensor_limit`"},{"id":"sensors.sensor_alert","field":"sensors.sensor_alert","type":"string","input":"text","operator":"equal","value":"1"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"macros.sensor_port_link","field":"macros.sensor_port_link","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Sensor under limit with linked port",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"less","value":"`sensors.sensor_limit_low`"},{"id":"sensors.sensor_alert","field":"sensors.sensor_alert","type":"string","input":"text","operator":"equal","value":"1"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"macros.sensor_port_link","field":"macros.sensor_port_link","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "UPS is running on the bypass",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsOutputSourceState"}],"valid":true}
+  },
+  {
+    "name": "UPS is running on the battery",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"5"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsOutputSourceState"}],"valid":true}
+  },
+  {
+    "name": "UPS has a low battery",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"3"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsBatteryStatusState"}],"valid":true}
+  },
+  {
+    "name": "UPS has a depleted battery",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsBatteryStatusState"}],"valid":true}
+  },
+  {
+    "name": "UPS has a heavy load",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_descr","field":"sensors.sensor_descr","type":"string","input":"text","operator":"regex","value":"Percentage load"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"greater_or_equal","value":"90"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"rfc1628"}],"valid":true}
+  },
+  {
+    "name": "HPE iLo Server drive degraded/failure",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[3-4]"},{"id":"sensors.sensor_oid","field":"sensors.sensor_oid","type":"string","input":"text","operator":"equal","value":".1.3.6.1.4.1.232.3.2.5.1.1.37."}],"valid":true}
+  },
+  {
+    "name": "HPE iLo Server Power Supply degraded/failure",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[3-4]"},{"id":"sensors.sensor_oid","field":"sensors.sensor_oid","type":"string","input":"text","operator":"equal","value":".1.3.6.1.4.1.232.6.2.9.3.1.4."}],"valid":true}
+  },
+  {
+    "name": "HPE iLo Server Fan degraded/failure",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[3-4]"},{"id":"sensors.sensor_oid","field":"sensors.sensor_oid","type":"string","input":"text","operator":"equal","value":".1.3.6.1.4.1.232.6.2.6.7.1.9."}],"valid":true}
+  },
+  {
+    "name": "HPE iLo Server CPU degraded/failure",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[3-4]"},{"id":"sensors.sensor_oid","field":"sensors.sensor_oid","type":"string","input":"text","operator":"equal","value":".1.3.6.1.4.1.232.1.2.2.1.1.6."}],"valid":true}
+  },
+  {
+    "name": "HPE iLo Server Memory degraded/failure",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[3-4]"},{"id":"sensors.sensor_oid","field":"sensors.sensor_oid","type":"string","input":"text","operator":"equal","value":".1.3.6.1.4.1.232.6.2.14.13.1.20."}],"valid":true}
+  },
+  {
+    "name": "Applications OS-Updates, New Updates Available",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"os-updates"},{"id":"applications.app_status","field":"applications.app_status","type":"string","input":"text","operator":"greater_or_equal","value":"10"}],"valid":true}
+  },
+  {
+    "name": "HPE BladeSystem has a bad power supply",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"hpblmos"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"hpblmos_psustate"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"[3-4]"}],"valid":true}
+  },
+  {
+    "name": "HPE BladeSystem has a bad fan",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"hpblmos"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"hpblmos_fanstate"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"[3-4]"}],"valid":true}
+  },
+  {
+    "name": "AXIS camera has a failed temperature sensor",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"axiscam"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"tempSensorStatusState"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"2"}],"valid":true}
+  },
+  {
+    "name": "RITTAL LCP has a failed status",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"rittal-lcp"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"cmcIIIUnitStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"2"}],"valid":true}
+  },
+  {
+    "name": "RITTAL LCP has an overloaded status",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"rittal-lcp"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"cmcIIIUnitStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"3"}],"valid":true}
+  },
+  {
+    "name": "Synology NAS has a failed status",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dsm"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"systemStatusState"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"2"}],"valid":true}
+  },
+  {
+    "name": "Synology NAS has a failed power status",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dsm"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"powerStatusState"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"2"}],"valid":true}
+  },
+  {
+    "name": "Synology NAS has a failed fan status",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dsm"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"systemFanStatusState"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"2"}],"valid":true}
+  },
+  {
+    "name": "Synology NAS has a failed CPU fan status",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dsm"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"cpuFanStatusState"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"2"}],"valid":true}
+  },
+  {
+    "name": "Synology NAS has a new upgrade available",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dsm"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upgradeAvailableState"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Synology NAS has a bad RAID status",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dsm"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"raidStatusState"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"[11-12]"}],"valid":true}
+  },
+  {
+    "name": "Synology NAS has a bad disk status",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dsm"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"diskStatusState"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"[4-5]"}],"valid":true}
+  },
+  {
+    "name": "F5 appliance has a bad power supply",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"f5"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"sysChassisPowerSupplyStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"0"}],"valid":true}
+  },
+  {
+    "name": "F5 appliance has a bad fan",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"f5"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"sysChassisFanStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"0"}],"valid":true}
+  },
+  {
+    "name": "Cisco NX-OS device has a bad fan",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"nxos"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"cefcFanTrayOperStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"[3-4]"}],"valid":true}
+  },
+  {
+    "name": "Palo Alto Networks passive firewall changed to active",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"panos"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"panSysHAState"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"1"},{"id":"sensors.sensor_prev","field":"sensors.sensor_prev","type":"string","input":"text","operator":"equal","value":"2"}],"valid":true}
+  },
+  {
+    "name": "Comware Fan Status failed",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"2"},{"id":"sensors.sensor_oid","field":"sensors.sensor_oid","type":"string","input":"text","operator":"equal","value":".1.3.6.1.4.1.25506.8.35.9.1.1.1.2"}],"valid":true}
+  },
+  {
+    "name": "Comware PSU status failed",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"2"},{"id":"sensors.sensor_oid","field":"sensors.sensor_oid","type":"string","input":"text","operator":"equal","value":".1.3.6.1.4.1.25506.8.35.9.1.2.1.2"}],"valid":true}
+  },
+  {
+    "name": "Cisco Fan Status failed ",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"9"},{"id":"sensors.sensor_oid","field":"sensors.sensor_oid","type":"string","input":"text","operator":"equal","value":".1.3.6.1.4.1.9.9.13.1.4.1.3"}],"valid":true}
+  },
+  {
+    "name": "Cisco PSU status failed",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"8"},{"id":"sensors.sensor_oid","field":"sensors.sensor_oid","type":"string","input":"text","operator":"equal","value":".1.3.6.1.4.1.9.9.13.1.5.1.3"}],"valid":true}
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_alert","field":"sensors.sensor_alert","type":"string","input":"text","operator":"equal","value":"1"},{"condition":"OR","rules":[{"id":"sensors.sensor_descr","field":"sensors.sensor_descr","type":"string","input":"text","operator":"regex","value":".*Power Supply.*"},{"id":"sensors.sensor_descr","field":"sensors.sensor_descr","type":"string","input":"text","operator":"regex","value":".*PEM.*"},{"id":"sensors.sensor_descr","field":"sensors.sensor_descr","type":"string","input":"text","operator":"regex","value":".*PSU.*"}]},{"condition":"OR","rules":[{"id":"macros.state_sensor_warning","field":"macros.state_sensor_warning","type":"boolean","input":"radio","operator":"equal","value":"1"},{"id":"macros.state_sensor_critical","field":"macros.state_sensor_critical","type":"boolean","input":"radio","operator":"equal","value":"1"}]}],"valid":true},
+    "name": "Generic PSU status failed"
+  },
+  {
+    "name": "UBNT EdgeSwitch Chassis state failed",
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"3"},{"id":"sensors.sensor_oid","field":"sensors.sensor_oid","type":"string","input":"text","operator":"equal","value":".1.3.6.1.4.1.4413.1.1.43.1.15.1.2.1"}],"valid":true}
+  },
+  {
+    "name": "Netscaler HA node mode change",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"Netscaler"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"sysHighAvailabilityMode"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"not_equal","value":"`sensors.sensor_prev`"},{"id":"sensors.lastupdate","field":"sensors.lastupdate","type":"datetime","input":"text","operator":"less","value":"DATE_SUB(NOW(),INTERVAL 5 MINUTE)"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Netscaler HA node state Warning",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"Netscaler"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"haCurState"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[1|8|9]"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Netscaler HA node state Critical",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"Netscaler"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"haCurState"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"regex","value":"[2|4|5|7|10|11]"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "SSH Connections To",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"'portactivity'"},{"id":"applications_metrics.ssh_total_to","field":"applications_metrics.ssh_total_to","type":null,"input":"text","operator":"greater","value":"'5'"}],"valid":true}
+  },
+  {
+    "name": "HTTP Connections To",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"'portactivity'"},{"id":"applications_metrics.http_total_to","field":"applications_metrics.http_total_to","type":null,"input":"text","operator":"greater","value":"'100'"}],"valid":true}
+  },
+  {
+    "name": "HTTPS Connections To",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"'portactivity'"},{"id":"applications_metrics.https_total_to","field":"applications_metrics.https_total_to","type":null,"input":"text","operator":"greater","value":"'100'"}],"valid":true}
+  },
+  {
+    "name": "SMTP Connections From",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"'portactivity'"},{"id":"applications_metrics.smtp_total_from","field":"applications_metrics.smtp_total_from","type":null,"input":"text","operator":"greater","value":"'10'"}],"valid":true}
+  },
+  {
+    "name": "SMTP Connections To",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"'portactivity'"},{"id":"applications_metrics.smtp_total_to","field":"applications_metrics.smtp_total_to","type":null,"input":"text","operator":"greater","value":"'30'"}],"valid":true}
+  },
+  {
+    "name": "FTP Connections To",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"'portactivity'"},{"id":"applications_metrics.ftp_total_to","field":"applications_metrics.ftp_total_to","type":null,"input":"text","operator":"greater","value":"'5'"}],"valid":true}
+  },
+  {
+    "name": "IMAP Connections To",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"'portactivity'"},{"id":"applications_metrics.imap_total_to","field":"applications_metrics.imap_total_to","type":null,"input":"text","operator":"greater","value":"'20'"}],"valid":true}
+  },
+  {
+    "name": "IMAPS Connections To",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"'portactivity'"},{"id":"applications_metrics.imaps_total_to","field":"applications_metrics.imaps_total_to","type":null,"input":"text","operator":"greater","value":"'20'"}],"valid":true}
+  },
+  {
+    "name": "IRCD Connections From",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"'portactivity'"},{"id":"applications_metrics.imaps_total_from","field":"applications_metrics.imaps_total_from","type":null,"input":"text","operator":"greater","value":"'0'"}],"valid":true}
+  },
+  {
+    "name": "CustomOID over limit",
+    "builder": {"condition":"AND","rules":[{"id":"customoids.customoid_current","field":"customoids.customoid_current","type":"string","input":"text","operator":"greater_or_equal","value":"`customoids.customoid_limit`"},{"id":"customoids.customoid_alert","field":"customoids.customoid_alert","type":"string","input":"text","operator":"equal","value":"1"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "CustomOID under limit",
+    "builder": {"condition":"AND","rules":[{"id":"customoids.customoid_current","field":"customoids.customoid_current","type":"string","input":"text","operator":"less_or_equal","value":"`customoids.customoid_limit_low`"},{"id":"customoids.customoid_alert","field":"customoids.customoid_alert","type":"string","input":"text","operator":"equal","value":"1"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "CustomOID over warning limit",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"customoids.customoid_current","field":"customoids.customoid_current","type":"string","input":"text","operator":"greater_or_equal","value":"`customoids.customoid_limit_warn`"},{"id":"customoids.customoid_alert","field":"customoids.customoid_alert","type":"string","input":"text","operator":"equal","value":"1"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "CustomOID under warning limit",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"customoids.customoid_current","field":"customoids.customoid_current","type":"string","input":"text","operator":"less_or_equal","value":"`customoids.customoid_limit_low_warn`"},{"id":"customoids.customoid_alert","field":"customoids.customoid_alert","type":"string","input":"text","operator":"equal","value":"1"},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "UPS-NUT on battery",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"ups-nut"},{"id":"state_indexes.state_name","field":"state_indexes.state_name","type":"string","input":"text","operator":"equal","value":"UPSOnBattery"},{"id":"macros.state_sensor_warning","field":"macros.state_sensor_warning","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "UPS-NUT low battery",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"ups-nut"},{"id":"state_indexes.state_name","field":"state_indexes.state_name","type":"string","input":"text","operator":"equal","value":"UPSLowBattery"},{"id":"macros.state_sensor_critical","field":"macros.state_sensor_critical","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "UPS-NUT high battery",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"ups-nut"},{"id":"state_indexes.state_name","field":"state_indexes.state_name","type":"string","input":"text","operator":"equal","value":"UPSHighBattery"},{"id":"macros.state_sensor_warning","field":"macros.state_sensor_warning","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "UPS-NUT battery needs to be replaced",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"ups-nut"},{"id":"state_indexes.state_name","field":"state_indexes.state_name","type":"string","input":"text","operator":"equal","value":"UPSBatteryReplace"},{"id":"macros.state_sensor_warning","field":"macros.state_sensor_warning","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "UPS-NUT battery is charging",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"ups-nut"},{"id":"state_indexes.state_name","field":"state_indexes.state_name","type":"string","input":"text","operator":"equal","value":"UPSBatteryCharging"},{"id":"macros.state_sensor_warning","field":"macros.state_sensor_warning","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "UPS-NUT battery is discharging",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"ups-nut"},{"id":"state_indexes.state_name","field":"state_indexes.state_name","type":"string","input":"text","operator":"equal","value":"UPSBatteryDischarging"},{"id":"macros.state_sensor_warning","field":"macros.state_sensor_warning","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "UPS-NUT bypass circuit is active",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"ups-nut"},{"id":"state_indexes.state_name","field":"state_indexes.state_name","type":"string","input":"text","operator":"equal","value":"UPSUPSBypass"},{"id":"macros.state_sensor_warning","field":"macros.state_sensor_warning","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "UPS-NUT performing runtime calibration",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"ups-nut"},{"id":"state_indexes.state_name","field":"state_indexes.state_name","type":"string","input":"text","operator":"equal","value":"UPSRuntimeCalibration"},{"id":"macros.state_sensor_warning","field":"macros.state_sensor_warning","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "UPS-NUT offline and is not supplying power to the load",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"ups-nut"},{"id":"state_indexes.state_name","field":"state_indexes.state_name","type":"string","input":"text","operator":"equal","value":"UPSOffline"},{"id":"macros.state_sensor_critical","field":"macros.state_sensor_critical","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "UPS-NUT overloaded",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"ups-nut"},{"id":"state_indexes.state_name","field":"state_indexes.state_name","type":"string","input":"text","operator":"equal","value":"UPSUPSOverloaded"},{"id":"macros.state_sensor_critical","field":"macros.state_sensor_critical","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "UPS-NUT trimming incoming voltage",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"ups-nut"},{"id":"state_indexes.state_name","field":"state_indexes.state_name","type":"string","input":"text","operator":"equal","value":"UPSUPSBuck"},{"id":"macros.state_sensor_warning","field":"macros.state_sensor_warning","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "UPS-NUT boosting incoming voltage",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"ups-nut"},{"id":"state_indexes.state_name","field":"state_indexes.state_name","type":"string","input":"text","operator":"equal","value":"UPSUPSBoost"},{"id":"macros.state_sensor_warning","field":"macros.state_sensor_warning","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "UPS-NUT trimming incoming voltage",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"ups-nut"},{"id":"state_indexes.state_name","field":"state_indexes.state_name","type":"string","input":"text","operator":"equal","value":"UPSForcedShutdown"},{"id":"macros.state_sensor_critical","field":"macros.state_sensor_critical","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "QNAP NAS has a failed power status",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"qnap"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"systemPowerStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"-1"}],"valid":true}
+  },
+  {
+    "name": "QNAP NAS has a failed fan status",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"qnap"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"systemFanStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"-1"}],"valid":true}
+  },
+  {
+    "name": "QNAP NAS has a bad RAID status",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"qnap"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"raidStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"not_equal","value":"0"}],"valid":true}
+  },
+  {
+    "name": "QNAP NAS has a bad SMART disk status",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"qnap"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"diskSmartInfo"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"not_equal","value":"0"}],"valid":true}
+  },
+  {
+    "name": "A Device sensor has been deleted",
+    "builder": {"condition":"AND","rules":[{"id":"eventlog.message","field":"eventlog.message","type":"string","input":"text","operator":"regex","value":"Deleted"},{"id":"eventlog.datetime","field":"eventlog.datetime","type":"datetime","input":"text","operator":"greater_or_equal","value":"`DATE_SUB(NOW(),INTERVAL 12 Hour)`"}],"valid":true}
+  },
+  {
+    "name": "Unpolled Devices",
+    "builder": {"condition":"AND","rules":[{"id":"macros.device","field":"macros.device","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"devices.last_polled","field":"devices.last_polled","type":"datetime","input":"text","operator":"less","value":"`DATE_SUB(NOW(), INTERVAL 6 MINUTE)`"}],"valid":true}
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"id":"ports.ifSpeed","field":"ports.ifSpeed","type":"string","input":"text","operator":"greater","value":"0"},{"id":"ports.ifSpeed","field":"ports.ifSpeed","type":"string","input":"text","operator":"less","value":"`ports.ifSpeed_prev`"},{"id":"eventlog.message","field":"eventlog.message","type":"string","input":"text","operator":"begins_with","value":"ifSpeed:"},{"id":"eventlog.datetime","field":"eventlog.datetime","type":"datetime","input":"text","operator":"greater_or_equal","value":"`macros.past_10m`"},{"id":"ports.port_id","field":"ports.port_id","type":"string","input":"text","operator":"equal","value":"`eventlog.reference`"},{"id":"ports.ifOperStatus","field":"ports.ifOperStatus","type":"string","input":"text","operator":"equal","value":"up"},{"id":"ports.disabled","field":"ports.disabled","type":"string","input":"text","operator":"equal","value":"0"}],"valid":true},
+    "name": "Port Speed Degraded"
+  },
+  {
+    "name": "Sneck Warnings >= 1",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sneck"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"warning"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater_or_equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Sneck Critical >= 1",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sneck"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"critical"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater_or_equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Sneck Unknown >= 1",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sneck"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"unknown"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater_or_equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Sneck Errored >= 1",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sneck"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"errored"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater_or_equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Sneck - IPMI PSU Warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sneck"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"check_ipmi_psu"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Sneck - IPMI PSU Critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sneck"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"check_ipmi_psu"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"equal","value":"2"}],"valid":true}
+  },
+  {
+    "name": "Sneck - IPMI PSU Unknown",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sneck"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"check_ipmi_psu"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"equal","value":"3"}],"valid":true}
+  },
+  {
+    "name": "Sneck - IPMI Fan Warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sneck"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"check_ipmi_fan"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Sneck - IPMI Fan Critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sneck"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"check_ipmi_fan"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"equal","value":"2"}],"valid":true}
+  },
+  {
+    "name": "Sneck - IPMI Fan Unknown",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sneck"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"check_ipmi_fan"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"equal","value":"3"}],"valid":true}
+  },
+  {
+    "name": "Sneck - IPMI Temperature Warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sneck"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"check_ipmi_temp"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Sneck - IPMI Temperature Critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sneck"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"check_ipmi_temp"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"equal","value":"2"}],"valid":true}
+  },
+  {
+    "name": "Sneck - IPMI Temperature Unknown",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sneck"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"check_ipmi_temp"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"equal","value":"3"}],"valid":true}
+  },
+  {
+    "name": "Sneck - IPMI Volts Warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sneck"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"check_ipmi_volts"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Sneck - IPMI Volts Critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sneck"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"check_ipmi_volts"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"equal","value":"2"}],"valid":true}
+  },
+  {
+    "name": "Sneck - IPMI Volts Unknown",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sneck"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"check_ipmi_volts"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"equal","value":"3"}],"valid":true}
+  },
+  {
+    "name": "Sneck - IPMI Amps Warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sneck"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"check_ipmi_amps"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Sneck - IPMI Amps Critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sneck"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"check_ipmi_amps"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"equal","value":"2"}],"valid":true}
+  },
+  {
+    "name": "Sneck - IPMI Amps Unknown",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sneck"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"check_ipmi_amps"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"equal","value":"3"}],"valid":true}
+  },
+  {
+    "name": "Sneck - Wrong Number Of Suricata Procs Running",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sneck"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"check_suricata_procs"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"not_equal","value":"0"}],"valid":true}
+  },
+  {
+    "name": "Sneck - Wrong Number Of Meer Procs Running",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sneck"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"check_meer_procs"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"not_equal","value":"0"}],"valid":true}
+  },
+  {
+    "name": "Sneck - Wrong Number Of Sagan Procs Running",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sneck"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"check_sagan_procs"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"not_equal","value":"0"}],"valid":true}
+  },
+  {
+    "name": "Sneck - Wrong Number Of Daemonlogger Procs Running",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sneck"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"check_daemonlogger_procs"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"not_equal","value":"0"}],"valid":true}
+  },
+  {
+    "name": "Sneck Has Not Run For Over 540 Seconds",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sneck"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"time_to_polling_abs"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater_or_equal","value":"540"}],"valid":true}
+  },
+  {
+    "name": "Suricata has a WARNING alert",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"suricata"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"alert"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Suricata has a CRITICAL alert",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"suricata"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"alert"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"equal","value":"2"}],"valid":true}
+  },
+  {
+    "name": "Suricata has a UNKNOWN alert",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"suricata"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"alert"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"equal","value":"3"}],"valid":true}
+  },
+  {
+    "name": "Suricata Packet Drop > 1%",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"suricata"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":".total_drop_percent"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater_or_equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Suricata Packet Drop > 2%",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"suricata"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":".total_drop_percent"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater_or_equal","value":"2"}],"valid":true}
+  },
+  {
+    "name": "Suricata Packet If Drop > 1%",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"suricata"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":".total_ifdrop_percent"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater_or_equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Suricata Packet If Drop > 2%",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"suricata"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":".total_ifdrop_percent"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater_or_equal","value":"2"}],"valid":true}
+  },
+  {
+    "name": "Suricata Packet Error >= 1%",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"suricata"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":".total_error_delta"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater_or_equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Suricata Packet Error >= 2%",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"suricata"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":".total_error_delta"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater_or_equal","value":"2"}],"valid":true}
+  },
+  {
+    "name": "MySQL Server not responding",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"mysql"},{"id":"applications.app_state","field":"applications.app_state","type":"string","input":"text","operator":"not_equal","value":"OK"}],"valid":true}
+  },
+  {
+    "name": "Opensearch/Elasticsearch Cluster Status Yellow",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"opensearch"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":".status"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Opensearch/Elasticsearch Cluster Status Red",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"opensearch"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":".status"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"equal","value":"2"}],"valid":true}
+  },
+  {
+    "name": "Sagan has a WARNING alert",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sagan"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":".total_alert"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Sagan has a CRITICAL alert",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sagan"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":".total_alert"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"equal","value":"2"}],"valid":true}
+  },
+  {
+    "name": "Sagan has a UNKNOWN alert",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sagan"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":".total_alert"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"equal","value":"3"}],"valid":true}
+  },
+  {
+    "name": "Sagan Flow Drop Percent >= 1%",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sagan"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":".total_f_drop_percent"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater_or_equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Sagan Flow Drop Percent >= 2%",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sagan"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":".total_f_drop_percent"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater_or_equal","value":"2"}],"valid":true}
+  },
+  {
+    "name": "Sagan Drop Percent >= 1%",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sagan"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":".total_drop_percent"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater_or_equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Sagan Drop Percent >= 2%",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"sagan"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":".total_drop_percent"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater_or_equal","value":"2"}],"valid":true}
+  },
+  {
+    "name": "Space on / is >= 90% and < 95% in use",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"storage.storage_descr","field":"storage.storage_descr","type":"string","input":"text","operator":"equal","value":"/"},{"id":"storage.storage_perc","field":"storage.storage_perc","type":"string","input":"text","operator":"greater_or_equal","value":"90"},{"id":"storage.storage_perc","field":"storage.storage_perc","type":"string","input":"text","operator":"less","value":"95"}],"valid":true}
+  },
+  {
+    "name": "Space on / is >= 95% in use",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"storage.storage_descr","field":"storage.storage_descr","type":"string","input":"text","operator":"equal","value":"/"},{"id":"storage.storage_perc","field":"storage.storage_perc","type":"string","input":"text","operator":"greater_or_equal","value":"95"}],"valid":true}
+  },
+  {
+    "name": "Systemd Services Failed > 0",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"systemd"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"sub_service_failed"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+  },
+  {
+    "name": "Logsize: set(s) have a size > 5GB",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"logsize"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"max_size"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"5000000000"}],"valid":true}
+  },
+  {
+    "name": "Logsize: set(s) has a log file(s) with a size > 5GB",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"logsize"},{"id":"application_metrics.metric like \"set_%_max_size\"","field":"application_metrics.metric like \"set_%_max_size\"","type":null,"input":"text","operator":"equal","value":"1"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"5000000000"}],"valid":true}
+  },
+  {
+    "name": "Logsize: total size > 5GB",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"logsize"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"size"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"5000000000"}],"valid":true}
+  },
+  {
+    "name": "ZFS L2 errors present",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"zfs"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"l2_errors"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater_or_equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "ZFS has one or more pool DEGRADED, FAULTED, UNAVAIL, REMOVED, or other",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"zfs"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"health"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"equal","value":"0"}],"valid":true}
+  },
+  {
+    "name": "linux_config_files Configuration Files Out-Of-Sync > 0",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"linux_config_files"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"number_of_confs"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+  },
+  {
+    "name": "SMART: one or more disk is unhealthy",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"unhealthy"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+  },
+  {
+    "name": "SMART: one or more disk could not be polled",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"exit_nonzero"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+  },
+  {
+    "name": "SS TCP TIME-WAIT Sessions > 100",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"ss"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"tcp_time-wait"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"100"}],"valid":true}
+  },
+  {
+    "name": "SS IPv6 TCP ESTABLISHED Sessions < 10",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"ss"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"inet6_tcp_established"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"less","value":"10"}],"valid":true}
+  },
+  {
+    "name": "Suricata Extract Submit errors found > 0",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"suricata_extract"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"errors"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+  },
+  {
+    "name": "Suricata Extract Submit submission failures found > 0",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"(applications.app_type","field":"(applications.app_type","type":"string","input":"text","operator":"equal","value":"suricata_extract"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"sub_fail"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0\")"},{"id":"(applications.app_type","field":"(applications.app_type","type":null,"input":"text","operator":"equal","value":"suricata_extract"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"sub_4xx"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"},{"id":"(applications.app_type","field":"(applications.app_type","type":null,"input":"text","operator":"equal","value":"suricata_extract"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"sub_5xx"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+  },
+  {
+    "name": "Suricata Extract Submit truncated extracts found > 0",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"suricata_extract"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"truncated"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+  },
+  {
+    "name": "Suricata Extract Submit zero sized files > 0",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"suricata_extract"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"zero_sized"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+  },
+  {
+    "name": "Dell DRAC amperage probe status critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"amperageProbeStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6,8-9]|10\")","field":"sensors.sensor_current REGEXP \"[5-6,8-9]|10\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Dell DRAC amperage probe status warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"amperageProbeStatus"},{"id":"sensors.sensor_current REGEXP \"[4,7]\")","field":"sensors.sensor_current REGEXP \"[4,7]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Dell DRAC global system status critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"drsGlobalSystemStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6]\")","field":"sensors.sensor_current REGEXP \"[5-6]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Dell DRAC global system status warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"drsGlobalSystemStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+  },
+  {
+    "name": "Dell DRAC memory device status critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"memoryDeviceStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6]\")","field":"sensors.sensor_current REGEXP \"[5-6]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Dell DRAC memory device status warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"memoryDeviceStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+  },
+  {
+    "name": "Dell DRAC physical disk state critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"physicalDiskState"},{"id":"sensors.sensor_current REGEXP \"[5-9]|10\")","field":"sensors.sensor_current REGEXP \"[5-9]|10\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Dell DRAC physical disk state warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"physicalDiskState"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+  },
+  {
+    "name": "Dell DRAC processor device status critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"processorDeviceStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6]\")","field":"sensors.sensor_current REGEXP \"[5-6]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Dell DRAC processor device status warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"processorDeviceStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+  },
+  {
+    "name": "Dell DRAC system battery status critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"systemBatteryStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6,8-9]|10\")","field":"sensors.sensor_current REGEXP \"[5-6,8-9]|10\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Dell DRAC system battery status warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"systemBatteryStatus"},{"id":"sensors.sensor_current REGEXP \"[4,7]\")","field":"sensors.sensor_current REGEXP \"[4,7]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Dell DRAC virtual disk state critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"virtualDiskState"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"3)"}],"valid":true}
+  },
+  {
+    "name": "Dell DRAC virtual disk state warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"drac"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"virtualDiskState"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+  },
+  {
+    "name": "Dell OME-M blade status critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmBladeCurrStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6]\")","field":"sensors.sensor_current REGEXP \"[5-6]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Dell OME-M blade status warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmBladeCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+  },
+  {
+    "name": "Dell OME-M fan status critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmFanCurrStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6]\")","field":"sensors.sensor_current REGEXP \"[5-6]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Dell OME-M fan status warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmFanCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+  },
+  {
+    "name": "Dell OME-M global system status critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmGlobalSystemStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6]\")","field":"sensors.sensor_current REGEXP \"[5-6]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Dell OME-M global system status warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmGlobalSystemStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+  },
+  {
+    "name": "Dell OME-M IOM status critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmIOMCurrStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6]\")","field":"sensors.sensor_current REGEXP \"[5-6]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Dell OME-M IOM status warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmIOMCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+  },
+  {
+    "name": "Dell OME-M MM status critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmMMCurrStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6]\")","field":"sensors.sensor_current REGEXP \"[5-6]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Dell OME-M MM status warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmMMCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+  },
+  {
+    "name": "Dell OME-M power status critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmPowerCurrStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6]\")","field":"sensors.sensor_current REGEXP \"[5-6]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Dell OME-M power status warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmPowerCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+  },
+  {
+    "name": "Dell OME-M PSU status critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmPSUTable"},{"id":"sensors.sensor_current REGEXP \"[5-6]\")","field":"sensors.sensor_current REGEXP \"[5-6]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Dell OME-M PSU status warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmPSUTable"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+  },
+  {
+    "name": "Dell OME-M redundancy status critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmRedCurrStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6]\")","field":"sensors.sensor_current REGEXP \"[5-6]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Dell OME-M redundancy status warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmRedCurrStatus"},{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4)"}],"valid":true}
+  },
+  {
+    "name": "Dell OME-M temperature status critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmTempCurrStatus"},{"id":"sensors.sensor_current REGEXP \"[5-6]\")","field":"sensors.sensor_current REGEXP \"[5-6]\")","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "Dell OME-M temperature status warning",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"dell-ome-m"},{"id":"(sensors.sensor_class","field":"(sensors.sensor_class","type":null,"input":"text","operator":"equal","value":"state"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"dmmTempCurrStatus"},{"id":"sensors.sensor_current REGEXP 4)","field":"sensors.sensor_current REGEXP 4)","type":null,"input":"text","operator":"equal","value":"1"}],"valid":true}
+  },
+  {
+    "name": "CAPE reported = 0, nothing is processing",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"cape"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"reported"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+  },
+  {
+    "name": "CAPE Criticals > 0",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"cape"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"critical"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+  },
+  {
+    "name": "CAPE Errors > 0",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"cape"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"error"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"regex","value":"disk.*fail.*"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"number","operator":"greater_or_equal","value":"1"}],"valid":false},
+    "name": "SMART: one or more disk is has failures",
+    "severity": "critical"
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"regex","value":"disk.*readfailure"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"number","operator":"greater_or_equal","value":"1"}],"valid":false},
+    "name": "SMART: one or more disk is has self test read failures",
+    "severity": "critical"
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"smart"},{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"regex","value":"disk.*unknownfail"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"number","operator":"greater_or_equal","value":"1"}],"valid":false},
+    "name": "SMART: one or more disk is has self test unknown failures",
+    "severity": "critical"
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"id":"mempools.mempool_class","field":"mempools.mempool_class","type":"string","input":"text","operator":"equal","value":"system"},{"id":"mempools.mempool_perc","field":"mempools.mempool_perc","type":"string","input":"number","operator":"greater_or_equal","value":"90"},{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"linux"}],"valid":false},
+    "name": "Linux High Memory Usage, >= 90% in use",
+    "severity": "warning"
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"id":"mempools.mempool_class","field":"mempools.mempool_class","type":"string","input":"text","operator":"equal","value":"system"},{"id":"mempools.mempool_perc","field":"mempools.mempool_perc","type":"string","input":"number","operator":"greater_or_equal","value":"95"},{"id":"devices.os","field":"devices.os","type":"string","input":"text","operator":"equal","value":"linux"}],"valid":false},
+    "name": "Linux High Memory Usage, >= 95% in use",
+    "severity": "critical"
+  },
+  {
+    "name": "ZFS: pool with errors present",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"zfs"},{"id":"application_metrics.metric like \"pool_%_%_errors\"","field":"application_metrics.metric like \"pool_%_%_errors\"","type":null,"input":"text","operator":"equal","value":"1"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+  }
+]

@@ -26,9 +26,9 @@
 
 namespace App\ApiClients;
 
+use App\Facades\LibrenmsConfig;
 use Exception;
 use Illuminate\Http\Client\Response;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\Geocoder;
 
 class BingApi extends BaseApi implements Geocoder
@@ -56,7 +56,7 @@ class BingApi extends BaseApi implements Geocoder
      */
     protected function buildGeocodingOptions(string $address): array
     {
-        $api_key = Config::get('geoloc.api_key');
+        $api_key = LibrenmsConfig::get('geoloc.api_key');
         if (! $api_key) {
             throw new Exception('Bing API key missing, set geoloc.api_key');
         }

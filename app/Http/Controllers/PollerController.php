@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Poller;
 use App\Models\PollerCluster;
@@ -9,7 +10,6 @@ use App\Models\PollerGroup;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use LibreNMS\Config;
 
 class PollerController extends Controller
 {
@@ -17,7 +17,7 @@ class PollerController extends Controller
 
     public function __construct()
     {
-        $this->rrdstep = Config::get('rrd.step');
+        $this->rrdstep = LibrenmsConfig::get('rrd.step');
     }
 
     public function logTab(Request $request)
@@ -37,7 +37,7 @@ class PollerController extends Controller
         return view('poller.groups', [
             'current_tab' => 'groups',
             'poller_groups' => PollerGroup::query()->withCount('devices')->get(),
-            'default_group_id' => Config::get('default_poller_group'),
+            'default_group_id' => LibrenmsConfig::get('default_poller_group'),
             'ungrouped_count' => Device::where('poller_group', 0)->count(),
         ]);
     }
@@ -74,7 +74,7 @@ class PollerController extends Controller
 
     protected function pollerStatus($poller, $last)
     {
-        $since_last_poll = Carbon::parse($last)->diffInSeconds();
+        $since_last_poll = (int) Carbon::parse($last)->diffInSeconds(null, true);
 
         $poller->row_class = $this->checkTimeSinceLastPoll($since_last_poll);
         $poller->long_not_polled = (\Auth::user()->hasGlobalAdmin() && ($since_last_poll > ($this->rrdstep * 2)));

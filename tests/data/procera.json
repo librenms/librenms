@@ -637,8 +637,8 @@
                     "ifName": "bond0",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -837,8 +837,8 @@
                     "ifName": "eth1",
                     "portName": null,
                     "ifIndex": 4,
-                    "ifSpeed": 0,
-                    "ifSpeed_prev": null,
+                    "ifSpeed": null,
+                    "ifSpeed_prev": 0,
                     "ifConnectorPresent": "true",
                     "ifOperStatus": "down",
                     "ifOperStatus_prev": "down",
@@ -2042,7 +2042,8 @@
                     "context_name": ""
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ipv6-addresses": {
         "discovery": {
@@ -2063,6 +2064,56 @@
                     "ipv6_origin": "linklayer",
                     "context_name": "",
                     "ipv6_network": null,
+                    "ifIndex": 5
+                }
+            ]
+        }
+    },
+    "ipv6-nd": {
+        "discovery": {
+            "ipv6_nd": [
+                {
+                    "mac_address": "e8:f7:24:49:47:d3",
+                    "ipv6_address": "1601:3617:ea0d:0001:0000:0000:0059:2bea",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "e8:f7:24:49:47:d3",
+                    "ipv6_address": "2b17:0000:0000:0000:3659:172b:1516:2b17",
+                    "context_name": ""
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "169.254.1.1",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "169.254.2.1",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "20.48.53.26",
+                    "ipv4_prefixlen": 29,
+                    "context_name": "",
+                    "ipv4_network": "20.48.53.24/29",
                     "ifIndex": 5
                 }
             ]

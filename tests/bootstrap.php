@@ -31,7 +31,6 @@ require $install_dir . '/includes/init.php';
 chdir($install_dir);
 
 ini_set('display_errors', '1');
-//error_reporting(E_ALL & ~E_WARNING);
 
 if (getenv('DBTEST')) {
     // create testing table if needed
@@ -51,5 +50,7 @@ if (getenv('DBTEST')) {
 }
 
 LibrenmsConfig::invalidateAndReload();
+
+Illuminate\Foundation\Bootstrap\HandleExceptions::flushState(); // Reset Laravels error handler
 
 app()->terminate(); // destroy the bootstrap Laravel application

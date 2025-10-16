@@ -26,11 +26,28 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
+use App\Models\Ipv4Mac;
+use Illuminate\Support\Collection;
+use LibreNMS\Interfaces\Discovery\ArpTableDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Polling\ProcessorPolling;
 use LibreNMS\OS;
+use LibreNMS\Util\Mac;
 
-class Edgeswitch extends OS implements ProcessorDiscovery, ProcessorPolling
+class Edgeswitch extends OS implements ProcessorDiscovery, ProcessorPolling, ArpTableDiscovery
 {
     use Traits\VxworksProcessorUsage;
+
+    public function discoverArpTable(): Collection
+    {
+        return \SnmpQuery::walk('EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingTable')
+            ->mapTable(function ($data) {
+                return new Ipv4Mac([
+                    'port_id' => (int) PortCache::getIdFromIfIndex($data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingIfIndex'], $this->getDevice()),
+                    'mac_address' => Mac::parse($data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingMacAddr'])->hex(),
+                    'ipv4_address' => $data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingIpAddr'],
+                ]);
+            });
+    }
 }

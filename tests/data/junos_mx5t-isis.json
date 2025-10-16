@@ -11482,19 +11482,6 @@
             ]
         }
     },
-    "vlans": {
-        "discovery": {
-            "vlans": [
-                {
-                    "vlan_vlan": 0,
-                    "vlan_domain": 1,
-                    "vlan_name": "____juniper_private1____",
-                    "vlan_type": null,
-                    "vlan_mtu": null
-                }
-            ]
-        }
-    },
     "isis": {
         "discovery": {
             "isis_adjacencies": [
@@ -12208,6 +12195,26 @@
                     "ifAlias": "lab-er2",
                     "ifDescr": "xe-0/0/1",
                     "ifName": "xe-0/0/1"
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.99.252.252",
+                    "ipv4_prefixlen": 31,
+                    "context_name": "",
+                    "ipv4_network": "10.99.252.252/31",
+                    "ifIndex": 572
+                },
+                {
+                    "ipv4_address": "10.99.252.254",
+                    "ipv4_prefixlen": 31,
+                    "context_name": "",
+                    "ipv4_network": "10.99.252.254/31",
+                    "ifIndex": 559
                 }
             ]
         }

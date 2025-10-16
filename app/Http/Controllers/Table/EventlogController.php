@@ -26,10 +26,10 @@
 
 namespace App\Http\Controllers\Table;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Blade;
-use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Url;
 
@@ -102,7 +102,7 @@ class EventlogController extends TableController
             }
         } elseif ($eventlog->type == 'stp') {
             return Blade::render('<x-device-link :device="$device" tab="stp">stp</x-device-link>', ['device' => $eventlog->device]);
-        } elseif (in_array($eventlog->type, \App\Models\Sensor::getTypes())) {
+        } elseif (in_array($eventlog->type, \LibreNMS\Enum\Sensor::values())) {
             if (is_numeric($eventlog->reference)) {
                 $sensor = $eventlog->related;
                 if (isset($sensor)) {
@@ -118,9 +118,8 @@ class EventlogController extends TableController
     {
         $output = "<span class='alert-status ";
         $output .= $this->severityLabel($eventlog->severity);
-        $output .= " eventlog-status'></span><span style='display:inline;'>";
-        $output .= (new Carbon($eventlog->datetime))->setTimezone(session('preferences.timezone'))->format(Config::get('dateformat.compact'));
-        $output .= '</span>';
+        $output .= " eventlog-status'></span>";
+        $output .= (new Carbon($eventlog->datetime))->setTimezone(session('preferences.timezone'))->format(LibrenmsConfig::get('dateformat.compact'));
 
         return $output;
     }

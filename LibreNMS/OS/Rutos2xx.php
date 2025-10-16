@@ -60,7 +60,7 @@ class Rutos2xx extends OS implements
                 'usage_received' => $usage_received,
             ];
 
-            $tags = compact('rrd_def');
+            $tags = ['rrd_def' => $rrd_def];
             $datastore->put($this->getDeviceArray(), 'rutos_2xx_mobileDataUsage', $tags, $fields);
             $this->enableGraph('rutos_2xx_mobileDataUsage');
         }

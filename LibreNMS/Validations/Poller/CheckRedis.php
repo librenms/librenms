@@ -46,7 +46,7 @@ class CheckRedis implements \LibreNMS\Interfaces\Validation
         }
 
         // cache driver set to redis, it is required. Otherwise, if there are 2 or more distrubted poller nodes, it is required
-        if ($driver == 'redis' || (\LibreNMS\Config::get('distributed_poller') && \App\Models\PollerCluster::isActive()->count() > 2)) {
+        if ($driver == 'redis' || (\App\Facades\LibrenmsConfig::get('distributed_poller') && \App\Models\PollerCluster::isActive()->count() > 2)) {
             return ValidationResult::fail(trans('validation.validations.poller.CheckRedis.unavailable'));
         }
 
@@ -63,12 +63,16 @@ class CheckRedis implements \LibreNMS\Interfaces\Validation
 
     private function redisIsAvailable(): bool
     {
+        set_error_handler(null); // hide connection errors, we will send our own message
+
         try {
             Redis::command('ping');
 
             return true;
         } catch (\Exception $e) {
             return false;
+        } finally {
+            restore_error_handler();
         }
     }
 }

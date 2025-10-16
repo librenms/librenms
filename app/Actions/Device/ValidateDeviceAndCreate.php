@@ -26,9 +26,9 @@
 
 namespace App\Actions\Device;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Arr;
-use LibreNMS\Config;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostIpExistsException;
 use LibreNMS\Exceptions\HostnameExistsException;
@@ -41,29 +41,15 @@ use SnmpQuery;
 
 class ValidateDeviceAndCreate
 {
-    /**
-     * @var Device
-     */
-    private $device;
-    /**
-     * @var bool
-     */
-    private $force;
-    /**
-     * @var bool
-     */
-    private $ping_fallback;
-    /**
-     * @var \LibreNMS\Polling\ConnectivityHelper
-     */
-    private $connectivity;
+    private Device $device;
+    private bool $force;
+    private bool $ping_fallback;
 
     public function __construct(Device $device, bool $force = false, bool $ping_fallback = false)
     {
         $this->device = $device;
         $this->force = $force;
         $this->ping_fallback = $ping_fallback;
-        $this->connectivity = new \LibreNMS\Polling\ConnectivityHelper($this->device);
     }
 
     /**
@@ -86,7 +72,7 @@ class ValidateDeviceAndCreate
         if (! $this->force) {
             $this->exceptIfIpExists();
 
-            if (! $this->connectivity->isPingable()->success()) {
+            if (! app(DeviceIsPingable::class)->execute($this->device)->success()) {
                 throw new HostUnreachablePingException($this->device->hostname);
             }
 
@@ -117,9 +103,9 @@ class ValidateDeviceAndCreate
         $host_unreachable_exception = new HostUnreachableSnmpException($this->device->hostname);
 
         // which snmp version should we try (and in what order)
-        $snmp_versions = $this->device->snmpver ? [$this->device->snmpver] : Config::get('snmp.version');
+        $snmp_versions = $this->device->snmpver ? [$this->device->snmpver] : LibrenmsConfig::get('snmp.version');
 
-        $communities = Arr::where(Arr::wrap(Config::get('snmp.community')), function ($community) {
+        $communities = Arr::where(Arr::wrap(LibrenmsConfig::get('snmp.community')), function ($community) {
             return $community && is_string($community);
         });
         if ($this->device->community) {
@@ -127,7 +113,7 @@ class ValidateDeviceAndCreate
         }
         $communities = array_unique($communities);
 
-        $v3_credentials = Config::get('snmp.v3');
+        $v3_credentials = LibrenmsConfig::get('snmp.v3');
         array_unshift($v3_credentials, $this->device->only(['authlevel', 'authname', 'authpass', 'authalgo', 'cryptopass', 'cryptoalgo']));
         $v3_credentials = array_unique($v3_credentials, SORT_REGULAR);
 
@@ -139,7 +125,7 @@ class ValidateDeviceAndCreate
                 foreach ($v3_credentials as $v3) {
                     $this->device->fill(Arr::only($v3, ['authlevel', 'authname', 'authpass', 'authalgo', 'cryptopass', 'cryptoalgo']));
 
-                    if ($this->connectivity->isSNMPable()) {
+                    if (app(DeviceIsSnmpable::class)->execute($this->device)) {
                         return;
                     } else {
                         $host_unreachable_exception->addReason($snmp_version, $this->device->authname . '/' . $this->device->authlevel);
@@ -149,7 +135,7 @@ class ValidateDeviceAndCreate
                 // try each community from config
                 foreach ($communities as $community) {
                     $this->device->community = $community;
-                    if ($this->connectivity->isSNMPable()) {
+                    if (app(DeviceIsSnmpable::class)->execute($this->device)) {
                         return;
                     } else {
                         $host_unreachable_exception->addReason($snmp_version, $this->device->community);
@@ -185,13 +171,13 @@ class ValidateDeviceAndCreate
 
     private function fillDefaults(): void
     {
-        $this->device->port = $this->device->port ?: Config::get('snmp.port', 161);
-        $this->device->transport = $this->device->transport ?: Config::get('snmp.transports.0', 'udp');
-        $this->device->poller_group = $this->device->poller_group ?: Config::get('default_poller_group', 0);
+        $this->device->port = $this->device->port ?: LibrenmsConfig::get('snmp.port', 161);
+        $this->device->transport = $this->device->transport ?: LibrenmsConfig::get('snmp.transports.0', 'udp');
+        $this->device->poller_group = $this->device->poller_group ?: LibrenmsConfig::get('default_poller_group', 0);
         $this->device->os = $this->device->os ?: 'generic';
         $this->device->status_reason = '';
         $this->device->sysName = $this->device->sysName ?: $this->device->hostname;
-        $this->device->port_association_mode = $this->device->port_association_mode ?: Config::get('default_port_association_mode', 'ifIndex');
+        $this->device->port_association_mode = $this->device->port_association_mode ?: LibrenmsConfig::get('default_port_association_mode', 'ifIndex');
         if (! is_int($this->device->port_association_mode)) {
             $this->device->port_association_mode = PortAssociationMode::getId($this->device->port_association_mode) ?? 1;
         }
@@ -214,7 +200,7 @@ class ValidateDeviceAndCreate
     {
         if ($this->device->overwrite_ip) {
             $ip = $this->device->overwrite_ip;
-        } elseif (Config::get('addhost_alwayscheckip')) {
+        } elseif (LibrenmsConfig::get('addhost_alwayscheckip')) {
             $ip = gethostbyname($this->device->hostname);
         } else {
             $ip = $this->device->hostname;
@@ -237,12 +223,12 @@ class ValidateDeviceAndCreate
      */
     private function exceptIfSysNameExists(): void
     {
-        if (Config::get('allow_duplicate_sysName')) {
+        if (LibrenmsConfig::get('allow_duplicate_sysName')) {
             return;
         }
 
         if (Device::where('sysName', $this->device->sysName)
-            ->when(Config::get('mydomain'), function ($query, $domain) {
+            ->when(LibrenmsConfig::get('mydomain'), function ($query, $domain) {
                 $query->orWhere('sysName', rtrim($this->device->sysName, '.') . '.' . $domain);
             })->exists()) {
             throw new HostSysnameExistsException($this->device->hostname, $this->device->sysName);

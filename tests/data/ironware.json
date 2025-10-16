@@ -23431,28 +23431,28 @@
                     "vlan_domain": 1,
                     "vlan_name": "DEFAULT-VLAN",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 55,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 55",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 66,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 66",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4095,
                     "vlan_domain": 1,
                     "vlan_name": "CONTROL-VLAN",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -24698,6 +24698,47 @@
                     "context_name": "",
                     "ipv6_network": null,
                     "ifIndex": 1
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "172.31.31.20",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "172.31.31.0/24",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "192.0.2.1",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 33554433
+                },
+                {
+                    "ipv4_address": "192.0.2.5",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "192.0.2.4/30",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "192.168.55.2",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.55.0/24",
+                    "ifIndex": 16777271
+                },
+                {
+                    "ipv4_address": "192.168.66.2",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.66.0/24",
+                    "ifIndex": 16777282
                 }
             ]
         }

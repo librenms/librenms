@@ -1,6 +1,6 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
 $dest = device_by_id_cache($vars['dest']);
 
@@ -13,7 +13,7 @@ require 'includes/html/graphs/common.inc.php';
 require 'includes/html/graphs/device/smokeping_common.inc.php';
 
 $i = 0;
-$pings = Config::get('smokeping.pings');
+$pings = LibrenmsConfig::get('smokeping.pings');
 $iter = 0;
 $colourset = 'mixed';
 
@@ -30,7 +30,7 @@ if ($width > '500') {
 }
 
 $filename_dir = generate_smokeping_file($device);
-if ($device['hostname'] == Config::get('own_hostname')) {
+if ($device['hostname'] == LibrenmsConfig::get('own_hostname')) {
     $filename = $filename_dir . $dest['hostname'] . '.rrd';
     if (! Rrd::checkRrdExists($filename)) {
         // Try with dots in hostname replaced by underscores
@@ -44,11 +44,11 @@ if ($device['hostname'] == Config::get('own_hostname')) {
     }
 }
 
-if (! Config::has("graph_colours.$colourset.$iter")) {
+if (! LibrenmsConfig::has("graph_colours.$colourset.$iter")) {
     $iter = 0;
 }
 
-$colour = Config::get("graph_colours.$colourset.$iter");
+$colour = LibrenmsConfig::get("graph_colours.$colourset.$iter");
 $iter++;
 
 $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($source, $descr_len);

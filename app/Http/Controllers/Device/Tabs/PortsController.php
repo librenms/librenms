@@ -26,9 +26,11 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Link;
 use App\Models\Port;
+use App\Models\PortSecurity;
 use App\Models\Pseudowire;
 use App\Models\UserPref;
 use Illuminate\Database\Eloquent\Builder;
@@ -37,7 +39,6 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class PortsController implements DeviceTab
@@ -79,7 +80,7 @@ class PortsController implements DeviceTab
         Validator::validate($request->all(), [
             'page' => 'int',
             'perPage' => ['regex:/^(\d+|all)$/'],
-            'sort' => 'in:media,mac,port,traffic,speed',
+            'sort' => 'in:media,mac,port,traffic,speed,index',
             'order' => 'in:asc,desc',
             'disabled' => 'in:0,1',
             'ignored' => 'in:0,1',
@@ -97,6 +98,7 @@ class PortsController implements DeviceTab
             'links' => $this->linksData($device),
             'transceivers' => $this->transceiversData($device),
             'xdsl' => $this->xdslData($device),
+            'portsecurity' => $this->portSecurityData($device),
             'graphs', 'mini_graphs' => $this->graphData($device, $request),
             default => $this->portData($device, $request),
         };
@@ -108,7 +110,7 @@ class PortsController implements DeviceTab
                 $this->getTabs($device),
                 __('Graphs') => $this->getGraphLinks(),
             ],
-            'page_links' => $this->pageLinks($request),
+            'dropdownLinks' => $this->pageLinks($request),
             'perPage' => $this->settings['perPage'],
             'sort' => $this->settings['sort'],
             'next_order' => $this->settings['order'] == 'asc' ? 'desc' : 'asc',
@@ -279,6 +281,11 @@ class PortsController implements DeviceTab
         return ['links' => $device->links];
     }
 
+    private function portSecurityData(Device $device): array
+    {
+        return [];
+    }
+
     private function getTabs(Device $device): array
     {
         $tabs = [
@@ -308,6 +315,10 @@ class PortsController implements DeviceTab
 
         if ($device->portsAdsl()->exists() || $device->portsVdsl()->exists()) {
             $tabs[] = ['name' => __('port.tabs.xdsl'), 'url' => 'xdsl'];
+        }
+
+        if (PortSecurity::where('device_id', $device->device_id)->exists()) {
+            $tabs[] = ['name' => __('Port Security'), 'url' => 'portsecurity'];
         }
 
         return $tabs;
@@ -345,7 +356,7 @@ class PortsController implements DeviceTab
             ],
         ];
 
-        if (Config::get('enable_ports_etherlike')) {
+        if (LibrenmsConfig::get('enable_ports_etherlike')) {
             $graph_links[] = [
                 'name' => __('port.graphs.etherlike'),
                 'url' => 'graphs?type=etherlike',

@@ -6,7 +6,7 @@ $apc_env_data = snmpwalk_cache_oid($device, 'uioSensor', [], 'PowerNet-MIB', nul
 if ($apc_env_data) {
     // NMC2/NMC3/etc Universal Input Output
     foreach (array_keys($apc_env_data) as $index) {
-        $current = $apc_env_data[$index]['uioSensorStatusHumidity'];
+        $current = isset($apc_env_data[$index]['uioSensorStatusHumidity']) ? $apc_env_data[$index]['uioSensorStatusHumidity'] : 0;
         if ($current > 0) {
             // Humidity <= 0 -> Sensor not available
             $descr = $apc_env_data[$index]['uioSensorConfigSensorName'];
@@ -73,7 +73,7 @@ foreach (array_keys($apc_env_data) as $index) {
 
 foreach ($pre_cache['mem_sensors_status'] as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.10.4.2.3.1.6.' . $index;
-    $descr = $data['memSensorsStatusSensorName'] . ' - ' . $data['memSensorsStatusSensorLocation'];
+    $descr = ($data['memSensorsStatusSensorName'] ?? '') . ' - ' . ($data['memSensorsStatusSensorLocation'] ?? '');
     $divisor = 1;
     $multiplier = 1;
     $value = $data['memSensorsHumidity'];

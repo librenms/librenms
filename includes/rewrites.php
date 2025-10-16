@@ -1,9 +1,12 @@
 <?php
 
-use LibreNMS\Config;
+use App\Facades\LibrenmsConfig;
 
 function rewrite_entity_descr($descr)
 {
+    if (is_null($descr)) {
+        return '';
+    }
     $descr = str_replace('Distributed Forwarding Card', 'DFC', $descr);
     $descr = preg_replace('/7600 Series SPA Interface Processor-/', '7600 SIP-', $descr);
     $descr = preg_replace('/Rev\.\ [0-9\.]+\ /', '', $descr);
@@ -50,37 +53,37 @@ function cleanPort($interface, $device = null)
         $device = device_by_id_cache($interface['device_id']);
     }
 
-    $os = strtolower($device['os']);
+    // set "label"
+    $interface['label'] = $interface['ifDescr'];
+    if (isset($device['os'])) {
+        $os = strtolower($device['os']);
+        if (LibrenmsConfig::get("os.$os.ifname")) {
+            $interface['label'] = $interface['ifName'];
 
-    if (Config::get("os.$os.ifname")) {
-        $interface['label'] = $interface['ifName'];
-
-        if ($interface['ifName'] == '') {
-            $interface['label'] = $interface['ifDescr'];
-        }
-    } elseif (Config::get("os.$os.ifalias")) {
-        $interface['label'] = $interface['ifAlias'];
-    } else {
-        $interface['label'] = $interface['ifDescr'];
-        if (Config::get("os.$os.ifindex")) {
+            if ($interface['ifName'] == '') {
+                $interface['label'] = $interface['ifDescr'];
+            }
+        } elseif (LibrenmsConfig::get("os.$os.ifalias")) {
+            $interface['label'] = $interface['ifAlias'];
+        } elseif (LibrenmsConfig::get("os.$os.ifindex")) {
             $interface['label'] = $interface['label'] . ' ' . $interface['ifIndex'];
         }
+
+        if ($os == 'speedtouch') {
+            [$interface['label']] = explode('thomson', $interface['label']);
+        }
     }
 
-    if ($device['os'] == 'speedtouch') {
-        [$interface['label']] = explode('thomson', $interface['label']);
-    }
-
-    if (is_array(Config::get('rewrite_if'))) {
-        foreach (Config::get('rewrite_if') as $src => $val) {
+    if (is_array(LibrenmsConfig::get('rewrite_if'))) {
+        foreach (LibrenmsConfig::get('rewrite_if') as $src => $val) {
             if (stristr($interface['label'], $src)) {
                 $interface['label'] = $val;
             }
         }
     }
 
-    if (is_array(Config::get('rewrite_if_regexp'))) {
-        foreach (Config::get('rewrite_if_regexp') as $reg => $val) {
+    if (is_array(LibrenmsConfig::get('rewrite_if_regexp'))) {
+        foreach (LibrenmsConfig::get('rewrite_if_regexp') as $reg => $val) {
             if (preg_match($reg . 'i', $interface['label'])) {
                 $interface['label'] = preg_replace($reg . 'i', $val, $interface['label']);
             }
@@ -202,7 +205,7 @@ function get_nagios_state($descr)
 
 /**
  * @param  $state
- * @return int
+ * @return int|void
  */
 function apc_relay_state($state)
 {

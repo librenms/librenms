@@ -65,6 +65,10 @@ if (! empty($entity_oids)) {
         $current = null;
         $entPhysicalIndex = null;
 
+        if (! isset($entry['entPhySensorType'])) {
+            continue;
+        }
+
         // Fix for Cisco ASR920, 15.5(2)S
         if ($entry['entPhySensorType'] == 'other' && Str::contains($entity_array[$index]['entPhysicalName'], ['Rx Power Sensor', 'Tx Power Sensor'])) {
             $entitysensor['other'] = 'dbm';
@@ -82,10 +86,11 @@ if (! empty($entity_oids)) {
                 }
                 $descr = ucwords($entity_array[$card]['entPhysicalName'] ?? '') . ' ' . ucwords($entity_array[$index]['entPhysicalDescr'] ?? '');
             } elseif ($device['os'] === 'xos' && str_starts_with($entity_oids[$entity_oids[$index]['entPhysicalContainedIn'] . '.0']['entAliasMappingIdentifier'], 'mib-2.2.2.1.1.')) {
-                $xos_ifindex = end(explode('.', $entity_oids[$entity_oids[$index]['entPhysicalContainedIn'] . '.0']['entAliasMappingIdentifier']));
+                $xof_ifindex = explode('.', $entity_oids[$entity_oids[$index]['entPhysicalContainedIn'] . '.0']['entAliasMappingIdentifier']);
+                $xos_ifindex = end($xof_ifindex);
                 $xos_portname = $xos_ifname[$xos_ifindex]['ifName'];
                 $descr = ucwords($xos_portname . ' ' . str_replace(' Sensor', '', $entity_array[$index]['entPhysicalDescr']));
-            } else {
+            } elseif (isset($entity_array[$index]['entPhysicalName'])) {
                 $descr = ucwords($entity_array[$index]['entPhysicalName']);
             }
             if ($descr) {
@@ -182,7 +187,7 @@ if (! empty($entity_oids)) {
                 }
 
                 if ($device['os'] === 'arista_eos') {
-                    if ($entry['aristaEntSensorThresholdLowWarning'] != '-1000000000') {
+                    if (isset($entry['aristaEntSensorThresholdLowWarning']) && $entry['aristaEntSensorThresholdLowWarning'] != '-1000000000') {
                         if ($entry['entPhySensorScale'] == 'milli' && $entry['entPhySensorType'] == 'watts') {
                             $temp_low_warn_limit = $entry['aristaEntSensorThresholdLowWarning'] / 10000;
                             $low_warn_limit = round(10 * log10($temp_low_warn_limit), 2);
@@ -190,7 +195,7 @@ if (! empty($entity_oids)) {
                             $low_warn_limit = $entry['aristaEntSensorThresholdLowWarning'] / $divisor;
                         }
                     }
-                    if ($entry['aristaEntSensorThresholdLowCritical'] != '-1000000000') {
+                    if (isset($entry['aristaEntSensorThresholdLowCritical']) && $entry['aristaEntSensorThresholdLowCritical'] != '-1000000000') {
                         if ($entry['entPhySensorScale'] == 'milli' && $entry['entPhySensorType'] == 'watts') {
                             $temp_low_limit = $entry['aristaEntSensorThresholdLowCritical'] / 10000;
                             $low_limit = round(10 * log10($temp_low_limit), 2);
@@ -198,7 +203,7 @@ if (! empty($entity_oids)) {
                             $low_limit = $entry['aristaEntSensorThresholdLowCritical'] / $divisor;
                         }
                     }
-                    if ($entry['aristaEntSensorThresholdHighWarning'] != '1000000000') {
+                    if (isset($entry['aristaEntSensorThresholdHighWarning']) && $entry['aristaEntSensorThresholdHighWarning'] != '1000000000') {
                         if ($entry['entPhySensorScale'] == 'milli' && $entry['entPhySensorType'] == 'watts') {
                             $temp_warn_limit = $entry['aristaEntSensorThresholdHighWarning'] / 10000;
                             $warn_limit = round(10 * log10($temp_warn_limit), 2);
@@ -206,7 +211,7 @@ if (! empty($entity_oids)) {
                             $warn_limit = $entry['aristaEntSensorThresholdHighWarning'] / $divisor;
                         }
                     }
-                    if ($entry['aristaEntSensorThresholdHighCritical'] != '1000000000') {
+                    if (isset($entry['aristaEntSensorThresholdHighCritical']) && $entry['aristaEntSensorThresholdHighCritical'] != '1000000000') {
                         if ($entry['entPhySensorScale'] == 'milli' && $entry['entPhySensorType'] == 'watts') {
                             $temp_high_limit = $entry['aristaEntSensorThresholdHighCritical'] / 10000;
                             $high_limit = round(10 * log10($temp_high_limit), 2);

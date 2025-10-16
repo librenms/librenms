@@ -6122,5 +6122,32 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "127.0.0.1",
+                    "ipv4_prefixlen": 8,
+                    "context_name": "",
+                    "ipv4_network": "127.0.0.0/8",
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "192.168.1.1",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.1.0/24",
+                    "ifIndex": 29
+                },
+                {
+                    "ipv4_address": "213.43.3.26",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "213.43.3.0/24",
+                    "ifIndex": 28
+                }
+            ]
+        }
     }
 }

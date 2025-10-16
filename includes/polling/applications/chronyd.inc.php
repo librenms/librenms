@@ -42,6 +42,8 @@ $fields = [
     'update_interval' => $chronyd['tracking']['update_interval'],
 ];
 
+$metrics = $fields;
+
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 app('Datastore')->put($device, 'app', $tags, $fields);
 
@@ -62,9 +64,6 @@ $source_rrd_def = RrdDefinition::make()
     ->addDataset('frequency_skew', 'GAUGE', -1000, 1000)
     ->addDataset('offset', 'GAUGE', -1000, 1000)
     ->addDataset('stddev', 'GAUGE', -1000, 1000);
-
-$metrics = $chronyd;
-unset($metrics['sources']);
 
 foreach ($chronyd['sources'] as $source) {
     $sources[] = $source['source_name'];
@@ -87,11 +86,6 @@ foreach ($chronyd['sources'] as $source) {
 
     $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $source_rrd_def, 'rrd_name' => $rrd_name];
     app('Datastore')->put($device, 'app', $tags, $fields);
-
-    // insert flattened source metrics into the metrics array
-    foreach ($fields as $field => $value) {
-        $metrics['source_' . $source['source_name'] . '_' . $field] = $value;
-    }
 }
 
 // check for added or removed sources

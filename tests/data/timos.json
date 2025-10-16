@@ -9192,5 +9192,32 @@
                 }
             ]
         }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "172.17.0.0",
+                    "ipv4_prefixlen": 32,
+                    "context_name": "",
+                    "ipv4_network": null,
+                    "ifIndex": 1
+                },
+                {
+                    "ipv4_address": "172.17.10.0",
+                    "ipv4_prefixlen": 31,
+                    "context_name": "",
+                    "ipv4_network": "172.17.10.0/31",
+                    "ifIndex": 3
+                },
+                {
+                    "ipv4_address": "172.17.10.4",
+                    "ipv4_prefixlen": 31,
+                    "context_name": "",
+                    "ipv4_network": "172.17.10.4/31",
+                    "ifIndex": 4
+                }
+            ]
+        }
     }
 }

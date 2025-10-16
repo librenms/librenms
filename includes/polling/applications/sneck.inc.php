@@ -1,8 +1,8 @@
 <?php
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use Carbon\Carbon;
-use LibreNMS\Config;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
@@ -21,8 +21,8 @@ if (isset($app->data['debugs'])) {
     $old_debugs = array_keys($app->data['debugs']);
 }
 
-if (Config::has('apps.sneck.polling_time_diff')) {
-    $compute_time_diff = Config::get('apps.sneck.polling_time_diff');
+if (LibrenmsConfig::has('apps.sneck.polling_time_diff')) {
+    $compute_time_diff = LibrenmsConfig::get('apps.sneck.polling_time_diff');
 } else {
     $compute_time_diff = false;
 }
@@ -79,6 +79,29 @@ $fields = [
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 app('Datastore')->put($device, 'app', $tags, $fields);
+
+// run_time is only present in version 1.1.0 and up
+if (isset($json_return['data']) and isset($json_return['data']['run_time']) and is_numeric($json_return['data']['run_time'])) {
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('data', 'GAUGE', 0);
+
+    $rrd_name = ['app', $name, $app->app_id, 'run_time'];
+
+    // $fields is also used for storing metrics, so don't stomp it
+    $run_time_fields = [
+        'data' => $json_return['data']['run_time'],
+    ];
+    $fields['run_time'] = $json_return['data']['run_time'];
+
+    $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+    app('Datastore')->put($device, 'app', $tags, $run_time_fields);
+
+    // if this is over 300, it took 300+ seconds to run, meaning we are currently ingesting data for a previous time slot
+    if ($json_return['data']['run_time'] >= 300) {
+        $log_message = 'Sneck took ' . $json_return['data']['run_time'] . ' seconds to run';
+        Eventlog::log($log_message, $device['device_id'], 'application', Severity::Error);
+    }
+}
 
 // save the return status for each alerting possibilities
 foreach ($json_return['data']['checks'] as $key => $value) {

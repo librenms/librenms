@@ -28,7 +28,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
 
-class CienaCesAAAUserAuthenticationEventTest extends SnmpTrapTestCase
+final class CienaCesAAAUserAuthenticationEventTest extends SnmpTrapTestCase
 {
     public function testAuthSuccess(): void
     {

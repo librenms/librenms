@@ -26,11 +26,12 @@
 
 namespace App\Http\Middleware;
 
+use App\Facades\LibrenmsConfig;
 use Closure;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 
@@ -76,7 +77,7 @@ class AuthenticateGraph
 
     protected function isAllowed(Request $request): bool
     {
-        if (Config::get('allow_unauth_graphs', false)) {
+        if (LibrenmsConfig::get('allow_unauth_graphs', false)) {
             d_echo("Unauthorized graphs allowed\n");
 
             return true;
@@ -85,7 +86,7 @@ class AuthenticateGraph
         $ip = $request->getClientIp();
         try {
             $client_ip = IP::parse($ip);
-            foreach (Config::get('allow_unauth_graphs_cidr', []) as $range) {
+            foreach (LibrenmsConfig::get('allow_unauth_graphs_cidr', []) as $range) {
                 if ($client_ip->inNetwork($range)) {
                     d_echo("Unauthorized graphs allowed from $range\n");
 

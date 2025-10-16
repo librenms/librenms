@@ -1,0 +1,105 @@
+mib: SW-MIB:FA-EXT-MIB
+modules:
+    mempools:
+        data:
+            -
+                percent_used: SW-MIB::swMemUsage
+    processors:
+        data:
+            -
+                oid: swCpuUsage
+                num_oid: '.1.3.6.1.4.1.1588.2.1.1.1.26.1.{{ $index }}'
+                index: 1
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - swFCPortName
+        temperature:
+            data:
+                -
+                    oid: swSensorTable
+                    value: swSensorValue
+                    num_oid: '.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.4.{{ $index }}'
+                    descr: swSensorInfo
+                    skip_values:
+                        -
+                            oid: swSensorValue
+                            op: '='
+                            value: -2147483648
+                        -
+                            oid: swSensorType
+                            op: '!='
+                            value: 1
+
+                -
+                    oid: swSfpTemperature
+                    value: swSfpTemperature
+                    snmp_flags: ['-OteUsbQ']
+                    num_oid: ".1.3.6.1.4.1.1588.2.1.1.1.28.1.1.1.{{ $index }}"
+                    descr: "{{ swFCPortName:16 }} Temp"
+                    entPhysicalIndex: "200000{{ $subindex16 }}"
+                    group: 'transceiver'
+                    index: "swSfpTemperature.{{ $subindex16 }}"
+
+        fanspeed:
+            data:
+                -
+                    oid: swSensorTable
+                    value: swSensorValue
+                    num_oid: '.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.4.{{ $index }}'
+                    descr: swSensorInfo
+                    skip_values:
+                        -
+                            oid: swSensorValue
+                            op: '='
+                            value: -2147483648
+                        -
+                            oid: swSensorType
+                            op: '!='
+                            value: 2
+        dbm:
+            data:
+                -
+                    oid: swSfpRxPower
+                    value: swSfpRxPower
+                    snmp_flags: ['-OteUsbQ']
+                    num_oid: ".1.3.6.1.4.1.1588.2.1.1.1.28.1.1.4.{{ $index }}"
+                    descr: "{{ swFCPortName:16 }} RX"
+                    entPhysicalIndex: "200000{{ $subindex16 }}"
+                    group: 'transceiver'
+                    index: "swSfpRxPower.{{ $subindex16 }}"
+                    low_warn_limit: -5
+                    warn_limit: 1
+                -
+                    oid: swSfpTxPower
+                    value: swSfpTxPower
+                    snmp_flags: ['-OteUsbQ']
+                    num_oid: ".1.3.6.1.4.1.1588.2.1.1.1.28.1.1.5.{{ $index }}"
+                    descr: "{{ swFCPortName:16 }} TX"
+                    entPhysicalIndex: "200000{{ $subindex16 }}"
+                    group: 'transceiver'
+                    index: "swSfpTxPower.{{ $subindex16 }}"
+                    low_warn_limit: -5
+                    warn_limit: 1
+        state:
+            data:
+                -
+                    oid: swSensorTable
+                    value: swSensorStatus
+                    num_oid: '.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.3.{{ $index }}'
+                    descr: swSensorInfo
+                    state_name: swSensorStatus
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: 'unknown' }
+                        - { value: 2, generic: 2, graph: 1, descr: 'faulty' }
+                        - { value: 3, generic: 1, graph: 1, descr: 'below-min' }
+                        - { value: 4, generic: 0, graph: 1, descr: 'nominal' }
+                        - { value: 5, generic: 1, graph: 1, descr: 'above-max' }
+                        - { value: 6, generic: 1, graph: 1, descr: 'absent' }
+                    skip_values:
+                        -
+                            oid: swSensorValue
+                            op: '='
+                            value: -2147483648

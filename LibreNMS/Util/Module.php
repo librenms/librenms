@@ -26,8 +26,8 @@
 
 namespace LibreNMS\Util;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use LibreNMS\Config;
 use LibreNMS\Modules\LegacyModule;
 use LibreNMS\Polling\ModuleStatus;
 
@@ -39,7 +39,7 @@ class Module
             return true;
         }
 
-        return Config::has('discovery_modules.' . $module_name) || Config::has('poller_modules.' . $module_name);
+        return LibrenmsConfig::has('discovery_modules.' . $module_name) || LibrenmsConfig::has('poller_modules.' . $module_name);
     }
 
     public static function fromName(string $module_name): \LibreNMS\Interfaces\Module
@@ -62,8 +62,8 @@ class Module
     public static function pollingStatus(string $module_name, Device $device, ?bool $manual = null): ModuleStatus
     {
         return new ModuleStatus(
-            Config::get("poller_modules.$module_name"),
-            Config::get("os.{$device->os}.poller_modules.$module_name"),
+            LibrenmsConfig::get("poller_modules.$module_name"),
+            LibrenmsConfig::get("os.{$device->os}.poller_modules.$module_name"),
             $device->getAttrib("poll_$module_name"),
             $manual,
         );

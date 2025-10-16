@@ -36145,119 +36145,119 @@
                     "vlan_domain": 1,
                     "vlan_name": "Vlan 1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 99,
                     "vlan_domain": 1,
                     "vlan_name": "Management",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 100,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan 100",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2201,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan 2201",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2211,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan 2211",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2221,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan 2221",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2222,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan 2222",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2297,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan 2297",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2298,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan 2298",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2299,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan 2299",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2400,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan 2400",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2403,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan 2403",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2405,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan 2405",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2465,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan 2465",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2515,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan 2515",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2540,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan 2540",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2561,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan 2561",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -38803,5 +38803,46 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.232.5.201",
+                    "ipv4_prefixlen": 23,
+                    "context_name": "",
+                    "ipv4_network": "10.232.4.0/23",
+                    "ifIndex": 1276298752
+                },
+                {
+                    "ipv4_address": "10.32.224.10",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.32.224.0/24",
+                    "ifIndex": 9437185
+                },
+                {
+                    "ipv4_address": "169.254.254.1",
+                    "ipv4_prefixlen": 30,
+                    "context_name": "",
+                    "ipv4_network": "169.254.254.0/30",
+                    "ifIndex": 9437185
+                },
+                {
+                    "ipv4_address": "172.31.12.7",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "172.31.12.0/24",
+                    "ifIndex": 7340033
+                },
+                {
+                    "ipv4_address": "192.168.240.47",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "192.168.240.0/24",
+                    "ifIndex": 1275119104
+                }
+            ]
+        }
     }
 }

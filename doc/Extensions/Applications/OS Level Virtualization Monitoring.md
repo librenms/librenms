@@ -55,12 +55,12 @@ An optional config file may be specified via -f or placed at
 The following keys are used in the JSON config file.
 
 
-| Option       | Description                                                                                     | Default   |
-|--------------|-------------------------------------------------------------------------------------------------|-----------|
-| include      | An array of regular expressions to include.                                                     | ["^.*$"]  |
-| exclude      | An array of regular expressions to exclude.                                                     | undef     |
-| backend      | Override the backend and automatically choose it.                                               |           |
-| time_divider | Override the time_divider value. see chapter under Time divider.                            |           |
+| Option         | Description                                                      | Default    |
+|----------------|------------------------------------------------------------------|------------|
+| `include`      | An array of regular expressions to include.                      | `["^.*$"]` |
+| `exclude`      | An array of regular expressions to exclude.                      | undef      |
+| `backend`      | Override the backend and automatically choose it.                |            |
+| `time_divider` | Override the time_divider value. see chapter under Time divider. |            |
 
 #### Time divider 
 
@@ -120,25 +120,27 @@ The stats names match those produced by `ps --libxo json`.
 
 The cgroup to name mapping is done like below.
 
-| Input          | Output         |
-|----------------|----------------|
-| systemd        | s_$name        |
-| user           | u_$name        |
-| docker         | d_$name        |
-| podman         | p_$name        |
-| anything else  | $name          |
+| Input         | Output    |
+|---------------|-----------|
+| systemd       | `s_$name` |
+| user          | `u_$name` |
+| docker        | `d_$name` |
+| podman        | `p_$name` |
+| anything else | `$name`   |
+
 
 The following `ps` to stats mapping are as below.
 
-| `ps` | stats     |
-|------|-----------|
-| %cpu | percent-cpu |
-| %mem | percent-memory |
-| rss  | rss        |
-| vsize | virtual-size |
-| trs  | text-size  |
-| drs  | data-size  |
-| size | size       |
+| `ps`    | stats            |
+|---------|------------------|
+| `%cpu`  | `percent-cpu`    |
+| `%mem`  | `percent-memory` |
+| `rss`   | `rss`            |
+| `vsize` | `virtual-size`   |
+| `trs`   | `text-size`      |
+| `drs`   | `data-size`      |
+| `size`  | `size`           |
+
 
 `procs` is a total number of procs in that cgroup.
 
@@ -153,12 +155,97 @@ The following mappings are done though.
 
 The following mappings are done though.
 
-| cgroupv2 | stats     |
-|----------|-----------|
-| pgfault  | minor-faults |
-| pgmajfault | major-faults |
-| usage_usec | cpu-time |
-| system_usec | system-time |
-| user_usec | user-time |
-| throttled_usecs | throttled-time |
+| cgroupv2          | stats            |
+|-------------------|------------------|
+| `pgfault`         | `minor-faults`   |
+| `pgmajfault`      | `major-faults`   |
+| `usage_usec`      | `cpu-time`       |
+| `system_usec`     | `system-time`    |
+| `user_usec`       | `user-time`      |
+| `throttled_usecs` | `throttled-time` |
 
+If the extended memory stat information pulled via C groups is not needed, it can be
+disabled as below.
+
+```
+lnms config:set apps.oslv_monitor.linux_pg_memory_stats false
+lnms config:set apps.oslv_monitor.misc_linux_memory_stats false
+lnms config:set apps.oslv_monitor.zswap_size false
+lnms config:set apps.oslv_monitor.zswap_activity false
+lnms config:set apps.oslv_monitor.workingset_stats false
+lnms config:set apps.oslv_monitor.thp_activity false
+```
+
+`apps.oslv_monitor.linux_pg_memory_stats` will disable graphs and stat gathering for the
+items below.
+
+- `pgactivate`
+- `pgdeactivate`
+- `pglazyfree`
+- `pglazyfreed`
+- `pgrefill`
+- `pgscan`
+- `pgscan_direct`
+- `pgscan_khugepaged`
+- `pgscan_kswapd`
+- `pgsteal`
+- `pgsteal_direct`
+- `pgsteal_khugepaged`
+- `pgsteal_kswapd`
+
+`apps.oslv_monitor.misc_linux_memory_stats` will disable graphs and stat gathering for the
+items below.
+
+- `anon`
+- `file`
+- `kernel`
+- `kernel_stack`
+- `pagetables`
+- `sec_pagetables`
+- `percpu`
+- `vmalloc`
+- `shmem`
+- `file_mapped`
+- `file_dirty`
+- `file_writeback`
+- `swapcached`
+- `anon_thp`
+- `file_thp`
+- `shmem_thp`
+- `inactive_anon`
+- `active_anon`
+- `slab_reclaimable`
+- `slab_unreclaimable`
+- `slab`
+
+`apps.oslv_monitor.zswap_size` will disable graphs and stat gathering for the
+items below.
+
+- `zswap`
+- `zswapped`
+
+`apps.oslv_monitor.zswap_activity` will disable graphs and stat gathering for the
+items below.
+
+- `zswpin`
+- `zswpout`
+- `zswpwb`
+
+`apps.oslv_monitor.workingset_stats` will disable graphs and stat gathering for the
+items below.
+
+- `workingset_refault_anon`
+- `workingset_refault_file`
+- `workingset_activate_anon`
+- `workingset_activate_file`
+- `workingset_restore_anon`
+- `workingset_restore_file`
+- `workingset_nodereclaim`
+
+`apps.oslv_monitor.thp_activity` will disable graphs and stat gathering for the
+items below.
+
+- `thp_fault_alloc`
+- `thp_collapse_alloc`
+- `thp_swpout`
+- `thp_swpout_fallback`

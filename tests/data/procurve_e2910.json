@@ -8310,42 +8310,42 @@
                     "vlan_domain": 1,
                     "vlan_name": "DEFAULT_VLAN",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 12,
                     "vlan_domain": 1,
                     "vlan_name": "vlana",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 22,
                     "vlan_domain": 1,
                     "vlan_name": "vlanb",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 64,
                     "vlan_domain": 1,
                     "vlan_name": "vlanc",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 72,
                     "vlan_domain": 1,
                     "vlan_name": "vland",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 112,
                     "vlan_domain": 1,
                     "vlan_name": "vlane",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ]
         }
@@ -8468,7 +8468,7 @@
                     "designatedRoot": "000000000000",
                     "designatedCost": 24000,
                     "designatedBridge": "000000000000",
-                    "designatedPort": 10,
+                    "designatedPort": 0,
                     "forwardTransitions": 1,
                     "ifIndex": 54
                 }

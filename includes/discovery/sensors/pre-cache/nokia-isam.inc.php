@@ -155,7 +155,7 @@ $portTable = [
 $pre_cache['nokiaIsamSfpPort'] = snmpwalk_cache_twopart_oid($device, 'sfpDiagAvailable', [], 'SFP-MIB', 'nokia');
 foreach ($pre_cache['nokiaIsamSfpPort'] as $slotId => $slot) {
     foreach ($slot as $portId => $port) {
-        if ($portTable[$portId]) {
+        if (isset($portTable[$portId])) {
             $pre_cache['nokiaIsamSfpPort'][$slotId][$portId]['numBasedPort'] = $portTable[$portId];
         } else {
             $pre_cache['nokiaIsamSfpPort'][$slotId][$portId]['numBasedPort'] = $portId;

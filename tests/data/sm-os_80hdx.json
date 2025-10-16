@@ -3378,7 +3378,7 @@
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -3912,6 +3912,19 @@
                     "connector": null,
                     "channels": 1,
                     "ifIndex": 2
+                }
+            ]
+        }
+    },
+    "ipv4-addresses": {
+        "discovery": {
+            "ipv4_addresses": [
+                {
+                    "ipv4_address": "10.250.0.110",
+                    "ipv4_prefixlen": 24,
+                    "context_name": "",
+                    "ipv4_network": "10.250.0.0/24",
+                    "ifIndex": 21
                 }
             ]
         }

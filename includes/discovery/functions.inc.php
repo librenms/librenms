@@ -12,21 +12,19 @@
  * See COPYING for more details.
  */
 
+use App\Actions\Device\CheckDeviceAvailability;
 use App\Actions\Device\ValidateDeviceAndCreate;
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
-use App\Models\Ipv4Address;
-use App\Models\Ipv4Network;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\OS;
 use LibreNMS\Util\IP;
-use LibreNMS\Util\IPv4;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\UserFuncHelper;
 
@@ -42,17 +40,22 @@ use LibreNMS\Util\UserFuncHelper;
 function discover_new_device($hostname, $device, $method, $interface = null)
 {
     Log::debug("discovering $hostname\n");
+    if (empty(LibrenmsConfig::get('nets'))) {
+        Log::debug("Allowed discovery network list is empty - skipping\n");
+
+        return false;
+    }
 
     if (IP::isValid($hostname)) {
         $ip = $hostname;
-        if (! Config::get('discovery_by_ip', false)) {
+        if (! LibrenmsConfig::get('discovery_by_ip', false)) {
             Log::debug('Discovery by IP disabled, skipping ' . $hostname);
             Eventlog::log("$method discovery of " . $hostname . ' failed - Discovery by IP disabled', $device['device_id'], 'discovery', Severity::Warning);
 
             return false;
         }
     } elseif (\LibreNMS\Util\Validate::hostname($hostname)) {
-        if ($mydomain = Config::get('mydomain')) {
+        if ($mydomain = LibrenmsConfig::get('mydomain')) {
             $full_host = rtrim($hostname, '.') . '.' . $mydomain;
             if (isDomainResolves($full_host)) {
                 $hostname = $full_host;
@@ -77,13 +80,13 @@ function discover_new_device($hostname, $device, $method, $interface = null)
     $hostname = rtrim($hostname, '.'); // remove trailing dot
 
     $ip = IP::parse($ip, true);
-    if ($ip->inNetworks(Config::get('autodiscovery.nets-exclude'))) {
+    if ($ip->inNetworks(LibrenmsConfig::get('autodiscovery.nets-exclude'))) {
         Log::debug("$ip in an excluded network - skipping\n");
 
         return false;
     }
 
-    if (! $ip->inNetworks(Config::get('nets'))) {
+    if (! $ip->inNetworks(LibrenmsConfig::get('nets'))) {
         Log::debug("$ip not in a matched network - skipping\n");
 
         return false;
@@ -137,20 +140,20 @@ function discover_device(&$device, $force_module = false)
     // Start counting device poll time
     echo $device['hostname'] . ' ' . $device['device_id'] . ' ' . $device['os'] . ' ';
 
-    $helper = new \LibreNMS\Polling\ConnectivityHelper(DeviceCache::getPrimary());
+    if (! app(CheckDeviceAvailability::class)->execute(DeviceCache::getPrimary())) {
+        Log::error('%RDOWN%n', ['color' => true]);
 
-    if (! $helper->isUp()) {
         return false;
     }
 
-    $discovery_modules = ['core' => true] + Config::get('discovery_modules', []);
+    $discovery_modules = ['core' => true] + LibrenmsConfig::get('discovery_modules', []);
 
     /** @var \App\Polling\Measure\MeasurementManager $measurements */
     $measurements = app(\App\Polling\Measure\MeasurementManager::class);
     $measurements->checkpoint(); // don't count previous stats
 
     foreach ($discovery_modules as $module => $module_status) {
-        $os_module_status = Config::getOsSetting($device['os'], "discovery_modules.$module");
+        $os_module_status = LibrenmsConfig::getOsSetting($device['os'], "discovery_modules.$module");
         $device_module_status = DeviceCache::getPrimary()->getAttrib('discover_' . $module);
         Log::debug('Modules status: Global' . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
         Log::debug('OS' . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
@@ -167,15 +170,14 @@ function discover_device(&$device, $force_module = false)
             try {
                 include "includes/discovery/$module.inc.php";
             } catch (Throwable $e) {
-                // isolate module exceptions so they don't disrupt the polling process
-                Log::error("%rError discovering $module module for {$device['hostname']}.%n $e", ['color' => true]);
-                Eventlog::log("Error discovering $module module. Check log file for more details.", $device['device_id'], 'discovery', Severity::Error);
-                report($e);
-
-                // Re-throw exception if we're in CI
-                if (getenv('CI') == true) {
+                // Re-throw exception if we're in running tests
+                if (defined('PHPUNIT_RUNNING')) {
                     throw $e;
                 }
+
+                // isolate module exceptions so they don't disrupt the polling process
+                Eventlog::log("Error discovering $module module. Check log file for more details.", $device['device_id'], 'discovery', Severity::Error);
+                report($e);
             }
 
             $module_time = microtime(true) - $module_start;
@@ -314,75 +316,6 @@ function discover_link($local_port_id, $protocol, $remote_port_id, $remote_hostn
     $link_exists[$local_port_id][$remote_hostname][$remote_port] = 1;
 }
 
-/**
- * create or update IPv4 Addresses and/or IPv4 Networks
- *
- * @param  pointer  $valid_v4
- * @param  array  $device
- * @param  int  $ifIndex
- * @param  string  $ipv4_address
- * @param  string  $mask
- * @param  string  $context_name
- * @return array
- *
- * @throws InvalidIpException
- */
-function discover_process_ipv4(&$valid_v4, $device, int $ifIndex, $ipv4_address, $mask, $context_name = '')
-{
-    $cidr = IPv4::netmask2cidr($mask);
-    try {
-        $ipv4 = new IPv4($ipv4_address . '/' . $cidr);
-    } catch (InvalidIpException $e) {
-        Log::debug('Invalid data: ' . $ipv4_address);
-
-        return;
-    }
-    $ipv4_network = $ipv4->getNetworkAddress() . '/' . $ipv4->cidr;
-
-    if ($ipv4_address != '0.0.0.0' && $ifIndex > 0) {
-        $port_id = \App\Facades\PortCache::getIdFromIfIndex($ifIndex, $device['device_id']);
-
-        if (is_numeric($port_id)) {
-            $dbIpv4Net = Ipv4Network::updateOrCreate([
-                'ipv4_network' => $ipv4_network,
-            ], [
-                'context_name' => $device['context_name'],
-            ]);
-
-            if (! $dbIpv4Net->wasRecentlyCreated && $dbIpv4Net->wasChanged()) {
-                Eventlog::log('IPv4 network ' . $ipv4_network . ' changed', $device['device_id'], 'ipv4', Severity::Warning);
-                echo 'Nu';
-            }
-            if ($dbIpv4Net->wasRecentlyCreated) {
-                Eventlog::log('IPv4 network ' . $ipv4_network . ' created', $device['device_id'], 'ipv4', Severity::Notice);
-                echo 'N+';
-            }
-
-            $ipv4_network_id = Ipv4Network::where('ipv4_network', $ipv4_network)->value('ipv4_network_id');
-            $dbIpv4Addr = Ipv4Address::updateOrCreate([
-                'ipv4_address' => $ipv4_address,
-                'ipv4_prefixlen' => $cidr,
-                'ipv4_network_id' => $ipv4_network_id,
-                'port_id' => $port_id,
-            ], [
-                'context_name' => $device['context_name'],
-            ]);
-
-            if (! $dbIpv4Addr->wasRecentlyCreated && $dbIpv4Addr->wasChanged()) {
-                Eventlog::log('IPv4 address ' . $ipv4_address . '/' . $cidr . ' changed', $device['device_id'], 'ipv4', Severity::Warning);
-                echo 'Au';
-            }
-            if ($dbIpv4Addr->wasRecentlyCreated) {
-                Eventlog::log('IPv4 address ' . $ipv4_address . '/' . $cidr . ' created', $device['device_id'], 'ipv4', Severity::Notice);
-                echo 'A+';
-            }
-            $full_address = $ipv4_address . '/' . $cidr . '|' . $ifIndex;
-            $valid_v4[$full_address] = 1;
-        } else {
-            Log::debug('No port id found for ifindex: ' . $ifIndex . PHP_EOL);
-        }
-    }
-}
 /*
  * Check entity sensors to be excluded
  *
@@ -394,7 +327,7 @@ function discover_process_ipv4(&$valid_v4, $device, int $ifIndex, $ipv4_address,
 */
 function check_entity_sensor($string, $device)
 {
-    $fringe = array_merge(Config::get('bad_entity_sensor_regex', []), Config::getOsSetting($device['os'], 'bad_entity_sensor_regex', []));
+    $fringe = array_merge(LibrenmsConfig::get('bad_entity_sensor_regex', []), LibrenmsConfig::getOsSetting($device['os'], 'bad_entity_sensor_regex', []));
 
     foreach ($fringe as $bad) {
         if (preg_match($bad . 'i', $string)) {
@@ -587,7 +520,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     if (isset($data['multiplier'])) {
                         $multiplier = YamlDiscovery::replaceValues('multiplier', $index, $count, $data, $pre_cache);
                     } elseif (isset($sensor_options['multiplier'])) {
-                        $multipler = $sensor_options['multiplier'];
+                        $multiplier = $sensor_options['multiplier'];
                     } else {
                         $multiplier = 1;
                     }
@@ -599,6 +532,9 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     }
 
                     // process the limits
+                    // phpstan does not like $$var variables
+                    $low_limit = $low_warn_limit = $warn_limit = $high_limit = null;
+
                     $limits = ['low_limit', 'low_warn_limit', 'warn_limit', 'high_limit'];
                     foreach ($limits as $limit) {
                         if (isset($data[$limit]) && is_numeric($data[$limit])) {
@@ -666,7 +602,7 @@ function sensors($types, $os, $pre_cache = [])
     $device = &$os->getDeviceArray();
     foreach ((array) $types as $sensor_class) {
         echo ucfirst($sensor_class) . ': ';
-        $dir = Config::get('install_dir') . '/includes/discovery/sensors/' . $sensor_class . '/';
+        $dir = LibrenmsConfig::get('install_dir') . '/includes/discovery/sensors/' . $sensor_class . '/';
 
         if (isset($device['os_group']) && is_file($dir . $device['os_group'] . '.inc.php')) {
             include $dir . $device['os_group'] . '.inc.php';
@@ -674,7 +610,7 @@ function sensors($types, $os, $pre_cache = [])
         if (is_file($dir . $device['os'] . '.inc.php')) {
             include $dir . $device['os'] . '.inc.php';
         }
-        if (Config::getOsSetting($device['os'], 'rfc1628_compat', false)) {
+        if (LibrenmsConfig::getOsSetting($device['os'], 'rfc1628_compat', false)) {
             if (is_file($dir . '/rfc1628.inc.php')) {
                 include $dir . '/rfc1628.inc.php';
             }
@@ -807,7 +743,7 @@ function add_bgp_peer($device, $peer)
             'bgpPeerInUpdateElapsedTime' => 0,
         ];
         dbInsert($bgpPeers, 'bgpPeers');
-        if (Config::get('autodiscovery.bgp')) {
+        if (LibrenmsConfig::get('autodiscovery.bgp')) {
             $name = gethostbyaddr($peer['ip']);
             discover_new_device($name, $device, 'BGP');
         }
@@ -826,7 +762,7 @@ function add_cbgp_peer($device, $peer, $afi, $safi)
             'bgpPeerIdentifier' => $peer['ip'],
             'afi' => $afi,
             'safi' => $safi,
-            'context_name' => $device['context_name'],
+            'context_name' => $device['context_name'] ?? null,
             'AcceptedPrefixes' => 0,
             'DeniedPrefixes' => 0,
             'PrefixAdminLimit' => 0,
@@ -861,7 +797,7 @@ function add_cbgp_peer($device, $peer, $afi, $safi)
 function can_skip_discovery($sysName, $sysDescr = '', $platform = '')
 {
     if ($sysName) {
-        foreach ((array) Config::get('autodiscovery.xdp_exclude.sysname_regexp') as $needle) {
+        foreach ((array) LibrenmsConfig::get('autodiscovery.xdp_exclude.sysname_regexp') as $needle) {
             if (preg_match($needle . 'i', $sysName)) {
                 Log::debug("$sysName - regexp '$needle' matches '$sysName' - skipping device discovery \n");
 
@@ -871,7 +807,7 @@ function can_skip_discovery($sysName, $sysDescr = '', $platform = '')
     }
 
     if ($sysDescr) {
-        foreach ((array) Config::get('autodiscovery.xdp_exclude.sysdesc_regexp') as $needle) {
+        foreach ((array) LibrenmsConfig::get('autodiscovery.xdp_exclude.sysdesc_regexp') as $needle) {
             if (preg_match($needle . 'i', $sysDescr)) {
                 Log::debug("$sysName - regexp '$needle' matches '$sysDescr' - skipping device discovery \n");
 
@@ -881,7 +817,7 @@ function can_skip_discovery($sysName, $sysDescr = '', $platform = '')
     }
 
     if ($platform) {
-        foreach ((array) Config::get('autodiscovery.cdp_exclude.platform_regexp') as $needle) {
+        foreach ((array) LibrenmsConfig::get('autodiscovery.cdp_exclude.platform_regexp') as $needle) {
             if (preg_match($needle . 'i', $platform)) {
                 Log::debug("$sysName - regexp '$needle' matches '$platform' - skipping device discovery \n");
 
@@ -911,7 +847,7 @@ function find_device_id($name = '', $ip = '', $mac_address = '')
         $where[] = '`hostname`=?';
         $params[] = $name;
 
-        if ($mydomain = Config::get('mydomain')) {
+        if ($mydomain = LibrenmsConfig::get('mydomain')) {
             $where[] = '`hostname`=?';
             $params[] = "$name.$mydomain";
 
@@ -953,7 +889,7 @@ function find_device_id($name = '', $ip = '', $mac_address = '')
         $where[] = '`sysName`=?';
         $params[] = $name;
 
-        if ($mydomain = Config::get('mydomain')) {
+        if ($mydomain = LibrenmsConfig::get('mydomain')) {
             $where[] = '`sysName`=?';
             $params[] = "$name.$mydomain";
 

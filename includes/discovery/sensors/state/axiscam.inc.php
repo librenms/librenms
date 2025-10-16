@@ -11,7 +11,7 @@ foreach ($oids_tmp as $key_oids_tmp => $val_oids_tmp) {
     $oids[str_replace('common.', '', $key_oids_tmp)] = $val_oids_tmp;
 }
 
-if (is_array($oids)) {
+if (isset($oids) && is_array($oids)) {
     //Create State Index
     $state_name = 'tempSensorStatusState';
     $states = [
@@ -42,7 +42,7 @@ if (is_array($oids)) {
 
     foreach ($oids as $index => $entry) {
         //Discover Sensors
-        discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, 'Storage Status: ' . $entry['storageName'], 1, 1, null, null, null, null, $entry['storageDisruptionDetected'], 'snmp', $index);
+        discover_sensor(null, 'state', $device, $cur_oid . $index, $index, $state_name, 'Storage Status: ' . ($entry['storageName'] ?? null), 1, 1, null, null, null, null, $entry['storageDisruptionDetected'], 'snmp', $index);
     }
 }
 
