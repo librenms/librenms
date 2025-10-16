@@ -119,10 +119,10 @@ class Controller
         $nummonbssid_lines = [];
         $interference_lines = [];
 
-    // Gather device info mapping for labels
-    // Limit to devices referenced by access_points
-    $deviceIds = AccessPoint::select('device_id')->distinct()->pluck('device_id');
-    $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
+        // Gather device info mapping for labels
+        // Limit to devices referenced by access_points
+        $deviceIds = AccessPoint::select('device_id')->distinct()->pluck('device_id');
+        $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
 
         // Gather per-access-point metrics
         foreach (AccessPoint::select('accesspoint_id', 'device_id', 'name', 'radio_number', 'type', 'mac_addr', 'deleted', 'channel', 'txpow', 'radioutil', 'numasoclients', 'nummonclients', 'numactbssid', 'nummonbssid', 'interference')->cursor() as $ap) {
@@ -306,8 +306,6 @@ class Controller
 
         // Return the response with appropriate headers
         return response($body, 200, ['Content-Type' => 'text/plain; version=0.0.4; charset=utf-8']);
-    }
-
     }
 
     /**
