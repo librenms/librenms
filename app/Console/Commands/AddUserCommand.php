@@ -104,12 +104,12 @@ class AddUserCommand extends LnmsCommand
                 label: __('commands.user:add.form.username'),
                 default: $username ?? '',
                 required: true,
-                validate: fn ($value) => $this->validatePromptInput($value, 'username', $this->usernameRules())
+                validate: $this->validatePromptInput('username', $this->usernameRules())
             )
             ->password(
                 label: __('commands.user:add.form.password'),
                 required: true,
-                validate: fn ($value) => $this->validatePromptInput($value, 'password', $this->passwordRules())
+                validate: $this->validatePromptInput('password', $this->passwordRules())
             )
             ->multiselect(
                 label: __('commands.user:add.form.roles'),
@@ -120,7 +120,7 @@ class AddUserCommand extends LnmsCommand
             ->text(
                 label: __('commands.user:add.form.email'),
                 default: $email ?? '',
-                validate: fn ($value) => $this->validatePromptInput($value, 'email', ['nullable', 'email'])
+                validate: $this->validatePromptInput('email', ['nullable', 'email'])
             )
             ->text(__('commands.user:add.form.full-name'), default: $fullName ?? '')
             ->text(__('commands.user:add.form.descr'), default: $descr ?? '')

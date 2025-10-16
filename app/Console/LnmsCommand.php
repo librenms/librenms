@@ -185,15 +185,17 @@ abstract class LnmsCommand extends Command
         }
     }
 
-    protected function validatePromptInput(string|array $value, string $attributeName, string|array $rules): ?string
+    protected function validatePromptInput(string $attributeName, string|array $rules): Callable
     {
-        $validator = Validator::make([$attributeName => $value], [$attributeName => $rules]);
+        return function (string|array $value) use ($attributeName, $rules): ?string {
+            $validator = Validator::make([$attributeName => $value], [$attributeName => $rules]);
 
-        if ($validator->fails()) {
-            return $validator->errors()->first($attributeName);
-        }
+            if ($validator->fails()) {
+                return $validator->errors()->first($attributeName);
+            }
 
-        return null;
+            return null;
+        };
     }
 
     private function getCallable(string $type, string $name): ?callable
