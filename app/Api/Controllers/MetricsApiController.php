@@ -3,30 +3,34 @@
 namespace App\Api\Controllers;
 
 use Illuminate\Http\Request;
+use App\Api\Controllers\MetricsApi\DevicesMetrics;
+use App\Api\Controllers\MetricsApi\AccessPointsMetrics;
+use App\Api\Controllers\MetricsApi\PortsMetrics;
+use App\Api\Controllers\MetricsApi\PortsStatisticsMetrics;
 
 class MetricsApiController
 {
     public function devices(Request $request)
     {
-    // Forward to the MetricsApi controller for implementation (resolve instance to avoid static call)
-    return app()->call([app(\App\Api\Controllers\MetricsApi\Controller::class), 'devices'], ['request' => $request]);
+        $body = app(DevicesMetrics::class)->render($request);
+        return response($body, 200, ['Content-Type' => 'text/plain; version=0.0.4; charset=utf-8']);
     }
 
     public function accessPoints(Request $request)
     {
-    // Forward to the MetricsApi controller for implementation (resolve instance to avoid static call)
-    return app()->call([app(\App\Api\Controllers\MetricsApi\Controller::class), 'accessPoints'], ['request' => $request]);
+        $body = app(AccessPointsMetrics::class)->render($request);
+        return response($body, 200, ['Content-Type' => 'text/plain; version=0.0.4; charset=utf-8']);
     }
 
     public function ports(Request $request)
     {
-    // Forward to the MetricsApi controller for implementation (resolve instance to avoid static call)
-    return app()->call([app(\App\Api\Controllers\MetricsApi\Controller::class), 'ports'], ['request' => $request]);
+        $body = app(PortsMetrics::class)->render($request);
+        return response($body, 200, ['Content-Type' => 'text/plain; version=0.0.4; charset=utf-8']);
     }
 
     public function portsStatistics(Request $request)
     {
-    // Forward to the MetricsApi controller for implementation (resolve instance to avoid static call)
-    return app()->call([app(\App\Api\Controllers\MetricsApi\Controller::class), 'portsStatistics'], ['request' => $request]);
+        $body = app(PortsStatisticsMetrics::class)->render($request);
+        return response($body, 200, ['Content-Type' => 'text/plain; version=0.0.4; charset=utf-8']);
     }
 }
