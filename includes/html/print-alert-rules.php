@@ -337,11 +337,11 @@ foreach ($rule_list as $rule) {
             $transport_name = null;
             if ($transport_map['target_type'] == 'group') {
                 $transport_name = dbFetchCell('SELECT transport_group_name FROM alert_transport_groups WHERE transport_group_id=?', [$transport_map['transport_or_group_id']]);
-                $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-transport-group' data-group_id='" . $transport_map['transport_or_group_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport group  $transport_name'>" . $transport_name . '</a>';
+                $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-transport-group' data-group_id='" . $transport_map['transport_or_group_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport group " . e($transport_name) . "'>" . e($transport_name)  . '</a>';
             }
             if ($transport_map['target_type'] == 'single') {
                 $transport_name = dbFetchCell('SELECT transport_name FROM alert_transports WHERE transport_id=?', [$transport_map['transport_or_group_id']]);
-                $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='" . $transport_map['transport_or_group_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport $transport_name'>" . $transport_name . '</a>';
+                $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='" . $transport_map['transport_or_group_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport " . e($transport_name) . "'>" . e($transport_name) . '</a>';
             }
             $transports .= $transport_edit . '<br>';
         }
@@ -350,7 +350,7 @@ foreach ($rule_list as $rule) {
     if (! $transport_count || ! $transports) {
         $default_transports = dbFetchRows('SELECT transport_id, transport_name FROM alert_transports WHERE is_default=1 ORDER BY transport_name', []);
         foreach ($default_transports as $default_transport) {
-            $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='" . $default_transport['transport_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit default transport " . $default_transport['transport_name'] . "'>" . $default_transport['transport_name'] . '</a>';
+            $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='" . $default_transport['transport_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit default transport " . e($default_transport['transport_name']) . "'>" . e($default_transport['transport_name']) . '</a>';
             $transports .= $transport_edit . '<br>';
         }
     }

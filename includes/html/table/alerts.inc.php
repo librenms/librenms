@@ -158,7 +158,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         }
     }
 
-    $hostname = '<div class="incident">' . generate_device_link($alert, shorthost(format_hostname($alert))) . '<div id="incident' . $alert['id'] . '"';
+    $hostname = '<div class="incident">' . \LibreNMS\Util\Url::modernDeviceLink(DeviceCache::get($alert['device_id'] ?? null)) . '<div id="incident' . $alert['id'] . '"';
     if (isset($vars['uncollapse_key_count']) && is_numeric($vars['uncollapse_key_count'])) {
         $hostname .= $max_row_length < (int) $vars['uncollapse_key_count'] ? '' : ' class="collapse"';
     } else {
