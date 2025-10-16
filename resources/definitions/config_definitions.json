@@ -1496,9 +1496,14 @@
                     "type": "firewall"
                 },
                 {
-                    "icon": "scale-blanaced",
+                    "icon": "scale-balanced",
                     "text": "Load Balancers",
                     "type": "loadbalancer"
+                },
+                {
+                    "icon": "door-open",
+                    "text": "Management",
+                    "type": "management"
                 },
                 {
                     "icon": "network-wired",
@@ -5639,7 +5644,7 @@
             "type": "oxidized-maps",
             "validate": {
                 "value": "array",
-                "value.*": "array:hostname,sysName,sysDescr,sysObjectID,hardware,os,location,ip,purpose,notes,poller_group",
+                "value.*": "array:hostname,sysName,sysDescr,sysObjectID,hardware,type,os,location,ip,purpose,notes,poller_group",
                 "value.*.*": "array|min:1",
                 "value.*.*.*": "array:match,regex,value|size:2",
                 "value.*.*.*.value": "required|string",
@@ -6154,6 +6159,13 @@
             "group": "poller",
             "section": "poller_modules",
             "default": true,
+            "type": "boolean"
+        },
+        "poller_modules.port-security": {
+            "order": 460,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
             "type": "boolean"
         },
         "polling.selected_ports": {

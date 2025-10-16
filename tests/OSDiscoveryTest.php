@@ -37,7 +37,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Group;
 
-class OSDiscoveryTest extends TestCase
+final class OSDiscoveryTest extends TestCase
 {
     private static $unchecked_files;
 
@@ -52,6 +52,31 @@ class OSDiscoveryTest extends TestCase
         }, glob($glob)), function ($file) {
             return ! Str::contains($file, '@');
         }));
+    }
+
+    public function testValidOSNames(): void
+    {
+        $os = array_keys(self::osProvider());
+
+        $invalid_os_name = array_filter($os, function ($os_name) {
+            return preg_match('/[^a-z0-9\-]/', $os_name);
+        });
+
+        // DO NOT ADD ANY OS HERE!
+        $exceptions = [
+            'adva_fsp150',
+            'adva_fsp3kr7',
+            'adva_xg300',
+            'allworx_voip',
+            'arista_eos',
+            'xirrus_aos',
+            'fujitsuiRMC',
+            'ies52xxM',
+            'polycomLens',
+        ];
+        $invalid_os_name = array_diff($invalid_os_name, $exceptions);
+
+        $this->assertEmpty($invalid_os_name, 'Invalid OS name found: ' . implode(', ', $invalid_os_name));
     }
 
     /**

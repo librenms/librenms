@@ -79,19 +79,11 @@ class SensorObserver
             $sensor->sensor_limit_low_warn = $sensor->getOriginal('sensor_limit_low_warn');
             $sensor->sensor_limit_low = $sensor->getOriginal('sensor_limit_low');
         } else {
-            // only allow update if it wasn't previously set
-            if ($sensor->getOriginal('sensor_limit') !== null) {
-                $sensor->sensor_limit = $sensor->getOriginal('sensor_limit');
-            }
-            if ($sensor->getOriginal('sensor_limit_warn') !== null) {
-                $sensor->sensor_limit_warn = $sensor->getOriginal('sensor_limit_warn');
-            }
-            if ($sensor->getOriginal('sensor_limit_low_warn') !== null) {
-                $sensor->sensor_limit_low_warn = $sensor->getOriginal('sensor_limit_low_warn');
-            }
-            if ($sensor->getOriginal('sensor_limit_low') !== null) {
-                $sensor->sensor_limit_low = $sensor->getOriginal('sensor_limit_low');
-            }
+            // change unset sensor limits to current values
+            $sensor->sensor_limit ??= $sensor->getOriginal('sensor_limit');
+            $sensor->sensor_limit_warn ??= $sensor->getOriginal('sensor_limit_warn');
+            $sensor->sensor_limit_low_warn ??= $sensor->getOriginal('sensor_limit_low_warn');
+            $sensor->sensor_limit_low ??= $sensor->getOriginal('sensor_limit_low');
         }
     }
 

@@ -87,6 +87,8 @@ been up for 30344 seconds`.
 - Transport name: `$alert->transport_name`
 - Contacts, must be iterated in a foreach, `$key` holds email and
   `$value` holds name: `$alert->contacts`
+- Application Data: `$alert->applications`
+- Application Metrics: `$alert->applications_metrics`
 
 Placeholders can be used within the subjects for templates as well
 although $faults is most likely going to be worthless due to it being
@@ -254,6 +256,19 @@ Percent Utilized: {{ $value['mempool_perc'] }}
 @endforeach
 ```
 
+#### Sneck Alert
+
+```text
+{{ $alert->title }}
+Severity: {{ $alert->severity }}
+@if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
+Timestamp: {{ $alert->timestamp }}
+Unique-ID: {{ $alert->uid }}
+@if ($alert->description) Description: {{ $alert->description }} @endif
+@if ($alert->notes) Notes: {{ $alert->notes }} @endif
+Alert String: {{ $alert->applications['sneck'][0]['data']['alertString'] }}
+```
+
 ### Advanced options
 
 #### Conditional formatting
@@ -276,6 +291,40 @@ email or just the hostname in any other transport:
         {{ $alert->debug['traceroute'] }}
     @endif
 @endif
+```
+
+### Using Application Data In Alert Templates
+
+Application data may be used in a alert template. `$alert->applications` is a
+associative array that contains the various applications for the device in
+question the alert is for. Each sub array contains that line from the
+applications table. So if you wanted for example access the app data for Sneck,
+it would be `$alert->applications['sneck'][0]['data']` and thus if we wanted to
+make us of the value `.data.alertString` in the stored return JSON, we would
+use `$alert->applications['sneck'][0]['data']['data']['alertString']`.
+
+If you want to get a better idea of what is usable, call
+`lnms report:devices -o json -r applications $device | jq -S .applications | less`
+on some device that has the app in question you are curious about and pay attention
+to the app data chunk.
+
+`[0]` is there as the legacy apps proxmox and drdb don't use make
+use of app data and instead can have multiple instances.
+
+#### Metrics
+
+Application metrics are also available via `$alert->application_metrics`.
+
+For example for ZFS if you wanted to include error info, you could do this.
+
+```
+Current Total Errors: {{ $alert->applications['zfs'][0]['total_errors']['value'] }}
+Current Read Errors: {{ $alert->applications['zfs'][0]['read_errors']['value'] }}
+Current Write Errors: {{ $alert->applications['zfs'][0][write_errors']['value'] }}
+
+Previous Total Errors: {{ $alert->applications['zfs'][0]['total_errors']['value_prev'] }}
+Previous Read Errors: {{ $alert->applications['zfs'][0]['read_errors']['value_prev'] }}
+Previous Write Errors: {{ $alert->applications['zfs'][0][write_errors']['value_prev'] }}
 ```
 
 ## Examples HTML

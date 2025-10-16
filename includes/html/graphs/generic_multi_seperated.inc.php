@@ -81,7 +81,7 @@ if ($width > '500') {
 }
 
 if ($previous) {
-    $rrd_options .= sprintf(" COMMENT:'\t'", '');
+    $rrd_options .= sprintf(" COMMENT:'\t'");
     $rrd_options .= sprintf(" COMMENT:'%10s'", 'P Avg');
     $rrd_options .= sprintf(" COMMENT:'%10s'", 'P Max');
     if (! $nototal) {

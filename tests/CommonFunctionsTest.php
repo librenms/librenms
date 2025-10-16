@@ -33,7 +33,7 @@ use LibreNMS\Util\Clean;
 use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Validate;
 
-class CommonFunctionsTest extends TestCase
+final class CommonFunctionsTest extends TestCase
 {
     public function testStrContains(): void
     {

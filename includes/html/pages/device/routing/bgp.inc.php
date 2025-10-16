@@ -220,7 +220,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
 
     $link_array = $graph_array;
     $link_array['page'] = 'graphs';
-    unset($link_array['height'], $link_array['width'], $link_array['legend']);
+    unset($link_array['height'], $link_array['width']);
     $link = \LibreNMS\Util\Url::generate($link_array);
     $peeraddresslink = '<span class=list-large>' . \LibreNMS\Util\Url::overlibLink($link, $peerIdentifierIp?->compressed(), \LibreNMS\Util\Url::graphTag($graph_array_zoom)) . '</span>';
 
