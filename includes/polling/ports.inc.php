@@ -410,7 +410,7 @@ if (LibrenmsConfig::get('enable_ports_poe')) {
     }
 }
 
-if ($device['os_group'] == 'cisco' && $device['os'] != 'asa') {
+if (isset($device['os_group']) && $device['os_group'] == 'cisco' && $device['os'] != 'asa') {
     foreach ($pagp_oids as $oid) {
         $pagp_port_stats = snmpwalk_cache_oid($device, $oid, [], 'CISCO-PAGP-MIB');
     }
