@@ -196,27 +196,6 @@ abstract class LnmsCommand extends Command
         return null;
     }
 
-    protected function promptForInput(string $inputName, string|array $validationRules, \Closure $prompt, bool $shouldPrompt = true): string|array|null
-    {
-        $input = ($this->hasArgument($inputName) ? $this->argument($inputName) : null)
-            ?? ($this->hasOption($inputName) ? $this->option($inputName) : null);
-
-        if ((is_array($input) && ! empty($input)) || (is_string($input) && $input !== '')) {
-            Validator::make(
-                [$inputName => $input],
-                [$inputName => $validationRules]
-            )->validate();
-
-            return $input;
-        }
-
-        if ($shouldPrompt) {
-            return $prompt(fn ($value) => $this->validatePromptInput($value, $inputName, $validationRules));
-        }
-
-        return null;
-    }
-
     private function getCallable(string $type, string $name): ?callable
     {
         if (empty($this->{'option' . $type}[$name])) {
