@@ -27,16 +27,17 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\AlertTransportGroup;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class AlertTransportGroupController extends SelectController
 {
-    protected function searchFields(Request $request)
+    protected function searchFields(Request $request): array
     {
         return ['transport_group_name'];
     }
 
-    protected function baseQuery(Request $request)
+    protected function baseQuery(Request $request): Builder
     {
         return AlertTransportGroup::query()
             ->orderBy('transport_group_name');

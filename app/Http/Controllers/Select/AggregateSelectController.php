@@ -26,6 +26,7 @@
 
 namespace App\Http\Controllers\Select;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
 
@@ -66,13 +67,13 @@ abstract class AggregateSelectController extends SelectController
         return $this->formatResponse($groups, $hasMore);
     }
 
-    public function baseQuery(Request $request): void
+    public function baseQuery(Request $request)
     {
-        //
+        return \App\Models\Device::query(); // unused
     }
 
     /**
-     * @param  array{text: string, controller: SelectController, prefix: string, items: Paginator}  $group
+     * @param  array{text: string, controller: SelectController, prefix: string, items: Paginator}|Model  $group
      * @return array
      */
     public function formatItem($group): array

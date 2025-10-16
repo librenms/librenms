@@ -459,7 +459,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             width: "100%",
             placeholder: "Transport/Group Name",
             ajax: {
-                url: '<?php echo route('ajax.select.transport-groups') ?>',
+                url: '<?php echo route('ajax.select.alert-transports-groups') ?>',
                 delay: 150
             }
         });

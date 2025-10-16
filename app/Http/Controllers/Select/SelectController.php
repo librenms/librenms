@@ -86,7 +86,7 @@ abstract class SelectController extends PaginatedAjaxController
      */
     protected function formatResponse($paginator, bool $hasMore = false): JsonResponse
     {
-        $results = ($paginator instanceof Paginator ? $paginator->getCollection() : $paginator)
+        $results = ($paginator instanceof Paginator ? collect($paginator->items()) : $paginator)
             ->map(fn ($model) => $this->formatItem($model));
 
         if ($this->canPrependFirstItem(request())) {
