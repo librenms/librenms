@@ -60,6 +60,7 @@ Route::prefix('v0')->group(function () {
             Route::get('devices', [App\Api\Controllers\MetricsApiController::class, 'devices'])->name('metrics_devices');
             Route::get('access_points', [App\Api\Controllers\MetricsApiController::class, 'accessPoints'])->name('metrics_access_points');
             Route::get('ports', [App\Api\Controllers\MetricsApiController::class, 'ports'])->name('metrics_ports');
+            Route::get('ports_statistics', [App\Api\Controllers\MetricsApiController::class, 'portsStatistics'])->name('metrics_ports_statistics');
         });
     });
 
