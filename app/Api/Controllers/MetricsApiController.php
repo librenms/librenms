@@ -11,4 +11,16 @@ class MetricsController
         // Forward to the MetricsApi controller for implementation
         return app()->call([\App\Api\Controllers\MetricsApi\Controller::class, 'devices'], ['request' => $request]);
     }
+
+    public function accessPoints(Request $request)
+    {
+        // Forward to the MetricsApi controller for implementation
+        return app()->call([\App\Api\Controllers\MetricsApi\Controller::class, 'accessPoints'], ['request' => $request]);
+    }
+
+    public function ports(Request $request)
+    {
+        // Forward to the MetricsApi controller for implementation
+        return app()->call([\App\Api\Controllers\MetricsApi\Controller::class, 'ports'], ['request' => $request]);
+    }
 }
