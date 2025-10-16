@@ -1172,6 +1172,7 @@ Input:
     - hardware: The model of the device (wildcard)
     - features: Software license features (wildcard)
 - query: If searching by, then this will be used as the input.
+- columns: only return requested columns.
 
 Example:
 
