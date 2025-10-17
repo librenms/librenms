@@ -16,7 +16,7 @@ class WirelessSensorsMetrics
 
         // Gather global metrics
         $total = DB::table('wireless_sensors')->count();
-        
+
         // Append global metrics
         $lines[] = '# HELP librenms_wireless_sensors_total Total number of wireless sensors';
         $lines[] = '# TYPE librenms_wireless_sensors_total gauge';
@@ -34,7 +34,7 @@ class WirelessSensorsMetrics
         $deviceIds = DB::table('wireless_sensors')->distinct()->pluck('device_id');
         $devices = Device::select('device_id', 'hostname', 'sysName')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
 
-        $rows = DB::table('wireless_sensors')->select('sensor_id','device_id','sensor_class','sensor_type','sensor_descr','sensor_current','sensor_multiplier','sensor_divisor','sensor_limit_warn','sensor_limit')->cursor();
+        $rows = DB::table('wireless_sensors')->select('sensor_id', 'device_id', 'sensor_class', 'sensor_type', 'sensor_descr', 'sensor_current', 'sensor_multiplier', 'sensor_divisor', 'sensor_limit_warn', 'sensor_limit')->cursor();
 
         foreach ($rows as $s) {
             $dev = $devices->get($s->device_id);
@@ -97,8 +97,6 @@ class WirelessSensorsMetrics
             $lines[] = '# TYPE librenms_wireless_sensor_limit_crit_counter counter';
             $lines = array_merge($lines, $counter_limit_crit_lines);
         }
-
-    // Note: individual gauge/counter limit metrics were already appended above
 
         return implode("\n", $lines) . "\n";
     }

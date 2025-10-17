@@ -2,8 +2,8 @@
 
 namespace App\Api\Controllers\MetricsApi;
 
-use App\Models\Sensor;
 use App\Models\Device;
+use App\Models\Sensor;
 use Illuminate\Http\Request;
 
 class SensorsMetrics

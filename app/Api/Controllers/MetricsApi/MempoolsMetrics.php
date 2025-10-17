@@ -2,8 +2,8 @@
 
 namespace App\Api\Controllers\MetricsApi;
 
-use App\Models\Mempool;
 use App\Models\Device;
+use App\Models\Mempool;
 use Illuminate\Http\Request;
 
 class MempoolsMetrics
