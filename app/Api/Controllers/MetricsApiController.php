@@ -21,7 +21,8 @@ class MetricsApiController
         $html[] = '<!doctype html>';
         $html[] = '<html><head><meta charset="utf-8"><title>LibreNMS Prometheus metrics</title></head><body>';
         $html[] = '<h1>LibreNMS Prometheus metrics</h1>';
-        $html[] = '<p>This endpoint exposes multiple Prometheus-compatible metric endpoints. Each endpoint requires a valid API token with global-read access. Scrape the specific metric paths below (relative links).</p>';
+        $html[] = '<p>This endpoint exposes multiple Prometheus-compatible metric endpoints. Each endpoint requires a valid API token with global-read access.</br>';
+        $html[] = 'Scrape the specific metric paths below (relative links).</p>';
         $html[] = '<ul>';
         $html[] = '<li><a href="access_points">/metrics/access_points</a> — access point metrics</li>';
         $html[] = '<li><a href="applications">/metrics/applications</a> — application metric values (app_type, instance, metric)</li>';
@@ -33,7 +34,8 @@ class MetricsApiController
         $html[] = '<li><a href="processors">/metrics/processors</a> — processor usage metrics</li>';
         $html[] = '<li><a href="sensors">/metrics/sensors</a> — health sensors (temperature, power, etc.)</li>';
         $html[] = '</ul>';
-        $html[] = '<p>Each metrics endpoint returns text in the Prometheus exposition format (text/plain). Use your API token via the X-Auth-Token header when scraping.</p>';
+        $html[] = '<p>Each metrics endpoint returns text in the Prometheus exposition format (text/plain).</br>';
+        $html[] = '<p>Use your API token via the X-Auth-Token header when scraping.</p>';
         $html[] = '<p>Example curl (replace TOKEN):<br><code>curl -H "X-Auth-Token: TOKEN" https://your.librenms.example/api/v0/metrics/applications</code></p>';
         $html[] = '</body></html>';
 
