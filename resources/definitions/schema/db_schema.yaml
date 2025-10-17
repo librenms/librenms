@@ -245,15 +245,15 @@ bgpPeers_cbgp:
     - { Field: AdvertisedPrefixes, Type: 'bigint unsigned', 'Null': false, Extra: '' }
     - { Field: SuppressedPrefixes, Type: 'bigint unsigned', 'Null': false, Extra: '' }
     - { Field: WithdrawnPrefixes, Type: 'bigint unsigned', 'Null': false, Extra: '' }
-    - { Field: AcceptedPrefixes_delta, Type: 'bigint unsigned', 'Null': false, Extra: '' }
+    - { Field: AcceptedPrefixes_delta, Type: bigint, 'Null': false, Extra: '' }
     - { Field: AcceptedPrefixes_prev, Type: 'bigint unsigned', 'Null': false, Extra: '' }
-    - { Field: DeniedPrefixes_delta, Type: 'bigint unsigned', 'Null': false, Extra: '' }
+    - { Field: DeniedPrefixes_delta, Type: bigint, 'Null': false, Extra: '' }
     - { Field: DeniedPrefixes_prev, Type: 'bigint unsigned', 'Null': false, Extra: '' }
-    - { Field: AdvertisedPrefixes_delta, Type: 'bigint unsigned', 'Null': false, Extra: '' }
+    - { Field: AdvertisedPrefixes_delta, Type: bigint, 'Null': false, Extra: '' }
     - { Field: AdvertisedPrefixes_prev, Type: 'bigint unsigned', 'Null': false, Extra: '' }
-    - { Field: SuppressedPrefixes_delta, Type: 'bigint unsigned', 'Null': false, Extra: '' }
+    - { Field: SuppressedPrefixes_delta, Type: bigint, 'Null': false, Extra: '' }
     - { Field: SuppressedPrefixes_prev, Type: 'bigint unsigned', 'Null': false, Extra: '' }
-    - { Field: WithdrawnPrefixes_delta, Type: 'bigint unsigned', 'Null': false, Extra: '' }
+    - { Field: WithdrawnPrefixes_delta, Type: bigint, 'Null': false, Extra: '' }
     - { Field: WithdrawnPrefixes_prev, Type: 'bigint unsigned', 'Null': false, Extra: '' }
     - { Field: context_name, Type: varchar(128), 'Null': true, Extra: '' }
   Indexes:
