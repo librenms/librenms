@@ -54,9 +54,9 @@ class MetricsApiController
         $html[] = '<li><code>device_group</code> — a device group id or name; the group will be expanded to its member devices</li>';
         $html[] = '</ul>';
         $html[] = '<p>Examples:<br>';
-        $html[] = '<code>curl -H "X-Auth-Token: TOKEN" "https://your.librenms.example/api/v0/metrics/ports?device_id=1,2,3"</code><br>';
-        $html[] = '<code>curl -H "X-Auth-Token: TOKEN" "https://your.librenms.example/api/v0/metrics/mempools?hostnames=sw1,sw2"</code>';
-        $html[] = '<code>curl -H "X-Auth-Token: TOKEN" "https://your.librenms.example/api/v0/metrics/sensors?device_group=4,5"</code><br>';
+        $html[] = '<code>curl -H "X-Auth-Token: TOKEN" "https://your.librenms.example/api/v0/metrics/ports?device_id=1,2,3"</code></br>';
+        $html[] = '<code>curl -H "X-Auth-Token: TOKEN" "https://your.librenms.example/api/v0/metrics/mempools?hostnames=sw1,sw2"</br></code>';
+        $html[] = '<code>curl -H "X-Auth-Token: TOKEN" "https://your.librenms.example/api/v0/metrics/sensors?device_group=4,5"</code></br>';
         $html[] = '<code>curl -H "X-Auth-Token: TOKEN" "https://your.librenms.example/api/v0/metrics/devices?device_group=switches"</code>';
         $html[] = '</p>';
         $html[] = '</body></html>';
