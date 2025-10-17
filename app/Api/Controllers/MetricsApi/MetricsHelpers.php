@@ -1,10 +1,11 @@
 <?php
 
 namespace App\Api\Controllers\MetricsApi;
+
+use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use App\Models\Device;
 
 trait MetricsHelpers
 {
@@ -13,7 +14,7 @@ trait MetricsHelpers
      */
     private function escapeLabel(string $v): string
     {
-        return str_replace(["\\", '"', "\n"], ["\\\\", '\\"', '\\n'], $v);
+        return str_replace(['\\', '"', "\n"], ['\\\\', '\\"', '\\n'], $v);
     }
 
     /**
@@ -61,7 +62,9 @@ trait MetricsHelpers
             $deviceIds = $deviceIds->merge($fromGroup);
         }
 
-        $deviceIds = $deviceIds->filter(function ($v) { return $v !== null && $v !== ''; })->unique()->values();
+        $deviceIds = $deviceIds->filter(function ($v) {
+            return $v !== null && $v !== '';
+        })->unique()->values();
 
         return ['device_ids' => $deviceIds->isEmpty() ? null : $deviceIds];
     }
