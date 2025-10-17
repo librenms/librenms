@@ -68,6 +68,10 @@ Route::prefix('v0')->group(function () {
             Route::get('sensors', [App\Api\Controllers\MetricsApiController::class, 'sensors'])->name('metrics_sensors');
             Route::get('applications', [App\Api\Controllers\MetricsApiController::class, 'applications'])->name('metrics_applications');
             Route::get('customoids', [App\Api\Controllers\MetricsApiController::class, 'customoids'])->name('metrics_customoids');
+            Route::get('alerts', [App\Api\Controllers\MetricsApiController::class, 'alerts'])->name('metrics_alerts');
+            Route::get('services', [App\Api\Controllers\MetricsApiController::class, 'services'])->name('metrics_services');
+            Route::get('storages', [App\Api\Controllers\MetricsApiController::class, 'storages'])->name('metrics_storages');
+            Route::get('wireless_sensors', [App\Api\Controllers\MetricsApiController::class, 'wirelessSensors'])->name('metrics_wireless_sensors');
         });
     });
 

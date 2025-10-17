@@ -12,6 +12,10 @@ use App\Api\Controllers\MetricsApi\ProcessorsMetrics;
 use App\Api\Controllers\MetricsApi\SensorsMetrics;
 use App\Api\Controllers\MetricsApi\ApplicationsMetrics;
 use App\Api\Controllers\MetricsApi\CustomoidsMetrics;
+use App\Api\Controllers\MetricsApi\AlertsMetrics;
+use App\Api\Controllers\MetricsApi\ServicesMetrics;
+use App\Api\Controllers\MetricsApi\StoragesMetrics;
+use App\Api\Controllers\MetricsApi\WirelessSensorsMetrics;
 
 class MetricsApiController
 {
@@ -25,6 +29,7 @@ class MetricsApiController
         $html[] = 'Scrape the specific metric paths below (relative links).</p>';
         $html[] = '<ul>';
         $html[] = '<li><a href="access_points">/metrics/access_points</a> — access point metrics</li>';
+        $html[] = '<li><a href="alerts">/metrics/alerts</a> — alert metrics</li>';
         $html[] = '<li><a href="applications">/metrics/applications</a> — application metric values (app_type, instance, metric)</li>';
         $html[] = '<li><a href="customoids">/metrics/customoids</a> — custom oid metrics</li>';
         $html[] = '<li><a href="devices">/metrics/devices</a> — device-level metrics (uptime, last poll, status)</li>';
@@ -33,6 +38,9 @@ class MetricsApiController
         $html[] = '<li><a href="ports_statistics">/metrics/ports_statistics</a> — higher-cardinality per-port statistics</li>';
         $html[] = '<li><a href="processors">/metrics/processors</a> — processor usage metrics</li>';
         $html[] = '<li><a href="sensors">/metrics/sensors</a> — health sensors (temperature, power, etc.)</li>';
+        $html[] = '<li><a href="services">/metrics/services</a> — service check status metrics</li>';
+        $html[] = '<li><a href="storages">/metrics/storages</a> — storage usage metrics</li>';
+        $html[] = '<li><a href="wireless_sensors">/metrics/wireless_sensors</a> — wireless sensor metrics</li>';
         $html[] = '</ul>';
         $html[] = '<p>Each metrics endpoint returns text in the Prometheus exposition format (text/plain).</br>';
         $html[] = 'Use your API token via the X-Auth-Token header when scraping.</p>';
@@ -92,6 +100,30 @@ class MetricsApiController
     public function customoids(Request $request)
     {
         $body = app(CustomoidsMetrics::class)->render($request);
+        return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
+    }
+
+    public function alerts(Request $request)
+    {
+        $body = app(AlertsMetrics::class)->render($request);
+        return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
+    }
+
+    public function services(Request $request)
+    {
+        $body = app(ServicesMetrics::class)->render($request);
+        return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
+    }
+
+    public function storages(Request $request)
+    {
+        $body = app(StoragesMetrics::class)->render($request);
+        return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
+    }
+
+    public function wirelessSensors(Request $request)
+    {
+        $body = app(WirelessSensorsMetrics::class)->render($request);
         return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
     }
 }
