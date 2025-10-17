@@ -14,12 +14,12 @@ class SensorsMetrics
     {
         $lines = [];
 
-    // Parse filters
-    $filters = $this->parseDeviceFilters($request);
+        // Parse filters
+        $filters = $this->parseDeviceFilters($request);
 
-    // Gather global metrics
-    $totalQ = Sensor::query();
-    $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
+        // Gather global metrics
+        $totalQ = Sensor::query();
+        $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
 
         // Append global metrics
         $lines[] = '# HELP librenms_sensors_total Total number of sensors';
@@ -34,14 +34,14 @@ class SensorsMetrics
         $counter_limit_warn_lines = [];
         $counter_limit_crit_lines = [];
 
-    $deviceIdsQuery = Sensor::select('device_id')->distinct();
-    $deviceIdsQuery = $this->applyDeviceFilter($deviceIdsQuery, $filters['device_ids']);
-    $deviceIds = $deviceIdsQuery->pluck('device_id');
-    $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
+        $deviceIdsQuery = Sensor::select('device_id')->distinct();
+        $deviceIdsQuery = $this->applyDeviceFilter($deviceIdsQuery, $filters['device_ids']);
+        $deviceIds = $deviceIdsQuery->pluck('device_id');
+        $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
 
-    $sensorQuery = Sensor::select('sensor_id', 'device_id', 'sensor_class', 'sensor_type', 'sensor_descr', 'sensor_current', 'sensor_divisor', 'sensor_multiplier', 'sensor_limit_warn', 'sensor_limit', 'group', 'rrd_type');
-    $sensorQuery = $this->applyDeviceFilter($sensorQuery, $filters['device_ids']);
-    foreach ($sensorQuery->cursor() as $s) {
+        $sensorQuery = Sensor::select('sensor_id', 'device_id', 'sensor_class', 'sensor_type', 'sensor_descr', 'sensor_current', 'sensor_divisor', 'sensor_multiplier', 'sensor_limit_warn', 'sensor_limit', 'group', 'rrd_type');
+        $sensorQuery = $this->applyDeviceFilter($sensorQuery, $filters['device_ids']);
+        foreach ($sensorQuery->cursor() as $s) {
             $dev = $devices->get($s->device_id);
             $device_hostname = $dev ? $this->escapeLabel((string) $dev->hostname) : '';
             $device_sysName = $dev ? $this->escapeLabel((string) $dev->sysName) : '';

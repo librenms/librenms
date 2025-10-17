@@ -1,6 +1,10 @@
 <?php
 
 namespace App\Api\Controllers\MetricsApi;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use App\Models\Device;
 
 trait MetricsHelpers
 {
@@ -11,10 +15,6 @@ trait MetricsHelpers
     {
         return str_replace(["\\", '"', "\n"], ["\\\\", '\\"', '\\n'], $v);
     }
-
-    use Illuminate\Http\Request;
-    use Illuminate\Support\Collection;
-    use Illuminate\Support\Facades\DB;
 
     /**
      * Parse device / device group filters from the Request.
