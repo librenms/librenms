@@ -48,8 +48,8 @@ if (isset($app->data['checks'])) {
             }
         }
         // run time
-        if (isset($app->data['data']['run_time'])) {
-            echo '<b>Runtime:</b> ' . htmlspecialchars($app->data['data']['run_time']) . " seconds<br>\n";
+        if (isset($app->data['run_time'])) {
+            echo '<b>Runtime:</b> ' . htmlspecialchars($app->data['run_time']) . " seconds<br>\n";
         }
         print_optionbar_end();
     }
@@ -74,8 +74,8 @@ if ((isset($vars['sneck_check']) && isset($app->data['checks'][$vars['sneck_chec
         echo '<b>Ran:</b> ' . htmlspecialchars($app->data[$type][$type_name]['ran']) . "<br>\n";
     }
     // run time
-    if (isset($app->data['data'][$type][$type_name]['run_time'])) {
-        echo '<b>Runtime:</b> ' . htmlspecialchars($app->data['data'][$type][$type_name]['run_time']) . " seconds<br>\n";
+    if (isset($app->data[$type][$type_name]['run_time'])) {
+        echo '<b>Runtime:</b> ' . htmlspecialchars($app->data[$type][$type_name]['run_time']) . " seconds<br>\n";
     }
     // exit code
     if (isset($app->data[$type][$type_name]['exit'])) {
@@ -100,7 +100,7 @@ if ((isset($vars['sneck_check']) && isset($app->data['checks'][$vars['sneck_chec
         'sneck_time' => 'Time Difference',
     ];
 
-    if (isset($app->data['data']['checks'])) {
+    if (isset($app->data['runtime'])) {
         $graphs['sneck_runtime'] = 'Runtime';
     }
 
