@@ -14,12 +14,12 @@ class MempoolsMetrics
     {
         $lines = [];
 
-    // Parse filters
-    $filters = $this->parseDeviceFilters($request);
+        // Parse filters
+        $filters = $this->parseDeviceFilters($request);
 
-    // Gather global metrics
-    $totalQ = Mempool::query();
-    $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
+        // Gather global metrics
+        $totalQ = Mempool::query();
+        $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
 
         // Prepare per-mempool metrics arrays
         $lines[] = '# HELP librenms_mempools_total Total number of mempools';
@@ -32,14 +32,14 @@ class MempoolsMetrics
         $perc_lines = [];
 
         // Gather device info mapping for labels
-    $deviceIdsQuery = Mempool::select('device_id')->distinct();
-    $deviceIdsQuery = $this->applyDeviceFilter($deviceIdsQuery, $filters['device_ids']);
-    $deviceIds = $deviceIdsQuery->pluck('device_id');
-    $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
+        $deviceIdsQuery = Mempool::select('device_id')->distinct();
+        $deviceIdsQuery = $this->applyDeviceFilter($deviceIdsQuery, $filters['device_ids']);
+        $deviceIds = $deviceIdsQuery->pluck('device_id');
+        $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
 
-    $mpQuery = Mempool::select('mempool_id', 'device_id', 'mempool_descr', 'mempool_class', 'mempool_used', 'mempool_free', 'mempool_total', 'mempool_perc');
-    $mpQuery = $this->applyDeviceFilter($mpQuery, $filters['device_ids']);
-    foreach ($mpQuery->cursor() as $m) {
+        $mpQuery = Mempool::select('mempool_id', 'device_id', 'mempool_descr', 'mempool_class', 'mempool_used', 'mempool_free', 'mempool_total', 'mempool_perc');
+        $mpQuery = $this->applyDeviceFilter($mpQuery, $filters['device_ids']);
+        foreach ($mpQuery->cursor() as $m) {
             $dev = $devices->get($m->device_id);
             $device_hostname = $dev ? $this->escapeLabel((string) $dev->hostname) : '';
             $device_sysName = $dev ? $this->escapeLabel((string) $dev->sysName) : '';

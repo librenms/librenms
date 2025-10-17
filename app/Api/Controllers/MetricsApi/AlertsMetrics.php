@@ -37,6 +37,7 @@ class AlertsMetrics
         $statesQ = Alert::select('state', DB::raw('count(*) as cnt'))->groupBy('state');
         $statesQ = $this->applyDeviceFilter($statesQ, $filters['device_ids']);
         $states = $statesQ->get();
+        /** @var \stdClass $s */
         foreach ($states as $s) {
             $lines[] = sprintf('librenms_alerts_by_state{state="%s"} %d', $s->state, $s->cnt);
         }

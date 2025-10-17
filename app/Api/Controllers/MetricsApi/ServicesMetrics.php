@@ -27,6 +27,7 @@ class ServicesMetrics
         $lines[] = '# HELP librenms_services_by_status Number of services by status (0=OK,1=WARNING,2=CRITICAL)';
         $lines[] = '# TYPE librenms_services_by_status gauge';
         $statuses = Service::select('service_status', DB::raw('count(*) as cnt'))->groupBy('service_status')->get();
+        /** @var \stdClass $s */
         foreach ($statuses as $s) {
             $lines[] = sprintf('librenms_services_by_status{status="%s"} %d', $s->service_status, $s->cnt);
         }
@@ -48,6 +49,7 @@ class ServicesMetrics
         $lines[] = '# HELP librenms_services_by_device_and_status Number of services per device by status';
         $lines[] = '# TYPE librenms_services_by_device_and_status gauge';
         $rows = Service::select('device_id', 'service_status', DB::raw('count(*) as cnt'))->groupBy('device_id', 'service_status')->cursor();
+        /** @var \stdClass $r */
         foreach ($rows as $r) {
             $dev = $devices->get($r->device_id);
             $device_hostname = $dev ? $this->escapeLabel((string) $dev->hostname) : '';
