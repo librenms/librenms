@@ -2,8 +2,8 @@
 
 namespace App\Api\Controllers\MetricsApi;
 
-use App\Models\Processor;
 use App\Models\Device;
+use App\Models\Processor;
 use Illuminate\Http\Request;
 
 class ProcessorsMetrics

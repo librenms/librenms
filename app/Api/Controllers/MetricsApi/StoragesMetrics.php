@@ -2,8 +2,8 @@
 
 namespace App\Api\Controllers\MetricsApi;
 
-use App\Models\Storage;
 use App\Models\Device;
+use App\Models\Storage;
 use Illuminate\Http\Request;
 
 class StoragesMetrics
