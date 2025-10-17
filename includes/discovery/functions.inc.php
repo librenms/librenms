@@ -540,7 +540,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                         if (isset($data[$limit]) && is_numeric($data[$limit])) {
                             $$limit = $data[$limit];
                         } else {
-                            $$limit = YamlDiscovery::getValueFromData($limit, $index, $data, $pre_cache, 'null');
+                            $$limit = trim(YamlDiscovery::replaceValues($limit, $index, null, $data, $pre_cache));
                             if (is_numeric($$limit)) {
                                 $$limit = ($$limit / $divisor) * $multiplier;
                             }
