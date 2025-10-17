@@ -6636,7 +6636,7 @@
             "units": "Seconds"
         },
         "ping_rrd_step": {
-            "default": 60,
+            "default": 300,
             "group": "poller",
             "section": "dispatcherservice",
             "order": 21,
