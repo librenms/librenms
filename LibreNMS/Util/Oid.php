@@ -155,14 +155,6 @@ class Oid
     }
 
     /**
-     * Returns a numeric oid representation of a string.  The first octet is the string length.
-     */
-    public static function ofString(string $string): string
-    {
-        return strlen($string) . '.' . implode('.', unpack('c*', $string));
-    }
-
-    /**
      * Try to parse an oid into a string.
      * If the oid contains multiple strings, skip until we get to the given position
      */
