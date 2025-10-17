@@ -13,10 +13,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('bgpPeers_cbgp', function (Blueprint $table) {
-            $table->unsignedInteger('device_id');
-            $table->string('bgpPeerIdentifier', 64);
-            $table->string('afi', 16);
-            $table->string('safi', 16);
             $table->bigInteger('AcceptedPrefixes');
             $table->bigInteger('DeniedPrefixes');
             $table->bigInteger('PrefixAdminLimit');
@@ -35,9 +31,6 @@ return new class extends Migration
             $table->bigInteger('SuppressedPrefixes_prev');
             $table->bigInteger('WithdrawnPrefixes_delta');
             $table->bigInteger('WithdrawnPrefixes_prev');
-            $table->string('context_name', 128)->nullable();
-            $table->unique(['device_id', 'bgpPeerIdentifier', 'afi', 'safi']);
-            $table->index(['device_id', 'bgpPeerIdentifier', 'context_name']);
         });
     }
 
@@ -49,10 +42,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('bgpPeers_cbgp', function (Blueprint $table) {
-            $table->unsignedInteger('device_id');
-            $table->string('bgpPeerIdentifier', 64);
-            $table->string('afi', 16);
-            $table->string('safi', 16);
             $table->integer('AcceptedPrefixes');
             $table->integer('DeniedPrefixes');
             $table->integer('PrefixAdminLimit');
@@ -71,9 +60,7 @@ return new class extends Migration
             $table->integer('SuppressedPrefixes_prev');
             $table->integer('WithdrawnPrefixes_delta');
             $table->integer('WithdrawnPrefixes_prev');
-            $table->string('context_name', 128)->nullable();
-            $table->unique(['device_id', 'bgpPeerIdentifier', 'afi', 'safi']);
-            $table->index(['device_id', 'bgpPeerIdentifier', 'context_name']);
+
         });
     }
 };
