@@ -98,13 +98,7 @@ class WirelessSensorsMetrics
             $lines = array_merge($lines, $counter_limit_crit_lines);
         }
 
-        $lines[] = '# HELP librenms_wireless_sensor_limit_warn Wireless sensor warning threshold';
-        $lines[] = '# TYPE librenms_wireless_sensor_limit_warn gauge';
-        $lines = array_merge($lines, $warn_lines);
-
-        $lines[] = '# HELP librenms_wireless_sensor_limit_crit Wireless sensor critical threshold';
-        $lines[] = '# TYPE librenms_wireless_sensor_limit_crit gauge';
-        $lines = array_merge($lines, $crit_lines);
+    // Note: individual gauge/counter limit metrics were already appended above
 
         return implode("\n", $lines) . "\n";
     }
