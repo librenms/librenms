@@ -157,7 +157,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 }
             }
 
-            $text = join("\n", $lines);
+            $text = implode("\n", $lines);
         }
     } elseif (LibrenmsConfig::get('oxidized.enabled') === true && LibrenmsConfig::has('oxidized.url')) {
         // Try with hostname as set in librenms first
@@ -174,7 +174,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         // Try other hostname format if Oxidized request failed
         if (! $node_info) {
             // Adjust hostname based on whether domain was already in it or not
-            if (strpos($oxidized_hostname, '.') !== false) {
+            if (str_contains($oxidized_hostname, '.')) {
                 // Use short name
                 $oxidized_hostname = strtok($device['hostname'], '.');
             } elseif (LibrenmsConfig::get('mydomain')) {

@@ -43,7 +43,7 @@ foreach (explode("\n", $oids) as $data) {
         $descr = 'BIAS Pump - ' . $index;
         $num_oid = '.1.3.6.1.4.1.17409.1.11.4.1.2.' . $index;
         $sensor_index = 'oaPumpBIAS' . $index;
-        $value = $value / $divisor;
+        $value /= $divisor;
         if (is_numeric($value)) {
             $low_limit = snmp_get($device, 'analogAlarmLOLO.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
             $low_warn = snmp_get($device, 'analogAlarmLO.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
@@ -56,7 +56,7 @@ foreach (explode("\n", $oids) as $data) {
         $divisor = 100;
         $descr = 'TEC Pump - ' . $index;
         $num_oid = '.1.3.6.1.4.1.17409.1.11.4.1.3.' . $index;
-        $value = $value / $divisor;
+        $value /= $divisor;
         if (is_numeric($value)) {
             $low_limit = snmp_get($device, 'analogAlarmLOLO.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
             $low_warn = snmp_get($device, 'analogAlarmLO.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
@@ -70,7 +70,7 @@ foreach (explode("\n", $oids) as $data) {
         $divisor = 10;
         $descr = 'Temperature Pump - ' . $index;
         $num_oid = '.1.3.6.1.4.1.17409.1.11.4.1.4.' . $index;
-        $value = $value / $divisor;
+        $value /= $divisor;
         if (is_numeric($value)) {
             $low_limit = snmp_get($device, 'analogAlarmLOLO.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
             $low_warn = snmp_get($device, 'analogAlarmLO.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
@@ -106,7 +106,7 @@ foreach (explode("\n", $oids) as $data) {
             $high_limit = snmp_get($device, 'analogAlarmHIHI.13' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
         }
         $sensor_index = 'oaDCPowerVoltage' . $index;
-        $value = $value / $divisor;
+        $value /= $divisor;
         discover_sensor(null, 'voltage', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
     }
 }
@@ -145,7 +145,7 @@ if (is_numeric($value)) {
     $high_warn = snmp_get($device, 'analogAlarmHI.11' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
     $high_limit = snmp_get($device, 'analogAlarmHIHI.11' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
 }
-$value = $value / $divisor;
+$value /= $divisor;
 $sensor_index = 'oaOutputOpticalPower.0';
 discover_sensor(null, 'dbm', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
 
@@ -165,7 +165,7 @@ if (is_numeric($value)) {
     $high_warn = snmp_get($device, 'analogAlarmHI.11' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
     $high_limit = snmp_get($device, 'analogAlarmHIHI.11' . $num_oid, '-Ovq', 'NSCRTV-HFCEMS-PROPERTY-MIB') / $divisor;
 }
-$value = $value / $divisor;
+$value /= $divisor;
 $sensor_index = 'oaInputOpticalPower.0';
 discover_sensor(null, 'dbm', $device, $num_oid, $sensor_index, 'gw-eydfa', $descr, $divisor, 1, $low_limit, $low_warn, $high_warn, $high_limit, $value);
 

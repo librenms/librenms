@@ -54,7 +54,7 @@ class VminfoController extends TableController
             ->select('vminfo.*')
             ->with('device')
             ->with('parentDevice')
-            ->when($request->get('searchPhrase') || in_array('hostname', array_keys($request->get('sort', []))), function ($query) {
+            ->when($request->get('searchPhrase') || in_array('hostname', array_keys($request->get('sort', []))), function ($query): void {
                 $query->leftJoin('devices', 'devices.device_id', 'vminfo.device_id');
             });
     }

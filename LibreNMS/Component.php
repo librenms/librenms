@@ -224,7 +224,7 @@ class Component
         \App\Models\Component::whereIntegerInRaw('id', array_keys($updated))
             ->with('prefs')
             ->get()
-            ->each(function (\App\Models\Component $component) use ($device_id, $updated) {
+            ->each(function (\App\Models\Component $component) use ($device_id, $updated): void {
                 $update = $updated[$component->id];
                 unset($update['type']);  // can't change type
 

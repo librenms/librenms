@@ -18,7 +18,7 @@ class UpdateDeviceOutage
 
         if ($available) {
             // Device is up, close any open outages
-            $device->outages()->whereNull('up_again')->get()->each(function (DeviceOutage $outage) {
+            $device->outages()->whereNull('up_again')->get()->each(function (DeviceOutage $outage): void {
                 $outage->up_again = time();
                 $outage->save();
             });

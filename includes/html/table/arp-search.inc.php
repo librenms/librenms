@@ -46,7 +46,7 @@ if (isset($vars['searchPhrase']) && ! empty($vars['searchPhrase'])) {
     } elseif (isset($vars['searchby']) && $vars['searchby'] == 'mac') {
         $query->where('mac_address', 'like', $mac_search);
     } else {
-        $query->where(function ($q) use ($ip_search, $mac_search) {
+        $query->where(function ($q) use ($ip_search, $mac_search): void {
             $q->where('ipv4_address', 'like', $ip_search)
                 ->orWhere('mac_address', 'like', $mac_search);
         });

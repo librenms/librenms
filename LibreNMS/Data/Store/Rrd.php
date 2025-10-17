@@ -266,7 +266,7 @@ class Rrd extends BaseDatastore
             if ($max < 10000000) {
                 return false;
             }
-            $max = $max / 8;
+            $max /= 8;
             $fields = [
                 'INOCTETS',
                 'OUTOCTETS',

@@ -141,8 +141,7 @@ class RrdDefinition
                 }
 
                 $this->sources[] = $file;
-                end($this->sources);
-                $index = key($this->sources);
+                $index = array_key_last($this->sources);
             }
 
             $output .= '[' . ($index + 1) . ']'; // rrdcreate sources are 1 based

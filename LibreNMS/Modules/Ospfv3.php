@@ -158,7 +158,7 @@ class Ospfv3 implements Module
 
         // go through each instance (unique context) and fetch values displayed in ui
         ModuleModelObserver::observe(Ospfv3Instance::class, 'Instances');
-        $instances->each(function (Ospfv3Instance $instance) {
+        $instances->each(function (Ospfv3Instance $instance): void {
             $instanceValues = SnmpQuery::context($instance->context_name)->enumStrings()->get([
                 'OSPFV3-MIB::ospfv3AdminStatus.0',
                 'OSPFV3-MIB::ospfv3AreaBdrRtrStatus.0',

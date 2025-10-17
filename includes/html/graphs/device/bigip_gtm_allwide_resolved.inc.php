@@ -29,7 +29,7 @@ $colcount = 0;
 $count = 0;
 
 // add all GTM Wide IP Request on this device.
-foreach ($components as $compid => $comp) {
+foreach ($components as $comp) {
     $label = $comp['label'];
     $hash = $comp['hash'];
     $rrd_filename = Rrd::name($device['hostname'], [$comp['type'], $label, $hash]);

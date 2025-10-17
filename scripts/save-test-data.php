@@ -134,7 +134,7 @@ echo "\n";
 
 try {
     $no_save = isset($options['n']) || isset($options['no-save']);
-    foreach ($os_list as $full_os_name => $parts) {
+    foreach ($os_list as $parts) {
         [$target_os, $target_variant] = $parts;
         echo "OS: $target_os\n";
         echo "Module: $modules_input\n";

@@ -103,7 +103,7 @@ class IRCBot
 
         $this->config = LibrenmsConfig::getAll();
         $this->debug = $this->config['irc_debug'];
-        $this->config['irc_authtime'] = $this->config['irc_authtime'] ? $this->config['irc_authtime'] : 3;
+        $this->config['irc_authtime'] = $this->config['irc_authtime'] ?: 3;
         $this->max_retry = $this->config['irc_maxretry'];
         $this->server = $this->config['irc_host'];
         if ($this->config['irc_port'][0] == '+') {
@@ -954,7 +954,7 @@ class IRCBot
                 $prtup = Port::hasAccess($this->user['user'])->isUp()->count();
                 $prtdown = Port::hasAccess($this->user['user'])->isDown()->whereHas('device', fn ($q) => $q->where('ignore', 0))->count();
                 $prtsht = Port::hasAccess($this->user['user'])->isShutdown()->whereHas('device', fn ($q) => $q->where('ignore', 0))->count();
-                $prtign = Port::hasAccess($this->user['user'])->where(function ($query) {
+                $prtign = Port::hasAccess($this->user['user'])->where(function ($query): void {
                     $query->isIgnored()->orWhereHas('device', fn ($q) => $q->where('ignore', 1));
                 })->count();
 //                $prterr   = dbFetchCell("SELECT count(*) FROM ports AS I, devices AS D WHERE D.device_id = I.device_id AND (I.ignore = '0' OR D.ignore = '0') AND (I.ifInErrors_delta > '0' OR I.ifOutErrors_delta > '0')".$p_a);

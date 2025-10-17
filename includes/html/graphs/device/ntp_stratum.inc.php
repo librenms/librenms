@@ -26,7 +26,7 @@ $rrd_options .= " COMMENT:'Stratum               Now      Min      Max\\n'";
 $rrd_additions = '';
 
 $count = 0;
-foreach ($components as $id => $array) {
+foreach ($components as $array) {
     $rrd_filename = Rrd::name($device['hostname'], ['ntp', $array['peer']]);
 
     if (Rrd::checkRrdExists($rrd_filename)) {

@@ -74,16 +74,16 @@ class SyslogController extends TableController
     {
         return Syslog::hasAccess($request->user())
             ->with('device')
-            ->when($request->device_group, function ($query, $group) {
+            ->when($request->device_group, function ($query, $group): void {
                 $query->inDeviceGroup($group);
             })
-            ->when($request->from, function ($query, $from) {
+            ->when($request->from, function ($query, $from): void {
                 $query->where('timestamp', '>=', $from);
             })
-            ->when($request->to, function ($query, $to) {
+            ->when($request->to, function ($query, $to): void {
                 $query->where('timestamp', '<=', $to);
             })
-            ->when($request->level, function ($query, $level) {
+            ->when($request->level, function ($query, $level): void {
                 if ($level >= 7) {
                     return;  // include everything
                 }

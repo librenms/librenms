@@ -231,7 +231,7 @@ if ($device['os_group'] == 'cisco') {
             // Guilty until proven innocent
             $found = false;
 
-            foreach ($tblOTV as $k => $v) {
+            foreach ($tblOTV as $v) {
                 if ($array['UID'] == $v['UID']) {
                     // Yay, we found it...
                     $found = true;

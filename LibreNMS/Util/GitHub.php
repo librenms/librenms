@@ -220,7 +220,7 @@ GRAPHQL;
     {
         $valid_labels = array_keys($this->changelog);
 
-        foreach ($this->pull_requests as $k => $pr) {
+        foreach ($this->pull_requests as $pr) {
             // check valid labels in order
             $category = 'misc';
             foreach ($valid_labels as $valid_label) {

@@ -175,7 +175,7 @@ class Location extends Model
 
     public function scopeInDeviceGroup($query, $deviceGroup)
     {
-        return $query->whereHas('devices.groups', function ($query) use ($deviceGroup) {
+        return $query->whereHas('devices.groups', function ($query) use ($deviceGroup): void {
             $query->where('device_groups.id', $deviceGroup);
         });
     }

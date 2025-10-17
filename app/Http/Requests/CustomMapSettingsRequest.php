@@ -30,7 +30,7 @@ class CustomMapSettingsRequest extends FormRequest
             'edge_separation' => 'integer',
             'width_type' => 'in:px,%',
             'width' => [
-                function (string $attribute, mixed $value, Closure $fail) {
+                function (string $attribute, mixed $value, Closure $fail): void {
                     if (! preg_match('/^(\d+)(px|%)$/', $value, $matches)) {
                         $fail(__('map.custom.edit.validate.width_format'));
                     } elseif ($matches[2] == 'px' && $matches[1] < 200) {
@@ -42,7 +42,7 @@ class CustomMapSettingsRequest extends FormRequest
             ],
             'height_type' => 'in:px,%',
             'height' => [
-                function (string $attribute, mixed $value, Closure $fail) {
+                function (string $attribute, mixed $value, Closure $fail): void {
                     if (! preg_match('/^(\d+)(px|%)$/', $value, $matches)) {
                         $fail(__('map.custom.edit.validate.height_format'));
                     } elseif ($matches[2] == 'px' && $matches[1] < 200) {

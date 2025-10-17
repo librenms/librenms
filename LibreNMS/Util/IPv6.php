@@ -89,7 +89,7 @@ class IPv6 extends IP
      */
     public function isLinkLocal()
     {
-        return substr($this->uncompressed(), 0, 20) == 'fe80:0000:0000:0000:';
+        return str_starts_with($this->uncompressed(), 'fe80:0000:0000:0000:');
     }
 
     /**

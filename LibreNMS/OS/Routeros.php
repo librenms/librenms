@@ -562,7 +562,7 @@ class Routeros extends OS implements
 
     public function setQosParents($qos)
     {
-        $qos->each(function (Qos $thisQos, int $key) use ($qos) {
+        $qos->each(function (Qos $thisQos, int $key) use ($qos): void {
             $qosParentMap = $this->qosIdxToParent->get($thisQos->type);
             if (! $qosParentMap) {
                 // Parent data does not exist
@@ -606,7 +606,7 @@ class Routeros extends OS implements
         $simpleDropsIn = \SnmpQuery::walk('MIKROTIK-MIB::mtxrQueueSimpleDroppedIn')->table(1);
         $simpleDropsOut = \SnmpQuery::walk('MIKROTIK-MIB::mtxrQueueSimpleDroppedOut')->table(1);
 
-        $qos->each(function (Qos $thisQos, int $key) use ($poll_time, $treeNames, $treeBytes, $treeDrops, $simpleNames, $simpleBytesIn, $simpleBytesOut, $simpleDropsIn, $simpleDropsOut) {
+        $qos->each(function (Qos $thisQos, int $key) use ($poll_time, $treeNames, $treeBytes, $treeDrops, $simpleNames, $simpleBytesIn, $simpleBytesOut, $simpleDropsIn, $simpleDropsOut): void {
             switch ($thisQos->type) {
                 case 'routeros_tree':
                     if (! array_key_exists($thisQos->snmp_idx, $treeNames)) {

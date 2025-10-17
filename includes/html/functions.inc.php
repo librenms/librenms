@@ -23,17 +23,17 @@ function toner2colour($descr, $percent)
 {
     $colour = \LibreNMS\Util\Color::percentage(100 - $percent, null);
 
-    if (substr($descr, -1) == 'C' || stripos($descr, 'cyan') !== false) {
+    if (str_ends_with($descr, 'C') || stripos($descr, 'cyan') !== false) {
         $colour['left'] = '55D6D3';
         $colour['right'] = '33B4B1';
     }
 
-    if (substr($descr, -1) == 'M' || stripos($descr, 'magenta') !== false) {
+    if (str_ends_with($descr, 'M') || stripos($descr, 'magenta') !== false) {
         $colour['left'] = 'F24AC8';
         $colour['right'] = 'D028A6';
     }
 
-    if (substr($descr, -1) == 'Y' || stripos($descr, 'yellow') !== false
+    if (str_ends_with($descr, 'Y') || stripos($descr, 'yellow') !== false
         || stripos($descr, 'giallo') !== false
         || stripos($descr, 'gul') !== false
     ) {
@@ -41,7 +41,7 @@ function toner2colour($descr, $percent)
         $colour['right'] = 'DDD000';
     }
 
-    if (substr($descr, -1) == 'K' || stripos($descr, 'black') !== false
+    if (str_ends_with($descr, 'K') || stripos($descr, 'black') !== false
         || stripos($descr, 'nero') !== false
     ) {
         $colour['left'] = '000000';

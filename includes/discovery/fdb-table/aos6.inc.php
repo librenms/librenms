@@ -49,7 +49,7 @@ if (! empty($fdbPort_table)) {
     // Build dot1dBasePort to port_id dictionary
     $portid_dict = [];
     $dot1dBasePortIfIndex = snmpwalk_group($device, 'dot1dBasePortIfIndex', 'BRIDGE-MIB');
-    foreach ($dot1dBasePortIfIndex as $portLocal => $data) {
+    foreach ($dot1dBasePortIfIndex as $data) {
         $portid_dict[$port['ifIndex']] = PortCache::getIdFromIfIndex($data['dot1dBasePortIfIndex'], $device['device_id']);
     }
     // Collect data and populate $insert

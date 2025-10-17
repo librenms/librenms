@@ -65,7 +65,7 @@ if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
             'Value',
         ],
     ];
-    foreach ($pools as $pool_key => $pool) {
+    foreach ($pools as $pool) {
         // re-init the rows the pools detail table
         unset($pool_detail_table['rows']);
         $pool_detail_table['rows'] = [];

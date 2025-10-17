@@ -109,7 +109,7 @@ class DeviceGroupController extends Controller
             'name' => [
                 'required',
                 'string',
-                Rule::unique('device_groups')->where(function ($query) use ($deviceGroup) {
+                Rule::unique('device_groups')->where(function ($query) use ($deviceGroup): void {
                     $query->where('id', '!=', $deviceGroup->id);
                 }),
             ],

@@ -28,7 +28,7 @@ class ValidateController extends Controller
         $this->validate($request, [
             'fixer' => [
                 'starts_with:LibreNMS\Validations',
-                function ($attribute, $value, $fail) {
+                function ($attribute, $value, $fail): void {
                     if (! class_exists($value) || ! in_array(ValidationFixer::class, class_implements($value))) {
                         $fail(trans('validation.results.invalid_fixer'));
                     }

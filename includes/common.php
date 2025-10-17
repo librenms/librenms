@@ -601,7 +601,7 @@ function celsius_to_fahrenheit($value, $scale = 'celsius')
 function kelvin_to_celsius($value, $scale = 'celsius')
 {
     if ($scale === 'celsius') {
-        $value = $value - 273.15;
+        $value -= 273.15;
     }
 
     return sprintf('%.02f', $value);

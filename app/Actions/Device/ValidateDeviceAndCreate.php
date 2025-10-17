@@ -228,7 +228,7 @@ class ValidateDeviceAndCreate
         }
 
         if (Device::where('sysName', $this->device->sysName)
-            ->when(LibrenmsConfig::get('mydomain'), function ($query, $domain) {
+            ->when(LibrenmsConfig::get('mydomain'), function ($query, $domain): void {
                 $query->orWhere('sysName', rtrim($this->device->sysName, '.') . '.' . $domain);
             })->exists()) {
             throw new HostSysnameExistsException($this->device->hostname, $this->device->sysName);

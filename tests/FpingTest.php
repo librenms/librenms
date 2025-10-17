@@ -158,7 +158,7 @@ OUT;
 
         // make call
         $calls = 0;
-        app()->make(Fping::class)->bulkPing($hosts, function (FpingResponse $response) use ($expected, &$calls) {
+        app()->make(Fping::class)->bulkPing($hosts, function (FpingResponse $response) use ($expected, &$calls): void {
             $calls++;
 
             $this->assertArrayHasKey($response->host, $expected);

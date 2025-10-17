@@ -72,11 +72,11 @@ class PortSecurityController extends TableController
         if ($search = trim(\Request::get('searchPhrase') ?? '')) {
             switch (\Request::get('searchby') ?? '') {
                 case 'device':
-                    return $query->whereHas('device', function ($q) use ($search) {
+                    return $query->whereHas('device', function ($q) use ($search): void {
                         $q->where('hostname', 'like', "%$search%");
                     });
                 case 'port':
-                    return $query->whereHas('port', function ($q) use ($search) {
+                    return $query->whereHas('port', function ($q) use ($search): void {
                         $q->where('ifDescr', 'like', "%$search%")
                           ->orWhere('ifAlias', 'like', "%$search%");
                     });
@@ -97,11 +97,11 @@ class PortSecurityController extends TableController
                 case 'sticky_enable':
                     return $query->where('sticky_enable', 'like', "%$search%");
                 default:
-                    return $query->where(function ($query) use ($search) {
-                        $query->whereHas('device', function ($q) use ($search) {
+                    return $query->where(function ($query) use ($search): void {
+                        $query->whereHas('device', function ($q) use ($search): void {
                             $q->where('hostname', 'like', "%$search%");
                         })
-                        ->orWhereHas('port', function ($q) use ($search) {
+                        ->orWhereHas('port', function ($q) use ($search): void {
                             $q->where('ifDescr', 'like', "%$search%")
                               ->orWhere('ifAlias', 'like', "%$search%");
                         })

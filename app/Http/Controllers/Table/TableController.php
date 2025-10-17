@@ -217,7 +217,7 @@ abstract class TableController extends PaginatedAjaxController
     protected function generateCsvResponse($data, $headers, $filename)
     {
         return response()->stream(
-            function () use ($data, $headers) {
+            function () use ($data, $headers): void {
                 $output = fopen('php://output', 'w');
 
                 fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));

@@ -330,7 +330,7 @@ class ConfigRepository
 
         try {
             Models\Config::get(['config_name', 'config_value'])
-                ->each(function ($item) {
+                ->each(function ($item): void {
                     Arr::set($this->config, $item->config_name, $item->config_value);
                 });
         } catch (QueryException $e) {
@@ -354,7 +354,7 @@ class ConfigRepository
         foreach ($graph_types as $graph) {
             $g = [];
             foreach ($graph as $k => $v) {
-                if (strpos($k, 'graph_') == 0) {
+                if (str_starts_with($k, 'graph_')) {
                     // remove leading 'graph_' from column name
                     $key = str_replace('graph_', '', $k);
                 } else {

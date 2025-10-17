@@ -250,7 +250,7 @@ class CiHelper
                 ->setIdleTimeout(3600)
                 ->start();
             $server->waitUntil(function ($type, $output) {
-                return strpos($output, 'Development Server (http://127.0.0.1:8000) started') !== false;
+                return str_contains($output, 'Development Server (http://127.0.0.1:8000) started');
             });
             if ($server->isRunning()) {
                 echo "Started server http://127.0.0.1:8000\n";
@@ -394,7 +394,7 @@ class CiHelper
             echo PHP_EOL;
 
             // Run the process synchronously with a callback to handle output
-            $proc->run(function ($type, $buffer) {
+            $proc->run(function ($type, $buffer): void {
                 if (Process::ERR === $type) {
                     fwrite(STDERR, $buffer);
                 } else {

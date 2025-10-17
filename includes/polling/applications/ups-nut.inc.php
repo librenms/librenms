@@ -106,7 +106,7 @@ $sensors = [
     ['state_name' => 'UPSAlarm', 'value' => $UPSAlarm],
 ];
 
-foreach ($sensors as $index => $sensor) {
+foreach ($sensors as $sensor) {
     $rrd_def->addDataset($sensor['state_name'], 'GAUGE', 0);
     $fields[$sensor['state_name']] = $sensor['value'];
 }

@@ -79,7 +79,7 @@ class RoutesTablesController extends TableController
      */
     protected function baseQuery($request)
     {
-        $join = function ($query) {
+        $join = function ($query): void {
             $query->on('ports.port_id', 'route.port_id');
         };
         $showAllRoutes = trim(\Request::get('showAllRoutes'));

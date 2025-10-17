@@ -77,7 +77,7 @@ class Vlans implements Module
     {
         $vlans = $os->discoverVlans()->filter(function (?Vlan $data) {
             return ! empty($data->vlan_vlan);
-        })->each(function (Vlan $data) {
+        })->each(function (Vlan $data): void {
             if (empty($data->vlan_name)) {
                 $data->vlan_name = 'VLAN ' . $data->vlan_vlan; // default VLAN name
             }
@@ -89,7 +89,7 @@ class Vlans implements Module
 
         $ports = $os->discoverVlanPorts($vlans)->filter(function (PortVlan $data) {
             return ! empty($data->vlan) && ! empty($data->port_id);
-        })->each(function (PortVlan $data) {
+        })->each(function (PortVlan $data): void {
             $data->priority ??= 0;
             $data->state ??= 'unknown';
             $data->cost ??= 0;

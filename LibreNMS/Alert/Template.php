@@ -46,7 +46,7 @@ class Template
             // Return the cached template information.
             return $this->template;
         }
-        $this->template = AlertTemplate::whereHas('map', function ($query) use ($obj) {
+        $this->template = AlertTemplate::whereHas('map', function ($query) use ($obj): void {
             $query->where('alert_rule_id', '=', $obj['rule_id']);
         })->first();
         if (! $this->template) {

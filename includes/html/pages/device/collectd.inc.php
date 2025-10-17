@@ -92,7 +92,7 @@ foreach ($pinsts as &$instance) {
 
         foreach ($typeinstances as &$tinst) {
             $i++;
-            if (! is_integer($i / 2)) {
+            if (! is_int($i / 2)) {
                 $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
             } else {
                 $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');

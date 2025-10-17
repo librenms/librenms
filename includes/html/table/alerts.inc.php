@@ -203,7 +203,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         'verbose_details' => "<button type='button' class='btn btn-alert-details command-alert-details' aria-label='Details' id='alert-details' data-alert_log_id='{$alert_log_id}'><i class='fa-solid fa-circle-info'></i></button>",
         'hostname' => $hostname,
         'location' => generate_link(htmlspecialchars($alert['location'] ?? 'N/A'), ['page' => 'devices', 'location' => $alert['location'] ?? '']),
-        'timestamp' => ($alert['timestamp_display'] ? $alert['timestamp_display'] : 'N/A'),
+        'timestamp' => ($alert['timestamp_display'] ?: 'N/A'),
         'severity' => $severity_ico,
         'state' => $alert['state'],
         'alert_id' => $alert['id'],

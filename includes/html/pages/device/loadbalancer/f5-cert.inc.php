@@ -50,7 +50,7 @@ $components = $keep;
     </thead>
     <tbody>
     <?php
-    foreach ($components as $cert => $array) {
+    foreach ($components as $array) {
         if ($array['type'] != 'f5-cert') {
             continue;
         }

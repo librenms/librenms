@@ -170,7 +170,7 @@ class AlertUtil
 
     public static function findContactsOwners(array $results): array
     {
-        return User::whereNot('email', '')->where(function (Builder $query) use ($results) {
+        return User::whereNot('email', '')->where(function (Builder $query) use ($results): void {
             if ($device_ids = array_filter(Arr::pluck($results, 'device_id'))) {
                 $query->orWhereHas('devicesOwned', fn ($q) => $q->whereIn('devices_perms.device_id', $device_ids));
             }

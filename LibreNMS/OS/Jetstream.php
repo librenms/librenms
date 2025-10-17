@@ -179,7 +179,7 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Vlan
             $types = ['TPLINK-DOT1Q-VLAN-MIB::vlanTagPortMemberAdd' => 0, 'TPLINK-DOT1Q-VLAN-MIB::vlanUntagPortMemberAdd' => 1];
             foreach ($types as $type => $tag) {
                 $expand = $this->jetstreamExpand($data[$type] ?? []);
-                foreach ($expand as $key => $port) {
+                foreach ($expand as $port) {
                     $ifIndex = $portConfig[$port] ?? 0;
                     $ports->push(new PortVlan([
                         'vlan' => $vlan_id,

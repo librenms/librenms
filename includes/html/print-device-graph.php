@@ -8,7 +8,7 @@ if (empty($graph_array['device'])) {
 }
 // FIXME not css alternating yet
 $g_i = $g_i ?? 0;
-if (! is_integer($g_i / 2)) {
+if (! is_int($g_i / 2)) {
     $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
 } else {
     $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');

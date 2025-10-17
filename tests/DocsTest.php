@@ -57,7 +57,7 @@ final class DocsTest extends TestCase
         // Check for missing pages
         collect(explode(PHP_EOL, $files))
             ->diff(collect($mkdocs['nav'])->flatten()->merge($this->hidden_pages)) // grab defined pages and diff
-            ->each(function ($missing_doc) {
+            ->each(function ($missing_doc): void {
                 $this->fail("The doc $missing_doc doesn't exist in mkdocs.yml, please add it to the relevant section");
             });
 
