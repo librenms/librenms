@@ -70,6 +70,7 @@ class PortsStatisticsMetrics
             $out_multicast_lines[] = "librenms_port_ifOutMulticastPkts{{$labels}} " . ((int) $ps->ifOutMulticastPkts ?: 0);
         }
 
+        // Append per-port metrics
         $lines[] = '# HELP librenms_port_ifInNUcastPkts In non-unicast packets';
         $lines[] = '# TYPE librenms_port_ifInNUcastPkts counter';
         $lines = array_merge($lines, $in_nucast_lines);

@@ -35,7 +35,7 @@ class MetricsApiController
         $html[] = '<li><a href="sensors">/metrics/sensors</a> — health sensors (temperature, power, etc.)</li>';
         $html[] = '</ul>';
         $html[] = '<p>Each metrics endpoint returns text in the Prometheus exposition format (text/plain).</br>';
-        $html[] = '<p>Use your API token via the X-Auth-Token header when scraping.</p>';
+        $html[] = 'Use your API token via the X-Auth-Token header when scraping.</p>';
         $html[] = '<p>Example curl (replace TOKEN):<br><code>curl -H "X-Auth-Token: TOKEN" https://your.librenms.example/api/v0/metrics/applications</code></p>';
         $html[] = '</body></html>';
 

@@ -14,7 +14,10 @@ class SensorsMetrics
     {
         $lines = [];
 
+        // Gather global metrics
         $total = Sensor::count();
+
+        // Append global metrics
         $lines[] = '# HELP librenms_sensors_total Total number of sensors';
         $lines[] = '# TYPE librenms_sensors_total gauge';
         $lines[] = "librenms_sensors_total {$total}";
@@ -42,7 +45,7 @@ class SensorsMetrics
                 $this->escapeLabel((string) $s->group)
             );
 
-            // apply multiplier/divisor
+            // Apply multiplier/divisor
             $mult = (int) ($s->sensor_multiplier ?: 1);
             $div = (int) ($s->sensor_divisor ?: 1);
             $value = $s->sensor_current !== null ? ((float) $s->sensor_current * $mult / max(1, $div)) : null;
@@ -52,6 +55,7 @@ class SensorsMetrics
             $limit_crit_lines[] = "librenms_sensor_limit_crit{{$labels}} " . ((float) ($s->sensor_limit ?? 0));
         }
 
+        // Append per-sensor metrics
         $lines[] = '# HELP librenms_sensor_value Current sensor value (units vary by sensor)';
         $lines[] = '# TYPE librenms_sensor_value gauge';
         $lines = array_merge($lines, $value_lines);

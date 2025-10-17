@@ -14,9 +14,12 @@ class MempoolsMetrics
     {
         $lines = [];
 
+        // Gather global metrics
         $total = Mempool::count();
+
+        // Prepare per-mempool metrics arrays
         $lines[] = '# HELP librenms_mempools_total Total number of mempools';
-    $lines[] = '# TYPE librenms_mempools_total gauge';
+        $lines[] = '# TYPE librenms_mempools_total gauge';
         $lines[] = "librenms_mempools_total {$total}";
 
         $used_lines = [];
@@ -24,6 +27,7 @@ class MempoolsMetrics
         $total_lines = [];
         $perc_lines = [];
 
+        // Gather device info mapping for labels
         $deviceIds = Mempool::select('device_id')->distinct()->pluck('device_id');
         $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
 
@@ -46,6 +50,7 @@ class MempoolsMetrics
             $perc_lines[] = "librenms_mempool_used_percent{{$labels}} " . ((int) $m->mempool_perc ?: 0);
         }
 
+        // Append per-mempool metrics
         $lines[] = '# HELP librenms_mempool_used_bytes Used bytes in mempool';
         $lines[] = '# TYPE librenms_mempool_used_bytes gauge';
         $lines = array_merge($lines, $used_lines);
