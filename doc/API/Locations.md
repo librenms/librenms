@@ -152,6 +152,8 @@ Input (JSON):
 
 - `title`: *optional* -  Some title for the Maintenance
   Will be replaced with location name if omitted
+- `behavior`: *optional* - id of maintenance behavior desired
+  Defaults to alert.scheduled_maintenance_default_behavior if omitted
 - `notes`: *optional* -  Some description for the Maintenance
   Will also be added to location notes if user prefs "Add schedule notes to locations notes" is set
 - `start`: *optional* - start time of Maintenance in full format `Y-m-d H:i:00`
@@ -184,7 +186,7 @@ Output:
 }
 ```
 
-Example with no start time and using location id:
+Example with no start time and using location id with "run alerts" behavior:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
@@ -193,7 +195,8 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
 {
   "title":"Location Mcewen Maintenance",
   "notes":"A 2 hour Maintenance triggered via API with no start time",
-  "duration":"2:00"
+  "duration":"2:00",
+  "behavior": 3
 }
 '
 ```
