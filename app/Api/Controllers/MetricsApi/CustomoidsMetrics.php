@@ -22,15 +22,18 @@ class CustomoidsMetrics
         $lines[] = '# TYPE librenms_customoids_total gauge';
         $lines[] = "librenms_customoids_total {$total}";
 
-        // Prepare per-customoid metrics arrays
-        $value_lines = [];
-        $limit_warn_lines = [];
-        $limit_crit_lines = [];
+        // Prepare per-customoid metrics arrays grouped by datatype
+        $gauge_value_lines = [];
+        $counter_value_lines = [];
+        $gauge_limit_warn_lines = [];
+        $gauge_limit_crit_lines = [];
+        $counter_limit_warn_lines = [];
+        $counter_limit_crit_lines = [];
 
         $deviceIds = Customoid::select('device_id')->distinct()->pluck('device_id');
         $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
 
-        foreach (Customoid::select('customoid_id', 'device_id', 'customoid_descr', 'customoid_current', 'customoid_multiplier', 'customoid_divisor', 'customoid_limit_warn', 'customoid_limit')->cursor() as $c) {
+        foreach (Customoid::select('customoid_id', 'device_id', 'customoid_descr', 'customoid_current', 'customoid_multiplier', 'customoid_divisor', 'customoid_limit_warn', 'customoid_limit', 'customoid_datatype')->cursor() as $c) {
             $dev = $devices->get($c->device_id);
             $device_hostname = $dev ? $this->escapeLabel((string) $dev->hostname) : '';
             $device_sysName = $dev ? $this->escapeLabel((string) $dev->sysName) : '';
@@ -48,23 +51,49 @@ class CustomoidsMetrics
             $div = (int) ($c->customoid_divisor ?: 1);
             $value = $c->customoid_current !== null ? ((float) $c->customoid_current * $mult / max(1, $div)) : null;
 
-            $value_lines[] = "librenms_customoid_value{{$labels}} " . ($value !== null ? $value : 0);
-            $limit_warn_lines[] = "librenms_customoid_limit_warn{{$labels}} " . ((float) ($c->customoid_limit_warn ?? 0));
-            $limit_crit_lines[] = "librenms_customoid_limit_crit{{$labels}} " . ((float) ($c->customoid_limit ?? 0));
+            // Determine datatype; treat non-GAUGE as counter-like
+            $datatype = strtoupper((string) ($c->customoid_datatype ?? 'GAUGE'));
+            if ($datatype === 'GAUGE') {
+                $gauge_value_lines[] = "librenms_customoid_value{{$labels}} " . ($value !== null ? $value : 0);
+                $gauge_limit_warn_lines[] = "librenms_customoid_limit_warn{{$labels}} " . ((float) ($c->customoid_limit_warn ?? 0));
+                $gauge_limit_crit_lines[] = "librenms_customoid_limit_crit{{$labels}} " . ((float) ($c->customoid_limit ?? 0));
+            } else {
+                // treat as counter
+                $counter_value_lines[] = "librenms_customoid_value_counter{{$labels}} " . ($value !== null ? $value : 0);
+                $counter_limit_warn_lines[] = "librenms_customoid_limit_warn_counter{{$labels}} " . ((float) ($c->customoid_limit_warn ?? 0));
+                $counter_limit_crit_lines[] = "librenms_customoid_limit_crit_counter{{$labels}} " . ((float) ($c->customoid_limit ?? 0));
+            }
         }
 
-        // Append per-customoid metrics
-        $lines[] = '# HELP librenms_customoid_value Custom oid current value';
-        $lines[] = '# TYPE librenms_customoid_value gauge';
-        $lines = array_merge($lines, $value_lines);
+        // Append gauge-type customoids
+        if (! empty($gauge_value_lines)) {
+            $lines[] = '# HELP librenms_customoid_value Custom oid current value (gauge)';
+            $lines[] = '# TYPE librenms_customoid_value gauge';
+            $lines = array_merge($lines, $gauge_value_lines);
 
-        $lines[] = '# HELP librenms_customoid_limit_warn Customoid warning threshold';
-        $lines[] = '# TYPE librenms_customoid_limit_warn gauge';
-        $lines = array_merge($lines, $limit_warn_lines);
+            $lines[] = '# HELP librenms_customoid_limit_warn Customoid warning threshold (gauge)';
+            $lines[] = '# TYPE librenms_customoid_limit_warn gauge';
+            $lines = array_merge($lines, $gauge_limit_warn_lines);
 
-        $lines[] = '# HELP librenms_customoid_limit_crit Customoid critical threshold';
-        $lines[] = '# TYPE librenms_customoid_limit_crit gauge';
-        $lines = array_merge($lines, $limit_crit_lines);
+            $lines[] = '# HELP librenms_customoid_limit_crit Customoid critical threshold (gauge)';
+            $lines[] = '# TYPE librenms_customoid_limit_crit gauge';
+            $lines = array_merge($lines, $gauge_limit_crit_lines);
+        }
+
+        // Append counter-type customoids (use distinct metric names to avoid TYPE conflicts)
+        if (! empty($counter_value_lines)) {
+            $lines[] = '# HELP librenms_customoid_value_counter Custom oid current value (counter-like)';
+            $lines[] = '# TYPE librenms_customoid_value_counter counter';
+            $lines = array_merge($lines, $counter_value_lines);
+
+            $lines[] = '# HELP librenms_customoid_limit_warn_counter Customoid warning threshold (counter-like)';
+            $lines[] = '# TYPE librenms_customoid_limit_warn_counter counter';
+            $lines = array_merge($lines, $counter_limit_warn_lines);
+
+            $lines[] = '# HELP librenms_customoid_limit_crit_counter Customoid critical threshold (counter-like)';
+            $lines[] = '# TYPE librenms_customoid_limit_crit_counter counter';
+            $lines = array_merge($lines, $counter_limit_crit_lines);
+        }
 
         return implode("\n", $lines) . "\n";
     }
