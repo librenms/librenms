@@ -55,7 +55,6 @@ modules:
                     oid: JNX-OPT-IF-EXT-MIB::jnxoptIfOTNPMFECCurrentTable
                     value: JNX-OPT-IF-EXT-MIB::jnxoptIfOTNPMCurrentFECBERMantissa
                     num_oid: '.1.3.6.1.4.1.2636.3.73.1.3.3.8.1.5.{{ $index }}'
-                    snmp_flags: '-OteQUb'
                     divisor: '1.0E+{{ JNX-OPT-IF-EXT-MIB::jnxoptIfOTNPMCurrentFECBERExponent }}'
                     descr: '{{ ifDescr:0 }} preFEC BER'
                     entPhysicalIndex: '{{ $subindex0 }}'

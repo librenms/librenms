@@ -930,7 +930,6 @@ modules:
                     value: xPDUMainInputVoltageLtoL
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.1.4.1.2.{{ $index }}'
                     index: 'xPDUMainInputVoltageLtoL.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Input - Phase {{ $index }} L-L'
                     divisor: 10
                     skip_values: -1
@@ -939,7 +938,6 @@ modules:
                     value: xPDUMainInputVoltageLtoN
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.1.4.1.3.{{ $index }}'
                     index: 'xPDUMainInputVoltageLtoN.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Input - Phase {{ $index }} L-N'
                     divisor: 10
                     skip_values: -1
@@ -948,7 +946,6 @@ modules:
                     value: xPDUSystemOutputVoltageLtoL
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.14.1.2.{{ $index }}'
                     index: 'xPDUSystemOutputVoltageLtoL.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Output - Phase {{ $index }} L-L'
                     divisor: 10
                     skip_values: -1
@@ -957,7 +954,6 @@ modules:
                     value: xPDUSystemOutputVoltageLtoN
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.14.1.3.{{ $index }}'
                     index: 'xPDUSystemOutputVoltageLtoN.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Output - Phase {{ $index }} L-N'
                     divisor: 10
                     skip_values: -1
@@ -994,7 +990,6 @@ modules:
                     value: xPDUSystemOutputPhaseCurrent
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.14.1.4.{{ $index }}'
                     index: 'xPDUSystemOutputPhaseCurrent.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Output - Phase {{ $index }}'
                     divisor: 10
                     skip_values: -1
@@ -1130,7 +1125,6 @@ modules:
                     value: xPDUSystemOutputPower
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.14.1.5.{{ $index }}'
                     index: 'xPDUSystemOutputPower.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Real Power - Phase {{ $index }}'
                     multiplier: 100
                     skip_values: -1
@@ -1139,7 +1133,6 @@ modules:
                     value: xPDUSystemOutputApparentPower
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.14.1.6.{{ $index }}'
                     index: 'xPDUSystemOutputApparentPower.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Apparent Power - Phase {{ $index }}'
                     multiplier: 100
                     skip_values: -1
