@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Data\Source;
 
+use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Models\Device;
 use Carbon\Carbon;
@@ -146,6 +147,7 @@ class FpingResponse
 
         // detailed multi-ping capable graph
         app('Datastore')->put($device->toArray(), 'icmp-perf', [
+            'rrd_step' => LibrenmsConfig::get('ping_rrd_step'),
             'rrd_def' => RrdDefinition::make()
                 ->addDataset('avg', 'GAUGE', 0, 65535, source_ds: 'ping', source_file: Rrd::name($device->hostname, 'ping-perf'))
                 ->addDataset('xmt', 'GAUGE', 0, 65535)
