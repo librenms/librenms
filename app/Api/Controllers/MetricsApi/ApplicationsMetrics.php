@@ -15,8 +15,16 @@ class ApplicationsMetrics
     {
         $lines = [];
 
+        // Parse filters
+        $filters = $this->parseDeviceFilters($request);
+
         // Gather global metrics
-        $total = ApplicationMetric::count();
+        $totalQ = ApplicationMetric::query();
+        // apply device filter via join
+        if ($filters['device_ids']) {
+            $totalQ = $totalQ->join('applications', 'application_metrics.app_id', '=', 'applications.app_id')->whereIn('applications.device_id', $filters['device_ids']->all());
+        }
+        $total = $totalQ->count();
 
         // Append global metrics
         $lines[] = '# HELP librenms_application_metrics_total Total number of application metrics rows';
@@ -26,9 +34,11 @@ class ApplicationsMetrics
         $metric_lines = [];
 
         // Get device ids referenced by application metrics so we can preload devices
-        $deviceIds = Application::join('application_metrics', 'applications.app_id', '=', 'application_metrics.app_id')
-            ->distinct()
-            ->pluck('applications.device_id');
+        $appJoin = Application::join('application_metrics', 'applications.app_id', '=', 'application_metrics.app_id')->distinct();
+        if ($filters['device_ids']) {
+            $appJoin = $appJoin->whereIn('applications.device_id', $filters['device_ids']->all());
+        }
+        $deviceIds = $appJoin->pluck('applications.device_id');
 
         $devices = Device::select('device_id', 'hostname', 'sysName')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
 
@@ -43,6 +53,9 @@ class ApplicationsMetrics
                 'applications.app_type',
                 'applications.app_instance'
             );
+        if ($filters['device_ids']) {
+            $query->whereIn('applications.device_id', $filters['device_ids']->all());
+        }
 
         foreach ($query->cursor() as $am) {
             $device = $devices->get($am->device_id);

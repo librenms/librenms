@@ -14,8 +14,12 @@ class PortsMetrics
     {
         $lines = [];
 
-        // Gather global metrics
-        $total = Port::count();
+    // Parse filters
+    $filters = $this->parseDeviceFilters($request);
+
+    // Gather global metrics
+    $totalQ = Port::query();
+    $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
 
         // Append global metrics
         $lines[] = '# HELP librenms_ports_total Total number of ports';
@@ -34,11 +38,15 @@ class PortsMetrics
         $out_errors_lines = [];
 
         // Gather device info mapping only for referenced devices
-        $deviceIds = Port::select('device_id')->distinct()->pluck('device_id');
-        $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
+    $deviceIdsQuery = Port::select('device_id')->distinct();
+    $deviceIdsQuery = $this->applyDeviceFilter($deviceIdsQuery, $filters['device_ids']);
+    $deviceIds = $deviceIdsQuery->pluck('device_id');
+    $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
 
         // Gather per-port metrics
-        foreach (Port::select('port_id', 'device_id', 'ifName', 'ifDescr', 'ifIndex', 'ifType', 'ifAlias', 'ifAdminStatus', 'ifOperStatus', 'ifSpeed', 'ifInOctets', 'ifOutOctets', 'ifInUcastPkts', 'ifOutUcastPkts', 'ifInErrors', 'ifOutErrors', 'poll_time')->cursor() as $p) {
+        $portQuery = Port::select('port_id', 'device_id', 'ifName', 'ifDescr', 'ifIndex', 'ifType', 'ifAlias', 'ifAdminStatus', 'ifOperStatus', 'ifSpeed', 'ifInOctets', 'ifOutOctets', 'ifInUcastPkts', 'ifOutUcastPkts', 'ifInErrors', 'ifOutErrors', 'poll_time');
+        $portQuery = $this->applyDeviceFilter($portQuery, $filters['device_ids']);
+        foreach ($portQuery->cursor() as $p) {
             $dev = $devices->get($p->device_id);
             $device_hostname = $dev ? $this->escapeLabel((string) $dev->hostname) : '';
             $device_sysName = $dev ? $this->escapeLabel((string) $dev->sysName) : '';

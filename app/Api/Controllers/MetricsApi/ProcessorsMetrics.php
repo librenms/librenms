@@ -14,8 +14,12 @@ class ProcessorsMetrics
     {
         $lines = [];
 
-        // Gather global metrics
-        $total = Processor::count();
+    // Parse filters
+    $filters = $this->parseDeviceFilters($request);
+
+    // Gather global metrics
+    $totalQ = Processor::query();
+    $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
 
         // Append global metrics
         $lines[] = '# HELP librenms_processors_total Total number of processors';
@@ -25,10 +29,14 @@ class ProcessorsMetrics
         $usage_lines = [];
 
         // Gather device info mapping for labels
-        $deviceIds = Processor::select('device_id')->distinct()->pluck('device_id');
-        $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
+    $deviceIdsQuery = Processor::select('device_id')->distinct();
+    $deviceIdsQuery = $this->applyDeviceFilter($deviceIdsQuery, $filters['device_ids']);
+    $deviceIds = $deviceIdsQuery->pluck('device_id');
+    $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
 
-        foreach (Processor::select('processor_id', 'device_id', 'processor_descr', 'processor_index', 'processor_type', 'processor_usage')->cursor() as $p) {
+    $procQuery = Processor::select('processor_id', 'device_id', 'processor_descr', 'processor_index', 'processor_type', 'processor_usage');
+    $procQuery = $this->applyDeviceFilter($procQuery, $filters['device_ids']);
+    foreach ($procQuery->cursor() as $p) {
             $dev = $devices->get($p->device_id);
             $device_hostname = $dev ? $this->escapeLabel((string) $dev->hostname) : '';
             $device_sysName = $dev ? $this->escapeLabel((string) $dev->sysName) : '';
