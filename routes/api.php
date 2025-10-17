@@ -61,6 +61,11 @@ Route::prefix('v0')->group(function () {
             Route::get('access_points', [App\Api\Controllers\MetricsApiController::class, 'accessPoints'])->name('metrics_access_points');
             Route::get('ports', [App\Api\Controllers\MetricsApiController::class, 'ports'])->name('metrics_ports');
             Route::get('ports_statistics', [App\Api\Controllers\MetricsApiController::class, 'portsStatistics'])->name('metrics_ports_statistics');
+            Route::get('mempools', [App\Api\Controllers\MetricsApiController::class, 'mempools'])->name('metrics_mempools');
+            Route::get('processors', [App\Api\Controllers\MetricsApiController::class, 'processors'])->name('metrics_processors');
+            Route::get('sensors', [App\Api\Controllers\MetricsApiController::class, 'sensors'])->name('metrics_sensors');
+            Route::get('applications', [App\Api\Controllers\MetricsApiController::class, 'applications'])->name('metrics_applications');
+            Route::get('customoids', [App\Api\Controllers\MetricsApiController::class, 'customoids'])->name('metrics_customoids');
         });
     });
 
