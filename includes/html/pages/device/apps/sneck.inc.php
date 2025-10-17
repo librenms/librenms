@@ -7,8 +7,7 @@ $link_array = [
     'app' => 'sneck',
 ];
 
-$sneck_data = $app->app_id;
-if (isset($sneck_data)) {
+if (isset($app->data['checks'])) {
     $checks = $app->data['checks'] ?? [];
     $checks_list = array_keys($checks);
     $debugs = $app->data['debugs'] ?? [];
@@ -126,7 +125,7 @@ if ((isset($vars['sneck_check']) && isset($app->data['checks'][$vars['sneck_chec
     }
 
     // print returned all info from sneck with alert info broken out
-    if (isset($sneck_data)) {
+    if (isset($app->data)) {
         print_optionbar_start();
         echo 'Last Return...<br>';
         echo "<b>Alert(s):</b><br>\n";
