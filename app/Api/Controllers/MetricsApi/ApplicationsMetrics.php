@@ -2,8 +2,8 @@
 
 namespace App\Api\Controllers\MetricsApi;
 
-use App\Models\ApplicationMetric;
 use App\Models\Application;
+use App\Models\ApplicationMetric;
 use App\Models\Device;
 use Illuminate\Http\Request;
 

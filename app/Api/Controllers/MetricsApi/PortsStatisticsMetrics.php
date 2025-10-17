@@ -2,8 +2,8 @@
 
 namespace App\Api\Controllers\MetricsApi;
 
-use App\Models\PortStatistic;
 use App\Models\Port;
+use App\Models\PortStatistic;
 use App\Models\Device;
 use Illuminate\Http\Request;
 
