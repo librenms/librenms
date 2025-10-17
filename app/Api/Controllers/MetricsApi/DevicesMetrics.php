@@ -78,8 +78,8 @@ class DevicesMetrics
         $lines[] = '# TYPE librenms_last_ping_timetaken_seconds gauge';
         $lines = array_merge($lines, $ping_timetaken_lines);
 
-        $lines[] = '# HELP librenms_device_uptime_seconds Device uptime in seconds (0 if down)';
-        $lines[] = '# TYPE librenms_device_uptime_seconds counter';
+    $lines[] = '# HELP librenms_device_uptime_seconds Device uptime in seconds (0 if down)';
+    $lines[] = '# TYPE librenms_device_uptime_seconds gauge';
         $lines = array_merge($lines, $uptime_lines);
 
         return implode("\n", $lines) . "\n";
