@@ -157,25 +157,27 @@ class Oid
     /**
      * Try to parse an oid into a string.
      * If the oid contains multiple strings, skip until we get to the given position
+     * Keep in mind that strings in oids must be prefixed with the length of the string
      */
-    public static function stringFromOid(string $oid, int $position = 0): string
+    public static function stringFromOid(string $oid, int $skip = 0): string
     {
         $parts = explode('.', $oid);
         $count = count($parts);
 
-        // walk through the parts
         $offset = 0;
-        for ($i = 0; $i < $count; $i++) {
-            $length = (int) $parts[$offset]; // get the string length
-            $offset++; // skip over string length position
+        $segment = 0;
+        while ($offset < $count) {
+            $length = (int) ($parts[$offset] ?? 0); // get the string length (the first byte)
+            $offset++; // move past the length byte
 
-            if ($i == $position) {
-                // convert the parts to a string
-                return pack('c*', ...array_slice($parts, $offset, $length));
+            if ($segment === $skip) {
+                // convert the parts to a string (unsigned bytes)
+                return pack('C*', ...array_slice($parts, $offset, $length));
             }
 
-            // skip processed parts
+            // skip processed bytes for this segment
             $offset += $length;
+            $segment++;
         }
 
         return '';
