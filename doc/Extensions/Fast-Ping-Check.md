@@ -22,7 +22,7 @@ devices by switching to 1 minute polling.
 
 !!! note
 
-    This will flush all pending writes so that the rrdstep.php script can change the steps.
+    This will flush all pending writes so that the lnms maintenance:rrd-step script can change the steps.
 
 2: Change the `ping_rrd_step` setting in WebUI or CLI
 
@@ -36,7 +36,7 @@ devices by switching to 1 minute polling.
 creation in rrd files)
 
 ```bash
-./scripts/rrdstep.php -h all
+lnms maintenance:rrd-step all
 ```
 
 4: Add the following line to `/etc/cron.d/librenms` to allow 1 minute
@@ -73,7 +73,7 @@ proceeding!
 2: Update the rrd files
 
 ```bash
-./scripts/rrdstep.php -h all
+lnms maintenance:rrd-step all
 ```
 
 3: Update cron (removing any other `ping.php` or `alerts.php` entries)
