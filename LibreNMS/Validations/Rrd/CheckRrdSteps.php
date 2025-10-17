@@ -26,7 +26,8 @@ class CheckRrdSteps implements Validation, ValidationFixer
     private InputStream $input;
     private ?Process $rrdtool = null;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->rrd_step = (int) LibrenmsConfig::get('rrd.step', self::DEFAULT_RRD_STEP);
         $this->ping_rrd_step = (int) LibrenmsConfig::get('ping_rrd_step', self::DEFAULT_PING_RRD_STEP);
         $this->rrdcached = LibrenmsConfig::get('rrdcached', false);
@@ -99,13 +100,11 @@ class CheckRrdSteps implements Validation, ValidationFixer
                 throw new \Exception($buffer);
             }
 
-
             if (preg_match('/step = (\d+)/', $buffer, $matches)) {
                 $step = (int) $matches[1];
 
                 return true;
             }
-
 
             if (preg_match('/ERROR: (.*)/', $buffer, $matches)) {
                 throw new \Exception($matches[1]);
