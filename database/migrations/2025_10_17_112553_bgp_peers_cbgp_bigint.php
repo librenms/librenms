@@ -60,7 +60,6 @@ return new class extends Migration
             $table->integer('SuppressedPrefixes_prev')->change();
             $table->integer('WithdrawnPrefixes_delta')->change();
             $table->integer('WithdrawnPrefixes_prev')->change();
-
         });
     }
 };
