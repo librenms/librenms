@@ -123,7 +123,7 @@ class CheckRrdSteps implements Validation, ValidationFixer
 
     public function fix(): bool
     {
-        $return = Artisan::call('maintenance:rrd-step', ['device' => 'all', '--confirm']);
+        $return = Artisan::call('maintenance:rrd-step', ['device' => 'all', '--confirm' => true]);
 
         return $return === 0;
     }
