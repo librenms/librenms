@@ -63,6 +63,7 @@ class MetricsApiController
 
         return response(implode("\n", $html), 200, ['Content-Type' => 'text/html; charset=utf-8']);
     }
+
     public function devices(Request $request)
     {
         $body = app(DevicesMetrics::class)->render($request);
