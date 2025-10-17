@@ -8,7 +8,6 @@ use App\Facades\LibrenmsConfig;
 use App\Jobs\PingCheck;
 use App\Models\Device;
 use Illuminate\Support\Arr;
-use LibreNMS\Polling\ConnectivityHelper;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
