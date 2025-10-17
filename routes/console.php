@@ -2,8 +2,10 @@
 
 use App\Console\Commands\MaintenanceCleanupNetworks;
 use App\Console\Commands\MaintenanceFetchOuis;
+use App\Console\Commands\MaintenanceSyslogCleanup;
 use App\Jobs\PingCheck;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schedule;
 use Symfony\Component\Process\Process;
 
@@ -206,5 +208,10 @@ Schedule::command(MaintenanceFetchOuis::class, ['--wait'])
 
 Schedule::command(MaintenanceCleanupNetworks::class, [])
     ->weeklyOn(0, '2:00')
+    ->onOneServer()
+    ->appendOutputTo($maintenance_log_file);
+
+Schedule::command(MaintenanceSyslogCleanup::class)
+    ->dailyAt('03:30')
     ->onOneServer()
     ->appendOutputTo($maintenance_log_file);
