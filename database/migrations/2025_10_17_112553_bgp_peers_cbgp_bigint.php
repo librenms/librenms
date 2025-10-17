@@ -13,24 +13,24 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('bgpPeers_cbgp', function (Blueprint $table) {
-            $table->bigInteger('AcceptedPrefixes');
-            $table->bigInteger('DeniedPrefixes');
-            $table->bigInteger('PrefixAdminLimit');
-            $table->bigInteger('PrefixThreshold');
-            $table->bigInteger('PrefixClearThreshold');
-            $table->bigInteger('AdvertisedPrefixes');
-            $table->bigInteger('SuppressedPrefixes');
-            $table->bigInteger('WithdrawnPrefixes');
-            $table->bigInteger('AcceptedPrefixes_delta');
-            $table->bigInteger('AcceptedPrefixes_prev');
-            $table->bigInteger('DeniedPrefixes_delta');
-            $table->bigInteger('DeniedPrefixes_prev');
-            $table->bigInteger('AdvertisedPrefixes_delta');
-            $table->bigInteger('AdvertisedPrefixes_prev');
-            $table->bigInteger('SuppressedPrefixes_delta');
-            $table->bigInteger('SuppressedPrefixes_prev');
-            $table->bigInteger('WithdrawnPrefixes_delta');
-            $table->bigInteger('WithdrawnPrefixes_prev');
+            $table->bigInteger('AcceptedPrefixes')->change();
+            $table->bigInteger('DeniedPrefixes')->change();
+            $table->bigInteger('PrefixAdminLimit')->change();
+            $table->bigInteger('PrefixThreshold')->change();
+            $table->bigInteger('PrefixClearThreshold')->change();
+            $table->bigInteger('AdvertisedPrefixes')->change();
+            $table->bigInteger('SuppressedPrefixes')->change();
+            $table->bigInteger('WithdrawnPrefixes')->change();
+            $table->bigInteger('AcceptedPrefixes_delta')->change();
+            $table->bigInteger('AcceptedPrefixes_prev')->change();
+            $table->bigInteger('DeniedPrefixes_delta')->change();
+            $table->bigInteger('DeniedPrefixes_prev')->change();
+            $table->bigInteger('AdvertisedPrefixes_delta')->change();
+            $table->bigInteger('AdvertisedPrefixes_prev')->change();
+            $table->bigInteger('SuppressedPrefixes_delta')->change();
+            $table->bigInteger('SuppressedPrefixes_prev')->change();
+            $table->bigInteger('WithdrawnPrefixes_delta')->change();
+            $table->bigInteger('WithdrawnPrefixes_prev')->change();
         });
     }
 
@@ -42,24 +42,24 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('bgpPeers_cbgp', function (Blueprint $table) {
-            $table->integer('AcceptedPrefixes');
-            $table->integer('DeniedPrefixes');
-            $table->integer('PrefixAdminLimit');
-            $table->integer('PrefixThreshold');
-            $table->integer('PrefixClearThreshold');
-            $table->integer('AdvertisedPrefixes');
-            $table->integer('SuppressedPrefixes');
-            $table->integer('WithdrawnPrefixes');
-            $table->integer('AcceptedPrefixes_delta');
-            $table->integer('AcceptedPrefixes_prev');
-            $table->integer('DeniedPrefixes_delta');
-            $table->integer('DeniedPrefixes_prev');
-            $table->integer('AdvertisedPrefixes_delta');
-            $table->integer('AdvertisedPrefixes_prev');
-            $table->integer('SuppressedPrefixes_delta');
-            $table->integer('SuppressedPrefixes_prev');
-            $table->integer('WithdrawnPrefixes_delta');
-            $table->integer('WithdrawnPrefixes_prev');
+            $table->integer('AcceptedPrefixes')->change();
+            $table->integer('DeniedPrefixes')->change();
+            $table->integer('PrefixAdminLimit')->change();
+            $table->integer('PrefixThreshold')->change();
+            $table->integer('PrefixClearThreshold')->change();
+            $table->integer('AdvertisedPrefixes')->change();
+            $table->integer('SuppressedPrefixes')->change();
+            $table->integer('WithdrawnPrefixes')->change();
+            $table->integer('AcceptedPrefixes_delta')->change();
+            $table->integer('AcceptedPrefixes_prev')->change();
+            $table->integer('DeniedPrefixes_delta')->change();
+            $table->integer('DeniedPrefixes_prev')->change();
+            $table->integer('AdvertisedPrefixes_delta')->change();
+            $table->integer('AdvertisedPrefixes_prev')->change();
+            $table->integer('SuppressedPrefixes_delta')->change();
+            $table->integer('SuppressedPrefixes_prev')->change();
+            $table->integer('WithdrawnPrefixes_delta')->change();
+            $table->integer('WithdrawnPrefixes_prev')->change();
 
         });
     }
