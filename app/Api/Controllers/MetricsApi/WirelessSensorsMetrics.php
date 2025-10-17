@@ -22,9 +22,13 @@ class WirelessSensorsMetrics
         $lines[] = '# TYPE librenms_wireless_sensors_total gauge';
         $lines[] = "librenms_wireless_sensors_total {$total}";
 
-        $value_lines = [];
-        $warn_lines = [];
-        $crit_lines = [];
+        // Group outputs by rrd_type
+        $gauge_value_lines = [];
+        $gauge_limit_warn_lines = [];
+        $gauge_limit_crit_lines = [];
+        $counter_value_lines = [];
+        $counter_limit_warn_lines = [];
+        $counter_limit_crit_lines = [];
 
         // Gather device info mapping for labels
         $deviceIds = DB::table('wireless_sensors')->distinct()->pluck('device_id');
@@ -51,15 +55,48 @@ class WirelessSensorsMetrics
             $div = (int) ($s->sensor_divisor ?: 1);
             $value = $s->sensor_current !== null ? ((float) $s->sensor_current * $mult / max(1, $div)) : null;
 
-            $value_lines[] = "librenms_wireless_sensor_value{{$labels}} " . ($value !== null ? $value : 0);
-            $warn_lines[] = "librenms_wireless_sensor_limit_warn{{$labels}} " . ((float) ($s->sensor_limit_warn ?? 0));
-            $crit_lines[] = "librenms_wireless_sensor_limit_crit{{$labels}} " . ((float) ($s->sensor_limit ?? 0));
+            $rrd = strtoupper((string) ($s->rrd_type ?? 'GAUGE'));
+            if ($rrd === 'GAUGE') {
+                $gauge_value_lines[] = "librenms_wireless_sensor_value{{$labels}} " . ($value !== null ? $value : 0);
+                $gauge_limit_warn_lines[] = "librenms_wireless_sensor_limit_warn{{$labels}} " . ((float) ($s->sensor_limit_warn ?? 0));
+                $gauge_limit_crit_lines[] = "librenms_wireless_sensor_limit_crit{{$labels}} " . ((float) ($s->sensor_limit ?? 0));
+            } else {
+                $counter_value_lines[] = "librenms_wireless_sensor_value_counter{{$labels}} " . ($value !== null ? $value : 0);
+                $counter_limit_warn_lines[] = "librenms_wireless_sensor_limit_warn_counter{{$labels}} " . ((float) ($s->sensor_limit_warn ?? 0));
+                $counter_limit_crit_lines[] = "librenms_wireless_sensor_limit_crit_counter{{$labels}} " . ((float) ($s->sensor_limit ?? 0));
+            }
         }
 
         // Append per-wireless-sensor metrics
-        $lines[] = '# HELP librenms_wireless_sensor_value Current wireless sensor value';
-        $lines[] = '# TYPE librenms_wireless_sensor_value gauge';
-        $lines = array_merge($lines, $value_lines);
+        // Append gauge sensors
+        if (! empty($gauge_value_lines)) {
+            $lines[] = '# HELP librenms_wireless_sensor_value Current wireless sensor value (units vary by sensor)';
+            $lines[] = '# TYPE librenms_wireless_sensor_value gauge';
+            $lines = array_merge($lines, $gauge_value_lines);
+
+            $lines[] = '# HELP librenms_wireless_sensor_limit_warn Sensor warning threshold';
+            $lines[] = '# TYPE librenms_wireless_sensor_limit_warn gauge';
+            $lines = array_merge($lines, $gauge_limit_warn_lines);
+
+            $lines[] = '# HELP librenms_wireless_sensor_limit_crit Sensor critical threshold';
+            $lines[] = '# TYPE librenms_wireless_sensor_limit_crit gauge';
+            $lines = array_merge($lines, $gauge_limit_crit_lines);
+        }
+
+        // Append counter-like sensors
+        if (! empty($counter_value_lines)) {
+            $lines[] = '# HELP librenms_wireless_sensor_value_counter Current wireless sensor value (counter-like)';
+            $lines[] = '# TYPE librenms_wireless_sensor_value_counter counter';
+            $lines = array_merge($lines, $counter_value_lines);
+
+            $lines[] = '# HELP librenms_wireless_sensor_limit_warn_counter Sensor warning threshold (counter-like)';
+            $lines[] = '# TYPE librenms_wireless_sensor_limit_warn_counter counter';
+            $lines = array_merge($lines, $counter_limit_warn_lines);
+
+            $lines[] = '# HELP librenms_wireless_sensor_limit_crit_counter Sensor critical threshold (counter-like)';
+            $lines[] = '# TYPE librenms_wireless_sensor_limit_crit_counter counter';
+            $lines = array_merge($lines, $counter_limit_crit_lines);
+        }
 
         $lines[] = '# HELP librenms_wireless_sensor_limit_warn Wireless sensor warning threshold';
         $lines[] = '# TYPE librenms_wireless_sensor_limit_warn gauge';

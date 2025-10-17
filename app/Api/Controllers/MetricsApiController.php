@@ -31,7 +31,7 @@ class MetricsApiController
         $html[] = '<li><a href="access_points">/metrics/access_points</a> — access point metrics</li>';
         $html[] = '<li><a href="alerts">/metrics/alerts</a> — alert metrics</li>';
         $html[] = '<li><a href="applications">/metrics/applications</a> — application metric values (app_type, instance, metric)</li>';
-        $html[] = '<li><a href="customoids">/metrics/customoids</a> — custom oid metrics</li>';
+        $html[] = '<li><a href="customoids">/metrics/customoids</a> — customoid metrics</li>';
         $html[] = '<li><a href="devices">/metrics/devices</a> — device-level metrics (uptime, last poll, status)</li>';
         $html[] = '<li><a href="mempools">/metrics/mempools</a> — mempool (memory) usage metrics</li>';
         $html[] = '<li><a href="ports">/metrics/ports</a> — ports metrics (octets, packets, errors)</li>';
