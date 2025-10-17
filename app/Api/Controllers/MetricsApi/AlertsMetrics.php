@@ -46,6 +46,7 @@ class AlertsMetrics
         $lines[] = '# HELP librenms_alert_rules_by_severity Number of alert rules by severity';
         $lines[] = '# TYPE librenms_alert_rules_by_severity gauge';
         $sevs = AlertRule::select('severity', DB::raw('count(*) as cnt'))->groupBy('severity')->get();
+        /** @var \stdClass $sv */
         foreach ($sevs as $sv) {
             $sev = $this->escapeLabel((string) ($sv->severity ?? 'unknown'));
             $lines[] = sprintf('librenms_alert_rules_by_severity{severity="%s"} %d', $sev, $sv->cnt);
