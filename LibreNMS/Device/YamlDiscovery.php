@@ -211,8 +211,10 @@ class YamlDiscovery
             $template = new SimpleTemplate($value);
             $template->replaceWith(function ($matches) use ($index, $def, $pre_cache) {
                 // convert the numeric index to a string
-                if (Str::startsWith($matches[1], 'index_string')) {
-                    return Oid::stringFromOid($index, (int) substr($matches[1], 12));
+                if (str_starts_with($matches[1], 'index_string')) {
+                    $format = str_contains($matches[1], ':') ? substr($matches[1], 12) : 's';
+
+                    return Oid::stringFromOid($index, $format);
                 }
 
                 $replace = static::getValueFromData($matches[1], $index, $def, $pre_cache);

@@ -150,8 +150,12 @@ is `{{ $variable }}`. Any oid in the current table can be used, as
 well as pre-fetched data. The index ($index) and the sub_indexes (in
 case the oid is indexed multiple times) are also available: if
 $index="1.20", then $subindex0="1" and $subindex1="20".
+
 If you want access a string in an index, `{{ $index_string }}` can be used,
-optionally suffixed with the position of the one you want.
+optionally suffixed with a format string to specify how to extract the string.
+`{{ $index_string:nns }}` will skip two numeric indexes and return the string after.
+`{{ $index_string:nss }}` will skip one numeric index and one string index and return
+next string after.
 
 #### Fetching values from other tables/oids
 

@@ -156,28 +156,46 @@ class Oid
 
     /**
      * Try to parse an oid into a string.
-     * If the oid contains multiple strings, skip until we get to the given position
-     * Keep in mind that strings in oids must be prefixed with the length of the string
+     *
+     * @param string $oid The OID to parse
+     * @param string $format Format string: 'n' = numeric (1 part), 's' = string (length + data)
+     *                       Example: 'nns' = skip 2 numerics, then extract first string
+     *                       Example: 'ss' = skip first string, extract second string
+     *                       Example: 'nsns' = skip numeric, string, numeric, then extract string
+     * @return string The extracted string, or empty string if not found
      */
-    public static function stringFromOid(string $oid, int $skip = 0): string
+    public static function stringFromOid(string $oid, string $format = 's'): string
     {
         $parts = explode('.', $oid);
         $count = count($parts);
-
         $offset = 0;
-        $segment = 0;
-        while ($offset < $count) {
-            $length = (int) ($parts[$offset] ?? 0); // get the string length (the first byte)
-            $offset++; // move past the length byte
 
-            if ($segment === $skip) {
-                // convert the parts to a string (unsigned bytes)
-                return pack('C*', ...array_slice($parts, $offset, $length));
+        for ($i = 0; $i < strlen($format); $i++) {
+            $type = $format[$i];
+
+            if ($offset >= $count) {
+                return ''; // ran out of parts
             }
 
-            // skip processed bytes for this segment
-            $offset += $length;
-            $segment++;
+            if ($type === 'n') {
+                // Numeric index - just skip one position
+                $offset++;
+            } elseif ($type === 's') {
+                // String - read length prefix and data
+                $length = (int) ($parts[$offset] ?? 0);
+                $offset++; // move past the length byte
+
+                // If this is the last 's' in the format, extract and return
+                if ($i === strlen($format) - 1) {
+                    if ($offset + $length > $count) {
+                        return ''; // not enough data
+                    }
+                    return pack('C*', ...array_slice($parts, $offset, $length));
+                }
+
+                // Otherwise skip this string's data
+                $offset += $length;
+            }
         }
 
         return '';

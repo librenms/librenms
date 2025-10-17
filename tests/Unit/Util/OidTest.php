@@ -11,31 +11,42 @@ final class OidTest extends TestCase
     {
         // 3 characters: 'A' (65) 'B' (66) 'C' (67)
         $oid = '3.65.66.67';
-        $this->assertSame('ABC', Oid::stringFromOid($oid));
+        $this->assertSame('ABC', Oid::stringFromOid($oid)); // default 's' extracts first string
+        $this->assertSame('ABC', Oid::stringFromOid($oid, 's')); // explicit
     }
 
     public function testStringFromOidMultiplePositions(): void
     {
         // two strings: 'ABC' and 'xy'
         $oid = '3.65.66.67.2.120.121';
-        $this->assertSame('ABC', Oid::stringFromOid($oid, 0));
-        $this->assertSame('xy', Oid::stringFromOid($oid, 1));
+        $this->assertSame('ABC', Oid::stringFromOid($oid, 's'));
+        $this->assertSame('xy', Oid::stringFromOid($oid, 'ss')); // skip first string, extract second
     }
 
     public function testStringFromOidPositionOutOfBounds(): void
     {
         $oid = '1.90'; // 'Z'
-        $this->assertSame('Z', Oid::stringFromOid($oid, 0));
-        $this->assertSame('', Oid::stringFromOid($oid, 1)); // no second string present
+        $this->assertSame('Z', Oid::stringFromOid($oid, 's'));
+        $this->assertSame('', Oid::stringFromOid($oid, 'ss')); // no second string present
     }
 
     public function testStringFromOidZeroLengthSegment(): void
     {
         // three segments: 'ABC', '', 'Z'
         $oid = '3.65.66.67.0.1.90';
-        $this->assertSame('ABC', Oid::stringFromOid($oid, 0));
-        $this->assertSame('', Oid::stringFromOid($oid, 1));
-        $this->assertSame('Z', Oid::stringFromOid($oid, 2));
+        $this->assertSame('ABC', Oid::stringFromOid($oid, 's'));
+        $this->assertSame('', Oid::stringFromOid($oid, 'ss'));
+        $this->assertSame('Z', Oid::stringFromOid($oid, 'sss'));
+    }
+
+    public function testOidWithCombinedNumericAndString(): void
+    {
+        // first two indices are numeric (3, 49), followed by a string of length 7: 'Pre-Amp'
+        $oid = '3.49.7.80.114.101.45.65.109.112';
+        $this->assertSame('Pre-Amp', Oid::stringFromOid($oid, 'nns'));
+        // sanity checks of other formats
+        $this->assertSame("1\x07P", Oid::stringFromOid($oid, 's'));   // first string length=3 -> 49,7,80 ("1\x07P")
+        $this->assertSame('', Oid::stringFromOid($oid, 'ns'));  // interpreting 49 as length also fails
     }
 
     public function testStringFromOidHighAsciiBytes(): void
