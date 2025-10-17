@@ -77,6 +77,7 @@ trait MetricsHelpers
         if ($deviceIds === null) {
             return $query;
         }
+
         return $query->whereIn((string) ($query->getModel() ? $query->getModel()->getTable() . '.device_id' : 'device_id'), $deviceIds->all());
     }
 }
