@@ -91,7 +91,6 @@ are as follows:
   automatically by discovery process. This parameter is still required to
   submit a pull request. This is the numerical OID that contains
   `value`. This should usually include `{{ $index }}`.
-  In case the index is a string, `{{ $str_index_as_numeric }}` can be used instead and will convert
 the string to the equivalent OID representation.
 - `divisor` (optional): This is the divisor to use against the returned `value`.
 - `multiplier` (optional): This is the multiplier to use against the returned `value`.
