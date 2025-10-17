@@ -14,13 +14,17 @@ class ProcessorsMetrics
     {
         $lines = [];
 
+        // Gather global metrics
         $total = Processor::count();
+
+        // Append global metrics
         $lines[] = '# HELP librenms_processors_total Total number of processors';
         $lines[] = '# TYPE librenms_processors_total gauge';
         $lines[] = "librenms_processors_total {$total}";
 
         $usage_lines = [];
 
+        // Gather device info mapping for labels
         $deviceIds = Processor::select('device_id')->distinct()->pluck('device_id');
         $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
 
@@ -42,6 +46,7 @@ class ProcessorsMetrics
             $usage_lines[] = "librenms_processor_usage_percent{{$labels}} " . ((int) $p->processor_usage ?: 0);
         }
 
+        // Append per-processor metrics
         $lines[] = '# HELP librenms_processor_usage_percent Processor usage percent (0-100)';
         $lines[] = '# TYPE librenms_processor_usage_percent gauge';
         $lines = array_merge($lines, $usage_lines);

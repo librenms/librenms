@@ -20,7 +20,7 @@ class AccessPointsMetrics
         // Append global metrics
         $lines[] = '# HELP librenms_access_points_total Total number of access points';
         $lines[] = '# TYPE librenms_access_points_total gauge';
-    $lines[] = "librenms_access_points_total {$total}";
+        $lines[] = "librenms_access_points_total {$total}";
 
         // Prepare per-access-point metrics arrays
         $deleted_lines = [];
