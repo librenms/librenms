@@ -1,7 +1,7 @@
 <?php
 
 /**
- * LocationController.php
+ * AlertTransportController.php
  *
  * -Description-
  *
@@ -20,31 +20,38 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2019 Tony Murray
+ * © 2025 Tony Murray
+ *
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace App\Http\Controllers\Select;
 
-use App\Models\Location;
+use App\Models\AlertTransport;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 
-class LocationController extends SelectController
+class AlertTransportController extends SelectController
 {
-    protected function searchFields($request)
+    protected function searchFields(Request $request)
     {
-        return ['location'];
+        return ['transport_type', 'transport_name'];
     }
 
-    /**
-     * Defines the base query for this resource
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
-     */
-    protected function baseQuery($request)
+    public function baseQuery(Request $request): Builder
     {
-        return Location::hasAccess($request->user())
-            ->orderBy('location')
-            ->select(['id', 'location']);
+        return AlertTransport::query()
+            ->select(['transport_id', 'transport_type', 'transport_name'])
+            ->orderBy('transport_type')
+            ->orderBy('transport_name');
+    }
+
+    /** @param  AlertTransport  $model */
+    public function formatItem($model): array
+    {
+        return [
+            'id' => $model->transport_id,
+            'text' => ucfirst((string) $model->transport_type) . ': ' . $model->transport_name,
+        ];
     }
 }

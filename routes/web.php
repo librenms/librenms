@@ -252,12 +252,16 @@ Route::middleware(['auth'])->group(function () {
 
         // js select2 data controllers
         Route::prefix('select')->group(function () {
+            Route::get('alert-transport', Select\AlertTransportController::class)->name('ajax.select.alert-transport');
+            Route::get('alert-transport-group', Select\AlertTransportGroupController::class)->name('ajax.select.alert-transport-group');
+            Route::get('alert-transports-groups', Select\AlertTransportsAndGroupsController::class)->name('ajax.select.alert-transports-groups');
             Route::get('application', Select\ApplicationController::class)->name('ajax.select.application');
             Route::get('bill', Select\BillController::class)->name('ajax.select.bill');
             Route::get('custom-map', Select\CustomMapController::class)->name('ajax.select.custom-map');
             Route::get('custom-map-menu-group', Select\CustomMapMenuGroupController::class)->name('ajax.select.custom-map-menu-group');
             Route::get('dashboard', Select\DashboardController::class)->name('ajax.select.dashboard');
             Route::get('device', Select\DeviceController::class)->name('ajax.select.device');
+            Route::get('devices-groups-locations', Select\DevicesGroupsAndLocationsController::class)->name('ajax.select.devices-groups-locations');
             Route::get('device-field', Select\DeviceFieldController::class)->name('ajax.select.device-field');
             Route::get('device-group', Select\DeviceGroupController::class)->name('ajax.select.device-group');
             Route::get('port-group', Select\PortGroupController::class)->name('ajax.select.port-group');

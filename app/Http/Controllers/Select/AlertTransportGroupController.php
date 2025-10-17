@@ -1,7 +1,7 @@
 <?php
 
 /**
- * ServiceTemplateController.php
+ * AlertTransportGroupController.php
  *
  * -Description-
  *
@@ -20,34 +20,26 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2020 Anthony F McInerney <bofh80>
- * @author     Anthony F McInerney <afm404@gmail.com>
+ * @copyright  2025 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace App\Http\Controllers\Select;
 
-use App\Models\ServiceTemplate;
+use App\Models\AlertTransportGroup;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
 
-class ServiceTemplateController extends SelectController
+class AlertTransportGroupController extends SelectController
 {
-    protected function searchFields($request)
+    protected function searchFields(Request $request): array
     {
-        return ['name'];
+        return ['transport_group_name'];
     }
 
-    protected function baseQuery($request)
+    protected function baseQuery(Request $request): Builder
     {
-        return ServiceTemplate::hasAccess($request->user())->select(['id', 'name']);
-    }
-
-    /**
-     * @param  ServiceTemplate  $template
-     */
-    public function formatItem($template)
-    {
-        return [
-            'id' => $template->id,
-            'text' => $template->name,
-        ];
+        return AlertTransportGroup::query()
+            ->orderBy('transport_group_name');
     }
 }
