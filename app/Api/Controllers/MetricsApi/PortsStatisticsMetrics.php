@@ -15,12 +15,12 @@ class PortsStatisticsMetrics
     {
         $lines = [];
 
-    // Parse filters
-    $filters = $this->parseDeviceFilters($request);
+        // Parse filters
+        $filters = $this->parseDeviceFilters($request);
 
-    // Gather global metrics
-    $totalQ = PortStatistic::query();
-    $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
+        // Gather global metrics
+        $totalQ = PortStatistic::query();
+        $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
 
         $lines[] = '# HELP librenms_ports_statistics_total Total number of ports_statistics rows';
         $lines[] = '# TYPE librenms_ports_statistics_total gauge';
@@ -38,16 +38,16 @@ class PortsStatisticsMetrics
         $out_multicast_lines = [];
 
         // Preload device/port labels mapping
-    $portIdsQuery = PortStatistic::select('port_id')->distinct();
-    $portIdsQuery = $this->applyDeviceFilter($portIdsQuery, $filters['device_ids']);
-    $portIds = $portIdsQuery->pluck('port_id');
-    $ports = Port::select('port_id', 'device_id', 'ifName', 'ifDescr', 'ifIndex', 'ifType', 'ifAlias')->whereIn('port_id', $portIds)->get()->keyBy('port_id');
-    $deviceIds = $ports->pluck('device_id')->unique();
-    $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
+        $portIdsQuery = PortStatistic::select('port_id')->distinct();
+        $portIdsQuery = $this->applyDeviceFilter($portIdsQuery, $filters['device_ids']);
+        $portIds = $portIdsQuery->pluck('port_id');
+        $ports = Port::select('port_id', 'device_id', 'ifName', 'ifDescr', 'ifIndex', 'ifType', 'ifAlias')->whereIn('port_id', $portIds)->get()->keyBy('port_id');
+        $deviceIds = $ports->pluck('device_id')->unique();
+        $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
 
-    $psQuery = PortStatistic::query();
-    $psQuery = $this->applyDeviceFilter($psQuery, $filters['device_ids']);
-    foreach ($psQuery->cursor() as $ps) {
+        $psQuery = PortStatistic::query();
+        $psQuery = $this->applyDeviceFilter($psQuery, $filters['device_ids']);
+        foreach ($psQuery->cursor() as $ps) {
             $p = $ports->get($ps->port_id);
             $dev = $p ? $devices->get($p->device_id) : null;
             $device_hostname = $dev ? $this->escapeLabel((string) $dev->hostname) : '';

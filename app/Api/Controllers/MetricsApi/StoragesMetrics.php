@@ -14,12 +14,12 @@ class StoragesMetrics
     {
         $lines = [];
 
-    // Parse filters
-    $filters = $this->parseDeviceFilters($request);
+        // Parse filters
+        $filters = $this->parseDeviceFilters($request);
 
-    // Gather global metrics
-    $totalQ = Storage::query();
-    $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
+        // Gather global metrics
+        $totalQ = Storage::query();
+        $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
 
         // Append global metrics
         $lines[] = '# HELP librenms_storages_total Total number of storage entries';
@@ -32,14 +32,14 @@ class StoragesMetrics
         $perc_lines = [];
 
         // Gather device info mapping for labels
-    $deviceIdsQuery = Storage::select('device_id')->distinct();
-    $deviceIdsQuery = $this->applyDeviceFilter($deviceIdsQuery, $filters['device_ids']);
-    $deviceIds = $deviceIdsQuery->pluck('device_id');
-    $devices = Device::select('device_id', 'hostname', 'sysName')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
+        $deviceIdsQuery = Storage::select('device_id')->distinct();
+        $deviceIdsQuery = $this->applyDeviceFilter($deviceIdsQuery, $filters['device_ids']);
+        $deviceIds = $deviceIdsQuery->pluck('device_id');
+        $devices = Device::select('device_id', 'hostname', 'sysName')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
 
-    $storageQuery = Storage::select('storage_id', 'device_id', 'storage_descr', 'storage_size', 'storage_used', 'storage_free', 'storage_perc');
-    $storageQuery = $this->applyDeviceFilter($storageQuery, $filters['device_ids']);
-    foreach ($storageQuery->cursor() as $s) {
+        $storageQuery = Storage::select('storage_id', 'device_id', 'storage_descr', 'storage_size', 'storage_used', 'storage_free', 'storage_perc');
+        $storageQuery = $this->applyDeviceFilter($storageQuery, $filters['device_ids']);
+        foreach ($storageQuery->cursor() as $s) {
             $dev = $devices->get($s->device_id);
             $device_hostname = $dev ? $this->escapeLabel((string) $dev->hostname) : '';
             $device_sysName = $dev ? $this->escapeLabel((string) $dev->sysName) : '';

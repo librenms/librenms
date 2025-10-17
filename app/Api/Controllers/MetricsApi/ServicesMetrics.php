@@ -15,7 +15,10 @@ class ServicesMetrics
     {
         $lines = [];
 
+        // Gather global metrics
         $total = Service::count();
+
+        // Append global metrics
         $lines[] = '# HELP librenms_services_total Total number of services configured';
         $lines[] = '# TYPE librenms_services_total gauge';
         $lines[] = "librenms_services_total {$total}";

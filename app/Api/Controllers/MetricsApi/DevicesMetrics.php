@@ -45,9 +45,9 @@ class DevicesMetrics
         $uptime_lines = [];
 
         // Gather per-device metrics
-    $deviceQuery = Device::select('device_id', 'hostname', 'sysName', 'type', 'status', 'last_polled_timetaken', 'last_discovered_timetaken', 'last_ping_timetaken', 'uptime');
-    $deviceQuery = $this->applyDeviceFilter($deviceQuery, $filters['device_ids']);
-    foreach ($deviceQuery->cursor() as $device) {
+        $deviceQuery = Device::select('device_id', 'hostname', 'sysName', 'type', 'status', 'last_polled_timetaken', 'last_discovered_timetaken', 'last_ping_timetaken', 'uptime');
+        $deviceQuery = $this->applyDeviceFilter($deviceQuery, $filters['device_ids']);
+        foreach ($deviceQuery->cursor() as $device) {
             $labels = sprintf('device_id="%s",device_hostname="%s",device_sysName="%s",device_type="%s"',
                 $device->device_id,
                 $this->escapeLabel((string) $device->hostname),
@@ -86,8 +86,8 @@ class DevicesMetrics
         $lines[] = '# TYPE librenms_last_ping_timetaken_seconds gauge';
         $lines = array_merge($lines, $ping_timetaken_lines);
 
-    $lines[] = '# HELP librenms_device_uptime_seconds Device uptime in seconds (0 if down)';
-    $lines[] = '# TYPE librenms_device_uptime_seconds gauge';
+        $lines[] = '# HELP librenms_device_uptime_seconds Device uptime in seconds (0 if down)';
+        $lines[] = '# TYPE librenms_device_uptime_seconds gauge';
         $lines = array_merge($lines, $uptime_lines);
 
         return implode("\n", $lines) . "\n";
