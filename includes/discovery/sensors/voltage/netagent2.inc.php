@@ -46,7 +46,7 @@ $bat_1phase_limit = 30; // Remember to check correct values
 $bat_1phase_warnlimit = 28;
 $bat_1phase_lowlimit = 10;
 $bat_1phase_lowwarnlimit = 18;
-$bat_1phase_divisor = 10;
+$bat_1phase_divisor = 1;
 
     // UPS 3 phase battery system values
 $bat_3phase_limit = 270; // Remember to check correct values
