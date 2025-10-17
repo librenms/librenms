@@ -24,7 +24,7 @@ $temp = SnmpQuery::cache()->walk('CISCO-FIREWALL-MIB::cfwHardwareStatusTable')->
 
 if (is_array($temp)) {
     //Create State Index
-    if (!str_contains($temp['netInterface']['CISCO-FIREWALL-MIB::cfwHardwareStatusDetail'], 'not Configured')) {
+    if (! str_contains($temp['netInterface']['CISCO-FIREWALL-MIB::cfwHardwareStatusDetail'], 'not Configured')) {
         $state_name = 'cfwHardwareStatus';
         $states = [
             ['value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'other'],

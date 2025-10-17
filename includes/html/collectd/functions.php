@@ -394,7 +394,7 @@ function _rrd_info($file)
 
                 $ds_key = substr($key, $p + 2);
 
-                if (!str_contains($ds_key, '[')) {
+                if (! str_contains($ds_key, '[')) {
                     if (! isset($info['DS']["$ds"])) {
                         $info['DS']["$ds"] = [];
                     }
@@ -411,14 +411,14 @@ function _rrd_info($file)
 
                 $rra_key = substr($key, $p + 2);
 
-                if (!str_contains($rra_key, '[')) {
+                if (! str_contains($rra_key, '[')) {
                     if (! isset($info['RRA']["$rra"])) {
                         $info['RRA']["$rra"] = [];
                     }
 
                     $info['RRA']["$rra"]["$rra_key"] = rrd_strip_quotes($value);
                 }
-            } elseif (!str_contains($key, '[')) {
+            } elseif (! str_contains($key, '[')) {
                 $info[$key] = rrd_strip_quotes($value);
             }//end if
         }//end while
