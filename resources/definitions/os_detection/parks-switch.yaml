@@ -5,5 +5,5 @@ icon: parks
 mib_dir: parks
 
 discovery:
-  - sysDescr:
-      - PK700-12X
+  - sysObjectID:
+      - .1.3.6.1.4.1.50224.3.1.1
