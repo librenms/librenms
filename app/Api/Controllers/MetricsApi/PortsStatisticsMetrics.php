@@ -2,9 +2,9 @@
 
 namespace App\Api\Controllers\MetricsApi;
 
+use App\Models\Device;
 use App\Models\Port;
 use App\Models\PortStatistic;
-use App\Models\Device;
 use Illuminate\Http\Request;
 
 class PortsStatisticsMetrics
