@@ -408,8 +408,8 @@
                 window.alertRule = this;
 
                 this.initQueryBuilder();
-                this.initSelect2('#maps', 'devices_groups_locations', v => this.rule.maps = v);
-                this.initSelect2('#transports', 'transport_groups', v => this.rule.transports = v);
+                this.initSelect2('#maps', '{{ route('ajax.select.alert-transports-groups') }}', v => this.rule.maps = v);
+                this.initSelect2('#transports', '{{ route('ajax.select.alert-transport-group') }}', v => this.rule.transports = v);
 
                 if (this.mode === 'edit' && this.loadUrl) {
                     fetch(this.loadUrl)
@@ -451,13 +451,12 @@
                 });
             },
 
-            initSelect2(el, type, callback) {
+            initSelect2(el, url, callback) {
                 $(el).select2({
                     width: '100%',
                     ajax: {
-                        url: 'ajax_list.php',
-                        delay: 250,
-                        data: params => ({ type, search: params.term })
+                        url: url,
+                        delay: 150
                     }
                 }).on('change', () => {
                     const val = $(el).val();
