@@ -13,10 +13,16 @@ class DevicesMetrics
     {
         $lines = [];
 
+        // Parse filters
+        $filters = $this->parseDeviceFilters($request);
+
         // Gather global metrics
-        $total = Device::count();
-        $up = Device::where('status', 1)->count();
-        $down = Device::where('status', 0)->count();
+        $totalQ = Device::query();
+        $upQ = Device::query()->where('status', 1);
+        $downQ = Device::query()->where('status', 0);
+        $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
+        $up = $this->applyDeviceFilter($upQ, $filters['device_ids'])->count();
+        $down = $this->applyDeviceFilter($downQ, $filters['device_ids'])->count();
 
         // Append global metrics
         $lines[] = '# HELP librenms_devices_total Total number of devices';
@@ -39,7 +45,9 @@ class DevicesMetrics
         $uptime_lines = [];
 
         // Gather per-device metrics
-        foreach (Device::select('device_id', 'hostname', 'sysName', 'type', 'status', 'last_polled_timetaken', 'last_discovered_timetaken', 'last_ping_timetaken', 'uptime')->cursor() as $device) {
+    $deviceQuery = Device::select('device_id', 'hostname', 'sysName', 'type', 'status', 'last_polled_timetaken', 'last_discovered_timetaken', 'last_ping_timetaken', 'uptime');
+    $deviceQuery = $this->applyDeviceFilter($deviceQuery, $filters['device_ids']);
+    foreach ($deviceQuery->cursor() as $device) {
             $labels = sprintf('device_id="%s",device_hostname="%s",device_sysName="%s",device_type="%s"',
                 $device->device_id,
                 $this->escapeLabel((string) $device->hostname),

@@ -14,8 +14,12 @@ class CustomoidsMetrics
     {
         $lines = [];
 
-        // Gather global metrics
-        $total = Customoid::count();
+    // Parse filters
+    $filters = $this->parseDeviceFilters($request);
+
+    // Gather global metrics
+    $totalQ = Customoid::query();
+    $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
 
         // Append global metrics
         $lines[] = '# HELP librenms_customoids_total Total number of customoids';
@@ -30,10 +34,14 @@ class CustomoidsMetrics
         $counter_limit_warn_lines = [];
         $counter_limit_crit_lines = [];
 
-        $deviceIds = Customoid::select('device_id')->distinct()->pluck('device_id');
-        $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
+    $deviceIdsQuery = Customoid::select('device_id')->distinct();
+    $deviceIdsQuery = $this->applyDeviceFilter($deviceIdsQuery, $filters['device_ids']);
+    $deviceIds = $deviceIdsQuery->pluck('device_id');
+    $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
 
-        foreach (Customoid::select('customoid_id', 'device_id', 'customoid_descr', 'customoid_current', 'customoid_multiplier', 'customoid_divisor', 'customoid_limit_warn', 'customoid_limit', 'customoid_datatype')->cursor() as $c) {
+    $coQuery = Customoid::select('customoid_id', 'device_id', 'customoid_descr', 'customoid_current', 'customoid_multiplier', 'customoid_divisor', 'customoid_limit_warn', 'customoid_limit', 'customoid_datatype');
+    $coQuery = $this->applyDeviceFilter($coQuery, $filters['device_ids']);
+    foreach ($coQuery->cursor() as $c) {
             $dev = $devices->get($c->device_id);
             $device_hostname = $dev ? $this->escapeLabel((string) $dev->hostname) : '';
             $device_sysName = $dev ? $this->escapeLabel((string) $dev->sysName) : '';
