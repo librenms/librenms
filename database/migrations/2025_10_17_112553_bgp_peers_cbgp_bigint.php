@@ -21,15 +21,15 @@ return new class extends Migration
             $table->unsignedBigInteger('AdvertisedPrefixes')->change();
             $table->unsignedBigInteger('SuppressedPrefixes')->change();
             $table->unsignedBigInteger('WithdrawnPrefixes')->change();
-            $table->unsignedBigInteger('AcceptedPrefixes_delta')->change();
+            $table->bigInteger('AcceptedPrefixes_delta')->change();
             $table->unsignedBigInteger('AcceptedPrefixes_prev')->change();
-            $table->unsignedBigInteger('DeniedPrefixes_delta')->change();
+            $table->bigInteger('DeniedPrefixes_delta')->change();
             $table->unsignedBigInteger('DeniedPrefixes_prev')->change();
-            $table->unsignedBigInteger('AdvertisedPrefixes_delta')->change();
+            $table->bigInteger('AdvertisedPrefixes_delta')->change();
             $table->unsignedBigInteger('AdvertisedPrefixes_prev')->change();
-            $table->unsignedBigInteger('SuppressedPrefixes_delta')->change();
+            $table->bigInteger('SuppressedPrefixes_delta')->change();
             $table->unsignedBigInteger('SuppressedPrefixes_prev')->change();
-            $table->unsignedBigInteger('WithdrawnPrefixes_delta')->change();
+            $table->bigInteger('WithdrawnPrefixes_delta')->change();
             $table->unsignedBigInteger('WithdrawnPrefixes_prev')->change();
         });
     }
