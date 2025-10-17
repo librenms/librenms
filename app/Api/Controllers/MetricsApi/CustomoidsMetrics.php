@@ -14,11 +14,15 @@ class CustomoidsMetrics
     {
         $lines = [];
 
+        // Gather global metrics
         $total = Customoid::count();
+
+        // Append global metrics
         $lines[] = '# HELP librenms_customoids_total Total number of customoids';
         $lines[] = '# TYPE librenms_customoids_total gauge';
         $lines[] = "librenms_customoids_total {$total}";
 
+        // Prepare per-customoid metrics arrays
         $value_lines = [];
         $limit_warn_lines = [];
         $limit_crit_lines = [];
@@ -39,6 +43,7 @@ class CustomoidsMetrics
                 $this->escapeLabel((string) $c->customoid_descr)
             );
 
+            // Apply multiplier/divisor
             $mult = (int) ($c->customoid_multiplier ?: 1);
             $div = (int) ($c->customoid_divisor ?: 1);
             $value = $c->customoid_current !== null ? ((float) $c->customoid_current * $mult / max(1, $div)) : null;
@@ -48,6 +53,7 @@ class CustomoidsMetrics
             $limit_crit_lines[] = "librenms_customoid_limit_crit{{$labels}} " . ((float) ($c->customoid_limit ?? 0));
         }
 
+        // Append per-customoid metrics
         $lines[] = '# HELP librenms_customoid_value Custom oid current value';
         $lines[] = '# TYPE librenms_customoid_value gauge';
         $lines = array_merge($lines, $value_lines);
