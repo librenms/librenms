@@ -17,8 +17,8 @@ class MaintenanceRrdStep extends LnmsCommand
     public function __construct()
     {
         parent::__construct();
-        $this->addArgument('device', InputArgument::REQUIRED, 'Hostname, device id, or all');
-        $this->addOption('confirm', null, InputOption::VALUE_NONE, 'Confirm that you have backed up your rrd files.');
+        $this->addArgument('device', InputArgument::REQUIRED);
+        $this->addOption('confirm', null, InputOption::VALUE_NONE);
     }
 
     public function handle(): int
@@ -31,12 +31,12 @@ class MaintenanceRrdStep extends LnmsCommand
         }
 
         if (empty($hostname)) {
-            $this->error('Invalid hostname or device id specified');
+            $this->error(__('commands.maintenance:rrd-step.errors.invalid'));
 
             return 1;
         }
 
-        if (! $this->option('confirm') && ! $this->confirm('Before continuing, please confirm that you have backed up your rrd files.')) {
+        if (! $this->option('confirm') && ! $this->confirm(__('commands.maintenance:rrd-step.confirm_backup'))) {
             return 0;
         }
 
@@ -74,20 +74,20 @@ class MaintenanceRrdStep extends LnmsCommand
                     }
 
                     $allOk = false;
-                    $this->line("$file: Mismatched heartbeat. {$dsHeartbeat} != $heartbeat");
+                    $this->line(__('commands.maintenance:rrd-step.mismatched_heartbeat', ['file' => $file, 'ds' => $dsHeartbeat, 'hb' => $heartbeat]));
                     break;
                 }
 
                 if ($allOk) {
                     if ($this->getOutput()->isVerbose()) {
-                        $this->info("Skipping $file, step is already $step.");
+                        $this->info(__('commands.maintenance:rrd-step.skipping', ['file' => $file, 'step' => $step]));
                     }
                     $skipped++;
                     continue;
                 }
             }
 
-            $this->getOutput()->write("Converting $file: ");
+            $this->getOutput()->write(__('commands.maintenance:rrd-step.converting', ['file' => $file]) . ' ');
 
             $commands = [
                 "$rrdtool dump $daemon " . escapeshellarg($file) . ' > ' . escapeshellarg($random),
@@ -108,7 +108,7 @@ class MaintenanceRrdStep extends LnmsCommand
             }
         }
 
-        $this->line("Converted: $converted  Failed: $failed  Skipped: $skipped");
+        $this->line(__('commands.maintenance:rrd-step.summary', ['converted' => $converted, 'failed' => $failed, 'skipped' => $skipped]));
 
         return $failed > 0 ? 1 : 0;
     }
