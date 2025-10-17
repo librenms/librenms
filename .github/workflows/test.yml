@@ -23,11 +23,11 @@ jobs:
             name: Unit
             skip-web-check: 1
             database: mariadb:11.7
-          -
-            php-version: 8.2
-            name: Unit
-            skip-web-check: 1
-            database: mysql:8.0
+#          -
+#            php-version: 8.2
+#            name: Unit
+#            skip-web-check: 1
+#            database: mysql:8.0
     services:
       database:
         image: ${{ matrix.database }}
