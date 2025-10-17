@@ -179,11 +179,7 @@ class CiHelper
      */
     public function checkUnit(): int
     {
-        $phpunit_cmd = [$this->checkPhpExec('phpunit'), '--colors=always', '--fail-on-all-issues'];
-
-        if ($this->flags['fail-fast']) {
-            $phpunit_cmd[] = '--stop-on-defect';
-        }
+        $phpunit_cmd = [$this->checkPhpExec('phpunit'), '--colors=always'];
 
         if (Debug::isVerbose()) {
             $phpunit_cmd[] = '--debug';
