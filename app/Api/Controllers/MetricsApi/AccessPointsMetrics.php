@@ -14,12 +14,12 @@ class AccessPointsMetrics
     {
         $lines = [];
 
-    // Parse filters
-    $filters = $this->parseDeviceFilters($request);
+        // Parse filters
+        $filters = $this->parseDeviceFilters($request);
 
-    // Gather global metrics
-    $totalQ = AccessPoint::query();
-    $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
+        // Gather global metrics
+        $totalQ = AccessPoint::query();
+        $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
 
         // Append global metrics
         $lines[] = '# HELP librenms_access_points_total Total number of access points';
@@ -38,14 +38,14 @@ class AccessPointsMetrics
         $interference_lines = [];
 
         // Gather device info mapping for labels
-    $deviceIdsQuery = AccessPoint::select('device_id')->distinct();
-    $deviceIdsQuery = $this->applyDeviceFilter($deviceIdsQuery, $filters['device_ids']);
-    $deviceIds = $deviceIdsQuery->pluck('device_id');
-    $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
+        $deviceIdsQuery = AccessPoint::select('device_id')->distinct();
+        $deviceIdsQuery = $this->applyDeviceFilter($deviceIdsQuery, $filters['device_ids']);
+        $deviceIds = $deviceIdsQuery->pluck('device_id');
+        $devices = Device::select('device_id', 'hostname', 'sysName', 'type')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
 
-    $apQuery = AccessPoint::select('accesspoint_id', 'device_id', 'name', 'radio_number', 'type', 'mac_addr', 'deleted', 'channel', 'txpow', 'radioutil', 'numasoclients', 'nummonclients', 'numactbssid', 'nummonbssid', 'interference');
-    $apQuery = $this->applyDeviceFilter($apQuery, $filters['device_ids']);
-    foreach ($apQuery->cursor() as $ap) {
+        $apQuery = AccessPoint::select('accesspoint_id', 'device_id', 'name', 'radio_number', 'type', 'mac_addr', 'deleted', 'channel', 'txpow', 'radioutil', 'numasoclients', 'nummonclients', 'numactbssid', 'nummonbssid', 'interference');
+        $apQuery = $this->applyDeviceFilter($apQuery, $filters['device_ids']);
+        foreach ($apQuery->cursor() as $ap) {
             $dev = $devices->get($ap->device_id);
             $device_hostname = $dev ? $this->escapeLabel((string) $dev->hostname) : '';
             $device_sysName = $dev ? $this->escapeLabel((string) $dev->sysName) : '';

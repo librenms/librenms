@@ -57,6 +57,7 @@ class ApplicationsMetrics
             $query->whereIn('applications.device_id', $filters['device_ids']->all());
         }
 
+        /** @var \stdClass $am */
         foreach ($query->cursor() as $am) {
             $device = $devices->get($am->device_id);
             $device_hostname = $device ? $this->escapeLabel((string) $device->hostname) : '';
