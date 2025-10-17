@@ -133,13 +133,6 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('module/{module}', [Device\Tabs\ModuleController::class, 'delete'])->name('module.delete');
     });
 
-    // Legacy log routes - redirect to new format
-    Route::redirect('device/device={id}/tab=logs/section=eventlog/{vars?}', '/device/{id}/logs/eventlog')->where('vars', '.*');
-    Route::redirect('device/device={id}/tab=logs/section=graylog/{vars?}', '/device/{id}/logs/graylog')->where('vars', '.*');
-    Route::redirect('device/device={id}/tab=logs/section=outages/{vars?}', '/device/{id}/logs/outages')->where('vars', '.*');
-    Route::redirect('device/device={id}/tab=logs/section=syslog/{vars?}', '/device/{id}/logs/syslog')->where('vars', '.*');
-    Route::redirect('device/device={id}/tab=logs/{vars?}', '/device/{id}/logs/eventlog')->where('vars', '.*');
-
     // fallback device routes
     Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', [DeviceController::class, 'index'])
         ->name('device')->where('vars', '.*');
