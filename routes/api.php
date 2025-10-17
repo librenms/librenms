@@ -57,6 +57,8 @@ Route::prefix('v0')->group(function () {
 
         // Prometheus Metrics endpoints
         Route::prefix('metrics')->group(function () {
+            // index/info page for metrics (GET /api/v0/metrics)
+            Route::get('', [App\Api\Controllers\MetricsApiController::class, 'index'])->name('metrics_index');
             Route::get('devices', [App\Api\Controllers\MetricsApiController::class, 'devices'])->name('metrics_devices');
             Route::get('access_points', [App\Api\Controllers\MetricsApiController::class, 'accessPoints'])->name('metrics_access_points');
             Route::get('ports', [App\Api\Controllers\MetricsApiController::class, 'ports'])->name('metrics_ports');
