@@ -407,8 +407,12 @@ class PingQueueManager(TimedQueueManager):
             try:
                 logger.info("Running fast ping")
 
-                args = ("-d", "-g", group) if self.config.debug else ("-g", group)
-                exit_code, output = LibreNMS.call_script("ping.php", args)
+                args = (
+                    ("device:ping", "fast", "-vv", "-g", group)
+                    if self.config.debug
+                    else ("device:ping", "fast", "-q", "-g", group)
+                )
+                exit_code, output = LibreNMS.call_script("lnms", args)
 
                 if self.config.log_output:
                     with open(

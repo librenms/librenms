@@ -115,7 +115,13 @@ return [
     'device:ping' => [
         'description' => 'Ping device and record data for response',
         'arguments' => [
-            'device spec' => 'Device to ping one of: <Device ID>, <Hostname/IP>, all',
+            'device spec' => 'Device to ping one of: <Device ID>, <Hostname/IP>, all, fast ("fast" will ping all devices and update graphs and status)',
+        ],
+        'options' => [
+            'groups' => 'Group ID(s) to ping. Specify multiple times for multiple groups. (only valid with fast)',
+        ],
+        'errors' => [
+            'groups_without_fast' => 'The --groups (-g) option is only supported with "fast" device spec.',
         ],
     ],
     'device:poll' => [
