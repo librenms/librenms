@@ -564,14 +564,17 @@ function collectd_draw_rrd($host, $plugin, $type, $pinst = null, $tinst = null, 
         }
 
         if ($has_avg) {
+            // @phpstan-ignore argument.sprintf
             $graph[] = sprintf('GPRINT:%s_avg:AVERAGE:%%5.1lf%%s', $k, $has_max || $has_min || $has_avg ? ',' : '\\l');
         }
 
         if ($has_min) {
+            // @phpstan-ignore argument.sprintf
             $graph[] = sprintf('GPRINT:%s_min:MIN:%%5.1lf%%s', $k, $has_max || $has_avg ? ',' : '\\l');
         }
 
         if ($has_max) {
+            // @phpstan-ignore argument.sprintf
             $graph[] = sprintf('GPRINT:%s_max:MAX:%%5.1lf%%s', $k, $has_avg ? ',' : '\\l');
         }
 

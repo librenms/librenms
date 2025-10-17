@@ -1,7 +1,7 @@
 mib: SSU2000-MIB:DATUM-MIB
 modules:
     os:
-       hardware: 
+       hardware:
            - SSU2000-MIB::inName.1.2
            - SSU2000-MIB::inHwPart.1.2
        hardware_template: '{{ SSU2000-MIB::inName.1.2 }} Module {{ SSU2000-MIB::inHwPart.1.2 }}'
@@ -10,7 +10,7 @@ modules:
        features: SSU2000-MIB::inFeature.1
        features_template: 'NTP {{ SSU2000-MIB::inFeature.1 }}'
     sensors:
-       pre-cache:
+       additional_oids:
             data:
                 -
                     oid:

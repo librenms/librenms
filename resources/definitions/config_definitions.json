@@ -1501,6 +1501,11 @@
                     "type": "loadbalancer"
                 },
                 {
+                    "icon": "door-open",
+                    "text": "Management",
+                    "type": "management"
+                },
+                {
                     "icon": "network-wired",
                     "text": "Network",
                     "type": "network"
@@ -5639,7 +5644,7 @@
             "type": "oxidized-maps",
             "validate": {
                 "value": "array",
-                "value.*": "array:hostname,sysName,sysDescr,sysObjectID,hardware,os,location,ip,purpose,notes,poller_group",
+                "value.*": "array:hostname,sysName,sysDescr,sysObjectID,hardware,type,os,location,ip,purpose,notes,poller_group",
                 "value.*.*": "array|min:1",
                 "value.*.*.*": "array:match,regex,value|size:2",
                 "value.*.*.*.value": "required|string",
@@ -6156,6 +6161,13 @@
             "default": true,
             "type": "boolean"
         },
+        "poller_modules.port-security": {
+            "order": 460,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
         "polling.selected_ports": {
             "default": false,
             "type": "boolean",
@@ -6624,7 +6636,7 @@
             "units": "Seconds"
         },
         "ping_rrd_step": {
-            "default": 60,
+            "default": 300,
             "group": "poller",
             "section": "dispatcherservice",
             "order": 21,

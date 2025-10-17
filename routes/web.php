@@ -21,10 +21,12 @@ use App\Http\Controllers\Maps;
 use App\Http\Controllers\Maps\CustomMapBackgroundController;
 use App\Http\Controllers\Maps\CustomMapController;
 use App\Http\Controllers\Maps\CustomMapDataController;
+use App\Http\Controllers\Maps\CustomMapListController;
 use App\Http\Controllers\Maps\CustomMapNodeImageController;
 use App\Http\Controllers\Maps\DeviceDependencyController;
 use App\Http\Controllers\NacController;
 use App\Http\Controllers\OuiLookupController;
+use App\Http\Controllers\OutagesController;
 use App\Http\Controllers\OverviewController;
 use App\Http\Controllers\PluginLegacyController;
 use App\Http\Controllers\PluginPageController;
@@ -35,6 +37,7 @@ use App\Http\Controllers\PollerSettingsController;
 use App\Http\Controllers\PortController;
 use App\Http\Controllers\PortGroupController;
 use App\Http\Controllers\PushNotificationController;
+use App\Http\Controllers\Search\PortSecuritySearchController;
 use App\Http\Controllers\Select;
 use App\Http\Controllers\SensorController;
 use App\Http\Controllers\ServiceTemplateController;
@@ -82,6 +85,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('device-groups', DeviceGroupController::class);
     Route::any('inventory', App\Http\Controllers\InventoryController::class)->name('inventory');
     Route::get('inventory/purge', [App\Http\Controllers\InventoryController::class, 'purge'])->name('inventory.purge');
+    Route::get('outages', [OutagesController::class, 'index'])->name('outages');
     Route::resource('port', PortController::class)->only('update');
     Route::get('vlans', [App\Http\Controllers\VlansController::class, 'index'])->name('vlans.index');
     Route::prefix('poller')->group(function () {
@@ -118,6 +122,11 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::prefix('device/{device}')->name('device.')->group(function () {
+        Route::redirect('logs', 'logs/eventlog')->name('logs');
+        Route::get('logs/eventlog', Device\Tabs\EventlogController::class)->name('eventlog');
+        Route::get('logs/graylog', Device\Tabs\GraylogController::class)->name('graylog');
+        Route::get('logs/outages', Device\Tabs\OutagesController::class)->name('outages');
+        Route::get('logs/syslog', Device\Tabs\SyslogController::class)->name('syslog');
         Route::get('popup', \App\Http\Controllers\DevicePopupController::class)->name('popup');
         Route::put('notes', [Device\Tabs\NotesController::class, 'update'])->name('notes.update');
         Route::put('module/{module}', [Device\Tabs\ModuleController::class, 'update'])->name('module.update');
@@ -140,6 +149,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('custom/{map}/background', [CustomMapBackgroundController::class, 'save'])->name('maps.custom.background.save');
         Route::get('custom/{map}/data', [CustomMapDataController::class, 'get'])->name('maps.custom.data');
         Route::post('custom/{map}/data', [CustomMapDataController::class, 'save'])->name('maps.custom.data.save');
+        Route::get('customlist', [CustomMapListController::class, 'index'])->name('maps.custom.list');
         Route::get('devicedependency', [DeviceDependencyController::class, 'dependencyMap']);
         Route::post('getdevices', [Maps\MapDataController::class, 'getDevices'])->name('maps.getdevices');
         Route::post('getdevicelinks', [Maps\MapDataController::class, 'getDeviceLinks'])->name('maps.getdevicelinks');
@@ -200,6 +210,9 @@ Route::middleware(['auth'])->group(function () {
     Route::any('plugin/v1/{plugin:plugin_name}/{other?}', PluginLegacyController::class)->where('other', '(.*)')->name('plugin.legacy');
     Route::get('plugin/{plugin:plugin_name}', PluginPageController::class)->name('plugin.page');
 
+    // Search pages
+    Route::get('search/secureports', [PortSecuritySearchController::class, 'index'])->name('search.secureports');
+
     Route::get('health/{metric?}/{legacyview?}', [SensorController::class, 'index'])->name('sensor.index');
     Route::get('wireless/{metric}/{legacyview?}', [WirelessSensorController::class, 'index'])->name('wireless.index');
 
@@ -239,12 +252,16 @@ Route::middleware(['auth'])->group(function () {
 
         // js select2 data controllers
         Route::prefix('select')->group(function () {
+            Route::get('alert-transport', Select\AlertTransportController::class)->name('ajax.select.alert-transport');
+            Route::get('alert-transport-group', Select\AlertTransportGroupController::class)->name('ajax.select.alert-transport-group');
+            Route::get('alert-transports-groups', Select\AlertTransportsAndGroupsController::class)->name('ajax.select.alert-transports-groups');
             Route::get('application', Select\ApplicationController::class)->name('ajax.select.application');
             Route::get('bill', Select\BillController::class)->name('ajax.select.bill');
             Route::get('custom-map', Select\CustomMapController::class)->name('ajax.select.custom-map');
             Route::get('custom-map-menu-group', Select\CustomMapMenuGroupController::class)->name('ajax.select.custom-map-menu-group');
             Route::get('dashboard', Select\DashboardController::class)->name('ajax.select.dashboard');
             Route::get('device', Select\DeviceController::class)->name('ajax.select.device');
+            Route::get('devices-groups-locations', Select\DevicesGroupsAndLocationsController::class)->name('ajax.select.devices-groups-locations');
             Route::get('device-field', Select\DeviceFieldController::class)->name('ajax.select.device-field');
             Route::get('device-group', Select\DeviceGroupController::class)->name('ajax.select.device-group');
             Route::get('port-group', Select\PortGroupController::class)->name('ajax.select.port-group');
@@ -272,9 +289,9 @@ Route::middleware(['auth'])->group(function () {
             Route::post('device', Table\DeviceController::class)->name('table.device');
             Route::get('device/export', [Table\DeviceController::class, 'export']);
             Route::post('edit-ports', Table\EditPortsController::class);
-            Route::post('eventlog', Table\EventlogController::class);
+            Route::post('eventlog', Table\EventlogController::class)->name('table.eventlog');
             Route::post('fdb-tables', Table\FdbTablesController::class);
-            Route::post('graylog', Table\GraylogController::class);
+            Route::post('graylog', Table\GraylogController::class)->name('table.graylog');
             Route::post('inventory', Table\InventoryController::class)->name('table.inventory');
             Route::get('inventory/export', [Table\InventoryController::class, 'export']);
             Route::post('location', Table\LocationController::class);
@@ -283,6 +300,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('outages', Table\OutagesController::class)->name('table.outages');
             Route::get('outages/export', [Table\OutagesController::class, 'export']);
             Route::post('port-nac', Table\PortNacController::class)->name('table.port-nac');
+            Route::post('port-security', Table\PortSecurityController::class)->name('table.port-security');
             Route::post('port-stp', Table\PortStpController::class);
             Route::post('ports', Table\PortsController::class)->name('table.ports');
             Route::get('ports/export', [Table\PortsController::class, 'export']);
@@ -293,7 +311,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('sensors/export', [Table\SensorsController::class, 'export']);
             Route::post('storages', Table\StoragesController::class)->name('table.storages');
             Route::get('storages/export', [Table\StoragesController::class, 'export']);
-            Route::post('syslog', Table\SyslogController::class);
+            Route::post('syslog', Table\SyslogController::class)->name('table.syslog');
             Route::post('printer-supply', Table\PrinterSupplyController::class)->name('table.printer-supply');
             Route::post('tnmsne', Table\TnmsneController::class)->name('table.tnmsne');
             Route::post('wireless', Table\WirelessSensorController::class)->name('table.wireless');

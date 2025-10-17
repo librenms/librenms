@@ -5,7 +5,7 @@ modules:
         version: IB-PLATFORMONE-MIB::ibNiosVersion.0
         serial: IB-PLATFORMONE-MIB::ibSerialNumber.0
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

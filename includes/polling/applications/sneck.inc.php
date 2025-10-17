@@ -11,14 +11,14 @@ $name = 'sneck';
 
 $old_checks = [];
 $old_checks_data = [];
-if (isset($app->data['data']) && isset($app->data['data']['checks'])) {
-    $old_checks = array_keys($app->data['data']['checks']);
-    $old_checks_data = $app->data['data']['checks'];
+if (isset($app->data['checks'])) {
+    $old_checks = array_keys($app->data['checks']);
+    $old_checks_data = $app->data['checks'];
 }
 
 $old_debugs = [];
-if (isset($app->data['data']) && isset($app->data['data']['debugs'])) {
-    $old_debugs = array_keys($app->data['data']['debugs']);
+if (isset($app->data['debugs'])) {
+    $old_debugs = array_keys($app->data['debugs']);
 }
 
 if (LibrenmsConfig::has('apps.sneck.polling_time_diff')) {
@@ -37,7 +37,7 @@ try {
     return;
 }
 
-$app->data = $json_return;
+$app->data = $json_return['data'];
 
 $new_checks = [];
 if (isset($json_return['data']) and isset($json_return['data']['checks'])) {
@@ -79,6 +79,29 @@ $fields = [
 
 $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 app('Datastore')->put($device, 'app', $tags, $fields);
+
+// run_time is only present in version 1.1.0 and up
+if (isset($json_return['data']) and isset($json_return['data']['run_time']) and is_numeric($json_return['data']['run_time'])) {
+    $rrd_def = RrdDefinition::make()
+        ->addDataset('data', 'GAUGE', 0);
+
+    $rrd_name = ['app', $name, $app->app_id, 'run_time'];
+
+    // $fields is also used for storing metrics, so don't stomp it
+    $run_time_fields = [
+        'data' => $json_return['data']['run_time'],
+    ];
+    $fields['run_time'] = $json_return['data']['run_time'];
+
+    $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+    app('Datastore')->put($device, 'app', $tags, $run_time_fields);
+
+    // if this is over 300, it took 300+ seconds to run, meaning we are currently ingesting data for a previous time slot
+    if ($json_return['data']['run_time'] >= 300) {
+        $log_message = 'Sneck took ' . $json_return['data']['run_time'] . ' seconds to run';
+        Eventlog::log($log_message, $device['device_id'], 'application', Severity::Error);
+    }
+}
 
 // save the return status for each alerting possibilities
 foreach ($json_return['data']['checks'] as $key => $value) {

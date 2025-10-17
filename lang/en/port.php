@@ -26,6 +26,7 @@ return [
         'links' => 'Neighbors',
         'transceivers' => 'Transceivers',
         'xdsl' => 'xDSL',
+        'portsecurity' => 'Port Security',
     ],
     'transceiver' => 'Transceiver',
     'transceivers' => [

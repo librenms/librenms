@@ -48,7 +48,7 @@ class AlertSchedule extends Model
     protected $table = 'alert_schedule';
     protected $primaryKey = 'schedule_id';
     protected $appends = ['start_recurring_dt', 'end_recurring_dt', 'start_recurring_hr', 'end_recurring_hr', 'status'];
-    protected $fillable = ['title', 'notes', 'recurring'];
+    protected $fillable = ['title', 'notes', 'recurring', 'behavior'];
 
     private $timezone;
     private $days = [

@@ -27,7 +27,7 @@ modules:
                 percent_used: ERICSSON-ROUTER-SYS-RESOURCES-MIB::eriRouterSRStorageUtilization
                 units: 1024
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     snmp_flags: '-OQUsbe'
