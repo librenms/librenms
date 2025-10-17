@@ -77,9 +77,15 @@ class AppServiceProvider extends ServiceProvider
         $this->configureMorphAliases();
         $this->bootObservers();
         Version::registerAboutCommand();
+
         Password::defaults(function () {
-            return Password::min(LibrenmsConfig::get('password.min_length', 8))
-             ->uncompromised();
+            $validation = Password::min(LibrenmsConfig::get('password.min_length', 8));
+
+            if (LibrenmsConfig::get('password.uncompromised', true)) {
+                $validation->uncompromised();
+            }
+
+            return $validation;
         });
 
         $this->bootAuth();
