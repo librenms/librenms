@@ -45,6 +45,20 @@ class MetricsApiController
         $html[] = '<p>Each metrics endpoint returns text in the Prometheus exposition format (text/plain).</br>';
         $html[] = 'Use your API token via the X-Auth-Token header when scraping.</p>';
         $html[] = '<p>Example curl (replace TOKEN):<br><code>curl -H "X-Auth-Token: TOKEN" https://your.librenms.example/api/v0/metrics/applications</code></p>';
+
+        $html[] = '<h2>Filtering</h2>';
+        $html[] = '<p>All metrics endpoints support optional query parameters to filter results to specific devices or device groups. Supported parameters:</p>';
+        $html[] = '<ul>';
+        $html[] = '<li><code>device_id</code> or <code>device_ids</code> — single or comma-separated device IDs</li>';
+        $html[] = '<li><code>hostname</code> or <code>hostnames</code> — single or comma-separated hostnames (matches <code>hostname</code> and <code>sysName</code>)</li>';
+        $html[] = '<li><code>device_group</code> — a device group id or name; the group will be expanded to its member devices</li>';
+        $html[] = '</ul>';
+        $html[] = '<p>Examples:<br>';
+        $html[] = '<code>curl -H "X-Auth-Token: TOKEN" "https://your.librenms.example/api/v0/metrics/ports?device_id=1,2,3"</code><br>';
+        $html[] = '<code>curl -H "X-Auth-Token: TOKEN" "https://your.librenms.example/api/v0/metrics/mempools?hostnames=sw1,sw2"</code>';
+        $html[] = '<code>curl -H "X-Auth-Token: TOKEN" "https://your.librenms.example/api/v0/metrics/sensors?device_group=4,5"</code><br>';
+        $html[] = '<code>curl -H "X-Auth-Token: TOKEN" "https://your.librenms.example/api/v0/metrics/devices?device_group=switches"</code>';
+        $html[] = '</p>';
         $html[] = '</body></html>';
 
         return response(implode("\n", $html), 200, ['Content-Type' => 'text/html; charset=utf-8']);
