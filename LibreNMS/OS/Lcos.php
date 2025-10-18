@@ -70,7 +70,7 @@ class Lcos extends OS implements
             $sensors[$radio] = new WirelessSensor(
                 'frequency',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.2356.11.1.3.57.1.3.' . '6.' . Oid::encodeString($index),
+                '.1.3.6.1.4.1.2356.11.1.3.57.1.3.' . Oid::encodeString($index),
                 'lcos',
                 $radio,
                 "Frequency ($radio)",
@@ -113,7 +113,7 @@ class Lcos extends OS implements
             $sensors[$radio] = new WirelessSensor(
                 'capacity',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.2356.11.1.3.57.1.6.' . '6.' . Oid::encodeString($index),
+                '.1.3.6.1.4.1.2356.11.1.3.57.1.6.' . Oid::encodeString($index),
                 'lcos',
                 $radio,
                 "Modem Load ($radio)",
@@ -144,7 +144,7 @@ class Lcos extends OS implements
             $sensors[$radio] = new WirelessSensor(
                 'noise-floor',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.2356.11.1.3.57.1.5.' . '6.' . Oid::encodeString($index),
+                '.1.3.6.1.4.1.2356.11.1.3.57.1.5.' . Oid::encodeString($index),
                 'lcos',
                 $radio,
                 "Noise Floor ($radio)",
@@ -176,7 +176,7 @@ class Lcos extends OS implements
             $sensors[$radio] = new WirelessSensor(
                 'power',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.2356.11.1.3.57.1.7.' . '6.' . Oid::encodeString($index),
+                '.1.3.6.1.4.1.2356.11.1.3.57.1.7.' . Oid::encodeString($index),
                 'lcos-tx',
                 $radio,
                 "Tx Power ($radio)",
