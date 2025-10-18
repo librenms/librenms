@@ -10,7 +10,6 @@ modules:
 #                # snMspsDiagnosticsUsageTable contains multiple disaparate items with no formal type identifiers, specific OIDs used
 #                oid: SN-MSPS-SCX200-MIB::snMspsDiagnosticsUsageValue.0
 #                num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.79.3.1.13.0'
-#                snmp_flags: ['-OaeQUs', '-Pu'] # display name HEX as ASCII
 #    mempools:
 #        additional_oids:
 #            data:
@@ -47,7 +46,6 @@ modules:
                     value: snMspsDiagnosticsTemperatureValue
                     num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.79.7.1.16.{{ $index }}'
                     descr: snMspsDiagnosticsTemperatureName
-                    snmp_flags: ['-OaeQUs', '-Pu'] # display name HEX as ASCII
                     index: snMspsDiagnosticsTemperatureValue.{{ $index }}
         dbm:
             data:

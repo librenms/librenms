@@ -55,7 +55,6 @@ modules:
                     oid: JNX-OPT-IF-EXT-MIB::jnxoptIfOTNPMFECCurrentTable
                     value: JNX-OPT-IF-EXT-MIB::jnxoptIfOTNPMCurrentFECBERMantissa
                     num_oid: '.1.3.6.1.4.1.2636.3.73.1.3.3.8.1.5.{{ $index }}'
-                    snmp_flags: '-OteQUb'
                     divisor: '1.0E+{{ JNX-OPT-IF-EXT-MIB::jnxoptIfOTNPMCurrentFECBERExponent }}'
                     descr: '{{ ifDescr:0 }} preFEC BER'
                     entPhysicalIndex: '{{ $subindex0 }}'
@@ -265,10 +264,15 @@ modules:
                 -
                     oid: jnxRpmResultsSummaryTable
                     value: jnxRpmResSumPercentLost
-                    num_oid: '.1.3.6.1.4.1.2636.3.50.1.2.1.{{ $str_index_as_numeric }}'
+                    num_oid: '.1.3.6.1.4.1.2636.3.50.1.2.1.{{ $index }}'
                     group: RPM Probes
-                    descr: '{{ $index }} Probe Loss'
-                    index: 'jnxRpmResSumPercentLost.{{ $index }}'
+                    descr: '{{ $index_string:s }} {{ $index_string:ss }} Probe Loss'
+                    index: 'jnxRpmResSumPercentLost.{{ $index_string:s }}.{{ $index_string:ss }}.allTests'
+                    skip_values:
+                        -
+                            oid: index
+                            op: 'not_ends'
+                            value: '.2' # only the last completed test result
         count:
             data:
                 -

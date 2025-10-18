@@ -231,7 +231,7 @@
                                             },
                                             "num_oid": {
                                                 "type": "string",
-                                                "pattern": "^(\\.\\d+)+(\\.?\\{\\{ \\$(index|str_index_as_numeric|subindex\\d) \\}\\})?(\\.\\d+)*$"
+                                                "pattern": "^(\\.\\d+)+(\\.?\\{\\{ \\$(index|subindex\\d) \\}\\})?(\\.\\d+)*$"
                                             },
                                             "descr": {
                                                 "type": "string"
@@ -412,7 +412,7 @@
         },
         "num_oid": {
             "type": "string",
-            "pattern": "^(\\.\\d+)+(\\.?\\{\\{ \\$(index|str_index_as_numeric) \\}\\})?(\\.\\d+)*$"
+            "pattern": "^(\\.\\d+)+(\\.?\\{\\{ \\$(index) \\}\\})?(\\.\\d+)*$"
         },
         "oids": {
             "type": ["string", "array"],

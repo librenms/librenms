@@ -64,6 +64,7 @@ use LibreNMS\OS;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\Oid;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
@@ -567,11 +568,9 @@ class Vrp extends OS implements
         $ssid_total_oid_array = []; // keep all OIDs so we can compute the total of all STA
 
         foreach ($staTable as $ssid => $sta) {
-            //Convert string to num_oid
-            $numSsid = strlen($ssid) . '.' . implode('.', unpack('c*', $ssid));
             $ssid_oid_array = []; // keep all OIDs of different freqs for a single SSID, to compute each SSID sta count, all freqs included
             foreach ($sta as $staFreq => $count) {
-                $oid = $oidMap[$staFreq] . $numSsid;
+                $oid = $oidMap[$staFreq] . Oid::encodeString($ssid);
                 $ssid_oid_array[] = $oid;
                 $ssid_total_oid_array[] = $oid;
                 $sensors[] = new WirelessSensor(

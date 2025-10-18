@@ -27,7 +27,6 @@ modules:
                         - tmnxCellPdnApn
                         - tmnxPortAdminStatus
                         - tmnxPortSFPNumLanes
-                    snmp_flags: ['-OtbeQUs']
         state:
             data:
                 -
@@ -402,7 +401,6 @@ modules:
                     high_limit: 95
                     low_limit: 0
                     index: '{{ $index }}'
-                    snmp_flags: ['-OtbeQUs']
         count:
             data:
                 -
