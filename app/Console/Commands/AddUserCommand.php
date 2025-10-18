@@ -29,76 +29,148 @@ namespace App\Console\Commands;
 use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
 use App\Models\User;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
-use LibreNMS\Authentication\LegacyAuth;
+use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+
+use function Laravel\Prompts\form;
 
 class AddUserCommand extends LnmsCommand
 {
     protected $name = 'user:add';
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         parent::__construct();
 
         $this->setDescription(__('commands.user:add.description'));
-
-        $this->addArgument('username', InputArgument::REQUIRED);
+        $this->addArgument('username', InputArgument::OPTIONAL);
         $this->addOption('password', 'p', InputOption::VALUE_REQUIRED);
-        $this->addOption('role', 'r', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, __('commands.user:add.options.role', ['roles' => '[user, global-read, admin]']), ['user']);
+        $this->addOption('role', 'r', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+            __('commands.user:add.options.role', ['roles' => '[user, global-read, admin]']), default: ['user']);
         $this->addOption('email', 'e', InputOption::VALUE_REQUIRED);
         $this->addOption('full-name', 'l', InputOption::VALUE_REQUIRED);
         $this->addOption('descr', 's', InputOption::VALUE_REQUIRED);
     }
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): int
     {
-        if (LibrenmsConfig::get('auth_mechanism') != 'mysql') {
+        if (LibrenmsConfig::get('auth_mechanism') !== 'mysql') {
             $this->warn(__('commands.user:add.wrong-auth'));
         }
 
-        $roles = Role::query()->pluck('name')
-            ->whenEmpty(fn () => collect(['admin', 'global-read', 'user']));
+        $availableRoles = Role::pluck('name')->whenEmpty(fn () => collect(['admin', 'global-read', 'user']))->all();
 
-        $this->validate([
-            'username' => ['required', Rule::unique('users', 'username')->where('auth_type', 'mysql')],
-            'email' => 'nullable|email',
-            'role.*' => Rule::in($roles),
-        ]);
-
-        // set get password
+        $username = $this->argument('username');
         $password = $this->option('password');
-        if (! $password) {
-            $password = $this->secret(__('commands.user:add.password-request'));
+        $roles = $this->option('role');
+        $roles = empty($roles) ? ['user'] : $roles;
+        $email = $this->option('email');
+        $fullName = $this->option('full-name');
+        $descr = $this->option('descr');
+
+        if ($username && $password) {
+            // cli input method
+            try {
+                Validator::make(['username' => $username], ['username' => $this->usernameRules()])->validate();
+                Validator::make(['password' => $password], ['password' => $this->passwordRules()])->validate();
+                Validator::make(['roles' => $roles],
+                    ['roles' => ['required', 'array', Rule::in($availableRoles)]])->validate();
+                Validator::make(['email' => $email], ['email' => ['nullable', 'email']])->validate();
+            } catch (ValidationException $e) {
+                $this->error($e->getMessage());
+
+                return 1;
+            }
+
+            $this->makeUser(
+                $username,
+                $password,
+                $roles,
+                $email,
+                $fullName,
+                $descr,
+            );
+
+            return 0;
         }
 
+        // interactive input
+        $data = form()
+            ->text(
+                label: __('commands.user:add.form.username'),
+                default: $username ?? '',
+                required: true,
+                validate: $this->validatePromptInput('username', $this->usernameRules())
+            )
+            ->password(
+                label: __('commands.user:add.form.password'),
+                required: true,
+                validate: $this->validatePromptInput('password', $this->passwordRules())
+            )
+            ->multiselect(
+                label: __('commands.user:add.form.roles'),
+                options: $availableRoles,
+                default: $roles,
+                required: true,
+            )
+            ->text(
+                label: __('commands.user:add.form.email'),
+                default: $email ?? '',
+                validate: $this->validatePromptInput('email', ['nullable', 'email'])
+            )
+            ->text(__('commands.user:add.form.full-name'), default: $fullName ?? '')
+            ->text(__('commands.user:add.form.descr'), default: $descr ?? '')
+            ->submit();
+
+        $this->makeUser(...$data);
+
+        return 0;
+    }
+
+    private function usernameRules(): array
+    {
+        return [
+            'required',
+            'string',
+            'max:255',
+            Rule::unique('users', 'username')->where('auth_type', 'mysql'),
+        ];
+    }
+
+    private function passwordRules(): array
+    {
+        return [
+            'required',
+            Password::defaults(),
+        ];
+    }
+
+    private function makeUser(
+        string $username,
+        string $password,
+        array $roles,
+        ?string $email,
+        ?string $fullName,
+        ?string $descr,
+    ): void {
         $user = new User([
-            'username' => $this->argument('username'),
-            'descr' => $this->option('descr'),
-            'email' => $this->option('email'),
-            'realname' => $this->option('full-name'),
+            'username' => $username,
+            'realname' => $fullName,
+            'email' => $email,
+            'descr' => $descr,
             'auth_type' => 'mysql',
         ]);
 
         $user->setPassword($password);
-        $user->save();
-        $user->assignRole($this->option('role'));
-
-        $user->auth_id = (string) LegacyAuth::get()->getUserid($user->username) ?: $user->user_id;
+        $user->save(); // assign roles requires a user_id
+        $user->assignRole($roles);
         $user->save();
 
         $this->info(__('commands.user:add.success', ['username' => $user->username]));
-
-        return 0;
     }
 }
