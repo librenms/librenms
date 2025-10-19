@@ -4,17 +4,15 @@ namespace LibreNMS\Validations\Rrd;
 
 use App\Facades\LibrenmsConfig;
 use FilesystemIterator;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Validation;
-use LibreNMS\Interfaces\ValidationFixer;
 use LibreNMS\ValidationResult;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use Symfony\Component\Process\InputStream;
 use Symfony\Component\Process\Process;
 
-class CheckRrdSteps implements Validation, ValidationFixer
+class CheckRrdStep implements Validation
 {
     const DEFAULT_RRD_STEP = 300;
     const DEFAULT_PING_RRD_STEP = 300;
@@ -75,7 +73,6 @@ class CheckRrdSteps implements Validation, ValidationFixer
         if (! empty($bad_step_files)) {
             return ValidationResult::fail('Some RRD files have the incorrect step. ' . count($bad_step_files) . "/$total")
                 ->setList('RRD files with incorrect step (backup rrd files before applying fix)', $bad_step_files)
-                ->setFixer(__CLASS__, is_writable($this->rrd_dir))
                 ->setFix('lnms maintenance:rrd-step all');
         }
 
@@ -119,13 +116,6 @@ class CheckRrdSteps implements Validation, ValidationFixer
     public function enabled(): bool
     {
         return LibrenmsConfig::get('rrd.step') !== self::DEFAULT_RRD_STEP || LibrenmsConfig::get('ping_rrd_step') !== self::DEFAULT_PING_RRD_STEP;
-    }
-
-    public function fix(): bool
-    {
-        $return = Artisan::call('maintenance:rrd-step', ['device' => 'all', '--confirm' => true]);
-
-        return $return === 0;
     }
 
     private function infoCommand(string $file): string
