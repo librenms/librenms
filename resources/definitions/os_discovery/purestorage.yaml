@@ -1,4 +1,3 @@
-mib_dir: purestorage
 modules:
   os:
     sysDescr_regex: '/Pure Storage (?<hardware>\w+), (?<version>Purity\/\/FA [\d\.]+)/'
