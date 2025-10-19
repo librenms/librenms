@@ -23,7 +23,7 @@ foreach ($lines as $line) {
 
 // Check $freeradius array for missing keys, returns null when the key does not exist.
 $get = function ($key) use ($freeradius) {
-    if (!array_key_exists($key, $freeradius)) {
+    if (! array_key_exists($key, $freeradius)) {
         return null;
     }
 
