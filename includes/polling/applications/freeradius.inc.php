@@ -12,7 +12,7 @@ if (! empty($agent_data['app'][$name])) {
     $rawdata = snmp_get($device, $oid, $options);
 }
 
-//Format Data
+// Format Data
 $lines = explode("\n", $rawdata);
 $freeradius = [];
 $metrics = [];
@@ -21,10 +21,7 @@ foreach ($lines as $line) {
     $freeradius[$var] = $value;
 }
 
-/*
- * Helper function to check $freeradius array for missing keys.
- * Returns null when the key does not exist.
- */
+// Check $freeradius array for missing keys, returns null when the key does not exist.
 $get = function ($key) use ($freeradius) {
     if (!array_key_exists($key, $freeradius)) {
         return null;
@@ -51,7 +48,7 @@ $get = function ($key) use ($freeradius) {
     return $v;
 };
 
-//FreeRADIUS-Total-Access
+// FreeRADIUS-Total-Access
 $rrd_def = RrdDefinition::make()
     ->addDataset('requests', 'DERIVE', 0, 125000000000)
     ->addDataset('accepts', 'DERIVE', 0, 125000000000)
@@ -73,7 +70,7 @@ $tags = [
 ];
 app('Datastore')->put($device, 'app', $tags, $fields);
 
-//FreeRADIUS-Total-Auth
+// FreeRADIUS-Total-Auth
 $rrd_def = RrdDefinition::make()
     ->addDataset('responses', 'DERIVE', 0, 125000000000)
     ->addDataset('duplicate_requests', 'DERIVE', 0, 125000000000)
@@ -99,7 +96,7 @@ $tags = [
 ];
 app('Datastore')->put($device, 'app', $tags, $fields);
 
-//FreeRADIUS-Total-Acct
+// FreeRADIUS-Total-Acct
 $rrd_def = RrdDefinition::make()
     ->addDataset('requests', 'DERIVE', 0, 125000000000)
     ->addDataset('responses', 'DERIVE', 0, 125000000000)
@@ -127,7 +124,7 @@ $tags = [
 ];
 app('Datastore')->put($device, 'app', $tags, $fields);
 
-//FreeRADIUS-Total-Proxy-Access
+// FreeRADIUS-Total-Proxy-Access
 $rrd_def = RrdDefinition::make()
     ->addDataset('requests', 'DERIVE', 0, 125000000000)
     ->addDataset('accepts', 'DERIVE', 0, 125000000000)
@@ -149,7 +146,7 @@ $tags = [
 ];
 app('Datastore')->put($device, 'app', $tags, $fields);
 
-//FreeRADIUS-Total-Proxy-Auth
+// FreeRADIUS-Total-Proxy-Auth
 $rrd_def = RrdDefinition::make()
     ->addDataset('responses', 'DERIVE', 0, 125000000000)
     ->addDataset('duplicate_requests', 'DERIVE', 0, 125000000000)
@@ -175,7 +172,7 @@ $tags = [
 ];
 app('Datastore')->put($device, 'app', $tags, $fields);
 
-//FreeRADIUS-Total-Proxy-Acct
+// FreeRADIUS-Total-Proxy-Acct
 $rrd_def = RrdDefinition::make()
     ->addDataset('requests', 'DERIVE', 0, 125000000000)
     ->addDataset('responses', 'DERIVE', 0, 125000000000)
@@ -203,7 +200,7 @@ $tags = [
 ];
 app('Datastore')->put($device, 'app', $tags, $fields);
 
-//FreeRADIUS-Queue
+// FreeRADIUS-Queue
 $rrd_name = ['app', $name, 'queue', $app->app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('len_internal', 'DERIVE', 0, 125000000000)
