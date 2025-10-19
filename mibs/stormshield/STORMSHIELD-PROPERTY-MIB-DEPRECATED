@@ -1,4 +1,4 @@
-STORMSHIELD-PROPERTY-MIB DEFINITIONS ::= BEGIN
+STORMSHIELD-PROPERTY-MIB-DEPRECATED DEFINITIONS ::= BEGIN
 
    IMPORTS
       MODULE-IDENTITY, OBJECT-TYPE, Integer32   FROM SNMPv2-SMI
@@ -18,10 +18,10 @@ STORMSHIELD-PROPERTY-MIB DEFINITIONS ::= BEGIN
          Tel: +33 (0)9 69 32 96 29
          E-mail: support@stormshield.eu
          http://www.stormshield.eu"
-      DESCRIPTION   "stormshield Product Property"
-      REVISION      "202206280000Z"
+      DESCRIPTION   "stormshield deprecated Product Property"
+      REVISION      "201702200000Z"
       DESCRIPTION   "Initial"
-      ::= { stormshieldMIB 18 }
+      ::= { stormshieldMIB 0 }
 
    snsModel OBJECT-TYPE
       SYNTAX DisplayString (SIZE (0..255))
@@ -142,13 +142,5 @@ STORMSHIELD-PROPERTY-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION
          "Firewall licence 'HA-dialup' token"
       ::= { snsProductProperty 15 }
-
-   snsSystemNodeName OBJECT-TYPE
-      SYNTAX DisplayString (SIZE (0..255))
-      MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION
-         "Firewall System Node Name"
-      ::= { snsProductProperty 16 }
 
 END
