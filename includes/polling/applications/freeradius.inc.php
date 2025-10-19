@@ -42,6 +42,7 @@ $get = function ($key) use ($freeradius) {
         if (strpos($v, '.') !== false) {
             return (float) $v;
         }
+
         return (int) $v;
     }
 
