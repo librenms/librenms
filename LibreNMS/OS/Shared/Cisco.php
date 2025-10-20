@@ -1046,7 +1046,7 @@ class Cisco extends OS implements
                         'priority' => $data['BRIDGE-MIB::dot1dStpPortPriority'] ?? 0,
                         'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown',
                         'cost' => $data['BRIDGE-MIB::dot1dStpPortPathCost'] ?? 0,
-                        'untagged' => isset($isNative[$vlan_id][$ifindex]),
+                        'untagged' => isset($isNative[$vlan_id][$ifindex]) && $isNative[$vlan_id][$ifindex] > 0,
                         'port_id' => PortCache::getIdFromIfIndex($ifindex, $this->getDeviceId()) ?? 0, // ifIndex from device
                     ]));
                 }
