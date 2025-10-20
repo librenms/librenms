@@ -1001,7 +1001,7 @@ class Cisco extends OS implements
             'CISCO-VTP-MIB::vlanTrunkPortTable',
             'CISCO-VLAN-MEMBERSHIP-MIB::vmVlan',
         ])->table(1);
-        
+
         // Hash Table indexed by vlans and ifIndexes
         foreach ($native_vlans_raw as $ifindex => $data) {
             // Only returns 'untagged' vlan for each port (either access ports, or native vlan of a trunk)
