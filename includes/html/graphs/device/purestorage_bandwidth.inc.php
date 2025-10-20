@@ -13,7 +13,7 @@ if (Rrd::checkRrdExists($rrd_filename)) {
 
     // Read bandwidth (converted from bytes to bits)
     $rrd_options .= " DEF:readBytes=$rrd_filename:read:AVERAGE";
-    $rrd_options .= ' CDEF:readBits=readBytes,8,*';
+    $rrd_options .= " CDEF:readBits=readBytes,8,*";
     $rrd_options .= " LINE2:readBits#00AA00:'Read Bandwidth'";
     $rrd_options .= " GPRINT:readBits:LAST:'Last\\:%8.2lf %s'";
     $rrd_options .= " GPRINT:readBits:AVERAGE:'Avg\\:%8.2lf %s'";
