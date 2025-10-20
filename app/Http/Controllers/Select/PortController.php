@@ -67,9 +67,9 @@ class PortController extends SelectController
             ->isNotDeleted()
             ->has('device')
             ->with(['device' => function ($query) {
-                $query->select('device_id', 'hostname', 'sysName', 'display');
+                $query->select(['device_id', 'hostname', 'sysName', 'display']);
             }])
-            ->select('ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr')
+            ->select(['ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr'])
             ->groupBy(['ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr']);
 
         if ($request->get('term')) {

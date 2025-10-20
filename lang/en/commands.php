@@ -115,7 +115,13 @@ return [
     'device:ping' => [
         'description' => 'Ping device and record data for response',
         'arguments' => [
-            'device spec' => 'Device to ping one of: <Device ID>, <Hostname/IP>, all',
+            'device spec' => 'Device to ping one of: <Device ID>, <Hostname/IP>, all, fast ("fast" will ping all devices and update graphs and status)',
+        ],
+        'options' => [
+            'groups' => 'Group ID(s) to ping. Specify multiple times for multiple groups. (only valid with fast)',
+        ],
+        'errors' => [
+            'groups_without_fast' => 'The --groups (-g) option is only supported with "fast" device spec.',
         ],
     ],
     'device:poll' => [
@@ -171,6 +177,9 @@ return [
         'validation-errors' => [
             'optionValue' => 'Selected :option is invalid. Should be one of: :values',
         ],
+    ],
+    'maintenance:cleanup-database' => [
+        'description' => 'Database cleanup of orphaned items.',
     ],
     'maintenance:cleanup-networks' => [
         'delete' => 'Deleting :count unused networks',
@@ -294,8 +303,5 @@ return [
         'password-request' => "Please enter the user's password",
         'success' => 'Successfully added user: :username',
         'wrong-auth' => 'Warning! You will not be able to log in with this user because you are not using MySQL auth',
-    ],
-    'maintenance:database-cleanup' => [
-        'description' => 'Database cleanup of orphaned items.',
     ],
 ];

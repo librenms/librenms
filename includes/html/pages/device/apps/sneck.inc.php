@@ -7,11 +7,10 @@ $link_array = [
     'app' => 'sneck',
 ];
 
-$sneck_data = $app->app_id;
-if (isset($sneck_data)) {
-    $checks = $app->data['data']['checks'] ?? [];
+if (isset($app->data['checks'])) {
+    $checks = $app->data['checks'] ?? [];
     $checks_list = array_keys($checks);
-    $debugs = $app->data['data']['debugs'] ?? [];
+    $debugs = $app->data['debugs'] ?? [];
     $debugs_list = array_keys($debugs);
     if (isset($checks_list[0]) || isset($debugs_list[0])) {
         print_optionbar_start();
@@ -49,14 +48,14 @@ if (isset($sneck_data)) {
             }
         }
         // run time
-        if (isset($app->data['data']['run_time'])) {
-            echo '<b>Runtime:</b> ' . htmlspecialchars($app->data['data']['run_time']) . " seconds<br>\n";
+        if (isset($app->data['run_time'])) {
+            echo '<b>Runtime:</b> ' . htmlspecialchars($app->data['run_time']) . " seconds<br>\n";
         }
         print_optionbar_end();
     }
 }
 
-if ((isset($vars['sneck_check']) && isset($app->data['data']['checks'][$vars['sneck_check']])) || (isset($vars['sneck_debug']) && isset($app->data['data']['debugs'][$vars['sneck_debug']]))) {
+if ((isset($vars['sneck_check']) && isset($app->data['checks'][$vars['sneck_check']])) || (isset($vars['sneck_debug']) && isset($app->data['debugs'][$vars['sneck_debug']]))) {
     $type = 'checks';
     $type_name = '';
     if (isset($vars['sneck_debug'])) {
@@ -67,33 +66,33 @@ if ((isset($vars['sneck_check']) && isset($app->data['data']['checks'][$vars['sn
     }
     print_optionbar_start();
     // is the template used
-    if (isset($app->data['data'][$type][$type_name]['check'])) {
-        echo '<b>Check:</b> ' . htmlspecialchars($app->data['data'][$type][$type_name]['check']) . "<br>\n";
+    if (isset($app->data[$type][$type_name]['check'])) {
+        echo '<b>Check:</b> ' . htmlspecialchars($app->data[$type][$type_name]['check']) . "<br>\n";
     }
     // what was ran post templating
-    if (isset($app->data['data'][$type][$type_name]['ran'])) {
-        echo '<b>Ran:</b> ' . htmlspecialchars($app->data['data'][$type][$type_name]['ran']) . "<br>\n";
+    if (isset($app->data[$type][$type_name]['ran'])) {
+        echo '<b>Ran:</b> ' . htmlspecialchars($app->data[$type][$type_name]['ran']) . "<br>\n";
     }
     // run time
-    if (isset($app->data['data'][$type][$type_name]['run_time'])) {
-        echo '<b>Runtime:</b> ' . htmlspecialchars($app->data['data'][$type][$type_name]['run_time']) . " seconds<br>\n";
+    if (isset($app->data[$type][$type_name]['run_time'])) {
+        echo '<b>Runtime:</b> ' . htmlspecialchars($app->data[$type][$type_name]['run_time']) . " seconds<br>\n";
     }
     // exit code
-    if (isset($app->data['data'][$type][$type_name]['exit'])) {
-        echo '<b>Exit:</b> ' . htmlspecialchars($app->data['data'][$type][$type_name]['exit']) . "<br>\n";
+    if (isset($app->data[$type][$type_name]['exit'])) {
+        echo '<b>Exit:</b> ' . htmlspecialchars($app->data[$type][$type_name]['exit']) . "<br>\n";
     }
     // error non-standard exit info
-    if (isset($app->data['data'][$type][$type_name]['error'])) {
-        echo '<b>Error:</b> ' . htmlspecialchars($app->data['data'][$type][$type_name]['error']) . "<br>\n";
+    if (isset($app->data[$type][$type_name]['error'])) {
+        echo '<b>Error:</b> ' . htmlspecialchars($app->data[$type][$type_name]['error']) . "<br>\n";
     }
     // output
-    if (isset($app->data['data'][$type][$type_name]['output'])) {
+    if (isset($app->data[$type][$type_name]['output'])) {
         echo "<b>Output...</b><br>\n<pre>";
-        echo htmlspecialchars($app->data['data'][$type][$type_name]['output']) . "\n";
+        echo htmlspecialchars($app->data[$type][$type_name]['output']) . "\n";
         echo "</pre><br>\n";
     }
     echo "<b>Raw JSON:</b><br>\n";
-    echo "<pre>\n" . htmlspecialchars(json_encode($app->data['data'][$type][$type_name], JSON_PRETTY_PRINT)) . "</pre>\n";
+    echo "<pre>\n" . htmlspecialchars(json_encode($app->data[$type][$type_name], JSON_PRETTY_PRINT)) . "</pre>\n";
     print_optionbar_end();
 } else {
     $graphs = [
@@ -101,7 +100,7 @@ if ((isset($vars['sneck_check']) && isset($app->data['data']['checks'][$vars['sn
         'sneck_time' => 'Time Difference',
     ];
 
-    if (isset($app->data['data']['checks'])) {
+    if (isset($app->data['runtime'])) {
         $graphs['sneck_runtime'] = 'Runtime';
     }
 
@@ -126,11 +125,11 @@ if ((isset($vars['sneck_check']) && isset($app->data['data']['checks'][$vars['sn
     }
 
     // print returned all info from sneck with alert info broken out
-    if (isset($sneck_data)) {
+    if (isset($app->data)) {
         print_optionbar_start();
         echo 'Last Return...<br>';
         echo "<b>Alert(s):</b><br>\n";
-        echo str_replace("\n", "<br>\n", htmlspecialchars($app->data['data']['alertString'])) . "<br><br>\n";
+        echo str_replace("\n", "<br>\n", htmlspecialchars($app->data['alertString'])) . "<br><br>\n";
         echo "<b>Raw JSON:</b><br>\n";
         echo "<pre>\n" . htmlspecialchars(json_encode($app->data, JSON_PRETTY_PRINT)) . "</pre>\n";
         print_optionbar_end();

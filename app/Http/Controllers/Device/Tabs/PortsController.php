@@ -80,7 +80,7 @@ class PortsController implements DeviceTab
         Validator::validate($request->all(), [
             'page' => 'int',
             'perPage' => ['regex:/^(\d+|all)$/'],
-            'sort' => 'in:media,mac,port,traffic,speed',
+            'sort' => 'in:media,mac,port,traffic,speed,index',
             'order' => 'in:asc,desc',
             'disabled' => 'in:0,1',
             'ignored' => 'in:0,1',
