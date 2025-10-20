@@ -13,7 +13,7 @@ if (Rrd::checkRrdExists($rrd_filename)) {
 
     // Read latency (convert from microseconds to milliseconds)
     $rrd_options .= " DEF:readLatencyUS=$rrd_filename:read:AVERAGE";
-    $rrd_options .= ' CDEF:readLatency=readLatencyUS,1000,/';
+    $rrd_options .= " CDEF:readLatency=readLatencyUS,1000,/";
     $rrd_options .= " LINE2:readLatency#00AA00:'Read Latency'";
     $rrd_options .= " GPRINT:readLatency:LAST:'Last\\:%8.2lf %s'";
     $rrd_options .= " GPRINT:readLatency:AVERAGE:'Avg\\:%8.2lf %s'";
