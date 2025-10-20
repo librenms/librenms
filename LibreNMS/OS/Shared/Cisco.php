@@ -1,6 +1,6 @@
 <?php
 
-/**
+    /**
  * Cisco.php
  *
  * Base Cisco OS for Cisco based devices
@@ -997,35 +997,27 @@ class Cisco extends OS implements
             return $ports;
         }
 
-        $trunkTable = SnmpQuery::walk([
+        $native_vlans_raw = SnmpQuery::abortOnFailure()->walk([
             'CISCO-VTP-MIB::vlanTrunkPortTable',
+            'CISCO-VLAN-MEMBERSHIP-MIB::vmVlan',
         ])->table(1);
-
-        foreach ($trunkTable as $ifIndex => $data) {
+        
+        // Hash Table indexed by vlans and ifIndexes
+        foreach ($native_vlans_raw as $ifindex => $data) {
+            // Only returns 'untagged' vlan for each port (either access ports, or native vlan of a trunk)
+            // stored for use in below loop
+            $vlan_id = $data['CISCO-VLAN-MEMBERSHIP-MIB::vmVlan'] ?? $data['CISCO-VTP-MIB::vlanTrunkPortNativeVlan'] ?? 0;
+            if ($vlan_id > 0) {
+                $isNative[$vlan_id][$ifindex] = 1;
+            }
+            // Only returns 'tagged' vlan for each port
+            // stored for use in below loop
             if (isset($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined'])) {
                 $vlanIds = StringHelpers::bitsToIndices($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined']);
                 foreach ($vlanIds as $tmp => $vlan_id) {
-                    $ports->push(new PortVlan([
-                        'vlan' => $vlan_id - 1,
-                        'baseport' => $this->bridgePortFromIfIndex($ifIndex),
-                        'untagged' => 0,
-                        'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0,
-                    ]));
+                    $isNative[$vlan_id-1][$ifindex] = 0;
                 }
             }
-        }
-
-        // Only returns 'untagged' vlan for each port (either access ports, or native vlan of a trunk)
-        // stored for use in below loop
-        $native_vlans_raw = SnmpQuery::abortOnFailure()->walk([
-            'CISCO-VTP-MIB::vlanTrunkPortNativeVlan',
-            'CISCO-VLAN-MEMBERSHIP-MIB::vmVlan',
-        ])->table(1);
-
-        // Hash Table indexed by vlans and ifIndexes
-        foreach ($native_vlans_raw as $ifindex => $data) {
-            $vlan_id = $data['CISCO-VLAN-MEMBERSHIP-MIB::vmVlan'] ?? $data['CISCO-VTP-MIB::vlanTrunkPortNativeVlan'] ?? 0;
-            $isNative[$vlan_id][$ifindex] = 1;
         }
 
         // process all the discovered vlans
