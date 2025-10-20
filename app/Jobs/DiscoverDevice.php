@@ -2,8 +2,10 @@
 
 namespace App\Jobs;
 
+use App\Actions\Device\CheckDeviceAvailability;
 use App\Events\DeviceDiscovered;
 use App\Events\DiscoveringDevice;
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
@@ -15,16 +17,13 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Config;
 use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Util\Dns;
 use LibreNMS\Util\Module;
 use LibreNMS\Util\ModuleList;
 use Throwable;
-use function sprintf;
 
 class DiscoverDevice implements ShouldQueue
 {
@@ -50,9 +49,8 @@ class DiscoverDevice implements ShouldQueue
         $measurement = Measurement::start('discover');
         $measurement->manager()->checkpoint(); // don't count previous stats
 
-        if (! $this->device->snmp_disable && (new ConnectivityHelper($this->device))->isUp()) {
-            $this->discoverModules();
-        }
+        $this->discoverModules();
+
         $measurement->end();
 
         Log::info(sprintf("\n>>> Discovered %s (%s) in %0.3f seconds <<<",
@@ -75,7 +73,7 @@ class DiscoverDevice implements ShouldQueue
         $this->device->ip = $this->device->overwrite_ip ?: Dns::lookupIp($this->device) ?: $this->device->ip;
 
         $this->deviceArray = $this->device->toArray();
-        if ($os_group = Config::get("os.{$this->device->os}.group")) {
+        if ($os_group = LibrenmsConfig::get("os.{$this->device->os}.group")) {
             $this->deviceArray['os_group'] = $os_group;
         }
 
@@ -96,7 +94,8 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
         include_once base_path('includes/discovery/functions.inc.php');
         include_once base_path('includes/snmp.inc.php');
 
-        // update $device array status
+        // update availability status
+        app(CheckDeviceAvailability::class)->execute($this->device, true);
         $this->deviceArray['status'] = $this->device->status;
         $this->deviceArray['status_reason'] = $this->device->status_reason;
         $os = OS::make($this->deviceArray);
@@ -115,7 +114,7 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
                     Log::debug($module_status);
 
                     if ($module_status->hasSubModules()) {
-                        Config::set('discovery_submodules.' . $module, $module_status->submodules);
+                        LibrenmsConfig::set('discovery_submodules.' . $module, $module_status->submodules);
                     }
 
                     $instance->discover($os);
