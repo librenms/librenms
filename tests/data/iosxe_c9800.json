@@ -5735,7 +5735,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 5,
@@ -5743,7 +5743,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0
+                    "untagged": 1
                 },
                 {
                     "vlan": 52,
@@ -5775,7 +5775,7 @@
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,
-                    "untagged": 0
+                    "untagged": 1
                 }
             ]
         }
