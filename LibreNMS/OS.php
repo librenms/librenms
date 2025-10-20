@@ -318,13 +318,15 @@ class OS implements
 
         $data = [];
         foreach ($oids as $id => $oid) {
-            if (isset($callback)) {
-                $channel = call_user_func($callback, $snmp_data[$oid]);
-            } else {
-                $channel = $snmp_data[$oid];
-            }
+            if (isset($snmp_data[$oid])) {
+                if (isset($callback)) {
+                    $channel = call_user_func($callback, $snmp_data[$oid]);
+                } else {
+                    $channel = $snmp_data[$oid];
+                }
 
-            $data[$id] = WirelessSensor::channelToFrequency($channel);
+                $data[$id] = WirelessSensor::channelToFrequency($channel);
+            }
         }
 
         return $data;
