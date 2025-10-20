@@ -1,6 +1,6 @@
 <?php
 
-    /**
+/**
  * Cisco.php
  *
  * Base Cisco OS for Cisco based devices
@@ -1015,7 +1015,7 @@ class Cisco extends OS implements
             if (isset($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined'])) {
                 $vlanIds = StringHelpers::bitsToIndices($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined']);
                 foreach ($vlanIds as $tmp => $vlan_id) {
-                    $isNative[$vlan_id-1][$ifindex] = 0;
+                    $isNative[$vlan_id - 1][$ifindex] = 0;
                 }
             }
         }
