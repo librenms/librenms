@@ -5,7 +5,7 @@ namespace LibreNMS\OS;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
-use SnmpQuery;
+use LibreNMS\SnmpQuery;
 
 class Purestorage extends \LibreNMS\OS implements OSPolling
 {
@@ -15,7 +15,8 @@ class Purestorage extends \LibreNMS\OS implements OSPolling
     public function pollOS(DataStorageInterface $datastore): void
     {
         // Pure Storage SNMP metrics OIDs (from PURESTORAGE-MIB)
-        // Using numeric OIDs directly
+        // Using numeric OIDs directly since MIB object names don't exist in the device
+        
         $metrics = [
             'pureArrayReadBandwidth'  => '.1.3.6.1.4.1.40482.4.1.0',    // bytes/sec
             'pureArrayWriteBandwidth' => '.1.3.6.1.4.1.40482.4.2.0',    // bytes/sec
@@ -26,15 +27,26 @@ class Purestorage extends \LibreNMS\OS implements OSPolling
         ];
 
         // Query all OIDs at once
+        $oids_list = array_values($metrics);
+        $snmp_data = snmp_get_multi_oid($this->getDeviceArray(), $oids_list);
+
+        if (empty($snmp_data)) {
+            echo "[Purestorage] No metrics found\n";
+            return;
+        }
+
+        // Extract values from SNMP response
         $data = [];
         foreach ($metrics as $name => $oid) {
-            $value = SnmpQuery::get($oid)->value();
-            // Cast to integer, filtering out non-numeric values
-            if (is_numeric($value)) {
-                $data[$name] = (int)$value;
-                echo "[Purestorage] $name = $value\n";
-            } else {
-                echo "[Purestorage] WARNING: $name has non-numeric value: $value\n";
+            if (isset($snmp_data[$oid])) {
+                $value = $snmp_data[$oid];
+                // Cast to integer, filtering out non-numeric values
+                if (is_numeric($value)) {
+                    $data[$name] = (int)$value;
+                    echo "[Purestorage] $name = $value\n";
+                } else {
+                    echo "[Purestorage] WARNING: $name has non-numeric value: $value\n";
+                }
             }
         }
 
@@ -49,7 +61,7 @@ class Purestorage extends \LibreNMS\OS implements OSPolling
         $this->storeBandwidth($datastore, $data);
         $this->storeIOPS($datastore, $data);
         $this->storeLatency($datastore, $data);
-
+        
         // Enable graphs for display
         $this->enableGraph('purestorage_bandwidth');
         $this->enableGraph('purestorage_iops');
@@ -63,21 +75,21 @@ class Purestorage extends \LibreNMS\OS implements OSPolling
     private function storeBandwidth(DataStorageInterface $datastore, $data): void
     {
         $rrd_name = 'purestorage_bandwidth';
-
+        
         $rrd_def = RrdDefinition::make()
             ->addDataset('read', 'GAUGE', 0, 125000000000)      // max 125 Gbps
             ->addDataset('write', 'GAUGE', 0, 125000000000);
 
         $read = isset($data['pureArrayReadBandwidth']) ? (int)$data['pureArrayReadBandwidth'] : 0;
         $write = isset($data['pureArrayWriteBandwidth']) ? (int)$data['pureArrayWriteBandwidth'] : 0;
-
+        
         $fields = [
             'read'  => $read,
             'write' => $write,
         ];
-
+        
         echo "[Purestorage] Bandwidth - read: $read, write: $write\n";
-
+        
         $tags = ['rrd_def' => $rrd_def];
         $datastore->put($this->getDeviceArray(), $rrd_name, $tags, $fields);
         echo "[Purestorage] Stored bandwidth metrics\n";
@@ -90,21 +102,21 @@ class Purestorage extends \LibreNMS\OS implements OSPolling
     private function storeIOPS(DataStorageInterface $datastore, $data): void
     {
         $rrd_name = 'purestorage_iops';
-
+        
         $rrd_def = RrdDefinition::make()
             ->addDataset('read', 'DERIVE', 0, 1000000000)        // max 1B ops/sec
             ->addDataset('write', 'DERIVE', 0, 1000000000);
 
         $read = isset($data['pureArrayReadIOPS']) ? (int)$data['pureArrayReadIOPS'] : 0;
         $write = isset($data['pureArrayWriteIOPS']) ? (int)$data['pureArrayWriteIOPS'] : 0;
-
+        
         $fields = [
             'read'  => $read,
             'write' => $write,
         ];
-
+        
         echo "[Purestorage] IOPS - read: $read, write: $write\n";
-
+        
         $tags = ['rrd_def' => $rrd_def];
         $datastore->put($this->getDeviceArray(), $rrd_name, $tags, $fields);
         echo "[Purestorage] Stored IOPS metrics\n";
@@ -117,21 +129,21 @@ class Purestorage extends \LibreNMS\OS implements OSPolling
     private function storeLatency(DataStorageInterface $datastore, $data): void
     {
         $rrd_name = 'purestorage_latency';
-
+        
         $rrd_def = RrdDefinition::make()
             ->addDataset('read', 'GAUGE', 0, 1000000)            // max 1 second in µs
             ->addDataset('write', 'GAUGE', 0, 1000000);
 
         $read = isset($data['pureArrayReadLatency']) ? (int)$data['pureArrayReadLatency'] : 0;
         $write = isset($data['pureArrayWriteLatency']) ? (int)$data['pureArrayWriteLatency'] : 0;
-
+        
         $fields = [
             'read'  => $read,
             'write' => $write,
         ];
-
+        
         echo "[Purestorage] Latency - read: $read, write: $write\n";
-
+        
         $tags = ['rrd_def' => $rrd_def];
         $datastore->put($this->getDeviceArray(), $rrd_name, $tags, $fields);
         echo "[Purestorage] Stored latency metrics\n";
