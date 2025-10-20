@@ -1,7 +1,6 @@
 <?php
 
 use LibreNMS\RRD\RrdDefinition;
-use LibreNMS\Util\Number;
 
 $name = 'freeradius';
 
