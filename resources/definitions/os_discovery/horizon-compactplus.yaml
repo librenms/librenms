@@ -13,7 +13,6 @@ modules:
                     index: 'hzCpRadioTemperature.{{ $index }}'
                     divisor: 10
                     descr: 'Radio{{ $index }} Temp'
-                    snmp_flags: ['-ObsQ']
         state:
             data:
                 -
@@ -33,7 +32,6 @@ modules:
                     states:
                         - { value: 1, generic: 2, graph: 0, descr: 'Down' }
                         - { value: 2, generic: 0, graph: 0, descr: 'Up' }
-                    snmp_flags: ['-ObsQe']
                 -
                     oid: hzCpAlarmStatus.tempOutOfLimits.1
                     value: hzCpAlarmStatus
@@ -58,7 +56,6 @@ modules:
                         - { value: 7, generic: 0, graph: 0, descr: 'qam512' }
                         - { value: 8, generic: 0, graph: 0, descr: 'qam1024' }
                         - { value: 9, generic: 0, graph: 0, descr: 'qam2048' }
-                    snmp_flags: ['-ObsQ']
         count:
             data:
                 -
@@ -66,10 +63,8 @@ modules:
                     num_oid: '.1.3.6.1.4.1.7262.2.5.3.1.3.1.6.{{ $index }}'
                     index: 'hzCpEnetPortRxFramesLengthErrors.{{ $index }}'
                     descr: 'Enet Port{{ $index }} Input Errors'
-                    snmp_flags: ['-ObsQ']
                 -
                     oid: hzCpEnetPortRxFramesCRCErrors
                     num_oid: '.1.3.6.1.4.1.7262.2.5.3.1.3.1.7.{{ $index }}'
                     index: 'hzCpEnetPortRxFramesCRCErrors.{{ $index }}'
                     descr: 'Enet Port{{ $index }} CRC Errors'
-                    snmp_flags: ['-ObsQ']
