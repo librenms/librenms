@@ -1299,6 +1299,8 @@ tr.search:nth-child(odd) {
 
 
 .scrollable-menu {
+    height: auto;
+    max-height: 80vh; 
     overflow-y: auto;
     overflow-x: hidden;
 }
