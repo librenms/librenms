@@ -8,7 +8,7 @@
                     "sysDescr": null,
                     "sysContact": null,
                     "version": "v7.0.6,build0366,220606 (GA.F)",
-                    "hardware": "FORTINET-CORE-MIB::fortinet.15",
+                    "hardware": "",
                     "features": null,
                     "location": null,
                     "os": "fortigate",

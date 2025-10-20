@@ -24,6 +24,8 @@ modules:
             - ['/(I)$/', ' 3G/4G']
             - ['/(ev)$/', 'Evaluation']
 
+            #some device use old Fortinet Bridge ?!
+            - ['/^FORTINET-CORE-MIB::fortinet.15/', '']
     processors:
         data:
             -

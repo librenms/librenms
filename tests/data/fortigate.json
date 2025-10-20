@@ -26,7 +26,7 @@
                     "sysDescr": "",
                     "sysContact": "<private>",
                     "version": "v5.6.4,build1575,180425 (GA)",
-                    "hardware": "FORTINET-CORE-MIB::fortinet.15",
+                    "hardware": "",
                     "features": null,
                     "location": "<private>",
                     "os": "fortigate",
