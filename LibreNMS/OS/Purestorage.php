@@ -5,7 +5,7 @@ namespace LibreNMS\OS;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
-use LibreNMS\SnmpQuery;
+use SnmpQuery;
 
 class Purestorage extends \LibreNMS\OS implements OSPolling
 {
@@ -15,8 +15,7 @@ class Purestorage extends \LibreNMS\OS implements OSPolling
     public function pollOS(DataStorageInterface $datastore): void
     {
         // Pure Storage SNMP metrics OIDs (from PURESTORAGE-MIB)
-        // Using numeric OIDs directly since MIB object names don't exist in the device
-
+        // Using numeric OIDs directly
         $metrics = [
             'pureArrayReadBandwidth'  => '.1.3.6.1.4.1.40482.4.1.0',    // bytes/sec
             'pureArrayWriteBandwidth' => '.1.3.6.1.4.1.40482.4.2.0',    // bytes/sec
@@ -26,7 +25,7 @@ class Purestorage extends \LibreNMS\OS implements OSPolling
             'pureArrayWriteLatency'   => '.1.3.6.1.4.1.40482.4.6.0',    // microseconds
         ];
 
-        // Query all OIDs at once using SnmpQuery
+        // Query all OIDs at once
         $data = [];
         foreach ($metrics as $name => $oid) {
             $value = SnmpQuery::get($oid)->value();
