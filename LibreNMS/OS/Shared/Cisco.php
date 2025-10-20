@@ -1062,7 +1062,7 @@ class Cisco extends OS implements
                     $ports->push(new PortVlan([
                         'vlan' => $vlan_id,
                         'baseport' => $this->bridgePortFromIfIndex($ifindex),
-                        'untagged' => 1,
+                        'untagged' => $value,
                         'state' => 'unknown',
                         'port_id' => PortCache::getIdFromIfIndex($ifindex, $this->getDeviceId()) ?? 0, // ifIndex from device,
                     ]));
