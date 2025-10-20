@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Number;
 
 $name = 'freeradius';
 
@@ -36,14 +37,9 @@ $get = function ($key) use ($freeradius) {
     $v = trim($v);
     $v = trim($v, '"');
 
-    // Convert numeric strings to numbers
+    // Convert numeric strings to numbers using Number::cast()
     if (is_numeric($v)) {
-        // Preserve integer vs float
-        if (strpos($v, '.') !== false) {
-            return (float) $v;
-        }
-
-        return (int) $v;
+        return Number::cast($v);
     }
 
     return $v;
