@@ -8,6 +8,7 @@ use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessChannelDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessClientsPolling;
 use LibreNMS\OS;
 use SnmpQuery;
@@ -16,7 +17,8 @@ class GrandstreamAp extends OS implements
     OSDiscovery,
     WirelessChannelDiscovery,
     WirelessClientsDiscovery,
-    WirelessClientsPolling
+    WirelessClientsPolling,
+    WirelessPowerDiscovery
 {
     public function discoverOS(Device $device): void
     {
@@ -112,6 +114,36 @@ class GrandstreamAp extends OS implements
                     $index,
                     'CHANNEL: ' . $entry['GRANDSTREAM-GWN-PRODUCTS-AP-MIB::gwnRadioName'],
                     $entry['GRANDSTREAM-GWN-PRODUCTS-AP-MIB::gwnRadioChannel']
+                );
+            }
+        }
+
+        return $sensors;
+    }
+
+    /**
+     * Discover wireless tx power. This is in dBm. Type is power.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array
+     */
+    public function discoverWirelessPower(): array
+    {
+        $sensors = [];
+
+        $carrier = SnmpQuery::cache()->walk('GRANDSTREAM-GWN-PRODUCTS-AP-MIB::gwnRadioName')->table(1);
+        $data = SnmpQuery::walk('GRANDSTREAM-GWN-PRODUCTS-AP-MIB::gwnRadioTransmitPower')->valuesByIndex($carrier);
+
+        foreach ($data as $index => $entry) {
+            if (isset($entry['GRANDSTREAM-GWN-PRODUCTS-AP-MIB::gwnRadioTransmitPower'])) {
+                $sensors[] = new WirelessSensor(
+                    'power',
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.42397.1.1.3.1.1.5.' . $index,
+                    'grandstream-ap',
+                    $index,
+                    'Tx Power: ' . $entry['GRANDSTREAM-GWN-PRODUCTS-AP-MIB::gwnRadioName'],
+                    $entry['GRANDSTREAM-GWN-PRODUCTS-AP-MIB::gwnRadioTransmitPower']
                 );
             }
         }
