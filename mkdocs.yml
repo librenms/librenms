@@ -54,6 +54,7 @@ plugins:
   - macros:
       j2_variable_start_string: '@='
       j2_variable_end_string: '=@'
+  - markdown-exec
   - search
   - include_dir_to_nav
   - exclude:

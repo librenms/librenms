@@ -11738,10 +11738,10 @@
                     "sensor_deleted": 0,
                     "sensor_class": "loss",
                     "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.2636.3.50.1.2.1.3.75.80.78.7.75.80.78.45.82.80.77.8.97.108.108.84.101.115.116.115",
+                    "sensor_oid": ".1.3.6.1.4.1.2636.3.50.1.2.1.3.75.80.78.7.75.80.78.45.82.80.77.2",
                     "sensor_index": "jnxRpmResSumPercentLost.KPN.KPN-RPM.allTests",
                     "sensor_type": "junos",
-                    "sensor_descr": "KPN.KPN-RPM.allTests Probe Loss",
+                    "sensor_descr": "KPN KPN-RPM Probe Loss",
                     "group": "RPM Probes",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -11763,110 +11763,10 @@
                     "sensor_deleted": 0,
                     "sensor_class": "loss",
                     "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.2636.3.50.1.2.1.3.75.80.78.7.75.80.78.45.82.80.77.11.99.117.114.114.101.110.116.84.101.115.116",
-                    "sensor_index": "jnxRpmResSumPercentLost.KPN.KPN-RPM.currentTest",
-                    "sensor_type": "junos",
-                    "sensor_descr": "KPN.KPN-RPM.currentTest Probe Loss",
-                    "group": "RPM Probes",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 0,
-                    "sensor_limit": null,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "loss",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.2636.3.50.1.2.1.3.75.80.78.7.75.80.78.45.82.80.77.17.108.97.115.116.67.111.109.112.108.101.116.101.100.84.101.115.116",
-                    "sensor_index": "jnxRpmResSumPercentLost.KPN.KPN-RPM.lastCompletedTest",
-                    "sensor_type": "junos",
-                    "sensor_descr": "KPN.KPN-RPM.lastCompletedTest Probe Loss",
-                    "group": "RPM Probes",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 0,
-                    "sensor_limit": null,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "loss",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.2636.3.50.1.2.1.5.90.73.71.71.79.9.90.73.71.71.79.45.82.80.77.8.97.108.108.84.101.115.116.115",
+                    "sensor_oid": ".1.3.6.1.4.1.2636.3.50.1.2.1.5.90.73.71.71.79.9.90.73.71.71.79.45.82.80.77.2",
                     "sensor_index": "jnxRpmResSumPercentLost.ZIGGO.ZIGGO-RPM.allTests",
                     "sensor_type": "junos",
-                    "sensor_descr": "ZIGGO.ZIGGO-RPM.allTests Probe Loss",
-                    "group": "RPM Probes",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 0,
-                    "sensor_limit": null,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "loss",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.2636.3.50.1.2.1.5.90.73.71.71.79.9.90.73.71.71.79.45.82.80.77.11.99.117.114.114.101.110.116.84.101.115.116",
-                    "sensor_index": "jnxRpmResSumPercentLost.ZIGGO.ZIGGO-RPM.currentTest",
-                    "sensor_type": "junos",
-                    "sensor_descr": "ZIGGO.ZIGGO-RPM.currentTest Probe Loss",
-                    "group": "RPM Probes",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 0,
-                    "sensor_limit": null,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "loss",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.2636.3.50.1.2.1.5.90.73.71.71.79.9.90.73.71.71.79.45.82.80.77.17.108.97.115.116.67.111.109.112.108.101.116.101.100.84.101.115.116",
-                    "sensor_index": "jnxRpmResSumPercentLost.ZIGGO.ZIGGO-RPM.lastCompletedTest",
-                    "sensor_type": "junos",
-                    "sensor_descr": "ZIGGO.ZIGGO-RPM.lastCompletedTest Probe Loss",
+                    "sensor_descr": "ZIGGO ZIGGO-RPM Probe Loss",
                     "group": "RPM Probes",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -13590,6 +13490,117 @@
                     "context_name": "",
                     "ipv4_network": "82.74.138.0/23",
                     "ifIndex": 530
+                }
+            ]
+        }
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 3,
+                    "low_ifIndex": 15,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 6,
+                    "low_ifIndex": 16,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 6,
+                    "low_ifIndex": 21,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 6,
+                    "low_ifIndex": 22,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 6,
+                    "low_ifIndex": 248,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 504,
+                    "low_ifIndex": 505,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 504,
+                    "low_ifIndex": 508,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 504,
+                    "low_ifIndex": 510,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 504,
+                    "low_ifIndex": 511,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 504,
+                    "low_ifIndex": 512,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 509,
+                    "low_ifIndex": 513,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 509,
+                    "low_ifIndex": 514,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 509,
+                    "low_ifIndex": 515,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 509,
+                    "low_ifIndex": 516,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 509,
+                    "low_ifIndex": 517,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 518,
+                    "low_ifIndex": 520,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 519,
+                    "low_ifIndex": 525,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 526,
+                    "low_ifIndex": 529,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 527,
+                    "low_ifIndex": 530,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 538,
+                    "low_ifIndex": 539,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 538,
+                    "low_ifIndex": 545,
+                    "ifStackStatus": "active"
                 }
             ]
         }
