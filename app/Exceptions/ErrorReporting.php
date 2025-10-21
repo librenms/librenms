@@ -161,7 +161,7 @@ class ErrorReporting
     {
         // throw exceptions and deprecations in testing and non-prod when APP_DEBUG is set.
         if ($environment == 'testing' || ($environment !== 'production' && config('app.debug'))) {
-            app()->booted(function () {
+            app()->booted(function (): void {
                 config([
                     'logging.deprecations.channel' => 'deprecations_channel',
                     'logging.deprecations.trace' => true,

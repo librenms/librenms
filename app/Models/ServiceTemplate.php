@@ -59,18 +59,18 @@ class ServiceTemplate extends BaseModel
     {
         parent::boot();
 
-        static::deleting(function (ServiceTemplate $template) {
+        static::deleting(function (ServiceTemplate $template): void {
             $template->devices()->detach();
             $template->groups()->detach();
         });
 
-        static::saving(function (ServiceTemplate $template) {
+        static::saving(function (ServiceTemplate $template): void {
             if ($template->type == 'dynamic' and $template->isDirty('rules')) {
                 $template->rules = $template->getDeviceParser()->generateJoins()->toArray();
             }
         });
 
-        static::saved(function (ServiceTemplate $template) {
+        static::saved(function (ServiceTemplate $template): void {
             if ($template->type == 'dynamic' and $template->isDirty('rules')) {
                 $template->updateDevices();
             }
@@ -121,7 +121,7 @@ class ServiceTemplate extends BaseModel
         }
 
         $template_ids = static::query()
-            ->with(['devices' => function ($query) {
+            ->with(['devices' => function ($query): void {
                 $query->select('devices.device_id');
             }])
             ->get()
@@ -167,7 +167,7 @@ class ServiceTemplate extends BaseModel
         }
 
         $template_ids = static::query()
-            ->with(['groups' => function ($query) {
+            ->with(['groups' => function ($query): void {
                 $query->select('device_groups.id');
             }])
             ->get()

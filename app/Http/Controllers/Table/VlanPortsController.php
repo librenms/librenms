@@ -40,7 +40,7 @@ class VlanPortsController extends TableController
         return Port::with(['device', 'device.location'])
             ->hasAccess($request->user())
             ->leftJoin('ports_vlans', 'ports.port_id', 'ports_vlans.port_id')
-            ->where(function ($query) {
+            ->where(function ($query): void {
                 $query->where(fn ($q) => $q->where('ifVlan', $this->vlanId)->whereNull('ports_vlans.vlan'))
                     ->orWhere('ports_vlans.vlan', $this->vlanId);
             })

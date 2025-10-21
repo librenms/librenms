@@ -139,7 +139,7 @@ trait QBridgeMib
             return $ports;
         }
 
-        foreach ($port_data as $vlan_domain_id => $vlan_domains) {
+        foreach ($port_data as $vlan_domains) {
             foreach ($vlan_domains as $vlan_id => $data) {
                 //portmap for untagged ports
                 $untagged_ids = StringHelpers::bitsToIndices($data['IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticUntaggedPorts'] ?? '');

@@ -60,7 +60,7 @@ foreach (['eth100g', 'eth40g', 'eth10g', 'fc16g', 'fc8g'] as $infineratype) {
         }
 
         // The CLI port name is not available in SNMP
-        $descr = (strpos($infineratype, 'eth') === false) ? $infineratype : $infspeed . 'gbe';
+        $descr = (!str_contains($infineratype, 'eth')) ? $infineratype : $infspeed . 'gbe';
 
         // 100g and 40g ports use shelfId, slotId, portId
         // 10g, fc16g and fc8g ports append the subportId with '.'

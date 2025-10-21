@@ -26,7 +26,7 @@ $instances = Ospfv3Instance::with([
 ])->withCount([
     'areas',
     'ospfv3Ports',
-    'ospfv3Ports as ospfv3Ports_enabled_count' => function ($query) {
+    'ospfv3Ports as ospfv3Ports_enabled_count' => function ($query): void {
         $query->where('ospfv3IfAdminStatus', 'enabled');
     },
     'nbrs',

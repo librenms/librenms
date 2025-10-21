@@ -54,7 +54,7 @@ function get_mib_dir($device)
 
         if ($group_mibdir = LibrenmsConfig::get("os_groups.{$device['os_group']}.mib_dir")) {
             if (is_array($group_mibdir)) {
-                foreach ($group_mibdir as $k => $dir) {
+                foreach ($group_mibdir as $dir) {
                     $dirs[] = LibrenmsConfig::get('mib_dir') . '/' . $dir;
                 }
             }

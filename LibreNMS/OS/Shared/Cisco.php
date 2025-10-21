@@ -868,7 +868,7 @@ class Cisco extends OS implements
 
     public function setQosParents($qos)
     {
-        $qos->each(function (Qos $thisQos, int $key) use ($qos) {
+        $qos->each(function (Qos $thisQos, int $key) use ($qos): void {
             $parent_idx = $this->qosIdxToParent->get($thisQos->snmp_idx);
 
             if ($parent_idx) {

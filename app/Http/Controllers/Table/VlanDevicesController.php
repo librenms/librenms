@@ -37,15 +37,15 @@ class VlanDevicesController extends TableController
                 'vlans.vlan_type',
                 'vlans.vlan_state',
             ])
-            ->withCount(['ports' => function ($query) {
+            ->withCount(['ports' => function ($query): void {
                 $query->distinct()->where('ifVlan', $this->vlanId)
                     ->orWhereHas('vlans', fn ($q) => $q->where('vlan', $this->vlanId));
             }])
-            ->where(function ($query) {
+            ->where(function ($query): void {
                 $query->where('vlans.vlan_vlan', $this->vlanId)
                     ->orWhereHas('ports', fn ($q) => $q->where('ifVlan', $this->vlanId));
             })
-        ->leftJoin('vlans', function ($join) {
+        ->leftJoin('vlans', function ($join): void {
             $join->on('devices.device_id', '=', 'vlans.device_id')
             ->on('vlans.vlan_vlan', '=', DB::raw($this->vlanId));
         });

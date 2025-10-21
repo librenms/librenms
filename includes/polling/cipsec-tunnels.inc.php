@@ -179,7 +179,7 @@ if ($device['os_group'] == 'firebrick') {
         'fbIPsecConnectionName' => 'tunnel_name',
     ];
 
-    foreach ($ipsec_array as $index => $tunnel) {
+    foreach ($ipsec_array as $tunnel) {
         if (
             (! isset($tunnels[$tunnel['fbIPsecConnectionName']]) || ! is_array($tunnels[$tunnel['fbIPsecConnectionName']]))
             && ! empty($tunnel['fbIPsecConnectionName'])

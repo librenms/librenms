@@ -160,7 +160,7 @@ trait BridgeMib
 
     public function pollStpInstances(Collection $stpInstances): Collection
     {
-        return $stpInstances->each(function (Stp $instance) {
+        return $stpInstances->each(function (Stp $instance): void {
             $data = SnmpQuery::context("$instance->vlan", 'vlan-')->enumStrings()->get([
                 'BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0',
                 'BRIDGE-MIB::dot1dStpTopChanges.0',

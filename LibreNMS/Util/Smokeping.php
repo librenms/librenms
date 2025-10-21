@@ -52,7 +52,7 @@ class Smokeping
             if (is_dir($dir) && is_readable($dir)) {
                 foreach (array_diff(scandir($dir), ['.', '..']) as $file) {
                     if (stripos($file, '.rrd') !== false) {
-                        if (strpos($file, '~') !== false) {
+                        if (str_contains($file, '~')) {
                             [$target, $slave] = explode('~', $this->filenameToHostname($file));
                             $this->files['in'][$target][$slave] = $file;
                             $this->files['out'][$slave][$target] = $file;
