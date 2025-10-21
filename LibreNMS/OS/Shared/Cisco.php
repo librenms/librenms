@@ -1012,10 +1012,28 @@ class Cisco extends OS implements
             }
             // Only returns 'tagged' vlan for each port
             // stored for use in below loop
-            if (isset($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined'])) {
-                $vlanIds = StringHelpers::bitsToIndices($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined']);
+            if (isset($data['CISCO-VTP-MIB::vlanTrunkPortVlansEnabled'])) {
+                $vlanIds = StringHelpers::bitsToIndices($data['CISCO-VTP-MIB::vlanTrunkPortVlansEnabled']);
                 foreach ($vlanIds as $tmp => $vlan_id) {
-                    $isNative[$vlan_id - 1][$ifindex] = 0;
+                    $isNative[$vlan_id][$ifindex] = 0;
+                }
+            }
+            if (isset($data['CISCO-VTP-MIB::vlanTrunkPortVlansEnabled2k'])) {
+                $vlanIds = StringHelpers::bitsToIndices($data['CISCO-VTP-MIB::vlanTrunkPortVlansEnabled2k']);
+                foreach ($vlanIds as $tmp => $vlan_id) {
+                    $isNative[$vlan_id + 1024][$ifindex] = 0;
+                }
+            }
+            if (isset($data['CISCO-VTP-MIB::vlanTrunkPortVlansEnabled3k'])) {
+                $vlanIds = StringHelpers::bitsToIndices($data['CISCO-VTP-MIB::vlanTrunkPortVlansEnabled3k']);
+                foreach ($vlanIds as $tmp => $vlan_id) {
+                    $isNative[$vlan_id + 2048][$ifindex] = 0;
+                }
+            }
+            if (isset($data['CISCO-VTP-MIB::vlanTrunkPortVlansEnabled4k'])) {
+                $vlanIds = StringHelpers::bitsToIndices($data['CISCO-VTP-MIB::vlanTrunkPortVlansEnabled4k']);
+                foreach ($vlanIds as $tmp => $vlan_id) {
+                    $isNative[$vlan_id + 3072][$ifindex] = 0;
                 }
             }
         }
