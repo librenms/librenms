@@ -22,7 +22,7 @@
  */
 
 // Workaround for Metamako platform fanspeed reporting bug on early (circa 0.16.x) code versions
-if ((str_starts_with($sensor['sensor_oid'], '.1.3.6.1.4.1.2021.13.16.3.1.3.')) &&
+if (str_starts_with($sensor['sensor_oid'], '.1.3.6.1.4.1.2021.13.16.3.1.3.') &&
         ($sensor_value >= 2 ** 31)) {
     // 2's complement negation of the value
     $sensor_value ^= 0xFFFFFFFF;
