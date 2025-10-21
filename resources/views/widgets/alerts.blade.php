@@ -44,8 +44,8 @@
             rowCount: [50, 100, 250, -1]
         }).on("loaded.rs.jquery.bootgrid", function() {
             alerts_grid = $(this);
-            alerts_grid.find(".incident-toggle").each( function() {
-                $(this).parent().addClass('incident-toggle-td');
+            alerts_grid.find(".incident-toggleInput").each( function() {
+                $(this).parent().addClass('incident-toggleInput-td');
             }).on("click", function(e) {
                 var target = $(this).data("target");
                 $(target).collapse('toggle');
@@ -54,9 +54,9 @@
             alerts_grid.find(".incident").each( function() {
                 $(this).parent().addClass('col-lg-4 col-md-4 col-sm-4 col-xs-4');
                 $(this).parent().parent().on("mouseenter", function() {
-                    $(this).find(".incident-toggle").fadeIn(200);
+                    $(this).find(".incident-toggleInput").fadeIn(200);
                 }).on("mouseleave", function() {
-                    $(this).find(".incident-toggle").fadeOut(200);
+                    $(this).find(".incident-toggleInput").fadeOut(200);
                 });
             });
             alerts_grid.find(".command-ack-alert").on("click", function(e) {
