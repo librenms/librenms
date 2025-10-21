@@ -6,6 +6,7 @@ use App\Models\Device;
 use App\Models\Sensor;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessChannelDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessClientsPolling;
 use LibreNMS\OS;
@@ -13,6 +14,7 @@ use SnmpQuery;
 
 class GrandstreamAp extends OS implements
     OSDiscovery,
+    WirelessChannelDiscovery,
     WirelessClientsDiscovery,
     WirelessClientsPolling
 {
@@ -91,5 +93,29 @@ class GrandstreamAp extends OS implements
         }
 
         return $data;
+    }
+
+    public function discoverWirelessChannel(): array
+    {
+        $sensors = [];
+
+        $carrier = SnmpQuery::cache()->walk('GRANDSTREAM-GWN-PRODUCTS-AP-MIB::gwnRadioName')->valuesByIndex();
+        $data = SnmpQuery::walk('GRANDSTREAM-GWN-PRODUCTS-AP-MIB::gwnRadioChannel')->valuesByIndex($carrier);
+
+        foreach ($data as $index => $entry) {
+            if (isset($entry['GRANDSTREAM-GWN-PRODUCTS-AP-MIB::gwnRadioChannel'])) {
+                $sensors[] = new WirelessSensor(
+                    'channel',
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.42397.1.1.3.1.1.4.' . $index,
+                    'grandstream-ap',
+                    $index,
+                    'CHANNEL: ' . $entry['GRANDSTREAM-GWN-PRODUCTS-AP-MIB::gwnRadioName'],
+                    $entry['GRANDSTREAM-GWN-PRODUCTS-AP-MIB::gwnRadioChannel']
+                );
+            }
+        }
+
+        return $sensors;
     }
 }

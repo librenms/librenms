@@ -4,6 +4,7 @@ text: 'Grandstream Access Point'
 type: wireless
 icon: grandstream
 snmp_bulk: false
+snmp_max_oid: 1
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
