@@ -59,16 +59,16 @@ add `-d` to the end of the command - it is NOT recommended to do this
 in cron.
 
 You also may use `-m` to pass a list of comma-separated modules.
-Please refer to [Command options](#command-options) of discovery.php.
+Please refer to [Command options](#command-options) of `lnms device:discover -h`.
 Example: `/opt/librenms/discovery-wrapper.py 1 -m bgp-peers`
 
-If you want to switch back to discovery.php then you can replace (not recommended):
+If you want to switch back to `lnms device:discover` (not recommended), then you can replace:
 
 `33  */6   * * *   librenms    /opt/librenms/discovery-wrapper.py 1 >> /dev/null 2>&1`
 
 With:
 
-`33  */6   * * *   librenms    /opt/librenms/discovery.php -h all >> /dev/null 2>&1`
+`33  */6   * * *   librenms    /opt/librenms/lnms device:discover all >> /dev/null 2>&1`
 
 ## Discovery config
 

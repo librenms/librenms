@@ -242,7 +242,7 @@ is also an [online version](https://jakearchibald.github.io/svgomg/).
 Discovery
 
 ```bash
-./discovery.php -d -h HOSTNAME
+lnms device:discover -vv HOSTNAME
 ```
 
 Polling

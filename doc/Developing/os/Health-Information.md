@@ -452,7 +452,7 @@ Lastly the program calls `discover_sensor()` and passes the information collecte
 steps. The `null` values are for low, low warning, high, and high warning values, which are not
 collected in the Adva's MIB.
 
-You can manually run discovery to verify the code works by running `./discovery.php -h $device_id -m sensors`.
+You can manually run discovery to verify the code works by running `lnms device:discover $device_id -m sensors`.
 You can use `-v` to see what calls are being used during discovery and `-d` to see debug output.
 In the output under `#### Load disco module sensors ####` you can see a list of sensors types. If
 there is a `+` a sensor is added, if there is a `-` one was deleted, and a `.` means no change. If
@@ -460,7 +460,7 @@ there is nothing next to the sensor type then the sensor was not discovered. The
 information about changes to the database and RRD files at the bottom.
 
 ```
-[librenms@nms-test ~]$ ./discovery.php -h 2 -m sensors
+[librenms@nms-test ~]$ lnms device:discover 2 -m sensors
 LibreNMS Discovery
 164.113.194.250 2 adva_fsp150
 

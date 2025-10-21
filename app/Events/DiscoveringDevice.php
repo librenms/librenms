@@ -3,12 +3,13 @@
 namespace App\Events;
 
 use App\Models\Device;
+use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class DevicePolled
+class DiscoveringDevice
 {
-    use Dispatchable, SerializesModels;
+    use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public function __construct(
         public Device $device

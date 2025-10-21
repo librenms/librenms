@@ -1564,7 +1564,7 @@ return [
                 'help' => 'Метод планирования задач обнаружения. Устаревший метод будет использовать cron, если запись crontab существует, и службу диспетчера, если устаревшая конфигурация service_discovery_enabled установлена в true.',
                 'options' => [
                     'legacy' => 'Устаревший (Без ограничений)',
-                    'cron' => 'Cron (discovery.php)',
+                    'cron' => 'Cron (lnms device:discover)',
                     'dispatcher' => 'Служба диспетчера',
                 ],
             ],
