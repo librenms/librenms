@@ -14393,6 +14393,28 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00:50:d7:12:68:68 (0050d7126868)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "SAN-3 - B-Fabric",
+                    "ifDescr": "1/1/8",
+                    "ifName": "1/1/8"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00:50:d7:12:63:f0 (0050d71263f0)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "SAN-4 - B-Fabric",
+                    "ifDescr": "1/1/9",
+                    "ifName": "1/1/9"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
                     "remote_hostname": "Broadcom Adv. Dual 10Gb Ethernet fw_version:AFW_214.0.245.0",
                     "remote_port": "00:0a:f7:ec:d1:61 (000af7ecd161)",
                     "remote_platform": null,
@@ -14415,6 +14437,17 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00:50:da:41:d5:d1 (0050da41d5d1)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "vmhost-30 - B-Fabric",
+                    "ifDescr": "1/1/43",
+                    "ifName": "1/1/43"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
                     "remote_hostname": "vmhost-30",
                     "remote_port": "vmnic3 (0050da41d5d1)",
                     "remote_platform": null,
@@ -14422,6 +14455,17 @@
                     "ifAlias": "vmhost-30 - B-Fabric",
                     "ifDescr": "1/1/43",
                     "ifName": "1/1/43"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00:50:da:41:d5:85 (0050da41d585)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "vmhost-31 - B-Fabric",
+                    "ifDescr": "1/1/44",
+                    "ifName": "1/1/44"
                 },
                 {
                     "active": 1,
@@ -14437,6 +14481,17 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00:50:da:41:d5:e9 (0050da41d5e9)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "vmhost-32 - B-Fabric",
+                    "ifDescr": "1/1/45",
+                    "ifName": "1/1/45"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
                     "remote_hostname": "vmhost-32",
                     "remote_port": "vmnic3 (0050da41d5e9)",
                     "remote_platform": null,
@@ -14444,6 +14499,17 @@
                     "ifAlias": "vmhost-32 - B-Fabric",
                     "ifDescr": "1/1/45",
                     "ifName": "1/1/45"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00:50:da:41:d5:89 (0050da41d589)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "vmhost-33 - B-Fabric",
+                    "ifDescr": "1/1/46",
+                    "ifName": "1/1/46"
                 },
                 {
                     "active": 1,
@@ -14459,6 +14525,17 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00:50:da:41:d5:5d (0050da41d55d)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "vmhost-34 - B-Fabric",
+                    "ifDescr": "1/1/47",
+                    "ifName": "1/1/47"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
                     "remote_hostname": "vmhost-34",
                     "remote_port": "vmnic3 (0050da41d55d)",
                     "remote_platform": null,
@@ -14466,6 +14543,17 @@
                     "ifAlias": "vmhost-34 - B-Fabric",
                     "ifDescr": "1/1/47",
                     "ifName": "1/1/47"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00:50:da:41:d5:c9 (0050da41d5c9)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "vmhost-35 - B-Fabric",
+                    "ifDescr": "1/1/48",
+                    "ifName": "1/1/48"
                 },
                 {
                     "active": 1,

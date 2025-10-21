@@ -3773,7 +3773,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "Siemens, SIMATIC NET, CP 443-1, 6GK7 443-1EX30-0XE0, HW: Version 2, FW: Version V3.2.17, SVPN3383264",
-                    "remote_port": "port-001 ()",
+                    "remote_port": "port-001",
                     "remote_platform": null,
                     "remote_version": "Siemens, SIMATIC NET, CP 443-1, 6GK7 443-1EX30-0XE0, HW: Version 2, FW: Version V3.2.17, SVPN3383264",
                     "ifAlias": "### PLC ###",

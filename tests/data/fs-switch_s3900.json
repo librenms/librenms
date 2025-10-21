@@ -8064,6 +8064,17 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "94 C6 91 12 D2 77 (94c69112d277)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Ethernet Port on unit 1, port 10",
+                    "ifDescr": "Ethernet Port on unit 1, port 10",
+                    "ifName": "Port10"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
                     "remote_hostname": "GS1900-ModemSide",
                     "remote_port": "8 (60319781e864)",
                     "remote_platform": null,
@@ -8071,6 +8082,17 @@
                     "ifAlias": "Ethernet Port on unit 1, port 12",
                     "ifDescr": "Ethernet Port on unit 1, port 12",
                     "ifName": "Port12"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "3C 52 82 17 63 35 (3c5282176335)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Ethernet Port on unit 1, port 9",
+                    "ifDescr": "Ethernet Port on unit 1, port 9",
+                    "ifName": "Port9"
                 },
                 {
                     "active": 1,
