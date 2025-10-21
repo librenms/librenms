@@ -242,8 +242,8 @@ class SnmpResponse
 
     public function table(int $group = 0, array &$array = []): array
     {
-        foreach ($this->values() as $key => $value) {
-            $parts = $this->getOidParts($key);
+        foreach ($this->values() as $full_oid => $value) {
+            $parts = $this->getOidParts($full_oid);
 
             // move the oid name to the correct depth
             array_splice($parts, $group, 0, array_shift($parts));
@@ -252,6 +252,12 @@ class SnmpResponse
             $tmp = &$array;
             foreach ($parts as $part) {
                 $key = trim($part, '"');
+
+                // handle leafs that are now branches. eg .1.4 = 42 && .1.4.1 = 13
+                if (isset($tmp[$key]) && ! is_array($tmp[$key])) {
+                    $tmp[$key] = ['' => $tmp[$key]];
+                }
+
                 $tmp = &$tmp[$key];
             }
             $tmp = $value; // assign the value as the leaf
