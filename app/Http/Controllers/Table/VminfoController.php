@@ -79,6 +79,6 @@ class VminfoController extends TableController
 
     private static function getHostname(Device $device): string
     {
-        return '<a class="list-device" href="' . Url::deviceUrl($device) . '">' . $device->hostname . '</a><br>' . $device->sysName;
+        return '<a class="list-device" href="' . Url::deviceUrl($device) . '">' . $device->displayName() . '</a>';
     }
 }
