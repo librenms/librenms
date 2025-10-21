@@ -1010,30 +1010,33 @@ class Cisco extends OS implements
             if ($vlan_id > 0) {
                 $isNative[$vlan_id][$ifindex] = 1;
             }
+            if (isset($data['CISCO-VTP-MIB::vlanTrunkPortDynamicState']) && $data['CISCO-VTP-MIB::vlanTrunkPortDynamicState'] == 2) {
+                continue; // This port is not a trunk, so continue to next one
+            }
             // Only returns 'tagged' vlan for each port
             // stored for use in below loop
-            if (isset($data['CISCO-VTP-MIB::vlanTrunkPortVlansEnabled'])) {
-                $vlanIds = StringHelpers::bitsToIndices($data['CISCO-VTP-MIB::vlanTrunkPortVlansEnabled']);
-                foreach ($vlanIds as $tmp => $vlan_id) {
-                    $isNative[$vlan_id][$ifindex] = 0;
+            if (isset($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined'])) {
+                $vlanIds = StringHelpers::bitsToIndices($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined']);
+                foreach ($vlanIds as $vlan_id) {
+                    $isNative[$vlan_id - 1][$ifindex] = $isNative[$vlan_id - 1][$ifindex] ?? 0;
                 }
             }
-            if (isset($data['CISCO-VTP-MIB::vlanTrunkPortVlansEnabled2k'])) {
-                $vlanIds = StringHelpers::bitsToIndices($data['CISCO-VTP-MIB::vlanTrunkPortVlansEnabled2k']);
-                foreach ($vlanIds as $tmp => $vlan_id) {
-                    $isNative[$vlan_id + 1024][$ifindex] = 0;
+            if (isset($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined2k'])) {
+                $vlanIds = StringHelpers::bitsToIndices($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined2k']);
+                foreach ($vlanIds as $vlan_id) {
+                    $isNative[$vlan_id + 1023][$ifindex] = $isNative[$vlan_id + 1023][$ifindex] ?? 0;
                 }
             }
-            if (isset($data['CISCO-VTP-MIB::vlanTrunkPortVlansEnabled3k'])) {
-                $vlanIds = StringHelpers::bitsToIndices($data['CISCO-VTP-MIB::vlanTrunkPortVlansEnabled3k']);
-                foreach ($vlanIds as $tmp => $vlan_id) {
-                    $isNative[$vlan_id + 2048][$ifindex] = 0;
+            if (isset($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined3k'])) {
+                $vlanIds = StringHelpers::bitsToIndices($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined3k']);
+                foreach ($vlanIds as $vlan_id) {
+                    $isNative[$vlan_id + 2047][$ifindex] = $isNative[$vlan_id + 2047][$ifindex] ?? 0;
                 }
             }
-            if (isset($data['CISCO-VTP-MIB::vlanTrunkPortVlansEnabled4k'])) {
-                $vlanIds = StringHelpers::bitsToIndices($data['CISCO-VTP-MIB::vlanTrunkPortVlansEnabled4k']);
-                foreach ($vlanIds as $tmp => $vlan_id) {
-                    $isNative[$vlan_id + 3072][$ifindex] = 0;
+            if (isset($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined4k'])) {
+                $vlanIds = StringHelpers::bitsToIndices($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined4k']);
+                foreach ($vlanIds as $vlan_id) {
+                    $isNative[$vlan_id + 3071][$ifindex] = $isNative[$vlan_id + 3071][$ifindex] ?? 0;
                 }
             }
         }
@@ -1070,7 +1073,7 @@ class Cisco extends OS implements
                 }
             }
 
-            // Let's do the native/access that were not processed above
+            // Let's do the ones that were not processed above
             // if we have isNative for this vlan, then we check which ifindexes are not yet processed and we add them.
             if (isset($isNative[$vlan_id])) {
                 foreach ($isNative[$vlan_id] as $ifindex => $value) {
