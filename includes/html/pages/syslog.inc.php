@@ -18,7 +18,7 @@ use Carbon\Carbon;
 
 $no_refresh = true;
 $param = [];
-$device_id = (int) $vars['device'];
+$device_id = isset($vars['device']) ? (int) $vars['device'] : null;
 
 if (isset($vars['action']) && $vars['action'] == 'expunge' && \Auth::user()->hasGlobalAdmin()) {
     \App\Models\Syslog::truncate();
