@@ -830,6 +830,18 @@ return [
             'description' => 'Memcached port',
             'help' => 'The port for the memcached server. Default is 11211',
         ],
+        'distributed_poller_metricsendpoint' => [
+            'description' => 'Enable metrics endpoint',
+            'help' => 'Enable /metrics endpoint for Prometheus style poller metrics',
+        ],
+        'distributed_poller_metricsendpoint_port' => [
+            'description' => 'Metrics endpoint port',
+            'help' => 'The port for metrics.  Default is 8080',
+        ],
+        'distributed_poller_memorylimit' => [
+            'description' => 'Pause on Memory Usage %',
+            'help' => 'Pause at this percentage of memory usage (cgroups2)',
+        ],
         'email_auto_tls' => [
             'description' => 'Auto TLS support',
             'help' => 'Tries to use TLS before falling back to un-encrypted',
