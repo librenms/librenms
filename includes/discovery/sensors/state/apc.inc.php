@@ -39,11 +39,11 @@ foreach ($cooling_status as $index => $data) {
     foreach ($tmp_states as $ref) {
         preg_match('/([\w]+) ?\\(([\d]+)\\)/', $ref, $matches);
         $nagios_state = get_nagios_state($matches[1]);
-        $states[] = ['value' => 0, 'generic' => $nagios_state, 'graph' => 0, $matches[2], 'descr' => $matches[1]];
+        $states[] = ['value' => $matches[2], 'generic' => $nagios_state, 'graph' => 0, 'descr' => $matches[1]];
     }
     create_state_index($state_name, $states);
 
-    discover_sensor(null, 'state', $device, $cur_oid, $cur_oid, 'apc', $state_name, 1, 1, null, null, null, null, $data['coolingUnitStatusDiscreteValueAsInteger']);
+    discover_sensor(null, 'state', $device, $cur_oid, $cur_oid, $state_name, $state_name, 1, 1, null, null, null, null, $data['coolingUnitStatusDiscreteValueAsInteger']);
 }
 
 unset($cooling_status);
@@ -56,13 +56,13 @@ foreach ($cooling_unit as $index => $data) {
     $tmp_states = explode(',', $data['coolingUnitExtendedDiscreteIntegerReferenceKey']);
     $states = [];
     foreach ($tmp_states as $k => $ref) {
-        preg_match('/([\w]+)\\(([\d]+)\\)/', $ref, $matches);
+        preg_match('/([\w ]+)\\(([\d]+)\\)/', $ref, $matches);
         $nagios_state = get_nagios_state($matches[1]);
-        $states[] = ['value' => 0, 'generic' => $nagios_state, 'graph' => 0, $matches[2], 'descr' => $matches[1]];
+        $states[] = ['value' => $matches[2], 'generic' => $nagios_state, 'graph' => 0, 'descr' => $matches[1]];
     }
     create_state_index($state_name, $states);
 
-    discover_sensor(null, 'state', $device, $cur_oid, $cur_oid, 'apc', $state_name, 1, 1, null, null, null, null, $data['coolingUnitExtendedDiscreteValueAsInteger']);
+    discover_sensor(null, 'state', $device, $cur_oid, $cur_oid, $state_name, $state_name, 1, 1, null, null, null, null, $data['coolingUnitExtendedDiscreteValueAsInteger']);
 }
 
 unset($cooling_unit);
