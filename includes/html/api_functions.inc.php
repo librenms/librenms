@@ -1295,7 +1295,7 @@ function search_ports(Illuminate\Http\Request $request): JsonResponse
 
     $ports = Port::hasAccess(Auth::user())
         ->isNotDeleted()
-        ->where(function ($query) use ($fields, $search) {
+        ->where(function ($query) use ($fields, $search): void {
             foreach ($fields as $field) {
                 $query->orWhere($field, 'like', "%$search%");
             }
@@ -3166,7 +3166,7 @@ function list_logs(Illuminate\Http\Request $request, Router $router)
 
     $sort_order = $request->get('sortorder') === 'DESC' ? 'DESC' : 'ASC';
 
-    $count_query = $count_query . $query;
+    $count_query .= $query;
     $count = dbFetchCell($count_query, $param);
     $full_query = $full_query . $query . " ORDER BY $timestamp $sort_order LIMIT $start,$limit";
     $logs = dbFetchRows($full_query, $param);
@@ -3280,8 +3280,8 @@ function add_service_for_host(Illuminate\Http\Request $request)
     }
     $service_type = $data['type'];
     $service_ip = $data['ip'];
-    $service_desc = $data['desc'] ? $data['desc'] : '';
-    $service_param = $data['param'] ? $data['param'] : '';
+    $service_desc = $data['desc'] ?: '';
+    $service_param = $data['param'] ?: '';
     $service_ignore = $data['ignore'] ? true : false; // Default false
     $service_disable = $data['disable'] ? true : false; // Default false
     $service_name = $data['name'];
@@ -3538,7 +3538,7 @@ function search_by_mac(Illuminate\Http\Request $request)
         return api_error(422, $validate->messages());
     }
 
-    $ports = Port::whereHas('fdbEntries', function ($fdbDownlink) use ($macAddress) {
+    $ports = Port::whereHas('fdbEntries', function ($fdbDownlink) use ($macAddress): void {
         $fdbDownlink->where('mac_address', $macAddress);
     })
          ->withCount('fdbEntries')

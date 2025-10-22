@@ -66,7 +66,7 @@ class PortController extends SelectController
         $query = Port::hasAccess($request->user())
             ->isNotDeleted()
             ->has('device')
-            ->with(['device' => function ($query) {
+            ->with(['device' => function ($query): void {
                 $query->select(['device_id', 'hostname', 'sysName', 'display']);
             }])
             ->select(['ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr'])

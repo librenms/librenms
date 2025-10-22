@@ -42,7 +42,7 @@ if ($components[$vars['id']]['type'] == 'f5-ltm-pool') {
     $parent = $components[$vars['id']]['UID'];
 
     // Find all pool members
-    foreach ($components as $compid => $comp) {
+    foreach ($components as $comp) {
         if ($comp['type'] != 'f5-ltm-poolmember') {
             continue;
         }

@@ -234,7 +234,7 @@ class CustomMapDataController extends Controller
 
         $map->load(['nodes', 'edges']);
 
-        DB::transaction(function () use ($map, $data) {
+        DB::transaction(function () use ($map, $data): void {
             $map->legend_x = $data['legend_x'];
             $map->legend_y = $data['legend_y'];
             $map->legend_steps = $data['legend_steps'];
@@ -258,7 +258,7 @@ class CustomMapDataController extends Controller
             $map->save();
 
             foreach ($data['nodes'] as $nodeid => $node) {
-                if (strpos($nodeid, 'new') === 0) {
+                if (str_starts_with($nodeid, 'new')) {
                     $dbnode = new CustomMapNode;
                     $dbnode->map()->associate($map);
                 } else {
@@ -290,7 +290,7 @@ class CustomMapDataController extends Controller
                 $newNodes[$nodeid] = $dbnode;
             }
             foreach ($data['edges'] as $edgeid => $edge) {
-                if (strpos($edgeid, 'new') === 0) {
+                if (str_starts_with($edgeid, 'new')) {
                     $dbedge = new CustomMapEdge;
                     $dbedge->map()->associate($map);
                 } else {
@@ -300,13 +300,13 @@ class CustomMapDataController extends Controller
                         abort(404);
                     }
                 }
-                $dbedge->custom_map_node1_id = strpos($edge['from'], 'new') == 0 ? $newNodes[$edge['from']]->custom_map_node_id : $edge['from'];
-                $dbedge->custom_map_node2_id = strpos($edge['to'], 'new') == 0 ? $newNodes[$edge['to']]->custom_map_node_id : $edge['to'];
-                $dbedge->port_id = $edge['port_id'] ? $edge['port_id'] : null;
+                $dbedge->custom_map_node1_id = str_starts_with($edge['from'], 'new') ? $newNodes[$edge['from']]->custom_map_node_id : $edge['from'];
+                $dbedge->custom_map_node2_id = str_starts_with($edge['to'], 'new') ? $newNodes[$edge['to']]->custom_map_node_id : $edge['to'];
+                $dbedge->port_id = $edge['port_id'] ?: null;
                 $dbedge->reverse = filter_var($edge['reverse'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
                 $dbedge->showpct = filter_var($edge['showpct'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
                 $dbedge->showbps = filter_var($edge['showbps'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-                $dbedge->label = $edge['label'] ? $edge['label'] : '';
+                $dbedge->label = $edge['label'] ?: '';
                 $dbedge->fixed_width = $edge['fixed_width'];
                 $dbedge->style = $edge['style'];
                 $dbedge->text_face = $edge['text_face'];

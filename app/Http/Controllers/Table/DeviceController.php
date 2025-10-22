@@ -109,7 +109,7 @@ class DeviceController extends TableController
             if ($group == 'none') {
                 $query->whereDoesntHave('groups');
             } else {
-                $query->whereHas('groups', function ($query) use ($group) {
+                $query->whereHas('groups', function ($query) use ($group): void {
                     $query->where('id', $group);
                 });
             }

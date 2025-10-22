@@ -157,7 +157,7 @@ abstract class LnmsCommand extends Command
 
             return $validator->validated();
         } catch (ValidationException $e) {
-            collect($validator->getMessageBag()->all())->each(function ($message) {
+            collect($validator->getMessageBag()->all())->each(function ($message): void {
                 $this->error($message);
             });
             exit(1);

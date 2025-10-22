@@ -52,7 +52,7 @@ trait YamlMempoolsDiscovery
             ->addField(new OidField('total', 'mempool_total', should_poll: false))
             ->addField(new OidField('percent_used', 'mempool_perc'))
             ->addField(new YamlDiscoveryField('warn_percent', 'mempool_perc_warn', 90))
-            ->afterEach(function (Mempool $mempool, YamlDiscoveryDefinition $def, $yaml, $index) {
+            ->afterEach(function (Mempool $mempool, YamlDiscoveryDefinition $def, $yaml, $index): void {
                 // fill missing values
                 $mempool->fillUsage($mempool->mempool_used, $mempool->mempool_total, $mempool->mempool_free, $mempool->mempool_perc);
             });

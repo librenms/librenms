@@ -117,7 +117,7 @@ class MeasurementManager
         $this->printSummary('SNMP', $this->getCategory('snmp'), self::SNMP_COLOR);
         $this->printSummary('SQL', $this->getCategory('db'), self::DB_COLOR);
 
-        app('Datastore')->getStats()->each(function (MeasurementCollection $stats, string $datastore) {
+        app('Datastore')->getStats()->each(function (MeasurementCollection $stats, string $datastore): void {
             $this->printSummary($datastore, $stats, self::DATASTORE_COLOR);
         });
 
