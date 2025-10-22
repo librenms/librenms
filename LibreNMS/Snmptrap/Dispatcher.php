@@ -66,7 +66,7 @@ class Dispatcher
         if ($logging == 'all' || ($fallback && $logging == 'unhandled')) {
             $trap->log($trap->toString($detailed));
         }
-        if ($logging != 'none' || ! $fallback) {
+        if ($logging == 'all' || ($fallback && $logging == 'unhandled') || ! $fallback) {
             $rules = new AlertRules;
             $rules->runRules($trap->getDevice()->device_id);
         }
