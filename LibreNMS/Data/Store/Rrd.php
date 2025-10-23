@@ -709,11 +709,11 @@ class Rrd extends BaseDatastore
             if (isset($parts[1])) {
                 return str_replace('1.7.01.7.0', '1.7.0', $parts[1]);
             }
-
-            return null;
         } catch (Exception) {
-            return null;
+            //
         }
+
+        return null;
     }
 
     /**
