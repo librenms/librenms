@@ -85,6 +85,7 @@ class CheckRrdStep implements Validation
 
     /**
      * @return string[]
+     *
      * @throws RrdException
      */
     private function listFiles(): array
