@@ -45,7 +45,7 @@ class CheckMysqlEngine implements Validation, ValidationFixer
 
         if ($tables->isNotEmpty()) {
             return ValidationResult::warn(trans('validation.validations.database.CheckMysqlEngine.fail'))
-                ->setFixer(__CLASS__)
+                ->setFixer(self::class)
                 ->setList(trans('validation.validations.database.CheckMysqlEngine.tables'), $tables->all());
         }
 

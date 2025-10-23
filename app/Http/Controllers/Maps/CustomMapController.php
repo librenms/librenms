@@ -267,7 +267,7 @@ class CustomMapController extends Controller
             }
 
             $node_id_map = collect();
-            foreach ($nodes as $id => $node) {
+            foreach ($nodes as $node) {
                 $newnode = $node->replicate();
                 $newnode->custom_map_id = $newmap->custom_map_id;
                 $newnode->save();

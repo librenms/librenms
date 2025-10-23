@@ -116,7 +116,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             $proc->processor_usage = static::processData($data, $proc->processor_precision);
         }
 
-        d_echo('Discovered ' . get_called_class() . ' ' . print_r($proc->toArray(), true));
+        d_echo('Discovered ' . static::class . ' ' . print_r($proc->toArray(), true));
 
         return $proc;
     }
@@ -264,7 +264,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             return [];
         }
 
-        return YamlDiscovery::discover($os, get_called_class(), $discovery);
+        return YamlDiscovery::discover($os, static::class, $discovery);
     }
 
     /**
