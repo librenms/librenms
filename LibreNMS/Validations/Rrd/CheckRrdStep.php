@@ -3,37 +3,27 @@
 namespace LibreNMS\Validations\Rrd;
 
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Interfaces\Validation;
+use LibreNMS\RRD\RrdProcess;
 use LibreNMS\ValidationResult;
-use Symfony\Component\Process\InputStream;
-use Symfony\Component\Process\Process;
 
 class CheckRrdStep implements Validation
 {
     const DEFAULT_RRD_STEP = 300;
     const DEFAULT_PING_RRD_STEP = 300;
 
-    private int $rrd_step;
     private int $ping_rrd_step;
-    private string $rrdcached;
-    private string $rrd_dir;
-    private string $rrdtool_exec;
-    private array $env = [];
-    private InputStream $input;
-    private ?Process $rrdtool = null;
+    private int $rrd_step;
+
+    private RrdProcess $rrdtool;
 
     public function __construct()
     {
-        $this->rrd_step = (int) LibrenmsConfig::get('rrd.step', self::DEFAULT_RRD_STEP);
         $this->ping_rrd_step = (int) LibrenmsConfig::get('ping_rrd_step', self::DEFAULT_PING_RRD_STEP);
-        $this->rrdtool_exec = LibrenmsConfig::get('rrdtool', 'rrdtool');
-        $this->rrdcached = (string) LibrenmsConfig::get('rrdcached', '');
-        $this->rrd_dir = LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd');
-        $this->input = new InputStream();
+        $this->rrd_step = (int) LibrenmsConfig::get('rrd.step', self::DEFAULT_RRD_STEP);
 
-        if ($this->rrdcached) {
-            $this->env['RRDCACHED_ADDRESS'] = $this->rrdcached;
-        }
+        $this->rrdtool = app(RrdProcess::class, ['timeout' => 30]);
     }
 
     public function enabled(): bool
@@ -45,15 +35,6 @@ class CheckRrdStep implements Validation
     {
         $bad_step_files = [];
         $bad_files = [];
-
-        $this->rrdtool = new Process(
-            command: [$this->rrdtool_exec, '-'],
-            cwd: $this->rrd_dir,
-            env: $this->env,
-        );
-        $this->rrdtool->setInput($this->input);
-        $this->rrdtool->setTimeout(15);
-        $this->rrdtool->start();
 
         $rrd_files = $this->listFiles();
 
@@ -70,7 +51,6 @@ class CheckRrdStep implements Validation
             }
         }
 
-        $this->input->write("\n\n");
         $this->rrdtool->stop();
 
         $total = count($rrd_files);
@@ -89,9 +69,12 @@ class CheckRrdStep implements Validation
         return ValidationResult::ok(__('validation.validations.rrd.CheckRrdStep.ok', ['total' => $total]));
     }
 
+    /**
+     * @throws RrdException
+     */
     private function getStep(string $file): int
     {
-        $output = $this->runCommand("info $file", 'step = ');
+        $output = $this->rrdtool->run("info $file", 'step = ');
 
         if (preg_match('/step = (\d+)/', $output, $matches)) {
             return (int) $matches[1];
@@ -102,34 +85,15 @@ class CheckRrdStep implements Validation
 
     /**
      * @return string[]
+     * @throws RrdException
      */
     private function listFiles(): array
     {
-        $dir = $this->rrdcached ? '/' : $this->rrd_dir;
-        $output = $this->runCommand("list --recursive $dir");
+        $dir = LibrenmsConfig::get('rrdcached') ? '/' : LibrenmsConfig::get('rrd_dir');
+        $output = $this->rrdtool->run("list --recursive $dir");
         $files = explode("\n", $output);
         array_pop($files); // remove OK
 
         return $files;
-    }
-
-    private function runCommand(string $command, string $waitFor = 'OK u:'): string
-    {
-        $this->rrdtool->clearOutput();
-        $this->input->write("$command\n");
-        $this->rrdtool->waitUntil(function ($type, $buffer) use ($waitFor) {
-            if ($type === Process::ERR) {
-                throw new \Exception($buffer);
-            }
-
-            if (str_contains($buffer, 'ERROR: ')) {
-                preg_match('/ERROR: (.*)/', $buffer, $matches);
-                throw new \Exception($matches[1]);
-            }
-
-            return str_contains($buffer, $waitFor);
-        });
-
-        return rtrim($this->rrdtool->getOutput());
     }
 }
