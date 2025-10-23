@@ -38,7 +38,7 @@ foreach ($cooling_status as $index => $data) {
     $tmp_states = explode(',', $data['coolingUnitStatusDiscreteIntegerReferenceKey']);
     $states = [];
     foreach ($tmp_states as $ref) {
-        preg_match('/([\w]+) ?\\(([\d]+)\\)/', $ref, $matches);
+        preg_match('/([\w ]+)?\\(([\d]+)\\)/', $ref, $matches);
         $nagios_state = get_nagios_state($matches[1]);
         $states[] = ['value' => $matches[2], 'generic' => $nagios_state, 'graph' => 0, 'descr' => $matches[1]];
     }
@@ -57,7 +57,7 @@ foreach ($cooling_unit as $index => $data) {
     $tmp_states = explode(',', $data['coolingUnitExtendedDiscreteIntegerReferenceKey']);
     $states = [];
     foreach ($tmp_states as $ref) {
-        preg_match('/([\w]+)\\(([\d]+)\\)/', $ref, $matches);
+        preg_match('/([\w ]+)\\(([\d]+)\\)/', $ref, $matches);
         $nagios_state = get_nagios_state($matches[1]);
         $states[] = ['value' => $matches[2], 'generic' => $nagios_state, 'graph' => 0, 'descr' => $matches[1]];
     }
