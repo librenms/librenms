@@ -487,27 +487,30 @@ class Rrd extends BaseDatastore
      * Get array of all rrd files for a device,
      * via rrdached or localdisk.
      *
-     * @param  array  $device  device for which we get the rrd's
-     * @return array array of rrd files for this host
+     * @param  string  $hostname hostname of the device
+     * @return string[] array of rrd files for this host
      */
-    public function getRrdFiles($device)
+    public function getRrdFiles(string $hostname): array
     {
+        $safeHost = self::safeName($hostname);
+
         if ($this->rrdcached) {
-            $filename = sprintf('/%s', self::safeName($device['hostname']));
-            $rrd_files = $this->command('list', $filename, '');
-            // Command output is an array, create new array with each filename as a item in array.
-            $rrd_files_array = explode("\n", trim($rrd_files[0]));
-            // Remove status line from response
-            array_pop($rrd_files_array);
-        } else {
-            $rrddir = $this->dirFromHost($device['hostname']);
-            $pattern = sprintf('%s/*.rrd', $rrddir);
-            $rrd_files_array = glob($pattern);
+            $rrdFiles = $this->command('list', "/$safeHost", '');
+
+            $rrdFilesArray = explode("\n", trim($rrdFiles[0]));
+            array_pop($rrdFilesArray); // remove status line
+            sort($rrdFilesArray);
+
+            return $rrdFilesArray;
         }
 
-        sort($rrd_files_array);
+        $rrdDir = $this->dirFromHost($hostname);
+        $pattern = "$rrdDir/*.rrd";
 
-        return $rrd_files_array;
+        $files = array_map(fn($f) => basename($f), glob($pattern));
+        sort($files);
+
+        return $files;
     }
 
     /**
@@ -524,7 +527,7 @@ class Rrd extends BaseDatastore
         $entries = [];
         $separator = '-';
 
-        $rrdfile_array = $this->getRrdFiles($device);
+        $rrdfile_array = $this->getRrdFiles($device['hostname']);
         if ($category) {
             $pattern = sprintf('%s-%s-%s-%s', 'app', $app_name, $app_id, $category);
         } else {

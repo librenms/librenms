@@ -70,7 +70,7 @@ return [
             ],
             'CheckRrdcachedConnectivity' => [
                 'fail_socket' => ':socket does not appear to exist, rrdcached connectivity test failed',
-                'fail_port' => 'Cannot connect to rrdcached server on port :port',
+                'fail_port' => 'Cannot connect to rrdcached server :server on port :port',
                 'ok' => 'Connected to rrdcached',
             ],
             'CheckRrdDirPermissions' => [

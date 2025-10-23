@@ -70,7 +70,7 @@ return [
             ],
             'CheckRrdcachedConnectivity' => [
                 'fail_socket' => 'როგორც ჩანს :socket არ არსებობს. rrdcached-სთან დაკავშირების შემოწმება ჩავარდა',
-                'fail_port' => 'ვერ დავუკავშირდი rrdcached-ის სერვერს პორტზე :port',
+                'fail_port' => 'rrdcached სერვერთან :server დაკავშირება შეუძლებელია პორტზე :port',
                 'ok' => 'rrdcached დაკავშირებულია',
             ],
             'CheckRrdDirPermissions' => [
