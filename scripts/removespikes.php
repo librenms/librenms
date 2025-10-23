@@ -865,10 +865,10 @@ function standard_deviation($samples)
     $sample_square = [];
 
     for ($current_sample = 0; $sample_count > $current_sample; $current_sample++) {
-        $sample_square[$current_sample] = pow($samples[$current_sample], 2);
+        $sample_square[$current_sample] = $samples[$current_sample] ** 2;
     }
 
-    return sqrt(array_sum($sample_square) / $sample_count - pow(array_sum($samples) / $sample_count, 2));
+    return sqrt(array_sum($sample_square) / $sample_count - (array_sum($samples) / $sample_count) ** 2);
 }
 
 /* display_help - displays the usage of the function */

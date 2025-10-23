@@ -53,7 +53,7 @@ abstract class Transport implements TransportInterface
             return $this->name;
         }
 
-        $path = explode('\\', get_called_class());
+        $path = explode('\\', static::class);
 
         return array_pop($path);
     }

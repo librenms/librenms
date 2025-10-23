@@ -78,7 +78,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
     $systemd_containers = [];
     $other_containers = [];
     $user_containers = [];
-    foreach ($app_data['oslvms'] as $index => $oslvm) {
+    foreach ($app_data['oslvms'] as $oslvm) {
         $oslvm = htmlspecialchars($oslvm);
         if (preg_match('/^d_.*/', $oslvm)) {
             $docker_containers[] = $oslvm;

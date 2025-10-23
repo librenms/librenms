@@ -100,7 +100,7 @@ abstract class BaseModel extends Model
 
     public static function definedRelations(): array
     {
-        $reflector = new \ReflectionClass(get_called_class());
+        $reflector = new \ReflectionClass(static::class);
 
         return collect($reflector->getMethods())
             ->filter(
