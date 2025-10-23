@@ -487,7 +487,7 @@ class Rrd extends BaseDatastore
      * Get array of all rrd files for a device,
      * via rrdached or localdisk.
      *
-     * @param  string  $hostname hostname of the device
+     * @param  string  $hostname  hostname of the device
      * @return string[] array of rrd files for this host
      */
     public function getRrdFiles(string $hostname): array
@@ -507,7 +507,7 @@ class Rrd extends BaseDatastore
         $rrdDir = $this->dirFromHost($hostname);
         $pattern = "$rrdDir/*.rrd";
 
-        $files = array_map(fn($f) => basename($f), glob($pattern));
+        $files = array_map(fn ($f) => basename($f), glob($pattern));
         sort($files);
 
         return $files;
