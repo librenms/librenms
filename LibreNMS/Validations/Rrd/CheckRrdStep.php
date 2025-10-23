@@ -3,12 +3,11 @@
 namespace LibreNMS\Validations\Rrd;
 
 use App\Facades\LibrenmsConfig;
-use FilesystemIterator;
+use App\Facades\Rrd;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Validation;
 use LibreNMS\ValidationResult;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use Symfony\Component\Process\InputStream;
 use Symfony\Component\Process\Process;
 
@@ -35,54 +34,54 @@ class CheckRrdStep implements Validation
 
     public function validate(): ValidationResult
     {
-        $total = 0;
         $bad_step_files = [];
         $bad_files = [];
 
-        $this->rrdtool = new Process([LibrenmsConfig::get('rrdtool', 'rrdtool'), '-']);
+        $this->rrdtool = new Process(
+            command: [LibrenmsConfig::get('rrdtool', 'rrdtool'), '-'],
+            cwd: $this->rrd_dir,
+            env: $this->rrdcached ? ['RRDCACHED_ADDRESS' => $this->rrdcached] : [],
+        );
         $this->rrdtool->setInput($this->input);
         $this->rrdtool->setTimeout(15);
         $this->rrdtool->start();
 
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($this->rrd_dir, FilesystemIterator::SKIP_DOTS)
-        );
+        $rrd_files = DB::table('devices')
+            ->pluck('hostname')
+            ->flatMap(fn ($hostname) => Rrd::getRrdFiles(['hostname' => $hostname]))
+            ->map(fn ($file) => Str::chopStart($file, $this->rrd_dir))
+            ->all();
 
-        foreach ($iterator as $file) {
-            if ($file->isFile() && $file->getExtension() === 'rrd') {
-                $total++;
-                $rrd_file = $file->getPathname();
-                $rrd_name = $this->getRelativePath($rrd_file);
+        foreach ($rrd_files as $rrd_file) {
+            try {
+                $step = $this->getStep($rrd_file);
+                $target_step = str_ends_with($rrd_file, '/icmp-perf.rrd') ? $this->ping_rrd_step : $this->rrd_step;
 
-                try {
-                    $step = $this->getStep($rrd_file);
-                    $target_step = $file->getBasename('.rrd') === 'icmp-perf' ? $this->ping_rrd_step : $this->rrd_step;
-
-                    if ($step !== $target_step) {
-                        $bad_step_files[] = $rrd_name . ': step is ' . $step . ', should be ' . $target_step;
-                    }
-                } catch (\Exception $e) {
-                    $bad_files[] = $rrd_name . ': ' . $e->getMessage();
+                if ($step !== $target_step) {
+                    $bad_step_files[] = __('validation.validations.rrd.CheckRrdStep.list_bad_step_item', ['file' => $rrd_file, 'step' => $step, 'target' => $target_step]);
                 }
+            } catch (\Exception $e) {
+                $bad_files[] = $rrd_file . ': ' . $e->getMessage();
             }
         }
 
         $this->input->write("\n\n");
         $this->rrdtool->stop();
 
+        $total = count($rrd_files);
+
         if (! empty($bad_step_files)) {
-            return ValidationResult::fail('Some RRD files have the incorrect step. ' . count($bad_step_files) . "/$total")
-                ->setList('RRD files with incorrect step (backup rrd files before applying fix)', $bad_step_files)
+            return ValidationResult::fail(__('validation.validations.rrd.CheckRrdStep.fail', ['bad' => count($bad_step_files), 'total' => $total]))
+                ->setList(__('validation.validations.rrd.CheckRrdStep.list_bad_step_title'), $bad_step_files)
                 ->setFix('lnms maintenance:rrd-step all');
         }
 
         if (! empty($bad_files)) {
-            return ValidationResult::fail('Errors reading RRD files. ' . count($bad_files) . "/$total")
-//                ->setFix('rm ' . implode(' ', array_map(fn($file) => escapeshellarg($this->rrd_dir . explode(':', $file, 2)[0]), $bad_files)))
-                ->setList('Error running rrdinfo on files', $bad_files);
+            return ValidationResult::fail(__('validation.validations.rrd.CheckRrdStep.fail_bad_files', ['bad' => count($bad_files), 'total' => $total]))
+                ->setList(__('validation.validations.rrd.CheckRrdStep.list_bad_files_title'), $bad_files);
         }
 
-        return ValidationResult::ok("All $total RRD files have the correct step.");
+        return ValidationResult::ok(__('validation.validations.rrd.CheckRrdStep.ok', ['total' => $total]));
     }
 
     public function getStep(string $file): int
@@ -90,7 +89,7 @@ class CheckRrdStep implements Validation
         $step = 0;
 
         $this->rrdtool->clearOutput();
-        $this->input->write($this->infoCommand($file) . "\n");
+        $this->input->write("info $file\n");
 
         $this->rrdtool->waitUntil(function ($type, $buffer) use (&$step) {
             if ($type === Process::ERR) {
@@ -116,21 +115,5 @@ class CheckRrdStep implements Validation
     public function enabled(): bool
     {
         return LibrenmsConfig::get('rrd.step') !== self::DEFAULT_RRD_STEP || LibrenmsConfig::get('ping_rrd_step') !== self::DEFAULT_PING_RRD_STEP;
-    }
-
-    private function infoCommand(string $file): string
-    {
-        $daemon = '';
-        if ($this->rrdcached) {
-            $daemon = " --daemon $this->rrdcached";
-            $file = $this->getRelativePath($file);
-        }
-
-        return sprintf('info %s%s', $file, $daemon);
-    }
-
-    private function getRelativePath(string $file): string
-    {
-        return Str::chopStart($file, $this->rrd_dir);
     }
 }

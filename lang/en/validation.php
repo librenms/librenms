@@ -78,6 +78,14 @@ return [
                 'fail_mode' => 'Your RRD directory is not set to 0775',
                 'ok' => 'rrd_dir is writable',
             ],
+            'CheckRrdStep' => [
+                'fail' => 'Some RRD files have the incorrect step. :bad/:total',
+                'fail_bad_files' => 'Errors reading RRD files. :bad/:total',
+                'list_bad_step_title' => 'RRD files with incorrect step',
+                'list_bad_files_title' => 'Error running rrdinfo on files',
+                'list_bad_step_item' => ':file: step is :step, should be :target',
+                'ok' => 'All :total RRD files have the correct step.',
+            ],
         ],
         'database' => [
             'CheckDatabaseConnected' => [
