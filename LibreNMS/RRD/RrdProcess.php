@@ -42,6 +42,7 @@ class RrdProcess
             );
             $this->process->setInput($this->input);
             $this->process->setTimeout($this->timeout);
+            $this->process->setIdleTimeout($this->timeout);
             $this->process->start();
         }
     }
@@ -84,21 +85,6 @@ class RrdProcess
         $this->start();
         $this->logger->debug("RRD[%g$command%n]", ['color' => true]);
         $this->input->write("$command\n");
-    }
-
-    public function oneShot(array $command): string
-    {
-        $process = new Process(
-            command: [$this->rrdtool_exec] + $command,
-            cwd: $this->rrd_dir,
-            env: $this->env);
-
-        $cmd = $process->getCommandLine();
-        $this->logger->debug("RRD[%g$cmd%n]", ['color' => true]);
-
-        $process->run();
-
-        return $process->getOutput();
     }
 
     public function __destruct()

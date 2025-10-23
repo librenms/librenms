@@ -30,6 +30,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
+use Exception;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Enum\Severity;
@@ -37,6 +38,7 @@ use LibreNMS\Exceptions\FileExistsException;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Proc;
+use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Rewrite;
 use Log;
@@ -125,7 +127,7 @@ class Rrd extends BaseDatastore
             }
 
             return $this->isSyncRunning() && ($dual_process ? $this->isAsyncRunning() : true);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to start RRD datastore: ' . $e->getMessage());
 
             return false;
@@ -392,7 +394,7 @@ class Rrd extends BaseDatastore
      * @param  string  $options  rrdtool command options
      * @return array the output of stdout and stderr in an array
      *
-     * @throws \Exception thrown when the rrdtool process(s) cannot be started
+     * @throws Exception thrown when the rrdtool process(s) cannot be started
      */
     private function command($command, $filename, $options): array
     {
@@ -699,11 +701,19 @@ class Rrd extends BaseDatastore
      */
     public static function version(): ?string
     {
-        $proc = new Process([LibrenmsConfig::get('rrdtool', 'rrdtool'), '--version']);
-        $proc->run();
-        $parts = explode(' ', $proc->getOutput(), 3);
+        try {
+            $rrd = app(RrdProcess::class, ['timeout' => 10]);
+            $output = $rrd->run('--version');
+            $parts = explode(' ', $output, 3);
 
-        return $proc->isSuccessful() && isset($parts[1]) ? str_replace('1.7.01.7.0', '1.7.0', $parts[1]) : null;
+            if (isset($parts[1])) {
+                return str_replace('1.7.01.7.0', '1.7.0', $parts[1]);
+            }
+
+            return null;
+        } catch (Exception) {
+            return null;
+        }
     }
 
     /**
