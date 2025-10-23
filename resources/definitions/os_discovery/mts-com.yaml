@@ -1,9 +1,7 @@
 modules:
   os:
-    # Device header fields
-    hardware: .1.3.6.1.4.1.40865.1.2.0
-    version: .1.3.6.1.4.1.40865.1.3.0
-    sysName: .1.3.6.1.4.1.40865.1.4
+    hardware: ARHANGELSK-GLOBAL-REG::modelname.0
+    version: ARHANGELSK-GLOBAL-REG::controllerswversion.0
 
   sensors:
     voltage:
