@@ -487,9 +487,12 @@ class MapDataController extends Controller
                 $updowntime = '';
             }
 
+            $deviceTypes = collect(LibrenmsConfig::get('device_types', []));
+
             $device_list[$device->device_id] = [
                 'id' => $device->device_id,
                 'icon' => $device->icon,
+                'typeIcon' => $deviceTypes->firstWhere('type', $device->type)['icon'] ?? null,
                 'icontitle' => $device->icon ? str_replace(['.svg', '.png'], '', basename($device->icon)) : $device->os,
                 'sname' => $device->shortDisplayName(),
                 'status' => $device->status,
