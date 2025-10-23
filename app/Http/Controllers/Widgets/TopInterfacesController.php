@@ -50,7 +50,7 @@ class TopInterfacesController extends WidgetController
     {
         $data = $this->getSettings();
 
-        $query = Port::hasAccess($request->user())->with(['device' => function ($query) {
+        $query = Port::hasAccess($request->user())->with(['device' => function ($query): void {
             $query->select('device_id', 'hostname', 'sysName', 'status', 'os', 'display');
         }])
             ->isValid()

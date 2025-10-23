@@ -144,7 +144,7 @@ class ObjectCache
     private static function getPortCount($field, $device_id)
     {
         return Cache::remember("ObjectCache:port_{$field}_count:$device_id:" . auth()->id(), self::$cache_time, function () use ($field, $device_id) {
-            $query = Port::hasAccess(auth()->user())->when($device_id, function ($query) use ($device_id) {
+            $query = Port::hasAccess(auth()->user())->when($device_id, function ($query) use ($device_id): void {
                 $query->where('device_id', $device_id);
             });
             switch ($field) {
@@ -224,7 +224,7 @@ class ObjectCache
     private static function getServiceCount($field, $device_id)
     {
         return Cache::remember("ObjectCache:service_{$field}_count:$device_id:" . auth()->id(), self::$cache_time, function () use ($field, $device_id) {
-            $query = Service::hasAccess(auth()->user())->when($device_id, function ($query) use ($device_id) {
+            $query = Service::hasAccess(auth()->user())->when($device_id, function ($query) use ($device_id): void {
                 $query->where('device_id', $device_id);
             });
             switch ($field) {
@@ -262,7 +262,7 @@ class ObjectCache
     private static function getSensorCount($field, $device_id)
     {
         return Cache::remember("ObjectCache:sensor_{$field}_count:$device_id:" . auth()->id(), self::$cache_time, function () use ($field, $device_id) {
-            $query = Sensor::hasAccess(auth()->user())->when($device_id, function ($query) use ($device_id) {
+            $query = Sensor::hasAccess(auth()->user())->when($device_id, function ($query) use ($device_id): void {
                 $query->where('device_id', $device_id);
             });
             switch ($field) {

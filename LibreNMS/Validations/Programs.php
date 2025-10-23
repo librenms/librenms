@@ -80,7 +80,7 @@ class Programs extends BaseValidation
             return;
         }
 
-        if (substr($fping6, -6) == 'fping6') {
+        if (str_ends_with($fping6, 'fping6')) {
             $this->failFping($validator, $fping6, $output);
         }
     }

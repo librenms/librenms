@@ -71,27 +71,27 @@ class OutagesController extends TableController
 
         return DeviceOutage::hasAccess($request->user())
             ->with('device')
-            ->whereHas('device', function ($query) {
+            ->whereHas('device', function ($query): void {
                 $query->where('disabled', 0);
             })
-            ->when($from_ts || $to_ts, function ($query) use ($from_ts, $to_ts) {
-                $query->where(function ($q) use ($from_ts, $to_ts) {
+            ->when($from_ts || $to_ts, function ($query) use ($from_ts, $to_ts): void {
+                $query->where(function ($q) use ($from_ts, $to_ts): void {
                     // Outage starts within range
                     $this->applyDateRangeCondition($q, 'going_down', $from_ts, $to_ts);
 
                     // OR outage ends within range (if it has ended)
-                    $q->orWhere(function ($subQuery) use ($from_ts, $to_ts) {
+                    $q->orWhere(function ($subQuery) use ($from_ts, $to_ts): void {
                         $subQuery->whereNotNull('up_again');
                         $this->applyDateRangeCondition($subQuery, 'up_again', $from_ts, $to_ts);
                     });
 
                     // OR outage spans the entire range (started before, still ongoing or ended after)
-                    $q->orWhere(function ($subQuery) use ($from_ts, $to_ts) {
+                    $q->orWhere(function ($subQuery) use ($from_ts, $to_ts): void {
                         if ($from_ts) {
                             $subQuery->where('going_down', '<', $from_ts);
                         }
                         if ($to_ts) {
-                            $subQuery->where(function ($q) use ($to_ts) {
+                            $subQuery->where(function ($q) use ($to_ts): void {
                                 $q->whereNotNull('up_again') // Still ongoing
                                 ->orWhere('up_again', '>', $to_ts); // Ended after range
                             });
@@ -99,10 +99,10 @@ class OutagesController extends TableController
                     });
                 });
             })
-            ->when($request->status === 'current', function ($query) {
+            ->when($request->status === 'current', function ($query): void {
                 $query->whereNull('up_again');
             })
-            ->when($request->status === 'previous', function ($query) {
+            ->when($request->status === 'previous', function ($query): void {
                 $query->whereNotNull('up_again');
             });
     }

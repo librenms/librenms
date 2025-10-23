@@ -30,8 +30,8 @@ $dot1d = snmpwalk_group($device, 'slMacAddressGblManagement', 'ALCATEL-IND1-MAC-
 if (! empty($dot1d)) {
     echo 'AOS7+ MAC-ADDRESS-MIB:';
     $fdbPort_table = [];
-    foreach ($dot1d['slMacAddressGblManagement'] as $slMacDomain => $data) {
-        foreach ($data as $slLocaleType => $data2) {
+    foreach ($dot1d['slMacAddressGblManagement'] as $data) {
+        foreach ($data as $data2) {
             foreach ($data2 as $portLocal => $data3) {
                 foreach ($data3 as $vlanLocal => $data4) {
                     if (! isset($fdbPort_table[$vlanLocal]['dot1qTpFdbPort'])) {

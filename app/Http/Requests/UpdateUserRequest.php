@@ -77,7 +77,7 @@ class UpdateUserRequest extends FormRequest
      */
     public function withValidator($validator)
     {
-        $validator->after(function ($validator) {
+        $validator->after(function ($validator): void {
             // if not an admin and new_password is set, check old password matches
             $user = $this->route('user');
             if ($user && $this->user()->can('update', $user) && $this->user()->is($user)) {

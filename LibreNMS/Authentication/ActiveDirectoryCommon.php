@@ -44,7 +44,7 @@ trait ActiveDirectoryCommon
         if (PHP_INT_SIZE <= 4) {
             for ($i = 1; $i <= count($subAuths); $i++) {
                 if ($subAuths[$i] < 0) {
-                    $subAuths[$i] = $subAuths[$i] + 0x100000000;
+                    $subAuths[$i] += 0x100000000;
                 }
             }
         }

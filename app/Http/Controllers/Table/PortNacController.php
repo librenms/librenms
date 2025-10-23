@@ -113,7 +113,7 @@ class PortNacController extends TableController
 
                     return $this->queryByOui($vendor_ouis, $query);
                 default:
-                    return $query->where(function ($query) use ($search, $mac_search) {
+                    return $query->where(function ($query) use ($search, $mac_search): void {
                         $vendor_ouis = $this->ouisFromVendor($search);
                         $this->queryByOui($vendor_ouis, $query)
                             ->orWhereIntegerInRaw('ports_nac.port_id', $this->findPorts($search))
@@ -185,7 +185,7 @@ class PortNacController extends TableController
      */
     protected function queryByOui(array $vendor_ouis, Builder $query): Builder
     {
-        $query->where(function (Builder $query) use ($vendor_ouis) {
+        $query->where(function (Builder $query) use ($vendor_ouis): void {
             foreach ($vendor_ouis as $oui) {
                 $query->orWhere('ports_nac.mac_address', 'LIKE', "$oui%");
             }

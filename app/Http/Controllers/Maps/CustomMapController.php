@@ -258,7 +258,7 @@ class CustomMapController extends Controller
         $nodes = $map->nodes()->get();
         $edges = $map->edges()->get();
 
-        DB::transaction(function () use ($newmap, $newbackground, $nodes, $edges) {
+        DB::transaction(function () use ($newmap, $newbackground, $nodes, $edges): void {
             $newmap->save();
 
             if ($newbackground) {
@@ -275,7 +275,7 @@ class CustomMapController extends Controller
                 $node_id_map->put($node->custom_map_node_id, $newnode->custom_map_node_id);
             }
 
-            foreach ($edges as $id => $edge) {
+            foreach ($edges as $edge) {
                 $newedge = $edge->replicate();
                 $newedge->custom_map_id = $newmap->custom_map_id;
                 $newedge->custom_map_node1_id = $node_id_map->get($edge->custom_map_node1_id);

@@ -214,7 +214,7 @@ class DashboardController extends Controller
 
         if ($dashboard_copy->save()) {
             // copy widgets
-            $dashboard->widgets->each(function (UserWidget $widget) use ($dashboard_copy, $target_user_id) {
+            $dashboard->widgets->each(function (UserWidget $widget) use ($dashboard_copy, $target_user_id): void {
                 $dashboard_copy->widgets()->save($widget->replicate()->fill([
                     'user_id' => $target_user_id,
                 ]));

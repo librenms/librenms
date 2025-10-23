@@ -74,7 +74,7 @@ abstract class SelectController extends PaginatedAjaxController
 
         $controller->filterById($query, $request->get('id'));
         $controller->filter($request, $query, $controller->filterFields($request));
-        $controller->search($request->get('term'), $query, $this->searchFields($request));
+        $controller->search($request->get('term'), $query, $controller->searchFields($request));
         $controller->sort($request, $query);
 
         return $query;

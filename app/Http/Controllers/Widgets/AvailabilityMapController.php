@@ -140,7 +140,7 @@ class AvailabilityMapController extends WidgetController
         }
 
         $services = $services_query->with([
-            'device' => function ($query) {
+            'device' => function ($query): void {
                 $query->select(['devices.device_id', 'hostname', 'sysName', 'display']);
             },
         ])->select(['service_id', 'services.device_id', 'service_type', 'service_name', 'service_desc', 'service_status'])->get();
