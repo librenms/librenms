@@ -54,7 +54,6 @@ foreach ($cooling_unit as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.27.1.6.2.2.1.4.' . $index;
     $state_name = 'coolingUnitExtendedDiscreteDescription';
     $descr = $data[$state_name];
-    
     $tmp_states = explode(',', $data['coolingUnitExtendedDiscreteIntegerReferenceKey']);
     $states = [];
     foreach ($tmp_states as $k => $ref) {
@@ -74,7 +73,6 @@ foreach ($relays as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.10.3.2.1.1.3.' . $index;
     $state_name = 'emsOutputRelayControlOutputRelayName';
     $descr = $data[$state_name];
-    
     $states = [
         ['value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'immediateCloseEMS'],
         ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'immediateOpenEMS'],
