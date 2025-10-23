@@ -18,40 +18,32 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        php-version:
+          - 8.2
+          - 8.4
+        arguments:
+          - --os a
+          - --os b,c,d
+          - --os e,f
+          - --os g,h,i
+          - --os j,k,l,m,n
+          - --os o,p,q,r,s
+          - --os t
+          - --os u,v,w,x,y,z,0,1,2,3,4,5,6,7,8,9
         include:
+          -
+            name: PHP 8.2
+            php-version: 8.2
+            database: mysql:8.0
+          -
+            name: PHP 8.4
+            php-version: 8.4
+            database: mariadb:11.7
           -
             name: Other
             php-version: 8.4
             database: mariadb:11.7
-            arguments: "--full --exclude-phpunit-group=browser,mibs,external-dependencies,os"
-          -
-            name: "PHP 8.2"
-            php-version: 8.2
-            database: mysql:8.0
-            arguments: [
-              "--os a",
-              "--os b,c,d",
-              "--os e,f",
-              "--os g,h,i",
-              "--os j,k,l,m,n",
-              "--os o,p,q,r,s",
-              "--os t,u",
-              "--os v,w,x,y,z,0,1,2,3,4,5,6,7,8,9"
-            ]
-          -
-            name: "PHP 8.4"
-            php-version: 8.4
-            database: mariadb:11.7
-            arguments: [
-              "--os a",
-              "--os b,c,d",
-              "--os e,f",
-              "--os g,h,i",
-              "--os j,k,l,m,n",
-              "--os o,p,q,r,s",
-              "--os t,u",
-              "--os v,w,x,y,z,0,1,2,3,4,5,6,7,8,9"
-            ]
+            arguments: --full --exclude-phpunit-group=browser,mibs,external-dependencies,os
 
     services:
       database:
@@ -66,7 +58,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       -
         name: Set up PHP
         uses: shivammathur/setup-php@v2
