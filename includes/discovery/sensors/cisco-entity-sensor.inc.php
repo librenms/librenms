@@ -147,7 +147,7 @@ if ($device['os_group'] == 'cisco') {
 
                 // Check thresholds for this entry (bit dirty, but it works!)
                 if (isset($t_oids[$index]) && is_array($t_oids[$index])) {
-                    foreach ($t_oids[$index] as $t_index => $key) {
+                    foreach ($t_oids[$index] as $key) {
                         // Skip invalid treshold values
                         if (! isset($key['entSensorThresholdValue']) || $key['entSensorThresholdValue'] == '-32768' || $key['entSensorThresholdValue'] == '2147483647') {
                             continue;

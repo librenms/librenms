@@ -56,10 +56,10 @@ if ($components) {
         $rrd['stratum'] = $array['stratum'];
         $rrd['offset'] = $atNtpAssociationEntry[$array['UID']]['atNtpAssociationOffset'];
         $rrd['offset'] = str_replace(' milliseconds', '', $rrd['offset']);
-        $rrd['offset'] = $rrd['offset'] / 1000; // Convert to seconds
+        $rrd['offset'] /= 1000; // Convert to seconds
         $rrd['delay'] = $atNtpAssociationEntry[$array['UID']]['atNtpAssociationDelay'];
         $rrd['delay'] = str_replace(' milliseconds', '', $rrd['delay']);
-        $rrd['delay'] = $rrd['delay'] / 1000; // Convert to seconds
+        $rrd['delay'] /= 1000; // Convert to seconds
         $rrd['dispersion'] = $atNtpAssociationEntry[$array['UID']]['atNtpAssociationDisp'];
         $tags = ['type' => $type, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def, 'peer' => $peer];
         app('Datastore')->put($device, 'ntp', $tags, $rrd);

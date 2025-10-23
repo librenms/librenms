@@ -17,7 +17,7 @@ $multiplier = 1;
 $divisor = 1000000;
 
 foreach ($oids as $index => $ciscosb_data) {
-    foreach ($ciscosb_data as $key => $value) {
+    foreach ($ciscosb_data as $value) {
         if (! isset($value['rlPhyTestTableTransceiverTemp']) || $value['rlPhyTestTableTransceiverTemp'] == 0) {
             continue;
         }

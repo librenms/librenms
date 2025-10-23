@@ -47,7 +47,7 @@ function process_syslog($entry, $update)
     global $dev_cache;
 
     foreach (LibrenmsConfig::get('syslog_filter') as $bi) {
-        if (strpos($entry['msg'], $bi) !== false) {
+        if (str_contains($entry['msg'], $bi)) {
             return $entry;
         }
     }
@@ -63,7 +63,7 @@ function process_syslog($entry, $update)
         $hostname = get_cache($entry['host'], 'hostname');
 
         if (LibrenmsConfig::get('enable_syslog_hooks') && is_array(LibrenmsConfig::getOsSetting($os, 'syslog_hook'))) {
-            foreach (LibrenmsConfig::getOsSetting($os, 'syslog_hook') as $k => $v) {
+            foreach (LibrenmsConfig::getOsSetting($os, 'syslog_hook') as $v) {
                 $syslogprogmsg = $entry['program'] . ': ' . $entry['msg'];
                 if ((isset($v['script'])) && (isset($v['regex'])) && preg_match($v['regex'], $syslogprogmsg)) {
                     shell_exec(escapeshellcmd($v['script']) . ' ' . escapeshellarg($hostname) . ' ' . escapeshellarg($os) . ' ' . escapeshellarg($syslogprogmsg) . ' >/dev/null 2>&1 &');
@@ -73,7 +73,7 @@ function process_syslog($entry, $update)
 
         if (in_array($os, ['ios', 'iosxe', 'catos'])) {
             // multipart message
-            if (strpos($entry['msg'], ':') !== false) {
+            if (str_contains($entry['msg'], ':')) {
                 $matches = [];
                 $timestamp_prefix = '([\*\.]?[A-Z][a-z]{2} \d\d? \d\d:\d\d:\d\d(.\d\d\d)?( [A-Z]{3})?: )?';
                 $program_match = '(?<program>%?[A-Za-z\d\-_]+(:[A-Z]* %[A-Z\d\-_]+)?)';
@@ -138,7 +138,7 @@ function process_syslog($entry, $update)
                     $entry['program'] = str_replace('"', '', $val);
                 }
             }
-            $entry['msg'] = join(' ', $msg);
+            $entry['msg'] = implode(' ', $msg);
         }//end if
 
         if (! isset($entry['program'])) {

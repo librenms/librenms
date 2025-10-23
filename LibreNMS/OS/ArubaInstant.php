@@ -355,7 +355,7 @@ class ArubaInstant extends OS implements
 
         $index = 2;
         $ap_data = SnmpQuery::cache()->walk('AI-AP-MIB::aiAccessPointTable')->table(1);
-        foreach ($ap_data as $mac => $entry) {
+        foreach ($ap_data as $entry) {
             $type = $master_ip == $entry['AI-AP-MIB::aiAPIPAddress'] ? 'Master' : 'Member';
             $model = $entry['AI-AP-MIB::aiAPModel'] ?? null;
             $inventory->push(new EntPhysical([

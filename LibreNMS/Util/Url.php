@@ -565,7 +565,7 @@ class Url
                 $possibilities[] = "$distro.png";
 
                 // second, prefer the first two words of $feature (i.e. 'Red Hat' becomes 'redhat')
-                if (strpos($feature, ' ') !== false) {
+                if (str_contains($feature, ' ')) {
                     $distro = Str::replaceFirst(' ', '', strtolower(trim($feature)));
                     $distro = Str::before($distro, ' ');
                     $possibilities[] = "$distro.svg";

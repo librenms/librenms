@@ -111,7 +111,7 @@ foreach ($json_return['data']['checks'] as $key => $value) {
 $fields['time_to_polling_abs'] = abs($time_to_polling);
 
 if (abs($time_to_polling) > 540) {
-    $json_return['data']['alertString'] = $json_return['data']['alertString'] . "\nGreater than 540 seconds since the polled data was generated";
+    $json_return['data']['alertString'] .= "\nGreater than 540 seconds since the polled data was generated";
     $json_return['data']['alert'] = 1;
 }
 

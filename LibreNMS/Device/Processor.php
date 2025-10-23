@@ -180,7 +180,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
         $rrd_def = RrdDefinition::make()->addDataset('usage', 'GAUGE', -273, 1000);
 
-        foreach ($processors as $index => $processor) {
+        foreach ($processors as $processor) {
             extract($processor); // extract db fields to variables
             /** @var int $processor_id */
             /** @var string $processor_type */
@@ -248,7 +248,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             // idle value, subtract from 100
             $value = 100 - ($value / ($precision * -1));
         } elseif ($precision > 1) {
-            $value = $value / $precision;
+            $value /= $precision;
         }
 
         return $value;

@@ -21,7 +21,7 @@ class ConfigServiceProvider extends ServiceProvider
         });
 
         // if we skipped loading the DB the first time config was called, load it when it is available
-        $this->callAfterResolving('db', function () {
+        $this->callAfterResolving('db', function (): void {
             if ($this->app->resolved('librenms-config')) {
                 Log::error('Loaded config twice due to bad initialization order');
                 LibrenmsConfig::reload();

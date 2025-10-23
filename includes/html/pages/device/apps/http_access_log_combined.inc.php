@@ -127,7 +127,7 @@ if (isset($vars['access_log_page']) && $vars['access_log_page'] == 'bytes') {
         'POST',
         'PUT',
     ];
-    foreach ($stats as $key => $val) {
+    foreach ($stats as $val) {
         $graphs[] = [
             'type' => 'stat',
             'description' => $val,

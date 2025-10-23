@@ -126,7 +126,7 @@ $oids = SnmpQuery::walk([
     'PowerNet-MIB::emsOutletStatusEntry',
 ])->table(1);
 
-foreach ($oids as $id => $outlet) {
+foreach ($oids as $outlet) {
     $index = $outlet['PowerNet-MIB::emsOutletStatusOutletIndex'];
     $oid = '.1.3.6.1.4.1.318.1.1.10.3.16.1.1.3.' . $index;
     $descr = $outlet['PowerNet-MIB::emsOutletStatusOutletName'];

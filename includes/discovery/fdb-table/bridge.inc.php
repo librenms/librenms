@@ -58,7 +58,7 @@ if (! empty($fdbPort_table)) {
     $vlan_fdb_dict = [];
 
     // Indexed first by dot1qVlanTimeMark, which we ignore
-    foreach ($vlan_cur_table as $dot1qVlanTimeMark => $a) {
+    foreach ($vlan_cur_table as $a) {
         // Then by VLAN ID mapped to a single member array with the dot1qVlanFdbId
         foreach ($a as $vid => $data) {
             // Flip it round into the dictionary
