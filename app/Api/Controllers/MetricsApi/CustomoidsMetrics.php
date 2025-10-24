@@ -5,10 +5,10 @@ namespace App\Api\Controllers\MetricsApi;
 use App\Models\Customoid;
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Traits\MetricsHelpers;
 
 class CustomoidsMetrics
-{
-    use MetricsHelpers;
+{    
 
     public function render(Request $request): string
     {
@@ -22,9 +22,7 @@ class CustomoidsMetrics
         $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
 
         // Append global metrics
-        $lines[] = '# HELP librenms_customoids_total Total number of customoids';
-        $lines[] = '# TYPE librenms_customoids_total gauge';
-        $lines[] = "librenms_customoids_total {$total}";
+        $this->appendMetricBlock($lines, 'librenms_customoids_total', 'Total number of customoids', 'gauge', ["librenms_customoids_total {$total}"]);
 
         // Prepare per-customoid metrics arrays grouped by datatype
         $gauge_value_lines = [];
@@ -75,32 +73,16 @@ class CustomoidsMetrics
 
         // Append gauge-type customoids
         if (! empty($gauge_value_lines)) {
-            $lines[] = '# HELP librenms_customoid_value Custom oid current value (gauge)';
-            $lines[] = '# TYPE librenms_customoid_value gauge';
-            $lines = array_merge($lines, $gauge_value_lines);
-
-            $lines[] = '# HELP librenms_customoid_limit_warn Customoid warning threshold (gauge)';
-            $lines[] = '# TYPE librenms_customoid_limit_warn gauge';
-            $lines = array_merge($lines, $gauge_limit_warn_lines);
-
-            $lines[] = '# HELP librenms_customoid_limit_crit Customoid critical threshold (gauge)';
-            $lines[] = '# TYPE librenms_customoid_limit_crit gauge';
-            $lines = array_merge($lines, $gauge_limit_crit_lines);
+            $this->appendMetricBlock($lines, 'librenms_customoid_value', 'Custom oid current value', 'gauge', $gauge_value_lines);
+            $this->appendMetricBlock($lines, 'librenms_customoid_limit_warn', 'Customoid warning threshold', 'gauge', $gauge_limit_warn_lines);
+            $this->appendMetricBlock($lines, 'librenms_customoid_limit_crit', 'Customoid critical threshold', 'gauge', $gauge_limit_crit_lines);
         }
 
         // Append counter-type customoids (use distinct metric names to avoid TYPE conflicts)
         if (! empty($counter_value_lines)) {
-            $lines[] = '# HELP librenms_customoid_value_counter Custom oid current value (counter-like)';
-            $lines[] = '# TYPE librenms_customoid_value_counter counter';
-            $lines = array_merge($lines, $counter_value_lines);
-
-            $lines[] = '# HELP librenms_customoid_limit_warn_counter Customoid warning threshold (counter-like)';
-            $lines[] = '# TYPE librenms_customoid_limit_warn_counter counter';
-            $lines = array_merge($lines, $counter_limit_warn_lines);
-
-            $lines[] = '# HELP librenms_customoid_limit_crit_counter Customoid critical threshold (counter-like)';
-            $lines[] = '# TYPE librenms_customoid_limit_crit_counter counter';
-            $lines = array_merge($lines, $counter_limit_crit_lines);
+            $this->appendMetricBlock($lines, 'librenms_customoid_value_counter', 'Custom oid current value (counter-like)', 'counter', $counter_value_lines);
+            $this->appendMetricBlock($lines, 'librenms_customoid_limit_warn_counter', 'Customoid warning threshold (counter-like)', 'counter', $counter_limit_warn_lines);
+            $this->appendMetricBlock($lines, 'librenms_customoid_limit_crit_counter', 'Customoid critical threshold (counter-like)', 'counter', $counter_limit_crit_lines);
         }
 
         return implode("\n", $lines) . "\n";

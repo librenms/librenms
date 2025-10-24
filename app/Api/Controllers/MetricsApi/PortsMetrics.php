@@ -5,10 +5,10 @@ namespace App\Api\Controllers\MetricsApi;
 use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Http\Request;
+use Traits\MetricsHelpers;
 
 class PortsMetrics
-{
-    use MetricsHelpers;
+{    
 
     public function render(Request $request): string
     {
@@ -22,9 +22,7 @@ class PortsMetrics
         $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
 
         // Append global metrics
-        $lines[] = '# HELP librenms_ports_total Total number of ports';
-        $lines[] = '# TYPE librenms_ports_total gauge';
-        $lines[] = "librenms_ports_total {$total}";
+        $this->appendMetricBlock($lines, 'librenms_ports_total', 'Total number of ports', 'gauge', "librenms_ports_total {$total}");
 
         // Prepare per-port metric arrays
         $admin_lines = [];
@@ -76,42 +74,16 @@ class PortsMetrics
             $out_errors_lines[] = "librenms_port_ifOutErrors{{$labels}} " . ((int) $p->ifOutErrors ?: 0);
         }
 
-        // Append metrics
-        $lines[] = '# HELP librenms_port_admin_up Whether admin status is up (1) or not (0)';
-        $lines[] = '# TYPE librenms_port_admin_up gauge';
-        $lines = array_merge($lines, $admin_lines);
-
-        $lines[] = '# HELP librenms_port_oper_up Whether oper status is up (1) or not (0)';
-        $lines[] = '# TYPE librenms_port_oper_up gauge';
-        $lines = array_merge($lines, $oper_lines);
-
-        $lines[] = '# HELP librenms_port_speed_bits_per_second Port speed in bits per second';
-        $lines[] = '# TYPE librenms_port_speed_bits_per_second gauge';
-        $lines = array_merge($lines, $speed_lines);
-
-        $lines[] = '# HELP librenms_port_ifInOctets In octets';
-        $lines[] = '# TYPE librenms_port_ifInOctets counter';
-        $lines = array_merge($lines, $in_octets_lines);
-
-        $lines[] = '# HELP librenms_port_ifOutOctets Out octets';
-        $lines[] = '# TYPE librenms_port_ifOutOctets counter';
-        $lines = array_merge($lines, $out_octets_lines);
-
-        $lines[] = '# HELP librenms_port_ifInUcastPkts In unicast packets';
-        $lines[] = '# TYPE librenms_port_ifInUcastPkts counter';
-        $lines = array_merge($lines, $in_ucast_pkt_lines);
-
-        $lines[] = '# HELP librenms_port_ifOutUcastPkts Out unicast packets';
-        $lines[] = '# TYPE librenms_port_ifOutUcastPkts counter';
-        $lines = array_merge($lines, $out_ucast_pkt_lines);
-
-        $lines[] = '# HELP librenms_port_ifInErrors In errors';
-        $lines[] = '# TYPE librenms_port_ifInErrors counter';
-        $lines = array_merge($lines, $in_errors_lines);
-
-        $lines[] = '# HELP librenms_port_ifOutErrors Out errors';
-        $lines[] = '# TYPE librenms_port_ifOutErrors counter';
-        $lines = array_merge($lines, $out_errors_lines);
+        // Append per-port metrics
+        $this->appendMetricBlock($lines, 'librenms_port_admin_up', 'Whether admin status is up (1) or not (0)', 'gauge', $admin_lines);
+        $this->appendMetricBlock($lines, 'librenms_port_oper_up', 'Whether oper status is up (1) or not (0)', 'gauge', $oper_lines);
+        $this->appendMetricBlock($lines, 'librenms_port_speed_bits_per_second', 'Port speed in bits per second', 'gauge', $speed_lines);
+        $this->appendMetricBlock($lines, 'librenms_port_ifInOctets', 'In octets', 'counter', $in_octets_lines);
+        $this->appendMetricBlock($lines, 'librenms_port_ifOutOctets', 'Out octets', 'counter', $out_octets_lines);
+        $this->appendMetricBlock($lines, 'librenms_port_ifInUcastPkts', 'In unicast packets', 'counter', $in_ucast_pkt_lines);
+        $this->appendMetricBlock($lines, 'librenms_port_ifOutUcastPkts', 'Out unicast packets', 'counter', $out_ucast_pkt_lines);
+        $this->appendMetricBlock($lines, 'librenms_port_ifInErrors', 'In errors', 'counter', $in_errors_lines);
+        $this->appendMetricBlock($lines, 'librenms_port_ifOutErrors', 'Out errors', 'counter', $out_errors_lines);
 
         return implode("\n", $lines) . "\n";
     }
