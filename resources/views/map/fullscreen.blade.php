@@ -124,7 +124,7 @@ html, body, #fullscreen-map {
                 $.each( data, function( device_id, device ) {
                     
                     var icon = L.AwesomeMarkers.icon({
-                        icon: device.typeIcon ?? 'server',
+                        icon: device.typeIcon,
                         markerColor: device.status ? 'green' : (device.maintenance == 1 ? 'blue' : 'red'),
                         prefix: 'fa',
                         iconColor: 'white'

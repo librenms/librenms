@@ -17,7 +17,7 @@
                 success: function (data) {
                     var markers = Object.values(data).map((device) => {
                         var deviceMarker = L.AwesomeMarkers.icon({
-                            icon: device.typeIcon ?? 'server',
+                            icon: device.typeIcon,
                             markerColor: device.status ? 'green' : (device.maintenance == 1 ? 'blue' : 'red'),
                             prefix: 'fa',
                             iconColor: 'white'
