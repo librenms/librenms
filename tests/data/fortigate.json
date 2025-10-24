@@ -22,11 +22,11 @@
             "devices": [
                 {
                     "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.12356.15",
+                    "sysObjectID": ".1.3.6.1.4.1.12356.101.1.5006",
                     "sysDescr": "",
                     "sysContact": "<private>",
                     "version": "v5.6.4,build1575,180425 (GA)",
-                    "hardware": "FGT_501E",
+                    "hardware": "FortiGate 501E",
                     "features": null,
                     "location": "<private>",
                     "os": "fortigate",
