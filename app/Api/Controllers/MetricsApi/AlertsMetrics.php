@@ -6,11 +6,11 @@ use App\Models\Alert;
 use App\Models\AlertRule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Traits\MetricsHelpers;
 
 class AlertsMetrics
 {
-    
+    use Traits\MetricsHelpers;
+
     public function render(Request $request): string
     {
         $lines = [];

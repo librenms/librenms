@@ -5,10 +5,10 @@ namespace App\Api\Controllers\MetricsApi;
 use App\Models\Device;
 use App\Models\Mempool;
 use Illuminate\Http\Request;
-use Traits\MetricsHelpers;
 
 class MempoolsMetrics
 {
+    use Traits\MetricsHelpers;
 
     public function render(Request $request): string
     {

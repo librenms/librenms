@@ -6,10 +6,10 @@ use App\Models\Device;
 use App\Models\Port;
 use App\Models\PortStatistic;
 use Illuminate\Http\Request;
-use Traits\MetricsHelpers;
 
 class PortsStatisticsMetrics
 {
+    use Traits\MetricsHelpers;
 
     public function render(Request $request): string
     {
