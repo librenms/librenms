@@ -23,7 +23,6 @@
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
-
 use LibreNMS\OS;
 use LibreNMS\Util\Oid;
 
