@@ -39,7 +39,7 @@ class BashCompletionCommand extends Command
         $previous = getenv('COMP_PREVIOUS');
         $words = explode(' ', $line);
 
-        $command_name = isset($words[1]) ? $words[1] : $current; // handle : silliness
+        $command_name = $words[1] ?? $current; // handle : silliness
 
         if (count($words) < 3) {
             $completions = $this->completeCommand($command_name);
@@ -76,9 +76,7 @@ class BashCompletionCommand extends Command
                         $command_completions = $command->completeOptionValue($option, $current);
                     }
 
-                    $completions = $command_completions !== null
-                        ? $command_completions
-                        : $this->completeOptionValue($option, $current);
+                    $completions = $command_completions ?? $this->completeOptionValue($option, $current);
                 } else {
                     $completions = new Collection();
                     if (! Str::startsWith($previous, '-')) {

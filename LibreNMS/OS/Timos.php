@@ -939,10 +939,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         }
 
         $nonNg = str_replace('Ng', '', $ngField);
-        if (isset($data[$nonNg])) {
-            return $data[$nonNg];
-        }
 
-        return null;
+        return $data[$nonNg] ?? null;
     }
 }

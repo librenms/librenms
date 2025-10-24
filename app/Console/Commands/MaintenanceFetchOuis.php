@@ -58,7 +58,7 @@ class MaintenanceFetchOuis extends LnmsCommand
 
         // wait for 0-15 minutes to prevent stampeding herd
         if ($this->option('wait')) {
-            $seconds = rand(1, $this->max_wait_seconds);
+            $seconds = random_int(1, $this->max_wait_seconds);
             $minutes = (int) round($seconds / 60);
             $this->info(trans_choice('commands.maintenance:fetch-ouis.waiting', $minutes, ['minutes' => $minutes]));
             sleep($seconds);

@@ -44,8 +44,8 @@ class GoogleMapsApi extends BaseApi implements Geocoder
     protected function parseLatLng(array $data): array
     {
         return [
-            'lat' => isset($data['results'][0]['geometry']['location']['lat']) ? $data['results'][0]['geometry']['location']['lat'] : 0,
-            'lng' => isset($data['results'][0]['geometry']['location']['lng']) ? $data['results'][0]['geometry']['location']['lng'] : 0,
+            'lat' => $data['results'][0]['geometry']['location']['lat'] ?? 0,
+            'lng' => $data['results'][0]['geometry']['location']['lng'] ?? 0,
         ];
     }
 
@@ -55,7 +55,7 @@ class GoogleMapsApi extends BaseApi implements Geocoder
     protected function parseMessages(array $data): array
     {
         return [
-            'error' => isset($data['error_message']) ? $data['error_message'] : '',
+            'error' => $data['error_message'] ?? '',
             'response' => $data,
         ];
     }

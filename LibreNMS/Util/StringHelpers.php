@@ -73,7 +73,7 @@ class StringHelpers
             'zfs' => 'ZFS',
         ];
 
-        return isset($replacements[$string]) ? $replacements[$string] : ucwords(str_replace(['_', '-'], ' ', $string));
+        return $replacements[$string] ?? ucwords(str_replace(['_', '-'], ' ', $string));
     }
 
     /**

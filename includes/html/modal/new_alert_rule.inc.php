@@ -26,7 +26,7 @@ $default_acknowledgement_alerts = LibrenmsConfig::get('alert_rule.acknowledgemen
 $default_invert_map = LibrenmsConfig::get('alert_rule.invert_map');
 
 if (Auth::user()->hasGlobalAdmin()) {
-    $device_id = isset($device['device_id']) ? $device['device_id'] : -1;
+    $device_id = $device['device_id'] ?? -1;
     $filters = json_encode(new QueryBuilderFilter('alert')); ?>
 
     <div class="modal fade" id="create-alert" tabindex="-1" role="dialog"

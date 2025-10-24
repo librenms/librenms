@@ -181,7 +181,7 @@ class ValidationResult
      */
     public function consolePrint(): void
     {
-        c_echo(str_pad('[' . $this->getStatusText($this->status) . ']', 12) . $this->message . PHP_EOL);
+        c_echo(str_pad('[' . static::getStatusText($this->status) . ']', 12) . $this->message . PHP_EOL);
 
         if (isset($this->fix)) {
             c_echo("\t[%BFIX%n]: \n");
@@ -226,7 +226,7 @@ class ValidationResult
 
         return [
             'status' => $resultStatus,
-            'statusText' => substr($this->getStatusText($resultStatus), 2, -2), // remove console colors
+            'statusText' => substr(static::getStatusText($resultStatus), 2, -2), // remove console colors
             'message' => $this->getMessage(),
             'fix' => Arr::wrap($resultFix),
             'fixer' => $this->getFixer(),

@@ -155,7 +155,7 @@ final class ComponentTest extends DBTestCase
 
     public function testCreateComponent(): void
     {
-        $device_id = rand(1, 32);
+        $device_id = random_int(1, 32);
         $type = Str::random(9);
         $component = (new Component())->createComponent($device_id, $type);
 

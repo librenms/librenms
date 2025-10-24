@@ -134,8 +134,8 @@ class Url
         $contents .= '</div><br />';
 
         foreach ((array) $graphs as $entry) {
-            $graph = isset($entry['graph']) ? $entry['graph'] : 'unknown';
-            $graphhead = isset($entry['text']) ? $entry['text'] : 'unknown';
+            $graph = $entry['graph'] ?? 'unknown';
+            $graphhead = $entry['text'] ?? 'unknown';
             $contents .= '<div class="overlib-box">';
             $contents .= '<span class="overlib-title">' . $graphhead . '</span><br />';
             $contents .= Url::minigraphImage($device, $start, $end, $graph);
@@ -389,8 +389,8 @@ class Url
     public static function graphPopup($args, $content = null, $link = null)
     {
         // Take $args and print day,week,month,year graphs in overlib, hovered over graph
-        $original_from = isset($args['from']) ? $args['from'] : '';
-        $popup_title = isset($args['popup_title']) ? $args['popup_title'] : 'Graph';
+        $original_from = $args['from'] ?? '';
+        $popup_title = $args['popup_title'] ?? 'Graph';
         $now = CarbonImmutable::now();
 
         $graph = $content ?: self::graphTag($args);

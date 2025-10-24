@@ -293,7 +293,7 @@ class GraphController extends WidgetController
         if ($setting && ! is_numeric($setting)) {
             $data = json_decode($setting, true);
 
-            return isset($data[$key]) ? $data[$key] : 0;
+            return $data[$key] ?? 0;
         }
 
         return $setting;

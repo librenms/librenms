@@ -452,7 +452,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     $user_function = $data['user_func'];
                 }
                 // get the value for this sensor, check 'value' and 'oid', if state string, translate to a number
-                $data['value'] = isset($data['value']) ? $data['value'] : $data['oid'];  // fallback to oid if value is not set
+                $data['value'] = $data['value'] ?? $data['oid'];  // fallback to oid if value is not set
 
                 $snmp_value = $snmp_data[$data['value']] ?? '';
                 if (! is_numeric($snmp_value)) {
@@ -473,7 +473,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                 } elseif ($sensor_class === 'state') {
                     // translate string states to values (poller does this as well)
                     $states = array_column($data['states'], 'value', 'descr');
-                    $value = isset($states[$snmp_value]) ? $states[$snmp_value] : false;
+                    $value = $states[$snmp_value] ?? false;
                 } else {
                     $value = false;
                 }
@@ -538,17 +538,17 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     $limits = ['low_limit', 'low_warn_limit', 'warn_limit', 'high_limit'];
                     foreach ($limits as $limit) {
                         if (isset($data[$limit]) && is_numeric($data[$limit])) {
-                            $$limit = $data[$limit];
+                            ${$limit} = $data[$limit];
                         } else {
-                            $$limit = trim(YamlDiscovery::replaceValues($limit, $index, null, $data, $pre_cache));
-                            if (is_numeric($$limit)) {
-                                $$limit = ($$limit / $divisor) * $multiplier;
+                            ${$limit} = trim(YamlDiscovery::replaceValues($limit, $index, null, $data, $pre_cache));
+                            if (is_numeric(${$limit})) {
+                                ${$limit} = (${$limit} / $divisor) * $multiplier;
                             }
-                            if (is_numeric($$limit) && isset($user_function)) {
+                            if (is_numeric(${$limit}) && isset($user_function)) {
                                 if (is_callable($user_function)) {
-                                    $$limit = $user_function($$limit);
+                                    ${$limit} = $user_function(${$limit});
                                 } else {
-                                    $$limit = (new UserFuncHelper($$limit))->{$user_function}();
+                                    ${$limit} = (new UserFuncHelper(${$limit}))->{$user_function}();
                                 }
                             }
                         }
@@ -565,7 +565,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     }
 
                     $entPhysicalIndex = YamlDiscovery::replaceValues('entPhysicalIndex', $index, null, $data, $pre_cache) ?: null;
-                    $entPhysicalIndex_measured = isset($data['entPhysicalIndex_measured']) ? $data['entPhysicalIndex_measured'] : null;
+                    $entPhysicalIndex_measured = $data['entPhysicalIndex_measured'] ?? null;
 
                     //user_func must be applied after divisor/multiplier
                     if (isset($user_function)) {

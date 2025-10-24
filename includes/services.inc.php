@@ -192,8 +192,8 @@ function poll_service($service)
 
         // TODO: Put the 3 lines below in a function getStatus(int) ?
         $status_text = [0 => 'OK', 1 => 'Warning', 3 => 'Unknown'];
-        $old_status_text = isset($status_text[$old_status]) ? $status_text[$old_status] : 'Critical';
-        $new_status_text = isset($status_text[$new_status]) ? $status_text[$new_status] : 'Critical';
+        $old_status_text = $status_text[$old_status] ?? 'Critical';
+        $new_status_text = $status_text[$new_status] ?? 'Critical';
 
         Eventlog::log(
             "Service {$service['service_name']} ({$service['service_type']})' changed status from $old_status_text to $new_status_text - {$service['service_desc']} - $msg",

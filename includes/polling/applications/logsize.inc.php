@@ -107,11 +107,7 @@ foreach ($data['sets'] as $set_name => $set_data) {
         }
 
         uasort($app_data['sets'][$set_name]['log_sizes'], function ($a, $b) {
-            if ($a == $b) {
-                return 0;
-            }
-
-            return ($a > $b) ? -1 : 1;
+            return $b <=> $a;
         });
     }
 }

@@ -499,7 +499,7 @@ function cache_peeringdb()
         // We cache for 71 hours
         $cached = dbFetchCell('SELECT count(*) FROM `pdb_ix` WHERE (UNIX_TIMESTAMP() - timestamp) < 255600');
         if ($cached == 0) {
-            $rand = rand(3, 30);
+            $rand = random_int(3, 30);
             echo "No cached PeeringDB data found, sleeping for $rand seconds" . PHP_EOL;
             sleep($rand);
             $peer_keep = [];

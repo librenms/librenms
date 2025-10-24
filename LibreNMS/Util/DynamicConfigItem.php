@@ -238,7 +238,7 @@ class DynamicConfigItem implements \ArrayAccess
     #[\ReturnTypeWillChange]
     public function offsetGet($offset): mixed
     {
-        return isset($this->$offset) ? $this->$offset : null;
+        return $this->$offset ?? null;
     }
 
     public function offsetSet($offset, $value): void

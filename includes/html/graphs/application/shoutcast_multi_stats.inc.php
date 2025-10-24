@@ -37,7 +37,7 @@ if ($width > '500') {
 }
 
 foreach ($rrd_list as $rrd) {
-    $colours = (isset($rrd['colour']) ? $rrd['colour'] : 'default');
+    $colours = ($rrd['colour'] ?? 'default');
     $strlen = ((strlen($rrd['descr']) < $descr_len) ? ($descr_len - strlen($rrd['descr'])) : '0');
     $descr = (isset($rrd['descr']) ? \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr'], $desc_len + $strlen) : 'Unknown');
     for ($z = 0; $z < $strlen; $z++) {

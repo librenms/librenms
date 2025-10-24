@@ -250,11 +250,7 @@ function parse_entity_state($state, $value)
         ],
     ];
 
-    if (isset($data[$state][$value])) {
-        return $data[$state][$value];
-    }
-
-    return ['text' => 'na', 'color' => 'default'];
+    return $data[$state][$value] ?? ['text' => 'na', 'color' => 'default'];
 }
 
 function parse_entity_state_alarm($bits)

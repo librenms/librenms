@@ -129,7 +129,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             empty($data['type']) ? $os->getName() : $data['type'],
             $os->getDeviceId(),
             $data['num_oid'],
-            isset($data['index']) ? $data['index'] : $index,
+            $data['index'] ?? $index,
             empty($data['descr']) ? 'Processor' : trim($data['descr']),
             $precision,
             static::processData($data['value'], $precision),

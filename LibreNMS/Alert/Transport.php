@@ -95,7 +95,7 @@ abstract class Transport implements TransportInterface
             AlertState::CHANGED => LibrenmsConfig::get('alert_colour.changed'),
         ];
 
-        return isset($colors[$state]) ? $colors[$state] : '#337AB7';
+        return $colors[$state] ?? '#337AB7';
     }
 
     /**
