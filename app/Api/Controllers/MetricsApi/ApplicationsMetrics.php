@@ -6,10 +6,10 @@ use App\Models\Application;
 use App\Models\ApplicationMetric;
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Traits\MetricsHelpers;
 
 class ApplicationsMetrics
 {
-    use MetricsHelpers;
 
     public function render(Request $request): string
     {
@@ -25,11 +25,7 @@ class ApplicationsMetrics
             $totalQ = $totalQ->join('applications', 'application_metrics.app_id', '=', 'applications.app_id')->whereIn('applications.device_id', $filters['device_ids']->all());
         }
         $total = $totalQ->count();
-
-        // Append global metrics
-        $lines[] = '# HELP librenms_application_metrics_total Total number of application metrics rows';
-        $lines[] = '# TYPE librenms_application_metrics_total gauge';
-        $lines[] = "librenms_application_metrics_total {$total}";
+        $this->appendMetricBlock($lines, 'librenms_application_metrics_total', 'Total number of application metrics rows', 'gauge', ["librenms_application_metrics_total {$total}"]);
 
         $metric_lines = [];
 
@@ -78,9 +74,7 @@ class ApplicationsMetrics
         }
 
         // Append per-application metrics
-        $lines[] = '# HELP librenms_application_metric_value Application metric value';
-        $lines[] = '# TYPE librenms_application_metric_value gauge';
-        $lines = array_merge($lines, $metric_lines);
+        $this->appendMetricBlock($lines, 'librenms_application_metric_value', 'Application metric value', 'gauge', $metric_lines);
 
         return implode("\n", $lines) . "\n";
     }

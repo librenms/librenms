@@ -5,10 +5,10 @@ namespace App\Api\Controllers\MetricsApi;
 use App\Models\AccessPoint;
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Traits\MetricsHelpers;
 
 class AccessPointsMetrics
 {
-    use MetricsHelpers;
 
     public function render(Request $request): string
     {
@@ -22,9 +22,7 @@ class AccessPointsMetrics
         $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
 
         // Append global metrics
-        $lines[] = '# HELP librenms_access_points_total Total number of access points';
-        $lines[] = '# TYPE librenms_access_points_total gauge';
-        $lines[] = "librenms_access_points_total {$total}";
+        $this->appendMetricBlock($lines, 'librenms_access_points_total', 'Total number of access points', 'gauge', "librenms_access_points_total {$total}");
 
         // Prepare per-access-point metrics arrays
         $deleted_lines = [];
@@ -74,41 +72,15 @@ class AccessPointsMetrics
         }
 
         // Append per-access-point metrics
-        $lines[] = '# HELP librenms_access_point_deleted Whether an access point is deleted (1) or not (0)';
-        $lines[] = '# TYPE librenms_access_point_deleted gauge';
-        $lines = array_merge($lines, $deleted_lines);
-
-        $lines[] = '# HELP librenms_access_point_channel Access point channel';
-        $lines[] = '# TYPE librenms_access_point_channel gauge';
-        $lines = array_merge($lines, $channel_lines);
-
-        $lines[] = '# HELP librenms_access_point_txpow Access point transmit power';
-        $lines[] = '# TYPE librenms_access_point_txpow gauge';
-        $lines = array_merge($lines, $txpow_lines);
-
-        $lines[] = '# HELP librenms_access_point_radioutil Access point radio utilization';
-        $lines[] = '# TYPE librenms_access_point_radioutil gauge';
-        $lines = array_merge($lines, $radioutil_lines);
-
-        $lines[] = '# HELP librenms_access_point_numasoclients Number of associated clients (active)';
-        $lines[] = '# TYPE librenms_access_point_numasoclients gauge';
-        $lines = array_merge($lines, $numasoclients_lines);
-
-        $lines[] = '# HELP librenms_access_point_nummonclients Number of monitored clients';
-        $lines[] = '# TYPE librenms_access_point_nummonclients gauge';
-        $lines = array_merge($lines, $nummonclients_lines);
-
-        $lines[] = '# HELP librenms_access_point_numactbssid Number of active BSSIDs';
-        $lines[] = '# TYPE librenms_access_point_numactbssid gauge';
-        $lines = array_merge($lines, $numactbssid_lines);
-
-        $lines[] = '# HELP librenms_access_point_nummonbssid Number of monitored BSSIDs';
-        $lines[] = '# TYPE librenms_access_point_nummonbssid gauge';
-        $lines = array_merge($lines, $nummonbssid_lines);
-
-        $lines[] = '# HELP librenms_access_point_interference Interference level reported for access point';
-        $lines[] = '# TYPE librenms_access_point_interference gauge';
-        $lines = array_merge($lines, $interference_lines);
+        $this->appendMetricBlock($lines, 'librenms_access_point_deleted', 'Whether an access point is deleted (1) or not (0)', 'gauge', $deleted_lines);
+        $this->appendMetricBlock($lines, 'librenms_access_point_channel', 'Access point channel', 'gauge', $channel_lines);
+        $this->appendMetricBlock($lines, 'librenms_access_point_txpow', 'Access point transmit power', 'gauge', $txpow_lines);
+        $this->appendMetricBlock($lines, 'librenms_access_point_radioutil', 'Access point radio utilization', 'gauge', $radioutil_lines);
+        $this->appendMetricBlock($lines, 'librenms_access_point_numasoclients', 'Number of associated clients (active)', 'gauge', $numasoclients_lines);
+        $this->appendMetricBlock($lines, 'librenms_access_point_nummonclients', 'Number of monitored clients', 'gauge', $nummonclients_lines);
+        $this->appendMetricBlock($lines, 'librenms_access_point_numactbssid', 'Number of active BSSIDs', 'gauge', $numactbssid_lines);
+        $this->appendMetricBlock($lines, 'librenms_access_point_nummonbssid', 'Number of monitored BSSIDs', 'gauge', $nummonbssid_lines);
+        $this->appendMetricBlock($lines, 'librenms_access_point_interference', 'Interference level reported for access point', 'gauge', $interference_lines);
 
         return implode("\n", $lines) . "\n";
     }

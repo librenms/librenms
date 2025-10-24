@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class SensorsMetrics
 {
-    use MetricsHelpers;
+    use Traits\MetricsHelpers;
 
     public function render(Request $request): string
     {
@@ -22,9 +22,7 @@ class SensorsMetrics
         $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
 
         // Append global metrics
-        $lines[] = '# HELP librenms_sensors_total Total number of sensors';
-        $lines[] = '# TYPE librenms_sensors_total gauge';
-        $lines[] = "librenms_sensors_total {$total}";
+        $this->appendMetricBlock($lines, 'librenms_sensors_total', 'Total number of sensors', 'gauge', [$total]);
 
         // Group outputs by rrd_type
         $gauge_value_lines = [];
@@ -77,32 +75,16 @@ class SensorsMetrics
 
         // Append gauge sensors
         if (! empty($gauge_value_lines)) {
-            $lines[] = '# HELP librenms_sensor_value Current sensor value (units vary by sensor)';
-            $lines[] = '# TYPE librenms_sensor_value gauge';
-            $lines = array_merge($lines, $gauge_value_lines);
-
-            $lines[] = '# HELP librenms_sensor_limit_warn Sensor warning threshold';
-            $lines[] = '# TYPE librenms_sensor_limit_warn gauge';
-            $lines = array_merge($lines, $gauge_limit_warn_lines);
-
-            $lines[] = '# HELP librenms_sensor_limit_crit Sensor critical threshold';
-            $lines[] = '# TYPE librenms_sensor_limit_crit gauge';
-            $lines = array_merge($lines, $gauge_limit_crit_lines);
+            $this->appendMetricBlock($lines, 'librenms_sensor_value', 'Current sensor value (units vary by sensor)', 'gauge', $gauge_value_lines);
+            $this->appendMetricBlock($lines, 'librenms_sensor_limit_warn', 'Sensor warning threshold', 'gauge', $gauge_limit_warn_lines);
+            $this->appendMetricBlock($lines, 'librenms_sensor_limit_crit', 'Sensor critical threshold', 'gauge', $gauge_limit_crit_lines);
         }
 
         // Append counter-like sensors
         if (! empty($counter_value_lines)) {
-            $lines[] = '# HELP librenms_sensor_value_counter Current sensor value (counter-like)';
-            $lines[] = '# TYPE librenms_sensor_value_counter counter';
-            $lines = array_merge($lines, $counter_value_lines);
-
-            $lines[] = '# HELP librenns_sensor_limit_warn_counter Sensor warning threshold (counter-like)';
-            $lines[] = '# TYPE librenns_sensor_limit_warn_counter counter';
-            $lines = array_merge($lines, $counter_limit_warn_lines);
-
-            $lines[] = '# HELP librenns_sensor_limit_crit_counter Sensor critical threshold (counter-like)';
-            $lines[] = '# TYPE librenns_sensor_limit_crit_counter counter';
-            $lines = array_merge($lines, $counter_limit_crit_lines);
+            $this->appendMetricBlock($lines, 'librenms_sensor_value_counter', 'Current sensor value (counter-like)', 'counter', $counter_value_lines);
+            $this->appendMetricBlock($lines, 'librenms_sensor_limit_warn_counter', 'Sensor warning threshold (counter-like)', 'counter', $counter_limit_warn_lines);
+            $this->appendMetricBlock($lines, 'librenms_sensor_limit_crit_counter', 'Sensor critical threshold (counter-like)', 'counter', $counter_limit_crit_lines);
         }
 
         return implode("\n", $lines) . "\n";

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class WirelessSensorsMetrics
 {
-    use MetricsHelpers;
+    use Traits\MetricsHelpers;
 
     public function render(Request $request): string
     {
@@ -18,9 +18,7 @@ class WirelessSensorsMetrics
         $total = DB::table('wireless_sensors')->count();
 
         // Append global metrics
-        $lines[] = '# HELP librenms_wireless_sensors_total Total number of wireless sensors';
-        $lines[] = '# TYPE librenms_wireless_sensors_total gauge';
-        $lines[] = "librenms_wireless_sensors_total {$total}";
+        $this->appendMetricBlock($lines, 'librenms_wireless_sensors_total', 'Total number of wireless sensors', 'gauge', [$total]);
 
         // Group outputs by rrd_type
         $gauge_value_lines = [];
@@ -70,32 +68,16 @@ class WirelessSensorsMetrics
         // Append per-wireless-sensor metrics
         // Append gauge sensors
         if (! empty($gauge_value_lines)) {
-            $lines[] = '# HELP librenms_wireless_sensor_value Current wireless sensor value (units vary by sensor)';
-            $lines[] = '# TYPE librenms_wireless_sensor_value gauge';
-            $lines = array_merge($lines, $gauge_value_lines);
-
-            $lines[] = '# HELP librenms_wireless_sensor_limit_warn Sensor warning threshold';
-            $lines[] = '# TYPE librenms_wireless_sensor_limit_warn gauge';
-            $lines = array_merge($lines, $gauge_limit_warn_lines);
-
-            $lines[] = '# HELP librenms_wireless_sensor_limit_crit Sensor critical threshold';
-            $lines[] = '# TYPE librenms_wireless_sensor_limit_crit gauge';
-            $lines = array_merge($lines, $gauge_limit_crit_lines);
+            $this->appendMetricBlock($lines, 'librenms_wireless_sensor_value', 'Current wireless sensor value (units vary by sensor)', 'gauge', $gauge_value_lines);
+            $this->appendMetricBlock($lines, 'librenms_wireless_sensor_limit_warn', 'Sensor warning threshold', 'gauge', $gauge_limit_warn_lines);
+            $this->appendMetricBlock($lines, 'librenms_wireless_sensor_limit_crit', 'Sensor critical threshold', 'gauge', $gauge_limit_crit_lines);
         }
 
         // Append counter-like sensors
         if (! empty($counter_value_lines)) {
-            $lines[] = '# HELP librenms_wireless_sensor_value_counter Current wireless sensor value (counter-like)';
-            $lines[] = '# TYPE librenms_wireless_sensor_value_counter counter';
-            $lines = array_merge($lines, $counter_value_lines);
-
-            $lines[] = '# HELP librenms_wireless_sensor_limit_warn_counter Sensor warning threshold (counter-like)';
-            $lines[] = '# TYPE librenms_wireless_sensor_limit_warn_counter counter';
-            $lines = array_merge($lines, $counter_limit_warn_lines);
-
-            $lines[] = '# HELP librenms_wireless_sensor_limit_crit_counter Sensor critical threshold (counter-like)';
-            $lines[] = '# TYPE librenms_wireless_sensor_limit_crit_counter counter';
-            $lines = array_merge($lines, $counter_limit_crit_lines);
+            $this->appendMetricBlock($lines, 'librenms_wireless_sensor_value_counter', 'Current wireless sensor value (counter-like)', 'counter', $counter_value_lines);
+            $this->appendMetricBlock($lines, 'librenms_wireless_sensor_limit_warn_counter', 'Sensor warning threshold (counter-like)', 'counter', $counter_limit_warn_lines);
+            $this->appendMetricBlock($lines, 'librenms_wireless_sensor_limit_crit_counter', 'Sensor critical threshold (counter-like)', 'counter', $counter_limit_crit_lines);
         }
 
         return implode("\n", $lines) . "\n";
