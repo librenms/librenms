@@ -6,10 +6,10 @@ use App\Models\Device;
 use App\Models\Port;
 use App\Models\PortStatistic;
 use Illuminate\Http\Request;
+use Traits\MetricsHelpers;
 
 class PortsStatisticsMetrics
 {
-    use MetricsHelpers;
 
     public function render(Request $request): string
     {
@@ -27,11 +27,10 @@ class PortsStatisticsMetrics
             $total = PortStatistic::count();
         }
 
-        $lines[] = '# HELP librenms_ports_statistics_total Total number of ports_statistics rows';
-        $lines[] = '# TYPE librenms_ports_statistics_total gauge';
-        $lines[] = "librenms_ports_statistics_total {$total}";
+        // Append global metrics
+        $this->appendMetricBlock($lines, 'librenms_ports_statistics_total', 'Total number of ports_statistics rows', 'gauge', [$total]);
 
-        // Prepare arrays
+        // Prepare per-port stats arrays
         $in_nucast_lines = [];
         $out_nucast_lines = [];
         $in_discards_lines = [];
@@ -89,41 +88,15 @@ class PortsStatisticsMetrics
         }
 
         // Append per-port metrics
-        $lines[] = '# HELP librenms_port_ifInNUcastPkts In non-unicast packets';
-        $lines[] = '# TYPE librenms_port_ifInNUcastPkts counter';
-        $lines = array_merge($lines, $in_nucast_lines);
-
-        $lines[] = '# HELP librenms_port_ifOutNUcastPkts Out non-unicast packets';
-        $lines[] = '# TYPE librenms_port_ifOutNUcastPkts counter';
-        $lines = array_merge($lines, $out_nucast_lines);
-
-        $lines[] = '# HELP librenms_port_ifInDiscards In discards';
-        $lines[] = '# TYPE librenms_port_ifInDiscards counter';
-        $lines = array_merge($lines, $in_discards_lines);
-
-        $lines[] = '# HELP librenms_port_ifOutDiscards Out discards';
-        $lines[] = '# TYPE librenms_port_ifOutDiscards counter';
-        $lines = array_merge($lines, $out_discards_lines);
-
-        $lines[] = '# HELP librenms_port_ifInUnknownProtos In unknown protocols';
-        $lines[] = '# TYPE librenms_port_ifInUnknownProtos counter';
-        $lines = array_merge($lines, $in_unknown_proto_lines);
-
-        $lines[] = '# HELP librenms_port_ifInBroadcastPkts In broadcast packets';
-        $lines[] = '# TYPE librenms_port_ifInBroadcastPkts counter';
-        $lines = array_merge($lines, $in_broadcast_lines);
-
-        $lines[] = '# HELP librenms_port_ifOutBroadcastPkts Out broadcast packets';
-        $lines[] = '# TYPE librenms_port_ifOutBroadcastPkts counter';
-        $lines = array_merge($lines, $out_broadcast_lines);
-
-        $lines[] = '# HELP librenms_port_ifInMulticastPkts In multicast packets';
-        $lines[] = '# TYPE librenms_port_ifInMulticastPkts counter';
-        $lines = array_merge($lines, $in_multicast_lines);
-
-        $lines[] = '# HELP librenms_port_ifOutMulticastPkts Out multicast packets';
-        $lines[] = '# TYPE librenms_port_ifOutMulticastPkts counter';
-        $lines = array_merge($lines, $out_multicast_lines);
+        $this->appendMetricBlock($lines, 'librenms_port_ifInNUcastPkts', 'In non-unicast packets', 'counter', $in_nucast_lines);
+        $this->appendMetricBlock($lines, 'librenms_port_ifOutNUcastPkts', 'Out non-unicast packets', 'counter', $out_nucast_lines);
+        $this->appendMetricBlock($lines, 'librenms_port_ifInDiscards', 'In discards', 'counter', $in_discards_lines);
+        $this->appendMetricBlock($lines, 'librenms_port_ifOutDiscards', 'Out discards', 'counter', $out_discards_lines);
+        $this->appendMetricBlock($lines, 'librenms_port_ifInUnknownProtos', 'In unknown protocols', 'counter', $in_unknown_proto_lines);
+        $this->appendMetricBlock($lines, 'librenms_port_ifInBroadcastPkts', 'In broadcast packets', 'counter', $in_broadcast_lines);
+        $this->appendMetricBlock($lines, 'librenms_port_ifOutBroadcastPkts', 'Out broadcast packets', 'counter', $out_broadcast_lines);
+        $this->appendMetricBlock($lines, 'librenms_port_ifInMulticastPkts', 'In multicast packets', 'counter', $in_multicast_lines);
+        $this->appendMetricBlock($lines, 'librenms_port_ifOutMulticastPkts', 'Out multicast packets', 'counter', $out_multicast_lines);
 
         return implode("\n", $lines) . "\n";
     }

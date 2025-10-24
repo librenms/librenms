@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class StoragesMetrics
 {
-    use MetricsHelpers;
+    use Traits\MetricsHelpers;
 
     public function render(Request $request): string
     {
@@ -22,10 +22,9 @@ class StoragesMetrics
         $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
 
         // Append global metrics
-        $lines[] = '# HELP librenms_storages_total Total number of storage entries';
-        $lines[] = '# TYPE librenms_storages_total gauge';
-        $lines[] = "librenms_storages_total {$total}";
+        $this->appendMetricBlock($lines, 'librenms_storages_total', 'Total number of storage entries', 'gauge', [$total]);
 
+        // Prepare per-storage arrays
         $used_lines = [];
         $free_lines = [];
         $total_lines = [];
@@ -59,21 +58,10 @@ class StoragesMetrics
         }
 
         // Append per-storage metrics
-        $lines[] = '# HELP librenms_storage_used_bytes Used bytes in storage';
-        $lines[] = '# TYPE librenms_storage_used_bytes gauge';
-        $lines = array_merge($lines, $used_lines);
-
-        $lines[] = '# HELP librenms_storage_free_bytes Free bytes in storage';
-        $lines[] = '# TYPE librenms_storage_free_bytes gauge';
-        $lines = array_merge($lines, $free_lines);
-
-        $lines[] = '# HELP librenms_storage_total_bytes Total bytes in storage';
-        $lines[] = '# TYPE librenms_storage_total_bytes gauge';
-        $lines = array_merge($lines, $total_lines);
-
-        $lines[] = '# HELP librenms_storage_used_percent Percent used in storage';
-        $lines[] = '# TYPE librenms_storage_used_percent gauge';
-        $lines = array_merge($lines, $perc_lines);
+        $this->appendMetricBlock($lines, 'librenms_storage_used_bytes', 'Used bytes in storage', 'gauge', $used_lines);
+        $this->appendMetricBlock($lines, 'librenms_storage_free_bytes', 'Free bytes in storage', 'gauge', $free_lines);
+        $this->appendMetricBlock($lines, 'librenms_storage_total_bytes', 'Total bytes in storage', 'gauge', $total_lines);
+        $this->appendMetricBlock($lines, 'librenms_storage_used_percent', 'Percent used in storage', 'gauge', $perc_lines);
 
         return implode("\n", $lines) . "\n";
     }

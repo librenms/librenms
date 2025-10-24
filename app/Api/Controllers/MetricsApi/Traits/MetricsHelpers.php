@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Api\Controllers\MetricsApi;
+namespace App\Api\Controllers\MetricsApi\Traits;
 
 use App\Models\Device;
 use Illuminate\Http\Request;
@@ -9,14 +9,6 @@ use Illuminate\Support\Facades\DB;
 
 trait MetricsHelpers
 {
-    /**
-     * Escape a value for use in Prometheus labels
-     */
-    private function escapeLabel(string $v): string
-    {
-        return str_replace(['\\', '"', "\n"], ['\\\\', '\\"', '\\n'], $v);
-    }
-
     /**
      * Parse device / device group filters from the Request.
      * Supports:
@@ -79,5 +71,60 @@ trait MetricsHelpers
         }
 
         return $query->whereIn((string) ($query->getModel() ? $query->getModel()->getTable() . '.device_id' : 'device_id'), $deviceIds->all());
+    }
+
+    /**
+     * Given a collection of device ids, return a keyed map of Device models by device_id.
+     * If null is given, returns an empty collection.
+     */
+    private function gatherDevicesForIds(?Collection $deviceIds): Collection
+    {
+        if ($deviceIds === null || $deviceIds->isEmpty()) {
+            return collect();
+        }
+
+        return Device::select('device_id', 'hostname', 'sysName', 'type')
+            ->whereIn('device_id', $deviceIds)
+            ->get()
+            ->keyBy('device_id');
+    }
+
+    /**
+     * Escape a value for use in Prometheus labels
+     */
+    private function escapeLabel(string $v): string
+    {
+        return str_replace(['\\', '"', "\n"], ['\\\\', '\\"', '\\n'], $v);
+    }
+
+    /**
+     * Format a set of label key=>value pairs into a Prometheus label string.
+     * Values should already be escaped using escapeLabel from MetricsHelpers.
+     */
+    private function formatLabels(array $labels): string
+    {
+        $parts = [];
+        foreach ($labels as $k => $v) {
+            $parts[] = sprintf('%s="%s"', $k, $v);
+        }
+
+        return implode(',', $parts);
+    }
+
+    /**
+     * Append a metric block (HELP, TYPE, and lines) into the main lines array.
+     * $metricLines may be a single formatted metric line string or an array of lines.
+     */
+    private function appendMetricBlock(array &$lines, string $metricName, string $help, string $type, array|string $metricLines): void
+    {
+        $lines[] = '# HELP ' . $metricName . ' ' . $help;
+        $lines[] = '# TYPE ' . $metricName . ' ' . $type;
+
+        // Normalize to array
+        $metricLinesArr = is_array($metricLines) ? $metricLines : [$metricLines];
+
+        if (!empty($metricLinesArr)) {
+            $lines = array_merge($lines, $metricLinesArr);
+        }
     }
 }

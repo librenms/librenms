@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class ProcessorsMetrics
 {
-    use MetricsHelpers;
+    use Traits\MetricsHelpers;
 
     public function render(Request $request): string
     {
@@ -22,9 +22,7 @@ class ProcessorsMetrics
         $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
 
         // Append global metrics
-        $lines[] = '# HELP librenms_processors_total Total number of processors';
-        $lines[] = '# TYPE librenms_processors_total gauge';
-        $lines[] = "librenms_processors_total {$total}";
+        $this->appendMetricBlock($lines, 'librenms_processors_total', 'Total number of processors', 'gauge', [$total]);
 
         $usage_lines = [];
 
@@ -55,9 +53,7 @@ class ProcessorsMetrics
         }
 
         // Append per-processor metrics
-        $lines[] = '# HELP librenms_processor_usage_percent Processor usage percent (0-100)';
-        $lines[] = '# TYPE librenms_processor_usage_percent gauge';
-        $lines = array_merge($lines, $usage_lines);
+        $this->appendMetricBlock($lines, 'librenms_processor_usage_percent', 'Processor usage percent (0-100)', 'gauge', $usage_lines);
 
         return implode("\n", $lines) . "\n";
     }
