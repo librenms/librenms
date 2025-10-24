@@ -5,10 +5,10 @@ namespace App\Api\Controllers\MetricsApi;
 use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Http\Request;
-use Traits\MetricsHelpers;
 
 class PortsMetrics
-{    
+{
+    use Traits\MetricsHelpers;
 
     public function render(Request $request): string
     {

@@ -4,10 +4,10 @@ namespace App\Api\Controllers\MetricsApi;
 
 use App\Models\Device;
 use Illuminate\Http\Request;
-use Traits\MetricsHelpers;
 
 class DevicesMetrics
 {
+    use Traits\MetricsHelpers;
 
     public function render(Request $request): string
     {

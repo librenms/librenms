@@ -123,7 +123,7 @@ trait MetricsHelpers
         // Normalize to array
         $metricLinesArr = is_array($metricLines) ? $metricLines : [$metricLines];
 
-        if (!empty($metricLinesArr)) {
+        if (! empty($metricLinesArr)) {
             $lines = array_merge($lines, $metricLinesArr);
         }
     }

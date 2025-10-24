@@ -5,10 +5,10 @@ namespace App\Api\Controllers\MetricsApi;
 use App\Models\Customoid;
 use App\Models\Device;
 use Illuminate\Http\Request;
-use Traits\MetricsHelpers;
 
 class CustomoidsMetrics
-{    
+{
+    use Traits\MetricsHelpers;
 
     public function render(Request $request): string
     {
