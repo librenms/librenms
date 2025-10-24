@@ -466,7 +466,7 @@ if (! empty($peers)) {
                 $peer_data = [];
 
                 foreach ($oid_map as $source => $target) {
-                    $v = $peer_data_raw[$source] ?? in_array($target, $intFields) ? 0 : '';
+                    $v = $peer_data_raw[$source] ?? (in_array($target, $intFields) ? 0 : '');
 
                     if (Str::contains($source, 'LocalAddr')) {
                         try {
