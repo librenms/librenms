@@ -75,8 +75,10 @@ class DeviceGroup extends BaseModel
     public function updateDevices()
     {
         if ($this->type == 'dynamic') {
-            $this->devices()->sync(QueryBuilderFluentParser::fromJson($this->rules)->toQuery()
-                ->distinct()->pluck('devices.device_id'));
+            $ids = QueryBuilderFluentParser::fromJson($this->rules)
+                       ->toQuery()->pluck('devices.device_id');
+            $ids = collect($ids)->unique()->all();  // ensure unique device IDs
+            $this->devices()->sync($ids);
         }
     }
 
