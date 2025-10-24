@@ -19,11 +19,7 @@ $mempool_classes = [
 $mempools = DeviceCache::get($device['device_id'])->mempools->sort(function (Mempool $a_weight, Mempool $b_weight) use ($mempool_classes) {
     $a_weight = $mempool_classes[$a_weight->mempool_class] ?? 99;
     $b_weight = $mempool_classes[$b_weight->mempool_class] ?? 99;
-    if ($a_weight == $b_weight) {
-        return 0;
-    }
-
-    return $a_weight < $b_weight ? -1 : 1;
+    return $a_weight <=> $b_weight;
 })->values();
 
 // find available
