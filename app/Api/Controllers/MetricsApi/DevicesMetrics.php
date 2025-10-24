@@ -4,10 +4,10 @@ namespace App\Api\Controllers\MetricsApi;
 
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Traits\MetricsHelpers;
 
 class DevicesMetrics
 {
-    use MetricsHelpers;
 
     public function render(Request $request): string
     {
@@ -25,17 +25,9 @@ class DevicesMetrics
         $down = $this->applyDeviceFilter($downQ, $filters['device_ids'])->count();
 
         // Append global metrics
-        $lines[] = '# HELP librenms_devices_total Total number of devices';
-        $lines[] = '# TYPE librenms_devices_total gauge';
-        $lines[] = "librenms_devices_total {$total}";
-
-        $lines[] = '# HELP librenms_devices_up Number of devices currently up';
-        $lines[] = '# TYPE librenms_devices_up gauge';
-        $lines[] = "librenms_devices_up {$up}";
-
-        $lines[] = '# HELP librenms_devices_down Number of devices currently down';
-        $lines[] = '# TYPE librenms_devices_down gauge';
-        $lines[] = "librenms_devices_down {$down}";
+        $this->appendMetricBlock($lines, 'librenms_devices_total', 'Total number of devices', 'gauge', ["librenms_devices_total {$total}"]);
+        $this->appendMetricBlock($lines, 'librenms_devices_up', 'Number of devices currently up', 'gauge', ["librenms_devices_up {$up}"]);
+        $this->appendMetricBlock($lines, 'librenms_devices_down', 'Number of devices currently down', 'gauge', ["librenms_devices_down {$down}"]);
 
         // Prepare per-device arrays
         $device_up_lines = [];
@@ -70,25 +62,11 @@ class DevicesMetrics
         }
 
         // Append per-device metrics
-        $lines[] = '# HELP librenms_device_up Whether a device is up (1) or not (0)';
-        $lines[] = '# TYPE librenms_device_up gauge';
-        $lines = array_merge($lines, $device_up_lines);
-
-        $lines[] = '# HELP librenms_last_polled_timetaken_seconds Last polled time taken in seconds';
-        $lines[] = '# TYPE librenms_last_polled_timetaken_seconds gauge';
-        $lines = array_merge($lines, $polled_timetaken_lines);
-
-        $lines[] = '# HELP librenms_last_discovered_timetaken_seconds Last discovered time taken in seconds';
-        $lines[] = '# TYPE librenms_last_discovered_timetaken_seconds gauge';
-        $lines = array_merge($lines, $discovered_timetaken_lines);
-
-        $lines[] = '# HELP librenms_last_ping_timetaken_seconds Last ping time taken in seconds';
-        $lines[] = '# TYPE librenms_last_ping_timetaken_seconds gauge';
-        $lines = array_merge($lines, $ping_timetaken_lines);
-
-        $lines[] = '# HELP librenms_device_uptime_seconds Device uptime in seconds (0 if down)';
-        $lines[] = '# TYPE librenms_device_uptime_seconds gauge';
-        $lines = array_merge($lines, $uptime_lines);
+        $this->appendMetricBlock($lines, 'librenms_device_up', 'Whether a device is up (1) or not (0)', 'gauge', $device_up_lines);
+        $this->appendMetricBlock($lines, 'librenms_last_polled_timetaken_seconds', 'Last polled time taken in seconds', 'gauge', $polled_timetaken_lines);
+        $this->appendMetricBlock($lines, 'librenms_last_discovered_timetaken_seconds', 'Last discovered time taken in seconds', 'gauge', $discovered_timetaken_lines);
+        $this->appendMetricBlock($lines, 'librenms_last_ping_timetaken_seconds', 'Last ping time taken in seconds', 'gauge', $ping_timetaken_lines);
+        $this->appendMetricBlock($lines, 'librenms_device_uptime_seconds', 'Device uptime in seconds (0 if down)', 'gauge', $uptime_lines);
 
         return implode("\n", $lines) . "\n";
     }
