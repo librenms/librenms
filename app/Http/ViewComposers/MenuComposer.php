@@ -103,7 +103,15 @@ class MenuComposer
         $vars['links'] = Link::exists();
         $vars['device_dependencies'] = \DB::table('device_relationships')->exists();
         $vars['device_group_dependencies'] = $vars['device_groups']->isNotEmpty() && \DB::table('device_group_device')->exists();
-        $vars['custommaps'] = CustomMap::select(['custom_map_id', 'name', 'menu_group'])->hasAccess($user)->orderBy('name')->get()->groupBy('menu_group')->sortKeys();
+
+        $vars['custommaps_groups'] = CustomMap::select(['custom_map_id', 'name', 'menu_group'])
+            ->hasAccess($user)->orderBy('name')->get()
+            ->groupBy('menu_group')->sortKeys();
+        $vars['custommaps'] = $vars['custommaps_groups']->pull('');
+        if ($vars['custommaps']->count() >= 20) {
+            $vars['custommaps_groups']->prepend($vars['custommaps'], __('Custom Maps'));
+            $vars['custommaps'] = new Collection;
+        }
 
         // Service menu
         if (LibrenmsConfig::get('show_services')) {
