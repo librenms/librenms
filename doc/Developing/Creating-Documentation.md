@@ -68,8 +68,26 @@ This is achieved with `mkdocs`, a python package.
 
 1. Install the required packages.
 
+Make a new virtual environment and activate it:
+
 ```
-pip install mkdocs mkdocs-exclude mkdocs-material mkdocs-macros-plugin mkdocs-minify-plugin mkdocs-redirects mkdocs-include-dir-to-nav
+python -m venv .python_venvs/docs
+source .python_venvs/docs/bin/activate
+```
+
+```
+pip install \
+ markdown-exec \
+ markdown-include \
+ mkdocs \
+ mkdocs-awesome-pages-plugin \
+ mkdocs-exclude \
+ mkdocs-git-revision-date-localized-plugin \
+ mkdocs-include-dir-to-nav \
+ mkdocs-macros-plugin \
+ mkdocs-material \
+ mkdocs-minify-plugin \
+ mkdocs-redirects
 ```
 If you encounter permissions issues, these might be reoslved by using the
 user option, with whatever user you are building as, e.g. `-u librenms`
