@@ -91,19 +91,6 @@ html, body, #fullscreen-map {
     });
     device_map.addLayer(device_marker_cluster);
 
-    var redMarker = L.AwesomeMarkers.icon({
-        icon: 'server',
-        markerColor: 'red', prefix: 'fa', iconColor: 'white'
-    });
-    var blueMarker = L.AwesomeMarkers.icon({
-        icon: 'server',
-        markerColor: 'blue', prefix: 'fa', iconColor: 'white'
-    });
-    var greenMarker = L.AwesomeMarkers.icon({
-        icon: 'server',
-        markerColor: 'green', prefix: 'fa', iconColor: 'white'
-    });
-
     var device_markers = {};
     var link_markers = {};
 
@@ -135,14 +122,19 @@ html, body, #fullscreen-map {
 @endif
             .done(function( data ) {
                 $.each( data, function( device_id, device ) {
-                    var icon = greenMarker;
+                    
+                    var icon = L.AwesomeMarkers.icon({
+                        icon: device.typeIcon,
+                        markerColor: device.status ? 'green' : (device.maintenance == 1 ? 'blue' : 'red'),
+                        prefix: 'fa',
+                        iconColor: 'white'
+                    });
+
                     var z_offset = 0;
                     if (device["status"] == 0) {
                         if (device["maintenance"] != 0) {
-                            icon = blueMarker;
                             z_offset = 5000;
                         } else {
-                            icon = redMarker;
                             z_offset = 10000;
                         }
                     }
