@@ -1,49 +1,44 @@
 # Distributed Polling
 
-Distributed polling allows the workers to be spread across additional
-servers for horizontal scaling. 
+**Distributed Polling** enables LibreNMS to spread polling and discovery tasks across multiple servers for horizontal scaling.
 
-A single poller can poll up to 1000 devices or more, depending on many
-variables such as latency and the amount of data being polled.
-Before reaching for distributed polling review the [performance documentation](../Support/Performance.md)
-to ensure that your install is running well.
+A single poller can typically handle up to **1,000+ devices**, depending on factors like latency and device responsiveness.
+Before deploying distributed polling, review the [Performance Documentation](../Support/Performance.md) to ensure your system is fully optimized.
 
-Distributed polling is not intended for remote polling.
+> **Note:** Distributed polling is **not intended for remote polling**.
+
+---
 
 ## Overview
 
-In addition to splitting up the services required to run LibreNMS to run
-on separate servers, distributed polling allows polling to be spread
-across multiple servers.
+In addition to separating LibreNMS components across different servers, distributed polling allows poller workloads to be balanced among multiple nodes.
 
-LibreNMS is made up of the following services:
+LibreNMS consists of several core services:
 
-- Poller/Discovery/etc workers
-- RRD (Time series data store)
+- Poller, Discovery, and related workers
+- RRD (time-series data store)
 - Database
-- Webserver (Web UI/API)
+- Web Server (UI/API)
 
 Distributed Polling also requires:
 
 - [The Dispatcher Service](Dispatcher-Service.md)
-- [Redis](#redis)
 - [RRDCached](RRDCached.md)
+- [Redis](#redis)
 
-All nodes must point to the same instance of following services:
+All poller nodes must connect to the same instance of:
 
- - Database
- - Redis
- - RRDCached
+- Database
+- RRDCached
+- Redis
 
 ---
 
 ## Redis
 
-Distributed polling uses Redis for coordination of nodes.
+Distributed Polling uses **Redis** to coordinate polling nodes.
 
-Install and configure Redis on a server.  Once it is set up, you
-will need to set the following environment variables in the
-`.env` file on all nodes:
+Install and configure Redis on a shared server, then set the following environment variables in the `.env` file on **all nodes**:
 
 ```dotenv
 REDIS_HOST=127.0.0.1
@@ -51,37 +46,37 @@ REDIS_PORT=6379
 REDIS_DB=0
 REDIS_TIMEOUT=60
 
-# If requirepass is set in redis set everything above as well as: (recommended)
+# If Redis authentication is enabled (recommended):
 REDIS_PASSWORD=PasswordGoesHere
 
-# If ACL's are in use, set everything above as well as: (recommended)
+# If Redis ACLs are in use (recommended):
 REDIS_USERNAME=UsernameGoesHere
 ```
 
-
 ### Sentinel
 
-Note that if you use Sentinel, you may still need `REDIS_PASSWORD`, `REDIS_USERNAME`, `REDIS_DB` and `REDIS_TIMEOUT`
-Sentinel just provides the address of the instance currently accepting writes and manages failover. 
-It's possible (and recommended) to have authentication both on Sentinel and the managed Redis instances.
+If you use Redis Sentinel, you may still need to define
+`REDIS_PASSWORD`, `REDIS_USERNAME`, `REDIS_DB`, and `REDIS_TIMEOUT`.
 
+Sentinel provides high availability and automatic failover.
+Authentication can (and should) be enabled for both Sentinel and Redis instances.
 
 ```dotenv
 REDIS_SENTINEL=redis-001.example.org:26379,redis-002.example.org:26379,redis-003.example.org:26379
 REDIS_SENTINEL_SERVICE=mymaster
 
-# If requirepass is set in sentinel, set everything above as well as: (recommended)
+# If Sentinel authentication is enabled (recommended):
 REDIS_SENTINEL_PASSWORD=SentinelPasswordGoesHere
-
-# If ACL's are in use, set everything above as well as: (recommended)
 REDIS_SENTINEL_USERNAME=SentinelUsernameGoesHere
 ```
 
 ### Redis Security
-For more information on ACL's, see <https://redis.io/docs/management/security/acl/>
 
-#### Caching, Locks, and Sessions
-Since you have set up Redis you should enable it for various uses in LibreNMS.
+See <https://redis.io/docs/management/security/acl/> for details on Redis ACLs and security best practices.
+
+### Caching, Locks, and Sessions
+
+Since Redis is already configured, enable it for caching, queues, and sessions:
 
 ```dotenv
 CACHE_DRIVER=redis
@@ -89,26 +84,21 @@ QUEUE_CONNECTION=redis
 SESSION_DRIVER=redis
 ```
 
-Enable distributed polling to make options show in the web ui.
-!!! setting "poller/distributed"
-```bash
-lnms config:set distributed_poller true
-```
-
 ---
 
 ## Configuration
 
-Connection settings are required in `.env`. The `.env` file is
-generated after composer install and `APP_KEY` and `NODE_ID` are set.
+Each node requires valid connection settings in `.env`.
+This file is generated after running Composer and setting both `APP_KEY` and `NODE_ID`.
 
-!!! Warning
-    `APP_KEY` must be the same for all nodes.
-    `NODE_ID` must be unique for each node.`
+!!! warning
+    `APP_KEY` must be **identical** across all nodes.
+
+    `NODE_ID` must be **unique** per node.
 
 ```dotenv
-APP_KEY=   #Required
-NODE_ID=   #Required
+APP_KEY=   # Required - same on all nodes
+NODE_ID=   # Required - unique per node
 
 DB_HOST=localhost
 DB_DATABASE=librenms
@@ -116,12 +106,14 @@ DB_USERNAME=librenms
 DB_PASSWORD=
 ```
 
+---
+
 ## Poller Groups
 
-Poller groups allow you to pin devices to a single or a group of designated pollers.
-By default all devices and pollers are assigned to group 0.
+Poller groups allow you to assign devices to specific pollers or sets of pollers.
+By default, all devices and pollers belong to **group 0**.
 
-To show poller groups in the Web UI, set:
+Enable distributed polling to expose poller group options in the Web UI:
 
 !!! setting "poller/distributed"
     ```bash
@@ -129,14 +121,14 @@ To show poller groups in the Web UI, set:
     ```
 
 ### Creating Poller Groups
-To create a poller groups go to **Settings > Poller > Groups**.
 
-### Assigning Poller Nodes to Poller Groups
+In the Web UI, go to **Settings > Poller > Groups** to create groups.
 
-In the web UI, go to **Settings > Poller > Settings** and select the desired group for each node.
+### Assigning Poller Nodes to Groups
 
-You can also set groups in `config.php`
-This is overriden by the poller specific settings in the web UI and should not be set in the global configuration.
+In **Settings > Poller > Settings**, choose poller group(s) for each node.
+
+You can also set poller groups manually in `config.php` (though this is overridden by per-node Web UI settings):
 
 ```php
 $config['distributed_poller_group'] = '1,2,3';
@@ -144,9 +136,8 @@ $config['distributed_poller_group'] = '1,2,3';
 
 ### Assigning Devices to a Poller Group
 
-You can select a poller group when adding devices or by editing the device.
-
-You can change the default poller group by setting:
+You can assign devices to a poller group when adding or editing them.
+To change the default poller group:
 
 !!! setting "poller/distributed"
     ```bash
@@ -154,8 +145,9 @@ You can change the default poller group by setting:
     ```
 
 ### Distributed Billing
-By default billing will only run on a single poller.
-To allow billing to use polling groups, set:
+
+By default, billing runs on a single poller.
+To allow billing across groups:
 
 !!! setting "poller/distributed"
     ```bash
@@ -166,22 +158,24 @@ To allow billing to use polling groups, set:
 
 ## Scaling
 
-Scaling your install gradually is the best way to keep things as simple as possible
-while still being able to meet your needs.
+Scale gradually to simplify management and maintain reliability.
+Stop when you are able to handle your work load.
 
-1. First start with a working single server install
-2. Set up and enable [RRDCached](RRDCached.md)
-3. Switch to [The Dispatcher Service](Dispatcher-Service.md)
-4. Go through the [performance documentation](../Support/Performance.md) to ensure that your install is running well.
-5. Move services to additional servers. These services can be located on any server.
+1. Start with a stable single-server installation.
+2. Enable [RRDCached](RRDCached.md).
+3. Switch to [The Dispatcher Service](Dispatcher-Service.md).
+4. Review [Performance Documentation](../Support/Performance.md).
+5. Move services to separate servers as needed:
     - Database
     - RRDCached
-    - Web Server (UI and API)
+    - Web Server (UI/API)
     - Poller
-6. Set up and configure Redis
-7. Add an additional poller
-8. Add more pollers as needed
-9. Consider using poller groups to pin devices to various pollers
+6. Configure Redis.
+7. Add an additional poller node.
+8. Add more pollers as required.
+9. Use poller groups to control how devices are distributed across nodes.
+
+---
 
 ## High Availability
 
@@ -189,22 +183,19 @@ Electrocret said he is going to write a guide on this. :D
 
 ---
 
-## Setting up a dispatcher only node
+## Dispatcher-Only Node
 
-For a node that intended to only run poller (and other) work we can streamline
-the install by skipping the folloing things:
+For nodes dedicated solely to polling, you can skip certain setup steps to streamline installation.
 
- - Database
- - Web Server
- - Web install
- - Cron scripts
+Do **not** install or configure:
 
-Run through the [install documentation](../Installation/Install-LibreNMS.md) skipping all steps that
-to configure database and web server.
+- Database
+- Web Server
+- Web Installer
+- Cron Scripts
 
-When you get to the web install step, instead you should manually create .env by copying it from another node.
-Make sure you modify `NODE_ID` to be unique.
+Follow the [installation guide](../Installation/Install-LibreNMS.md), skipping database and web configuration steps.
+When prompted for the web install, instead copy the `.env` file from another node and assign a unique `NODE_ID`.
 
-Set up the [dispatcher service](Dispatcher-Service.md)
-
-The poller node should now be active and show in the web ui.
+Then set up the [Dispatcher Service](Dispatcher-Service.md).
+The poller node will appear in the Web UI once it starts reporting.
