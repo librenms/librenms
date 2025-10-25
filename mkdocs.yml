@@ -186,7 +186,7 @@ nav:
       - Bare Dashboard: Support/Bare-Dashboard.md
       - Cleanup Options: Support/Cleanup-options.md
       - Customizing the Web UI: Extensions/Customizing-the-Web-UI.md
-      - Dispatcher Service (RC): Extensions/Dispatcher-Service.md
+      - Dispatcher Service: Extensions/Dispatcher-Service.md
       - Environment Variables: Support/Environment-Variables.md
       - Fast Ping Checking: Extensions/Fast-Ping-Check.md
       - Galera Database Cluster: Extensions/Galera-Cluster.md

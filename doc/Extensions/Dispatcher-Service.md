@@ -1,10 +1,10 @@
 # Dispatcher Service
 
-The LibreNMS dispatcher service (`librenms-service.py`) is a method
-of running the poller service at set times. It does not replace the php scripts,
-just the cron entries running them.
+The **LibreNMS Dispatcher Service** (`librenms-service.py`) schedules core LibreNMS tasks without using cron jobs.
+It does **not** replace the PHP scripts - only the cron entries that run them.
 
-The Dispatcher Service includes scheduling for the following processes:
+The Dispatcher handles scheduling for:
+
  - Discovery
  - Poller
  - Services
@@ -13,45 +13,52 @@ The Dispatcher Service includes scheduling for the following processes:
  - [Fast Ping](#fast-ping)
  - Daily Maintenance
 
+---
+
 ## Setup
 
-### Service Installation
+### Install the Service
 
-A systemd unit file can be found in `misc/librenms.service`. You must adapt `ExecStart`
-and `WorkingDirectory` if you did not install librenms in `/opt/librenms`
+A systemd unit file is provided in `misc/librenms.service`.
+Update `ExecStart` and `WorkingDirectory` if LibreNMS is not installed in `/opt/librenms`.
 
-To install run:
 ```bash
 cp /opt/librenms/misc/librenms.service /etc/systemd/system/librenms.service && systemctl enable --now librenms.service
 ```
 
-### Disable Cron Scripts
+### Disable Cron Jobs
 
-To prevent to regular cron based poller from running, you need to disable the cron scripts.
-
-You should remove all cron entries from `dist/librenms.cron`, or simply run:
+To prevent duplicate polling, disable existing cron-based pollers:
 
 ```bash
 rm /etc/cron.d/librenms
 ```
 
->Note: If you are using the librenms-scheduler cron instead of systemd timer, do not disable that.
+> **Note:** If using the *librenms-scheduler* cron (systemd timer), do **not** disable it.
 
-### Validate
+### Validate Setup
 
-Let the poller run for a few minutes, then run `./validate.php` to check for known issues.
+Let the poller run for a few minutes, then verify with:
+
+```bash
+./validate.php
+```
+
+---
 
 ## Configuration
 
-Configuration of the dispatcher can be done by two methods:
- - The Web UI
- - Configuration dafaults
+The dispatcher can be configured through:
+
+* The **Web UI**
+* **Configuration defaults**
+
+>Note: Settings are not applied until you restart the service.
 
 ### Web UI
 
-In the web ui under `Settings` > `Poller` > `Settings`, you can configure each node.
-Nodes will appear in this list after they have run for a few minutes.
-To apply settings, you must restart the service of the affected node.
+In the Web UI, go to **Settings > Poller > Settings** to manage node configurations.
+Nodes appear automatically after running for a few minutes.
 
 ### Configuration Defaults
 
@@ -70,7 +77,7 @@ To apply settings, you must restart the service of the affected node.
     lnms config:set service_update_frequency 86400
     ```
 
-### Ensure only dispatcher runs processes
+### Restrict Processing to Dispatcher
 
 !!! setting "poller/dispatcherservice"
     ```bash
@@ -83,69 +90,66 @@ To apply settings, you must restart the service of the affected node.
 
 ### Local Settings
 
-Most of the time these settings are not needed, but if you want to set them,
-they should only be set in `config.php`:
+Optional settings - define only in `config.php`:
 
 ```php
-$config['distributed_poller_name']  = php_uname('n');  # Uniquely identifies the poller instance
-$config['distributed_poller_group'] = 0;               # Which group(s) to poll
+$config['distributed_poller_name']  = php_uname('n');  // Unique poller name
+$config['distributed_poller_group'] = 0;               // Poller group ID
 ```
+
+---
 
 ## Optimization
 
 ### Worker Count
 
-Some statistics from your dispatcher service are displayed in the `Settings` > `Poller` > `Poller` page.
+Dispatcher statistics appear in **Settings > Poller > Poller**.
 
->It is very important that you set the number of workers correctly. Too low and you
->will not finish polling in time and too high and you will overload your hardware.
+> **Tip:** Set the number of workers carefully.
+> Too few will delay polling; too many will overload your hardware.
 
-You want to keep Consumed Worker Seconds comfortably below Maximum Worker Seconds (WS). The closer the values are to each 
-other, the flatter the CPU graph of the poller machine. Meaning that you are utilizing your CPU resources well. As 
-long as Consumed WS stays below Maximum WS and Devices Pending is 0, you should be ok.
+Keep **Consumed Worker Seconds** below **Maximum Worker Seconds**.
+If the two values are close and **Devices Pending** is 0, the poller is well tuned.
+If **Devices Pending** > 0 while **Consumed Worker Seconds** < **Maximum Worker Seconds**,
+consider [Distributed Polling](Distributed-Poller.md).
 
-If Consumed WS is below Maximum WS and Devices Pending is > 0, you may need to utilize [distributed polling](Distributed-Poller.md).
-
-Maximum WS equals the number of workers multiplied with the number of seconds in the polling period. (default 300)
+**Maximum WS** = `workers × polling interval (default 300s)`
 
 !!! warning "Workers"
-The number of workers configured will be evenly split amongst the number of poller
-groups configured. I.e if you have 4 groups and 24 workers then each group will get
-6 workers. If you have an uneven distribution of devices between the groups then you
-should consider setting the workers value higher.
+    The configured workers are divided evenly across poller groups.
+    For example, 24 workers and 4 groups = 6 workers per group.
+    If device distribution is uneven, increase worker count or rebalance groups.
 
 ### Performance Tuning
 
-To get the most out of your hardware, please review the [Performance Documentation](../Support/Performance.md)
+See [Performance Documentation](../Support/Performance.md) for advanced tuning.
 
 ### Distributed Polling
 
-A single instance will be able to poll as many as 1000 devices or even more, depending on a number of
-variables such as latency and device speed.  If you have reached the limit of what you can
-achieve with a single instance, you should consider using [distributed polling](Distributed-Poller.md).
+A single instance can poll up to **1,000+ devices**, depending on latency and device responsiveness.
+If performance limits are reached, use [Distributed Polling](Distributed-Poller.md).
+
+---
 
 ## Fast Ping
 
-The [fast ping](Fast-Ping-Check.md) scheduler is disabled by default.
-Ensuring it is enabled in the poller settings and setting the following:
+The [Fast Ping](Fast-Ping-Check.md) scheduler is disabled by default.
+If you use it, enable Fast Ping in the poller settings and set the following:
 
 !!! setting "poller/scheduledtasks"
     ```bash
     lnms config:set schedule_type.ping dispatcher
     ```
 
-## SystemD Service Watchdog
+## Systemd Watchdog Service
 
-This service file is an alternative to the regular service file. It uses the systemd WatchdogSec= option 
-to restart the service if it does not receive a keep-alive from the running process.
+An alternate service file uses `WatchdogSec` to restart the dispatcher if it becomes unresponsive.
 
-A systemd unit file can be found in `misc/librenms-watchdog.service`. To
-install run:
+To install:
+
 ```bash
 cp /opt/librenms/misc/librenms-watchdog.service /etc/systemd/system/librenms.service && systemctl enable --now librenms.service
 ```
 
-This requires: python3-systemd (or python-systemd on older systems)
-or https://pypi.org/project/systemd-python/
-If you run this systemd service without python3-systemd it will restart every 30 seconds.
-
+Requires **python3-systemd** (or **python-systemd** on older systems).
+Without it, the service restarts every 30 seconds.
