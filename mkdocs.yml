@@ -249,7 +249,6 @@ nav:
       - Locations: API/Locations.md
       - Logs: API/Logs.md
       - PollerGroups: API/PollerGroups.md
-      - Port_Groups: API/Port_Groups.md
       - PortGroups: API/PortGroups.md
       - PortSecurity: API/PortSecurity.md
       - Ports: API/Ports.md
