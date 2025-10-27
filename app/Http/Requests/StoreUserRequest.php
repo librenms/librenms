@@ -2,10 +2,10 @@
 
 namespace App\Http\Requests;
 
-use App\Facades\LibrenmsConfig;
 use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 use LibreNMS\Authentication\LegacyAuth;
 use Spatie\Permission\Models\Role;
 
@@ -48,7 +48,7 @@ class StoreUserRequest extends FormRequest
             'descr' => 'nullable|max:30|alpha_space',
             'roles' => 'array',
             'roles.*' => 'exists:roles,name',
-            'new_password' => 'required|confirmed|min:' . LibrenmsConfig::get('password.min_length', 8),
+            'new_password' => ['required', 'confirmed', Password::defaults()],
             'dashboard' => 'int',
         ];
     }
