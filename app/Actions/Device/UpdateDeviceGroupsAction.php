@@ -57,7 +57,7 @@ class UpdateDeviceGroupsAction
         }
 
         $device_group_ids = DeviceGroup::query()
-            ->with(['devices' => function ($query) {
+            ->with(['devices' => function ($query): void {
                 $query->select('devices.device_id');
             }])
             ->get()

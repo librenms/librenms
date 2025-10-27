@@ -22,7 +22,7 @@ use Symfony\Component\Process\Process;
 Artisan::command('device:rename
     {old hostname : ' . __('The existing hostname, IP, or device id') . '}
     {new hostname : ' . __('The new hostname or IP') . '}
-', function () {
+', function (): void {
     /** @var Illuminate\Console\Command $this */
     (new Process([
         base_path('renamehost.php'),
@@ -31,13 +31,13 @@ Artisan::command('device:rename
     ]))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Rename a device, this can be used to change the hostname or IP of a device'));
 
-Artisan::command('update', function () {
+Artisan::command('update', function (): void {
     (new Process([base_path('daily.sh')]))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Update LibreNMS and run maintenance routines'));
 
 Artisan::command('poller:ping
     {groups?* : ' . __('Optional List of distributed poller groups to poll') . '}
-', function () {
+', function (): void {
     PingCheck::dispatch($this->argument('groups'));
 })->purpose(__('Check if devices are up or down via icmp'));
 
@@ -46,7 +46,7 @@ Artisan::command('poller:discovery
     {--o|os= : ' . __('Only devices with the specified operating system') . '}
     {--t|type= : ' . __('Only devices with the specified type') . '}
     {--m|modules= : ' . __('Specify single module to be run. Comma separate modules, submodules may be added with /') . '}
-', function () {
+', function (): void {
     $command = [base_path('discovery.php'), '-h', $this->argument('device spec')];
     if ($this->option('os')) {
         $command[] = '-o';
@@ -69,7 +69,7 @@ Artisan::command('poller:discovery
     (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Discover information about existing devices, defines what will be polled'));
 
-Artisan::command('poller:alerts', function () {
+Artisan::command('poller:alerts', function (): void {
     $command = [base_path('alerts.php')];
     if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {
         $command[] = '-d';
@@ -83,7 +83,7 @@ Artisan::command('poller:alerts', function () {
 
 Artisan::command('poller:billing
     {bill id? : ' . __('The bill id to poll') . '}
-', function () {
+', function (): void {
     /** @var Illuminate\Console\Command $this */
     $command = [base_path('poll-billing.php')];
     if ($this->argument('bill id')) {
@@ -103,7 +103,7 @@ Artisan::command('poller:billing
 Artisan::command('poller:services
     {device spec : ' . __('Device spec to poll: device_id, hostname, wildcard, all') . '}
     {--x|no-data : ' . __('Do not update datastores (RRD, InfluxDB, etc)') . '}
-', function () {
+', function (): void {
     /** @var Illuminate\Console\Command $this */
     $command = [base_path('check-services.php')];
     if ($this->option('no-data')) {
@@ -125,7 +125,7 @@ Artisan::command('poller:services
 
 Artisan::command('poller:billing-calculate
     {--c|clear-history : ' . __('Delete all billing history') . '}
-', function () {
+', function (): void {
     /** @var Illuminate\Console\Command $this */
     $command = [base_path('billing-calculate.php')];
     if ($this->option('clear-history')) {
@@ -194,7 +194,7 @@ Artisan::command('scan
 })->purpose(__('Scan the network for hosts and try to add them to LibreNMS'));
 
 // mark schedule working
-Schedule::call(function () {
+Schedule::call(function (): void {
     Cache::put('scheduler_working', now(), now()->addMinutes(6));
 })->everyFiveMinutes();
 

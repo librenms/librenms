@@ -26,6 +26,7 @@
 
 namespace App\Jobs;
 
+use App\Actions\Device\SetDeviceAvailability;
 use App\Models\Device;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -37,6 +38,7 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Source\FpingResponse;
+use LibreNMS\Enum\AvailabilitySource;
 
 class PingCheck implements ShouldQueue
 {
@@ -137,10 +139,10 @@ class PingCheck implements ShouldQueue
         $query = Device::canPing()
             ->select(['devices.device_id', 'hostname', 'overwrite_ip', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken'])
             ->with([
-                'parents' => function ($q) {
+                'parents' => function ($q): void {
                     $q->canPing()->select('devices.device_id');
                 },
-                'children' => function ($q) {
+                'children' => function ($q): void {
                     $q->canPing()->select('devices.device_id');
                 },
             ])
@@ -180,12 +182,7 @@ class PingCheck implements ShouldQueue
         }
 
         // mark up only if snmp is not down too
-        $device->status = ($response->success() && $device->status_reason != 'snmp');
-        if ($device->isDirty('status')) {
-            // if changed, update reason
-            $device->status_reason = $device->status ? '' : 'icmp';
-            $type = $device->status ? 'up' : 'down';
-        }
+        $changed = app(SetDeviceAvailability::class)->execute($device, $response->success(), AvailabilitySource::ICMP, true);
 
         // save last_ping_timetaken and rrd data
         $response->saveStats($device);
@@ -194,7 +191,8 @@ class PingCheck implements ShouldQueue
         $this->processed->put($device->device_id, true);
         Log::debug("Recorded data for $device->hostname");
 
-        if (isset($type)) { // only run alert rules if status changed
+        if ($changed) { // only run alert rules if status changed
+            $type = $device->status ? 'up' : 'down';
             Log::debug("Device $device->hostname changed status to $type, running alerts");
 
             if (count($waiting_on) === 0) {

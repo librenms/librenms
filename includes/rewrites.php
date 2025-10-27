@@ -205,7 +205,7 @@ function get_nagios_state($descr)
 
 /**
  * @param  $state
- * @return int
+ * @return int|void
  */
 function apc_relay_state($state)
 {
@@ -250,11 +250,7 @@ function parse_entity_state($state, $value)
         ],
     ];
 
-    if (isset($data[$state][$value])) {
-        return $data[$state][$value];
-    }
-
-    return ['text' => 'na', 'color' => 'default'];
+    return $data[$state][$value] ?? ['text' => 'na', 'color' => 'default'];
 }
 
 function parse_entity_state_alarm($bits)

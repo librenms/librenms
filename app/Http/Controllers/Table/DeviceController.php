@@ -33,6 +33,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
+use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
@@ -108,7 +109,7 @@ class DeviceController extends TableController
             if ($group == 'none') {
                 $query->whereDoesntHave('groups');
             } else {
-                $query->whereHas('groups', function ($query) use ($group) {
+                $query->whereHas('groups', function ($query) use ($group): void {
                     $query->where('id', $group);
                 });
             }
@@ -149,34 +150,27 @@ class DeviceController extends TableController
      */
     public function formatItem($device)
     {
-        $status = $this->getStatus($device);
+        $deviceStatus = $device->getDeviceStatus();
+        $status = match ($deviceStatus) {
+            DeviceStatus::DOWN, DeviceStatus::NEVER_POLLED => 'down',
+            DeviceStatus::IGNORED_UP, DeviceStatus::UP => 'up',
+            DeviceStatus::IGNORED_DOWN, DeviceStatus::DISABLED => 'disabled',
+        };
 
         return [
             'extra' => $this->getLabel($device),
             'status' => $status,
             'maintenance' => $device->isUnderMaintenance(),
             'icon' => '<img src="' . asset($device->icon) . '" title="' . pathinfo($device->icon, PATHINFO_FILENAME) . '">',
-            'hostname' => $this->getHostname($device, $status),
+            'hostname' => URL::modernDeviceLink($device, extra: $this->isDetailed() ? $device->name() : ''),
             'metrics' => $this->getMetrics($device),
             'hardware' => htmlspecialchars(Rewrite::ciscoHardware($device)),
             'os' => $this->getOsText($device),
-            'uptime' => (! $device->status && ! $device->last_polled) ? __('Never polled') : Time::formatInterval($device->status ? $device->uptime : (int) $device->downSince()->diffInSeconds(null, true), true),
+            'uptime' => $deviceStatus == DeviceStatus::NEVER_POLLED ? __('device.never_polled') : Time::formatInterval($device->status ? $device->uptime : (int) $device->downSince()->diffInSeconds(null, true), true),
             'location' => htmlspecialchars($this->getLocation($device)),
             'actions' => view('device.actions', ['actions' => $this->getActions($device)])->__toString(),
             'device_id' => $device->device_id,
         ];
-    }
-
-    /**
-     * Get the device up/down/disabled status
-     */
-    private function getStatus(Device $device): string
-    {
-        if ($device->disabled) {
-            return 'disabled';
-        }
-
-        return $device->status ? 'up' : ($device->ignore ? 'disabled' : 'down');
     }
 
     /**
@@ -203,19 +197,6 @@ class DeviceController extends TableController
 
             return 'label-success';
         }
-    }
-
-    /**
-     * @param  Device  $device
-     * @return string
-     */
-    private function getHostname(Device $device, string $status): string
-    {
-        return (string) view('device.list.hostname', [
-            'device' => $device,
-            'extra' => $this->isDetailed() ? $device->name() : '',
-            'class' => 'device-link-' . $status,
-        ]);
     }
 
     /**

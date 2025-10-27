@@ -49,7 +49,7 @@ class CheckRrdVersion implements Validation, ValidationFixer
             return ValidationResult::fail(
                 trans('validation.validations.rrd.CheckRrdVersion.fail', ['config_version' => $config_version, 'installed_version' => $rrd_version]),
                 trans('validation.validations.rrd.CheckRrdVersion.fix', ['version' => $config_version])
-            )->setFixer(__CLASS__, is_writable(base_path('config.php')));
+            )->setFixer(self::class, is_writable(base_path('config.php')));
         }
 
         return ValidationResult::ok(trans('validation.validations.rrd.CheckRrdVersion.ok'));

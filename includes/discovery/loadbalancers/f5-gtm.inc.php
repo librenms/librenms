@@ -14,7 +14,6 @@
  */
 
 // Define some error messages
-use LibreNMS\Util\IP;
 
 $error_poolaction = [];
 $error_poolaction[0] = 'Unused';
@@ -71,7 +70,7 @@ if (! is_null($gtmWideIPEntry) || ! is_null($gtmWideStatusEntry) || ! is_null($g
             $result = [];
 
             // Find all Virtual server names and UID's, then we can find everything else we need.
-            if (strpos($oid, '1.3.6.1.4.1.3375.2.3.12.3.2.1.1.') !== false) {
+            if (str_contains($oid, '1.3.6.1.4.1.3375.2.3.12.3.2.1.1.')) {
                 [$null, $index] = explode('1.3.6.1.4.1.3375.2.3.12.3.2.1.1.', $oid);
                 $result['type'] = 'f5-gtm-wide';
                 $result['UID'] = (string) $index;
@@ -116,7 +115,7 @@ if (! is_null($gtmWideIPEntry) || ! is_null($gtmWideStatusEntry) || ! is_null($g
             $result = [];
 
             // Find all Pool names and UID's, then we can find everything else we need.
-            if (strpos($oid, '1.3.6.1.4.1.3375.2.3.6.2.3.1.1.') !== false) {
+            if (str_contains($oid, '1.3.6.1.4.1.3375.2.3.6.2.3.1.1.')) {
                 [$null, $index] = explode('1.3.6.1.4.1.3375.2.3.6.2.3.1.1.', $oid);
                 $result['type'] = 'f5-gtm-pool';
                 $result['UID'] = (string) $index;
@@ -171,7 +170,7 @@ if (! is_null($gtmWideIPEntry) || ! is_null($gtmWideStatusEntry) || ! is_null($g
         // Guilty until proven innocent
         $found = false;
 
-        foreach ($tblBigIP as $k => $v) {
+        foreach ($tblBigIP as $v) {
             if (($array['UID'] == $v['UID']) && ($array['type'] == $v['type'])) {
                 // Yay, we found it...
                 $found = true;

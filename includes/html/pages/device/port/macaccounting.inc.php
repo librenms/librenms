@@ -124,7 +124,7 @@ if ($vars['subview'] == 'top10') {
     $param = [$port['port_id']];
 
     foreach (dbFetchRows($query, $param) as $acc) {
-        if (! is_integer($i / 2)) {
+        if (! is_int($i / 2)) {
             $row_colour = LibrenmsConfig::get('list_colour.even');
         } else {
             $row_colour = LibrenmsConfig::get('list_colour.odd');

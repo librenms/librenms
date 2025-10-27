@@ -67,7 +67,7 @@ class DevicePoll extends LnmsCommand
             $this->line("Starting polling run:\n");
 
             // listen for the device polled events to mark the device completed
-            Event::listen(function (DevicePolled $event) use ($result) {
+            Event::listen(function (DevicePolled $event) use ($result): void {
                 if ($event->device->device_id == $this->current_device_id) {
                     $result->markCompleted($event->device->status);
                 }

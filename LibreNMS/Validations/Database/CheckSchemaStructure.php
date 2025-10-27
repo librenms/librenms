@@ -66,7 +66,7 @@ class CheckSchemaStructure implements Validation, ValidationFixer
 
         return ValidationResult::fail("We have detected that your database schema may be wrong\n" . implode("\n", $this->descriptions))
             ->setFix('Run the following SQL statements to fix it')
-            ->setFixer(__CLASS__)
+            ->setFixer(self::class)
             ->setList('SQL Statements', $this->schema_update);
     }
 

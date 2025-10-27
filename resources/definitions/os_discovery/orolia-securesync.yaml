@@ -4,14 +4,13 @@ modules:
         serial: SNMPv2-SMI::enterprises.18837.3.2.2.1.16.0
         version: SNMPv2-SMI::enterprises.18837.3.2.2.1.11.0
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:
                         - ntpSysStaCurrentPeerName
                         - ntpAssocEntry
                         - ptpbaseClockParentDSEntry
-                    snmp_flags: '-OQUsbe'
         count:
             data:
                 -
@@ -20,7 +19,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.8.{{ $index }}'
                     descr: 'Phase error (ns)'
                     group: PRECISION
-                    snmp_flags: '-OQUsbe'
                     index: 'ssSysStaEstPhaseError.{{ $index }}'
                 -
                     oid: ssSysStaEstFreqError
@@ -28,14 +26,12 @@ modules:
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.9.{{ $index }}'
                     descr: 'Frequence error (Hz)'
                     group: PRECISION
-                    snmp_flags: '-OQUsbe'
                     index: 'ssSysStaEstFreqError.{{ $index }}'
                 -
                     oid: ssGpsRefNumSats
                     value: ssGpsRefNumSats
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.2.1.1.8.{{ $index }}'
                     descr: 'Current number of good/usable satellites'
-                    snmp_flags: '-OQUsbe'
                     group: GNSS
                     index: 'ssGpsRefNumSats.{{ $index }}'
                 -
@@ -43,7 +39,6 @@ modules:
                     value: ntpSysStaStratum
                     num_oid: '.1.3.6.1.4.1.18837.3.3.2.2.{{ $index }}'
                     descr: 'Current stratum'
-                    snmp_flags: '-OQUsbe'
                     group: NTP
                     index: 'ntpSysStaStratum.{{ $index }}'
                 -
@@ -51,7 +46,6 @@ modules:
                     value: ntpSysStaPeerJitter
                     num_oid: '.1.3.6.1.4.1.18837.3.3.2.7.{{ $index }}'
                     descr: 'Jitter Selected peer (ms): {{ $ntpSysStaCurrentPeerName }}'
-                    snmp_flags: '-OQUsbe'
                     group: REFERENCE
                     index: 'ntpSysStaPeerJitter.{{ $index }}'
                 -
@@ -60,7 +54,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.18837.3.3.2.6.{{ $index }}'
                     descr: 'Offset Selected peer (µs): {{ $ntpSysStaCurrentPeerName }}'
                     multiplier: 1000
-                    snmp_flags: '-OQUsbe'
                     group: REFERENCE
                     index: 'ntpSysStaPeerOffset.{{ $index }}'
                 -
@@ -68,7 +61,6 @@ modules:
                     value: ntpSysStaPeerDelay
                     num_oid: '.1.3.6.1.4.1.18837.3.3.2.5.{{ $index }}'
                     descr: 'Delay Selected peer (ms): {{ $ntpSysStaCurrentPeerName }}'
-                    snmp_flags: '-OQUsbe'
                     group: REFERENCE
                     index: 'ntpSysStaPeerDelay.{{ $index }}'
                 -
@@ -76,7 +68,6 @@ modules:
                     value: assocEntryJitter
                     num_oid: '.1.3.6.1.4.1.18837.3.3.3.2.1.14.{{ $index }}'
                     descr: 'Jitter (ms): {{ $assocEntryIdentity }}'
-                    snmp_flags: '-OQUsbe'
                     group: NTP
                     index: 'assocEntryJitter.{{ $index }}'
                 -
@@ -85,7 +76,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.18837.3.3.3.2.1.13.{{ $index }}'
                     multiplier: 1000
                     descr: 'Offset (µs): {{ $assocEntryIdentity }} {{ $assocEntryRefId }}'
-                    snmp_flags: '-OQUsbe'
                     group: NTP
                     index: 'assocEntryOffset.{{ $index }}'
                 -
@@ -93,21 +83,18 @@ modules:
                     value: assocEntryDelay
                     num_oid: '.1.3.6.1.4.1.18837.3.3.3.2.1.12.{{ $index }}'
                     descr: 'Delay (ms): {{ $assocEntryIdentity }}'
-                    snmp_flags: '-OQUsbe'
                     group: NTP
                     index: 'assocEntryDelay.{{ $index }}'
                 -
                     oid: ptpbaseClockParentDSEntry
                     value: ptpbaseClockParentDSGMClockPriority1
                     descr: '{{ $ptpbaseClockParentDSGMClockIdentity }} master Priority'
-                    snmp_flags: '-OQUsbe'
                     group: PTP
                     index: 'ptpbaseClockParentDSGMClockPriority1.{{ $index }}'
                 -
                     oid: ptpbaseClockParentDSEntry
                     value: ptpbaseClockParentDSGMClockQualityOffset
                     descr: '{{ $ptpbaseClockParentDSGMClockIdentity }} master Variance'
-                    snmp_flags: '-OQUsbe'
                     group: PTP
                     index: 'ptpbaseClockParentDSGMClockQualityOffset.{{ $index }}'
 
@@ -119,21 +106,18 @@ modules:
                     value: ssSysStaOscTemp
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.17.{{ $index }}'
                     descr: 'Oscillator Temp'
-                    snmp_flags: '-OQUsbe'
                     index: 'ssSysStaOscTemp.{{ $index }}'
                 -
                     oid: ssSysStaBrdTemp
                     value: ssSysStaBrdTemp
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.18.{{ $index }}'
                     descr: 'Board Temp'
-                    snmp_flags: '-OQUsbe'
                     index: 'ssSysStaBrdTemp.{{ $index }}'
                 -
                     oid: ssSysStaCpuTemp
                     value: ssSysStaCpuTemp
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.19.{{ $index }}'
                     descr: 'CPU Temp'
-                    snmp_flags: '-OQUsbe'
                     index: 'ssSysStaCpuTemp.{{ $index }}'
         state:
             data:
@@ -142,7 +126,6 @@ modules:
                     value: ssSysStaPowerDC
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.2.{{ $index }}'
                     descr: 'DC power'
-                    snmp_flags: '-OQUsbe'
                     index: 'dcpower.{{ $index }}'
                     states:
                         - { value: 1, descr: ok, graph: 1, generic: 0 }
@@ -153,7 +136,6 @@ modules:
                     value: ssSysStaSyncState
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.5.{{ $index }}'
                     descr: 'Sync status'
-                    snmp_flags: '-OQUsbe'
                     group: TIME
                     index: 'ssSysStaSyncState.{{ $index }}'
                     states:
@@ -164,7 +146,6 @@ modules:
                     value: ssSysStaHoldoverState
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.6.{{ $index }}'
                     descr: 'Holdover status'
-                    snmp_flags: '-OQUsbe'
                     group: TIME
                     index: 'ssSysStaHoldoverState.{{ $index }}'
                     states:
@@ -175,7 +156,6 @@ modules:
                     value: ssSysStaTimeScale
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.10.{{ $index }}'
                     descr: 'Time scale'
-                    snmp_flags: '-OQUsbe'
                     group: TIME
                     index: 'ssSysStaTimeScale.{{ $index }}'
                     states:
@@ -187,7 +167,6 @@ modules:
                     value: ssSysStaBshJammingState
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.22.{{ $index }}'
                     descr: 'Jamming status'
-                    snmp_flags: '-OQUsbe'
                     index: 'ssSysStaBshJammingState.{{ $index }}'
                     states:
                         - { value: 1, descr: active, graph: 1, generic: 2 }
@@ -197,7 +176,6 @@ modules:
                     value: ssSysStaBshSpoofingState
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.23.{{ $index }}'
                     descr: 'Spoofing status'
-                    snmp_flags: '-OQUsbe'
                     index: 'ssSysStaBshSpoofingState.{{ $index }}'
                     states:
                         - { value: 1, descr: active, graph: 1, generic: 2 }
@@ -207,23 +185,21 @@ modules:
                     value: ssSysStaDisciplining
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.1.24.{{ $index }}'
                     descr: 'Oscillator disciplined'
-                    snmp_flags: '-OQUsbe'
                     group: TIME
                     index: 'ssSysStaDisciplining.{{ $index }}'
                     states:
                         - { value: 0, descr: none, graph: 1, generic: 3 }
                         - { value: 1, descr: warmup, graph: 1, generic: 0 }
-                        - { value: 2, descr: calibration, graph: 1, generic: 1 }                        
-                        - { value: 3, descr: trackSetup, graph: 1, generic: 1 }                       
-                        - { value: 4, descr: trackLock, graph: 1, generic: 0 }  
-                        - { value: 5, descr: freerun, graph: 1, generic: 2 }  
-                        - { value: 6, descr: fault, graph: 1, generic: 2 }  
+                        - { value: 2, descr: calibration, graph: 1, generic: 1 }
+                        - { value: 3, descr: trackSetup, graph: 1, generic: 1 }
+                        - { value: 4, descr: trackLock, graph: 1, generic: 0 }
+                        - { value: 5, descr: freerun, graph: 1, generic: 2 }
+                        - { value: 6, descr: fault, graph: 1, generic: 2 }
                 -
                     oid: ssGpsRefTimeValid
                     value: ssGpsRefTimeValid
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.2.1.1.4.{{ $index }}'
                     descr: 'GNSS valid time'
-                    snmp_flags: '-OQUsbe'
                     group: GNSS
                     index: 'ssGpsRefTimeValid.{{ $index }}'
                     states:
@@ -234,7 +210,6 @@ modules:
                     value: ssGpsRefAntennaState
                     num_oid: '.1.3.6.1.4.1.18837.3.2.2.2.1.1.17.{{ $index }}'
                     descr: 'Antenna state'
-                    snmp_flags: '-OQUsbe'
                     group: GNSS
                     index: 'ssGpsRefAntennaState.{{ $index }}'
                     states:
@@ -247,22 +222,20 @@ modules:
                     value: ntpSysStaCurrentMode
                     num_oid: '.1.3.6.1.4.1.18837.3.3.2.1.{{ $index }}'
                     descr: 'NTP service'
-                    snmp_flags: '-OQUsbe'
                     group: NTP
                     index: 'ntpSysStaCurrentMode.{{ $index }}'
                     states:
                         - { value: 1, descr: unknown, graph: 1, generic: 3 }
                         - { value: 2, descr: notRunning, graph: 1, generic: 2 }
                         - { value: 3, descr: notSynchonized, graph: 1, generic: 2 }
-                        - { value: 4, descr: synchronized, graph: 1, generic: 0 } 
+                        - { value: 4, descr: synchronized, graph: 1, generic: 0 }
                 -
                     oid: ptpbaseClockParentDSEntry
                     value: ptpbaseClockParentDSGMClockQualityAccuracy
                     num_oid: '.1.3.6.1.4.1.18837.3.5.1.2.2.1.12.{{ $index }}'
                     descr: '{{ $ptpbaseClockParentDSGMClockIdentity }} Master accuracy'
-                    snmp_flags: '-OQUsbe'                    
                     group: PTP
-                    index: 'ptpbaseQualityAccuracy.{{ $index }}'        
+                    index: 'ptpbaseQualityAccuracy.{{ $index }}'
                     states:
                         - { value: 254, descr: ok, graph: 1, generic: 3 }
                         - { value: 32, descr: <25ns, graph: 1, generic: 0 }

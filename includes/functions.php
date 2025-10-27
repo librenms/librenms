@@ -75,7 +75,7 @@ function logfile($string)
         return;
     }
 
-    fputs($fd, $string . "\n");
+    fwrite($fd, $string . "\n");
     fclose($fd);
 }
 
@@ -363,7 +363,7 @@ function fix_integer_value($value)
 function host_exists(string $hostname, ?string $sysName = null): bool
 {
     return Device::where('hostname', $hostname)
-        ->when(! empty($sysName), function ($query) use ($sysName) {
+        ->when(! empty($sysName), function ($query) use ($sysName): void {
             $query->when(! LibrenmsConfig::get('allow_duplicate_sysName'), fn ($q) => $q->orWhere('sysName', $sysName))
                   ->when(! empty(LibrenmsConfig::get('mydomain')), fn ($q) => $q->orWhere('sysName', rtrim($sysName, '.') . '.' . LibrenmsConfig::get('mydomain')));
         })->exists();
@@ -499,7 +499,7 @@ function cache_peeringdb()
         // We cache for 71 hours
         $cached = dbFetchCell('SELECT count(*) FROM `pdb_ix` WHERE (UNIX_TIMESTAMP() - timestamp) < 255600');
         if ($cached == 0) {
-            $rand = rand(3, 30);
+            $rand = random_int(3, 30);
             echo "No cached PeeringDB data found, sleeping for $rand seconds" . PHP_EOL;
             sleep($rand);
             $peer_keep = [];
@@ -536,7 +536,7 @@ function cache_peeringdb()
                     $ix_json = $get_ix->body();
                     $ix_data = json_decode($ix_json);
                     $peers = $ix_data->{'data'};
-                    foreach ($peers ?? [] as $index => $peer) {
+                    foreach ($peers ?? [] as $peer) {
                         $peer_name = \LibreNMS\Util\AutonomousSystem::get($peer->{'asn'})->name();
                         $tmp_peer = dbFetchRow('SELECT * FROM `pdb_ix_peers` WHERE `peer_id` = ? AND `ix_id` = ?', [$peer->{'id'}, $ixid]);
                         if ($tmp_peer) {

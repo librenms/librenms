@@ -174,7 +174,7 @@ class TopDevicesController extends WidgetController
     {
         $settings = $this->getSettings();
 
-        $query = Port::hasAccess(Auth::user())->with(['device' => function ($query) {
+        $query = Port::hasAccess(Auth::user())->with(['device' => function ($query): void {
             $query->select('device_id', 'hostname', 'sysName', 'display', 'status', 'os');
         }])
             ->select('device_id')
@@ -276,13 +276,13 @@ class TopDevicesController extends WidgetController
     {
         $settings = $this->getSettings();
 
-        $query = Storage::hasAccess(Auth::user())->with(['device' => function ($query) {
+        $query = Storage::hasAccess(Auth::user())->with(['device' => function ($query): void {
             $query->select('device_id', 'hostname', 'sysName', 'display', 'status', 'os');
         }])
             ->leftJoin('devices', 'storage.device_id', 'devices.device_id')
             ->select('storage.device_id', 'storage_id', 'storage_descr', 'storage_perc', 'storage_perc_warn')
             ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings['time_interval']))
-            ->when($settings['device_group'], function ($query) use ($settings) {
+            ->when($settings['device_group'], function ($query) use ($settings): void {
                 $query->inDeviceGroup($settings['device_group']);
             })
             ->orderBy('storage_perc', $sort)
