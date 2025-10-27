@@ -84,7 +84,7 @@ final class TimeUtilityTest extends TestCase
 
         $this->assertNull(Time::parseInput('not a date'));
     }
-  
+
     public function testRandomTimeBetween(): void
     {
         $start = time();
@@ -102,5 +102,5 @@ final class TimeUtilityTest extends TestCase
             Time::pseudoRandomBetween($start, $end),
             Time::pseudoRandomBetween($start, $end),
         );
-    }  
+    }
 }
