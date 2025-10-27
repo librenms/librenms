@@ -145,9 +145,7 @@ class Device extends BaseModel
             if ($port) {
                 return $port->device;
             }
-        } catch (InvalidIpException $e) {
-            //
-        } catch (ModelNotFoundException $e) {
+        } catch (InvalidIpException|ModelNotFoundException $e) {
             //
         }
 
@@ -159,9 +157,7 @@ class Device extends BaseModel
             if ($port) {
                 return $port->device;
             }
-        } catch (InvalidIpException $e) {
-            //
-        } catch (ModelNotFoundException $e) {
+        } catch (InvalidIpException|ModelNotFoundException $e) {
             //
         }
 
