@@ -39,7 +39,7 @@ if (LibrenmsConfig::get('graylog.server')) {
         $.ajax({
             type: "post",
             data: {
-                device: "' . (isset($filter_device) ? $filter_device : '') . '",
+                device: "' . ($filter_device ?? '') . '",
                 ' . ($rowCount ? 'rowCount: ' . $rowCount . ',' : '') . '
                 ' . ($loglevel ? 'loglevel: ' . $loglevel . ',' : '') . '
             },

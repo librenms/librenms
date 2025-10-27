@@ -411,7 +411,7 @@ class RunAlerts
     {
         $keyParts = [];
         foreach ($idFields as $field) {
-            $keyParts[] = isset($element[$field]) ? $element[$field] : '';
+            $keyParts[] = $element[$field] ?? '';
         }
 
         return implode('|', $keyParts);

@@ -199,7 +199,7 @@ class Schema
 
         $all = $this->getAllRelationshipPaths($start);
 
-        return isset($all[$target]) ? $all[$target] : false;
+        return $all[$target] ?? false;
     }
 
     private function findPathRecursive(array $tables, $target, $history = [])
