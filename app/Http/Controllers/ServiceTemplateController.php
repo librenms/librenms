@@ -154,7 +154,7 @@ class ServiceTemplateController extends Controller
                     'required',
                     'string',
                     Rule::unique('service_templates')->where(
-                        function ($query) use ($template) {
+                        function ($query) use ($template): void {
                             $query->where('id', '!=', $template->id);
                         }
                     ),

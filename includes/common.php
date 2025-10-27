@@ -601,7 +601,7 @@ function celsius_to_fahrenheit($value, $scale = 'celsius')
 function kelvin_to_celsius($value, $scale = 'celsius')
 {
     if ($scale === 'celsius') {
-        $value = $value - 273.15;
+        $value -= 273.15;
     }
 
     return sprintf('%.02f', $value);
@@ -708,10 +708,10 @@ function ieee754_to_decimal($value)
     $mantissa_value = 1;
     for ($i = 0; $i < strlen($mantissa); $i++) {
         if ($mantissa[$i] == '1') {
-            $mantissa_value += pow(2, -($i + 1));
+            $mantissa_value += 2 ** -($i + 1);
         }
     }
-    $value = pow(-1, $sign) * $mantissa_value * pow(2, $exponent);
+    $value = (-1) ** $sign * $mantissa_value * 2 ** $exponent;
 
     return $value;
 }

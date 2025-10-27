@@ -76,7 +76,7 @@ function cleanPort($interface, $device = null)
 
     if (is_array(LibrenmsConfig::get('rewrite_if'))) {
         foreach (LibrenmsConfig::get('rewrite_if') as $src => $val) {
-            if (stristr($interface['label'], $src)) {
+            if (stristr($interface['label'], (string) $src)) {
                 $interface['label'] = $val;
             }
         }
@@ -205,7 +205,7 @@ function get_nagios_state($descr)
 
 /**
  * @param  $state
- * @return int
+ * @return int|void
  */
 function apc_relay_state($state)
 {
@@ -250,11 +250,7 @@ function parse_entity_state($state, $value)
         ],
     ];
 
-    if (isset($data[$state][$value])) {
-        return $data[$state][$value];
-    }
-
-    return ['text' => 'na', 'color' => 'default'];
+    return $data[$state][$value] ?? ['text' => 'na', 'color' => 'default'];
 }
 
 function parse_entity_state_alarm($bits)

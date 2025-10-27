@@ -54,7 +54,7 @@ class Pagerduty extends Transport
                 'group' => (string) \DeviceCache::get($alert_data['device_id'])->groups->pluck('name'),
                 'source' => $alert_data['hostname'],
                 'severity' => $alert_data['severity'],
-                'summary' => ($alert_data['name'] ? $alert_data['name'] . ' on ' . $alert_data['hostname'] : $alert_data['title']),
+                'summary' => ($alert_data['title'] ?: $alert_data['name'] . ' on ' . $alert_data['hostname']),
             ],
         ];
 

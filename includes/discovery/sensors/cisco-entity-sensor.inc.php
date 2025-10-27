@@ -147,17 +147,27 @@ if ($device['os_group'] == 'cisco') {
 
                 // Check thresholds for this entry (bit dirty, but it works!)
                 if (isset($t_oids[$index]) && is_array($t_oids[$index])) {
-                    foreach ($t_oids[$index] as $t_index => $key) {
+                    foreach ($t_oids[$index] as $key) {
                         // Skip invalid treshold values
-                        if (! isset($key['entSensorThresholdValue']) || $key['entSensorThresholdValue'] == '-32768') {
+                        if (! isset($key['entSensorThresholdValue']) || $key['entSensorThresholdValue'] == '-32768' || $key['entSensorThresholdValue'] == '2147483647') {
+                            continue;
+                        } elseif ($type == 'fanspeed' && $key['entSensorThresholdValue'] == '-1') {
                             continue;
                         }
                         // Critical Limit
                         if (($key['entSensorThresholdSeverity'] == 'major' || $key['entSensorThresholdSeverity'] == 'critical') && ($key['entSensorThresholdRelation'] == 'greaterOrEqual' || $key['entSensorThresholdRelation'] == 'greaterThan')) {
+                            if ($key['entSensorThresholdValue'] == '0' && isset($limit)) {
+                                // Ignore a threshold of 0 if another threshold has been set (major vs critical)
+                                continue;
+                            }
                             $limit = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
 
                         if (($key['entSensorThresholdSeverity'] == 'major' || $key['entSensorThresholdSeverity'] == 'critical') && ($key['entSensorThresholdRelation'] == 'lessOrEqual' || $key['entSensorThresholdRelation'] == 'lessThan')) {
+                            if ($key['entSensorThresholdValue'] == '0' && isset($limit_low)) {
+                                // Ignore a threshold of 0 if another threshold has been set (major vs critical)
+                                continue;
+                            }
                             $limit_low = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
 

@@ -99,7 +99,7 @@ class Notifications
             $feed = json_decode(json_encode(simplexml_load_string(file_get_contents($url))), true);
             $feed = isset($feed['channel']) ? self::parseRss($feed) : self::parseAtom($feed);
 
-            array_walk($feed, function (&$items, $key, $url) {
+            array_walk($feed, function (&$items, $key, $url): void {
                 $items['source'] = $url;
             }, $url);
             $notifications = array_merge($notifications, $feed);

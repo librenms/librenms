@@ -100,7 +100,10 @@ function poll_sensor($device, $class)
                     }
                 }
             }//end if
-            unset($mib);
+            if (isset($mib)) {
+                // @phpstan-ignore unset.variable
+                unset($mib);
+            }
             unset($mibdir);
             $sensor['new_value'] = $sensor_value;
             $all_sensors[] = $sensor;
@@ -110,6 +113,7 @@ function poll_sensor($device, $class)
     foreach ($misc_sensors as $sensor) {
         if ($sensor['poller_type'] == 'agent') {
             if (isset($agent_sensors)) {
+                // @phpstan-ignore variable.undefined
                 $sensor_value = $agent_sensors[$class][$sensor['sensor_type']][$sensor['sensor_index']]['current'];
                 $sensor['new_value'] = $sensor_value;
                 $all_sensors[] = $sensor;
@@ -147,11 +151,11 @@ function record_sensor_data($device, $all_sensors)
         }
 
         if ($sensor['sensor_divisor'] && $sensor_value !== 0) {
-            $sensor_value = ($sensor_value / $sensor['sensor_divisor']);
+            $sensor_value /= $sensor['sensor_divisor'];
         }
 
         if ($sensor['sensor_multiplier']) {
-            $sensor_value = ($sensor_value * $sensor['sensor_multiplier']);
+            $sensor_value *= $sensor['sensor_multiplier'];
         }
 
         if (isset($sensor['user_func'])) {

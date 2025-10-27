@@ -1501,6 +1501,11 @@
                     "type": "loadbalancer"
                 },
                 {
+                    "icon": "door-open",
+                    "text": "Management",
+                    "type": "management"
+                },
+                {
                     "icon": "network-wired",
                     "text": "Network",
                     "type": "network"
@@ -3758,6 +3763,30 @@
             },
             "type": "graph"
         },
+	"graph_types.device.purestorage_bandwidth": {
+            "default": {
+                "section": "storage",
+                "order": 0,
+                "descr": "Array Bandwidth"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.purestorage_iops": {
+            "default": {
+                "section": "storage",
+                "order": 1,
+                "descr": "Array IOPS"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.purestorage_latency": {
+            "default": {
+                "section": "storage",
+                "order": 2,
+                "descr": "Array Latency"
+            },
+            "type": "graph"
+        },
         "graph_types.device.riverbed_connections": {
             "default": {
                 "section": "network",
@@ -4214,7 +4243,71 @@
             },
             "type": "graph"
         },
-        "graphite.enable": {
+        "graph_types.device.purestorage_total_capacity": {
+	    "default": {
+	        "section": "storage",
+  	        "order": 0,
+ 	        "descr": "Total Capacity"
+	    },
+	  "type": "graph"
+	},
+	"graph_types.device.purestorage_used_capacity": {
+  	    "default": {
+    		"section": "storage",
+    		"order": 1,
+    		"descr": "Used Capacity"
+  	    },
+  	  "type": "graph"
+	},
+        "graph_types.device.purestorage_read_iops": {
+    	    "default": {
+      		"section": "storage",
+      		"order": 2,
+      		"descr": "Read IOPS"
+    	},
+    	  "type": "graph"
+  	},
+  	"graph_types.device.purestorage_write_iops": {
+    	    "default": {
+      		"section": "storage",
+      		"order": 3,
+      		"descr": "Write IOPS"
+    	},
+    	  "type": "graph"
+  	},
+  	"graph_types.device.purestorage_read_bandwidth": {
+    	    "default": {
+      		"section": "storage",
+      		"order": 4,
+      		"descr": "Read Bandwidth"
+    	},
+    	  "type": "graph"
+  	},
+  	"graph_types.device.purestorage_write_bandwidth": {
+    	    "default": {
+      		"section": "storage",
+      		"order": 5,
+      		"descr": "Write Bandwidth"
+    	},
+    	  "type": "graph"
+  	},
+  	"graph_types.device.purestorage_read_latency": {
+    	    "default": {
+      		"section": "storage",
+      		"order": 6,
+      		"descr": "Read Latency"
+    	},
+    	  "type": "graph"
+  	},
+  	"graph_types.device.purestorage_write_latency": {
+    	    "default": {
+      	   "section": "storage",
+           "order": 7,
+      	   "descr": "Write Latency"
+    	},
+    	   "type": "graph"
+  	},
+	"graphite.enable": {
             "default": false,
             "type": "boolean",
             "group": "poller",
@@ -5639,7 +5732,7 @@
             "type": "oxidized-maps",
             "validate": {
                 "value": "array",
-                "value.*": "array:hostname,sysName,sysDescr,sysObjectID,hardware,os,location,ip,purpose,notes,poller_group",
+                "value.*": "array:hostname,sysName,sysDescr,sysObjectID,hardware,type,os,location,ip,purpose,notes,poller_group",
                 "value.*.*": "array|min:1",
                 "value.*.*.*": "array:match,regex,value|size:2",
                 "value.*.*.*.value": "required|string",
@@ -5742,6 +5835,13 @@
             "group": "auth",
             "section": "general",
             "order": 6
+        },
+        "password.uncompromised": {
+            "default": true,
+            "type": "boolean",
+            "group": "auth",
+            "section": "general",
+            "order": 7
         },
         "peering_descr": {
             "default": [
@@ -6156,6 +6256,13 @@
             "default": true,
             "type": "boolean"
         },
+        "poller_modules.port-security": {
+            "order": 460,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
         "polling.selected_ports": {
             "default": false,
             "type": "boolean",
@@ -6282,7 +6389,7 @@
             "default": false,
             "group": "auth",
             "section": "general",
-            "order": 7,
+            "order": 20,
             "type": "boolean"
         },
         "radius.default_roles": {
@@ -6624,7 +6731,7 @@
             "units": "Seconds"
         },
         "ping_rrd_step": {
-            "default": 60,
+            "default": 300,
             "group": "poller",
             "section": "dispatcherservice",
             "order": 21,

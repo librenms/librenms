@@ -418,7 +418,7 @@ if (! empty($peers)) {
                         ];
                         if ($cumulus_vrf) {
                             $bgp_peers = array_filter($peer_data_check->toArray(), function ($peer) use ($peer_identifier) {
-                                return isset($peer[$peer_identifier]) ? $peer[$peer_identifier] : [];
+                                return $peer[$peer_identifier] ?? [];
                             });
                             $tmp_data = array_pop($bgp_peers)[$peer_identifier];
                             $peer_data['bgpPeerDescr'] = $tmp_data['bgpPeerDesc'];
@@ -466,7 +466,7 @@ if (! empty($peers)) {
                 $peer_data = [];
 
                 foreach ($oid_map as $source => $target) {
-                    $v = isset($peer_data_raw[$source]) ? $peer_data_raw[$source] : (in_array($target, $intFields) ? 0 : '');
+                    $v = $peer_data_raw[$source] ?? (in_array($target, $intFields) ? 0 : '');
 
                     if (Str::contains($source, 'LocalAddr')) {
                         try {

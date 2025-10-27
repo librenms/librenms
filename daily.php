@@ -78,36 +78,6 @@ if ($options['f'] === 'rrd_purge') {
     }
 }
 
-if ($options['f'] === 'syslog') {
-    $lock = Cache::lock('syslog_purge', 86000);
-    if ($lock->get()) {
-        $syslog_purge = LibrenmsConfig::get('syslog_purge');
-
-        if (is_numeric($syslog_purge)) {
-            $rows = (int) dbFetchCell('SELECT MIN(seq) FROM syslog');
-            $initial_rows = $rows;
-            while (true) {
-                $limit = dbFetchCell('SELECT seq FROM syslog WHERE seq >= ? ORDER BY seq LIMIT 1000,1', [$rows]);
-                if (empty($limit)) {
-                    break;
-                }
-
-                // Deletes are done in blocks of 1000 to avoid a single very large operation.
-                if (dbDelete('syslog', 'seq >= ? AND seq < ? AND timestamp < DATE_SUB(NOW(), INTERVAL ? DAY)', [$rows, $limit, $syslog_purge]) > 0) {
-                    $rows = $limit;
-                } else {
-                    break;
-                }
-            }
-
-            dbDelete('syslog', 'seq >= ? AND timestamp < DATE_SUB(NOW(), INTERVAL ? DAY)', [$rows, $syslog_purge]);
-            $final_rows = $rows - $initial_rows;
-            echo "Syslog cleared for entries over $syslog_purge days (about $final_rows rows)\n";
-        }
-        $lock->release();
-    }
-}
-
 if ($options['f'] === 'ports_fdb') {
     $ret = lock_and_purge('ports_fdb', 'updated_at < DATE_SUB(NOW(), INTERVAL ? DAY)');
     exit($ret);
@@ -339,13 +309,6 @@ if ($options['f'] === 'peeringdb') {
     if ($lock->get()) {
         cache_peeringdb();
         $lock->release();
-    }
-}
-
-if ($options['f'] === 'refresh_os_cache') {
-    echo 'Clearing OS cache' . PHP_EOL;
-    if (is_file(LibrenmsConfig::get('install_dir') . '/cache/os_defs.cache')) {
-        unlink(LibrenmsConfig::get('install_dir') . '/cache/os_defs.cache');
     }
 }
 

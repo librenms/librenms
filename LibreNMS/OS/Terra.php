@@ -79,7 +79,7 @@ class Terra extends OS implements ProcessorDiscovery, OSDiscovery
         ];
 
         foreach ($query as $decr => $oid) {
-            if (strpos($device['sysDescr'], $decr) !== false) {
+            if (str_contains($device['sysDescr'], $decr)) {
                 return [
                     Processor::discover(
                         'cpu',

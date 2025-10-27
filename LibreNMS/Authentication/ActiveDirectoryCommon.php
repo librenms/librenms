@@ -44,7 +44,7 @@ trait ActiveDirectoryCommon
         if (PHP_INT_SIZE <= 4) {
             for ($i = 1; $i <= count($subAuths); $i++) {
                 if ($subAuths[$i] < 0) {
-                    $subAuths[$i] = $subAuths[$i] + 0x100000000;
+                    $subAuths[$i] += 0x100000000;
                 }
             }
         }
@@ -165,7 +165,7 @@ trait ActiveDirectoryCommon
             'user_id' => $this->getUseridFromSid($this->sidFromLdap($entry['objectsid'][0])),
             'username' => $entry['samaccountname'][0],
             'realname' => $entry['displayname'][0],
-            'email' => isset($entry['mail'][0]) ? $entry['mail'][0] : null,
+            'email' => $entry['mail'][0] ?? null,
             'descr' => '',
             'can_modify_passwd' => 0,
         ];

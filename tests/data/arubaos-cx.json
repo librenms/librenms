@@ -14480,5 +14480,101 @@
                 }
             ]
         }
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 1,
+                    "low_ifIndex": 1018,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2,
+                    "low_ifIndex": 1018,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 53,
+                    "low_ifIndex": 821,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 54,
+                    "low_ifIndex": 821,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
+    },
+    "hr-device": {
+        "discovery": {
+            "hrDevice": [
+                {
+                    "hrDeviceIndex": 196608,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) CPU D-1518 @ 2.20GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 4
+                },
+                {
+                    "hrDeviceIndex": 196609,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) CPU D-1518 @ 2.20GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 4
+                },
+                {
+                    "hrDeviceIndex": 196610,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) CPU D-1518 @ 2.20GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 5
+                },
+                {
+                    "hrDeviceIndex": 196611,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) CPU D-1518 @ 2.20GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 4
+                },
+                {
+                    "hrDeviceIndex": 196612,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) CPU D-1518 @ 2.20GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 5
+                },
+                {
+                    "hrDeviceIndex": 196613,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) CPU D-1518 @ 2.20GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 5
+                },
+                {
+                    "hrDeviceIndex": 196614,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) CPU D-1518 @ 2.20GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 4
+                },
+                {
+                    "hrDeviceIndex": 196615,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) CPU D-1518 @ 2.20GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 4
+                }
+            ]
+        }
     }
 }

@@ -182,7 +182,7 @@ class EnvHelper
      */
     private static function escapeValue($value)
     {
-        if (strpos($value, ' ') !== false) {
+        if (str_contains($value, ' ')) {
             return "\"$value\"";
         }
 

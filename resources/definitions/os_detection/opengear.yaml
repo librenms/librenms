@@ -1,6 +1,6 @@
 os: opengear
 text: Opengear
-type: 'OOB Management'
+type: management
 icon: opengear
 over:
     - { graph: device_signal, text: 'Signal' }

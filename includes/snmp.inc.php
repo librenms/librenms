@@ -17,9 +17,9 @@
  */
 
 use App\Facades\LibrenmsConfig;
-use App\Models\Device;
 use App\Polling\Measure\Measurement;
 use Illuminate\Support\Str;
+use LibreNMS\Util\Rewrite;
 
 /**
  * @deprecated Please use SnmpQuery instead
@@ -54,7 +54,7 @@ function get_mib_dir($device)
 
         if ($group_mibdir = LibrenmsConfig::get("os_groups.{$device['os_group']}.mib_dir")) {
             if (is_array($group_mibdir)) {
-                foreach ($group_mibdir as $k => $dir) {
+                foreach ($group_mibdir as $dir) {
                     $dirs[] = LibrenmsConfig::get('mib_dir') . '/' . $dir;
                 }
             }
@@ -189,7 +189,7 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
         array_push($cmd, '-r', $retries);
     }
 
-    $pollertarget = \LibreNMS\Util\Rewrite::addIpv6Brackets(Device::pollerTarget($device));
+    $pollertarget = Rewrite::addIpv6Brackets(DeviceCache::get($device['device_id'])->pollerTarget());
     $cmd[] = $device['transport'] . ':' . $pollertarget . ':' . $device['port'];
     $cmd = array_merge($cmd, (array) $oids);
 
@@ -595,7 +595,7 @@ function snmp_gen_auth(&$device, $cmd = [])
 {
     if ($device['snmpver'] === 'v3') {
         array_push($cmd, '-v3', '-l', $device['authlevel']);
-        array_push($cmd, '-n', isset($device['context_name']) ? $device['context_name'] : '');
+        array_push($cmd, '-n', $device['context_name'] ?? '');
 
         $authlevel = strtolower($device['authlevel']);
         if ($authlevel === 'noauthnopriv') {

@@ -70,7 +70,7 @@ class ComponentStatusController extends WidgetController
             ->get()->pluck('total', 'status')->toArray();
 
         foreach ($status as $key => $value) {
-            $status[$key]['total'] = isset($component_status[$key]) ? $component_status[$key] : 0;
+            $status[$key]['total'] = $component_status[$key] ?? 0;
         }
 
         return view('widgets.component-status', ['status' => $status]);

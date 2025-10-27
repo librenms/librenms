@@ -157,7 +157,7 @@ abstract class LnmsCommand extends Command
 
             return $validator->validated();
         } catch (ValidationException $e) {
-            collect($validator->getMessageBag()->all())->each(function ($message) {
+            collect($validator->getMessageBag()->all())->each(function ($message): void {
                 $this->error($message);
             });
             exit(1);
@@ -183,6 +183,19 @@ abstract class LnmsCommand extends Command
                 Debug::setVerbose();
             }
         }
+    }
+
+    protected function validatePromptInput(string $attributeName, string|array $rules): callable
+    {
+        return function (string|array $value) use ($attributeName, $rules): ?string {
+            $validator = Validator::make([$attributeName => $value], [$attributeName => $rules]);
+
+            if ($validator->fails()) {
+                return $validator->errors()->first($attributeName);
+            }
+
+            return null;
+        };
     }
 
     private function getCallable(string $type, string $name): ?callable

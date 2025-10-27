@@ -1,7 +1,6 @@
 <?php
 
 use App\Facades\LibrenmsConfig;
-use App\Models\Device;
 use App\Models\Eventlog;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Enum\Severity;
@@ -43,15 +42,13 @@ function get_service_status($device = null)
 
 function add_service($device, $type, $desc, $ip = '', $param = '', $ignore = 0, $disabled = 0, $template_id = '', $name = '')
 {
-    if (! is_array($device)) {
-        $device = device_by_id_cache($device);
-    }
+    $device = DeviceCache::get(is_array($device) ? $device['device_id'] : $device);
 
     if (empty($ip)) {
-        $ip = Device::pollerTarget($device['hostname']);
+        $ip = $device->pollerTarget();
     }
 
-    $insert = ['device_id' => $device['device_id'], 'service_ip' => $ip, 'service_type' => $type, 'service_changed' => ['UNIX_TIMESTAMP(NOW())'], 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked', 'service_ds' => '{}', 'service_disabled' => $disabled, 'service_template_id' => $template_id, 'service_name' => $name];
+    $insert = ['device_id' => $device->device_id, 'service_ip' => $ip, 'service_type' => $type, 'service_changed' => ['UNIX_TIMESTAMP(NOW())'], 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked', 'service_ds' => '{}', 'service_disabled' => $disabled, 'service_template_id' => $template_id, 'service_name' => $name];
 
     return dbInsert($insert, 'services');
 }
@@ -195,8 +192,8 @@ function poll_service($service)
 
         // TODO: Put the 3 lines below in a function getStatus(int) ?
         $status_text = [0 => 'OK', 1 => 'Warning', 3 => 'Unknown'];
-        $old_status_text = isset($status_text[$old_status]) ? $status_text[$old_status] : 'Critical';
-        $new_status_text = isset($status_text[$new_status]) ? $status_text[$new_status] : 'Critical';
+        $old_status_text = $status_text[$old_status] ?? 'Critical';
+        $new_status_text = $status_text[$new_status] ?? 'Critical';
 
         Eventlog::log(
             "Service {$service['service_name']} ({$service['service_type']})' changed status from $old_status_text to $new_status_text - {$service['service_desc']} - $msg",

@@ -23,17 +23,17 @@ function toner2colour($descr, $percent)
 {
     $colour = \LibreNMS\Util\Color::percentage(100 - $percent, null);
 
-    if (substr($descr, -1) == 'C' || stripos($descr, 'cyan') !== false) {
+    if (str_ends_with($descr, 'C') || stripos($descr, 'cyan') !== false) {
         $colour['left'] = '55D6D3';
         $colour['right'] = '33B4B1';
     }
 
-    if (substr($descr, -1) == 'M' || stripos($descr, 'magenta') !== false) {
+    if (str_ends_with($descr, 'M') || stripos($descr, 'magenta') !== false) {
         $colour['left'] = 'F24AC8';
         $colour['right'] = 'D028A6';
     }
 
-    if (substr($descr, -1) == 'Y' || stripos($descr, 'yellow') !== false
+    if (str_ends_with($descr, 'Y') || stripos($descr, 'yellow') !== false
         || stripos($descr, 'giallo') !== false
         || stripos($descr, 'gul') !== false
     ) {
@@ -41,7 +41,7 @@ function toner2colour($descr, $percent)
         $colour['right'] = 'DDD000';
     }
 
-    if (substr($descr, -1) == 'K' || stripos($descr, 'black') !== false
+    if (str_ends_with($descr, 'K') || stripos($descr, 'black') !== false
         || stripos($descr, 'nero') !== false
     ) {
         $colour['left'] = '000000';
@@ -626,7 +626,7 @@ function format_alert_details($alert_idx, $tmp_alerts, $type_info = null)
     if (isset($tmp_alerts['sensor_id'])) {
         if ($tmp_alerts['sensor_class'] == 'state') {
             // Give more details for a state (textual form)
-            $details = 'State: ' . $tmp_alerts['state_descr'] ?? '' . ' (numerical ' . $tmp_alerts['sensor_current'] . ')<br>  ';
+            $details = 'State: ' . ($tmp_alerts['state_descr'] ?? '') . ' (numerical ' . $tmp_alerts['sensor_current'] . ')<br>  ';
         } else {
             // Other sensors
             $details = 'Value: ' . $tmp_alerts['sensor_current'] . ' (' . $tmp_alerts['sensor_class'] . ')<br>  ';
@@ -979,7 +979,7 @@ function lowest_time($time, $seconds = 300)
 /**
  * @params int
  *
- * @return string
+ * @return string|void
  *
  * This returns the subpath for working with nfdump.
  *
@@ -1048,7 +1048,7 @@ function nfsen_hostname($hostname)
 /**
  * @params string hostname
  *
- * @return string
+ * @return string|void
  *
  * Takes a hostname and returns the path to the nfsen
  * live dir.

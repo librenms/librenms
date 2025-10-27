@@ -90,11 +90,11 @@ class LocationController extends TableController
     {
         switch ($field) {
             case 'devices':
-                return function ($query) {
+                return function ($query): void {
                     $query->on('devices.location_id', 'locations.id');
                 };
             case 'down':
-                return function ($query) {
+                return function ($query): void {
                     $query->on('devices.location_id', 'locations.id');
                     (new Device)->scopeIsDown($query);
                 };

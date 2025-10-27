@@ -64,6 +64,7 @@ use LibreNMS\OS;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\Oid;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
@@ -95,7 +96,7 @@ class Vrp extends OS implements
             'HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc',
         ])->table(1);
 
-        $inventory->each(function (EntPhysical $entry) use ($extra) {
+        $inventory->each(function (EntPhysical $entry) use ($extra): void {
             if (isset($entry->entPhysicalIndex)) {
                 if (! empty($extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc'])) {
                     $entry->entPhysicalDescr = $extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc'];
@@ -295,7 +296,7 @@ class Vrp extends OS implements
                 //Convert mac address (hh:hh:hh:hh:hh:hh) to dec OID (ddd.ddd.ddd.ddd.ddd.ddd)
                 //$a_index_oid = implode(".", array_map("hexdec", explode(":", $ap_id)));
                 foreach ($ap as $r_id => $radio) {
-                    foreach ($radio as $s_index => $ssid) {
+                    foreach ($radio as $ssid) {
                         $clientPerRadio[$ap_id][$r_id] = ($clientPerRadio[$ap_id][$r_id] ?? 0) + ($ssid['hwWlanVapStaOnlineCnt'] ?? 0);
                         $numClients += ($ssid['hwWlanVapStaOnlineCnt'] ?? 0);
                     }
@@ -567,11 +568,9 @@ class Vrp extends OS implements
         $ssid_total_oid_array = []; // keep all OIDs so we can compute the total of all STA
 
         foreach ($staTable as $ssid => $sta) {
-            //Convert string to num_oid
-            $numSsid = strlen($ssid) . '.' . implode('.', unpack('c*', $ssid));
             $ssid_oid_array = []; // keep all OIDs of different freqs for a single SSID, to compute each SSID sta count, all freqs included
             foreach ($sta as $staFreq => $count) {
-                $oid = $oidMap[$staFreq] . $numSsid;
+                $oid = $oidMap[$staFreq] . Oid::encodeString($ssid);
                 $ssid_oid_array[] = $oid;
                 $ssid_total_oid_array[] = $oid;
                 $sensors[] = new WirelessSensor(
