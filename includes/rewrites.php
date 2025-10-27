@@ -76,7 +76,7 @@ function cleanPort($interface, $device = null)
 
     if (is_array(LibrenmsConfig::get('rewrite_if'))) {
         foreach (LibrenmsConfig::get('rewrite_if') as $src => $val) {
-            if (stristr($interface['label'], $src)) {
+            if (stristr($interface['label'], (string) $src)) {
                 $interface['label'] = $val;
             }
         }
