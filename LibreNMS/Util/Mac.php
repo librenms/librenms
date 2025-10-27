@@ -137,12 +137,10 @@ class Mac
     {
         $oui = implode(array_slice($this->mac, 0, 3));
 
-        $results = Cache::remember($oui, 21600, function () use ($oui) {
-            return DB::table('vendor_ouis')
-                ->where('oui', 'like', "$oui%") // possible matches
-                ->orderBy('oui', 'desc') // so we can check longer ones first if we have them
-                ->pluck('vendor', 'oui');
-        });
+        $results = Cache::remember($oui, 21600, fn () => DB::table('vendor_ouis')
+            ->where('oui', 'like', "$oui%") // possible matches
+            ->orderBy('oui', 'desc') // so we can check longer ones first if we have them
+            ->pluck('vendor', 'oui'));
 
         if (count($results) == 1) {
             return Arr::first($results);

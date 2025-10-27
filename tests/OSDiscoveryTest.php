@@ -47,20 +47,14 @@ final class OSDiscoveryTest extends TestCase
 
         $glob = realpath(__DIR__ . '/..') . '/tests/snmpsim/*.snmprec';
 
-        self::$unchecked_files = array_flip(array_filter(array_map(function ($file) {
-            return basename($file, '.snmprec');
-        }, glob($glob)), function ($file) {
-            return ! Str::contains($file, '@');
-        }));
+        self::$unchecked_files = array_flip(array_filter(array_map(fn ($file) => basename($file, '.snmprec'), glob($glob)), fn ($file) => ! Str::contains($file, '@')));
     }
 
     public function testValidOSNames(): void
     {
         $os = array_keys(self::osProvider());
 
-        $invalid_os_name = array_filter($os, function ($os_name) {
-            return preg_match('/[^a-z0-9\-]/', $os_name);
-        });
+        $invalid_os_name = array_filter($os, fn ($os_name) => preg_match('/[^a-z0-9\-]/', $os_name));
 
         // DO NOT ADD ANY OS HERE!
         $exceptions = [
@@ -101,9 +95,7 @@ final class OSDiscoveryTest extends TestCase
         }
 
         $glob = LibrenmsConfig::get('install_dir') . "/tests/snmpsim/$os_name*.snmprec";
-        $files = array_map(function ($file) {
-            return basename($file, '.snmprec');
-        }, glob($glob));
+        $files = array_map(fn ($file) => basename($file, '.snmprec'), glob($glob));
         $files = array_filter($files, function ($file) use ($os_name) {
             if (Str::contains($file, '@')) {
                 return false;

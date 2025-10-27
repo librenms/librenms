@@ -153,13 +153,11 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Vlan
         }
 
         return SnmpQuery::cache()->walk('TPLINK-DOT1Q-VLAN-MIB::vlanConfigTable')
-            ->mapTable(function ($data, $vlan_id) {
-                return new Vlan([
-                    'vlan_vlan' => $vlan_id,
-                    'vlan_domain' => 1,
-                    'vlan_name' => $data['TPLINK-DOT1Q-VLAN-MIB::dot1qVlanDescription'],
-                ]);
-            });
+            ->mapTable(fn ($data, $vlan_id) => new Vlan([
+                'vlan_vlan' => $vlan_id,
+                'vlan_domain' => 1,
+                'vlan_name' => $data['TPLINK-DOT1Q-VLAN-MIB::dot1qVlanDescription'],
+            ]));
     }
 
     public function discoverVlanPorts(Collection $vlans): Collection

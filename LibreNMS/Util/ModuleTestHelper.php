@@ -555,9 +555,7 @@ class ModuleTestHelper
         app()->bind(AutonomousSystem::class, function ($app, $parameters) {
             $asn = $parameters['asn'] ?? '?';
             $mock = \Mockery::mock(AutonomousSystem::class);
-            $mock->shouldReceive('name')->withAnyArgs()->zeroOrMoreTimes()->andReturnUsing(function () use ($asn) {
-                return "AS$asn-MOCK-TEXT";
-            });
+            $mock->shouldReceive('name')->withAnyArgs()->zeroOrMoreTimes()->andReturnUsing(fn () => "AS$asn-MOCK-TEXT");
 
             return $mock;
         });

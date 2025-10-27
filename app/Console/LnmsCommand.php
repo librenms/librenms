@@ -196,8 +196,6 @@ abstract class LnmsCommand extends Command
             return $values;
         }
 
-        return function () use ($values) {
-            return $values;
-        };
+        return fn () => $values;
     }
 }

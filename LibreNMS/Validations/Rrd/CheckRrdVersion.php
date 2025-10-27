@@ -65,9 +65,7 @@ class CheckRrdVersion implements Validation, ValidationFixer
         try {
             $contents = Storage::disk('base')->get('config.php');
 
-            $lines = array_filter(explode("\n", $contents), function ($line) {
-                return ! Str::contains($line, ['$config[\'rrdtool_version\']', '$config["rrdtool_version"]']);
-            });
+            $lines = array_filter(explode("\n", $contents), fn ($line) => ! Str::contains($line, ['$config[\'rrdtool_version\']', '$config["rrdtool_version"]']));
 
             return Storage::disk('base')->put('config.php', implode("\n", $lines));
         } catch (FileNotFoundException $e) {

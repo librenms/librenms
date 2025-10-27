@@ -394,10 +394,9 @@ class RunAlerts
      */
     private function extractIdFieldsForFault($element)
     {
-        return array_filter(array_keys($element), function ($key) {
+        return array_filter(array_keys($element), fn ($key) =>
             // Exclude location_id as it is not relevant for the comparison
-            return ($key === 'id' || strpos($key, '_id')) !== false && $key !== 'location_id';
-        });
+            ($key === 'id' || strpos($key, '_id')) !== false && $key !== 'location_id');
     }
 
     /**

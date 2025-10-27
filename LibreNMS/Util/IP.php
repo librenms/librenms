@@ -99,9 +99,7 @@ abstract class IP
         $hex = implode(
             ':',
             array_map(
-                function ($dec) {
-                    return sprintf('%02x', $dec);
-                },
+                fn ($dec) => sprintf('%02x', $dec),
                 explode(' ', (string) $snmpOid)
             )
         );

@@ -109,9 +109,7 @@ class DashboardController extends Controller
 
         // Split dashboards into user owned or shared
         $dashboards = $this->getAvailableDashboards($user);
-        [$user_dashboards, $shared_dashboards] = $dashboards->partition(function ($dashboard) use ($user) {
-            return $dashboard->user_id == $user->user_id;
-        });
+        [$user_dashboards, $shared_dashboards] = $dashboards->partition(fn ($dashboard) => $dashboard->user_id == $user->user_id);
 
         $data = $dashboard->widgets;
 

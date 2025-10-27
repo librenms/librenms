@@ -106,9 +106,7 @@ foreach ($data['sets'] as $set_name => $set_data) {
             //$metrics['set_' . $set_name . '_files_' .$log_name] = 0;
         }
 
-        uasort($app_data['sets'][$set_name]['log_sizes'], function ($a, $b) {
-            return $b <=> $a;
-        });
+        uasort($app_data['sets'][$set_name]['log_sizes'], fn ($a, $b) => $b <=> $a);
     }
 }
 

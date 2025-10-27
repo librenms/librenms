@@ -51,9 +51,7 @@ class Component
 
     public function getComponentCount($device_id = null)
     {
-        $counts = \App\Models\Component::query()->when($device_id, function ($query, $device_id) {
-            return $query->where('device_id', $device_id);
-        })->selectRaw('type, count(*) as count')->groupBy('type')->pluck('count', 'type');
+        $counts = \App\Models\Component::query()->when($device_id, fn ($query, $device_id) => $query->where('device_id', $device_id))->selectRaw('type, count(*) as count')->groupBy('type')->pluck('count', 'type');
 
         return $counts->isEmpty() ? false : $counts->all();
     }
@@ -115,12 +113,8 @@ class Component
         }
 
         // get and format results as expected by receivers
-        return $query->get()->groupBy('device_id')->map(function ($group) {
-            return $group->keyBy('id')->map(function ($component) {
-                return $component->prefs->pluck('value', 'attribute')
-                    ->merge($component->only(array_keys($this->reserved)));
-            });
-        })->toArray();
+        return $query->get()->groupBy('device_id')->map(fn ($group) => $group->keyBy('id')->map(fn ($component) => $component->prefs->pluck('value', 'attribute')
+            ->merge($component->only(array_keys($this->reserved)))))->toArray();
     }
 
     public function getComponentStatus($device = null)
@@ -233,9 +227,7 @@ class Component
                 if ($component->isDirty()) {
                     // Log the update to the Eventlog.
                     $message = "Component $component->id has been modified: ";
-                    $message .= collect($component->getDirty())->map(function ($value, $key) {
-                        return "$key => $value";
-                    })->implode(',');
+                    $message .= collect($component->getDirty())->map(fn ($value, $key) => "$key => $value")->implode(',');
 
                     // If the Status has changed we need to add a log entry
                     if ($component->isDirty('status')) {
@@ -248,9 +240,7 @@ class Component
                 }
 
                 // update preferences
-                $prefs = collect($updated[$component->id])->filter(function ($value, $attr) {
-                    return ! array_key_exists($attr, $this->reserved);
-                });
+                $prefs = collect($updated[$component->id])->filter(fn ($value, $attr) => ! array_key_exists($attr, $this->reserved));
 
                 $invalid = $component->prefs->keyBy('id');
 

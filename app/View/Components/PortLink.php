@@ -84,12 +84,10 @@ class PortLink extends Component
 
     public function fillDefaultVars(array $vars): array
     {
-        return array_map(function ($graph_vars) {
-            return array_merge([
-                'from' => '-1d',
-                'legend' => 'yes',
-                'text' => '',
-            ], Arr::wrap($graph_vars));
-        }, $vars);
+        return array_map(fn ($graph_vars) => array_merge([
+            'from' => '-1d',
+            'legend' => 'yes',
+            'text' => '',
+        ], Arr::wrap($graph_vars)), $vars);
     }
 }

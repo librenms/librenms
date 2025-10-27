@@ -25,9 +25,7 @@ function bulk_sensor_snmpget($device, $sensors)
     $sensors = array_chunk($sensors, $oid_per_pdu);
     $cache = [];
     foreach ($sensors as $chunk) {
-        $oids = array_map(function ($data) {
-            return $data['sensor_oid'];
-        }, $chunk);
+        $oids = array_map(fn ($data) => $data['sensor_oid'], $chunk);
         $oids = implode(' ', $oids);
         $multi_response = snmp_get_multi_oid($device, $oids, '-OUQntea');
         $cache = array_merge($cache, $multi_response);

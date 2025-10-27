@@ -29,19 +29,15 @@ class MarkNotificationsRead
     {
         $user = $event->user;
         // mark pre-existing notifications as read
-        NotificationAttrib::query()->insert(Notification::whereNotExists(function ($query) use ($user) {
-            return $query->select(DB::raw(1))
-                ->from('notifications_attribs')
-                ->whereRaw('notifications.notifications_id = notifications_attribs.notifications_id')
-                ->where('notifications_attribs.user_id', $user->user_id);
-        })->get()->map(function ($notif) use ($user) {
-            return [
-                'notifications_id' => $notif->notifications_id,
-                'user_id' => $user->user_id,
-                'key' => 'read',
-                'value' => 1,
-            ];
-        })->toArray());
+        NotificationAttrib::query()->insert(Notification::whereNotExists(fn ($query) => $query->select(DB::raw(1))
+            ->from('notifications_attribs')
+            ->whereRaw('notifications.notifications_id = notifications_attribs.notifications_id')
+            ->where('notifications_attribs.user_id', $user->user_id))->get()->map(fn ($notif) => [
+            'notifications_id' => $notif->notifications_id,
+            'user_id' => $user->user_id,
+            'key' => 'read',
+            'value' => 1,
+        ])->toArray());
 
         \Log::info('Marked all notifications as read for user ' . $user->username);
     }

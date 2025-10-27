@@ -192,7 +192,7 @@ class SnmpResponse
     public function pluck(?string $oid = null): array
     {
         $output = [];
-        $oid = $oid ?? '[a-zA-Z0-9:.-]+';
+        $oid ??= '[a-zA-Z0-9:.-]+';
         $regex = "/^{$oid}[[.]([\d.[\]]+?)]?$/";
 
         foreach ($this->values() as $key => $value) {

@@ -57,9 +57,7 @@ class DatabaseInconsistentException extends \Exception implements UpgradeableExc
                 (new Database())->validate($validator);
 
                 // get only failed results
-                $results = array_filter($validator->getResults('database'), function (ValidationResult $result) {
-                    return $result->getStatus() === ValidationResult::FAILURE;
-                });
+                $results = array_filter($validator->getResults('database'), fn (ValidationResult $result) => $result->getStatus() === ValidationResult::FAILURE);
 
                 if ($results) {
                     return new static($results, $exception->getMessage(), 0, $exception);

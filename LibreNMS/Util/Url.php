@@ -595,9 +595,7 @@ class Url
      */
     public static function parseLegacyPath($path)
     {
-        $parts = array_filter(explode('/', $path), function ($part) {
-            return Str::contains($part, '=');
-        });
+        $parts = array_filter(explode('/', $path), fn ($part) => Str::contains($part, '='));
 
         $vars = [];
         foreach ($parts as $part) {

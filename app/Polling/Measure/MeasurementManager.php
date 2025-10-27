@@ -72,9 +72,7 @@ class MeasurementManager
      */
     public function printChangedStats(): void
     {
-        $dsStats = app('Datastore')->getStats()->map(function (MeasurementCollection $stats, $datastore) {
-            return sprintf('%s%s%s: [%d/%.2fs]', self::DATASTORE_COLOR, $datastore, self::NO_COLOR, $stats->getCountDiff(), $stats->getDurationDiff());
-        });
+        $dsStats = app('Datastore')->getStats()->map(fn (MeasurementCollection $stats, $datastore) => sprintf('%s%s%s: [%d/%.2fs]', self::DATASTORE_COLOR, $datastore, self::NO_COLOR, $stats->getCountDiff(), $stats->getDurationDiff()));
 
         Log::info(sprintf(
             '>> %sSNMP%s: [%d/%.2fs] %sMySQL%s: [%d/%.2fs] %s',
@@ -142,9 +140,7 @@ class MeasurementManager
 
     public function printSummary(string $name, MeasurementCollection $collection, string $color = ''): void
     {
-        $summaries = $collection->map(function (MeasurementSummary $stat) {
-            return sprintf('%s[%d/%.2fs]', ucfirst($stat->getType()), $stat->getCount(), $stat->getDuration());
-        });
+        $summaries = $collection->map(fn (MeasurementSummary $stat) => sprintf('%s[%d/%.2fs]', ucfirst($stat->getType()), $stat->getCount(), $stat->getDuration()));
 
         Log::info(sprintf('%s%s%s [%d/%.2fs]: %s',
             $color,

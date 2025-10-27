@@ -114,9 +114,7 @@ class Validator
     {
         $results = $this->getResults($validation_group);
 
-        return array_reduce($results, function ($compound, ValidationResult $result) {
-            return min($compound, $result->getStatus());
-        }, ValidationResult::SUCCESS);
+        return array_reduce($results, fn ($compound, ValidationResult $result) => min($compound, $result->getStatus()), ValidationResult::SUCCESS);
     }
 
     /**
@@ -337,9 +335,7 @@ class Validator
                 'name' => ucfirst($group),
                 'status' => $groupStatus,
                 'statusText' => $this->getStatusText($groupStatus),
-                'results' => array_map(function (ValidationResult $result) {
-                    return $result->toArray();
-                }, $results),
+                'results' => array_map(fn (ValidationResult $result) => $result->toArray(), $results),
             ];
         }, $this->getAllResults(), array_keys($this->getAllResults()));
     }

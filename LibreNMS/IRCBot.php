@@ -805,9 +805,7 @@ class IRCBot
             $hostname = preg_replace("/[^A-z0-9\.\-]/", '', $params[1]);
         }
 
-        $tmp = Eventlog::with('device')->hasAccess($this->user['user'])->whereIn('device_id', function ($query) use ($hostname) {
-            return $query->where('hostname', 'like', $hostname . '%')->select('device_id');
-        })->select(['event_id', 'datetime', 'type', 'message'])->orderBy('event_id')->limit((int) $num)->get();
+        $tmp = Eventlog::with('device')->hasAccess($this->user['user'])->whereIn('device_id', fn ($query) => $query->where('hostname', 'like', $hostname . '%')->select('device_id'))->select(['event_id', 'datetime', 'type', 'message'])->orderBy('event_id')->limit((int) $num)->get();
 
         /** @var Eventlog $logline */
         foreach ($tmp as $logline) {

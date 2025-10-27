@@ -452,7 +452,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     $user_function = $data['user_func'];
                 }
                 // get the value for this sensor, check 'value' and 'oid', if state string, translate to a number
-                $data['value'] = $data['value'] ?? $data['oid'];  // fallback to oid if value is not set
+                $data['value'] ??= $data['oid'];  // fallback to oid if value is not set
 
                 $snmp_value = $snmp_data[$data['value']] ?? '';
                 if (! is_numeric($snmp_value)) {

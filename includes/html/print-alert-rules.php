@@ -41,9 +41,7 @@ $no_refresh = true;
 </div>
 <?php
 if (isset($_POST['create-default'])) {
-    $default_rules = array_filter(get_rules_from_json(), function ($rule) {
-        return isset($rule['default']) && $rule['default'];
-    });
+    $default_rules = array_filter(get_rules_from_json(), fn ($rule) => isset($rule['default']) && $rule['default']);
 
     $default_extra = [
         'mute' => false,

@@ -60,9 +60,7 @@ class ErrorReporting
         $exceptions->report([$this, 'report']);
         $exceptions->render([$this, 'render']);
 
-        Flare::determineVersionUsing(function () {
-            return \LibreNMS\Util\Version::VERSION;
-        });
+        Flare::determineVersionUsing(fn () => \LibreNMS\Util\Version::VERSION);
     }
 
     public function reportable(Throwable $e): bool
