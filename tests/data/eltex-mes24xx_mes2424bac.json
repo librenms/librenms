@@ -10971,7 +10971,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.35265.52.1.1.3.2.1.8.28.3.1",
                     "sensor_index": "SfpTxBias28",
-                    "sensor_type": "ELTEX-PHY-MIB",
+                    "sensor_type": "eltex-mes24xx",
                     "sensor_descr": "SfpTxBias-te 0/4",
                     "group": "transceiver",
                     "sensor_divisor": 1000,
@@ -10983,7 +10983,7 @@
                     "sensor_limit_low_warn": 0.012,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "28",
+                    "entPhysicalIndex": "32",
                     "entPhysicalIndex_measured": "port",
                     "sensor_prev": null,
                     "user_func": null,
@@ -10996,7 +10996,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.35265.52.1.1.3.2.1.8.28.5.1",
                     "sensor_index": "SfpRxDbm28",
-                    "sensor_type": "ELTEX-PHY-MIB",
+                    "sensor_type": "eltex-mes24xx",
                     "sensor_descr": "SfpRxDbm-te 0/4",
                     "group": "transceiver",
                     "sensor_divisor": 1000,
@@ -11008,7 +11008,7 @@
                     "sensor_limit_low_warn": -7.943,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "28",
+                    "entPhysicalIndex": "32",
                     "entPhysicalIndex_measured": "port",
                     "sensor_prev": null,
                     "user_func": null,
@@ -11021,7 +11021,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.35265.52.1.1.3.2.1.8.28.4.1",
                     "sensor_index": "SfpTxDbm28",
-                    "sensor_type": "ELTEX-PHY-MIB",
+                    "sensor_type": "eltex-mes24xx",
                     "sensor_descr": "SfpTxDbm-te 0/4",
                     "group": "transceiver",
                     "sensor_divisor": 1000,
@@ -11033,7 +11033,7 @@
                     "sensor_limit_low_warn": -15.849,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "28",
+                    "entPhysicalIndex": "32",
                     "entPhysicalIndex_measured": "port",
                     "sensor_prev": null,
                     "user_func": null,
@@ -11044,84 +11044,9 @@
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.35265.52.1.1.3.2.1.8.25.6.1",
-                    "sensor_index": "SfpLoss25",
-                    "sensor_type": "ELTEX-PHY-MIB",
-                    "sensor_descr": "SfpLoss-te 0/1",
-                    "group": "transceiver",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 0,
-                    "sensor_limit": 1,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": "25",
-                    "entPhysicalIndex_measured": "port",
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "state",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.35265.52.1.1.3.2.1.8.26.6.1",
-                    "sensor_index": "SfpLoss26",
-                    "sensor_type": "ELTEX-PHY-MIB",
-                    "sensor_descr": "SfpLoss-te 0/2",
-                    "group": "transceiver",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 0,
-                    "sensor_limit": 1,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": "26",
-                    "entPhysicalIndex_measured": "port",
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "state",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.35265.52.1.1.3.2.1.8.27.6.1",
-                    "sensor_index": "SfpLoss27",
-                    "sensor_type": "ELTEX-PHY-MIB",
-                    "sensor_descr": "SfpLoss-te 0/3",
-                    "group": "transceiver",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 0,
-                    "sensor_limit": 1,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": "27",
-                    "entPhysicalIndex_measured": "port",
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "state",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.35265.52.1.1.3.2.1.8.28.6.1",
+                    "sensor_oid": ".1.3.6.1.4.1.35265.52.1.1.3.2.1.3.28.6.1",
                     "sensor_index": "SfpLoss28",
-                    "sensor_type": "ELTEX-PHY-MIB",
+                    "sensor_type": "eltex-mes24xx",
                     "sensor_descr": "SfpLoss-te 0/4",
                     "group": "transceiver",
                     "sensor_divisor": 1,
@@ -11133,12 +11058,12 @@
                     "sensor_limit_low_warn": null,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "28",
+                    "entPhysicalIndex": "32",
                     "entPhysicalIndex_measured": "port",
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": null
+                    "state_name": "eltex-mes24xx"
                 },
                 {
                     "sensor_deleted": 0,
@@ -11196,7 +11121,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.35265.52.1.1.3.2.1.8.28.1.1",
                     "sensor_index": "SfpTemp28",
-                    "sensor_type": "ELTEX-PHY-MIB",
+                    "sensor_type": "eltex-mes24xx",
                     "sensor_descr": "SfpTemp-te 0/4",
                     "group": "transceiver",
                     "sensor_divisor": 1,
@@ -11208,7 +11133,7 @@
                     "sensor_limit_low_warn": -5,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "28",
+                    "entPhysicalIndex": "32",
                     "entPhysicalIndex_measured": "port",
                     "sensor_prev": null,
                     "user_func": null,
@@ -11246,7 +11171,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.35265.52.1.1.3.2.1.8.28.2.1",
                     "sensor_index": "SfpVolt28",
-                    "sensor_type": "ELTEX-PHY-MIB",
+                    "sensor_type": "eltex-mes24xx",
                     "sensor_descr": "SfpVolt-te 0/4",
                     "group": "transceiver",
                     "sensor_divisor": 1,
@@ -11258,7 +11183,7 @@
                     "sensor_limit_low_warn": 3,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "28",
+                    "entPhysicalIndex": "32",
                     "entPhysicalIndex_measured": "port",
                     "sensor_prev": null,
                     "user_func": null,
@@ -11267,6 +11192,20 @@
                 }
             ],
             "state_indexes": [
+                {
+                    "state_name": "eltex-mes24xx",
+                    "state_descr": "false",
+                    "state_draw_graph": 1,
+                    "state_value": 0,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "eltex-mes24xx",
+                    "state_descr": "true",
+                    "state_draw_graph": 1,
+                    "state_value": 1,
+                    "state_generic_value": 2
+                },
                 {
                     "state_name": "eltMesIssBatteryStatusTable",
                     "state_descr": "NotSupported",
@@ -11432,7 +11371,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 1
                 },
                 {
                     "entPhysicalIndex": 6,
@@ -11451,7 +11390,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 2
                 },
                 {
                     "entPhysicalIndex": 7,
@@ -11470,7 +11409,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 3
                 },
                 {
                     "entPhysicalIndex": 8,
@@ -11489,7 +11428,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 4
                 },
                 {
                     "entPhysicalIndex": 9,
@@ -11508,7 +11447,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 5
                 },
                 {
                     "entPhysicalIndex": 10,
@@ -11527,7 +11466,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 6
                 },
                 {
                     "entPhysicalIndex": 11,
@@ -11546,7 +11485,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 7
                 },
                 {
                     "entPhysicalIndex": 12,
@@ -11565,7 +11504,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 8
                 },
                 {
                     "entPhysicalIndex": 13,
@@ -11584,7 +11523,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 9
                 },
                 {
                     "entPhysicalIndex": 14,
@@ -11603,7 +11542,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 10
                 },
                 {
                     "entPhysicalIndex": 15,
@@ -11622,7 +11561,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 11
                 },
                 {
                     "entPhysicalIndex": 16,
@@ -11641,7 +11580,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 12
                 },
                 {
                     "entPhysicalIndex": 17,
@@ -11660,7 +11599,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 13
                 },
                 {
                     "entPhysicalIndex": 18,
@@ -11679,7 +11618,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 14
                 },
                 {
                     "entPhysicalIndex": 19,
@@ -11698,7 +11637,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 15
                 },
                 {
                     "entPhysicalIndex": 20,
@@ -11717,7 +11656,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 16,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 16
                 },
                 {
                     "entPhysicalIndex": 21,
@@ -11736,7 +11675,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 17,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 17
                 },
                 {
                     "entPhysicalIndex": 22,
@@ -11755,7 +11694,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 18,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 18
                 },
                 {
                     "entPhysicalIndex": 23,
@@ -11774,7 +11713,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 19,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 19
                 },
                 {
                     "entPhysicalIndex": 24,
@@ -11793,7 +11732,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 20,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 20
                 },
                 {
                     "entPhysicalIndex": 25,
@@ -11812,7 +11751,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 21
                 },
                 {
                     "entPhysicalIndex": 26,
@@ -11831,7 +11770,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 22,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 22
                 },
                 {
                     "entPhysicalIndex": 27,
@@ -11850,7 +11789,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 23
                 },
                 {
                     "entPhysicalIndex": 28,
@@ -11869,143 +11808,67 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 24,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 24
                 },
                 {
                     "entPhysicalIndex": 29,
-                    "entPhysicalDescr": "tengigabitethernet0/1",
-                    "entPhysicalClass": "port",
-                    "entPhysicalName": "te 0/1",
+                    "entPhysicalDescr": "unknown",
+                    "entPhysicalClass": "sfp-cage",
+                    "entPhysicalName": "unknown",
                     "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": "",
-                    "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
-                    "entPhysicalIsFRU": "false",
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": "true",
                     "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "",
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 25,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 25
                 },
                 {
                     "entPhysicalIndex": 30,
-                    "entPhysicalDescr": "tengigabitethernet0/2",
-                    "entPhysicalClass": "port",
-                    "entPhysicalName": "te 0/2",
+                    "entPhysicalDescr": "unknown",
+                    "entPhysicalClass": "sfp-cage",
+                    "entPhysicalName": "unknown",
                     "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": "",
-                    "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
-                    "entPhysicalIsFRU": "false",
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": "true",
                     "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "",
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 26,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
+                    "ifIndex": 26
                 },
                 {
                     "entPhysicalIndex": 31,
-                    "entPhysicalDescr": "tengigabitethernet0/3",
-                    "entPhysicalClass": "port",
-                    "entPhysicalName": "te 0/3",
+                    "entPhysicalDescr": "unknown",
+                    "entPhysicalClass": "sfp-cage",
+                    "entPhysicalName": "unknown",
                     "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": "",
-                    "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
-                    "entPhysicalIsFRU": "false",
+                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": "true",
                     "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "zeroDotZero",
+                    "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "",
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 32,
-                    "entPhysicalDescr": "tengigabitethernet0/4",
-                    "entPhysicalClass": "port",
-                    "entPhysicalName": "te 0/4",
-                    "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": "",
-                    "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "trunk: Up (p28)",
-                    "entPhysicalAssetID": "",
-                    "entPhysicalIsFRU": "false",
-                    "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "zeroDotZero",
-                    "entPhysicalSerialNum": "",
-                    "entPhysicalContainedIn": 4,
-                    "entPhysicalParentRelPos": 28,
-                    "entPhysicalMfgName": "",
-                    "ifIndex": null
-                },
-                {
-                    "entPhysicalIndex": 1000025,
-                    "entPhysicalDescr": "unknown",
-                    "entPhysicalClass": "sfp-cage",
-                    "entPhysicalName": "unknown",
-                    "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "",
-                    "entPhysicalContainedIn": 0,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "",
-                    "ifIndex": 25
-                },
-                {
-                    "entPhysicalIndex": 1000026,
-                    "entPhysicalDescr": "unknown",
-                    "entPhysicalClass": "sfp-cage",
-                    "entPhysicalName": "unknown",
-                    "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "",
-                    "entPhysicalContainedIn": 0,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "",
-                    "ifIndex": 26
-                },
-                {
-                    "entPhysicalIndex": 1000027,
-                    "entPhysicalDescr": "unknown",
-                    "entPhysicalClass": "sfp-cage",
-                    "entPhysicalName": "unknown",
-                    "entPhysicalHardwareRev": "",
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": null,
-                    "entPhysicalAssetID": null,
-                    "entPhysicalIsFRU": "true",
-                    "entPhysicalModelName": "",
-                    "entPhysicalVendorType": null,
-                    "entPhysicalSerialNum": "",
-                    "entPhysicalContainedIn": 0,
-                    "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "",
                     "ifIndex": 27
                 },
                 {
-                    "entPhysicalIndex": 1000028,
+                    "entPhysicalIndex": 32,
                     "entPhysicalDescr": "sfp-sfpplus",
                     "entPhysicalClass": "sfp-cage",
                     "entPhysicalName": "lc",
@@ -12018,8 +11881,8 @@
                     "entPhysicalModelName": "KYBP-3327192-LRC",
                     "entPhysicalVendorType": null,
                     "entPhysicalSerialNum": "GS2201190408",
-                    "entPhysicalContainedIn": 0,
-                    "entPhysicalParentRelPos": -1,
+                    "entPhysicalContainedIn": 4,
+                    "entPhysicalParentRelPos": 28,
                     "entPhysicalMfgName": "OEM",
                     "ifIndex": 28
                 }
@@ -12035,7 +11898,7 @@
                     "ipv6_compressed": "fdfd:0:2:255::39",
                     "ipv6_prefixlen": 64,
                     "ipv6_origin": "manual",
-                    "context_name": null,
+                    "context_name": "",
                     "ipv6_network": "fdfd:0:2:255::/64",
                     "ifIndex": 90
                 }
@@ -12046,65 +11909,8 @@
         "discovery": {
             "transceivers": [
                 {
-                    "index": "25",
-                    "entity_physical_index": 25,
-                    "type": null,
-                    "vendor": "",
-                    "oui": null,
-                    "model": "",
-                    "revision": "",
-                    "serial": "",
-                    "date": null,
-                    "ddm": null,
-                    "encoding": null,
-                    "cable": null,
-                    "distance": 0,
-                    "wavelength": 0,
-                    "connector": "UNKNOWN",
-                    "channels": 1,
-                    "ifIndex": 25
-                },
-                {
-                    "index": "26",
-                    "entity_physical_index": 26,
-                    "type": null,
-                    "vendor": "",
-                    "oui": null,
-                    "model": "",
-                    "revision": "",
-                    "serial": "",
-                    "date": null,
-                    "ddm": null,
-                    "encoding": null,
-                    "cable": null,
-                    "distance": 0,
-                    "wavelength": 0,
-                    "connector": "UNKNOWN",
-                    "channels": 1,
-                    "ifIndex": 26
-                },
-                {
-                    "index": "27",
-                    "entity_physical_index": 27,
-                    "type": null,
-                    "vendor": "",
-                    "oui": null,
-                    "model": "",
-                    "revision": "",
-                    "serial": "",
-                    "date": null,
-                    "ddm": null,
-                    "encoding": null,
-                    "cable": null,
-                    "distance": 0,
-                    "wavelength": 0,
-                    "connector": "UNKNOWN",
-                    "channels": 1,
-                    "ifIndex": 27
-                },
-                {
                     "index": "28",
-                    "entity_physical_index": 28,
+                    "entity_physical_index": 32,
                     "type": null,
                     "vendor": "OEM",
                     "oui": null,
