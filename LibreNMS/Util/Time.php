@@ -29,6 +29,7 @@ namespace LibreNMS\Util;
 use Carbon\CarbonInterface;
 use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Config;
 
 class Time
 {
@@ -172,5 +173,34 @@ class Time
         }
 
         return $duration === '' ? 0 : 300;
+    }
+
+    /**
+     * Return a random time between the two given times.
+     */
+    public static function randomBetween(string|int $min, string|int $max): Carbon
+    {
+        $time = new Carbon($min);
+
+        $time->addSeconds(mt_rand(0, (int) $time->diffInSeconds(new Carbon($max), true)));
+
+        return $time;
+    }
+
+    /**
+     * Return a psedudo random time between the two given times.
+     * The same time will always be returned for a given APP_KEY
+     */
+    public static function pseudoRandomBetween(string|int $min, string|int $max, string $format = 'H:i'): string
+    {
+        // Seed the random number generator to get consistent results for a given APP_KEY
+        mt_srand(crc32(Config::get('app.key') . $min . $max));
+
+        $time = self::randomBetween($min, $max);
+
+        // Need to restore the seed after
+        mt_srand();
+
+        return $time->format($format);
     }
 }
