@@ -8,7 +8,7 @@
                     "sysDescr": null,
                     "sysContact": null,
                     "version": "v6.4.8,build1914,211117 (GA)",
-                    "hardware": "FortiGate 100F",
+                    "hardware": null,
                     "features": null,
                     "location": null,
                     "os": "fortigate",

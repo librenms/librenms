@@ -8,7 +8,7 @@
                     "sysDescr": "our firewall",
                     "sysContact": "<private>",
                     "version": null,
-                    "hardware": "FortiGate 1500D",
+                    "hardware": null,
                     "features": null,
                     "location": null,
                     "os": "fortigate",
