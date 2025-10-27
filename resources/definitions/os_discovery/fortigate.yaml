@@ -10,20 +10,11 @@ modules:
     os:
         version: FORTINET-FORTIGATE-MIB::fgSysVersion.0
         serial: ENTITY-MIB::entPhysicalSerialNum.1
-        hardware: SNMPv2-MIB::sysObjectID.0
+        hardware: ENTITY-MIB::entPhysicalModelName.1
         hardware_replace:
-            - ['/^FORTINET-FORTIGATE-MIB::fgvm/', 'FortiGate VM ']
-            - ['/^FORTINET-FORTIGATE-MIB::fgr/', 'FortiGate Rugged ']
-            - ['/^FORTINET-FORTIGATE-MIB::fwf?/', 'FortiWiFi ']
-            - ['/^FORTINET-FORTIGATE-MIB::fgt/', 'FortiGate ']
+            - ['FGT_VM64', 'FortiGate VM']
+            - ['FGT_', 'FortiGate ']
 
-            - ['/(POE)$/', ' PoE']
-            - ['/(LTE)$/', ' LTE']
-            - ['/(I)$/', ' 3G/4G']
-            - ['/(ev)$/', 'Evaluation']
-
-            #some device use old Fortinet Bridge ?!
-            - ['/^FORTINET-CORE-MIB::fortinet.15/', '']
     processors:
         data:
             -
