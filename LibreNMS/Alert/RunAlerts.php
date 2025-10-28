@@ -104,7 +104,7 @@ class RunAlerts
         $obj['os'] = $device->os;
         $obj['type'] = $device->type;
         $obj['ip'] = $device->ip;
-        $obj['device_group'] = $device->groups()->pluck('device_group_id');
+        $obj['device_group'] = $device->groups()->pluck('device_group_id')->implode(',');
         $obj['hardware'] = $device->hardware;
         $obj['version'] = $device->version;
         $obj['serial'] = $device->serial;
