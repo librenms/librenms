@@ -40,7 +40,7 @@ use LibreNMS\Util\IPv6;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
-class EltexMes23xx extends Radlan implements TransceiverDiscovery, Ipv6AddressDiscovery
+class EltexMes23xx extends Radlan implements Ipv6AddressDiscovery, TransceiverDiscovery
 {
     use EntityMib {
         EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
@@ -52,20 +52,22 @@ class EltexMes23xx extends Radlan implements TransceiverDiscovery, Ipv6AddressDi
 
         // add in transceivers
         $trans = SnmpQuery::hideMib()->enumStrings()->cache()->walk('ELTEX-MES-PHYSICAL-DESCRIPTION-MIB::eltPhdTransceiverInfoTable')->table(1);
+        $portsIndex = $inventory->where('entPhysicalDescr', 'switch processor')->value('entPhysicalIndex');
         $ifIndexToEntIndexMap = array_flip($this->getIfIndexEntPhysicalMap());
-
         foreach ($trans as $ifIndex => $data) {
+            $entIndex = $ifIndexToEntIndexMap[$ifIndex];
+            $entPos = $inventory->where('entPhysicalIndex', $entIndex)->value('entPhysicalParentRelPos');
             $inventory->push(new EntPhysical([
-                'entPhysicalIndex' => 1000000 + $ifIndex,
+                'entPhysicalIndex' => $entIndex,
                 'entPhysicalDescr' => $data['eltPhdTransceiverInfoType'],
                 'entPhysicalClass' => 'sfp-cage',
-                'entPhysicalName' => strtoupper($data['eltPhdTransceiverInfoConnectorType']),
+                'entPhysicalName' => strtoupper($data['eltPhdTransceiverInfoConnectorType'] ?? ''),
                 'entPhysicalModelName' => $this->normData($data['eltPhdTransceiverInfoPartNumber']),
                 'entPhysicalSerialNum' => $data['eltPhdTransceiverInfoSerialNumber'],
-                'entPhysicalContainedIn' => $ifIndexToEntIndexMap[$ifIndex] ?? 0,
-                'entPhysicalMfgName' => $data['eltPhdTransceiverInfoVendorName'],
-                'entPhysicalHardwareRev' => $this->normData($data['eltPhdTransceiverInfoVendorRev']),
-                'entPhysicalParentRelPos' => 0,
+                'entPhysicalContainedIn' => $portsIndex,
+                'entPhysicalMfgName' => $this->normData($data['eltPhdTransceiverInfoVendorName']),
+                'entPhysicalHardwareRev' => $data['eltPhdTransceiverInfoVendorRev'],
+                'entPhysicalParentRelPos' => $entPos,
                 'entPhysicalIsFRU' => 'true',
                 'ifIndex' => $ifIndex,
             ]));
@@ -76,19 +78,21 @@ class EltexMes23xx extends Radlan implements TransceiverDiscovery, Ipv6AddressDi
 
     public function discoverTransceivers(): Collection
     {
+        $ifIndexToEntIndexMap = array_flip($this->getIfIndexEntPhysicalMap());
+
         return SnmpQuery::hideMib()->enumStrings()->cache()->walk('ELTEX-MES-PHYSICAL-DESCRIPTION-MIB::eltPhdTransceiverInfoTable')
-            ->mapTable(function ($data, $ifIndex) {
+            ->mapTable(function ($data, $ifIndex) use ($ifIndexToEntIndexMap) {
                 return new Transceiver([
                     'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                     'index' => $ifIndex,
-                    'connector' => $data['eltPhdTransceiverInfoConnectorType'] ? strtoupper($data['eltPhdTransceiverInfoConnectorType']) : null,
+                    'connector' => strtoupper($data['eltPhdTransceiverInfoConnectorType'] ?? ''),
                     'distance' => $data['eltPhdTransceiverInfoTransferDistance'] ?? null,
-                    'model' => $data['eltPhdTransceiverInfoPartNumber'] ?? null,
+                    'model' => $this->normData($data['eltPhdTransceiverInfoPartNumber'] ?? null),
                     'revision' => $data['eltPhdTransceiverInfoVendorRev'] ?? null,
                     'serial' => $data['eltPhdTransceiverInfoSerialNumber'] ?? null,
-                    'vendor' => $data['eltPhdTransceiverInfoVendorName'] ?? null,
+                    'vendor' => $this->normData($data['eltPhdTransceiverInfoVendorName']),
                     'wavelength' => $data['eltPhdTransceiverInfoWaveLength'] ?? null,
-                    'entity_physical_index' => $ifIndex,
+                    'entity_physical_index' => $ifIndexToEntIndexMap[$ifIndex],
                 ]);
             });
     }
@@ -98,7 +102,9 @@ class EltexMes23xx extends Radlan implements TransceiverDiscovery, Ipv6AddressDi
      */
     protected function normData(string $par = ''): string
     {
-        return StringHelpers::isHex($par, ' ') ? StringHelpers::hexToAscii($par, ' ') : $par;
+        $par = trim($par);
+
+        return StringHelpers::isHex($par, ' ') ? trim(StringHelpers::hexToAscii($par, ' ')) : $par;
     }
 
     public function discoverIpv6Addresses(): Collection
@@ -119,6 +125,7 @@ class EltexMes23xx extends Radlan implements TransceiverDiscovery, Ipv6AddressDi
                         'ipv6_prefixlen' => $data['RADLAN-IPv6::rlIpAddressPrefixLength'] ?? '',
                         'ipv6_origin' => $data['RADLAN-IPv6::rlIpAddressType'] ?? 'unknown',
                         'port_id' => PortCache::getIdFromIfIndex($data['IP-MIB::ipAddressIfIndex'], $this->getDevice()),
+                        'context_name' => '',
                     ]);
                 } catch (InvalidIpException $e) {
                     Log::error('Failed to parse IP: ' . $e->getMessage());
