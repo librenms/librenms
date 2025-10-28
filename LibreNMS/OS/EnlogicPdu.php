@@ -1,4 +1,5 @@
 <?php
+
 /**
  * EnlogicPdu.php
  *
@@ -31,7 +32,6 @@ use SnmpQuery;
 
 class EnlogicPdu extends OS
 {
-
     public function discoverOS(Device $device): void
     {
         // try new mib first, they moved oids in this MIB, so we have to check the contents of the version to make sure
