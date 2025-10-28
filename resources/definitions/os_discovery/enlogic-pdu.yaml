@@ -1,14 +1,4 @@
 modules:
-    os:
-        hardware:
-            - ENLOGIC-PDU2-MIB::pduNamePlatePartNumber.1
-            - ENLOGIC-PDU-MIB::pduNamePlateModelNumber.1
-        serial:
-            - ENLOGIC-PDU2-MIB::pduNamePlateSerialNumber.1
-            - ENLOGIC-PDU-MIB::pduNamePlateSerialNumber.1
-        version:
-            - ENLOGIC-PDU2-MIB::pduNamePlateFirmwareVersion.1
-            - ENLOGIC-PDU-MIB::pduNamePlateFirmwareVersion.1
     sensors:
         pre-cache:
             data:
