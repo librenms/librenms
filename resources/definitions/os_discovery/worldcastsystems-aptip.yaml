@@ -1,0 +1,215 @@
+modules:
+  os:
+    serial: APT-MIB::serialNumber.0
+    hardware: APT-MIB::hardwareRevision.0
+    version: APT-MIB::softwareRevision.0
+  sensors:
+    state:
+      data:
+        - oid: APT-MIB::ipTXError
+          index: 'ipTXError.0'
+          group: 'APT Alarms'
+          descr: 'IP TX Error'
+          states:
+            - { value: 2, descr: on,  graph: 0, generic: 2 }
+            - { value: 1, descr: off, graph: 0, generic: 0 }
+            - { value: 0, descr: disabled, graph: 0, generic: 0 }
+
+        - oid: APT-MIB::ipRXError
+          index: 'ipRXError.0'
+          group: 'APT Alarms'
+          descr: 'IP RX Error'
+          states:
+            - { value: 2, descr: on,  graph: 0, generic: 2 }
+            - { value: 1, descr: off, graph: 0, generic: 0 }
+            - { value: 0, descr: disabled, graph: 0, generic: 0 }
+
+        - oid: APT-MIB::audioMismatch
+          index: 'audioMismatch.0'
+          group: 'APT Alarms'
+          descr: 'Audio Mismatch'
+          states:
+            - { value: 2, descr: on,  graph: 0, generic: 2 }
+            - { value: 1, descr: off, graph: 0, generic: 0 }
+            - { value: 0, descr: disabled, graph: 0, generic: 0 }
+
+        - oid: APT-MIB::psu1Failure
+          index: 'psu1Failure.0'
+          group: 'APT Alarms'
+          descr: 'PSU1 Failure'
+          states:
+            - { value: 2, descr: on, graph: 0, generic: 2 }
+            - { value: 1, descr: off, graph: 0, generic: 0 }
+            - { value: 0, descr: disabled, graph: 0, generic: 0 }
+
+        - oid: APT-MIB::psu2Failure
+          index: 'psu2Failure.0'
+          group: 'APT Alarms'
+          descr: 'PSU2 Failure'
+          states:
+            - { value: 2, descr: on, graph: 0, generic: 2 }
+            - { value: 1, descr: off, graph: 0, generic: 0 }
+            - { value: 0, descr: disabled, graph: 0, generic: 0 }
+
+        - oid: APT-MIB::syncFailed
+          index: 'syncFailed.0'
+          group: 'APT Alarms'
+          descr: 'Sync Failed'
+          states:
+            - { value: 2, descr: on, graph: 0, generic: 2 }
+            - { value: 1, descr: off, graph: 0, generic: 0 }
+            - { value: 0, descr: disabled, graph: 0, generic: 0 }
+
+        - oid: APT-MIB::silDetChanA
+          index: 'silDetChanA.0'
+          group: 'APT Alarms'
+          descr: 'Silence Detect A'
+          states:
+            - { value: 2, descr: on, graph: 0, generic: 2 }
+            - { value: 1, descr: off, graph: 0, generic: 0 }
+            - { value: 0, descr: disabled, graph: 0, generic: 0 }
+
+        - oid: APT-MIB::silDetChanB
+          index: 'silDetChanB.0'
+          group: 'APT Alarms'
+          descr: 'Silence Detect B'
+          states:
+            - { value: 2, descr: on, graph: 0, generic: 2 }
+            - { value: 1, descr: off, graph: 0, generic: 0 }
+            - { value: 0, descr: disabled, graph: 0, generic: 0 }
+
+        - oid: APT-MIB::silDetChanC
+          index: 'silDetChanC.0'
+          group: 'APT Alarms'
+          descr: 'Silence Detect C'
+          states:
+            - { value: 2, descr: on, graph: 0, generic: 2 }
+            - { value: 1, descr: off, graph: 0, generic: 0 }
+            - { value: 0, descr: disabled, graph: 0, generic: 0 }
+
+        - oid: APT-MIB::silDetChanD
+          index: 'silDetChanD.0'
+          group: 'APT Alarms'
+          descr: 'Silence Detect D'
+          states:
+            - { value: 2, descr: on, graph: 0, generic: 2 }
+            - { value: 1, descr: off, graph: 0, generic: 0 }
+            - { value: 0, descr: disabled, graph: 0, generic: 0 }
+
+        - oid: APT-MIB::lossDigitalInputAB
+          index: 'lossDigitalInputAB.0'
+          group: 'APT Alarms'
+          descr: 'Loss of Digital Input A/B'
+          states:
+            - { value: 2, descr: on, graph: 0, generic: 2 }
+            - { value: 1, descr: off, graph: 0, generic: 0 }
+            - { value: 0, descr: disabled, graph: 0, generic: 0 }
+
+        - oid: APT-MIB::lossDigitalReference
+          index: 'lossDigitalReference.0'
+          group: 'APT Alarms'
+          descr: 'Loss of Digital Reference'
+          states:
+            - { value: 2, descr: on, graph: 0, generic: 2 }
+            - { value: 1, descr: off, graph: 0, generic: 0 }
+            - { value: 0, descr: disabled, graph: 0, generic: 0 }
+
+        # --- Physical Ethernet loss (note: values are inverted per your sample) ---
+        - oid: APT-MIB::lossOfPhysicalEthStatus
+          index: 'lossOfPhysicalEthStatus.0'
+          group: 'APT Alarms'
+          descr: 'Loss of Physical Ethernet Status (eth 0)'
+          states:
+            - { value: 2, descr: on, graph: 0, generic: 2 }
+            - { value: 1, descr: off, graph: 0, generic: 0 }
+            - { value: 0, descr: disabled, graph: 0, generic: 0 }
+
+        - oid: APT-MIB::lossOfPhysicalEthStatus
+          index: 'lossOfPhysicalEthStatus.1'
+          group: 'APT Alarms'
+          descr: 'Loss of Physical Ethernet Status (eth 1)'
+          states:
+            - { value: 2, descr: on, graph: 0, generic: 2 }
+            - { value: 1, descr: off, graph: 0, generic: 0 }
+            - { value: 0, descr: disabled, graph: 0, generic: 0 }
+
+        - oid: APT-MIB::ddnsEthFailureStatus
+          index: 'ddnsEthFailureStatus.0'
+          group: 'APT Alarms'
+          descr: 'DDNS Failure Status (eth 0)'
+          states:
+            - { value: 2, descr: on, graph: 0, generic: 2 }
+            - { value: 1, descr: off, graph: 0, generic: 0 }
+            - { value: 0, descr: disabled, graph: 0, generic: 0 }
+
+        - oid: APT-MIB::ddnsEthFailureStatus
+          index: 'ddnsEthFailureStatus.1'
+          group: 'APT Alarms'
+          descr: 'DDNS Failure Status (eth 1)'
+          states:
+            - { value: 2, descr: on, graph: 0, generic: 2 }
+            - { value: 1, descr: off, graph: 0, generic: 0 }
+            - { value: 0, descr: disabled, graph: 0, generic: 0 }
+
+        - oid: APT-MIB::ntpSync
+          index: 'ntpSync.0'
+          group: 'APT Alarms'
+          descr: 'NTP Sync'
+          states:
+            - { value: 2, descr: on, graph: 0, generic: 2 }
+            - { value: 1, descr: off, graph: 0, generic: 0 }
+            - { value: 0, descr: disabled, graph: 0, generic: 0 }
+
+        - oid: APT-MIB::lossOfIpConnection
+          index: 'lossOfIpConnection.0'
+          group: 'APT Alarms'
+          descr: 'Loss of IP Connection'
+          states:
+            - { value: 2, descr: on, graph: 0, generic: 2 }
+            - { value: 1, descr: off, graph: 0, generic: 0 }
+            - { value: 0, descr: disabled, graph: 0, generic: 0 }
+
+        - oid: APT-MIB::minimumJitterBufferAlarm
+          index: 'minimumJitterBufferAlarm.0'
+          group: 'APT Alarms'
+          descr: 'Minimum Jitter Buffer Alarm'
+          states:
+            - { value: 2, descr: on, graph: 0, generic: 2 }
+            - { value: 1, descr: off, graph: 0, generic: 0 }
+            - { value: 0, descr: disabled, graph: 0, generic: 0 }
+
+        - oid: APT-MIB::vpnConnectionAlarm
+          index: 'vpnConnectionAlarm.0'
+          group: 'APT Alarms'
+          descr: 'VPN Connection Alarm'
+          states:
+            - { value: 2, descr: on, graph: 0, generic: 2 }
+            - { value: 1, descr: off, graph: 0, generic: 0 }
+            - { value: 0, descr: disabled, graph: 0, generic: 0 }
+
+        - oid: APT-MIB::ext10MhzClockAlarm
+          index: 'ext10MhzClockAlarm.0'
+          group: 'APT Alarms'
+          descr: 'External 10 MHz Clock Alarm'
+          states:
+            - { value: 2, descr: on, graph: 0, generic: 2 }
+            - { value: 1, descr: off, graph: 0, generic: 0 }
+            - { value: 0, descr: disabled, graph: 0, generic: 0 }
+
+        - oid: APT-MIB::extPPSClockAlarm
+          index: 'extPPSClockAlarm.0'
+          group: 'APT Alarms'
+          descr: 'External PPS Clock Alarm'
+          states:
+            - { value: 2, descr: on, graph: 0, generic: 2 }
+            - { value: 1, descr: off, graph: 0, generic: 0 }
+            - { value: 0, descr: disabled, graph: 0, generic: 0 }
+
+        - oid: APT-MIB::extClockModuleMissingAlarm
+          index: 'extClockModuleMissingAlarm.0'
+          group: 'APT Alarms'
+          descr: 'External Clock Module Missing'
+          states:
+            - { value: 2, descr: on, graph: 0, generic: 2 }
+            - { value: 1, descr: off, graph: 0, generic: 0 }
+            - { value: 0, descr: disabled, graph: 0, generic: 0 }

@@ -1,0 +1,12 @@
+os: worldcastsystems-aptip
+text: 'Worldcast Systems APT IP Codec'
+type: appliance
+icon: worldcastsystems
+group: worldcastsystems
+discovery:
+    - 
+        sysObjectID: .1.3.6.1.4.1.8072.3.2
+        snmpget:
+            oid: .1.3.6.1.4.1.22425.10.4.1.0
+            op: '='
+            value: 'HorizonNextGen'

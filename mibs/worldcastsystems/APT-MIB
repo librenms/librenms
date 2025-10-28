@@ -1,0 +1,5155 @@
+--
+-- APT_MIB.mib
+--
+-- Copyright (c) WorldCastSystems
+-- All rights reserved.
+
+APT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-GROUP, NOTIFICATION-GROUP
+		FROM SNMPv2-CONF
+	sysDescr, sysName, sysLocation
+		FROM SNMPv2-MIB
+	DisplayString, DateAndTime
+		FROM SNMPv2-TC
+	enterprises, Integer32, Gauge32, OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY, NOTIFICATION-TYPE
+		FROM SNMPv2-SMI;
+
+nextGen MODULE-IDENTITY
+	LAST-UPDATED "202012011025Z"
+	ORGANIZATION
+		"WorldCastSystems"
+	CONTACT-INFO
+		"support@worldcastsystems.com"
+	DESCRIPTION
+		"MIB for WorldCast Systems NextGen units based on the Phoenix platform"
+
+    REVISION "202012011025Z"
+    DESCRIPTION
+        "Added reset streams performance"
+
+    REVISION "202008241025Z"
+    DESCRIPTION
+        "Added Rx playout fine nudge"
+        
+    REVISION "202001201206Z"
+    DESCRIPTION
+        "Added ntp status"
+        
+	REVISION "202001141245Z"
+    DESCRIPTION
+        "Added SFN alarms and traps"
+        
+    REVISION "202001061610Z"
+    DESCRIPTION
+        "Added monoSourceSelection and monoOutputModeSelection"
+        
+    REVISION "201911291108Z"
+    DESCRIPTION
+        "Added AGC Get"
+        
+	REVISION "201907041126Z"
+	DESCRIPTION
+		"Added unitClockMode Set and Get"
+
+	REVISION "201903290857Z"
+	DESCRIPTION
+		"Added additional system information {MAC address, license and Hardware alarms}"
+
+	REVISION "201810151144Z"
+	DESCRIPTION
+		"MIB File for System Release 3.0.2 Added SNMP Set for stream Address and Port"
+
+	REVISION "201708011442Z"
+	DESCRIPTION
+		"MIB File for System Release 3.0."
+	
+	REVISION "201612151645Z"
+	DESCRIPTION
+		"MIB File for System Release 2.2. Added ScriptEasy state variable"
+	
+	REVISION "201604280845Z"
+	DESCRIPTION
+		"Update MIB name. Add loss of IP connection"
+
+	REVISION "201603251238Z"
+	DESCRIPTION
+		"Add relay invert controls"
+		
+	REVISION "201602100746Z"
+	DESCRIPTION
+		"Add NTP Sync support"
+	
+	REVISION "201507030931Z"
+	DESCRIPTION
+		"Rename from APT_OSLO_AOIP_MIB.mib to APT_MIB.mib"
+	
+	REVISION "201504031427Z"
+	DESCRIPTION
+		"Add distant redirection"
+
+	REVISION "201402191518Z"
+	DESCRIPTION
+		"MIB File for System Release 2.0"
+	::= { aptltd 10 }
+
+aptltd OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { enterprises 22425 }
+
+commonEventBindings OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { nextGen 3 }
+
+eventTimestamp OBJECT-TYPE
+	SYNTAX DateAndTime
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"YYYY/MM/DD HH:MM:SS"
+	::= { commonEventBindings 1 }
+
+eventsParams OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION 
+		"Params for each trap: enable and priority"
+	::= { nextGen 7 }
+
+misc OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { nextGen 4 }
+
+systemType OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Type of the unit"
+	::= { misc 1 }
+
+serialNumber OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Serial Number of unit"
+	::= { misc 2 }
+
+hardwareRevision OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { misc 3 }
+
+softwareRevision OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { misc 4 }
+
+unitName OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"System Name"
+	::= { misc 5 }
+
+cpuLoad OBJECT-TYPE
+	SYNTAX Gauge32
+	UNITS "%/100"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Current CPU load x100 (808 <=> 8.08%)"
+	::= { misc 6 }
+
+syTrapCounter OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"This mib trap counter."
+	::= { misc 7 }
+
+unitReboot OBJECT-TYPE
+	SYNTAX Integer32(0..1)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Set to 1 to reboot the unit."
+	::= { misc 8 }
+
+-- License
+licenseTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF LicenseEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "license table"
+    ::= { misc 9 }
+
+licenseEntry OBJECT-TYPE
+    SYNTAX LicenseEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "License row"
+    INDEX { licenseIndex }
+    ::= { licenseTable 1 }
+
+LicenseEntry ::=
+    SEQUENCE { 
+        licenseIndex
+            Integer32,
+        licenseName
+            DisplayString,
+        licenseActive
+            INTEGER,
+        licenseExpireDate
+            Integer32
+    }
+
+licenseIndex OBJECT-TYPE
+    SYNTAX Integer32 (0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "IP Index"
+    ::= { licenseEntry 1 }
+
+licenseName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "License name"
+    ::= { licenseEntry 2 }
+    
+licenseActive OBJECT-TYPE
+    SYNTAX INTEGER { false(0), true(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "0: Inactive
+        1: Active"
+    ::= { licenseEntry 3 }
+    
+licenseExpireDate OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The expiration date"
+    ::= { licenseEntry 4 }
+
+-- End license
+	
+status OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { nextGen 5 }
+
+stMisc OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { status 1 }
+
+connectionStatus OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			off(0),
+			disconnected(1),
+			connected(2),
+			limitedConnection(3)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Connection Status
+		0:Off
+		1:Disconnected
+		2:Connected
+		3:LimitedConnection"
+	::= { stMisc 1 }
+
+ipAddressEthernet0 OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"No description"
+	::= { stMisc 2 }
+
+ipAddressEthernet1 OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"No description"
+	::= { stMisc 3 }
+
+unitTemperature OBJECT-TYPE
+	SYNTAX Integer32(0..55)
+	UNITS "degree_C"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Unit temperature (degree_C)"
+	::= { stMisc 4 }
+-- IP
+ipTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF IpEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"IP table (0..7) 0 -> ETH0 etc."
+	::= { stMisc 5 }
+
+ipEntry OBJECT-TYPE
+	SYNTAX IpEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"IP row"
+	INDEX { ipEthId }
+	::= { ipTable 1 }
+
+IpEntry ::=
+	SEQUENCE { 
+		ipEthId
+			Integer32,
+		ipEthEnabled
+			INTEGER,
+		ipEthAddress
+			DisplayString,
+		ipEthNetmask
+			DisplayString,
+		ipEthGateway
+			DisplayString,
+        ipMacAddress
+            DisplayString
+	}
+
+ipEthId OBJECT-TYPE
+	SYNTAX Integer32 (0..7)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"IP Index"
+	::= { ipEntry 1 }
+
+ipEthEnabled OBJECT-TYPE
+	SYNTAX INTEGER { false(0), true(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"0: Inactive
+		1: Active"
+	::= { ipEntry 2 }
+
+ipEthAddress OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"IP Address"
+	::= { ipEntry 3 }
+
+ipEthNetmask OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"IP Netmask"
+	::= { ipEntry 4 }
+
+ipEthGateway OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"IP Gateway"
+	::= { ipEntry 5 }
+	
+ipMacAddress OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP Mac Address"
+    ::= { ipEntry 6 }
+
+-- Distant redirections
+distantRedirectionTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF DistantRedirectionEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Distant redirections table"
+	::= { stMisc 6 }
+
+distantRedirectionEntry OBJECT-TYPE
+	SYNTAX DistantRedirectionEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Distant redirection row"
+	INDEX { distantRedirectionId }
+	::= { distantRedirectionTable 1 }
+
+DistantRedirectionEntry ::=
+	SEQUENCE { 
+		distantRedirectionId
+			Integer32,
+		distantRedirectionDescription
+			DisplayString,
+		distantRedirectionInterface
+			DisplayString,
+		distantRedirectionPortNumber
+			Integer32,
+		distantRedirectionToAddress
+			DisplayString,
+		distantRedirectionToPortNumber
+			Integer32,
+		distantRedirectionProtocol
+			INTEGER,
+		distantRedirectionEnabled
+			INTEGER
+	}
+
+distantRedirectionId OBJECT-TYPE
+	SYNTAX Integer32(0..32)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Distant Redirection Index"
+	::= { distantRedirectionEntry 1 }
+
+distantRedirectionDescription OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Description / service of the redirection (HTTP, HTTPS...)"
+	::= { distantRedirectionEntry 2 }
+
+distantRedirectionInterface OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..31))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Network interface of the incoming packet to redirect"
+	::= { distantRedirectionEntry 3 }
+
+distantRedirectionPortNumber OBJECT-TYPE
+	SYNTAX Integer32(0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Port of the incoming packet to redirect"
+	::= { distantRedirectionEntry 4 }
+
+distantRedirectionToAddress OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"IP address where filtered incoming packet have to be redirected"
+	::= { distantRedirectionEntry 5 }
+
+distantRedirectionToPortNumber OBJECT-TYPE
+	SYNTAX Integer32(0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Port where filtered incoming packet have to be redirected"
+	::= { distantRedirectionEntry 6 }
+
+distantRedirectionProtocol OBJECT-TYPE
+	SYNTAX INTEGER { tcp(0), udp(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"0: TCP
+		1: UDP"
+	::= { distantRedirectionEntry 7 }
+
+distantRedirectionEnabled OBJECT-TYPE
+	SYNTAX INTEGER { disabled(0), enabled(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"0: Disabled
+		1: Enabled"
+	::= { distantRedirectionEntry 8 }
+-- Firewall
+firewallTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF FirewallEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Firewall rules table"
+	::= { stMisc 7 }
+
+firewallEntry OBJECT-TYPE
+	SYNTAX FirewallEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Firewall rule row"
+	INDEX { firewallRuleId }
+	::= { firewallTable 1 }
+
+FirewallEntry ::=
+	SEQUENCE { 
+		firewallRuleId
+			Integer32,
+		firewallDescription
+			DisplayString,
+		firewallNetworkInterface
+			DisplayString,
+		firewallPortNumber
+			Integer32,
+		firewallProtocol
+			INTEGER,
+		firewallEnabled
+			INTEGER
+	}
+
+firewallRuleId OBJECT-TYPE
+	SYNTAX Integer32(0..48)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Rule Index"
+	::= { firewallEntry 1 }
+
+firewallDescription OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Description / service of the rule (HTTP, HTTPS...)"
+	::= { firewallEntry 2 }
+
+
+firewallNetworkInterface OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..16))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Network interface concerned (eth0, eth1...)"
+	::= { firewallEntry 3 }
+
+firewallPortNumber OBJECT-TYPE
+	SYNTAX Integer32(0..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Port of filtered service"
+	::= { firewallEntry 4 }
+
+firewallProtocol OBJECT-TYPE
+	SYNTAX INTEGER { tcp(0), udp(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"0: TCP
+		1: UDP"
+	::= { firewallEntry 5 }
+
+firewallEnabled OBJECT-TYPE
+	SYNTAX INTEGER { disabled(0), enabled(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"0: Disable filtering
+		1: Enable filtering"
+	::= { firewallEntry 6 }
+	
+ioCardType OBJECT-TYPE
+	SYNTAX INTEGER { noneOrUnknown(-1), standard(0), analogMpx(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"-1: None / Unknown
+		0: Standard Audio
+		1: Analog MPX"
+	::= { stMisc 8 }
+	
+stateVariable OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Use this to record temporary state information"
+	::= { stMisc 9 }
+	
+defaultGateway OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Read the default gateway"
+    ::= { stMisc 10 }
+	
+-- Alarms
+alarms OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { status 2 }
+
+ipTXError OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disable(0),
+			off(1),
+			on(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		                IP TX error
+		                0  : disable
+		                1   : off
+		                2   : on
+		              "
+	::= { alarms 1 }
+
+ipRXError OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disable(0),
+			off(1),
+			on(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		                IP RX error
+		                0  : disable
+		                1   : off
+		                2   : on
+		              "
+	::= { alarms 2 }
+
+audioMismatch OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disable(0),
+			off(1),
+			on(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Audio mismatch alarm"
+	::= { alarms 3 }
+
+psu1Failure OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disable(0),
+			off(1),
+			on(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		                PSU 1 Failure :
+		                0  : disable
+		                1   : off
+		                2   : on
+		              "
+	::= { alarms 4 }
+
+psu2Failure OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disable(0),
+			off(1),
+			on(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		                PSU 2 Failure :
+		                0  : disable
+		                1   : off
+		                2   : on
+		              "
+	::= { alarms 5 }
+
+lossOfPhysicalEth0 OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disable(0),
+			on(1),
+			off(2)
+		}
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"
+		                Loss of physical connection Eth0
+		                0  : disable
+		                1   : on
+		                2   : off
+		              "
+	::= { alarms 6 }
+
+lossOfPhysicalEth1 OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disable(0),
+			on(1),
+			off(2)
+		}
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"
+		                Loss of physical connection Eth1
+		                0  : disable
+		                1   : on
+		                2   : off
+		              "
+	::= { alarms 7 }
+
+syncFailed OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disable(0),
+			off(1),
+			on(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		                Autosync Failed
+		                0  : disable
+		                1   : off
+		                2   : on
+		              "
+	::= { alarms 8 }
+
+silDetChanA OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disable(0),
+			off(1),
+			on(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		                Silence Detect Channel A :
+		                0  : disable
+		                1   : off
+		                2   : on
+		              "
+	::= { alarms 9 }
+
+silDetChanB OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disable(0),
+			off(1),
+			on(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		                Silence Detect Channel B
+		                0  : disable
+		                1   : off
+		                2   : on
+		              "
+	::= { alarms 10 }
+
+silDetChanC OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disable(0),
+			off(1),
+			on(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		                Audio Alarm Left Output
+		                0  : disable
+		                1   : off
+		                2   : on
+		              "
+	::= { alarms 11 }
+
+silDetChanD OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disable(0),
+			off(1),
+			on(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		                Audio Alarm Right Output
+		                0  : disable
+		                1   : off
+		                2   : on
+		              "
+	::= { alarms 12 }
+
+lossDigitalInputAB OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disable(0),
+			off(1),
+			on(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		                Loss Of Digital Input - Channel AB
+		                0  : disable
+		                1   : off
+		                2   : on
+		              "
+	::= { alarms 13 }
+
+lossDigitalReference OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disable(0),
+			off(1),
+			on(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Loss Of Digital Reference"
+	::= { alarms 14 }
+
+lossDigitalInputCD OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disable(0),
+			off(1),
+			on(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		                Loss Of Digital Input - Channel CD
+		                0  : disable
+		                1   : off
+		                2   : on
+		              "
+	::= { alarms 15 }
+
+ioBoardRemoved OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disable(0),
+			off(1),
+			on(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		IO Board Removal
+		0  : disable
+		1   : off
+		2   : on
+		"
+	::= { alarms 16 }
+
+ddnsEth0Failure OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disable(0),
+			off(1),
+			on(2)
+		}
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"
+		 DDNS ETH0 Failure :0 : disable, 1 : off, 2 : on"
+	::= { alarms 17 }
+
+ddnsEth1Failure OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disable(0),
+			off(1),
+			on(2)
+		}
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"DDNS ETH1 Failure : 0 : disable 1 : off; 2 : on"
+	::= { alarms 18 }
+
+lossOfPhysicalTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF LossOfPhysicalEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Loss of Physical ETH connection table (cable unplugged)"
+	::= { alarms 19 }
+
+lossOfPhysicalEntry OBJECT-TYPE
+	SYNTAX LossOfPhysicalEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Loss of Physical row"
+	INDEX { lossOfPhysicalEthId }
+	::= { lossOfPhysicalTable 1 }
+
+LossOfPhysicalEntry ::= 
+	SEQUENCE { 
+		lossOfPhysicalEthId
+			Integer32,
+		lossOfPhysicalEthStatus
+			INTEGER,
+		lossOfPhysicalEthNumber
+			Integer32
+	}
+
+lossOfPhysicalEthId OBJECT-TYPE
+	SYNTAX Integer32 (0..7)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Alarm of ETH Index"
+	::= { lossOfPhysicalEntry 1 }
+
+lossOfPhysicalEthStatus OBJECT-TYPE
+	SYNTAX INTEGER { inactive(0), on(1), off(2) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"0: Inactive
+		1: Alarm On
+		2: Alarm Off"
+	::= { lossOfPhysicalEntry 2 }
+
+lossOfPhysicalEthNumber OBJECT-TYPE
+	SYNTAX Integer32 (0..7)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of internet device in alarm (ETH0..ETH7)"
+	::= { lossOfPhysicalEntry 3 }
+
+ddnsFailureTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF DdnsFailureEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Dynamic DNS alarm table"
+	::= { alarms 20 }
+
+ddnsFailureEntry OBJECT-TYPE
+	SYNTAX DdnsFailureEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Dynamic DNS alarm row"
+	INDEX { ddnsFailureEthId }
+	::= { ddnsFailureTable 1 }
+
+DdnsFailureEntry ::=
+	SEQUENCE { 
+		ddnsFailureEthId
+			Integer32,
+		ddnsEthFailureStatus
+			INTEGER,
+		ddnsEthFailureNumber
+			Integer32
+	}
+
+ddnsFailureEthId OBJECT-TYPE
+	SYNTAX Integer32 (0..7)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Alarm of Dynamic DNS Index"
+	::= { ddnsFailureEntry 1 }
+
+ddnsEthFailureStatus OBJECT-TYPE
+	SYNTAX INTEGER { inactive(0), off(1), on(2) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"0: Inactive
+		1: Alarm Off
+		2: Alarm On"
+	::= { ddnsFailureEntry 2 }
+
+ddnsEthFailureNumber OBJECT-TYPE
+	SYNTAX Integer32 (0..7)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of Dynamic DNS device in alarm (ETH0..ETH7)"
+	::= { ddnsFailureEntry 3 }
+
+ntpSync OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disable(0),
+			off(1),
+			on(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		NTP Sync. Failure
+		0  : disable
+		1  : off
+		2  : on
+		"
+	::= { alarms 21 }
+
+lossOfIpConnection OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disable(0),
+			off(1),
+			on(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		Loss of IP Connection
+		0  : disable
+		1  : off
+		2  : on
+		"
+	::= { alarms 22 }
+	
+minimumJitterBufferAlarm OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            disable(0),
+            off(1),
+            on(2)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        Minimum Jitter Buffer alarm
+        0  : disable
+        1  : off
+        2  : on
+        "
+    ::= { alarms 23 }
+    
+vpnConnectionAlarm OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            disable(0),
+            off(1),
+            on(2)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        VPN connection alarm
+        0  : disable
+        1  : off
+        2  : on
+        "
+    ::= { alarms 24 }
+    
+ext10MhzClockAlarm OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disable(0),
+			off(1),
+			on(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+        External 10Mhz Clock Alarm :
+        0  : disable
+        1   : off
+        2   : on
+      	"
+	::= { alarms 25 }
+	
+extPPSClockAlarm OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disable(0),
+			off(1),
+			on(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+        External PPS Clock Alarm :
+        0  : disable
+        1   : off
+        2   : on
+      	"
+	::= { alarms 26 }
+	
+extClockModuleMissingAlarm OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disable(0),
+			off(1),
+			on(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+        External Clock Module Missing Alarm :
+        0  : disable
+        1   : off
+        2   : on
+      	"
+	::= { alarms 27 }
+
+performance OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { status 3 }
+
+audioLevelChannelA OBJECT-TYPE
+	SYNTAX Integer32(0..15)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Audio Level A"
+	::= { performance 1 }
+
+audioLevelChannelB OBJECT-TYPE
+	SYNTAX Integer32(0..15)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Audio Level B"
+	::= { performance 2 }
+
+audioLevelChannelC OBJECT-TYPE
+	SYNTAX Integer32(0..15)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Audio Level C"
+	::= { performance 3 }
+
+audioLevelChannelD OBJECT-TYPE
+	SYNTAX Integer32(0..15)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Audio Level D"
+	::= { performance 4 }
+
+streamsTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF StreamsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { performance 5 }
+
+streamsEntry OBJECT-TYPE
+	SYNTAX StreamsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"An entry of the streamsTable table"
+	INDEX { streamsid }
+	::= { streamsTable 1 }
+
+StreamsEntry ::=
+	SEQUENCE {
+		streamsid
+			Integer32,
+		streamsstreamEnabled
+			Integer32,
+		streamsstreamName
+			DisplayString,
+		streamsrouteType
+			INTEGER,
+		streamsencodeSlot
+			Integer32,
+		streamsdecodeSlot
+			Integer32,
+		streamscastingMode
+			INTEGER,
+		streamsethernetInterface
+			Integer32,
+		streamssourceIPAddress
+			DisplayString,
+		streamssourceIPort
+			Integer32,
+		streamsdestinationIPAddress
+			DisplayString,
+		streamsipPort
+			Integer32,
+		streamssureStreamLevel
+			INTEGER,
+		streamstxPacketCount
+			Integer32,
+		streamsrxPacketCount
+			Integer32,
+		streamstxkbCount
+			Integer32,
+		streamsrxkbCount
+			Integer32,
+		streamstxBitrate
+			Integer32,
+		streamsrxBitrate
+			Integer32,
+		streamsresequencedPacketCount
+			Integer32,
+		streamsdroppedPacketCount
+			Integer32,
+		streamslossOfConnectionErrors
+			Integer32,
+		streamsduplicatePacketCount
+			Integer32,
+		streamsreceiveBufferLevel
+			Integer32,
+		streamsreceiveBufferThreshold
+			Integer32,
+		streamsrxLatency
+			Integer32,
+		streamstxPacketSize
+			Integer32,
+		streamsrxPacketSize
+			Integer32,
+		streamsfloodedBufferCount
+			Integer32,
+		streamsauxRouteType
+			INTEGER,
+		streamsrxForwardingChannel
+			INTEGER,
+		streamstxForwardingChannel
+			INTEGER,
+		streamsextPort
+			Integer32,
+		streamsupnpEnable
+			Integer32,
+		streamsrxPacketInterval
+			Integer32,
+		streamstxPacketInterval
+			Integer32,
+		streamslocAlarmStatus
+			INTEGER,
+		streamstxInactiveAlarmStatus
+			INTEGER,
+		streamsrxInactiveAlarmStatus
+			INTEGER,
+		streamstxContentSyncEnabled
+            INTEGER,
+        streamstxPlayoutOffset
+            Integer32,
+        streamsrxBufferMode
+            INTEGER,
+        streamsrxPlayoutOffset
+            Integer32,
+        streamsrxPlayoutNudge
+            Integer32,
+        streamsrxLinkLatency
+            Integer32,
+        streamsrxBufferHeadroom
+            Integer32,
+        streamsrxLinkJitter
+            Integer32,
+        streamsMinimumJitterBufferAlarm
+            INTEGER,    
+        streamsMinJitterBufferMicroS    
+            Integer32,
+        streamsPacketsOrderingEnable
+            INTEGER,
+        streamsWanProtection
+            INTEGER,
+        streamsSsmMode
+            INTEGER,
+        streamsSsmGroup
+            INTEGER,
+        streamsrxPlayoutFineNudgeNanoS
+            Integer32
+	}
+
+streamsid OBJECT-TYPE
+	SYNTAX Integer32 (0..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Stream Identifier"
+	::= { streamsEntry 1 }
+
+streamsstreamEnabled OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Stream Enabled"
+	::= { streamsEntry 2 }
+
+streamsstreamName OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Stream Name"
+	::= { streamsEntry 3 }
+
+streamsrouteType OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			audioRtp(0),
+			auxDataUdp(1),
+			gpioUdp(2),
+			ipForwardUdp(3),
+			mediaForwardRtp(4)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		                    Route type:
+		                    0: Audio (RTP)
+		                    1: Aux Data (UDP)
+		                    2: GPIO (UDP)
+		                    3: IP Forward (UDP)
+		                    4: Media Forward (RTP)
+		                  "
+	::= { streamsEntry 4 }
+
+streamsencodeSlot OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		                    Encode audio codec id (see also : phoenixbridge.audiocodec.id)
+		                    -1 : None
+		                    0  : Tx Audio codec (Left for Dual mono)
+		                    1  : Tx Audio codec right (Dual mono only)
+		                  "
+	::= { streamsEntry 5 }
+
+streamsdecodeSlot OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		                    Decode audio codec id (see also : phoenixbridge.audiocodec.id)
+		                    0: None
+		                    1: Rx Audio codec
+		                  "
+	::= { streamsEntry 6 }
+
+streamscastingMode OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			unicast(0),
+			multicast(1),
+			multicastSsm(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		                    Casting mode:
+		                    0: Unicast
+		                    1: Multicast
+		                    2: Multicast SSM
+		                  "
+	::= { streamsEntry 7 }
+
+streamsethernetInterface OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Ethernet interface"
+	::= { streamsEntry 8 }
+
+streamssourceIPAddress OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Source IP address"
+	::= { streamsEntry 9 }
+
+streamssourceIPort OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Source IP port"
+	::= { streamsEntry 10 }
+
+streamsdestinationIPAddress OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Destination IP Address"
+	::= { streamsEntry 11 }
+
+streamsipPort OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"IP Port"
+	::= { streamsEntry 12 }
+
+streamssureStreamLevel OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			off(0),
+			levelI(1),
+			levelII(4),
+			levelIII(8)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"SureStream Level"
+	::= { streamsEntry 13 }
+
+streamstxPacketCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Transmitted packet count"
+	::= { streamsEntry 14 }
+
+streamsrxPacketCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Received packet count"
+	::= { streamsEntry 15 }
+
+streamstxkbCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Transmitted kilobytes"
+	::= { streamsEntry 16 }
+
+streamsrxkbCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Received kilobytes"
+	::= { streamsEntry 17 }
+
+streamstxBitrate OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Transmit bitrate"
+	::= { streamsEntry 18 }
+
+streamsrxBitrate OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Transmit bitrate"
+	::= { streamsEntry 19 }
+
+streamsresequencedPacketCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Resequencer activity"
+	::= { streamsEntry 20 }
+
+streamsdroppedPacketCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Dropped packets count"
+	::= { streamsEntry 21 }
+
+streamslossOfConnectionErrors OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Loss of connection error count"
+	::= { streamsEntry 22 }
+
+streamsduplicatePacketCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Duplicate packet count"
+	::= { streamsEntry 23 }
+
+streamsreceiveBufferLevel OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Receive buffer level"
+	::= { streamsEntry 24 }
+
+streamsreceiveBufferThreshold OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Receive buffer threshold"
+	::= { streamsEntry 25 }
+
+streamsrxLatency OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Receive Latency"
+	::= { streamsEntry 26 }
+
+streamstxPacketSize OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Transmit packet size"
+	::= { streamsEntry 27 }
+
+streamsrxPacketSize OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Receive packet size"
+	::= { streamsEntry 28 }
+
+streamsfloodedBufferCount OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Flooded buffer count"
+	::= { streamsEntry 29 }
+	
+streamsauxRouteType OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			aux1(0),
+			aux2(1)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Aux data route type 0: Aux 1; 1: Aux 2"
+	::= { streamsEntry 30 }
+	
+streamsrxForwardingChannel OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			none(0),
+			one(1),
+			two(2),
+			three(3),
+			four(4),
+			five(5),
+			six(6)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Channel used for rx audio forwarding"
+	::= { streamsEntry 31 }
+
+streamstxForwardingChannel OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			none(0),
+			one(1),
+			two(2),
+			three(3),
+			four(4),
+			five(5),
+			six(6)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Channel used for tx audio forwarding"
+	::= { streamsEntry 32 }
+	
+streamsextPort OBJECT-TYPE
+	SYNTAX Integer32(0..5998)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"UPnP Mapped IP Port"
+	::= { streamsEntry 33 }
+
+streamsupnpEnable OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Active / deactive UPnP"
+	::= { streamsEntry 34 }
+	
+streamsrxPacketInterval OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Receive Packet interval, display format 4ms(250 pkts/sec)"
+	::= { streamsEntry 35 }
+
+streamstxPacketInterval OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Transmit Packet interval, display format 4ms(250 pkts/sec)"
+	::= { streamsEntry 36 }
+
+streamslocAlarmStatus OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disabled(0),
+			off(1),
+			on(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		Loss of IP Connection
+		0  : disabled
+		1  : off
+		2  : on
+		"	
+	::= { streamsEntry 37 }
+
+streamstxInactiveAlarmStatus OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disabled(0),
+			off(1),
+			on(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		Transmit Inactive Alarm
+		0  : disabled
+		1  : off
+		2  : on
+		"	
+	::= { streamsEntry 38 }
+
+streamsrxInactiveAlarmStatus OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disabled(0),
+			off(1),
+			on(2)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		Receive Inactive Alarm
+		0  : disabled
+		1  : off
+		2  : on
+		"	
+	::= { streamsEntry 39 }
+    
+streamstxContentSyncEnabled OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            disabled(0),
+            enabled(1)
+        }    
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Encoder content sync enabled"
+    ::= { streamsEntry 40 }
+    
+streamstxPlayoutOffset OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Encoder playout offset in microseconds"
+    ::= { streamsEntry 41 }
+    
+streamsrxBufferMode OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            latencyBuffer(0),
+            contentSync(1)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        Decoder buffer mode
+        0  :  latency buffer
+        1  : conent sync
+        "   
+    ::= { streamsEntry 42 }
+    
+streamsrxPlayoutOffset OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Decoder playout offset in microseconds"
+    ::= { streamsEntry 43 }
+    
+streamsrxPlayoutNudge OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Decoder playout nudge in microseconds"
+    ::= { streamsEntry 44 }
+    
+streamsrxLinkLatency OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Decoder link latency in microseconds"
+    ::= { streamsEntry 45 }
+    
+streamsrxBufferHeadroom OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Decoder buffer headroom in microseconds"
+    ::= { streamsEntry 46 }
+    
+streamsrxLinkJitter OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Decoder link jitter in microseconds"
+    ::= { streamsEntry 47 }
+    
+streamsMinimumJitterBufferAlarm OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            disabled(0),
+            off(1),
+            on(2)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        Minimum Jitter Buffer Alarm
+        0  : disabled
+        1  : off
+        2  : on
+        "   
+    ::= { streamsEntry 48 }
+	
+streamsMinJitterBufferMicroS OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Minimum Jitter Buffer in microseconds"
+    ::= { streamsEntry 49 }
+    
+streamsPacketsOrderingEnable OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            disabled(0),
+            enabled(1)
+        }    
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Packets ordering enable"
+    ::= { streamsEntry 50 }
+    
+streamsWanProtection OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            level1(0),
+            level2(1),
+            level3(2),
+            level4(3)
+        }    
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "WAN Protection Level"
+    ::= { streamsEntry 51 }
+    
+streamsSsmMode OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            none(0),
+            client(1),
+            server(2)
+        }    
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ssm Mode"
+    ::= { streamsEntry 52 }
+    
+streamsSsmGroup OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            none(0),
+            group1(1),
+            group2(2),
+            group3(3),
+            group4(4),
+            group5(5),
+            group6(6),
+            group7(7),
+            group8(8),
+            group9(9),
+            group10(10),
+            group11(11),
+            group12(12)
+        }    
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ssm Group"
+    ::= { streamsEntry 53 }
+
+streamsrxPlayoutFineNudgeNanoS OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Decoder playout fine nudge in nanoseconds"
+    ::= { streamsEntry 54 }    
+    
+resetStreamsPerformance OBJECT-TYPE
+    SYNTAX Integer32(0..1)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Reset performance streams"
+    ::= { performance 6 }
+
+audioCodec OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { status 4 }
+
+audioCodec1 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"ID of the audio codec (Channel 1)"
+	::= { audioCodec 1 }
+
+audioCodec2 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"ID of the audio codec (Channel 2) - Used for dual mono configuration"
+	::= { audioCodec 2 }
+
+audioCodec3 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"ID of the audio codec (Channel 3)"
+	::= { audioCodec 3 }
+
+audioCodec4 OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"ID of the audio codec (Channel 4)"
+	::= { audioCodec 4 }
+
+gpio OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { status 5 }
+
+relay1OutputState OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			off(0),
+			on(1)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		                Relay 1 Status :
+		                0 : off
+		                1 : on
+		              "
+	::= { gpio 1 }
+
+relay2OutputState OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			off(0),
+			on(1)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		                Relay 2 Status :
+		                0 : off
+		                1 : on
+		              "
+	::= { gpio 2 }
+
+relay3OutputState OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			off(0),
+			on(1)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		                Relay 3 Status :
+		                0 : off
+		                1 : on
+		              "
+	::= { gpio 3 }
+
+relay4OutputState OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			off(0),
+			on(1)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		                Relay 4 Status :
+		                0 : off
+		                1 : on
+		              "
+	::= { gpio 4 }
+
+opto1InputState OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			off(0),
+			on(1)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		                Opto 1 Status :
+		                0 : off
+		                1 : on
+		              "
+	::= { gpio 5 }
+
+opto2InputState OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			off(0),
+			on(1)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		                Opto 2 Status :
+		                0 : off
+		                1 : on
+		              "
+	::= { gpio 6 }
+
+opto3InputState OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			off(0),
+			on(1)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		                Opto 3 Status :
+		                0 : off
+		                1 : on
+		              "
+	::= { gpio 7 }
+
+opto4InputState OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			off(0),
+			on(1)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"
+		                Opto 4 Status :
+		                0 : off
+		                1 : on
+		              "
+	::= { gpio 8 }
+
+optoActiveHigh OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			off(0),
+			on(1)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Invert Switch Input
+		0: Off
+		1: On"
+	::= { gpio 9 }
+	
+timing OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "No description"
+    ::= { status 6 }
+    
+ntpLastSync OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Time of the last NTP synchronization in Epoch format (number of seconds since 01-01-1970)"
+    ::= { timing 1 }
+    
+ntpLastOffset OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates the time difference, in milliseconds, between the client server and source"
+    ::= { timing 2 }
+
+configuration OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { nextGen 6 }
+
+connection OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { configuration 1 }
+
+activeProfileNumber OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { connection 1 }
+
+activeProfileName OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Name of the active configuration"
+	::= { connection 2 }
+
+audio OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { configuration 2 }
+
+audioInputMode OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			analog(0),
+			digital(1),
+			testTone(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Input mode: Analog or Digital
+		0: Analog
+		1: Digital
+		2: Test tone"
+	::= { audio 1 }
+
+audioIOImpedance OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			impHighLow(0),
+			imp600R600R(1)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"I/O Impedance: High/Low or 600R/600R"
+	::= { audio 2 }
+
+audioOutputDigitalSampleFrequency OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			freq32kHz(0),
+			freq441kHz(1),
+			freq48kHz(2),
+			freq96kHz(5),
+			freq192kHz(7),
+			freqRef(3)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Digital output sample frequency.
+		0: 32kHz
+		1: 44.1kHz
+		2: 48kHz
+		5: 96kHz
+		7: 192kHz
+		3: Ref
+		"
+	::= { audio 3 }
+
+audioLoopbackEnabled OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			off(0),
+			localLoopback(1)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Audio loopback mode"
+	::= { audio 4 }
+
+enableSilenceDetectChannelC OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"Silence detect alarm - Channel C enabled"
+	::= { audio 5 }
+
+silenceDetectThresholdChannelC OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			chanCminus3(0),
+			chanCminus6(1),
+			chanCminus9(2),
+			chanCminus12(3),
+			chanCminus15(4),
+			chanCminus18(5),
+			chanCminus21(6),
+			chanCminus24(7),
+			chanCminus27(8),
+			chanCminus30(9),
+			chanCminus33(10),
+			chanCminus36(11),
+			chanCminus39(12),
+			chanCminus42(13)
+		}
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"Silence detect alarm - Channel C threshold
+		0: -3
+		1: -6
+		2: -9
+		3: -12
+		4: -15,
+		5: -18,
+		6: -21,
+		7: -24,
+		8: -27,
+		9: -30,
+		10: -33,
+		11: -36,
+		12: -39,
+		13: -42"
+	::= { audio 6 }
+
+enableSilenceDetectChannelD OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"Silence detect alarm - Channel D enabled"
+	::= { audio 7 }
+
+silenceDetectThresholdChannelD OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			chanCminus3(0),
+			chanCminus6(1),
+			chanCminus9(2),
+			chanCminus12(3),
+			chanCminus15(4),
+			chanCminus18(5),
+			chanCminus21(6),
+			chanCminus24(7),
+			chanCminus27(8),
+			chanCminus30(9),
+			chanCminus33(10),
+			chanCminus36(11),
+			chanCminus39(12),
+			chanCminus42(13)
+		}
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"Silence detect alarm - Channel D threshold
+		0: -3
+		1: -6
+		2: -9
+		3: -12
+		4: -15,
+		5: -18,
+		6: -21,
+		7: -24,
+		8: -27,
+		9: -30,
+		10: -33,
+		11: -36,
+		12: -39,
+		13: -42"
+	::= { audio 8 }
+
+enableSilenceDetectChannelA OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"Silence detect alarm - Channel A enabled"
+	::= { audio 9 }
+
+silenceDetectThresholdChannelA OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			chanCminus3(0),
+			chanCminus6(1),
+			chanCminus9(2),
+			chanCminus12(3),
+			chanCminus15(4),
+			chanCminus18(5),
+			chanCminus21(6),
+			chanCminus24(7),
+			chanCminus27(8),
+			chanCminus30(9),
+			chanCminus33(10),
+			chanCminus36(11),
+			chanCminus39(12),
+			chanCminus42(13)
+		}
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"Silence detect alarm - Channel A threshold
+		0: -3
+		1: -6
+		2: -9
+		3: -12
+		4: -15,
+		5: -18,
+		6: -21,
+		7: -24,
+		8: -27,
+		9: -30,
+		10: -33,
+		11: -36,
+		12: -39,
+		13: -42"
+	::= { audio 10 }
+
+enableSilenceDetectChannelB OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"Silence detect alarm - Channel B enabled"
+	::= { audio 11 }
+
+silenceDetectThresholdChannelB OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			chanCminus3(0),
+			chanCminus6(1),
+			chanCminus9(2),
+			chanCminus12(3),
+			chanCminus15(4),
+			chanCminus18(5),
+			chanCminus21(6),
+			chanCminus24(7),
+			chanCminus27(8),
+			chanCminus30(9),
+			chanCminus33(10),
+			chanCminus36(11),
+			chanCminus39(12),
+			chanCminus42(13)
+		}
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"Silence detect alarm - Channel B threshold
+		0: -3
+		1: -6
+		2: -9
+		3: -12
+		4: -15,
+		5: -18,
+		6: -21,
+		7: -24,
+		8: -27,
+		9: -30,
+		10: -33,
+		11: -36,
+		12: -39,
+		13: -42"
+	::= { audio 12 }
+
+audioAlarmTimeout OBJECT-TYPE
+	SYNTAX Integer32(0..2147483647)
+	MAX-ACCESS read-only
+	STATUS obsolete
+	DESCRIPTION
+		"Audio alarm time out for silence alarms (seconds)"
+	::= { audio 13 }
+
+enableLossOfDigitalInputAlarm OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Loss of digital input alarm enabled"
+	::= { audio 14 }
+
+enableLossOfDigitalReferenceAlarm OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Loss of digital reference alarm enabled"
+	::= { audio 15 }
+
+enableAdvancedRouting OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Advanced output routing enabled"
+	::= { audio 16 }
+
+advancedRoutingA OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disabled(0),
+			a(1),
+			b(2),
+			c(3),
+			d(4),
+			abHalf(11),
+			cdHalf(12)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Advanced routing: output A
+		0: routing disabled
+		1: redirected on output A
+		2: redirected on output B
+		3: redirected on output C
+		4: redirected on outuput D
+		11: redirected on A and B =>(A+B)/2
+		12: redirected on C and D =>(C+D)/2"
+	::= { audio 17 }
+
+advancedRoutingB OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disabled(0),
+			a(1),
+			b(2),
+			c(3),
+			d(4),
+			abHalf(11),
+			cdHalf(12)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Advanced routing: output B
+		0: routing disabled
+		1: redirected on output A
+		2: redirected on output B
+		3: redirected on output C
+		4: redirected on outuput D
+		11: redirected on A and B =>(A+B)/2
+		12: redirected on C and D =>(C+D)/2"
+	::= { audio 18 }
+
+advancedRoutingC OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disabled(0),
+			a(1),
+			b(2),
+			c(3),
+			d(4),
+			abHalf(11),
+			cdHalf(12)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Advanced routing: output C
+		0: routing disabled
+		1: redirected on output A
+		2: redirected on output B
+		3: redirected on output C
+		4: redirected on outuput D
+		11: redirected on A and B =>(A+B)/2
+		12: redirected on C and D =>(C+D)/2"
+	::= { audio 19 }
+
+advancedRoutingD OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			disabled(0),
+			a(1),
+			b(2),
+			c(3),
+			d(4),
+			abHalf(11),
+			cdHalf(12)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Advanced routing: output D
+		0: routing disabled
+		1: redirected on output A
+		2: redirected on output B
+		3: redirected on output C
+		4: redirected on outuput D
+		11: redirected on A and B =>(A+B)/2
+		12: redirected on C and D =>(C+D)/2"
+	::= { audio 20 }
+
+-- silence configuration --
+audioAlarmConfigurationTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF AudioAlarmConfigurationEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Audio Silent Alarm Configuration table"
+	::= { audio 21 }
+
+audioAlarmConfigurationEntry OBJECT-TYPE
+	SYNTAX AudioAlarmConfigurationEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Audio Silent Alarm Configuration row"
+	INDEX { channelId }
+	::= { audioAlarmConfigurationTable 1 }
+
+AudioAlarmConfigurationEntry ::=
+	SEQUENCE { 
+		channelId
+			Integer32,
+		alarmEnabled
+			INTEGER,
+		alarmThreshold
+			INTEGER,
+		alarmFailTime
+			Integer32,
+		alarmRecoverTime
+			Integer32
+	}
+
+channelId OBJECT-TYPE
+	SYNTAX Integer32 (0..3)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Audio Silent Alarm Configuration Index. 0=A, 1=B, 2=C and 3=D"
+	::= { audioAlarmConfigurationEntry 1 }
+
+alarmEnabled OBJECT-TYPE
+	SYNTAX INTEGER { disabled(0), enabled(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"0: Disabled
+		1: Enabled"
+	::= { audioAlarmConfigurationEntry 2 }
+
+alarmThreshold OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			minus3(0),
+			minus6(1),
+			minus9(2),
+			minus12(3),
+			minus15(4),
+			minus18(5),
+			minus21(6),
+			minus24(7),
+			minus27(8),
+			minus30(9),
+			minus33(10),
+			minus36(11),
+			minus39(12),
+			minus42(13)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Silence detect alarm - Channel B threshold
+		0: -3
+		1: -6
+		2: -9
+		3: -12
+		4: -15,
+		5: -18,
+		6: -21,
+		7: -24,
+		8: -27,
+		9: -30,
+		10: -33,
+		11: -36,
+		12: -39,
+		13: -42"
+	::= { audioAlarmConfigurationEntry 3 }
+
+alarmFailTime OBJECT-TYPE
+	SYNTAX Integer32 (1..65535)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Number of seconds before rising the alarm"
+	::= { audioAlarmConfigurationEntry 4 }
+
+
+alarmRecoverTime OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Number of seconds before turning off the alarm"
+	::= { audioAlarmConfigurationEntry 5 }
+	
+----
+audioDuplexMode OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            duplex(0),
+            encodeOnly(1),
+            decodeOnly(2)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Get system duplex mode
+        0: duplex
+        1: encode only
+        2: decode only"
+    ::= { audio 22 }
+    
+
+lowLatencyMode OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            off(0),
+            on(1)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Get/Set Low Latency Mode
+        0: off
+        1: on"
+    ::= { audio 23 }
+    
+syncAlarmFailTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Get/Set decoder sync. alarm fail time"
+    ::= { audio 24 }
+
+unitClockMode OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            asymmetric(0),
+            master(1),
+            slave(2),
+            systemTimeSync(3)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Get/Set Unit Clock Mode
+        0: Asymmetric
+        1: Master
+        2: Slave
+        4: System Time Sync"
+    ::= { audio 25 }
+
+-- AGC --
+audioAgcConfigurationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AudioAgcConfigurationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Audio AGC Configuration table"
+    ::= { audio 26 }
+
+audioAgcConfigurationEntry OBJECT-TYPE
+    SYNTAX AudioAgcConfigurationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Audio AGC Configuration row"
+    INDEX { channelIdAgc }
+    ::= { audioAgcConfigurationTable 1 }
+
+AudioAgcConfigurationEntry ::=
+    SEQUENCE { 
+        channelIdAgc
+            Integer32,
+        agcEnabled
+            INTEGER,
+        agcDrive
+            INTEGER,
+        agcSpeed
+            Integer32,
+        agcReference
+            Integer32,
+        limiterEnabled
+            INTEGER,
+        limiterDrive
+            Integer32
+    }
+
+channelIdAgc OBJECT-TYPE
+    SYNTAX Integer32 (0..3)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Audio AGC Configuration Index. 0=A, 1=B, 2=C and 3=D"
+    ::= { audioAgcConfigurationEntry 1 }
+
+agcEnabled OBJECT-TYPE
+    SYNTAX INTEGER { disabled(0), enabled(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "0: Disabled
+        1: Enabled"
+    ::= { audioAgcConfigurationEntry 2 }
+
+agcDrive OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            dB0(0),
+            dB1p5(1),
+            dB3(2),
+            dB4p5(3),
+            dB6(4),
+            dB7p5(5),
+            dB9(6),
+            dB10p5(7),
+            dB12(8)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "AGC drive
+        0: 0dB
+        1: 1_5dB
+        2: 3dB
+        3: 4_5dB
+        4: 6dB,
+        5: 7_5dB,
+        6: 9dB,
+        7: 10_5dB,
+        8: 12dB"
+    ::= { audioAgcConfigurationEntry 3 }
+
+agcSpeed OBJECT-TYPE
+    SYNTAX Integer32 (1..8)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "AGC Speed (Attack / Release characteristic)"
+    ::= { audioAgcConfigurationEntry 4 }
+
+agcReference OBJECT-TYPE
+    SYNTAX Integer32 (-18..0)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "AGC Reference Level (dBFS)"
+    ::= { audioAgcConfigurationEntry 5 }
+
+limiterEnabled OBJECT-TYPE
+    SYNTAX INTEGER { disabled(0), enabled(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "AGC Limiter Enabled Status
+        0: Disabled
+        1: Enabled"
+    ::= { audioAgcConfigurationEntry 6 }
+    
+limiterDrive OBJECT-TYPE
+    SYNTAX Integer32 (1..8)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "AGC Limiter Drive Level"
+    ::= { audioAgcConfigurationEntry 7}
+
+-- Mono --
+monoSourceSelection OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            leftChannelOnly(0),
+            stereoMixLRDiv2(1)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Mono Mode Source Selection
+        0: Left Channel Only
+        1: Stereo Mix ((L+R) / 2)"
+    ::= { audio 27 }
+    
+monoOutputModeSelection OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            monoOutput(0),
+            monofill(1)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Mono Output Mode Selection
+        0: Mono Output
+        1: Monofill (Copy to Idle Channel)"
+    ::= { audio 28 }
+    ----
+auxrelay OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { configuration 3 }
+
+serialDataBaudRate OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			baud1200(1200),
+			baud2400(2400),
+			baud4800(4800),
+			baud9600(9600),
+			baud19200(19200),
+			baud38400(38400),
+			baud57600(57600),
+			baud115200(115200)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Aux baud rate"
+	::= { auxrelay 1 }
+
+serialDataBaudRate2 OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			baud1200(1200),
+			baud2400(2400),
+			baud4800(4800),
+			baud9600(9600),
+			baud19200(19200),
+			baud38400(38400),
+			baud57600(57600),
+			baud115200(115200)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Aux 2 baud rate"
+	::= { auxrelay 2 }
+
+inputSource1 OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			switchInput(0),
+			controlInterface(1)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Remote Relay Control Mode - 1
+		0: Switch Input
+		1: Control Interface"
+	::= { auxrelay 3 }
+
+inputSource2 OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			switchInput(0),
+			controlInterface(1)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Remote Relay Control Mode - 2
+		0: Switch Input
+		1: Control Interface"
+	::= { auxrelay 4 }
+
+inputSource3 OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			switchInput(0),
+			controlInterface(1)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Remote Relay Control Mode - 3
+		0: Switch Input
+		1: Control Interface"
+	::= { auxrelay 5 }
+
+inputSource4 OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			switchInput(0),
+			controlInterface(1)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Remote Relay Control Mode - 4
+		0: Switch Input
+		1: Control Interface"
+	::= { auxrelay 6 }
+
+invertSwitchInput OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		off(0),
+		switchInverted(1)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Invert Switch Input"
+	::= { auxrelay 7 }
+
+relayControlMode1 OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			alarm(0),
+			controlInterface(1),
+			remoteStatusStream(2),
+			localSwitchInput(3)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Relay Control Mode - Relay 1
+		0: Alarm
+		1: Control Interface
+		2: Remote Status Stream
+		3: Local Switch Input"
+	::= { auxrelay 8 }
+
+relayControlMode2 OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			alarm(0),
+			controlInterface(1),
+			remoteStatusStream(2),
+			localSwitchInput(3)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Relay Control Mode - Relay 2
+		0: Alarm
+		1: Control Interface
+		2: Remote Status Stream
+		3: Local Switch Input"
+	::= { auxrelay 9 }
+
+relayControlMode3 OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			alarm(0),
+			controlInterface(1),
+			remoteStatusStream(2),
+			localSwitchInput(3)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Relay Control Mode - Relay 3
+		0: Alarm
+		1: Control Interface
+		2: Remote Status Stream
+		3: Local Switch Input"
+	::= { auxrelay 10 }
+
+relayControlMode4 OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			alarm(0),
+			controlInterface(1),
+			remoteStatusStream(2),
+			localSwitchInput(3)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Relay Control Mode - Relay 4
+		0: Alarm
+		1: Control Interface
+		2: Remote Status Stream
+		3: Local Switch Input"
+	::= { auxrelay 11 }
+
+invertRelayOutput1 OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		off(0),
+		relayInverted(1)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Invert Relay Output 1"
+	::= { auxrelay 12 }
+
+invertRelayOutput2 OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		off(0),
+		relayInverted(1)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Invert Relay Output 2"
+	::= { auxrelay 13 }
+
+invertRelayOutput3 OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		off(0),
+		relayInverted(1)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Invert Relay Output 3"
+	::= { auxrelay 14 }
+
+invertRelayOutput4 OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		off(0),
+		relayInverted(1)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Invert Relay Output 4"
+	::= { auxrelay 15 }
+switchManualState1 OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        off(0),
+        on(1)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Switch1 state value - only applicable when switch mode is Control Interface"
+    ::= { auxrelay 16 }
+    
+switchManualState2 OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        off(0),
+        on(1)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Switch2 state value - only applicable when switch mode is Control Interface"
+    ::= { auxrelay 17 }
+    
+switchManualState3 OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        off(0),
+        on(1)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Switch3 state value - only applicable when switch mode is Control Interface"
+    ::= { auxrelay 18 }
+    
+switchManualState4 OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        off(0),
+        on(1)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Switch4 state value - only applicable when switch mode is Control Interface"
+    ::= { auxrelay 19 }
+
+relayManualState1 OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        off(0),
+        on(1)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Relay1 state value - only applicable when relay mode is Control Interface"
+    ::= { auxrelay 20 }
+    
+relayManualState2 OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        off(0),
+        on(1)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Relay2 state value - only applicable when relay mode is Control Interface"
+    ::= { auxrelay 21 }
+    
+relayManualState3 OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        off(0),
+        on(1)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Relay3 state value - only applicable when relay mode is Control Interface"
+    ::= { auxrelay 22 }
+    
+relayManualState4 OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        off(0),
+        on(1)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Relay4 state value - only applicable when relay mode is Control Interface"
+    ::= { auxrelay 23 }
+
+streams OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { configuration 4 }
+
+streamTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF StreamEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Stream (de)activation table"
+	::= { streams 1 }
+
+streamEntry OBJECT-TYPE
+	SYNTAX StreamEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Stream (de)activation row"
+	INDEX { streamId }
+	::= { streamTable 1 }
+
+StreamEntry ::=
+	SEQUENCE { 
+		streamId
+			Integer32,
+		streamStatus
+			INTEGER,
+		streamDestinationIp
+			DisplayString,
+		streamIpPort
+			Integer32
+	}
+
+streamId OBJECT-TYPE
+	SYNTAX Integer32 (0..24)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Stream Index"
+	::= { streamEntry 1 }
+
+streamStatus OBJECT-TYPE
+	SYNTAX INTEGER { notconfigured(-1), inactive(0), active(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"-1: Not present
+		0: Inactive
+		1: Active"
+	::= { streamEntry 2 }
+	
+streamDestinationIp OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Stream Destination IP"
+	::= { streamEntry 3 }
+
+streamIpPort OBJECT-TYPE
+	SYNTAX Integer32 (0..65535)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Stream IP Port"
+	::= { streamEntry 4 }
+	
+hardwareAlarms OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "No description"
+    ::= { configuration 5 }
+    
+enablePSU1Alarm OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            off(0),
+            on(1)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable PSU1 alarm"
+    ::= { hardwareAlarms 1 }
+    
+enablePSU2Alarm OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            off(0),
+            on(1)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable PSU2 alarm"
+    ::= { hardwareAlarms 2 }
+
+events OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { nextGen 0 }
+
+eventIpTXError NOTIFICATION-TYPE
+		OBJECTS {
+			sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventIpTXErrorPriority, 
+			syTrapCounter, ipTXError 
+		}
+	STATUS current
+	DESCRIPTION
+		"IP Transmit Error (RTCP)"
+	::= { events 1 }
+
+eventIpTXErrorParams OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 1 }
+
+eventIpTXErrorPriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Priority of eventIpTXError
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventIpTXErrorParams 1 }
+
+eventIpTXErrorEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable switch for eventIpTXError event"
+	::= { eventIpTXErrorParams 2 }
+
+eventIpRXError NOTIFICATION-TYPE
+		OBJECTS {
+			sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventIpRXErrorPriority, 
+			syTrapCounter, ipRXError 
+		}
+	STATUS current
+	DESCRIPTION
+		"IP Receive Error (RTCP)"
+	::= { events 2 }
+
+eventIpRXErrorParams OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 2 }
+
+eventIpRXErrorPriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Priority of eventIpRXError
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventIpRXErrorParams 1 }
+
+eventIpRXErrorEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable switch for eventIpRXError event"
+	::= { eventIpRXErrorParams 2 }
+
+eventAudioMismatch NOTIFICATION-TYPE
+		OBJECTS {
+			sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventAudioMismatchPriority, 
+			syTrapCounter, audioMismatch 
+		}
+	STATUS current
+	DESCRIPTION
+		"Audio Mismatch"
+	::= { events 3 }
+
+eventAudioMismatchParams OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 3 }
+
+eventAudioMismatchPriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Priority of eventAudioMismatch
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventAudioMismatchParams 1 }
+
+eventAudioMismatchEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable switch for eventAudioMismatch event"
+	::= { eventAudioMismatchParams 2 }
+
+eventPsu1Failure NOTIFICATION-TYPE
+		OBJECTS {
+			sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventPsu1FailurePriority, 
+			syTrapCounter, psu1Failure 
+		}
+	STATUS current
+	DESCRIPTION
+		"Power Supply 1 Failure"
+	::= { events 4 }
+
+eventPsu1FailureParams OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 4 }
+
+eventPsu1FailurePriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Priority of eventPsu1Failure
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventPsu1FailureParams 1 }
+
+eventPsu1FailureEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable switch for eventPsu1Failure event"
+	::= { eventPsu1FailureParams 2 }
+
+eventPsu2Failure NOTIFICATION-TYPE
+		OBJECTS {
+			sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventPsu2FailurePriority, 
+			syTrapCounter, psu2Failure 
+		}
+	STATUS current
+	DESCRIPTION
+		"Power Supply 2 Failure"
+	::= { events 5 }
+
+eventPsu2FailureParams OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 5 }
+
+eventPsu2FailurePriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Priority of eventPsu2Failure
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventPsu2FailureParams 1 }
+
+eventPsu2FailureEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable switch for eventPsu2Failure event"
+	::= { eventPsu2FailureParams 2 }
+
+eventLossOfPhysicalEth1 NOTIFICATION-TYPE
+		OBJECTS {
+			sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventLossOfPhysicalEth1Priority, --severity, 
+			syTrapCounter, lossOfPhysicalEth1 
+		}
+	STATUS obsolete
+	DESCRIPTION
+		"Loss of Physical Connection - Ethernet 1"
+	::= { events 6 }
+
+eventLossOfPhysicalEth1Params OBJECT-IDENTITY
+	STATUS obsolete
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 6 }
+
+eventLossOfPhysicalEth1Priority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS obsolete
+	DESCRIPTION
+		"Priority of eventLossOfPhysicalEth1
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventLossOfPhysicalEth1Params 1 }
+
+eventLossOfPhysicalEth1Enable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS obsolete
+	DESCRIPTION
+		"Enable/Disable switch for eventLossOfPhysicalEth1 event"
+	::= { eventLossOfPhysicalEth1Params 2 }
+
+eventLossOfPhysicalEth0 NOTIFICATION-TYPE
+		OBJECTS {
+			sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventLossOfPhysicalEth0Priority, 
+			syTrapCounter, lossOfPhysicalEth0 
+		}
+	STATUS obsolete
+	DESCRIPTION
+		"Loss of Physical Connection - Ethernet 0"
+	::= { events 7 }
+
+eventLossOfPhysicalEth0Params OBJECT-IDENTITY
+	STATUS obsolete
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 7 }
+
+eventLossOfPhysicalEth0Priority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS obsolete
+	DESCRIPTION
+		"Priority of eventLossOfPhysicalEth0
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventLossOfPhysicalEth0Params 1 }
+
+eventLossOfPhysicalEth0Enable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS obsolete
+	DESCRIPTION
+		"Enable/Disable switch for eventLossOfPhysicalEth0 event"
+	::= { eventLossOfPhysicalEth0Params 2 }
+
+eventSyncFailed NOTIFICATION-TYPE
+		OBJECTS {
+			sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventSyncFailedPriority, 
+			syTrapCounter, syncFailed 
+		}
+	STATUS current
+	DESCRIPTION
+		"Sync Failed"
+	::= { events 8 }
+
+eventSyncFailedParams OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 8 }
+
+eventSyncFailedPriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Priority of eventSyncFailed
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventSyncFailedParams 1 }
+
+eventSyncFailedEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable switch for eventSyncFailed event"
+	::= { eventSyncFailedParams 2 }
+
+eventSilDetChanA NOTIFICATION-TYPE
+		OBJECTS {
+			sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventSilDetChanAPriority, 
+			syTrapCounter, silDetChanA 
+		}
+	STATUS current
+	DESCRIPTION
+		"Silence Detect - Channel A"
+	::= { events 9 }
+
+eventSilDetChanAParams OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 9 }
+
+eventSilDetChanAPriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Priority of eventSilDetChanA
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventSilDetChanAParams 1 }
+
+eventSilDetChanAEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable switch for eventSilDetChanA event"
+	::= { eventSilDetChanAParams 2 }
+
+eventSilDetChanB NOTIFICATION-TYPE
+		OBJECTS {
+			sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventSilDetChanBPriority, 
+			syTrapCounter, silDetChanB 
+		}
+	STATUS current
+	DESCRIPTION
+		"Silence Detect - Channel B"
+	::= { events 10 }
+
+eventSilDetChanBParams OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 10 }
+
+eventSilDetChanBPriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Priority of eventSilDetChanB
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventSilDetChanBParams 1 }
+
+eventSilDetChanBEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable switch for eventSilDetChanB event"
+	::= { eventSilDetChanBParams 2 }
+
+eventSilDetChanC NOTIFICATION-TYPE
+		OBJECTS {
+			sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventSilDetChanCPriority, 
+			syTrapCounter, silDetChanC 
+		}
+	STATUS current
+	DESCRIPTION
+		"Silence Detect - Channel C"
+	::= { events 11 }
+
+eventSilDetChanCParams OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 11 }
+
+eventSilDetChanCPriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Priority of eventSilDetChanC
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventSilDetChanCParams 1 }
+
+eventSilDetChanCEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable switch for eventSilDetChanC event"
+	::= { eventSilDetChanCParams 2 }
+
+eventSilDetChanD NOTIFICATION-TYPE
+		OBJECTS {
+			sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventSilDetChanDPriority, 
+			syTrapCounter, silDetChanD 
+		}
+	STATUS current
+	DESCRIPTION
+		"Silence Detect - Channel D"
+	::= { events 12 }
+
+eventSilDetChanDParams OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 12 }
+
+eventSilDetChanDPriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Priority of eventSilDetChanD
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventSilDetChanDParams 1 }
+
+eventSilDetChanDEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable switch for eventSilDetChanD event"
+	::= { eventSilDetChanDParams 2 }
+
+eventLossDigitalInputAB NOTIFICATION-TYPE
+		OBJECTS {
+			sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventLossDigitalInputABPriority, 
+			syTrapCounter, lossDigitalInputAB 
+		}
+	STATUS current
+	DESCRIPTION
+		"Loss Of Digital Input - AB"
+	::= { events 13 }
+
+eventLossDigitalInputABParams OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 13 }
+
+eventLossDigitalInputABPriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Priority of eventLossDigitalInputAB
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventLossDigitalInputABParams 1 }
+
+eventLossDigitalInputABEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable switch for eventLossDigitalInputAB event"
+	::= { eventLossDigitalInputABParams 2 }
+
+eventLossDigitalReference NOTIFICATION-TYPE
+		OBJECTS {
+			sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventLossDigitalReferencePriority, 
+			syTrapCounter, lossDigitalReference 
+		}
+	STATUS current
+	DESCRIPTION
+		"Loss Of Digital Reference"
+	::= { events 14 }
+
+eventLossDigitalReferenceParams OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 14 }
+
+eventLossDigitalReferencePriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Priority of eventLossDigitalReference
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventLossDigitalReferenceParams 1 }
+
+eventLossDigitalReferenceEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable switch for eventLossDigitalReference event"
+	::= {eventLossDigitalReferenceParams 2 }
+
+eventCustomAlarm NOTIFICATION-TYPE
+		OBJECTS {
+			sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventCustomAlarmPriority, 
+			syTrapCounter 
+		}
+	STATUS current
+	DESCRIPTION
+		"Custom Alarm
+		1: Off
+		2: On"
+	::= { events 15 }
+
+eventCustomAlarmParams OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 15 }
+
+eventCustomAlarmPriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Priority of eventCustomAlarm
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventCustomAlarmParams 1 }
+
+eventCustomAlarmEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable switch for eventCustomAlarm event"
+	::= {eventCustomAlarmParams 2 }
+
+eventLossDigitalInputCD NOTIFICATION-TYPE
+		OBJECTS {
+			sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventLossDigitalInputCDPriority, 
+			syTrapCounter, lossDigitalInputCD 
+		}
+	STATUS current
+	DESCRIPTION
+		"Loss Of Digital Input - CD"
+	::= { events 16 }
+
+eventLossDigitalInputCDParams OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 16 }
+
+eventLossDigitalInputCDPriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Priority of eventLossDigitalInputCD
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventLossDigitalInputCDParams 1 }
+
+eventLossDigitalInputCDEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable switch for eventLossDigitalInputCD event"
+	::= { eventLossDigitalInputCDParams 2 }
+
+
+eventIoBoardRemoved NOTIFICATION-TYPE
+		OBJECTS {
+			sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventIoBoardRemovedPriority, 
+			syTrapCounter, ioBoardRemoved 
+		}
+	STATUS current
+	DESCRIPTION
+		"IO Board Removed"
+	::= { events 17 }
+
+eventIoBoardRemovedParams OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 17 }
+
+eventIoBoardRemovedPriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Priority of eventIoBoardRemoved
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventIoBoardRemovedParams 1 }
+
+eventIoBoardRemovedEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable switch for eventIoBoardRemoved event"
+	::= { eventIoBoardRemovedParams 2 }
+
+
+eventDdnsEth0Failure NOTIFICATION-TYPE
+		OBJECTS {
+			sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventDdnsEth0FailurePriority, 
+			syTrapCounter, ddnsEth0Failure 
+		}
+	STATUS obsolete
+	DESCRIPTION
+		"Loss of Dynamic DNS on Interface 0"
+	::= { events 18 }
+
+eventDdnsEth0FailureParams OBJECT-IDENTITY
+	STATUS obsolete
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 18 }
+
+eventDdnsEth0FailurePriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS obsolete
+	DESCRIPTION
+		"Priority of eventDdnsEth0Failure
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventDdnsEth0FailureParams 1 }
+
+eventDdnsEth0FailureEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS obsolete
+	DESCRIPTION
+		"Enable/Disable switch for eventDdnsEth0Failure event"
+	::= { eventDdnsEth0FailureParams 2 }
+
+eventDdnsEth1Failure NOTIFICATION-TYPE
+		OBJECTS {
+			sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventDdnsEth1FailurePriority, 
+			syTrapCounter, ddnsEth1Failure  
+		}
+	STATUS obsolete
+	DESCRIPTION
+		"Loss of Dynamic DNS on Interface 1"
+	::= { events 19 }
+
+eventDdnsEth1FailureParams OBJECT-IDENTITY
+	STATUS obsolete
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 19 }
+
+eventDdnsEth1FailurePriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS obsolete
+	DESCRIPTION
+		"Priority of eventDdnsEth1Failure
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventDdnsEth1FailureParams 1 }
+
+eventDdnsEth1FailureEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS obsolete
+	DESCRIPTION
+		"Enable/Disable switch for eventDdnsEth1Failure event"
+	::= { eventDdnsEth1FailureParams 2 }
+
+-- NTP sync.
+eventNtpSyncFault NOTIFICATION-TYPE
+		OBJECTS {
+			sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventNtpSyncFaultPriority, 
+			syTrapCounter, ntpSync 
+		}
+	STATUS current
+	DESCRIPTION
+		"NTP Sync."
+	::= { events 26 }
+
+eventNtpSyncFaultParams OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 26 }
+
+eventNtpSyncFaultPriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Priority of eventNtpSyncFault
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventNtpSyncFaultParams 1 }
+
+eventNtpSyncFaultEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable switch for eventNtpSyncFaultParams event"
+	::= { eventNtpSyncFaultParams 2 }
+
+-- Loss Of IP Connection
+eventLossOfIpConnection NOTIFICATION-TYPE
+		OBJECTS {
+			sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventLossOfIpConnectionPriority, 
+			syTrapCounter, lossOfIpConnection 
+		}
+	STATUS current
+	DESCRIPTION
+		"Loss of IP Connection"
+	::= { events 27 }
+
+eventLossOfIpConnectionParams OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 27 }
+
+eventLossOfIpConnectionPriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Priority of eventLossOfIpConnection
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventLossOfIpConnectionParams 1 }
+
+eventLossOfIpConnectionEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable switch for eventLossOfIpConnection event"
+	::= { eventLossOfIpConnectionParams 2 }
+
+-- IO Card Type Changed
+eventIoBoardTypeChanged NOTIFICATION-TYPE
+		OBJECTS {
+			sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventIoBoardTypeChangedPriority, 
+			syTrapCounter, ioCardType 
+		}
+	STATUS current
+	DESCRIPTION
+		"IO Card Type Changed"
+	::= { events 28 }
+
+eventIoBoardTypeChangedParams OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 28 }
+
+eventIoBoardTypeChangedPriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Priority of eventIoBoardTypeChanged
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventIoBoardTypeChangedParams 1 }
+
+eventIoBoardTypeChangedEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable switch for eventIoBoardTypeChanged event"
+	::= { eventIoBoardTypeChangedParams 2 }
+
+-- Minimum Jitter Buffer
+eventMinimumJitterBufferAlarm NOTIFICATION-TYPE
+        OBJECTS {
+            sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventMinimumJitterBufferAlarmPriority, 
+            syTrapCounter, minimumJitterBufferAlarm 
+        }
+    STATUS current
+    DESCRIPTION
+        "Minimum Jitter Buffer Alarmn"
+    ::= { events 29 }
+
+eventMinimumJitterBufferAlarmParams OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "No description"
+    ::= { eventsParams 29 }
+
+eventMinimumJitterBufferAlarmPriority OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            emergency(0),
+            critical(2),
+            error(3),
+            warning(4),
+            notice(5),
+            info(6)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Priority of minimumJitterBufferAlarm
+        0:Emergency
+        2:Critical
+        3:Error
+        4:Warning
+        5:Notice
+        6:Info"
+    ::= { eventMinimumJitterBufferAlarmParams 1 }
+
+eventMinimumJitterBufferAlarmEnable OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            true(1),
+            false(2)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/Disable switch for eventMinimumJitterBufferAlarm event"
+    ::= { eventMinimumJitterBufferAlarmParams 2 }
+    
+-- VPN Connection Alarm
+eventVpnConnectionAlarm NOTIFICATION-TYPE
+        OBJECTS {
+            sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventVpnConnectionAlarmPriority, 
+            syTrapCounter, vpnConnectionAlarm 
+        }
+    STATUS current
+    DESCRIPTION
+        "VPN Connection Alarm"
+    ::= { events 30 }
+
+eventVpnConnectionAlarmParams OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "No description"
+    ::= { eventsParams 30 }
+
+eventVpnConnectionAlarmPriority OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            emergency(0),
+            critical(2),
+            error(3),
+            warning(4),
+            notice(5),
+            info(6)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Priority of vpnConnectionAlarm
+        0:Emergency
+        2:Critical
+        3:Error
+        4:Warning
+        5:Notice
+        6:Info"
+    ::= { eventVpnConnectionAlarmParams 1 }
+
+
+eventVpnConnectionAlarmEnable OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            true(1),
+            false(2)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/Disable switch for eventVpnConnectionAlarmEnable event"
+    ::= { eventVpnConnectionAlarmParams 2 }
+
+-- External 10Mhz Clock Alarm
+eventExt10MhzClockAlarm NOTIFICATION-TYPE
+        OBJECTS {
+            sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventExt10MhzClockAlarmPriority, 
+            syTrapCounter, ext10MhzClockAlarm 
+        }
+    STATUS current
+    DESCRIPTION
+        "External 10Mhz Clock Alarm"
+    ::= { events 31 }
+
+eventExt10MhzClockAlarmParams OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "No description"
+    ::= { eventsParams 31 }
+
+eventExt10MhzClockAlarmPriority OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            emergency(0),
+            critical(2),
+            error(3),
+            warning(4),
+            notice(5),
+            info(6)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Priority of ext10MhzClockAlarm
+        0:Emergency
+        2:Critical
+        3:Error
+        4:Warning
+        5:Notice
+        6:Info"
+    ::= { eventExt10MhzClockAlarmParams 1 }
+
+
+eventExt10MhzClockAlarmEnable OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            true(1),
+            false(2)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/Disable switch for eventExt10MhzClockAlarmEnable event"
+    ::= { eventExt10MhzClockAlarmParams 2 }
+    
+-- External PPS Clock Alarm
+eventExtPPSClockAlarm NOTIFICATION-TYPE
+        OBJECTS {
+            sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventExtPPSClockAlarmPriority, 
+            syTrapCounter, extPPSClockAlarm 
+        }
+    STATUS current
+    DESCRIPTION
+        "External PPS Clock Alarm"
+    ::= { events 32 }
+
+eventExtPPSClockAlarmParams OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "No description"
+    ::= { eventsParams 32 }
+
+eventExtPPSClockAlarmPriority OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            emergency(0),
+            critical(2),
+            error(3),
+            warning(4),
+            notice(5),
+            info(6)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Priority of extPPSClockAlarm
+        0:Emergency
+        2:Critical
+        3:Error
+        4:Warning
+        5:Notice
+        6:Info"
+    ::= { eventExtPPSClockAlarmParams 1 }
+
+
+eventExtPPSClockAlarmEnable OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            true(1),
+            false(2)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/Disable switch for eventExtPPSClockAlarmEnable event"
+    ::= { eventExtPPSClockAlarmParams 2 }
+
+-- External Clock Module Missing Alarm
+eventExtClockModuleMissingAlarm NOTIFICATION-TYPE
+        OBJECTS {
+            sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventExtClockModuleMissingAlarmPriority, 
+            syTrapCounter, extClockModuleMissingAlarm 
+        }
+    STATUS current
+    DESCRIPTION
+        "External Clock Module Missing Alarm"
+    ::= { events 33 }
+
+eventExtClockModuleMissingAlarmParams OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "No description"
+    ::= { eventsParams 33 }
+
+eventExtClockModuleMissingAlarmPriority OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            emergency(0),
+            critical(2),
+            error(3),
+            warning(4),
+            notice(5),
+            info(6)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Priority of extClockModuleMissingAlarm
+        0:Emergency
+        2:Critical
+        3:Error
+        4:Warning
+        5:Notice
+        6:Info"
+    ::= { eventExtClockModuleMissingAlarmParams 1 }
+
+
+eventExtClockModuleMissingAlarmEnable OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            true(1),
+            false(2)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/Disable switch for eventExtClockModuleMissingAlarmEnable event"
+    ::= { eventExtClockModuleMissingAlarmParams 2 }
+        
+-- Equipment ON
+eventEquipmentOn NOTIFICATION-TYPE
+	OBJECTS {
+		sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, 
+		eventEquipmentOnPriority, syTrapCounter
+	}
+	STATUS current
+	DESCRIPTION
+			"EquipmentOn notification"
+	::= { events 20 }
+
+eventEquipmentOnParams OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 20 }
+
+eventEquipmentOnPriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Priority of eventEquipmentOn
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventEquipmentOnParams 1 }
+
+eventEquipmentOnEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable switch for eventEquipmentOn event"
+	::= { eventEquipmentOnParams 2 }
+
+-- HeartBeat
+eventHeartBeat NOTIFICATION-TYPE
+	OBJECTS {
+		sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, 
+		eventHeartBeatPriority, syTrapCounter
+	}
+	STATUS current
+	DESCRIPTION
+			"HeartBeat notification"
+	::= { events 21 }
+
+eventHeartBeatParams OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 21 }
+
+eventHeartBeatPriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Priority of eventHeartBeat
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventHeartBeatParams 1 }
+
+eventHeartBeatEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable switch for eventHeartBeat event"
+	::= { eventHeartBeatParams 2 }
+
+-- Config Changed
+eventConfigChanged NOTIFICATION-TYPE
+	OBJECTS {
+		sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, 
+		eventConfigChangedPriority, syTrapCounter
+	}
+	STATUS current
+	DESCRIPTION
+			"ConfigChanged notification"
+	::= { events 22 }
+
+
+eventConfigChangedParams OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 22 }
+
+eventConfigChangedPriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Priority of eventConfigChanged
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventConfigChangedParams 1 }
+
+eventConfigChangedEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable switch for eventConfigChanged event"
+	::= { eventConfigChangedParams 2 }
+
+-- Equipment Fault
+eventEquipmentFault NOTIFICATION-TYPE
+	OBJECTS {
+		sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, 
+		eventConfigChangedPriority, syTrapCounter, eventEquipmentFaultError
+	}
+	STATUS current
+	DESCRIPTION
+			"EquipmentFault notification"
+	::= { events 23 }
+
+eventEquipmentFaultError OBJECT-TYPE
+	SYNTAX DisplayString(SIZE(0..255))
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"error message"
+	::= { commonEventBindings 2 }
+
+severity OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"Priority of eventLossOfPhysicalEth1
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { commonEventBindings 3 }
+
+errorStreamId OBJECT-TYPE
+	SYNTAX Integer32 (0..31)
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"Id of stream in error"
+	::= { commonEventBindings 4 }
+
+eventEquipmentFaultParams OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 23 }
+
+eventEquipmentFaultPriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Priority of eventEquipmentFault
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventEquipmentFaultParams 1 }
+
+eventEquipmentFaultEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable switch for LossOfPhysicalEth event"
+	::= { eventEquipmentFaultParams 2 }
+
+-- LossOfPhysicalEth
+eventLossOfPhysicalEth NOTIFICATION-TYPE
+		OBJECTS {
+			sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventLossOfPhysicalEthPriority, --severity, 
+			syTrapCounter, lossOfPhysicalEthNumber, lossOfPhysicalEthStatus
+		}
+	STATUS current
+	DESCRIPTION
+		"Loss of Physical Connection - Ethernet"
+	::= { events 24 }
+
+eventLossOfPhysicalEthParamsTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF EventLossOfPhysicalEthParamsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 24 }
+
+eventLossOfPhysicalEthParamsEntry OBJECT-TYPE
+	SYNTAX EventLossOfPhysicalEthParamsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"eventLossOfPhysicalEthParams Row"
+	INDEX { eventLossOfPhysicalEthParamsId }
+	::= { eventLossOfPhysicalEthParamsTable 1 }
+
+EventLossOfPhysicalEthParamsEntry ::=
+	SEQUENCE { 
+		eventLossOfPhysicalEthParamsId
+			Integer32,
+		eventLossOfPhysicalEthPriority
+			INTEGER,
+		eventLossOfPhysicalEthEnable
+			INTEGER
+	 }
+
+eventLossOfPhysicalEthParamsId OBJECT-TYPE
+	SYNTAX Integer32 (0..99)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"index"
+	::= { eventLossOfPhysicalEthParamsEntry 1 }
+
+eventLossOfPhysicalEthPriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Priority of eventEquipmentFault
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventLossOfPhysicalEthParamsEntry 2 }
+
+eventLossOfPhysicalEthEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable switch for LossOfPhysicalEth event"
+	::= { eventLossOfPhysicalEthParamsEntry 3 }
+
+-- DDNS failure
+eventDdnsEthFailure NOTIFICATION-TYPE
+		OBJECTS {
+			sysName, sysDescr, sysLocation, serialNumber, eventTimestamp, eventDdnsEthFailurePriority, --severity, 
+			syTrapCounter, ddnsEthFailureNumber, ddnsEthFailureStatus
+		}
+	STATUS current
+	DESCRIPTION
+		"Dynamic DNS Failure"
+	::= { events 25 }
+
+eventDdnsEthFailureParamsTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF EventDdnsEthFailureParamsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { eventsParams 25 }
+
+eventDdnsEthFailureParamsEntry OBJECT-TYPE
+	SYNTAX EventDdnsEthFailureParamsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"eventDdnsEthFailureParams Row"
+	INDEX { eventDdnsEthFailureParamsId }
+	::= { eventDdnsEthFailureParamsTable 1 }
+
+EventDdnsEthFailureParamsEntry ::=
+	SEQUENCE { 
+		eventDdnsEthFailureParamsId
+			Integer32,
+		eventDdnsEthFailurePriority
+			INTEGER,
+		eventDdnsEthFailureEnable
+			INTEGER
+	 }
+
+eventDdnsEthFailureParamsId OBJECT-TYPE
+	SYNTAX Integer32 (0..99)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"index"
+	::= { eventDdnsEthFailureParamsEntry 1 }
+
+eventDdnsEthFailurePriority OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			emergency(0),
+			critical(2),
+			error(3),
+			warning(4),
+			notice(5),
+			info(6)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Priority of eventEquipmentFault
+		0:Emergency
+		2:Critical
+		3:Error
+		4:Warning
+		5:Notice
+		6:Info"
+	::= { eventDdnsEthFailureParamsEntry 2 }
+
+eventDdnsEthFailureEnable OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+			true(1),
+			false(2)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Enable/Disable switch for LossOfPhysicalEth event"
+	::= { eventDdnsEthFailureParamsEntry 3 }
+
+
+groups OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"No description"
+	::= { nextGen 2 }
+
+	objectGroup OBJECT-GROUP
+		OBJECTS {
+			-- Enable and Priority trap binding fields
+			syTrapCounter, eventIpTXErrorPriority, eventIpTXErrorEnable, 
+			eventIpRXErrorPriority, eventIpRXErrorEnable, 
+			eventAudioMismatchPriority, eventAudioMismatchEnable, 
+			eventPsu1FailurePriority, eventPsu1FailureEnable, 
+			eventPsu2FailurePriority, eventPsu2FailureEnable, 
+			eventSyncFailedPriority, eventSyncFailedEnable, 
+			eventSilDetChanAPriority, eventSilDetChanAEnable, 
+			eventSilDetChanBPriority, eventSilDetChanBEnable, 
+			eventSilDetChanCPriority, eventSilDetChanCEnable, 
+			eventSilDetChanDPriority, eventSilDetChanDEnable, 
+			eventLossDigitalInputABPriority, eventLossDigitalInputABEnable, 
+			eventLossDigitalInputCDPriority, eventLossDigitalInputCDEnable, 
+			eventLossDigitalReferencePriority, eventLossDigitalReferenceEnable, 
+			eventCustomAlarmPriority, eventCustomAlarmEnable, 
+			eventIoBoardRemovedPriority, eventIoBoardRemovedEnable, 
+			eventLossOfPhysicalEthPriority, eventLossOfPhysicalEthEnable,
+			eventDdnsEthFailurePriority, eventDdnsEthFailureEnable,
+			eventNtpSyncFaultPriority, eventNtpSyncFaultEnable,
+			eventLossOfIpConnectionPriority, eventLossOfIpConnectionEnable,
+			eventIoBoardTypeChangedPriority, eventIoBoardTypeChangedEnable,
+			eventMinimumJitterBufferAlarmPriority, eventMinimumJitterBufferAlarmEnable,
+			eventVpnConnectionAlarmPriority, eventVpnConnectionAlarmEnable,
+			eventExt10MhzClockAlarmPriority, eventExt10MhzClockAlarmEnable,
+			eventExtPPSClockAlarmPriority, eventExtPPSClockAlarmEnable,
+			eventExtClockModuleMissingAlarmPriority,eventExtClockModuleMissingAlarmEnable,
+			-- CoreGT
+			eventEquipmentOnPriority, eventEquipmentOnEnable, 
+			eventHeartBeatPriority, eventHeartBeatEnable,
+			eventConfigChangedPriority, eventConfigChangedEnable, 
+			eventEquipmentFaultPriority, eventEquipmentFaultEnable, 
+			-- ETH
+			ipEthEnabled, ipEthAddress, ipEthNetmask, ipEthGateway, ipMacAddress,
+			-- Distant Redirections
+			distantRedirectionDescription, distantRedirectionInterface,
+			distantRedirectionPortNumber, distantRedirectionToAddress,
+			distantRedirectionToPortNumber, distantRedirectionProtocol, distantRedirectionEnabled, 
+			-- Firewall
+			firewallDescription, firewallNetworkInterface,
+			firewallPortNumber, firewallProtocol, firewallEnabled,
+			-- alarms
+			lossOfPhysicalEthStatus, lossOfPhysicalEthNumber,
+			ddnsEthFailureStatus, ddnsEthFailureNumber,
+			-- APT
+			eventTimestamp, severity, errorStreamId, eventEquipmentFaultError, systemType, serialNumber, hardwareRevision, softwareRevision, unitName, 
+			cpuLoad, unitReboot, licenseName,  licenseActive, licenseExpireDate, connectionStatus, unitTemperature, ipTXError, 
+			ipRXError, audioMismatch, psu1Failure, psu2Failure, syncFailed, silDetChanA, silDetChanB, silDetChanC, 
+			silDetChanD, lossDigitalInputAB, lossDigitalReference, lossDigitalInputCD, ioBoardRemoved, 
+			ddnsEthFailureStatus, audioLevelChannelA, audioLevelChannelB, audioLevelChannelC, 
+			audioLevelChannelD, streamsstreamEnabled, streamsstreamName, streamsrouteType, streamsauxRouteType, 
+			streamsencodeSlot, streamsdecodeSlot, streamscastingMode, streamsethernetInterface, streamssourceIPAddress, 
+			streamssourceIPort, streamsdestinationIPAddress, streamsipPort, streamssureStreamLevel, streamstxPacketCount, 
+			streamsrxPacketCount, streamstxkbCount, streamsrxkbCount, streamstxBitrate, streamsrxBitrate, 
+			streamsresequencedPacketCount, streamsdroppedPacketCount, streamslossOfConnectionErrors, streamsduplicatePacketCount, streamsreceiveBufferLevel, 
+			streamsreceiveBufferThreshold, streamsrxLatency, streamsextPort, streamsupnpEnable, streamsrxForwardingChannel, streamstxForwardingChannel, 
+			streamstxPacketSize, streamsrxPacketSize, streamsfloodedBufferCount, streamsrxPacketInterval, streamstxPacketInterval, streamslocAlarmStatus,
+			streamstxInactiveAlarmStatus, streamsrxInactiveAlarmStatus, streamstxContentSyncEnabled, streamstxPlayoutOffset, streamsrxBufferMode, 
+			streamsrxPlayoutOffset, streamsrxPlayoutNudge, streamsrxLinkLatency, streamsrxBufferHeadroom, streamsrxLinkJitter,
+		    streamsMinimumJitterBufferAlarm, streamsMinJitterBufferMicroS, streamsPacketsOrderingEnable, streamsWanProtection, streamsSsmMode, streamsSsmGroup,
+			streamsrxPlayoutFineNudgeNanoS, resetStreamsPerformance, audioCodec1, audioCodec2, audioCodec3, audioCodec4, relay1OutputState, relay2OutputState, 	relay3OutputState, relay4OutputState, 
+			opto1InputState, opto2InputState, opto3InputState, opto4InputState, optoActiveHigh, ntpLastSync, ntpLastOffset, activeProfileNumber, activeProfileName, audioInputMode, 
+			audioIOImpedance, audioOutputDigitalSampleFrequency, audioLoopbackEnabled, enableLossOfDigitalInputAlarm, enableLossOfDigitalReferenceAlarm, 
+			enableAdvancedRouting, advancedRoutingA, advancedRoutingB, advancedRoutingC, advancedRoutingD, audioDuplexMode, lowLatencyMode, syncAlarmFailTime, unitClockMode,
+			monoSourceSelection, monoOutputModeSelection,
+			serialDataBaudRate, serialDataBaudRate2, streamStatus, streamDestinationIp, streamIpPort, inputSource1, inputSource2, inputSource3, inputSource4, 
+			invertSwitchInput, relayControlMode1, relayControlMode2, relayControlMode3, relayControlMode4,
+			invertRelayOutput1, invertRelayOutput2, invertRelayOutput3, invertRelayOutput4,switchManualState1,
+			switchManualState2,switchManualState3,switchManualState4,relayManualState1,relayManualState2,relayManualState3,
+			relayManualState4,enablePSU1Alarm,enablePSU2Alarm,alarmEnabled, alarmThreshold, alarmFailTime, alarmRecoverTime, 
+			agcEnabled, agcDrive, agcSpeed, agcReference, limiterEnabled, limiterDrive,
+			ntpSync, lossOfIpConnection, minimumJitterBufferAlarm, vpnConnectionAlarm, ext10MhzClockAlarm, extPPSClockAlarm, 
+			extClockModuleMissingAlarm, ioCardType, stateVariable, defaultGateway
+		}
+	STATUS current
+	DESCRIPTION
+		"All current objects"
+	::= { groups 1 }
+
+	objectObsoleteGroup OBJECT-GROUP
+		OBJECTS {
+			eventLossOfPhysicalEth0Priority, eventLossOfPhysicalEth0Enable, 
+			eventLossOfPhysicalEth1Priority, eventLossOfPhysicalEth1Enable, 
+			ipAddressEthernet0, ipAddressEthernet1, lossOfPhysicalEth0, 
+			lossOfPhysicalEth1, ddnsEth0Failure, ddnsEth1Failure,
+			eventDdnsEth0FailurePriority, eventDdnsEth0FailureEnable, 
+			eventDdnsEth1FailurePriority, eventDdnsEth1FailureEnable,
+			enableSilenceDetectChannelC, silenceDetectThresholdChannelC, 
+			enableSilenceDetectChannelD, silenceDetectThresholdChannelD, enableSilenceDetectChannelA, silenceDetectThresholdChannelA, 		
+			enableSilenceDetectChannelB, silenceDetectThresholdChannelB, audioAlarmTimeout
+		}
+	STATUS obsolete
+	DESCRIPTION
+		"All obsolete objects"
+	::= { groups 2 }
+
+	eventGroup NOTIFICATION-GROUP
+		NOTIFICATIONS {
+			eventIpTXError, eventIpRXError, eventAudioMismatch, eventPsu1Failure, eventPsu2Failure, 
+			eventSyncFailed, eventSilDetChanA, eventSilDetChanB, 
+			eventSilDetChanC, eventSilDetChanD, eventLossDigitalInputAB, eventLossDigitalReference, eventCustomAlarm, 
+			eventLossDigitalInputCD, eventIoBoardRemoved, eventNtpSyncFault, eventLossOfIpConnection, eventIoBoardTypeChanged, 
+			eventMinimumJitterBufferAlarm, eventVpnConnectionAlarm,eventExt10MhzClockAlarm, eventExtPPSClockAlarm, eventExtClockModuleMissingAlarm,
+			eventEquipmentOn, eventHeartBeat, eventConfigChanged, eventEquipmentFault, eventLossOfPhysicalEth, eventDdnsEthFailure
+		}
+	STATUS current
+	DESCRIPTION
+		"All current events"
+	::= { groups 3 }
+
+	eventObsoleteGroup NOTIFICATION-GROUP
+		NOTIFICATIONS {
+			eventLossOfPhysicalEth1, eventLossOfPhysicalEth0, 
+			eventDdnsEth0Failure, eventDdnsEth1Failure
+		}
+	STATUS obsolete
+	DESCRIPTION
+		"All obsolete events"
+	::= { groups 4 }
+
+
+END
