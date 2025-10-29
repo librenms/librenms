@@ -224,7 +224,7 @@ class CiHelper
         } elseif ($this->flags['unit_docs']) {
             array_push($phpunit_cmd, '--group', 'docs');
         } elseif ($this->flags['unit_svg']) {
-            array_push($phpunit_cmd, '--group', 'yaml');
+            array_push($phpunit_cmd, '--group', 'svg');
         } elseif ($this->flags['unit_modules'] || $this->flags['os-modules-only']) {
             $phpunit_cmd[] = 'tests/OSModulesTest.php';
         }
