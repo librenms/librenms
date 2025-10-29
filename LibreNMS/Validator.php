@@ -62,7 +62,7 @@ class Validator
                     $this->validation_groups[$validation_name] = new $class();
                     $this->results[$validation_name] = [];
                 }
-            } catch (ReflectionException $e) {
+            } catch (ReflectionException) {
             }
         }
     }
@@ -311,18 +311,13 @@ class Validator
 
     public function getStatusText(int $status): string
     {
-        switch ($status) {
-            case ValidationResult::SUCCESS:
-                return 'Ok';
-            case ValidationResult::FAILURE:
-                return 'Failure';
-            case ValidationResult::WARNING:
-                return 'Warning';
-            case ValidationResult::INFO:
-                return 'Info';
-            default:
-                return '';
-        }
+        return match ($status) {
+            ValidationResult::SUCCESS => 'Ok',
+            ValidationResult::FAILURE => 'Failure',
+            ValidationResult::WARNING => 'Warning',
+            ValidationResult::INFO => 'Info',
+            default => '',
+        };
     }
 
     public function toArray(): array

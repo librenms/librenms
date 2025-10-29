@@ -69,31 +69,16 @@ class TopDevicesController extends WidgetController
         // We use raw() function below, validate input and default to sane value.
         $sort = Validate::ascDesc($sort, 'ASC');
 
-        switch ($settings['top_query']) {
-            case 'traffic':
-                $data = $this->getTrafficData($sort);
-                break;
-            case 'uptime':
-                $data = $this->getUptimeData($sort);
-                break;
-            case 'ping':
-                $data = $this->getPingData($sort);
-                break;
-            case 'cpu':
-                $data = $this->getProcessorData($sort);
-                break;
-            case 'ram':
-                $data = $this->getMemoryData($sort);
-                break;
-            case 'poller':
-                $data = $this->getPollerData($sort);
-                break;
-            case 'storage':
-                $data = $this->getStorageData($sort);
-                break;
-            default:
-                $data = [];
-        }
+        $data = match ($settings['top_query']) {
+            'traffic' => $this->getTrafficData($sort),
+            'uptime' => $this->getUptimeData($sort),
+            'ping' => $this->getPingData($sort),
+            'cpu' => $this->getProcessorData($sort),
+            'ram' => $this->getMemoryData($sort),
+            'poller' => $this->getPollerData($sort),
+            'storage' => $this->getStorageData($sort),
+            default => [],
+        };
 
         return view('widgets.top-devices', $data);
     }

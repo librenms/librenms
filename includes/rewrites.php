@@ -182,25 +182,12 @@ function ipmiSensorName($hardwareId, $sensorIpmi)
  */
 function get_nagios_state($descr)
 {
-    switch ($descr) {
-        case 'On':
-        case 'Okay':
-        case 'Ok':
-            return 0;
-            break;
-        case 'Standby':
-        case 'Idle':
-        case 'Maintenance':
-            return 1;
-            break;
-        case 'Under':
-        case 'Over':
-            return 2;
-            break;
-        default:
-            return 3;
-            break;
-    }
+    return match ($descr) {
+        'On', 'Okay', 'Ok' => 0,
+        'Standby', 'Idle', 'Maintenance' => 1,
+        'Under', 'Over' => 2,
+        default => 3,
+    };
 }
 
 /**

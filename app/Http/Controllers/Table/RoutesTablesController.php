@@ -194,7 +194,7 @@ class RoutesTablesController extends TableController
         try {
             $obj_inetCidrRouteNextHop = IP::parse($route_entry->inetCidrRouteNextHop);
             $item['inetCidrRouteNextHop'] = $obj_inetCidrRouteNextHop->compressed();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $item['inetCidrRouteNextHop'] = $route_entry->inetCidrRouteNextHop;
         }
         $device = Device::findByIp($route_entry->inetCidrRouteNextHop);

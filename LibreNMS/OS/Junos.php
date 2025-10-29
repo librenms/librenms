@@ -251,24 +251,16 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
      */
     private function retrieveJuniperType($rtt_type)
     {
-        switch ($rtt_type) {
-            case 'enterprises.2636.3.7.2.1':
-                return 'IcmpTimeStamp';
-            case 'enterprises.2636.3.7.2.2':
-                return 'HttpGet';
-            case 'enterprises.2636.3.7.2.3':
-                return 'HttpGetMetadata';
-            case 'enterprises.2636.3.7.2.4':
-                return 'DnsQuery';
-            case 'enterprises.2636.3.7.2.5':
-                return 'NtpQuery';
-            case 'enterprises.2636.3.7.2.6':
-                return 'UdpTimestamp';
-            case 'zeroDotZero':
-                return 'twamp';
-            default:
-                return str_replace('ping', '', $rtt_type);
-        }
+        return match ($rtt_type) {
+            'enterprises.2636.3.7.2.1' => 'IcmpTimeStamp',
+            'enterprises.2636.3.7.2.2' => 'HttpGet',
+            'enterprises.2636.3.7.2.3' => 'HttpGetMetadata',
+            'enterprises.2636.3.7.2.4' => 'DnsQuery',
+            'enterprises.2636.3.7.2.5' => 'NtpQuery',
+            'enterprises.2636.3.7.2.6' => 'UdpTimestamp',
+            'zeroDotZero' => 'twamp',
+            default => str_replace('ping', '', $rtt_type),
+        };
     }
 
     /**

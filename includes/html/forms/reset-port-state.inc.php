@@ -55,7 +55,7 @@ if (isset($_POST['device_id'])) {
             }
             $status = 'ok';
             $message = 'Port state cleared successfully';
-        } catch (Exception $e) {
+        } catch (Exception) {
             $status = 'error';
             $message = 'Clearing port state failed: $e';
         }

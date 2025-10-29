@@ -696,7 +696,7 @@ function list_bgp(Illuminate\Http\Request $request)
         $sql .= ' AND `bgpPeers`.`bgpLocalAddr` = ?';
         try {
             $sql_params[] = IP::parse($local_address)->uncompressed();
-        } catch (InvalidIpException $e) {
+        } catch (InvalidIpException) {
             return api_error(400, 'Invalid local address');
         }
     }
@@ -704,7 +704,7 @@ function list_bgp(Illuminate\Http\Request $request)
         $sql .= ' AND `bgpPeers`.`bgpPeerIdentifier` = ?';
         try {
             $sql_params[] = IP::parse($remote_address)->uncompressed();
-        } catch (InvalidIpException $e) {
+        } catch (InvalidIpException) {
             return api_error(400, 'Invalid remote address');
         }
     }
@@ -2404,7 +2404,7 @@ function update_device_group(Illuminate\Http\Request $request)
 
     try {
         $deviceGroup->save();
-    } catch (\Illuminate\Database\QueryException $e) {
+    } catch (\Illuminate\Database\QueryException) {
         return api_error(500, 'Failed to save changes device group');
     }
 
@@ -2996,7 +2996,7 @@ function list_arp(Illuminate\Http\Request $request)
         try {
             $ip = new IPv4("$query/$cidr");
             $arp = Ipv4Mac::whereRaw('(inet_aton(`ipv4_address`) & ?) = ?', [ip2long($ip->getNetmask()), ip2long($ip->getNetworkAddress())])->get();
-        } catch (InvalidIpException $e) {
+        } catch (InvalidIpException) {
             return api_error(400, 'Invalid Network Address');
         }
     } elseif (filter_var($query, FILTER_VALIDATE_MAC)) {

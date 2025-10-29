@@ -162,7 +162,7 @@ if (! empty($peers)) {
 
                     try {
                         $peer_data['bgpLocalAddr'] = IP::fromHexString($junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLocalAddr'])->uncompressed();
-                    } catch (InvalidIpException $e) {
+                    } catch (InvalidIpException) {
                         $peer_data['bgpLocalAddr'] = '';
                     }
                     d_echo("State = {$peer_data['bgpPeerState']} - AdminStatus: {$peer_data['bgpPeerAdminStatus']}\n");
@@ -467,7 +467,7 @@ if (! empty($peers)) {
                     if (Str::contains($source, 'LocalAddr')) {
                         try {
                             $v = IP::fromHexString($v)->uncompressed();
-                        } catch (InvalidIpException $e) {
+                        } catch (InvalidIpException) {
                             // if parsing fails, leave the data as-is
                         }
                     }
@@ -494,7 +494,7 @@ if (! empty($peers)) {
                         $ip_address = IP::parse($peer_data['bgpPeerLocalAddr']);
                         $family = $ip_address->getFamily();
                         $peer_data['bgpPeerIface'] = DB::table('ports')->join("{$family}_addresses", 'ports.port_id', '=', "{$family}_addresses.port_id")->where("{$family}_address", '=', $ip_address->uncompressed())->value('ifIndex');
-                    } catch (InvalidIpException $e) {
+                    } catch (InvalidIpException) {
                         $peer_data['bgpPeerIface'] = null;
                     }
                 } elseif (isset($peer_data['bgpLocalAddr']) && IP::isValid($peer_data['bgpLocalAddr'])) {
@@ -503,14 +503,14 @@ if (! empty($peers)) {
                         $ip_address = IP::parse($peer_data['bgpLocalAddr']);
                         $family = $ip_address->getFamily();
                         $peer_data['bgpPeerIface'] = DB::table('ports')->join("{$family}_addresses", 'ports.port_id', '=', "{$family}_addresses.port_id")->where("{$family}_address", '=', $ip_address->uncompressed())->value('ifIndex');
-                    } catch (InvalidIpException $e) {
+                    } catch (InvalidIpException) {
                         $peer_data['bgpPeerIface'] = null;
                     }
                 } else {
                     $peer_data['bgpPeerIface'] = null;
                 }
             }
-        } catch (InvalidIpException $e) {
+        } catch (InvalidIpException) {
             // ignore
         }
 

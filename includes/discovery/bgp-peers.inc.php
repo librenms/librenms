@@ -111,7 +111,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
                             $ip = IP::fromHexString($entry['jnxBgpM2PeerRemoteAddr']);
                             d_echo('peerindex for ' . $ip->getFamily() . " $ip is $peer_index\n");
                             $j_peerIndexes[(string) $ip] = $peer_index;
-                        } catch (InvalidIpException $e) {
+                        } catch (InvalidIpException) {
                             d_echo("Unable to parse IP for peer $peer_index: " . $entry['jnxBgpM2PeerRemoteAddr'] . PHP_EOL);
                         }
                     }

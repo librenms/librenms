@@ -256,7 +256,7 @@ if (LibrenmsConfig::get('enable_vrfs')) {
                 dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
                 $if = $interface['port_id'];
                 $valid_vrf_if[$vrf_id][$if] = 1;
-            } catch (Exception $e) {
+            } catch (Exception) {
                 continue;
             }
         }

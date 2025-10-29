@@ -65,7 +65,7 @@ class ErrorReporting
 
     public function reportable(Throwable $e): bool
     {
-        \Log::critical('%RException: ' . get_class($e) . ' ' . $e->getMessage() . '%n @ %G' . $e->getFile() . ':' . $e->getLine() . '%n' . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
+        \Log::critical('%RException: ' . $e::class . ' ' . $e->getMessage() . '%n @ %G' . $e->getFile() . ':' . $e->getLine() . '%n' . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
 
         return false; // false = block default log message
     }

@@ -35,7 +35,6 @@ use LibreNMS\Util\IP;
 
 class Trap
 {
-    public readonly string $raw;
     public readonly string $hostname;
     public readonly ?string $ip;
     protected Collection $oid_data;
@@ -44,11 +43,9 @@ class Trap
     /**
      * Construct a trap from raw trap text
      */
-    public function __construct(string $trap)
+    public function __construct(public readonly string $raw)
     {
-        $this->raw = $trap;
-
-        $lines = explode(PHP_EOL, trim($trap));
+        $lines = explode(PHP_EOL, trim($this->raw));
 
         $this->hostname = array_shift($lines);
 

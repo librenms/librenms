@@ -114,7 +114,7 @@ trait HostResources
             }
 
             $hrDeviceDescr = $this->getCacheByIndex('hrDeviceDescr', 'HOST-RESOURCES-MIB');
-        } catch (Exception $e) {
+        } catch (Exception) {
             return [];
         }
 

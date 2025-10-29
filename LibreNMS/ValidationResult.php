@@ -34,17 +34,10 @@ class ValidationResult
     public const WARNING = 1;
     public const SUCCESS = 2;
     public const INFO = 3;
-
-    /** @var string */
-    private $message;
-    /** @var int */
-    private $status;
     /** @var string */
     private $list_description = '';
     /** @var array */
     private $list;
-    /** @var string|null */
-    private $fix;
     /** @var string|null */
     private $fixer;
 
@@ -55,11 +48,8 @@ class ValidationResult
      * @param  int  $status  The status of this result FAILURE, WARNING, or SUCCESS
      * @param  string|null  $fix  a suggested fix to highlight for the user
      */
-    public function __construct(string $message, int $status, ?string $fix = null)
+    public function __construct(private string $message, private int $status, private ?string $fix = null)
     {
-        $this->message = $message;
-        $this->status = $status;
-        $this->fix = $fix;
     }
 
     /**
