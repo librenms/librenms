@@ -42,7 +42,7 @@ if ($agent_data['app'][$name]) {
     if (! $sock) {
         d_echo("\nNo Socket to rrdcached server " . $device['hostname'] . ":42217 try to get rrdcached from SNMP\n");
         $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.9.114.114.100.99.97.99.104.101.100';
-        $result = snmp_get($device, $oid, '-Oqv');
+        $result = SnmpQuery::get($oid)->value();
         $data = trim($result, '"');
         $data = str_replace("<<<rrdcached>>>\n", '', $data);
     }
