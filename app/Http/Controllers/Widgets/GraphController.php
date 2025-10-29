@@ -29,6 +29,7 @@ namespace App\Http\Controllers\Widgets;
 use App\Facades\LibrenmsConfig;
 use App\Models\Application;
 use App\Models\Bill;
+use App\Models\Customoid;
 use App\Models\Device;
 use App\Models\MuninPlugin;
 use App\Models\Port;
@@ -53,6 +54,7 @@ class GraphController extends WidgetController
         'graph_application' => null,
         'graph_munin' => null,
         'graph_service' => null,
+        'graph_customoid' => null,
         'graph_ports' => [],
         'graph_custom' => [],
         'graph_manual' => null,
@@ -94,6 +96,10 @@ class GraphController extends WidgetController
         } elseif ($type == 'service') {
             if ($service = Service::find($settings['graph_service'])) {
                 return $service->device->displayName() . ' / ' . $service->service_type . ' (' . $service->service_desc . ')' . ' / ' . $settings['graph_type'];
+            }
+        } elseif ($type == 'customoid') {
+            if ($customoid = Customoid::find($settings['graph_customoid'])) {
+                return $customoid->device->displayName() . ' / ' . $type . ' / ' . $customoid->customoid_descr;
             }
         }
 
@@ -146,6 +152,11 @@ class GraphController extends WidgetController
         }
         $data['service_text'] = isset($service) ? $service->device->displayName() . ' - ' . $service->service_type . ' (' . $service->service_desc . ')' : __('Service does not exist');
 
+        if ($primary == 'customoid' && $data['graph_customoid']) {
+            $customoid = Customoid::with('device')->find($data['graph_customoid']);
+        }
+        $data['customoid_text'] = isset($customoid) ? $customoid->device->displayName() . ' - ' . $customoid->customoid_descr : __('Custom OID does not exist');
+
         $data['graph_ports'] = Port::whereIntegerInRaw('port_id', $data['graph_ports'])
             ->select('ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr')
             ->with(['device' => function ($query): void {
@@ -188,6 +199,12 @@ class GraphController extends WidgetController
             if ($service = Service::find($settings['graph_service'])) {
                 $params[] = 'device=' . $service->device_id;
                 $params[] = 'id=' . $service->service_id;
+            }
+        } elseif ($type == 'customoid') {
+            if ($customoid = Customoid::find($settings['graph_customoid'])) {
+                $params[] = 'device=' . $customoid->device_id;
+                $params[] = 'id=' . $customoid->customoid_id;
+                $settings['graph_type'] = 'customoid_' . $customoid->customoid_descr;
             }
         } elseif ($type == 'aggregate') {
             $aggregate_type = $this->getGraphType(false);
@@ -277,6 +294,7 @@ class GraphController extends WidgetController
             $settings['graph_application'] = $this->convertLegacySettingId($settings['graph_application'], 'app_id');
             $settings['graph_munin'] = $this->convertLegacySettingId($settings['graph_munin'], 'mplug_id');
             $settings['graph_service'] = $this->convertLegacySettingId($settings['graph_service'], 'service_id');
+            $settings['graph_customoid'] = $this->convertLegacySettingId($settings['graph_customoid'], 'customoid_id');
             $settings['graph_bill'] = $this->convertLegacySettingId($settings['graph_bill'], 'bill_id');
 
             $settings['graph_custom'] = (array) $settings['graph_custom'];
