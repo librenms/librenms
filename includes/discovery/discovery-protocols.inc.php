@@ -397,6 +397,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                     if (isset($lldp['lldpRemSysName'])) {
                         $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
                     }
+
                     if (! $remote_device_id && LibrenmsConfig::get('discovery_by_ip', false)) {
                         $ptopo_array = snmpwalk_cache_multi_oid($device, 'ptopoConnEntry', [], 'PTOPO-MIB');
                         d_echo($ptopo_array);
@@ -446,12 +447,12 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                 }
 
                 $remote_port_id = find_port_id(
-                    $lldp['lldpRemPortDesc'],
+                    $lldp['lldpRemPortDesc'] ?? null,
                     $remote_port_name,
                     $remote_device_id,
                     $remote_port_mac
                 );
-                if ($remote_port_id == 0) { //We did not find it
+                if ($remote_port_id == 0 && (! empty($remote_port_mac) && $remote_port_mac != '000000000000')) { //We did not find it
                     $remote_port_name = $remote_port_name . ' (' . $remote_port_mac . ')';
                 }
                 if (empty($lldp['lldpRemSysName']) && isset($remote_device)) {
@@ -460,7 +461,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                 if (empty($lldp['lldpRemSysName']) && isset($lldp['lldpRemSysDesc'])) {
                     $lldp['lldpRemSysName'] = $lldp['lldpRemSysDesc'];
                 }
-                if (is_array($interface) && $interface['port_id'] && $lldp['lldpRemSysName'] && $remote_port_name) {
+                if (is_array($interface) && $interface['port_id'] && isset($lldp['lldpRemSysName'])) {
                     discover_link(
                         $interface['port_id'],
                         'lldp',

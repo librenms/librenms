@@ -20976,6 +20976,28 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "F8 B4 6A C0 CE F9 (f8b46ac0cef9)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "gigabitethernet1/0/5",
+                    "ifDescr": "gigabitethernet1/0/5",
+                    "ifName": "gi1/0/5"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "80 E8 2C 30 9C 83 (80e82c309c83)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "gigabitethernet1/0/7",
+                    "ifDescr": "gigabitethernet1/0/7",
+                    "ifName": "gi1/0/7"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
                     "remote_hostname": "GXP1625_00:0b:82:f6:1e:68",
                     "remote_port": "00 0B 82 F6 1E 68 (000b82f61e68)",
                     "remote_platform": null,

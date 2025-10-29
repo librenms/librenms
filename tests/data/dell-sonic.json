@@ -13601,6 +13601,193 @@
                 {
                     "active": 1,
                     "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "a0:29:19:d0:25:58 (a02919d02558)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Eth1/13",
+                    "ifDescr": "Eth1/13",
+                    "ifName": "Eth1/13"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "ac:1a:3d:4f:f5:c1 (ac1a3d4ff5c1)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Eth1/15",
+                    "ifDescr": "Eth1/15",
+                    "ifName": "Eth1/15"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "74:86:e2:0a:0c:04 (7486e20a0c04)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Eth1/19",
+                    "ifDescr": "Eth1/19",
+                    "ifName": "Eth1/19"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "cc:48:3a:90:5d:71 (cc483a905d71)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Eth1/2",
+                    "ifDescr": "Eth1/2",
+                    "ifName": "Eth1/2"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00:26:fd:a0:54:cf (0026fda054cf)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Eth1/20",
+                    "ifDescr": "Eth1/20",
+                    "ifName": "Eth1/20"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "cc:48:3a:91:74:90 (cc483a917490)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Eth1/21",
+                    "ifDescr": "Eth1/21",
+                    "ifName": "Eth1/21"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "00:26:fd:a0:54:b9 (0026fda054b9)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Eth1/22",
+                    "ifDescr": "Eth1/22",
+                    "ifName": "Eth1/22"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "cc:48:3a:90:0d:a6 (cc483a900da6)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Eth1/23",
+                    "ifDescr": "Eth1/23",
+                    "ifName": "Eth1/23"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "4c:d7:17:23:37:a7 (4cd7172337a7)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Eth1/30",
+                    "ifDescr": "Eth1/30",
+                    "ifName": "Eth1/30"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "ac:91:a1:7a:b5:f6 (ac91a17ab5f6)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Eth1/32",
+                    "ifDescr": "Eth1/32",
+                    "ifName": "Eth1/32"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "ac:1a:3d:aa:55:0e (ac1a3daa550e)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Eth1/33",
+                    "ifDescr": "Eth1/33",
+                    "ifName": "Eth1/33"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "4c:d7:17:c2:7c:88 (4cd717c27c88)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Eth1/35",
+                    "ifDescr": "Eth1/35",
+                    "ifName": "Eth1/35"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "34:48:ed:d1:2e:a7 (3448edd12ea7)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Eth1/36",
+                    "ifDescr": "Eth1/36",
+                    "ifName": "Eth1/36"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "ac:b4:80:09:71:b1 (acb4800971b1)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Eth1/39",
+                    "ifDescr": "Eth1/39",
+                    "ifName": "Eth1/39"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "a0:29:19:b4:aa:17 (a02919b4aa17)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Eth1/4",
+                    "ifDescr": "Eth1/4",
+                    "ifName": "Eth1/4"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "cc:96:e5:d0:fa:89 (cc96e5d0fa89)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Eth1/46",
+                    "ifDescr": "Eth1/46",
+                    "ifName": "Eth1/46"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "c4:5a:b1:e0:c0:f5 (c45ab1e0c0f5)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Eth1/47",
+                    "ifDescr": "Eth1/47",
+                    "ifName": "Eth1/47"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
                     "remote_hostname": "xxxxx-xxx-xxx-sw-acc02",
                     "remote_port": "Gi1/0/44 (28f10efb09d8)",
                     "remote_platform": null,
@@ -13619,6 +13806,39 @@
                     "ifAlias": "Eth1/53",
                     "ifDescr": "Eth1/53",
                     "ifName": "Eth1/53"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "a0:29:19:d0:20:b9 (a02919d020b9)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Eth1/7",
+                    "ifDescr": "Eth1/7",
+                    "ifName": "Eth1/7"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "ac:91:a1:7a:b4:1a (ac91a17ab41a)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Eth1/8",
+                    "ifDescr": "Eth1/8",
+                    "ifName": "Eth1/8"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "",
+                    "remote_port": "ac:91:a1:81:8f:d5 (ac91a1818fd5)",
+                    "remote_platform": null,
+                    "remote_version": "",
+                    "ifAlias": "Eth1/9",
+                    "ifDescr": "Eth1/9",
+                    "ifName": "Eth1/9"
                 },
                 {
                     "active": 1,
@@ -17508,5 +17728,110 @@
                 }
             ]
         }
+    },
+    "hr-device": {
+        "discovery": {
+            "hrDevice": [
+                {
+                    "hrDeviceIndex": 196608,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Atom(TM) CPU C3558R @ 2.40GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 14
+                },
+                {
+                    "hrDeviceIndex": 196609,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Atom(TM) CPU C3558R @ 2.40GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 14
+                },
+                {
+                    "hrDeviceIndex": 196610,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Atom(TM) CPU C3558R @ 2.40GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 12
+                },
+                {
+                    "hrDeviceIndex": 196611,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Atom(TM) CPU C3558R @ 2.40GHz",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 13
+                },
+                {
+                    "hrDeviceIndex": 786432,
+                    "hrDeviceDescr": "Guessing that there's a floating point co-processor",
+                    "hrDeviceType": "hrDeviceCoprocessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                }
+            ]
+        }
+    },
+    "ucd-diskio": {
+        "discovery": {
+            "disks": [
+                {
+                    "diskio_index": 10,
+                    "diskio_descr": "loop0"
+                },
+                {
+                    "diskio_index": 11,
+                    "diskio_descr": "loop1"
+                },
+                {
+                    "diskio_index": 12,
+                    "diskio_descr": "loop2"
+                },
+                {
+                    "diskio_index": 1,
+                    "diskio_descr": "mmcblk0"
+                },
+                {
+                    "diskio_index": 5,
+                    "diskio_descr": "mmcblk0boot0"
+                },
+                {
+                    "diskio_index": 4,
+                    "diskio_descr": "mmcblk0boot1"
+                },
+                {
+                    "diskio_index": 2,
+                    "diskio_descr": "mmcblk0p1"
+                },
+                {
+                    "diskio_index": 3,
+                    "diskio_descr": "mmcblk0p2"
+                },
+                {
+                    "diskio_index": 18,
+                    "diskio_descr": "ramdisk"
+                },
+                {
+                    "diskio_index": 6,
+                    "diskio_descr": "sda"
+                },
+                {
+                    "diskio_index": 7,
+                    "diskio_descr": "sda1"
+                },
+                {
+                    "diskio_index": 8,
+                    "diskio_descr": "sda2"
+                },
+                {
+                    "diskio_index": 9,
+                    "diskio_descr": "sda3"
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }
