@@ -107,6 +107,11 @@ class ServiceConfig(DBConfig):
     watchdog_logfile = "logs/librenms.log"
     health_file = ""  # disabled by default
 
+    metricsendpoint = False
+    metricsendpoint_port = 8080
+
+    memorylimit = None
+
     def populate(self):
         config = LibreNMS.get_config_data(self.BASE_DIR)
 
@@ -242,9 +247,11 @@ class ServiceConfig(DBConfig):
         self.redis_timeout = int(
             os.getenv(
                 "REDIS_TIMEOUT",
-                self.alerting.frequency
-                if self.alerting.frequency != 0
-                else self.redis_timeout,
+                (
+                    self.alerting.frequency
+                    if self.alerting.frequency != 0
+                    else self.redis_timeout
+                ),
             )
         )
 
@@ -279,6 +286,17 @@ class ServiceConfig(DBConfig):
         self.logdir = config.get("log_dir", ServiceConfig.BASE_DIR + "/logs")
         self.watchdog_logfile = config.get("log_file", self.logdir + "/librenms.log")
         self.health_file = config.get("service_health_file", ServiceConfig.health_file)
+
+        self.metricsendpoint = config.get(
+            "distributed_poller_metricsendpoint", ServiceConfig.metricsendpoint
+        )
+        self.metricsendpoint_port = config.get(
+            "distributed_poller_metricsendpoint_port",
+            ServiceConfig.metricsendpoint_port,
+        )
+        self.memorylimit = config.get(
+            "distributed_poller_memorylimit", ServiceConfig.memorylimit
+        )
 
         # set convenient debug variable
         self.debug = logging.getLogger().isEnabledFor(logging.DEBUG)
@@ -393,6 +411,7 @@ class Service:
         self.config.populate()
         self._db = LibreNMS.DB(self.config)
         self.config.load_poller_config(self._db)
+        self.prom_metrics = None
 
         threading.current_thread().name = self.config.name  # rename main thread
         self.attach_signals()
@@ -474,23 +493,131 @@ class Service:
             raise RuntimeWarning("Not allowed to start Poller twice")
         self._started = True
 
+        if self.config.metricsendpoint:
+            logger.debug("Prometheus metrics init")
+            try:
+                from prometheus_client import Gauge, Counter, MetricsHandler
+            except ImportError:
+                logger.info(
+                    "Prometheus client is not available. Metrics will be disabled."
+                )
+                prom_metrics = None
+            else:
+
+                class ServiceMetricsHandler(MetricsHandler):
+                    def do_GET(self):
+                        if self.path in ["/health", "/healthz"]:
+                            # potentially in the future we could do some checks based on watchdog flags
+                            # ie. lnms health:check
+                            self.send_response(200)
+                            self.send_header("Content-type", "text/plain")
+                            self.end_headers()
+                            self.wfile.write(b"OK")
+                        else:
+                            # default /metrics handling
+                            super().do_GET()
+
+                from http.server import HTTPServer
+
+                try:
+                    httpd = HTTPServer(
+                        ("", self.config.metricsendpoint_port), ServiceMetricsHandler
+                    )
+                    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+                except OSError as e:
+                    logger.error(
+                        "Metrics endpoint bind failed on port %d: %s. Disabling metrics.",
+                        self.config.metricsendpoint_port,
+                        e,
+                    )
+                    self.config.metricsendpoint = False
+                    self.prom_metrics = None
+                else:
+                    logger.info(
+                        "Prometheus metrics available on http://localhost:{}/metrics".format(
+                            self.config.metricsendpoint_port
+                        )
+                    )
+
+                    # Initialize the dictionary to hold our metrics
+                    prom_metrics = {}
+
+                    # Create Gauge metrics with a label for poller_type
+                    prom_metrics["dispatcher_depth"] = Gauge(
+                        "librenms_dispatcher_depth",
+                        "Dispatcher depth metric for various pollers",
+                        ["poller_type"],
+                    )
+                    prom_metrics["dispatcher_devices"] = Gauge(
+                        "librenms_dispatcher_devices",
+                        "Dispatcher devices count for various pollers",
+                        ["poller_type"],
+                    )
+                    prom_metrics["dispatcher_workers"] = Gauge(
+                        "librenms_dispatcher_workers",
+                        "Number of workers for various pollers",
+                        ["poller_type"],
+                    )
+                    prom_metrics["dispatcher_worker_seconds"] = Gauge(
+                        "librenms_dispatcher_worker_seconds",
+                        "Worker seconds for various pollers",
+                        ["poller_type"],
+                    )
+                    prom_metrics["dispatcher_frequency"] = Gauge(
+                        "librenms_dispatcher_frequency",
+                        "Dispatcher frequency for various pollers",
+                        ["poller_type"],
+                    )
+                    prom_metrics["node_master"] = Gauge(
+                        "librenms_node_master",
+                        "Indicates if the node is the current leader (1 for master, 0 for non-master)",
+                    )
+
+                    if self.config.memorylimit:
+                        prom_metrics["memory_paused"] = Gauge(
+                            "librenms_memory_paused",
+                            "Whether this dispatcher thread is currently paused due to memory pressure",
+                            ["poller_type"],
+                        )
+                        prom_metrics["memory_pause_events"] = Counter(
+                            "librenms_memory_pause_events_total",
+                            "Total number of times dispatchers paused intake due to memory pressure",
+                            ["poller_type"],
+                        )
+                        prom_metrics["memory_pause_seconds"] = Counter(
+                            "librenms_memory_pause_seconds_total",
+                            "Cumulative seconds dispatchers have spent paused due to memory pressure",
+                            ["poller_type"],
+                        )
+
+                    self.prom_metrics = prom_metrics
+                    logger.info("Prometheus metrics initialized.")
+        else:
+            logger.info("Prometheus metrics not enabled in config.")
+
         logger.debug("Starting up queue managers...")
 
         # initialize and start the worker pools
-        self.poller_manager = LibreNMS.PollerQueueManager(self.config, self._lm)
+        self.poller_manager = LibreNMS.PollerQueueManager(
+            self.config, self._lm, self.prom_metrics
+        )
         self.queue_managers["poller"] = self.poller_manager
-        self.discovery_manager = LibreNMS.DiscoveryQueueManager(self.config, self._lm)
+        self.discovery_manager = LibreNMS.DiscoveryQueueManager(
+            self.config, self._lm, self.prom_metrics
+        )
         self.queue_managers["discovery"] = self.discovery_manager
         self.queue_managers["alerting"] = LibreNMS.AlertQueueManager(
-            self.config, self._lm
+            self.config, self._lm, self.prom_metrics
         )
         self.queue_managers["services"] = LibreNMS.ServicesQueueManager(
-            self.config, self._lm
+            self.config, self._lm, self.prom_metrics
         )
         self.queue_managers["billing"] = LibreNMS.BillingQueueManager(
-            self.config, self._lm
+            self.config, self._lm, self.prom_metrics
         )
-        self.queue_managers["ping"] = LibreNMS.PingQueueManager(self.config, self._lm)
+        self.queue_managers["ping"] = LibreNMS.PingQueueManager(
+            self.config, self._lm, self.prom_metrics
+        )
 
         if self.config.update_enabled:
             self.daily_timer.start()
@@ -509,15 +636,21 @@ class Service:
         )
         logger.info(
             "Queue Workers: Discovery={} Poller={} Services={} Alerting={} Billing={} Ping={}".format(
-                self.config.discovery.workers
-                if self.config.discovery.enabled
-                else "disabled",
-                self.config.poller.workers
-                if self.config.poller.enabled
-                else "disabled",
-                self.config.services.workers
-                if self.config.services.enabled
-                else "disabled",
+                (
+                    self.config.discovery.workers
+                    if self.config.discovery.enabled
+                    else "disabled"
+                ),
+                (
+                    self.config.poller.workers
+                    if self.config.poller.enabled
+                    else "disabled"
+                ),
+                (
+                    self.config.services.workers
+                    if self.config.services.enabled
+                    else "disabled"
+                ),
                 "enabled" if self.config.alerting.enabled else "disabled",
                 "enabled" if self.config.billing.enabled else "disabled",
                 "enabled" if self.config.ping.enabled else "disabled",
@@ -776,8 +909,9 @@ class Service:
         :param signalnum: UNIX signal number
         :param flag: Flags accompanying signal
         """
-        logger.info(
-            "Received signal on thread %s, handling", threading.current_thread().name
+        logger.warning(
+            "Received signal SIGUP on thread %s, handling",
+            threading.current_thread().name,
         )
         self.reload_flag = True
 
@@ -787,8 +921,9 @@ class Service:
         :param signalnum: UNIX signal number
         :param flag: Flags accompanying signal
         """
-        logger.info(
-            "Received signal on thread %s, handling", threading.current_thread().name
+        logger.warning(
+            "Received signal SIGTERM on thread %s, handling",
+            threading.current_thread().name,
         )
         self.terminate_flag = True
 
@@ -875,6 +1010,9 @@ class Service:
     def log_performance_stats(self):
         logger.info("Counting up time spent polling")
 
+        if self.prom_metrics is not None:
+            self.prom_metrics["node_master"].set(1 if self.is_master else 0)
+
         try:
             # Report on the poller instance as a whole
             self._db.query(
@@ -898,6 +1036,29 @@ class Service:
 
             for worker_type, manager in self.queue_managers.items():
                 worker_seconds, devices = manager.performance.reset()
+                depth = sum(
+                    [manager.get_queue(group).qsize() for group in self.config.group]
+                )
+                workers = getattr(self.config, worker_type).workers
+                frequency = getattr(self.config, worker_type).frequency
+
+                # Update metrics
+                if self.prom_metrics is not None:
+                    self.prom_metrics["dispatcher_depth"].labels(
+                        poller_type=worker_type
+                    ).set(depth)
+                    self.prom_metrics["dispatcher_devices"].labels(
+                        poller_type=worker_type
+                    ).set(devices)
+                    self.prom_metrics["dispatcher_workers"].labels(
+                        poller_type=worker_type
+                    ).set(workers)
+                    self.prom_metrics["dispatcher_worker_seconds"].labels(
+                        poller_type=worker_type
+                    ).set(worker_seconds)
+                    self.prom_metrics["dispatcher_frequency"].labels(
+                        poller_type=worker_type
+                    ).set(frequency)
 
                 # Record the queue state
                 self._db.query(
@@ -905,16 +1066,11 @@ class Service:
                     'values(@parent_poller_id, "{0}", {1}, {2}, {3}, {4}, {5}) '
                     "ON DUPLICATE KEY UPDATE depth={1}, devices={2}, worker_seconds={3}, workers={4}, frequency={5}; ".format(
                         worker_type,
-                        sum(
-                            [
-                                manager.get_queue(group).qsize()
-                                for group in self.config.group
-                            ]
-                        ),
+                        depth,
                         devices,
                         worker_seconds,
-                        getattr(self.config, worker_type).workers,
-                        getattr(self.config, worker_type).frequency,
+                        workers,
+                        frequency,
                     )
                 )
         except (pymysql.err.Error, ConnectionResetError, RedisConnectionError):

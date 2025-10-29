@@ -1,6 +1,8 @@
 import logging
 import threading
 import traceback
+import os
+import time
 from queue import Empty
 from subprocess import CalledProcessError
 
@@ -12,8 +14,34 @@ logger = logging.getLogger(__name__)
 
 
 class QueueManager:
+    _CG2 = "/sys/fs/cgroup"
+
+    @staticmethod
+    def _read_int(path):
+        """Private helper: read an int (or max) from a cgroup file."""
+        try:
+            v = open(path).read().strip()
+            return None if v == "max" else int(v)
+        except Exception:
+            return None
+
+    @staticmethod
+    def _get_memory_frac():
+        """Private helper: return current/limit as a float, or None if unreadable."""
+        cur = QueueManager._read_int(os.path.join(QueueManager._CG2, "memory.current"))
+        lim = QueueManager._read_int(os.path.join(QueueManager._CG2, "memory.max"))
+        if cur is None or lim in (None, 0):
+            return None
+        return cur / lim
+
     def __init__(
-        self, config, lock_manager, type_desc, uses_groups=False, auto_start=True
+        self,
+        config,
+        lock_manager,
+        type_desc,
+        uses_groups=False,
+        auto_start=True,
+        prom_metrics=None,
     ):
         """
         This class manages a queue of jobs and can be used to submit jobs to the queue with post_work()
@@ -28,6 +56,7 @@ class QueueManager:
         :param type_desc: description for this queue manager type
         :param work_function: function that will be called to perform the task
         :param auto_start: automatically start worker threads
+        :param prom_metrics: a store of prom_metrics when enabled
         """
         self.type = type_desc
         self.uses_groups = uses_groups
@@ -38,6 +67,7 @@ class QueueManager:
         self._queues = {}
         self._queue_create_lock = threading.Lock()
         self._lm = lock_manager
+        self._prom_metrics = prom_metrics
 
         self._stop_event = threading.Event()
 
@@ -50,12 +80,80 @@ class QueueManager:
             )
         )
 
+        if self.config.memorylimit is not None:
+            try:
+                pct = int(self.config.memorylimit)
+                if not (0 < pct < 100):
+                    raise ValueError
+            except (TypeError, ValueError):
+                raise ValueError(
+                    "distributed_poller_memorylimit must be an integer 1-99"
+                )
+            self._mem_limit_frac = pct / 100.0
+        else:
+            self._mem_limit_frac = None
+        self._mem_paused = False
+        self._last_pause_log = 0.0
+
         if auto_start:
             self.start()
 
     def _service_worker(self, queue_id):
         logger.debug("Worker started {}".format(threading.current_thread().getName()))
         while not self._stop_event.is_set():
+
+            # Memory usage check
+            if self._mem_limit_frac is not None:
+                frac = self._get_memory_frac()
+                if frac is None:
+                    logger.warning(
+                        "distributed_poller_memorylimit is set but unable to retrieve current usage"
+                    )
+                else:
+                    logger.debug(
+                        "Container mem usage: %.1f%% of limit (thresh: %.0f%%)",
+                        frac * 100,
+                        self._mem_limit_frac * 100,
+                    )
+
+                    now = time.time()
+                    if frac >= self._mem_limit_frac:
+                        # only log the first time we enter pause or each 60 seconds
+                        if not self._mem_paused or (now - self._last_pause_log) > 60:
+                            self._mem_paused = True
+                            self._last_pause_log = now
+                            logger.warning(
+                                "Memory usage %.1f%% ≥ %.0f%%; pausing intake",
+                                frac * 100,
+                                self._mem_limit_frac * 100,
+                            )
+                            if self._prom_metrics:
+                                self._prom_metrics["memory_pause_events"].labels(
+                                    poller_type=self.type.title()
+                                ).inc()
+
+                        if self._prom_metrics:
+                            self._prom_metrics["memory_pause_seconds"].labels(
+                                poller_type=self.type.title()
+                            ).inc(5)
+                            self._prom_metrics["memory_paused"].labels(
+                                poller_type=self.type.title()
+                            ).set(1)
+                        time.sleep(5)
+                        continue
+                    else:
+                        # once we dip below threshold, clear the flag
+                        if self._mem_paused:
+                            logger.warning(
+                                "Memory usage back to %.1f%%; resuming intake",
+                                frac * 100,
+                            )
+                            self._mem_paused = False
+                            if self._prom_metrics:
+                                self._prom_metrics["memory_paused"].labels(
+                                    poller_type=self.type.title()
+                                ).set(0)
+
             logger.debug(
                 "Worker {} checking queue {} ({}) for work".format(
                     threading.current_thread().getName(),
@@ -282,7 +380,13 @@ class QueueManager:
 
 class TimedQueueManager(QueueManager):
     def __init__(
-        self, config, lock_manager, type_desc, uses_groups=False, auto_start=True
+        self,
+        config,
+        lock_manager,
+        type_desc,
+        uses_groups=False,
+        auto_start=True,
+        prom_metrics=None,
     ):
         """
         A queue manager that periodically dispatches work to the queue
@@ -291,9 +395,10 @@ class TimedQueueManager(QueueManager):
         :param type_desc: description for this queue manager type
         :param uses_groups: If this queue respects assigned groups or there is only one group
         :param auto_start: automatically start worker threads
+        :param prom_metrics: a store of metrics
         """
         QueueManager.__init__(
-            self, config, lock_manager, type_desc, uses_groups, auto_start
+            self, config, lock_manager, type_desc, uses_groups, auto_start, prom_metrics
         )
         self.timer = LibreNMS.RecurringTimer(
             self.get_poller_config().frequency, self.do_dispatch
@@ -323,15 +428,22 @@ class TimedQueueManager(QueueManager):
 
 
 class BillingQueueManager(TimedQueueManager):
-    def __init__(self, config, lock_manager):
+    def __init__(self, config, lock_manager, prom_metrics=None):
         """
         A TimedQueueManager with two timers dispatching poll billing and calculate billing to the same work queue
 
         :param config: LibreNMS.ServiceConfig reference to the service config object
         :param lock_manager: the single instance of lock manager
+        :param prom_metrics: a store of metrics
         """
         TimedQueueManager.__init__(
-            self, config, lock_manager, "billing", False, config.billing.enabled
+            self,
+            config,
+            lock_manager,
+            "billing",
+            False,
+            config.billing.enabled,
+            prom_metrics,
         )
         self.calculate_timer = LibreNMS.RecurringTimer(
             self.get_poller_config().calculate,
@@ -382,15 +494,16 @@ class BillingQueueManager(TimedQueueManager):
 
 
 class PingQueueManager(TimedQueueManager):
-    def __init__(self, config, lock_manager):
+    def __init__(self, config, lock_manager, prom_metrics=None):
         """
         A TimedQueueManager to manage dispatch and workers for Ping
 
         :param config: LibreNMS.ServiceConfig reference to the service config object
         :param lock_manager: the single instance of lock manager
+        :param prom_metrics: a store of metrics
         """
         TimedQueueManager.__init__(
-            self, config, lock_manager, "ping", True, config.ping.enabled
+            self, config, lock_manager, "ping", True, config.ping.enabled, prom_metrics
         )
         self._db = LibreNMS.DB(self.config)
 
@@ -434,15 +547,22 @@ class PingQueueManager(TimedQueueManager):
 
 
 class ServicesQueueManager(TimedQueueManager):
-    def __init__(self, config, lock_manager):
+    def __init__(self, config, lock_manager, prom_metrics=None):
         """
         A TimedQueueManager to manage dispatch and workers for Services
 
         :param config: LibreNMS.ServiceConfig reference to the service config object
         :param lock_manager: the single instance of lock manager
+        :param prom_metrics: a store of metrics
         """
         TimedQueueManager.__init__(
-            self, config, lock_manager, "services", True, config.services.enabled
+            self,
+            config,
+            lock_manager,
+            "services",
+            True,
+            config.services.enabled,
+            prom_metrics,
         )
         self._db = LibreNMS.DB(self.config)
 
@@ -493,15 +613,22 @@ class ServicesQueueManager(TimedQueueManager):
 
 
 class AlertQueueManager(TimedQueueManager):
-    def __init__(self, config, lock_manager):
+    def __init__(self, config, lock_manager, prom_metrics=None):
         """
         A TimedQueueManager to manage dispatch and workers for Alerts
 
         :param config: LibreNMS.ServiceConfig reference to the service config object
         :param lock_manager: the single instance of lock manager
+        :param prom_metrics: a store of metrics
         """
         TimedQueueManager.__init__(
-            self, config, lock_manager, "alerting", False, config.alerting.enabled
+            self,
+            config,
+            lock_manager,
+            "alerting",
+            False,
+            config.alerting.enabled,
+            prom_metrics,
         )
         self._db = LibreNMS.DB(self.config)
 
@@ -528,15 +655,22 @@ class AlertQueueManager(TimedQueueManager):
 
 
 class PollerQueueManager(QueueManager):
-    def __init__(self, config, lock_manager):
+    def __init__(self, config, lock_manager, prom_metrics=None):
         """
-        A TimedQueueManager to manage dispatch and workers for Alerts
+        A QueueManager to manage dispatch and workers for Polling
 
         :param config: LibreNMS.ServiceConfig reference to the service config object
         :param lock_manager: the single instance of lock manager
+        :param prom_metrics: a store of metrics
         """
         QueueManager.__init__(
-            self, config, lock_manager, "poller", True, config.poller.enabled
+            self,
+            config,
+            lock_manager,
+            "poller",
+            True,
+            config.poller.enabled,
+            prom_metrics,
         )
 
     def do_work(self, device_id, group):
@@ -584,15 +718,22 @@ class PollerQueueManager(QueueManager):
 
 
 class DiscoveryQueueManager(TimedQueueManager):
-    def __init__(self, config, lock_manager):
+    def __init__(self, config, lock_manager, prom_metrics=None):
         """
-        A TimedQueueManager to manage dispatch and workers for Alerts
+        A TimedQueueManager to manage dispatch and workers for Discovery
 
         :param config: LibreNMS.ServiceConfig reference to the service config object
         :param lock_manager: the single instance of lock manager
+        :param prom_metrics: a store of metrics
         """
         TimedQueueManager.__init__(
-            self, config, lock_manager, "discovery", True, config.discovery.enabled
+            self,
+            config,
+            lock_manager,
+            "discovery",
+            True,
+            config.discovery.enabled,
+            prom_metrics,
         )
         self._db = LibreNMS.DB(self.config)
 
