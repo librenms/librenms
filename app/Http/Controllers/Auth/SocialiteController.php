@@ -176,7 +176,14 @@ class SocialiteController extends Controller
                 }
                 $attributes = $parsed_attributes;
             }
-
+            
+            // MICROSOFT-SPECIFIC-PATCH: Check for 'roles' attribute (when groups emitted as roles)
+            if ($provider === 'microsoft' && isset($attributes['roles']) && is_array($attributes['roles'])) {
+                foreach ($attributes['roles'] as $group_id) {
+                    $roles = array_merge($roles, $claims[$group_id]['roles'] ?? []);
+                }
+            }
+            
             foreach ($scopes as $scope) {
                 foreach ($attributes as $attribute_name => $attribute_values) {
                     if (str_contains($attribute_name, $scope)) {
