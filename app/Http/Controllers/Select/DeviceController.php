@@ -56,7 +56,7 @@ class DeviceController extends SelectController
         if ($request->get('access') == 'inverted' && $user_id && $request->user()->isAdmin()) {
             return Device::query()
                 ->select(['device_id', 'hostname', 'sysName', 'display', 'icon'])
-                ->whereNotIn('device_id', function ($query) use ($user_id) {
+                ->whereNotIn('device_id', function ($query) use ($user_id): void {
                     $query->select('device_id')
                         ->from('devices_perms')
                         ->where('user_id', $user_id);

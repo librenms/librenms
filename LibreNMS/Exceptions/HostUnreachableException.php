@@ -32,7 +32,7 @@ class HostUnreachableException extends \Exception
 
     public function __toString()
     {
-        $string = __CLASS__ . ": [{$this->code}]: {$this->message}\n";
+        $string = self::class . ": [{$this->code}]: {$this->message}\n";
         foreach ($this->reasons as $reason) {
             $string .= "  $reason\n";
         }

@@ -34,12 +34,8 @@ final class CiHelperTest extends TestCase
     public function testSetFlags(): void
     {
         $helper = new CiHelper();
-        $allFalse = array_map(function ($flag) {
-            return false;
-        }, $this->getDefaultFlags());
-        $allTrue = array_map(function ($flag) {
-            return true;
-        }, $this->getDefaultFlags());
+        $allFalse = array_map(fn ($flag) => false, $this->getDefaultFlags());
+        $allTrue = array_map(fn ($flag) => true, $this->getDefaultFlags());
 
         $helper->setFlags($allFalse);
         $this->assertEquals($allFalse, $helper->getFlags());

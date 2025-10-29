@@ -102,7 +102,7 @@ if (is_null($cntpPeersVarEntry)) {
         // Guilty until proven innocent
         $found = false;
 
-        foreach ($tblComponents as $k => $v) {
+        foreach ($tblComponents as $v) {
             if ($array['UID'] == $v['UID']) {
                 // Yay, we found it...
                 $found = true;

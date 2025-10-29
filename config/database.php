@@ -125,7 +125,6 @@ return [
         'client' => env('REDIS_CLIENT', 'predis'),
 
         'options' => [
-            'cluster' => env('REDIS_CLUSTER', 'redis'),
             'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_database_'),
         ],
 
@@ -147,6 +146,30 @@ return [
             'password' => env('REDIS_PASSWORD'),
             'port' => env('REDIS_PORT', '6379'),
             'database' => env('REDIS_CACHE_DB', '1'),
+        ],
+
+        'sentinel_session' => [
+            ...explode(',', env('REDIS_SENTINEL_HOSTS', '')),
+            'options' => [
+                'replication' => 'sentinel',
+                'service' => env('REDIS_SENTINEL_SERVICE', 'mymaster'),
+                'parameters' => [
+                    'password' => env('REDIS_PASSWORD', ''),
+                    'database' => env('REDIS_SESSION_DB', '0'),
+                ],
+            ],
+        ],
+
+        'sentinel_cache' => [
+            ...explode(',', env('REDIS_SENTINEL_HOSTS', '')),
+            'options' => [
+                'replication' => 'sentinel',
+                'service' => env('REDIS_SENTINEL_SERVICE', 'mymaster'),
+                'parameters' => [
+                    'password' => env('REDIS_PASSWORD', ''),
+                    'database' => env('REDIS_CACHE_DB', '1'),
+                ],
+            ],
         ],
 
     ],

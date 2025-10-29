@@ -196,7 +196,7 @@ if (! empty($f5CertEntry) || ! empty($ltmBwcEntry) || ! empty($ltmVirtualServEnt
             $result = [];
 
             // Find all Virtual server names and UID's, then we can find everything else we need.
-            if (strpos($oid, '1.3.6.1.4.1.3375.2.2.10.1.2.1.1.') !== false) {
+            if (str_contains($oid, '1.3.6.1.4.1.3375.2.2.10.1.2.1.1.')) {
                 [$null, $index] = explode('1.3.6.1.4.1.3375.2.2.10.1.2.1.1.', $oid);
                 $result['type'] = 'f5-ltm-vs';
                 $result['UID'] = (string) $index;
@@ -250,7 +250,7 @@ if (! empty($f5CertEntry) || ! empty($ltmBwcEntry) || ! empty($ltmVirtualServEnt
             $result = [];
 
             // Find all Bandwidth Controller  names and UID's, then we can find everything else we need.
-            if (strpos($oid, '1.3.6.1.4.1.3375.2.2.13.1.3.1.1.') !== false) {
+            if (str_contains($oid, '1.3.6.1.4.1.3375.2.2.13.1.3.1.1.')) {
                 [$null, $index] = explode('1.3.6.1.4.1.3375.2.2.13.1.3.1.1.', $oid);
                 $result['type'] = 'f5-ltm-bwc';
                 $result['UID'] = (string) $index;
@@ -273,7 +273,7 @@ if (! empty($f5CertEntry) || ! empty($ltmBwcEntry) || ! empty($ltmVirtualServEnt
             $result = [];
 
             // Find all Pool names and UID's, then we can find everything else we need.
-            if (strpos($oid, '1.3.6.1.4.1.3375.2.2.5.1.2.1.1.') !== false) {
+            if (str_contains($oid, '1.3.6.1.4.1.3375.2.2.5.1.2.1.1.')) {
                 [$null, $index] = explode('1.3.6.1.4.1.3375.2.2.5.1.2.1.1.', $oid);
                 $result['type'] = 'f5-ltm-pool';
                 $result['UID'] = (string) $index;
@@ -320,7 +320,7 @@ if (! empty($f5CertEntry) || ! empty($ltmBwcEntry) || ! empty($ltmVirtualServEnt
             $result = [];
 
             // Find all Pool member names and UID's, then we can find everything else we need.
-            if (strpos($oid, '1.3.6.1.4.1.3375.2.2.5.3.2.1.1.') !== false) {
+            if (str_contains($oid, '1.3.6.1.4.1.3375.2.2.5.3.2.1.1.')) {
                 [$null, $index] = explode('1.3.6.1.4.1.3375.2.2.5.3.2.1.1.', $oid);
                 $result['type'] = 'f5-ltm-poolmember';
                 $result['UID'] = (string) $index;
@@ -406,7 +406,7 @@ if (! empty($f5CertEntry) || ! empty($ltmBwcEntry) || ! empty($ltmVirtualServEnt
         // Guilty until proven innocent
         $found = false;
 
-        foreach ($tblBigIP as $k => $v) {
+        foreach ($tblBigIP as $v) {
             if (($array['UID'] == $v['UID']) && ($array['type'] == $v['type'])) {
                 // Yay, we found it...
                 $found = true;

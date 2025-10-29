@@ -38,7 +38,6 @@ class Fortios extends Fortinet implements OSPolling
     {
         parent::discoverOS($device); // yaml
 
-        $device->hardware = $device->hardware ?: $this->getHardwareName();
         $device->features = snmp_get($this->getDeviceArray(), 'fmDeviceEntMode.1', '-OQv', 'FORTINET-FORTIMANAGER-FORTIANALYZER-MIB') == 'fmg-faz' ? 'with Analyzer features' : null;
     }
 

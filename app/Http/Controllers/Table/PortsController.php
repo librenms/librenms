@@ -64,18 +64,8 @@ class PortsController extends TableController
             'port_descr_type',
             'ports.disabled' => 'disabled',
             'ports.ignore' => 'ignore',
-            'group' => function ($query, $group) {
-                return $query->whereHas('groups', function ($query) use ($group) {
-                    return $query->where('id', $group);
-                });
-            },
-            'devicegroup' => function ($query, $devicegroup) {
-                return $query->whereHas('device', function ($query) use ($devicegroup) {
-                    return $query->whereHas('groups', function ($query) use ($devicegroup) {
-                        return $query->where('id', $devicegroup);
-                    });
-                });
-            },
+            'group' => fn ($query, $group) => $query->whereHas('groups', fn ($query) => $query->where('id', $group)),
+            'devicegroup' => fn ($query, $devicegroup) => $query->whereHas('device', fn ($query) => $query->whereHas('groups', fn ($query) => $query->where('id', $devicegroup))),
         ];
     }
 
@@ -108,25 +98,19 @@ class PortsController extends TableController
             ->with(['device', 'device.location'])
             ->leftJoin('devices', 'ports.device_id', 'devices.device_id')
             ->where('deleted', $request->get('deleted', 0)) // always filter deleted
-            ->when($request->get('hostname'), function (Builder $query, $hostname) {
-                $query->where(function (Builder $query) use ($hostname) {
+            ->when($request->get('hostname'), function (Builder $query, $hostname): void {
+                $query->where(function (Builder $query) use ($hostname): void {
                     $query->where('devices.hostname', 'like', "%$hostname%")
                         ->orWhere('devices.sysName', 'like', "%$hostname%");
                 });
             })
-            ->when($request->get('ifAlias'), function (Builder $query, $ifAlias) {
-                return $query->where('ifAlias', 'like', "%$ifAlias%");
-            })
-            ->when($request->get('errors'), function (Builder $query) {
-                return $query->hasErrors();
-            })
-            ->when($request->get('state'), function (Builder $query, $state) {
-                return match ($state) {
-                    'down' => $query->isDown(),
-                    'up' => $query->isUp(),
-                    'admindown' => $query->isShutdown(),
-                    default => $query,
-                };
+            ->when($request->get('ifAlias'), fn (Builder $query, $ifAlias) => $query->where('ifAlias', 'like', "%$ifAlias%"))
+            ->when($request->get('errors'), fn (Builder $query) => $query->hasErrors())
+            ->when($request->get('state'), fn (Builder $query, $state) => match ($state) {
+                'down' => $query->isDown(),
+                'up' => $query->isUp(),
+                'admindown' => $query->isShutdown(),
+                default => $query,
             });
 
         $select = [

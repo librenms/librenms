@@ -45,7 +45,7 @@ class CliColorFormatter extends \Monolog\Formatter\LineFormatter
         );
 
         $this->console_color = new \Console_Color2();
-        $this->console = $this->console ?? \App::runningInConsole();
+        $this->console ??= \App::runningInConsole();
     }
 
     public function format(\Monolog\LogRecord $record): string

@@ -44,8 +44,8 @@ class BingApi extends BaseApi implements Geocoder
     protected function parseLatLng(array $data): array
     {
         return [
-            'lat' => isset($data['resourceSets'][0]['resources'][0]['point']['coordinates'][0]) ? $data['resourceSets'][0]['resources'][0]['point']['coordinates'][0] : 0,
-            'lng' => isset($data['resourceSets'][0]['resources'][0]['point']['coordinates'][1]) ? $data['resourceSets'][0]['resources'][0]['point']['coordinates'][1] : 0,
+            'lat' => $data['resourceSets'][0]['resources'][0]['point']['coordinates'][0] ?? 0,
+            'lng' => $data['resourceSets'][0]['resources'][0]['point']['coordinates'][1] ?? 0,
         ];
     }
 

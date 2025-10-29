@@ -157,9 +157,7 @@ class Datastore implements WriteInterface, DataStorageInterface
      */
     private function rrdTagFilter(array &$tags): array
     {
-        [$metaTags, $filteredTags] = Arr::partition($tags, function ($value, string $tag) {
-            return str_starts_with($tag, 'rrd_');
-        });
+        [$metaTags, $filteredTags] = Arr::partition($tags, fn ($value, string $tag) => str_starts_with($tag, 'rrd_'));
 
         $tags = $filteredTags; // Update the original array with remaining tags
 
@@ -183,8 +181,6 @@ class Datastore implements WriteInterface, DataStorageInterface
      */
     public function getStats(): Collection
     {
-        return collect($this->stores)->mapWithKeys(function (DatastoreContract $store) {
-            return [$store->getName() => $store->getStats()];
-        });
+        return collect($this->stores)->mapWithKeys(fn (DatastoreContract $store) => [$store->getName() => $store->getStats()]);
     }
 }

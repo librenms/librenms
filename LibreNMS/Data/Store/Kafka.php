@@ -223,9 +223,7 @@ class Kafka extends BaseDatastore
             $stat = Measurement::start('write');
 
             // remove tags with empty values
-            $tags = array_filter($tags, function ($value) {
-                return $value !== '' && $value !== null;
-            });
+            $tags = array_filter($tags, fn ($value) => $value !== '' && $value !== null);
 
             if (empty($fields)) {
                 Log::warning('KAFKA: All fields empty, skipping update', [

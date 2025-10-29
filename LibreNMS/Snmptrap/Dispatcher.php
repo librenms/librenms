@@ -65,7 +65,8 @@ class Dispatcher
         $detailed = LibrenmsConfig::get('snmptraps.eventlog_detailed', false);
         if ($logging == 'all' || ($fallback && $logging == 'unhandled')) {
             $trap->log($trap->toString($detailed));
-        } else {
+        }
+        if ($logging != 'none' || ! $fallback) {
             $rules = new AlertRules;
             $rules->runRules($trap->getDevice()->device_id);
         }

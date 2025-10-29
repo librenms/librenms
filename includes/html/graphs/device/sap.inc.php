@@ -14,7 +14,7 @@ foreach ($stats as $stat => $descr) {
     $rrd_list[$i]['filename'] = $rrd_filename;
     $rrd_list[$i]['descr'] = $descr;
     $rrd_list[$i]['ds'] = $stat;
-    if (strpos($stat, 'Out') !== false || strpos($stat, 'Retrans') !== false || strpos($stat, 'Attempt') !== false) {
+    if (str_contains($stat, 'Out') || str_contains($stat, 'Retrans') || str_contains($stat, 'Attempt')) {
         $rrd_list[$i]['invert'] = true;
     }
 }

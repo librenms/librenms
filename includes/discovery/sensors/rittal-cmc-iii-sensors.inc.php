@@ -198,34 +198,34 @@ foreach ($cmc_iii_sensors as $sensor_id => $sensor_data) {
 
     if (isset($sensor_data['divisor'])) {
         if (isset($sensor_data['low_limit'])) {
-            $sensor_data['low_limit'] = ($sensor_data['low_limit'] / $sensor_data['divisor']);
+            $sensor_data['low_limit'] /= $sensor_data['divisor'];
         }
         if (isset($sensor_data['low_warn_limit'])) {
-            $sensor_data['low_warn_limit'] = ($sensor_data['low_warn_limit'] / $sensor_data['divisor']);
+            $sensor_data['low_warn_limit'] /= $sensor_data['divisor'];
         }
         if (isset($sensor_data['warn_limit'])) {
-            $sensor_data['warn_limit'] = ($sensor_data['warn_limit'] / $sensor_data['divisor']);
+            $sensor_data['warn_limit'] /= $sensor_data['divisor'];
         }
         if (isset($sensor_data['high_limit'])) {
-            $sensor_data['high_limit'] = ($sensor_data['high_limit'] / $sensor_data['divisor']);
+            $sensor_data['high_limit'] /= $sensor_data['divisor'];
         }
 
-        $sensor_data['value'] = ($sensor_data['value'] / $sensor_data['divisor']);
+        $sensor_data['value'] /= $sensor_data['divisor'];
     } elseif (isset($sensor_data['multiplier'])) {
         if (isset($sensor_data['low_limit'])) {
-            $sensor_data['low_limit'] = ($sensor_data['low_limit'] * $sensor_data['multiplier']);
+            $sensor_data['low_limit'] *= $sensor_data['multiplier'];
         }
         if (isset($sensor_data['low_warn_limit'])) {
-            $sensor_data['low_warn_limit'] = ($sensor_data['low_warn_limit'] * $sensor_data['multiplier']);
+            $sensor_data['low_warn_limit'] *= $sensor_data['multiplier'];
         }
         if (isset($sensor_data['warn_limit'])) {
-            $sensor_data['warn_limit'] = ($sensor_data['warn_limit'] * $sensor_data['multiplier']);
+            $sensor_data['warn_limit'] *= $sensor_data['multiplier'];
         }
         if (isset($sensor_data['high_limit'])) {
-            $sensor_data['high_limit'] = ($sensor_data['high_limit'] * $sensor_data['multiplier']);
+            $sensor_data['high_limit'] *= $sensor_data['multiplier'];
         }
 
-        $sensor_data['value'] = ($sensor_data['value'] * $sensor_data['multiplier']);
+        $sensor_data['value'] *= $sensor_data['multiplier'];
     }
     discover_sensor(null, $sensor_data['type'], $device, $sensor_data['oid'], $sensor_id, $sensor_data['name'], $sensor_data['desc'], $sensor_data['divisor'] ?? 1, $sensor_data['multiplier'] ?? 1, $sensor_data['low_limit'] ?? null, $sensor_data['low_warn_limit'] ?? null, $sensor_data['warn_limit'] ?? null, $sensor_data['high_limit'] ?? null, $sensor_data['value']);
 }

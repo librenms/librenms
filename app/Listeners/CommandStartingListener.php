@@ -26,6 +26,7 @@
 
 namespace App\Listeners;
 
+use App\Exceptions\RunningAsIncorrectUserException;
 use Illuminate\Console\Events\CommandStarting;
 
 class CommandStartingListener
@@ -34,6 +35,9 @@ class CommandStartingListener
         'list:bash-completion',
     ];
 
+    /**
+     * @throws RunningAsIncorrectUserException
+     */
     public function handle(CommandStarting $event): void
     {
         // Check that we don't run this as the wrong user and break the install
@@ -41,6 +45,20 @@ class CommandStartingListener
             return;
         }
 
-        \App\Checks::runningUser();
+        if (! function_exists('posix_getpwuid') || ! function_exists('posix_geteuid')) {
+            return;
+        }
+
+        $current_user = posix_getpwuid(posix_geteuid())['name'];
+        $executable = basename($_SERVER['argv'][0] ?? $_SERVER['SCRIPT_FILENAME'] ?? 'this');
+
+        if ($current_user == 'root') {
+            throw new RunningAsIncorrectUserException("Error: $executable must not run as root.");
+        }
+
+        $librenms_user = config('librenms.user');
+        if ($librenms_user !== $current_user) {
+            throw new RunningAsIncorrectUserException("Error: $executable must be run as the user $librenms_user.");
+        }
     }
 }

@@ -127,9 +127,7 @@ final class YamlSchemaTest extends TestCase
         }
 
         $errors = collect($validator->getErrors())
-            ->reduce(function ($out, $error) {
-                return sprintf("%s[%s] %s\n", $out, $error['property'], $error['message']);
-            }, '');
+            ->reduce(fn ($out, $error) => sprintf("%s[%s] %s\n", $out, $error['property'], $error['message']), '');
 
         $this->assertTrue($validator->isValid(), "$filename does not validate. Violations:\n$errors");
     }

@@ -278,7 +278,7 @@ class MenuComposer
 
         // User menu
         $vars['notification_count'] = Notification::isSticky()
-            ->orWhere(function ($query) use ($user) {
+            ->orWhere(function ($query) use ($user): void {
                 $query->isUnread($user);
             })->count();
 

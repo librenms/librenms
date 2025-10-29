@@ -8,7 +8,7 @@
                     "sysDescr": "",
                     "sysContact": "<private>",
                     "version": "v5.6.6,build1630,180913 (GA)",
-                    "hardware": "FGT_500D",
+                    "hardware": "FortiGate 500D",
                     "features": null,
                     "location": "<private>",
                     "os": "fortigate",
@@ -7234,6 +7234,37 @@
                     "context_name": "",
                     "ipv4_network": "220.241.122.0/29",
                     "ifIndex": 13
+                }
+            ]
+        }
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 11,
+                    "low_ifIndex": 25,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 12,
+                    "low_ifIndex": 25,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 14,
+                    "low_ifIndex": 26,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 15,
+                    "low_ifIndex": 28,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 16,
+                    "low_ifIndex": 28,
+                    "ifStackStatus": "active"
                 }
             ]
         }

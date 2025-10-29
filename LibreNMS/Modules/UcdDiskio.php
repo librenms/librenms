@@ -84,7 +84,7 @@ class UcdDiskio implements Module
         $oids = SnmpQuery::hideMib()->walk('UCD-DISKIO-MIB::diskIOTable')->table(1);
         $ucddisk = new Collection;
 
-        foreach ($oids as $key => $diskData) {
+        foreach ($oids as $diskData) {
             if (is_array($diskData)) { // invalid snmp response
                 if ($this->valid_disk($os, $diskData['diskIODevice']) &&
                     ($diskData['diskIONRead'] > '0' || $diskData['diskIONWritten'] > '0')) {

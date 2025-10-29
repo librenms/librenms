@@ -99,9 +99,7 @@ abstract class IP
         $hex = implode(
             ':',
             array_map(
-                function ($dec) {
-                    return sprintf('%02x', $dec);
-                },
+                fn ($dec) => sprintf('%02x', $dec),
                 explode(' ', (string) $snmpOid)
             )
         );
@@ -270,11 +268,15 @@ abstract class IP
      * Extract an address from a cidr, assume a host is given if it does not contain /
      *
      * @param  string  $ip
-     * @return array [$ip, $cidr]
+     * @return array{0: string, 1: int} [$ip, $cidr]
      */
-    protected function extractCidr($ip)
+    protected function extractCidr($ip): array
     {
-        return array_pad(explode('/', $ip, 2), 2, $this->host_bits);
+        $parts = explode('/', $ip, 2);
+        $addr = $parts[0];
+        $cidr = $parts[1] ?? $this->host_bits;
+
+        return [$addr, (int) $cidr];
     }
 
     /**
