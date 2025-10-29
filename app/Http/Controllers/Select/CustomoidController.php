@@ -15,7 +15,7 @@ class CustomoidController extends SelectController
     protected function baseQuery($request)
     {
         return Customoid::hasAccess($request->user())
-            ->with(['device' => function ($query) : void {
+            ->with(['device' => function ($query): void {
                 $query->select('device_id', 'hostname', 'sysName', 'display');
             }])
             ->select('customoid_id', 'customoid_descr', 'device_id');
