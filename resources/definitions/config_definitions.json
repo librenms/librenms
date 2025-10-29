@@ -5772,8 +5772,9 @@
             "type": "integer"
         },
         "radius.users_purge": {
-            "default": null,
-            "type": "boolean"
+            "default": 0,
+            "units": "days",
+            "type": "integer"
         },
         "radius.secret": {
             "default": null,
