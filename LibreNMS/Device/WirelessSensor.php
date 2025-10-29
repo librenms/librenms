@@ -46,7 +46,7 @@ class WirelessSensor
      * @param  int  $multiplier  a number to multiply the value(s) by
      * @param  int  $divisor  a number to divide the value(s) by
      * @param  string  $aggregator  an operation to combine multiple numbers. Supported: sum, avg
-     * @param  int  $access_point_ip  The id of the AP in the access_points sensor this belongs to (generally used for controllers)
+     * @param  int  $access_point_id  The id of the AP in the access_points sensor this belongs to (generally used for controllers)
      * @param  int|float  $high_limit  Alerting: Maximum value
      * @param  int|float  $low_limit  Alerting: Minimum value
      * @param  int|float  $high_warn  Alerting: High warning value
@@ -65,7 +65,7 @@ class WirelessSensor
         protected $multiplier = 1,
         protected $divisor = 1,
         protected $aggregator = 'sum',
-        protected $access_point_ip = null,
+        protected $access_point_id = null,
         protected $high_limit = null,
         protected $low_limit = null,
         protected $high_warn = null,
@@ -95,7 +95,7 @@ class WirelessSensor
             'entPhysicalIndex' => $this->entPhysicalIndex,
             'entPhysicalMeasured' => $this->entPhysicalMeasured,
             'sensor_oids' => $this->oids,
-            'access_point_ip' => $this->access_point_ip,
+            'access_point_id' => $this->access_point_id,
             'rrd_type' => $this->rrd_type,
         ]);
     }
