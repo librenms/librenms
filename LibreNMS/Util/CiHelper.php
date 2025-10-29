@@ -35,6 +35,7 @@ class CiHelper
     private ?array $os = null;
     private array $unitEnv = [];
     private array $duskEnv = ['APP_ENV' => 'testing'];
+    private ?array $excludedPhpunitGroups = null;
     private ?Snmpsim $snmpsim = null;
 
     private array $completedChecks = [
@@ -126,6 +127,11 @@ class CiHelper
         }
     }
 
+    public function setExcludedPhpunitGroups(array $groups): void
+    {
+        $this->excludedPhpunitGroups = $groups;
+    }
+
     public function run(): int
     {
         $return = 0;
@@ -187,21 +193,36 @@ class CiHelper
             $phpunit_cmd[] = '--debug';
         }
 
+        if ($this->excludedPhpunitGroups) {
+            foreach ($this->excludedPhpunitGroups as $group) {
+                array_push($phpunit_cmd, '--exclude-group', $group);
+            }
+        }
+
         // exclusive tests
         if ($this->flags['unit_os']) {
             echo 'Only checking os: ' . implode(', ', $this->os) . PHP_EOL;
-            $filter = implode('.*|', $this->os);
+            $filter = implode('|', $this->os);
             // include tests that don't have data providers and only data sets that match
             array_push($phpunit_cmd, '--group', 'os');
             if ($this->flags['os-modules-only']) {
-                array_push($phpunit_cmd, '--filter', "/::testOS with data set \"$filter.*\"$/");
+                array_push($phpunit_cmd, '--filter', "/::testOS with data set \"($filter)/");
             } else {
-                array_push($phpunit_cmd, '--filter', "/::test[A-Za-z]+$|::testOSDetection|::test[A-Za-z]+ with data set \"$filter.*\"$/");
+                if ($this->flags['ci']) {
+                    // If in CI mode, we're checking all OSes spread over multiple jobs, so we don't need a full "testOSDetection"
+                    array_push($phpunit_cmd, '--filter', "/with data set \"($filter)/");
+                } else {
+                    // If NOT in CI mode, explicity run testOSDetection for ALL OSes.
+                    array_push($phpunit_cmd, '--filter', "/::test\w+$|::testOSDetection|with data set \"($filter)/");
+                    // We also enable SVG and YAML tests
+                    array_push($phpunit_cmd, '--group', 'svg');
+                    array_push($phpunit_cmd, '--group', 'yaml');
+                }
             }
         } elseif ($this->flags['unit_docs']) {
             array_push($phpunit_cmd, '--group', 'docs');
         } elseif ($this->flags['unit_svg']) {
-            $phpunit_cmd[] = 'tests/SVGTest.php';
+            array_push($phpunit_cmd, '--group', 'svg');
         } elseif ($this->flags['unit_modules'] || $this->flags['os-modules-only']) {
             $phpunit_cmd[] = 'tests/OSModulesTest.php';
         }
@@ -425,10 +446,13 @@ class CiHelper
 
     public function detectChangedFiles(): void
     {
+        if ($this->flags['full'] || $this->flags['ci']) {
+            return;
+        }
         $changed_files = trim(getenv('FILES')) ?:
             exec("git diff --diff-filter=d --name-only master | tr '\n' ' '|sed 's/,*$//g'");
 
-        $this->flags['full'] = $this->flags['full'] || empty($changed_files); // don't disable full if already set
+        $this->flags['full'] = empty($changed_files); // don't disable full if already set
         $files = $changed_files ? explode(' ', $changed_files) : [];
 
         $this->changed = (new FileCategorizer($files))->categorize();

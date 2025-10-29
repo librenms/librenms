@@ -35,7 +35,7 @@ final class CiHelperTest extends TestCase
     {
         $helper = new CiHelper();
         $allFalse = array_map(fn ($flag) => false, $this->getDefaultFlags());
-        $allTrue = array_map(fn ($flag) => false, $this->getDefaultFlags());
+        $allTrue = array_map(fn ($flag) => true, $this->getDefaultFlags());
 
         $helper->setFlags($allFalse);
         $this->assertEquals($allFalse, $helper->getFlags());
