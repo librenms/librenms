@@ -288,16 +288,11 @@ class IRCBot
                 $this->log('Alert channels ' . print_r($this->config['irc_alert_chan'], true));
             }
 
-            switch ($alert['state']) {
-                case AlertState::WORSE:
-                    $severity_extended = '+';
-                    break;
-                case AlertState::BETTER:
-                    $severity_extended = '-';
-                    break;
-                default:
-                    $severity_extended = '';
-            }
+            $severity_extended = match ($alert['state']) {
+                AlertState::WORSE => '+',
+                AlertState::BETTER => '-',
+                default => '',
+            };
             $severity = '';
             if (isset($alert['severity'])) {
                 $severity = str_replace(['warning', 'critical', 'normal'], [$this->_color('Warning', 'yellow'), $this->_color('Critical', 'red'), $this->_color('Info', 'lightblue')], $alert['severity']) . $severity_extended . ' ';

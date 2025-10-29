@@ -142,7 +142,7 @@ class SSOAuthorizer extends MysqlAuthorizer
 
                 // No match, proxy is untrusted
                 return false;
-            } catch (InvalidIpException $e) {
+            } catch (InvalidIpException) {
                 // Webserver is talking nonsense (or, IPv10 has been deployed, or maybe something weird like a domain socket is in use?)
                 return false;
             }

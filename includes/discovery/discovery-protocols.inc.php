@@ -502,7 +502,7 @@ if (LibrenmsConfig::get('autodiscovery.ospf') === true) {
 
             $name = gethostbyaddr($ip);
             $remote_device_id = discover_new_device($name, $device, 'OSPF');
-        } catch (\LibreNMS\Exceptions\InvalidIpException $e) {
+        } catch (\LibreNMS\Exceptions\InvalidIpException) {
             //
         }
     }
@@ -531,7 +531,7 @@ if (LibrenmsConfig::get('autodiscovery.ospfv3') === true) {
 
             $name = gethostbyaddr($ip);
             $remote_device_id = discover_new_device($name, $device, 'OSPFv3');
-        } catch (\LibreNMS\Exceptions\InvalidIpException $e) {
+        } catch (\LibreNMS\Exceptions\InvalidIpException) {
             //
         }
     }

@@ -72,7 +72,7 @@ class CheckMysqlEngine implements Validation, ValidationFixer
             foreach ($tables as $table) {
                 DB::statement("ALTER TABLE $db.$table ENGINE=InnoDB;");
             }
-        } catch (QueryException $e) {
+        } catch (QueryException) {
             return false;
         }
 

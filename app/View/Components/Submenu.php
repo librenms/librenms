@@ -7,52 +7,37 @@ use Illuminate\View\Component;
 class Submenu extends Component
 {
     /**
-     * The submenu title.
-     *
-     * @var string
-     */
-    public $title;
-
-    /**
-     * The submenu menu.
-     *
-     * @var string
-     */
-    public $menu;
-
-    /**
-     * The submenu device_id.
-     *
-     * @var string
-     */
-    public $device_id;
-
-    /**
-     * The submenu current_tab.
-     *
-     * @var string
-     */
-    public $current_tab;
-
-    /**
-     * The submenu selected.
-     *
-     * @var string
-     */
-    public $selected;
-
-    /**
      * Create a new component instance.
      *
+     * @param  string  $title
+     * @param  string  $menu
+     * @param  string  $device_id
+     * @param  string  $current_tab
+     * @param  string  $selected
      * @return void
      */
-    public function __construct($title, $menu, $deviceId, $currentTab, $selected)
-    {
-        $this->title = $title;
-        $this->menu = $menu;
-        $this->device_id = $deviceId;
-        $this->current_tab = $currentTab;
-        $this->selected = $selected;
+    public function __construct(
+        /**
+         * The submenu title.
+         */
+        public $title,
+        /**
+         * The submenu menu.
+         */
+        public $menu,
+        /**
+         * The submenu device_id.
+         */
+        public $device_id,
+        /**
+         * The submenu current_tab.
+         */
+        public $current_tab,
+        /**
+         * The submenu selected.
+         */
+        public $selected
+    ) {
     }
 
     /**

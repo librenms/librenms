@@ -210,7 +210,7 @@ class PluginManager implements PluginManagerInterface
                     'version' => 2,
                 ]);
                 $this->getPlugins()->put($name, $plugin);
-            } catch (QueryException $e) {
+            } catch (QueryException) {
                 // DB not migrated/connected
             }
         }
@@ -223,7 +223,7 @@ class PluginManager implements PluginManagerInterface
         if ($this->plugins === null) {
             try {
                 $this->plugins = Plugin::versionTwo()->get()->keyBy('plugin_name');
-            } catch (QueryException $e) {
+            } catch (QueryException) {
                 // DB not migrated/connected
                 $this->plugins = new Collection;
             }

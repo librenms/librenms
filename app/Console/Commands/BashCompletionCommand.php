@@ -51,7 +51,7 @@ class BashCompletionCommand extends Command
                 $input = new StringInput(implode(' ', array_slice($words, 2)));
                 try {
                     $input->bind($command_def);
-                } catch (\RuntimeException $e) {
+                } catch (\RuntimeException) {
                     // ignore?
                 }
 

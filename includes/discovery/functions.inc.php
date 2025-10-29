@@ -109,7 +109,7 @@ function discover_new_device($hostname, $device, $method, $interface = null)
         }
 
         Eventlog::log("$method discovery of " . $remote_device->hostname . " ($ip) failed - Check ping and SNMP access", $device['device_id'], 'discovery', Severity::Error);
-    } catch (HostExistsException $e) {
+    } catch (HostExistsException) {
         // already have this device
     } catch (Exception $e) {
         Eventlog::log("$method discovery of " . $hostname . " ($ip) failed - " . $e->getMessage(), $device['device_id'], 'discovery', Severity::Error);
@@ -484,7 +484,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                 if (empty($data['num_oid'])) {
                     try {
                         $data['num_oid'] = YamlDiscovery::computeNumericalOID($os, $data);
-                    } catch (\Exception $e) {
+                    } catch (\Exception) {
                         Log::debug('Error: We cannot find a numerical OID for ' . $data['value'] . '. Skipping this one...');
                         $skippedFromYaml = true;
                         // Because we don't have a num_oid, we have no way to add this sensor.
@@ -864,7 +864,7 @@ function find_device_id($name = '', $ip = '', $mac_address = '')
         try {
             $params[] = IP::fromHexString($ip)->packed();
             $where[] = '`ip`=?';
-        } catch (InvalidIpException $e) {
+        } catch (InvalidIpException) {
             //
         }
     }

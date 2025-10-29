@@ -925,7 +925,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 }
 
                 return IP::parse($data[$ngField])->uncompressed();
-            } catch (InvalidIpException $e) {
+            } catch (InvalidIpException) {
                 return null;
             }
         }

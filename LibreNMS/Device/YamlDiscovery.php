@@ -52,7 +52,7 @@ class YamlDiscovery
 
         // convert to class name for static call below
         if (is_object($class)) {
-            $class = get_class($class);
+            $class = $class::class;
         }
 
         d_echo('YAML Discovery Data: ');
@@ -92,7 +92,7 @@ class YamlDiscovery
                     if (! isset($data['num_oid'])) {
                         try {
                             $data['num_oid'] = static::computeNumericalOID($os, $data);
-                        } catch (\Exception $e) {
+                        } catch (\Exception) {
                             d_echo('Error: We cannot find a numerical OID for ' . $data['value'] . '. Skipping this one...');
                             continue;
                         }

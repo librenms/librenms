@@ -34,13 +34,8 @@ use Throwable;
 
 class UnserializableRouteCache extends \Exception implements UpgradeableException
 {
-    protected $cli_php_version;
-    protected $web_php_version;
-
-    public function __construct($message = '', $code = 0, ?Throwable $previous = null, $cli_php_version = null, $web_php_version = null)
+    public function __construct($message = '', $code = 0, ?Throwable $previous = null, protected $cli_php_version = null, protected $web_php_version = null)
     {
-        $this->cli_php_version = $cli_php_version;
-        $this->web_php_version = $web_php_version;
         parent::__construct($message, $code, $previous);
     }
 

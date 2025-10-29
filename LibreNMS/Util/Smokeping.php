@@ -32,12 +32,10 @@ use Illuminate\Support\Str;
 
 class Smokeping
 {
-    private $device;
     private $files;
 
-    public function __construct(Device $device)
+    public function __construct(private Device $device)
     {
-        $this->device = $device;
     }
 
     public static function make(Device $device)

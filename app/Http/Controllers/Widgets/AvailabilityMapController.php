@@ -172,32 +172,23 @@ class AvailabilityMapController extends WidgetController
 
     private function sort(array &$data): void
     {
-        switch ($this->getSettings()['order_by']) {
-            case 'status':
-                usort($data, fn ($l, $r) => ($l['status'] <=> $r['status']) ?: strcasecmp($l['label'], $r['label']));
-                break;
-            case 'label':
-                usort($data, fn ($l, $r) => strcasecmp($l['label'], $r['label']));
-                break;
-            default: // device display name (tooltip starts with the display name)
-                usort($data, fn ($l, $r) => strcasecmp($l['tooltip'], $r['tooltip']) ?: strcasecmp($l['label'], $r['label']));
-        }
+        match ($this->getSettings()['order_by']) {
+            'status' => usort($data, fn ($l, $r) => ($l['status'] <=> $r['status']) ?: strcasecmp($l['label'], $r['label'])),
+            'label' => usort($data, fn ($l, $r) => strcasecmp($l['label'], $r['label'])),
+            // device display name (tooltip starts with the display name)
+            default => usort($data, fn ($l, $r) => strcasecmp($l['tooltip'], $r['tooltip']) ?: strcasecmp($l['label'], $r['label'])),
+        };
     }
 
     private function getDeviceLabel(Device $device, string $state_name): string
     {
-        switch ($this->getSettings()['color_only_select']) {
-            case 1:
-                return '';
-            case 4:
-                return $device->shortDisplayName();
-            case 2:
-                return strtolower($device->hostname);
-            case 3:
-                return strtolower($device->sysName);
-            default:
-                return __($state_name);
-        }
+        return match ($this->getSettings()['color_only_select']) {
+            1 => '',
+            4 => $device->shortDisplayName(),
+            2 => strtolower($device->hostname),
+            3 => strtolower($device->sysName),
+            default => __($state_name),
+        };
     }
 
     private function getServiceLabel(Service $service): string
