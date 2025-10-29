@@ -11,8 +11,8 @@ class Submenu extends Component
      *
      * @param  string  $title
      * @param  string  $menu
-     * @param  string  $deviceId
-     * @param  string  $currentTab
+     * @param  string  $device_id
+     * @param  string  $current_tab
      * @param  string  $selected
      * @return void
      */

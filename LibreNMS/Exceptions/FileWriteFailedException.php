@@ -31,7 +31,7 @@ use Throwable;
 class FileWriteFailedException extends \Exception
 {
     /**
-     * @param  string  $file
+     * @param  string  $file_path
      */
     public function __construct(protected $file_path, $code = 0, ?Throwable $previous = null)
     {

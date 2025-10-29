@@ -10,7 +10,7 @@ class Panel extends Component
      * Create a new component instance.
      *
      * @param  string  $title
-     * @param  string  $bodyClass
+     * @param  string  $body_class
      * @return void
      */
     public function __construct(

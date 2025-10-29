@@ -49,7 +49,7 @@ abstract class IP implements \Stringable
 
         try {
             return self::parse($hex);
-        } catch (InvalidIpException $e) {
+        } catch (InvalidIpException) {
             // ignore
         }
 
@@ -120,7 +120,7 @@ abstract class IP implements \Stringable
     {
         try {
             return new IPv4($ip);
-        } catch (InvalidIpException $e) {
+        } catch (InvalidIpException) {
             // ignore ipv4 failure and try ipv6
         }
 

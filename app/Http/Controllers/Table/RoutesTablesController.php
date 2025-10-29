@@ -182,7 +182,7 @@ class RoutesTablesController extends TableController
         try {
             $obj_inetCidrRouteDest = IP::parse($route_entry->inetCidrRouteDest);
             $item['inetCidrRouteDest'] = $obj_inetCidrRouteDest->compressed();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $item['inetCidrRouteDest'] = $route_entry->inetCidrRouteDest;
         }
 
