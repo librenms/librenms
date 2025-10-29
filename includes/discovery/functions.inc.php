@@ -710,7 +710,7 @@ function build_cbgp_peers($device, $peer, $af_data, $peer2)
             }
         }
         $bgp_ip = preg_replace('/:/', ' ', (string) $bgp_ip);
-        $bgp_ip = preg_replace('/(\S+\s+\S+)\s/', '$1:', $bgp_ip);
+        $bgp_ip = preg_replace('/(\S+\s+\S+)\s/', '$1:', (string) $bgp_ip);
         $bgp_ip = str_replace('"', '', str_replace(' ', '', $bgp_ip));
 
         if ($afi && $safi && $bgp_ip == $peer['ip']) {

@@ -41,8 +41,8 @@ class Ciscospark extends Transport
             $mtype = 'text';
         }
 
-        if (strlen($msg) > Ciscospark::$MAX_MSG_SIZE) {
-            $msg = substr($msg, 0, Ciscospark::$MAX_MSG_SIZE) . '...';
+        if (strlen((string) $msg) > Ciscospark::$MAX_MSG_SIZE) {
+            $msg = substr((string) $msg, 0, Ciscospark::$MAX_MSG_SIZE) . '...';
         }
 
         $data[$mtype] = $msg;

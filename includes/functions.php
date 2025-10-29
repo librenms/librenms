@@ -153,7 +153,7 @@ function match_network($nets, $ip, $first = false)
     foreach ($nets as $net) {
         $rev = (preg_match("/^\!/", (string) $net)) ? true : false;
         $net = preg_replace("/^\!/", '', (string) $net);
-        $ip_arr = explode('/', $net);
+        $ip_arr = explode('/', (string) $net);
         $net_long = ip2long($ip_arr[0]);
         $x = ip2long($ip_arr[1]);
         $mask = long2ip($x) == $ip_arr[1] ? $x : 0xFFFFFFFF << (32 - $ip_arr[1]);

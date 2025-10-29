@@ -229,7 +229,7 @@ GRAPHQL;
 
             // only add the changelog if it isn't set to ignore
             if (! in_array('ignore changelog', $pr['labels'])) {
-                $title = addcslashes(ucfirst(trim(preg_replace('/^[\S]+: /', '', (string) $pr['title']))), '<>');
+                $title = addcslashes(ucfirst(trim((string) preg_replace('/^[\S]+: /', '', (string) $pr['title']))), '<>');
                 $this->changelog[$category][] = "$title ([#{$pr['number']}]({$pr['url']})) - [{$pr['author']['login']}]({$pr['author']['url']})" . PHP_EOL;
             }
 

@@ -104,7 +104,7 @@ function convert_template($line)
         '$value',
     ];
 
-    return preg_replace($find, $replace, $old1);
+    return preg_replace($find, $replace, (string) $old1);
 }
 
 exit(json_encode([

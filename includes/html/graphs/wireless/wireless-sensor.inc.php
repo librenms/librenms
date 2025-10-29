@@ -32,7 +32,7 @@ if ($unit_long == $sensor['sensor_descr']) {
     $unit_long = '';
 }
 
-$col_w = 7 + strlen($unit);
+$col_w = 7 + strlen((string) $unit);
 $sensor_descr_fixed = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($sensor['sensor_descr'], 28);
 
 $rrd_options .= " COMMENT:'" . str_pad((string) $unit_long, 35) . str_pad('Cur', $col_w) . str_pad('Min', $col_w) . "Max\\n'";

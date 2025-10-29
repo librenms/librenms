@@ -41,7 +41,7 @@ if (is_array($temp)) {
         create_state_index($state_name, $states);
 
         foreach ($temp as $index => $entry) {
-            $descr = ucwords(trim(preg_replace('/\s*\([^\s)]*\)/', '', (string) $temp[$index]['CISCO-FIREWALL-MIB::cfwHardwareInformation'])));
+            $descr = ucwords(trim((string) preg_replace('/\s*\([^\s)]*\)/', '', (string) $temp[$index]['CISCO-FIREWALL-MIB::cfwHardwareInformation'])));
 
             if ($index == 'netInterface') {
                 $oid_index = 4;

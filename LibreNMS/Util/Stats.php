@@ -177,7 +177,7 @@ class Stats
             $entry->sysDescr = preg_replace_callback(
                 '/((s\/?n|serial num(ber)?)[:=]? ?)([a-z0-9.\-]{4,16})/i',
                 fn ($matches) => $matches[1] . preg_replace($sn_patterns, $sn_replacements, $matches[4]),
-                $entry->sysDescr
+                (string) $entry->sysDescr
             );
 
             return $entry;
