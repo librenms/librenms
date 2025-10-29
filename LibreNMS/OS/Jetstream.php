@@ -219,7 +219,7 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Vlan
         Log::info('JETSTREAM-LLDP MIB:');
         $oids = SnmpQuery::hideMib()->walk('TPLINK-LLDPINFO-MIB::lldpNeighborInfoEntry')->table(2);
         foreach ($oids as $ifIndex => $tmp) {
-            foreach ($tmp as $tmpkey => $data) { // more than one neighbor on same port??
+            foreach ($tmp as $data) { // more than one neighbor on same port??
                 $port = PortCache::getByIfIndex($ifIndex, $this->getDeviceId());
                 $local_port_id = $port?->port_id;
                 $remote_hostname = $data['lldpNeighborDeviceName'] ?? '';

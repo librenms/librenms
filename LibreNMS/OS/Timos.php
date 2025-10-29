@@ -952,10 +952,10 @@ class Timos extends OS implements
         $links = new Collection;
 
         $lldp_array = SnmpQuery::hideMib()->walk('TIMETRA-LLDP-MIB::tmnxLldpRemoteSystemsData')->table(4);
-        foreach ($lldp_array as $timeMark => $sub_lldp_1) {
+        foreach ($lldp_array as $sub_lldp_1) {
             foreach ($sub_lldp_1 as $ifIndex => $sub_lldp_2) {
-                foreach ($sub_lldp_2 as $macIndex => $sub_lldp_3) {
-                    foreach ($sub_lldp_3 as $remIndex => $data) {
+                foreach ($sub_lldp_2 as $sub_lldp_3) {
+                    foreach ($sub_lldp_3 as $data) {
                         $port = PortCache::getByIfIndex($ifIndex, $this->getDeviceId());
                         $port_id = $port?->port_id;
                         $remote_device_id = find_device_id($data['tmnxLldpRemSysName']);

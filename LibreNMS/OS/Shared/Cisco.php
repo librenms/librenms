@@ -1109,7 +1109,7 @@ class Cisco extends OS implements
         foreach ($cdp_array as $key => $cdp_if_array) {
             $interface = get_port_by_ifIndex($this->getDeviceId(), $key);
 
-            foreach ($cdp_if_array as $entry_key => $data) {
+            foreach ($cdp_if_array as $data) {
                 $data['cdpCacheDeviceId'] = StringHelpers::linksRemSysName($data['cdpCacheDeviceId'] ?? '');
                 if (empty($data['cdpCacheDeviceId'])) {
                     continue;

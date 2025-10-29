@@ -42,8 +42,8 @@ class Bdcom extends OS implements LinkDiscovery
 
         Log::info('NMS-LLDP-MIB:');
         $lldp_array = SnmpQuery::hideMib()->walk('NMS-LLDP-MIB::lldpRemoteSystemsData')->table(2);
-        foreach ($lldp_array as $key => $lldp_array_inner) {
-            foreach ($lldp_array_inner as $ifIndex => $lldp) {
+        foreach ($lldp_array as $lldp_array_inner) {
+            foreach ($lldp_array_inner as $lldp) {
                 $interface = PortCache::getByIfIndex($lldp['lldpRemLocalPortNum'] ?? null, $this->getDeviceId());
                 $remote_device_id = find_device_id($lldp['lldpRemSysName'] ?? null);
                 if ($interface['port_id'] && $lldp['lldpRemSysName'] && $lldp['lldpRemPortId']) {

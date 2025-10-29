@@ -64,7 +64,7 @@ class Links implements Module
             $links = $links->merge($this->discoverLldp($os->getDevice()));
         }
 
-        $links->each(function (Link $link) use ($os) {
+        $links->each(function (Link $link) use ($os): void {
             $link->remote_hostname = substr((string) $link->remote_hostname, 0, 127);
             $link->remote_port = substr((string) $link->remote_port, 0, 127);
             $link->remote_version = substr((string) $link->remote_version, 0, 255);
@@ -159,9 +159,7 @@ class Links implements Module
                     if ($matches[5] == 4) {
                         $addr = $matches[6];
                     } else {
-                        $ipv6 = implode(':', array_map(function ($v) {
-                            return sprintf('%02x', $v);
-                        },
+                        $ipv6 = implode(':', array_map(fn($v) => sprintf('%02x', $v),
                             explode('.', $matches[6])
                         ));
                         $addr = preg_replace('/([^:]{2}):([^:]{2})/i', '$1$2', $ipv6);
@@ -201,7 +199,7 @@ class Links implements Module
             foreach ($tmp1 as $lldpRemLocalPortNum => $tmp2) {
                 foreach ($tmp2 as $lldpRemIndex => $data) {
                     foreach ($lldpKeys as $keyName) {
-                        $data[$keyName] = $data[$keyName] ?? '';
+                        $data[$keyName] ??= '';
                     }
 
                     // fill the $data structure, in case we need to do debugging
