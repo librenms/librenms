@@ -40,7 +40,7 @@ function levsortos($base, $obj, $keys)
     foreach ($obj as $elem) {
         $lev = false;
         foreach ($keys as $key) {
-            $levnew = levenshtein(strtolower($base), strtolower($elem[$key]), 1, 10, 10);
+            $levnew = levenshtein(strtolower($base), strtolower((string) $elem[$key]), 1, 10, 10);
             if ($lev === false || $levnew < $lev) {
                 $lev = $levnew;
             }
@@ -59,7 +59,7 @@ function levsortos($base, $obj, $keys)
 
 header('Content-type: application/json');
 if (isset($_GET['term'])) {
-    $_GET['term'] = strip_tags($_GET['term']);
+    $_GET['term'] = strip_tags((string) $_GET['term']);
     $sortos = levsortos($_GET['term'], \App\Facades\LibrenmsConfig::get('os'), ['text', 'os']);
     $sortos = array_slice($sortos, 0, 20);
     foreach ($sortos as $lev => $os) {

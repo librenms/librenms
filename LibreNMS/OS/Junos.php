@@ -284,7 +284,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
 
         // $chassisName is known
         $name = preg_replace("/jnx($chassisName)?([^.]+).*/", '$2', $type);
-        $words = preg_split('/(^[^A-Z]+|[A-Z][^A-Z0-9]+)/', $name, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
+        $words = preg_split('/(^[^A-Z]+|[A-Z][^A-Z0-9]+)/', (string) $name, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE);
 
         return implode(' ', $words);
     }

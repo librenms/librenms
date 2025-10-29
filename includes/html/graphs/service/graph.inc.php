@@ -36,7 +36,7 @@ if (isset($vars['id'])) {
 $rrd_filename = Rrd::name($device['hostname'], ['services', $services[$vars['service']]['service_id']]);
 
 // if we have a script for this check, use it.
-$check_script = \App\Facades\LibrenmsConfig::get('install_dir') . '/includes/services/check_' . strtolower($services[$vars['service']]['service_type']) . '.inc.php';
+$check_script = \App\Facades\LibrenmsConfig::get('install_dir') . '/includes/services/check_' . strtolower((string) $services[$vars['service']]['service_type']) . '.inc.php';
 if (is_file($check_script)) {
     include $check_script;
 
@@ -52,7 +52,7 @@ $rrd_options .= " COMMENT:'                      Now     Avg      Max\\n'";
 $rrd_additions = '';
 
 // Remove encoded characters
-$services[$vars['service']]['service_ds'] = htmlspecialchars_decode($services[$vars['service']]['service_ds']);
+$services[$vars['service']]['service_ds'] = htmlspecialchars_decode((string) $services[$vars['service']]['service_ds']);
 
 if ($services[$vars['service']]['service_ds'] != '') {
     $graphinfo = json_decode($services[$vars['service']]['service_ds'], true);
@@ -75,7 +75,7 @@ if ($services[$vars['service']]['service_ds'] != '') {
             $rrd_additions .= $check_graph[$ds];
         } else {
             // Build the graph ourselves
-            if (preg_match('/loss/i', $ds)) {
+            if (preg_match('/loss/i', (string) $ds)) {
                 $tint = 'pinks';
             } else {
                 $tint = 'blues';
@@ -86,7 +86,7 @@ if ($services[$vars['service']]['service_ds'] != '') {
             $rrd_additions .= ' DEF:DS=' . $rrd_filename . ':' . $ds . ':AVERAGE ';
             $rrd_additions .= ' DEF:DS_MAX=' . $rrd_filename . ':' . $ds . ':MAX ';
             $rrd_additions .= ' AREA:DS_MAX#' . $color_max . ':';
-            $rrd_additions .= ' AREA:DS#' . $color_avg . ":'" . str_pad(substr(ucfirst($ds) . ' (' . $label . ')', 0, 15), 15) . "' ";
+            $rrd_additions .= ' AREA:DS#' . $color_avg . ":'" . str_pad(substr(ucfirst((string) $ds) . ' (' . $label . ')', 0, 15), 15) . "' ";
             $rrd_additions .= ' GPRINT:DS:LAST:%5.2lf%s ';
             $rrd_additions .= ' GPRINT:DS:AVERAGE:%5.2lf%s ';
             $rrd_additions .= ' GPRINT:DS_MAX:MAX:%5.2lf%s\\l ';

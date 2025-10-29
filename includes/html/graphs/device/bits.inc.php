@@ -22,7 +22,7 @@ foreach ($ports as $port) {
                 // This patch will avoid filtering l2vlan and propVirtual on ASA devices.
                 continue;
             }
-            if (preg_match($iftype . 'i', $port['ifType'])) {
+            if (preg_match($iftype . 'i', (string) $port['ifType'])) {
                 $ignore = 1;
             }
         }
@@ -30,7 +30,7 @@ foreach ($ports as $port) {
 
     if (is_array(\App\Facades\LibrenmsConfig::get('device_traffic_descr'))) {
         foreach (\App\Facades\LibrenmsConfig::get('device_traffic_descr') as $ifdescr) {
-            if (preg_match($ifdescr . 'i', $port['ifDescr']) || preg_match($ifdescr . 'i', $port['ifName'])) {
+            if (preg_match($ifdescr . 'i', (string) $port['ifDescr']) || preg_match($ifdescr . 'i', (string) $port['ifName'])) {
                 $ignore = 1;
             }
         }

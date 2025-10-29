@@ -35,10 +35,10 @@ if (! Auth::user()->hasGlobalAdmin()) {
 $status = 'ok';
 $message = '';
 
-$transport_id = strip_tags($vars['transport_id']);
-$name = strip_tags($vars['name']);
+$transport_id = strip_tags((string) $vars['transport_id']);
+$name = strip_tags((string) $vars['name']);
 $is_default = (int) (isset($vars['is_default']) && $vars['is_default'] == 'on');
-$transport_type = strip_tags($vars['transport-type']);
+$transport_type = strip_tags((string) $vars['transport-type']);
 
 if (empty($name)) {
     $status = 'error';
@@ -81,7 +81,7 @@ if (empty($name)) {
             }
             $status = 'error';
         } else {
-            $transport_config = (array) json_decode(dbFetchCell('SELECT transport_config FROM alert_transports WHERE transport_id=?', [$transport_id]), true);
+            $transport_config = (array) json_decode((string) dbFetchCell('SELECT transport_config FROM alert_transports WHERE transport_id=?', [$transport_id]), true);
             foreach ($result['config'] as $tmp_config) {
                 if (isset($tmp_config['name']) && $tmp_config['type'] !== 'hidden') {
                     $transport_config[$tmp_config['name']] = $vars[$tmp_config['name']] ?? null;

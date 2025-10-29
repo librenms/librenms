@@ -18,7 +18,7 @@ if (session('widescreen')) {
 $vars['from'] = Time::parseAt($vars['from'] ?? '') ?: LibrenmsConfig::get('time.day');
 $vars['to'] = Time::parseAt($vars['to'] ?? '') ?: LibrenmsConfig::get('time.now');
 
-preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $vars['type'], $graphtype);
+preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', (string) $vars['type'], $graphtype);
 
 $type = basename($graphtype['type']);
 $subtype = basename($graphtype['subtype']);
@@ -166,7 +166,7 @@ if (! $auth) {
         echo ' | To show trend, set to future date';
     }
 
-    if (str_contains($vars['type'], 'sensor_')) {
+    if (str_contains((string) $vars['type'], 'sensor_')) {
         echo ' | To show trend, set to future date';
     }
 

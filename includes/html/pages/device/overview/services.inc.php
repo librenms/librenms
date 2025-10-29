@@ -11,8 +11,8 @@ if (ObjectCache::serviceCounts(['total'], $device['device_id'])['total'] > 0) {
         ->map(function ($service) use ($colors) {
             $message = htmlentities(str_replace(' ', '&nbsp;', $service->service_message));
             $color = $colors->get($service->service_status, 'grey');
-            $type = htmlentities(strtolower($service->service_type));
-            $name = htmlentities($service->service_name);
+            $type = htmlentities(strtolower((string) $service->service_type));
+            $name = htmlentities((string) $service->service_name);
             $name_type = ($name == '' || $name == $type) ? $type : $name . ' (' . $type . ')';
 
             return "<span title='$message' class='$color'>$name_type</span>";

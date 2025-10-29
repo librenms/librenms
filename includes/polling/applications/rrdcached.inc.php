@@ -86,10 +86,10 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('journal_rotate', 'COUNTER', 0);
 
 $fields = [];
-foreach (explode("\n", $data) as $line) {
+foreach (explode("\n", (string) $data) as $line) {
     $split = explode(': ', $line);
     if (count($split) == 2) {
-        $ds = strtolower(preg_replace('/[A-Z]/', '_$0', lcfirst($split[0])));
+        $ds = strtolower((string) preg_replace('/[A-Z]/', '_$0', lcfirst($split[0])));
         $fields[$ds] = $split[1];
     }
 }

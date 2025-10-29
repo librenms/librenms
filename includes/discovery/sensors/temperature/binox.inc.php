@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-if (str_contains($device['sysObjectID'], '.1.3.6.1.4.1.738.10.5.100')) {
+if (str_contains((string) $device['sysObjectID'], '.1.3.6.1.4.1.738.10.5.100')) {
     echo 'Telco Systems:';
 
     // CPU temperature

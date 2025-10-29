@@ -78,7 +78,7 @@ if ($interface == 'Vlan%') {
                   "</select>"+
                   "</div>&nbsp;"+
                   "<div class=\"form-group\">"+
-                  "<input type=\"text\" name=\"address\" id=\"address\" size=40 value=\"<?php echo htmlspecialchars($address); ?>\" class=\"form-control input-sm\" placeholder=\"IPv4 Address\"/>"+
+                  "<input type=\"text\" name=\"address\" id=\"address\" size=40 value=\"<?php echo htmlspecialchars((string) $address); ?>\" class=\"form-control input-sm\" placeholder=\"IPv4 Address\"/>"+
                   "</div>&nbsp;"+
                   "<button type=\"submit\" class=\"btn btn-default input-sm\">Search</button>"+
                   "</form></span></div>"+
@@ -90,8 +90,8 @@ if ($interface == 'Vlan%') {
             id: "address-search",
             search_type: "ipv4",
             device_id: '<?php echo $device_id ?: 'null'; ?>',
-            interface: '<?php echo htmlspecialchars($interface); ?>',
-            address: '<?php echo htmlspecialchars($address); ?>'
+            interface: '<?php echo htmlspecialchars((string) $interface); ?>',
+            address: '<?php echo htmlspecialchars((string) $address); ?>'
         };
     },
     url: "ajax_table.php",

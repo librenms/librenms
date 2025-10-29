@@ -12,7 +12,7 @@ $type = 'beagleboardTemp';
 //    snmptranslate -On NET-SNMP-EXTEND-MIB::nsExtendOutLine.\"beagleboard\"
 // to,
 $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.11.98.101.97.103.108.101.98.111.97.114.100';
-$value = explode("\n", trim(snmp_walk($device, $oid, '-Oqve'), '"'));
+$value = explode("\n", trim((string) snmp_walk($device, $oid, '-Oqve'), '"'));
 for ($temp = 0; $temp < 5; $temp++) {
     switch ($temp) {
         case '0':

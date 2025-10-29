@@ -9,7 +9,7 @@ if (is_numeric($vars['id'])) {
         $device = device_by_id_cache($ap['device_id']);
 
         $title = generate_device_link($device);
-        $title .= ' :: AP :: ' . htmlentities($ap['name']);
+        $title .= ' :: AP :: ' . htmlentities((string) $ap['name']);
         $auth = true;
     }
 }

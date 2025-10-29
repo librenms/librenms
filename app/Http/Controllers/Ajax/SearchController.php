@@ -43,7 +43,7 @@ abstract class SearchController
         $query = $this->buildQuery($search, $request)
             ->limit((int) LibrenmsConfig::get('webui.global_search_result_limit'));
 
-        return response()->json($query->get()->map([$this, 'formatItem']));
+        return response()->json($query->get()->map($this->formatItem(...)));
     }
 
     abstract public function buildQuery(string $search, Request $request): Builder;

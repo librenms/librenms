@@ -34,10 +34,10 @@ class Ciscospark extends Transport
 
         if ($this->config['use-markdown'] === 'on') {
             // Remove blank lines as they create weird markdown behaviors.
-            $msg = preg_replace('/^\s+/m', '', $alert_data['msg']);
+            $msg = preg_replace('/^\s+/m', '', (string) $alert_data['msg']);
             $mtype = 'markdown';
         } else {
-            $msg = strip_tags($alert_data['msg']);
+            $msg = strip_tags((string) $alert_data['msg']);
             $mtype = 'text';
         }
 

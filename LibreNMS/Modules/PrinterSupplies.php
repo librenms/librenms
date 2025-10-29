@@ -176,7 +176,7 @@ class PrinterSupplies implements Module
         }
 
         foreach ($oids as $index => $data) {
-            $last_index = substr($index, strrpos($index, '.') + 1);
+            $last_index = substr((string) $index, strrpos((string) $index, '.') + 1);
 
             $descr = $data['prtMarkerSuppliesDescription'];
             $raw_capacity = $data['prtMarkerSuppliesMaxCapacity'];
@@ -187,7 +187,7 @@ class PrinterSupplies implements Module
             // work around weird HP bug where descriptions are on two lines and the second line is hex
             if (Str::contains($descr, "\n")) {
                 $new_descr = '';
-                foreach (explode("\n", $descr) as $line) {
+                foreach (explode("\n", (string) $descr) as $line) {
                     if (preg_match('/^([A-F\d]{2} )*[A-F\d]{1,2} ?$/', $line)) {
                         $line = snmp_hexstring($line);
                     }
@@ -210,7 +210,7 @@ class PrinterSupplies implements Module
 
             // trim part & serial number from devices that include it
             if (Str::contains($descr, ', PN')) {
-                $descr = explode(', PN', $descr)[0];
+                $descr = explode(', PN', (string) $descr)[0];
             }
 
             $capacity = self::getTonerCapacity($raw_capacity);
@@ -244,7 +244,7 @@ class PrinterSupplies implements Module
         }
 
         foreach ($tray_oids as $index => $data) {
-            $last_index = substr($index, strrpos($index, '.') + 1);
+            $last_index = substr((string) $index, strrpos((string) $index, '.') + 1);
 
             $capacity = $data['prtInputMaxCapacity'];
             $current = $data['prtInputCurrentLevel'];

@@ -268,7 +268,7 @@ class CiHelper
             $server->setTimeout(3600)
                 ->setIdleTimeout(3600)
                 ->start();
-            $server->waitUntil(fn ($type, $output) => str_contains($output, 'Development Server (http://127.0.0.1:8000) started'));
+            $server->waitUntil(fn ($type, $output) => str_contains((string) $output, 'Development Server (http://127.0.0.1:8000) started'));
             if ($server->isRunning()) {
                 echo "Started server http://127.0.0.1:8000\n";
             }

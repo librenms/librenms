@@ -90,10 +90,10 @@ class InventoryController extends TableController
     {
         return [
             'device' => Blade::render('<x-device-link :device="$device"/>', ['device' => $entPhysical->device]),
-            'descr' => htmlspecialchars($entPhysical->entPhysicalDescr),
-            'name' => htmlspecialchars($entPhysical->entPhysicalName),
-            'model' => htmlspecialchars($entPhysical->entPhysicalModelName),
-            'serial' => htmlspecialchars($entPhysical->entPhysicalSerialNum),
+            'descr' => htmlspecialchars((string) $entPhysical->entPhysicalDescr),
+            'name' => htmlspecialchars((string) $entPhysical->entPhysicalName),
+            'model' => htmlspecialchars((string) $entPhysical->entPhysicalModelName),
+            'serial' => htmlspecialchars((string) $entPhysical->entPhysicalSerialNum),
         ];
     }
 

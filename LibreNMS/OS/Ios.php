@@ -59,7 +59,7 @@ class Ios extends Cisco implements
     {
         $device = $this->getDevice();
 
-        if (empty($device->hardware) || (! str_starts_with($device->hardware, 'AIR-') && ! str_contains($device->hardware, 'ciscoAIR'))) {
+        if (empty($device->hardware) || (! str_starts_with((string) $device->hardware, 'AIR-') && ! str_contains((string) $device->hardware, 'ciscoAIR'))) {
             // unsupported IOS hardware
             return [];
         }
@@ -123,7 +123,7 @@ class Ios extends Cisco implements
                 $descr = $ent['ENTITY-MIB::entPhysicalDescr'];
                 unset($entPhys[$entIndex]); // only use each one once
 
-                if (str_ends_with($descr, 'Radio')) {
+                if (str_ends_with((string) $descr, 'Radio')) {
                     d_echo("Mapping entPhysicalIndex $entIndex to ifIndex $ifIndex\n");
                     $data[$ifIndex]['entPhysicalIndex'] = $entIndex;
                     $data[$ifIndex]['entPhysicalDescr'] = $descr;

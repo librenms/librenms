@@ -93,7 +93,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         }
 
         // special character handling
-        $group_dn = addcslashes($result[0]['dn'], '()#');
+        $group_dn = addcslashes((string) $result[0]['dn'], '()#');
 
         $search = ldap_search(
             $connection,

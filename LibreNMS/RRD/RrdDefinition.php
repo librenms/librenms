@@ -178,6 +178,6 @@ class RrdDefinition implements \Stringable
     {
         $name = preg_replace('/[^a-zA-Z0-9_\-]/', '', $name);
 
-        return substr($name, 0, 19);
+        return substr((string) $name, 0, 19);
     }
 }

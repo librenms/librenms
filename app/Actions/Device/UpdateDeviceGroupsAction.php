@@ -32,7 +32,7 @@ use Log;
 
 class UpdateDeviceGroupsAction
 {
-    public function __construct(private Device $device)
+    public function __construct(private readonly Device $device)
     {
     }
 

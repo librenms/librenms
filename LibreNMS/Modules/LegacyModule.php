@@ -58,7 +58,7 @@ class LegacyModule implements Module
         return $this->module_deps[$this->name] ?? [];
     }
 
-    public function __construct(private string $name)
+    public function __construct(private readonly string $name)
     {
     }
 
@@ -156,8 +156,8 @@ class LegacyModule implements Module
 
                     $default_select = [];
                 } else {
-                    [$left, $lkey] = explode('.', $join_info['left']);
-                    [$right, $rkey] = explode('.', $join_info['right']);
+                    [$left, $lkey] = explode('.', (string) $join_info['left']);
+                    [$right, $rkey] = explode('.', (string) $join_info['right']);
                     $join .= " LEFT JOIN `$right` ON (`$left`.`$lkey` = `$right`.`$rkey`)";
 
                     $default_select = ["`$right`.*"];

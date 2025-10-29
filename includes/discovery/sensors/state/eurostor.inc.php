@@ -34,7 +34,7 @@ foreach ($walk as $mib => $num_oid) {
             $group = 'Non RAID member';
             $tmp = preg_replace('/hddEnclosure0(\d)(\d+)/i', 'E${1}S${2}', $mib . $entry[$mib . 'Slots']);
             foreach ($raids as $raid) {
-                if (in_array($tmp, explode(',', $raid['raidMemberDiskChannels']))) {
+                if (in_array($tmp, explode(',', (string) $raid['raidMemberDiskChannels']))) {
                     $group = $raid['raidName'];
                     break;
                 }

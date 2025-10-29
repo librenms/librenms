@@ -49,7 +49,7 @@ class Slack extends Transport
          * This has to be done after strip_tags() because these are actually tags.
          * So [Target](https://mysite.example.com) becomes <https://mysite.example.com|Target>
          */
-        $slack_msg = preg_replace('/\[([^\]]+)\]\(((https?|mailto|ftp):[^\)]+)\)/', '<$2|$1>', $slack_msg);
+        $slack_msg = preg_replace('/\[([^\]]+)\]\(((https?|mailto|ftp):[^\)]+)\)/', '<$2|$1>', (string) $slack_msg);
 
         $data = [
             'attachments' => [

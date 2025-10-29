@@ -40,7 +40,7 @@ class InfluxDB extends BaseDatastore
     private $batchSize = 0; // Number of points to write at once
     private $measurements = []; // List of measurements to write
 
-    public function __construct(private Database $connection)
+    public function __construct(private readonly Database $connection)
     {
         parent::__construct();
         $this->batchSize = LibrenmsConfig::get('influxdb.batch_size', 0);

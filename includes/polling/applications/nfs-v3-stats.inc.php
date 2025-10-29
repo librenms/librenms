@@ -62,7 +62,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('proc3_pathconf', 'GAUGE', 0)
     ->addDataset('proc3_commit', 'GAUGE', 0);
 
-$data = explode("\n", $nfsstats);
+$data = explode("\n", (string) $nfsstats);
 $fields = [
     'rc_hits' => $data[1],
     'rc_misses' => $data[2],

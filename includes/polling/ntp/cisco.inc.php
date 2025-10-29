@@ -64,14 +64,14 @@ if (is_array($components) && count($components) > 0) {
         // the last 16 bits.
 
         $hexoffset = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][23][$array['UID']];
-        $rrd['offset'] = Number::constrainInteger(hexdec(substr($hexoffset, 0, 5)), IntegerType::int16) + hexdec(substr($hexoffset, -5)) / 65536;
+        $rrd['offset'] = Number::constrainInteger(hexdec(substr((string) $hexoffset, 0, 5)), IntegerType::int16) + hexdec(substr((string) $hexoffset, -5)) / 65536;
 
         $hexdelay = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][24][$array['UID']];
-        $rrd['delay'] = Number::constrainInteger(hexdec(substr($hexdelay, 0, 5)), IntegerType::int16) + hexdec(substr($hexdelay, -5)) / 65536;
+        $rrd['delay'] = Number::constrainInteger(hexdec(substr((string) $hexdelay, 0, 5)), IntegerType::int16) + hexdec(substr((string) $hexdelay, -5)) / 65536;
 
         // Cisco NTPUnsignedTimeValue - 16 bits of unsignedint, and 16 bits of unsignedint for fractional
         $hexdisp = $cntpPeersVarEntry['1.3.6.1.4.1.9.9.168.1.2.1.1'][25][$array['UID']];
-        $rrd['dispersion'] = hexdec(substr($hexdisp, 0, 5)) + hexdec(substr($hexdisp, -5)) / 65536;
+        $rrd['dispersion'] = hexdec(substr((string) $hexdisp, 0, 5)) + hexdec(substr((string) $hexdisp, -5)) / 65536;
 
         $tags = ['rrd_name' => $rrd_name, 'rrd_def' => $rrd_def, 'peer' => $peer];
         app('Datastore')->put($device, 'ntp', $tags, $rrd);

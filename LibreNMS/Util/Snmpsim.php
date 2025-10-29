@@ -64,7 +64,7 @@ class Snmpsim extends Process
             return $type == Process::ERR && str_contains($buffer, $listen);
         });
 
-        return trim($last);
+        return trim((string) $last);
     }
 
     public function isVenvSetUp(): bool

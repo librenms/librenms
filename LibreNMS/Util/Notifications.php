@@ -121,7 +121,7 @@ class Notifications
                 'title' => $item['title'],
                 'body' => $item['description'],
                 'checksum' => hash('sha512', $item['title'] . $item['description']),
-                'datetime' => date('Y-m-d', strtotime($item['pubDate']) ?: time()),
+                'datetime' => date('Y-m-d', strtotime((string) $item['pubDate']) ?: time()),
             ];
         }
 
@@ -145,7 +145,7 @@ class Notifications
                 'title' => $item['title'],
                 'body' => $item['content'],
                 'checksum' => hash('sha512', $item['title'] . $item['content']),
-                'datetime' => date('Y-m-d', strtotime($item['updated']) ?: time()),
+                'datetime' => date('Y-m-d', strtotime((string) $item['updated']) ?: time()),
             ];
         }
 

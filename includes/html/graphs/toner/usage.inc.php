@@ -12,7 +12,7 @@ if ($colour['left'] == null) {
     $colour['left'] = 'CC0000';
 }
 
-$descr = \LibreNMS\Data\Store\Rrd::safeDescr(substr(str_pad($toner['supply_descr'], 26), 0, 26));
+$descr = \LibreNMS\Data\Store\Rrd::safeDescr(substr(str_pad((string) $toner['supply_descr'], 26), 0, 26));
 
 $background = \LibreNMS\Util\Color::percentage(100 - $toner['supply_current']);
 

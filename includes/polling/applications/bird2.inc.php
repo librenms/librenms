@@ -148,8 +148,8 @@ foreach ($protocolsData as $protocol) {
     $bgpPeer->astext = \LibreNMS\Util\AutonomousSystem::get($protocol['neighbor_as'])->name();
     $bgpPeer->bgpPeerIdentifier = $protocol['neighbor_id'] ?: '0.0.0.0';
     $bgpPeer->bgpPeerRemoteAs = $protocol['neighbor_as'];
-    $bgpPeer->bgpPeerState = strtolower($protocol['bgp_state']);
-    $bgpPeer->bgpPeerAdminStatus = str_replace('up', 'start', strtolower($protocol['protocol_state']));
+    $bgpPeer->bgpPeerState = strtolower((string) $protocol['bgp_state']);
+    $bgpPeer->bgpPeerAdminStatus = str_replace('up', 'start', strtolower((string) $protocol['protocol_state']));
 
     if (isset($protocolData['last_error'])) {
         // Find the subcode if its there and set it

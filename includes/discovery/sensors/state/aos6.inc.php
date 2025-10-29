@@ -3,8 +3,8 @@
 $chas_oid = '.1.3.6.1.4.1.6486.800.1.1.1.1.1.1.1.2.'; // chasEntPhysOperStatus
 $stack_left = snmp_walk($device, 'chasFreeSlots', '-OQUse', 'ALCATEL-IND1-CHASSIS-MIB', 'nokia');
 $stack_role = snmp_walk($device, 'alaStackMgrChasRole', '-OQUse', 'ALCATEL-IND1-STACK-MANAGER-MIB', 'nokia');
-$stack_alone = substr($stack_role, strpos($stack_role, '=') + 1);
-$stack_left = substr($stack_left, strpos($stack_left, '=') + 1);
+$stack_alone = substr((string) $stack_role, strpos((string) $stack_role, '=') + 1);
+$stack_left = substr((string) $stack_left, strpos((string) $stack_left, '=') + 1);
 //$true_stacking = (7 - $stack_left);
 $stacking = '7';
 $stacking_non = '4';

@@ -55,9 +55,9 @@ function rename_mib_file($file)
     }
 
     $mib_name = extract_mib_name($file);
-    $filename = basename($file);
+    $filename = basename((string) $file);
     if ($mib_name != $filename) {
-        $new_file = dirname($file) . '/' . $mib_name;
+        $new_file = dirname((string) $file) . '/' . $mib_name;
         echo "$file -> $new_file\n";
 
         return rename($file, $new_file);

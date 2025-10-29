@@ -41,7 +41,7 @@ use SnmpQuery;
 
 class ValidateDeviceAndCreate
 {
-    public function __construct(private Device $device, private bool $force = false, private bool $ping_fallback = false)
+    public function __construct(private readonly Device $device, private readonly bool $force = false, private readonly bool $ping_fallback = false)
     {
     }
 

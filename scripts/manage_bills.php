@@ -94,7 +94,7 @@ function add_ports_to_bill($devs, $intf_glob, $id)
     return true;
 }
 
-function print_help()
+function print_help(): never
 {
     echo "Usage:\n";
     echo "Updating bills\n";

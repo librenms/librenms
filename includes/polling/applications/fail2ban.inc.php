@@ -11,7 +11,7 @@ try {
     $f2b = json_app_get($device, $name);
 } catch (JsonAppParsingFailedException $e) {
     // Legacy script, build compatible array
-    $legacy = explode("\n", $e->getOutput());
+    $legacy = explode("\n", (string) $e->getOutput());
     $f2b = [
         'data' => [
             'total' => array_shift($legacy), // total was first line in legacy app

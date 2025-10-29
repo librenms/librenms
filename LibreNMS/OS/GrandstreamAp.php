@@ -52,7 +52,7 @@ class GrandstreamAp extends OS implements
         // Assemble Sensors
         $total_clients = 0;
         foreach ($unique_ssids as $ssid_name) {
-            if (str_starts_with($ssid_name, 'GWN-MESH-')) {
+            if (str_starts_with((string) $ssid_name, 'GWN-MESH-')) {
                 continue;
             }
 

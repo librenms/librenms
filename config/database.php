@@ -149,7 +149,7 @@ return [
         ],
 
         'sentinel_session' => [
-            ...explode(',', env('REDIS_SENTINEL_HOSTS', '')),
+            ...explode(',', (string) env('REDIS_SENTINEL_HOSTS', '')),
             'options' => [
                 'replication' => 'sentinel',
                 'service' => env('REDIS_SENTINEL_SERVICE', 'mymaster'),
@@ -161,7 +161,7 @@ return [
         ],
 
         'sentinel_cache' => [
-            ...explode(',', env('REDIS_SENTINEL_HOSTS', '')),
+            ...explode(',', (string) env('REDIS_SENTINEL_HOSTS', '')),
             'options' => [
                 'replication' => 'sentinel',
                 'service' => env('REDIS_SENTINEL_SERVICE', 'mymaster'),

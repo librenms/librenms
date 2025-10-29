@@ -98,7 +98,7 @@ $mapping = [
     'SlLa' => 'br',
 ];
 
-$data = explode("\n", $mysql);
+$data = explode("\n", (string) $mysql);
 
 if (count($data) < 80) {
     echo " Incorrect number of datapoints returned from device, skipping\n";

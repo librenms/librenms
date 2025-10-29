@@ -83,7 +83,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
 
     print_optionbar_end();
 
-    $section = basename($vars['section']);
+    $section = basename((string) $vars['section']);
     if (is_file("includes/html/pages/device/edit/$section.inc.php")) {
         require "includes/html/pages/device/edit/$section.inc.php";
     }

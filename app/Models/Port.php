@@ -86,13 +86,13 @@ class Port extends DeviceRelatedModel
         }
 
         foreach ((array) \App\Facades\LibrenmsConfig::get('rewrite_if', []) as $src => $val) {
-            if (Str::contains(strtolower($label), strtolower($src))) {
+            if (Str::contains(strtolower($label), strtolower((string) $src))) {
                 $label = $val;
             }
         }
 
         foreach ((array) \App\Facades\LibrenmsConfig::get('rewrite_if_regexp', []) as $reg => $val) {
-            $label = preg_replace($reg . 'i', $val, $label);
+            $label = preg_replace($reg . 'i', (string) $val, $label);
         }
 
         return $label;
@@ -154,7 +154,7 @@ class Port extends DeviceRelatedModel
     public function getIfPhysAddressAttribute($mac)
     {
         if (! empty($mac)) {
-            return preg_replace('/(..)(..)(..)(..)(..)(..)/', '\\1:\\2:\\3:\\4:\\5:\\6', $mac);
+            return preg_replace('/(..)(..)(..)(..)(..)(..)/', '\\1:\\2:\\3:\\4:\\5:\\6', (string) $mac);
         }
 
         return null;

@@ -85,7 +85,7 @@ class DeviceFieldController extends SelectController
         if ($field == 'os') {
             $text = LibrenmsConfig::getOsSetting($text, 'text');
         } elseif ($field == 'type') {
-            $text = ucfirst($text);
+            $text = ucfirst((string) $text);
         }
 
         return [

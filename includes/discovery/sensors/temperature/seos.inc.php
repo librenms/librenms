@@ -7,7 +7,7 @@ $insert_index = 0;
 
 $oids = snmp_walk($device, 'rbnCpuTempDescr', '-OsqnU', 'RBN-ENVMON-MIB');
 
-foreach (explode("\n", $oids) as $data) {
+foreach (explode("\n", (string) $oids) as $data) {
     $data = trim($data);
     if ($data) {
         [$oid,$descr] = explode(' ', $data, 2);
@@ -24,7 +24,7 @@ foreach (explode("\n", $oids) as $data) {
 
 $oids = snmp_walk($device, 'rbnEntityTempDescr', '-OsqnU', 'RBN-ENVMON-MIB');
 
-foreach (explode("\n", $oids) as $data) {
+foreach (explode("\n", (string) $oids) as $data) {
     $data = trim($data);
     if ($data) {
         [$oid,$descr] = explode(' ', $data, 2);

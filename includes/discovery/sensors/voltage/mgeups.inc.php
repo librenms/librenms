@@ -1,7 +1,7 @@
 <?php
 
 echo 'MGE ';
-$oids = trim(snmp_walk($device, 'mgoutputVoltage', '-OsqnU', 'MG-SNMP-UPS-MIB'));
+$oids = trim((string) snmp_walk($device, 'mgoutputVoltage', '-OsqnU', 'MG-SNMP-UPS-MIB'));
 d_echo($oids . "\n");
 
 $numPhase = count(explode("\n", $oids));
@@ -26,7 +26,7 @@ for ($i = 1; $i <= $numPhase; $i++) {
     discover_sensor(null, 'voltage', $device, $volt_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }
 
-$oids = trim(snmp_walk($device, 'mgeinputVoltage', '-OsqnU', 'MG-SNMP-UPS-MIB'));
+$oids = trim((string) snmp_walk($device, 'mgeinputVoltage', '-OsqnU', 'MG-SNMP-UPS-MIB'));
 d_echo($oids . "\n");
 
 $numPhase = count(explode("\n", $oids));

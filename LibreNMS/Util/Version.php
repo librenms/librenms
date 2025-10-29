@@ -41,7 +41,7 @@ class Version
     /** @var Git convenience instance */
     public $git;
 
-    public function __construct(private ConfigRepository $config)
+    public function __construct(private readonly ConfigRepository $config)
     {
         $this->git = Git::make();
     }
@@ -89,7 +89,7 @@ class Version
             case 'mysql':
                 $ret = Arr::first(DB::selectOne('select version()'));
 
-                return (str_contains($ret, 'MariaDB') ? 'MariaDB ' : 'MySQL ') . $ret;
+                return (str_contains((string) $ret, 'MariaDB') ? 'MariaDB ' : 'MySQL ') . $ret;
             case 'sqlite':
                 return 'SQLite ' . Arr::first(DB::selectOne('select sqlite_version()'));
             default:

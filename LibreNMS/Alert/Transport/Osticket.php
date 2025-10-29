@@ -37,7 +37,7 @@ class Osticket extends Transport
             'name' => 'LibreNMS',
             'email' => $email,
             'subject' => ($alert_data['name'] ? $alert_data['name'] . ' on ' . $alert_data['hostname'] : $alert_data['title']),
-            'message' => strip_tags($alert_data['msg']),
+            'message' => strip_tags((string) $alert_data['msg']),
             'ip' => $_SERVER['REMOTE_ADDR'],
             'attachments' => [],
         ];

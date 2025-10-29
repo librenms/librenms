@@ -2,7 +2,7 @@
 
 if ($vars['id']) {
     $sla = dbFetchRow('SELECT `tag`, `sla_nr`,`rtt_type` FROM `slas` WHERE `sla_id` = ?', [$vars['id']]);
-    $name = 'SLA #' . $sla['sla_nr'] . ' - ' . trans_fb("modules.slas.{$sla['rtt_type']}", ucfirst($sla['rtt_type']));
+    $name = 'SLA #' . $sla['sla_nr'] . ' - ' . trans_fb("modules.slas.{$sla['rtt_type']}", ucfirst((string) $sla['rtt_type']));
     if ($sla['tag']) {
         $name .= ': ' . $sla['tag'];
     }
@@ -25,7 +25,7 @@ if ($vars['id']) {
     include 'sla/rtt.inc.php';
 
     // Load the per-type SLA metrics
-    $rtt_type = basename($sla['rtt_type']);
+    $rtt_type = basename((string) $sla['rtt_type']);
     if (file_exists("includes/html/pages/device/sla/$rtt_type.inc.php")) {
         include "includes/html/pages/device/sla/$rtt_type.inc.php";
     }
@@ -40,7 +40,7 @@ if ($vars['id']) {
     $sla_types = ['all' => 'All'];
     foreach ($slas as $sla) {
         $sla_type = $sla['rtt_type'];
-        $sla_types[$sla_type] = trans_fb("modules.slas.{$sla_type}", ucfirst($sla_type));
+        $sla_types[$sla_type] = trans_fb("modules.slas.{$sla_type}", ucfirst((string) $sla_type));
     }
     asort($sla_types);
 

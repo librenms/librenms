@@ -1,10 +1,10 @@
 <?php
 
 // Convert string with textual date to remaining days for license expiration
-if (preg_match("/fgLicContractExpiry\.\d+/", $sensor['sensor_index'])) {
+if (preg_match("/fgLicContractExpiry\.\d+/", (string) $sensor['sensor_index'])) {
     $expirationRaw = SnmpQuery::get($sensor['sensor_oid'])->value(0);
-    $expirationDate = strtotime($expirationRaw);
-    $sensor_value = round((strtotime($expirationRaw) - strtotime('now')) / 86400, 0);
+    $expirationDate = strtotime((string) $expirationRaw);
+    $sensor_value = round((strtotime((string) $expirationRaw) - strtotime('now')) / 86400, 0);
 }
 
 if ($sensor['sensor_type'] === 'clusterState') {

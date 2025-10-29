@@ -29,7 +29,7 @@ use LibreNMS\Util\IP;
 
 $bgpPeersCache = snmpwalk_cache_multi_oid($device, 'fbBgpPeerTable', [], 'FIREBRICK-BGP-MIB', 'firebrick');
 foreach ($bgpPeersCache as $key => $value) {
-    $oid = explode('.', $key);
+    $oid = explode('.', (string) $key);
     $protocol = $oid[0];
 
     // We have test-data that looks like 'fbBgpPeerEntry.14.ipv4."90.155.53.63"', filter away when protocol doesn't start with "ipv"

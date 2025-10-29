@@ -28,7 +28,7 @@ $multiplier = 1;
 
 // Check for per-outlet polling PDU-MIB
 $outlet_oids = snmp_walk($device, 'outletIndex', '-Osqn', 'PDU-MIB');
-$outlet_oids = trim($outlet_oids);
+$outlet_oids = trim((string) $outlet_oids);
 if ($outlet_oids) {
     d_echo('PDU MIB Outlets');
     foreach (explode("\n", $outlet_oids) as $outlet_data) {

@@ -62,7 +62,7 @@ try {
     $template_newid = 0;
     $create = true;
 
-    $name = strip_tags($vars['name']);
+    $name = strip_tags((string) $vars['name']);
     if (! empty($name)) {
         if ($vars['template'] && is_numeric($vars['template_id'])) {
             // Update template
@@ -115,6 +115,6 @@ try {
     $message .= $e->getMessage();
 }
 
-$response = ['status' => htmlentities($status), 'message' => htmlentities($message), 'newid' => $template_newid ?? null];
+$response = ['status' => htmlentities($status), 'message' => htmlentities((string) $message), 'newid' => $template_newid ?? null];
 
 echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

@@ -43,7 +43,7 @@ foreach ($components as $comp) {
         }
 
         $rrd_options .= ' DEF:DS' . $count . '=' . $rrd_filename . ':resolved:AVERAGE ';
-        $rrd_options .= ' LINE1.25:DS' . $count . '#' . $colour . ":'" . str_pad(substr($label, 0, 60), 60) . "'";
+        $rrd_options .= ' LINE1.25:DS' . $count . '#' . $colour . ":'" . str_pad(substr((string) $label, 0, 60), 60) . "'";
         $rrd_options .= ' GPRINT:DS' . $count . ':LAST:%6.2lf%s ';
         $rrd_options .= ' GPRINT:DS' . $count . ':AVERAGE:%6.2lf%s ';
         $rrd_options .= ' GPRINT:DS' . $count . ":MAX:%6.2lf%s\l ";

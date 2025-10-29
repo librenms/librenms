@@ -169,7 +169,7 @@ class Stats
         // sanitize sysDescr
         return $device_info->map(function ($entry) {
             // remove hostnames from linux, macosx, and SunOS
-            $entry->sysDescr = preg_replace_callback('/^(Linux |Darwin |FreeBSD |SunOS )[A-Za-z0-9._\-]+ ([0-9.]{3,9})/', fn ($matches) => $matches[1] . 'hostname ' . $matches[2], $entry->sysDescr);
+            $entry->sysDescr = preg_replace_callback('/^(Linux |Darwin |FreeBSD |SunOS )[A-Za-z0-9._\-]+ ([0-9.]{3,9})/', fn ($matches) => $matches[1] . 'hostname ' . $matches[2], (string) $entry->sysDescr);
 
             // wipe serial numbers, preserve the format
             $sn_patterns = ['/[A-Z]/', '/[a-z]/', '/[0-9]/'];

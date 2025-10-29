@@ -158,7 +158,7 @@ class GraylogController extends SimpleTableController
 
             $this->deviceLinkCache[$source] = $device
                 ? Blade::render('<x-device-link :device="$device"/>', ['device' => $device])
-                : htmlspecialchars($source);
+                : htmlspecialchars((string) $source);
         }
 
         return $this->deviceLinkCache[$source];

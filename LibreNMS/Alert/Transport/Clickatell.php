@@ -35,7 +35,7 @@ class Clickatell extends Transport
         $url = 'https://platform.clickatell.com/messages/http/send';
         $params = [
             'apiKey' => $this->config['clickatell-token'],
-            'to' => implode(',', preg_split('/([,\r\n]+)/', $this->config['clickatell-numbers'])),
+            'to' => implode(',', preg_split('/([,\r\n]+)/', (string) $this->config['clickatell-numbers'])),
             'content' => $alert_data['title'],
         ];
 
