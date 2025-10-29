@@ -329,7 +329,7 @@ LibreNMS will ignore any other strings sent in `Filter-ID` and revert to default
     lnms config:set radius.secret testing123
     lnms config:set radius.timeout 3
     lnms config:set radius.users_purge 14
-    lnms config:set radius.default_roles ["admin"]
+    lnms config:set radius.default_roles '["Admin"]'
     ```
 
 ### Radius Huntgroup
