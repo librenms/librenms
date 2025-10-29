@@ -105,9 +105,7 @@ if ($ignore_filter == 0 && $disabled_filter == 0) {
 $query = 'SELECT * FROM `ports` AS I, `devices` AS D LEFT JOIN `locations` AS L ON D.location_id = L.id WHERE I.device_id = D.device_id' . $where;
 
 // only grab list of ports for graph pages, table uses ajax
-$ports = array_map(function ($value) {
-    return (array) $value;
-}, DB::select($query, $param));
+$ports = array_map(fn ($value) => (array) $value, DB::select($query, $param));
 
 switch ($vars['sort'] ?? '') {
     case 'traffic':

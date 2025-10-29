@@ -176,7 +176,7 @@ if (defined('SHOW_SETTINGS')) {
     $group = $widget_settings['group'] ?? '';
     $proc = $widget_settings['proc'] ?? '';
     $sort = $widget_settings['sort'] ?? '';
-    $unique_id = $unique_id ?? '';
+    $unique_id ??= '';
 
     $title = 'Alerts';
 

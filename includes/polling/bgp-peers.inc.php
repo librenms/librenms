@@ -417,9 +417,7 @@ if (! empty($peers)) {
                             'bgpPeerIface' => 'bgpPeerIface',
                         ];
                         if ($cumulus_vrf) {
-                            $bgp_peers = array_filter($peer_data_check->toArray(), function ($peer) use ($peer_identifier) {
-                                return $peer[$peer_identifier] ?? [];
-                            });
+                            $bgp_peers = array_filter($peer_data_check->toArray(), fn ($peer) => $peer[$peer_identifier] ?? []);
                             $tmp_data = array_pop($bgp_peers)[$peer_identifier];
                             $peer_data['bgpPeerDescr'] = $tmp_data['bgpPeerDesc'];
                             $peer_data['bgpPeerState'] = $tmp_data['bgpPeerState'];
@@ -457,9 +455,7 @@ if (! empty($peers)) {
             if (empty($peer_data) && isset($peer_identifier, $oid_map, $mib)) {
                 echo "Fetching $mib data... \n";
 
-                $get_oids = array_map(function ($oid) use ($peer_identifier) {
-                    return "$oid.$peer_identifier";
-                }, array_keys($oid_map));
+                $get_oids = array_map(fn ($oid) => "$oid.$peer_identifier", array_keys($oid_map));
                 $peer_data_raw = snmp_get_multi($device, $get_oids, '-OQUs', $mib);
                 $peer_data_raw = reset($peer_data_raw);  // get the first element of the array
 

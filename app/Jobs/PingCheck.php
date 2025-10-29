@@ -152,9 +152,7 @@ class PingCheck implements ShouldQueue
             $query->whereIntegerInRaw('poller_group', $this->groups);
         }
 
-        $this->devices = $query->get()->keyBy(function ($device) {
-            return $device->overwrite_ip ?: $device->hostname;
-        });
+        $this->devices = $query->get()->keyBy(fn ($device) => $device->overwrite_ip ?: $device->hostname);
 
         return $this->devices;
     }

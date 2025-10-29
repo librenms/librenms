@@ -174,19 +174,13 @@ class AvailabilityMapController extends WidgetController
     {
         switch ($this->getSettings()['order_by']) {
             case 'status':
-                usort($data, function ($l, $r) {
-                    return ($l['status'] <=> $r['status']) ?: strcasecmp($l['label'], $r['label']);
-                });
+                usort($data, fn ($l, $r) => ($l['status'] <=> $r['status']) ?: strcasecmp($l['label'], $r['label']));
                 break;
             case 'label':
-                usort($data, function ($l, $r) {
-                    return strcasecmp($l['label'], $r['label']);
-                });
+                usort($data, fn ($l, $r) => strcasecmp($l['label'], $r['label']));
                 break;
             default: // device display name (tooltip starts with the display name)
-                usort($data, function ($l, $r) {
-                    return strcasecmp($l['tooltip'], $r['tooltip']) ?: strcasecmp($l['label'], $r['label']);
-                });
+                usort($data, fn ($l, $r) => strcasecmp($l['tooltip'], $r['tooltip']) ?: strcasecmp($l['label'], $r['label']));
         }
     }
 

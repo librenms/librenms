@@ -303,9 +303,7 @@ class CheckSchemaStructure implements Validation, ValidationFixer
             $index = "INDEX `{$index_data['Name']}` (%s)";
         }
 
-        $columns = implode(',', array_map(function ($col) {
-            return "`$col`";
-        }, $index_data['Columns']));
+        $columns = implode(',', array_map(fn ($col) => "`$col`", $index_data['Columns']));
 
         return sprintf($index, $columns);
     }

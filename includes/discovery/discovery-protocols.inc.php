@@ -281,9 +281,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                     $ipv6 = implode(
                         ':',
                         array_map(
-                            function ($v) {
-                                return sprintf('%02x', $v);
-                            },
+                            fn ($v) => sprintf('%02x', $v),
                             explode('.', $matches[6])
                         )
                     );

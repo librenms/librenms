@@ -74,9 +74,7 @@ class Schema
     private static function getMigrationFiles()
     {
         $migrations = collect(glob(base_path('database/migrations/') . '*.php'))
-            ->map(function ($migration_file) {
-                return basename($migration_file, '.php');
-            });
+            ->map(fn ($migration_file) => basename($migration_file, '.php'));
 
         return $migrations;
     }
@@ -235,9 +233,7 @@ class Schema
                     }
                 }
             } else {
-                $relations = array_keys(array_filter($relationships, function ($related) use ($table) {
-                    return in_array($table, $related);
-                }));
+                $relations = array_keys(array_filter($relationships, fn ($related) => in_array($table, $related)));
 
                 d_echo("Dead end at $table, searching for relationships " . json_encode($relations) . PHP_EOL);
                 $recurse = $this->findPathRecursive($relations, $target, array_merge($history, $tables));
@@ -353,9 +349,7 @@ class Schema
             }
 
             $keys = DB::connection($connection)->select(DB::raw("SHOW INDEX FROM `$table`")->getValue(DB::connection($connection)->getQueryGrammar()));
-            usort($keys, function ($a, $b) {
-                return $a->Key_name <=> $b->Key_name;
-            });
+            usort($keys, fn ($a, $b) => $a->Key_name <=> $b->Key_name);
             foreach ($keys as $key) {
                 $key_name = $key->Key_name;
                 if (isset($output[$table]['Indexes'][$key_name])) {

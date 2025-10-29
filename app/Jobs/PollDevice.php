@@ -179,7 +179,7 @@ class PollDevice implements ShouldQueue
     {
         \DeviceCache::setPrimary($this->device_id);
         $this->device = \DeviceCache::getPrimary();
-        $this->device->ip = $this->device->overwrite_ip ?: Dns::lookupIp($this->device) ?: $this->device->ip;
+        $this->device->ip = ($this->device->overwrite_ip ?: Dns::lookupIp($this->device)) ?: $this->device->ip;
 
         $this->deviceArray = $this->device->toArray();
         if ($os_group = LibrenmsConfig::get("os.{$this->device->os}.group")) {

@@ -4,11 +4,11 @@ $pagetitle[] = 'Routing';
 
 $optb = $_GET['optb'] ?? '';
 $optc = $_GET['optc'] ?? '';
-$vars['view'] = $vars['view'] ?? 'basic';
-$vars['graph'] = $vars['graph'] ?? '';
-$vars['type'] = $vars['type'] ?? 'all';
-$vars['adminstatus'] = $vars['adminstatus'] ?? '';
-$vars['state'] = $vars['state'] ?? '';
+$vars['view'] ??= 'basic';
+$vars['graph'] ??= '';
+$vars['type'] ??= 'all';
+$vars['adminstatus'] ??= '';
+$vars['state'] ??= '';
 $width = $vars['width'] ?? '218';
 
 if ($optb == 'graphs' || $optc == 'graphs') {

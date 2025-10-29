@@ -138,9 +138,7 @@ class ValidationResult
     public function setList(string $description, array $list): ValidationResult
     {
         if (is_array(current($list))) {
-            $list = array_map(function ($item) {
-                return implode(' ', $item);
-            }, $list);
+            $list = array_map(fn ($item) => implode(' ', $item), $list);
         }
 
         $this->list_description = $description;

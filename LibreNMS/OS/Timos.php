@@ -156,22 +156,20 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         return SnmpQuery::hideMib()->abortOnFailure()->walk([
             'TIMETRA-MPLS-MIB::vRtrMplsLspTable',
             'TIMETRA-MPLS-MIB::vRtrMplsLspLastChange',
-        ])->mapTable(function ($value, $vrf_oid, $lsp_oid) {
-            return new MplsLsp([
-                'vrf_oid' => $vrf_oid,
-                'lsp_oid' => $lsp_oid,
-                'device_id' => $this->getDeviceId(),
-                'mplsLspRowStatus' => $value['vRtrMplsLspRowStatus'] ?? null,
-                'mplsLspLastChange' => round(($value['vRtrMplsLspLastChange'] ?? 0) / 100),
-                'mplsLspName' => $value['vRtrMplsLspName'] ?? null,
-                'mplsLspAdminState' => $value['vRtrMplsLspAdminState'] ?? null,
-                'mplsLspOperState' => $value['vRtrMplsLspOperState'] ?? null,
-                'mplsLspFromAddr' => $this->parseIpField($value, 'vRtrMplsLspNgFromAddr'),
-                'mplsLspToAddr' => $this->parseIpField($value, 'vRtrMplsLspNgToAddr'),
-                'mplsLspType' => $value['vRtrMplsLspType'] ?? null,
-                'mplsLspFastReroute' => $value['vRtrMplsLspFastReroute'] ?? null,
-            ]);
-        });
+        ])->mapTable(fn ($value, $vrf_oid, $lsp_oid) => new MplsLsp([
+            'vrf_oid' => $vrf_oid,
+            'lsp_oid' => $lsp_oid,
+            'device_id' => $this->getDeviceId(),
+            'mplsLspRowStatus' => $value['vRtrMplsLspRowStatus'] ?? null,
+            'mplsLspLastChange' => round(($value['vRtrMplsLspLastChange'] ?? 0) / 100),
+            'mplsLspName' => $value['vRtrMplsLspName'] ?? null,
+            'mplsLspAdminState' => $value['vRtrMplsLspAdminState'] ?? null,
+            'mplsLspOperState' => $value['vRtrMplsLspOperState'] ?? null,
+            'mplsLspFromAddr' => $this->parseIpField($value, 'vRtrMplsLspNgFromAddr'),
+            'mplsLspToAddr' => $this->parseIpField($value, 'vRtrMplsLspNgToAddr'),
+            'mplsLspType' => $value['vRtrMplsLspType'] ?? null,
+            'mplsLspFastReroute' => $value['vRtrMplsLspFastReroute'] ?? null,
+        ]));
     }
 
     /**
@@ -213,24 +211,22 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
      */
     public function discoverMplsSdps(): Collection
     {
-        return SnmpQuery::hideMib()->enumStrings()->walk('TIMETRA-SDP-MIB::sdpInfoTable')->mapTable(function ($value) {
-            return new MplsSdp([
-                'sdp_oid' => $value['sdpId'],
-                'device_id' => $this->getDeviceId(),
-                'sdpRowStatus' => $value['sdpRowStatus'] ?? null,
-                'sdpDelivery' => $value['sdpDelivery'] ?? null,
-                'sdpDescription' => $value['sdpDescription'] ?? null,
-                'sdpAdminStatus' => $value['sdpAdminStatus'] ?? null,
-                'sdpOperStatus' => $value['sdpOperStatus'] ?? null,
-                'sdpAdminPathMtu' => $value['sdpAdminPathMtu'] ?? null,
-                'sdpOperPathMtu' => $value['sdpOperPathMtu'] ?? null,
-                'sdpLastMgmtChange' => round(($value['sdpLastMgmtChange'] ?? 0) / 100),
-                'sdpLastStatusChange' => round(($value['sdpLastStatusChange'] ?? 0) / 100),
-                'sdpActiveLspType' => $value['sdpActiveLspType'] ?? null,
-                'sdpFarEndInetAddressType' => $value['sdpFarEndInetAddressType'] ?? null,
-                'sdpFarEndInetAddress' => IP::fromHexString($value['sdpFarEndInetAddress'] ?? $value['sdpFarEndIpAddress'] ?? '', true),
-            ]);
-        });
+        return SnmpQuery::hideMib()->enumStrings()->walk('TIMETRA-SDP-MIB::sdpInfoTable')->mapTable(fn ($value) => new MplsSdp([
+            'sdp_oid' => $value['sdpId'],
+            'device_id' => $this->getDeviceId(),
+            'sdpRowStatus' => $value['sdpRowStatus'] ?? null,
+            'sdpDelivery' => $value['sdpDelivery'] ?? null,
+            'sdpDescription' => $value['sdpDescription'] ?? null,
+            'sdpAdminStatus' => $value['sdpAdminStatus'] ?? null,
+            'sdpOperStatus' => $value['sdpOperStatus'] ?? null,
+            'sdpAdminPathMtu' => $value['sdpAdminPathMtu'] ?? null,
+            'sdpOperPathMtu' => $value['sdpOperPathMtu'] ?? null,
+            'sdpLastMgmtChange' => round(($value['sdpLastMgmtChange'] ?? 0) / 100),
+            'sdpLastStatusChange' => round(($value['sdpLastStatusChange'] ?? 0) / 100),
+            'sdpActiveLspType' => $value['sdpActiveLspType'] ?? null,
+            'sdpFarEndInetAddressType' => $value['sdpFarEndInetAddressType'] ?? null,
+            'sdpFarEndInetAddress' => IP::fromHexString($value['sdpFarEndInetAddress'] ?? $value['sdpFarEndIpAddress'] ?? '', true),
+        ]));
     }
 
     /**
@@ -437,31 +433,29 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             'TIMETRA-MPLS-MIB::vRtrMplsLspTable',
             'TIMETRA-MPLS-MIB::vRtrMplsLspLastChange',
             'TIMETRA-MPLS-MIB::vRtrMplsLspStatTable',
-        ])->mapTable(function ($value, $vrf_oid, $lsp_oid) {
-            return new MplsLsp([
-                'vrf_oid' => $vrf_oid,
-                'lsp_oid' => $lsp_oid,
-                'device_id' => $this->getDeviceId(),
-                'mplsLspRowStatus' => $value['vRtrMplsLspRowStatus'],
-                'mplsLspLastChange' => round(($value['vRtrMplsLspLastChange'] ?? 0) / 100),
-                'mplsLspName' => $value['vRtrMplsLspName'] ?? null,
-                'mplsLspAdminState' => $value['vRtrMplsLspAdminState'] ?? null,
-                'mplsLspOperState' => $value['vRtrMplsLspOperState'] ?? null,
-                'mplsLspFromAddr' => $this->parseIpField($value, 'vRtrMplsLspNgFromAddr'),
-                'mplsLspToAddr' => $this->parseIpField($value, 'vRtrMplsLspNgToAddr'),
-                'mplsLspType' => $value['vRtrMplsLspType'] ?? null,
-                'mplsLspFastReroute' => $value['vRtrMplsLspFastReroute'] ?? null,
-                'mplsLspAge' => abs($value['vRtrMplsLspAge'] ?? 0),
-                'mplsLspTimeUp' => abs($value['vRtrMplsLspTimeUp'] ?? 0),
-                'mplsLspTimeDown' => abs($value['vRtrMplsLspTimeDown'] ?? 0),
-                'mplsLspPrimaryTimeUp' => abs($value['vRtrMplsLspPrimaryTimeUp'] ?? 0),
-                'mplsLspTransitions' => $value['vRtrMplsLspTransitions'] ?? null,
-                'mplsLspLastTransition' => abs(round(($value['vRtrMplsLspLastTransition'] ?? 0) / 100)),
-                'mplsLspConfiguredPaths' => $value['vRtrMplsLspConfiguredPaths'] ?? null,
-                'mplsLspStandbyPaths' => $value['vRtrMplsLspStandbyPaths'] ?? null,
-                'mplsLspOperationalPaths' => $value['vRtrMplsLspOperationalPaths'] ?? null,
-            ]);
-        });
+        ])->mapTable(fn ($value, $vrf_oid, $lsp_oid) => new MplsLsp([
+            'vrf_oid' => $vrf_oid,
+            'lsp_oid' => $lsp_oid,
+            'device_id' => $this->getDeviceId(),
+            'mplsLspRowStatus' => $value['vRtrMplsLspRowStatus'],
+            'mplsLspLastChange' => round(($value['vRtrMplsLspLastChange'] ?? 0) / 100),
+            'mplsLspName' => $value['vRtrMplsLspName'] ?? null,
+            'mplsLspAdminState' => $value['vRtrMplsLspAdminState'] ?? null,
+            'mplsLspOperState' => $value['vRtrMplsLspOperState'] ?? null,
+            'mplsLspFromAddr' => $this->parseIpField($value, 'vRtrMplsLspNgFromAddr'),
+            'mplsLspToAddr' => $this->parseIpField($value, 'vRtrMplsLspNgToAddr'),
+            'mplsLspType' => $value['vRtrMplsLspType'] ?? null,
+            'mplsLspFastReroute' => $value['vRtrMplsLspFastReroute'] ?? null,
+            'mplsLspAge' => abs($value['vRtrMplsLspAge'] ?? 0),
+            'mplsLspTimeUp' => abs($value['vRtrMplsLspTimeUp'] ?? 0),
+            'mplsLspTimeDown' => abs($value['vRtrMplsLspTimeDown'] ?? 0),
+            'mplsLspPrimaryTimeUp' => abs($value['vRtrMplsLspPrimaryTimeUp'] ?? 0),
+            'mplsLspTransitions' => $value['vRtrMplsLspTransitions'] ?? null,
+            'mplsLspLastTransition' => abs(round(($value['vRtrMplsLspLastTransition'] ?? 0) / 100)),
+            'mplsLspConfiguredPaths' => $value['vRtrMplsLspConfiguredPaths'] ?? null,
+            'mplsLspStandbyPaths' => $value['vRtrMplsLspStandbyPaths'] ?? null,
+            'mplsLspOperationalPaths' => $value['vRtrMplsLspOperationalPaths'] ?? null,
+        ]));
     }
 
     /**
@@ -507,24 +501,22 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
      */
     public function pollMplsSdps(): Collection
     {
-        return SnmpQuery::hideMib()->enumStrings()->walk('TIMETRA-SDP-MIB::sdpInfoTable')->mapTable(function ($value) {
-            return new MplsSdp([
-                'sdp_oid' => $value['sdpId'],
-                'device_id' => $this->getDeviceId(),
-                'sdpRowStatus' => $value['sdpRowStatus'],
-                'sdpDelivery' => $value['sdpDelivery'],
-                'sdpDescription' => $value['sdpDescription'],
-                'sdpAdminStatus' => $value['sdpAdminStatus'],
-                'sdpOperStatus' => $value['sdpOperStatus'],
-                'sdpAdminPathMtu' => $value['sdpAdminPathMtu'],
-                'sdpOperPathMtu' => $value['sdpOperPathMtu'],
-                'sdpLastMgmtChange' => round($value['sdpLastMgmtChange'] / 100),
-                'sdpLastStatusChange' => round($value['sdpLastStatusChange'] / 100),
-                'sdpActiveLspType' => $value['sdpActiveLspType'] ?? null,
-                'sdpFarEndInetAddressType' => $value['sdpFarEndInetAddressType'] ?? null,
-                'sdpFarEndInetAddress' => IP::fromHexString($value['sdpFarEndInetAddress'] ?? $value['sdpFarEndIpAddress'] ?? '', true),
-            ]);
-        });
+        return SnmpQuery::hideMib()->enumStrings()->walk('TIMETRA-SDP-MIB::sdpInfoTable')->mapTable(fn ($value) => new MplsSdp([
+            'sdp_oid' => $value['sdpId'],
+            'device_id' => $this->getDeviceId(),
+            'sdpRowStatus' => $value['sdpRowStatus'],
+            'sdpDelivery' => $value['sdpDelivery'],
+            'sdpDescription' => $value['sdpDescription'],
+            'sdpAdminStatus' => $value['sdpAdminStatus'],
+            'sdpOperStatus' => $value['sdpOperStatus'],
+            'sdpAdminPathMtu' => $value['sdpAdminPathMtu'],
+            'sdpOperPathMtu' => $value['sdpOperPathMtu'],
+            'sdpLastMgmtChange' => round($value['sdpLastMgmtChange'] / 100),
+            'sdpLastStatusChange' => round($value['sdpLastStatusChange'] / 100),
+            'sdpActiveLspType' => $value['sdpActiveLspType'] ?? null,
+            'sdpFarEndInetAddressType' => $value['sdpFarEndInetAddressType'] ?? null,
+            'sdpFarEndInetAddress' => IP::fromHexString($value['sdpFarEndInetAddress'] ?? $value['sdpFarEndIpAddress'] ?? '', true),
+        ]));
     }
 
     /**

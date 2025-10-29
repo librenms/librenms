@@ -127,9 +127,7 @@ class PluginManager implements PluginManagerInterface
 
                     return 'HOOK FAILED';
                 }
-            })->filter(function ($hook) {
-                return $hook !== 'HOOK FAILED';
-            })->values()->all();
+            })->filter(fn ($hook) => $hook !== 'HOOK FAILED')->values()->all();
     }
 
     /**
@@ -247,12 +245,8 @@ class PluginManager implements PluginManagerInterface
         }
 
         return $this->hooks->get($hookType)
-            ->when($onlyPlugin, function (Collection $hooks, $only) {
-                return $hooks->where('plugin_name', $only);
-            })
-            ->filter(function ($hook) use ($args) {
-                return app()->call([$hook['instance'], 'authorize'], $this->fillArgs($args, $hook['plugin_name']));
-            });
+            ->when($onlyPlugin, fn (Collection $hooks, $only) => $hooks->where('plugin_name', $only))
+            ->filter(fn ($hook) => app()->call([$hook['instance'], 'authorize'], $this->fillArgs($args, $hook['plugin_name'])));
     }
 
     protected function fillArgs(array $args, string $pluginName): array

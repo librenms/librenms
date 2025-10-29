@@ -149,9 +149,7 @@ class CiHelper
      */
     public function allChecksComplete(): bool
     {
-        return array_reduce($this->completedChecks, function ($result, $check) {
-            return $result && $check;
-        }, false);
+        return array_reduce($this->completedChecks, fn ($result, $check) => $result && $check, false);
     }
 
     /**
@@ -249,9 +247,7 @@ class CiHelper
             $server->setTimeout(3600)
                 ->setIdleTimeout(3600)
                 ->start();
-            $server->waitUntil(function ($type, $output) {
-                return str_contains($output, 'Development Server (http://127.0.0.1:8000) started');
-            });
+            $server->waitUntil(fn ($type, $output) => str_contains($output, 'Development Server (http://127.0.0.1:8000) started'));
             if ($server->isRunning()) {
                 echo "Started server http://127.0.0.1:8000\n";
             }
