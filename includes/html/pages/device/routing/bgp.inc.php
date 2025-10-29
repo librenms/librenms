@@ -236,7 +236,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     echo '
         <td>' . $peeraddresslink . '<br />' . ($peername ?? '') . "</td>
         <td>$peer_type</td>
-        <td style='font-size: 10px; font-weight: bold; line-height: 10px;'>" . (isset($peer['afi']) ? $peer['afi'] : '') . '</td>
+        <td style='font-size: 10px; font-weight: bold; line-height: 10px;'>" . ($peer['afi'] ?? '') . '</td>
         <td><strong>AS' . $peer['bgpPeerRemoteAs'] . '</strong><br />' . $peer['astext'] . '</td>
         <td>' . $peer['bgpPeerDescr'] . "</td>
         <td><strong><span style='color: $admin_col;'>" . $peer['bgpPeerAdminStatus'] . "<span><br /><span style='color: $col;'>" . $peer['bgpPeerState'] . '</span></strong></td>

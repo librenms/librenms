@@ -336,13 +336,11 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
 
         // could use improvement by mapping JUNIPER-IFOPTICS-MIB::jnxOpticsConfigTable for a tiny bit more info
         return SnmpQuery::cache()->walk('JUNIPER-IFOPTICS-MIB::jnxOpticsPMCurrentTable')
-            ->mapTable(function ($data, $ifIndex) {
-                return new Transceiver([
-                    'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex),
-                    'index' => $ifIndex,
-                    'entity_physical_index' => $ifIndex,
-                ]);
-            });
+            ->mapTable(fn ($data, $ifIndex) => new Transceiver([
+                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex),
+                'index' => $ifIndex,
+                'entity_physical_index' => $ifIndex,
+            ]));
     }
 
     private function findTransceiverEntityByPortName(array $entPhysical, ?string $ifName): array
@@ -396,28 +394,24 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
             return $QBridgeMibVlans;
         }
 
-        $vlans = SnmpQuery::enumStrings()->walk('JUNIPER-VLAN-MIB::jnxExVlanTable')->mapTable(function ($data, $vlanId) {
-            return new Vlan([
-                'vlan_vlan' => $data['JUNIPER-VLAN-MIB::jnxExVlanTag'],
-                'vlan_domain' => $data['JUNIPER-VLAN-MIB::jnxExVlanPortGroupInstance'],
-                'vlan_type' => $data['JUNIPER-VLAN-MIB::jnxExVlanType'],
-                'vlan_name' => $data['JUNIPER-VLAN-MIB::jnxExVlanName'],
-            ]);
-        });
+        $vlans = SnmpQuery::enumStrings()->walk('JUNIPER-VLAN-MIB::jnxExVlanTable')->mapTable(fn ($data, $vlanId) => new Vlan([
+            'vlan_vlan' => $data['JUNIPER-VLAN-MIB::jnxExVlanTag'],
+            'vlan_domain' => $data['JUNIPER-VLAN-MIB::jnxExVlanPortGroupInstance'],
+            'vlan_type' => $data['JUNIPER-VLAN-MIB::jnxExVlanType'],
+            'vlan_name' => $data['JUNIPER-VLAN-MIB::jnxExVlanName'],
+        ]));
 
         if ($vlans->isNotEmpty()) {
             return $vlans;
         }
 
         return SnmpQuery::enumStrings()->walk('JUNIPER-L2ALD-MIB::jnxL2aldVlanTable')
-            ->mapTable(function ($data) {
-                return new Vlan([
-                    'vlan_vlan' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanTag'] ?? 0,
-                    'vlan_domain' => 1,
-                    'vlan_type' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanType'] ?? '',
-                    'vlan_name' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanName'] ?? '',
-                ]);
-            });
+            ->mapTable(fn ($data) => new Vlan([
+                'vlan_vlan' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanTag'] ?? 0,
+                'vlan_domain' => 1,
+                'vlan_type' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanType'] ?? '',
+                'vlan_name' => $data['JUNIPER-L2ALD-MIB::jnxL2aldVlanName'] ?? '',
+            ]));
     }
 
     public function discoverVlanPorts(Collection $vlans): Collection

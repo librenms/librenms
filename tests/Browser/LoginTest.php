@@ -34,7 +34,7 @@ final class LoginTest extends DuskTestCase
      */
     public function testUserCanLogin(): void
     {
-        $this->browse(function (Browser $browser) {
+        $this->browse(function (Browser $browser): void {
             $password = 'some_password';
             $user = User::factory()->create([
                 'password' => Hash::make($password),
@@ -60,7 +60,7 @@ final class LoginTest extends DuskTestCase
      */
     public function test2faLogin(): void
     {
-        $this->browse(function (Browser $browser) {
+        $this->browse(function (Browser $browser): void {
             $password = 'another_password';
             $user = User::factory()->create([
                 'password' => Hash::make($password),

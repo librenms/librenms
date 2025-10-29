@@ -148,7 +148,7 @@ class GraphController extends WidgetController
 
         $data['graph_ports'] = Port::whereIntegerInRaw('port_id', $data['graph_ports'])
             ->select('ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr')
-            ->with(['device' => function ($query) {
+            ->with(['device' => function ($query): void {
                 $query->select('device_id', 'hostname', 'sysName', 'display');
             }])->get();
 
@@ -207,7 +207,7 @@ class GraphController extends WidgetController
                     return $type;
                 })->flatten();
 
-                $port_ids = Port::hasAccess($request->user())->where(function ($query) use ($port_types) {
+                $port_ids = Port::hasAccess($request->user())->where(function ($query) use ($port_types): void {
                     foreach ($port_types as $port_type) {
                         $port_type = str_replace('@', '%', $port_type);
                         $query->orWhere('port_descr_type', 'LIKE', $port_type);
@@ -293,7 +293,7 @@ class GraphController extends WidgetController
         if ($setting && ! is_numeric($setting)) {
             $data = json_decode($setting, true);
 
-            return isset($data[$key]) ? $data[$key] : 0;
+            return $data[$key] ?? 0;
         }
 
         return $setting;

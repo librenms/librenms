@@ -79,7 +79,7 @@ class RoutesTablesController extends TableController
      */
     protected function baseQuery($request)
     {
-        $join = function ($query) {
+        $join = function ($query): void {
             $query->on('ports.port_id', 'route.port_id');
         };
         $showAllRoutes = trim(\Request::get('showAllRoutes'));
@@ -125,10 +125,8 @@ class RoutesTablesController extends TableController
         if ($search = trim(\Request::get('searchPhrase'))) {
             $searchLike = '%' . $search . '%';
 
-            return $query->where(function ($query) use ($searchLike) {
-                return $query->where('route.inetCidrRouteNextHop', 'like', $searchLike)
-                    ->orWhere('route.inetCidrRouteDest', 'like', $searchLike);
-            });
+            return $query->where(fn ($query) => $query->where('route.inetCidrRouteNextHop', 'like', $searchLike)
+                ->orWhere('route.inetCidrRouteDest', 'like', $searchLike));
         }
 
         return $query;

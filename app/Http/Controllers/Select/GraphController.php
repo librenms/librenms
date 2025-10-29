@@ -58,9 +58,7 @@ class GraphController extends Controller
             if ($graphs->isNotEmpty()) {
                 $data[] = [
                     'text' => StringHelpers::niceCase($type),
-                    'children' => $graphs->map(function ($graph) use ($type) {
-                        return $this->formatGraph($type, $graph);
-                    })->values(),
+                    'children' => $graphs->map(fn ($graph) => $this->formatGraph($type, $graph))->values(),
                 ];
             }
         }
@@ -75,9 +73,7 @@ class GraphController extends Controller
         if ($aggregators->isNotEmpty()) {
             $data[] = [
                 'text' => 'Aggregators',
-                'children' => $aggregators->map(function ($text, $id) {
-                    return ['id' => $id, 'text' => $text];
-                })->values(),
+                'children' => $aggregators->map(fn ($text, $id) => ['id' => $id, 'text' => $text])->values(),
             ];
         }
 
@@ -87,9 +83,7 @@ class GraphController extends Controller
         if ($billing->isNotEmpty()) {
             $data[] = [
                 'text' => 'Bill',
-                'children' => $billing->map(function ($text, $id) {
-                    return ['id' => $id, 'text' => $text];
-                })->values(),
+                'children' => $billing->map(fn ($text, $id) => ['id' => $id, 'text' => $text])->values(),
             ];
         }
 
@@ -137,15 +131,11 @@ class GraphController extends Controller
                 // search matches type, show all unless there are more terms.
                 if (! empty($terms)) {
                     $sub_search = array_shift($terms);
-                    $graphs = $graphs->filter(function ($graph) use ($sub_search) {
-                        return Str::contains(strtolower($graph), $sub_search);
-                    });
+                    $graphs = $graphs->filter(fn ($graph) => Str::contains(strtolower($graph), $sub_search));
                 }
             } else {
                 // if the type matches, don't filter the sub values
-                $graphs = $graphs->filter(function ($graph) use ($search) {
-                    return Str::contains(strtolower($graph), $search);
-                });
+                $graphs = $graphs->filter(fn ($graph) => Str::contains(strtolower($graph), $search));
             }
         }
 

@@ -60,9 +60,7 @@ class ErrorReporting
         $exceptions->report([$this, 'report']);
         $exceptions->render([$this, 'render']);
 
-        Flare::determineVersionUsing(function () {
-            return \LibreNMS\Util\Version::VERSION;
-        });
+        Flare::determineVersionUsing(fn () => \LibreNMS\Util\Version::VERSION);
     }
 
     public function reportable(Throwable $e): bool
@@ -161,7 +159,7 @@ class ErrorReporting
     {
         // throw exceptions and deprecations in testing and non-prod when APP_DEBUG is set.
         if ($environment == 'testing' || ($environment !== 'production' && config('app.debug'))) {
-            app()->booted(function () {
+            app()->booted(function (): void {
                 config([
                     'logging.deprecations.channel' => 'deprecations_channel',
                     'logging.deprecations.trace' => true,

@@ -57,7 +57,7 @@ print_optionbar_end();
 echo "<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=0 width=100%>";
 $i = '0';
 foreach (dbFetchRows('SELECT * FROM `loadbalancer_rservers` WHERE `device_id` = ? ORDER BY `farm_id`', [$device['device_id']]) as $rserver) {
-    if (is_integer($i / 2)) {
+    if (is_int($i / 2)) {
         $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
     } else {
         $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');

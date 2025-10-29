@@ -39,7 +39,7 @@ class ServiceController extends SelectController
     protected function baseQuery($request)
     {
         return Service::hasAccess($request->user())
-            ->with(['device' => function ($query) {
+            ->with(['device' => function ($query): void {
                 $query->select(['device_id', 'hostname', 'sysName', 'display']);
             }])
             ->select(['service_id', 'service_type', 'service_desc', 'device_id']);

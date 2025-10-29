@@ -108,9 +108,7 @@ trait CiscoPortSecurity
                 unset($entry['laravel_through_key']);
 
                 // Remove null values from record for comparison
-                $record = array_filter($record, function ($value) {
-                    return $value !== null;
-                });
+                $record = array_filter($record, fn ($value) => $value !== null);
 
                 // Checking that polled data exists and doesn't match. Else if polled data exists, insert a new record.
                 if (isset($record['port_security_enable']) and $record != $entry) {

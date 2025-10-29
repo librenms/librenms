@@ -142,20 +142,18 @@ class Procurve extends \LibreNMS\OS implements OSPolling, NacPolling, Transceive
 
     public function discoverTransceivers(): Collection
     {
-        return SnmpQuery::cache()->walk('HP-ICF-TRANSCEIVER-MIB::hpicfXcvrInfoTable')->mapTable(function ($data, $ifIndex) {
-            return new Transceiver([
-                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
-                'index' => $ifIndex,
-                'entity_physical_index' => $ifIndex,
-                'type' => $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrType'] ?? null,
-                'date' => isset($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrManufacDate']) ? Carbon::createFromFormat('mdy', $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrManufacDate'])->toDateString() : null,
-                'model' => $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrModel'] ?? null,
-                'serial' => $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrSerial'] ?? null,
-                'ddm' => empty($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrDiagnostics']) ? 0 : 1,
-                'distance' => isset($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrTxDist']) ? Number::extract($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrTxDist']) : null,
-                'wavelength' => isset($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrWavelength']) ? Number::extract($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrTxDist']) : null,
-                'connector' => $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrConnectorType'] ?? null,
-            ]);
-        });
+        return SnmpQuery::cache()->walk('HP-ICF-TRANSCEIVER-MIB::hpicfXcvrInfoTable')->mapTable(fn ($data, $ifIndex) => new Transceiver([
+            'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
+            'index' => $ifIndex,
+            'entity_physical_index' => $ifIndex,
+            'type' => $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrType'] ?? null,
+            'date' => isset($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrManufacDate']) ? Carbon::createFromFormat('mdy', $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrManufacDate'])->toDateString() : null,
+            'model' => $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrModel'] ?? null,
+            'serial' => $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrSerial'] ?? null,
+            'ddm' => empty($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrDiagnostics']) ? 0 : 1,
+            'distance' => isset($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrTxDist']) ? Number::extract($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrTxDist']) : null,
+            'wavelength' => isset($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrWavelength']) ? Number::extract($data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrTxDist']) : null,
+            'connector' => $data['HP-ICF-TRANSCEIVER-MIB::hpicfXcvrConnectorType'] ?? null,
+        ]));
     }
 }

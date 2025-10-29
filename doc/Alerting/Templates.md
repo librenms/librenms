@@ -510,7 +510,7 @@ The included templates apart from the default template are:
 
 ```php
 {
-    "@context": "https://schema.org/extensions",
+    "@@context": "https://schema.org/extensions",
     "@type": "MessageCard",
     "title": "{{ $alert->title }}",
 @if ($alert->state === 0)

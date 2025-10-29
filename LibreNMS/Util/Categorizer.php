@@ -35,9 +35,7 @@ class Categorizer
 
     public function __construct($items = [])
     {
-        $this->skippable = function ($item) {
-            return false;
-        };
+        $this->skippable = (fn ($item) => false);
         $this->items = $items;
     }
 

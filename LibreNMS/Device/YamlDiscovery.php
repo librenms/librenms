@@ -63,7 +63,7 @@ class YamlDiscovery
                 continue;
             }
 
-            $group_options = isset($first_yaml['options']) ? $first_yaml['options'] : [];
+            $group_options = $first_yaml['options'] ?? [];
 
             // find the data array, we could already be at for simple modules
             if (isset($data['data'])) {
