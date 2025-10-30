@@ -49,10 +49,8 @@ class OsController
             ];
         }, $items);
 
-        usort($scored, function ($a, $b) {
-            return ($b['hasPrefix'] <=> $a['hasPrefix'])
-                ?: ($a['distance'] <=> $b['distance']);
-        });
+        usort($scored, fn($a, $b) => ($b['hasPrefix'] <=> $a['hasPrefix'])
+            ?: ($a['distance'] <=> $b['distance']));
 
         return array_column($scored, 'item');
     }
