@@ -182,7 +182,9 @@ class AvailabilityMapController extends WidgetController
 
     private function getDeviceLabel(Device $device, string $state_name): string
     {
-        return match ($this->getSettings()['color_only_select']) {
+        $choice = (int) ($this->getSettings()['color_only_select'] ?? 0);
+
+        return match ($choice) {
             1 => '',
             4 => $device->shortDisplayName(),
             2 => strtolower($device->hostname),
@@ -193,7 +195,9 @@ class AvailabilityMapController extends WidgetController
 
     private function getServiceLabel(Service $service): string
     {
-        if ($this->getSettings()['color_only_select'] == 1) {
+        $choice = (int) ($this->getSettings()['color_only_select'] ?? 0);
+
+        if ($choice == 1) {
             return '';
         }
 
