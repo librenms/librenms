@@ -274,7 +274,7 @@ trait HostResources
             return false;
         }
 
-        $hrStorageDescr = strtolower($storage['hrStorageDescr']);
+        $hrStorageDescr = strtolower((string) $storage['hrStorageDescr']);
 
         if ($storage['hrStorageType'] == 'hrStorageOther' && ! in_array($hrStorageDescr, $this->validOtherMemory)) {
             Log::debug("hrStorageIndex {$storage['hrStorageIndex']} invalid: hrStorageOther & not an exception");
@@ -302,19 +302,19 @@ trait HostResources
 
     protected function fixBadTypes($hrStorageType): string
     {
-        if (str_starts_with($hrStorageType, 'hrStorage')) {
+        if (str_starts_with((string) $hrStorageType, 'hrStorage')) {
             // fix some that set them incorrectly as scalars
-            return preg_replace('/\.0$/', '', $hrStorageType);
+            return preg_replace('/\.0$/', '', (string) $hrStorageType);
         }
 
         // if the agent returns with a bad base oid, just take the last index off the oid and manually convert it
-        if (preg_match('/\.(\d+)$/', $hrStorageType, $matches)) {
+        if (preg_match('/\.(\d+)$/', (string) $hrStorageType, $matches)) {
             if (isset($this->hrTypes[$matches[1]])) {
                 return $this->hrTypes[$matches[1]];
             }
         }
 
-        if (str_starts_with($hrStorageType, 'hr')) {
+        if (str_starts_with((string) $hrStorageType, 'hr')) {
             return $hrStorageType; // pass through other types (such as fs)
         }
 

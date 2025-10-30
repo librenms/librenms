@@ -9,9 +9,9 @@ use LibreNMS\Polling\ConnectivityHelper;
 class CheckDeviceAvailability
 {
     public function __construct(
-        private SetDeviceAvailability $setDeviceAvailability,
-        private DeviceIsPingable $deviceIsPingable,
-        private DeviceIsSnmpable $deviceIsSnmpable,
+        private readonly SetDeviceAvailability $setDeviceAvailability,
+        private readonly DeviceIsPingable $deviceIsPingable,
+        private readonly DeviceIsSnmpable $deviceIsSnmpable,
     ) {
     }
 

@@ -14,7 +14,7 @@ echo ' | Sources: ';
 $sources = $app->data['sources'] ?? [];
 sort($sources);
 foreach ($sources as $index => $source) {
-    $source = htmlspecialchars($source);
+    $source = htmlspecialchars((string) $source);
     $label = $vars['source'] == $source
         ? '<span class="pagemenu-selected">' . $source . '</span>'
         : $source;

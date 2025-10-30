@@ -19,7 +19,7 @@ if (is_array($temp)) {
             continue;
         }
         if ($temp[$index]['ciscoEnvMonTemperatureState'] != 'notPresent' && ! empty($temp[$index]['ciscoEnvMonTemperatureStatusDescr'])) {
-            $descr = ucwords($temp[$index]['ciscoEnvMonTemperatureStatusDescr']);
+            $descr = ucwords((string) $temp[$index]['ciscoEnvMonTemperatureStatusDescr']);
             discover_sensor(null, 'temperature', $device, $cur_oid . $index, $index, 'cisco', $descr, '1', '1', null, null, null, $temp[$index]['ciscoEnvMonTemperatureThreshold'], $temp[$index]['ciscoEnvMonTemperatureStatusValue'], 'snmp', $index);
         }
     }

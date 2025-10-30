@@ -37,7 +37,7 @@ if (! empty($temp)) {
     create_state_index($state_name, $states);
 
     foreach ($temp[$state_name] as $index => $value) {
-        $port = PortCache::getByIfIndex(preg_replace('/^\d+\./', '', $index), $device['device_id']);
+        $port = PortCache::getByIfIndex(preg_replace('/^\d+\./', '', (string) $index), $device['device_id']);
         $descr = trim($port?->ifDescr . ' Suspended Status');
 
         if (Str::contains($descr, ['ethernet', 'Ethernet']) && $port?->ifOperStatus !== 'notPresent') {

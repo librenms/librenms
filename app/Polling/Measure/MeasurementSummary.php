@@ -34,7 +34,7 @@ class MeasurementSummary
     private $checkpointCount = 0;
     private $checkpointDuration = 0.0;
 
-    public function __construct(private string $type)
+    public function __construct(private readonly string $type)
     {
     }
 

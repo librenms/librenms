@@ -28,7 +28,7 @@ if (is_array($pre_cache['adva_fsp3kr7_Card'])) {
     foreach (array_keys($pre_cache['adva_fsp3kr7_Card']) as $index) {
         if ($pre_cache['adva_fsp3kr7_Card'][$index]['eqptPhysInstValuePsuVoltInp']) {
             $oid = '.1.3.6.1.4.1.2544.1.11.11.1.2.1.1.1.7.' . $index;
-            $descr = strtoupper($pre_cache['adva_fsp3kr7_Card'][$index]['entityEqptAidString']) . ' Input';
+            $descr = strtoupper((string) $pre_cache['adva_fsp3kr7_Card'][$index]['entityEqptAidString']) . ' Input';
             $rrd_filename = $descr;
             $current = $pre_cache['adva_fsp3kr7_Card'][$index]['eqptPhysInstValuePsuVoltInp'] / $divisor;
 

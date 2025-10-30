@@ -340,7 +340,7 @@ if (! Auth::user()->hasGlobalRead()) {
             case 'prefixes_ipv4vpn':
             case 'prefixes_ipv6unicast':
             case 'prefixes_ipv6multicast':
-                [,$afisafi] = explode('_', $vars['graph']);
+                [,$afisafi] = explode('_', (string) $vars['graph']);
                 if (isset($peer['afisafi'][$afisafi])) {
                     $peer['graph'] = 1;
                 }

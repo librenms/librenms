@@ -83,16 +83,16 @@ class TnmsneController extends TableController
     {
         $neOp = $tnmsne->neOpMode == 'operation'
             ? '<span style="min-width:40px;" class="label label-success">operation</span>'
-            : '<span style="min-width:40px;" class="label label-danger">' . htmlspecialchars($tnmsne->neOpMode) . '</span>';
+            : '<span style="min-width:40px;" class="label label-danger">' . htmlspecialchars((string) $tnmsne->neOpMode) . '</span>';
 
         $opState = $tnmsne->neOpState == 'enabled'
             ? '<td class="list"><span style="min-width:40px;" class="label label-success">enabled</span></td>'
-            : '<td class="list"><span style="min-width:40px;" class="label label-danger">' . htmlspecialchars($tnmsne->neOpState) . '</span></td>';
+            : '<td class="list"><span style="min-width:40px;" class="label label-danger">' . htmlspecialchars((string) $tnmsne->neOpState) . '</span></td>';
 
         return [
-            'neName' => htmlspecialchars($tnmsne->neName),
-            'neLocation' => htmlspecialchars($tnmsne->neLocation),
-            'neType' => htmlspecialchars($tnmsne->neType),
+            'neName' => htmlspecialchars((string) $tnmsne->neName),
+            'neLocation' => htmlspecialchars((string) $tnmsne->neLocation),
+            'neType' => htmlspecialchars((string) $tnmsne->neType),
             'neOpMode' => $neOp,
             'neAlarm' => $this->getAlarmLabel($tnmsne->neAlarm),
             'neOpState' => $opState,

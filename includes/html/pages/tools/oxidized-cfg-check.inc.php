@@ -8,7 +8,7 @@ if (isset($_POST['config'])) {
         $oxidized_cfg = Yaml::parse($_POST['config']);
         $validate_cfg = validate_oxidized_cfg($oxidized_cfg);
         foreach ($validate_cfg as $error) {
-            $error = htmlspecialchars($error);
+            $error = htmlspecialchars((string) $error);
             echo "<div class='alert alert-danger'>$error</div>";
         }
         if (empty($validate_cfg)) {
@@ -24,7 +24,7 @@ if (isset($_POST['config'])) {
         <?php echo csrf_field() ?>
         <div class="form-group">
             <label for="exampleInputEmail1">Paste your Oxidized yaml config:</label>
-            <textarea name="config" value="config" rows="20" class="form-control" placeholder="Paste your Oxidized yaml config"><?php echo htmlspecialchars($_POST['config']); ?></textarea>
+            <textarea name="config" value="config" rows="20" class="form-control" placeholder="Paste your Oxidized yaml config"><?php echo htmlspecialchars((string) $_POST['config']); ?></textarea>
         </div>
         <button type="submit" class="btn btn-default btn-primary">Validate YAML</button>
     </form>

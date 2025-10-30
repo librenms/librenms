@@ -354,8 +354,8 @@ class Billing
         $allowed_val = null;
 
         foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY `bill_datefrom` DESC LIMIT 12', [$bill_id]) as $data) {
-            $datefrom = date('Y-m-d', strtotime($data['bill_datefrom']));
-            $dateto = date('Y-m-d', strtotime($data['bill_dateto']));
+            $datefrom = date('Y-m-d', strtotime((string) $data['bill_datefrom']));
+            $dateto = date('Y-m-d', strtotime((string) $data['bill_dateto']));
             $datelabel = $datefrom . ' - ' . $dateto;
 
             array_push($ticklabels, $datelabel);

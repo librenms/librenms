@@ -222,7 +222,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         foreach ($bill_perms as $bill_perm) {
             echo '<tr>
               <td>
-                <strong>' . htmlentities($bill_perm['bill_name']) . "</strong></td><td width=50>&nbsp;&nbsp;<a href='edituser/action=delbillperm/user_id=" . $vars['user_id'] . '/bill_id=' . $bill_perm['bill_id'] . "'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a>
+                <strong>' . htmlentities((string) $bill_perm['bill_name']) . "</strong></td><td width=50>&nbsp;&nbsp;<a href='edituser/action=delbillperm/user_id=" . $vars['user_id'] . '/bill_id=' . $bill_perm['bill_id'] . "'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a>
               </td>
             </tr>";
             $bill_access_list[] = $bill_perm['bill_id'];

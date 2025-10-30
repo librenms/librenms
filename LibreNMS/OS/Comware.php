@@ -44,7 +44,7 @@ class Comware extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
         parent::discoverOS($device); // yaml
 
         // serial
-        $serial_nums = explode("\n", snmp_walk($this->getDeviceArray(), 'hh3cEntityExtManuSerialNum', '-Osqv', 'HH3C-ENTITY-EXT-MIB'));
+        $serial_nums = explode("\n", (string) snmp_walk($this->getDeviceArray(), 'hh3cEntityExtManuSerialNum', '-Osqv', 'HH3C-ENTITY-EXT-MIB'));
         $this->getDevice()->serial = $serial_nums[0]; // use the first s/n
     }
 

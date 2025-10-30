@@ -66,7 +66,7 @@ class DeviceGroupController extends Controller
             $deviceGroup->devices()->sync($request->devices);
         }
 
-        $toast->success(__('Device Group :name created', ['name' => htmlentities($deviceGroup->name)]));
+        $toast->success(__('Device Group :name created', ['name' => htmlentities((string) $deviceGroup->name)]));
 
         return redirect()->route('device-groups.index');
     }

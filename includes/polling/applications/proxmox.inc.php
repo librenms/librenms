@@ -58,7 +58,7 @@ if (\App\Facades\LibrenmsConfig::get('enable_proxmox') && ! empty($agent_data['a
 }
 
 if (! empty($proxmox)) {
-    $pmxlines = explode("\n", $proxmox);
+    $pmxlines = explode("\n", (string) $proxmox);
     $pmxcluster = array_shift($pmxlines);
     dbUpdate(
         ['device_id' => $device['device_id'], 'app_type' => $name, 'app_instance' => $pmxcluster],

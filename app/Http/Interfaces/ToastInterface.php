@@ -31,7 +31,7 @@ use Illuminate\Session\SessionManager;
 class ToastInterface
 {
     public function __construct(
-        private SessionManager $session
+        private readonly SessionManager $session
     ) {
     }
 

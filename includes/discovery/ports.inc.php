@@ -128,7 +128,7 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
     if (is_port_valid($snmp_data, $device)) {
         port_fill_missing_and_trim($snmp_data, $device);
 
-        if ($device['os'] == 'vmware-vcsa' && preg_match('/Device ([a-z0-9]+) at .*/', $snmp_data['ifDescr'], $matches)) {
+        if ($device['os'] == 'vmware-vcsa' && preg_match('/Device ([a-z0-9]+) at .*/', (string) $snmp_data['ifDescr'], $matches)) {
             $snmp_data['ifName'] = $matches[1];
         }
 

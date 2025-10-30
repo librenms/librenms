@@ -112,7 +112,7 @@ class CustomMapBackgroundController extends Controller
                 $map->background()->save($background);
                 Cache::driver('file')->forget($this->getCacheKey($map)); // clear old image cache if present
                 $map->background_data = array_merge($map->background_data ?? [], [
-                    'version' => md5($background->background_image),
+                    'version' => md5((string) $background->background_image),
                     'original_filename' => $request->image->getClientOriginalName(),
                     'mime' => $mimeType,
                 ]);

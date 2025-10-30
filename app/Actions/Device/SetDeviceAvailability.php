@@ -8,7 +8,7 @@ use LibreNMS\Enum\AvailabilitySource;
 class SetDeviceAvailability
 {
     public function __construct(
-        private UpdateDeviceOutage $updateDeviceOutage,
+        private readonly UpdateDeviceOutage $updateDeviceOutage,
     ) {
     }
 

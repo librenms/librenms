@@ -65,7 +65,6 @@ final class SocialiteControllerTest extends TestCase
         $controller = new SocialiteController();
         $reflectionClass = new \ReflectionClass($controller);
         $prop = $reflectionClass->getProperty('socialite_user');
-        $prop->setAccessible(true);
         $prop->setValue($controller, $socialiteUserStub);
 
         // Stub the User model and assert syncRoles().
@@ -80,7 +79,6 @@ final class SocialiteControllerTest extends TestCase
 
         // Invoke the private method with the chosen provider.
         $method = $reflectionClass->getMethod('setRolesFromClaim');
-        $method->setAccessible(true);
 
         return $method->invokeArgs($controller, [$provider, $userMock]);
     }

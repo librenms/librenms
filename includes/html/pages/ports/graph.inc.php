@@ -6,7 +6,7 @@ echo $displayLists;
 echo '</div>';
 echo '<div class="panel-body">';
 echo '<div style="padding-bottom: 10px;">';
-echo stripcslashes($output);
+echo stripcslashes((string) $output);
 echo '</div>';
 
 $param = [];

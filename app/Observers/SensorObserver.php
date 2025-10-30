@@ -11,7 +11,7 @@ use LibreNMS\Enum\Severity;
 
 class SensorObserver
 {
-    private bool $consoleOutputEnabled;
+    private readonly bool $consoleOutputEnabled;
 
     public function __construct(Application $app)
     {

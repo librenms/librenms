@@ -62,7 +62,7 @@ $device = DeviceCache::get($device_id);
 $device_selected = json_encode($device->exists ? ['id' => $device->device_id, 'text' => $device->displayName()] : '');
 
 if (isset($_POST['state'])) {
-    $selected_state = '<option value="' . htmlspecialchars($_POST['state']) . '" selected="selected">';
+    $selected_state = '<option value="' . htmlspecialchars((string) $_POST['state']) . '" selected="selected">';
     $selected_state .= array_search((int) $_POST['state'], $alert_states) . '</option>';
 } else {
     $selected_state = '';
@@ -152,8 +152,8 @@ $common_output[] = '<div class="form-group"> \
         post: function () {
             return {
                 id: "alertlog",
-                device_id: \'' . htmlspecialchars($device_id ?: '') . '\',
-                state: \'' . htmlspecialchars($_POST['state']) . '\',
+                device_id: \'' . htmlspecialchars((string) $device_id ?: '') . '\',
+                state: \'' . htmlspecialchars((string) $_POST['state']) . '\',
                 min_severity: \'' . htmlspecialchars($_POST['min_severity']) . '\'
             };
         },

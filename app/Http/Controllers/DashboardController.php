@@ -154,7 +154,7 @@ class DashboardController extends Controller
             'dashboard_name' => 'string|max:255',
         ]);
 
-        $name = trim(strip_tags($request->get('dashboard_name')));
+        $name = trim(strip_tags((string) $request->get('dashboard_name')));
         $dashboard = Dashboard::create([
             'user_id' => Auth::id(),
             'dashboard_name' => $name,

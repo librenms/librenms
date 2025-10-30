@@ -31,7 +31,7 @@ class Measurement
     private $start;
     private $duration;
 
-    private function __construct(private string $type, ?float $duration = null)
+    private function __construct(private readonly string $type, ?float $duration = null)
     {
         $this->start = microtime(true);
         if ($duration !== null) {

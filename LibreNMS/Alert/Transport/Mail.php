@@ -47,10 +47,10 @@ class Mail extends Transport
 
         if ($html && ! $this->isHtmlContent($alert_data['msg'])) {
             // if there are no html tags in the content, but we are sending an html email, use br for line returns instead
-            $msg = preg_replace("/\r?\n/", "<br />\n", $alert_data['msg']);
+            $msg = preg_replace("/\r?\n/", "<br />\n", (string) $alert_data['msg']);
         } else {
             // fix line returns for windows mail clients
-            $msg = preg_replace("/(?<!\r)\n/", "\r\n", $alert_data['msg']);
+            $msg = preg_replace("/(?<!\r)\n/", "\r\n", (string) $alert_data['msg']);
         }
 
         try {

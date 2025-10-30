@@ -3,7 +3,7 @@
 $vars = \LibreNMS\Util\Url::parseLegacyPathVars($_SERVER['REQUEST_URI'] ?? null);
 
 foreach ($_GET as $name => $value) {
-    $vars[$name] = strip_tags($value);
+    $vars[$name] = strip_tags((string) $value);
 }
 
 foreach ($_POST as $name => $value) {

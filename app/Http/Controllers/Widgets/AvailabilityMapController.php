@@ -173,10 +173,10 @@ class AvailabilityMapController extends WidgetController
     private function sort(array &$data): void
     {
         match ($this->getSettings()['order_by']) {
-            'status' => usort($data, fn ($l, $r) => ($l['status'] <=> $r['status']) ?: strcasecmp($l['label'], $r['label'])),
-            'label' => usort($data, fn ($l, $r) => strcasecmp($l['label'], $r['label'])),
+            'status' => usort($data, fn ($l, $r) => ($l['status'] <=> $r['status']) ?: strcasecmp((string) $l['label'], (string) $r['label'])),
+            'label' => usort($data, fn ($l, $r) => strcasecmp((string) $l['label'], (string) $r['label'])),
             // device display name (tooltip starts with the display name)
-            default => usort($data, fn ($l, $r) => strcasecmp($l['tooltip'], $r['tooltip']) ?: strcasecmp($l['label'], $r['label'])),
+            default => usort($data, fn ($l, $r) => strcasecmp((string) $l['tooltip'], (string) $r['tooltip']) ?: strcasecmp((string) $l['label'], (string) $r['label'])),
         };
     }
 

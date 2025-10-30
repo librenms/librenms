@@ -9,7 +9,7 @@ if ($oids) {
     $divisor = 1;
     $type = 'f5';
 
-    foreach (explode("\n", $oids) as $data) {
+    foreach (explode("\n", (string) $oids) as $data) {
         $data = trim($data);
         if ($data) {
             [$oid, $fanspeed] = explode(' ', $data, 2);

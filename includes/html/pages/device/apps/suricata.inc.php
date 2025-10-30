@@ -37,7 +37,7 @@ echo ' | Instances: ';
 $suricata_instances = $app->data['instances'] ?? [];
 sort($suricata_instances);
 foreach ($suricata_instances as $index => $sinstance) {
-    $sinstance = htmlspecialchars($sinstance);
+    $sinstance = htmlspecialchars((string) $sinstance);
     $label = $vars['sinstance'] == $sinstance
         ? '<span class="pagemenu-selected">' . $sinstance . '</span>'
         : $sinstance;

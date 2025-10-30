@@ -50,7 +50,7 @@ abstract class DeviceOverviewHook implements \LibreNMS\Interfaces\Plugins\Hooks\
 
     final public function handle(string $pluginName, array $settings, Device $device, Application $app): \Illuminate\Contracts\View\View
     {
-        return view(Str::start($this->view, "$pluginName::"), $app->call([$this, 'data'], [
+        return view(Str::start($this->view, "$pluginName::"), $app->call($this->data(...), [
             'device' => $device,
             'settings' => $settings,
         ]));

@@ -23,26 +23,26 @@ function toner2colour($descr, $percent)
 {
     $colour = \LibreNMS\Util\Color::percentage(100 - $percent, null);
 
-    if (str_ends_with($descr, 'C') || stripos($descr, 'cyan') !== false) {
+    if (str_ends_with((string) $descr, 'C') || stripos((string) $descr, 'cyan') !== false) {
         $colour['left'] = '55D6D3';
         $colour['right'] = '33B4B1';
     }
 
-    if (str_ends_with($descr, 'M') || stripos($descr, 'magenta') !== false) {
+    if (str_ends_with((string) $descr, 'M') || stripos((string) $descr, 'magenta') !== false) {
         $colour['left'] = 'F24AC8';
         $colour['right'] = 'D028A6';
     }
 
-    if (str_ends_with($descr, 'Y') || stripos($descr, 'yellow') !== false
-        || stripos($descr, 'giallo') !== false
-        || stripos($descr, 'gul') !== false
+    if (str_ends_with((string) $descr, 'Y') || stripos((string) $descr, 'yellow') !== false
+        || stripos((string) $descr, 'giallo') !== false
+        || stripos((string) $descr, 'gul') !== false
     ) {
         $colour['left'] = 'FFF200';
         $colour['right'] = 'DDD000';
     }
 
-    if (str_ends_with($descr, 'K') || stripos($descr, 'black') !== false
-        || stripos($descr, 'nero') !== false
+    if (str_ends_with((string) $descr, 'K') || stripos((string) $descr, 'black') !== false
+        || stripos((string) $descr, 'nero') !== false
     ) {
         $colour['left'] = '000000';
         $colour['right'] = '222222';
@@ -63,7 +63,7 @@ function escape_quotes($text)
 
 function generate_overlib_content($graph_array, $text)
 {
-    $overlib_content = '<div class=overlib><span class=overlib-text>' . htmlspecialchars($text) . '</span><br />';
+    $overlib_content = '<div class=overlib><span class=overlib-text>' . htmlspecialchars((string) $text) . '</span><br />';
     foreach (['day', 'week', 'month', 'year'] as $period) {
         $graph_array['from'] = LibrenmsConfig::get("time.$period");
         $overlib_content .= escape_quotes(Url::graphTag($graph_array));
@@ -146,7 +146,7 @@ function generate_dynamic_graph_tag($args)
     $urlargs = [];
     $width = 0;
     foreach ($args as $key => $arg) {
-        switch (strtolower($key)) {
+        switch (strtolower((string) $key)) {
             case 'width':
                 $width = $arg;
                 $value = '{{width}}';
@@ -563,7 +563,7 @@ function alert_details($details)
         if (isset($details['diff']['added'])) {
             foreach (array_values($details['diff']['added'] ?? []) as $oa => $tmp_alerts_added) {
                 $fault_detail = format_alert_details($oa, $tmp_alerts_added, 'Added');
-                $max_row_length = strlen(strip_tags($fault_detail)) > $max_row_length ? strlen(strip_tags($fault_detail)) : $max_row_length;
+                $max_row_length = strlen(strip_tags((string) $fault_detail)) > $max_row_length ? strlen(strip_tags((string) $fault_detail)) : $max_row_length;
                 $all_fault_detail .= $fault_detail;
             }//end foreach
         }
@@ -572,7 +572,7 @@ function alert_details($details)
         if (isset($details['diff']['resolved'])) {
             foreach (array_values($details['diff']['resolved'] ?? []) as $or => $tmp_alerts_resolved) {
                 $fault_detail = format_alert_details($or, $tmp_alerts_resolved, 'Resolved');
-                $max_row_length = strlen(strip_tags($fault_detail)) > $max_row_length ? strlen(strip_tags($fault_detail)) : $max_row_length;
+                $max_row_length = strlen(strip_tags((string) $fault_detail)) > $max_row_length ? strlen(strip_tags((string) $fault_detail)) : $max_row_length;
                 $all_fault_detail .= $fault_detail;
             }//end foreach
         }
@@ -583,7 +583,7 @@ function alert_details($details)
 
     foreach ($details['rule'] ?? [] as $o => $tmp_alerts_rule) {
         $fault_detail = format_alert_details($o, $tmp_alerts_rule);
-        $max_row_length = strlen(strip_tags($fault_detail)) > $max_row_length ? strlen(strip_tags($fault_detail)) : $max_row_length;
+        $max_row_length = strlen(strip_tags((string) $fault_detail)) > $max_row_length ? strlen(strip_tags((string) $fault_detail)) : $max_row_length;
         $all_fault_detail .= $fault_detail;
     }//end foreach
 
@@ -755,9 +755,9 @@ function dynamic_override_config($type, $name, $device)
         $checked = '';
     }
     if ($type == 'checkbox') {
-        return '<input type="checkbox" id="override_config" name="override_config" data-attrib="' . htmlentities($name) . '" data-device_id="' . $device['device_id'] . '" data-size="small" ' . $checked . '>';
+        return '<input type="checkbox" id="override_config" name="override_config" data-attrib="' . htmlentities((string) $name) . '" data-device_id="' . $device['device_id'] . '" data-size="small" ' . $checked . '>';
     } elseif ($type == 'text') {
-        return '<input type="text" id="override_config_text" name="override_config_text" data-attrib="' . htmlentities($name) . '" data-device_id="' . $device['device_id'] . '" value="' . htmlentities($attrib_val) . '">';
+        return '<input type="text" id="override_config_text" name="override_config_text" data-attrib="' . htmlentities((string) $name) . '" data-device_id="' . $device['device_id'] . '" value="' . htmlentities((string) $attrib_val) . '">';
     }
 }//end dynamic_override_config()
 
@@ -823,7 +823,7 @@ function get_ports_from_type($given_types)
  */
 function file_download($filename, $content)
 {
-    $length = strlen($content);
+    $length = strlen((string) $content);
     header('Content-Description: File Transfer');
     header('Content-Type: text/plain');
     header("Content-Disposition: attachment; filename=$filename");

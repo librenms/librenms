@@ -11,11 +11,11 @@ if ($height < '99') {
 
 $i = 1;
 
-foreach (explode(',', $vars['id']) as $ifid) {
+foreach (explode(',', (string) $vars['id']) as $ifid) {
     $int = dbFetchRow('SELECT `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', [$ifid]);
     $rrd_file = get_port_rrdfile_path($int['hostname'], $ifid);
     if (Rrd::checkRrdExists($rrd_file)) {
-        if (strstr($inverse, 'a')) {
+        if (strstr((string) $inverse, 'a')) {
             $in = 'OUT';
             $out = 'IN';
         } else {
@@ -37,11 +37,11 @@ foreach (explode(',', $vars['id']) as $ifid) {
 unset($seperator);
 unset($plus);
 
-foreach (explode(',', $vars['idb']) as $ifid) {
+foreach (explode(',', (string) $vars['idb']) as $ifid) {
     $int = dbFetchRow('SELECT `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', [$ifid]);
     $rrd_file = get_port_rrdfile_path($int['hostname'], $ifid);
     if (Rrd::checkRrdExists($rrd_file)) {
-        if (strstr($inverse, 'b')) {
+        if (strstr((string) $inverse, 'b')) {
             $in = 'OUT';
             $out = 'IN';
         } else {
@@ -63,11 +63,11 @@ foreach (explode(',', $vars['idb']) as $ifid) {
 unset($seperator);
 unset($plus);
 
-foreach (explode(',', $vars['idc']) as $ifid) {
+foreach (explode(',', (string) $vars['idc']) as $ifid) {
     $int = dbFetchRow('SELECT `hostname` FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', [$ifid]);
     $rrd_file = get_port_rrdfile_path($int['hostname'], $ifid);
     if (Rrd::checkRrdExists($rrd_file)) {
-        if (strstr($inverse, 'c')) {
+        if (strstr((string) $inverse, 'c')) {
             $in = 'OUT';
             $out = 'IN';
         } else {
