@@ -50,7 +50,7 @@ class InfluxDB extends BaseDatastore
 
         // if the database doesn't exist, create it.
         // this only works if the transport is TCP-based.
-        if (! $this->isUdp === true) {
+        if ($this->isUdp === false) {
             try {
                 if (! $this->connection->exists()) {
                     $this->connection->create();
