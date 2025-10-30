@@ -39,20 +39,25 @@ class InfluxDB extends BaseDatastore
     private $batchPoints = []; // Store points before writing
     private $batchSize = 0; // Number of points to write at once
     private $measurements = []; // List of measurements to write
+    private $isUdp = false; // Is this using a UDP transport
 
     public function __construct(private Database $connection)
     {
         parent::__construct();
         $this->batchSize = LibrenmsConfig::get('influxdb.batch_size', 0);
         $this->measurements = LibrenmsConfig::get('influxdb.measurements', []);
+        $this->isUdp = LibrenmsConfig::get('influxdb.transport', 'http') === 'udp';
 
         // if the database doesn't exist, create it.
-        try {
-            if (! $this->connection->exists()) {
-                $this->connection->create();
+        // this only works if the transport is TCP-based.
+        if (! $this->isUdp === true) {
+            try {
+                if (! $this->connection->exists()) {
+                    $this->connection->create();
+                }
+            } catch (\Exception) {
+                Log::warning('InfluxDB: Could not create database');
             }
-        } catch (\Exception) {
-            Log::warning('InfluxDB: Could not create database');
         }
     }
 
@@ -118,7 +123,12 @@ class InfluxDB extends BaseDatastore
         try {
             // Add timestamp to points as current time in seconds
             // This is important for batch writes to ensure data is ordered and aggregated correctly
-            $timestamp = (int) floor(microtime(true));
+            // UDP requires nanosecond timestamps.
+            if ($this->isUdp === true) {
+                $timestamp = (int) floor(microtime(true) * 1000 * 1000 * 1000);
+            } else {
+                $timestamp = (int) floor(microtime(true));
+            }
 
             $this->batchPoints[] = new \InfluxDB\Point(
                 $measurement,
@@ -152,7 +162,11 @@ class InfluxDB extends BaseDatastore
             Log::debug('Flushing InfluxDB batch of ' . count($this->batchPoints) . ' points');
         }
         try {
-            $this->connection->writePoints($this->batchPoints, \InfluxDB\Database::PRECISION_SECONDS); // Added timestamps are in seconds
+            if ($this->isUdp === true) {
+                $this->connection->writePoints($this->batchPoints); // UDP requires nanosecond timestamps and ignores the precision argument
+            } else {
+                $this->connection->writePoints($this->batchPoints, \InfluxDB\Database::PRECISION_SECONDS); // Added timestamps are in seconds
+            }
         } catch (\InfluxDB\Exception $e) {
             Log::error('InfluxDB batch write failed: ' . $e->getMessage());
         }
