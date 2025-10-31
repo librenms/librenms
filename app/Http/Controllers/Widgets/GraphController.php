@@ -99,7 +99,7 @@ class GraphController extends WidgetController
             }
         } elseif ($type == 'customoid') {
             if ($customoid = Customoid::find($settings['graph_customoid'])) {
-                return $customoid->device->displayName() . ' / ' . $type . ' / ' . $customoid->customoid_descr;
+                return $customoid->device?->displayName() . ' / ' . $type . ' / ' . $customoid->customoid_descr;
             }
         }
 
@@ -155,7 +155,7 @@ class GraphController extends WidgetController
         if ($primary == 'customoid' && $data['graph_customoid']) {
             $customoid = Customoid::with('device')->find($data['graph_customoid']);
         }
-        $data['customoid_text'] = isset($customoid) ? $customoid->device->displayName() . ' - ' . $customoid->customoid_descr : __('Custom OID does not exist');
+        $data['customoid_text'] = isset($customoid) ? $customoid->device?->displayName() . ' - ' . $customoid->customoid_descr : __('Custom OID does not exist');
 
         $data['graph_ports'] = Port::whereIntegerInRaw('port_id', $data['graph_ports'])
             ->select('ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr')
@@ -294,7 +294,6 @@ class GraphController extends WidgetController
             $settings['graph_application'] = $this->convertLegacySettingId($settings['graph_application'], 'app_id');
             $settings['graph_munin'] = $this->convertLegacySettingId($settings['graph_munin'], 'mplug_id');
             $settings['graph_service'] = $this->convertLegacySettingId($settings['graph_service'], 'service_id');
-            $settings['graph_customoid'] = $this->convertLegacySettingId($settings['graph_customoid'], 'customoid_id');
             $settings['graph_bill'] = $this->convertLegacySettingId($settings['graph_bill'], 'bill_id');
 
             $settings['graph_custom'] = (array) $settings['graph_custom'];
