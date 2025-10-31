@@ -32,18 +32,19 @@ if (is_numeric($temp)) {
 $cooling_status = snmpwalk_cache_oid($device, 'coolingUnitStatusDiscreteEntry', [], 'PowerNet-MIB');
 foreach ($cooling_status as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.27.1.4.2.2.1.4.' . $index;
-    $state_name = $data['coolingUnitStatusDiscreteDescription'];
+    $state_name = 'coolingUnitStatusDiscreteDescription';
+    $descr = $data[$state_name];
 
     $tmp_states = explode(',', $data['coolingUnitStatusDiscreteIntegerReferenceKey']);
     $states = [];
     foreach ($tmp_states as $ref) {
-        preg_match('/([\w]+) ?\\(([\d]+)\\)/', $ref, $matches);
+        preg_match('/([\w ]+)?\\(([\d]+)\\)/', $ref, $matches);
         $nagios_state = get_nagios_state($matches[1]);
-        $states[] = ['value' => 0, 'generic' => $nagios_state, 'graph' => 0, $matches[2], 'descr' => $matches[1]];
+        $states[] = ['value' => $matches[2], 'generic' => $nagios_state, 'graph' => 0, 'descr' => $matches[1]];
     }
     create_state_index($state_name, $states);
 
-    discover_sensor(null, 'state', $device, $cur_oid, $cur_oid, 'apc', $state_name, 1, 1, null, null, null, null, $data['coolingUnitStatusDiscreteValueAsInteger']);
+    discover_sensor(null, 'state', $device, $cur_oid, $cur_oid, $state_name, $descr, 1, 1, null, null, null, null, $data['coolingUnitStatusDiscreteValueAsInteger']);
 }
 
 unset($cooling_status);
@@ -51,18 +52,18 @@ unset($cooling_status);
 $cooling_unit = snmpwalk_cache_oid($device, 'coolingUnitExtendedDiscreteEntry', [], 'PowerNet-MIB');
 foreach ($cooling_unit as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.27.1.6.2.2.1.4.' . $index;
-    $state_name = $data['coolingUnitExtendedDiscreteDescription'];
-
+    $state_name = 'coolingUnitExtendedDiscreteDescription';
+    $descr = $data[$state_name];
     $tmp_states = explode(',', $data['coolingUnitExtendedDiscreteIntegerReferenceKey']);
     $states = [];
     foreach ($tmp_states as $ref) {
-        preg_match('/([\w]+)\\(([\d]+)\\)/', $ref, $matches);
+        preg_match('/([\w ]+)\\(([\d]+)\\)/', $ref, $matches);
         $nagios_state = get_nagios_state($matches[1]);
-        $states[] = ['value' => 0, 'generic' => $nagios_state, 'graph' => 0, $matches[2], 'descr' => $matches[1]];
+        $states[] = ['value' => $matches[2], 'generic' => $nagios_state, 'graph' => 0, 'descr' => $matches[1]];
     }
     create_state_index($state_name, $states);
 
-    discover_sensor(null, 'state', $device, $cur_oid, $cur_oid, 'apc', $state_name, 1, 1, null, null, null, null, $data['coolingUnitExtendedDiscreteValueAsInteger']);
+    discover_sensor(null, 'state', $device, $cur_oid, $cur_oid, $state_name, $descr, 1, 1, null, null, null, null, $data['coolingUnitExtendedDiscreteValueAsInteger']);
 }
 
 unset($cooling_unit);
@@ -70,7 +71,8 @@ unset($cooling_unit);
 $relays = snmpwalk_cache_oid($device, 'emsOutputRelayControlEntry', [], 'PowerNet-MIB');
 foreach ($relays as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.10.3.2.1.1.3.' . $index;
-    $state_name = $data['emsOutputRelayControlOutputRelayName'];
+    $state_name = 'emsOutputRelayControlOutputRelayName';
+    $descr = $data[$state_name];
     $states = [
         ['value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'immediateCloseEMS'],
         ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'immediateOpenEMS'],
@@ -79,7 +81,7 @@ foreach ($relays as $index => $data) {
 
     $current = apc_relay_state($data['emsOutputRelayControlOutputRelayCommand']);
     if (is_numeric($current)) {
-        discover_sensor(null, 'state', $device, $cur_oid, $cur_oid, $state_name, $state_name, 1, 1, null, null, null, null, $current);
+        discover_sensor(null, 'state', $device, $cur_oid, $cur_oid, $state_name, $descr, 1, 1, null, null, null, null, $current);
     }
 }
 unset(
@@ -91,7 +93,8 @@ unset(
 $switched = snmpwalk_cache_oid($device, 'emsOutletControlEntry', [], 'PowerNet-MIB');
 foreach ($switched as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.10.3.3.1.1.3.' . $index;
-    $state_name = $data['emsOutletControlOutletName'];
+    $state_name = 'emsOutletControlOutletName';
+    $descr = $data[$state_name];
     $states = [
         ['value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'immediateOnEMS'],
         ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'immediateOffEMS'],
@@ -100,7 +103,7 @@ foreach ($switched as $index => $data) {
 
     $current = apc_relay_state($data['emsOutletControlOutletCommand']);
     if (is_numeric($current)) {
-        discover_sensor(null, 'state', $device, $cur_oid, $cur_oid, $state_name, $state_name, 1, 1, null, null, null, null, $current);
+        discover_sensor(null, 'state', $device, $cur_oid, $cur_oid, $state_name, $descr, 1, 1, null, null, null, null, $current);
     }
 }
 unset(
