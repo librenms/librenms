@@ -149,7 +149,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
                         }
                     }
                 }
-            } catch (AuthenticationException $e) {
+            } catch (AuthenticationException) {
             }
         }
 

@@ -8,7 +8,6 @@ modules:
         data:
             -
                 oid: nnOpticalPmRecentTable
-                snmp_flags: [-OeQUsb]
             - oid: ifName
     sensors:
         count:
@@ -112,7 +111,6 @@ modules:
                     group: transceiver
                     low_limit: cienaCesPortXcvrLowTempAlarmThreshold
                     high_limit: cienaCesPortXcvrHighTempAlarmThreshold
-                    snmp_flags: '-OQUsbe'
                     skip_values:
                         -   oid: cienaCesPortXcvrOperState
                             op: 'in_array'
@@ -129,7 +127,6 @@ modules:
                     low_limit: cienaCesPortXcvrLowVccAlarmThreshold
                     high_limit: cienaCesPortXcvrHighVccAlarmThreshold
                     divisor: 1000
-                    snmp_flags: '-OQUsbe'
                     index: 'xcvr-vcc-{{ $index }}'
                     skip_values:
                         -   oid: cienaCesPortXcvrOperState
@@ -147,7 +144,6 @@ modules:
                     low_limit: 0
                     high_limit: cienaCesPortXcvrHighBiasAlarmThreshold
                     divisor: 1000
-                    snmp_flags: '-OQUsbe'
                     group: 'Transceivers'
                     index: 'xcvr-i-{{ $index }}'
                     skip_values:
@@ -168,7 +164,6 @@ modules:
                     low_limit: cienaCesPortXcvrLowRxPwAlarmThreshold
                     high_limit: cienaCesPortXcvrHighRxPwAlarmThreshold
                     divisor: 1000000
-                    snmp_flags: '-OQUsbe'
                     index: 'rx-{{ $index }}'
                     skip_values:
                         -
@@ -186,7 +181,6 @@ modules:
                     low_limit: cienaCesPortXcvrLowTxPwAlarmThreshold
                     high_limit: cienaCesPortXcvrHighTxPwAlarmThreshold
                     divisor: 1000000
-                    snmp_flags: '-OQUsbe'
                     index: 'tx-{{ $index }}'
                     skip_values:
                         -
@@ -220,7 +214,6 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: disabled }
                         - { value: 2, generic: 0, graph: 0, descr: generic }
                         - { value: 3, generic: 0, graph: 0, descr: enhanced }
-                    snmp_flags: '-OQUsbe'
                     group: 'Transceiver FEC Mode'
                 -
                     oid: cienaCesModuleTable

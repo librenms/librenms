@@ -59,7 +59,7 @@ class Configuration extends BaseValidation
                 if (\Crypt::decryptString(LibrenmsConfig::get('validation.encryption.test')) !== 'librenms') {
                     $this->failKeyChanged($validator);
                 }
-            } catch (DecryptException $e) {
+            } catch (DecryptException) {
                 $this->failKeyChanged($validator);
             }
         } else {

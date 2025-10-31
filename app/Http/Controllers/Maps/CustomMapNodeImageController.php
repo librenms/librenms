@@ -52,7 +52,7 @@ class CustomMapNodeImageController extends Controller
         try {
             $imageContent = Cache::driver('file')
                 ->remember($this->getCacheKey($image), new \DateInterval('P30D'), fn () => $image->image);
-        } catch (\ErrorException $e) {
+        } catch (\ErrorException) {
             // if cache fails, just load from database :(
             $imageContent = $image->image;
         }

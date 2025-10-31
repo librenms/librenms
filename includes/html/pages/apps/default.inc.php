@@ -12,9 +12,7 @@ $graph_array_zoom['height'] = '150';
 $graph_array_zoom['width'] = '400';
 $graph_array['legend'] = 'no';
 
-$apps = Application::query()->hasAccess(Auth::user())->where('app_type', $vars['app'])->with('device')->get()->sortBy(function ($app) {
-    return $app->device->hostname;
-});
+$apps = Application::query()->hasAccess(Auth::user())->where('app_type', $vars['app'])->with('device')->get()->sortBy(fn ($app) => $app->device->hostname);
 
 foreach ($apps as $app) {
     $app_state = \LibreNMS\Util\Html::appStateIcon($app['app_state']);

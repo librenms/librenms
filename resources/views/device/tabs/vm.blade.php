@@ -9,7 +9,7 @@
         <table class="table table-hover table-condensed table-striped">
         <thead>
             <tr>
-                <th>{{ __('Server Name') }}</th>
+                <th>{{ __('VM Name') }}</th>
                 <th>{{ __('Power Status') }}</th>
                 <th>{{ __('Operating System') }}</th>
                 <th>{{ __('Memory') }}</th>

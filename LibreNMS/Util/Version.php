@@ -40,11 +40,9 @@ class Version
 
     /** @var Git convenience instance */
     public $git;
-    private ConfigRepository $config;
 
-    public function __construct(ConfigRepository $config)
+    public function __construct(private ConfigRepository $config)
     {
-        $this->config = $config;
         $this->git = Git::make();
     }
 
@@ -116,7 +114,7 @@ class Version
             if (Eloquent::isConnected()) {
                 return Eloquent::DB()->table('migrations')->count();
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
         }
 
         return 0;
@@ -133,7 +131,7 @@ class Version
 
         try {
             return Eloquent::DB()->table('migrations')->orderBy('id', 'desc')->value('migration');
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return 'No Schema';
         }
     }

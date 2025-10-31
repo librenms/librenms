@@ -103,9 +103,7 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
             LibrenmsConfig::get('rrd_dir', base_path('rrd')),
         ];
 
-        $mk_dirs = array_filter($mkdirs, function ($file) {
-            return ! file_exists($file);
-        });
+        $mk_dirs = array_filter($mkdirs, fn ($file) => ! file_exists($file));
 
         if (! empty($mk_dirs)) {
             $commands[] = 'sudo mkdir -p ' . implode(' ', $mk_dirs);

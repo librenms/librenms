@@ -52,7 +52,7 @@ class YamlDiscovery
 
         // convert to class name for static call below
         if (is_object($class)) {
-            $class = get_class($class);
+            $class = $class::class;
         }
 
         d_echo('YAML Discovery Data: ');
@@ -63,7 +63,7 @@ class YamlDiscovery
                 continue;
             }
 
-            $group_options = isset($first_yaml['options']) ? $first_yaml['options'] : [];
+            $group_options = $first_yaml['options'] ?? [];
 
             // find the data array, we could already be at for simple modules
             if (isset($data['data'])) {
@@ -92,7 +92,7 @@ class YamlDiscovery
                     if (! isset($data['num_oid'])) {
                         try {
                             $data['num_oid'] = static::computeNumericalOID($os, $data);
-                        } catch (\Exception $e) {
+                        } catch (\Exception) {
                             d_echo('Error: We cannot find a numerical OID for ' . $data['value'] . '. Skipping this one...');
                             continue;
                         }
@@ -189,11 +189,6 @@ class YamlDiscovery
             $variables = [
                 'index' => $index,
                 'count' => $count,
-                // we compute a numOid compatible version of index
-                // string length followed by ASCII of each char.
-                'str_index_as_numeric' => implode('.', array_map(function ($index) {
-                    return strlen($index) . '.' . implode('.', unpack('c*', $index));
-                }, explode('.', $index))),
             ];
             foreach (explode('.', $index) as $pos => $subindex) {
                 $variables['subindex' . $pos] = $subindex;
@@ -210,6 +205,13 @@ class YamlDiscovery
             // search discovery data for values
             $template = new SimpleTemplate($value);
             $template->replaceWith(function ($matches) use ($index, $def, $pre_cache) {
+                // convert the numeric index to a string
+                if (str_starts_with($matches[1], 'index_string')) {
+                    $format = str_contains($matches[1], ':') ? substr($matches[1], 12) : 's';
+
+                    return Oid::stringFromOid($index, $format);
+                }
+
                 $replace = static::getValueFromData($matches[1], $index, $def, $pre_cache);
                 if (is_null($replace)) {
                     // allow parsing of InetAddress hex data representing ipv4 or ipv6
@@ -367,9 +369,9 @@ class YamlDiscovery
                                 if (isset($data['snmp_flags'])) {
                                     $snmp_flag = Arr::wrap($data['snmp_flags']);
                                 } elseif (str_contains($oid, '::')) {
-                                    $snmp_flag = ['-OteQUSa'];
+                                    $snmp_flag = ['-OteQUSab', '-Pu'];
                                 } else {
-                                    $snmp_flag = ['-OteQUsa'];
+                                    $snmp_flag = ['-OteQUsab', '-Pu'];
                                 }
 
                                 if (! isset($data['snmp_no_Ih_flag'])) {
@@ -419,6 +421,7 @@ class YamlDiscovery
                     // field from device model
                     $tmp_value = \DeviceCache::getPrimary()[$skip_value['device']] ?? null;
                 } elseif ($skip_value['oid'] == 'index') {
+                    // matching the index of the table row
                     $tmp_value = $index;
                 } else {
                     // oid previously fetched from the device

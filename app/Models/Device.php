@@ -117,7 +117,7 @@ class Device extends BaseModel
 
     public function pollerTarget(): string
     {
-        return $this->overwrite_ip ?: $this->hostname ?: '';
+        return ($this->overwrite_ip ?: $this->hostname) ?: '';
     }
 
     public function ipFamily(): AddressFamily
@@ -145,9 +145,7 @@ class Device extends BaseModel
             if ($port) {
                 return $port->device;
             }
-        } catch (InvalidIpException $e) {
-            //
-        } catch (ModelNotFoundException $e) {
+        } catch (InvalidIpException|ModelNotFoundException) {
             //
         }
 
@@ -159,9 +157,7 @@ class Device extends BaseModel
             if ($port) {
                 return $port->device;
             }
-        } catch (InvalidIpException $e) {
-            //
-        } catch (ModelNotFoundException $e) {
+        } catch (InvalidIpException|ModelNotFoundException) {
             //
         }
 
@@ -252,19 +248,19 @@ class Device extends BaseModel
         }
 
         $behavior = AlertSchedule::isActive()
-            ->where(function (Builder $query) {
-                $query->whereHas('devices', function (Builder $query) {
+            ->where(function (Builder $query): void {
+                $query->whereHas('devices', function (Builder $query): void {
                     $query->where('alert_schedulables.alert_schedulable_id', $this->device_id);
                 });
 
                 if ($this->groups->isNotEmpty()) {
-                    $query->orWhereHas('deviceGroups', function (Builder $query) {
+                    $query->orWhereHas('deviceGroups', function (Builder $query): void {
                         $query->whereIntegerInRaw('alert_schedulables.alert_schedulable_id', $this->groups->pluck('id'));
                     });
                 }
 
                 if ($this->location) {
-                    $query->orWhereHas('locations', function (Builder $query) {
+                    $query->orWhereHas('locations', function (Builder $query): void {
                         $query->where('alert_schedulables.alert_schedulable_id', $this->location->id);
                     });
                 }
@@ -446,9 +442,7 @@ class Device extends BaseModel
 
     public function setAttrib($name, $value)
     {
-        $attrib = $this->attribs->first(function ($item) use ($name) {
-            return $item->attrib_type === $name;
-        });
+        $attrib = $this->attribs->first(fn ($item) => $item->attrib_type === $name);
 
         if (! $attrib) {
             $attrib = new DeviceAttrib(['attrib_type' => $name]);
@@ -462,9 +456,7 @@ class Device extends BaseModel
 
     public function forgetAttrib($name)
     {
-        $attrib_index = $this->attribs->search(function ($attrib) use ($name) {
-            return $attrib->attrib_type === $name;
-        });
+        $attrib_index = $this->attribs->search(fn ($attrib) => $attrib->attrib_type === $name);
 
         if ($attrib_index !== false) {
             $deleted = (bool) $this->attribs->get($attrib_index)->delete();
@@ -625,10 +617,10 @@ class Device extends BaseModel
 
     public function scopeWhereAttributeDisabled(Builder $query, string $attribute): Builder
     {
-        return $query->leftJoin('devices_attribs', function (JoinClause $query) use ($attribute) {
+        return $query->leftJoin('devices_attribs', function (JoinClause $query) use ($attribute): void {
             $query->on('devices.device_id', 'devices_attribs.device_id')
                 ->where('devices_attribs.attrib_type', $attribute);
-        })->where(function (Builder $query) {
+        })->where(function (Builder $query): void {
             $query->whereNull('devices_attribs.attrib_value')
                 ->orWhere('devices_attribs.attrib_value', '!=', 'true');
         });
@@ -655,7 +647,7 @@ class Device extends BaseModel
     public function scopeInDeviceGroup($query, $deviceGroup)
     {
         return $query->whereIn(
-            $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
+            $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup): void {
                 $query->select('device_id')
                 ->from('device_group_device')
                 ->whereIn('device_group_id', Arr::wrap($deviceGroup));
@@ -666,7 +658,7 @@ class Device extends BaseModel
     public function scopeNotInDeviceGroup($query, $deviceGroup)
     {
         return $query->whereNotIn(
-            $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
+            $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup): void {
                 $query->select('device_id')
                 ->from('device_group_device')
                 ->whereIn('device_group_id', Arr::wrap($deviceGroup));
@@ -677,7 +669,7 @@ class Device extends BaseModel
     public function scopeInServiceTemplate($query, $serviceTemplate)
     {
         return $query->whereIn(
-            $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate) {
+            $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate): void {
                 $query->select('device_id')
                 ->from('service_templates_device')
                 ->where('service_template_id', $serviceTemplate);
@@ -688,7 +680,7 @@ class Device extends BaseModel
     public function scopeNotInServiceTemplate($query, $serviceTemplate)
     {
         return $query->whereNotIn(
-            $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate) {
+            $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate): void {
                 $query->select('device_id')
                 ->from('service_templates_device')
                 ->where('service_template_id', $serviceTemplate);

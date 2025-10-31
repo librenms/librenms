@@ -327,9 +327,7 @@ class QueryBuilderParser implements \JsonSerializable
         $shared_keys = array_filter(array_intersect(
             $this->schema->getColumns($parent),
             $this->schema->getColumns($child)
-        ), function ($table) {
-            return Str::endsWith($table, '_id');
-        });
+        ), fn ($table) => Str::endsWith($table, '_id'));
 
         if (count($shared_keys) === 1) {
             $shared_key = reset($shared_keys);

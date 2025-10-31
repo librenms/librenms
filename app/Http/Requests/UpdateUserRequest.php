@@ -2,11 +2,11 @@
 
 namespace App\Http\Requests;
 
-use App\Facades\LibrenmsConfig;
 use App\Models\User;
 use Hash;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 use Spatie\Permission\Models\Role;
 
 class UpdateUserRequest extends FormRequest
@@ -48,7 +48,7 @@ class UpdateUserRequest extends FormRequest
                 'realname' => 'nullable|max:64|alpha_space',
                 'email' => 'nullable|email|max:64',
                 'descr' => 'nullable|max:30|alpha_space',
-                'new_password' => 'nullable|confirmed|min:' . LibrenmsConfig::get('password.min_length', 8),
+                'new_password' => ['nullable', 'confirmed', Password::defaults()],
                 'new_password_confirmation' => 'nullable|same:new_password',
                 'dashboard' => 'int',
                 'roles' => 'array',
@@ -63,7 +63,7 @@ class UpdateUserRequest extends FormRequest
             'email' => 'nullable|email|max:64',
             'descr' => 'nullable|max:30|alpha_space',
             'old_password' => 'nullable|string',
-            'new_password' => 'nullable|confirmed|min:' . LibrenmsConfig::get('password.min_length', 8),
+            'new_password' => ['nullable', 'confirmed', Password::defaults()],
             'new_password_confirmation' => 'nullable|same:new_password',
             'dashboard' => 'int',
         ];
@@ -77,7 +77,7 @@ class UpdateUserRequest extends FormRequest
      */
     public function withValidator($validator)
     {
-        $validator->after(function ($validator) {
+        $validator->after(function ($validator): void {
             // if not an admin and new_password is set, check old password matches
             $user = $this->route('user');
             if ($user && $this->user()->can('update', $user) && $this->user()->is($user)) {
