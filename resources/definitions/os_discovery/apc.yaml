@@ -613,6 +613,55 @@ modules:
                         - { descr: failed, graph: 0, value: 2, generic: 3 }
                         - { descr: invalidTest, graph: 0, value: 3, generic: 1 }
                         - { descr: testInProgress, graph: 0, value: 4, generic: 1 }
+                -
+                    oid: upsOutletGroupControlTable
+                    value: upsOutletGroupControlCommand
+                    num_oid: '.1.3.6.1.4.1.318.1.1.1.12.3.2.1.3.{{ $index }}'
+                    group: 'UPS Outlet Group Status'
+                    descr: 'Main: {{ $upsOutletGroupControlName }}'
+                    index: 'upsOutletGroupControlCommand.{{ $index }}'
+                    state_name: upsOutletGroupControlCommand
+                    states:
+                        - { descr: Immediate On, graph: 0, value: 1, generic: 0}
+                        - { descr: Immediate Off, graph: 0, value: 2, generic: 1}
+                        - { descr: Immediate Reboot With Or Without AC, graph: 0, value: 3, generic: 1}
+                        - { descr: Delayed On, graph: 0, value: 4, generic: 1}
+                        - { descr: Delayed Off, graph: 0, value: 5, generic: 1}
+                        - { descr: Delayed Reboot With Or Without AC, graph: 0, value: 6, generic: 1}
+                        - { descr: Cancel Pending Command, graph: 0, value: 7, generic: 1}
+                        - { descr: Control Unknown, graph: 0, value: 8, generic: 3}
+                        - { descr: Immediate Reboot Shutdown, graph: 0, value: 9, generic: 1}
+                        - { descr: Delayed Reboot Shutdown, graph: 0, value: 10, generic: 1}
+                    skip_values:
+                        -
+                            oid: upsOutletGroupControlOutletType
+                            op: '!='
+                            value: 2
+                -
+                    oid: upsOutletGroupControlTable
+                    value: upsOutletGroupControlCommand
+                    num_oid: '.1.3.6.1.4.1.318.1.1.1.12.3.2.1.3.{{ $index }}'
+                    group: 'UPS Outlet Group Status'
+                    descr: '{{ $upsOutletGroupControlName }}'
+                    index: 'upsOutletGroupControlCommand.{{ $index }}'
+                    state_name: upsOutletGroupControlCommand
+                    states:
+                        - { descr: Immediate On, graph: 0, value: 1, generic: 0}
+                        - { descr: Immediate Off, graph: 0, value: 2, generic: 1}
+                        - { descr: Immediate Reboot With Or Without AC, graph: 0, value: 3, generic: 1}
+                        - { descr: Delayed On, graph: 0, value: 4, generic: 1}
+                        - { descr: Delayed Off, graph: 0, value: 5, generic: 1}
+                        - { descr: Delayed Reboot With Or Without AC, graph: 0, value: 6, generic: 1}
+                        - { descr: Cancel Pending Command, graph: 0, value: 7, generic: 1}
+                        - { descr: Control Unknown, graph: 0, value: 8, generic: 3}
+                        - { descr: Immediate Reboot Shutdown, graph: 0, value: 9, generic: 1}
+                        - { descr: Delayed Reboot Shutdown, graph: 0, value: 10, generic: 1}
+                    skip_values:
+                        -
+                            oid: upsOutletGroupControlOutletType
+                            op: '!='
+                            value: 1
+
 
         temperature:
             data:

@@ -484,6 +484,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                 if (empty($data['num_oid'])) {
                     try {
                         $data['num_oid'] = YamlDiscovery::computeNumericalOID($os, $data);
+                        dd($data['num_oid']);
                     } catch (\Exception) {
                         Log::debug('Error: We cannot find a numerical OID for ' . $data['value'] . '. Skipping this one...');
                         $skippedFromYaml = true;
