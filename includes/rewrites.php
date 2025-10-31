@@ -76,7 +76,7 @@ function cleanPort($interface, $device = null)
 
     if (is_array(LibrenmsConfig::get('rewrite_if'))) {
         foreach (LibrenmsConfig::get('rewrite_if') as $src => $val) {
-            if (stristr($interface['label'], $src)) {
+            if (stristr($interface['label'], (string) $src)) {
                 $interface['label'] = $val;
             }
         }
@@ -182,25 +182,12 @@ function ipmiSensorName($hardwareId, $sensorIpmi)
  */
 function get_nagios_state($descr)
 {
-    switch ($descr) {
-        case 'On':
-        case 'Okay':
-        case 'Ok':
-            return 0;
-            break;
-        case 'Standby':
-        case 'Idle':
-        case 'Maintenance':
-            return 1;
-            break;
-        case 'Under':
-        case 'Over':
-            return 2;
-            break;
-        default:
-            return 3;
-            break;
-    }
+    return match ($descr) {
+        'On', 'Okay', 'Ok' => 0,
+        'Standby', 'Idle', 'Maintenance' => 1,
+        'Under', 'Over' => 2,
+        default => 3,
+    };
 }
 
 /**
@@ -250,11 +237,7 @@ function parse_entity_state($state, $value)
         ],
     ];
 
-    if (isset($data[$state][$value])) {
-        return $data[$state][$value];
-    }
-
-    return ['text' => 'na', 'color' => 'default'];
+    return $data[$state][$value] ?? ['text' => 'na', 'color' => 'default'];
 }
 
 function parse_entity_state_alarm($bits)

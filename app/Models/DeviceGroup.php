@@ -40,17 +40,17 @@ class DeviceGroup extends BaseModel
     {
         parent::boot();
 
-        static::deleting(function (DeviceGroup $deviceGroup) {
+        static::deleting(function (DeviceGroup $deviceGroup): void {
             $deviceGroup->devices()->detach();
         });
 
-        static::saving(function (DeviceGroup $deviceGroup) {
+        static::saving(function (DeviceGroup $deviceGroup): void {
             if ($deviceGroup->isDirty('rules')) {
                 $deviceGroup->rules = $deviceGroup->getParser()->generateJoins()->toArray();
             }
         });
 
-        static::saved(function (DeviceGroup $deviceGroup) {
+        static::saved(function (DeviceGroup $deviceGroup): void {
             if ($deviceGroup->isDirty('rules')) {
                 $deviceGroup->updateDevices();
             }
@@ -104,7 +104,7 @@ class DeviceGroup extends BaseModel
     public function scopeInServiceTemplate($query, $serviceTemplate)
     {
         return $query->whereIn(
-            $query->qualifyColumn('id'), function ($query) use ($serviceTemplate) {
+            $query->qualifyColumn('id'), function ($query) use ($serviceTemplate): void {
                 $query->select('device_group_id')
                     ->from('service_templates_device_group')
                     ->where('service_template_id', $serviceTemplate);
@@ -115,7 +115,7 @@ class DeviceGroup extends BaseModel
     public function scopeNotInServiceTemplate($query, $serviceTemplate)
     {
         return $query->whereNotIn(
-            $query->qualifyColumn('id'), function ($query) use ($serviceTemplate) {
+            $query->qualifyColumn('id'), function ($query) use ($serviceTemplate): void {
                 $query->select('device_group_id')
                     ->from('service_templates_device_group')
                     ->where('service_template_id', $serviceTemplate);

@@ -75,7 +75,7 @@ if ($device['os'] == 'netscaler') {
 
     d_echo($vsvrs);
 
-    foreach ($vsvr_array as $index => $vsvr) {
+    foreach ($vsvr_array as $vsvr) {
         if (isset($vsvr['vsvrFullName'])) {
             $vsvr_exist[$vsvr['vsvrFullName']] = 1;
             $rrd_name = 'netscaler-vsvr-' . $vsvr['vsvrFullName'];

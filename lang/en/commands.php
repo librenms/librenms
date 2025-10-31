@@ -115,7 +115,13 @@ return [
     'device:ping' => [
         'description' => 'Ping device and record data for response',
         'arguments' => [
-            'device spec' => 'Device to ping one of: <Device ID>, <Hostname/IP>, all',
+            'device spec' => 'Device to ping one of: <Device ID>, <Hostname/IP>, all, fast ("fast" will ping all devices and update graphs and status)',
+        ],
+        'options' => [
+            'groups' => 'Group ID(s) to ping. Specify multiple times for multiple groups. (only valid with fast)',
+        ],
+        'errors' => [
+            'groups_without_fast' => 'The --groups (-g) option is only supported with "fast" device spec.',
         ],
     ],
     'device:poll' => [
@@ -172,6 +178,9 @@ return [
             'optionValue' => 'Selected :option is invalid. Should be one of: :values',
         ],
     ],
+    'maintenance:cleanup-database' => [
+        'description' => 'Database cleanup of orphaned items.',
+    ],
     'maintenance:cleanup-networks' => [
         'delete' => 'Deleting :count unused networks',
     ],
@@ -209,6 +218,8 @@ return [
         'skipping' => 'Skipping :file, step is already :step.',
         'converting' => 'Converting :file:',
         'summary' => 'Converted: :converted  Failed: :failed  Skipped: :skipped',
+    'maintenance:syslog-cleanup' => [
+        'delete' => 'Cleared syslog entries older than :days days (:count rows)',
     ],
     'plugin:disable' => [
         'description' => 'Disable all plugins with the given name',
@@ -308,11 +319,15 @@ return [
             'full-name' => 'Full name for the user',
             'role' => 'Set the user to the desired role :roles',
         ],
-        'password-request' => "Please enter the user's password",
+        'form' => [
+            'username' => 'Username',
+            'password' => 'Password',
+            'roles' => 'Select user role(s)',
+            'email' => 'Email (optional)',
+            'full-name' => 'Full name (optional)',
+            'descr' => 'Description (optional)',
+        ],
         'success' => 'Successfully added user: :username',
         'wrong-auth' => 'Warning! You will not be able to log in with this user because you are not using MySQL auth',
-    ],
-    'maintenance:database-cleanup' => [
-        'description' => 'Database cleanup of orphaned items.',
     ],
 ];

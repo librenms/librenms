@@ -21,7 +21,7 @@ Connect to the server command line and follow the instructions below.
 === "Ubuntu 24.04"
     === "NGINX"
         ```
-        apt install acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip rrdtool snmp snmpd unzip python3-command-runner python3-pymysql python3-dotenv python3-redis python3-setuptools python3-psutil python3-systemd python3-pip whois traceroute
+        apt install acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip python3-command-runner python3-dotenv python3-pip python3-psutil python3-pymysql python3-redis python3-setuptools python3-systemd rrdtool snmp snmpd traceroute unzip whois
         ```
 
 === "Ubuntu 22.04"
@@ -30,7 +30,7 @@ Connect to the server command line and follow the instructions below.
         apt install software-properties-common
         LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
         apt update
-        apt install acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php8.3-cli php8.3-curl php8.3-fpm php8.3-gd php8.3-gmp php8.3-mbstring php8.3-mysql php8.3-snmp php8.3-xml php8.3-zip rrdtool snmp snmpd unzip python3-pymysql python3-dotenv python3-redis python3-setuptools python3-psutil python3-systemd python3-pip whois traceroute
+        apt install acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php8.3-cli php8.3-curl php8.3-fpm php8.3-gd php8.3-gmp php8.3-mbstring php8.3-mysql php8.3-snmp php8.3-xml php8.3-zip python3-dotenv python3-pip python3-psutil python3-pymysql python3-redis python3-setuptools python3-systemd rrdtool snmp snmpd traceroute unzip whois
         ```
 
     === "Apache"
@@ -39,7 +39,7 @@ Connect to the server command line and follow the instructions below.
         add-apt-repository universe
         LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php
         apt update
-        apt install acl curl apache2 fping git graphviz imagemagick libapache2-mod-fcgid mariadb-client mariadb-server mtr-tiny nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip rrdtool snmp snmpd whois python3-pymysql python3-dotenv python3-redis python3-setuptools python3-systemd python3-pip unzip traceroute
+        apt install acl apache2 curl fping git graphviz imagemagick libapache2-mod-fcgid mariadb-client mariadb-server mtr-tiny nmap php-cli php-curl php-fpm php-gd php-gmp php-json php-mbstring php-mysql php-snmp php-xml php-zip python3-dotenv python3-pip python3-psutil python3-pymysql python3-redis python3-setuptools python3-systemd rrdtool snmp snmpd traceroute unzip whois
         ```
 
 === "CentOS 8"
@@ -58,19 +58,19 @@ Connect to the server command line and follow the instructions below.
         dnf -y install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
         dnf module reset php
         dnf module enable php:8.2
-        dnf install bash-completion cronie fping gcc git httpd ImageMagick mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-devel python3-PyMySQL python3-redis python3-memcached python3-pip python3-systemd rrdtool unzip 
+        dnf install bash-completion cronie fping gcc git httpd ImageMagick mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-devel python3-PyMySQL python3-redis python3-memcached python3-pip python3-systemd rrdtool unzip
         ```
 
 === "Debian 12"
     === "NGINX"
         ```
-        apt install lsb-release ca-certificates wget acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-mbstring php-mysql php-snmp php-xml php-zip python3-dotenv python3-pymysql python3-redis python3-setuptools python3-systemd python3-pip rrdtool snmp snmpd unzip whois
+        apt install acl ca-certificates curl fping git graphviz imagemagick lsb-release mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-mbstring php-mysql php-snmp php-xml php-zip python3-dotenv python3-pip python3-psutil python3-pymysql python3-redis python3-setuptools python3-systemd rrdtool snmp snmpd unzip wget whois
         ```
 
 === "Debian 13"
     === "NGINX"
         ```
-        apt install lsb-release ca-certificates wget acl curl fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-mbstring php-mysql php-snmp php-xml php-zip python3-command-runner python3-dotenv python3-pymysql python3-redis python3-setuptools python3-systemd python3-pip rrdtool snmp snmpd unzip whois
+        apt install acl ca-certificates curl fping git graphviz imagemagick lsb-release mariadb-client mariadb-server mtr-tiny nginx-full nmap php-cli php-curl php-fpm php-gd php-gmp php-mbstring php-mysql php-snmp php-xml php-zip python3-command-runner python3-dotenv python3-pip python3-psutil python3-pymysql python3-redis python3-setuptools python3-systemd rrdtool snmp snmpd unzip wget whois
         ```
 
 ## Add librenms user
@@ -568,6 +568,9 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
     ```
 
 === "Debian 12"
+    SELinux not enabled by default
+
+=== "Debian 13"
     SELinux not enabled by default
 
 ## Allow access through firewall

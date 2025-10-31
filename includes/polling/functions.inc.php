@@ -25,9 +25,7 @@ function bulk_sensor_snmpget($device, $sensors)
     $sensors = array_chunk($sensors, $oid_per_pdu);
     $cache = [];
     foreach ($sensors as $chunk) {
-        $oids = array_map(function ($data) {
-            return $data['sensor_oid'];
-        }, $chunk);
+        $oids = array_map(fn ($data) => $data['sensor_oid'], $chunk);
         $oids = implode(' ', $oids);
         $multi_response = snmp_get_multi_oid($device, $oids, '-OUQntea');
         $cache = array_merge($cache, $multi_response);
@@ -151,11 +149,11 @@ function record_sensor_data($device, $all_sensors)
         }
 
         if ($sensor['sensor_divisor'] && $sensor_value !== 0) {
-            $sensor_value = ($sensor_value / $sensor['sensor_divisor']);
+            $sensor_value /= $sensor['sensor_divisor'];
         }
 
         if ($sensor['sensor_multiplier']) {
-            $sensor_value = ($sensor_value * $sensor['sensor_multiplier']);
+            $sensor_value *= $sensor['sensor_multiplier'];
         }
 
         if (isset($sensor['user_func'])) {

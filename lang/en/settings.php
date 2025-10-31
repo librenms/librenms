@@ -343,6 +343,14 @@ return [
             'description' => 'Active Directory Domain',
             'help' => 'Active Directory Domain Example: example.com',
         ],
+        'auth_ad_global_read' => [
+            'description' => 'Global Read',
+            'help' => 'Allow global-read access to all users',
+        ],
+        'auth_ad_group' => [
+            'description' => 'Access group DN',
+            'help' => 'Distinguished name for a group to give normal level access. Example: cn=groupname,ou=groups,dc=example,dc=com',
+        ],
         'auth_ad_group_filter' => [
             'description' => 'Group LDAP filter',
             'help' => 'Active Directory LDAP filter for selecting groups',
@@ -354,6 +362,10 @@ return [
         'auth_ad_require_groupmembership' => [
             'description' => 'Require group membership',
             'help' => 'Only allow users to log in if they are part of a defined group',
+        ],
+        'auth_ad_timeout' => [
+            'description' => 'Connection timeout',
+            'help' => 'If one or more servers are unresponsive, higher timeouts will cause slow logins. To low may cause connection failures in some cases',
         ],
         'auth_ad_user_filter' => [
             'description' => 'User LDAP filter',
@@ -1575,6 +1587,10 @@ return [
             'min_length' => [
                 'description' => 'Minimum password length',
                 'help' => 'Passwords shorter than the given length will be rejected',
+            ],
+            'uncompromised' => [
+                'description' => 'Require password to be uncompromised',
+                'help' => 'Checks password against HaveIBeenPwned database using k-anonymity',
             ],
         ],
         'peeringdb' => [

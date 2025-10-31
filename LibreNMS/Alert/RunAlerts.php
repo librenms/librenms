@@ -35,6 +35,7 @@ use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Models\AlertTransport;
+use App\Models\ApplicationMetric;
 use App\Models\Eventlog;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Enum\AlertState;
@@ -132,6 +133,23 @@ class RunAlerts
             }
         }
         $extra = $alert['details'];
+
+        $obj['applications'] = $device->applications->groupBy('app_type');
+        $obj['applications_metrics'] = [];
+        foreach ($obj['applications'] as $app_name => $app_instances) {
+            $obj['applications_metrics'][$app_name] = [];
+            foreach ($app_instances as $app) {
+                $app_metrics = ApplicationMetric::where(['app_id' => $app->app_id])->get();
+                $rendered_app_metrics = [];
+                foreach ($app_metrics as $metric) {
+                    $rendered_app_metrics[$metric['metric']] = [
+                        'value' => $metric['value'],
+                        'value_prev' => $metric['value_prev'],
+                    ];
+                }
+                $obj['applications_metrics'][$app_name][] = $rendered_app_metrics;
+            }
+        }
 
         $tpl = new Template;
         $template = $tpl->getTemplate($obj);
@@ -376,10 +394,9 @@ class RunAlerts
      */
     private function extractIdFieldsForFault($element)
     {
-        return array_filter(array_keys($element), function ($key) {
+        return array_filter(array_keys($element), fn ($key) =>
             // Exclude location_id as it is not relevant for the comparison
-            return ($key === 'id' || strpos($key, '_id')) !== false && $key !== 'location_id';
-        });
+            ($key === 'id' || strpos($key, '_id')) !== false && $key !== 'location_id');
     }
 
     /**
@@ -393,7 +410,7 @@ class RunAlerts
     {
         $keyParts = [];
         foreach ($idFields as $field) {
-            $keyParts[] = isset($element[$field]) ? $element[$field] : '';
+            $keyParts[] = $element[$field] ?? '';
         }
 
         return implode('|', $keyParts);

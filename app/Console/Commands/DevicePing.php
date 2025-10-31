@@ -5,8 +5,11 @@ namespace App\Console\Commands;
 use App\Actions\Device\DeviceIsPingable;
 use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
+use App\Jobs\PingCheck;
 use App\Models\Device;
+use Illuminate\Support\Arr;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 class DevicePing extends LnmsCommand
 {
@@ -21,6 +24,7 @@ class DevicePing extends LnmsCommand
     {
         parent::__construct();
         $this->addArgument('device spec', InputArgument::REQUIRED);
+        $this->addOption('groups', 'g', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED);
     }
 
     /**
@@ -30,7 +34,28 @@ class DevicePing extends LnmsCommand
      */
     public function handle(DeviceIsPingable $deviceIsPingable): int
     {
+        $this->configureOutputOptions();
         $spec = $this->argument('device spec');
+
+        if ($spec == 'fast') {
+            try {
+                $groups = Arr::wrap($this->option('groups'));
+                PingCheck::dispatchSync($groups);
+
+                return 0;
+            } catch (\Throwable $e) {
+                $this->error($e->getMessage());
+
+                return 1;
+            }
+        }
+
+        if ($this->option('groups')) {
+            $this->error('The --groups (-g) option is only supported with "fast" device spec.');
+
+            return 1;
+        }
+
         $devices = Device::whereDeviceSpec($spec)->get();
 
         if ($devices->isEmpty()) {

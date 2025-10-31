@@ -268,7 +268,7 @@ class Rrd extends BaseDatastore
             if ($max < 10000000) {
                 return false;
             }
-            $max = $max / 8;
+            $max /= 8;
             $fields = [
                 'INOCTETS',
                 'OUTOCTETS',
@@ -403,7 +403,7 @@ class Rrd extends BaseDatastore
 
         try {
             $cmd = self::buildCommand($command, $filename, $options);
-        } catch (FileExistsException $e) {
+        } catch (FileExistsException) {
             Log::debug("RRD[%g$filename already exists%n]", ['color' => true]);
 
             return [null, null];
@@ -562,7 +562,7 @@ class Rrd extends BaseDatastore
     public function checkRrdExists($filename): bool
     {
         if ($this->rrdcached && version_compare($this->version, '1.5', '>=')) {
-            $check_output = implode($this->command('last', $filename, ''));
+            $check_output = implode('', $this->command('last', $filename, ''));
             $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
 
             return ! (str_contains($check_output, $filename) && str_contains($check_output, 'No such file or directory'));

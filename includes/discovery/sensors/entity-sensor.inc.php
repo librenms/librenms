@@ -148,7 +148,7 @@ if (! empty($entity_oids)) {
             if ($device['os'] == 'fortiswitch' && $entry['entPhySensorType'] == 'rpm') {
                 $type = 'percent';
                 $divisor = 1;
-                $current = $current * 10;
+                $current *= 10;
             }
 
             if ($device['os'] == 'rittal-lcp') {

@@ -1,7 +1,8 @@
-FROM squidfunk/mkdocs-material:9.6.14
+FROM squidfunk/mkdocs-material:9.6
 
 RUN \
   pip install --no-cache-dir \
+    'markdown-exec' \
     'markdown-include' \
     'mkdocs-awesome-pages-plugin' \
     'mkdocs-exclude' \

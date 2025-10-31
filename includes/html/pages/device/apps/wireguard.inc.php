@@ -86,7 +86,7 @@ if (isset($vars['interface']) && isset($interface_client_map[$vars['interface']]
 
     $i = 0;
     echo '<br>Peers: ';
-    foreach ($interface_client_map[$vars['interface']] as $peer_key => $peer) {
+    foreach ($interface_client_map[$vars['interface']] as $peer) {
         $peer = htmlspecialchars($peer);
 
         $label =
@@ -163,7 +163,7 @@ if (isset($vars['interface']) &&
     echo 'Allowed IPs: ';
     $allowed_ips = '';
     if (isset($peer['allowed_ips']) && ! is_null($peer['allowed_ips']) && is_array($peer['allowed_ips'])) {
-        foreach ($peer['allowed_ips'] as $allowed_ips_key => $allowed_ip) {
+        foreach ($peer['allowed_ips'] as $allowed_ip) {
             $ip_found = false;
             if (preg_match('/^[\:A-Fa-f0-9]+$/', $allowed_ip)) {
                 $ip_info = Ipv6Address::firstWhere(['ipv6_address' => $allowed_ip]);
@@ -278,7 +278,7 @@ if (isset($vars['wg_page']) and $vars['wg_page'] == 'details') {
             // build string of allowed IPs
             $allowed_ips = '';
             if (isset($peer['allowed_ips']) && ! is_null($peer['allowed_ips']) && is_array($peer['allowed_ips'])) {
-                foreach ($peer['allowed_ips'] as $allowed_ips_key => $allowed_ip) {
+                foreach ($peer['allowed_ips'] as $allowed_ip) {
                     $ip_found = false;
                     if (preg_match('/^[\:A-Fa-f0-9]+$/', $allowed_ip)) {
                         $ip_info = Ipv6Address::firstWhere(['ipv6_address' => $allowed_ip]);
@@ -345,7 +345,7 @@ if (isset($vars['wg_page']) and $vars['wg_page'] == 'details') {
             'interface' => $vars['interface'],
         ],
     ];
-    foreach ($interface_client_map[$vars['interface']] as $peer_key => $peer) {
+    foreach ($interface_client_map[$vars['interface']] as $peer) {
         $graphs['peer_bw_' . $peer] = [
             'type' => 'wireguard_traffic',
             'description' => 'Peer Traffic, ' . $vars['interface'] . ' - ' . $peer,
@@ -355,7 +355,7 @@ if (isset($vars['wg_page']) and $vars['wg_page'] == 'details') {
     }
 } elseif (isset($vars['interface']) && ! isset($vars['client']) && $vars['wg_page'] == 'peer_last') {
     $graphs = [];
-    foreach ($interface_client_map[$vars['interface']] as $peer_key => $peer) {
+    foreach ($interface_client_map[$vars['interface']] as $peer) {
         $graphs['peer_last_' . $peer] = [
             'type' => 'wireguard_time',
             'description' => 'Peer Minutes Since Last Handshake , ' . $vars['interface'] . ' - ' . $peer,

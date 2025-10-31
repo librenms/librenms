@@ -30,13 +30,12 @@ use Throwable;
 
 class FileWriteFailedException extends \Exception
 {
-    /** @var string */
-    protected $file_path;
-
-    public function __construct($file, $code = 0, ?Throwable $previous = null)
+    /**
+     * @param  string  $file_path
+     */
+    public function __construct(protected $file_path, $code = 0, ?Throwable $previous = null)
     {
-        $this->file_path = $file;
-        parent::__construct("Failed to write file: $file", $code, $previous);
+        parent::__construct("Failed to write file: {$this->file_path}", $code, $previous);
     }
 
     /**

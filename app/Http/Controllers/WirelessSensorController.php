@@ -41,12 +41,10 @@ class WirelessSensorController
     {
         $types = \LibreNMS\Device\WirelessSensor::getTypes();
 
-        return WirelessSensor::distinct()->pluck('sensor_class')->flip()->map(function ($index, $class) use ($types, $request) {
-            return [
-                'text' => __("wireless.$class.short"),
-                'link' => route('wireless.index', $request->all() + ['metric' => $class]),
-                'icon' => 'fa-' . $types[$class]['icon'],
-            ];
-        })->all();
+        return WirelessSensor::distinct()->pluck('sensor_class')->flip()->map(fn ($index, $class) => [
+            'text' => __("wireless.$class.short"),
+            'link' => route('wireless.index', $request->all() + ['metric' => $class]),
+            'icon' => 'fa-' . $types[$class]['icon'],
+        ])->all();
     }
 }

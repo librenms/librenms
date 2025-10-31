@@ -32,11 +32,8 @@ use Net_DNS2_Resolver;
 
 class Dns implements Geocoder
 {
-    protected Net_DNS2_Resolver $resolver;
-
-    public function __construct(Net_DNS2_Resolver $resolver)
+    public function __construct(protected Net_DNS2_Resolver $resolver)
     {
-        $this->resolver = $resolver;
     }
 
     public static function lookupIp(Device $device): ?string
@@ -51,7 +48,7 @@ class Dns implements Geocoder
             }
 
             return dns_get_record($device['hostname'], DNS_A)[0]['ip'] ?? null;
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return null;
         }
     }

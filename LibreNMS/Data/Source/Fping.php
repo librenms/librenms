@@ -115,7 +115,7 @@ class Fping
         Log::debug('[FPING] ' . $process->getCommandLine() . PHP_EOL);
 
         $partial = '';
-        $process->run(function ($type, $output) use ($callback, &$partial) {
+        $process->run(function ($type, $output) use ($callback, &$partial): void {
             // stdout contains individual ping responses, stderr contains summaries
             if ($type == Process::ERR) {
                 $lines = explode(PHP_EOL, $output);
