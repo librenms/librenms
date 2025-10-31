@@ -218,6 +218,7 @@ return [
         'skipping' => 'Skipping :file, step is already :step.',
         'converting' => 'Converting :file:',
         'summary' => 'Converted: :converted  Failed: :failed  Skipped: :skipped',
+    ],
     'maintenance:syslog-cleanup' => [
         'delete' => 'Cleared syslog entries older than :days days (:count rows)',
     ],
