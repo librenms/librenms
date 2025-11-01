@@ -39,7 +39,7 @@ if (isset($_POST['editing'])) {
             $device->features = null;
             $device->hardware = $_POST['hardware'];
             $device->icon = null;
-            $device->os = $_POST['os'] ? strip_tags($_POST['os_id']) : 'ping';
+            $device->os = $_POST['os'] ? strip_tags($_POST['os']) : 'ping';
             $device->snmp_disable = 1;
             $device->sysName = $_POST['sysName'] ?: null;
             $device->version = null;
@@ -209,8 +209,7 @@ echo "
     <div class='form-group'>
     <label for='os' class='col-sm-2 control-label'>OS (optional)</label>
     <div class='col-sm-4'>
-    <input id='os' class='form-control' name='os' value='" . htmlspecialchars(LibrenmsConfig::get("os.{$device->os}.text")) . "'/>
-    <input type='hidden' id='os_id' class='form-control' name='os_id' value='" . htmlspecialchars($device->os) . "'/>
+    <select id='os' class='form-control' name='os'></select>
     </div>
     </div>
     </div>
@@ -427,46 +426,8 @@ function disableSnmp(e) {
     }
 }
 
-var os_suggestions = new Bloodhound({
-    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('text'),
-    queryTokenizer: Bloodhound.tokenizers.whitespace,
-    remote: {
-        url: "ajax_ossuggest.php?term=%QUERY",
-        filter: function (output) {
-            return $.map(output, function (item) {
-                return {
-                    text: item.text,
-                    os: item.os,
-                };
-            });
-        },
-        wildcard: "%QUERY"
-    }
-});
-os_suggestions.initialize();
-$('#os').typeahead({
-        hint: true,
-        highlight: true,
-        minLength: 1,
-        classNames: {
-            menu: 'typeahead-left'
-        }
-    },
-    {
-        source: os_suggestions.ttAdapter(),
-        async: true,
-        displayKey: 'text',
-        valueKey: 'os',
-        templates: {
-            suggestion: Handlebars.compile('<p>&nbsp;{{text}}</p>')
-        },
-        limit: 20
-    });
-
-$("#os").on("typeahead:selected typeahead:autocompleted", function(e,datum) {
-    $("#os_id").val(datum.os);
-    $("#os").html('<mark>' + datum.text + '</mark>');
-});
+var current_os = <?php echo json_encode(['id' => $device->os, 'text' => LibrenmsConfig::get("os.{$device->os}.text")], JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS) ?>;
+init_select2('#os', 'os', {}, current_os, 'OS (optional)');
 
 $("[name='snmp']").bootstrapSwitch('offColor','danger');
 
