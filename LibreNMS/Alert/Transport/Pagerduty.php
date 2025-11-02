@@ -42,9 +42,7 @@ class Pagerduty extends Transport
         };
 
         $safe_message = strip_tags($alert_data['msg']) ?: 'Test';
-        $message = array_filter(explode("\n", $safe_message), function ($value): bool {
-            return strlen($value) > 0;
-        });
+        $message = array_filter(explode("\n", $safe_message), fn ($value): bool => strlen($value) > 0);
         $data = [
             'routing_key' => $this->config['service_key'],
             'event_action' => $event_action,
@@ -54,7 +52,7 @@ class Pagerduty extends Transport
                 'group' => (string) \DeviceCache::get($alert_data['device_id'])->groups->pluck('name'),
                 'source' => $alert_data['hostname'],
                 'severity' => $alert_data['severity'],
-                'summary' => ($alert_data['title'] ? $alert_data['title'] : $alert_data['name'] . ' on ' . $alert_data['hostname']),
+                'summary' => ($alert_data['title'] ?: $alert_data['name'] . ' on ' . $alert_data['hostname']),
             ],
         ];
 

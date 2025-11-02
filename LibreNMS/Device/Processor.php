@@ -98,9 +98,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
         // handle string indexes
         if (Str::contains($oid, '"')) {
-            $oid = preg_replace_callback('/"([^"]+)"/', function ($matches) {
-                return Oid::encodeString($matches[1])->oid;
-            }, $oid);
+            $oid = preg_replace_callback('/"([^"]+)"/', fn ($matches) => Oid::encodeString($matches[1])->oid, $oid);
         }
         $proc->processor_oid = '.' . ltrim($oid, '.');
 
@@ -116,7 +114,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             $proc->processor_usage = static::processData($data, $proc->processor_precision);
         }
 
-        d_echo('Discovered ' . get_called_class() . ' ' . print_r($proc->toArray(), true));
+        d_echo('Discovered ' . static::class . ' ' . print_r($proc->toArray(), true));
 
         return $proc;
     }
@@ -129,7 +127,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             empty($data['type']) ? $os->getName() : $data['type'],
             $os->getDeviceId(),
             $data['num_oid'],
-            isset($data['index']) ? $data['index'] : $index,
+            $data['index'] ?? $index,
             empty($data['descr']) ? 'Processor' : trim($data['descr']),
             $precision,
             static::processData($data['value'], $precision),
@@ -180,7 +178,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
         $rrd_def = RrdDefinition::make()->addDataset('usage', 'GAUGE', -273, 1000);
 
-        foreach ($processors as $index => $processor) {
+        foreach ($processors as $processor) {
             extract($processor); // extract db fields to variables
             /** @var int $processor_id */
             /** @var string $processor_type */
@@ -248,7 +246,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             // idle value, subtract from 100
             $value = 100 - ($value / ($precision * -1));
         } elseif ($precision > 1) {
-            $value = $value / $precision;
+            $value /= $precision;
         }
 
         return $value;
@@ -264,7 +262,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             return [];
         }
 
-        return YamlDiscovery::discover($os, get_called_class(), $discovery);
+        return YamlDiscovery::discover($os, static::class, $discovery);
     }
 
     /**

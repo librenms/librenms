@@ -30,7 +30,7 @@ abstract class TestCase extends BaseTestCase
 
     protected function tearDown(): void
     {
-        $this->beforeApplicationDestroyed(function () {
+        $this->beforeApplicationDestroyed(function (): void {
             $this->getConnection()->disconnect();
         });
 

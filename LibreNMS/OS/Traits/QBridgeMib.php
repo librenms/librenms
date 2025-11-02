@@ -40,25 +40,21 @@ trait QBridgeMib
     private function discoverIetfQBridgeMibVlans(): Collection
     {
         return SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanStaticName')
-            ->mapTable(function ($data, $vlan_id) {
-                return new Vlan([
-                    'vlan_vlan' => $vlan_id,
-                    'vlan_domain' => 1,
-                    'vlan_name' => $data['Q-BRIDGE-MIB::dot1qVlanStaticName'] ?? '',
-                ]);
-            });
+            ->mapTable(fn ($data, $vlan_id) => new Vlan([
+                'vlan_vlan' => $vlan_id,
+                'vlan_domain' => 1,
+                'vlan_name' => $data['Q-BRIDGE-MIB::dot1qVlanStaticName'] ?? '',
+            ]));
     }
 
     private function discoverIeeeQBridgeMibVlans(): Collection
     {
         return SnmpQuery::walk('IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticName')
-            ->mapTable(function ($data, $vlan_domain_id, $vlan_id) {
-                return new Vlan([
-                    'vlan_vlan' => $vlan_id,
-                    'vlan_domain' => $vlan_domain_id,
-                    'vlan_name' => $data['IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticName'] ?? '',
-                ]);
-            });
+            ->mapTable(fn ($data, $vlan_domain_id, $vlan_id) => new Vlan([
+                'vlan_vlan' => $vlan_id,
+                'vlan_domain' => $vlan_domain_id,
+                'vlan_name' => $data['IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticName'] ?? '',
+            ]));
     }
 
     private function discoverIetfQBridgeMibPorts(): Collection
@@ -139,7 +135,7 @@ trait QBridgeMib
             return $ports;
         }
 
-        foreach ($port_data as $vlan_domain_id => $vlan_domains) {
+        foreach ($port_data as $vlan_domains) {
             foreach ($vlan_domains as $vlan_id => $data) {
                 //portmap for untagged ports
                 $untagged_ids = StringHelpers::bitsToIndices($data['IEEE8021-Q-BRIDGE-MIB::ieee8021QBridgeVlanStaticUntaggedPorts'] ?? '');

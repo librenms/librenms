@@ -23,6 +23,7 @@ if (! isset($options['q'])) {
 }
 
 $where = '';
+$doing = '';
 if (isset($options['h'])) {
     if ($options['h'] == 'odd') {
         $options['n'] = '1';

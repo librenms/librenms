@@ -43,16 +43,11 @@ class Gotify extends Transport
          * 4-7 + Sound      = Warning
          * 8-10 + Vibration = Critical
          */
-        switch ($alert_data['severity']) {
-            case 'critical':
-                $priority = 8;
-                break;
-            case 'warning':
-                $priority = 4;
-                break;
-            default:
-                $priority = 0;
-        }
+        $priority = match ($alert_data['severity']) {
+            'critical' => 8,
+            'warning' => 4,
+            default => 0,
+        };
 
         $data = [
             'title' => $alert_data['title'],

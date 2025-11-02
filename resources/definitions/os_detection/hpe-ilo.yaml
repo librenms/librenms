@@ -1,6 +1,6 @@
 os: hpe-ilo
 text: 'HPE Integrated Lights Out'
-type: appliance
+type: management
 icon: hpe
 over:
     - { graph: device_bits, text: Traffic }

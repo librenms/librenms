@@ -173,9 +173,7 @@ abstract class TableController extends PaginatedAjaxController
             $fields = \Schema::getColumnListing((new $this->model)->getTable());
 
             // Convert DB column names to human-readable format
-            return array_map(function ($field) {
-                return ucwords(str_replace('_', ' ', $field));
-            }, $fields);
+            return array_map(fn ($field) => ucwords(str_replace('_', ' ', $field)), $fields);
         }
 
         return [];
@@ -194,9 +192,7 @@ abstract class TableController extends PaginatedAjaxController
 
         // If formatItem returns an array, process it to remove HTML
         if (is_array($formatted)) {
-            return array_map(function ($value) {
-                return is_string($value) ? trim(strip_tags($value)) : $value;
-            }, $formatted);
+            return array_map(fn ($value) => is_string($value) ? trim(strip_tags($value)) : $value, $formatted);
         }
 
         if (method_exists($item, 'toArray')) {
@@ -217,7 +213,7 @@ abstract class TableController extends PaginatedAjaxController
     protected function generateCsvResponse($data, $headers, $filename)
     {
         return response()->stream(
-            function () use ($data, $headers) {
+            function () use ($data, $headers): void {
                 $output = fopen('php://output', 'w');
 
                 fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));

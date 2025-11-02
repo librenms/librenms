@@ -58,19 +58,15 @@ class GraphAggregateController extends Controller
 
         // handle search
         if ($search = strtolower($request->get('term'))) {
-            $types = array_filter($types, function ($type) use ($search) {
-                return ! Str::contains(strtolower($type), $search);
-            });
+            $types = array_filter($types, fn ($type) => ! Str::contains(strtolower($type), $search));
         }
 
         // format results
         return response()->json([
-            'results' => array_map(function ($type) {
-                return [
-                    'id' => $type,
-                    'text' => ucwords($type),
-                ];
-            }, $types),
+            'results' => array_map(fn ($type) => [
+                'id' => $type,
+                'text' => ucwords($type),
+            ], $types),
             'pagination' => ['more' => false],
         ]);
     }

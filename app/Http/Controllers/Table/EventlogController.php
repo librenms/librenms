@@ -72,7 +72,7 @@ class EventlogController extends TableController
     {
         return Eventlog::hasAccess($request->user())
             ->with('device')
-            ->when($request->device_group, function ($query) use ($request) {
+            ->when($request->device_group, function ($query) use ($request): void {
                 $query->inDeviceGroup($request->device_group);
             });
     }

@@ -89,7 +89,7 @@ class IPv6 extends IP
      */
     public function isLinkLocal()
     {
-        return substr($this->uncompressed(), 0, 20) == 'fe80:0000:0000:0000:';
+        return str_starts_with($this->uncompressed(), 'fe80:0000:0000:0000:');
     }
 
     /**
@@ -180,9 +180,7 @@ class IPv6 extends IP
         // mapped ipv4 to hex
         if (str_contains($ip, '.') && str_contains($ip, ':')) {
             $split = strrpos($ip, ':');
-            $parts = array_map(function ($part) {
-                return dechex((int) $part);
-            }, explode('.', substr($ip, $split + 1)));
+            $parts = array_map(fn ($part) => dechex((int) $part), explode('.', substr($ip, $split + 1)));
             $ip = substr($ip, 0, $split); // extract prefix
 
             foreach ($parts as $pos => $part) {
@@ -200,9 +198,7 @@ class IPv6 extends IP
         // zero pad
         $parts = explode(':', $ip, 8);
 
-        return implode(':', array_map(function ($section) {
-            return Str::padLeft($section, 4, '0');
-        }, $parts));
+        return implode(':', array_map(fn ($section) => Str::padLeft($section, 4, '0'), $parts));
     }
 
     /**

@@ -1,9 +1,9 @@
 <?php
 
 /**
- * devices_groups.inc.php
+ * DevicesGroupsAndLocationsController.php
  *
- * List devices and groups in one
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,21 +20,29 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2018 Tony Murray
+ * @copyright  2025 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-[$devices, $d_more] = include 'devices.inc.php';
-[$groups, $g_more] = include 'groups.inc.php';
 
-$groups = array_map(function ($group) {
-    $group['id'] = 'g' . $group['id'];
+namespace App\Http\Controllers\Select;
 
-    return $group;
-}, $groups);
-
-$data = [
-    ['text' => 'Groups', 'children' => $groups],
-    ['text' => 'Devices', 'children' => $devices],
-];
-
-return [$data, $d_more || $g_more];
+class DevicesGroupsAndLocationsController extends AggregateSelectController
+{
+    protected array $groups = [
+        [
+            'text' => 'Devices',
+            'controller' => DeviceController::class,
+            'prefix' => '',
+        ],
+        [
+            'text' => 'Groups',
+            'controller' => DeviceGroupController::class,
+            'prefix' => 'g',
+        ],
+        [
+            'text' => 'Locations',
+            'controller' => LocationController::class,
+            'prefix' => 'l',
+        ],
+    ];
+}

@@ -38,7 +38,6 @@ modules:
                     low_limit: devMSlotEnvironmentLowerLimit
                     warn_limit: devMSlotEnvironmentUpperLimit
                     high_limit: devMSlotEnvironmentCriticalLimit
-                    snmp_flags: ['-OteQUsab'] # make sure the index is numberic only
         percent:
             data:
                 -
@@ -49,7 +48,6 @@ modules:
                     descr: 'Fan {{ $subindex2 }} speed'
                     group: 'Fans'
                     state_name: FanSpeed
-                    snmp_flags: ['-OteQUsab'] # make sure the index is numberic only
         state:
             data:
                 -
@@ -60,7 +58,6 @@ modules:
                     descr: 'Fan {{ $subindex2 }} status'
                     state_name: FanStatus
                     group: 'Fans'
-                    snmp_flags: ['-OteQUsab']
                     states:
                         - { descr: active, graph: 1, value: 1, generic: 0 }
                         - { descr: deactive, graph: 2, value: 2, generic: 2 }

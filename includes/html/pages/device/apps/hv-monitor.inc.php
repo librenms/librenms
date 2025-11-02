@@ -70,7 +70,7 @@ echo implode(', ', $page_links);
 if (isset($vars['vm'])) {
     echo '<br><b>Disks:</b> ';
     $disk_links = [];
-    foreach ($app->data['VMdisks'][$vars['vm']] as $index => $disk) {
+    foreach ($app->data['VMdisks'][$vars['vm']] as $disk) {
         $disk = htmlspecialchars($disk);
         $label = $disk;
 

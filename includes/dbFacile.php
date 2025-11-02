@@ -60,21 +60,25 @@ function dbQuery($sql, $parameters = [])
  * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent#inserting-and-updating-models
  * @see https://laravel.com/docs/eloquent#inserting-and-updating-models
  */
-function dbInsert($data, $table)
+function dbInsert($data, $table): ?int
 {
     $sql = 'INSERT IGNORE INTO `' . $table . '` (`' . implode('`,`', array_keys($data)) . '`)  VALUES (' . implode(',', dbPlaceHolders($data)) . ')';
 
     try {
         $result = Eloquent::DB()->insert($sql, (array) $data);
+
+        if ($result) {
+            $lastInsertId = Eloquent::DB()->getPdo()->lastInsertId();
+
+            if ($lastInsertId) {
+                return (int) $lastInsertId;
+            }
+        }
     } catch (PDOException $pdoe) {
         dbHandleException(new QueryException('dbFacile', $sql, $data, $pdoe));
     }
 
-    if ($result) {
-        return Eloquent::DB()->getPdo()->lastInsertId();
-    } else {
-        return null;
-    }
+    return null;
 }//end dbInsert()
 
 /**

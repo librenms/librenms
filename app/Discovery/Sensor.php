@@ -46,13 +46,11 @@ class Sensor
     /** @var bool[] */
     private array $discovered = [];
     private string $relationship = 'sensors';
-    private Device $device;
     /** @var array<string, Collection<StateTranslation>> */
     private array $states = [];
 
-    public function __construct(Device $device)
+    public function __construct(private Device $device)
     {
-        $this->device = $device;
         $this->models = new Collection;
     }
 

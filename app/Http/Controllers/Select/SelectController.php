@@ -31,6 +31,7 @@ use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 
@@ -57,37 +58,44 @@ abstract class SelectController extends PaginatedAjaxController
     public function __invoke(Request $request)
     {
         $this->validate($request, $this->rules());
+
         $limit = $request->get('limit', 50);
+        $paginator = $this->buildQuery($this, $request)->simplePaginate($limit);
 
-        $query = $this->baseQuery($request);
-        if ($this->idField && $this->textField) {
-            $query->select([$this->idField, $this->textField]);
+        return $this->formatResponse($paginator, $paginator->hasMorePages());
+    }
+
+    protected function buildQuery(SelectController $controller, Request $request): EloquentBuilder|Builder
+    {
+        $query = $controller->baseQuery($request);
+        if ($controller->idField && $controller->textField) {
+            $query->select([$controller->idField, $controller->textField]);
         }
-        $this->filterById($query, $request->get('id'));
-        $this->filter($request, $query, $this->filterFields($request));
-        $this->search($request->get('term'), $query, $this->searchFields($request));
-        $this->sort($request, $query);
-        $paginator = $query->simplePaginate($limit);
 
-        return $this->formatResponse($paginator);
+        $controller->filterById($query, $request->get('id'));
+        $controller->filter($request, $query, $controller->filterFields($request));
+        $controller->search($request->get('term'), $query, $controller->searchFields($request));
+        $controller->sort($request, $query);
+
+        return $query;
     }
 
     /**
      * @param  Paginator|Collection  $paginator
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function formatResponse($paginator)
+    protected function formatResponse($paginator, bool $hasMore = false): JsonResponse
     {
-        $results = collect($paginator->items())->map([$this, 'formatItem']);
+        $results = ($paginator instanceof Paginator ? collect($paginator->items()) : $paginator)
+            ->map(fn ($model) => $this->formatItem($model));
 
-        // prepend the initial item, unless filtered out
         if ($this->canPrependFirstItem(request())) {
             $results->prepend($this->prependItem());
         }
 
         return response()->json([
-            'results' => $results,
-            'pagination' => ['more' => $paginator->hasMorePages()],
+            'results' => $results->filter(),
+            'pagination' => ['more' => $hasMore],
         ]);
     }
 
