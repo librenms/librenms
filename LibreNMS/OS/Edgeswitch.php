@@ -56,13 +56,11 @@ class Edgeswitch extends OS implements ProcessorDiscovery, ProcessorPolling, Arp
     public function discoverFdbTable(): Collection
     {
         $fdbt = SnmpQuery::cache()->walk('EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingTable')
-            ->mapTable(function ($data) {
-                return new PortsFdb([
-                    'port_id' => (int) PortCache::getIdFromIfIndex($data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingIfIndex'], $this->getDeviceId()),
-                    'mac_address' => $data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingMacAddr'],
-                    'vlan_id' => $data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingVlanId'],
-                ]);
-            });
+            ->mapTable(fn ($data) => new PortsFdb([
+                'port_id' => (int) PortCache::getIdFromIfIndex($data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingIfIndex'], $this->getDeviceId()),
+                'mac_address' => $data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingMacAddr'],
+                'vlan_id' => $data['EdgeSwitch-SWITCHING-MIB::agentDynamicDsBindingVlanId'],
+            ]));
 
         if ($fdbt->isEmpty()) {
             $fdbt = parent::discoverFdbTable();

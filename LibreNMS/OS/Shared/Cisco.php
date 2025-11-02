@@ -1113,7 +1113,7 @@ class Cisco extends OS implements
         foreach ($vtpdomains as $vtpdomain_id => $vtpdomain) {
             echo 'VTP Domain ' . $vtpdomain_id . ' > ';
             foreach ($vlans[$vtpdomain_id] as $vlan_raw => $vlan) {
-                $vlan['vtpVlanState'] = $vlan['vtpVlanState'] ?? 0;
+                $vlan['vtpVlanState'] ??= 0;
                 echo "$vlan_raw ";
                 if (($vlan['vtpVlanState'] == 1) && ($vlan_raw < 1002 || $vlan_raw > 1005)) {
                     $fdbPort_table = SnmpQuery::context($vlan_raw, 'vlan-')->walk('BRIDGE-MIB::dot1dTpFdbPort')->table();

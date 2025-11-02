@@ -176,7 +176,7 @@ trait QBridgeMib
         foreach ($dot1qTpFdbPort as $vlanIdx => $macData) {
             foreach ($macData as $mac_address => $portIdx) {
                 if (is_array($portIdx)) {
-                    foreach ($portIdx as $key => $idx) { //multiple port for one mac ???
+                    foreach ($portIdx as $idx) { //multiple port for one mac ???
                         $ifIndex = $this->ifIndexFromBridgePort($idx);
                         $port_id = PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0;
                         $fdbt->push(new PortsFdb([

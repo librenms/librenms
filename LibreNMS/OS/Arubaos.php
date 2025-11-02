@@ -239,7 +239,7 @@ class Arubaos extends OS implements
             $tmpOids = SnmpQuery::context($vlanIdx, 'vlan-')->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table();
             if (! empty($tmpOids)) {
                 $tmpOids = array_shift($tmpOids);
-                $dot1dBasePortIfIndex = $dot1dBasePortIfIndex + $tmpOids;
+                $dot1dBasePortIfIndex += $tmpOids;
             }
 
             foreach ($macData as $mac_address => $portIdx) {

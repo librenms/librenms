@@ -66,7 +66,7 @@ class Port extends DeviceRelatedModel
     {
         $findMe = (is_array($findMe)) ? $findMe : [0 => $findMe];
         $portId = 0;
-        foreach ($findMe as $key => $search) {
+        foreach ($findMe as $search) {
             if (! empty($device_id)) {
                 $portId = (empty($portId)) ? \App\Facades\PortCache::getIdFromIfDescr($search, $device_id) : $portId;
                 $portId = (empty($portId)) ? \App\Facades\PortCache::getIdFromIfName($search, $device_id) : $portId;
