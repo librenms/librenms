@@ -39,13 +39,13 @@ use Throwable;
 class DatabaseInconsistentException extends \Exception implements UpgradeableException
 {
     /**
+     * @param  \LibreNMS\ValidationResult[]  $validationResults
+     */
+    public function __construct(/**
      * @var \LibreNMS\ValidationResult[]
      */
-    private $validationResults;
-
-    public function __construct($validationResults, $message = '', $code = 0, ?Throwable $previous = null)
+    private $validationResults, $message = '', $code = 0, ?Throwable $previous = null)
     {
-        $this->validationResults = $validationResults;
         parent::__construct($message, $code, $previous);
     }
 

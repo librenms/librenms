@@ -30,7 +30,7 @@ use Cache;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidOidException;
 
-class Oid
+class Oid implements \Stringable
 {
     public function __construct(
         public readonly string $oid

@@ -106,7 +106,7 @@ class MakeUserController extends InstallationController implements InstallerStep
 
                 return $exists;
             }
-        } catch (QueryException $e) {
+        } catch (QueryException) {
             //
         }
 

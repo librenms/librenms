@@ -937,7 +937,7 @@ class Timos extends OS implements
                 }
 
                 return IP::parse($data[$ngField])->uncompressed();
-            } catch (InvalidIpException $e) {
+            } catch (InvalidIpException) {
                 return null;
             }
         }

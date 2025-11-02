@@ -13,17 +13,14 @@ use RdKafka\Producer;
 
 class Kafka extends BaseDatastore
 {
-    private $client = null;
     private $topicName = null;
     private $kafkaFlushTimeout = 100;
     private $excluded_groups = [];
     private $excluded_measurement = [];
 
-    public function __construct(Producer $client)
+    public function __construct(private Producer $client)
     {
         parent::__construct();
-
-        $this->client = $client;
 
         // Load the topic name from config
         $this->topicName = LibrenmsConfig::get('kafka.topic', 'librenms');

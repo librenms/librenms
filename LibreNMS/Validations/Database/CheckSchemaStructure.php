@@ -78,7 +78,7 @@ class CheckSchemaStructure implements Validation, ValidationFixer
             foreach ($this->schema_update as $query) {
                 DB::statement($query);
             }
-        } catch (QueryException $e) {
+        } catch (QueryException) {
             return false;
         }
 

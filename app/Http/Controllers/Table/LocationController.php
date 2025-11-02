@@ -88,18 +88,15 @@ class LocationController extends TableController
 
     private function getJoinQuery($field)
     {
-        switch ($field) {
-            case 'devices':
-                return function ($query): void {
-                    $query->on('devices.location_id', 'locations.id');
-                };
-            case 'down':
-                return function ($query): void {
-                    $query->on('devices.location_id', 'locations.id');
-                    (new Device)->scopeIsDown($query);
-                };
-            default:
-                return null;
-        }
+        return match ($field) {
+            'devices' => function ($query): void {
+                $query->on('devices.location_id', 'locations.id');
+            },
+            'down' => function ($query): void {
+                $query->on('devices.location_id', 'locations.id');
+                (new Device)->scopeIsDown($query);
+            },
+            default => null,
+        };
     }
 }

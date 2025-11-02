@@ -199,7 +199,7 @@ class Component
     {
         try {
             return ComponentStatusLog::create(['component_id' => $component_id, 'status' => $status, 'message' => $message])->id;
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             Log::debug('Failed to create component status log');
         }
 

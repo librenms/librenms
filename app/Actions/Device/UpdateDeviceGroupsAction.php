@@ -32,14 +32,8 @@ use Log;
 
 class UpdateDeviceGroupsAction
 {
-    /**
-     * @var Device
-     */
-    private $device;
-
-    public function __construct(Device $device)
+    public function __construct(private Device $device)
     {
-        $this->device = $device;
     }
 
     /**

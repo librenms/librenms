@@ -32,7 +32,6 @@ use Validator;
 #[\AllowDynamicProperties]
 class DynamicConfigItem implements \ArrayAccess
 {
-    public $name;
     public $group;
     public $section;
     public $value;
@@ -48,9 +47,8 @@ class DynamicConfigItem implements \ArrayAccess
     public $validate;
     public $units;
 
-    public function __construct($name, $settings = [])
+    public function __construct(public $name, $settings = [])
     {
-        $this->name = $name;
         $this->value = LibrenmsConfig::get($this->name, $this->default);
 
         foreach ($settings as $key => $value) {

@@ -53,7 +53,7 @@ class SetGroups implements \Spatie\FlareClient\FlareMiddleware\FlareMiddleware
                 'RRDtool' => $version->rrdtool(),
 
             ]);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
         }
 
         return $next($report);

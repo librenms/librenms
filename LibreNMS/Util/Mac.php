@@ -30,7 +30,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
-class Mac
+class Mac implements \Stringable
 {
     private array $mac = [];
 
@@ -120,7 +120,7 @@ class Mac
      */
     public function hex(): string
     {
-        return implode($this->mac);
+        return implode('', $this->mac);
     }
 
     /**
@@ -136,7 +136,7 @@ class Mac
      */
     public function vendor(): string
     {
-        $oui = implode(array_slice($this->mac, 0, 3));
+        $oui = implode('', array_slice($this->mac, 0, 3));
 
         $results = Cache::remember($oui, 21600, fn () => DB::table('vendor_ouis')
             ->where('oui', 'like', "$oui%") // possible matches
@@ -181,6 +181,6 @@ class Mac
 
     public function __toString(): string
     {
-        return $this->readable();
+        return (string) $this->readable();
     }
 }

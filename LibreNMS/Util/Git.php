@@ -53,7 +53,7 @@ class Git
             $git->runtimeCacheExternalTTL = $cache;
 
             return $git;
-        } catch (BindingResolutionException $e) {
+        } catch (BindingResolutionException) {
             return new static($cache); // no container, just return a regular instance
         }
     }
@@ -178,7 +178,7 @@ class Git
             if ($this->isAvailable()) {
                 try {
                     return (array) Http::client()->get(LibrenmsConfig::get('github_api') . 'commits/master')->json();
-                } catch (ConnectionException $e) {
+                } catch (ConnectionException) {
                 }
             }
 

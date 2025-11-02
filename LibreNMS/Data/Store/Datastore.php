@@ -38,11 +38,6 @@ use LibreNMS\Interfaces\Data\WriteInterface;
 class Datastore implements WriteInterface, DataStorageInterface
 {
     /**
-     * @var DatastoreContract[]
-     */
-    protected array $stores;
-
-    /**
      * Legacy factory method to initialize and create the Datastore(s)
      *
      * @param  array  $options
@@ -70,11 +65,10 @@ class Datastore implements WriteInterface, DataStorageInterface
     /**
      * Datastore constructor.
      *
-     * @param  DatastoreContract[]  $datastores
+     * @param  DatastoreContract[]  $stores
      */
-    public function __construct(array $datastores)
+    public function __construct(protected array $stores)
     {
-        $this->stores = $datastores;
     }
 
     public function terminate(): void

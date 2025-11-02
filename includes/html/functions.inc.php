@@ -884,20 +884,14 @@ function search_oxidized_config($search_in_conf_textbox)
  */
 function eventlog_severity($eventlog_severity)
 {
-    switch ($eventlog_severity) {
-        case 1:
-            return 'label-success'; //OK
-        case 2:
-            return 'label-info'; //Informational
-        case 3:
-            return 'label-primary'; //Notice
-        case 4:
-            return 'label-warning'; //Warning
-        case 5:
-            return 'label-danger'; //Critical
-        default:
-            return 'label-default'; //Unknown
-    }
+    return match ($eventlog_severity) {
+        1 => 'label-success',
+        2 => 'label-info',
+        3 => 'label-primary',
+        4 => 'label-warning',
+        5 => 'label-danger',
+        default => 'label-default',
+    };
 } // end eventlog_severity
 
 function get_oxidized_nodes_list()
@@ -925,7 +919,7 @@ function get_oxidized_nodes_list()
 
             // Generate local time string
             $formatted_local_time = $local_date->format('Y-m-d H:i:s T');
-        } catch (Exception $e) {
+        } catch (Exception) {
             // Just display the current value of $object['time'];
             $formatted_local_time = $object['time'];
         }
