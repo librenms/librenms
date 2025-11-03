@@ -7,7 +7,7 @@
             <tr>
                 <th data-column-id="hostname">Device</th>
                 <th data-column-id="interface">Interface</th>
-                <th data-column-id="address" data-sortable="false" data-formatter="tooltip">Address</th>
+                <th data-column-id="address" data-formatter="tooltip">Address</th>
                 <th data-column-id="description" data-sortable="false" data-formatter="tooltip">Description</th>
             </tr>
         <thead>

@@ -84,16 +84,12 @@ class PollerController extends Controller
 
     private function poller()
     {
-        return Poller::query()->orderBy('poller_name')->get()->map(function ($poller) {
-            return $this->pollerStatus($poller, $poller->last_polled);
-        });
+        return Poller::query()->orderBy('poller_name')->get()->map(fn ($poller) => $this->pollerStatus($poller, $poller->last_polled));
     }
 
     private function pollerCluster()
     {
-        return PollerCluster::with('stats')->orderBy('poller_name')->get()->map(function ($poller) {
-            return $this->pollerStatus($poller, $poller->last_report);
-        });
+        return PollerCluster::with('stats')->orderBy('poller_name')->get()->map(fn ($poller) => $this->pollerStatus($poller, $poller->last_report));
     }
 
     private function checkTimeSinceLastPoll($seconds)

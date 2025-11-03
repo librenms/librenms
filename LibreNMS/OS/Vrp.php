@@ -64,6 +64,7 @@ use LibreNMS\OS;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\Oid;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
@@ -95,7 +96,7 @@ class Vrp extends OS implements
             'HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc',
         ])->table(1);
 
-        $inventory->each(function (EntPhysical $entry) use ($extra) {
+        $inventory->each(function (EntPhysical $entry) use ($extra): void {
             if (isset($entry->entPhysicalIndex)) {
                 if (! empty($extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc'])) {
                     $entry->entPhysicalDescr = $extra[$entry->entPhysicalIndex]['HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc'];
@@ -181,7 +182,7 @@ class Vrp extends OS implements
             if (! is_null($type) && ! is_null($entityType)) {
                 $type .= " ($entityType)";
             } else {
-                $type = $type ?? $entityType;
+                $type ??= $entityType;
             }
             if (! is_null($type)) {
                 $type .= $mode;
@@ -295,7 +296,7 @@ class Vrp extends OS implements
                 //Convert mac address (hh:hh:hh:hh:hh:hh) to dec OID (ddd.ddd.ddd.ddd.ddd.ddd)
                 //$a_index_oid = implode(".", array_map("hexdec", explode(":", $ap_id)));
                 foreach ($ap as $r_id => $radio) {
-                    foreach ($radio as $s_index => $ssid) {
+                    foreach ($radio as $ssid) {
                         $clientPerRadio[$ap_id][$r_id] = ($clientPerRadio[$ap_id][$r_id] ?? 0) + ($ssid['hwWlanVapStaOnlineCnt'] ?? 0);
                         $numClients += ($ssid['hwWlanVapStaOnlineCnt'] ?? 0);
                     }
@@ -329,7 +330,7 @@ class Vrp extends OS implements
                     $radioutil = $radio['hwWlanRadioChUtilizationRate'] ?? 0;
                     $radioutil = ($radioutil > 100 || $radioutil < 0) ? -1 : $radioutil;
                     $numasoclients = $clientPerRadio[$ap_id][$r_id] ?? 0;
-                    $radio['hwWlanRadioType'] = $radio['hwWlanRadioType'] ?? 0;
+                    $radio['hwWlanRadioType'] ??= 0;
 
                     if ($txpow > 127) {
                         // means the radio is disabled for some reason.
@@ -567,11 +568,9 @@ class Vrp extends OS implements
         $ssid_total_oid_array = []; // keep all OIDs so we can compute the total of all STA
 
         foreach ($staTable as $ssid => $sta) {
-            //Convert string to num_oid
-            $numSsid = strlen($ssid) . '.' . implode('.', unpack('c*', $ssid));
             $ssid_oid_array = []; // keep all OIDs of different freqs for a single SSID, to compute each SSID sta count, all freqs included
             foreach ($sta as $staFreq => $count) {
-                $oid = $oidMap[$staFreq] . $numSsid;
+                $oid = $oidMap[$staFreq] . Oid::encodeString($ssid);
                 $ssid_oid_array[] = $oid;
                 $ssid_total_oid_array[] = $oid;
                 $sensors[] = new WirelessSensor(
@@ -714,14 +713,12 @@ class Vrp extends OS implements
             'HUAWEI-L2VLAN-MIB::hwL2VlanDescr',
             // 'HUAWEI-L2VLAN-MIB::hwL2VlanRowStatus', // for filtering only active vlans
             'HUAWEI-L2VLAN-MIB::hwL2VlanType',
-        ])->mapTable(function ($vlanArray, $vlanId) {
-            return new Vlan([
-                'vlan_name' => $vlanArray['HUAWEI-L2VLAN-MIB::hwL2VlanDescr'] ?? '',
-                'vlan_vlan' => $vlanId,
-                'vlan_domain' => 1,
-                'vlan_type' => $vlanArray['HUAWEI-L2VLAN-MIB::hwL2VlanType'] ?? '',
-            ]);
-        });
+        ])->mapTable(fn ($vlanArray, $vlanId) => new Vlan([
+            'vlan_name' => $vlanArray['HUAWEI-L2VLAN-MIB::hwL2VlanDescr'] ?? '',
+            'vlan_vlan' => $vlanId,
+            'vlan_domain' => 1,
+            'vlan_type' => $vlanArray['HUAWEI-L2VLAN-MIB::hwL2VlanType'] ?? '',
+        ]));
 
         if ($vlansData->isEmpty()) { // try standard QBridge Vlan data
             $vlansData = parent::discoverVlans();

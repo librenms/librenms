@@ -114,22 +114,20 @@ class Comware extends OS implements MempoolsDiscovery, ProcessorDiscovery, Trans
 
     public function discoverTransceivers(): Collection
     {
-        return \SnmpQuery::cache()->enumStrings()->walk('HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverInfoTable')->mapTable(function ($data, $ifIndex) {
-            return new Transceiver([
-                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
-                'index' => $ifIndex,
-                'type' => $data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverType'] ?? null,
-                'vendor' => $data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverVendorName'] ?? null,
-                'oui' => $data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverVendorOUI'] ?? null,
-                'revision' => $data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverRevisionNumber'] ?? null,
-                'model' => $data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverPartNumber'] ?? null,
-                'serial' => $data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverSerialNumber'] ?? null,
-                'ddm' => isset($data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverDiagnostic']) && $data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverDiagnostic'] == 'true',
-                'cable' => $data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverHardwareType'] ?? null,
-                'distance' => $data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverTransferDistance'] ?? null,
-                'wavelength' => isset($data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverWaveLength']) && $data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverWaveLength'] != 2147483647 ? $data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverWaveLength'] : null,
-                'entity_physical_index' => $ifIndex,
-            ]);
-        });
+        return \SnmpQuery::cache()->enumStrings()->walk('HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverInfoTable')->mapTable(fn ($data, $ifIndex) => new Transceiver([
+            'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
+            'index' => $ifIndex,
+            'type' => $data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverType'] ?? null,
+            'vendor' => $data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverVendorName'] ?? null,
+            'oui' => $data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverVendorOUI'] ?? null,
+            'revision' => $data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverRevisionNumber'] ?? null,
+            'model' => $data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverPartNumber'] ?? null,
+            'serial' => $data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverSerialNumber'] ?? null,
+            'ddm' => isset($data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverDiagnostic']) && $data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverDiagnostic'] == 'true',
+            'cable' => $data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverHardwareType'] ?? null,
+            'distance' => $data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverTransferDistance'] ?? null,
+            'wavelength' => isset($data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverWaveLength']) && $data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverWaveLength'] != 2147483647 ? $data['HH3C-TRANSCEIVER-INFO-MIB::hh3cTransceiverWaveLength'] : null,
+            'entity_physical_index' => $ifIndex,
+        ]));
     }
 }

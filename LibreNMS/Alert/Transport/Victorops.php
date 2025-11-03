@@ -54,7 +54,7 @@ class Victorops extends Transport
             },
         };
 
-        foreach ($alert_data['faults'] as $fault => $data) {
+        foreach ($alert_data['faults'] as $data) {
             $protocol['state_message'] .= $data['string'];
         }
 

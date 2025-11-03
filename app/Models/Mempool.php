@@ -68,7 +68,7 @@ class Mempool extends DeviceRelatedModel implements Keyable
                 $multiplier,
             );
         } catch (InsufficientDataException|UncorrectableNegativeException $e) {
-            Log::info(get_class($e));
+            Log::info($e::class);
             Log::debug($e->getMessage());
 
             return $this;

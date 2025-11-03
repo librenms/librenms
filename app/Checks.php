@@ -84,48 +84,4 @@ class Checks
             }
         }
     }
-
-    /**
-     * Check the script is running as the right user (works before config is available)
-     */
-    public static function runningUser()
-    {
-        if (function_exists('posix_getpwuid') && posix_getpwuid(posix_geteuid())['name'] !== get_current_user()) {
-            if (get_current_user() == 'root') {
-                self::printMessage(
-                    'Error: lnms file is owned by root, it should be owned and ran by a non-privileged user.',
-                    null,
-                    true
-                );
-            }
-
-            self::printMessage(
-                'Error: You must run lnms as the user ' . get_current_user(),
-                null,
-                true
-            );
-        }
-    }
-
-    private static function printMessage($title, $content, $exit = false)
-    {
-        $content = (array) $content;
-
-        if (PHP_SAPI == 'cli') {
-            $format = "%s\n\n%s\n\n";
-            $message = implode(PHP_EOL, $content);
-        } else {
-            $format = "<h3 style='color: firebrick;'>%s</h3><p>%s</p>";
-            $message = '';
-            foreach ($content as $line) {
-                $message .= "<p style='margin:0.5em'>$line</p>\n";
-            }
-        }
-
-        printf($format, $title, $message);
-
-        if ($exit) {
-            exit(1);
-        }
-    }
 }

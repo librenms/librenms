@@ -506,9 +506,7 @@ class NetSnmpQuery implements SnmpQueryInterface
         }
 
         // remove trailing /, remove empty dirs, and remove duplicates
-        $dirs = array_unique(array_filter(array_map(function ($dir) {
-            return rtrim($dir, '/');
-        }, $dirs)));
+        $dirs = array_unique(array_filter(array_map(fn ($dir) => rtrim($dir, '/'), $dirs)));
 
         return implode(':', $dirs);
     }

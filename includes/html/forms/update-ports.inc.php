@@ -19,7 +19,7 @@ $device_id = intval($_POST['device']);
 $rows_updated = 0;
 
 foreach ($_POST as $key => $val) {
-    if (strncmp($key, 'oldign_', 7) == 0) {
+    if (str_starts_with($key, 'oldign_')) {
         // Interface identifier passed as part of the field name
         $port_id = intval(substr($key, 7));
 
@@ -40,7 +40,7 @@ foreach ($_POST as $key => $val) {
         }
 
         $rows_updated += $n;
-    } elseif (strncmp($key, 'olddis_', 7) == 0) {
+    } elseif (str_starts_with($key, 'olddis_')) {
         // Interface identifier passed as part of the field name
         $port_id = intval(substr($key, 7));
 

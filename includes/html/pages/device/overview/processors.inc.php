@@ -91,7 +91,7 @@ if (count($processors)) {
         echo \LibreNMS\Util\Url::overlibLink($link, $graph, $overlib_content);
         echo '  </td>
             </tr>';
-        foreach ($total_percent as $type => $values) {
+        foreach ($total_percent as $values) {
             //Add a row with CPU desc, count and percent graph
             $percent_usage = ceil($values['usage'] / $values['count']);
             $percent_warn = $values['warn'] / $values['count'];

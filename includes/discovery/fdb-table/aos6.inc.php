@@ -49,7 +49,7 @@ if (! empty($fdbPort_table)) {
     // Build dot1dBasePort to port_id dictionary
     $portid_dict = [];
     $dot1dBasePortIfIndex = snmpwalk_group($device, 'dot1dBasePortIfIndex', 'BRIDGE-MIB');
-    foreach ($dot1dBasePortIfIndex as $portLocal => $data) {
+    foreach ($dot1dBasePortIfIndex as $data) {
         $portid_dict[$port['ifIndex']] = PortCache::getIdFromIfIndex($data['dot1dBasePortIfIndex'], $device['device_id']);
     }
     // Collect data and populate $insert
@@ -70,7 +70,7 @@ if (! empty($fdbPort_table)) {
                 continue;
             }
             $port_id = $portid_dict[$dot1dBasePort];
-            $vlan_id = isset($vlans_dict[$vlan]) ? $vlans_dict[$vlan] : 0;
+            $vlan_id = $vlans_dict[$vlan] ?? 0;
             $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
             Log::debug("vlan $vlan_id mac $mac_address port ($dot1dBasePort) $port_id\n");
         }

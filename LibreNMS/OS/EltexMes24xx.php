@@ -52,20 +52,18 @@ class EltexMes24xx extends OS implements TransceiverDiscovery, Ipv6AddressDiscov
     public function discoverTransceivers(): Collection
     {
         return SnmpQuery::hideMib()->enumStrings()->cache()->walk('ELTEX-PHY-MIB::eltexPhyTransceiverInfoTable')
-            ->mapTable(function ($data, $ifIndex) {
-                return new Transceiver([
-                    'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
-                    'index' => $ifIndex,
-                    'connector' => $data['eltexPhyTransceiverInfoConnectorType'] ? strtoupper($data['eltexPhyTransceiverInfoConnectorType']) : null,
-                    'distance' => $data['eltexPhyTransceiverInfoTransferDistance'] ?? null,
-                    'model' => $data['eltexPhyTransceiverInfoPartNumber'] ?? null,
-                    'revision' => $data['eltexPhyTransceiverInfoVendorRevision'] ?? null,
-                    'serial' => $data['eltexPhyTransceiverInfoSerialNumber'] ?? null,
-                    'vendor' => $data['eltexPhyTransceiverInfoVendorName'] ?? null,
-                    'wavelength' => $data['eltexPhyTransceiverInfoWaveLength'] ?? null,
-                    'entity_physical_index' => $ifIndex,
-                ]);
-            });
+            ->mapTable(fn ($data, $ifIndex) => new Transceiver([
+                'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
+                'index' => $ifIndex,
+                'connector' => $data['eltexPhyTransceiverInfoConnectorType'] ? strtoupper($data['eltexPhyTransceiverInfoConnectorType']) : null,
+                'distance' => $data['eltexPhyTransceiverInfoTransferDistance'] ?? null,
+                'model' => $data['eltexPhyTransceiverInfoPartNumber'] ?? null,
+                'revision' => $data['eltexPhyTransceiverInfoVendorRevision'] ?? null,
+                'serial' => $data['eltexPhyTransceiverInfoSerialNumber'] ?? null,
+                'vendor' => $data['eltexPhyTransceiverInfoVendorName'] ?? null,
+                'wavelength' => $data['eltexPhyTransceiverInfoWaveLength'] ?? null,
+                'entity_physical_index' => $ifIndex,
+            ]));
     }
 
     public function discoverIpv6Addresses(): Collection

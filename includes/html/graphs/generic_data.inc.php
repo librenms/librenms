@@ -20,9 +20,9 @@ use LibreNMS\Util\Number;
 require 'includes/html/graphs/common.inc.php';
 
 $stacked = generate_stacked_graphs(! empty($port['ifSpeed']) && ($vars['port_speed_zoom'] ?? LibrenmsConfig::get('graphs.port_speed_zoom')));
-$inverse = $inverse ?? false;
-$multiplier = $multiplier ?? false;
-$format = $format ?? '';
+$inverse ??= false;
+$multiplier ??= false;
+$format ??= '';
 $previous = $graph_params->visible('previous');
 
 $rrd_filename_out ??= $rrd_filename ?? '';

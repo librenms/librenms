@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2ff264f5cbf0791450955522ee335fc0",
+    "content-hash": "874e46f9ab754ac185bc8ca878639833",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -9926,6 +9926,66 @@
             "time": "2022-12-23T10:58:28+00:00"
         },
         {
+            "name": "coding-socks/lost-in-translation",
+            "version": "v0.3.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/coding-socks/lost-in-translation.git",
+                "reference": "e513b493352843e7d45263afafbdd77efe947b0e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/coding-socks/lost-in-translation/zipball/e513b493352843e7d45263afafbdd77efe947b0e",
+                "reference": "e513b493352843e7d45263afafbdd77efe947b0e",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/console": "^9.0 || ^10.0 || ^11.0 || ^12.0",
+                "illuminate/filesystem": "^9.0 || ^10.0 || ^11.0 || ^12.0",
+                "illuminate/support": "^9.0 || ^10.0 || ^11.0 || ^12.0",
+                "illuminate/translation": "^9.0 || ^10.0 || ^11.0 || ^12.0",
+                "illuminate/view": "^9.0 || ^10.0 || ^11.0 || ^12.0",
+                "nikic/php-parser": "^4.18 || ^5.0",
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^7.3 || ^8.0 || ^9.0 || ^10.0",
+                "phpunit/phpunit": "^9.5 || ^10.5 || ^11.5"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "CodingSocks\\LostInTranslation\\LostInTranslationServiceProvider"
+                    ]
+                },
+                "branch-alias": {
+                    "dev-main": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "CodingSocks\\LostInTranslation\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "László Görög",
+                    "homepage": "https://github.com/nerg4l"
+                }
+            ],
+            "description": "This package helps to find missing translation strings in your Laravel blade files",
+            "support": {
+                "issues": "https://github.com/coding-socks/lost-in-translation/issues",
+                "source": "https://github.com/coding-socks/lost-in-translation/tree/v0.3.5"
+            },
+            "time": "2025-07-23T08:34:38+00:00"
+        },
+        {
             "name": "composer/ca-bundle",
             "version": "1.5.8",
             "source": {
@@ -13559,6 +13619,66 @@
                 }
             ],
             "time": "2024-06-11T12:45:25+00:00"
+        },
+        {
+            "name": "rector/rector",
+            "version": "2.1.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rectorphp/rector.git",
+                "reference": "c34cc07c4698f007a20dc5c99ff820089ae413ce"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/c34cc07c4698f007a20dc5c99ff820089ae413ce",
+                "reference": "c34cc07c4698f007a20dc5c99ff820089ae413ce",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4|^8.0",
+                "phpstan/phpstan": "^2.1.18"
+            },
+            "conflict": {
+                "rector/rector-doctrine": "*",
+                "rector/rector-downgrade-php": "*",
+                "rector/rector-phpunit": "*",
+                "rector/rector-symfony": "*"
+            },
+            "suggest": {
+                "ext-dom": "To manipulate phpunit.xml via the custom-rule command"
+            },
+            "bin": [
+                "bin/rector"
+            ],
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "bootstrap.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Instant Upgrade and Automated Refactoring of any PHP code",
+            "homepage": "https://getrector.com/",
+            "keywords": [
+                "automation",
+                "dev",
+                "migration",
+                "refactoring"
+            ],
+            "support": {
+                "issues": "https://github.com/rectorphp/rector/issues",
+                "source": "https://github.com/rectorphp/rector/tree/2.1.7"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/tomasvotruba",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-09-10T11:13:58+00:00"
         },
         {
             "name": "sebastian/cli-parser",

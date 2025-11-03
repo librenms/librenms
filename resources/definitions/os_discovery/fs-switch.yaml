@@ -4,7 +4,6 @@
 #
 # SWITCH MIB entries are for centec based switches where Fiberstore forgot to change the enterprise IDs
 # e.g. the S5800-8TF12S before version 5.3.11.r3
-mib: FS-MIB
 modules:
     mempools:
         data:
@@ -33,33 +32,32 @@ modules:
     processors:
         data:
             -
-                oid: cpuCurrentUti
-                value: cpuCurrentUti
+                oid: FS-MIB::cpuCurrentUti
+                value: FS-MIB::cpuCurrentUti
                 num_oid: '..1.3.6.1.4.1.52642.2.1.45.1.39.2.1.{{ $index }}'
                 descr: 'Processor'
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:
-                    - ifName
+                    - IF-MIB::ifName
                     - FS-MIB::portMediaInfoTable
                     - FS-MIB::portTransceiverThresholdInfoTable
         temperature:
             data:
                 -
-                    oid: switchThermalTempValue
-                    value: switchThermalTempValue
+                    oid: FS-MIB::switchThermalTempValue
                     num_oid: '.1.3.6.1.4.1.52642.2.1.45.1.1.11.1.3.{{ $index }}'
                     index: 'temp1.{{ $index }}'
                     descr: 'Temperature Unit {{ $subindex0 }} sensor {{ $subindex1 }}'
                 -
-                    oid: portOpticalMonitoringInfoTable
-                    value: portOpticalMonitoringInfoTemperature
+                    oid: FS-MIB::portOpticalMonitoringInfoTable
+                    value: FS-MIB::portOpticalMonitoringInfoTemperature
                     num_oid: '.1.3.6.1.4.1.52642.2.1.45.1.2.11.1.2.{{ $index }}'
-                    descr: '{{ $ifName }} temperature'
+                    descr: '{{ IF-MIB::ifName }} temperature'
                     index: 'portOpticalMonitoringInfoTemperature.{{ $index }}'
-                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ FS-MIB::portMediaInfoVendorName }} PN: {{ FS-MIB::portMediaInfoPartNumber }} S/N: {{ FS-MIB::portMediaInfoSerialNumber }})'
+                    group: 'Transceiver: {{ IF-MIB::ifName }} (Vendor: {{ FS-MIB::portMediaInfoVendorName }} PN: {{ FS-MIB::portMediaInfoPartNumber }} S/N: {{ FS-MIB::portMediaInfoSerialNumber }})'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     low_limit: FS-MIB::portTransceiverThresholdInfoTemperatureLowAlarm
@@ -70,12 +68,12 @@ modules:
         voltage:
             data:
                 -
-                    oid: portOpticalMonitoringInfoTable
-                    value: portOpticalMonitoringInfoVcc
+                    oid: FS-MIB::portOpticalMonitoringInfoTable
+                    value: FS-MIB::portOpticalMonitoringInfoVcc
                     num_oid: '.1.3.6.1.4.1.52642.2.1.45.1.2.11.1.3.{{ $index }}'
-                    descr: '{{ $ifName }} voltage'
+                    descr: '{{ IF-MIB::ifName }} voltage'
                     index: 'portOpticalMonitoringInfoVcc.{{ $index }}'
-                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ FS-MIB::portMediaInfoVendorName }} PN: {{ FS-MIB::portMediaInfoPartNumber }} S/N: {{ FS-MIB::portMediaInfoSerialNumber }})'
+                    group: 'Transceiver: {{ IF-MIB::ifName }} (Vendor: {{ FS-MIB::portMediaInfoVendorName }} PN: {{ FS-MIB::portMediaInfoPartNumber }} S/N: {{ FS-MIB::portMediaInfoSerialNumber }})'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     low_limit: FS-MIB::portTransceiverThresholdInfoVccLowAlarm
@@ -86,12 +84,12 @@ modules:
         current:
             data:
                 -
-                    oid: portOpticalMonitoringInfoTable
-                    value: portOpticalMonitoringInfoTxBiasCurrent
+                    oid: FS-MIB::portOpticalMonitoringInfoTable
+                    value: FS-MIB::portOpticalMonitoringInfoTxBiasCurrent
                     num_oid: '.1.3.6.1.4.1.52642.2.1.45.1.2.11.1.4.{{ $index }}'
-                    descr: '{{ $ifName }} current'
+                    descr: '{{ IF-MIB::ifName }} current'
                     index: 'portOpticalMonitoringInfoTxBiasCurrent.{{ $index }}'
-                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ FS-MIB::portMediaInfoVendorName }} PN: {{ FS-MIB::portMediaInfoPartNumber }} S/N: {{ FS-MIB::portMediaInfoSerialNumber }})'
+                    group: 'Transceiver: {{ IF-MIB::ifName }} (Vendor: {{ FS-MIB::portMediaInfoVendorName }} PN: {{ FS-MIB::portMediaInfoPartNumber }} S/N: {{ FS-MIB::portMediaInfoSerialNumber }})'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     low_limit: FS-MIB::portTransceiverThresholdInfoTxBiasCurrentLowAlarm
@@ -102,12 +100,12 @@ modules:
         dbm:
             data:
                 -
-                    oid: portOpticalMonitoringInfoTable
-                    value: portOpticalMonitoringInfoTxPower
+                    oid: FS-MIB::portOpticalMonitoringInfoTable
+                    value: FS-MIB::portOpticalMonitoringInfoTxPower
                     num_oid: '.1.3.6.1.4.1.52642.2.1.45.1.2.11.1.5.{{ $index }}'
-                    descr: '{{ $ifName }} TxPower'
+                    descr: '{{ IF-MIB::ifName }} TxPower'
                     index: 'portOpticalMonitoringInfoTxPower.{{ $index }}'
-                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ FS-MIB::portMediaInfoVendorName }} PN: {{ FS-MIB::portMediaInfoPartNumber }} S/N: {{ FS-MIB::portMediaInfoSerialNumber }})'
+                    group: 'Transceiver: {{ IF-MIB::ifName }} (Vendor: {{ FS-MIB::portMediaInfoVendorName }} PN: {{ FS-MIB::portMediaInfoPartNumber }} S/N: {{ FS-MIB::portMediaInfoSerialNumber }})'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     low_limit: FS-MIB::portTransceiverThresholdInfoTxPowerLowAlarm
@@ -116,12 +114,12 @@ modules:
                     high_limit: FS-MIB::portTransceiverThresholdInfoTxPowerHighAlarm
                     user_func: \LibreNMS\OS\FsSwitch::normalizeTransceiverValues
                 -
-                    oid: portOpticalMonitoringInfoTable
-                    value: portOpticalMonitoringInfoRxPower
+                    oid: FS-MIB::portOpticalMonitoringInfoTable
+                    value: FS-MIB::portOpticalMonitoringInfoRxPower
                     num_oid: '.1.3.6.1.4.1.52642.2.1.45.1.2.11.1.6.{{ $index }}'
-                    descr: '{{ $ifName }} RxPower'
+                    descr: '{{ IF-MIB::ifName }} RxPower'
                     index: 'portOpticalMonitoringInfoRxPower.{{ $index }}'
-                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ FS-MIB::portMediaInfoVendorName }} PN: {{ FS-MIB::portMediaInfoPartNumber }} S/N: {{ FS-MIB::portMediaInfoSerialNumber }})'
+                    group: 'Transceiver: {{ IF-MIB::ifName }} (Vendor: {{ FS-MIB::portMediaInfoVendorName }} PN: {{ FS-MIB::portMediaInfoPartNumber }} S/N: {{ FS-MIB::portMediaInfoSerialNumber }})'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     low_limit: FS-MIB::portTransceiverThresholdInfoRxPowerLowAlarm
@@ -132,10 +130,10 @@ modules:
         state:
             data:
                 -
-                    oid: switchOperState
-                    value: switchOperState
+                    oid: FS-MIB::switchOperState
                     num_oid: '.1.3.6.1.4.1.52642.2.1.45.1.1.4.{{ $index }}'
                     descr: 'Oper State'
+                    state_name: FS-MIB::switchOperState
                     states:
                         - { value: 1, generic: 3, descr: other, graph: 0 }
                         - { value: 2, generic: 3, descr: unknown, graph: 0 }
@@ -144,18 +142,40 @@ modules:
                         - { value: 5, generic: 2, descr: critical, graph: 0 }
                         - { value: 6, generic: 2, descr: unrecoverable, graph: 0 }
                 -
-                    oid: swPowerStatus
+                    oid: FS-MIB::swPowerStatus
                     num_oid: '.1.3.6.1.4.1.52642.2.1.45.1.1.3.1.8.1'
                     descr: 'Power status'
+                    state_name: FS-MIB::swPowerStatus
                     states:
                         - { value: 1, generic: 0, graph: 1, descr: internalPower }
                         - { value: 2, generic: 0, graph: 1, descr: redundantPower }
                         - { value: 3, generic: 0, graph: 1, descr: internalAndRedundantPower }
                 -
-                    oid: swIndivPowerStatus
+                    oid: FS-MIB::swIndivPowerStatus
                     num_oid: '.1.3.6.1.4.1.52642.2.1.45.1.1.6.1.3.{{ $index }}'
-                    descr: 'Power Unit {{ $subindex0 }} ({{ $subindex1 }}) status'
+                    descr: 'Power Unit {{ $subindex0 }} (Internal) status'
+                    state_name: FS-MIB::swIndivPowerStatus
                     states:
                         - { value: 1, generic: 1, graph: 1, descr: notPresent }
                         - { value: 2, generic: 0, graph: 1, descr: green }
                         - { value: 3, generic: 2, graph: 1, descr: red }
+                    skip_values:
+                        -
+                            oid: index
+                            op: not_ends
+                            value: '.1'
+
+                -
+                    oid: FS-MIB::swIndivPowerStatus
+                    num_oid: '.1.3.6.1.4.1.52642.2.1.45.1.1.6.1.3.{{ $index }}'
+                    descr: 'Power Unit {{ $subindex0 }} (External) status'
+                    state_name: FS-MIB::swIndivPowerStatus
+                    states:
+                        - { value: 1, generic: 1, graph: 1, descr: notPresent }
+                        - { value: 2, generic: 0, graph: 1, descr: green }
+                        - { value: 3, generic: 2, graph: 1, descr: red }
+                    skip_values:
+                        -
+                            oid: index
+                            op: not_ends
+                            value: '.2'

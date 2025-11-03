@@ -16,7 +16,7 @@ if ($_POST['editing']) {
             del_dev_attrib($device, 'ipmi_hostname');
         }
 
-        if ($ipmi_port != '') {
+        if ($ipmi_port != 0) {
             set_dev_attrib($device, 'ipmi_port', $ipmi_port);
         } else {
             set_dev_attrib($device, 'ipmi_port', '623'); // Default port

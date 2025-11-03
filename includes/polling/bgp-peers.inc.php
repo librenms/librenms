@@ -162,7 +162,7 @@ if (! empty($peers)) {
 
                     try {
                         $peer_data['bgpLocalAddr'] = IP::fromHexString($junos[$address]['BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLocalAddr'])->uncompressed();
-                    } catch (InvalidIpException $e) {
+                    } catch (InvalidIpException) {
                         $peer_data['bgpLocalAddr'] = '';
                     }
                     d_echo("State = {$peer_data['bgpPeerState']} - AdminStatus: {$peer_data['bgpPeerAdminStatus']}\n");
@@ -417,9 +417,7 @@ if (! empty($peers)) {
                             'bgpPeerIface' => 'bgpPeerIface',
                         ];
                         if ($cumulus_vrf) {
-                            $bgp_peers = array_filter($peer_data_check->toArray(), function ($peer) use ($peer_identifier) {
-                                return isset($peer[$peer_identifier]) ? $peer[$peer_identifier] : [];
-                            });
+                            $bgp_peers = array_filter($peer_data_check->toArray(), fn ($peer) => $peer[$peer_identifier] ?? []);
                             $tmp_data = array_pop($bgp_peers)[$peer_identifier];
                             $peer_data['bgpPeerDescr'] = $tmp_data['bgpPeerDesc'];
                             $peer_data['bgpPeerState'] = $tmp_data['bgpPeerState'];
@@ -457,21 +455,19 @@ if (! empty($peers)) {
             if (empty($peer_data) && isset($peer_identifier, $oid_map, $mib)) {
                 echo "Fetching $mib data... \n";
 
-                $get_oids = array_map(function ($oid) use ($peer_identifier) {
-                    return "$oid.$peer_identifier";
-                }, array_keys($oid_map));
+                $get_oids = array_map(fn ($oid) => "$oid.$peer_identifier", array_keys($oid_map));
                 $peer_data_raw = snmp_get_multi($device, $get_oids, '-OQUs', $mib);
                 $peer_data_raw = reset($peer_data_raw);  // get the first element of the array
 
                 $peer_data = [];
 
                 foreach ($oid_map as $source => $target) {
-                    $v = isset($peer_data_raw[$source]) ? $peer_data_raw[$source] : (in_array($target, $intFields) ? 0 : '');
+                    $v = $peer_data_raw[$source] ?? (in_array($target, $intFields) ? 0 : '');
 
                     if (Str::contains($source, 'LocalAddr')) {
                         try {
                             $v = IP::fromHexString($v)->uncompressed();
-                        } catch (InvalidIpException $e) {
+                        } catch (InvalidIpException) {
                             // if parsing fails, leave the data as-is
                         }
                     }
@@ -498,7 +494,7 @@ if (! empty($peers)) {
                         $ip_address = IP::parse($peer_data['bgpPeerLocalAddr']);
                         $family = $ip_address->getFamily();
                         $peer_data['bgpPeerIface'] = DB::table('ports')->join("{$family}_addresses", 'ports.port_id', '=', "{$family}_addresses.port_id")->where("{$family}_address", '=', $ip_address->uncompressed())->value('ifIndex');
-                    } catch (InvalidIpException $e) {
+                    } catch (InvalidIpException) {
                         $peer_data['bgpPeerIface'] = null;
                     }
                 } elseif (isset($peer_data['bgpLocalAddr']) && IP::isValid($peer_data['bgpLocalAddr'])) {
@@ -507,14 +503,14 @@ if (! empty($peers)) {
                         $ip_address = IP::parse($peer_data['bgpLocalAddr']);
                         $family = $ip_address->getFamily();
                         $peer_data['bgpPeerIface'] = DB::table('ports')->join("{$family}_addresses", 'ports.port_id', '=', "{$family}_addresses.port_id")->where("{$family}_address", '=', $ip_address->uncompressed())->value('ifIndex');
-                    } catch (InvalidIpException $e) {
+                    } catch (InvalidIpException) {
                         $peer_data['bgpPeerIface'] = null;
                     }
                 } else {
                     $peer_data['bgpPeerIface'] = null;
                 }
             }
-        } catch (InvalidIpException $e) {
+        } catch (InvalidIpException) {
             // ignore
         }
 

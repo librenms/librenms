@@ -21,7 +21,7 @@
 // ***** Current Sensors for Nokia PSD
 // *************************************************************
 
-if (strpos($device['sysObjectID'], '.1.3.6.1.4.1.7483.1.3.1.12') !== false) {
+if (str_contains($device['sysObjectID'], '.1.3.6.1.4.1.7483.1.3.1.12')) {
     d_echo('Nokia PSD DDM Current Sensors\n');
     $ifIndexToName = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
     $ifAdminStatus = SnmpQuery::cache()->enumStrings()->walk('IF-MIB::ifAdminStatus')->pluck();

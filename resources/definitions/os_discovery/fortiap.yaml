@@ -3,6 +3,10 @@ modules:
     os:
         version: FORTINET-FORTIAP-MIB::fapVersion.0
         serial: FORTINET-FORTIAP-MIB::fapSerialNum.0
+        hardware: FORTINET-FORTIAP-MIB::fapVersion.0
+        hardware_regex: '/(?<hardware>FP\d+[A-Z])/i'
+        hardware_replace: 
+            -   ['/FP/', 'FortiAP ']
     mempools:
         data:
             -

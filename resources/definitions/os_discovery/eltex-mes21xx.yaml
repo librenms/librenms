@@ -26,7 +26,7 @@ modules:
                 size: RADLAN-File::rlFileTotalSizeOfFlash
 
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:
@@ -47,7 +47,7 @@ modules:
                 -
                     oid: rlPhyTestGetTable
                     value: rlPhyTestGetResult
-                    num_oid: '.1.3.6.1.4.1.89.90.1.2.1.3.{{ $subindex0 }}.11'
+                    num_oid: '.1.3.6.1.4.1.89.90.1.2.1.3.{{ $index }}'
                     group: 'transceiver'
                     index: 'SfpLOS{{ $subindex0 }}'
                     descr: 'SfpLOS-{{ $ifName:0 }}'
@@ -59,8 +59,8 @@ modules:
                     skip_values:
                         -
                             oid: index
-                            op: not_regex
-                            value: '/^\d+\.rlPhyTestTableLOS$/'
+                            op: 'not_ends'
+                            value: '.11' # rlPhyTestTableLOS
         temperature:
             data:
                 -

@@ -58,9 +58,7 @@ class RipeNccApiController extends Controller
             if (isset($response['messages'])) {
                 $message .= ': ' . collect($response['messages'])
                         ->flatten()
-                        ->reject(function ($value, $key) {
-                            return $value != 'error';
-                        })
+                        ->reject(fn ($value, $key) => $value != 'error')
                         ->implode(', ');
             }
 

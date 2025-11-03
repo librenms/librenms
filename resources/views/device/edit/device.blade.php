@@ -79,6 +79,19 @@
                 </div>
             </div>
 
+            @if($show_static_groups)
+            <div class="form-group">
+                <label for="static_groups" class="col-sm-2 control-label">{{ __('device.edit.static_groups') }}</label>
+                <div class="col-sm-6">
+                    <select id="static_groups" name="static_groups[]" class="form-control" multiple style="width: 100%">
+                        @foreach($static_groups as $group_id => $group_name)
+                            <option value="{{ $group_id }}" selected>{{ $group_name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            @endif
+
             <div class="form-group">
                 <label for="sysLocation" class="col-sm-2 control-label">{{ __('device.edit.override_sysLocation') }}</label>
                 <div class="col-sm-6">
@@ -123,11 +136,8 @@
                 <label for="parent_id" class="col-sm-2 control-label">{{ __('device.edit.depends_on') }}</label>
                 <div class="col-sm-6">
                     <select multiple name="parent_id[]" id="parent_id" class="form-control" style="width: 100%">
-                        <option value="0" {{ empty($parents) ? 'selected' : '' }}>{{ __('device.edit.none') }}</option>
-                        @foreach ($devices as $dev)
-                            <option value="{{ $dev->device_id }}" {{ $parents->contains($dev->device_id) ? 'selected' : '' }}>
-                                {{ $dev->hostname }} ({{ $dev->sysName }})
-                            </option>
+                        @foreach ($parents as $parent_id => $parent_hostname)
+                            <option value="{{  $parent_id }}" selected>{{ $parent_hostname }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -220,6 +230,8 @@
 
 @push('scripts')
     <script>
+        init_select2('#parent_id', 'device', {exclude: {{ $device->device_id }}}, null, '{{ __('device.edit.none') }}');
+        init_select2('#static_groups', 'device-group', {type: 'static'}, null, '{{ __('device.edit.none') }}');
         const defaultType = '{{ $default_type }}';
         function templateTypeSelection(option) {
             if (!option.id) { // placeholder
@@ -281,9 +293,6 @@
         function toggleHostnameEdit() {
             document.getElementById('edit-hostname-input').disabled = ! document.getElementById('edit-hostname-input').disabled;
         }
-        $('#parent_id').select2({
-            width: 'resolve'
-        });
     </script>
     @vuei18n
 @endpush

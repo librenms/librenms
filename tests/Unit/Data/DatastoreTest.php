@@ -54,7 +54,7 @@ final class DatastoreTest extends TestCase
         $stores = $ds->getStores();
         $this->assertCount(1, $stores, 'Incorrect number of default stores enabled');
 
-        $this->assertEquals('LibreNMS\Data\Store\Rrd', get_class($stores[0]), 'The default enabled store should be Rrd');
+        $this->assertEquals(\LibreNMS\Data\Store\Rrd::class, $stores[0]::class, 'The default enabled store should be Rrd');
     }
 
     public function testInitialization(): void
@@ -74,11 +74,11 @@ final class DatastoreTest extends TestCase
         $enabled = array_map('get_class', $stores);
 
         $expected_enabled = [
-            'LibreNMS\Data\Store\Graphite',
-            'LibreNMS\Data\Store\InfluxDB',
-            'LibreNMS\Data\Store\InfluxDBv2',
-            'LibreNMS\Data\Store\OpenTSDB',
-            'LibreNMS\Data\Store\Prometheus',
+            \LibreNMS\Data\Store\Graphite::class,
+            \LibreNMS\Data\Store\InfluxDB::class,
+            \LibreNMS\Data\Store\InfluxDBv2::class,
+            \LibreNMS\Data\Store\OpenTSDB::class,
+            \LibreNMS\Data\Store\Prometheus::class,
         ];
 
         $this->assertEquals($expected_enabled, $enabled, 'Expected all non-default stores to be initialized');

@@ -12,6 +12,7 @@
  * See COPYING for more details.
  */
 
+use App\Actions\Device\CheckDeviceAvailability;
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
@@ -108,7 +109,7 @@ function discover_new_device($hostname, $device, $method, $interface = null)
         }
 
         Eventlog::log("$method discovery of " . $remote_device->hostname . " ($ip) failed - Check ping and SNMP access", $device['device_id'], 'discovery', Severity::Error);
-    } catch (HostExistsException $e) {
+    } catch (HostExistsException) {
         // already have this device
     } catch (Exception $e) {
         Eventlog::log("$method discovery of " . $hostname . " ($ip) failed - " . $e->getMessage(), $device['device_id'], 'discovery', Severity::Error);
@@ -139,9 +140,7 @@ function discover_device(&$device, $force_module = false)
     // Start counting device poll time
     echo $device['hostname'] . ' ' . $device['device_id'] . ' ' . $device['os'] . ' ';
 
-    $helper = new \LibreNMS\Polling\ConnectivityHelper(DeviceCache::getPrimary());
-
-    if (! $helper->isUp()) {
+    if (! app(CheckDeviceAvailability::class)->execute(DeviceCache::getPrimary())) {
         Log::error('%RDOWN%n', ['color' => true]);
 
         return false;
@@ -453,7 +452,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     $user_function = $data['user_func'];
                 }
                 // get the value for this sensor, check 'value' and 'oid', if state string, translate to a number
-                $data['value'] = isset($data['value']) ? $data['value'] : $data['oid'];  // fallback to oid if value is not set
+                $data['value'] ??= $data['oid'];  // fallback to oid if value is not set
 
                 $snmp_value = $snmp_data[$data['value']] ?? '';
                 if (! is_numeric($snmp_value)) {
@@ -474,7 +473,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                 } elseif ($sensor_class === 'state') {
                     // translate string states to values (poller does this as well)
                     $states = array_column($data['states'], 'value', 'descr');
-                    $value = isset($states[$snmp_value]) ? $states[$snmp_value] : false;
+                    $value = $states[$snmp_value] ?? false;
                 } else {
                     $value = false;
                 }
@@ -485,7 +484,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                 if (empty($data['num_oid'])) {
                     try {
                         $data['num_oid'] = YamlDiscovery::computeNumericalOID($os, $data);
-                    } catch (\Exception $e) {
+                    } catch (\Exception) {
                         Log::debug('Error: We cannot find a numerical OID for ' . $data['value'] . '. Skipping this one...');
                         $skippedFromYaml = true;
                         // Because we don't have a num_oid, we have no way to add this sensor.
@@ -533,20 +532,23 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     }
 
                     // process the limits
+                    // phpstan does not like $$var variables
+                    $low_limit = $low_warn_limit = $warn_limit = $high_limit = null;
+
                     $limits = ['low_limit', 'low_warn_limit', 'warn_limit', 'high_limit'];
                     foreach ($limits as $limit) {
                         if (isset($data[$limit]) && is_numeric($data[$limit])) {
-                            $$limit = $data[$limit];
+                            ${$limit} = $data[$limit];
                         } else {
-                            $$limit = YamlDiscovery::getValueFromData($limit, $index, $data, $pre_cache, 'null');
-                            if (is_numeric($$limit)) {
-                                $$limit = ($$limit / $divisor) * $multiplier;
+                            ${$limit} = trim(YamlDiscovery::replaceValues($limit, $index, null, $data, $pre_cache));
+                            if (is_numeric(${$limit})) {
+                                ${$limit} = (${$limit} / $divisor) * $multiplier;
                             }
-                            if (is_numeric($$limit) && isset($user_function)) {
+                            if (is_numeric(${$limit}) && isset($user_function)) {
                                 if (is_callable($user_function)) {
-                                    $$limit = $user_function($$limit);
+                                    ${$limit} = $user_function(${$limit});
                                 } else {
-                                    $$limit = (new UserFuncHelper($$limit))->{$user_function}();
+                                    ${$limit} = (new UserFuncHelper(${$limit}))->{$user_function}();
                                 }
                             }
                         }
@@ -563,7 +565,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     }
 
                     $entPhysicalIndex = YamlDiscovery::replaceValues('entPhysicalIndex', $index, null, $data, $pre_cache) ?: null;
-                    $entPhysicalIndex_measured = isset($data['entPhysicalIndex_measured']) ? $data['entPhysicalIndex_measured'] : null;
+                    $entPhysicalIndex_measured = $data['entPhysicalIndex_measured'] ?? null;
 
                     //user_func must be applied after divisor/multiplier
                     if (isset($user_function)) {
@@ -862,7 +864,7 @@ function find_device_id($name = '', $ip = '', $mac_address = '')
         try {
             $params[] = IP::fromHexString($ip)->packed();
             $where[] = '`ip`=?';
-        } catch (InvalidIpException $e) {
+        } catch (InvalidIpException) {
             //
         }
     }

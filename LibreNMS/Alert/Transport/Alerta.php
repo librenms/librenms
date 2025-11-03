@@ -21,7 +21,6 @@ use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
-use LibreNMS\Util\Url;
 
 class Alerta extends Transport
 {
@@ -30,25 +29,21 @@ class Alerta extends Transport
         $severity = ($alert_data['state'] == AlertState::RECOVERED ? $this->config['recoverstate'] : $this->config['alertstate']);
         $data = [
             'resource' => $alert_data['display'],
-            'event' => $alert_data['name'],
+            'event' => $alert_data['title'],
             'environment' => $this->config['environment'],
             'severity' => $severity,
-            'service' => [$alert_data['title']],
+            'service' => [$alert_data['type']],
             'group' => $alert_data['name'],
             'value' => $alert_data['state'],
-            'text' => strip_tags($alert_data['msg']),
-            'tags' => [$alert_data['title']],
+            'text' => $alert_data['msg'],
             'attributes' => [
                 'sysName' => $alert_data['sysName'],
                 'sysDescr' => $alert_data['sysDescr'],
                 'os' => $alert_data['os'],
-                'type' => $alert_data['type'],
                 'ip' => $alert_data['ip'],
                 'uptime' => $alert_data['uptime_long'],
-                'moreInfo' => '<a href=' . Url::deviceUrl($alert_data['device_id']) . '>' . $alert_data['display'] . '</a>',
             ],
-            'origin' => $alert_data['rule'],
-            'type' => $alert_data['title'],
+            'origin' => $this->config['origin'],
         ];
 
         $res = Http::client()
@@ -75,16 +70,22 @@ class Alerta extends Transport
                     'type' => 'text',
                 ],
                 [
-                    'title' => 'Environment',
-                    'name' => 'environment',
-                    'descr' => 'An allowed environment from your alertad.conf.',
-                    'type' => 'text',
-                ],
-                [
                     'title' => 'Api Key',
                     'name' => 'apikey',
                     'descr' => 'Your alerta api key with minimally write:alert permissions.',
                     'type' => 'password',
+                ],
+                [
+                    'title' => 'Origin',
+                    'name' => 'origin',
+                    'descr' => 'Name of this monitoring source e.g. LibreNMS.',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'Environment',
+                    'name' => 'environment',
+                    'descr' => 'An allowed environment from your alertad.conf.',
+                    'type' => 'text',
                 ],
                 [
                     'title' => 'Alert State',

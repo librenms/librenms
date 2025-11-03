@@ -29,12 +29,10 @@ namespace App\Polling\Measure;
 class Measurement
 {
     private $start;
-    private $type;
     private $duration;
 
-    private function __construct(string $type, ?float $duration = null)
+    private function __construct(private string $type, ?float $duration = null)
     {
-        $this->type = $type;
         $this->start = microtime(true);
         if ($duration !== null) {
             $this->duration = $duration;

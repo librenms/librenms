@@ -11,18 +11,16 @@ modules:
           - .1.3.6.1.4.1.13742.6.3.2.3.1.6.1.1.1
           - .1.3.6.1.4.1.13742.4.1.1.1.0
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 - oid:
-                    - PDU2-MIB::externalSensorMeasurementsTable
                     - PDU2-MIB::externalSensorConfigurationTable
-                    - PDU2-MIB::outletSensorMeasurementsTable
                     - PDU2-MIB::outletSensorConfigurationTable
                     - PDU2-MIB::outletConfigurationTable
-                    - PDU2-MIB::inletSensorMeasurementsTable
                     - PDU2-MIB::inletSensorConfigurationTable
                     - PDU2-MIB::inletConfigurationTable
-                  snmp_flags: -OQUbe
+                    - PDU2-MIB::overCurrentProtectorSensorConfigurationTable
+                    - PDU2-MIB::overCurrentProtectorConfigurationTable
         current:
             data:
                 - oid: PDU2-MIB::inletSensorMeasurementsTable
@@ -55,6 +53,22 @@ modules:
                       - oid: index
                         op: not_ends
                         value: '.1'
+                - oid: PDU2-MIB::overCurrentProtectorSensorMeasurementsTable
+                  value: PDU2-MIB::measurementsOverCurrentProtectorSensorValue
+                  num_oid: '.1.3.6.1.4.1.13742.6.5.3.3.1.4.{{ $index }}'
+                  divisor: 1000
+                  descr: '{{ PDU2-MIB::overCurrentProtectorLabel:0-1 }} {{ PDU2-MIB::overCurrentProtectorName:0-1 }}'
+                  index: 'measurementsOverCurrentProtectorSensorValue.{{ $index }}'
+                  group: OverCurrentProtector
+                  low_limit: PDU2-MIB::overCurrentProtectorSensorSignedLowerCriticalThreshold
+                  low_warn_limit: PDU2-MIB::overCurrentProtectorSensorSignedLowerWarningThreshold
+                  warn_limit: PDU2-MIB::overCurrentProtectorSensorSignedUpperWarningThreshold
+                  high_limit: PDU2-MIB::overCurrentProtectorSensorSignedUpperCriticalThreshold
+                  skip_values:
+                      - oid: index
+                        op: not_ends
+                        value: '.1'
+
         frequency:
             data:
                 - oid: PDU2-MIB::inletSensorMeasurementsTable
@@ -277,3 +291,36 @@ modules:
                       - oid: index
                         op: not_ends
                         value: '.4'
+        power_consumed:
+            data:
+                - oid: PDU2-MIB::inletSensorMeasurementsTable
+                  value: PDU2-MIB::measurementsInletSensorValue
+                  num_oid: '.1.3.6.1.4.1.13742.6.5.2.3.1.4.{{ $index }}'
+                  divisor: 1000
+                  descr: '{{ PDU2-MIB::inletLabel:0-1 }} {{ PDU2-MIB::inletName:0-1 }}'
+                  index: 'measurementsInletSensorValue.{{ $index }}'
+                  group: Inlet
+                  low_limit: PDU2-MIB::inletSensorSignedLowerCriticalThreshold
+                  low_warn_limit: PDU2-MIB::inletSensorSignedLowerWarningThreshold
+                  warn_limit: PDU2-MIB::inletSensorSignedUpperWarningThreshold
+                  high_limit: PDU2-MIB::inletSensorSignedUpperCriticalThreshold
+                  skip_values:
+                      - oid: index
+                        op: not_ends
+                        value: '.8'
+                - oid: PDU2-MIB::outletSensorMeasurementsTable
+                  value: PDU2-MIB::measurementsOutletSensorValue
+                  num_oid: '.1.3.6.1.4.1.13742.6.5.4.3.1.4.{{ $index }}'
+                  divisor: 1000
+                  descr: '{{ PDU2-MIB::outletLabel:0-1 }} {{ PDU2-MIB::outletName:0-1 }}'
+                  index: 'measurementsOutletSensorValue.{{ $index }}'
+                  group: Outlet
+                  low_limit: PDU2-MIB::outletSensorSignedLowerCriticalThreshold
+                  low_warn_limit: PDU2-MIB::outletSensorSignedLowerWarningThreshold
+                  warn_limit: PDU2-MIB::outletSensorSignedUpperWarningThreshold
+                  high_limit: PDU2-MIB::outletSensorSignedUpperCriticalThreshold
+                  skip_values:
+                      - oid: index
+                        op: not_ends
+                        value: '.8'
+

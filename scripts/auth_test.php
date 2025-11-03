@@ -131,6 +131,6 @@ try {
         }
     }
 } catch (Exception $e) {
-    echo 'Error: ' . get_class($e) . " thrown!\n";
+    echo 'Error: ' . $e::class . " thrown!\n";
     echo $e->getMessage() . PHP_EOL;
 }

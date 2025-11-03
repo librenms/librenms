@@ -79,7 +79,7 @@ class RoutesTablesController extends TableController
      */
     protected function baseQuery($request)
     {
-        $join = function ($query) {
+        $join = function ($query): void {
             $query->on('ports.port_id', 'route.port_id');
         };
         $showAllRoutes = trim(\Request::get('showAllRoutes'));
@@ -125,10 +125,8 @@ class RoutesTablesController extends TableController
         if ($search = trim(\Request::get('searchPhrase'))) {
             $searchLike = '%' . $search . '%';
 
-            return $query->where(function ($query) use ($searchLike) {
-                return $query->where('route.inetCidrRouteNextHop', 'like', $searchLike)
-                    ->orWhere('route.inetCidrRouteDest', 'like', $searchLike);
-            });
+            return $query->where(fn ($query) => $query->where('route.inetCidrRouteNextHop', 'like', $searchLike)
+                ->orWhere('route.inetCidrRouteDest', 'like', $searchLike));
         }
 
         return $query;
@@ -184,7 +182,7 @@ class RoutesTablesController extends TableController
         try {
             $obj_inetCidrRouteDest = IP::parse($route_entry->inetCidrRouteDest);
             $item['inetCidrRouteDest'] = $obj_inetCidrRouteDest->compressed();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $item['inetCidrRouteDest'] = $route_entry->inetCidrRouteDest;
         }
 
@@ -196,7 +194,7 @@ class RoutesTablesController extends TableController
         try {
             $obj_inetCidrRouteNextHop = IP::parse($route_entry->inetCidrRouteNextHop);
             $item['inetCidrRouteNextHop'] = $obj_inetCidrRouteNextHop->compressed();
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             $item['inetCidrRouteNextHop'] = $route_entry->inetCidrRouteNextHop;
         }
         $device = Device::findByIp($route_entry->inetCidrRouteNextHop);

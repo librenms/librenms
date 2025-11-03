@@ -2,14 +2,14 @@
 
 $pagetitle[] = 'Routing';
 
-$optb = isset($_GET['optb']) ? $_GET['optb'] : '';
-$optc = isset($_GET['optc']) ? $_GET['optc'] : '';
-$vars['view'] = isset($vars['view']) ? $vars['view'] : 'basic';
-$vars['graph'] = isset($vars['graph']) ? $vars['graph'] : '';
-$vars['type'] = isset($vars['type']) ? $vars['type'] : 'all';
-$vars['adminstatus'] = isset($vars['adminstatus']) ? $vars['adminstatus'] : '';
-$vars['state'] = isset($vars['state']) ? $vars['state'] : '';
-$width = isset($vars['width']) ? $vars['width'] : '218';
+$optb = $_GET['optb'] ?? '';
+$optc = $_GET['optc'] ?? '';
+$vars['view'] ??= 'basic';
+$vars['graph'] ??= '';
+$vars['type'] ??= 'all';
+$vars['adminstatus'] ??= '';
+$vars['state'] ??= '';
+$width = $vars['width'] ?? '218';
 
 if ($optb == 'graphs' || $optc == 'graphs') {
     $graphs = 'graphs';

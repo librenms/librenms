@@ -62,7 +62,7 @@ final class GraphiteStoreTest extends TestCase
         $mockFactory = \Mockery::mock(\Socket\Raw\Factory::class);
 
         $mockFactory->shouldReceive('createClient')
-            ->andThrow('Socket\Raw\Exception', 'Failed to handle connect exception')->once();
+            ->andThrow(\Socket\Raw\Exception::class, 'Failed to handle connect exception')->once();
 
         new Graphite($mockFactory);
     }
@@ -73,7 +73,7 @@ final class GraphiteStoreTest extends TestCase
         $graphite = $this->mockGraphite($mockSocket);
 
         $mockSocket->shouldReceive('write')
-            ->andThrow('Socket\Raw\Exception', 'Did not handle socket exception')->once();
+            ->andThrow(\Socket\Raw\Exception::class, 'Did not handle socket exception')->once();
 
         $graphite->write('fake', ['one' => 1], ['rrd_name' => 'name']);
     }

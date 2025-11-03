@@ -32,14 +32,8 @@ use Log;
 
 class UpdateDeviceGroupsAction
 {
-    /**
-     * @var Device
-     */
-    private $device;
-
-    public function __construct(Device $device)
+    public function __construct(private Device $device)
     {
-        $this->device = $device;
     }
 
     /**
@@ -57,7 +51,7 @@ class UpdateDeviceGroupsAction
         }
 
         $device_group_ids = DeviceGroup::query()
-            ->with(['devices' => function ($query) {
+            ->with(['devices' => function ($query): void {
                 $query->select('devices.device_id');
             }])
             ->get()

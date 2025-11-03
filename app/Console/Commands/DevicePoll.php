@@ -67,7 +67,7 @@ class DevicePoll extends LnmsCommand
             $this->line("Starting polling run:\n");
 
             // listen for the device polled events to mark the device completed
-            Event::listen(function (DevicePolled $event) use ($result) {
+            Event::listen(function (DevicePolled $event) use ($result): void {
                 if ($event->device->device_id == $this->current_device_id) {
                     $result->markCompleted($event->device->status);
                 }
@@ -153,9 +153,7 @@ class DevicePoll extends LnmsCommand
     private function printModules(array $module_overrides): void
     {
         if (! empty($module_overrides)) {
-            $modules = array_map(function ($module, $status) {
-                return $module . (is_array($status) ? '(' . implode(',', $status) . ')' : '');
-            }, array_keys($module_overrides), array_values($module_overrides));
+            $modules = array_map(fn ($module, $status) => $module . (is_array($status) ? '(' . implode(',', $status) . ')' : ''), array_keys($module_overrides), array_values($module_overrides));
 
             Log::debug('Override poller modules: ' . implode(', ', $modules));
         }

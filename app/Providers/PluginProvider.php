@@ -35,9 +35,7 @@ class PluginProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->singleton(PluginManagerInterface::class, function ($app) {
-            return new \App\Plugins\PluginManager;
-        });
+        $this->app->singleton(PluginManagerInterface::class, fn ($app) => new \App\Plugins\PluginManager);
     }
 
     public function boot(): void

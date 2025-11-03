@@ -61,9 +61,7 @@ class GlobeController extends WidgetController
         $eager_load = $data['markers'] == 'ports' ? ['devices.ports'] : ['devices'];
         $query = Location::hasAccess($request->user())
             ->with($eager_load)
-            ->when($data['device_group'], function ($query) use ($data) {
-                return $query->inDeviceGroup($data['device_group']);
-            });
+            ->when($data['device_group'], fn ($query) => $query->inDeviceGroup($data['device_group']));
 
         /** @var Location $location */
         foreach ($query->get() as $location) {
@@ -73,23 +71,15 @@ class GlobeController extends WidgetController
 
             if ($data['markers'] == 'devices') {
                 $count = $location->devices->count();
-                [$devices_down, $devices_up] = $location->devices->partition(function ($device) {
-                    return $device->disabled == 0 && $device->ignore == 0 && $device->status == 0;
-                });
+                [$devices_down, $devices_up] = $location->devices->partition(fn ($device) => $device->disabled == 0 && $device->ignore == 0 && $device->status == 0);
                 $up = $devices_up->count();
-                $down_items = $devices_down->map(function ($device) {
-                    return $device->displayName() . ' DOWN';
-                });
+                $down_items = $devices_down->map(fn ($device) => $device->displayName() . ' DOWN');
             } elseif ($data['markers'] == 'ports') {
                 foreach ($location->devices as $device) {
-                    [$ports_down, $ports_up] = $device->ports->partition(function ($port) {
-                        return $port->ifOperStatus != 'up' && $port->ifAdminStatus == 'up';
-                    });
+                    [$ports_down, $ports_up] = $device->ports->partition(fn ($port) => $port->ifOperStatus != 'up' && $port->ifAdminStatus == 'up');
                     $count += $device->ports->count();
                     $up += $ports_up->count();
-                    $down_items = $ports_down->map(function ($port) use ($device) {
-                        return $device->displayName() . '/' . $port->getShortLabel() . ' DOWN';
-                    });
+                    $down_items = $ports_down->map(fn ($port) => $device->displayName() . '/' . $port->getShortLabel() . ' DOWN');
                 }
             }
 

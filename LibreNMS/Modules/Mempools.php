@@ -102,7 +102,7 @@ class Mempools implements Module
             ? $os->pollMempools($mempools)
             : $this->defaultPolling($os, $mempools);
 
-        $this->calculateAvailable($mempools)->each(function (Mempool $mempool) use ($os, $datastore) {
+        $this->calculateAvailable($mempools)->each(function (Mempool $mempool) use ($os, $datastore): void {
             $this->printMempool($mempool);
 
             if (empty($mempool->mempool_class)) {
@@ -145,7 +145,7 @@ class Mempools implements Module
             ->flatten()->filter()->unique()->values()->all();
         $data = snmp_get_multi_oid($os->getDeviceArray(), $oids);
 
-        $mempools->each(function (Mempool $mempool) use ($data) {
+        $mempools->each(function (Mempool $mempool) use ($data): void {
             $mempool->fillUsage(
                 $data[$mempool->mempool_used_oid] ?? null,
                 $data[$mempool->mempool_total_oid] ?? null,

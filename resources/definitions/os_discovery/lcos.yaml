@@ -5,12 +5,11 @@ modules:
         serial: LCOS-MIB::lcsFirmwareVersionTableEntrySerialNumber.eIfc
         version: LCOS-MIB::lcsFirmwareVersionTableEntryVersion.eIfc
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:
                         - lcsStatusWlanInterpointsAccesspointListEntryInterpointPeerName
-                    snmp_flags: '-OQUsb'
         temperature:
             data:
                 -
@@ -26,7 +25,6 @@ modules:
                     value: lcsStatusWlanInterpointsAccesspointListEntryKeyingState
                     num_oid: '.1.3.6.1.4.1.2356.11.1.3.36.1.1.12.{{ $index }}'
                     descr: 'Keying {{ $lcsStatusWlanInterpointsAccesspointListEntryInterpointPeerName }}'
-                    snmp_flags: '-OQUsbe'
                     state_name: KeyingState
                     states:
                         - { graph: 0, value: 0, generic: 0, descr: Idle }
@@ -38,7 +36,6 @@ modules:
                     value: lcsStatusWlanInterpointsAccesspointListEntryWpaVersion
                     num_oid: '.1.3.6.1.4.1.2356.11.1.3.36.1.1.21.{{ $index }}'
                     descr: 'WPA Version {{ $lcsStatusWlanInterpointsAccesspointListEntryInterpointPeerName }}'
-                    snmp_flags: '-OQUsbe'
                     state_name: WpaVersion
                     states:
                         - { graph: 0, value: 0, generic: 1, descr: None }
@@ -50,7 +47,6 @@ modules:
                     value: lcsStatusWlanInterpointsAccesspointListEntryLinkActive
                     num_oid: '.1.3.6.1.4.1.2356.11.1.3.36.1.1.40.{{ $index }}'
                     descr: 'Link Active {{ $lcsStatusWlanInterpointsAccesspointListEntryInterpointPeerName }}'
-                    snmp_flags: '-OQUsbe'
                     state_name: LinkActive
                     states:
                         - { graph: 0, value: 0, generic: 2, descr: No }
@@ -60,7 +56,6 @@ modules:
                     value: lcsStatusWlanInterpointsAccesspointListEntryRemoteStatus
                     num_oid: '.1.3.6.1.4.1.2356.11.1.3.36.1.1.43.{{ $index }}'
                     descr: 'Remote Status {{ $lcsStatusWlanInterpointsAccesspointListEntryInterpointPeerName }}'
-                    snmp_flags: '-OQUsbe'
                     state_name: RemoteStatus
                     states:
                         - { graph: 0, value: 0, generic: 3, descr: Unknown }

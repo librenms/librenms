@@ -5,7 +5,7 @@ modules:
         serial: PAN-COMMON-MIB::panSysSerialNumber.0
         version: PAN-COMMON-MIB::panSysSwVersion.0
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

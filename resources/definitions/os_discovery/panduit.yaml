@@ -5,7 +5,7 @@ modules:
         serial: PANDUIT-MIB::pdug5SerialNumber.1
         version: PANDUIT-MIB::pdug5FirmwareVersion.1
         features: RFC1213-MIB::sysDescr.0
-        features_replace: 
+        features_replace:
           - '/SN:/'
           - '/PN:Device Model:\S+/'
     sensors:
@@ -64,7 +64,6 @@ modules:
                     descr: 'Breaker {{ $pdug5GroupName }} Output'
                     group: breakers
                     index: 'pdug5GroupPowerWatts.{{ $index }}'
-                    snmp_flags: ['-ObsaQ']
                     skip_values:
                         -
                              oid: pdug5GroupName
@@ -76,7 +75,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.19536.10.1.2.1.1.5.{{ $index }}'
                     multiplier: 1
                     descr: 'Input power'
-                    snmp_flags: ['-ObsaQ']
                 -
                     oid: pdug5OutletEntry
                     value: pdug5OutletWatts
@@ -99,7 +97,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.19536.10.1.2.2.1.23.{{ $index }}'
                     descr: '{{ $pdug5InputPhasePowerMeasType }} Power Factor'
                     divisor: 100
-                    snmp_flags: ['-ObsaQ']
                     skip_values:
                       -
                         oid: pdug5InputPhaseIndex
@@ -117,7 +114,6 @@ modules:
                     index: 'pdug5GroupCurrent.{{ $index }}'
                     high_limit: pdug5GroupCurrentThUpperCritical
                     warn_limit: pdug5GroupCurrentThUpperWarning
-                    snmp_flags: ['-ObsaQ']
                     skip_values:
                         -
                              oid: pdug5GroupName
@@ -129,7 +125,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.19536.10.1.2.1.1.11.{{ $index }}'
                     divisor: 100
                     descr: 'Input current'
-                    snmp_flags: ['-ObsaQ']
         voltage:
             data:
                 -
@@ -140,7 +135,6 @@ modules:
                     descr: 'Breaker {{ $pdug5GroupName }} Voltage'
                     group: breakers
                     index: 'pdug5GroupVoltage.{{ $index }}'
-                    snmp_flags: ['-ObsaQ']
                     skip_values:
                         -
                             oid: pdug5GroupName
@@ -154,7 +148,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.19536.10.1.2.1.1.2.{{ $index }}'
                     divisor: 10
                     descr: 'Input frequency'
-                    snmp_flags: ['-ObsaQ']
         load:
               data:
                   -
@@ -163,7 +156,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.19536.10.1.2.2.1.17.{{ $index }}'
                     descr: '{{ pdug5InputPhasePowerMeasType }} Input Load'
                     index: 'pdug5InputPhaseIndex.{{ $index }}'
-                    snmp_flags: ['-ObsaQ']
                     skip_values:
                       -
                         oid: pdug5InputPhaseIndex
@@ -175,7 +167,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.19536.10.1.3.1.1.18.{{ $index }}'
                     descr: 'Breaker {{ pdug5GroupName }} Output Load'
                     group: breakers
-                    snmp_flags: ['-ObsaQ']
                     skip_values:
                       -
                         oid: pdug5GroupName

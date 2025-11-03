@@ -44,7 +44,7 @@ abstract class PortTabHook implements \LibreNMS\Interfaces\Plugins\Hooks\PortTab
     public function data(Port $port): array
     {
         return [
-            'title' => __CLASS__,
+            'title' => self::class,
             'port' => $port,
         ];
     }

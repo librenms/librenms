@@ -14,7 +14,7 @@ $ctypes = collect(\App\Facades\LibrenmsConfig::get('custom_descr', []))->keyBy(f
 
     return strtolower($descr);
 });
-array_walk($types_array, function (&$type) use ($ctypes) {
+array_walk($types_array, function (&$type) use ($ctypes): void {
     $name = $ctypes->get(strtolower($type), $type);
     $type = ucwords(is_array($name) ? $name[0] : $name);
 });

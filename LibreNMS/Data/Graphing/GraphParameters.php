@@ -33,7 +33,7 @@ use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Util\Clean;
 use LibreNMS\Util\Time;
 
-class GraphParameters
+class GraphParameters implements \Stringable
 {
     public readonly array $visibleElements;
 

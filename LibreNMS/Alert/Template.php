@@ -46,7 +46,7 @@ class Template
             // Return the cached template information.
             return $this->template;
         }
-        $this->template = AlertTemplate::whereHas('map', function ($query) use ($obj) {
+        $this->template = AlertTemplate::whereHas('map', function ($query) use ($obj): void {
             $query->where('alert_rule_id', '=', $obj['rule_id']);
         })->first();
         if (! $this->template) {
@@ -93,7 +93,7 @@ class Template
         $alert['alert'] = new AlertData($data['alert']);
         try {
             return Blade::render($data['title'], $alert);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return $data['title'] ?: Blade::render('Template ' . $data['name'], $alert);
         }
     }

@@ -158,7 +158,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         }
     }
 
-    $hostname = '<div class="incident">' . generate_device_link($alert, shorthost(format_hostname($alert))) . '<div id="incident' . $alert['id'] . '"';
+    $hostname = '<div class="incident">' . \LibreNMS\Util\Url::modernDeviceLink(DeviceCache::get($alert['device_id'] ?? null)) . '<div id="incident' . $alert['id'] . '"';
     if (isset($vars['uncollapse_key_count']) && is_numeric($vars['uncollapse_key_count'])) {
         $hostname .= $max_row_length < (int) $vars['uncollapse_key_count'] ? '' : ' class="collapse"';
     } else {
@@ -203,7 +203,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         'verbose_details' => "<button type='button' class='btn btn-alert-details command-alert-details' aria-label='Details' id='alert-details' data-alert_log_id='{$alert_log_id}'><i class='fa-solid fa-circle-info'></i></button>",
         'hostname' => $hostname,
         'location' => generate_link(htmlspecialchars($alert['location'] ?? 'N/A'), ['page' => 'devices', 'location' => $alert['location'] ?? '']),
-        'timestamp' => ($alert['timestamp_display'] ? $alert['timestamp_display'] : 'N/A'),
+        'timestamp' => ($alert['timestamp_display'] ?: 'N/A'),
         'severity' => $severity_ico,
         'state' => $alert['state'],
         'alert_id' => $alert['id'],

@@ -1,0 +1,199 @@
+-- **********************************************************
+-- Copyright (c) 2019 Pure Storage, Inc. All rights reserved.
+-- This source code contains confidential information and trade secrets
+-- of Pure Storage, Inc. Use, disclosure or reproduction is strictly
+-- prohibited without the prior express written permission of Pure Storage, Inc.
+-- Versions:
+--   1.0 (2012-09-21)
+--     Purestorage Flash Array SNMP Trap v2c | v3 support
+--   1.1 (2013-08-20)
+--     Separate reminder from severity.
+-- **********************************************************
+
+PURESTORAGE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    NOTIFICATION-TYPE,
+    OBJECT-TYPE,
+    Integer32,
+    enterprises
+        FROM SNMPv2-SMI
+    OBJECT-GROUP
+        FROM SNMPv2-CONF;
+
+purestorage MODULE-IDENTITY
+    LAST-UPDATED "201209200000Z"
+    ORGANIZATION "Pure Storage, Inc"
+    CONTACT-INFO
+        "http://www.purestorage.com/ | support@purestorage.com"
+    DESCRIPTION
+        "Pure Storage v2c/v3 SNMP MIB"
+    REVISION "201209200000Z"
+    DESCRIPTION
+        "Pure Storage Flash Array MIB"
+    ::= { enterprises 40482 }
+
+pureSystem OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "Parent of all managed objects relating to system software identification"
+    ::= { purestorage 1 }
+
+pureNotifications OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "Parent of all notifications (traps, informs)"
+    ::= { purestorage 2 }
+
+pureObjects OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "Parent of all objects"
+    ::= { purestorage 3 }
+
+purePerformance OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "Parent of all performance data"
+    ::= { purestorage 4 }
+
+pureExperimental OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "Used for product testing and development"
+    ::= { purestorage 700 }
+
+pureProductName OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Pure Storage Product Name"
+    ::= {pureObjects 1}
+
+pureProductVersion OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Pure Storage Product Version"
+    ::= {pureObjects 2}
+
+pureHost OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Pure Storage Hostname"
+    ::= {pureObjects 3}
+
+pureAlertCode OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Alert Code"
+    ::= {pureObjects 4}
+
+pureAlertSubject OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Alert Subject"
+    ::= {pureObjects 5}
+
+pureAlertBody OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Alert Body or Extra Information"
+    ::= {pureObjects 6}
+
+pureAlertReminder OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "If alert is a reminder, true(1) or false(2)"
+    ::= {pureObjects 7}
+
+pureArrayReadBandwidth OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS  "B/s"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Array Read Bandwidth (bytes/s)"
+    ::= {purePerformance 1}
+
+pureArrayWriteBandwidth OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS  "B/s"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Array Write Bandwidth (bytes/s)"
+    ::= {purePerformance 2}
+
+pureArrayReadIOPS OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS  "op/s"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Array Read IOPS (op/s)"
+    ::= {purePerformance 3}
+
+pureArrayWriteIOPS OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS  "op/s"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Array Write IOPS (op/s)"
+    ::= {purePerformance 4}
+
+pureArrayReadLatency OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS  "us/op"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Array Read Latency (us/op)"
+    ::= {purePerformance 5}
+
+pureArrayWriteLatency OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS  "us/op"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Array Write Latency (us/op)"
+    ::= {purePerformance 6}
+
+pureInfoTrap NOTIFICATION-TYPE
+    OBJECTS { pureProductName, pureProductVersion, pureHost, pureAlertCode, pureAlertSubject, pureAlertBody }
+    STATUS current
+    DESCRIPTION
+        "Info Trap"
+    ::= { pureNotifications 50}
+
+pureWarningTrap NOTIFICATION-TYPE
+    OBJECTS { pureProductName, pureProductVersion, pureHost, pureAlertCode, pureAlertSubject, pureAlertBody }
+    STATUS current
+    DESCRIPTION
+        "Warning Trap"
+    ::= { pureNotifications 51}
+
+pureCriticalTrap NOTIFICATION-TYPE
+    OBJECTS { pureProductName, pureProductVersion, pureHost, pureAlertCode, pureAlertSubject, pureAlertBody }
+    STATUS current
+    DESCRIPTION
+        "Critical Trap"
+    ::= { pureNotifications 52}
+
+END

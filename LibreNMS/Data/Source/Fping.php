@@ -27,6 +27,7 @@
 namespace LibreNMS\Data\Source;
 
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Exceptions\FpingUnparsableLine;
 use Log;
 use Symfony\Component\Process\Process;
@@ -58,16 +59,15 @@ class Fping
      * Run fping against a hostname/ip in count mode and collect stats.
      *
      * @param  string  $host  hostname or ip
-     * @param  string  $address_family  ipv4 or ipv6
+     * @param  AddressFamily  $address_family  ipv4 or ipv6
      * @return FpingResponse
      */
-    public function ping($host, $address_family = 'ipv4'): FpingResponse
+    public function ping(string $host, AddressFamily $address_family = AddressFamily::IPv4): FpingResponse
     {
-        if ($address_family == 'ipv6') {
-            $cmd = $this->fping6_bin === false ? [$this->fping_bin, '-6'] : [$this->fping6_bin];
-        } else {
-            $cmd = $this->fping6_bin === false ? [$this->fping_bin, '-4'] : [$this->fping_bin];
-        }
+        $cmd = match ($address_family) {
+            AddressFamily::IPv4 => $this->fping6_bin === false ? [$this->fping_bin, '-4'] : [$this->fping_bin],
+            AddressFamily::IPv6 => $this->fping6_bin === false ? [$this->fping_bin, '-6'] : [$this->fping6_bin],
+        };
 
         // build the command
         $cmd = array_merge($cmd, [
@@ -115,7 +115,7 @@ class Fping
         Log::debug('[FPING] ' . $process->getCommandLine() . PHP_EOL);
 
         $partial = '';
-        $process->run(function ($type, $output) use ($callback, &$partial) {
+        $process->run(function ($type, $output) use ($callback, &$partial): void {
             // stdout contains individual ping responses, stderr contains summaries
             if ($type == Process::ERR) {
                 $lines = explode(PHP_EOL, $output);

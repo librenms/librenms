@@ -11,7 +11,7 @@ Input (JSON):
 Examples:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devicegroups
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devicegroups
 ```
 
 Output:
@@ -58,7 +58,7 @@ Dynamic Example:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
-  -X POST https://librenms.org/api/v0/devicegroups \
+  -X POST https://foo.example/api/v0/devicegroups \
   --data-raw '
 {
  "name": "New Device Group", 
@@ -83,7 +83,7 @@ Static Example:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
-  -X POST https://librenms.org/api/v0/devicegroups \
+  -X POST https://foo.example/api/v0/devicegroups \
   -d '{"name":"New Device Group","type":"static","devices":[261,271]}'
 ```
 
@@ -122,7 +122,7 @@ Input (JSON):
 Examples:
 
 ```curl
-curl -X PATCH -d '{"name": "NewLinuxServers"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/LinuxServers
+curl -X PATCH -d '{"name": "NewLinuxServers"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/LinuxServers
 ```
 
 Output:
@@ -152,7 +152,7 @@ Input:
 Examples:
 
 ```curl
-curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/LinuxServers
+curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/LinuxServers
 ```
 
 Output:
@@ -182,7 +182,7 @@ Input (JSON):
 Examples:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devicegroups/LinuxServers
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devicegroups/LinuxServers
 ```
 
 Output:
@@ -216,20 +216,22 @@ Route: `/api/v0/devicegroups/:name/maintenance`
 
 Input (JSON):
 
-- `title`: *optional* - Some title for the Maintenance  
+- `title`: *optional* - Some title for the Maintenance
   Will be replaced with device group name if omitted
+- `behavior`: *optional* - id of maintenance behavior desired
+  Defaults to alert.scheduled_maintenance_default_behavior if omitted
 - `notes`: *optional* - Some description for the Maintenance
-- `start`: *optional* - start time of Maintenance in full format `Y-m-d H:i:00`  
-  eg: 2022-08-01 22:45:00  
+- `start`: *optional* - start time of Maintenance in full format `Y-m-d H:i:00`
+  eg: 2022-08-01 22:45:00
   Current system time `now()` will be used if omitted
-- `duration`: *required* - Duration of Maintenance in format `H:i` / `Hrs:Mins`  
+- `duration`: *required* - Duration of Maintenance in format `H:i` / `Hrs:Mins`
   eg: 02:00
 
 Example with start time:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
-  -X POST https://librenms.org/api/v0/devicegroups/Cisco%20switches/maintenance/ \
+  -X POST https://foo.example/api/v0/devicegroups/Cisco%20switches/maintenance/ \
   --data-raw '
 {
  "title":"Device group Maintenance",
@@ -253,7 +255,7 @@ Example with no start time:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
-  -X POST https://librenms.org/api/v0/devicegroups/Cisco%20switches/maintenance/ \
+  -X POST https://foo.example/api/v0/devicegroups/Cisco%20switches/maintenance/ \
   --data-raw '
 {
  "title":"Device group Maintenance",
@@ -291,7 +293,7 @@ Example:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
-  -X POST https://librenms.org/api/v0/devicegroups/devices \
+  -X POST https://foo.example/api/v0/devicegroups/devices \
   --data-raw '{"devices":[261,271]}'
 ```
 
@@ -323,7 +325,7 @@ Example:
 
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
-  -X DELETE https://librenms.org/api/v0/devicegroups/devices \
+  -X DELETE https://foo.example/api/v0/devicegroups/devices \
   --data-raw '{"devices":[261,271]}'
 ```
 

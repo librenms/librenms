@@ -34,7 +34,7 @@ foreach ($components as $devid => $comp) {
             $searchfound = false;
             $searchdata = [$device['hostname'], $array['peer'], $array['stratum'], $array['error']];
             foreach ($searchdata as $value) {
-                if (strstr($value, $vars['searchPhrase'])) {
+                if (strstr($value, (string) $vars['searchPhrase'])) {
                     $searchfound = true;
                 }
             }

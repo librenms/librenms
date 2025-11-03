@@ -62,7 +62,7 @@ class AutonomousSystem
 
                     return trim($txt[4], ' "');
                 }
-            } catch (ErrorException $e) {
+            } catch (ErrorException) {
             }
 
             return '';

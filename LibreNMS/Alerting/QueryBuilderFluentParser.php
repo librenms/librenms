@@ -61,7 +61,7 @@ class QueryBuilderFluentParser extends QueryBuilderParser
      */
     protected function parseGroupToQuery($query, $rule, $parent_condition = null)
     {
-        return $query->where(function ($query) use ($rule) {
+        return $query->where(function ($query) use ($rule): void {
             foreach ($rule['rules'] as $group_rule) {
                 if (array_key_exists('condition', $group_rule)) {
                     $this->parseGroupToQuery($query, $group_rule, $rule['condition']);

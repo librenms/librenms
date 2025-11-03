@@ -29,16 +29,15 @@ namespace LibreNMS\OS;
 use App\Models\Device;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
-use LibreNMS\OS\Shared\Fortinet;
+use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 
-class Fortios extends Fortinet implements OSPolling
+class Fortios extends OS implements OSPolling
 {
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
 
-        $device->hardware = $device->hardware ?: $this->getHardwareName();
         $device->features = snmp_get($this->getDeviceArray(), 'fmDeviceEntMode.1', '-OQv', 'FORTINET-FORTIMANAGER-FORTIANALYZER-MIB') == 'fmg-faz' ? 'with Analyzer features' : null;
     }
 

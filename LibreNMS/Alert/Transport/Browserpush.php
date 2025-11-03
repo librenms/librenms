@@ -37,9 +37,7 @@ class Browserpush extends Transport
 
     public function deliverAlert(array $alert_data): bool
     {
-        $users = User::when($this->config['user'] ?? 0, function ($query, $user_id) {
-            return $query->where('user_id', $user_id);
-        })->get();
+        $users = User::when($this->config['user'] ?? 0, fn ($query, $user_id) => $query->where('user_id', $user_id))->get();
 
         Notification::send($users, new AlertNotification(
             $alert_data['alert_id'],

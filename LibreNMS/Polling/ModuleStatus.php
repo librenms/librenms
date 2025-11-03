@@ -28,7 +28,7 @@ namespace LibreNMS\Polling;
 
 use App\Models\Device;
 
-class ModuleStatus
+class ModuleStatus implements \Stringable
 {
     public function __construct(
         public ?bool $global,

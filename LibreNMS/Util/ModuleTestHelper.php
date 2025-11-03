@@ -555,9 +555,7 @@ class ModuleTestHelper
         app()->bind(AutonomousSystem::class, function ($app, $parameters) {
             $asn = $parameters['asn'] ?? '?';
             $mock = \Mockery::mock(AutonomousSystem::class);
-            $mock->shouldReceive('name')->withAnyArgs()->zeroOrMoreTimes()->andReturnUsing(function () use ($asn) {
-                return "AS$asn-MOCK-TEXT";
-            });
+            $mock->shouldReceive('name')->withAnyArgs()->zeroOrMoreTimes()->andReturnUsing(fn () => "AS$asn-MOCK-TEXT");
 
             return $mock;
         });
@@ -576,6 +574,7 @@ class ModuleTestHelper
             $new_device = new Device([
                 'hostname' => $snmpSimIp,
                 'snmpver' => 'v2c',
+                'transport' => 'udp',
                 'community' => $this->file_name,
                 'port' => $snmpSimPort,
                 'disabled' => 1, // disable to block normal pollers

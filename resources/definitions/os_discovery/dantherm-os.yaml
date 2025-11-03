@@ -2,55 +2,145 @@ mib: DANTHERM-COOLING-MIB
 modules:
     os:
         sysName: DANTHERM-COOLING-MIB::hostName.0
+        serial: DANTHERM-COOLING-MIB::ccSN.0
+        version: DANTHERM-COOLING-MIB::fwVersion.0
     sensors:
         temperature:
+            options:
+                skip_value_lt: -40
             data:
                 -
                     oid: onBoardTempr
                     index: onBoardTempr.{{ $index }}
                     num_oid: .1.3.6.1.4.1.46651.1.1.1.{{ $index }}
-                    descr: onBoard Tempr
+                    descr: onBoard temperature
                 -
                     oid: roomTempr
                     index: roomTempr.{{ $index }}
                     num_oid: .1.3.6.1.4.1.46651.1.1.2.{{ $index }}
-                    descr: room Tempr
+                    descr: Room temperature
                 -
                     oid: hotSpotTempr
                     index: hotSpotTempr.{{ $index }}
                     num_oid: .1.3.6.1.4.1.46651.1.1.3.{{ $index }}
-                    descr: hotSpot Tempr
+                    descr: hotSpot temperature
+                -
+                    oid: outdoor1Tempr
+                    index: outdoor1Tempr.{{ $index }}
+                    num_oid: .1.3.6.1.4.1.46651.1.1.6.{{ $index }}
+                    descr: Outdoor temperature
+                -
+                    oid: shelter1Setpoint
+                    index: shelter1Setpoint.{{ $index }}
+                    num_oid: .1.3.6.1.4.1.46651.1.1.29.{{ $index }}
+                    descr: Shelter 1 temperature setpoint
         fanspeed:
             data:
                 -
                     oid: fan1RPM
                     index: fan1RPM.{{ $index }}
                     num_oid: .1.3.6.1.4.1.46651.1.1.8.{{ $index }}
-                    descr: fan1 RPM
+                    descr: Fan 1 RPM
                 -
                     oid: fan2RPM
                     index: fan2RPM.{{ $index }}
                     num_oid: .1.3.6.1.4.1.46651.1.1.9.{{ $index }}
-                    descr: fan2 RPM
+                    descr: Fan 2 RPM
+        percent:
+            data:
+                -
+                    oid: fan1SpeedPercentage
+                    index: fan1SpeedPercentage.{{ $index }}
+                    num_oid: .1.3.6.1.4.1.46651.1.1.10{{ $index }}
+                    descr: Fan 1 percent utilization
+                -
+                    oid: fan2SpeedPercentage
+                    index: fan2SpeedPercentage.{{ $index }}
+                    num_oid: .1.3.6.1.4.1.46651.1.1.11{{ $index }}
+                    descr: Fan 2 percent utilization
+                -
+                    oid: damper1Position
+                    index: damper1Position.{{ $index }}
+                    num_oid: 1.3.6.1.4.1.46651.1.1.12.{{ $index }}
+                    descr: Damper 1 position (0% closed / 100% open)
+                -
+                    oid: damper2Position
+                    index: damper2Position.{{ $index }}
+                    num_oid: 1.3.6.1.4.1.46651.1.1.13.{{ $index }}
+                    descr: Damper 2 position (0% closed / 100% open)
+        voltage:
+            data:
+                -
+                    oid: voltage
+                    index: voltage.{{ $index }}
+                    num_oid: .1.3.6.1.4.1.46651.1.1.33.{{ $index }}
+                    descr: System voltage
         state:
             data:
                 -
                     oid: fan1Status
                     num_oid: .1.3.6.1.4.1.46651.1.1.18.{{ $index }}
-                    descr: Fan 1 operation status
+                    descr: Fan 1 status
                     index: fan1Status.{{ $index }}
                     state_name: fanStatus_states
                     states:
-                        - { value: 0, graph: 0, generic: 2, descr: Off }
+                        - { value: 0, graph: 0, generic: 0, descr: Off }
                         - { value: 1, graph: 0, generic: 0, descr: On }
-                        - { value: 2, graph: 0, generic: 1, descr: Emergency/Boost }
+                        - { value: 2, graph: 0, generic: 2, descr: emergency/boost }
                 -
                     oid: fan2Status
                     num_oid: .1.3.6.1.4.1.46651.1.1.19.{{ $index }}
-                    descr: Fan 2 operation status
+                    descr: Fan 2 status
                     index: fan2Status.{{ $index }}
                     state_name: fanStatus_states
                     states:
-                        - { value: 0, graph: 0, generic: 2, descr: Off }
+                        - { value: 0, graph: 0, generic: 0, descr: Off }
                         - { value: 1, graph: 0, generic: 0, descr: On }
-                        - { value: 2, graph: 0, generic: 1, descr: Emergency/Boost }
+                        - { value: 2, graph: 0, generic: 2, descr: emergency/boost }
+                -
+                    oid: damper1Status
+                    num_oid: .1.3.6.1.4.1.46651.1.1.20.{{ $index }}
+                    descr: Damper 1 status
+                    index: damper1Status.{{ $index }}
+                    state_name: damperStatus_states
+                    states:
+                        - { value: 0, graph: 0, generic: 0, descr: closed }
+                        - { value: 1, graph: 0, generic: 0, descr: open }
+                        - { value: 2, graph: 0, generic: 0, descr: dynamic }
+                        - { value: 3, graph: 0, generic: 2, descr: emergency/boost}
+                -
+                    oid: damper2Status
+                    num_oid: .1.3.6.1.4.1.46651.1.1.21.{{ $index }}
+                    descr: Damper 2 status
+                    index: damper2Status.{{ $index }}
+                    state_name: damperStatus_states
+                    states:
+                        - { value: 0, graph: 0, generic: 0, descr: closed }
+                        - { value: 1, graph: 0, generic: 0, descr: open }
+                        - { value: 2, graph: 0, generic: 0, descr: dynamic }
+                        - { value: 3, graph: 0, generic: 2, descr: emergency/boost}
+                -
+                    oid: shelter1Status
+                    num_oid: .1.3.6.1.4.1.46651.1.1.25.{{ $index }}
+                    descr: Shelter 1 status
+                    index: shelter1Status.{{ $index }}
+                    state_name: shelterStatus_states
+                    states:
+                        - { value: 0, graph: 0, generic: 0, descr: Inactive state }
+                        - { value: 1, graph: 0, generic: 0, descr: Heating state }
+                        - { value: 2, graph: 0, generic: 0, descr: Re-Cycling state }
+                        - { value: 3, graph: 0, generic: 0, descr: Free Cooling state }
+                        - { value: 4, graph: 0, generic: 0, descr: Active or Aircon Cooling state }
+                        - { value: 5, graph: 0, generic: 2, descr: Emergency state }
+                        - { value: 6, graph: 0, generic: 0, descr: Intermediate state }
+                -
+                    oid: shelter1Mode
+                    num_oid: .1.3.6.1.4.1.46651.1.1.27.{{ $index }}
+                    descr: Shelter 1 mode
+                    index: shelter1Mode.{{ $index }}
+                    state_name: shelterMode_states
+                    states:
+                        - { value: 0, graph: 0, generic: 0, descr: Free Cooling mode }
+                        - { value: 1, graph: 0, generic: 0, descr: Standard mode }
+                        - { value: 2, graph: 0, generic: 0, descr: Power Save mode }
+                        - { value: 3, graph: 0, generic: 0, descr: Air Condionter mode }

@@ -18,9 +18,7 @@ foreach (Application::query()->hasAccess(Auth::user())->with('device')->get()->s
     $index++;
     echo '<h4>' . generate_link(htmlentities($groupedApps->first()->displayName()), ['page' => 'apps', 'app' => $type]) . '</h4>';
     /** @var \Illuminate\Support\Collection $groupedApps */
-    $groupedApps = $groupedApps->sortBy(function ($app) {
-        return $app->device->hostname;
-    });
+    $groupedApps = $groupedApps->sortBy(fn ($app) => $app->device->hostname);
     /** @var Application $app */
     foreach ($groupedApps as $app) {
         $graph_type = $graphs[$app->app_type][0] ?? '';

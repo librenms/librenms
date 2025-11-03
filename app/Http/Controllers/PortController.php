@@ -43,9 +43,7 @@ class PortController extends Controller
 
         if (array_key_exists('groups', $validated)) {
             $changes = $port->groups()->sync($validated['groups']);
-            $groups_updated = array_sum(array_map(function ($group_ids) {
-                return count($group_ids);
-            }, $changes));
+            $groups_updated = array_sum(array_map(fn ($group_ids) => count($group_ids), $changes));
 
             if ($groups_updated > 0) {
                 $message .= trans('port.groups.updated', ['port' => $port->getLabel()]);

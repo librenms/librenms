@@ -1,7 +1,7 @@
 --**MOD+***********************************************************************
 --* Module:    ARUBAWIRED-NETWORKING-OID.mib
 --*
---* (c) Copyright 2017-2024 Hewlett Packard Enterprise Development LP
+--* (c) Copyright 2017-2025 Hewlett Packard Enterprise Development LP
 --* All Rights Reserved.
 --*
 --* The contents of this software are proprietary and confidential
@@ -21,7 +21,7 @@ IMPORTS
             FROM SNMPv2-SMI;
 
 hpeNetworking MODULE-IDENTITY
-         LAST-UPDATED "202408210000Z"  -- September 21, 2024
+         LAST-UPDATED "202503120000Z"  -- March 12, 2025
 
          ORGANIZATION "HPE/Aruba Networking Division"
          CONTACT-INFO "Hewlett Packard Company
@@ -31,8 +31,29 @@ hpeNetworking MODULE-IDENTITY
          DESCRIPTION  "This MIB module defines HPE Networking
                        product hardware MIBs and proprietary MIBs. "
 
+         REVISION     "202503120000Z"  -- March 12, 2025
+         DESCRIPTION  "Added new SKU OIDs for 10040"
+
+         REVISION     "202502190000Z"  -- February 19, 2025
+         DESCRIPTION  "Updated with new 6000 SKUs"
+
+         REVISION     "202412050000Z"  -- December 5, 2024
+         DESCRIPTION  "Added fan and PSU modules for 8325H SKUs"
+
+         REVISION     "202411110000Z"  -- November 11, 2024
+         DESCRIPTION  "Added MII SKUs for 6200F"
+
+         REVISION     "202410250000Z"  -- October 25, 2024
+         DESCRIPTION  "Added MII SKU OIDs for 6000 and 6100"
+
+         REVISION     "202409110000Z"  -- September 11, 2024
+         DESCRIPTION  "Updated Descriptions for 8325H SKUs"
+
+         REVISION     "202408300000Z"  -- August 30, 2024
+         DESCRIPTION  "Added with new SKU OIDs for Glen (6300M)"
+
          REVISION     "202408210000Z"  -- August 21, 2024
-         DESCRIPTION  "Added 8325P SKUs"
+         DESCRIPTION  "Added 8325H and 8325P SKUs"
 
          REVISION     "202408070000Z"  -- August 7, 2024
          DESCRIPTION  "Updated Descriptions for 5420 modules"
@@ -285,6 +306,54 @@ arubaWiredSwitchJL636A OBJECT-IDENTITY
                      JL636A Aruba 8325 8325-32C chassis switch."
         ::= { wndDeviceIds 70 }
 
+arubaWiredSwitchS4B20A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for thes
+                     S4B20A HPE ANW 8325H 18Y 4C FB 4Fs 2PS Sw"
+        ::= { wndDeviceIds 80 }
+
+arubaWiredSwitchS4B21A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     S4B21A HPE ANW 8325H 18Y 4C BF 4Fs 2PS Sw"
+        ::= { wndDeviceIds 81 }
+
+arubaWiredSwitchS4B22A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     S4B22A HPE ANW 8325H 16C FB 4Fs 2PS Sw"
+        ::= { wndDeviceIds 82 }
+
+arubaWiredSwitchS4B23A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     S4B23A HPE ANW 8325H 16C BF 4Fs 2PS Sw"
+        ::= { wndDeviceIds 83 }
+
+arubaWiredSwitchS2T42A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     S2T42A HPE ANW 8325H 18Y 4C FB 4Fs 2PS TAA Sw"
+        ::= { wndDeviceIds 84 }
+
+arubaWiredSwitchS2T46A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     S2T46A HPE ANW 8325H 18Y 4C BF 4Fs 2PS TAA Sw"
+        ::= { wndDeviceIds 85 }
+
+arubaWiredSwitchS2T47A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     S2T47A HPE ANW 8325H 16C FB 4Fs 2PS TAA Sw"
+        ::= { wndDeviceIds 86 }
+
+arubaWiredSwitchS2T48A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     S2T48A HPE ANW 8325H 16C BF 4Fs 2PS TAA Sw"
+        ::= { wndDeviceIds 87 }
+
 arubaWiredSwitchJL658A OBJECT-IDENTITY
         STATUS      current
         DESCRIPTION "The authoritative identifier for the
@@ -501,6 +570,54 @@ arubaWiredSwitchS0G98A OBJECT-IDENTITY
                      HPE ANW 6300F 24G 4L TAA Sw."
         ::= { wndDeviceIds 133 }
 
+arubaWiredSwitchS4P41A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6300M 16SR5 32G CL8 2Y 2L Sw."
+        ::= { wndDeviceIds 1050 }
+
+arubaWiredSwitchS4P42A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6300M 32SR5 CL8 8P 2Y 2L Sw."
+        ::= { wndDeviceIds 1051 }
+
+arubaWiredSwitchS4P43A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6300M 48F 2Y 2L Sw."
+        ::= { wndDeviceIds 1052 }
+
+arubaWiredSwitchS4P44A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6300M 24F 2Y 2L Sw."
+        ::= { wndDeviceIds 1053 }
+
+arubaWiredSwitchS4P45A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6300M 16SR5 32G CL8 2Y 2L TAA Sw."
+        ::= { wndDeviceIds 1054 }
+
+arubaWiredSwitchS4P46A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6300M 32SR5 CL8 8P 2Y 2L TAA Sw."
+        ::= { wndDeviceIds 1055 }
+
+arubaWiredSwitchS4P47A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6300M 48F 2Y 2L TAA Sw."
+        ::= { wndDeviceIds 1056 }
+
+arubaWiredSwitchS4P48A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6300M 24F 2Y 2L TAA Sw."
+        ::= { wndDeviceIds 1057 }
+
 arubaWiredSwitchR0X24A OBJECT-IDENTITY
         STATUS      current
         DESCRIPTION "The authoritative identifier for the
@@ -561,6 +678,30 @@ arubaWiredSwitchR9Y04A OBJECT-IDENTITY
                      Aruba 6100 48G Class4 PoE 4SFP+ 740W Switch."
        ::= { wndDeviceIds 260 }
 
+arubaWiredSwitchS4U55A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6100 48G CL4 4P 370W MII Switch."
+       ::= { wndDeviceIds 261 }
+
+arubaWiredSwitchS4U56A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6100 48G 4P MII Switch."
+       ::= { wndDeviceIds 262 }
+
+arubaWiredSwitchS4U57A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6100 24G CL4 4P 370W MII Switch."
+       ::= { wndDeviceIds 263 }
+
+arubaWiredSwitchS4U58A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6100 24G 4P MII Switch."
+       ::= { wndDeviceIds 264 }
+
 arubaWiredSwitchR8N85A OBJECT-IDENTITY
         STATUS      current
         DESCRIPTION "The authoritative identifier for the
@@ -591,11 +732,131 @@ arubaWiredSwitchR8N89A OBJECT-IDENTITY
                      Aruba 6000 12G CLS4 2G/2SFP 139W."
        ::= { wndDeviceIds 274 }
 
+arubaWiredSwitchR8N85B OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6000 48G CL4 4F 370W Sw."
+       ::= { wndDeviceIds 275 }
+
+arubaWiredSwitchR8N86B OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6000 48G 4F Sw."
+       ::= { wndDeviceIds 276 }
+
+arubaWiredSwitchR8N87B OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6000 24G CL4 4F 370W Sw."
+       ::= { wndDeviceIds 277 }
+
+arubaWiredSwitchR8N88B OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6000 24G 4F Sw."
+       ::= { wndDeviceIds 278 }
+
+arubaWiredSwitchR8N89B OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6000 12G CL4 2F 139W Sw."
+       ::= { wndDeviceIds 279 }
+
 arubaWiredSwitchR9Y03A OBJECT-IDENTITY
         STATUS      current
         DESCRIPTION "The authoritative identifier for the
                      Aruba 6000 48G Class4 PoE 4SFP 740W Switch."
        ::= { wndDeviceIds 280 }
+
+arubaWiredSwitchS4U59A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6000 48G CL4 4F 370W MII Switch."
+       ::= { wndDeviceIds 281 }
+
+arubaWiredSwitchS4U60A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6000 48G 4F MII Switch."
+       ::= { wndDeviceIds 282 }
+
+arubaWiredSwitchS4U61A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6000 24G CL4 4F 370W MII Switch."
+       ::= { wndDeviceIds 283 }
+
+arubaWiredSwitchS4U62A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6000 24G 4F MII Switch."
+       ::= { wndDeviceIds 284 }
+
+arubaWiredSwitchR9Y03B OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6000 48G CL4 4F 740W Sw."
+       ::= { wndDeviceIds 285 }
+
+arubaWiredSwitchS4R20A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6000 48G CL4 4F 740W TAA Sw."
+       ::= { wndDeviceIds 286 }
+
+arubaWiredSwitchS4R21A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6000 12G CL4 2F 139W TAA Sw."
+       ::= { wndDeviceIds 287 }
+
+arubaWiredSwitchS4R22A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6000 8G 2F Sw."
+       ::= { wndDeviceIds 288 }
+
+arubaWiredSwitchS4R23A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6000 8G CL4 2F 67W Sw."
+       ::= { wndDeviceIds 289 }
+
+arubaWiredSwitchS4R24A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6000 48G CL4 4F 370W TAA Sw."
+       ::= { wndDeviceIds 290 }
+
+arubaWiredSwitchS4R25A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6000 48G 4F TAA Sw."
+       ::= { wndDeviceIds 291 }
+
+arubaWiredSwitchS4R26A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6000 24G CL4 4F 370W TAA Sw."
+       ::= { wndDeviceIds 292 }
+
+arubaWiredSwitchS4R27A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6000 24G 4F TAA Sw."
+       ::= { wndDeviceIds 293 }
+
+arubaWiredSwitchS4R28A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6000 8G 2F TAA Sw."
+       ::= { wndDeviceIds 294 }
+
+arubaWiredSwitchS4R29A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6000 8G CL4 2F 67W TAA Sw."
+       ::= { wndDeviceIds 295 }
 
 arubaWiredSwitchJL724A OBJECT-IDENTITY
         STATUS      current
@@ -716,6 +977,36 @@ arubaWiredSwitchS0M90A OBJECT-IDENTITY
         DESCRIPTION "The authoritative identifier for the
                      HPE NW 6200F 48G C4 4SFP+740W T Sw."
        ::= { wndDeviceIds 319 }
+
+arubaWiredSwitchS4U63A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6200F 24G 4P MII Switch."
+       ::= { wndDeviceIds 333 }
+
+arubaWiredSwitchS4U64A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 6200F 24G CL4 4P 370W MII Switch."
+       ::= { wndDeviceIds 334 }
+
+arubaWiredSwitchS4U65A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 2930F 48G 4P MII Switch."
+       ::= { wndDeviceIds 335 }
+
+arubaWiredSwitchS4U66A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 2930F 48G CL4 4P 370W MII Switch."
+       ::= { wndDeviceIds 336 }
+
+arubaWiredSwitchS4U67A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the
+                     HPE ANW 2930F 48G CL4 4P 740W MII Switch."
+       ::= { wndDeviceIds 337 }
 
 arubaWiredSwitchS0G13A OBJECT-IDENTITY
         STATUS      current
@@ -916,6 +1207,18 @@ arubaWiredSwitchS4K80A OBJECT-IDENTITY
         DESCRIPTION "The authoritative identifier for the HPE Aruba
         Networking CX 10000-48p SFP28 10G/25G 6p QSFP28 100G TAA switch"
        ::= { wndDeviceIds 601 }
+
+arubaWiredSwitchS4R58A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE Aruba
+        Networking CX 10040 Field Replacement Unit Switch"
+       ::= { wndDeviceIds 630 }
+
+arubaWiredSwitchS4R59A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE Aruba
+        Networking CX 10040 TAA Field Replacement Unit Switch"
+       ::= { wndDeviceIds 631 }
 
 arubaWiredSwitchR8Z96A OBJECT-IDENTITY
         STATUS      current
@@ -2380,11 +2683,297 @@ arubaWiredSwitchModuleS4K80A OBJECT-IDENTITY
                      CX 10000 48p SFP28 10G/25G 6p QSFP28 100G TAA Switch."
        ::= { wndModules 240 }
 
+arubaWiredSwitchModuleS4B20A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW Networking
+                     8325H-18Y4C 18p 25G 4p 100G QSFP28 Front to Back 2 PS 4 Fans Switch"
+       ::= { wndModules 241 }
+
+arubaWiredSwitchModuleS4B21A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW Networking
+                     8325H-18Y4C 18p 25G 4p 100G QSFP28 Back to Front 2 PS 4 Fans Switch"
+       ::= { wndModules 242 }
+
+arubaWiredSwitchModuleS4B22A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW Networking
+                     8325H-16C 16p 25G 4p 100G QSFP28 Front to Back 2 PS 4 Fans Switch"
+       ::= { wndModules 243 }
+
+arubaWiredSwitchModuleS4B23A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW Networking
+                     8325H-16C 16p 25G 4p 100G QSFP28 Back to Front 2 PS 4 Fans Switch"
+       ::= { wndModules 244 }
+
+arubaWiredSwitchModuleS2T42A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW Networking
+                     8325H-18Y4C 18p 25G 4p 100G QSFP28 Front to Back 2 PS 4 Fans TAA Switch"
+       ::= { wndModules 245 }
+
+arubaWiredSwitchModuleS2T46A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW Networking
+                     8325H-18Y4C 18p 25G 4p 100G QSFP28 Back to Front 2 PS 4 Fans TAA Switch"
+       ::= { wndModules 246 }
+
+arubaWiredSwitchModuleS2T47A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW Networking
+                     8325H-16C 16p 25G 4p 100G QSFP28 Front to Back 2 PS 4 Fans TAA Switch"
+       ::= { wndModules 247 }
+
+arubaWiredSwitchModuleS2T48A  OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW Networking
+                     8325H-16C 16p 25G 4p 100G QSFP28 Back to Front 2 PS 4 Fans TAA Switch"
+       ::= { wndModules 248 }
+
 arubaWiredSwitchModuleS4A48A OBJECT-IDENTITY
         STATUS      current
         DESCRIPTION "The authoritative identifier for the HPE Aruba Networking
                      8325P 32p QSFP28 40G/100G Switch"
        ::= { wndModules 249 }
+
+arubaWiredSwitchModuleS4P41A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE Aruba Networking
+                     6300M 16SR5 32G CL8 2Y 2L Sw"
+       ::= { wndModules 250 }
+
+arubaWiredSwitchModuleS4P42A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE Aruba Networking
+                     6300M 32SR5 CL8 8P 2Y 2L Sw"
+       ::= { wndModules 251 }
+
+arubaWiredSwitchModuleS4P43A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE Aruba Networking
+                     6300M 48F 2Y 2L Sw"
+       ::= { wndModules 252 }
+
+arubaWiredSwitchModuleS4P44A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE Aruba Networking
+                     6300M 24F 2Y 2L Sw"
+       ::= { wndModules 253 }
+
+arubaWiredSwitchModuleS4P45A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE Aruba Networking
+                     6300M 16SR5 32G CL8 2Y 2L TAA Sw"
+       ::= { wndModules 254 }
+
+arubaWiredSwitchModuleS4P46A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE Aruba Networking
+                     6300M 32SR5 CL8 8P 2Y 2L TAA Sw"
+       ::= { wndModules 255 }
+
+arubaWiredSwitchModuleS4P47A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE Aruba Networking
+                     6300M 48F 2Y 2L TAA Sw"
+       ::= { wndModules 256 }
+
+arubaWiredSwitchModuleS4P48A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE Aruba Networking
+                     6300M 24F 2Y 2L TAA Sw"
+       ::= { wndModules 257 }
+
+arubaWiredSwitchModuleS4U55A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6100 48G CL4 4P 370W MII Switch."
+       ::= { wndModules 258 }
+
+arubaWiredSwitchModuleS4U56A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6100 48G 4P MII Switch."
+       ::= { wndModules 259 }
+
+arubaWiredSwitchModuleS4U57A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6100 24G CL4 4P 370W MII Switch."
+       ::= { wndModules 260 }
+
+arubaWiredSwitchModuleS4U58A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6100 24G 4P MII Switch."
+       ::= { wndModules 261 }
+
+arubaWiredSwitchModuleS4U59A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6000 48G CL4 4F 370W MII Switch."
+       ::= { wndModules 262 }
+
+arubaWiredSwitchModuleS4U60A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6000 48G 4F MII Switch."
+       ::= { wndModules 263 }
+
+arubaWiredSwitchModuleS4U61A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6000 24G CL4 4F 370W MII Switch."
+       ::= { wndModules 264 }
+
+arubaWiredSwitchModuleS4U62A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6000 24G 4F MII Switch."
+       ::= { wndModules 265 }
+arubaWiredSwitchModuleS4U63A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6200F 24G 4P MII Switch."
+       ::= { wndModules 266 }
+
+arubaWiredSwitchModuleS4U64A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6200F 24G CL4 4P 370W MII Switch."
+       ::= { wndModules 267 }
+
+arubaWiredSwitchModuleS4U65A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 2930F 48G 4P MII Switch."
+       ::= { wndModules 268 }
+
+arubaWiredSwitchModuleS4U66A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 2930F 48G CL4 4P 370W MII Switch."
+       ::= { wndModules 269 }
+
+arubaWiredSwitchModuleS4U67A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 2930F 48G CL4 4P 740W MII Switch."
+       ::= { wndModules 270 }
+
+arubaWiredSwitchModule8325HPowerSupply OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE Aruba Networking
+                     8325H Power Supply"
+       ::= { wndModules 271 }
+
+arubaWiredSwitchModule8325HFanTray OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE Aruba Networking
+                     8325H Fan"
+       ::= { wndModules 272 }
+
+arubaWiredSwitchModuleR8N85B OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6000 48G CL4 4F 370W Sw."
+       ::= { wndModules 273 }
+
+arubaWiredSwitchModuleR8N86B OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6000 48G 4F Sw."
+       ::= { wndModules 274 }
+
+arubaWiredSwitchModuleR8N87B OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6000 24G CL4 4F 370W Sw."
+       ::= { wndModules 275 }
+
+arubaWiredSwitchModuleR8N88B OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6000 24G 4F Sw."
+       ::= { wndModules 276 }
+
+arubaWiredSwitchModuleR8N89B OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6000 12G CL4 2F 139W Sw."
+       ::= { wndModules 277 }
+
+arubaWiredSwitchModuleR9Y03B OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6000 48G CL4 4F 740W Sw."
+       ::= { wndModules 278 }
+
+arubaWiredSwitchModuleS4R20A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6000 48G CL4 4F 740W TAA Sw."
+       ::= { wndModules 279 }
+
+arubaWiredSwitchModuleS4R21A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6000 12G CL4 2F 139W TAA Sw."
+       ::= { wndModules 280 }
+
+arubaWiredSwitchModuleS4R22A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6000 8G 2F Sw."
+       ::= { wndModules 281 }
+
+arubaWiredSwitchModuleS4R23A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6000 8G CL4 2F 67W Sw."
+       ::= { wndModules 282 }
+
+arubaWiredSwitchModuleS4R24A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6000 48G CL4 4F 370W TAA Sw."
+       ::= { wndModules 283 }
+
+arubaWiredSwitchModuleS4R25A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6000 48G 4F TAA Sw."
+       ::= { wndModules 284 }
+
+arubaWiredSwitchModuleS4R26A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6000 24G CL4 4F 370W TAA Sw."
+       ::= { wndModules 285 }
+
+arubaWiredSwitchModuleS4R27A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6000 24G 4F TAA Sw."
+       ::= { wndModules 286 }
+
+arubaWiredSwitchModuleS4R28A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6000 8G 2F TAA Sw."
+       ::= { wndModules 287 }
+
+arubaWiredSwitchModuleS4R29A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 6000 8G CL4 2F 67W TAA Sw."
+       ::= { wndModules 288 }
+
+arubaWiredSwitchModuleS4R50A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE Aruba Networking
+                    10040 Front to Back Fan"
+       ::= { wndModules 289 }
+
+arubaWiredSwitchModuleS4R51A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE Aruba Networking
+                    10040 Back to Front Fan"
+       ::= { wndModules 290 }
+
+arubaWiredSwitchModuleS4R52A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE Aruba Networking
+                    10040 3000W Front to Back Power Supply"
+       ::= { wndModules 291 }
+
+arubaWiredSwitchModuleS4R53A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE Aruba Networking
+                    10040 3000W Back to Front Power Supply"
+       ::= { wndModules 292 }
+
+arubaWiredSwitchModuleS4R58A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 10040 FRU Sw"
+       ::= { wndModules 293 }
+
+arubaWiredSwitchModuleS4R59A OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "The authoritative identifier for the HPE ANW 10040 TAA FRU Sw"
+       ::= { wndModules 294 }
 
 -- Feature Sub-tree where we allocate OID for Proprietary MIBs
 

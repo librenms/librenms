@@ -74,7 +74,7 @@ class Ipv6Addresses implements Module
             }
 
             return $ip->ipv6_compressed === '::1';
-        })->each(function (Ipv6Address $ip) {
+        })->each(function (Ipv6Address $ip): void {
             $ipv6 = IPv6::parse($ip->ipv6_address);
 
             // do not set a network for link-local addresses as they exist on all interfaces

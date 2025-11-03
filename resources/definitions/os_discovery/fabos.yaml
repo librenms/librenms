@@ -1,4 +1,4 @@
-mib: SW-MIB
+mib: SW-MIB:FA-EXT-MIB
 modules:
     mempools:
         data:
@@ -11,6 +11,11 @@ modules:
                 num_oid: '.1.3.6.1.4.1.1588.2.1.1.1.26.1.{{ $index }}'
                 index: 1
     sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - swFCPortName
         temperature:
             data:
                 -
@@ -27,6 +32,16 @@ modules:
                             oid: swSensorType
                             op: '!='
                             value: 1
+
+                -
+                    oid: swSfpTemperature
+                    value: swSfpTemperature
+                    num_oid: ".1.3.6.1.4.1.1588.2.1.1.1.28.1.1.1.{{ $index }}"
+                    descr: "{{ swFCPortName:16 }} Temp"
+                    entPhysicalIndex: "200000{{ $subindex16 }}"
+                    group: 'transceiver'
+                    index: "swSfpTemperature.{{ $subindex16 }}"
+
         fanspeed:
             data:
                 -
@@ -43,6 +58,28 @@ modules:
                             oid: swSensorType
                             op: '!='
                             value: 2
+        dbm:
+            data:
+                -
+                    oid: swSfpRxPower
+                    value: swSfpRxPower
+                    num_oid: ".1.3.6.1.4.1.1588.2.1.1.1.28.1.1.4.{{ $index }}"
+                    descr: "{{ swFCPortName:16 }} RX"
+                    entPhysicalIndex: "200000{{ $subindex16 }}"
+                    group: 'transceiver'
+                    index: "swSfpRxPower.{{ $subindex16 }}"
+                    low_warn_limit: -5
+                    warn_limit: 1
+                -
+                    oid: swSfpTxPower
+                    value: swSfpTxPower
+                    num_oid: ".1.3.6.1.4.1.1588.2.1.1.1.28.1.1.5.{{ $index }}"
+                    descr: "{{ swFCPortName:16 }} TX"
+                    entPhysicalIndex: "200000{{ $subindex16 }}"
+                    group: 'transceiver'
+                    index: "swSfpTxPower.{{ $subindex16 }}"
+                    low_warn_limit: -5
+                    warn_limit: 1
         state:
             data:
                 -

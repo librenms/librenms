@@ -57,9 +57,7 @@ class QosController implements DeviceTab
         $show = null;
         $vars = $request->vars;
         if ($vars) {
-            $showvars = array_filter(explode('/', $vars), function ($v) {
-                return str_starts_with($v, 'show=');
-            });
+            $showvars = array_filter(explode('/', $vars), fn ($v) => str_starts_with($v, 'show='));
             if ($showvars) {
                 $showvar = explode('=', $showvars[0]);
                 $show = array_pop($showvar);

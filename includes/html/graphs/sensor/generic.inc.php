@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Data\Store\Rrd;
+use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Util\Number;
 
 if (empty($sensor)) {

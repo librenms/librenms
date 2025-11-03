@@ -153,12 +153,12 @@ class KeyRotate extends LnmsCommand
             \App\Facades\LibrenmsConfig::persist($key, $this->encrypt->encryptString($data));
 
             return true;
-        } catch (DecryptException $e) {
+        } catch (DecryptException) {
             try {
                 $this->encrypt->decryptString(\App\Facades\LibrenmsConfig::get($key));
 
                 return true; // already rotated
-            } catch (DecryptException $e) {
+            } catch (DecryptException) {
                 $this->warn(trans('commands.key:rotate.decrypt-failed', ['item' => $key]));
 
                 return false;

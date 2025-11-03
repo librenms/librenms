@@ -58,7 +58,7 @@ class Eloquent
 
                 return true;
             }
-        } catch (PDOException $e) {
+        } catch (PDOException) {
             return false;
         }
 

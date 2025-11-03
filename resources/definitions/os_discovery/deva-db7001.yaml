@@ -5,7 +5,7 @@ modules:
     location: DB7001-MIB::alias.0
     version: DB7001-MIB::fwrev.0
   sensors:
-    pre-cache:
+    additional_oids:
       data:
           -
             oid:

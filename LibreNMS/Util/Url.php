@@ -34,11 +34,35 @@ use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL as LaravelUrl;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\DeviceStatus;
 use Request;
 use Symfony\Component\HttpFoundation\ParameterBag;
 
 class Url
 {
+    /**
+     * Provisional device link generation
+     */
+    public static function modernDeviceLink(?Device $device, string $text = '', string $extra = ''): string
+    {
+        if ($device === null) {
+            return e($text);
+        }
+
+        $class = match ($device->getDeviceStatus()) {
+            DeviceStatus::UP, DeviceStatus::IGNORED_UP => 'device-link-up',
+            DeviceStatus::DOWN, DeviceStatus::NEVER_POLLED, DeviceStatus::IGNORED_DOWN => 'device-link-down',
+            DeviceStatus::DISABLED => 'device-link-disabled',
+        };
+
+        return sprintf('<a href="%s" class="%s" x-data="deviceLink()">%s</a>%s',
+            route('device', $device->device_id),
+            $class,
+            e($text ?: $device->displayName()),
+            $extra ? '<br />' . e($extra) : $extra
+        );
+    }
+
     /**
      * @param  Device|null  $device
      * @param  string|null  $text
@@ -110,8 +134,8 @@ class Url
         $contents .= '</div><br />';
 
         foreach ((array) $graphs as $entry) {
-            $graph = isset($entry['graph']) ? $entry['graph'] : 'unknown';
-            $graphhead = isset($entry['text']) ? $entry['text'] : 'unknown';
+            $graph = $entry['graph'] ?? 'unknown';
+            $graphhead = $entry['text'] ?? 'unknown';
             $contents .= '<div class="overlib-box">';
             $contents .= '<span class="overlib-title">' . $graphhead . '</span><br />';
             $contents .= Url::minigraphImage($device, $start, $end, $graph);
@@ -365,8 +389,8 @@ class Url
     public static function graphPopup($args, $content = null, $link = null)
     {
         // Take $args and print day,week,month,year graphs in overlib, hovered over graph
-        $original_from = isset($args['from']) ? $args['from'] : '';
-        $popup_title = isset($args['popup_title']) ? $args['popup_title'] : 'Graph';
+        $original_from = $args['from'] ?? '';
+        $popup_title = $args['popup_title'] ?? 'Graph';
         $now = CarbonImmutable::now();
 
         $graph = $content ?: self::graphTag($args);
@@ -475,15 +499,13 @@ class Url
      */
     private static function deviceLinkDisplayClass($device)
     {
-        if ($device->disabled) {
-            return 'list-device-disabled';
-        }
-
-        if ($device->ignore) {
-            return $device->status ? 'list-device-ignored-up' : 'list-device-ignored';
-        }
-
-        return $device->status ? 'list-device' : 'list-device-down';
+        return match ($device->getDeviceStatus()) {
+            DeviceStatus::DISABLED => 'list-device-disabled',
+            DeviceStatus::DOWN, DeviceStatus::NEVER_POLLED => 'list-device-down',
+            DeviceStatus::UP => 'list-device',
+            DeviceStatus::IGNORED_DOWN => 'list-device-ignored',
+            DeviceStatus::IGNORED_UP => 'list-device-ignored-up',
+        };
     }
 
     /**
@@ -543,7 +565,7 @@ class Url
                 $possibilities[] = "$distro.png";
 
                 // second, prefer the first two words of $feature (i.e. 'Red Hat' becomes 'redhat')
-                if (strpos($feature, ' ') !== false) {
+                if (str_contains($feature, ' ')) {
                     $distro = Str::replaceFirst(' ', '', strtolower(trim($feature)));
                     $distro = Str::before($distro, ' ');
                     $possibilities[] = "$distro.svg";
@@ -573,9 +595,7 @@ class Url
      */
     public static function parseLegacyPath($path)
     {
-        $parts = array_filter(explode('/', $path), function ($part) {
-            return Str::contains($part, '=');
-        });
+        $parts = array_filter(explode('/', $path), fn ($part) => Str::contains($part, '='));
 
         $vars = [];
         foreach ($parts as $part) {

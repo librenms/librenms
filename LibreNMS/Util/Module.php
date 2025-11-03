@@ -73,7 +73,7 @@ class Module
     {
         $modules = [];
 
-        foreach ($overrides as $index => $module) {
+        foreach ($overrides as $module) {
             // parse submodules (only supported by some modules)
             if (str_contains($module, '/')) {
                 [$module, $submodule] = explode('/', $module, 2);

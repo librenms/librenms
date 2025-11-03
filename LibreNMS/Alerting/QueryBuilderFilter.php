@@ -123,9 +123,7 @@ class QueryBuilderFilter implements \JsonSerializable
                     ];
                 } elseif ($type == 'enum') {// format enums as radios
                     $values = explode(',', substr($column_type, 4));
-                    $values = array_map(function ($val) {
-                        return trim($val, "()' ");
-                    }, $values);
+                    $values = array_map(fn ($val) => trim($val, "()' "), $values);
 
                     $this->filter[$field] = [
                         'id' => $field,

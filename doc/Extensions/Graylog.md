@@ -144,7 +144,7 @@ You can set a default Log Level Filter with
 ```bash
 lnms config:set graylog.loglevel 7
 ```
- (applies to  /graylog and /device/device=/tab=logs/section=graylog/ (min: 0, max: 7)
+ (applies to  /graylog and /device/<device_id>/logs/graylog/ (min: 0, max: 7)
 
 ## Domain and hostname handling
 

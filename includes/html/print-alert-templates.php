@@ -47,7 +47,7 @@ foreach ($full_query as $template) {
 $template_ids = array_column($templates, 'id');
 array_multisort($templates, SORT_ASC, $template_ids);
 foreach ($templates as $template) {
-    $old_template = strpos($template['template'], '{/if}') !== false ? '1' : '';
+    $old_template = str_contains($template['template'], '{/if}') ? '1' : '';
     echo '<tr data-row-id="' . $template['id'] . '">
             <td>' . $template['id'] . '</td>
             <td>' . htmlspecialchars($template['name']) . '</td>

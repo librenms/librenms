@@ -54,7 +54,7 @@ class VminfoController extends TableController
             ->select('vminfo.*')
             ->with('device')
             ->with('parentDevice')
-            ->when($request->get('searchPhrase') || in_array('hostname', array_keys($request->get('sort', []))), function ($query) {
+            ->when($request->get('searchPhrase') || in_array('hostname', array_keys($request->get('sort', []))), function ($query): void {
                 $query->leftJoin('devices', 'devices.device_id', 'vminfo.device_id');
             });
     }
@@ -79,6 +79,6 @@ class VminfoController extends TableController
 
     private static function getHostname(Device $device): string
     {
-        return '<a class="list-device" href="' . Url::deviceUrl($device) . '">' . $device->hostname . '</a><br>' . $device->sysName;
+        return '<a class="list-device" href="' . Url::deviceUrl($device) . '">' . $device->displayName() . '</a>';
     }
 }

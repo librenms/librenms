@@ -42,18 +42,10 @@ class DeviceAdd extends LnmsCommand
         ];
 
         $this->optionDefaults = [
-            'port' => function () {
-                return LibrenmsConfig::get('snmp.port', 161);
-            },
-            'transport' => function () {
-                return LibrenmsConfig::get('snmp.transports.0', 'udp');
-            },
-            'poller-group' => function () {
-                return LibrenmsConfig::get('default_poller_group');
-            },
-            'port-association-mode' => function () {
-                return LibrenmsConfig::get('default_port_association_mode');
-            },
+            'port' => fn () => LibrenmsConfig::get('snmp.port', 161),
+            'transport' => fn () => LibrenmsConfig::get('snmp.transports.0', 'udp'),
+            'poller-group' => fn () => LibrenmsConfig::get('default_poller_group'),
+            'port-association-mode' => fn () => LibrenmsConfig::get('default_port_association_mode'),
 
         ];
 

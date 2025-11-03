@@ -38,38 +38,22 @@ class FileCategorizer extends Categorizer
         parent::__construct($items);
 
         if (getenv('CIHELPER_DEBUG')) {
-            $this->setSkippable(function ($item) {
-                return in_array($item, [
-                    '.github/workflows/test.yml',
-                    'LibreNMS/Util/CiHelper.php',
-                    'LibreNMS/Util/FileCategorizer.php',
-                    'app/Console/Commands/DevCheckCommand.php',
-                    'tests/Unit/CiHelperTest.php',
-                ]);
-            });
+            $this->setSkippable(fn ($item) => in_array($item, [
+                '.github/workflows/test.yml',
+                'LibreNMS/Util/CiHelper.php',
+                'LibreNMS/Util/FileCategorizer.php',
+                'app/Console/Commands/DevCheckCommand.php',
+                'tests/Unit/CiHelperTest.php',
+            ]));
         }
 
-        $this->addCategory('php', function ($item) {
-            return Str::endsWith($item, '.php') ? $item : false;
-        });
-        $this->addCategory('docs', function ($item) {
-            return (Str::startsWith($item, 'doc/') || $item == 'mkdocs.yml') ? $item : false;
-        });
-        $this->addCategory('python', function ($item) {
-            return Str::endsWith($item, '.py') ? $item : false;
-        });
-        $this->addCategory('bash', function ($item) {
-            return Str::endsWith($item, '.sh') ? $item : false;
-        });
-        $this->addCategory('svg', function ($item) {
-            return Str::endsWith($item, '.svg') ? $item : false;
-        });
-        $this->addCategory('resources', function ($item) {
-            return (str_starts_with($item, 'resources/') && ! str_starts_with($item, 'resources/definitions/os_')) ? $item : false;
-        });
-        $this->addCategory('full-checks', function ($item) {
-            return in_array($item, ['composer.lock', '.github/workflows/test.yml']) ? $item : false;
-        });
+        $this->addCategory('php', fn ($item) => Str::endsWith($item, '.php') ? $item : false);
+        $this->addCategory('docs', fn ($item) => (Str::startsWith($item, 'doc/') || $item == 'mkdocs.yml') ? $item : false);
+        $this->addCategory('python', fn ($item) => Str::endsWith($item, '.py') ? $item : false);
+        $this->addCategory('bash', fn ($item) => Str::endsWith($item, '.sh') ? $item : false);
+        $this->addCategory('svg', fn ($item) => Str::endsWith($item, '.svg') ? $item : false);
+        $this->addCategory('resources', fn ($item) => (str_starts_with($item, 'resources/') && ! str_starts_with($item, 'resources/definitions/os_')) ? $item : false);
+        $this->addCategory('full-checks', fn ($item) => in_array($item, ['composer.lock', '.github/workflows/test.yml']) ? $item : false);
         $this->addCategory('os-files', function ($item) {
             if (($os_name = $this->osFromFile($item)) !== null) {
                 return ['os' => $os_name, 'file' => $item];

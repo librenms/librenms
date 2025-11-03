@@ -52,11 +52,7 @@ class Rewrite
             'propPointToPointSerial' => 'PtP Serial',
         ];
 
-        if (isset($rewrite_iftype[$type])) {
-            return $rewrite_iftype[$type];
-        }
-
-        return $type;
+        return $rewrite_iftype[$type] ?? $type;
     }
 
     public static function shortenIfType($type)

@@ -75,12 +75,12 @@ class VlansController implements DeviceTab
     {
         // port.device needed to prevent loading device multiple times
         $portVlan = PortVlan::where('ports_vlans.device_id', $device->device_id)
-            ->join('vlans', function ($join) {
+            ->join('vlans', function ($join): void {
                 $join
                 ->on('ports_vlans.vlan', 'vlans.vlan_vlan')
                 ->on('vlans.device_id', 'ports_vlans.device_id');
             })
-            ->join('ports', function ($join) {
+            ->join('ports', function ($join): void {
                 $join
                 ->on('ports_vlans.port_id', 'ports.port_id');
             })

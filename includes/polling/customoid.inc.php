@@ -38,10 +38,10 @@ foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
     }
 
     if ($customoid['customoid_divisor'] && $oid_value !== 0) {
-        $oid_value = ($oid_value / $customoid['customoid_divisor']);
+        $oid_value /= $customoid['customoid_divisor'];
     }
     if ($customoid['customoid_multiplier']) {
-        $oid_value = ($oid_value * $customoid['customoid_multiplier']);
+        $oid_value *= $customoid['customoid_multiplier'];
     }
 
     if (isset($customoid['user_func']) && in_array($customoid['user_func'], $user_funcs)) {

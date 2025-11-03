@@ -27,7 +27,7 @@ $temps = snmp_walk($device, '.1.3.6.1.4.1.674.10895.5000.2.6132.1.1.43.1.8.1.5',
 
 $counter = 0;
 
-foreach (explode("\n", $temps) as $i => $t) {
+foreach (explode("\n", $temps) as $t) {
     if (! Str::contains($t, ' ')) {
         continue;
     }
@@ -35,9 +35,9 @@ foreach (explode("\n", $temps) as $i => $t) {
     $oid = $t[0];
     $val = $t[1];
 
-    if (substr($oid, -1) == '1') {
+    if (str_ends_with($oid, '1')) {
         // This code will only pull CPU temp for each stack member, but there is no reason why the additional values couldn't be graphed
-        $counter = $counter + 1;
+        $counter += 1;
         discover_sensor(null, 'temperature', $device, $oid, $counter, 'dnos', 'Unit ' . $counter . ' CPU temperature', '1', '1', null, null, null, null, $val);
     }
 }

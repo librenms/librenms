@@ -741,3 +741,27 @@ function applySiteStyle(newStyle) {
         });
     }
 }
+
+// prevent dropdown menus from overflowing the viewport
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.dropdown-submenu:not(:has(.dropdown-submenu))').forEach(function (submenuParent) {
+        const submenu = submenuParent.querySelector('.dropdown-menu');
+        if (!submenu) return;
+
+        submenuParent.addEventListener('mouseenter', function () {
+            const rect = submenu.getBoundingClientRect();
+            const availableHeight = window.innerHeight - rect.top - 10;
+
+            if (rect.bottom > window.innerHeight) {
+                submenu.style.maxHeight = availableHeight + 'px';
+                submenu.style.overflowY = 'auto';
+            }
+        });
+
+        submenuParent.addEventListener('mouseleave', function () {
+            submenu.style.maxHeight = '';
+        });
+    });
+});
+
+

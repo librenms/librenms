@@ -48,6 +48,6 @@ class RRDRecursiveFilterIterator extends \RecursiveFilterIterator
 
         // Matches files with .rrd in the filename.
         // We are only searching rrd folder, but there could be other files and we don't want to cause a stink.
-        return strpos($filename, '.rrd') !== false;
+        return str_contains($filename, '.rrd');
     }
 }

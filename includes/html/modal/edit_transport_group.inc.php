@@ -140,14 +140,8 @@ if (Auth::user()->hasGlobalAdmin()) {
         width: "100%",
         placeholder: "Transport Name",
         ajax: {
-            url: 'ajax_list.php',
-            delay: 250,
-            data: function(params) {
-                return {
-                    type: "transports",
-                    search: params.term
-                }
-            }
+            url: '<?php echo route('ajax.select.alert-transport') ?>',
+            delay: 150
         }
     });
 

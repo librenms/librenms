@@ -30,7 +30,7 @@ $oids = SnmpQuery::cache()->walk([
     'PowerNet-MIB::emsProbeStatusEntry',
 ])->table(1);
 
-foreach ($oids as $id => $temp) {
+foreach ($oids as $temp) {
     if (isset($temp['PowerNet-MIB::emsProbeStatusProbeHumidity']) && $temp['PowerNet-MIB::emsProbeStatusProbeHumidity'] > 0) {
         $index = $temp['PowerNet-MIB::emsProbeStatusProbeIndex'];
         $oid = '.1.3.6.1.4.1.318.1.1.10.3.13.1.1.6.' . $index;

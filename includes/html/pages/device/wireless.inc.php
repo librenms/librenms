@@ -72,7 +72,7 @@ if ($vars['metric'] == 'overview') {
         [$vars['metric'], $device['device_id']]
     );
     foreach ($sensors as $sensor) {
-        if (! is_integer($row++ / 2)) {
+        if (! is_int($row++ / 2)) {
             $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
         } else {
             $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');

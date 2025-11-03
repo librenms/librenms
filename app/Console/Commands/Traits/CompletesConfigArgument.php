@@ -37,9 +37,7 @@ trait CompletesConfigArgument
     public function completeArgument($name, $value, $previous)
     {
         if ($name == 'setting') {
-            return (new DynamicConfig())->all()->keys()->filter(function ($setting) use ($value) {
-                return Str::startsWith($setting, $value);
-            })->toArray();
+            return (new DynamicConfig())->all()->keys()->filter(fn ($setting) => Str::startsWith($setting, $value))->toArray();
         } elseif ($name == 'value') {
             $config = (new DynamicConfig())->get($previous);
 
@@ -57,9 +55,7 @@ trait CompletesConfigArgument
     protected function suggestionsForSelect(DynamicConfigItem $config, ?string $value): array
     {
         $options = new \Illuminate\Support\Collection($config['options']);
-        $keyStartsWith = $options->filter(function ($description, $key) use ($value) {
-            return Str::startsWith($key, $value);
-        });
+        $keyStartsWith = $options->filter(fn ($description, $key) => Str::startsWith($key, $value));
 
         // try to see if it matches a value (aka key)
         if ($keyStartsWith->isNotEmpty()) {
@@ -67,9 +63,7 @@ trait CompletesConfigArgument
         }
 
         // last chance to try to find by the description
-        return $options->filter(function ($description, $key) use ($value) {
-            return Str::contains($description, $value);
-        })->keys()->all();
+        return $options->filter(fn ($description, $key) => Str::contains($description, $value))->keys()->all();
     }
 
     protected function suggestionsForSelectDynamic(DynamicConfigItem $config, ?string $value): array

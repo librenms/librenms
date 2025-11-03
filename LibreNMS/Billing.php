@@ -423,9 +423,9 @@ class Billing
         if ($imgtype == 'day') {
             foreach (dbFetchRows('SELECT DISTINCT UNIX_TIMESTAMP(timestamp) as timestamp, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out FROM bill_data WHERE `bill_id` = ? AND `timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?) GROUP BY DATE(timestamp) ORDER BY timestamp ASC', [$bill_id, $from, $to]) as $data) {
                 array_push($ticklabels, date('Y-m-d', $data['timestamp']));
-                array_push($in_data, isset($data['traf_in']) ? $data['traf_in'] : 0);
-                array_push($out_data, isset($data['traf_out']) ? $data['traf_out'] : 0);
-                array_push($tot_data, isset($data['traf_total']) ? $data['traf_total'] : 0);
+                array_push($in_data, $data['traf_in'] ?? 0);
+                array_push($out_data, $data['traf_out'] ?? 0);
+                array_push($tot_data, $data['traf_total'] ?? 0);
                 $average += $data['traf_total'];
             }
 
@@ -442,9 +442,9 @@ class Billing
         } elseif ($imgtype == 'hour') {
             foreach (dbFetchRows('SELECT DISTINCT HOUR(timestamp) as hour, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out FROM bill_data WHERE `bill_id` = ? AND `timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?) GROUP BY HOUR(timestamp) ORDER BY HOUR(timestamp) ASC', [$bill_id, $from, $to]) as $data) {
                 array_push($ticklabels, sprintf('%02d', $data['hour']) . ':00');
-                array_push($in_data, isset($data['traf_in']) ? $data['traf_in'] : 0);
-                array_push($out_data, isset($data['traf_out']) ? $data['traf_out'] : 0);
-                array_push($tot_data, isset($data['traf_total']) ? $data['traf_total'] : 0);
+                array_push($in_data, $data['traf_in'] ?? 0);
+                array_push($out_data, $data['traf_out'] ?? 0);
+                array_push($tot_data, $data['traf_total'] ?? 0);
                 $average += $data['traf_total'];
             }
 

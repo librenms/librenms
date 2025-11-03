@@ -1,3 +1,5 @@
+@section('title', $pagetitle)
+
 <div class="container-fluid">
     <x-panel body-class="{{ $alertClass }}">
         <img src="{{ url($device->logo()) }}" title="{{ $device->logo() }}"

@@ -79,7 +79,7 @@ if ($device['os_group'] == 'cisco') {
 
         // Let's create an array of each remote OTV endpoint and the count of MAC addresses that are reachable via.
         $count_mac = [];
-        foreach ($tblRouteNextHopAddr as $k => $v) {
+        foreach ($tblRouteNextHopAddr as $v) {
             $count_mac[$v]++;
         }
         // Let's log some debugging

@@ -1,7 +1,9 @@
 <?php
 
 return [
+    'all_devices' => 'All Devices',
     'attributes' => [
+        'hostname' => 'Hostname',
         'features' => 'OS Features',
         'hardware' => 'Hardware',
         'icon' => 'Icon',
@@ -14,6 +16,7 @@ return [
         'type' => 'Device type',
     ],
 
+    'never_polled' => 'Never polled',
     'vm_host' => 'VM Host',
     'scheduled_maintenance' => 'Scheduled Maintenance',
 
@@ -34,6 +37,7 @@ return [
 
         'description' => 'Description',
         'type' => 'Type',
+        'static_groups' => 'Static Groups',
 
         'override_sysLocation' => 'Override sysLocation',
         'coordinates_title' => 'To set coordinates, include [latitude,longitude]',

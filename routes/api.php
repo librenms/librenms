@@ -11,12 +11,12 @@
 |
 */
 
-Route::prefix('v0')->group(function () {
+Route::prefix('v0')->group(function (): void {
     Route::get('system', [App\Api\Controllers\LegacyApiController::class, 'server_info'])->name('server_info');
     Route::get('', [App\Api\Controllers\LegacyApiController::class, 'show_endpoints']);
 
     // global read only access required
-    Route::middleware(['can:global-read'])->group(function () {
+    Route::middleware(['can:global-read'])->group(function (): void {
         Route::get('bgp', [App\Api\Controllers\LegacyApiController::class, 'list_bgp'])->name('list_bgp');
         Route::get('bgp/{id}', [App\Api\Controllers\LegacyApiController::class, 'get_bgp'])->name('get_bgp');
         Route::get('ospf', [App\Api\Controllers\LegacyApiController::class, 'list_ospf'])->name('list_ospf');
@@ -39,7 +39,7 @@ Route::prefix('v0')->group(function () {
         Route::get('services', [App\Api\Controllers\LegacyApiController::class, 'list_services'])->name('list_services');
         Route::get('services/{hostname}', [App\Api\Controllers\LegacyApiController::class, 'list_services'])->name('list_services_device');
 
-        Route::prefix('resources')->group(function () {
+        Route::prefix('resources')->group(function (): void {
             Route::get('links/{id}', [App\Api\Controllers\LegacyApiController::class, 'get_link'])->name('get_link');
             Route::get('locations', [App\Api\Controllers\LegacyApiController::class, 'list_locations'])->name('list_locations');
             Route::get('ip/addresses/{address_family?}', [App\Api\Controllers\LegacyApiController::class, 'list_ip_addresses'])->name('list_ip_addresses');
@@ -48,7 +48,7 @@ Route::prefix('v0')->group(function () {
             Route::get('ip/networks/{id}/ip', [App\Api\Controllers\LegacyApiController::class, 'get_network_ip_addresses'])->name('get_network_ip_addresses');
         });
 
-        Route::prefix('logs')->group(function () {
+        Route::prefix('logs')->group(function (): void {
             Route::get('eventlog/{hostname?}', [App\Api\Controllers\LegacyApiController::class, 'list_logs'])->name('list_eventlog');
             Route::get('syslog/{hostname?}', [App\Api\Controllers\LegacyApiController::class, 'list_logs'])->name('list_syslog');
             Route::get('alertlog/{hostname?}', [App\Api\Controllers\LegacyApiController::class, 'list_logs'])->name('list_alertlog');
@@ -57,8 +57,8 @@ Route::prefix('v0')->group(function () {
     });
 
     // admin required
-    Route::middleware(['can:admin'])->group(function () {
-        Route::prefix('devices')->group(function () {
+    Route::middleware(['can:admin'])->group(function (): void {
+        Route::prefix('devices')->group(function (): void {
             Route::post('', [App\Api\Controllers\LegacyApiController::class, 'add_device'])->name('add_device');
             Route::delete('{hostname}', [App\Api\Controllers\LegacyApiController::class, 'del_device'])->name('del_device');
             Route::patch('{hostname}', [App\Api\Controllers\LegacyApiController::class, 'update_device'])->name('update_device_field');
@@ -69,7 +69,7 @@ Route::prefix('v0')->group(function () {
             Route::post('{hostname}/maintenance', [App\Api\Controllers\LegacyApiController::class, 'maintenance_device'])->name('maintenance_device');
         });
 
-        Route::prefix('devicegroups')->group(function () {
+        Route::prefix('devicegroups')->group(function (): void {
             Route::patch('{name}', [App\Api\Controllers\LegacyApiController::class, 'update_device_group'])->name('update_device_group');
             Route::delete('{name}', [App\Api\Controllers\LegacyApiController::class, 'delete_device_group'])->name('delete_device_group');
             Route::post('{name}/devices', [App\Api\Controllers\LegacyApiController::class, 'update_device_group_add_devices'])->name('update_device_group_add_devices');
@@ -98,6 +98,7 @@ Route::prefix('v0')->group(function () {
         Route::get('location/{location_id_or_name}', [App\Api\Controllers\LegacyApiController::class, 'get_location'])->name('get_location');
         Route::patch('locations/{location_id_or_name}', [App\Api\Controllers\LegacyApiController::class, 'edit_location'])->name('edit_location');
         Route::delete('locations/{location}', [App\Api\Controllers\LegacyApiController::class, 'del_location'])->name('del_location');
+        Route::post('locations/{location}/maintenance', [App\Api\Controllers\LegacyApiController::class, 'maintenance_location'])->name('maintenance_location');
         Route::delete('services/{id}', [App\Api\Controllers\LegacyApiController::class, 'del_service_from_host'])->name('del_service_from_host');
         Route::patch('services/{id}', [App\Api\Controllers\LegacyApiController::class, 'edit_service_for_host'])->name('edit_service_for_host');
         Route::post('bgp/{id}', [App\Api\Controllers\LegacyApiController::class, 'edit_bgp_descr'])->name('edit_bgp_descr');
@@ -107,7 +108,7 @@ Route::prefix('v0')->group(function () {
     });
 
     // restricted by access
-    Route::prefix('devices')->group(function () {
+    Route::prefix('devices')->group(function (): void {
         Route::get('{hostname}', [App\Api\Controllers\LegacyApiController::class, 'get_device'])->name('get_device');
         Route::get('{hostname}/discover', [App\Api\Controllers\LegacyApiController::class, 'trigger_device_discovery'])->name('trigger_device_discovery');
         Route::get('{hostname}/availability', [App\Api\Controllers\LegacyApiController::class, 'device_availability'])->name('device_availability');
@@ -121,7 +122,7 @@ Route::prefix('v0')->group(function () {
         Route::get('{hostname}/nac', [App\Api\Controllers\LegacyApiController::class, 'get_nac'])->name('get_nac');
         Route::get('{hostname}/health/{type?}/{sensor_id?}', [App\Api\Controllers\LegacyApiController::class, 'list_available_health_graphs'])->name('list_available_health_graphs');
         Route::get('{hostname}/wireless/{type?}/{sensor_id?}', [App\Api\Controllers\LegacyApiController::class, 'list_available_wireless_graphs'])->name('list_available_wireless_graphs');
-        Route::get('{hostname}/ports', [App\Api\Controllers\LegacyApiController::class, 'get_port_graphs'])->name('get_port_graphs');
+        Route::get('{hostname}/ports', [App\Api\Controllers\LegacyApiController::class, 'get_device_ports'])->name('get_device_ports');
         Route::get('{hostname}/ip', [App\Api\Controllers\LegacyApiController::class, 'get_device_ip_addresses'])->name('get_ip_addresses');
         Route::get('{hostname}/port_stack', [App\Api\Controllers\LegacyApiController::class, 'get_port_stack'])->name('get_port_stack');
         Route::get('{hostname}/transceivers', [App\Api\Controllers\LegacyApiController::class, 'get_transceivers'])->name('get_transceivers');
@@ -132,12 +133,12 @@ Route::prefix('v0')->group(function () {
         Route::get('{hostname}/ports/{ifname}', [App\Api\Controllers\LegacyApiController::class, 'get_port_stats_by_port_hostname'])->name('get_port_stats_by_port_hostname')->where('ifname', '.*');
         Route::get('{hostname}/ports/{ifname}/{type}', [App\Api\Controllers\LegacyApiController::class, 'get_graph_by_port_hostname'])->name('get_graph_by_port_hostname');
         Route::get('{hostname}/services/{id}/graphs/{datasource}', [App\Api\Controllers\LegacyApiController::class, 'get_graph_by_service'])->name('get_graph_by_service');
-
+        Route::post('{hostname}/eventlog', [App\Api\Controllers\LegacyApiController::class, 'add_eventlog'])->name('add_eventlog');
         Route::get('{hostname}/{type}', [App\Api\Controllers\LegacyApiController::class, 'get_graph_generic_by_hostname'])->name('get_graph_generic_by_hostname');
         Route::get('', [App\Api\Controllers\LegacyApiController::class, 'list_devices'])->name('list_devices');
     });
 
-    Route::prefix('ports')->group(function () {
+    Route::prefix('ports')->group(function (): void {
         Route::get('{portid}', [App\Api\Controllers\LegacyApiController::class, 'get_port_info'])->name('get_port_info');
         Route::get('{portid}/fdb', [App\Api\Controllers\LegacyApiController::class, 'get_port_fdb'])->name('get_port_fdb');
         Route::get('{portid}/ip', [App\Api\Controllers\LegacyApiController::class, 'get_port_ip_addresses'])->name('get_port_ip_info');
@@ -150,7 +151,7 @@ Route::prefix('v0')->group(function () {
         Route::patch('{portid}/description', [App\Api\Controllers\LegacyApiController::class, 'update_port_description'])->name('update_port_description');
     });
 
-    Route::prefix('bills')->group(function () {
+    Route::prefix('bills')->group(function (): void {
         Route::get('', [App\Api\Controllers\LegacyApiController::class, 'list_bills'])->name('list_bills');
         Route::get('{bill_id}', [App\Api\Controllers\LegacyApiController::class, 'list_bills'])->name('get_bill');
         Route::get('{bill_id}/graphs/{graph_type}', [App\Api\Controllers\LegacyApiController::class, 'get_bill_graph'])->name('get_bill_graph');
@@ -160,14 +161,14 @@ Route::prefix('v0')->group(function () {
         Route::get('{bill_id}/history/{bill_hist_id}/graphdata/{graph_type}', [App\Api\Controllers\LegacyApiController::class, 'get_bill_history_graphdata'])->name('get_bill_history_graphdata');
     });
 
-    Route::prefix('routing')->group(function () {
+    Route::prefix('routing')->group(function (): void {
         Route::get('bgp/cbgp', [App\Api\Controllers\LegacyApiController::class, 'list_cbgp'])->name('list_cbgp');
         Route::get('vrf', [App\Api\Controllers\LegacyApiController::class, 'list_vrf'])->name('list_vrf');
         Route::get('mpls/services', [App\Api\Controllers\LegacyApiController::class, 'list_mpls_services'])->name('list_mpls_services');
         Route::get('mpls/saps', [App\Api\Controllers\LegacyApiController::class, 'list_mpls_saps'])->name('list_mpls_saps');
     });
 
-    Route::prefix('resources')->group(function () {
+    Route::prefix('resources')->group(function (): void {
         Route::get('fdb', [App\Api\Controllers\LegacyApiController::class, 'list_fdb'])->name('list_fdb');
         Route::get('fdb/{mac}', [App\Api\Controllers\LegacyApiController::class, 'list_fdb'])->name('list_fdb_mac');
         Route::get('fdb/{mac}/detail', [App\Api\Controllers\LegacyApiController::class, 'list_fdb_detail'])->name('list_fdb_detail');
@@ -181,6 +182,11 @@ Route::prefix('v0')->group(function () {
     Route::get('inventory/{hostname}', [App\Api\Controllers\LegacyApiController::class, 'get_inventory'])->name('get_inventory');
     Route::get('inventory/{hostname}/all', [App\Api\Controllers\LegacyApiController::class, 'get_inventory_for_device'])->name('get_inventory_for_device');
 
+    Route::prefix('port_security')->group(function (): void {
+        Route::get('port/{portid}', [App\Api\Controllers\LegacyApiController::class, 'get_port_security'])->name('get_port_security_by_port');
+        Route::get('device/{hostname}', [App\Api\Controllers\LegacyApiController::class, 'get_port_security'])->name('get_port_security_by_hostname');
+        Route::get('', [App\Api\Controllers\LegacyApiController::class, 'get_port_security'])->name('get_port_security');
+    });
     // Route not found
     Route::any('/{path?}', [App\Api\Controllers\LegacyApiController::class, 'api_not_found'])->where('path', '.*');
 });

@@ -13,12 +13,12 @@
  * @author     LibreNMS Contributors
 */
 
-use Carbon\Carbon;
 use App\Facades\LibrenmsConfig;
+use Carbon\Carbon;
 
 $no_refresh = true;
 $param = [];
-$device_id = (int) $vars['device'];
+$device_id = isset($vars['device']) ? (int) $vars['device'] : null;
 
 if (isset($vars['action']) && $vars['action'] == 'expunge' && \Auth::user()->hasGlobalAdmin()) {
     \App\Models\Syslog::truncate();
@@ -147,7 +147,7 @@ $pagetitle[] = 'Syslog';
         allowClear: true,
         placeholder: "All Devices",
         ajax: {
-            url: '<?php echo url('/ajax/select/device'); ?>',
+            url: '<?php echo route('ajax.select.device') ?>',
             delay: 200
         }
     })<?php echo $device_id ? ".val($device_id).trigger('change');" : ''; ?>;
@@ -160,7 +160,7 @@ $pagetitle[] = 'Syslog';
         allowClear: true,
         placeholder: "All Programs",
         ajax: {
-            url: '<?php echo url('/ajax/select/syslog'); ?>',
+            url: '<?php echo route('ajax.select.syslog'); ?>',
             delay: 200,
             data: function(params) {
                 return {
@@ -180,7 +180,7 @@ $pagetitle[] = 'Syslog';
         allowClear: true,
         placeholder: "All Priorities",
         ajax: {
-            url: '<?php echo url('/ajax/select/syslog'); ?>',
+            url: '<?php echo route('ajax.select.syslog'); ?>',
             delay: 200,
             data: function(params) {
                 return {

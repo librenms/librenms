@@ -98,7 +98,7 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
     // If it's a new rule created, or a clear/RECOVERED
     if ($alert_state == '0') {
         // Get the latest active that is not a clear/RECOVERED
-        // @phpstan-ignore-next-line
+        // @phpstan-ignore function.deprecated
         $last_active_state = dbFetchRows('SELECT id, details FROM alert_log WHERE device_id = ? AND id < ? AND rule_id = ? AND `state` != 0 ORDER BY id DESC LIMIT 1', [$alertlog['device_id'], $alertlog['alert_log_id'], $alertlog['rule_id']]);
         // It's a real alarm, we can then used it for the details
         if ($last_active_state) {

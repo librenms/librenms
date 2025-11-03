@@ -46,29 +46,26 @@ final class SlackTest extends TestCase
         $mock_device = Device::factory()->make();
         $slack->deliverAlert(AlertData::testData($mock_device));
 
-        Http::assertSent(function (Request $request) {
-            return
-                $request->url() == '' &&
-                $request->method() == 'POST' &&
-                $request->hasHeader('Content-Type', 'application/json') &&
-                $request->data() == [
-                    'attachments' => [
-                        [
-                            'fallback' => 'This is a test alert',
-                            'color' => '#ff0000',
-                            'title' => 'Testing transport from LibreNMS',
-                            'text' => 'This is a test alert',
-                            'mrkdwn_in' => [
-                                'text',
-                                'fallback',
-                            ],
-                            'author_name' => null,
-                        ],
+        Http::assertSent(fn (Request $request) => $request->url() == '' &&
+        $request->method() == 'POST' &&
+        $request->hasHeader('Content-Type', 'application/json') &&
+        $request->data() == [
+            'attachments' => [
+                [
+                    'fallback' => 'This is a test alert',
+                    'color' => '#ff0000',
+                    'title' => 'Testing transport from LibreNMS',
+                    'text' => 'This is a test alert',
+                    'mrkdwn_in' => [
+                        'text',
+                        'fallback',
                     ],
-                    'channel' => null,
-                    'icon_emoji' => null,
-                ];
-        });
+                    'author_name' => null,
+                ],
+            ],
+            'channel' => null,
+            'icon_emoji' => null,
+        ]);
     }
 
     public function testSlackLegacyDelivery(): void
@@ -86,29 +83,26 @@ final class SlackTest extends TestCase
         $mock_device = Device::factory()->make();
         $slack->deliverAlert(AlertData::testData($mock_device));
 
-        Http::assertSent(function (Request $request) {
-            return
-                $request->url() == 'https://slack.com/some/webhook' &&
-                $request->method() == 'POST' &&
-                $request->hasHeader('Content-Type', 'application/json') &&
-                $request->data() == [
-                    'attachments' => [
-                        [
-                            'fallback' => 'This is a test alert',
-                            'color' => '#ff0000',
-                            'title' => 'Testing transport from LibreNMS',
-                            'text' => 'This is a test alert',
-                            'mrkdwn_in' => [
-                                'text',
-                                'fallback',
-                            ],
-                            'author_name' => 'Me',
-                        ],
+        Http::assertSent(fn (Request $request) => $request->url() == 'https://slack.com/some/webhook' &&
+        $request->method() == 'POST' &&
+        $request->hasHeader('Content-Type', 'application/json') &&
+        $request->data() == [
+            'attachments' => [
+                [
+                    'fallback' => 'This is a test alert',
+                    'color' => '#ff0000',
+                    'title' => 'Testing transport from LibreNMS',
+                    'text' => 'This is a test alert',
+                    'mrkdwn_in' => [
+                        'text',
+                        'fallback',
                     ],
-                    'channel' => 'Alerts',
-                    'icon_emoji' => ':smile:',
-                ];
-        });
+                    'author_name' => 'Me',
+                ],
+            ],
+            'channel' => 'Alerts',
+            'icon_emoji' => ':smile:',
+        ]);
     }
 
     public function testSlackDelivery(): void
@@ -129,28 +123,25 @@ final class SlackTest extends TestCase
         $mock_device = Device::factory()->make();
         $slack->deliverAlert(AlertData::testData($mock_device));
 
-        Http::assertSent(function (Request $request) {
-            return
-                $request->url() == 'https://slack.com/some/webhook' &&
-                $request->method() == 'POST' &&
-                $request->hasHeader('Content-Type', 'application/json') &&
-                $request->data() == [
-                    'attachments' => [
-                        [
-                            'fallback' => 'This is a test alert',
-                            'color' => '#ff0000',
-                            'title' => 'Testing transport from LibreNMS',
-                            'text' => 'This is a test alert',
-                            'mrkdwn_in' => [
-                                'text',
-                                'fallback',
-                            ],
-                            'author_name' => 'Other',
-                        ],
+        Http::assertSent(fn (Request $request) => $request->url() == 'https://slack.com/some/webhook' &&
+        $request->method() == 'POST' &&
+        $request->hasHeader('Content-Type', 'application/json') &&
+        $request->data() == [
+            'attachments' => [
+                [
+                    'fallback' => 'This is a test alert',
+                    'color' => '#ff0000',
+                    'title' => 'Testing transport from LibreNMS',
+                    'text' => 'This is a test alert',
+                    'mrkdwn_in' => [
+                        'text',
+                        'fallback',
                     ],
-                    'channel' => 'Critical',
-                    'icon_emoji' => ':slight_smile:',
-                ];
-        });
+                    'author_name' => 'Other',
+                ],
+            ],
+            'channel' => 'Critical',
+            'icon_emoji' => ':slight_smile:',
+        ]);
     }
 }

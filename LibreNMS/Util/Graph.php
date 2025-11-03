@@ -271,7 +271,7 @@ class Graph
     public static function error(string $text, ?string $short_text, int $width = 300, ?int $height = null, array $color = [128, 0, 0]): string
     {
         $type = LibrenmsConfig::get('webui.graph_type');
-        $height = $height ?? $width / 3;
+        $height ??= $width / 3;
 
         if ($short_text !== null && $width < 200) {
             $text = $short_text;

@@ -39,7 +39,6 @@ class RoutingController implements DeviceTab
     public function __construct()
     {
         $device = DeviceCache::getPrimary();
-        //dd($device);
         $this->tabs = [
             'ospf' => $device->ospfInstances()->count(),
             'ospfv3' => $device->ospfv3Instances()->count(),

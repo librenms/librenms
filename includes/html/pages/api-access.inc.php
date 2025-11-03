@@ -65,7 +65,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             <div class="form-group">
               <label for="description" class="col-sm-2 control-label">Descr: </label>
               <div class="col-sm-10">
-                <input type="text" class="form-control" id="description" name="description" value="<?php echo htmlspecialchars($_POST['description']); ?>">
+                <input type="text" class="form-control" id="description" name="description" value="<?php echo htmlspecialchars($_POST['description'] ?? ''); ?>">
               </div>
             </div>
         </div>

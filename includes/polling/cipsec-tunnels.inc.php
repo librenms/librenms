@@ -34,7 +34,7 @@ if ($device['os_group'] == 'cisco') {
 
         echo "Tunnel $index (" . $tunnel_full['cipSecTunIkeTunnelIndex'] . ")\n";
 
-        $address = isset($tunnel_full['cikeTunRemoteValue']) ? $tunnel_full['cikeTunRemoteValue'] : (string) IP::fromHexString($tunnel_full['cipSecTunRemoteAddr'], true);
+        $address = $tunnel_full['cikeTunRemoteValue'] ?? (string) IP::fromHexString($tunnel_full['cipSecTunRemoteAddr'], true);
 
         echo 'Address ' . $address . "\n";
 
@@ -78,7 +78,7 @@ if ($device['os_group'] == 'cisco') {
             $valid_tunnels[] = $tunnel_id;
         } else {
             foreach ($db_oids as $db_oid => $db_value) {
-                $db_update[$db_value] = isset($tunnel_full[$db_oid]) ? $tunnel_full[$db_oid] : '';
+                $db_update[$db_value] = $tunnel_full[$db_oid] ?? '';
             }
 
             if (! empty($tunnels[$address]['tunnel_id'])) {
@@ -179,7 +179,7 @@ if ($device['os_group'] == 'firebrick') {
         'fbIPsecConnectionName' => 'tunnel_name',
     ];
 
-    foreach ($ipsec_array as $index => $tunnel) {
+    foreach ($ipsec_array as $tunnel) {
         if (
             (! isset($tunnels[$tunnel['fbIPsecConnectionName']]) || ! is_array($tunnels[$tunnel['fbIPsecConnectionName']]))
             && ! empty($tunnel['fbIPsecConnectionName'])

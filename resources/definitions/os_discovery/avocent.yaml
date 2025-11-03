@@ -1,7 +1,7 @@
 mib: PM-MIB:ACS-MIB
 modules:
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

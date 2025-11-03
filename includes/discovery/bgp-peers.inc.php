@@ -105,13 +105,13 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
                     $j_bgp = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PeerTable', [], 'BGP4-V2-MIB-JUNIPER', 'junos', '-OQUbs');
                     d_echo($j_bgp);
                     $j_peerIndexes = [];
-                    foreach ($j_bgp as $index => $entry) {
+                    foreach ($j_bgp as $entry) {
                         $peer_index = $entry['jnxBgpM2PeerIndex'];
                         try {
                             $ip = IP::fromHexString($entry['jnxBgpM2PeerRemoteAddr']);
                             d_echo('peerindex for ' . $ip->getFamily() . " $ip is $peer_index\n");
                             $j_peerIndexes[(string) $ip] = $peer_index;
-                        } catch (InvalidIpException $e) {
+                        } catch (InvalidIpException) {
                             d_echo("Unable to parse IP for peer $peer_index: " . $entry['jnxBgpM2PeerRemoteAddr'] . PHP_EOL);
                         }
                     }

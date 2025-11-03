@@ -1,7 +1,7 @@
 mib: DELL-NETWORKING-CHASSIS-MIB:DELL-NETWORKING-IF-EXTENSION-MIB:DELL-NETWORKING-VIRTUAL-LINK-TRUNK-MIB
 modules:
     mempools:
-        pre-cache:
+        additional_oids:
             snmp_flags: '-OQUs'
             oids:
                 - DELL-NETWORKING-CHASSIS-MIB::dellNetProcessorTable
@@ -52,7 +52,6 @@ modules:
                 skip_values: 0
             data:
                 -
-                    snmp_flags: ['-ObsQ']
                     oid: dellNetIfTransceiverDataTable
                     value: dellNetIfTransVoltage
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.17.{{ $index }}'
@@ -63,7 +62,6 @@ modules:
                 skip_values: 0
             data:
                 -
-                    snmp_flags: ['-ObsQ']
                     oid: dellNetIfTransceiverDataTable
                     value: dellNetIfTransTransmitBiasCurrentLane1
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.18.{{ $index }}'
@@ -71,7 +69,6 @@ modules:
                     index: 'dellNetIfTransTransmitBiasCurrentLane1.{{ $index }}'
                     group: Lane 1
                 -
-                    snmp_flags: ['-ObsQ']
                     oid: dellNetIfTransceiverDataTable
                     value: dellNetIfTransTransmitBiasCurrentLane2
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.19.{{ $index }}'
@@ -79,7 +76,6 @@ modules:
                     index: 'dellNetIfTransTransmitBiasCurrentLane2.{{ $index }}'
                     group: Lane 2
                 -
-                    snmp_flags: ['-ObsQ']
                     oid: dellNetIfTransceiverDataTable
                     value: dellNetIfTransTransmitBiasCurrentLane3
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.20.{{ $index }}'
@@ -87,7 +83,6 @@ modules:
                     index: 'dellNetIfTransTransmitBiasCurrentLane3.{{ $index }}'
                     group: Lane 3
                 -
-                    snmp_flags: ['-ObsQ']
                     oid: dellNetIfTransceiverDataTable
                     value: dellNetIfTransTransmitBiasCurrentLane4
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.21.{{ $index }}'
@@ -99,7 +94,6 @@ modules:
                 skip_values: 0
             data:
                 -
-                    snmp_flags: ['-ObsQ']
                     oid: dellNetIfTransceiverDataTable
                     value: dellNetIfTransTransmitPowerLane1
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.8.{{ $index }}'
@@ -107,7 +101,6 @@ modules:
                     index: 'dellNetIfTransTransmitPowerLane1.{{ $index }}'
                     group: Lane 1
                 -
-                    snmp_flags: ['-ObsQ']
                     oid: dellNetIfTransceiverDataTable
                     value: dellNetIfTransReceivePowerLane1
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.12.{{ $index }}'
@@ -115,7 +108,6 @@ modules:
                     index: 'dellNetIfTransReceivePowerLane1.{{ $index }}'
                     group: Lane 1
                 -
-                    snmp_flags: ['-ObsQ']
                     oid: dellNetIfTransceiverDataTable
                     value: dellNetIfTransTransmitPowerLane2
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.9.{{ $index }}'
@@ -123,7 +115,6 @@ modules:
                     index: 'dellNetIfTransTransmitPowerLane2.{{ $index }}'
                     group: Lane 2
                 -
-                    snmp_flags: ['-ObsQ']
                     oid: dellNetIfTransceiverDataTable
                     value: dellNetIfTransReceivePowerLane2
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.13.{{ $index }}'
@@ -131,7 +122,6 @@ modules:
                     index: 'dellNetIfTransReceivePowerLane2.{{ $index }}'
                     group: Lane 2
                 -
-                    snmp_flags: ['-ObsQ']
                     oid: dellNetIfTransceiverDataTable
                     value: dellNetIfTransTransmitPowerLane3
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.10.{{ $index }}'
@@ -139,7 +129,6 @@ modules:
                     index: 'dellNetIfTransTransmitPowerLane3.{{ $index }}'
                     group: Lane 3
                 -
-                    snmp_flags: ['-ObsQ']
                     oid: dellNetIfTransceiverDataTable
                     value: dellNetIfTransReceivePowerLane3
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.14.{{ $index }}'
@@ -147,7 +136,6 @@ modules:
                     index: 'dellNetIfTransReceivePowerLane3.{{ $index }}'
                     group: Lane 3
                 -
-                    snmp_flags: ['-ObsQ']
                     oid: dellNetIfTransceiverDataTable
                     value: dellNetIfTransTransmitPowerLane4
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.11.{{ $index }}'
@@ -155,7 +143,6 @@ modules:
                     index: 'dellNetIfTransTransmitPowerLane4.{{ $index }}'
                     group: Lane 4
                 -
-                    snmp_flags: ['-ObsQ']
                     oid: dellNetIfTransceiverDataTable
                     value: dellNetIfTransReceivePowerLane4
                     num_oid: '.1.3.6.1.4.1.6027.3.11.1.3.1.1.15.{{ $index }}'
@@ -181,7 +168,6 @@ modules:
         state:
             data:
                 -
-                    snmp_flags: ['-ObsQ']
                     oid: dellNetFanTrayTable
                     value: dellNetFanTrayOperStatus
                     num_oid: '.1.3.6.1.4.1.6027.3.26.1.4.7.1.4.{{ $index }}'
@@ -193,7 +179,6 @@ modules:
                         - { value: 2, descr: down, graph: 1, generic: 2 }
                         - { value: 3, descr: absent, graph: 1, generic: 2 }
                 -
-                    snmp_flags: ['-ObsQ']
                     oid: dellNetPowerSupplyTable
                     value: dellNetPowerSupplyOperStatus
                     num_oid: '.1.3.6.1.4.1.6027.3.26.1.4.6.1.4.{{ $index }}'
@@ -215,7 +200,7 @@ modules:
                       oid: dellNetVLTDetailPeerStatus
                       op: '='
                       value: 0
-                    state_name: dellNetVLTDetailLocalStatus   
+                    state_name: dellNetVLTDetailLocalStatus
                     states:
                         - { value: 0, descr: down, graph: 1, generic: 2 }
                         - { value: 1, descr: up,   graph: 1, generic: 0 }
@@ -225,7 +210,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6027.3.17.1.1.1.20.{{ $index }}'
                     descr: 'ICL Bandwidth'
                     group: 'VIRTUAL-LINK-TRUNK'
-                    state_name: dellNetVLTIclBwStatus   
+                    state_name: dellNetVLTIclBwStatus
                     states:
                         - { value: 0, descr: '<80%', graph: 1, generic: 0 }
                         - { value: 1, descr: '>80%', graph: 1, generic: 1 }
@@ -235,7 +220,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6027.3.17.1.1.1.7.{{ $index }}'
                     descr: 'Link Status'
                     group: 'VIRTUAL-LINK-TRUNK'
-                    state_name: dellNetVLTIclStatus   
+                    state_name: dellNetVLTIclStatus
                     states:
                         - { value: 0, descr: 'not established', graph: 1, generic: 3 }
                         - { value: 1, descr: 'up', graph: 1, generic: 0 }
@@ -247,7 +232,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6027.3.17.1.1.1.5.{{ $index }}'
                     descr: 'Role'
                     group: 'VIRTUAL-LINK-TRUNK'
-                    state_name: dellNetVLTRole   
+                    state_name: dellNetVLTRole
                     states:
                         - { value: 0, descr: 'Standalone', graph: 1, generic: 3 }
                         - { value: 1, descr: 'Primary', graph: 1, generic: 0 }

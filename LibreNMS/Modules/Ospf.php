@@ -122,13 +122,11 @@ class Ospf implements Module
             $ospf_areas = SnmpQuery::context($context_name)
                 ->hideMib()->enumStrings()
                 ->walk('OSPF-MIB::ospfAreaTable')
-                ->mapTable(function ($ospf_area, $ospf_area_id) use ($context_name, $os) {
-                    return OspfArea::updateOrCreate([
-                        'device_id' => $os->getDeviceId(),
-                        'ospfAreaId' => $ospf_area_id,
-                        'context_name' => $context_name,
-                    ], $ospf_area);
-                });
+                ->mapTable(fn ($ospf_area, $ospf_area_id) => OspfArea::updateOrCreate([
+                    'device_id' => $os->getDeviceId(),
+                    'ospfAreaId' => $ospf_area_id,
+                    'context_name' => $context_name,
+                ], $ospf_area));
 
             // cleanup
             $os->getDevice()->ospfAreas()
