@@ -26,7 +26,6 @@ modules:
                     value: tmnxPhysChassisFanOperStatus
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.1.24.1.1.2.{{ $index }}'
                     descr: 'Fan {{ $subindex2 }}'
-                    index: 'tmnxPhysChassisFanOperStatus.{{ $index }}'
                     state_name: tmnxPhysChassisFanOperStatus
                     group: 'Fan State'
                     states:
@@ -37,10 +36,11 @@ modules:
                         - { value: 5, generic: 1, graph: 0, descr: OOS }
                         - { value: 6, generic: 1, graph: 0, descr: NotProvisioned }
                         - { value: 7, generic: 3, graph: 0, descr: NotApplicable }
+                    snmp_flags: ['-OtbeQUs']
                 -
                     oid: tBgpPeerNgTable
                     value: tBgpPeerNgConnState
-                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.14.4.7.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.14.4.7.1.59.{{ $index }}'
                     group: 'BGP Peer State'
                     descr: '{{ $tBgpPeerNgDescription }}'
                     states:
@@ -56,10 +56,11 @@ modules:
                       oid: tBgpPeerNgDescription
                       op: '=='
                       value: ""
+                    snmp_flags: ['-OtbeQUs']
                 -
                     oid: tBgpPeerNgTable
                     value: tBgpPeerNgConnState
-                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.14.4.7.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.14.4.7.1.59.{{ $index }}'
                     group: 'BGP Peer State'
                     descr: '{{ $subindex3 }}.{{ $subindex4 }}.{{ $subindex5 }}.{{ $subindex6 }} - {{ $tBgpPeerNgPeerGroup }}'
                     states:
@@ -75,6 +76,7 @@ modules:
                       oid: tBgpPeerNgDescription
                       op: '!='
                       value: ""
+                    snmp_flags: ['-OtbeQUs']
         temperature:
             data:
                 -
@@ -109,3 +111,4 @@ modules:
                     descr: 'Fan {{ $subindex2 }}'
                     group: 'System Fans'
                     index: '{{ $index }}'
+                    snmp_flags: ['-OtbeQUs']
