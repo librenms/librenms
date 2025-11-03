@@ -3,50 +3,23 @@
 namespace App\View\Components;
 
 use Illuminate\View\Component;
+use Illuminate\View\View;
 
 class Submenu extends Component
 {
-    /**
-     * Create a new component instance.
-     *
-     * @param  string  $title
-     * @param  string  $menu
-     * @param  string  $device_id
-     * @param  string  $current_tab
-     * @param  string  $selected
-     * @return void
-     */
     public function __construct(
-        /**
-         * The submenu title.
-         */
-        public $title,
-        /**
-         * The submenu menu.
-         */
-        public $menu,
-        /**
-         * The submenu device_id.
-         */
-        public $device_id,
-        /**
-         * The submenu current_tab.
-         */
-        public $current_tab,
-        /**
-         * The submenu selected.
-         */
-        public $selected
+        public string $title,
+        public array $menu,
+        public int $deviceId,
+        public string $currentTab,
+        public string $selected
     ) {
     }
 
     /**
      * Determine if the given option is the current selected option.
-     *
-     * @param  string  $url
-     * @return bool
      */
-    public function isSelected($url)
+    public function isSelected(string $url): bool
     {
         // check for get parameters
         $parsed_url = parse_url($url);
@@ -67,10 +40,8 @@ class Submenu extends Component
 
     /**
      * Get the view / contents that represent the component.
-     *
-     * @return \Illuminate\View\View|string
      */
-    public function render()
+    public function render(): View
     {
         return view('components.submenu');
     }

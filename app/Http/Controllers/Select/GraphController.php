@@ -87,6 +87,16 @@ class GraphController extends Controller
             ];
         }
 
+        $customoid = $this->filterTypeGraphs(collect([
+            'customoid_customoid' => 'CustomOID Graph',
+        ]), 'customoid', $search);
+        if ($customoid->isNotEmpty()) {
+            $data[] = [
+                'text' => 'CustomOID',
+                'children' => $customoid->map(fn ($text, $id) => ['id' => $id, 'text' => $text])->values(),
+            ];
+        }
+
         return response()->json([
             'results' => $data,
             'pagination' => ['more' => false],
