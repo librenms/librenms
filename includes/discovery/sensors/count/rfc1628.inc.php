@@ -1,10 +1,15 @@
 <?php
 
-use LibreNMS\Util\Number;
+/*
+ *
+ * @link       https://www.librenms.org
+ *
+ * @author     dag@bakke.com
+ */
 
 echo 'RFC1628 ';
 
-$ups_alarms_present = snmp_get($device, 'upsAlarmsPresent.0', '-OqvU', 'UPS-MIB');
+$ups_alarms_present = SnmpQuery::get('UPS-MIB::upsAlarmsPresent.0')->value();
 if (is_numeric($ups_alarms_present)) {
     $ups_alarms_present_oid = '.1.3.6.1.2.1.33.1.6.1.0';
 
