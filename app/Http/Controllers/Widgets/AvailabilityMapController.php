@@ -140,7 +140,7 @@ class AvailabilityMapController extends WidgetController
         }
 
         $services = $services_query->with([
-            'device' => function ($query) {
+            'device' => function ($query): void {
                 $query->select(['devices.device_id', 'hostname', 'sysName', 'display']);
             },
         ])->select(['service_id', 'services.device_id', 'service_type', 'service_name', 'service_desc', 'service_status'])->get();
@@ -172,43 +172,32 @@ class AvailabilityMapController extends WidgetController
 
     private function sort(array &$data): void
     {
-        switch ($this->getSettings()['order_by']) {
-            case 'status':
-                usort($data, function ($l, $r) {
-                    return ($l['status'] <=> $r['status']) ?: strcasecmp($l['label'], $r['label']);
-                });
-                break;
-            case 'label':
-                usort($data, function ($l, $r) {
-                    return strcasecmp($l['label'], $r['label']);
-                });
-                break;
-            default: // device display name (tooltip starts with the display name)
-                usort($data, function ($l, $r) {
-                    return strcasecmp($l['tooltip'], $r['tooltip']) ?: strcasecmp($l['label'], $r['label']);
-                });
-        }
+        match ($this->getSettings()['order_by']) {
+            'status' => usort($data, fn ($l, $r) => ($l['status'] <=> $r['status']) ?: strcasecmp($l['label'], $r['label'])),
+            'label' => usort($data, fn ($l, $r) => strcasecmp($l['label'], $r['label'])),
+            // device display name (tooltip starts with the display name)
+            default => usort($data, fn ($l, $r) => strcasecmp($l['tooltip'], $r['tooltip']) ?: strcasecmp($l['label'], $r['label'])),
+        };
     }
 
     private function getDeviceLabel(Device $device, string $state_name): string
     {
-        switch ($this->getSettings()['color_only_select']) {
-            case 1:
-                return '';
-            case 4:
-                return $device->shortDisplayName();
-            case 2:
-                return strtolower($device->hostname);
-            case 3:
-                return strtolower($device->sysName);
-            default:
-                return __($state_name);
-        }
+        $choice = (int) ($this->getSettings()['color_only_select'] ?? 0);
+
+        return match ($choice) {
+            1 => '',
+            4 => $device->shortDisplayName(),
+            2 => strtolower($device->hostname),
+            3 => strtolower($device->sysName),
+            default => __($state_name),
+        };
     }
 
     private function getServiceLabel(Service $service): string
     {
-        if ($this->getSettings()['color_only_select'] == 1) {
+        $choice = (int) ($this->getSettings()['color_only_select'] ?? 0);
+
+        if ($choice == 1) {
             return '';
         }
 

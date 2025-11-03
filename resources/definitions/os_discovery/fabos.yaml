@@ -36,7 +36,6 @@ modules:
                 -
                     oid: swSfpTemperature
                     value: swSfpTemperature
-                    snmp_flags: ['-OteUsbQ']
                     num_oid: ".1.3.6.1.4.1.1588.2.1.1.1.28.1.1.1.{{ $index }}"
                     descr: "{{ swFCPortName:16 }} Temp"
                     entPhysicalIndex: "200000{{ $subindex16 }}"
@@ -64,7 +63,6 @@ modules:
                 -
                     oid: swSfpRxPower
                     value: swSfpRxPower
-                    snmp_flags: ['-OteUsbQ']
                     num_oid: ".1.3.6.1.4.1.1588.2.1.1.1.28.1.1.4.{{ $index }}"
                     descr: "{{ swFCPortName:16 }} RX"
                     entPhysicalIndex: "200000{{ $subindex16 }}"
@@ -75,7 +73,6 @@ modules:
                 -
                     oid: swSfpTxPower
                     value: swSfpTxPower
-                    snmp_flags: ['-OteUsbQ']
                     num_oid: ".1.3.6.1.4.1.1588.2.1.1.1.28.1.1.5.{{ $index }}"
                     descr: "{{ swFCPortName:16 }} TX"
                     entPhysicalIndex: "200000{{ $subindex16 }}"

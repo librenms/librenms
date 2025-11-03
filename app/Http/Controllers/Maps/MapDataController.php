@@ -51,7 +51,7 @@ class MapDataController extends Controller
         }
 
         $linkQuery = Link::with('port', 'device', 'remoteDevice', 'device.location', 'remoteDevice.location')
-            ->whereHas('device', function (Builder $q) use ($user) {
+            ->whereHas('device', function (Builder $q) use ($user): void {
                 $q->whereIn('status', [0, 1])
                     ->where('disabled', 0)
                     ->where('ignore', 0);
@@ -60,11 +60,11 @@ class MapDataController extends Controller
                     $q->whereIntegerInRaw('device_id', \Permissions::devicesForUser($user));
                 }
             })
-            ->whereHas('device.location', function (Builder $q) {
+            ->whereHas('device.location', function (Builder $q): void {
                 $q->whereNotNull('lat')
                     ->whereNotNull('lng');
             })
-            ->whereHas('remoteDevice', function (Builder $q) use ($user) {
+            ->whereHas('remoteDevice', function (Builder $q) use ($user): void {
                 $q->whereIn('status', [0, 1])
                     ->where('disabled', 0)
                     ->where('ignore', 0);
@@ -73,25 +73,25 @@ class MapDataController extends Controller
                     $q->whereIntegerInRaw('device_id', \Permissions::devicesForUser($user));
                 }
             })
-            ->whereHas('remoteDevice.location', function (Builder $q) {
+            ->whereHas('remoteDevice.location', function (Builder $q): void {
                 $q->whereNotNull('lat')
                     ->whereNotNull('lng');
             })
-            ->whereHas('port', function (Builder $q) {
+            ->whereHas('port', function (Builder $q): void {
                 $q->where('ifOperStatus', 'up');
             });
 
         $group_id = $request->group;
         if ($group_id) {
-            $linkQuery->whereHas('remoteDevice', function ($q) use ($group_id) {
-                $q->whereIn('device_id', function ($q) use ($group_id) {
+            $linkQuery->whereHas('remoteDevice', function ($q) use ($group_id): void {
+                $q->whereIn('device_id', function ($q) use ($group_id): void {
                     $q->select('device_id')
                     ->from('device_group_device')
                     ->where('device_group_id', $group_id);
                 });
             })
-            ->whereHas('device', function ($q) use ($group_id) {
-                $q->whereIn('device_id', function ($q) use ($group_id) {
+            ->whereHas('device', function ($q) use ($group_id): void {
+                $q->whereIn('device_id', function ($q) use ($group_id): void {
                     $q->select('device_id')
                     ->from('device_group_device')
                     ->where('device_group_id', $group_id);
@@ -100,9 +100,7 @@ class MapDataController extends Controller
         }
 
         return $linkQuery->get()
-            ->groupBy(function (Link $i) {
-                return $i->device->location->lat . '.' . $i->device->location->lng . '.' . $i->remoteDevice->location->lat . '.' . $i->remoteDevice->location->lng;
-            });
+            ->groupBy(fn (Link $i) => $i->device->location->lat . '.' . $i->device->location->lng . '.' . $i->remoteDevice->location->lat . '.' . $i->remoteDevice->location->lng);
     }
 
     protected static function portsWithLinks(Request $request, string $remote_port_attr)
@@ -122,7 +120,7 @@ class MapDataController extends Controller
         $linkQuery = Port::hasAccess($request->user())
             ->with([
                 $remote_port_attr,
-                'device' => function ($q) use ($user, $disabled, $disabled_alerts, $group_id) {
+                'device' => function ($q) use ($user, $disabled, $disabled_alerts, $group_id): void {
                     // Apply device filter to the list of local devices that we will load
                     if (! $user->hasGlobalRead()) {
                         $q->whereIntegerInRaw('device_id', \Permissions::devicesForUser($user));
@@ -146,7 +144,7 @@ class MapDataController extends Controller
 
                     if ($group_id) {
                         $q->whereIn(
-                            $q->qualifyColumn('device_id'), function ($q) use ($group_id) {
+                            $q->qualifyColumn('device_id'), function ($q) use ($group_id): void {
                                 $q->select('device_id')
                                 ->from('device_group_device')
                                 ->where('device_group_id', $group_id);
@@ -154,7 +152,7 @@ class MapDataController extends Controller
                         );
                     }
                 },
-                "$remote_port_attr.device" => function ($q) use ($user, $disabled, $disabled_alerts, $group_id) {
+                "$remote_port_attr.device" => function ($q) use ($user, $disabled, $disabled_alerts, $group_id): void {
                     // Apply device filter to the list of remote devices that we will load
                     if (! $user->hasGlobalRead()) {
                         $q->whereIntegerInRaw('device_id', \Permissions::devicesForUser($user));
@@ -178,7 +176,7 @@ class MapDataController extends Controller
 
                     if ($group_id) {
                         $q->whereIn(
-                            $q->qualifyColumn('device_id'), function ($q) use ($group_id) {
+                            $q->qualifyColumn('device_id'), function ($q) use ($group_id): void {
                                 $q->select('device_id')
                                 ->from('device_group_device')
                                 ->where('device_group_id', $group_id);
@@ -190,7 +188,7 @@ class MapDataController extends Controller
 
         if ($device_filter) {
             // Apply device level filter to the port list so we exclude ports that are not connected to devices we want to display
-            $linkQuery->whereHas('device', function (Builder $q) use ($user, $disabled, $disabled_alerts, $group_id) {
+            $linkQuery->whereHas('device', function (Builder $q) use ($user, $disabled, $disabled_alerts, $group_id): void {
                 if (! $user->hasGlobalRead()) {
                     $q->whereIntegerInRaw($q->qualifyColumn('device_id'), \Permissions::devicesForUser($user));
                 }
@@ -213,7 +211,7 @@ class MapDataController extends Controller
 
                 if ($group_id) {
                     $q->whereIn(
-                        $q->qualifyColumn('device_id'), function ($q) use ($group_id) {
+                        $q->qualifyColumn('device_id'), function ($q) use ($group_id): void {
                             $q->select('device_id')
                             ->from('device_group_device')
                             ->where('device_group_id', $group_id);
@@ -223,7 +221,7 @@ class MapDataController extends Controller
             });
 
             // Apply the same device level filter to the port list so we exclude ports that have no remote devices we want to display
-            $linkQuery->whereHas("$remote_port_attr.device", function (Builder $q) use ($user, $disabled, $disabled_alerts, $group_id) {
+            $linkQuery->whereHas("$remote_port_attr.device", function (Builder $q) use ($user, $disabled, $disabled_alerts, $group_id): void {
                 if (! $user->hasGlobalRead()) {
                     $q->whereIntegerInRaw('device_id', \Permissions::devicesForUser($user));
                 }
@@ -246,7 +244,7 @@ class MapDataController extends Controller
 
                 if ($group_id) {
                     $q->whereIn(
-                        $q->qualifyColumn('device_id'), function ($q) use ($group_id) {
+                        $q->qualifyColumn('device_id'), function ($q) use ($group_id): void {
                             $q->select('device_id')
                             ->from('device_group_device')
                             ->where('device_group_id', $group_id);
@@ -258,11 +256,11 @@ class MapDataController extends Controller
 
         if ($device_id) {
             // If we have a device ID, we want to show if we are the soure or target of a link
-            $linkQuery->where(function ($q) use ($device_id, $remote_port_attr) {
-                $q->whereHas($remote_port_attr, function ($q) use ($device_id) {
+            $linkQuery->where(function ($q) use ($device_id, $remote_port_attr): void {
+                $q->whereHas($remote_port_attr, function ($q) use ($device_id): void {
                     $q->where('device_id', $device_id);
                 })
-                    ->orWhereHas('device', function ($q) use ($device_id) {
+                    ->orWhereHas('device', function ($q) use ($device_id): void {
                         $q->where('device_id', $device_id);
                     });
             });
@@ -321,7 +319,7 @@ class MapDataController extends Controller
         }
 
         if ($valid_loc) {
-            $deviceQuery->whereHas('location', function ($q) {
+            $deviceQuery->whereHas('location', function ($q): void {
                 $q->whereNotNull('lng')
                     ->whereNotNull('lat')
                     ->where('lng', '<>', '')
@@ -332,10 +330,10 @@ class MapDataController extends Controller
         if (! $group_id) {
             if ($linkType == 'depends') {
                 return $deviceQuery->with([
-                    'parents' => function ($q) use ($request) {
+                    'parents' => function ($q) use ($request): void {
                         $q->hasAccess($request->user());
                     },
-                    'children' => function ($q) use ($request) {
+                    'children' => function ($q) use ($request): void {
                         $q->hasAccess($request->user());
                     }, ])
                 ->get();
@@ -346,11 +344,11 @@ class MapDataController extends Controller
 
         if ($linkType == 'depends') {
             return $deviceQuery->with([
-                'parents' => function ($q) use ($request, $group_id) {
+                'parents' => function ($q) use ($request, $group_id): void {
                     $q->hasAccess($request->user())
                         ->inDeviceGroup($group_id);
                 },
-                'children' => function ($q) use ($request, $group_id) {
+                'children' => function ($q) use ($request, $group_id): void {
                     $q->hasAccess($request->user())
                         ->inDeviceGroup($group_id);
                 }, ])
@@ -465,11 +463,9 @@ class MapDataController extends Controller
                 'locations.devices:location_id,device_id',
                 'deviceGroups.devices:device_id',
             ])->get()
-            ->map(function ($schedule) {
-                return $schedule->devices->pluck('device_id')
-                    ->merge($schedule->locations->pluck('devices.*.device_id'))
-                    ->merge($schedule->deviceGroups->pluck('devices.*.device_id'));
-            })->flatten();
+            ->map(fn ($schedule) => $schedule->devices->pluck('device_id')
+                ->merge($schedule->locations->pluck('devices.*.device_id'))
+                ->merge($schedule->deviceGroups->pluck('devices.*.device_id')))->flatten();
 
         // For manual level we need to track some items
         $no_parent_devices = collect();
@@ -487,9 +483,12 @@ class MapDataController extends Controller
                 $updowntime = '';
             }
 
+            $deviceTypes = collect(LibrenmsConfig::get('device_types', []))->pluck('icon', 'type');
+
             $device_list[$device->device_id] = [
                 'id' => $device->device_id,
                 'icon' => $device->icon,
+                'typeIcon' => $deviceTypes->get($device->type, 'server'),
                 'icontitle' => $device->icon ? str_replace(['.svg', '.png'], '', basename($device->icon)) : $device->os,
                 'sname' => $device->shortDisplayName(),
                 'status' => $device->status,
@@ -518,9 +517,7 @@ class MapDataController extends Controller
                 $parent_only_ids = $parent_ids;
                 if ($device->children->count()) {
                     $child_ids = $device_list[$device->device_id]['children'];
-                    $parent_only_ids = $parent_only_ids->filter(function (int $parent_id, int $k) use ($child_ids) {
-                        return ! $child_ids->has($parent_id);
-                    });
+                    $parent_only_ids = $parent_only_ids->filter(fn (int $parent_id, int $k) => ! $child_ids->has($parent_id));
                 }
 
                 // All parents are peers becuase they are also children
@@ -731,15 +728,9 @@ class MapDataController extends Controller
         $link_list = [];
         foreach (self::geoLinks($request) as $location) {
             $link = $location[0];
-            $capacity = $location->sum(function (Link $l) {
-                return $l->port->ifSpeed;
-            });
-            $inRate = $location->sum(function (Link $l) {
-                return $l->port->ifInOctets_rate * 8;
-            });
-            $outRate = $location->sum(function (Link $l) {
-                return $l->port->ifOutOctets_rate * 8;
-            });
+            $capacity = $location->sum(fn (Link $l) => $l->port->ifSpeed);
+            $inRate = $location->sum(fn (Link $l) => $l->port->ifInOctets_rate * 8);
+            $outRate = $location->sum(fn (Link $l) => $l->port->ifOutOctets_rate * 8);
             if ($capacity > 0) {
                 $link_used = max($inRate / $capacity * 100, $outRate / $capacity * 100);
             } elseif ($inRate > 0 || $outRate > 0) {

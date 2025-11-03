@@ -34,16 +34,14 @@ class PortLink extends Component
      * @var string
      */
     public $status;
-    public bool $basic;
 
     /**
      * Create a new component instance.
      *
      * @return void
      */
-    public function __construct(Port $port, ?array $graphs = null, bool $basic = false, array $vars = [])
+    public function __construct(Port $port, ?array $graphs = null, public bool $basic = false, array $vars = [])
     {
-        $this->basic = $basic;
         $this->port = $port;
         $this->link = Url::portUrl($port, $vars);
         $this->label = Rewrite::normalizeIfName($port->getLabel());
@@ -84,12 +82,10 @@ class PortLink extends Component
 
     public function fillDefaultVars(array $vars): array
     {
-        return array_map(function ($graph_vars) {
-            return array_merge([
-                'from' => '-1d',
-                'legend' => 'yes',
-                'text' => '',
-            ], Arr::wrap($graph_vars));
-        }, $vars);
+        return array_map(fn ($graph_vars) => array_merge([
+            'from' => '-1d',
+            'legend' => 'yes',
+            'text' => '',
+        ], Arr::wrap($graph_vars)), $vars);
     }
 }

@@ -69,9 +69,7 @@ final class SimpleTemplateTest extends TestCase
     public function testCustomCallback(): void
     {
         $template = new SimpleTemplate('Hello {{ name }}!');
-        $template->replaceWith(function ($matches) {
-            return strtoupper($matches[1]);
-        });
+        $template->replaceWith(fn ($matches) => strtoupper($matches[1]));
         $this->assertEquals('Hello NAME!', (string) $template);
     }
 

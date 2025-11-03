@@ -11,7 +11,7 @@ echo '<tr><th>VLAN</th><th>Description</th><th>Cost</th><th>Priority</th><th>Sta
 $row = 0;
 foreach ($vlans as $vlan) {
     $row++;
-    if (is_integer($row / 2)) {
+    if (is_int($row / 2)) {
         $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
     } else {
         $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');

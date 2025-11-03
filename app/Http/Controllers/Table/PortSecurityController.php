@@ -70,47 +70,36 @@ class PortSecurityController extends TableController
     protected function search($search, $query, $fields = [])
     {
         if ($search = trim(\Request::get('searchPhrase') ?? '')) {
-            switch (\Request::get('searchby') ?? '') {
-                case 'device':
-                    return $query->whereHas('device', function ($q) use ($search) {
+            return match (\Request::get('searchby') ?? '') {
+                'device' => $query->whereHas('device', function ($q) use ($search): void {
+                    $q->where('hostname', 'like', "%$search%");
+                }),
+                'port' => $query->whereHas('port', function ($q) use ($search): void {
+                    $q->where('ifDescr', 'like', "%$search%")
+                      ->orWhere('ifAlias', 'like', "%$search%");
+                }),
+                'status' => $query->where('status', 'like', "%$search%"),
+                'enable' => $query->where('port_security_enable', 'like', "%$search%"),
+                'max_secure' => $query->where('max_addresses', $search),
+                'current_secure' => $query->where('address_count', $search),
+                'violation_action' => $query->where('violation_action', 'like', "%$search%"),
+                'violation_count' => $query->where('violation_count', $search),
+                'secure_last_mac' => $query->where('last_mac_address', 'like', "%$search%"),
+                'sticky_enable' => $query->where('sticky_enable', 'like', "%$search%"),
+                default => $query->where(function ($query) use ($search): void {
+                    $query->whereHas('device', function ($q) use ($search): void {
                         $q->where('hostname', 'like', "%$search%");
-                    });
-                case 'port':
-                    return $query->whereHas('port', function ($q) use ($search) {
+                    })
+                    ->orWhereHas('port', function ($q) use ($search): void {
                         $q->where('ifDescr', 'like', "%$search%")
                           ->orWhere('ifAlias', 'like', "%$search%");
-                    });
-                case 'status':
-                    return $query->where('status', 'like', "%$search%");
-                case 'enable':
-                    return $query->where('port_security_enable', 'like', "%$search%");
-                case 'max_secure':
-                    return $query->where('max_addresses', $search);
-                case 'current_secure':
-                    return $query->where('address_count', $search);
-                case 'violation_action':
-                    return $query->where('violation_action', 'like', "%$search%");
-                case 'violation_count':
-                    return $query->where('violation_count', $search);
-                case 'secure_last_mac':
-                    return $query->where('last_mac_address', 'like', "%$search%");
-                case 'sticky_enable':
-                    return $query->where('sticky_enable', 'like', "%$search%");
-                default:
-                    return $query->where(function ($query) use ($search) {
-                        $query->whereHas('device', function ($q) use ($search) {
-                            $q->where('hostname', 'like', "%$search%");
-                        })
-                        ->orWhereHas('port', function ($q) use ($search) {
-                            $q->where('ifDescr', 'like', "%$search%")
-                              ->orWhere('ifAlias', 'like', "%$search%");
-                        })
-                        ->orWhere('status', 'like', "%$search%")
-                        ->orWhere('port_security_enable', 'like', "%$search%")
-                        ->orWhere('violation_action', 'like', "%$search%")
-                        ->orWhere('last_mac_address', 'like', "%$search%");
-                    });
-            }
+                    })
+                    ->orWhere('status', 'like', "%$search%")
+                    ->orWhere('port_security_enable', 'like', "%$search%")
+                    ->orWhere('violation_action', 'like', "%$search%")
+                    ->orWhere('last_mac_address', 'like', "%$search%");
+                }),
+            };
         }
 
         return $query;

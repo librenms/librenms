@@ -1,9 +1,9 @@
 <?php
 
 /**
- * devices_groups.inc.php
+ * AlertTransportsAndGroupsController.php
  *
- * List devices and groups in one
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,29 +20,24 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2018 Tony Murray
+ * @copyright  2025 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-[$devices, $d_more] = include 'devices.inc.php';
-[$groups, $g_more] = include 'groups.inc.php';
-[$locations, $l_more] = include 'locations.inc.php';
 
-$locations = array_map(function ($location) {
-    $location['id'] = 'l' . $location['id'];
+namespace App\Http\Controllers\Select;
 
-    return $location;
-}, $locations);
-
-$groups = array_map(function ($group) {
-    $group['id'] = 'g' . $group['id'];
-
-    return $group;
-}, $groups);
-
-$data = [
-    ['text' => 'Locations', 'children' => $locations],
-    ['text' => 'Groups', 'children' => $groups],
-    ['text' => 'Devices', 'children' => $devices],
-];
-
-return [$data, $d_more || $g_more || $l_more];
+class AlertTransportsAndGroupsController extends AggregateSelectController
+{
+    protected array $groups = [
+        [
+            'text' => 'Transports',
+            'controller' => AlertTransportController::class,
+            'prefix' => '',
+        ],
+        [
+            'text' => 'Transport Groups',
+            'controller' => AlertTransportGroupController::class,
+            'prefix' => 'g',
+        ],
+    ];
+}

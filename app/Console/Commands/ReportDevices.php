@@ -176,7 +176,7 @@ class ReportDevices extends LnmsCommand
          * with processing one device while we fetch the info for the next.
          */
         Device::when($has_relationships, fn ($q) => $q->with($relationships))
-            ->whereDeviceSpec($this->argument('device spec'))->orderBy('device_id')->chunk(1, function ($device) {
+            ->whereDeviceSpec($this->argument('device spec'))->orderBy('device_id')->chunk(1, function ($device): void {
                 $this->line(json_encode($device[0]));
             });
 

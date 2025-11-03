@@ -20,7 +20,6 @@ class MaintenanceFetchOuis extends LnmsCommand
 
     protected string $mac_oui_url = 'https://www.wireshark.org/download/automated/data/manuf';
     protected int $min_refresh_days = 6;
-    protected int $max_wait_seconds = 900;
     protected int $upsert_chunk_size = 1000;
 
     public function __construct()
@@ -28,7 +27,6 @@ class MaintenanceFetchOuis extends LnmsCommand
         parent::__construct();
 
         $this->addOption('force', null, InputOption::VALUE_NONE);
-        $this->addOption('wait', null, InputOption::VALUE_NONE);
     }
 
     /**
@@ -56,14 +54,6 @@ class MaintenanceFetchOuis extends LnmsCommand
             return 0;
         }
 
-        // wait for 0-15 minutes to prevent stampeding herd
-        if ($this->option('wait')) {
-            $seconds = rand(1, $this->max_wait_seconds);
-            $minutes = (int) round($seconds / 60);
-            $this->info(trans_choice('commands.maintenance:fetch-ouis.waiting', $minutes, ['minutes' => $minutes]));
-            sleep($seconds);
-        }
-
         $this->line(trans('commands.maintenance:fetch-ouis.starting'));
 
         try {
@@ -85,7 +75,7 @@ class MaintenanceFetchOuis extends LnmsCommand
             return 0;
         } catch (\Exception|\ErrorException $e) {
             $this->error(trans('commands.maintenance:fetch-ouis.error'));
-            $this->error('Exception: ' . get_class($e));
+            $this->error('Exception: ' . $e::class);
             $this->error($e);
 
             $lock->release(); // We did not succeed, so we'll try again next time

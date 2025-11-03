@@ -45,7 +45,7 @@ class Ipv4Mac extends PortRelatedModel implements Keyable
     {
         // Join onto this class first because we need both the mac_address and ipv4_address columns
         return $this->hasManyThrough(Port::class, Ipv4Mac::class, 'id', 'ifPhysAddress', 'id', 'mac_address')
-            ->join('ipv4_addresses', function ($j) {
+            ->join('ipv4_addresses', function ($j): void {
                 $j->on('ipv4_mac.ipv4_address', 'ipv4_addresses.ipv4_address');
                 $j->on('ports.port_id', 'ipv4_addresses.port_id');
             })

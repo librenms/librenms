@@ -53,7 +53,7 @@ abstract class Transport implements TransportInterface
             return $this->name;
         }
 
-        $path = explode('\\', get_called_class());
+        $path = explode('\\', static::class);
 
         return array_pop($path);
     }
@@ -95,7 +95,7 @@ abstract class Transport implements TransportInterface
             AlertState::CHANGED => LibrenmsConfig::get('alert_colour.changed'),
         ];
 
-        return isset($colors[$state]) ? $colors[$state] : '#337AB7';
+        return $colors[$state] ?? '#337AB7';
     }
 
     /**
