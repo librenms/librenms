@@ -34,30 +34,8 @@
             </div>
         </x-panel>
     @endif
-    <x-panel title="{{ __('Performance') }}">
-        <x-slot name="heading">
-            <span class="panel-title" style="line-height: 34px">{{ __('Performance') }}</span>
-                <span style="text-align: center">
-                    <form method="post" role="form" id="map" class="form-inline">
-                            @csrf
-                            <div class="form-group">
-                                <label for="dtpickerfrom">{{ __('From') }}</label>
-                                <input type="text" class="form-control" id="dtpickerfrom" name="dtpickerfrom" maxlength="16"
-                                       value="{{ $data['from'] }}" data-date-format="YYYY-MM-DD HH:mm">
-                            </div>
-                            <div class="form-group">
-                                <label for="dtpickerto">{{ __('To') }}</label>
-                                <input type="text" class="form-control" id="dtpickerto" name="dtpickerto" maxlength=16
-                                       value="{{ $data['to'] }} " data-date-format="YYYY-MM-DD HH:mm">
-                            </div>
-                            <input type="submit" class="btn btn-default" id="submit" value="Update">
-                    </form>
-                </span>
-        </x-slot>
-
-        <div id="performance">
-            <x-graph type="device_icmp_perf" legend="yes" :device="$device" width="600" height="240" :from="$data['from']" :to="$data['to']"></x-graph>
-        </div>
+    <x-panel title="{{ __('ICMP Performance') }}">
+        <x-graph-row type="device_icmp_perf" :device="$device" columns="responsive"></x-graph-row>
     </x-panel>
 </x-device.page>
 @endsection
