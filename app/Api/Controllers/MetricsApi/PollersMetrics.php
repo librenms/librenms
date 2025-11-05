@@ -57,7 +57,7 @@ class PollersMetrics
         }
     }
 
-    private function addPollersClusterMetrics(array &$lines): void
+    private function addPollerClusterMetrics(array &$lines): void
     {
         // Gather global metrics
         $total = PollerCluster::count();

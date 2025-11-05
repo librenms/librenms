@@ -400,9 +400,3 @@ All metrics endpoints require authentication via the `X-Auth-Token` header with 
 ## Content Type
 
 All metrics endpoints return data in the Prometheus exposition format with content type `text/plain; version=0; charset=utf-8`.
-
-## Rate Limiting
-
-Be mindful of the polling frequency when scraping these endpoints, especially for endpoints with high cardinality like ports and sensors. Consider using device filtering to reduce the scope of metrics collection for large deployments.
-
-For Prometheus integration examples and configuration, see the [Prometheus Extensions documentation](../Extensions/metrics/Prometheus.md).
