@@ -62,12 +62,12 @@ class SensorsMetrics
 
             $rrd = strtoupper((string) ($s->rrd_type ?? 'GAUGE'));
             if ($rrd === 'GAUGE') {
-                $gauge_value_lines[] = "librenms_sensors_value{{$labels}} " . ($value !== null ? $value : 0);
+                $gauge_value_lines[] = "librenms_sensors_value{{$labels}} " . ($value ?? 0);
                 $gauge_limit_warn_lines[] = "librenms_sensors_limit_warn{{$labels}} " . ((float) ($s->sensor_limit_warn ?? 0));
                 $gauge_limit_crit_lines[] = "librenms_sensors_limit_crit{{$labels}} " . ((float) ($s->sensor_limit ?? 0));
             } else {
                 // export counter-like sensors with a different metric name to avoid TYPE conflicts
-                $counter_value_lines[] = "librenms_sensors_value_counter{{$labels}} " . ($value !== null ? $value : 0);
+                $counter_value_lines[] = "librenms_sensors_value_counter{{$labels}} " . ($value ?? 0);
                 $counter_limit_warn_lines[] = "librenms_sensors_limit_warn_counter{{$labels}} " . ((float) ($s->sensor_limit_warn ?? 0));
                 $counter_limit_crit_lines[] = "librenms_sensors_limit_crit_counter{{$labels}} " . ((float) ($s->sensor_limit ?? 0));
             }
