@@ -49,11 +49,11 @@ class ProcessorsMetrics
                 $this->escapeLabel((string) $p->processor_type)
             );
 
-            $usage_lines[] = "librenms_processor_usage_percent{{$labels}} " . ((int) $p->processor_usage ?: 0);
+            $usage_lines[] = "librenms_processors_usage_percent{{$labels}} " . ((int) $p->processor_usage ?: 0);
         }
 
         // Append per-processor metrics
-        $this->appendMetricBlock($lines, 'librenms_processor_usage_percent', 'Processor usage percent (0-100)', 'gauge', $usage_lines);
+        $this->appendMetricBlock($lines, 'librenms_processors_usage_percent', 'Processor usage percent (0-100)', 'gauge', $usage_lines);
 
         return implode("\n", $lines) . "\n";
     }

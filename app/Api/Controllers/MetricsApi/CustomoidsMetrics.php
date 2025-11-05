@@ -60,29 +60,29 @@ class CustomoidsMetrics
             // Determine datatype; treat non-GAUGE as counter-like
             $datatype = strtoupper((string) ($c->customoid_datatype ?? 'GAUGE'));
             if ($datatype === 'GAUGE') {
-                $gauge_value_lines[] = "librenms_customoid_value{{$labels}} " . ($value !== null ? $value : 0);
-                $gauge_limit_warn_lines[] = "librenms_customoid_limit_warn{{$labels}} " . ((float) ($c->customoid_limit_warn ?? 0));
-                $gauge_limit_crit_lines[] = "librenms_customoid_limit_crit{{$labels}} " . ((float) ($c->customoid_limit ?? 0));
+                $gauge_value_lines[] = "librenms_customoids_value{{$labels}} " . ($value !== null ? $value : 0);
+                $gauge_limit_warn_lines[] = "librenms_customoids_limit_warn{{$labels}} " . ((float) ($c->customoid_limit_warn ?? 0));
+                $gauge_limit_crit_lines[] = "librenms_customoids_limit_crit{{$labels}} " . ((float) ($c->customoid_limit ?? 0));
             } else {
                 // treat as counter
-                $counter_value_lines[] = "librenms_customoid_value_counter{{$labels}} " . ($value !== null ? $value : 0);
-                $counter_limit_warn_lines[] = "librenms_customoid_limit_warn_counter{{$labels}} " . ((float) ($c->customoid_limit_warn ?? 0));
-                $counter_limit_crit_lines[] = "librenms_customoid_limit_crit_counter{{$labels}} " . ((float) ($c->customoid_limit ?? 0));
+                $counter_value_lines[] = "librenms_customoids_value_counter{{$labels}} " . ($value !== null ? $value : 0);
+                $counter_limit_warn_lines[] = "librenms_customoids_limit_warn_counter{{$labels}} " . ((float) ($c->customoid_limit_warn ?? 0));
+                $counter_limit_crit_lines[] = "librenms_customoids_limit_crit_counter{{$labels}} " . ((float) ($c->customoid_limit ?? 0));
             }
         }
 
         // Append gauge-type customoids
         if (! empty($gauge_value_lines)) {
-            $this->appendMetricBlock($lines, 'librenms_customoid_value', 'Custom oid current value', 'gauge', $gauge_value_lines);
-            $this->appendMetricBlock($lines, 'librenms_customoid_limit_warn', 'Customoid warning threshold', 'gauge', $gauge_limit_warn_lines);
-            $this->appendMetricBlock($lines, 'librenms_customoid_limit_crit', 'Customoid critical threshold', 'gauge', $gauge_limit_crit_lines);
+            $this->appendMetricBlock($lines, 'librenms_customoids_value', 'Custom oid current value', 'gauge', $gauge_value_lines);
+            $this->appendMetricBlock($lines, 'librenms_customoids_limit_warn', 'Customoid warning threshold', 'gauge', $gauge_limit_warn_lines);
+            $this->appendMetricBlock($lines, 'librenms_customoids_limit_crit', 'Customoid critical threshold', 'gauge', $gauge_limit_crit_lines);
         }
 
         // Append counter-type customoids (use distinct metric names to avoid TYPE conflicts)
         if (! empty($counter_value_lines)) {
-            $this->appendMetricBlock($lines, 'librenms_customoid_value_counter', 'Custom oid current value (counter-like)', 'counter', $counter_value_lines);
-            $this->appendMetricBlock($lines, 'librenms_customoid_limit_warn_counter', 'Customoid warning threshold (counter-like)', 'counter', $counter_limit_warn_lines);
-            $this->appendMetricBlock($lines, 'librenms_customoid_limit_crit_counter', 'Customoid critical threshold (counter-like)', 'counter', $counter_limit_crit_lines);
+            $this->appendMetricBlock($lines, 'librenms_customoids_value_counter', 'Custom oid current value (counter-like)', 'counter', $counter_value_lines);
+            $this->appendMetricBlock($lines, 'librenms_customoids_limit_warn_counter', 'Customoid warning threshold (counter-like)', 'counter', $counter_limit_warn_lines);
+            $this->appendMetricBlock($lines, 'librenms_customoids_limit_crit_counter', 'Customoid critical threshold (counter-like)', 'counter', $counter_limit_crit_lines);
         }
 
         return implode("\n", $lines) . "\n";
