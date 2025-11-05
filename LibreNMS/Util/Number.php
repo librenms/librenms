@@ -72,21 +72,21 @@ class Number
         $value = (float) $value;
         $neg = $value < 0;
         if ($neg) {
-            $value = $value * -1;
+            $value *= -1;
         }
 
         if ($value >= '0.1') {
             $sizes = ['', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
             $ext = $sizes[0];
             for ($i = 1; ($i < count($sizes)) && ($value >= 1000); $i++) {
-                $value = $value / 1000;
+                $value /= 1000;
                 $ext = $sizes[$i];
             }
         } else {
             $sizes = ['', 'm', 'u', 'n', 'p'];
             $ext = $sizes[0];
             for ($i = 1; ($i < count($sizes)) && ($value != 0) && ($value <= 0.1); $i++) {
-                $value = $value * 1000;
+                $value *= 1000;
                 $ext = $sizes[$i];
             }
         }
@@ -95,7 +95,7 @@ class Number
         $round = self::calcRound($value, $round, $sf);
 
         if ($neg) {
-            $value = $value * -1;
+            $value *= -1;
         }
 
         return self::cast(number_format($value, $round, '.', '')) . " $ext$suffix";
@@ -106,12 +106,12 @@ class Number
         $value = (float) $value;
         $neg = $value < 0;
         if ($neg) {
-            $value = $value * -1;
+            $value *= -1;
         }
         $sizes = ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi', 'Yi'];
         $ext = $sizes[0];
         for ($i = 1; ($i < count($sizes)) && ($value >= 1024); $i++) {
-            $value = $value / 1024;
+            $value /= 1024;
             $ext = $sizes[$i];
         }
 
@@ -119,7 +119,7 @@ class Number
         $round = self::calcRound($value, $round, $sf);
 
         if ($neg) {
-            $value = $value * -1;
+            $value *= -1;
         }
 
         return self::cast(number_format($value, $round, '.', '')) . " $ext$suffix";
@@ -136,7 +136,7 @@ class Number
             $base = $baseIndicator == 'i' ? 1024 : 1000;
             $exponent = ['k' => 1, 'K' => 1, 'M' => 2, 'G' => 3, 'T' => 4, 'P' => 5, 'E' => 6, 'Z' => 7, 'Y' => 8];
 
-            return self::cast($number) * pow($base, $exponent[$magnitude] ?? 0);
+            return self::cast($number) * $base ** ($exponent[$magnitude] ?? 0);
         }
 
         return NAN;
@@ -368,7 +368,7 @@ class Number
         $percent = floatval($percent);
 
         while ($percent > 100) {
-            $percent = $percent / 10;
+            $percent /= 10;
         }
 
         return $percent;

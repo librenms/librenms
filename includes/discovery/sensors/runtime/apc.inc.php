@@ -28,9 +28,9 @@ if ($oids) {
     $service_interval = snmp_get($device, 'airIRRP100UnitServiceIntervalAirFilter.' . $index, '-Oqv', 'PowerNet-MIB');
     $alarm_status = snmp_get($device, 'airIRRP100UnitServiceIntervalAirFilterAlarm.' . $index, '-Oqv', 'PowerNet-MIB');
     $multiplier = 60;
-    $current = ($current * $multiplier);
+    $current *= $multiplier;
     if ($alarm_status == 'enable') {
-        $service_interval = ($service_interval * 10080);
+        $service_interval *= 10080;
     } else {
         $service_interval = null;
     }
@@ -45,8 +45,8 @@ if ($oids) {
     $current = snmp_get($device, 'airIRRP100UnitRunHoursFan1.' . $index, '-Oqv', 'PowerNet-MIB');
     $service_interval = snmp_get($device, 'airIRRP100UnitServiceIntervalFans.' . $index, '-Oqv', 'PowerNet-MIB');
     $multiplier = 60;
-    $current = ($current * $multiplier);
-    $service_interval = ($service_interval * 10080);
+    $current *= $multiplier;
+    $service_interval *= 10080;
     $descr = 'Fan 1';
     $sensorType = 'apc';
 
@@ -58,8 +58,8 @@ if ($oids) {
     $current = snmp_get($device, 'airIRRP100UnitRunHoursFan2.' . $index, '-Oqv', 'PowerNet-MIB');
     $service_interval = snmp_get($device, 'airIRRP100UnitServiceIntervalFans.' . $index, '-Oqv', 'PowerNet-MIB');
     $multiplier = 60;
-    $current = ($current * $multiplier);
-    $service_interval = ($service_interval * 10080);
+    $current *= $multiplier;
+    $service_interval *= 10080;
     $descr = 'Fan 2';
     $sensorType = 'apc';
 
@@ -71,8 +71,8 @@ if ($oids) {
     $current = snmp_get($device, 'airIRRP100UnitRunHoursCompressor.' . $index, '-Oqv', 'PowerNet-MIB');
     $service_interval = snmp_get($device, 'airIRRP100UnitServiceIntervalCompressor.' . $index, '-Oqv', 'PowerNet-MIB');
     $multiplier = 60;
-    $current = ($current * $multiplier);
-    $service_interval = ($service_interval * 10080);
+    $current *= $multiplier;
+    $service_interval *= 10080;
     $descr = 'Compressor';
     $sensorType = 'apc';
 

@@ -1,7 +1,7 @@
 <?php
 
 // check_cmd is the command that is run to execute the check
-$check_cmd = \App\Facades\LibrenmsConfig::get('nagios_plugins') . '/check_icmp ' . $service['service_param'] . ' ' . ($service['service_ip'] ? $service['service_ip'] : $service['hostname']);
+$check_cmd = \App\Facades\LibrenmsConfig::get('nagios_plugins') . '/check_icmp ' . $service['service_param'] . ' ' . ($service['service_ip'] ?: $service['hostname']);
 
 if (isset($rrd_filename)) {
     // Check DS is a json array of the graphs that are available

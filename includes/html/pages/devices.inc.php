@@ -232,7 +232,7 @@ if ($format == 'graph') {
 
     $row = 1;
     foreach (dbFetchRows($query, $sql_param) as $device) {
-        if (is_integer($row / 2)) {
+        if (is_int($row / 2)) {
             $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
         } else {
             $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
@@ -276,7 +276,7 @@ if ($format == 'graph') {
     }
     echo '</div>';
 } else {
-    $state = isset($vars['state']) ? $vars['state'] : '';
+    $state = $vars['state'] ?? '';
     $state_selection = "<select name='state' id='state' class='form-control'><option value=''>All</option>" .
         "<option value='up'" . ($state == 'up' ? ' selected' : '') . '>Up</option>' .
         "<option value='down'" . ($state == 'down' ? ' selected' : '') . '>Down</option></select>';

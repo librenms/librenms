@@ -104,18 +104,18 @@ modules:
                     oid: NETELASTIC-FLEXBNG-IPPOOLV6::addrAllocatePercent
                     num_oid: '.1.3.6.1.4.1.54268.1.1.3.3.1.3.{{ $index }}'
                     descr: 'IPv6 address allocated %'
-                    index: 'addrAllocatePercent.{{ $index }}'
+                    index: 'addrAllocatePercent.{{ $index_string }}'
                     group: 'IP Pool'
                 -
                     oid: NETELASTIC-FLEXBNG-IPPOOLV6::prefixAllocatePercent
                     num_oid: '.1.3.6.1.4.1.54268.1.1.3.1.1.2.{{ $index }}'
                     descr: 'IPv6 delegation pool allocated %'
-                    index: 'prefixAllocatePercent.{{ $index }}'
+                    index: 'prefixAllocatePercent.{{ $index_string }}'
                     group: 'IP Pool'
                 -
                     oid: NETELASTIC-FLEXBNG-IPPOOL::groupTable
                     value: NETELASTIC-FLEXBNG-IPPOOL::groupAllocatePercent
-                    num_oid: '.1.3.6.1.4.1.54268.1.1.2.1.1.5.{{ $str_index_as_numeric }}'
+                    num_oid: '.1.3.6.1.4.1.54268.1.1.2.1.1.5.{{ $index }}'
                     descr: '{{ NETELASTIC-FLEXBNG-IPPOOL::groupName }} DHCP Pool Used %'
-                    index: 'groupTable.{{ $index }}'
+                    index: 'groupTable.{{ $index_string }}'
                     group: 'IP Pool'

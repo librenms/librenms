@@ -4,11 +4,11 @@
 // args: ds_in, ds_out, rrd_filename, bg, legend, from, to, width, height, inverse, percentile
 require 'includes/html/graphs/common.inc.php';
 
-$multiplier = $multiplier ?? false;
-$print_total = $print_total ?? false;
-$percentile = $percentile ?? false;
-$unit_text = $unit_text ?? '';
-$line_text = $line_text ?? '';
+$multiplier ??= false;
+$print_total ??= false;
+$percentile ??= false;
+$unit_text ??= '';
+$line_text ??= '';
 $previous = $graph_params->visible('previous');
 
 $unit_text = str_pad(substr($unit_text, 0, 18), 18);

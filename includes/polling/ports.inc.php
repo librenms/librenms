@@ -346,7 +346,7 @@ if (LibrenmsConfig::get('enable_ports_poe')) {
                 We need to ignore the middle subslot number so this is slot.port
                 */
                 if (preg_match('/^[a-z]+ethernet(\d+)\/(\d+)(?:\/(\d+))?$/i', $if_descr['ifDescr'], $matches)) {
-                    $port_ent_to_if[$matches[1] . '.' . ($matches[3] ?: $matches[2])] = ['portIfIndex' => $if_index];
+                    $port_ent_to_if[$matches[1] . '.' . ($matches[3] ?? $matches[2])] = ['portIfIndex' => $if_index];
                 }
             }
         }
@@ -355,7 +355,7 @@ if (LibrenmsConfig::get('enable_ports_poe')) {
             //We replace the ENTITY EntIndex by the IfIndex using the portIfIndex table (stored in $port_ent_to_if).
             //Result is merged into $port_stats
             if ($port_ent_to_if[$p_index] && $port_ent_to_if[$p_index]['portIfIndex'] && $port_stats[$port_ent_to_if[$p_index]['portIfIndex']]) {
-                $port_stats[$port_ent_to_if[$p_index]['portIfIndex']] = $port_stats[$port_ent_to_if[$p_index]['portIfIndex']] + $p_stats;
+                $port_stats[$port_ent_to_if[$p_index]['portIfIndex']] += $p_stats;
             }
         }
     } elseif ($device['os'] == 'vrp') {
@@ -381,6 +381,7 @@ if (LibrenmsConfig::get('enable_ports_poe')) {
             'rlPethPsePortOutputPower',
         ];
 
+        $port_stats_temp = [];
         foreach ($linksys_poe_oids as $oid) {
             $port_stats_temp = snmpwalk_cache_oid($device, $oid, $port_stats_temp, 'LINKSYS-POE-MIB:POWER-ETHERNET-MIB');
         }
@@ -410,7 +411,7 @@ if (LibrenmsConfig::get('enable_ports_poe')) {
     }
 }
 
-if ($device['os_group'] == 'cisco' && $device['os'] != 'asa') {
+if (isset($device['os_group']) && $device['os_group'] == 'cisco' && $device['os'] != 'asa') {
     foreach ($pagp_oids as $oid) {
         $pagp_port_stats = snmpwalk_cache_oid($device, $oid, [], 'CISCO-PAGP-MIB');
     }

@@ -100,7 +100,7 @@ trait VminfoLibvirt
                         // See spec at https://libvirt.org/formatdomain.html
 
                         // Convert array to string
-                        $vm_info_xml = implode($vm_info_array);
+                        $vm_info_xml = implode('', $vm_info_array);
 
                         $xml = simplexml_load_string('<?xml version="1.0"?> ' . $vm_info_xml);
                         Log::debug($xml);

@@ -1,4 +1,5 @@
 <tr>
+    <td>{{ $port->ifIndex }}</td>
     <td>
         <div>
             <x-port-link :port="$port" class="tw:inline">

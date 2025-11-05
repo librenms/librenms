@@ -613,6 +613,54 @@ modules:
                         - { descr: failed, graph: 0, value: 2, generic: 3 }
                         - { descr: invalidTest, graph: 0, value: 3, generic: 1 }
                         - { descr: testInProgress, graph: 0, value: 4, generic: 1 }
+                -
+                    oid: upsOutletGroupControlTable
+                    value: upsOutletGroupControlCommand
+                    num_oid: '.1.3.6.1.4.1.318.1.1.1.12.3.2.1.3.{{ $index }}'
+                    group: 'UPS Outlet Group Status'
+                    descr: 'Main: {{ $upsOutletGroupControlName }}'
+                    index: 'upsOutletGroupControlCommand.{{ $index }}'
+                    state_name: upsOutletGroupControlCommand
+                    states:
+                        - { value: 1,  graph: 0, generic: 0, descr: Immediate On}
+                        - { value: 2,  graph: 0, generic: 1, descr: Immediate Off}
+                        - { value: 3,  graph: 0, generic: 1, descr: Immediate Reboot With Or Without AC}
+                        - { value: 4,  graph: 0, generic: 1, descr: Delayed On}
+                        - { value: 5,  graph: 0, generic: 1, descr: Delayed Off}
+                        - { value: 6,  graph: 0, generic: 1, descr: Delayed Reboot With Or Without AC}
+                        - { value: 7,  graph: 0, generic: 1, descr: Cancel Pending Command}
+                        - { value: 8,  graph: 0, generic: 3, descr: Control Unknown}
+                        - { value: 9,  graph: 0, generic: 1, descr: Immediate Reboot Shutdown}
+                        - { value: 10, graph: 0, generic: 1, descr: Delayed Reboot Shutdown}
+                    skip_values:
+                        -
+                            oid: upsOutletGroupControlOutletType
+                            op: '!='
+                            value: 2
+                -
+                    oid: upsOutletGroupControlTable
+                    value: upsOutletGroupControlCommand
+                    num_oid: '.1.3.6.1.4.1.318.1.1.1.12.3.2.1.3.{{ $index }}'
+                    group: 'UPS Outlet Group Status'
+                    descr: '{{ $upsOutletGroupControlName }}'
+                    index: 'upsOutletGroupControlCommand.{{ $index }}'
+                    state_name: upsOutletGroupControlCommand
+                    states:
+                        - { value: 1,  graph: 0, generic: 0, descr: Immediate On}
+                        - { value: 2,  graph: 0, generic: 1, descr: Immediate Off}
+                        - { value: 3,  graph: 0, generic: 1, descr: Immediate Reboot With Or Without AC}
+                        - { value: 4,  graph: 0, generic: 1, descr: Delayed On}
+                        - { value: 5,  graph: 0, generic: 1, descr: Delayed Off}
+                        - { value: 6,  graph: 0, generic: 1, descr: Delayed Reboot With Or Without AC}
+                        - { value: 7,  graph: 0, generic: 1, descr: Cancel Pending Command}
+                        - { value: 8,  graph: 0, generic: 3, descr: Control Unknown}
+                        - { value: 9,  graph: 0, generic: 1, descr: Immediate Reboot Shutdown}
+                        - { value: 10, graph: 0, generic: 1, descr: Delayed Reboot Shutdown}
+                    skip_values:
+                        -
+                            oid: upsOutletGroupControlOutletType
+                            op: '!='
+                            value: 1
 
         temperature:
             data:
@@ -880,7 +928,6 @@ modules:
                     oid: xATSSource1VoltageLtoL
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.4.1.7.1.2.{{ $index }}'
                     index: 'xATSSource1VoltageLtoL.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Source1 {{ $index }} L-L'
                     divisor: 10
                     skip_values: -1
@@ -888,7 +935,6 @@ modules:
                     oid: xATSSource1VoltageLtoN
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.4.1.7.1.3.{{ $index }}'
                     index: 'xATSSource1VoltageLtoN.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Source1 {{ $index }} L-N'
                     divisor: 10
                     skip_values: -1
@@ -896,7 +942,6 @@ modules:
                     oid: xATSSource2VoltageLtoL
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.4.2.7.1.2.{{ $index }}'
                     index: 'xATSSource2VoltageLtoL.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Source2 {{ $index }} L-L'
                     divisor: 10
                     skip_values: -1
@@ -904,7 +949,6 @@ modules:
                     oid: xATSSource2VoltageLtoN
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.4.2.7.1.3.{{ $index }}'
                     index: 'xATSSource2VoltageLtoN.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Source2 {{ $index }} L-N'
                     divisor: 10
                     skip_values: -1
@@ -912,7 +956,6 @@ modules:
                     oid: xATSSystemOutputVoltageLtoL
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.4.3.12.1.2.{{ $index }}'
                     index: 'xATSSystemOutputVoltageLtoL.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Output {{ $index }} L-L'
                     divisor: 10
                     skip_values: -1
@@ -920,7 +963,6 @@ modules:
                     oid: xATSSystemOutputVoltageLtoN
                     num_oid: '.1.3.6.1.4.1.318.1.1.17.4.3.12.1.3.{{ $index }}'
                     index: 'xATSSystemOutputVoltageLtoN.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Output {{ $index }} L-N'
                     divisor: 10
                     skip_values: -1
@@ -928,7 +970,6 @@ modules:
                     oid: xATSGeneratorAdvStatusBatteryVoltage
                     num_oid: '.1.3.6.1.4.1.318.1.1.18.1.3.1.{{ $index }}'
                     index: 'xATSGeneratorAdvStatusBatteryVoltage.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Generator Battery'
                     divisor: 10
                     skip_values: -1
@@ -937,7 +978,6 @@ modules:
                     value: xPDUMainInputVoltageLtoL
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.1.4.1.2.{{ $index }}'
                     index: 'xPDUMainInputVoltageLtoL.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Input - Phase {{ $index }} L-L'
                     divisor: 10
                     skip_values: -1
@@ -946,7 +986,6 @@ modules:
                     value: xPDUMainInputVoltageLtoN
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.1.4.1.3.{{ $index }}'
                     index: 'xPDUMainInputVoltageLtoN.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Input - Phase {{ $index }} L-N'
                     divisor: 10
                     skip_values: -1
@@ -955,7 +994,6 @@ modules:
                     value: xPDUSystemOutputVoltageLtoL
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.14.1.2.{{ $index }}'
                     index: 'xPDUSystemOutputVoltageLtoL.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Output - Phase {{ $index }} L-L'
                     divisor: 10
                     skip_values: -1
@@ -964,7 +1002,6 @@ modules:
                     value: xPDUSystemOutputVoltageLtoN
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.14.1.3.{{ $index }}'
                     index: 'xPDUSystemOutputVoltageLtoN.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Output - Phase {{ $index }} L-N'
                     divisor: 10
                     skip_values: -1
@@ -1001,7 +1038,6 @@ modules:
                     value: xPDUSystemOutputPhaseCurrent
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.14.1.4.{{ $index }}'
                     index: 'xPDUSystemOutputPhaseCurrent.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Output - Phase {{ $index }}'
                     divisor: 10
                     skip_values: -1
@@ -1137,7 +1173,6 @@ modules:
                     value: xPDUSystemOutputPower
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.14.1.5.{{ $index }}'
                     index: 'xPDUSystemOutputPower.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Real Power - Phase {{ $index }}'
                     multiplier: 100
                     skip_values: -1
@@ -1146,7 +1181,6 @@ modules:
                     value: xPDUSystemOutputApparentPower
                     num_oid: '.1.3.6.1.4.1.318.1.1.15.3.4.14.1.6.{{ $index }}'
                     index: 'xPDUSystemOutputApparentPower.{{ $index }}'
-                    snmp_flags: '-OQUsbe'
                     descr: 'Apparent Power - Phase {{ $index }}'
                     multiplier: 100
                     skip_values: -1

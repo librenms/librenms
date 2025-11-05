@@ -78,9 +78,7 @@ class OverviewController extends Controller
                 ->limit(LibrenmsConfig::get('front_page_down_box_limit'))
                 ->get();
 
-            $devices_uptime = $devices_uptime->reject(function ($device) {
-                return LibrenmsConfig::getOsSetting($device->os, 'bad_uptime') == true;
-            });
+            $devices_uptime = $devices_uptime->reject(fn ($device) => LibrenmsConfig::getOsSetting($device->os, 'bad_uptime') == true);
         }
 
         if (LibrenmsConfig::get('enable_syslog')) {

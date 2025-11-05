@@ -62,7 +62,7 @@ class Validator
                     $this->validation_groups[$validation_name] = new $class();
                     $this->results[$validation_name] = [];
                 }
-            } catch (ReflectionException $e) {
+            } catch (ReflectionException) {
             }
         }
     }
@@ -114,9 +114,7 @@ class Validator
     {
         $results = $this->getResults($validation_group);
 
-        return array_reduce($results, function ($compound, ValidationResult $result) {
-            return min($compound, $result->getStatus());
-        }, ValidationResult::SUCCESS);
+        return array_reduce($results, fn ($compound, ValidationResult $result) => min($compound, $result->getStatus()), ValidationResult::SUCCESS);
     }
 
     /**
@@ -313,18 +311,13 @@ class Validator
 
     public function getStatusText(int $status): string
     {
-        switch ($status) {
-            case ValidationResult::SUCCESS:
-                return 'Ok';
-            case ValidationResult::FAILURE:
-                return 'Failure';
-            case ValidationResult::WARNING:
-                return 'Warning';
-            case ValidationResult::INFO:
-                return 'Info';
-            default:
-                return '';
-        }
+        return match ($status) {
+            ValidationResult::SUCCESS => 'Ok',
+            ValidationResult::FAILURE => 'Failure',
+            ValidationResult::WARNING => 'Warning',
+            ValidationResult::INFO => 'Info',
+            default => '',
+        };
     }
 
     public function toArray(): array
@@ -337,9 +330,7 @@ class Validator
                 'name' => ucfirst($group),
                 'status' => $groupStatus,
                 'statusText' => $this->getStatusText($groupStatus),
-                'results' => array_map(function (ValidationResult $result) {
-                    return $result->toArray();
-                }, $results),
+                'results' => array_map(fn (ValidationResult $result) => $result->toArray(), $results),
             ];
         }, $this->getAllResults(), array_keys($this->getAllResults()));
     }

@@ -73,7 +73,7 @@ if (! empty($entity_oids)) {
         if ($entry['entPhySensorType'] == 'other' && Str::contains($entity_array[$index]['entPhysicalName'], ['Rx Power Sensor', 'Tx Power Sensor'])) {
             $entitysensor['other'] = 'dbm';
         }
-        if (isset($entitysensor[$entry['entPhySensorType']]) && is_numeric($entry['entPhySensorValue']) && is_numeric($index)) {
+        if (isset($entitysensor[$entry['entPhySensorType']]) && isset($entry['entPhySensorValue']) && is_numeric($entry['entPhySensorValue']) && is_numeric($index)) {
             $entPhysicalIndex = $index;
             $oid = '.1.3.6.1.2.1.99.1.1.1.4.' . $index;
             $current = $entry['entPhySensorValue'];
@@ -148,7 +148,7 @@ if (! empty($entity_oids)) {
             if ($device['os'] == 'fortiswitch' && $entry['entPhySensorType'] == 'rpm') {
                 $type = 'percent';
                 $divisor = 1;
-                $current = $current * 10;
+                $current *= 10;
             }
 
             if ($device['os'] == 'rittal-lcp') {

@@ -32,12 +32,10 @@ use Illuminate\Support\Str;
 
 class Smokeping
 {
-    private $device;
     private $files;
 
-    public function __construct(Device $device)
+    public function __construct(private Device $device)
     {
-        $this->device = $device;
     }
 
     public static function make(Device $device)
@@ -52,7 +50,7 @@ class Smokeping
             if (is_dir($dir) && is_readable($dir)) {
                 foreach (array_diff(scandir($dir), ['.', '..']) as $file) {
                     if (stripos($file, '.rrd') !== false) {
-                        if (strpos($file, '~') !== false) {
+                        if (str_contains($file, '~')) {
                             [$target, $slave] = explode('~', $this->filenameToHostname($file));
                             $this->files['in'][$target][$slave] = $file;
                             $this->files['out'][$slave][$target] = $file;

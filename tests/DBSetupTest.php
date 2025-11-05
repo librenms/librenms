@@ -54,9 +54,7 @@ final class DBSetupTest extends DBTestCase
 
     public function testSchema(): void
     {
-        $files = array_map(function ($migration_file) {
-            return basename($migration_file, '.php');
-        }, array_diff(scandir(base_path('/database/migrations')), ['.', '..', '.gitkeep']));
+        $files = array_map(fn ($migration_file) => basename($migration_file, '.php'), array_diff(scandir(base_path('/database/migrations')), ['.', '..', '.gitkeep']));
         $migrated = DB::connection($this->connection)->table('migrations')->pluck('migration')->toArray();
         sort($files);
         sort($migrated);
