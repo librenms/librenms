@@ -54,9 +54,7 @@ trait MetricsHelpers
             $deviceIds = $deviceIds->merge($fromGroup);
         }
 
-        $deviceIds = $deviceIds->filter(function ($v) {
-            return $v !== null && $v !== '';
-        })->unique()->values();
+        $deviceIds = $deviceIds->filter(fn($v) => $v !== null && $v !== '')->unique()->values();
 
         return ['device_ids' => $deviceIds->isEmpty() ? null : $deviceIds];
     }
