@@ -51,17 +51,17 @@ class MempoolsMetrics
 
             $labels = $this->formatLabels($labelsArr);
 
-            $used_lines[] = "librenms_mempool_used_bytes{{$labels}} " . ((int) $m->mempool_used ?: 0);
-            $free_lines[] = "librenms_mempool_free_bytes{{$labels}} " . ((int) $m->mempool_free ?: 0);
-            $total_lines[] = "librenms_mempool_total_bytes{{$labels}} " . ((int) $m->mempool_total ?: 0);
-            $perc_lines[] = "librenms_mempool_used_percent{{$labels}} " . ((int) $m->mempool_perc ?: 0);
+            $used_lines[] = "librenms_mempools_used_bytes{{$labels}} " . ((int) $m->mempool_used ?: 0);
+            $free_lines[] = "librenms_mempools_free_bytes{{$labels}} " . ((int) $m->mempool_free ?: 0);
+            $total_lines[] = "librenms_mempools_total_bytes{{$labels}} " . ((int) $m->mempool_total ?: 0);
+            $perc_lines[] = "librenms_mempools_used_percent{{$labels}} " . ((int) $m->mempool_perc ?: 0);
         }
 
         // Append per-mempool metrics
-        $this->appendMetricBlock($lines, 'librenms_mempool_used_bytes', 'Used bytes in mempool', 'gauge', $used_lines);
-        $this->appendMetricBlock($lines, 'librenms_mempool_free_bytes', 'Free bytes in mempool', 'gauge', $free_lines);
-        $this->appendMetricBlock($lines, 'librenms_mempool_total_bytes', 'Total bytes in mempool', 'gauge', $total_lines);
-        $this->appendMetricBlock($lines, 'librenms_mempool_used_percent', 'Percent used', 'gauge', $perc_lines);
+        $this->appendMetricBlock($lines, 'librenms_mempools_used_bytes', 'Used bytes in mempool', 'gauge', $used_lines);
+        $this->appendMetricBlock($lines, 'librenms_mempools_free_bytes', 'Free bytes in mempool', 'gauge', $free_lines);
+        $this->appendMetricBlock($lines, 'librenms_mempools_total_bytes', 'Total bytes in mempool', 'gauge', $total_lines);
+        $this->appendMetricBlock($lines, 'librenms_mempools_used_percent', 'Percent used', 'gauge', $perc_lines);
 
         return implode("\n", $lines) . "\n";
     }

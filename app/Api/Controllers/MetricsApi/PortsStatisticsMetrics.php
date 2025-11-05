@@ -76,27 +76,27 @@ class PortsStatisticsMetrics
                 $this->escapeLabel((string) ($p->ifAlias ?? ''))
             );
 
-            $in_nucast_lines[] = "librenms_port_ifInNUcastPkts{{$labels}} " . ((int) $ps->ifInNUcastPkts ?: 0);
-            $out_nucast_lines[] = "librenms_port_ifOutNUcastPkts{{$labels}} " . ((int) $ps->ifOutNUcastPkts ?: 0);
-            $in_discards_lines[] = "librenms_port_ifInDiscards{{$labels}} " . ((int) $ps->ifInDiscards ?: 0);
-            $out_discards_lines[] = "librenms_port_ifOutDiscards{{$labels}} " . ((int) $ps->ifOutDiscards ?: 0);
-            $in_unknown_proto_lines[] = "librenms_port_ifInUnknownProtos{{$labels}} " . ((int) $ps->ifInUnknownProtos ?: 0);
-            $in_broadcast_lines[] = "librenms_port_ifInBroadcastPkts{{$labels}} " . ((int) $ps->ifInBroadcastPkts ?: 0);
-            $out_broadcast_lines[] = "librenms_port_ifOutBroadcastPkts{{$labels}} " . ((int) $ps->ifOutBroadcastPkts ?: 0);
-            $in_multicast_lines[] = "librenms_port_ifInMulticastPkts{{$labels}} " . ((int) $ps->ifInMulticastPkts ?: 0);
-            $out_multicast_lines[] = "librenms_port_ifOutMulticastPkts{{$labels}} " . ((int) $ps->ifOutMulticastPkts ?: 0);
+            $in_nucast_lines[] = "librenms_ports_statistics_ifInNUcastPkts{{$labels}} " . ((int) $ps->ifInNUcastPkts ?: 0);
+            $out_nucast_lines[] = "librenms_ports_statistics_ifOutNUcastPkts{{$labels}} " . ((int) $ps->ifOutNUcastPkts ?: 0);
+            $in_discards_lines[] = "librenms_ports_statistics_ifInDiscards{{$labels}} " . ((int) $ps->ifInDiscards ?: 0);
+            $out_discards_lines[] = "librenms_ports_statistics_ifOutDiscards{{$labels}} " . ((int) $ps->ifOutDiscards ?: 0);
+            $in_unknown_proto_lines[] = "librenms_ports_statistics_ifInUnknownProtos{{$labels}} " . ((int) $ps->ifInUnknownProtos ?: 0);
+            $in_broadcast_lines[] = "librenms_ports_statistics_ifInBroadcastPkts{{$labels}} " . ((int) $ps->ifInBroadcastPkts ?: 0);
+            $out_broadcast_lines[] = "librenms_ports_statistics_ifOutBroadcastPkts{{$labels}} " . ((int) $ps->ifOutBroadcastPkts ?: 0);
+            $in_multicast_lines[] = "librenms_ports_statistics_ifInMulticastPkts{{$labels}} " . ((int) $ps->ifInMulticastPkts ?: 0);
+            $out_multicast_lines[] = "librenms_ports_statistics_ifOutMulticastPkts{{$labels}} " . ((int) $ps->ifOutMulticastPkts ?: 0);
         }
 
         // Append per-port metrics
-        $this->appendMetricBlock($lines, 'librenms_port_ifInNUcastPkts', 'In non-unicast packets', 'counter', $in_nucast_lines);
-        $this->appendMetricBlock($lines, 'librenms_port_ifOutNUcastPkts', 'Out non-unicast packets', 'counter', $out_nucast_lines);
-        $this->appendMetricBlock($lines, 'librenms_port_ifInDiscards', 'In discards', 'counter', $in_discards_lines);
-        $this->appendMetricBlock($lines, 'librenms_port_ifOutDiscards', 'Out discards', 'counter', $out_discards_lines);
-        $this->appendMetricBlock($lines, 'librenms_port_ifInUnknownProtos', 'In unknown protocols', 'counter', $in_unknown_proto_lines);
-        $this->appendMetricBlock($lines, 'librenms_port_ifInBroadcastPkts', 'In broadcast packets', 'counter', $in_broadcast_lines);
-        $this->appendMetricBlock($lines, 'librenms_port_ifOutBroadcastPkts', 'Out broadcast packets', 'counter', $out_broadcast_lines);
-        $this->appendMetricBlock($lines, 'librenms_port_ifInMulticastPkts', 'In multicast packets', 'counter', $in_multicast_lines);
-        $this->appendMetricBlock($lines, 'librenms_port_ifOutMulticastPkts', 'Out multicast packets', 'counter', $out_multicast_lines);
+        $this->appendMetricBlock($lines, 'librenms_ports_statistics_ifInNUcastPkts', 'In non-unicast packets', 'counter', $in_nucast_lines);
+        $this->appendMetricBlock($lines, 'librenms_ports_statistics_ifOutNUcastPkts', 'Out non-unicast packets', 'counter', $out_nucast_lines);
+        $this->appendMetricBlock($lines, 'librenms_ports_statistics_ifInDiscards', 'In discards', 'counter', $in_discards_lines);
+        $this->appendMetricBlock($lines, 'librenms_ports_statistics_ifOutDiscards', 'Out discards', 'counter', $out_discards_lines);
+        $this->appendMetricBlock($lines, 'librenms_ports_statistics_ifInUnknownProtos', 'In unknown protocols', 'counter', $in_unknown_proto_lines);
+        $this->appendMetricBlock($lines, 'librenms_ports_statistics_ifInBroadcastPkts', 'In broadcast packets', 'counter', $in_broadcast_lines);
+        $this->appendMetricBlock($lines, 'librenms_ports_statistics_ifOutBroadcastPkts', 'Out broadcast packets', 'counter', $out_broadcast_lines);
+        $this->appendMetricBlock($lines, 'librenms_ports_statistics_ifInMulticastPkts', 'In multicast packets', 'counter', $in_multicast_lines);
+        $this->appendMetricBlock($lines, 'librenms_ports_statistics_ifOutMulticastPkts', 'Out multicast packets', 'counter', $out_multicast_lines);
 
         return implode("\n", $lines) . "\n";
     }

@@ -57,18 +57,18 @@ Route::prefix('v0')->group(function () {
 
         // Prometheus Metrics endpoints
         Route::prefix('metrics')->group(function () {
-            // index/info page for metrics (GET /api/v0/metrics)
             Route::get('', [App\Api\Controllers\MetricsApiController::class, 'index'])->name('metrics_index');
-            Route::get('devices', [App\Api\Controllers\MetricsApiController::class, 'devices'])->name('metrics_devices');
             Route::get('access_points', [App\Api\Controllers\MetricsApiController::class, 'accessPoints'])->name('metrics_access_points');
-            Route::get('ports', [App\Api\Controllers\MetricsApiController::class, 'ports'])->name('metrics_ports');
-            Route::get('ports_statistics', [App\Api\Controllers\MetricsApiController::class, 'portsStatistics'])->name('metrics_ports_statistics');
-            Route::get('mempools', [App\Api\Controllers\MetricsApiController::class, 'mempools'])->name('metrics_mempools');
-            Route::get('processors', [App\Api\Controllers\MetricsApiController::class, 'processors'])->name('metrics_processors');
-            Route::get('sensors', [App\Api\Controllers\MetricsApiController::class, 'sensors'])->name('metrics_sensors');
+            Route::get('alerts', [App\Api\Controllers\MetricsApiController::class, 'alerts'])->name('metrics_alerts');
             Route::get('applications', [App\Api\Controllers\MetricsApiController::class, 'applications'])->name('metrics_applications');
             Route::get('customoids', [App\Api\Controllers\MetricsApiController::class, 'customoids'])->name('metrics_customoids');
-            Route::get('alerts', [App\Api\Controllers\MetricsApiController::class, 'alerts'])->name('metrics_alerts');
+            Route::get('devices', [App\Api\Controllers\MetricsApiController::class, 'devices'])->name('metrics_devices');
+            Route::get('mempools', [App\Api\Controllers\MetricsApiController::class, 'mempools'])->name('metrics_mempools');
+            Route::get('pollers', [App\Api\Controllers\MetricsApiController::class, 'pollers'])->name('metrics_pollers');
+            Route::get('ports', [App\Api\Controllers\MetricsApiController::class, 'ports'])->name('metrics_ports');
+            Route::get('ports_statistics', [App\Api\Controllers\MetricsApiController::class, 'portsStatistics'])->name('metrics_ports_statistics');
+            Route::get('processors', [App\Api\Controllers\MetricsApiController::class, 'processors'])->name('metrics_processors');
+            Route::get('sensors', [App\Api\Controllers\MetricsApiController::class, 'sensors'])->name('metrics_sensors');
             Route::get('services', [App\Api\Controllers\MetricsApiController::class, 'services'])->name('metrics_services');
             Route::get('storages', [App\Api\Controllers\MetricsApiController::class, 'storages'])->name('metrics_storages');
             Route::get('wireless_sensors', [App\Api\Controllers\MetricsApiController::class, 'wirelessSensors'])->name('metrics_wireless_sensors');

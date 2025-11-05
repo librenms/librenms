@@ -51,17 +51,17 @@ class StoragesMetrics
                 $this->escapeLabel((string) $s->storage_descr)
             );
 
-            $used_lines[] = "librenms_storage_used_bytes{{$labels}} " . ((float) $s->storage_used ?: 0);
-            $free_lines[] = "librenms_storage_free_bytes{{$labels}} " . ((float) $s->storage_free ?: 0);
-            $total_lines[] = "librenms_storage_total_bytes{{$labels}} " . ((float) $s->storage_size ?: 0);
-            $perc_lines[] = "librenms_storage_used_percent{{$labels}} " . ((float) $s->storage_perc ?: 0);
+            $used_lines[] = "librenms_storages_used_bytes{{$labels}} " . ((float) $s->storage_used ?: 0);
+            $free_lines[] = "librenms_storages_free_bytes{{$labels}} " . ((float) $s->storage_free ?: 0);
+            $total_lines[] = "librenms_storages_total_bytes{{$labels}} " . ((float) $s->storage_size ?: 0);
+            $perc_lines[] = "librenms_storages_used_percent{{$labels}} " . ((float) $s->storage_perc ?: 0);
         }
 
         // Append per-storage metrics
-        $this->appendMetricBlock($lines, 'librenms_storage_used_bytes', 'Used bytes in storage', 'gauge', $used_lines);
-        $this->appendMetricBlock($lines, 'librenms_storage_free_bytes', 'Free bytes in storage', 'gauge', $free_lines);
-        $this->appendMetricBlock($lines, 'librenms_storage_total_bytes', 'Total bytes in storage', 'gauge', $total_lines);
-        $this->appendMetricBlock($lines, 'librenms_storage_used_percent', 'Percent used in storage', 'gauge', $perc_lines);
+        $this->appendMetricBlock($lines, 'librenms_storages_used_bytes', 'Used bytes in storage', 'gauge', $used_lines);
+        $this->appendMetricBlock($lines, 'librenms_storages_free_bytes', 'Free bytes in storage', 'gauge', $free_lines);
+        $this->appendMetricBlock($lines, 'librenms_storages_total_bytes', 'Total bytes in storage', 'gauge', $total_lines);
+        $this->appendMetricBlock($lines, 'librenms_storages_used_percent', 'Percent used in storage', 'gauge', $perc_lines);
 
         return implode("\n", $lines) . "\n";
     }

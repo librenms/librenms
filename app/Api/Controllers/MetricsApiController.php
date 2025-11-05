@@ -8,6 +8,7 @@ use App\Api\Controllers\MetricsApi\ApplicationsMetrics;
 use App\Api\Controllers\MetricsApi\CustomoidsMetrics;
 use App\Api\Controllers\MetricsApi\DevicesMetrics;
 use App\Api\Controllers\MetricsApi\MempoolsMetrics;
+use App\Api\Controllers\MetricsApi\PollersMetrics;
 use App\Api\Controllers\MetricsApi\PortsMetrics;
 use App\Api\Controllers\MetricsApi\PortsStatisticsMetrics;
 use App\Api\Controllers\MetricsApi\ProcessorsMetrics;
@@ -41,6 +42,7 @@ class MetricsApiController
         $html[] = '<li><a href="/api/v0/metrics/services">/api/v0/metrics/services</a> — service check status metrics</li>';
         $html[] = '<li><a href="/api/v0/metrics/storages">/api/v0/metrics/storages</a> — storage usage metrics</li>';
         $html[] = '<li><a href="/api/v0/metrics/wireless_sensors">/api/v0/metrics/wireless_sensors</a> — wireless sensor metrics</li>';
+        $html[] = '<li><a href="/api/v0/metrics/pollers">/api/v0/metrics/pollers</a> — poller performance and cluster metrics</li>';
         $html[] = '</ul>';
         $html[] = '<p>Each metrics endpoint returns text in the Prometheus exposition format (text/plain).</br>';
         $html[] = 'Use your API token via the X-Auth-Token header when scraping.</p>';
@@ -64,13 +66,6 @@ class MetricsApiController
         return response(implode("\n", $html), 200, ['Content-Type' => 'text/html; charset=utf-8']);
     }
 
-    public function devices(Request $request)
-    {
-        $body = app(DevicesMetrics::class)->render($request);
-
-        return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
-    }
-
     public function accessPoints(Request $request)
     {
         $body = app(AccessPointsMetrics::class)->render($request);
@@ -78,37 +73,9 @@ class MetricsApiController
         return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
     }
 
-    public function ports(Request $request)
+    public function alerts(Request $request)
     {
-        $body = app(PortsMetrics::class)->render($request);
-
-        return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
-    }
-
-    public function portsStatistics(Request $request)
-    {
-        $body = app(PortsStatisticsMetrics::class)->render($request);
-
-        return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
-    }
-
-    public function mempools(Request $request)
-    {
-        $body = app(MempoolsMetrics::class)->render($request);
-
-        return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
-    }
-
-    public function processors(Request $request)
-    {
-        $body = app(ProcessorsMetrics::class)->render($request);
-
-        return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
-    }
-
-    public function sensors(Request $request)
-    {
-        $body = app(SensorsMetrics::class)->render($request);
+        $body = app(AlertsMetrics::class)->render($request);
 
         return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
     }
@@ -127,9 +94,51 @@ class MetricsApiController
         return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
     }
 
-    public function alerts(Request $request)
+    public function devices(Request $request)
     {
-        $body = app(AlertsMetrics::class)->render($request);
+        $body = app(DevicesMetrics::class)->render($request);
+
+        return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
+    }
+
+    public function mempools(Request $request)
+    {
+        $body = app(MempoolsMetrics::class)->render($request);
+
+        return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
+    }
+
+    public function pollers(Request $request)
+    {
+        $body = app(PollersMetrics::class)->render($request);
+
+        return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
+    }
+
+    public function ports(Request $request)
+    {
+        $body = app(PortsMetrics::class)->render($request);
+
+        return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
+    }
+
+    public function portsStatistics(Request $request)
+    {
+        $body = app(PortsStatisticsMetrics::class)->render($request);
+
+        return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
+    }
+
+    public function processors(Request $request)
+    {
+        $body = app(ProcessorsMetrics::class)->render($request);
+
+        return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
+    }
+
+    public function sensors(Request $request)
+    {
+        $body = app(SensorsMetrics::class)->render($request);
 
         return response($body, 200, ['Content-Type' => 'text/plain; version=0; charset=utf-8']);
     }

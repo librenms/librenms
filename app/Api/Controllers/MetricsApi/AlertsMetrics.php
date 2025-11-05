@@ -20,7 +20,7 @@ class AlertsMetrics
 
         // Gather global metrics
         $total_rules = AlertRule::count();
-        $this->appendMetricBlock($lines, 'librenms_alert_rules_total', 'Total number of alert rules', 'gauge', "librenms_alert_rules_total {$total_rules}");
+        $this->appendMetricBlock($lines, 'librenms_alerts_rules_total', 'Total number of alert rules', 'gauge', "librenms_alerts_rules_total {$total_rules}");
 
         $alertsQ = Alert::query();
         $alertsQ = $this->applyDeviceFilter($alertsQ, $filters['device_ids']);
@@ -44,9 +44,9 @@ class AlertsMetrics
         /** @var \stdClass $sv */
         foreach ($sevs as $sv) {
             $sev = $this->escapeLabel((string) ($sv->severity ?? 'unknown'));
-            $severity_lines[] = sprintf('librenms_alert_rules_by_severity{severity="%s"} %d', $sev, $sv->cnt);
+            $severity_lines[] = sprintf('librenms_alerts_rules_by_severity{severity="%s"} %d', $sev, $sv->cnt);
         }
-        $this->appendMetricBlock($lines, 'librenms_alert_rules_by_severity', 'Number of alert rules by severity', 'gauge', $severity_lines);
+        $this->appendMetricBlock($lines, 'librenms_alerts_rules_by_severity', 'Number of alert rules by severity', 'gauge', $severity_lines);
 
         // Active alert counts
         $activeQ = Alert::where('state', 1);
