@@ -219,7 +219,7 @@ return [
         'converting' => 'Converting :file:',
         'summary' => 'Converted: :converted  Failed: :failed  Skipped: :skipped',
     ],
-    'maintenance:syslog-cleanup' => [
+    'maintenance:cleanup-syslog' => [
         'delete' => 'Cleared syslog entries older than :days days (:count rows)',
     ],
     'plugin:disable' => [

@@ -8,9 +8,9 @@ use App\Models\Syslog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 
-class MaintenanceSyslogCleanup extends LnmsCommand
+class MaintenanceCleanupSyslog extends LnmsCommand
 {
-    protected $name = 'maintenance:syslog-cleanup';
+    protected $name = 'maintenance:cleanup-syslog';
 
     /**
      * Execute the console command.
@@ -39,7 +39,7 @@ class MaintenanceSyslogCleanup extends LnmsCommand
         }
         $lock->release();
 
-        $this->line(trans('commands.maintenance:syslog-cleanup.delete', ['days' => $syslog_purge, 'count' => $deleted_total]));
+        $this->line(trans('commands.maintenance:cleanup-syslog.delete', ['days' => $syslog_purge, 'count' => $deleted_total]));
 
         return 0;
     }
