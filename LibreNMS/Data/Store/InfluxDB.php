@@ -47,12 +47,18 @@ class InfluxDB extends BaseDatastore
         $this->measurements = LibrenmsConfig::get('influxdb.measurements', []);
 
         // if the database doesn't exist, create it.
-        try {
-            if (! $this->connection->exists()) {
-                $this->connection->create();
+        // When using UDP transport, the call to exists() fails
+	// since the transport doesn't support querying.  That said
+	// the database will be created automatically upon data
+	// reception.
+        if (LibrenmsConfig::get('influxdb.transport', 'http') !== 'udp') {
+            try {
+                if (! $this->connection->exists()) {
+                    $this->connection->create();
+                }
+            } catch (\Exception) {
+                Log::warning('InfluxDB: Could not create database');
             }
-        } catch (\Exception) {
-            Log::warning('InfluxDB: Could not create database');
         }
     }
 
