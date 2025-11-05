@@ -15,15 +15,20 @@ class ServicesMetrics
     {
         $lines = [];
 
+        // Parse filters
+        $filters = $this->parseDeviceFilters($request);
+
         // Gather global metrics
-        $total = Service::count();
+        $totalQ = Service::query();
+        $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
 
         // Append global metrics
         $this->appendMetricBlock($lines, 'librenms_services_total', 'Total number of services configured', 'gauge', [$total]);
 
         // counts by status (0=OK,1=WARNING,2=CRITICAL)
         $status_lines = [];
-        $statuses = Service::select('service_status', DB::raw('count(*) as cnt'))->groupBy('service_status')->get();
+        $statusesQ = Service::select('service_status', DB::raw('count(*) as cnt'));
+        $statuses = $this->applyDeviceFilter($statusesQ, $filters['device_ids'])->groupBy('service_status')->get();
         /** @var \stdClass $s */
         foreach ($statuses as $s) {
             $status_lines[] = sprintf('librenms_services_by_status{status="%s"} %d', $s->service_status, $s->cnt);
@@ -31,19 +36,23 @@ class ServicesMetrics
         $this->appendMetricBlock($lines, 'librenms_services_by_status', 'Number of services by status (0=OK,1=WARNING,2=CRITICAL)', 'gauge', $status_lines);
 
         // Ignored Service count
-        $ignored = Service::where('service_ignore', 1)->count();
+        $ignoredQ = Service::where('service_ignore', 1);
+        $ignored = $this->applyDeviceFilter($ignoredQ, $filters['device_ids'])->count();
         $this->appendMetricBlock($lines, 'librenms_services_ignored', 'Number of ignored services', 'gauge', [$ignored]);
 
         // Disabled Service count
-        $disabled = Service::where('service_disabled', 1)->count();
+        $disabledQ = Service::where('service_disabled', 1);
+        $disabled = $this->applyDeviceFilter($disabledQ, $filters['device_ids'])->count();
         $this->appendMetricBlock($lines, 'librenms_services_disabled', 'Number of disabled services', 'gauge', [$disabled]);
 
         // Prepare per-device counts by status (may be high-cardinality)
-        $deviceIds = Service::select('device_id')->distinct()->pluck('device_id');
+        $deviceIdsQuery = Service::select('device_id')->distinct();
+        $deviceIds = $this->applyDeviceFilter($deviceIdsQuery, $filters['device_ids'])->pluck('device_id');
         $devices = Device::select('device_id', 'hostname', 'sysName')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
 
         $services_lines = [];
-        $rows = Service::select('device_id', 'service_status', DB::raw('count(*) as cnt'))->groupBy('device_id', 'service_status')->cursor();
+        $rowsQ = Service::select('device_id', 'service_status', DB::raw('count(*) as cnt'));
+        $rows = $this->applyDeviceFilter($rowsQ, $filters['device_ids'])->groupBy('device_id', 'service_status')->cursor();
         /** @var \stdClass $r */
         foreach ($rows as $r) {
             $dev = $devices->get($r->device_id);
