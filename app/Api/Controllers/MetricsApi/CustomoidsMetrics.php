@@ -60,12 +60,12 @@ class CustomoidsMetrics
             // Determine datatype; treat non-GAUGE as counter-like
             $datatype = strtoupper((string) ($c->customoid_datatype ?? 'GAUGE'));
             if ($datatype === 'GAUGE') {
-                $gauge_value_lines[] = "librenms_customoids_value{{$labels}} " . ($value !== null ? $value : 0);
+                $gauge_value_lines[] = "librenms_customoids_value{{$labels}} " . ($value ?? 0);
                 $gauge_limit_warn_lines[] = "librenms_customoids_limit_warn{{$labels}} " . ((float) ($c->customoid_limit_warn ?? 0));
                 $gauge_limit_crit_lines[] = "librenms_customoids_limit_crit{{$labels}} " . ((float) ($c->customoid_limit ?? 0));
             } else {
                 // treat as counter
-                $counter_value_lines[] = "librenms_customoids_value_counter{{$labels}} " . ($value !== null ? $value : 0);
+                $counter_value_lines[] = "librenms_customoids_value_counter{{$labels}} " . ($value ?? 0);
                 $counter_limit_warn_lines[] = "librenms_customoids_limit_warn_counter{{$labels}} " . ((float) ($c->customoid_limit_warn ?? 0));
                 $counter_limit_crit_lines[] = "librenms_customoids_limit_crit_counter{{$labels}} " . ((float) ($c->customoid_limit ?? 0));
             }
