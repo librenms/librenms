@@ -9,14 +9,17 @@ class Customoid extends DeviceRelatedModel
     protected $primaryKey = 'customoid_id';
 =======
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 
-class Customoid extends Model
+class Customoid extends DeviceRelatedModel
 {
     use HasFactory;
 
     public $timestamps = false;
     protected $primaryKey = 'customoid_id';
     protected $table = 'customoids';
+<<<<<<< master
 >>>>>>> Update Customoid.php
 }
+=======
+}
+>>>>>>> Update Customoid.php
