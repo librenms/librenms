@@ -3,8 +3,8 @@
 namespace App\Api\Controllers\MetricsApi;
 
 use App\Models\Device;
+use App\Models\WirelessSensor;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class WirelessSensorsMetrics
 {
@@ -14,8 +14,12 @@ class WirelessSensorsMetrics
     {
         $lines = [];
 
+        // Parse filters
+        $filters = $this->parseDeviceFilters($request);
+
         // Gather global metrics
-        $total = DB::table('wireless_sensors')->count();
+        $totalQ = WirelessSensor::query();
+        $total = $this->applyDeviceFilter($totalQ, $filters['device_ids'])->count();
 
         // Append global metrics
         $this->appendMetricBlock($lines, 'librenms_wireless_sensors_total', 'Total number of wireless sensors', 'gauge', [$total]);
@@ -29,10 +33,12 @@ class WirelessSensorsMetrics
         $counter_limit_crit_lines = [];
 
         // Gather device info mapping for labels
-        $deviceIds = DB::table('wireless_sensors')->distinct()->pluck('device_id');
+        $deviceIdsQuery = WirelessSensor::select('device_id')->distinct();
+        $deviceIds = $this->applyDeviceFilter($deviceIdsQuery, $filters['device_ids'])->pluck('device_id');
         $devices = Device::select('device_id', 'hostname', 'sysName')->whereIn('device_id', $deviceIds)->get()->keyBy('device_id');
 
-        $rows = DB::table('wireless_sensors')->select('sensor_id', 'device_id', 'sensor_class', 'sensor_type', 'sensor_descr', 'sensor_current', 'sensor_multiplier', 'sensor_divisor', 'sensor_limit_warn', 'sensor_limit')->cursor();
+        $sensorQuery = WirelessSensor::select('sensor_id', 'device_id', 'sensor_class', 'sensor_type', 'sensor_descr', 'sensor_current', 'sensor_multiplier', 'sensor_divisor', 'sensor_limit_warn', 'sensor_limit');
+        $rows = $this->applyDeviceFilter($sensorQuery, $filters['device_ids'])->cursor();
 
         foreach ($rows as $s) {
             $dev = $devices->get($s->device_id);
