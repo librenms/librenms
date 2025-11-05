@@ -51,7 +51,7 @@ class PollersMetrics
         }
 
         // Append per-poller metrics
-        if (!empty($devices_lines)) {
+        if (! empty($devices_lines)) {
             $this->appendMetricBlock($lines, 'librenms_pollers_devices', 'Number of devices polled by this poller', 'gauge', $devices_lines);
             $this->appendMetricBlock($lines, 'librenms_pollers_time_taken_seconds', 'Time taken for last polling cycle in seconds', 'gauge', $time_taken_lines);
         }
@@ -82,18 +82,18 @@ class PollersMetrics
             );
 
             $is_master_lines[] = "librenms_poller_cluster_is_master{{$labels}} " . ($cluster->master ? '1' : '0');
-            
+
             // Check if cluster is active (reported recently)
             $is_active = PollerCluster::where('id', $cluster->id)->isActive()->exists();
             $is_active_lines[] = "librenms_poller_cluster_is_active{{$labels}} " . ($is_active ? '1' : '0');
-            
+
             // Convert last_report to unix timestamp
             $last_report_timestamp = $cluster->last_report ? $cluster->last_report->timestamp : 0;
             $last_report_lines[] = "librenms_poller_cluster_last_report_timestamp{{$labels}} " . $last_report_timestamp;
         }
 
         // Append per-cluster-node metrics
-        if (!empty($is_master_lines)) {
+        if (! empty($is_master_lines)) {
             $this->appendMetricBlock($lines, 'librenms_poller_cluster_is_master', 'Whether this cluster node is a master (1) or not (0)', 'gauge', $is_master_lines);
             $this->appendMetricBlock($lines, 'librenms_poller_cluster_is_active', 'Whether this cluster node is active (1) or not (0)', 'gauge', $is_active_lines);
             $this->appendMetricBlock($lines, 'librenms_poller_cluster_last_report_timestamp', 'Unix timestamp of last report from this cluster node', 'gauge', $last_report_lines);
@@ -135,7 +135,7 @@ class PollersMetrics
         }
 
         // Append cluster stats metrics
-        if (!empty($devices_lines)) {
+        if (! empty($devices_lines)) {
             $this->appendMetricBlock($lines, 'librenms_poller_cluster_stats_devices', 'Number of devices handled by this cluster poller', 'gauge', $devices_lines);
             $this->appendMetricBlock($lines, 'librenms_poller_cluster_stats_worker_seconds', 'Worker seconds consumed by this cluster poller', 'gauge', $worker_seconds_lines);
             $this->appendMetricBlock($lines, 'librenms_poller_cluster_stats_workers', 'Number of workers for this cluster poller', 'gauge', $workers_lines);
