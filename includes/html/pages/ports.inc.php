@@ -235,9 +235,9 @@ if (! isset($vars['deleted'])) {
 
 if (isset($vars['purge'])) {
     if ($vars['purge'] === 'all') {
-        Port::hasAccess(Auth::user())->with(['device' => function ($query) {
+        Port::hasAccess(Auth::user())->with(['device' => function ($query): void {
             $query->select('device_id', 'hostname');
-        }])->isDeleted()->chunkById(100, function ($ports) {
+        }])->isDeleted()->chunkById(100, function ($ports): void {
             foreach ($ports as $port) {
                 $port->delete();
             }
@@ -245,7 +245,7 @@ if (isset($vars['purge'])) {
     } else {
         try {
             Port::hasAccess(Auth::user())->where('port_id', $vars['purge'])->firstOrFail()->delete();
-        } catch (ModelNotFoundException $e) {
+        } catch (ModelNotFoundException) {
             echo "<div class='alert alert-danger'>Port ID " . htmlspecialchars($vars['purge']) . ' not found! Could not purge port.</div>';
         }
     }

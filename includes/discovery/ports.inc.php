@@ -105,17 +105,6 @@ if ($device['port_association_mode']) {
 $ports_mapped = get_ports_mapped($device['device_id']);
 $ports_db = $ports_mapped['ports'];
 
-//
-// Rename any old RRD files still named after the previous ifIndex based naming schema.
-foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
-    foreach (['', '-adsl', '-dot3'] as $suffix) {
-        $old_rrd_name = "port-$ifIndex$suffix.rrd";
-        $new_rrd_name = \Rrd::portName($port_id, ltrim($suffix, '-'));
-
-        \Rrd::renameFile(DeviceCache::get($device['device_id']), $old_rrd_name, $new_rrd_name);
-    }
-}
-
 // Fill ifAlias for fibrechannel ports
 if ($device['os'] == 'fabos') {
     require base_path('includes/discovery/ports/brocade.inc.php');

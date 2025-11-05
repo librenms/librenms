@@ -145,7 +145,7 @@ class Location extends Model
             $this->fill($api->getCoordinates(preg_replace($this->location_ignore_regex, '', $this->location)));
 
             return true;
-        } catch (BindingResolutionException $e) {
+        } catch (BindingResolutionException) {
             // could not resolve geocoder, Laravel isn't booted. Fail silently.
         }
 
@@ -175,7 +175,7 @@ class Location extends Model
 
     public function scopeInDeviceGroup($query, $deviceGroup)
     {
-        return $query->whereHas('devices.groups', function ($query) use ($deviceGroup) {
+        return $query->whereHas('devices.groups', function ($query) use ($deviceGroup): void {
             $query->where('device_groups.id', $deviceGroup);
         });
     }
@@ -189,8 +189,8 @@ class Location extends Model
         return $this->hasMany(Device::class, 'location_id');
     }
 
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->location;
+        return (string) $this->location;
     }
 }

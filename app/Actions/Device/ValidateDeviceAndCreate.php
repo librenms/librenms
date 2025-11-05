@@ -41,29 +41,8 @@ use SnmpQuery;
 
 class ValidateDeviceAndCreate
 {
-    /**
-     * @var Device
-     */
-    private $device;
-    /**
-     * @var bool
-     */
-    private $force;
-    /**
-     * @var bool
-     */
-    private $ping_fallback;
-    /**
-     * @var \LibreNMS\Polling\ConnectivityHelper
-     */
-    private $connectivity;
-
-    public function __construct(Device $device, bool $force = false, bool $ping_fallback = false)
+    public function __construct(private Device $device, private bool $force = false, private bool $ping_fallback = false)
     {
-        $this->device = $device;
-        $this->force = $force;
-        $this->ping_fallback = $ping_fallback;
-        $this->connectivity = new \LibreNMS\Polling\ConnectivityHelper($this->device);
     }
 
     /**
@@ -86,7 +65,7 @@ class ValidateDeviceAndCreate
         if (! $this->force) {
             $this->exceptIfIpExists();
 
-            if (! $this->connectivity->isPingable()->success()) {
+            if (! app(DeviceIsPingable::class)->execute($this->device)->success()) {
                 throw new HostUnreachablePingException($this->device->hostname);
             }
 
@@ -119,9 +98,7 @@ class ValidateDeviceAndCreate
         // which snmp version should we try (and in what order)
         $snmp_versions = $this->device->snmpver ? [$this->device->snmpver] : LibrenmsConfig::get('snmp.version');
 
-        $communities = Arr::where(Arr::wrap(LibrenmsConfig::get('snmp.community')), function ($community) {
-            return $community && is_string($community);
-        });
+        $communities = Arr::where(Arr::wrap(LibrenmsConfig::get('snmp.community')), fn ($community) => $community && is_string($community));
         if ($this->device->community) {
             array_unshift($communities, $this->device->community);
         }
@@ -139,7 +116,7 @@ class ValidateDeviceAndCreate
                 foreach ($v3_credentials as $v3) {
                     $this->device->fill(Arr::only($v3, ['authlevel', 'authname', 'authpass', 'authalgo', 'cryptopass', 'cryptoalgo']));
 
-                    if ($this->connectivity->isSNMPable()) {
+                    if (app(DeviceIsSnmpable::class)->execute($this->device)) {
                         return;
                     } else {
                         $host_unreachable_exception->addReason($snmp_version, $this->device->authname . '/' . $this->device->authlevel);
@@ -149,7 +126,7 @@ class ValidateDeviceAndCreate
                 // try each community from config
                 foreach ($communities as $community) {
                     $this->device->community = $community;
-                    if ($this->connectivity->isSNMPable()) {
+                    if (app(DeviceIsSnmpable::class)->execute($this->device)) {
                         return;
                     } else {
                         $host_unreachable_exception->addReason($snmp_version, $this->device->community);
@@ -242,7 +219,7 @@ class ValidateDeviceAndCreate
         }
 
         if (Device::where('sysName', $this->device->sysName)
-            ->when(LibrenmsConfig::get('mydomain'), function ($query, $domain) {
+            ->when(LibrenmsConfig::get('mydomain'), function ($query, $domain): void {
                 $query->orWhere('sysName', rtrim($this->device->sysName, '.') . '.' . $domain);
             })->exists()) {
             throw new HostSysnameExistsException($this->device->hostname, $this->device->sysName);

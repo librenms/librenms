@@ -44,7 +44,7 @@ class Zenduty extends Transport
             $alert_type = $alert_data['severity'];
         }
         // Set the standard data ZD expects to see
-        $msg = (json_decode($alert_data['msg'], true)) ? json_decode($alert_data['msg'], true) : $alert_data['msg'];
+        $msg = json_decode($alert_data['msg'], true) ?: $alert_data['msg'];
         $data = [
             'message' => $alert_data['title'],
             'alert_type' => $alert_type,

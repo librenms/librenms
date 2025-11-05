@@ -3,7 +3,7 @@
 @section('content')
     <x-device.page :device="$device" :dropdown-links="$data['dropdownLinks'] ?? []">
     @isset($data['submenu'])
-        <x-submenu :title="$title" :menu="$data['submenu']" :device-id="$device_id" :current-tab="$current_tab" :selected="$vars" />
+        <x-submenu :title="$title" :menu="$data['submenu']" :device-id="$device->device_id" :current-tab="$current_tab" :selected="$vars" />
     @endisset
 
     @includeFirst(['device.tabs.ports.' . $data['tab'], 'device.tabs.ports.detail'])

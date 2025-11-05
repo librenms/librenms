@@ -91,7 +91,6 @@ are as follows:
   automatically by discovery process. This parameter is still required to
   submit a pull request. This is the numerical OID that contains
   `value`. This should usually include `{{ $index }}`.
-  In case the index is a string, `{{ $str_index_as_numeric }}` can be used instead and will convert
 the string to the equivalent OID representation.
 - `divisor` (optional): This is the divisor to use against the returned `value`.
 - `multiplier` (optional): This is the multiplier to use against the returned `value`.
@@ -114,8 +113,8 @@ the string to the equivalent OID representation.
   the default group. If group is set to `transceiver` it will be shown with the port
   instead of in with all the generic sensors (You must also set `entPhysicalIndex` to ifIndex)
 - `index` (optional): This is the index value we use to uniquely
-  identify this sensor. `{{ $index }}` will be replaced by the `index`
-  from the snmp walk.
+  identify this sensor. `{{ $index }}` will be replaced by the numeric
+  `index` of this row in the table the snmp walk.
 - `skip_values` (optional): This is an array of values we should skip
   over (see note below).
 - `skip_value_lt` (optional): If sensor value is less than this, skip the discovery.
@@ -147,9 +146,15 @@ For `options:` you have the following available:
 
 Multiple variables can be used in the sensor's definition. The syntax
 is `{{ $variable }}`. Any oid in the current table can be used, as
-well as pre_cached data. The index ($index) and the sub_indexes (in
+well as pre-fetched data. The index ($index) and the sub_indexes (in
 case the oid is indexed multiple times) are also available: if
 $index="1.20", then $subindex0="1" and $subindex1="20".
+
+If you want access a string in an index, `{{ $index_string }}` can be used,
+optionally suffixed with a format string to specify how to extract the string.
+`{{ $index_string:nns }}` will skip two numeric indexes and return the string after.
+`{{ $index_string:nss }}` will skip one numeric index and one string index and return
+next string after.
 
 #### Fetching values from other tables/oids
 
@@ -254,11 +259,7 @@ sensors follows the same code format which is to collect sensor information
 via SNMP and then call the `discover_sensor()` function; except state
 sensors which requires additional code. Sensor information is commonly found in an ENTITY
 mib supplied by device's vendor in the form of a table. Other mib tables may be used as
-well. Sensor information is first collected by
-`includes/discovery/sensors/pre_cache/$os.inc.php`. This program will pull in data
-from mib tables into a `$pre_cache` array that can then be used in
-`includes/discovery/sensors/$class/$os.inc.php` to extract specific values which are
-then passed to `discover_sensor()`.
+well.
 
 `discover_sensor()` Accepts the following arguments:
 

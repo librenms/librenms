@@ -353,7 +353,7 @@ HOST-RESOURCES-MIB::hrStorageUsed.36 = 127044934
         $response = new SnmpResponse("hrDeviceTable = NULL\n", '', 0);
         $this->assertTrue($response->isValid());
         $this->assertEquals('', $response->getRawWithoutBadLines());
-        $response->mapTable(function () {
+        $response->mapTable(function (): void {
             $this->fail('There should be no data in the array.');
         });
     }

@@ -142,18 +142,18 @@ class Routes implements Module
             }
 
             $data->updated_at = $update_timestamp;
-            $data->port_id = $data->port_id ?? 0;
+            $data->port_id ??= 0;
             $data->context_name = $context;
             $data->inetCidrRouteIfIndex = intval($data->inetCidrRouteIfIndex);
             $data->inetCidrRouteType = intval($data->inetCidrRouteType);
             $data->inetCidrRouteProto = intval($data->inetCidrRouteProto);
             $data->inetCidrRouteNextHopAS = intval($data->inetCidrRouteNextHopAS);
             $data->inetCidrRouteMetric1 = intval($data->inetCidrRouteMetric1) < 0 ? 0 : intval($data->inetCidrRouteMetric1); //negative val from RFC1213
-            $data->inetCidrRouteDestType = $data->inetCidrRouteDestType ?? '';
+            $data->inetCidrRouteDestType ??= '';
             $data->inetCidrRouteDest = $dst;
-            $data->inetCidrRouteNextHopType = $data->inetCidrRouteNextHopType ?? '';
+            $data->inetCidrRouteNextHopType ??= '';
             $data->inetCidrRouteNextHop = $hop;
-            $data->inetCidrRoutePolicy = $data->inetCidrRoutePolicy ?? '';
+            $data->inetCidrRoutePolicy ??= '';
             $data->inetCidrRoutePfxLen = $pfxLen;
 
             return $data;
@@ -220,23 +220,21 @@ class Routes implements Module
         Log::info('IP-FORWARD-MIB::inetCidrRouteTable');
 
         return SnmpQuery::hideMib()->walk(['IP-FORWARD-MIB::inetCidrRouteTable'])
-            ->mapTable(function ($data, $dstType = '', $dst = '', $pfxLen = '', $policy = '', $hopType = '', $hop = '') use ($device) {
-                return new Route([
-                    'port_id' => PortCache::getIdFromIfIndex($data['inetCidrRouteIfIndex'] ?? 0, $device->device_id) ?? 0,
-                    'context_name' => '',
-                    'inetCidrRouteIfIndex' => $data['inetCidrRouteIfIndex'] ?? 0,
-                    'inetCidrRouteType' => $data['inetCidrRouteType'] ?? 0,
-                    'inetCidrRouteProto' => $data['inetCidrRouteProto'] ?? 0,
-                    'inetCidrRouteNextHopAS' => $data['inetCidrRouteNextHopAS'] ?? 0,
-                    'inetCidrRouteMetric1' => $data['inetCidrRouteMetric1'] ?? 0,
-                    'inetCidrRouteDestType' => $dstType,
-                    'inetCidrRouteDest' => $dst,
-                    'inetCidrRouteNextHopType' => $hopType,
-                    'inetCidrRouteNextHop' => $hop,
-                    'inetCidrRoutePolicy' => $policy,
-                    'inetCidrRoutePfxLen' => $pfxLen,
-                ]);
-            })->filter();
+            ->mapTable(fn ($data, $dstType = '', $dst = '', $pfxLen = '', $policy = '', $hopType = '', $hop = '') => new Route([
+                'port_id' => PortCache::getIdFromIfIndex($data['inetCidrRouteIfIndex'] ?? 0, $device->device_id) ?? 0,
+                'context_name' => '',
+                'inetCidrRouteIfIndex' => $data['inetCidrRouteIfIndex'] ?? 0,
+                'inetCidrRouteType' => $data['inetCidrRouteType'] ?? 0,
+                'inetCidrRouteProto' => $data['inetCidrRouteProto'] ?? 0,
+                'inetCidrRouteNextHopAS' => $data['inetCidrRouteNextHopAS'] ?? 0,
+                'inetCidrRouteMetric1' => $data['inetCidrRouteMetric1'] ?? 0,
+                'inetCidrRouteDestType' => $dstType,
+                'inetCidrRouteDest' => $dst,
+                'inetCidrRouteNextHopType' => $hopType,
+                'inetCidrRouteNextHop' => $hop,
+                'inetCidrRoutePolicy' => $policy,
+                'inetCidrRoutePfxLen' => $pfxLen,
+            ]))->filter();
     }
 
     private function discoverIpCidrRoutes(Device $device, int $max_routes): Collection
@@ -249,23 +247,21 @@ class Routes implements Module
         Log::info('IP-FORWARD-MIB::ipCidrRouteTable');
 
         return SnmpQuery::hideMib()->walk(['IP-FORWARD-MIB::ipCidrRouteTable'])
-        ->mapTable(function ($data, $dst = '', $netmask = '', $tos = '', $hop = '') use ($device) {
-            return new Route([
-                'port_id' => PortCache::getIdFromIfIndex($data['ipCidrRouteIfIndex'] ?? 0, $device->device_id) ?? 0,
-                'context_name' => '',
-                'inetCidrRouteIfIndex' => $data['ipCidrRouteIfIndex'] ?? 0,
-                'inetCidrRouteType' => $data['ipCidrRouteType'] ?? 0,
-                'inetCidrRouteProto' => $data['ipCidrRouteProto'] ?? 0,
-                'inetCidrRouteNextHopAS' => $data['ipCidrRouteNextHopAS'] ?? 0,
-                'inetCidrRouteMetric1' => $data['ipCidrRouteMetric1'] ?? 0,
-                'inetCidrRouteDestType' => 'ipv4',
-                'inetCidrRouteDest' => $dst,
-                'inetCidrRouteNextHopType' => 'ipv4',
-                'inetCidrRouteNextHop' => $hop,
-                'inetCidrRoutePolicy' => $data['ipCidrRouteInfo'] ?? '',
-                'inetCidrRoutePfxLen' => $netmask,
-            ]);
-        })->filter();
+        ->mapTable(fn ($data, $dst = '', $netmask = '', $tos = '', $hop = '') => new Route([
+            'port_id' => PortCache::getIdFromIfIndex($data['ipCidrRouteIfIndex'] ?? 0, $device->device_id) ?? 0,
+            'context_name' => '',
+            'inetCidrRouteIfIndex' => $data['ipCidrRouteIfIndex'] ?? 0,
+            'inetCidrRouteType' => $data['ipCidrRouteType'] ?? 0,
+            'inetCidrRouteProto' => $data['ipCidrRouteProto'] ?? 0,
+            'inetCidrRouteNextHopAS' => $data['ipCidrRouteNextHopAS'] ?? 0,
+            'inetCidrRouteMetric1' => $data['ipCidrRouteMetric1'] ?? 0,
+            'inetCidrRouteDestType' => 'ipv4',
+            'inetCidrRouteDest' => $dst,
+            'inetCidrRouteNextHopType' => 'ipv4',
+            'inetCidrRouteNextHop' => $hop,
+            'inetCidrRoutePolicy' => $data['ipCidrRouteInfo'] ?? '',
+            'inetCidrRoutePfxLen' => $netmask,
+        ]))->filter();
     }
 
     private function discoverRfcRoutes(Device $device): Collection
@@ -273,23 +269,21 @@ class Routes implements Module
         Log::info('RFC1213-MIB::ipRouteTable');
 
         return SnmpQuery::hideMib()->walk(['RFC1213-MIB::ipRouteTable'])
-            ->mapTable(function ($data) use ($device) {
-                return new Route([
-                    'port_id' => PortCache::getIdFromIfIndex($data['ipRouteIfIndex'] ?? 0, $device->device_id) ?? 0,
-                    'context_name' => '',
-                    'inetCidrRouteType' => $data['ipRouteType'] ?? 0,
-                    'inetCidrRouteProto' => $data['ipRouteProto'] ?? 0,
-                    'inetCidrRouteIfIndex' => $data['ipRouteIfIndex'] ?? 0,
-                    'inetCidrRouteNextHopAS' => '0',
-                    'inetCidrRouteMetric1' => $data['ipRouteMetric1'] ?? 0,
-                    'inetCidrRouteDestType' => 'ipv4',
-                    'inetCidrRouteDest' => $data['ipRouteDest'] ?? '',
-                    'inetCidrRouteNextHopType' => 'ipv4',
-                    'inetCidrRouteNextHop' => $data['ipRouteNextHop'] ?? '',
-                    'inetCidrRoutePfxLen' => $data['ipRouteMask'] ?? '',
-                    'inetCidrRoutePolicy' => $data['ipRouteInfo'] ?? '',
-                ]);
-            })->filter();
+            ->mapTable(fn ($data) => new Route([
+                'port_id' => PortCache::getIdFromIfIndex($data['ipRouteIfIndex'] ?? 0, $device->device_id) ?? 0,
+                'context_name' => '',
+                'inetCidrRouteType' => $data['ipRouteType'] ?? 0,
+                'inetCidrRouteProto' => $data['ipRouteProto'] ?? 0,
+                'inetCidrRouteIfIndex' => $data['ipRouteIfIndex'] ?? 0,
+                'inetCidrRouteNextHopAS' => '0',
+                'inetCidrRouteMetric1' => $data['ipRouteMetric1'] ?? 0,
+                'inetCidrRouteDestType' => 'ipv4',
+                'inetCidrRouteDest' => $data['ipRouteDest'] ?? '',
+                'inetCidrRouteNextHopType' => 'ipv4',
+                'inetCidrRouteNextHop' => $data['ipRouteNextHop'] ?? '',
+                'inetCidrRoutePfxLen' => $data['ipRouteMask'] ?? '',
+                'inetCidrRoutePolicy' => $data['ipRouteInfo'] ?? '',
+            ]))->filter();
     }
 
     private function discoverIpv6MibRoutes(Device $device, int $max_routes): Collection
@@ -302,23 +296,21 @@ class Routes implements Module
         Log::info('IPV6-MIB::ipv6RouteTable');
 
         return SnmpQuery::hideMib()->walk(['IPV6-MIB::ipv6RouteTable'])
-        ->mapTable(function ($data, $dst = '', $pfxLen = '', $tos = '') use ($device) {
-            return new Route([
-                'port_id' => PortCache::getIdFromIfIndex($data['ipv6RouteIfIndex'] ?? 0, $device->device_id) ?? 0,
-                'context_name' => '',
-                'inetCidrRouteIfIndex' => $data['ipv6RouteIfIndex'] ?? 0,
-                'inetCidrRouteType' => $data['ipv6RouteType'] ?? 0,
-                'inetCidrRouteProto' => $data['ipv6RouteProtocol'] ?? 0,
-                'inetCidrRouteNextHopAS' => '0',
-                'inetCidrRouteMetric1' => $data['ipv6RouteMetric'] ?? 0,
-                'inetCidrRouteDestType' => 'ipv6',
-                'inetCidrRouteDest' => $dst,
-                'inetCidrRouteNextHopType' => 'ipv6',
-                'inetCidrRouteNextHop' => $data['ipv6RouteNextHop'] ?? '',
-                'inetCidrRoutePolicy' => $data['ipv6RoutePolicy'] ?? '',
-                'inetCidrRoutePfxLen' => $pfxLen,
-            ]);
-        })->filter();
+        ->mapTable(fn ($data, $dst = '', $pfxLen = '', $tos = '') => new Route([
+            'port_id' => PortCache::getIdFromIfIndex($data['ipv6RouteIfIndex'] ?? 0, $device->device_id) ?? 0,
+            'context_name' => '',
+            'inetCidrRouteIfIndex' => $data['ipv6RouteIfIndex'] ?? 0,
+            'inetCidrRouteType' => $data['ipv6RouteType'] ?? 0,
+            'inetCidrRouteProto' => $data['ipv6RouteProtocol'] ?? 0,
+            'inetCidrRouteNextHopAS' => '0',
+            'inetCidrRouteMetric1' => $data['ipv6RouteMetric'] ?? 0,
+            'inetCidrRouteDestType' => 'ipv6',
+            'inetCidrRouteDest' => $dst,
+            'inetCidrRouteNextHopType' => 'ipv6',
+            'inetCidrRouteNextHop' => $data['ipv6RouteNextHop'] ?? '',
+            'inetCidrRoutePolicy' => $data['ipv6RoutePolicy'] ?? '',
+            'inetCidrRoutePfxLen' => $pfxLen,
+        ]))->filter();
     }
 
     private function discoverVpnVrfRoutes(Device $device, int $max_routes): Collection
@@ -333,22 +325,20 @@ class Routes implements Module
         }
 
         return SnmpQuery::hideMib()->walk(['MPLS-L3VPN-STD-MIB::mplsL3VpnVrfRteTable'])
-        ->mapTable(function ($data, $vpnId, $dstType = '', $dst = '', $pfxLen = '', $policy = '', $hopType = '', $hop = '') use ($device) {
-            return new Route([
-                'port_id' => PortCache::getIdFromIfIndex($data['mplsL3VpnVrfRteInetCidrIfIndex'] ?? 0, $device->device_id) ?? 0,
-                'context_name' => $vpnId,
-                'inetCidrRouteIfIndex' => $data['mplsL3VpnVrfRteInetCidrIfIndex'] ?? 0,
-                'inetCidrRouteType' => $data['mplsL3VpnVrfRteInetCidrType'] ?? 0,
-                'inetCidrRouteProto' => $data['mplsL3VpnVrfRteInetCidrProto'] ?? 0,
-                'inetCidrRouteNextHopAS' => $data['mplsL3VpnVrfRteInetCidrNextHopAS'] ?? 0,
-                'inetCidrRouteMetric1' => $data['mplsL3VpnVrfRteInetCidrMetric1'] ?? 0,
-                'inetCidrRouteDestType' => $dstType,
-                'inetCidrRouteDest' => $dst,
-                'inetCidrRouteNextHopType' => $hopType,
-                'inetCidrRouteNextHop' => $hop,
-                'inetCidrRoutePolicy' => $policy,
-                'inetCidrRoutePfxLen' => $pfxLen,
-            ]);
-        })->filter();
+        ->mapTable(fn ($data, $vpnId, $dstType = '', $dst = '', $pfxLen = '', $policy = '', $hopType = '', $hop = '') => new Route([
+            'port_id' => PortCache::getIdFromIfIndex($data['mplsL3VpnVrfRteInetCidrIfIndex'] ?? 0, $device->device_id) ?? 0,
+            'context_name' => $vpnId,
+            'inetCidrRouteIfIndex' => $data['mplsL3VpnVrfRteInetCidrIfIndex'] ?? 0,
+            'inetCidrRouteType' => $data['mplsL3VpnVrfRteInetCidrType'] ?? 0,
+            'inetCidrRouteProto' => $data['mplsL3VpnVrfRteInetCidrProto'] ?? 0,
+            'inetCidrRouteNextHopAS' => $data['mplsL3VpnVrfRteInetCidrNextHopAS'] ?? 0,
+            'inetCidrRouteMetric1' => $data['mplsL3VpnVrfRteInetCidrMetric1'] ?? 0,
+            'inetCidrRouteDestType' => $dstType,
+            'inetCidrRouteDest' => $dst,
+            'inetCidrRouteNextHopType' => $hopType,
+            'inetCidrRouteNextHop' => $hop,
+            'inetCidrRoutePolicy' => $policy,
+            'inetCidrRoutePfxLen' => $pfxLen,
+        ]))->filter();
     }
 }

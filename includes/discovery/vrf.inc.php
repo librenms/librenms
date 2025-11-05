@@ -23,7 +23,7 @@ if (LibrenmsConfig::get('enable_vrfs')) {
             $rds = snmp_walk($device, 'mplsVpnVrfRouteDistinguisher', '-Osqn', 'MPLS-VPN-MIB', null);
 
             // Cisco Catalyst C800 Routers does not correct answer on SNMP OID 'mplsVpnVrfRouteDistinguisher'
-            if ((empty($rds) || (substr($device['hardware'], 0, 2) == 'C8' && $device['os'] == 'ios')) && $device['os_group'] == 'cisco') {
+            if ((empty($rds) || (str_starts_with($device['hardware'], 'C8') && $device['os'] == 'ios')) && $device['os_group'] == 'cisco') {
                 // Use CISCO-VRF-MIB if others don't work
                 $rds = snmp_walk($device, 'cvVrfName', '-Osqn', 'CISCO-VRF-MIB', null);
                 $rds = str_replace('.1.3.6.1.4.1.9.9.711.1.1.1.1.2.', '', $rds);
@@ -256,7 +256,7 @@ if (LibrenmsConfig::get('enable_vrfs')) {
                 dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
                 $if = $interface['port_id'];
                 $valid_vrf_if[$vrf_id][$if] = 1;
-            } catch (Exception $e) {
+            } catch (Exception) {
                 continue;
             }
         }

@@ -26,11 +26,17 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\Device;
+use App\Models\Transceiver;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
-class Fabos extends OS implements OSDiscovery
+class Fabos extends OS implements OSDiscovery, TransceiverDiscovery
 {
     public function discoverOS(Device $device): void
     {
@@ -117,5 +123,40 @@ class Fabos extends OS implements OSDiscovery
         ];
 
         return $models[$model] ?? 'Unknown Brocade FC Switch';
+    }
+
+    public function discoverTransceivers(): Collection
+    {
+        $snmpData = SnmpQuery::hideMib()->mibs(['FA-EXT-MIB', 'FCMGMT-MIB'])->enumStrings()->walk(['connUnitPortModuleType', 'connUnitPortTransmitterType', 'connUnitPortRevision', 'connUnitPortSn', 'connUnitPortVendor']);
+
+        // indexed by 'connUnitPortUnitId' (string) and 'connUnitPortIndex' (int)
+        // connUnitPortVendor['..8...K.........'][1] = "BROCADE         "
+
+        Log::info('Transceivers discovery started');
+
+        return $snmpData->mapTable(function ($data, $unit, $portIndex) {
+            $ifIndex = $portIndex + 0x3FFFFFFF; // 0x3FFFFFFF is the const (until we find it's not) to move from portIndex to ifIndex
+            $port_id = PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId());
+            if (is_null($port_id)) {
+                // Invalid
+                return null;
+            }
+            if (empty($data['connUnitPortModuleType']) || $data['connUnitPortModuleType'] == 'gbicNotInstalled') {
+                return null;
+            }
+
+            // Create a new Transceiver object with the retrieved data
+            return new Transceiver([
+                'port_id' => $port_id,
+                'index' => $portIndex,
+                'type' => ($data['connUnitPortModuleType'] ?? 'UnknownModuleType') . ' ' . ($data['connUnitPortTransmitterType'] ?? ''),
+                'revision' => $data['connUnitPortRevision'] ?? null,
+                'serial' => $data['connUnitPortSn'] ?? null,
+                'vendor' => $data['connUnitPortVendor'] ?? null,
+                'cable' => null,
+                'entity_physical_index' => '200000' . $portIndex, // Avoid any collisions with "real" entity-mib indexes.
+                // using concatenation instead of maths to allow YAML discovery of the sensors (YAML cannot do maths ...)
+            ]);
+        })->filter();  // Filter out null values
     }
 }

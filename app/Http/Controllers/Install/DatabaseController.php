@@ -99,7 +99,7 @@ class DatabaseController extends InstallationController implements InstallerStep
 
     public function migrate(Request $request)
     {
-        $response = new StreamedResponse(function () {
+        $response = new StreamedResponse(function (): void {
             try {
                 $this->configureDatabase();
                 $output = new StreamedOutput(fopen('php://stdout', 'w'));

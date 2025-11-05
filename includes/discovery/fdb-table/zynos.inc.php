@@ -36,7 +36,7 @@ if (in_array(explode('-', $device['hardware'], 2)[0], ['GS1900'])) {
 
         $port_id = PortCache::getIdFromIfIndex($port_data['Q-BRIDGE-MIB::dot1qTpFdbPort'], $device['device_id']);
 
-        $vlan_id = isset($vlans_dict[$vlan]) ? $vlans_dict[$vlan] : 0;
+        $vlan_id = $vlans_dict[$vlan] ?? 0;
 
         Log::debug("vlan $vlan (id $vlan_id) mac $mac_address port $port_id\n");
         $insert[$vlan_id][$mac_address]['port_id'] = $port_id;

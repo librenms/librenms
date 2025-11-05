@@ -74,12 +74,12 @@ function extract_mib_name($file)
         while (($line = fgets($handle)) !== false) {
             $trimmed = trim($line);
 
-            if (empty($trimmed) || substr($trimmed, 0, 2) == '--') {
+            if (empty($trimmed) || str_starts_with($trimmed, '--')) {
                 continue;
             }
 
             $header .= " $trimmed";
-            if (strpos($trimmed, 'DEFINITIONS') !== false) {
+            if (str_contains($trimmed, 'DEFINITIONS')) {
                 preg_match('/(\S+)\s+(?=DEFINITIONS)/', $header, $matches);
                 fclose($handle);
 

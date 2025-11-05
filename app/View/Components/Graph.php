@@ -30,14 +30,6 @@ class Graph extends Component
      */
     public $type;
     /**
-     * @var int|string|null
-     */
-    public $from;
-    /**
-     * @var int|string|null
-     */
-    public $to;
-    /**
      * @var string
      */
     public $legend;
@@ -48,15 +40,7 @@ class Graph extends Component
     /**
      * @var bool
      */
-    private $link;
-    /**
-     * @var bool
-     */
     private $popup;
-    /**
-     * @var string
-     */
-    public mixed $popupTitle;
 
     /**
      * Create a new component instance.
@@ -72,34 +56,32 @@ class Graph extends Component
      * @param  int  $absolute_size
      * @param  Device|int|null  $device
      * @param  Port|int|null  $port
+     * @param  bool  $link
+     * @param  string  $popupTitle
      */
     public function __construct(
         string $type = '',
         array $vars = [],
-        $from = '-1d',
-        $to = null,
+        public $from = '-1d',
+        public $to = null,
         string $legend = 'no',
         string $aspect = 'normal',
         ?int $width = null,
         ?int $height = null,
         int $absolute_size = 0,
-        $link = true,
+        private $link = true,
         $popup = false,
-        $popupTitle = '',
+        public mixed $popupTitle = '',
         $device = null,
         $port = null
     ) {
         $this->type = $type;
         $this->vars = $vars;
-        $this->from = $from;
-        $this->to = $to;
         $this->legend = $legend;
         $this->absolute_size = $absolute_size;
         $this->width = $width ?: ($aspect == 'wide' ? self::DEFAULT_WIDE_WIDTH : self::DEFAULT_NORMAL_WIDTH);
         $this->height = $height ?: ($aspect == 'wide' ? self::DEFAULT_WIDE_HEIGHT : self::DEFAULT_NORMAL_HEIGHT);
-        $this->popupTitle = $popupTitle;
         $this->popup = filter_var($popup, FILTER_VALIDATE_BOOLEAN);
-        $this->link = $link;
 
         // handle device and port ids/models for convenience could be set in $vars
         if ($device instanceof Device) {

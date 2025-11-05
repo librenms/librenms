@@ -196,18 +196,14 @@ $dot3_oids = [
 // Query known ports and mapping table in order of discovery to make sure
 // the latest discoverd/polled port is in the mapping tables.
 $ports_mapped = get_ports_mapped($device['device_id'], true);
-$ports = $ports_mapped['ports'];
+// If we are not running tests, and no ports are found, we need to run discovery first.
+if (! defined('PHPUNIT_RUNNING') && empty($ports_mapped['ports'])) {
+    Log::info("No ports found for device {$device['hostname']}, discovery needs to be run first.");
 
-//
-// Rename any old RRD files still named after the previous ifIndex based naming schema.
-foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
-    foreach (['', '-adsl', '-dot3'] as $suffix) {
-        $old_rrd_name = "port-$ifIndex$suffix";
-        $new_rrd_name = \Rrd::portName($port_id, ltrim($suffix, '-'));
-
-        \Rrd::renameFile(DeviceCache::get($device['device_id']), $old_rrd_name, $new_rrd_name);
-    }
+    return;
 }
+
+$ports = $ports_mapped['ports'];
 
 $fetched_data_string = 'Fetched data ';
 $port_stats = [];
@@ -350,7 +346,7 @@ if (LibrenmsConfig::get('enable_ports_poe')) {
                 We need to ignore the middle subslot number so this is slot.port
                 */
                 if (preg_match('/^[a-z]+ethernet(\d+)\/(\d+)(?:\/(\d+))?$/i', $if_descr['ifDescr'], $matches)) {
-                    $port_ent_to_if[$matches[1] . '.' . ($matches[3] ?: $matches[2])] = ['portIfIndex' => $if_index];
+                    $port_ent_to_if[$matches[1] . '.' . ($matches[3] ?? $matches[2])] = ['portIfIndex' => $if_index];
                 }
             }
         }
@@ -359,7 +355,7 @@ if (LibrenmsConfig::get('enable_ports_poe')) {
             //We replace the ENTITY EntIndex by the IfIndex using the portIfIndex table (stored in $port_ent_to_if).
             //Result is merged into $port_stats
             if ($port_ent_to_if[$p_index] && $port_ent_to_if[$p_index]['portIfIndex'] && $port_stats[$port_ent_to_if[$p_index]['portIfIndex']]) {
-                $port_stats[$port_ent_to_if[$p_index]['portIfIndex']] = $port_stats[$port_ent_to_if[$p_index]['portIfIndex']] + $p_stats;
+                $port_stats[$port_ent_to_if[$p_index]['portIfIndex']] += $p_stats;
             }
         }
     } elseif ($device['os'] == 'vrp') {
@@ -385,6 +381,7 @@ if (LibrenmsConfig::get('enable_ports_poe')) {
             'rlPethPsePortOutputPower',
         ];
 
+        $port_stats_temp = [];
         foreach ($linksys_poe_oids as $oid) {
             $port_stats_temp = snmpwalk_cache_oid($device, $oid, $port_stats_temp, 'LINKSYS-POE-MIB:POWER-ETHERNET-MIB');
         }
@@ -414,7 +411,7 @@ if (LibrenmsConfig::get('enable_ports_poe')) {
     }
 }
 
-if ($device['os_group'] == 'cisco' && $device['os'] != 'asa') {
+if (isset($device['os_group']) && $device['os_group'] == 'cisco' && $device['os'] != 'asa') {
     foreach ($pagp_oids as $oid) {
         $pagp_port_stats = snmpwalk_cache_oid($device, $oid, [], 'CISCO-PAGP-MIB');
     }

@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Actions\Device\CheckDeviceAvailability;
 use App\Events\DevicePolled;
 use App\Events\PollingDevice;
 use App\Facades\LibrenmsConfig;
@@ -56,9 +57,8 @@ class PollDevice implements ShouldQueue
         $measurement = Measurement::start('poll');
         $measurement->manager()->checkpoint(); // don't count previous stats
 
-        $helper = new ConnectivityHelper($this->device);
-        $helper->saveMetrics();
-        $helper->isUp(); // check and save status
+        // check and save status
+        app(CheckDeviceAvailability::class)->execute($this->device, true);
 
         $this->pollModules();
 
@@ -70,7 +70,7 @@ class PollDevice implements ShouldQueue
                 $this->recordPerformance($measurement);
             }
 
-            if ($helper->canPing()) {
+            if (ConnectivityHelper::pingIsAllowed($this->device)) {
                 $this->os->enableGraph('ping_perf');
             }
 
@@ -179,7 +179,7 @@ class PollDevice implements ShouldQueue
     {
         \DeviceCache::setPrimary($this->device_id);
         $this->device = \DeviceCache::getPrimary();
-        $this->device->ip = $this->device->overwrite_ip ?: Dns::lookupIp($this->device) ?: $this->device->ip;
+        $this->device->ip = ($this->device->overwrite_ip ?: Dns::lookupIp($this->device)) ?: $this->device->ip;
 
         $this->deviceArray = $this->device->toArray();
         if ($os_group = LibrenmsConfig::get("os.{$this->device->os}.group")) {

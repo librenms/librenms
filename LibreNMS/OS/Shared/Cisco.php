@@ -63,6 +63,7 @@ use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
 class Cisco extends OS implements
@@ -455,6 +456,7 @@ class Cisco extends OS implements
                 return $data['rttMonEchoAdminURL'] ?? '';
             case 'dns':
                 return $data['rttMonEchoAdminTargetAddressString'] ?? '';
+            case 'icmpjitter':
             case 'echo':
                 return IP::fromHexString($data['rttMonEchoAdminTargetAddress'], true) ?? '';
             case 'jitter':
@@ -867,7 +869,7 @@ class Cisco extends OS implements
 
     public function setQosParents($qos)
     {
-        $qos->each(function (Qos $thisQos, int $key) use ($qos) {
+        $qos->each(function (Qos $thisQos, int $key) use ($qos): void {
             $parent_idx = $this->qosIdxToParent->get($thisQos->snmp_idx);
 
             if ($parent_idx) {
@@ -995,36 +997,57 @@ class Cisco extends OS implements
             return $ports;
         }
 
-        $native_vlans = SnmpQuery::abortOnFailure()->walk([
-            'CISCO-VTP-MIB::vlanTrunkPortNativeVlan',
+        $native_vlans_raw = SnmpQuery::abortOnFailure()->walk([
+            'CISCO-VTP-MIB::vlanTrunkPortTable',
             'CISCO-VLAN-MEMBERSHIP-MIB::vmVlan',
         ])->table(1);
 
-        foreach ($native_vlans as $ifIndex => $data) {
-            $vlan_id = $data['CISCO-VLAN-MEMBERSHIP-MIB::vmVlan'] ?? 0;
-            $vlan_id = (empty($vlan_id)) ? $data['CISCO-VTP-MIB::vlanTrunkPortNativeVlan'] : $vlan_id;
-            $baseport = $this->bridgePortFromIfIndex($ifIndex);
-            $port_id = PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId());
-
-            if (empty($baseport) && empty($port_id)) {
-                Log::debug("Skipping ifIndex: $ifIndex for vlan $vlan_id: Could not find port");
-                continue;
+        // Hash Table indexed by vlans and ifIndexes
+        foreach ($native_vlans_raw as $ifindex => $data) {
+            // Only returns 'untagged' vlan for each port (either access ports, or native vlan of a trunk)
+            // stored for use in below loop
+            $vlan_id = $data['CISCO-VLAN-MEMBERSHIP-MIB::vmVlan'] ?? $data['CISCO-VTP-MIB::vlanTrunkPortNativeVlan'] ?? 0;
+            if ($vlan_id > 0) {
+                $isNative[$vlan_id][$ifindex] = 1;
             }
-
-            $ports->push(new PortVlan([
-                'vlan' => $vlan_id,
-                'baseport' => $baseport,
-                'untagged' => 1,
-                'state' => 'unknown',
-                'port_id' => $port_id,
-            ]));
+            if (isset($data['CISCO-VTP-MIB::vlanTrunkPortDynamicState']) && $data['CISCO-VTP-MIB::vlanTrunkPortDynamicState'] == 2) {
+                continue; // This port is not a trunk, so continue to next one
+            }
+            // Only returns 'tagged' vlan for each port
+            // stored for use in below loop
+            if (isset($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined'])) {
+                $vlanIds = StringHelpers::bitsToIndices($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined']);
+                foreach ($vlanIds as $vlan_id) {
+                    $isNative[$vlan_id - 1][$ifindex] ??= 0;
+                }
+            }
+            if (isset($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined2k'])) {
+                $vlanIds = StringHelpers::bitsToIndices($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined2k']);
+                foreach ($vlanIds as $vlan_id) {
+                    $isNative[$vlan_id + 1023][$ifindex] ??= 0;
+                }
+            }
+            if (isset($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined3k'])) {
+                $vlanIds = StringHelpers::bitsToIndices($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined3k']);
+                foreach ($vlanIds as $vlan_id) {
+                    $isNative[$vlan_id + 2047][$ifindex] ??= 0;
+                }
+            }
+            if (isset($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined4k'])) {
+                $vlanIds = StringHelpers::bitsToIndices($data['CISCO-VTP-MIB::vlanTrunkPortVlansXmitJoined4k']);
+                foreach ($vlanIds as $vlan_id) {
+                    $isNative[$vlan_id + 3071][$ifindex] ??= 0;
+                }
+            }
         }
 
+        // process all the discovered vlans
         foreach ($vlans as $vlan) {
             $vlan_id = (int) $vlan->vlan_vlan;
 
             // Ignore reserved VLAN IDs
             if ($vlan->vlan_state && $vlan_id && ($vlan_id < 1002 || $vlan_id > 1005)) {
+                // collect BRIDGE-MIB in vlan context
                 $tmp_vlan_data = SnmpQuery::context($vlan_id === 1 ? '' : (string) $vlan_id, 'vlan-')
                     ->enumStrings()
                     ->abortOnFailure()
@@ -1035,14 +1058,34 @@ class Cisco extends OS implements
                     ])->table(1);
 
                 foreach ($tmp_vlan_data as $baseport => $data) {
+                    // use the collected untagged vlan info
+                    $ifindex = $this->ifIndexFromBridgePort($baseport);
+                    $alreadyProcessed[$vlan_id][$ifindex] = 1; // We don't want to override it later
                     $ports->push(new PortVlan([
                         'vlan' => $vlan_id,
                         'baseport' => $baseport,
                         'priority' => $data['BRIDGE-MIB::dot1dStpPortPriority'] ?? 0,
                         'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown',
                         'cost' => $data['BRIDGE-MIB::dot1dStpPortPathCost'] ?? 0,
-                        'untagged' => 1, // bridge mib only deals with untagged
-                        'port_id' => PortCache::getIdFromIfIndex($this->ifIndexFromBridgePort($baseport), $this->getDeviceId()) ?? 0, // ifIndex from device
+                        'untagged' => isset($isNative[$vlan_id][$ifindex]) && $isNative[$vlan_id][$ifindex] > 0,
+                        'port_id' => PortCache::getIdFromIfIndex($ifindex, $this->getDeviceId()) ?? 0, // ifIndex from device
+                    ]));
+                }
+            }
+
+            // Let's do the ones that were not processed above
+            // if we have isNative for this vlan, then we check which ifindexes are not yet processed and we add them.
+            if (isset($isNative[$vlan_id])) {
+                foreach ($isNative[$vlan_id] as $ifindex => $value) {
+                    if (isset($alreadyProcessed[$vlan_id][$ifindex])) {
+                        continue;
+                    }
+                    $ports->push(new PortVlan([
+                        'vlan' => $vlan_id,
+                        'baseport' => $this->bridgePortFromIfIndex($ifindex),
+                        'untagged' => $value,
+                        'state' => 'unknown',
+                        'port_id' => PortCache::getIdFromIfIndex($ifindex, $this->getDeviceId()) ?? 0, // ifIndex from device,
                     ]));
                 }
             }

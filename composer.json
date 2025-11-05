@@ -60,6 +60,7 @@
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15",
         "barryvdh/laravel-ide-helper": "^3.5",
+        "coding-socks/lost-in-translation": "^0.3.5",
         "composer/composer": "^2.8",
         "fakerphp/faker": "^1.23",
         "friendsofphp/php-cs-fixer": "^3.66",
@@ -72,7 +73,8 @@
         "php-parallel-lint/php-parallel-lint": "^1.1",
         "phpstan/phpstan-deprecation-rules": "^2.0",
         "phpstan/phpstan-mockery": "^2.0",
-        "phpunit/phpunit": "^11.5.33 || ^12.3.7"
+        "phpunit/phpunit": "^11.5.33 || ^12.3.7",
+        "rector/rector": "^2.1"
     },
     "suggest": {
         "ext-gmp": "Used for browser push notifications",
@@ -119,7 +121,8 @@
         "exclude-from-classmap": [
             "/vendor/laravel/laravel/database/",
             "/vendor/laravel/laravel/app/",
-            "/html/plugins"
+            "/html/plugins",
+            "/vendor/marc-mabe/php-enum/stubs/Stringable.php"
         ]
     },
     "scripts": {
