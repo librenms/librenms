@@ -18,8 +18,12 @@ class Customoid extends DeviceRelatedModel
     protected $primaryKey = 'customoid_id';
     protected $table = 'customoids';
 <<<<<<< master
+<<<<<<< master
 >>>>>>> Update Customoid.php
 }
 =======
 }
 >>>>>>> Update Customoid.php
+=======
+}
+>>>>>>> lint
