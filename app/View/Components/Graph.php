@@ -122,6 +122,7 @@ class Graph extends Component
             'legend',
             'height',
             'loading',
+            'img-class',
         ];
 
         // do not add class and style to the image, add them to the outer link

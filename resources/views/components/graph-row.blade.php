@@ -14,6 +14,7 @@
                 :legend="$attributes->get('legend', 'no')"
                 :height="$attributes->get('height', 150)"
                 :vars="array_merge($graph, $attributes->get('vars', []))"
+                :img-class="$responsive ? 'tw:w-full tw:h-auto' : null"
                 {{ $attributes->class(['tw:lg:w-1/4 tw:sm:w-1/2 tw:w-full' => $responsive]) }}></x-graph>
     @endforeach
 </div>
