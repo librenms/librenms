@@ -63,27 +63,27 @@ class PortsMetrics
                 $this->escapeLabel((string) $p->ifAlias)
             );
 
-            $admin_lines[] = "librenms_port_admin_up{{$labels}} " . ($p->ifAdminStatus === 'up' ? '1' : '0');
-            $oper_lines[] = "librenms_port_oper_up{{$labels}} " . ($p->ifOperStatus === 'up' ? '1' : '0');
-            $speed_lines[] = "librenms_port_speed_bits_per_second{{$labels}} " . ((int) $p->ifSpeed ?: 0);
-            $in_octets_lines[] = "librenms_port_ifInOctets{{$labels}} " . ((int) $p->ifInOctets ?: 0);
-            $out_octets_lines[] = "librenms_port_ifOutOctets{{$labels}} " . ((int) $p->ifOutOctets ?: 0);
-            $in_ucast_pkt_lines[] = "librenms_port_ifInUcastPkts{{$labels}} " . ((int) $p->ifInUcastPkts ?: 0);
-            $out_ucast_pkt_lines[] = "librenms_port_ifOutUcastPkts{{$labels}} " . ((int) $p->ifOutUcastPkts ?: 0);
-            $in_errors_lines[] = "librenms_port_ifInErrors{{$labels}} " . ((int) $p->ifInErrors ?: 0);
-            $out_errors_lines[] = "librenms_port_ifOutErrors{{$labels}} " . ((int) $p->ifOutErrors ?: 0);
+            $admin_lines[] = "librenms_ports_admin_up{{$labels}} " . ($p->ifAdminStatus === 'up' ? '1' : '0');
+            $oper_lines[] = "librenms_ports_oper_up{{$labels}} " . ($p->ifOperStatus === 'up' ? '1' : '0');
+            $speed_lines[] = "librenms_ports_speed_bits_per_second{{$labels}} " . ((int) $p->ifSpeed ?: 0);
+            $in_octets_lines[] = "librenms_ports_ifInOctets{{$labels}} " . ((int) $p->ifInOctets ?: 0);
+            $out_octets_lines[] = "librenms_ports_ifOutOctets{{$labels}} " . ((int) $p->ifOutOctets ?: 0);
+            $in_ucast_pkt_lines[] = "librenms_ports_ifInUcastPkts{{$labels}} " . ((int) $p->ifInUcastPkts ?: 0);
+            $out_ucast_pkt_lines[] = "librenms_ports_ifOutUcastPkts{{$labels}} " . ((int) $p->ifOutUcastPkts ?: 0);
+            $in_errors_lines[] = "librenms_ports_ifInErrors{{$labels}} " . ((int) $p->ifInErrors ?: 0);
+            $out_errors_lines[] = "librenms_ports_ifOutErrors{{$labels}} " . ((int) $p->ifOutErrors ?: 0);
         }
 
         // Append per-port metrics
-        $this->appendMetricBlock($lines, 'librenms_port_admin_up', 'Whether admin status is up (1) or not (0)', 'gauge', $admin_lines);
-        $this->appendMetricBlock($lines, 'librenms_port_oper_up', 'Whether oper status is up (1) or not (0)', 'gauge', $oper_lines);
-        $this->appendMetricBlock($lines, 'librenms_port_speed_bits_per_second', 'Port speed in bits per second', 'gauge', $speed_lines);
-        $this->appendMetricBlock($lines, 'librenms_port_ifInOctets', 'In octets', 'counter', $in_octets_lines);
-        $this->appendMetricBlock($lines, 'librenms_port_ifOutOctets', 'Out octets', 'counter', $out_octets_lines);
-        $this->appendMetricBlock($lines, 'librenms_port_ifInUcastPkts', 'In unicast packets', 'counter', $in_ucast_pkt_lines);
-        $this->appendMetricBlock($lines, 'librenms_port_ifOutUcastPkts', 'Out unicast packets', 'counter', $out_ucast_pkt_lines);
-        $this->appendMetricBlock($lines, 'librenms_port_ifInErrors', 'In errors', 'counter', $in_errors_lines);
-        $this->appendMetricBlock($lines, 'librenms_port_ifOutErrors', 'Out errors', 'counter', $out_errors_lines);
+        $this->appendMetricBlock($lines, 'librenms_ports_admin_up', 'Whether admin status is up (1) or not (0)', 'gauge', $admin_lines);
+        $this->appendMetricBlock($lines, 'librenms_ports_oper_up', 'Whether oper status is up (1) or not (0)', 'gauge', $oper_lines);
+        $this->appendMetricBlock($lines, 'librenms_ports_speed_bits_per_second', 'Port speed in bits per second', 'gauge', $speed_lines);
+        $this->appendMetricBlock($lines, 'librenms_ports_ifInOctets', 'In octets', 'counter', $in_octets_lines);
+        $this->appendMetricBlock($lines, 'librenms_ports_ifOutOctets', 'Out octets', 'counter', $out_octets_lines);
+        $this->appendMetricBlock($lines, 'librenms_ports_ifInUcastPkts', 'In unicast packets', 'counter', $in_ucast_pkt_lines);
+        $this->appendMetricBlock($lines, 'librenms_ports_ifOutUcastPkts', 'Out unicast packets', 'counter', $out_ucast_pkt_lines);
+        $this->appendMetricBlock($lines, 'librenms_ports_ifInErrors', 'In errors', 'counter', $in_errors_lines);
+        $this->appendMetricBlock($lines, 'librenms_ports_ifOutErrors', 'Out errors', 'counter', $out_errors_lines);
 
         return implode("\n", $lines) . "\n";
     }

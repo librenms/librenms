@@ -25,7 +25,7 @@ class ApplicationsMetrics
             $totalQ = $totalQ->join('applications', 'application_metrics.app_id', '=', 'applications.app_id')->whereIn('applications.device_id', $filters['device_ids']->all());
         }
         $total = $totalQ->count();
-        $this->appendMetricBlock($lines, 'librenms_application_metrics_total', 'Total number of application metrics rows', 'gauge', ["librenms_application_metrics_total {$total}"]);
+        $this->appendMetricBlock($lines, 'librenms_applications_metrics_total', 'Total number of application metrics rows', 'gauge', ["librenms_applications_metrics_total {$total}"]);
 
         $metric_lines = [];
 
@@ -70,11 +70,11 @@ class ApplicationsMetrics
                 $this->escapeLabel((string) $am->metric)
             );
 
-            $metric_lines[] = "librenms_application_metric_value{{$labels}} " . ((float) $am->value ?: 0);
+            $metric_lines[] = "librenms_applications_metric_value{{$labels}} " . ((float) $am->value ?: 0);
         }
 
         // Append per-application metrics
-        $this->appendMetricBlock($lines, 'librenms_application_metric_value', 'Application metric value', 'gauge', $metric_lines);
+        $this->appendMetricBlock($lines, 'librenms_applications_metric_value', 'Application metric value', 'gauge', $metric_lines);
 
         return implode("\n", $lines) . "\n";
     }

@@ -46,27 +46,27 @@ class DevicesMetrics
                 $this->escapeLabel((string) $device->sysName),
                 $this->escapeLabel((string) $device->type));
 
-            $device_up_lines[] = "librenms_device_up{{$labels}} " . ($device->status ? '1' : '0');
+            $device_up_lines[] = "librenms_devices_up{{$labels}} " . ($device->status ? '1' : '0');
 
             $lastPolledTimeTaken = $device->status ? ((int) $device->last_polled_timetaken ?: 0) : 0;
-            $polled_timetaken_lines[] = "librenms_last_polled_timetaken_seconds{{$labels}} {$lastPolledTimeTaken}";
+            $polled_timetaken_lines[] = "librenms_devices_last_polled_timetaken_seconds{{$labels}} {$lastPolledTimeTaken}";
 
             $lastDiscoveredTimeTaken = $device->status ? ((int) $device->last_discovered_timetaken ?: 0) : 0;
-            $discovered_timetaken_lines[] = "librenms_last_discovered_timetaken_seconds{{$labels}} {$lastDiscoveredTimeTaken}";
+            $discovered_timetaken_lines[] = "librenms_devices_last_discovered_timetaken_seconds{{$labels}} {$lastDiscoveredTimeTaken}";
 
             $lastPingTimeTaken = $device->status ? ((int) $device->last_ping_timetaken ?: 0) : 0;
-            $ping_timetaken_lines[] = "librenms_last_ping_timetaken_seconds{{$labels}} {$lastPingTimeTaken}";
+            $ping_timetaken_lines[] = "librenms_devices_last_ping_timetaken_seconds{{$labels}} {$lastPingTimeTaken}";
 
             $uptime = $device->status ? ((int) $device->uptime ?: 0) : 0;
-            $uptime_lines[] = "librenms_device_uptime_seconds{{$labels}} {$uptime}";
+            $uptime_lines[] = "librenms_devices_uptime_seconds{{$labels}} {$uptime}";
         }
 
         // Append per-device metrics
-        $this->appendMetricBlock($lines, 'librenms_device_up', 'Whether a device is up (1) or not (0)', 'gauge', $device_up_lines);
-        $this->appendMetricBlock($lines, 'librenms_last_polled_timetaken_seconds', 'Last polled time taken in seconds', 'gauge', $polled_timetaken_lines);
-        $this->appendMetricBlock($lines, 'librenms_last_discovered_timetaken_seconds', 'Last discovered time taken in seconds', 'gauge', $discovered_timetaken_lines);
-        $this->appendMetricBlock($lines, 'librenms_last_ping_timetaken_seconds', 'Last ping time taken in seconds', 'gauge', $ping_timetaken_lines);
-        $this->appendMetricBlock($lines, 'librenms_device_uptime_seconds', 'Device uptime in seconds (0 if down)', 'gauge', $uptime_lines);
+        $this->appendMetricBlock($lines, 'librenms_devices_up', 'Whether a device is up (1) or not (0)', 'gauge', $device_up_lines);
+        $this->appendMetricBlock($lines, 'librenms_devices_last_polled_timetaken_seconds', 'Last polled time taken in seconds', 'gauge', $polled_timetaken_lines);
+        $this->appendMetricBlock($lines, 'librenms_devices_last_discovered_timetaken_seconds', 'Last discovered time taken in seconds', 'gauge', $discovered_timetaken_lines);
+        $this->appendMetricBlock($lines, 'librenms_devices_last_ping_timetaken_seconds', 'Last ping time taken in seconds', 'gauge', $ping_timetaken_lines);
+        $this->appendMetricBlock($lines, 'librenms_devices_uptime_seconds', 'Device uptime in seconds (0 if down)', 'gauge', $uptime_lines);
 
         return implode("\n", $lines) . "\n";
     }
