@@ -48,9 +48,9 @@ class InfluxDB extends BaseDatastore
 
         // if the database doesn't exist, create it.
         // When using UDP transport, the call to exists() fails
-	// since the transport doesn't support querying.  That said
-	// the database will be created automatically upon data
-	// reception.
+        // since the transport doesn't support querying.  That said
+        // the database will be created automatically upon data
+        // reception.
         if (LibrenmsConfig::get('influxdb.transport', 'http') !== 'udp') {
             try {
                 if (! $this->connection->exists()) {
