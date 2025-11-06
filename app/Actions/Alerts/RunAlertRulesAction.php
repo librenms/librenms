@@ -31,19 +31,8 @@ use LibreNMS\Alert\AlertRules;
 
 class RunAlertRulesAction
 {
-    /**
-     * @var AlertRules
-     */
-    private $rules;
-    /**
-     * @var Device
-     */
-    private $device;
-
-    public function __construct(Device $device, AlertRules $rules)
+    public function __construct(private Device $device, private AlertRules $rules)
     {
-        $this->rules = $rules;
-        $this->device = $device;
     }
 
     public function execute(): void

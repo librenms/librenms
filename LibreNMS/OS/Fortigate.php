@@ -33,10 +33,10 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
-use LibreNMS\OS\Shared\Fortinet;
+use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 
-class Fortigate extends Fortinet implements
+class Fortigate extends OS implements
     OSPolling,
     WirelessClientsDiscovery,
     WirelessApCountDiscovery
@@ -44,8 +44,6 @@ class Fortigate extends Fortinet implements
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
-
-        $device->hardware = $device->hardware ?: $this->getHardwareName();
     }
 
     public function pollOS(DataStorageInterface $datastore): void

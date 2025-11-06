@@ -30,24 +30,8 @@ use LibreNMS\Modules\Wireless;
 
 class WirelessSensor
 {
-    protected $type;
-    protected $device_id;
     protected $oids;
-    protected $subtype;
-    protected $index;
-    protected $description;
-    protected $current;
-    protected $multiplier;
-    protected $divisor;
-    protected $aggregator;
-    protected $high_limit;
-    protected $low_limit;
-    protected $high_warn;
-    protected $low_warn;
-    protected $entPhysicalIndex;
-    protected $entPhysicalMeasured;
     protected string $rrd_type = 'GAUGE';
-    protected $access_point_ip;
 
     /**
      * Sensor constructor. Create a new sensor to be discovered.
@@ -71,41 +55,25 @@ class WirelessSensor
      * @param  int|float  $entPhysicalMeasured  the table to look for the entPhysicalIndex, for example 'ports' (maybe unused)
      */
     public function __construct(
-        $type,
-        $device_id,
+        protected $type,
+        protected $device_id,
         $oids,
-        $subtype,
-        $index,
-        $description,
-        $current = null,
-        $multiplier = 1,
-        $divisor = 1,
-        $aggregator = 'sum',
-        $access_point_id = null,
-        $high_limit = null,
-        $low_limit = null,
-        $high_warn = null,
-        $low_warn = null,
-        $entPhysicalIndex = null,
-        $entPhysicalMeasured = null
+        protected $subtype,
+        protected $index,
+        protected $description,
+        protected $current = null,
+        protected $multiplier = 1,
+        protected $divisor = 1,
+        protected $aggregator = 'sum',
+        protected $access_point_id = null,
+        protected $high_limit = null,
+        protected $low_limit = null,
+        protected $high_warn = null,
+        protected $low_warn = null,
+        protected $entPhysicalIndex = null,
+        protected $entPhysicalMeasured = null
     ) {
-        $this->access_point_ip = $access_point_id;
-        $this->type = $type;
-        $this->device_id = $device_id;
         $this->oids = (array) $oids;
-        $this->subtype = $subtype;
-        $this->index = $index;
-        $this->description = $description;
-        $this->current = $current;
-        $this->multiplier = $multiplier;
-        $this->divisor = $divisor;
-        $this->aggregator = $aggregator;
-        $this->entPhysicalIndex = $entPhysicalIndex;
-        $this->entPhysicalMeasured = $entPhysicalMeasured;
-        $this->high_limit = $high_limit;
-        $this->low_limit = $low_limit;
-        $this->high_warn = $high_warn;
-        $this->low_warn = $low_warn;
         $this->rrd_type = $this->type == 'errors' ? 'COUNTER' : 'GAUGE';
     }
 
@@ -127,7 +95,7 @@ class WirelessSensor
             'entPhysicalIndex' => $this->entPhysicalIndex,
             'entPhysicalMeasured' => $this->entPhysicalMeasured,
             'sensor_oids' => $this->oids,
-            'access_point_ip' => $this->access_point_ip,
+            'access_point_id' => $this->access_point_id,
             'rrd_type' => $this->rrd_type,
         ]);
     }

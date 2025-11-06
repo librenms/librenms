@@ -171,12 +171,11 @@ class ServiceTemplate extends BaseModel
                 $query->select('device_groups.id');
             }])
             ->get()
-            ->filter(function ($template) use ($deviceGroup) {
+            ->filter(fn ($template) =>
                 // for static, if this device group is include, keep it.
-                return $template->groups
-                    ->where('device_group_id', $deviceGroup->id)
-                    ->isNotEmpty();
-            })->pluck('id');
+                $template->groups
+                ->where('device_group_id', $deviceGroup->id)
+                ->isNotEmpty())->pluck('id');
 
         return $deviceGroup->serviceTemplates()->sync($template_ids);
     }

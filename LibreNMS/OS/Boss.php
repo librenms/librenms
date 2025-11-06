@@ -113,13 +113,11 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery, VlanDiscovery,
         }
 
         return SnmpQuery::walk('RC-VLAN-MIB::rcVlanName')
-            ->mapTable(function ($vlan, $vlan_id) {
-                return new Vlan([
-                    'vlan_vlan' => $vlan_id,
-                    'vlan_name' => $vlan['RC-VLAN-MIB::rcVlanName'] ?? '',
-                    'vlan_domain' => 1,
-                ]);
-            });
+            ->mapTable(fn ($vlan, $vlan_id) => new Vlan([
+                'vlan_vlan' => $vlan_id,
+                'vlan_name' => $vlan['RC-VLAN-MIB::rcVlanName'] ?? '',
+                'vlan_domain' => 1,
+            ]));
     }
 
     public function discoverVlanPorts(Collection $vlans): Collection

@@ -28,16 +28,14 @@ namespace App\Polling\Measure;
 
 class MeasurementSummary
 {
-    private $type;
     private $count = 0;
     private $duration = 0.0;
 
     private $checkpointCount = 0;
     private $checkpointDuration = 0.0;
 
-    public function __construct(string $type)
+    public function __construct(private string $type)
     {
-        $this->type = $type;
     }
 
     public function add(Measurement $measurement): void

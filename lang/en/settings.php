@@ -1588,6 +1588,10 @@ return [
                 'description' => 'Minimum password length',
                 'help' => 'Passwords shorter than the given length will be rejected',
             ],
+            'uncompromised' => [
+                'description' => 'Require password to be uncompromised',
+                'help' => 'Checks password against HaveIBeenPwned database using k-anonymity',
+            ],
         ],
         'peeringdb' => [
             'enabled' => [

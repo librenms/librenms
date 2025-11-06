@@ -58,14 +58,8 @@ class LegacyModule implements Module
         return $this->module_deps[$this->name] ?? [];
     }
 
-    /**
-     * @var string
-     */
-    private $name;
-
-    public function __construct(string $name)
+    public function __construct(private string $name)
     {
-        $this->name = $name;
     }
 
     public function shouldDiscover(OS $os, ModuleStatus $status): bool
@@ -185,14 +179,10 @@ class LegacyModule implements Module
             // remove unwanted fields
             if (isset($info['included_fields'])) {
                 $keys = array_flip($info['included_fields']);
-                $rows = array_map(function ($row) use ($keys) {
-                    return array_intersect_key((array) $row, $keys);
-                }, $rows);
+                $rows = array_map(fn ($row) => array_intersect_key((array) $row, $keys), $rows);
             } elseif (isset($info['excluded_fields'])) {
                 $keys = array_flip($info['excluded_fields']);
-                $rows = array_map(function ($row) use ($keys) {
-                    return array_diff_key((array) $row, $keys);
-                }, $rows);
+                $rows = array_map(fn ($row) => array_diff_key((array) $row, $keys), $rows);
             }
 
             $data[$table] = $rows;
@@ -216,9 +206,7 @@ class LegacyModule implements Module
     private function collectComponents(int $device_id): array
     {
         $components = (new Component())->getComponents($device_id)[$device_id] ?? [];
-        $components = Arr::sort($components, function ($item) {
-            return $item['type'] . $item['label'];
-        });
+        $components = Arr::sort($components, fn ($item) => $item['type'] . $item['label']);
 
         return array_values($components);
     }

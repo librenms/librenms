@@ -29,6 +29,7 @@ namespace App\Http\Controllers\Widgets;
 use App\Facades\LibrenmsConfig;
 use App\Models\Application;
 use App\Models\Bill;
+use App\Models\Customoid;
 use App\Models\Device;
 use App\Models\MuninPlugin;
 use App\Models\Port;
@@ -53,6 +54,7 @@ class GraphController extends WidgetController
         'graph_application' => null,
         'graph_munin' => null,
         'graph_service' => null,
+        'graph_customoid' => null,
         'graph_ports' => [],
         'graph_custom' => [],
         'graph_manual' => null,
@@ -94,6 +96,10 @@ class GraphController extends WidgetController
         } elseif ($type == 'service') {
             if ($service = Service::find($settings['graph_service'])) {
                 return $service->device->displayName() . ' / ' . $service->service_type . ' (' . $service->service_desc . ')' . ' / ' . $settings['graph_type'];
+            }
+        } elseif ($type == 'customoid') {
+            if ($customoid = Customoid::find($settings['graph_customoid'])) {
+                return $customoid->device?->displayName() . ' / ' . $type . ' / ' . $customoid->customoid_descr;
             }
         }
 
@@ -146,6 +152,11 @@ class GraphController extends WidgetController
         }
         $data['service_text'] = isset($service) ? $service->device->displayName() . ' - ' . $service->service_type . ' (' . $service->service_desc . ')' : __('Service does not exist');
 
+        if ($primary == 'customoid' && $data['graph_customoid']) {
+            $customoid = Customoid::with('device')->find($data['graph_customoid']);
+        }
+        $data['customoid_text'] = isset($customoid) ? $customoid->device?->displayName() . ' - ' . $customoid->customoid_descr : __('Custom OID does not exist');
+
         $data['graph_ports'] = Port::whereIntegerInRaw('port_id', $data['graph_ports'])
             ->select('ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr')
             ->with(['device' => function ($query): void {
@@ -188,6 +199,12 @@ class GraphController extends WidgetController
             if ($service = Service::find($settings['graph_service'])) {
                 $params[] = 'device=' . $service->device_id;
                 $params[] = 'id=' . $service->service_id;
+            }
+        } elseif ($type == 'customoid') {
+            if ($customoid = Customoid::find($settings['graph_customoid'])) {
+                $params[] = 'device=' . $customoid->device_id;
+                $params[] = 'id=' . $customoid->customoid_id;
+                $settings['graph_type'] = 'customoid_' . $customoid->customoid_descr;
             }
         } elseif ($type == 'aggregate') {
             $aggregate_type = $this->getGraphType(false);
@@ -293,7 +310,7 @@ class GraphController extends WidgetController
         if ($setting && ! is_numeric($setting)) {
             $data = json_decode($setting, true);
 
-            return isset($data[$key]) ? $data[$key] : 0;
+            return $data[$key] ?? 0;
         }
 
         return $setting;

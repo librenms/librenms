@@ -46,14 +46,12 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery
         }
 
         return SnmpQuery::walk('ALCATEL-IND1-VLAN-MGR-MIB::vlanDescription')
-            ->mapTable(function ($vlans, $vlan_id) {
-                return new Vlan([
-                    'vlan_vlan' => $vlan_id,
-                    'vlan_name' => $vlans['ALCATEL-IND1-VLAN-MGR-MIB::vlanDescription'] ?? null,
-                    'vlan_domain' => 1,
-                    'vlan_type' => null,
-                ]);
-            });
+            ->mapTable(fn ($vlans, $vlan_id) => new Vlan([
+                'vlan_vlan' => $vlan_id,
+                'vlan_name' => $vlans['ALCATEL-IND1-VLAN-MGR-MIB::vlanDescription'] ?? null,
+                'vlan_domain' => 1,
+                'vlan_type' => null,
+            ]));
     }
 
     public function discoverVlanPorts(Collection $vlans): Collection
@@ -63,13 +61,11 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery
         }
 
         return SnmpQuery::walk('ALCATEL-IND1-VLAN-MGR-MIB::vpaType')
-            ->mapTable(function ($data, $vpaVlanNumber, $vpaIfIndex = null) {
-                return new Portvlan([
-                    'vlan' => $vpaVlanNumber,
-                    'baseport' => $this->bridgePortFromIfIndex($vpaIfIndex),
-                    'untagged' => ($data['ALCATEL-IND1-VLAN-MGR-MIB::vpaType'] == 1 ? 1 : 0),
-                    'port_id' => PortCache::getIdFromIfIndex($vpaIfIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
-                ]);
-            });
+            ->mapTable(fn ($data, $vpaVlanNumber, $vpaIfIndex = null) => new Portvlan([
+                'vlan' => $vpaVlanNumber,
+                'baseport' => $this->bridgePortFromIfIndex($vpaIfIndex),
+                'untagged' => ($data['ALCATEL-IND1-VLAN-MGR-MIB::vpaType'] == 1 ? 1 : 0),
+                'port_id' => PortCache::getIdFromIfIndex($vpaIfIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
+            ]));
     }
 }

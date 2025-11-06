@@ -395,10 +395,9 @@ class RunAlerts
      */
     private function extractIdFieldsForFault($element)
     {
-        return array_filter(array_keys($element), function ($key) {
+        return array_filter(array_keys($element), fn ($key) =>
             // Exclude location_id as it is not relevant for the comparison
-            return ($key === 'id' || strpos($key, '_id')) !== false && $key !== 'location_id';
-        });
+            ($key === 'id' || strpos($key, '_id')) !== false && $key !== 'location_id');
     }
 
     /**
@@ -412,7 +411,7 @@ class RunAlerts
     {
         $keyParts = [];
         foreach ($idFields as $field) {
-            $keyParts[] = isset($element[$field]) ? $element[$field] : '';
+            $keyParts[] = $element[$field] ?? '';
         }
 
         return implode('|', $keyParts);
@@ -600,13 +599,13 @@ class RunAlerts
                 $noiss = true;
             }
 
-            if (! $noiss) {
-                $this->issueAlert($alert);
-                dbUpdate(['alerted' => $alert['state']], 'alerts', 'rule_id = ? && device_id = ?', [$alert['rule_id'], $alert['device_id']]);
+            if (! $noacc) {
+                dbUpdate(['open' => 0], 'alerts', 'rule_id = ? && device_id = ? && state = 0', [$alert['rule_id'], $alert['device_id']]);
             }
 
-            if (! $noacc) {
-                dbUpdate(['open' => 0], 'alerts', 'rule_id = ? && device_id = ?', [$alert['rule_id'], $alert['device_id']]);
+            if (! $noiss) {
+                dbUpdate(['alerted' => $alert['state']], 'alerts', 'rule_id = ? && device_id = ?', [$alert['rule_id'], $alert['device_id']]);
+                $this->issueAlert($alert);
             }
         }
     }

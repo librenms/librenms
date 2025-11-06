@@ -54,7 +54,7 @@ final class DatastoreTest extends TestCase
         $stores = $ds->getStores();
         $this->assertCount(1, $stores, 'Incorrect number of default stores enabled');
 
-        $this->assertEquals(\LibreNMS\Data\Store\Rrd::class, get_class($stores[0]), 'The default enabled store should be Rrd');
+        $this->assertEquals(\LibreNMS\Data\Store\Rrd::class, $stores[0]::class, 'The default enabled store should be Rrd');
     }
 
     public function testInitialization(): void

@@ -280,7 +280,7 @@ function is_client_authorized($clientip)
 
                 return true;
             }
-        } catch (InvalidIpException $e) {
+        } catch (InvalidIpException) {
             d_echo("Client IP ($clientip) is invalid.\n");
         }
     }

@@ -28,7 +28,7 @@ namespace LibreNMS\Util;
 
 use LibreNMS\Exceptions\InvalidIpException;
 
-abstract class IP
+abstract class IP implements \Stringable
 {
     public $ip;
     public $cidr;
@@ -49,7 +49,7 @@ abstract class IP
 
         try {
             return self::parse($hex);
-        } catch (InvalidIpException $e) {
+        } catch (InvalidIpException) {
             // ignore
         }
 
@@ -99,9 +99,7 @@ abstract class IP
         $hex = implode(
             ':',
             array_map(
-                function ($dec) {
-                    return sprintf('%02x', $dec);
-                },
+                fn ($dec) => sprintf('%02x', $dec),
                 explode(' ', (string) $snmpOid)
             )
         );
@@ -122,13 +120,13 @@ abstract class IP
     {
         try {
             return new IPv4($ip);
-        } catch (InvalidIpException $e) {
+        } catch (InvalidIpException) {
             // ignore ipv4 failure and try ipv6
         }
 
         try {
             return new IPv6($ip);
-        } catch (InvalidIpException $e) {
+        } catch (InvalidIpException) {
             if (! $ignore_errors) {
                 throw new InvalidIpException("$ip is not a valid IP address");
             }
@@ -257,10 +255,10 @@ abstract class IP
         return $this->host_bits == 32 ? 'ipv4' : 'ipv6';
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         if ($this->cidr == $this->host_bits) {
-            return $this->compressed();
+            return (string) $this->compressed();
         }
 
         return $this->compressed() . "/{$this->cidr}";
