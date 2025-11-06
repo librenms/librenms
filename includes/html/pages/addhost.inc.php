@@ -42,7 +42,7 @@ if (! empty($_POST['hostname'])) {
             $additional = [];
             if (! $snmp_enabled) {
                 $new_device->snmp_disable = 1;
-                $new_device->os = $_POST['os'] ? strip_tags($_POST['os_id']) : 'ping';
+                $new_device->os = $_POST['os'] ? strip_tags($_POST['os']) : 'ping';
                 $new_device->hardware = strip_tags($_POST['hardware']);
                 $new_device->sysName = strip_tags($_POST['sysName']);
             } elseif ($_POST['snmpver'] === 'v2c' || $_POST['snmpver'] === 'v1') {
@@ -137,8 +137,7 @@ $pagetitle[] = 'Add host';
         <div class='form-group'>
             <label for='os' class='col-sm-3 control-label'>OS (optional)</label>
             <div class='col-sm-9'>
-                <input id='os' class='form-control' name='os' placeholder="OS (optional)"/>
-                <input type='hidden' id='os_id' class='form-control' name='os_id' />
+                <select id='os' class='form-control' name='os' placeholder="OS (optional)"></select>
             </div>
         </div>
     </div>
@@ -329,46 +328,7 @@ if (LibrenmsConfig::get('distributed_poller') === true) {
         }
     }
 
-    var os_suggestions = new Bloodhound({
-        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('text'),
-        queryTokenizer: Bloodhound.tokenizers.whitespace,
-        remote: {
-            url: "ajax_ossuggest.php?term=%QUERY",
-            filter: function (output) {
-                return $.map(output, function (item) {
-                    return {
-                        text: item.text,
-                        os: item.os,
-                    };
-                });
-            },
-            wildcard: "%QUERY"
-        }
-    });
-    os_suggestions.initialize();
-    $('#os').typeahead({
-            hint: true,
-            highlight: true,
-            minLength: 1,
-            classNames: {
-                menu: 'typeahead-left'
-            }
-        },
-        {
-            source: os_suggestions.ttAdapter(),
-            async: true,
-            displayKey: 'text',
-            valueKey: 'os',
-            templates: {
-                suggestion: Handlebars.compile('<p>&nbsp;{{text}}</p>')
-            },
-            limit: 20
-        });
-
-    $("#os").on("typeahead:selected typeahead:autocompleted", function(e,datum) {
-        $("#os_id").val(datum.os);
-        $("#os").html('<mark>' + datum.text + '</mark>');
-    });
+    init_select2('#os', 'os', {}, null, 'OS (optional)');
 
     $("[name='snmp']").bootstrapSwitch('offColor','danger');
     $("[name='force_add']").bootstrapSwitch();
