@@ -82,7 +82,7 @@ class EltexMes23xx extends Radlan implements Ipv6AddressDiscovery, TransceiverDi
         $ifIndexToEntIndexMap = array_flip($this->getIfIndexEntPhysicalMap());
 
         return SnmpQuery::hideMib()->enumStrings()->cache()->walk('ELTEX-MES-PHYSICAL-DESCRIPTION-MIB::eltPhdTransceiverInfoTable')
-            ->mapTable(fn($data, $ifIndex) => new Transceiver([
+            ->mapTable(fn ($data, $ifIndex) => new Transceiver([
                 'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                 'index' => $ifIndex,
                 'connector' => strtoupper($data['eltPhdTransceiverInfoConnectorType'] ?? ''),
