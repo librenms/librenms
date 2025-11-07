@@ -330,7 +330,7 @@ class RunAlerts
                     $alert['query'] = QueryBuilderParser::fromJson($alert['builder'])->toSql();
                 }
                 $chk = dbFetchRows($alert['query'], [$alert['device_id']]);
-                //make sure we can json_encode all the datas later
+                //make sure we can json_encode all the data later
                 $current_alert_count = count($chk);
                 for ($i = 0; $i < $current_alert_count; $i++) {
                     if (isset($chk[$i]['ip'])) {

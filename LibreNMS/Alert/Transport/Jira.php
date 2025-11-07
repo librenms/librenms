@@ -29,14 +29,14 @@ class Jira extends Transport
     {
         $webhook_on = $this->config['enable-webhook'] ?? false;
 
-        // Check if messsage is an alert or not
+        // Check if message is an alert or not
         if ($alert_data['state'] != 0) {
             $url = $this->config['jira-url'];
             // If webhooks are not enabled, append the API info
             if (! $webhook_on) {
                 $url .= '/rest/api/latest/issue';
             }
-            // Messsage is a recovery
+            // Message is a recovery
         } else {
             if (! $webhook_on) {
                 return false; // Webhooks not enabled, do nothing.
@@ -73,7 +73,7 @@ class Jira extends Transport
             }
         }
 
-        // Add Custom fileds to the payload
+        // Add Custom fields to the payload
         $custom = json_decode($this->config['jira-custom'], true);
         if (! empty($custom)) {
             $data['fields'] = array_merge($data['fields'], $custom);

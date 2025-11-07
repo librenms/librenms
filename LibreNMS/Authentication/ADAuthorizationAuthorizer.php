@@ -86,7 +86,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
 
         if ($entries['count']) {
             /*
-             * Cache positiv result as this will result in more queries which we
+             * Cache positive result as this will result in more queries which we
              * want to speed up.
              */
             $this->authLdapSessionCacheSet('user_exists', 1);

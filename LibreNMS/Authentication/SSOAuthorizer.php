@@ -86,7 +86,7 @@ class SSOAuthorizer extends MysqlAuthorizer
     {
         // Check attribute originates from a trusted proxy - we check it on every attribute just in case this gets called after initial login
         if ($this->authSSOProxyTrusted()) {
-            // Short circuit everything if the attribute is non-existant or null
+            // Short circuit everything if the attribute is non-existent or null
             if (empty($attr)) {
                 return null;
             }

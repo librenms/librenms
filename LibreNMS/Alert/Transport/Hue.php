@@ -33,7 +33,7 @@ use LibreNMS\Util\Http;
 /**
  * The Hue API currently is fairly limited for alerts.
  * At it's current implementation we can send ['lselect' => "15 second flash", 'select' => "1 second flash"]
- * If a colour request is sent with it it will permenantly change the colour which is less than desired
+ * If a colour request is sent with it it will permanently change the colour which is less than desired
  */
 class Hue extends Transport
 {

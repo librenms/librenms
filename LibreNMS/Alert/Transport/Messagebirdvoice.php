@@ -3,7 +3,7 @@
 /**
  * Messagebirdvoice.php
  *
- * LibreNMS Messagebird voice API Tranport
+ * LibreNMS Messagebird voice API Transport
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
  *
  * Messagebird voice will return 201 status if the call was initiated, if status is not 201 LibreNMS will log the full error
  *
- * @contributer f0o, sdef2
+ * @contributor f0o, sdef2
  * Thanks to F0o <f0o@devilcode.org> for creating the Slack transport which is the majority of this code.
  * Thanks to sdef2 for figuring out the differences needed to make Discord work.
  * Thanks to theherodied for discord transport used as a base for messagebird.
