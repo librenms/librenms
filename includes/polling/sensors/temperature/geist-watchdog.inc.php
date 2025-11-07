@@ -23,7 +23,6 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
-
 $temp_unit = SnmpQuery::cache()->get('GEIST-V4-MIB::temperatureUnits.0')->value();
 
 if ($temp_unit === '0') {
