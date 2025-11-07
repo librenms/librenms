@@ -46,8 +46,6 @@ class PingCheck implements ShouldQueue
 
     /** @var Collection<string, Device> List of devices keyed by hostname */
     private Collection $devices;
-    /** @var array List of device group ids to check */
-    private array $groups = [];
 
     // working data for loop
     /** @var Collection */
@@ -62,9 +60,8 @@ class PingCheck implements ShouldQueue
      *
      * @param  array  $groups  List of distributed poller groups to check
      */
-    public function __construct(array $groups = [])
+    public function __construct(private array $groups = [])
     {
-        $this->groups = $groups;
         $this->deferred = new Collection;
         $this->waiting_on = new Collection;
         $this->processed = new Collection;
@@ -152,9 +149,7 @@ class PingCheck implements ShouldQueue
             $query->whereIntegerInRaw('poller_group', $this->groups);
         }
 
-        $this->devices = $query->get()->keyBy(function ($device) {
-            return $device->overwrite_ip ?: $device->hostname;
-        });
+        $this->devices = $query->get()->keyBy(fn ($device) => $device->overwrite_ip ?: $device->hostname);
 
         return $this->devices;
     }

@@ -187,9 +187,7 @@ function get_graph_by_port_hostname(Request $request, $ifname = null, $type = 'p
         $port_field => $vars['port'],
     ])->value('port_id');
 
-    return check_port_permission($vars['id'], $device_id, function () use ($request, $vars) {
-        return api_get_graph($request, $vars);
-    });
+    return check_port_permission($vars['id'], $device_id, fn () => api_get_graph($request, $vars));
 }
 
 function get_port_stats_by_port_hostname(Illuminate\Http\Request $request)
@@ -259,9 +257,7 @@ function get_graph_generic_by_hostname(Request $request)
     $device = device_by_id_cache($device_id);
     $vars['device'] = $device['device_id'];
 
-    return check_device_permission($device_id, function () use ($request, $vars) {
-        return api_get_graph($request, $vars);
-    });
+    return check_device_permission($device_id, fn () => api_get_graph($request, $vars));
 }
 
 function get_graph_by_service(Request $request)
@@ -277,9 +273,7 @@ function get_graph_by_service(Request $request)
     $device = device_by_id_cache($device_id);
     $vars['device'] = $device['device_id'];
 
-    return check_device_permission($device_id, function () use ($request, $vars) {
-        return api_get_graph($request, $vars);
-    });
+    return check_device_permission($device_id, fn () => api_get_graph($request, $vars));
 }
 
 function list_locations()
@@ -585,9 +579,7 @@ function device_under_maintenance(Illuminate\Http\Request $request)
         return api_error(404, "Device $hostname not found");
     }
 
-    return check_device_permission($device_id, function () use ($model) {
-        return api_success($model->isUnderMaintenance(), 'is_under_maintenance');
-    });
+    return check_device_permission($device_id, fn () => api_success($model->isUnderMaintenance(), 'is_under_maintenance'));
 }
 
 function device_availability(Illuminate\Http\Request $request)
@@ -704,7 +696,7 @@ function list_bgp(Illuminate\Http\Request $request)
         $sql .= ' AND `bgpPeers`.`bgpLocalAddr` = ?';
         try {
             $sql_params[] = IP::parse($local_address)->uncompressed();
-        } catch (InvalidIpException $e) {
+        } catch (InvalidIpException) {
             return api_error(400, 'Invalid local address');
         }
     }
@@ -712,7 +704,7 @@ function list_bgp(Illuminate\Http\Request $request)
         $sql .= ' AND `bgpPeers`.`bgpPeerIdentifier` = ?';
         try {
             $sql_params[] = IP::parse($remote_address)->uncompressed();
-        } catch (InvalidIpException $e) {
+        } catch (InvalidIpException) {
             return api_error(400, 'Invalid remote address');
         }
     }
@@ -1331,9 +1323,7 @@ function get_port_stack(Illuminate\Http\Request $request)
     $hostname = $request->route('hostname');
     $device = DeviceCache::get($hostname);
 
-    return check_device_permission($device->device_id, function () use ($device) {
-        return api_success($device->portsStack, 'mappings');
-    });
+    return check_device_permission($device->device_id, fn () => api_success($device->portsStack, 'mappings'));
 }
 
 function get_port_security(Illuminate\Http\Request $request)
@@ -1702,9 +1692,7 @@ function list_oxidized(Illuminate\Http\Request $request)
     $devices = Device::query()
             ->with('attribs')
              ->where('disabled', 0)
-             ->when($request->route('hostname'), function ($query, $hostname) {
-                 return $query->where('hostname', $hostname);
-             })
+             ->when($request->route('hostname'), fn ($query, $hostname) => $query->where('hostname', $hostname))
              ->whereNotIn('type', LibrenmsConfig::get('oxidized.ignore_types', []))
              ->whereNotIn('os', LibrenmsConfig::get('oxidized.ignore_os', []))
              ->whereAttributeDisabled('override_Oxidized_disable')
@@ -1867,9 +1855,7 @@ function get_bill_graph(Illuminate\Http\Request $request)
         'id' => $bill_id,
     ];
 
-    return check_bill_permission($bill_id, function () use ($request, $vars) {
-        return api_get_graph($request, $vars);
-    });
+    return check_bill_permission($bill_id, fn () => api_get_graph($request, $vars));
 }
 
 function get_bill_graphdata(Illuminate\Http\Request $request)
@@ -1935,9 +1921,7 @@ function get_bill_history_graph(Illuminate\Http\Request $request)
             return api_error(400, "Unknown Graph Type $graph_type");
     }
 
-    return check_bill_permission($bill_id, function () use ($request, $vars) {
-        return api_get_graph($request, $vars);
-    });
+    return check_bill_permission($bill_id, fn () => api_get_graph($request, $vars));
 }
 
 function get_bill_history_graphdata(Illuminate\Http\Request $request)
@@ -2420,7 +2404,7 @@ function update_device_group(Illuminate\Http\Request $request)
 
     try {
         $deviceGroup->save();
-    } catch (\Illuminate\Database\QueryException $e) {
+    } catch (\Illuminate\Database\QueryException) {
         return api_error(500, 'Failed to save changes device group');
     }
 
@@ -2679,9 +2663,7 @@ function list_mpls_services(Illuminate\Http\Request $request)
     $hostname = $request->get('hostname');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
 
-    $mpls_services = MplsService::hasAccess(Auth::user())->when($device_id, function ($query, $device_id) {
-        return $query->where('device_id', $device_id);
-    })->get();
+    $mpls_services = MplsService::hasAccess(Auth::user())->when($device_id, fn ($query, $device_id) => $query->where('device_id', $device_id))->get();
 
     if ($mpls_services->isEmpty()) {
         return api_error(404, 'MPLS Services do not exist');
@@ -2695,9 +2677,7 @@ function list_mpls_saps(Illuminate\Http\Request $request)
     $hostname = $request->get('hostname');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
 
-    $mpls_saps = MplsSap::hasAccess(Auth::user())->when($device_id, function ($query, $device_id) {
-        return $query->where('device_id', $device_id);
-    })->get();
+    $mpls_saps = MplsSap::hasAccess(Auth::user())->when($device_id, fn ($query, $device_id) => $query->where('device_id', $device_id))->get();
 
     if ($mpls_saps->isEmpty()) {
         return api_error(404, 'SAPs do not exist');
@@ -2864,9 +2844,7 @@ function list_fdb(Illuminate\Http\Request $request)
     $mac = $request->route('mac');
 
     $fdb = PortsFdb::hasAccess(Auth::user())
-           ->when(! empty($mac), function (Builder $query) use ($mac) {
-               return $query->where('mac_address', $mac);
-           })
+           ->when(! empty($mac), fn (Builder $query) => $query->where('mac_address', $mac))
            ->get();
 
     if ($fdb->isEmpty()) {
@@ -2913,9 +2891,7 @@ function list_nac(Illuminate\Http\Request $request)
     $mac = $request->route('mac');
 
     $nac = PortsNac::hasAccess(Auth::user())
-           ->when(! empty($mac), function (Builder $query) use ($mac) {
-               return $query->where('mac_address', $mac);
-           })
+           ->when(! empty($mac), fn (Builder $query) => $query->where('mac_address', $mac))
            ->get();
 
     if ($nac->isEmpty()) {
@@ -3020,7 +2996,7 @@ function list_arp(Illuminate\Http\Request $request)
         try {
             $ip = new IPv4("$query/$cidr");
             $arp = Ipv4Mac::whereRaw('(inet_aton(`ipv4_address`) & ?) = ?', [ip2long($ip->getNetmask()), ip2long($ip->getNetworkAddress())])->get();
-        } catch (InvalidIpException $e) {
+        } catch (InvalidIpException) {
             return api_error(400, 'Invalid Network Address');
         }
     } elseif (filter_var($query, FILTER_VALIDATE_MAC)) {

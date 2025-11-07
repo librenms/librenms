@@ -125,26 +125,17 @@ class SyslogController extends TableController
      */
     private function priorityLabel($syslog_priority)
     {
-        switch ($syslog_priority) {
-            case 'debug':
-                return 'label-default'; //Debug
-            case 'info':
-                return 'label-info'; //Informational
-            case 'notice':
-                return 'label-primary'; //Notice
-            case 'warning':
-                return 'label-warning'; //Warning
-            case 'err':
-                return 'label-danger'; //Error
-            case 'crit':
-                return 'label-danger'; //Critical
-            case 'alert':
-                return 'label-danger'; //Alert
-            case 'emerg':
-                return 'label-danger'; //Emergency
-            default:
-                return '';
-        }
+        return match ($syslog_priority) {
+            'debug' => 'label-default',
+            'info' => 'label-info',
+            'notice' => 'label-primary',
+            'warning' => 'label-warning',
+            'err' => 'label-danger',
+            'crit' => 'label-danger',
+            'alert' => 'label-danger',
+            'emerg' => 'label-danger',
+            default => '',
+        };
     }
 
     // end syslog_priority

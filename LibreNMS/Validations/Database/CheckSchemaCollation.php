@@ -62,9 +62,7 @@ class CheckSchemaCollation implements Validation, ValidationFixer
             return ValidationResult::fail('MySQL tables collation is wrong: ')
                 ->setFix('Check https://community.librenms.org/t/new-default-database-charset-collation/14956 for info on how to fix.')
                 ->setFixer(self::class)
-                ->setList('Tables', array_map(function ($row) {
-                    return "$row->TABLE_NAME   $row->CHARACTER_SET_NAME   $row->COLLATION_NAME";
-                }, $collation_tables));
+                ->setList('Tables', array_map(fn ($row) => "$row->TABLE_NAME   $row->CHARACTER_SET_NAME   $row->COLLATION_NAME", $collation_tables));
         }
 
         $column_collation_sql = "SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME
@@ -75,9 +73,7 @@ class CheckSchemaCollation implements Validation, ValidationFixer
             return ValidationResult::fail('MySQL column collation is wrong: ')
                 ->setFix('Check https://community.librenms.org/t/new-default-database-charset-collation/14956 for info on how to fix.')
                 ->setFixer(self::class)
-                ->setList('Columns', array_map(function ($row) {
-                    return "$row->TABLE_NAME: $row->COLUMN_NAME   $row->CHARACTER_SET_NAME   $row->COLLATION_NAME";
-                }, $collation_columns));
+                ->setList('Columns', array_map(fn ($row) => "$row->TABLE_NAME: $row->COLUMN_NAME   $row->CHARACTER_SET_NAME   $row->COLLATION_NAME", $collation_columns));
         }
 
         return ValidationResult::ok(trans('validation.validations.database.CheckSchemaCollation.ok'));

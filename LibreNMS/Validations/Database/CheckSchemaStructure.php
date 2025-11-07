@@ -78,7 +78,7 @@ class CheckSchemaStructure implements Validation, ValidationFixer
             foreach ($this->schema_update as $query) {
                 DB::statement($query);
             }
-        } catch (QueryException $e) {
+        } catch (QueryException) {
             return false;
         }
 
@@ -303,9 +303,7 @@ class CheckSchemaStructure implements Validation, ValidationFixer
             $index = "INDEX `{$index_data['Name']}` (%s)";
         }
 
-        $columns = implode(',', array_map(function ($col) {
-            return "`$col`";
-        }, $index_data['Columns']));
+        $columns = implode(',', array_map(fn ($col) => "`$col`", $index_data['Columns']));
 
         return sprintf($index, $columns);
     }

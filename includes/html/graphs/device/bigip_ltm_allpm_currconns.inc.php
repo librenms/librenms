@@ -46,7 +46,7 @@ if ($components[$vars['id']]['type'] == 'f5-ltm-pool') {
         if ($comp['type'] != 'f5-ltm-poolmember') {
             continue;
         }
-        if (! strstr($comp['UID'], $parent)) {
+        if (! strstr($comp['UID'], (string) $parent)) {
             continue;
         }
 

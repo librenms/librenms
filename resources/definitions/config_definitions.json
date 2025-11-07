@@ -5772,8 +5772,9 @@
             "type": "integer"
         },
         "radius.users_purge": {
-            "default": null,
-            "type": "boolean"
+            "default": 0,
+            "units": "days",
+            "type": "integer"
         },
         "radius.secret": {
             "default": null,
@@ -5835,6 +5836,13 @@
             "group": "auth",
             "section": "general",
             "order": 6
+        },
+        "password.uncompromised": {
+            "default": true,
+            "type": "boolean",
+            "group": "auth",
+            "section": "general",
+            "order": 7
         },
         "peering_descr": {
             "default": [
@@ -6382,7 +6390,7 @@
             "default": false,
             "group": "auth",
             "section": "general",
-            "order": 7,
+            "order": 20,
             "type": "boolean"
         },
         "radius.default_roles": {

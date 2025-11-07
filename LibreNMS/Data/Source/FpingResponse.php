@@ -33,7 +33,7 @@ use Carbon\Carbon;
 use LibreNMS\Exceptions\FpingUnparsableLine;
 use LibreNMS\RRD\RrdDefinition;
 
-class FpingResponse
+class FpingResponse implements \Stringable
 {
     const SUCESS = 0;
     const UNREACHABLE = 1;
@@ -128,7 +128,7 @@ class FpingResponse
         return $this->exit_code == 0 && $this->loss < 100;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         $str = "$this->host : xmt/rcv/%loss = $this->transmitted/$this->received/$this->loss%";
 

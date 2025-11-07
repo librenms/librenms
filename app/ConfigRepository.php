@@ -264,7 +264,7 @@ class ConfigRepository
         $this->forget($key);
         try {
             return Models\Config::withChildren($key)->delete();
-        } catch (Exception $e) {
+        } catch (Exception) {
             return false;
         }
     }
@@ -333,7 +333,7 @@ class ConfigRepository
                 ->each(function ($item): void {
                     Arr::set($this->config, $item->config_name, $item->config_value);
                 });
-        } catch (QueryException $e) {
+        } catch (QueryException) {
             // possibly table config doesn't exist yet
         }
 
@@ -345,7 +345,7 @@ class ConfigRepository
     {
         try {
             $graph_types = GraphType::all()->toArray();
-        } catch (QueryException $e) {
+        } catch (QueryException) {
             // possibly table config doesn't exist yet
             $graph_types = [];
         }

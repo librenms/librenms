@@ -182,7 +182,7 @@ class Vrp extends OS implements
             if (! is_null($type) && ! is_null($entityType)) {
                 $type .= " ($entityType)";
             } else {
-                $type = $type ?? $entityType;
+                $type ??= $entityType;
             }
             if (! is_null($type)) {
                 $type .= $mode;
@@ -330,7 +330,7 @@ class Vrp extends OS implements
                     $radioutil = $radio['hwWlanRadioChUtilizationRate'] ?? 0;
                     $radioutil = ($radioutil > 100 || $radioutil < 0) ? -1 : $radioutil;
                     $numasoclients = $clientPerRadio[$ap_id][$r_id] ?? 0;
-                    $radio['hwWlanRadioType'] = $radio['hwWlanRadioType'] ?? 0;
+                    $radio['hwWlanRadioType'] ??= 0;
 
                     if ($txpow > 127) {
                         // means the radio is disabled for some reason.
@@ -713,14 +713,12 @@ class Vrp extends OS implements
             'HUAWEI-L2VLAN-MIB::hwL2VlanDescr',
             // 'HUAWEI-L2VLAN-MIB::hwL2VlanRowStatus', // for filtering only active vlans
             'HUAWEI-L2VLAN-MIB::hwL2VlanType',
-        ])->mapTable(function ($vlanArray, $vlanId) {
-            return new Vlan([
-                'vlan_name' => $vlanArray['HUAWEI-L2VLAN-MIB::hwL2VlanDescr'] ?? '',
-                'vlan_vlan' => $vlanId,
-                'vlan_domain' => 1,
-                'vlan_type' => $vlanArray['HUAWEI-L2VLAN-MIB::hwL2VlanType'] ?? '',
-            ]);
-        });
+        ])->mapTable(fn ($vlanArray, $vlanId) => new Vlan([
+            'vlan_name' => $vlanArray['HUAWEI-L2VLAN-MIB::hwL2VlanDescr'] ?? '',
+            'vlan_vlan' => $vlanId,
+            'vlan_domain' => 1,
+            'vlan_type' => $vlanArray['HUAWEI-L2VLAN-MIB::hwL2VlanType'] ?? '',
+        ]));
 
         if ($vlansData->isEmpty()) { // try standard QBridge Vlan data
             $vlansData = parent::discoverVlans();

@@ -140,7 +140,7 @@ class GraylogController extends SimpleTableController
             '7' => 'label-default',
             '' => 'label-info',
         ];
-        $barColor = isset($map[$severity]) ? $map[$severity] : 'label-info';
+        $barColor = $map[$severity] ?? 'label-info';
 
         return '<span class="alert-status ' . $barColor . '" style="margin-right:8px;float:left;"></span>';
     }

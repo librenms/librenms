@@ -281,9 +281,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                     $ipv6 = implode(
                         ':',
                         array_map(
-                            function ($v) {
-                                return sprintf('%02x', $v);
-                            },
+                            fn ($v) => sprintf('%02x', $v),
                             explode('.', $matches[6])
                         )
                     );
@@ -504,7 +502,7 @@ if (LibrenmsConfig::get('autodiscovery.ospf') === true) {
 
             $name = gethostbyaddr($ip);
             $remote_device_id = discover_new_device($name, $device, 'OSPF');
-        } catch (\LibreNMS\Exceptions\InvalidIpException $e) {
+        } catch (\LibreNMS\Exceptions\InvalidIpException) {
             //
         }
     }
@@ -533,7 +531,7 @@ if (LibrenmsConfig::get('autodiscovery.ospfv3') === true) {
 
             $name = gethostbyaddr($ip);
             $remote_device_id = discover_new_device($name, $device, 'OSPFv3');
-        } catch (\LibreNMS\Exceptions\InvalidIpException $e) {
+        } catch (\LibreNMS\Exceptions\InvalidIpException) {
             //
         }
     }

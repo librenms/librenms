@@ -245,7 +245,7 @@ if (isset($vars['purge'])) {
     } else {
         try {
             Port::hasAccess(Auth::user())->where('port_id', $vars['purge'])->firstOrFail()->delete();
-        } catch (ModelNotFoundException $e) {
+        } catch (ModelNotFoundException) {
             echo "<div class='alert alert-danger'>Port ID " . htmlspecialchars($vars['purge']) . ' not found! Could not purge port.</div>';
         }
     }

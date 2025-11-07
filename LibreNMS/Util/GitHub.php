@@ -30,11 +30,7 @@ use Exception;
 
 class GitHub
 {
-    protected $tag;
-    protected $from;
     protected $token;
-    protected $file;
-    protected $pr;
     protected $stop = false;
     protected $pull_requests = [];
     protected $changelog = [
@@ -75,12 +71,8 @@ class GitHub
     protected $github = 'https://api.github.com/repos/librenms/librenms';
     protected $graphql = 'https://api.github.com/graphql';
 
-    public function __construct($tag, $from, $file, $token = null, $pr = null)
+    public function __construct(protected $tag, protected $from, protected $file, $token = null, protected $pr = null)
     {
-        $this->tag = $tag;
-        $this->from = $from;
-        $this->file = $file;
-        $this->pr = $pr;
         if (! is_null($token) || getenv('GH_TOKEN')) {
             $this->token = $token ?: getenv('GH_TOKEN');
         }
