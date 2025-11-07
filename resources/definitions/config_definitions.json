@@ -2245,7 +2245,7 @@
         "enable_ports_etherlike": {
             "group": "webui",
             "section": "device",
-            "order": 23,
+            "order": 22,
             "default": false,
             "type": "boolean"
         },
@@ -6305,17 +6305,6 @@
                 "detail": "Details",
                 "arp": "ARP",
                 "fdb": "FDB"
-            }
-        },
-        "ports_ipv4_neighbours": {
-            "default": "subnet",
-            "type": "select",
-            "group": "webui",
-            "section": "device",
-            "order": 22,
-            "options":{
-                "subnet": "Subnet",
-                "arp": "ARP"
             }
         },
         "ports_purge": {

@@ -124,15 +124,11 @@ class PortsController implements DeviceTab
             $relationships[] = 'links';
             $relationships[] = 'transceivers';
             $relationships[] = 'pseudowires.endpoints';
+            $relationships[] = 'ipv4Networks.ipv4';
             $relationships[] = 'ipv6Networks.ipv6';
+            $relationships[] = 'macLinkedPorts';
             $relationships['stackParent'] = fn ($q) => $q->select('port_id');
             $relationships['stackChildren'] = fn ($q) => $q->select('port_id');
-
-            if (LibrenmsConfig::get('ports_ipv4_neighbours') == 'arp') {
-                $relationships[] = 'macLinkedPorts';
-            } else {
-                $relationships[] = 'ipv4Networks.ipv4';
-            }
         }
 
         /** @var Collection<Port>|LengthAwarePaginator<Port> $ports */
@@ -183,23 +179,21 @@ class PortsController implements DeviceTab
             }
         }
 
-        // IPv4 + IPv6 subnet if detailed
+        // IPv4 + IPv6 subnet
         // fa-arrow-right green portlink on devicelink
         $ids = [];
-        if (LibrenmsConfig::get('ports_ipv4_neighbours') == 'arp') {
-            if ($port->macLinkedPorts->isNotEmpty()) {
-                $ids = $port->macLinkedPorts->pluck('port_id');
-            }
+        $ipv4_neighbours = $port->ipv4Networks->map(fn ($net) => $net->ipv4->where('port_id', '<>', $port->port_id)->pluck('ipv4_address'))->flatten();
+
+        if ($ipv4_neighbours->count() > 0 && $ipv4_neighbours->duplicates()->count() == 0) {
+            // Use the neighbours from IPv4 networks if we have found any, and there are no duplicates
+            $ids = $port->ipv4Networks->map(fn ($net) => $net->ipv4->where('port_id', '<>', $port->port_id)->pluck('port_id'))->flatten();
         } else {
-            if ($port->ipv4Networks->isNotEmpty()) {
-                $ids = $port->ipv4Networks->map(fn ($net) => $net->ipv4->pluck('port_id'))->flatten();
-            }
+            // Try using ports found through the ARP table as an alternative
+            $ids = $port->macLinkedPorts->pluck('port_id');
         }
 
         foreach ($ids as $port_id) {
-            if ($port_id !== $port->port_id) {
-                $this->addPortNeighbor($neighbors, 'ipv4_network', $port_id);
-            }
+            $this->addPortNeighbor($neighbors, 'ipv4_network', $port_id);
         }
 
         if ($port->ipv6Networks->isNotEmpty()) {
