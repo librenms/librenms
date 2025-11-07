@@ -54,6 +54,7 @@ been up for 30344 seconds`.
 - Features of the Device: `$alert->features`
 - Serial number of the Device: `$alert->serial`
 - Location of the Device: `$alert->location`
+- Device Groups of the Device: `$alert->device_groups`
 - uptime of the Device (in seconds): `$alert->uptime`
 - Short uptime of the Device (28d 22h 30m 7s): `$alert->uptime_short`
 - Long uptime of the Device (28 days, 22h 30m 7s): `$alert->uptime_long`
