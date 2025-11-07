@@ -10,6 +10,8 @@ use LibreNMS\Util\Number;
 
 class Billing
 {
+    private static array $get95thdataCache = [];
+
     public static function formatBytes($value): string
     {
         return Number::formatBase($value, LibrenmsConfig::get('billing.base'));
@@ -125,49 +127,28 @@ class Billing
         return $return;
     }
 
+    private static function get95thdata($bill_id, $datefrom, $dateto, $type): float
+    {
+        if (empty(self::$get95thdataCache)) {
+            self::$get95thdataCache = dbFetchRows("SELECT (SUM(delta) / SUM(period) * 8) as rate, (SUM(in_delta) / SUM(period) * 8) as in_rate, (SUM(out_delta) / SUM(period) * 8) as out_rate, FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(`timestamp`) / 300) * 300) AS bucket_start,   DATE_ADD(FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(`timestamp`) / 300) * 300), INTERVAL 5 MINUTE) AS bucket_end,SUM(delta) as delta_sum FROM bill_data WHERE bill_id = ? AND timestamp > ? AND timestamp <= ? GROUP BY bill_id, bucket_start ORDER BY rate ASC", [$bill_id, $datefrom, $dateto]);
+        }
+        $measurement_95th = (round(count(self::$get95thdataCache) / 100 * 95) - 2);
+        return round(self::$get95thdataCache[$measurement_95th][$type], 2);
+    }
+
     private static function get95thagg($bill_id, $datefrom, $dateto): float
     {
-        $mq_sql = 'SELECT count(delta) FROM bill_data WHERE bill_id = ?';
-        $mq_sql .= ' AND timestamp > ? AND timestamp <= ?';
-        $measurements = dbFetchCell($mq_sql, [$bill_id, $datefrom, $dateto]);
-        $measurement_95th = (round($measurements / 100 * 95) - 1);
-
-        $q_95_sql = 'SELECT (delta / period * 8) AS rate FROM bill_data  WHERE bill_id = ?';
-        $q_95_sql .= ' AND timestamp > ? AND timestamp <= ? ORDER BY rate ASC';
-        $a_95th = dbFetchColumn($q_95_sql, [$bill_id, $datefrom, $dateto]);
-        $m_95th = $a_95th[$measurement_95th];
-
-        return round($m_95th, 2);
+        return self::get95thdata($bill_id, $datefrom, $dateto, 'rate');
     }
 
     private static function get95thIn($bill_id, $datefrom, $dateto): float
     {
-        $mq_sql = 'SELECT count(delta) FROM bill_data WHERE bill_id = ?';
-        $mq_sql .= ' AND timestamp > ? AND timestamp <= ?';
-        $measurements = dbFetchCell($mq_sql, [$bill_id, $datefrom, $dateto]);
-        $measurement_95th = (round($measurements / 100 * 95) - 1);
-
-        $q_95_sql = 'SELECT (in_delta / period * 8) AS rate FROM bill_data  WHERE bill_id = ?';
-        $q_95_sql .= ' AND timestamp > ? AND timestamp <= ? ORDER BY rate ASC';
-        $a_95th = dbFetchColumn($q_95_sql, [$bill_id, $datefrom, $dateto]);
-        $m_95th = $a_95th[$measurement_95th] ?? 0;
-
-        return round($m_95th, 2);
+        return self::get95thdata($bill_id, $datefrom, $dateto, 'in_rate');
     }
 
     private static function get95thout($bill_id, $datefrom, $dateto): float
     {
-        $mq_sql = 'SELECT count(delta) FROM bill_data WHERE bill_id = ?';
-        $mq_sql .= ' AND timestamp > ? AND timestamp <= ?';
-        $measurements = dbFetchCell($mq_sql, [$bill_id, $datefrom, $dateto]);
-        $measurement_95th = (round($measurements / 100 * 95) - 1);
-
-        $q_95_sql = 'SELECT (out_delta / period * 8) AS rate FROM bill_data  WHERE bill_id = ?';
-        $q_95_sql .= ' AND timestamp > ? AND timestamp <= ? ORDER BY rate ASC';
-        $a_95th = dbFetchColumn($q_95_sql, [$bill_id, $datefrom, $dateto]);
-        $m_95th = $a_95th[$measurement_95th] ?? 0;
-
-        return round($m_95th, 2);
+        return self::get95thdata($bill_id, $datefrom, $dateto, 'out_rate');
     }
 
     public static function getRates($bill_id, $datefrom, $dateto, $dir_95th): array
