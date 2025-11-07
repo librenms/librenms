@@ -24,6 +24,6 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$scale = SnmpQuery::cache()->get('PowerNet-MIB::emsStatusSysTempUnits.0')->value();
+$scale = SnmpQuery::cache()->enumStrings()->get('PowerNet-MIB::emsStatusSysTempUnits.0')->value();
 
 $sensor_value = fahrenheit_to_celsius($sensor_value, $scale);
