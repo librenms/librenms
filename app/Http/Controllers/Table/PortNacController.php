@@ -157,12 +157,8 @@ class PortNacController extends TableController
         $device_id = \Request::get('device_id');
 
         return Port::where('ifAlias', 'like', "%$ifAlias%")
-            ->when($device_id, function ($query) use ($device_id) {
-                return $query->where('device_id', $device_id);
-            })
-            ->when($port_id, function ($query) use ($port_id) {
-                return $query->where('port_id', $port_id);
-            })
+            ->when($device_id, fn ($query) => $query->where('device_id', $device_id))
+            ->when($port_id, fn ($query) => $query->where('port_id', $port_id))
             ->pluck('port_id');
     }
 

@@ -188,7 +188,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         }
 
         if (LibrenmsConfig::get('oxidized.features.versioning') === true) { // fetch a list of versions
-            $config_versions = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/version?node_full=' . (isset($node_info['full_name']) ? $node_info['full_name'] : $oxidized_hostname) . '&format=json'), true);
+            $config_versions = json_decode((new \App\ApiClients\Oxidized())->getContent('/node/version?node_full=' . ($node_info['full_name'] ?? $oxidized_hostname) . '&format=json'), true);
         }
 
         $config_total = 1;

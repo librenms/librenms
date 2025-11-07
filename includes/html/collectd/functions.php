@@ -771,7 +771,7 @@ function collectd_draw_meta_stack(&$opts, &$sources)
     foreach ($sources as &$inst_data) {
         $inst_name = $inst_data['name'];
         $file = $inst_data['file'];
-        $ds = isset($inst_data['ds']) ? $inst_data['ds'] : 'value';
+        $ds = $inst_data['ds'] ?? 'value';
 
         if (strlen($inst_name) > $max_inst_name) {
             $max_inst_name = strlen($inst_name);
@@ -808,7 +808,7 @@ function collectd_draw_meta_stack(&$opts, &$sources)
             $legend .= ' ';
         }
 
-        $number_format = isset($opts['number_format']) ? $opts['number_format'] : '%6.1lf';
+        $number_format = $opts['number_format'] ?? '%6.1lf';
 
         if (isset($opts['colors'][$inst_name])) {
             $line_color = new CollectdColor($opts['colors'][$inst_name]);
@@ -907,7 +907,7 @@ function collectd_draw_meta_line(&$opts, &$sources)
     foreach ($sources as &$inst_data) {
         $inst_name = $inst_data['name'];
         $file = $inst_data['file'];
-        $ds = isset($inst_data['ds']) ? $inst_data['ds'] : 'value';
+        $ds = $inst_data['ds'] ?? 'value';
 
         if (strlen($inst_name) > $max_inst_name) {
             $max_inst_name = strlen($inst_name);
@@ -929,7 +929,7 @@ function collectd_draw_meta_line(&$opts, &$sources)
             $legend .= ' ';
         }
 
-        $number_format = isset($opts['number_format']) ? $opts['number_format'] : '%6.1lf';
+        $number_format = $opts['number_format'] ?? '%6.1lf';
 
         if (isset($opts['colors'][$inst_name])) {
             $line_color = new CollectdColor($opts['colors'][$inst_name]);

@@ -638,7 +638,7 @@ function outputStatistics($rra)
                             $ds_name[$dskey],
                             $rra_cf[$rra_key],
                             $ds['totalsamples'],
-                            isset($ds['numsamples']) ? $ds['numsamples'] : '0',
+                            $ds['numsamples'] ?? '0',
                             $ds['average'] != 'N/A' ? round($ds['average'], 2) : $ds['average'],
                             $ds['standard_deviation'] != 'N/A' ? round($ds['standard_deviation'], 2) : $ds['standard_deviation'],
                             isset($ds['max_value']) ? round($ds['max_value'], 2) : 'N/A',
@@ -692,7 +692,7 @@ function outputStatistics($rra)
                             $ds_name[$dskey],
                             $rra_cf[$rra_key],
                             $ds['totalsamples'],
-                            isset($ds['numsamples']) ? $ds['numsamples'] : '0',
+                            $ds['numsamples'] ?? '0',
                             $ds['average'] != 'N/A' ? round($ds['average'], 2) : $ds['average'],
                             $ds['standard_deviation'] != 'N/A' ? round($ds['standard_deviation'], 2) : $ds['standard_deviation'],
                             isset($ds['max_value']) ? round($ds['max_value'], 2) : 'N/A',
@@ -865,10 +865,10 @@ function standard_deviation($samples)
     $sample_square = [];
 
     for ($current_sample = 0; $sample_count > $current_sample; $current_sample++) {
-        $sample_square[$current_sample] = pow($samples[$current_sample], 2);
+        $sample_square[$current_sample] = $samples[$current_sample] ** 2;
     }
 
-    return sqrt(array_sum($sample_square) / $sample_count - pow(array_sum($samples) / $sample_count, 2));
+    return sqrt(array_sum($sample_square) / $sample_count - (array_sum($samples) / $sample_count) ** 2);
 }
 
 /* display_help - displays the usage of the function */

@@ -36,26 +36,29 @@ use Log;
 
 class InfluxDB extends BaseDatastore
 {
-    /** @var Database */
-    private $connection;
     private $batchPoints = []; // Store points before writing
     private $batchSize = 0; // Number of points to write at once
     private $measurements = []; // List of measurements to write
 
-    public function __construct(Database $influx)
+    public function __construct(private Database $connection)
     {
         parent::__construct();
-        $this->connection = $influx;
         $this->batchSize = LibrenmsConfig::get('influxdb.batch_size', 0);
         $this->measurements = LibrenmsConfig::get('influxdb.measurements', []);
 
         // if the database doesn't exist, create it.
-        try {
-            if (! $influx->exists()) {
-                $influx->create();
+        // When using UDP transport, the call to exists() fails
+        // since the transport doesn't support querying.  That said
+        // the database will be created automatically upon data
+        // reception.
+        if (LibrenmsConfig::get('influxdb.transport', 'http') !== 'udp') {
+            try {
+                if (! $this->connection->exists()) {
+                    $this->connection->create();
+                }
+            } catch (\Exception) {
+                Log::warning('InfluxDB: Could not create database');
             }
-        } catch (\Exception $e) {
-            Log::warning('InfluxDB: Could not create database');
         }
     }
 

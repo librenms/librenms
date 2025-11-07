@@ -288,16 +288,11 @@ class IRCBot
                 $this->log('Alert channels ' . print_r($this->config['irc_alert_chan'], true));
             }
 
-            switch ($alert['state']) {
-                case AlertState::WORSE:
-                    $severity_extended = '+';
-                    break;
-                case AlertState::BETTER:
-                    $severity_extended = '-';
-                    break;
-                default:
-                    $severity_extended = '';
-            }
+            $severity_extended = match ($alert['state']) {
+                AlertState::WORSE => '+',
+                AlertState::BETTER => '-',
+                default => '',
+            };
             $severity = '';
             if (isset($alert['severity'])) {
                 $severity = str_replace(['warning', 'critical', 'normal'], [$this->_color('Warning', 'yellow'), $this->_color('Critical', 'red'), $this->_color('Info', 'lightblue')], $alert['severity']) . $severity_extended . ' ';
@@ -419,7 +414,7 @@ class IRCBot
                     $this->tempnick = $ex[2];
                 }
                 if (! isset($this->tempnick)) {
-                    $this->tempnick = $this->nick . rand(0, 99);
+                    $this->tempnick = $this->nick . random_int(0, 99);
                 }
                 if ($this->debug) {
                     $this->log('Using temp nick ' . $this->tempnick);
@@ -805,9 +800,7 @@ class IRCBot
             $hostname = preg_replace("/[^A-z0-9\.\-]/", '', $params[1]);
         }
 
-        $tmp = Eventlog::with('device')->hasAccess($this->user['user'])->whereIn('device_id', function ($query) use ($hostname) {
-            return $query->where('hostname', 'like', $hostname . '%')->select('device_id');
-        })->select(['event_id', 'datetime', 'type', 'message'])->orderBy('event_id')->limit((int) $num)->get();
+        $tmp = Eventlog::with('device')->hasAccess($this->user['user'])->whereIn('device_id', fn ($query) => $query->where('hostname', 'like', $hostname . '%')->select('device_id'))->select(['event_id', 'datetime', 'type', 'message'])->orderBy('event_id')->limit((int) $num)->get();
 
         /** @var Eventlog $logline */
         foreach ($tmp as $logline) {

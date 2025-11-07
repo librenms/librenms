@@ -10,10 +10,8 @@ function printEntPhysical($device, $ent, $level, $class)
     foreach ($ents as $ent) {
         //Let's find if we have any sensors attached to the current entity;
         //We hit this code for every type of entity because not all vendors have 1 'sensor' entity per sensor
-        $sensors = DeviceCache::getPrimary()->sensors()->where(function (Builder $query) use ($ent) {
-            return $query->where('entPhysicalIndex', $ent['entPhysicalIndex'])
-                ->orWhere('sensor_index', $ent['entPhysicalIndex']);
-        })->get();
+        $sensors = DeviceCache::getPrimary()->sensors()->where(fn (Builder $query) => $query->where('entPhysicalIndex', $ent['entPhysicalIndex'])
+            ->orWhere('sensor_index', $ent['entPhysicalIndex']))->get();
         echo "
  <li class='$class'>";
 

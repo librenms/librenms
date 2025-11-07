@@ -50,7 +50,7 @@ if (! empty($entPhysical)) {
                     $state['entStateLastChanged'] = $lastChanged
                         ->setTimezone(new DateTimeZone(date_default_timezone_get()))
                         ->format('Y-m-d H:i:s');
-                } catch (Exception $e) {
+                } catch (Exception) {
                     // no update
                 }
             }

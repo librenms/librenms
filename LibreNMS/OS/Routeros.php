@@ -526,17 +526,15 @@ class Routeros extends OS implements
         $this->qosIdxToParent = new Collection();
         $qos = new Collection();
 
-        $qos = $qos->concat(\SnmpQuery::walk('MIKROTIK-MIB::mtxrQueueSimpleTable')->mapTable(function ($data, $qosIndex) {
-            return new Qos([
-                'device_id' => $this->getDeviceId(),
-                'type' => 'routeros_simple',
-                'title' => $data['MIKROTIK-MIB::mtxrQueueSimpleName'],
-                'snmp_idx' => $qosIndex,
-                'rrd_id' => $data['MIKROTIK-MIB::mtxrQueueSimpleName'],
-                'ingress' => 1,
-                'egress' => 1,
-            ]);
-        }));
+        $qos = $qos->concat(\SnmpQuery::walk('MIKROTIK-MIB::mtxrQueueSimpleTable')->mapTable(fn ($data, $qosIndex) => new Qos([
+            'device_id' => $this->getDeviceId(),
+            'type' => 'routeros_simple',
+            'title' => $data['MIKROTIK-MIB::mtxrQueueSimpleName'],
+            'snmp_idx' => $qosIndex,
+            'rrd_id' => $data['MIKROTIK-MIB::mtxrQueueSimpleName'],
+            'ingress' => 1,
+            'egress' => 1,
+        ])));
 
         $this->qosIdxToParent->put('routeros_tree', new Collection());
         $qos = $qos->concat(\SnmpQuery::walk('MIKROTIK-MIB::mtxrQueueTreeTable')->mapTable(function ($data, $qosIndex) {

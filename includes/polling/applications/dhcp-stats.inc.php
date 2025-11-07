@@ -20,7 +20,7 @@ try {
 } catch (JsonAppMissingKeysException $e) {
     $dhcpstats = $e->getParsedJson();
     $output = 'ERROR';
-} catch (JsonAppException $e) {
+} catch (JsonAppException) {
     $dhcpstats = snmp_walk($device, $oid, $options, $mib);
 }
 

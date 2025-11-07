@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Location;
 use App\Facades\LibrenmsConfig;
+use App\Models\Location;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\Clean;
 use LibreNMS\Util\IP;
@@ -50,7 +50,7 @@ if (! empty($device['overwrite_ip'])) {
         if ($ip !== format_hostname($device)) {
             echo "<div class='row'><div class='col-sm-4'>IP Address</div><div class='col-sm-8'>" . htmlentities($ip) . '</div></div>';
         }
-    } catch (InvalidIpException $e) {
+    } catch (InvalidIpException) {
         // don't add an ip line
     }
 }

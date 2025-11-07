@@ -412,14 +412,12 @@ function dnslookup($device, $type = false, $return = false)
  */
 function create_state_index($state_name, $states = []): void
 {
-    app('sensor-discovery')->withStateTranslations($state_name, array_map(function ($state) {
-        return new StateTranslation([
-            'state_descr' => $state['descr'],
-            'state_draw_graph' => $state['graph'],
-            'state_value' => $state['value'],
-            'state_generic_value' => $state['generic'],
-        ]);
-    }, $states));
+    app('sensor-discovery')->withStateTranslations($state_name, array_map(fn ($state) => new StateTranslation([
+        'state_descr' => $state['descr'],
+        'state_draw_graph' => $state['graph'],
+        'state_value' => $state['value'],
+        'state_generic_value' => $state['generic'],
+    ]), $states));
 }
 
 function delta_to_bits($delta, $period)
@@ -499,7 +497,7 @@ function cache_peeringdb()
         // We cache for 71 hours
         $cached = dbFetchCell('SELECT count(*) FROM `pdb_ix` WHERE (UNIX_TIMESTAMP() - timestamp) < 255600');
         if ($cached == 0) {
-            $rand = rand(3, 30);
+            $rand = random_int(3, 30);
             echo "No cached PeeringDB data found, sleeping for $rand seconds" . PHP_EOL;
             sleep($rand);
             $peer_keep = [];

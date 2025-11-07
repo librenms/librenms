@@ -16,9 +16,7 @@ class ConfigServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->singleton('librenms-config', function () {
-            return new ConfigRepository;
-        });
+        $this->app->singleton('librenms-config', fn () => new ConfigRepository);
 
         // if we skipped loading the DB the first time config was called, load it when it is available
         $this->callAfterResolving('db', function (): void {

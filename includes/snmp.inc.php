@@ -90,9 +90,7 @@ function mibdir($mibdir = null, $device = null)
     array_unshift($dirs, $base);
 
     // remove trailing /, remove empty dirs, and remove duplicates
-    $dirs = array_unique(array_filter(array_map(function ($dir) {
-        return rtrim($dir, '/');
-    }, $dirs)));
+    $dirs = array_unique(array_filter(array_map(fn ($dir) => rtrim($dir, '/'), $dirs)));
 
     return implode(':', $dirs);
 }//end mibdir()
@@ -595,7 +593,7 @@ function snmp_gen_auth(&$device, $cmd = [])
 {
     if ($device['snmpver'] === 'v3') {
         array_push($cmd, '-v3', '-l', $device['authlevel']);
-        array_push($cmd, '-n', isset($device['context_name']) ? $device['context_name'] : '');
+        array_push($cmd, '-n', $device['context_name'] ?? '');
 
         $authlevel = strtolower($device['authlevel']);
         if ($authlevel === 'noauthnopriv') {

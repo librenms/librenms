@@ -39,7 +39,7 @@ class BashCompletionCommand extends Command
         $previous = getenv('COMP_PREVIOUS');
         $words = explode(' ', $line);
 
-        $command_name = isset($words[1]) ? $words[1] : $current; // handle : silliness
+        $command_name = $words[1] ?? $current; // handle : silliness
 
         if (count($words) < 3) {
             $completions = $this->completeCommand($command_name);
@@ -51,7 +51,7 @@ class BashCompletionCommand extends Command
                 $input = new StringInput(implode(' ', array_slice($words, 2)));
                 try {
                     $input->bind($command_def);
-                } catch (\RuntimeException $e) {
+                } catch (\RuntimeException) {
                     // ignore?
                 }
 
@@ -76,9 +76,7 @@ class BashCompletionCommand extends Command
                         $command_completions = $command->completeOptionValue($option, $current);
                     }
 
-                    $completions = $command_completions !== null
-                        ? $command_completions
-                        : $this->completeOptionValue($option, $current);
+                    $completions = $command_completions ?? $this->completeOptionValue($option, $current);
                 } else {
                     $completions = new Collection();
                     if (! Str::startsWith($previous, '-')) {
@@ -146,19 +144,13 @@ class BashCompletionCommand extends Command
      */
     private function completeCommand($partial)
     {
-        $all_commands = collect(\Artisan::all())->keys()->filter(function ($cmd) {
-            return $cmd != 'list:bash-completion';
-        });
+        $all_commands = collect(\Artisan::all())->keys()->filter(fn ($cmd) => $cmd != 'list:bash-completion');
 
-        $completions = $all_commands->filter(function ($cmd) use ($partial) {
-            return empty($partial) || Str::startsWith($cmd, $partial);
-        });
+        $completions = $all_commands->filter(fn ($cmd) => empty($partial) || Str::startsWith($cmd, $partial));
 
         // handle : silliness
         if (Str::contains($partial, ':')) {
-            $completions = $completions->map(function ($cmd) {
-                return substr($cmd, strpos($cmd, ':') + 1);
-            });
+            $completions = $completions->map(fn ($cmd) => substr($cmd, strpos($cmd, ':') + 1));
         }
 
         return $completions;
@@ -203,9 +195,7 @@ class BashCompletionCommand extends Command
                 })->merge($options);
         }
 
-        return $options->filter(function ($option) use ($partial) {
-            return empty($partial) || Str::startsWith($option, $partial);
-        });
+        return $options->filter(fn ($option) => empty($partial) || Str::startsWith($option, $partial));
     }
 
     private function getPreviousOptions($words)
@@ -231,12 +221,8 @@ class BashCompletionCommand extends Command
     {
         if ($option && preg_match('/\[(.+)\]/', $option->getDescription(), $values)) {
             return collect(explode(',', $values[1]))
-                ->map(function ($value) {
-                    return trim($value);
-                })
-                ->filter(function ($value) use ($partial) {
-                    return empty($partial) || Str::startsWith($value, $partial);
-                });
+                ->map(fn ($value) => trim($value))
+                ->filter(fn ($value) => empty($partial) || Str::startsWith($value, $partial));
         }
 
         return new Collection();

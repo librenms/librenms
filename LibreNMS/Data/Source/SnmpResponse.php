@@ -33,13 +33,11 @@ use Illuminate\Support\Str;
 use LibreNMS\Util\Oid;
 use Log;
 
-class SnmpResponse
+class SnmpResponse implements \Stringable
 {
     protected const KEY_VALUE_DELIMITER = ' = ';
 
     public readonly string $raw;
-    public readonly int $exitCode;
-    public readonly string $stderr;
 
     private ?string $errorMessage = null;
     private ?array $values = null;
@@ -48,14 +46,12 @@ class SnmpResponse
      * Create a new response object filling with output from the net-snmp command.
      *
      * @param  string  $output
-     * @param  string  $errorOutput
+     * @param  string  $stderr
      * @param  int  $exitCode
      */
-    public function __construct(string $output, string $errorOutput = '', int $exitCode = 0)
+    public function __construct(string $output, public readonly string $stderr = '', public readonly int $exitCode = 0)
     {
         $this->raw = (string) preg_replace('/Wrong Type \(should be .*\): /', '', $output);
-        $this->stderr = $errorOutput;
-        $this->exitCode = $exitCode;
     }
 
     public function isValid(bool $ignore_partial = false): bool
@@ -192,7 +188,7 @@ class SnmpResponse
     public function pluck(?string $oid = null): array
     {
         $output = [];
-        $oid = $oid ?? '[a-zA-Z0-9:.-]+';
+        $oid ??= '[a-zA-Z0-9:.-]+';
         $regex = "/^{$oid}[[.]([\d.[\]]+?)]?$/";
 
         foreach ($this->values() as $key => $value) {

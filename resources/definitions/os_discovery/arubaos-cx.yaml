@@ -21,6 +21,7 @@ modules:
                     oid:
                         - entPhysicalName
                         - IF-MIB::ifName
+                        - ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomTable
         temperature:
             data:
                 -
@@ -82,22 +83,31 @@ modules:
                     oid: ARUBAWIRED-PM-MIB::arubaWiredPmXcvrLaneDomTable
                     num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.27.1.2.2.1.12.{{ $index }}'
                     value: ARUBAWIRED-PM-MIB::arubaWiredPmXcvrLaneDomRxPower
-                    descr: "{{ IF-MIB::ifName:0 }} RX Power"
+                    descr: "{{ IF-MIB::ifName:0 }} Lane {{ $subindex1 }} RX Power"
                     group: transceiver
-                    index: 'arubaWiredPmXcvrLaneDomRxPower.{{ $subindex0 }}'
+                    index: 'arubaWiredPmXcvrLaneDomRxPower.{{ $index }}'
                     entPhysicalIndex: '{{ $subindex0 }}'
                     entPhysicalIndex_measured: ports
                     user_func: 'mw_to_dbm'
+                    high_limit: "{{ ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomRxPwrHiAlarmThreshold:0 }}"
+                    warn_limit: "{{ ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomRxPwrHiWarnThreshold:0 }}"
+                    low_warn_limit: "{{ ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomRxPwrLoWarnThreshold:0 }}"
+                    low_limit: "{{ ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomRxPwrLoAlarmThreshold:0 }}"
+
                 -
                     oid: ARUBAWIRED-PM-MIB::arubaWiredPmXcvrLaneDomTable
                     num_oid: '.1.3.6.1.4.1.47196.4.1.1.3.27.1.2.2.1.7.{{ $index }}'
                     value: ARUBAWIRED-PM-MIB::arubaWiredPmXcvrLaneDomTxPower
-                    descr: "{{ IF-MIB::ifName:0 }} TX Power"
+                    descr: "{{ IF-MIB::ifName:0 }} Lane {{ $subindex1 }} TX Power"
                     group: transceiver
-                    index: 'arubaWiredPmXcvrLaneDomTxPower.{{ $subindex0 }}'
+                    index: 'arubaWiredPmXcvrLaneDomTxPower.{{ $index }}'
                     entPhysicalIndex: '{{ $subindex0 }}'
                     entPhysicalIndex_measured: ports
                     user_func: 'mw_to_dbm'
+                    high_limit: "{{ ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomTxPwrHiAlarmThreshold:0 }}"
+                    warn_limit: "{{ ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomTxPwrHiWarnThreshold:0 }}"
+                    low_warn_limit: "{{ ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomTxPwrLoWarnThreshold:0 }}"
+                    low_limit: "{{ ARUBAWIRED-PM-MIB::arubaWiredPmXcvrDomTxPwrLoAlarmThreshold:0 }}"
         state:
             data:
                 -

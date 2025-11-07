@@ -39,7 +39,7 @@ foreach (dbFetchRows('SELECT * FROM juniAtmVp WHERE port_id = ?', [$interface['p
     echo '<tr bgcolor="' . $row_colour . '"><td>';
 
     foreach ($periods as $period) {
-        $graph_array['from'] = $$period;
+        $graph_array['from'] = ${$period};
         $graph_array_zoom = $graph_array;
         $graph_array_zoom['height'] = '150';
         $graph_array_zoom['width'] = '400';

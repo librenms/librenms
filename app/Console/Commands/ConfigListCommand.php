@@ -51,9 +51,7 @@ class ConfigListCommand extends LnmsCommand
 
     private function filter(Collection $collection, string $search): Collection
     {
-        return $collection->filter(function (string $value, string $key) use ($search): bool {
-            return stripos($key, $search) !== false || stripos($value, $search) !== false;
-        });
+        return $collection->filter(fn (string $value, string $key): bool => stripos($key, $search) !== false || stripos($value, $search) !== false);
     }
 
     private function describe(string $setting): string

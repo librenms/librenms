@@ -29,7 +29,7 @@ namespace LibreNMS\RRD;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\InvalidRrdTypeException;
 
-class RrdDefinition
+class RrdDefinition implements \Stringable
 {
     private static $types = ['GAUGE', 'DERIVE', 'COUNTER', 'ABSOLUTE', 'DCOUNTER', 'DDERIVE'];
     private $dataSets = [];
@@ -83,7 +83,7 @@ class RrdDefinition
      *
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         $def = array_reduce($this->dataSets, function ($carry, $ds) {
             $name = $ds['name'] . $this->createSource($ds['source_ds'], $ds['source_file']);
