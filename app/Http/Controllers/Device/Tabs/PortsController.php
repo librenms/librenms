@@ -189,7 +189,7 @@ class PortsController implements DeviceTab
             $ids = $port->ipv4Networks->map(fn ($net) => $net->ipv4->where('port_id', '<>', $port->port_id)->pluck('port_id'))->flatten();
         } else {
             // Try using ports found through the ARP table as an alternative
-            $ids = $port->macLinkedPorts->pluck('port_id');
+            $ids = $port->macLinkedPorts->where('port_id', '<>', $port->port_id)->pluck('port_id');
         }
 
         foreach ($ids as $port_id) {
