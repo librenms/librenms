@@ -35,8 +35,8 @@ if ($sensor->hasThresholds()) {
     $rrd_options[] = 'COMMENT:"Alert thresholds\:"';
     $rrd_options += ($sensor->sensor_limit_low !== null) ? ['LINE1.5:' . $sensor->sensor_limit_low . '#00008b:"low = ' . $sensor->formatValue('sensor_limit_low') . '":dashes'] : [];
     $rrd_options += ($sensor->sensor_limit_low_warn !== null) ? ['LINE1.5:' . $sensor->sensor_limit_low_warn . '#005bdf:"low_warn = ' . $sensor->formatValue('sensor_limit_low_warn') . '":dashes'] : [];
-    $rrd_options += ($sensor->sensor_limit_warn !== null) ? [('LINE1.5:' . $sensor->sensor_limit_warn . '#ffa420:"high_warn = ' . $sensor->formatValue('sensor_limit_warn') . '":dashes')] : [];
-    $rrd_options += ($sensor->sensor_limit !== null) ? [('LINE1.5:' . $sensor->sensor_limit . '#ff0000:"high = ' . $sensor->formatValue('sensor_limit') . '":dashes')] : [];
+    $rrd_options += ($sensor->sensor_limit_warn !== null) ? ['LINE1.5:' . $sensor->sensor_limit_warn . '#ffa420:"high_warn = ' . $sensor->formatValue('sensor_limit_warn') . '":dashes'] : [];
+    $rrd_options += ($sensor->sensor_limit !== null) ? ['LINE1.5:' . $sensor->sensor_limit . '#ff0000:"high = ' . $sensor->formatValue('sensor_limit') . '":dashes'] : [];
 }
 
 // Workaround because rrdtool has trouble detecting the

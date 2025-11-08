@@ -40,7 +40,7 @@ foreach ($mempools as $index => $mempool) {
 if (! $swap_present) {
     // swap is negative axis
     $rrd_options[] = '-l';
-    $rrd_options[] =  '0';
+    $rrd_options[] = '0';
 }
 
 $colors = \App\Facades\LibrenmsConfig::get('graph_colours.varied');

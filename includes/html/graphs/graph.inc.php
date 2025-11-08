@@ -73,18 +73,20 @@ try {
             echo "<pre class='rrd-pre'>";
             echo 'There was an error opening a temporary file';
             echo '</pre>';
+
             return;
         }
         // $rrd_options may contain quotes for shell processing.  Remove these when passing as arguments to rrd_graph()
-        if (! rrd_graph($tmpname, str_replace(['"',"'"], '', $rrd_options))) {
+        if (! rrd_graph($tmpname, str_replace(['"', "'"], '', $rrd_options))) {
             echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Output</p>";
             echo "<pre class='rrd-pre'>";
             echo rrd_error();
             echo implode("\n", $rrd_options);
             echo '</pre>';
+
             return;
         }
-        ;
+
         $tmpfd = fopen($tmpname, 'rb');
         unlink($tmpname);
         header('Content-type: ' . ImageFormat::forGraph($vars['graph_type'] ?? null)->contentType());
