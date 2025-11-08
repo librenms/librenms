@@ -189,7 +189,10 @@ class PortsController implements DeviceTab
             $ids = $port->ipv4Networks->map(fn ($net) => $net->ipv4->where('port_id', '<>', $port->port_id)->pluck('port_id'))->flatten();
         } else {
             // Try using ports found through the ARP table as an alternative
-            $ids = $port->macLinkedPorts->where('port_id', '<>', $port->port_id)->pluck('port_id');
+            $arp_neighbours = $port->macLinkedPorts->where('port_id', '<>', $port->port_id)->pluck('ipv4_address')->flatten();
+            if ($arp_neighbours->count() > 0 && $arp_neighbours->duplicates()->count() == 0) {
+                $ids = $port->macLinkedPorts->where('port_id', '<>', $port->port_id)->pluck('port_id');
+            }
         }
 
         foreach ($ids as $port_id) {
