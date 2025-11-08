@@ -588,34 +588,55 @@ class Rrd extends BaseDatastore
      * Generates a graph file at $graph_file using $options
      * Graphs are a single command per run, so this just runs rrdtool
      *
-     * @param  string  $options
+     * @param  array  $options
      * @param  array|null  $env
      * @return string
      *
      * @throws RrdGraphException
      */
-    public function graph(string $options, ?array $env = null): string
+    public function graph(array $options, ?array $env = null): string
     {
-        $process = new Process([$this->rrdtool_executable, '-'], $this->rrd_dir, $env);
+        if ($this->rrdcached) {
+            // only relative paths if using rrdcached
+            $options = array_merge(str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $options), ['--daemon', $this->rrdcached]);
+        }
+
+        // Use php-rrd if it is installed
+        if (function_exists('rrd_graph')) {
+            if ($tmpname = tempnam('/tmp', 'LNMS_GRAPH')) {
+                // $rrd_options may contain quotes for shell processing.  Remove these when passing as arguments to rrd_graph()
+                if (! rrd_graph($tmpname, str_replace(['"', "'"], '', $options))) {
+                    throw new RrdGraphException(rrd_error());
+                }
+
+                $tmpfd = fopen($tmpname, 'rb');
+                unlink($tmpname);
+                $tmpstats = fstat($tmpfd);
+                $image = fread($tmpfd, $tmpstats['size']);
+                fclose($tmpfd);
+
+                return($image);
+            }
+        }
+
+        $process = new Process(array_merge([$this->rrdtool_executable, 'graph', '-'], $options), $this->rrd_dir, $env);
         $process->setTimeout(300);
         $process->setIdleTimeout(300);
 
         try {
-            $command = $this->buildCommand('graph', '-', $options);
-            $process->setInput($command . "\nquit");
             $process->run();
         } catch (FileExistsException $e) {
             throw new RrdGraphException($e->getMessage(), 'File Exists');
         }
 
-        $feedback_position = strrpos($process->getOutput(), 'OK ');
-        if ($feedback_position !== false) {
-            return substr($process->getOutput(), 0, $feedback_position);
+        // Return the image if the process returns without an error code
+        if ($process->getExitCode() == 0) {
+            return($process->getOutput());
         }
 
-        // if valid image is returned with error, extract image and feedback
+        // Make sure a valid image was returned
         // rrdtool defaults to png if imgformat not specified
-        $graph_type = preg_match('/--imgformat=([^\s]+)/', $options, $matches) ? strtolower($matches[1]) : 'png';
+        $graph_type = preg_grep('/--imgformat=([^\s]+)/', $options, $matches) ? strtolower($matches[1]) : 'png';
         $imageFormat = ImageFormat::forGraph($graph_type);
 
         $search = $imageFormat->getImageEnd();
@@ -632,7 +653,7 @@ class Rrd extends BaseDatastore
         }
 
         // only error text was returned
-        $error = trim($process->getOutput() . PHP_EOL . $process->getErrorOutput());
+        $error = trim($process->getErrorOutput());
         throw new RrdGraphException($error, null, null, null, $process->getExitCode());
     }
 

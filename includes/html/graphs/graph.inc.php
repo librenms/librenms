@@ -66,36 +66,6 @@ try {
         throw new \LibreNMS\Exceptions\RrdGraphException('Device not found');
     }
 
-    // Use php-rrd if it is installed
-    if (false && function_exists('rrd_graph')) {
-        if (! $tmpname = tempnam('/tmp', 'LNMS_GRAPH')) {
-            echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Output</p>";
-            echo "<pre class='rrd-pre'>";
-            echo 'There was an error opening a temporary file';
-            echo '</pre>';
-
-            return;
-        }
-        // $rrd_options may contain quotes for shell processing.  Remove these when passing as arguments to rrd_graph()
-        if (! rrd_graph($tmpname, str_replace(['"', "'"], '', $rrd_options))) {
-            echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Output</p>";
-            echo "<pre class='rrd-pre'>";
-            echo rrd_error();
-            echo implode("\n", $rrd_options);
-            echo '</pre>';
-
-            return;
-        }
-
-        $tmpfd = fopen($tmpname, 'rb');
-        unlink($tmpname);
-        header('Content-type: ' . ImageFormat::forGraph($vars['graph_type'] ?? null)->contentType());
-        fpassthru($tmpfd);
-        fclose($tmpfd);
-
-        return;
-    }
-
     // command output requested
     if (! empty($command_only)) {
         echo "<div class='infobox'>";
