@@ -116,5 +116,5 @@ foreach ($accs as $acc) {
     }//end if
 }//end foreach
 
-$rrd_options += $rrd_optionsb;
+array_push($rrd_options, ...$rrd_optionsb);
 $rrd_options[] = 'HRULE:0#999999';

@@ -102,7 +102,7 @@ if ($print_total) {
     $rrd_options[] = 'GPRINT:tot:AVERAGE:%5.1lf%s\n';
 }
 
-$rrd_options += $rrd_optionsb;
+array_push($rrd_options, ...$rrd_optionsb);
 $rrd_options[] = 'HRULE:0#555555';
 $rrd_options += $rrd_optionsc;
 

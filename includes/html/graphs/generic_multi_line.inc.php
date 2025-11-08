@@ -87,7 +87,7 @@ foreach ($rrd_list ?? [] as $rrd) {
     $i++;
 }
 
-$rrd_options += $rrd_optionsb;
+array_push($rrd_options, ...$rrd_optionsb);
 $rrd_options[] = 'HRULE:0#555555';
 
 unset($stacked);

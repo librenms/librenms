@@ -164,7 +164,7 @@ if (isset($custom_graph)) {
     $rrd_options[] = $custom_graph;
 }
 
-$rrd_options += $rrd_optionsb;
+array_push($rrd_options, ...$rrd_optionsb);
 $rrd_options[] = 'HRULE:0#999999';
 
 unset($stacked);

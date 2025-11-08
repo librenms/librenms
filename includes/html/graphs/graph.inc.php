@@ -67,7 +67,7 @@ try {
     }
 
     // Use php-rrd if it is installed
-    if (function_exists('rrd_graph')) {
+    if (false && function_exists('rrd_graph')) {
         if (! $tmpname = tempnam('/tmp', 'LNMS_GRAPH')) {
             echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Output</p>";
             echo "<pre class='rrd-pre'>";
@@ -104,7 +104,7 @@ try {
         echo escapeshellcmd('rrdtool ' . Rrd::buildCommand('graph', LibrenmsConfig::get('temp_dir') . '/' . Str::random(), implode(' ', $rrd_options)));
         echo '</pre>';
         try {
-            Rrd::graph(implode(' ', $rrd_options), $env);
+            Rrd::graph($rrd_options, $env);
         } catch (\LibreNMS\Exceptions\RrdGraphException $e) {
             echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Output</p>";
             echo "<pre class='rrd-pre'>";
@@ -123,7 +123,7 @@ try {
     }
 
     // Generating the graph!
-    $image_data = Rrd::graph(implode(' ', $rrd_options), $env);
+    $image_data = Rrd::graph($rrd_options, $env);
 
     // output the graph
     if (\LibreNMS\Util\Debug::isEnabled()) {

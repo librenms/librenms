@@ -121,8 +121,8 @@ if (! empty($free_indexes)) {
     }
 }
 
-$rrd_options += $legend_sections[0];
-$rrd_options += $legend_sections[1];
-$rrd_options += $legend_sections[2];
+array_push($rrd_options, ...$legend_sections[0]);
+array_push($rrd_options, ...$legend_sections[1]);
+array_push($rrd_options, ...$legend_sections[2]);
 
 $rrd_options[] = 'HRULE:0#999999';

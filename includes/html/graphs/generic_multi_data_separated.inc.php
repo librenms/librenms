@@ -127,7 +127,7 @@ if (! $nototal) {
     $rrd_options[] = 'VDEF:tot=octets,TOTAL';
 }
 
-$rrd_options += $rrd_optionsb;
+array_push($rrd_options, ...$rrd_optionsb);
 $rrd_options[] = 'HRULE:0#999999';
 
 unset($stacked);
