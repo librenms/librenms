@@ -244,19 +244,34 @@ modules:
                     index: mtxrDHCPLeaseCount.{{ $index }}
                 -
                     oid: MIKROTIK-MIB::mtxrCtTotalEntries
-                    num_oid: .1.3.6.1.4.1.14988.1.1.22.1.1.{{ $index }}
+                    num_oid: .1.3.6.1.4.1.14988.1.1.22.1.1.1.0
                     descr: 'Total number of connections'
-                    index: mtxrCtTotalEntries.{{ $index }}
+                    index: mtxrCtTotalEntries.0
                     group: Firewall
+                    skip_values:
+                        -
+                            oid: index
+                            op: not_ends
+                            value: '.1.0'
                 -
-                    oid: MIKROTIK-MIB::mtxrCtIP4Entries
-                    num_oid: .1.3.6.1.4.1.14988.1.1.22.1.2.{{ $index }}
+                    oid: MIKROTIK-MIB::mtxrCtTotalEntries
+                    num_oid: .1.3.6.1.4.1.14988.1.1.22.1.1.2.0
                     descr: 'Total number of ipv4 connections'
-                    index: mtxrCtIP4Entries.{{ $index }}
+                    index: mtxrCtIP4Entries.0
                     group: Firewall
+                    skip_values:
+                        -
+                            oid: index
+                            op: not_ends
+                            value: '.2.0'
                 -
-                    oid: MIKROTIK-MIB::mtxrCtIP6Entries
-                    num_oid: .1.3.6.1.4.1.14988.1.1.22.1.3.{{ $index }}
+                    oid: MIKROTIK-MIB::mtxrCtTotalEntries
+                    num_oid: .1.3.6.1.4.1.14988.1.1.22.1.1.3.0
                     descr: 'Total number of ipv6 connections'
-                    index: mtxrCtIP6Entries.{{ $index }}
+                    index: mtxrCtIP6Entries.0
                     group: Firewall
+                    skip_values:
+                        -
+                            oid: index
+                            op: not_ends
+                            value: '.3.0'
