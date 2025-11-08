@@ -34,7 +34,7 @@ try {
     $nototal = ! $graph_params->visible('total');
     $nodetails = ! $graph_params->visible('details');
     $noagg = ! $graph_params->visible('aggregate');
-    $rrd_options = '';
+    $rrd_options = $graph_params->toRrdOptions();
     $env = [];
 
     if (session('preferences.timezone')) {
@@ -66,17 +66,43 @@ try {
         throw new \LibreNMS\Exceptions\RrdGraphException('Device not found');
     }
 
-    $rrd_options = $graph_params . ' ' . $rrd_options;
+    // Use php-rrd if it is installed
+    if (function_exists('rrd_graph')) {
+        if (! $tmpname = tempnam('/tmp', 'LNMS_GRAPH')) {
+            echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Output</p>";
+            echo "<pre class='rrd-pre'>";
+            echo 'There was an error opening a temporary file';
+            echo '</pre>';
+            return;
+        }
+        // $rrd_options may contain quotes for shell processing.  Remove these when passing as arguments to rrd_graph()
+        if (! rrd_graph($tmpname, str_replace(['"',"'"], '', $rrd_options))) {
+            echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Output</p>";
+            echo "<pre class='rrd-pre'>";
+            echo rrd_error();
+            echo implode("\n", $rrd_options);
+            echo '</pre>';
+            return;
+        }
+        ;
+        $tmpfd = fopen($tmpname, 'rb');
+        unlink($tmpname);
+        header('Content-type: ' . ImageFormat::forGraph($vars['graph_type'] ?? null)->contentType());
+        fpassthru($tmpfd);
+        fclose($tmpfd);
+
+        return;
+    }
 
     // command output requested
     if (! empty($command_only)) {
         echo "<div class='infobox'>";
         echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Command</p>";
         echo "<pre class='rrd-pre'>";
-        echo escapeshellcmd('rrdtool ' . Rrd::buildCommand('graph', LibrenmsConfig::get('temp_dir') . '/' . Str::random(), $rrd_options));
+        echo escapeshellcmd('rrdtool ' . Rrd::buildCommand('graph', LibrenmsConfig::get('temp_dir') . '/' . Str::random(), implode(' ', $rrd_options)));
         echo '</pre>';
         try {
-            Rrd::graph($rrd_options, $env);
+            Rrd::graph(implode(' ', $rrd_options), $env);
         } catch (\LibreNMS\Exceptions\RrdGraphException $e) {
             echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Output</p>";
             echo "<pre class='rrd-pre'>";
@@ -95,7 +121,7 @@ try {
     }
 
     // Generating the graph!
-    $image_data = Rrd::graph($rrd_options, $env);
+    $image_data = Rrd::graph(implode(' ', $rrd_options), $env);
 
     // output the graph
     if (\LibreNMS\Util\Debug::isEnabled()) {
