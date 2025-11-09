@@ -100,8 +100,10 @@ foreach ($rrd_list as $rrd) {
     $stack = $i && ($dostack === 1) ? ':STACK' : '';
 
     $rrd_options[] = 'LINE2:' . $g_defname . $i . '#' . $colour . ":'" . $descr . "'$stack";
-    $rrd_options[] = 'GPRINT:' . $t_defname . $i . ':LAST:%8.0lf%s GPRINT:' . $t_defname . $i . 'min:MIN:%8.0lf%s';
-    $rrd_options[] = 'GPRINT:' . $t_defname . $i . 'max:MAX:%8.0lf%s GPRINT:' . $t_defname . $i . ":AVERAGE:'%8.0lf%s\\n'";
+    $rrd_options[] = 'GPRINT:' . $t_defname . $i . ':LAST:%8.0lf%s';
+    $rrd_options[] = 'GPRINT:' . $t_defname . $i . 'min:MIN:%8.0lf%s';
+    $rrd_options[] = 'GPRINT:' . $t_defname . $i . 'max:MAX:%8.0lf%s';
+    $rrd_options[] = 'GPRINT:' . $t_defname . $i . ":AVERAGE:'%8.0lf%s\\n'";
 
     if ($printtotal === 1) {
         $rrd_options[] = 'GPRINT:tot' . $rrd['ds'] . $i . ":%6.2lf%s'" . Rrd::safeDescr($total_units) . "'";

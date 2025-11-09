@@ -56,13 +56,17 @@ $rrd_options[] = "AREA:top$jitter_color::STACK";
 
 // Average RTT and legend
 $rrd_options[] = "LINE2:ping$line_color:RTT";
-$rrd_options[] = 'GPRINT:ping:LAST:%15.2lf GPRINT:min:LAST:%6.2lf';
-$rrd_options[] = 'GPRINT:max:LAST:%6.2lf GPRINT:ping:AVERAGE:%6.2lf\\n';
+$rrd_options[] = 'GPRINT:ping:LAST:%15.2lf';
+$rrd_options[] = 'GPRINT:min:LAST:%6.2lf';
+$rrd_options[] = 'GPRINT:max:LAST:%6.2lf';
+$rrd_options[] = 'GPRINT:ping:AVERAGE:%6.2lf\\n';
 
 // loss line and legend
 $rrd_options[] = 'AREA:loss#d42e08:Loss';
-$rrd_options[] = 'GPRINT:loss:LAST:%14.2lf GPRINT:loss:MIN:%6.2lf';
-$rrd_options[] = 'GPRINT:loss:MAX:%6.2lf GPRINT:loss:AVERAGE:%6.2lf\\n';
+$rrd_options[] = 'GPRINT:loss:LAST:%14.2lf';
+$rrd_options[] = 'GPRINT:loss:MIN:%6.2lf';
+$rrd_options[] = 'GPRINT:loss:MAX:%6.2lf';
+$rrd_options[] = 'GPRINT:loss:AVERAGE:%6.2lf\\n';
 
 // previous time period before this one
 if ($graph_params->visible('previous')) {
@@ -71,5 +75,6 @@ if ($graph_params->visible('previous')) {
     $rrd_options[] = "SHIFT:pingX:$period";
     $rrd_options[] = "LINE1.25:pingX#CCCCCC:'Prev RTT             '";
     $rrd_options[] = 'GPRINT:pingX:AVERAGE:%6.2lf';
-    $rrd_options[] = "GPRINT:pingX:MAX:%6.2lf  'GPRINT:pingX:AVERAGE:%6.2lf\\n'";
+    $rrd_options[] = "GPRINT:pingX:MAX:%6.2lf";
+    $rrd_options[] = "GPRINT:pingX:AVERAGE:%6.2lf\\n";
 }

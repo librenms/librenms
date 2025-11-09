@@ -95,8 +95,10 @@ foreach ($rrd_list as $i => $rrd) {
     if ($addarea === 1) {
         $rrd_options[] = 'AREA:' . $g_defname . $i . '#' . $colour . $transparency . ":''$stack";
     }
-    $rrd_options[] = 'GPRINT:' . $t_defname . $i . ':LAST:%6.' . $float_precision . 'lf%s GPRINT:' . $t_defname . $i . 'min:MIN:%6.' . $float_precision . 'lf%s';
-    $rrd_options[] = 'GPRINT:' . $t_defname . $i . 'max:MAX:%6.' . $float_precision . 'lf%s GPRINT:' . $t_defname . $i . ":AVERAGE:'%6." . $float_precision . "lf%s\\n'";
+    $rrd_options[] = 'GPRINT:' . $t_defname . $i . ':LAST:%6.' . $float_precision . 'lf%s';
+    $rrd_options[] = 'GPRINT:' . $t_defname . $i . 'min:MIN:%6.' . $float_precision . 'lf%s';
+    $rrd_options[] = 'GPRINT:' . $t_defname . $i . 'max:MAX:%6.' . $float_precision . 'lf%s';
+    $rrd_options[] = 'GPRINT:' . $t_defname . $i . ":AVERAGE:'%6." . $float_precision . "lf%s\\n'";
 
     if ($printtotal === 1) {
         $rrd_options[] = 'GPRINT:tot' . $rrd['ds'] . $i . ':%6.' . $float_precision . "lf%s'" . \Rrd::safeDescr($total_units) . "'";

@@ -74,12 +74,16 @@ $rrd_options[] = 'CDEF:avgpol=poller,datacountundef,/';
 $rrd_options[] = "'COMMENT:Seconds             Cur       Min        Max       Avg\\n'";
 $rrd_options[] = 'LINE1.25:pollerundef#' . $total_color . ":'Total      '";
 $rrd_options[] = 'AREA:pollerundef#' . $total_color . '70';
-$rrd_options[] = 'GPRINT:pollerundef:LAST:%8.2lf  GPRINT:pollerundef:MIN:%8.2lf';
-$rrd_options[] = 'GPRINT:pollerundef:MAX:%8.2lf  GPRINT:pollerundef:AVERAGE:%8.2lf\\n';
+$rrd_options[] = 'GPRINT:pollerundef:LAST:%8.2lf';
+$rrd_options[] = 'GPRINT:pollerundef:MIN:%8.2lf';
+$rrd_options[] = 'GPRINT:pollerundef:MAX:%8.2lf';
+$rrd_options[] = 'GPRINT:pollerundef:AVERAGE:%8.2lf\\n';
 $rrd_options[] = 'LINE1.25:avgpol#' . $device_color . ":'Device Avg '";
 $rrd_options[] = 'AREA:avgpol#' . $device_color . '70';
-$rrd_options[] = 'GPRINT:avgpol:LAST:%8.2lf  GPRINT:avgpol:MIN:%8.2lf';
-$rrd_options[] = 'GPRINT:avgpol:MAX:%8.2lf  GPRINT:avgpol:AVERAGE:%8.2lf\\n';
+$rrd_options[] = 'GPRINT:avgpol:LAST:%8.2lf';
+$rrd_options[] = 'GPRINT:avgpol:MIN:%8.2lf';
+$rrd_options[] = 'GPRINT:avgpol:MAX:%8.2lf';
+$rrd_options[] = 'GPRINT:avgpol:AVERAGE:%8.2lf\\n';
 if ($graph_params->visible('previous')) {
     $rrd_options[] = "COMMENT:' \\n'";
     $pollerX_cdef = implode(',', $cdefX);
@@ -87,6 +91,8 @@ if ($graph_params->visible('previous')) {
     $rrd_options[] = 'CDEF:datacountX=' . str_replace('pollerX', 'datapresentX', $pollerX_cdef);
     $rrd_options[] = 'CDEF:pollerundefX=datacountX,0,EQ,UNKN,pollerX,IF';
     $rrd_options[] = "LINE1.25:pollerundefX#46494D:'Prev Poller'";
-    $rrd_options[] = 'GPRINT:pollerundefX:LAST:%8.2lf  GPRINT:pollerundefX:MIN:%8.2lf';
-    $rrd_options[] = 'GPRINT:pollerundefX:MAX:%8.2lf  GPRINT:pollerundefX:AVERAGE:%8.2lf\\n';
+    $rrd_options[] = 'GPRINT:pollerundefX:LAST:%8.2lf';
+    $rrd_options[] = 'GPRINT:pollerundefX:MIN:%8.2lf';
+    $rrd_options[] = 'GPRINT:pollerundefX:MAX:%8.2lf';
+    $rrd_options[] = 'GPRINT:pollerundefX:AVERAGE:%8.2lf\\n';
 }
