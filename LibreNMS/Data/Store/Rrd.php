@@ -625,8 +625,8 @@ class Rrd extends BaseDatastore
 
         try {
             $process->run();
-        } catch (FileExistsException $e) {
-            throw new RrdGraphException($e->getMessage(), 'File Exists');
+        } catch (Exception $e) {
+            throw new RrdGraphException($e->getMessage());
         }
 
         // Return the image if the process returns without an error code
@@ -636,7 +636,8 @@ class Rrd extends BaseDatastore
 
         // Make sure a valid image was returned
         // rrdtool defaults to png if imgformat not specified
-        $graph_type = preg_grep('/--imgformat=([^\s]+)/', $options, $matches) ? strtolower($matches[1]) : 'png';
+        $matches = preg_grep('/--imgformat=([^\s]+)/', $options);
+        $graph_type = $matches ? strtolower($matches[1]) : 'png';
         $imageFormat = ImageFormat::forGraph($graph_type);
 
         $search = $imageFormat->getImageEnd();
