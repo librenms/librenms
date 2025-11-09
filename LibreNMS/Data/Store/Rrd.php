@@ -598,14 +598,16 @@ class Rrd extends BaseDatastore
     {
         if ($this->rrdcached) {
             // only relative paths if using rrdcached
-            $options = array_merge(str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $options), ['--daemon', $this->rrdcached]);
+            $options = array_merge(str_replace([$this->rrd_dir . '/', $this->rrd_dir, '"', "'"], '', $options), ['--daemon', $this->rrdcached]);
+        } else {
+            $options = str_replace(['"', "'"], '', $options);
         }
 
         // Use php-rrd if it is installed
         if (function_exists('rrd_graph')) {
             if ($tmpname = tempnam('/tmp', 'LNMS_GRAPH')) {
                 // $rrd_options may contain quotes for shell processing.  Remove these when passing as arguments to rrd_graph()
-                if (! rrd_graph($tmpname, str_replace(['"', "'"], '', $options))) {
+                if (! rrd_graph($tmpname, $options)) {
                     throw new RrdGraphException(rrd_error());
                 }
 
