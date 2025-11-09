@@ -75,6 +75,6 @@ if ($graph_params->visible('previous')) {
     $rrd_options[] = "SHIFT:pingX:$period";
     $rrd_options[] = "LINE1.25:pingX#CCCCCC:'Prev RTT             '";
     $rrd_options[] = 'GPRINT:pingX:AVERAGE:%6.2lf';
-    $rrd_options[] = "GPRINT:pingX:MAX:%6.2lf";
-    $rrd_options[] = "GPRINT:pingX:AVERAGE:%6.2lf\\n";
+    $rrd_options[] = 'GPRINT:pingX:MAX:%6.2lf';
+    $rrd_options[] = 'GPRINT:pingX:AVERAGE:%6.2lf\\n';
 }

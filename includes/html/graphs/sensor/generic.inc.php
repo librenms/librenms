@@ -33,16 +33,16 @@ if ($unit_label == '°F') {
 
 if ($sensor->hasThresholds()) {
     $rrd_options[] = 'COMMENT:"Alert thresholds\:"';
-    if($sensor->sensor_limit_low !== null) {
+    if ($sensor->sensor_limit_low !== null) {
         $rrd_options[] = 'LINE1.5:' . $sensor->sensor_limit_low . '#00008b:"low = ' . $sensor->formatValue('sensor_limit_low') . '":dashes';
     }
-    if($sensor->sensor_limit_low_warn !== null) {
+    if ($sensor->sensor_limit_low_warn !== null) {
         $rrd_options[] = 'LINE1.5:' . $sensor->sensor_limit_low_warn . '#005bdf:"low_warn = ' . $sensor->formatValue('sensor_limit_low_warn') . '":dashes';
     }
-    if($sensor->sensor_limit_warn !== null) {
+    if ($sensor->sensor_limit_warn !== null) {
         $rrd_options[] = 'LINE1.5:' . $sensor->sensor_limit_warn . '#ffa420:"high_warn = ' . $sensor->formatValue('sensor_limit_warn') . '":dashes';
     }
-    if($sensor->sensor_limit !== null) {
+    if ($sensor->sensor_limit !== null) {
         $rrd_options[] = 'LINE1.5:' . $sensor->sensor_limit . '#ff0000:"high = ' . $sensor->formatValue('sensor_limit') . '":dashes';
     }
 }

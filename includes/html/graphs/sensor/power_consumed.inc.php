@@ -27,13 +27,13 @@ $rrd_options[] = 'COMMENT:"Alert thresholds\:"';
 if ($sensor->sensor_limit_low) {
     $rrd_options[] = 'LINE1.5:' . $sensor->sensor_limit_low . '#00008b:"low = ' . Number::formatSi($sensor->sensor_limit_low, 2, 3, $sensor->unit()) . '":dashes';
 }
-if ($sensor->sensor_limit_low_warn){
+if ($sensor->sensor_limit_low_warn) {
     $rrd_options[] = 'LINE1.5:' . $sensor->sensor_limit_low_warn . '#005bdf:"low_warn = ' . Number::formatSi($sensor->sensor_limit_low_warn, 2, 3, $sensor->unit()) . '":dashes';
 }
-if ($sensor->sensor_limit_warn){
+if ($sensor->sensor_limit_warn) {
     $rrd_options[] = 'LINE1.5:' . $sensor->sensor_limit_warn . '#ffa420:"high_warn = ' . Number::formatSi($sensor->sensor_limit_warn, 2, 3, $sensor->unit()) . '":dashes';
 }
-if ($sensor->sensor_limit){
+if ($sensor->sensor_limit) {
     $rrd_options[] = 'LINE1.5:' . $sensor->sensor_limit . '#ff0000:"high = ' . Number::formatSi($sensor->sensor_limit, 2, 3, $sensor->unit()) . '":dashes';
 }
 $rrd_options[] = 'COMMENT:"\n"';

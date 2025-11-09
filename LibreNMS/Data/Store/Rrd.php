@@ -615,7 +615,7 @@ class Rrd extends BaseDatastore
                 $image = fread($tmpfd, $tmpstats['size']);
                 fclose($tmpfd);
 
-                return($image);
+                return $image;
             }
         }
 
@@ -631,7 +631,7 @@ class Rrd extends BaseDatastore
 
         // Return the image if the process returns without an error code
         if ($process->getExitCode() == 0) {
-            return($process->getOutput());
+            return $process->getOutput();
         }
 
         // Make sure a valid image was returned

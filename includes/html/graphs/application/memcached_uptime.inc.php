@@ -14,5 +14,5 @@ $rrd_options[] = 'AREA:cuptime#EEEEEE:Uptime';
 $rrd_options[] = 'LINE1.25:cuptime#36393D:';
 $rrd_options[] = 'GPRINT:cuptime:LAST:%6.2lf';
 $rrd_options[] = 'GPRINT:cuptime:MIN:%6.2lf';
-$rrd_options[] = "GPRINT:cuptime:MAX:%6.2lf';
+$rrd_options[] = 'GPRINT:cuptime:MAX:%6.2lf';
 $rrd_options[] = 'GPRINT:cuptime:AVERAGE:%6.2lf\\n';
