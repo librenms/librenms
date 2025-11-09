@@ -625,7 +625,7 @@ class Rrd extends BaseDatastore
 
         try {
             $process->run();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             throw new RrdGraphException($e->getMessage());
         }
 
