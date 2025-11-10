@@ -2243,9 +2243,6 @@
             "type": "boolean"
         },
         "enable_ports_etherlike": {
-            "group": "webui",
-            "section": "device",
-            "order": 22,
             "default": false,
             "type": "boolean"
         },
@@ -6295,14 +6292,11 @@
             "type": "integer"
         },
         "ports_page_default": {
-            "default": "detail",
+            "default": "details",
             "type": "select",
-            "group": "webui",
-            "section": "device",
-            "order": 21,
             "options":{
                 "basic": "Basic",
-                "detail": "Details",
+                "details": "Details",
                 "arp": "ARP",
                 "fdb": "FDB"
             }
