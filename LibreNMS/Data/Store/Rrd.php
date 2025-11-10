@@ -603,24 +603,6 @@ class Rrd extends BaseDatastore
             $options = str_replace(['"', "'"], '', $options);
         }
 
-        // Use php-rrd if it is installed
-        if (function_exists('rrd_graph')) {
-            if ($tmpname = tempnam('/tmp', 'LNMS_GRAPH')) {
-                // $rrd_options may contain quotes for shell processing.  Remove these when passing as arguments to rrd_graph()
-                if (! rrd_graph($tmpname, $options)) {
-                    throw new RrdGraphException(rrd_error());
-                }
-
-                $tmpfd = fopen($tmpname, 'rb');
-                unlink($tmpname);
-                $tmpstats = fstat($tmpfd);
-                $image = fread($tmpfd, $tmpstats['size']);
-                fclose($tmpfd);
-
-                return $image;
-            }
-        }
-
         $process = new Process(array_merge([$this->rrdtool_executable, 'graph', '-'], $options), $this->rrd_dir, $env);
         $process->setTimeout(300);
         $process->setIdleTimeout(300);
