@@ -25,11 +25,11 @@ Possible options:
 1. Set variables in `.env`, including database settings.  Which could be
    a local or remote MySQL server including your production DB.
 
-```dotenv
-APP_ENV=local
-APP_DEBUG=true
-...
-```
+    ```dotenv
+    APP_ENV=local
+    APP_DEBUG=true
+    ...
+    ```
 
 1. Start a development webserver `./lnms serve`
 
