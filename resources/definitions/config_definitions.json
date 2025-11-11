@@ -5386,7 +5386,7 @@
             "default": "xdp",
             "group": "webui",
             "section": "worldmap",
-            "order": 3,
+            "order": 2,
             "type": "select",
             "options": {
                 "xdp": "CDP/LLDP Neighbours",
@@ -5403,7 +5403,7 @@
             "type": "boolean",
             "group": "webui",
             "section": "worldmap",
-            "order": 2
+            "order": 10
         },
         "nfdump": {
             "default": "/usr/bin/nfdump",

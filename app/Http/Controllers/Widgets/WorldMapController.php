@@ -53,6 +53,7 @@ class WorldMapController extends WidgetController
         $settings = $this->getSettings();
         $settings['dimensions'] = $request->get('dimensions');
         $settings['status'] = array_map('intval', explode(',', $settings['status']));
+        $settings['disabled_alerts'] = LibrenmsConfig::get('network_map_worldmap_show_disabled_alerts') ? null : 0; // null to include 1 shows only notify disabled
         $settings['map_config'] = [
             'engine' => LibrenmsConfig::get('geoloc.engine'),
             'api_key' => LibrenmsConfig::get('geoloc.api_key'),
