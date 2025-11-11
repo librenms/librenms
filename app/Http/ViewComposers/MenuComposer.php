@@ -107,7 +107,7 @@ class MenuComposer
         $vars['custommaps_groups'] = CustomMap::select(['custom_map_id', 'name', 'menu_group'])
             ->hasAccess($user)->orderBy('name')->get()
             ->groupBy('menu_group')->sortKeys();
-        $vars['custommaps'] = $vars['custommaps_groups']->pull('');
+        $vars['custommaps'] = $vars['custommaps_groups']->pull('', new Collection);
         if ($vars['custommaps']->count() >= 20) {
             $vars['custommaps_groups']->prepend($vars['custommaps'], __('Custom Maps'));
             $vars['custommaps'] = new Collection;
