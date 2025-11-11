@@ -28,52 +28,88 @@ namespace App\Http\Controllers\Device\Tabs;
 
 use App\Facades\DeviceCache;
 use App\Models\Device;
+use App\Models\Sensor;
 use Illuminate\Http\Request;
+use LibreNMS\Component;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class LoadBalancerController implements DeviceTab
 {
-    private $tabs = [];
+    private array $tabs = [];
+    private array $counts = [];
 
     public function __construct()
     {
         $device = DeviceCache::getPrimary();
 
         if ($device->os == 'netscaler') {
-            if ($device->netscalerVservers()->exists()) {
-                $this->tabs[] = 'netscaler_vsvr';
+            $count = $device->netscalerVservers()->count();
+            if ($count > 0) {
+                $this->addTab('netscaler_vsvr', $count);
             }
         }
 
         // Cisco ACE
         if ($device->os == 'acsw') {
-            if ($device->vServers()->exists()) {
-                $this->tabs[] = 'loadbalancer_vservers';
+            $count = $device->vServers()->count();
+            if ($count > 0) {
+                $this->addTab('loadbalancer_vservers', $count);
             }
         }
 
         // F5 LTM
         if ($device->os == 'f5') {
-            $component = new \LibreNMS\Component();
+            $component = new Component();
             $component_count = $component->getComponentCount($device['device_id']);
 
-            if (isset($component_count['f5-ltm-bwc'])) {
-                $this->tabs[] = 'ltm_bwc';
+            if (! empty($component_count['f5-ltm-bwc'])) {
+                $this->addTab('ltm_bwc', (int) $component_count['f5-ltm-bwc']);
             }
-            if (isset($component_count['f5-ltm-vs'])) {
-                $this->tabs[] = 'ltm_vs';
+            if (! empty($component_count['f5-ltm-vs'])) {
+                $this->addTab('ltm_vs', (int) $component_count['f5-ltm-vs']);
             }
-            if (isset($component_count['f5-ltm-pool'])) {
-                $this->tabs[] = 'ltm_pool';
+            if (! empty($component_count['f5-ltm-pool'])) {
+                $this->addTab('ltm_pool', (int) $component_count['f5-ltm-pool']);
             }
-            if (isset($component_count['f5-gtm-wide'])) {
-                $this->tabs[] = 'gtm_wide';
+            if (! empty($component_count['f5-gtm-wide'])) {
+                $this->addTab('gtm_wide', (int) $component_count['f5-gtm-wide']);
             }
-            if (isset($component_count['f5-gtm-pool'])) {
-                $this->tabs[] = 'gtm_pool';
+            if (! empty($component_count['f5-gtm-pool'])) {
+                $this->addTab('gtm_pool', (int) $component_count['f5-gtm-pool']);
             }
-            if (isset($component_count['f5-cert'])) {
-                $this->tabs[] = 'f5-cert';
+            if (! empty($component_count['f5-cert'])) {
+                $this->addTab('f5-cert', (int) $component_count['f5-cert']);
+            }
+        }
+
+        if ($device->os == 'alteonos') {
+            $tabs = [
+                'alteonos_real_servers' => ['slbEnhRealServer', 'slbRealServer'],
+                'alteonos_real_groups' => ['slbOperEnhGroupRealServerRuntimeStatus', 'slbOperGroupRealServer'],
+                'alteonos_virtual_servers' => ['slbCurCfgEnhVirtServer', 'slbCurCfgVirtServer'],
+                'alteonos_virtual_services' => ['slbVirtServices', 'slbCurCfgEnhVirtServiceStatus'],
+            ];
+
+            foreach ($tabs as $tab => $types) {
+                $query = Sensor::query()
+                    ->where('device_id', $device->device_id)
+                    ->where('sensor_class', 'state')
+                    ->whereIn('sensor_type', $types);
+
+                if ($tab === 'alteonos_real_groups') {
+                    $count = $query->pluck('sensor_index')
+                        ->map(fn ($index) => ltrim((string) $index, '.'))
+                        ->map(fn ($index) => explode('.', (string) $index)[0] ?? null)
+                        ->filter()
+                        ->unique()
+                        ->count();
+                } else {
+                    $count = $query->count();
+                }
+
+                if ($count > 0) {
+                    $this->addTab($tab, $count);
+                }
             }
         }
     }
@@ -102,6 +138,13 @@ class LoadBalancerController implements DeviceTab
     {
         return [
             'loadbalancer_tabs' => $this->tabs,
+            'device_loadbalancer_count' => $this->counts,
         ];
+    }
+
+    private function addTab(string $tab, int $count = 0): void
+    {
+        $this->tabs[] = $tab;
+        $this->counts[$tab] = $count;
     }
 }

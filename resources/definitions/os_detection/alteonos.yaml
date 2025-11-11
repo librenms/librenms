@@ -1,7 +1,7 @@
 os: alteonos
 group: radware
 text: AlteonOS
-type: network
+type: loadbalancer
 icon: radware
 over:
     - { graph: device_bits, text: 'Device Traffic' }
@@ -10,5 +10,32 @@ over:
 discovery:
     -
         sysObjectID:
-            - .1.3.6.1.4.1.1872.1.13.3.5
-            - .1.3.6.1.4.1.1872.2.
+
+          # LegacNortel Alteon AWS platforms
+            - .1.3.6.1.4.1.1872.1.13.1    # Nortel Alteon AWS 2000 series switches
+            - .1.3.6.1.4.1.1872.1.13.2    # Nortel Alteon AWS 3000 series switches
+            - .1.3.6.1.4.1.1872.1.13.2.3     # Nortel NAS 3408 E
+
+            # Radware-manufactured Alteon platforms
+            - .1.3.6.1.4.1.1872.1.13.3    # Radware Alteon Application switches
+            - .1.3.6.1.4.1.1872.1.13.3.1     # Alteon ODS 4416
+            - .1.3.6.1.4.1.1872.1.13.3.2     # Alteon ODS 5412
+            - .1.3.6.1.4.1.1872.1.13.3.3     # Alteon ODS 4408
+            - .1.3.6.1.4.1.1872.1.13.3.4     # Alteon ODS VA
+            - .1.3.6.1.4.1.1872.1.13.3.5     # Alteon ODS 5224
+            - .1.3.6.1.4.1.1872.1.13.3.6     # Alteon ODS 10000
+            - .1.3.6.1.4.1.1872.1.13.3.7     # Alteon ODS 4024
+            - .1.3.6.1.4.1.1872.1.13.3.8     # Alteon ODS 6420P
+            - .1.3.6.1.4.1.1872.1.13.3.9     # Alteon ODS 6420
+            - .1.3.6.1.4.1.1872.1.13.3.10    # Alteon ODS 5208
+            - .1.3.6.1.4.1.1872.1.13.3.11    # Alteon ODS 8420
+            - .1.3.6.1.4.1.1872.1.13.3.12    # Alteon ODS 6024
+            - .1.3.6.1.4.1.1872.1.13.3.13    # Alteon ODS 8820
+            - .1.3.6.1.4.1.1872.1.13.3.14    # Alteon ODS 4208
+            - .1.3.6.1.4.1.1872.1.13.3.15    # Alteon ODS 7612
+            - .1.3.6.1.4.1.1872.1.13.3.16    # Alteon ODS 7220
+            - .1.3.6.1.4.1.1872.1.13.3.17    # Alteon ODS 9800
+            - .1.3.6.1.4.1.1872.1.13.3.18    # Alteon ODS 5208-16
+            - .1.3.6.1.4.1.1872.1.13.3.19    # Alteon ODS 5820
+            - .1.3.6.1.4.1.1872.1.13.3.20    # Alteon ODS 5424
+            - .1.3.6.1.4.1.1872.1.13.3.21    # Alteon ODS 4028

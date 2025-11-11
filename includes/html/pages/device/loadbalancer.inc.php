@@ -15,6 +15,12 @@ $type_text['ltm_bwc'] = 'LTM Bandwidth Controller';     // F5 BigIP
 $type_text['gtm_wide'] = 'GTM Wide IPs';                // F5 BigIP
 $type_text['gtm_pool'] = 'GTM Pools';                   // F5 BigIP
 $type_text['f5-cert'] = 'Certificates';                 // F5 BigIP
+$type_text['alteonos_real_servers'] = 'Alteon Real Servers';            // Radware Alteon
+$type_text['alteonos_real_groups'] = 'Alteon Real Server Groups';       // Radware Alteon
+$type_text['alteonos_virtual_servers'] = 'Alteon Virtual Servers';      // Radware Alteon
+$type_text['alteonos_virtual_services'] = 'Alteon Virtual Services';    // Radware Alteon
+
+$device_loadbalancer_count = $device_loadbalancer_count ?? [];
 
 print_optionbar_start();
 
@@ -34,7 +40,10 @@ foreach ($loadbalancer_tabs as $type) {
         echo '<span class="pagemenu-selected">';
     }
 
-    echo generate_link($type_text[$type] . ' (' . $device_loadbalancer_count[$type] . ')', $link_array, ['type' => $type]);
+    $count = $device_loadbalancer_count[$type] ?? 0;
+    $label = $type_text[$type] ?? ucfirst(str_replace('_', ' ', $type));
+
+    echo generate_link($label . ' (' . $count . ')', $link_array, ['type' => $type]);
     if ($vars['type'] == $type) {
         echo '</span>';
     }
