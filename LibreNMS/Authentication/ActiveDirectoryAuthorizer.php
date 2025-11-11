@@ -118,6 +118,11 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
             $this->userFilter($username),
             ['samaccountname']
         );
+
+        if ($search === false) {
+            throw new AuthenticationException('User search failed: ' . ldap_error($connection));
+        }
+
         $entries = ldap_get_entries($connection, $search);
 
         if ($entries['count']) {
