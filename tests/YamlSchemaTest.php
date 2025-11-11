@@ -59,7 +59,7 @@ final class YamlSchemaTest extends TestCase
         foreach ($this->listFiles(resource_path('definitions/os_detection/*.yaml')) as $filename => $file) {
             $this->assertEquals(
                 Yaml::parseFile($file)['os'],
-                substr($filename, 0, -5),
+                substr((string) $filename, 0, -5),
                 "Parameter 'os' doesn't match the filename $filename"
             );
         }

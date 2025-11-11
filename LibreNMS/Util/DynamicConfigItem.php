@@ -76,7 +76,7 @@ class DynamicConfigItem implements \ArrayAccess
             return in_array($value, array_keys($this->options));
         } elseif ($this->type == 'email') {
             // allow email format that includes display text
-            if (preg_match('/.* <(.*)>/', $value, $matches)) {
+            if (preg_match('/.* <(.*)>/', (string) $value, $matches)) {
                 $value = $matches[1];
             }
 
@@ -101,7 +101,7 @@ class DynamicConfigItem implements \ArrayAccess
 
             return true;
         } elseif ($this->type == 'color') {
-            return (bool) preg_match('/^#?[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/', $value);
+            return (bool) preg_match('/^#?[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/', (string) $value);
         } elseif (in_array($this->type, ['text', 'password'])) {
             return ! is_array($value);
         } elseif ($this->type === 'executable') {

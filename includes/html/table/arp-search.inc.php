@@ -10,7 +10,7 @@ $param = [];
 if (! isset($sort) || empty($sort)) {
     $sort = 'hostname ASC';
 }
-$sort_arr = explode(' ', trim($sort));
+$sort_arr = explode(' ', trim((string) $sort));
 if ($sort_arr[0] === 'interface') {
     $sort_arr[0] = 'port_if_descr';
 } elseif ($sort_arr[0] === 'hostname') {
@@ -38,8 +38,8 @@ if (isset($vars['port_id']) && is_numeric($vars['port_id'])) {
 }
 
 if (isset($vars['searchPhrase']) && ! empty($vars['searchPhrase'])) {
-    $ip_search = '%' . trim($vars['searchPhrase']) . '%';
-    $mac_search = '%' . str_replace([':', ' ', '-', '.', '0x'], '', trim($vars['searchPhrase'])) . '%';
+    $ip_search = '%' . trim((string) $vars['searchPhrase']) . '%';
+    $mac_search = '%' . str_replace([':', ' ', '-', '.', '0x'], '', trim((string) $vars['searchPhrase'])) . '%';
 
     if (isset($vars['searchby']) && $vars['searchby'] == 'ip') {
         $query->where('ipv4_address', 'like', $ip_search);

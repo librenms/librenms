@@ -150,7 +150,7 @@ class BashCompletionCommand extends Command
 
         // handle : silliness
         if (Str::contains($partial, ':')) {
-            $completions = $completions->map(fn ($cmd) => substr($cmd, strpos($cmd, ':') + 1));
+            $completions = $completions->map(fn ($cmd) => substr((string) $cmd, strpos((string) $cmd, ':') + 1));
         }
 
         return $completions;

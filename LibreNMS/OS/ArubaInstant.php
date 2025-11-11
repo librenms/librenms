@@ -268,7 +268,7 @@ class ArubaInstant extends OS implements
     protected function decodeChannel($channel): int
     {
         // Trim off everything not a digit, like channel "116e"
-        $channel = Number::cast(preg_replace("/\D/", '', $channel));
+        $channel = Number::cast(preg_replace("/\D/", '', (string) $channel));
 
         return $channel & 255; // mask off the channel width information
     }
@@ -365,7 +365,7 @@ class ArubaInstant extends OS implements
                 'entPhysicalClass' => 'other',
                 'entPhysicalContainedIn' => 1,
                 'entPhysicalSerialNum' => $entry['AI-AP-MIB::aiAPSerialNum'],
-                'entPhysicalModelName' => explode('::', $model, 2)[1] ?? $model,
+                'entPhysicalModelName' => explode('::', (string) $model, 2)[1] ?? $model,
                 'entPhysicalMfgName' => 'Aruba',
                 'entPhysicalVendorType' => 'accessPoint',
                 'entPhysicalSoftwareRev' => $this->getDevice()->version,

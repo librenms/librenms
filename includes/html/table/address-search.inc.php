@@ -15,7 +15,7 @@ if (! Auth::user()->hasGlobalRead()) {
 $search_type = $vars['search_type'] ?? 'ipv4';
 $address = $vars['address'] ?? '';
 $prefix = '';
-$sort = trim($sort);
+$sort = trim((string) $sort);
 
 if (str_contains($address, '/')) {
     [$address, $prefix] = explode('/', $address, 2);

@@ -330,7 +330,7 @@ function check_entity_sensor($string, $device)
     $fringe = array_merge(LibrenmsConfig::get('bad_entity_sensor_regex', []), LibrenmsConfig::getOsSetting($device['os'], 'bad_entity_sensor_regex', []));
 
     foreach ($fringe as $bad) {
-        if (preg_match($bad . 'i', $string)) {
+        if (preg_match($bad . 'i', (string) $string)) {
             Log::debug("Ignored entity sensor: $bad : $string");
 
             return false;
@@ -462,7 +462,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                             $user_function = 'fahrenheit_to_celsius';
                         }
                     }
-                    preg_match('/-?\d*\.?\d+/', $snmp_value, $temp_response);
+                    preg_match('/-?\d*\.?\d+/', (string) $snmp_value, $temp_response);
                     if (! empty($temp_response[0])) {
                         $snmp_value = $temp_response[0];
                     }
@@ -495,13 +495,13 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     Log::debug("Sensor fetched value: $value\n");
 
                     // process the oid (num_oid will contain index or str2num replacement calls)
-                    $oid = trim(YamlDiscovery::replaceValues('num_oid', $index, null, $data, []));
+                    $oid = trim((string) YamlDiscovery::replaceValues('num_oid', $index, null, $data, []));
 
                     // process the description
-                    $descr = trim(YamlDiscovery::replaceValues('descr', $index, null, $data, $pre_cache));
+                    $descr = trim((string) YamlDiscovery::replaceValues('descr', $index, null, $data, $pre_cache));
 
                     // process the group
-                    $group = trim(YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache)) ?: null;
+                    $group = trim((string) YamlDiscovery::replaceValues('group', $index, null, $data, $pre_cache)) ?: null;
 
                     // process the divisor - cannot be 0
                     if (isset($data['divisor'])) {
@@ -540,7 +540,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                         if (isset($data[$limit]) && is_numeric($data[$limit])) {
                             ${$limit} = $data[$limit];
                         } else {
-                            ${$limit} = trim(YamlDiscovery::replaceValues($limit, $index, null, $data, $pre_cache));
+                            ${$limit} = trim((string) YamlDiscovery::replaceValues($limit, $index, null, $data, $pre_cache));
                             if (is_numeric(${$limit})) {
                                 ${$limit} = (${$limit} / $divisor) * $multiplier;
                             }
@@ -579,7 +579,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     $uindex = $index;
                     if (isset($data['index'])) {
                         if (Str::contains($data['index'], '{{')) {
-                            $uindex = trim(YamlDiscovery::replaceValues('index', $index, null, $data, $pre_cache));
+                            $uindex = trim((string) YamlDiscovery::replaceValues('index', $index, null, $data, $pre_cache));
                         } else {
                             $uindex = $data['index'];
                         }
@@ -601,7 +601,7 @@ function sensors($types, $os, $pre_cache = [])
 {
     $device = &$os->getDeviceArray();
     foreach ((array) $types as $sensor_class) {
-        echo ucfirst($sensor_class) . ': ';
+        echo ucfirst((string) $sensor_class) . ': ';
         $dir = LibrenmsConfig::get('install_dir') . '/includes/discovery/sensors/' . $sensor_class . '/';
 
         if (isset($device['os_group']) && is_file($dir . $device['os_group'] . '.inc.php')) {
@@ -655,7 +655,7 @@ function build_bgp_peers($device, $data, $peer2)
         } else {
             if (strstr($peer_ip, ':')) {
                 $peer_ip_snmp = preg_replace('/:/', ' ', $peer_ip);
-                $peer_ip = preg_replace('/(\S+\s+\S+)\s/', '$1:', $peer_ip_snmp);
+                $peer_ip = preg_replace('/(\S+\s+\S+)\s/', '$1:', (string) $peer_ip_snmp);
                 $peer_ip = str_replace('"', '', str_replace(' ', '', $peer_ip));
             }
         }
@@ -685,12 +685,12 @@ function build_cbgp_peers($device, $peer, $af_data, $peer2)
     $af_list = [];
     foreach ($af_data as $k => $v) {
         if ($peer2 === true) {
-            [,$k] = explode('.', $k, 2);
+            [,$k] = explode('.', (string) $k, 2);
         }
 
         Log::debug("AFISAFI = $k\n");
 
-        $afisafi_tmp = explode('.', $k);
+        $afisafi_tmp = explode('.', (string) $k);
         if ($device['os_group'] === 'vrp') {
             $vpninst_id = array_shift($afisafi_tmp);
             $afi = array_shift($afisafi_tmp);
@@ -709,8 +709,8 @@ function build_cbgp_peers($device, $peer, $af_data, $peer2)
                 $bgp_ip = str_replace("$afi.", '', $bgp_ip);
             }
         }
-        $bgp_ip = preg_replace('/:/', ' ', $bgp_ip);
-        $bgp_ip = preg_replace('/(\S+\s+\S+)\s/', '$1:', $bgp_ip);
+        $bgp_ip = preg_replace('/:/', ' ', (string) $bgp_ip);
+        $bgp_ip = preg_replace('/(\S+\s+\S+)\s/', '$1:', (string) $bgp_ip);
         $bgp_ip = str_replace('"', '', str_replace(' ', '', $bgp_ip));
 
         if ($afi && $safi && $bgp_ip == $peer['ip']) {

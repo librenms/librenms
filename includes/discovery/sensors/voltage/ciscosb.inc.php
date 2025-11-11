@@ -23,7 +23,7 @@ foreach ($oids as $index => $ciscosb_data) {
         }
 
         $oid = '.1.3.6.1.4.1.9.6.1.101.90.1.2.1.3.' . $index . '.6';
-        $port = PortCache::getByIfIndex(preg_replace('/^\d+\./', '', $index), $device['device_id']);
+        $port = PortCache::getByIfIndex(preg_replace('/^\d+\./', '', (string) $index), $device['device_id']);
         $descr = trim($port?->ifDescr . ' Supply Voltage');
         $voltage = $value['rlPhyTestTableTransceiverSupply'] / $divisor;
 

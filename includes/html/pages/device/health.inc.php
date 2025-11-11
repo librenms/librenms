@@ -108,7 +108,7 @@ foreach ($datas as $type) {
 
 print_optionbar_end();
 
-$metric = basename($vars['metric']);
+$metric = basename((string) $vars['metric']);
 if (is_file("includes/html/pages/device/health/$metric.inc.php")) {
     include "includes/html/pages/device/health/$metric.inc.php";
 } else {

@@ -97,8 +97,8 @@ if ($device['os'] == 'netscaler') {
             ];
             app('Datastore')->put($device, 'netscaler-vsvr', $tags, $fields);
 
-            echo str_pad($vsvr['vsvrFullName'], 25) . ' | ' . str_pad($vsvr['vsvrType'], 5) . ' | ' . str_pad($vsvr['vsvrState'], 6) . ' | ' . str_pad($vsvr['vsvrIpAddress'], 16) . ' | ' . str_pad($vsvr['vsvrPort'], 5);
-            echo ' | ' . str_pad($vsvr['vsvrRequestRate'], 8) . ' | ' . str_pad($vsvr['vsvrRxBytesRate'] . 'B/s', 8) . ' | ' . str_pad($vsvr['vsvrTxBytesRate'] . 'B/s', 8);
+            echo str_pad($vsvr['vsvrFullName'], 25) . ' | ' . str_pad((string) $vsvr['vsvrType'], 5) . ' | ' . str_pad((string) $vsvr['vsvrState'], 6) . ' | ' . str_pad((string) $vsvr['vsvrIpAddress'], 16) . ' | ' . str_pad((string) $vsvr['vsvrPort'], 5);
+            echo ' | ' . str_pad((string) $vsvr['vsvrRequestRate'], 8) . ' | ' . str_pad($vsvr['vsvrRxBytesRate'] . 'B/s', 8) . ' | ' . str_pad($vsvr['vsvrTxBytesRate'] . 'B/s', 8);
 
             $db_update = [
                 'vsvr_ip' => $vsvr['vsvrIpAddress'],

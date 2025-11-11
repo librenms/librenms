@@ -52,7 +52,7 @@ class WorldMapController extends WidgetController
     {
         $settings = $this->getSettings();
         $settings['dimensions'] = $request->get('dimensions');
-        $settings['status'] = array_map('intval', explode(',', $settings['status']));
+        $settings['status'] = array_map('intval', explode(',', (string) $settings['status']));
         $settings['map_config'] = [
             'engine' => LibrenmsConfig::get('geoloc.engine'),
             'api_key' => LibrenmsConfig::get('geoloc.api_key'),

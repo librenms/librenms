@@ -81,7 +81,7 @@ class PingCheck implements ShouldQueue
         Log::info('Processing hosts in this order : ' . implode(', ', $ordered_hostname_list));
 
         // bulk ping and send FpingResponse's to recordData as they come in
-        app()->make(Fping::class)->bulkPing($ordered_hostname_list, [$this, 'handleResponse']);
+        app()->make(Fping::class)->bulkPing($ordered_hostname_list, $this->handleResponse(...));
 
         // check for any left over devices
         if ($this->deferred->isNotEmpty()) {

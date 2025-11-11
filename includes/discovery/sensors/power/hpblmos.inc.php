@@ -5,7 +5,7 @@ $psu_oid = '.1.3.6.1.4.1.232.22.2.5.1.1.1.16';
 $psu_usage_oid = '.1.3.6.1.4.1.232.22.2.5.1.1.1.10.';
 $psu_max_usage_oid = '.1.3.6.1.4.1.232.22.2.5.1.1.1.9.';
 
-$psus = trim(snmp_walk($device, $psu_oid, '-Osqn'));
+$psus = trim((string) snmp_walk($device, $psu_oid, '-Osqn'));
 
 foreach (explode("\n", $psus) as $psu) {
     $psu = trim($psu);

@@ -86,7 +86,7 @@ class EventlogController extends TableController
             'datetime' => $this->formatDatetime($eventlog),
             'device_id' => Blade::render('<x-device-link :device="$device"/>', ['device' => $eventlog->device]),
             'type' => $this->formatType($eventlog),
-            'message' => htmlspecialchars($eventlog->message),
+            'message' => htmlspecialchars((string) $eventlog->message),
             'username' => $eventlog->username ?: 'System',
         ];
     }
@@ -111,7 +111,7 @@ class EventlogController extends TableController
             }
         }
 
-        return htmlspecialchars($eventlog->type);
+        return htmlspecialchars((string) $eventlog->type);
     }
 
     private function formatDatetime($eventlog)
