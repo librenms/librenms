@@ -56,9 +56,9 @@ class ErrorReporting
 
         $exceptions->dontReportDuplicates();
         $exceptions->throttle(fn (Throwable $e) => Limit::perMinute(LibrenmsConfig::get('reporting.throttle', 30)));
-        $exceptions->reportable([$this, 'reportable']);
-        $exceptions->report([$this, 'report']);
-        $exceptions->render([$this, 'render']);
+        $exceptions->reportable($this->reportable(...));
+        $exceptions->report($this->report(...));
+        $exceptions->render($this->render(...));
 
         Flare::determineVersionUsing(fn () => \LibreNMS\Util\Version::VERSION);
     }

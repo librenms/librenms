@@ -61,7 +61,7 @@ if ($_GET['format'] == 'text') {
     header('X-Accel-Buffering: no');
 
     $proc->run(function ($type, $buffer): void {
-        echo preg_replace('/\033\[[\d;]+m/', '', $buffer) . PHP_EOL;
+        echo preg_replace('/\033\[[\d;]+m/', '', (string) $buffer) . PHP_EOL;
         ob_flush();
         flush(); // you have to flush buffer
     });

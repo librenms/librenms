@@ -64,7 +64,7 @@ $pagetitle[] = 'Syslog';
         '<option value="">All Programs&nbsp;&nbsp;</option>' +
         <?php
         if (! empty($vars['program'])) {
-            $js_program = addcslashes(htmlentities($vars['program']), "'");
+            $js_program = addcslashes(htmlentities((string) $vars['program']), "'");
             echo "'<option value=\"$js_program\">$js_program</option>' +";
         }
         ?>
@@ -75,7 +75,7 @@ $pagetitle[] = 'Syslog';
         '<option value="">All Priorities</option>' +
         <?php
         if (! empty($vars['priority'])) {
-            $js_priority = addcslashes(htmlentities($vars['priority']), "'");
+            $js_priority = addcslashes(htmlentities((string) $vars['priority']), "'");
             echo "'<option value=\"$js_priority\">$js_priority</option>' +";
         }
         ?>

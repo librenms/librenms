@@ -45,7 +45,7 @@ if ($apc_env_data) {
             // future appearing sub-index will remain untouched, so 1.2 will stay 1.2, 2.2 will stay 2.2, etc.
             // The reason that we remove the sub-index from the first entry is to preserve compatibility with sensors
             // created by prior versions using the legacy iemConfig and iemStatus tables.
-            $split_index = explode('.', $index);
+            $split_index = explode('.', (string) $index);
             if (count($split_index) == 2 && $split_index[1] == 1) {
                 $index = $split_index[0];
             }
@@ -189,7 +189,7 @@ foreach ($cooling_unit as $index => $data) {
     $descr = $data['coolingUnitExtendedAnalogDescription'];
     $scale = $data['coolingUnitExtendedAnalogScale'];
     $value = $data['coolingUnitExtendedAnalogValue'];
-    if (preg_match('/Temperature/', $descr) && $data['coolingUnitExtendedAnalogUnits'] == 'C' && $value >= 0) {
+    if (preg_match('/Temperature/', (string) $descr) && $data['coolingUnitExtendedAnalogUnits'] == 'C' && $value >= 0) {
         discover_sensor(null, 'temperature', $device, $cur_oid, $cur_oid, 'apc', $descr, $scale, 1, null, null, null, null, $value);
     }
 }
@@ -199,7 +199,7 @@ foreach ($pre_cache['cooling_unit_analog'] as $index => $data) {
     $descr = $data['coolingUnitStatusAnalogDescription'];
     $scale = $data['coolingUnitStatusAnalogScale'] ?? null;
     $value = $data['coolingUnitStatusAnalogValue'] ?? null;
-    if (preg_match('/Temperature/', $descr) && $data['coolingUnitStatusAnalogUnits'] == 'C' && $value >= 0) {
+    if (preg_match('/Temperature/', (string) $descr) && $data['coolingUnitStatusAnalogUnits'] == 'C' && $value >= 0) {
         discover_sensor(null, 'temperature', $device, $cur_oid, $cur_oid, 'apc', $descr, $scale, 1, null, null, null, null, $value);
     }
 }

@@ -102,7 +102,7 @@ class StringHelpers
 
         $charset = config('app.charset');
 
-        if (($converted = @iconv($charset, 'UTF-8', $string)) !== false) {
+        if (($converted = @iconv((string) $charset, 'UTF-8', $string)) !== false) {
             return (string) $converted;
         }
 

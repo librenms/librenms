@@ -46,7 +46,7 @@ class Printer extends \LibreNMS\OS
     protected function parseDeviceId($data)
     {
         $vars = [];
-        foreach (explode(';', $data) as $pair) {
+        foreach (explode(';', (string) $data) as $pair) {
             if (! Str::contains($pair, ':')) {
                 continue;
             }

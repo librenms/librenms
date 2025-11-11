@@ -24,7 +24,7 @@ echo ' | Users: ';
 $nextcloud_users = $app->data['users'] ?? [];
 sort($nextcloud_users);
 foreach ($nextcloud_users as $index => $nextcloud_user) {
-    $nextcloud_user = htmlspecialchars($nextcloud_user);
+    $nextcloud_user = htmlspecialchars((string) $nextcloud_user);
     $label = $vars['nextcloud_user'] == $nextcloud_user
         ? '<span class="pagemenu-selected">' . $nextcloud_user . '</span>'
         : $nextcloud_user;

@@ -107,8 +107,8 @@ if ($count > $results) {
     echo '</div>';
 }
 
-echo '<input type="hidden" name="page_number" id="page_number" value="' . htmlspecialchars($page_number) . '">
-    <input type="hidden" name="results_amount" id="results_amount" value="' . htmlspecialchars($results) . '">
+echo '<input type="hidden" name="page_number" id="page_number" value="' . htmlspecialchars((string) $page_number) . '">
+    <input type="hidden" name="results_amount" id="results_amount" value="' . htmlspecialchars((string) $results) . '">
     </form>';
 ?>
 <script>

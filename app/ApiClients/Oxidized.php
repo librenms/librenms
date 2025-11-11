@@ -30,7 +30,7 @@ use App\Facades\LibrenmsConfig;
 
 class Oxidized extends BaseApi
 {
-    private bool $enabled;
+    private readonly bool $enabled;
 
     public function __construct()
     {

@@ -133,10 +133,10 @@ class YamlDiscovery
      */
     public static function fillValues($name, $index, $discovery_data, $count, $pre_cache, $value): mixed
     {
-        if (str_contains($value, '{{')) {
+        if (str_contains((string) $value, '{{')) {
             // replace embedded values
             return static::replaceValues($name, $index, $count, $discovery_data, $pre_cache);
-        } elseif (! str_contains($value, ' ')) {
+        } elseif (! str_contains((string) $value, ' ')) {
             // replace references to data
             return static::getValueFromData($name, $index, $discovery_data, $pre_cache, $value);
         }
@@ -206,8 +206,8 @@ class YamlDiscovery
             $template = new SimpleTemplate($value);
             $template->replaceWith(function ($matches) use ($index, $def, $pre_cache) {
                 // convert the numeric index to a string
-                if (str_starts_with($matches[1], 'index_string')) {
-                    $format = str_contains($matches[1], ':') ? substr($matches[1], 12) : 's';
+                if (str_starts_with((string) $matches[1], 'index_string')) {
+                    $format = str_contains((string) $matches[1], ':') ? substr((string) $matches[1], 12) : 's';
 
                     return Oid::stringFromOid($index, $format);
                 }
@@ -219,8 +219,8 @@ class YamlDiscovery
                     // -Ih flag screew up HEX string that contain only printable chars, use at minimum -Ox, and remove -Ih use for exemple:
                     // snmp_flags: '-OteQUsax'
                     // snmp_no_Ih_flag: ''
-                    if (str_starts_with($matches[1], 'InetAddress_')) {
-                        $inetaddr = explode('_', $matches[1]);
+                    if (str_starts_with((string) $matches[1], 'InetAddress_')) {
+                        $inetaddr = explode('_', (string) $matches[1]);
                         if (count($inetaddr) == 2) {
                             return IP::fromHexString(static::getValueFromData($inetaddr[1], $index, $def, $pre_cache), true);
                         }
@@ -263,8 +263,8 @@ class YamlDiscovery
         }
 
         // if index is 0 and this is a scalar value, remove the scalar .0
-        if ($index == 0 && str_ends_with($name, '.0') && ! Oid::of($name)->isNumeric()) {
-            $name = substr($name, 0, -2);
+        if ($index == 0 && str_ends_with((string) $name, '.0') && ! Oid::of($name)->isNumeric()) {
+            $name = substr((string) $name, 0, -2);
         }
 
         if (isset($pre_fetched[$index][$name])) {
@@ -275,12 +275,12 @@ class YamlDiscovery
         }
 
         // parse sub_index options name with trailing colon and index
-        if (preg_match('/^(.+):(\d+)(?:-(\d+))?$/', $name, $matches)) {
+        if (preg_match('/^(.+):(\d+)(?:-(\d+))?$/', (string) $name, $matches)) {
             // subindex found
             $name = $matches[1];
 
             //create the sub-index values in order to try to match them with precache
-            $sub_indexes = explode('.', $index);
+            $sub_indexes = explode('.', (string) $index);
 
             // if subindex is a range, get them all, otherwise just get the first
             $index = isset($matches[3])
@@ -316,7 +316,7 @@ class YamlDiscovery
         }
 
         // search for name inside walked tables if oid is fully qualified
-        if (str_contains($name, '::')) {
+        if (str_contains((string) $name, '::')) {
             foreach ($pre_fetched as $table_name => $table) {
                 if (is_array($table) && isset($table[$index][$name])) {
                     $value = $table[$index][$name];
@@ -368,7 +368,7 @@ class YamlDiscovery
                             if (! array_key_exists($oid, $pre_cache)) {
                                 if (isset($data['snmp_flags'])) {
                                     $snmp_flag = Arr::wrap($data['snmp_flags']);
-                                } elseif (str_contains($oid, '::')) {
+                                } elseif (str_contains((string) $oid, '::')) {
                                     $snmp_flag = ['-OteQUSab', '-Pu'];
                                 } else {
                                     $snmp_flag = ['-OteQUsab', '-Pu'];
@@ -426,8 +426,8 @@ class YamlDiscovery
                 } else {
                     // oid previously fetched from the device
                     $tmp_value = static::getValueFromData($skip_value['oid'], $index, $yaml_item_data, $pre_fetched);
-                    if (str_contains($skip_value['oid'], '.')) {
-                        [$skip_value['oid'], $targeted_index] = explode('.', $skip_value['oid'], 2);
+                    if (str_contains((string) $skip_value['oid'], '.')) {
+                        [$skip_value['oid'], $targeted_index] = explode('.', (string) $skip_value['oid'], 2);
                         $tmp_value = static::getValueFromData($skip_value['oid'], $targeted_index, $yaml_item_data, $pre_fetched);
                     }
                 }

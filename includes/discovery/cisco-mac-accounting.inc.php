@@ -5,7 +5,7 @@ use Illuminate\Support\Str;
 if ($device['os_group'] == 'cisco') {
     $datas = snmp_walk($device, 'cipMacSwitchedBytes', '-Oqn', 'CISCO-IP-STAT-MIB');
 
-    foreach (explode("\n", $datas) as $data) {
+    foreach (explode("\n", (string) $datas) as $data) {
         if (empty($data)) {
             continue;
         }
