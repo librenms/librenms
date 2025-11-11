@@ -173,7 +173,7 @@ modules:
                     oid: SP2-MIB::load
                     value: SP2-MIB::loadFusesStatus
                     num_oid: '.1.3.6.1.4.1.12148.10.9.3.{{ $index }}'
-                    descr: Overal Load Fuses Status
+                    descr: Overall Load Fuses Status
                     entPhysicalIndex: '10'
                     state_name: loadFusesStatus
                     group: Load Fuse
@@ -224,7 +224,7 @@ modules:
                     oid: SP2-MIB::battery
                     value: SP2-MIB::batteryStatus
                     num_oid: '.1.3.6.1.4.1.12148.10.10.1.{{ $index }}'
-                    descr: Overal Battery Status
+                    descr: Overall Battery Status
                     entPhysicalIndex: '10'
                     state_name: batteryStatus
                     group: Battery
@@ -399,7 +399,7 @@ modules:
                     value: SP2-MIB::mainsVoltageValue
                     num_oid: '.1.3.6.1.4.1.12148.10.3.4.1.6.{{ $index }}'
                     descr: SP2-MIB::mainsVoltageDescription
-                    index: 'mainsVoltage.{{ $index }}'
+                    index: 'mains.{{ $index }}'
                     group: Mains
                     low_limit: SP2-MIB::mainsVoltageMajorLowLevel
                     low_warn_limit: SP2-MIB::mainsVoltageMinorLowLevel
@@ -410,7 +410,7 @@ modules:
                     value: SP2-MIB::rectifierInputVoltageValue
                     num_oid: '.1.3.6.1.4.1.12148.10.5.6.1.4.{{ $index }}'
                     descr:  '{{ SP2-MIB::rectifierType }} {{ $index }} Input Voltage'
-                    index: 'rectifiersInputVoltage.{{ $index }}'
+                    index: 'input.{{ $index }}'
                     entPhysicalIndex: '2{{ $index }}'
                     group: Rectifier
                     low_limit: 80
@@ -422,7 +422,7 @@ modules:
                     value: SP2-MIB::batteryVoltageValue
                     num_oid: '.1.3.6.1.4.1.12148.10.10.5.5.{{ $index }}'
                     descr: SP2-MIB::batteryVoltageDescription
-                    index: 'batteryVoltage.{{ $index }}'
+                    index: 'battery.{{ $index }}'
                     entPhysicalIndex: '100'
                     group: Battery
                     divisor: 100
@@ -468,7 +468,7 @@ modules:
                     value: SP2-MIB::rectifiersCurrentValue
                     num_oid: '.1.3.6.1.4.1.12148.10.5.2.5.{{ $index }}'
                     descr: System Output Current
-                    index: 'recitiferCurrent.{{ $index }}'
+                    index: 'current.{{ $index }}'
                     group: Rectifier
                     divisor: 10
                     warn_limit: SP2-MIB::rectifiersCurrentMinorAlarmLevel
@@ -482,7 +482,7 @@ modules:
                     value: SP2-MIB::rectifierOutputCurrentValue
                     num_oid: '.1.3.6.1.4.1.12148.10.5.6.1.3.{{ $index }}'
                     descr: '{{ SP2-MIB::rectifierType }} {{ $index }} Output Current'
-                    index: 'rectifierOutputCurrent.{{ $index }}'
+                    index: 'output.{{ $index }}'
                     entPhysicalIndex: '2{{ $index }}'
                     group: Rectifier
                     divisor: 10
@@ -490,7 +490,7 @@ modules:
                     oid: SP2-MIB::batteryCurrents
                     value: SP2-MIB::batteryCurrentsValue
                     num_oid: '.1.3.6.1.4.1.12148.10.10.6.5.{{ $index }}'
-                    descr: Overal Battery Current
+                    descr: Overall Battery Current
                     index: 'batteryCurrent.{{ $index }}'
                     entPhysicalIndex: '100'
                     group: Battery
@@ -529,7 +529,7 @@ modules:
                     oid: SP2-MIB::batteryTemperatures
                     value: SP2-MIB::batteryTemperaturesValue
                     num_oid: '.1.3.6.1.4.1.12148.10.10.7.5.{{ $index }}'
-                    descr: Overal Battery Temperature
+                    descr: Overall Battery Temperature
                     entPhysicalIndex: '100'
                     index: 'batteryTemperature.{{ $index }}'
                     low_limit: SP2-MIB::batteryTemperaturesMinorLowLevel
