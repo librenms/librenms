@@ -128,7 +128,7 @@ function poll_service($service)
     $check_cmd = '';
 
     // if we have a script for this check, use it.
-    $check_script = LibrenmsConfig::get('install_dir') . '/includes/services/check_' . strtolower($service['service_type']) . '.inc.php';
+    $check_script = LibrenmsConfig::get('install_dir') . '/includes/services/check_' . strtolower((string) $service['service_type']) . '.inc.php';
     if (is_file($check_script)) {
         include $check_script;
     }
@@ -164,7 +164,7 @@ function poll_service($service)
         // rrd definition
         $rrd_def = new RrdDefinition();
         foreach ($perf as $k => $v) {
-            if (($v['uom'] == 'c') && ! preg_match('/[Uu]ptime/', $k)) {
+            if (($v['uom'] == 'c') && ! preg_match('/[Uu]ptime/', (string) $k)) {
                 // This is a counter, create the DS as such
                 $rrd_def->addDataset($k, 'COUNTER', 0);
             } else {
@@ -228,7 +228,7 @@ function check_service($command)
     $valid_uom = ['us', 'ms', 'KB', 'MB', 'GB', 'TB', 'c', 's', '%', 'B'];
 
     // Make our command safe.
-    $parts = preg_split('~(?:\'[^\']*\'|"[^"]*")(*SKIP)(*F)|\h+~', trim($command));
+    $parts = preg_split('~(?:\'[^\']*\'|"[^"]*")(*SKIP)(*F)|\h+~', trim((string) $command));
     $safe_command = implode(' ', array_map(function ($part) {
         $trimmed = preg_replace('/^(\'(.*)\'|"(.*)")$/', '$2$3', $part);
 
@@ -281,8 +281,8 @@ function check_service($command)
             // http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html
             $normalized_ds = preg_replace('/[^a-zA-Z0-9_]/', '', $ds);
             // if ds_name is longer than 19 characters, only use the first 19
-            if (strlen($normalized_ds) > 19) {
-                $normalized_ds = substr($normalized_ds, 0, 19);
+            if (strlen((string) $normalized_ds) > 19) {
+                $normalized_ds = substr((string) $normalized_ds, 0, 19);
                 d_echo($ds . ' exceeded 19 characters, renaming to ' . $normalized_ds . "\n");
             }
             if ($ds != $normalized_ds) {
@@ -292,7 +292,7 @@ function check_service($command)
                     $perf_unique = 0;
                     // Try to generate a unique name
                     for ($i = 0; $i < 10; $i++) {
-                        $tmp_ds_name = substr($normalized_ds, 0, 18) . $i;
+                        $tmp_ds_name = substr((string) $normalized_ds, 0, 18) . $i;
                         if (! isset($metrics[$tmp_ds_name])) {
                             d_echo($normalized_ds . " collides with an existing index\n");
                             $normalized_ds = $tmp_ds_name;
@@ -304,7 +304,7 @@ function check_service($command)
                         // Try harder to generate a unique name
                         for ($i = 0; $i < 10; $i++) {
                             for ($j = 0; $j < 10; $j++) {
-                                $tmp_ds_name = substr($normalized_ds, 0, 17) . $j . $i;
+                                $tmp_ds_name = substr((string) $normalized_ds, 0, 17) . $j . $i;
                                 if (! isset($perf[$tmp_ds_name])) {
                                     $normalized_ds = $tmp_ds_name;
                                     $perf_unique = 1;

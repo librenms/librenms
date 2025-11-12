@@ -290,7 +290,7 @@ class PortsController implements DeviceTab
     {
         $tabs = [
             ['name' => __('Basic'), 'url' => 'basic'],
-            ['name' => __('Detail'), 'url' => ''],
+            ['name' => __('Detail'), 'url' => 'detail'],
         ];
 
         if ($device->macs()->exists()) {
@@ -422,7 +422,7 @@ class PortsController implements DeviceTab
             };
         }
 
-        return $request->route('vars', 'detail'); // fourth segment is called vars to handle legacy urls
+        return $request->route('vars', LibrenmsConfig::get('ports_page_default')); // fourth segment is called vars to handle legacy urls
     }
 
     private function pageLinks(Request $request): array

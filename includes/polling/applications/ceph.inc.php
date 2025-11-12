@@ -8,7 +8,7 @@ if (! empty($agent_data['app'][$name])) {
     $ceph_data = $agent_data['app'][$name];
 
     $metrics = [];
-    foreach (explode('<', $ceph_data) as $section) {
+    foreach (explode('<', (string) $ceph_data) as $section) {
         if (empty($section)) {
             continue;
         }

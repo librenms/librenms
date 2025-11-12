@@ -4,7 +4,7 @@ $sensor_type = 'hpblmos_temps';
 $temps_oid = '.1.3.6.1.4.1.232.22.2.3.1.2.1.5';
 $sensor_value_oid = '.1.3.6.1.4.1.232.22.2.3.1.2.1.6.';
 
-$temps = trim(snmp_walk($device, $temps_oid, '-Osqn'));
+$temps = trim((string) snmp_walk($device, $temps_oid, '-Osqn'));
 
 foreach (explode("\n", $temps) as $temp) {
     $temp = trim($temp);

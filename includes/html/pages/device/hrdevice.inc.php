@@ -55,11 +55,11 @@ foreach (dbFetchRows('SELECT * FROM `hrDevice` WHERE `device_id` = ? ORDER BY `h
 
             echo "<td>$mini_graph</td>";
         } else {
-            echo '<td>' . stripslashes($hrdevice['hrDeviceDescr']) . '</td>';
+            echo '<td>' . stripslashes((string) $hrdevice['hrDeviceDescr']) . '</td>';
             echo '<td></td>';
         }
     } else {
-        echo '<td>' . stripslashes($hrdevice['hrDeviceDescr']) . '</td>';
+        echo '<td>' . stripslashes((string) $hrdevice['hrDeviceDescr']) . '</td>';
         echo '<td></td>';
     }//end if
 

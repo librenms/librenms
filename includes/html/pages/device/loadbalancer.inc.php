@@ -44,7 +44,7 @@ foreach ($loadbalancer_tabs as $type) {
 
 print_optionbar_end();
 
-$type = basename($vars['type']);
+$type = basename((string) $vars['type']);
 if (is_file("includes/html/pages/device/loadbalancer/$type.inc.php")) {
     include "includes/html/pages/device/loadbalancer/$type.inc.php";
 } else {

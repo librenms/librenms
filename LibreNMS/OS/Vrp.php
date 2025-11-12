@@ -635,7 +635,7 @@ class Vrp extends OS implements
         }
 
         foreach ($sla_table as $sla_key => $sla_config) {
-            [$owner, $test] = explode('.', $sla_key, 2);
+            [$owner, $test] = explode('.', (string) $sla_key, 2);
 
             $slas->push(new Sla([
                 'sla_nr' => hexdec(hash('crc32', $owner . $test)), // indexed by owner+test, convert to int

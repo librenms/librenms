@@ -45,7 +45,7 @@ if (is_array($statuses)) {
     foreach ($statuses as $index => $entry) {
         $status = $entry;
         $numeric_value = $state_lookup[$status] ?? $status;
-        preg_match('/(\d+).([0\.]+)/', $index, $matches);
+        preg_match('/(\d+).([0\.]+)/', (string) $index, $matches);
         $oid = "$status_oid.{$matches[1]}.{$matches[2]}";
         $descr = "Port {$matches[1]} Hook Status";
         $state_index = "hookStatus{$matches[1]}";
@@ -94,7 +94,7 @@ if (is_array($statuses)) {
     foreach ($statuses as $index => $entry) {
         $status = $entry;
         $numeric_value = $state_lookup[$status] ?? $status;
-        preg_match('/(\d+).([0\.]+)/', $index, $matches);
+        preg_match('/(\d+).([0\.]+)/', (string) $index, $matches);
         $oid = "$status_oid.{$matches[1]}.{$matches[2]}";
         $descr = "Port {$matches[1]} Reg Status";
         $state_index = "regStatus{$matches[1]}";

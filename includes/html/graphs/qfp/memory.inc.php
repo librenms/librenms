@@ -26,10 +26,10 @@ if ($width > '500') {
 }
 
 if ($width > '500') {
-    $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, $descr_len + 5), 0, $descr_len + 5) . "Total       Used       Free       (Min       Max      Ave)'";
+    $rrd_options .= " COMMENT:'" . substr(str_pad((string) $unit_text, $descr_len + 5), 0, $descr_len + 5) . "Total       Used       Free       (Min       Max      Ave)'";
     $rrd_options .= " COMMENT:'\l'";
 } else {
-    $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, $descr_len + 5), 0, $descr_len + 5) . "Total       Used       Free\l'";
+    $rrd_options .= " COMMENT:'" . substr(str_pad((string) $unit_text, $descr_len + 5), 0, $descr_len + 5) . "Total       Used       Free\l'";
 }
 
 $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr(short_hrDeviceDescr($components['name']), $descr_len);

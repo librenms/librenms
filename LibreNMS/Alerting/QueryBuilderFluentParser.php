@@ -112,7 +112,7 @@ class QueryBuilderFluentParser extends QueryBuilderParser
                 return $query->whereBetween($field, $value, $condition, $op == 'not_between');
             case 'in':
             case 'not_in':
-                $values = preg_split('/[, ]/', $value);
+                $values = preg_split('/[, ]/', (string) $value);
                 if ($values !== false) {
                     return $query->whereIn($field, $values, $condition, $op == 'not_in');
                 }
@@ -176,7 +176,7 @@ class QueryBuilderFluentParser extends QueryBuilderParser
     {
         $joins = [];
         foreach ($this->generateGlue() as $glue) {
-            [$left, $right] = explode(' = ', $glue, 2);
+            [$left, $right] = explode(' = ', (string) $glue, 2);
             if (Str::contains($right, '.')) { // last line is devices.device_id = ? for alerting... ignore it
                 [$leftTable, $leftKey] = explode('.', $left);
                 [$rightTable, $rightKey] = explode('.', $right);

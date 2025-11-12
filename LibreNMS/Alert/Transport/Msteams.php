@@ -26,7 +26,7 @@ class Msteams extends Transport
         $data = [
             'title' => $alert_data['title'],
             'themeColor' => self::getColorForState($alert_data['state']),
-            'text' => strip_tags($alert_data['msg'], '<strong><em><h1><h2><h3><strike><ul><ol><li><pre><blockquote><a><img><p>'),
+            'text' => strip_tags((string) $alert_data['msg'], '<strong><em><h1><h2><h3><strike><ul><ol><li><pre><blockquote><a><img><p>'),
             'summary' => $alert_data['title'],
         ];
 

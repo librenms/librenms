@@ -66,7 +66,7 @@ class AlertRules
         //Checks each rule.
         foreach (AlertUtil::getRules($device_id) as $rule) {
             Log::info('Rule %p#' . $rule['id'] . ' (' . $rule['name'] . '):%n ', ['color' => true]);
-            $extra = json_decode($rule['extra'], true);
+            $extra = json_decode((string) $rule['extra'], true);
             if (isset($extra['invert'])) {
                 $inv = (bool) $extra['invert'];
             } else {

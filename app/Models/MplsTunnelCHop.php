@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Interfaces\Models\Keyable;
 
-class MplsTunnelCHop extends Model implements Keyable
+class MplsTunnelCHop extends DeviceRelatedModel implements Keyable
 {
     protected $primaryKey = 'c_hop_id';
     public $timestamps = false;
@@ -27,11 +27,19 @@ class MplsTunnelCHop extends Model implements Keyable
 
     /**
      * Get a string that can identify a unique instance of this model
-     *
-     * @return string
      */
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return $this->mplsTunnelCHopListIndex . '-' . $this->mplsTunnelCHopIndex;
+    }
+
+    // ---- Define Relationships ----
+
+    /**
+     * @return BelongsTo<MplsLspPath, $this>
+     */
+    public function lspPath(): BelongsTo
+    {
+        return $this->belongsTo(MplsLspPath::class, 'lsp_path_id');
     }
 }

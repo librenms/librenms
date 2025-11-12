@@ -87,7 +87,7 @@ class CustomMapDataController extends Controller
 
                 // Try to interpret the SNMP speeds
                 if ($edge->port->port_descr_speed) {
-                    $speed_parts = explode('/', $edge->port->port_descr_speed, 2);
+                    $speed_parts = explode('/', (string) $edge->port->port_descr_speed, 2);
 
                     if (count($speed_parts) == 1) {
                         $speedto = $this->snmpSpeed($speed_parts[0]);
@@ -300,8 +300,8 @@ class CustomMapDataController extends Controller
                         abort(404);
                     }
                 }
-                $dbedge->custom_map_node1_id = str_starts_with($edge['from'], 'new') ? $newNodes[$edge['from']]->custom_map_node_id : $edge['from'];
-                $dbedge->custom_map_node2_id = str_starts_with($edge['to'], 'new') ? $newNodes[$edge['to']]->custom_map_node_id : $edge['to'];
+                $dbedge->custom_map_node1_id = str_starts_with((string) $edge['from'], 'new') ? $newNodes[$edge['from']]->custom_map_node_id : $edge['from'];
+                $dbedge->custom_map_node2_id = str_starts_with((string) $edge['to'], 'new') ? $newNodes[$edge['to']]->custom_map_node_id : $edge['to'];
                 $dbedge->port_id = $edge['port_id'] ?: null;
                 $dbedge->reverse = filter_var($edge['reverse'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
                 $dbedge->showpct = filter_var($edge['showpct'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);

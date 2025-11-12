@@ -15,7 +15,7 @@ if (! empty($agent_data[$name])) {
 }
 
 // Format Data
-$lines = explode("\n", $rawdata);
+$lines = explode("\n", (string) $rawdata);
 
 $voip = [];
 

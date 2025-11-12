@@ -62,7 +62,7 @@ class EltexMes23xx extends Radlan implements Ipv6AddressDiscovery, TransceiverDi
                 'entPhysicalIndex' => $entIndex,
                 'entPhysicalDescr' => $data['eltPhdTransceiverInfoType'],
                 'entPhysicalClass' => 'sfp-cage',
-                'entPhysicalName' => strtoupper($data['eltPhdTransceiverInfoConnectorType'] ?? ''),
+                'entPhysicalName' => strtoupper((string) $data['eltPhdTransceiverInfoConnectorType']),
                 'entPhysicalModelName' => $this->normData($data['eltPhdTransceiverInfoPartNumber']),
                 'entPhysicalSerialNum' => $data['eltPhdTransceiverInfoSerialNumber'],
                 'entPhysicalContainedIn' => $portsIndex,
@@ -85,7 +85,7 @@ class EltexMes23xx extends Radlan implements Ipv6AddressDiscovery, TransceiverDi
             ->mapTable(fn ($data, $ifIndex) => new Transceiver([
                 'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                 'index' => $ifIndex,
-                'connector' => strtoupper($data['eltPhdTransceiverInfoConnectorType'] ?? ''),
+                'connector' => $data['eltPhdTransceiverInfoConnectorType'] ? strtoupper((string) $data['eltPhdTransceiverInfoConnectorType']) : null,
                 'distance' => $data['eltPhdTransceiverInfoTransferDistance'] ?? null,
                 'model' => $this->normData($data['eltPhdTransceiverInfoPartNumber'] ?? null),
                 'revision' => $data['eltPhdTransceiverInfoVendorRev'] ?? null,

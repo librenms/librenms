@@ -147,7 +147,7 @@ abstract class SelectController extends PaginatedAjaxController
             return false;
         }
 
-        if ($request->has('term') && ! str_contains(strtolower($item['text']), strtolower($request->term))) {
+        if ($request->has('term') && ! str_contains(strtolower((string) $item['text']), strtolower($request->term))) {
             return false;
         }
 

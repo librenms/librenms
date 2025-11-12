@@ -108,6 +108,6 @@ class CheckPythonWrapper implements \LibreNMS\Interfaces\Validation
             return $entries;
         }, '');
 
-        return (bool) preg_match('/^\s*[^#].*poller-wrapper\.py/', $cron_entries);
+        return (bool) preg_match('/^\s*[^#].*poller-wrapper\.py/', (string) $cron_entries);
     }
 }

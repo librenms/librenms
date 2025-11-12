@@ -55,7 +55,7 @@ class EltexMes24xx extends OS implements TransceiverDiscovery, Ipv6AddressDiscov
             ->mapTable(fn ($data, $ifIndex) => new Transceiver([
                 'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                 'index' => $ifIndex,
-                'connector' => $data['eltexPhyTransceiverInfoConnectorType'] ? strtoupper($data['eltexPhyTransceiverInfoConnectorType']) : null,
+                'connector' => $data['eltexPhyTransceiverInfoConnectorType'] ? strtoupper((string) $data['eltexPhyTransceiverInfoConnectorType']) : null,
                 'distance' => $data['eltexPhyTransceiverInfoTransferDistance'] ?? null,
                 'model' => $data['eltexPhyTransceiverInfoPartNumber'] ?? null,
                 'revision' => $data['eltexPhyTransceiverInfoVendorRevision'] ?? null,

@@ -285,7 +285,7 @@ class Schema
             }
 
             // try to guess assuming key_id = keys table
-            $guessed_table = substr($key, 0, -3);
+            $guessed_table = substr((string) $key, 0, -3);
 
             if (! Str::endsWith($guessed_table, 's')) {
                 if (Str::endsWith($guessed_table, 'x')) {
@@ -331,7 +331,7 @@ class Schema
             foreach (DB::connection($connection)->select(DB::raw("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '$db_name' AND TABLE_NAME='$table' ORDER BY ORDINAL_POSITION")->getValue(DB::connection($connection)->getQueryGrammar())) as $data) {
                 $def = [
                     'Field' => $data->COLUMN_NAME,
-                    'Type' => preg_replace('/int\([0-9]+\)/', 'int', $data->COLUMN_TYPE),
+                    'Type' => preg_replace('/int\([0-9]+\)/', 'int', (string) $data->COLUMN_TYPE),
                     'Null' => $data->IS_NULLABLE === 'YES',
                     'Extra' => str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $data->EXTRA),
                 ];

@@ -1,9 +1,9 @@
 <?php
 
 /**
- * geist-watchdog.inc.php
+ * AlertDetailsController.php
  *
- * LibreNMS pre-cache poller module for Geist Watchdog
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,9 +20,21 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2017 Neil Lathwood
- * @author     Neil Lathwood <gh+n@laf.io>
+ * @copyright  2025 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
-if ($type == 'temperature') {
-    $sensor_cache['geist_temp_unit'] = snmp_get($device, 'temperatureUnits.0', '-Oqv', 'GEIST-V4-MIB');
+
+namespace App\Http\Controllers\Ajax;
+
+use App\Models\AlertLog;
+use Illuminate\Http\JsonResponse;
+
+class AlertDetailsController
+{
+    public function __invoke(AlertLog $alertLog): JsonResponse
+    {
+        return response()->json([
+            'details' => $alertLog->details['rule'] ?? 'No Details found',
+        ]);
+    }
 }
