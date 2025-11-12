@@ -39,6 +39,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install PHP dependencies
+        if: steps.check_enabled.outputs.enabled == 'true'
         uses: ./.github/actions/composer-install
         with:
           cache-version: ${{ secrets.CACHE_VERSION }}
