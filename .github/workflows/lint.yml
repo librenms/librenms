@@ -5,13 +5,46 @@ on:
   pull_request:
     branches: [master, main]
 
-# Cancel in-progress runs for the same workflow on the same branch
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
   contents: read
+
+# Define reusable snippets
+x-php-checkout: &php-checkout
+  name: Checkout Code
+  uses: actions/checkout@v5
+  with:
+    sparse-checkout-cone-mode: false
+    sparse-checkout: |
+      /*
+      !/tests/data/
+      !/tests/snmpsim/
+      !/mibs/
+      !/doc/
+
+x-composer-cache: &composer-cache
+  name: Get composer cache directory
+  id: composer-cache
+  run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+x-cache-action: &cache-action
+  name: Cache composer
+  uses: actions/cache@v4
+  with:
+    path: ${{ steps.composer-cache.outputs.dir }}
+    key: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/composer.lock') }}
+    restore-keys: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-
+
+x-composer-install: &composer-install
+  name: Composer install
+  run: composer install --prefer-dist --no-interaction --no-progress --no-scripts --no-autoloader
+
+x-composer-dump: &composer-dump
+  name: Composer dump
+  run: composer dump --strict-psr --strict-ambiguous --no-interaction --no-scripts
 
 jobs:
   super-linter:
@@ -56,34 +89,11 @@ jobs:
           - { name: "Deprecated", file: "phpstan-deprecated.neon" }
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v5
-        with:
-          sparse-checkout-cone-mode: false
-          sparse-checkout: |
-            /*
-            !/tests/data/
-            !/tests/snmpsim/
-            !/mibs/
-            !/doc/
-
-      - name: Get composer cache directory
-        id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache composer
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-
-
-      - name: Composer install
-        run: composer install --prefer-dist --no-interaction --no-progress --no-scripts --no-autoloader
-
-      - name: Composer dump
-        run: composer dump --strict-psr --strict-ambiguous --no-interaction --no-scripts
-
+      - *php-checkout
+      - *composer-cache
+      - *cache-action
+      - *composer-install
+      - *composer-dump
       - name: Run PHPStan (${{ matrix.config.name }})
         run: ./vendor/bin/phpstan analyze --no-interaction --memory-limit=2G --configuration=${{ matrix.config.file }}
 
@@ -92,34 +102,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v5
-        with:
-          sparse-checkout-cone-mode: false
-          sparse-checkout: |
-            /*
-            !/tests/data/
-            !/tests/snmpsim/
-            !/mibs/
-            !/doc/
-
-      - name: Get composer cache directory
-        id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache composer
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-
-
-      - name: Composer install
-        run: composer install --prefer-dist --no-interaction --no-progress --no-scripts --no-autoloader
-
-      - name: Composer dump
-        run: composer dump --strict-psr --strict-ambiguous --no-interaction --no-scripts
-
+      - *php-checkout
+      - *composer-cache
+      - *cache-action
+      - *composer-install
+      - *composer-dump
       - name: Run Rector (dry-run)
         run: ./vendor/bin/rector process --dry-run --no-progress-bar --ansi --memory-limit=1G
 
@@ -128,33 +115,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v5
-        with:
-          sparse-checkout-cone-mode: false
-          sparse-checkout: |
-            /*
-            !/tests/data/
-            !/tests/snmpsim/
-            !/mibs/
-            !/doc/
-
-      - name: Get composer cache directory
-        id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache composer
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-
-
-      - name: Composer install
-        run: composer install --prefer-dist --no-interaction --no-progress --no-scripts --no-autoloader
-
-      - name: Composer dump
-        run: composer dump --strict-psr --strict-ambiguous --no-interaction --no-scripts
-
+      - *php-checkout
+      - *composer-cache
+      - *cache-action
+      - *composer-install
+      - *composer-dump
       - name: Run Pint (dry-run)
         run: ./vendor/bin/pint --test --parallel
