@@ -1,0 +1,71 @@
+name: Auto-Format Code (Fork Only)
+
+on:
+  push:
+    branches:
+      - '**'  # Run on all branches
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+
+jobs:
+  auto-format:
+    # Only run on forks, never on the main repository
+    if: github.repository != github.event.repository.full_name || github.repository_owner != 'MAIN_REPO_OWNER'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if auto-formatting is enabled
+        id: check_enabled
+        env:
+          ENABLE_AUTO_FORMAT: ${{ vars.ENABLE_AUTO_FORMAT }}
+        run: |
+          # Check for opt-in via repository variable
+          if [ "$ENABLE_AUTO_FORMAT" = "true" ]; then
+            echo "enabled=true" >> $GITHUB_OUTPUT
+            echo "✅ Auto-formatting is enabled for this fork"
+          else
+            echo "enabled=false" >> $GITHUB_OUTPUT
+            echo "⏭️ Auto-formatting is disabled."
+            echo "To enable: Go to Settings > Secrets and variables > Actions > Variables"
+            echo "Create a variable named ENABLE_AUTO_FORMAT with value: true"
+            exit 0
+          fi
+
+      - name: Checkout code
+        if: steps.check_enabled.outputs.enabled == 'true'
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Install PHP dependencies
+        uses: ./.github/actions/composer-install
+        with:
+          cache-version: ${{ secrets.CACHE_VERSION }}
+
+
+      - name: Run code formatter
+        if: steps.check_enabled.outputs.enabled == 'true'
+        run: |
+          ./vendor/bin/pint --parallel --diff=${{ github.base_ref || github.ref_name }}
+
+      - name: Check for changes
+        if: steps.check_enabled.outputs.enabled == 'true'
+        id: check_changes
+        run: |
+          if [[ -n $(git status -s) ]]; then
+            echo "changes=true" >> $GITHUB_OUTPUT
+            echo "Code formatting changes detected"
+          else
+            echo "changes=false" >> $GITHUB_OUTPUT
+            echo "No formatting changes needed"
+          fi
+
+      - name: Commit and push changes
+        if: steps.check_enabled.outputs.enabled == 'true' && steps.check_changes.outputs.changes == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add -A
+          git commit -m "style: auto-format code [skip ci]"
+          git push
