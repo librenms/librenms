@@ -46,7 +46,7 @@ modules:
                             op: 'regex'
                             value: (.*(LOW|HIGH).*)
                     group: nnOpticalPmRecentIfIndexDescr
-        percentage:
+        percent:
             data:
                 -
                     oid: nnOpticalPmRecentTable

@@ -105,7 +105,7 @@ modules:
                 -
                     oid:  hpStackConfig
                     value: hpStackOperStatus
-                    num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.69.1.1.2.0'
+                    num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.69.1.1.2.{{ $index }}'
                     descr: 'Stack State'
                     state_name: hpStackOperStatus
                     states:
@@ -117,7 +117,7 @@ modules:
                 -
                     oid:  hpStackConfig
                     value: hpStackTopology
-                    num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.69.1.1.4.0'
+                    num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.69.1.1.4.{{ $index }}'
                     descr: 'Stack Topology'
                     state_name: hpStackTopology
                     skip_values:
