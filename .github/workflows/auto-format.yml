@@ -38,6 +38,21 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Check if last commit was auto-format
+        if: steps.check_enabled.outputs.enabled == 'true'
+        id: check_loop
+        run: |
+          LAST_COMMIT_MSG=$(git log -1 --pretty=%B)
+          LAST_COMMIT_AUTHOR=$(git log -1 --pretty=%an)
+
+          if [[ "$LAST_COMMIT_MSG" == *"auto-format code"* ]] || [[ "$LAST_COMMIT_AUTHOR" == "github-actions[bot]" ]]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "⏭️ Skipping: Last commit was an auto-format"
+            exit 0
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Install PHP dependencies
         if: steps.check_enabled.outputs.enabled == 'true'
         uses: ./.github/actions/composer-install
@@ -45,13 +60,13 @@ jobs:
           cache-version: ${{ secrets.CACHE_VERSION }}
 
 
-      - name: Run code formatter
-        if: steps.check_enabled.outputs.enabled == 'true'
+      - name: Format Code
+        if: steps.check_enabled.outputs.enabled == 'true' && steps.check_loop.outputs.skip != 'true'
         run: |
           ./vendor/bin/pint --parallel --diff=${{ github.base_ref || github.ref_name }}
 
       - name: Check for changes
-        if: steps.check_enabled.outputs.enabled == 'true'
+        if: steps.check_enabled.outputs.enabled == 'true' && steps.check_loop.outputs.skip != 'true'
         id: check_changes
         run: |
           if [[ -n $(git status -s) ]]; then
@@ -63,7 +78,7 @@ jobs:
           fi
 
       - name: Commit and push changes
-        if: steps.check_enabled.outputs.enabled == 'true' && steps.check_changes.outputs.changes == 'true'
+        if: steps.check_enabled.outputs.enabled == 'true' && steps.check_loop.outputs.skip != 'true' && steps.check_changes.outputs.changes == 'true'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
