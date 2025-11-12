@@ -63,7 +63,10 @@ jobs:
       - name: Format Code
         if: steps.check_enabled.outputs.enabled == 'true' && steps.check_loop.outputs.skip != 'true'
         run: |
-          ./vendor/bin/pint --parallel --diff=${{ github.event.repository.default_branch }}
+          DEFAULT_BRANCH="${{ github.event.repository.default_branch }}"
+          DIFF_TARGET=$(git merge-base "origin/$DEFAULT_BRANCH" HEAD 2>/dev/null || echo "origin/$DEFAULT_BRANCH")
+
+          ./vendor/bin/pint --parallel --diff="$DIFF_TARGET"
 
       - name: Check for changes
         if: steps.check_enabled.outputs.enabled == 'true' && steps.check_loop.outputs.skip != 'true'
