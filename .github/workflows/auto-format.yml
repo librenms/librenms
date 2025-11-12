@@ -63,7 +63,7 @@ jobs:
       - name: Format Code
         if: steps.check_enabled.outputs.enabled == 'true' && steps.check_loop.outputs.skip != 'true'
         run: |
-          ./vendor/bin/pint --parallel --diff=${{ github.base_ref || github.ref_name }}
+          ./vendor/bin/pint --parallel --diff=${{ github.event.repository.default_branch }}
 
       - name: Check for changes
         if: steps.check_enabled.outputs.enabled == 'true' && steps.check_loop.outputs.skip != 'true'
