@@ -621,7 +621,7 @@ class Rrd extends BaseDatastore
         // Make sure a valid image was returned
         // rrdtool defaults to png if imgformat not specified
         $matches = preg_grep('/--imgformat=([^\s]+)/', $options);
-        $graph_type = $matches ? strtolower($matches[1]) : 'png';
+        $graph_type = $matches ? strtolower((string) $matches[1]) : 'png';
         $imageFormat = ImageFormat::forGraph($graph_type);
 
         $search = $imageFormat->getImageEnd();
