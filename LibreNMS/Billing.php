@@ -5,11 +5,9 @@ namespace LibreNMS;
 use App\Facades\LibrenmsConfig;
 use DateTime;
 use DateTimeZone;
-use Illuminate\Foundation\Mix;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Number;
-use stdClass;
 
 class Billing
 {
@@ -144,12 +142,11 @@ class Billing
             ->groupByRaw('bill_id, bucket_start')
             ->orderBy(column: 'rate')
             ->get()->toArray();
-    
+
         $measurement_95th = (round(count($get95thdataCache) / 100 * 95) - 2);
 
         return (array) $get95thdataCache[$measurement_95th];
     }
-
 
     public static function getRates($bill_id, $datefrom, $dateto, $dir_95th): array
     {
