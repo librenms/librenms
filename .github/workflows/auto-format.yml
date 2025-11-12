@@ -64,7 +64,7 @@ jobs:
         if: steps.check_enabled.outputs.enabled == 'true' && steps.check_loop.outputs.skip != 'true'
         run: |
           DEFAULT_BRANCH="${{ github.event.repository.default_branch }}"
-          git fetch origin "$DEFAULT_BRANCH" --depth=0
+          git fetch origin "$DEFAULT_BRANCH"
           DIFF_TARGET=$(git merge-base "origin/$DEFAULT_BRANCH" HEAD 2>/dev/null || echo "origin/$DEFAULT_BRANCH")
 
           ./vendor/bin/pint --parallel --diff="$DIFF_TARGET"
