@@ -14,7 +14,6 @@ class Mni extends OS implements
     WirelessRateDiscovery,
     WirelessFrequencyDiscovery,
     WirelessCapacityDiscovery
-
 {
     /**
      * Discover wireless tx or rx power. This is in dBm. Type is power.
@@ -87,17 +86,17 @@ class Mni extends OS implements
     {
         return \SnmpQuery::walk('MNI-PROTEUS-AMT-MIB::mnPrPerfBaseLinkCapMbps')
             ->mapTable(function ($data, $mnInterfaceIndex) {
-            return new WirelessSensor(
-                'capacity',
-                $this->getDeviceId(),
-                ".1.3.6.1.4.1.3323.13.1.4.1.1.17.$mnInterfaceIndex",
-                'mni-capacity',
-                $mnInterfaceIndex,
-                "Rx capacity $mnInterfaceIndex",
-                $data['MNI-PROTEUS-AMT-MIB::mnPrPerfBaseLinkCapMbps'] ?? 0,
-                100000
-            );
-        })->all();
+                return new WirelessSensor(
+                    'capacity',
+                    $this->getDeviceId(),
+                    ".1.3.6.1.4.1.3323.13.1.4.1.1.17.$mnInterfaceIndex",
+                    'mni-capacity',
+                    $mnInterfaceIndex,
+                    "Rx capacity $mnInterfaceIndex",
+                    $data['MNI-PROTEUS-AMT-MIB::mnPrPerfBaseLinkCapMbps'] ?? 0,
+                    100000
+                );
+            })->all();
     }
 
     public function discoverWirelessFrequency()
