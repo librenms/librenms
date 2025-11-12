@@ -144,6 +144,7 @@ class Billing
     ->get();
         }
         $measurement_95th = (round(count(self::$get95thdataCache) / 100 * 95) - 2);
+
         return round(self::$get95thdataCache[$measurement_95th][$type], 2);
     }
 
