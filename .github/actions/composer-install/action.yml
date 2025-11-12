@@ -1,6 +1,11 @@
 name: 'Composer Install'
 description: 'Checkout code and install PHP dependencies using Composer'
 
+inputs:
+  cache-version:
+    description: 'Cache version key for Composer dependency cache'
+    required: true
+
 runs:
   using: 'composite'
   steps:
@@ -13,8 +18,8 @@ runs:
       uses: actions/cache@v4
       with:
         path: ${{ steps.composer-cache.outputs.dir }}
-        key: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/composer.lock') }}
-        restore-keys: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-
+        key: ${{ runner.os }}-composer-${{ inputs.cache-version }}-${{ hashFiles('**/composer.lock') }}
+        restore-keys: ${{ runner.os }}-composer-${{ inputs.cache-version }}-
 
     - name: Composer install
       shell: bash

@@ -68,6 +68,8 @@ jobs:
 
       - name: Install PHP dependencies
         uses: ./.github/actions/composer-install
+        with:
+          cache-version: ${{ secrets.CACHE_VERSION }}
 
       - name: Run PHPStan (${{ matrix.config.name }})
         run: ./vendor/bin/phpstan analyze --no-interaction --memory-limit=2G --configuration=${{ matrix.config.file }}
@@ -90,6 +92,8 @@ jobs:
 
       - name: Install PHP dependencies
         uses: ./.github/actions/composer-install
+        with:
+          cache-version: ${{ secrets.CACHE_VERSION }}
 
       - name: Run Rector (dry-run)
         run: ./vendor/bin/rector process --dry-run --no-progress-bar --ansi --memory-limit=1G
@@ -112,6 +116,8 @@ jobs:
 
       - name: Install PHP dependencies
         uses: ./.github/actions/composer-install
+        with:
+          cache-version: ${{ secrets.CACHE_VERSION }}
 
       - name: Run Pint (dry-run)
         run: ./vendor/bin/pint --test --parallel
