@@ -95,7 +95,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                     echo '<div class="col-sm-3">';
                     echo '<select name="' . htmlentities((string) $item['name']) . '" id="' . htmlentities((string) $item['name']) . '" class="form-control">';
                     foreach ($item['options'] as $descr => $opt) {
-                        echo '<option value="' . htmlentities((string) $opt) . '">' . htmlentities((string) $descr). '</option>';
+                        echo '<option value="' . htmlentities((string) $opt) . '">' . htmlentities((string) $descr) . '</option>';
                     }
                     echo '</select>';
                     echo '</div>';

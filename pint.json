@@ -1,6 +1,7 @@
 {
     "preset": "laravel",
     "rules": {
+        "statement_indentation": false,
         "concat_space": {
             "spacing": "one"
         }

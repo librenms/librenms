@@ -150,7 +150,7 @@ $pagetitle[] = 'Add host';
                 $snmpver_pref = LibrenmsConfig::get('snmp.version.0', 'v2c');
                 $snmpver_list = ['v1', 'v2c', 'v3'];
                 foreach ($snmpver_list as $snmpver_item) {
-                    echo "<option value=\"" . $snmpver_item ."\"" . ($snmpver_item == $snmpver_pref ? ' selected' : '') . ">" . $snmpver_item. "</option>";
+                    echo "<option value=\"" . $snmpver_item . "\"" . ($snmpver_item == $snmpver_pref ? ' selected' : '') . ">" . $snmpver_item . "</option>";
                 }
                 ?>
 	    </select>
@@ -163,7 +163,7 @@ $pagetitle[] = 'Add host';
 <?php
 var_dump(LibrenmsConfig::get('snmp.transports', ['udp']));
 foreach (LibrenmsConfig::get('snmp.transports', 'udp') as $transport) {
-    echo '<option value="' . $transport . '"'. (LibrenmsConfig::get('snmp.transports.0') == $transport ? ' selected' : '') . '>' . $transport . '</option>';
+    echo '<option value="' . $transport . '"' . (LibrenmsConfig::get('snmp.transports.0') == $transport ? ' selected' : '') . '>' . $transport . '</option>';
 }
 ?>
             </select>
@@ -211,7 +211,7 @@ foreach (PortAssociationMode::getModes() as $mode) {
                   $authlevel_list = [ "noAuthNoPriv", "authNoPriv", "authPriv" ];
                   $authlevel_pref = LibrenmsConfig::get('snmp.v3.0.authlevel', 'noAuthNoPriv');
                   foreach ($authlevel_list as $authlevel_item) {
-                      echo "<option value=\"" . $authlevel_item. '"' . ($authlevel_item == $authlevel_pref ? ' selected' : '') . ">" . $authlevel_item. "</option>";
+                      echo "<option value=\"" . $authlevel_item . '"' . ($authlevel_item == $authlevel_pref ? ' selected' : '') . ">" . $authlevel_item . "</option>";
                   }
                   ?>
               </select>
