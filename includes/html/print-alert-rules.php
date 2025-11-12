@@ -92,9 +92,9 @@ if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
 echo '<div class="table-responsive">';
 echo '<div class="col pull-left">';
 $device_id = $device['device_id'] ?? 0;
-echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="' . $device_id . '">Create new alert rule</button>';
+echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="' .$device_id. '">Create new alert rule</button>';
 echo '<i> - OR - </i>';
-echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="' . $device_id . '">Create rule from collection</button>';
+echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="' .$device_id. '">Create rule from collection</button>';
 echo '</div>';
 
 echo '<div class="col pull-right">';
@@ -263,7 +263,7 @@ foreach ($rule_list as $rule) {
 
     // Name
 
-    echo '<td><a href="' . url('alerts/rule_id=' . $rule['id']) . '" data-container="body" data-toggle="popover" data-placement="right" data-content="View active alerts for this rule" target="_blank">' . htmlentities((string) $rule['name']) . '</a></td>';
+    echo '<td><a href="' . url('alerts/rule_id='.$rule['id']) .'" data-container="body" data-toggle="popover" data-placement="right" data-content="View active alerts for this rule" target="_blank">' . htmlentities((string) $rule['name']) . '</a></td>';
 
     // Devices (and Groups)
 
@@ -335,7 +335,7 @@ foreach ($rule_list as $rule) {
             $transport_name = null;
             if ($transport_map['target_type'] == 'group') {
                 $transport_name = dbFetchCell('SELECT transport_group_name FROM alert_transport_groups WHERE transport_group_id=?', [$transport_map['transport_or_group_id']]);
-                $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-transport-group' data-group_id='" . $transport_map['transport_or_group_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport group " . e($transport_name) . "'>" . e($transport_name) . '</a>';
+                $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-transport-group' data-group_id='" . $transport_map['transport_or_group_id'] . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport group " . e($transport_name) . "'>" . e($transport_name)  . '</a>';
             }
             if ($transport_map['target_type'] == 'single') {
                 $transport_name = dbFetchCell('SELECT transport_name FROM alert_transports WHERE transport_id=?', [$transport_map['transport_or_group_id']]);
@@ -384,7 +384,7 @@ foreach ($rule_list as $rule) {
 
     $status_popover = 'top';
 
-    echo "<td><a href=" . url('alerts/rule_id=' . $rule['id']) . "><span data-toggle='popover' data-placement='$status_popover' data-content='$status_msg' id='alert-rule-" . $rule['id'] . "' class='fa fa-fw fa-2x fa-" . $ico . ' text-' . $col . "'></span></a>";
+    echo "<td><a href=" . url('alerts/rule_id='.$rule['id']) ."><span data-toggle='popover' data-placement='$status_popover' data-content='$status_msg' id='alert-rule-" . $rule['id'] . "' class='fa fa-fw fa-2x fa-" . $ico . ' text-' . $col . "'></span></a>";
     if (isset($rule_extra['mute']) && $rule_extra['mute'] === true) {
         echo "<div data-toggle='popover' data-content='Alerts for " . htmlentities($rule['name'] ?? '') . " are muted' class='fa fa-fw fa-2x fa-volume-off text-primary' aria-hidden='true'></div>";
     }
