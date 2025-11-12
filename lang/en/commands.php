@@ -124,7 +124,7 @@ return [
             'device spec' => 'Device spec to discover: device_id, hostname, wildcard (*), odd, even, all',
         ],
         'options' => [
-            'modules' => 'Specify single module to be run. Comma separate modules, submodules may be added with /',
+            'module' => 'Specify module(s) to be run. submodules may be added with /.  Multiple values allowed.',
         ],
         'errors' => [
             'none_up' => 'Device was down, unable to discover.|All devices were down, unable to discover.',

@@ -49,7 +49,7 @@ class DeviceDiscover extends LnmsCommand
         parent::__construct();
         $this->setAliases(['poller:discovery']); // TODO remove
         $this->addArgument('device spec', InputArgument::REQUIRED);
-        $this->addOption('modules', 'm', InputOption::VALUE_REQUIRED);
+        $this->addOption('module', 'm', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
     }
 
     public function handle(MeasurementManager $measurements): int
@@ -64,7 +64,7 @@ class DeviceDiscover extends LnmsCommand
                 $this->argument('device spec'),
                 DiscoverDevice::class,
                 DeviceDiscovered::class,
-                explode(',', $this->option('modules') ?? ''),
+                array_map(fn ($m) => trim($m), explode(',', implode(',', $this->option('module')))),
             );
 
             $this->line(__('commands.device:discover.starting'));
