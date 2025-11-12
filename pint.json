@@ -7,19 +7,14 @@
             "spacing": "one"
         },
         "date_time_immutable": true,
-        "declare_strict_types": false,
         "lowercase_keywords": true,
         "lowercase_static_reference": true,
-        "final_class": false,
-        "final_internal_class": false,
-        "final_public_method_for_abstract_class": false,
         "fully_qualified_strict_types": true,
         "global_namespace_import": {
             "import_classes": true,
             "import_constants": true,
-            "import_functions": true
+            "import_functions": false
         },
-        "mb_str_functions": false,
         "modernize_types_casting": true,
         "new_with_parentheses": false,
         "no_superfluous_elseif": true,
@@ -55,7 +50,6 @@
         "protected_to_private": true,
         "self_accessor": true,
         "self_static_accessor": true,
-        "strict_comparison": false,
         "visibility_required": true
     }
 }
