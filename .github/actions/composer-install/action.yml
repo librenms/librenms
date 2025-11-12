@@ -1,5 +1,5 @@
 name: 'Composer Install'
-description: 'Checkout code and install PHP dependencies using Composer'
+description: 'Install PHP dependencies using Composer including caching'
 
 inputs:
   cache-version:
