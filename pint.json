@@ -3,6 +3,9 @@
     "rules": {
         "array_push": true,
         "backtick_to_shell_exec": true,
+        "concat_space": {
+            "spacing": "one"
+        },
         "date_time_immutable": true,
         "declare_strict_types": true,
         "lowercase_keywords": true,
