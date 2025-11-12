@@ -34,13 +34,12 @@ jobs:
             !/mibs/
 
       - name: Lint Code Base
-        uses: super-linter/super-linter/slim@v8.2.1
+        uses: super-linter/super-linter/slim@v8
         env:
           VALIDATE_BASH: true
           VALIDATE_PYTHON_PYLINT: true
           VALIDATE_PYTHON_BLACK: true
           VALIDATE_ALL_CODEBASE: false
-          DEFAULT_BRANCH: master
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   phpstan:
