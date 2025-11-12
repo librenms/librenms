@@ -269,18 +269,52 @@ class LdapAuthorizer extends AuthorizerBase
         $filter = '(' . LibrenmsConfig::get('auth_ldap_attr.uid') . '=' . $username . ')';
         $base_dn = preg_replace('/,ou=[^,]+,/', ',', LibrenmsConfig::get('auth_ldap_suffix'));
         $base_dn = trim($base_dn, ',');
-        $search = ldap_search($connection, $base_dn, $filter);
-        $results = ldap_get_entries($connection, $search);
-        if (! $results) {
+
+        $search = @ldap_search($connection, $base_dn, $filter);
+        if ($search === false) {
             return false;
         }
 
-        foreach ($results as $entry) {
-            if (isset($entry['uid'][0]) && $entry['uid'][0] == $username) {
-                preg_match('~,ou=([^,]+),~', (string) $entry['dn'], $matches);
-                $user_ou = $matches[1] ?? '';
-                $new_auth_ldap_suffix = preg_replace('/,ou=[^,]+,/', ',ou=' . $user_ou . ',', LibrenmsConfig::get('auth_ldap_suffix'));
-                LibrenmsConfig::set('auth_ldap_suffix', $new_auth_ldap_suffix);
+        $results = @ldap_get_entries($connection, $search);
+        if ($results === false || $results['count'] == 0) {
+            return false;
+        }
+
+        for ($i = 0; $i < $results['count']; $i++) {
+            $entry = $results[$i];
+            $dn = $entry['dn'] ?? null;
+            $uid = $entry['uid'][0] ?? null;
+
+            if ($uid === $username && $dn) {
+                // Extract all OU levels from DN
+                preg_match_all('/ou=([^,]+)/i', $dn, $ou_matches);
+                $ous = $ou_matches[1] ?? [];
+
+                // No OUs found -> no modification needed
+                if (empty($ous)) {
+                    return true;
+                }
+
+                // If user is directly under top-level OU, no modification needed
+                if (count($ous) < 2) {
+                    return true;
+                }
+
+                // Use first two OUs (top to bottom)
+                $user_ou   = $ous[0]; // e.g., "Special"
+                $parent_ou = $ous[1]; // e.g., "Users"
+
+                // Only adjust suffix if $user_ou differs from $parent_ou
+                if ($user_ou !== $parent_ou) {
+                    $old_suffix = LibrenmsConfig::get('auth_ldap_suffix');
+                    $new_auth_ldap_suffix = preg_replace(
+                        '/,ou=' . preg_quote($parent_ou, '/') . ',/i',
+                        ',ou=' . $user_ou . ',ou=' . $parent_ou . ',',
+                        $old_suffix
+                    );
+
+                    LibrenmsConfig::set('auth_ldap_suffix', $new_auth_ldap_suffix);
+                }
 
                 return true;
             }
