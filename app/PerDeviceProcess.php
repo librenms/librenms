@@ -38,7 +38,7 @@ class PerDeviceProcess
 {
     private ?int $current_device_id = null;
     public Result $results;
-    private ModuleList $moduleList;
+    private readonly ModuleList $moduleList;
 
     public function __construct(
         public readonly ProcessType $type,
@@ -56,7 +56,7 @@ class PerDeviceProcess
         $this->moduleList->printOverrides($this->type);
 
         // listen for the completed events to mark the device completed
-        Event::listen($this->completionEvent, function ($event) {
+        Event::listen($this->completionEvent, function ($event): void {
             if ($event->device->device_id == $this->current_device_id) {
                 $this->results->markCompleted($event->device->status);
             }

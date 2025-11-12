@@ -43,7 +43,7 @@ use LibreNMS\Exceptions\InvalidModuleException;
 class ModuleTestHelper
 {
     private $quiet = false;
-    private ModuleList $modules;
+    private readonly ModuleList $modules;
     private $variant;
     private $snmprec_file;
     private $json_file;
