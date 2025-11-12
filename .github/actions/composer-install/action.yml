@@ -1,31 +1,9 @@
 name: 'Composer Install'
 description: 'Checkout code and install PHP dependencies using Composer'
 
-inputs:
-  sparse-checkout:
-    description: 'Enable sparse checkout to skip large test/mib directories'
-    required: false
-    default: 'true'
-
 runs:
   using: 'composite'
   steps:
-    - name: Checkout Code (sparse)
-      if: ${{ inputs.sparse-checkout == 'true' }}
-      uses: actions/checkout@v5
-      with:
-        sparse-checkout-cone-mode: false
-        sparse-checkout: |
-          /*
-          !/tests/data/
-          !/tests/snmpsim/
-          !/mibs/
-          !/doc/
-
-    - name: Checkout Code (full)
-      if: ${{ inputs.sparse-checkout != 'true' }}
-      uses: actions/checkout@v5
-
     - name: Get composer cache directory
       id: composer-cache
       shell: bash

@@ -56,6 +56,9 @@ jobs:
         ports:
           - 3306
     steps:
+      - name: Checkout Code (sparse)
+        uses: actions/checkout@v5
+
       -
         name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -86,8 +89,6 @@ jobs:
 
       - name: Install PHP dependencies
         uses: ./.github/actions/composer-install
-        with:
-          sparse-checkout: 'false'
 
       -
         name: Cache pip
