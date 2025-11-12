@@ -179,7 +179,7 @@ Stop when you are able to handle your work load.
 
 ## High Availability
 
-Electrocret said he is going to write a guide on this. :D
+Coming soon.....
 
 ---
 
