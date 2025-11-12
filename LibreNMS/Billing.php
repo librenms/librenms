@@ -11,8 +11,6 @@ use LibreNMS\Util\Number;
 
 class Billing
 {
-    private static array $get95thdataCache = [];
-
     public static function formatBytes($value): string
     {
         return Number::formatBase($value, LibrenmsConfig::get('billing.base'));
