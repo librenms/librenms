@@ -39,6 +39,8 @@ jobs:
           VALIDATE_BASH: true
           VALIDATE_PYTHON_PYLINT: true
           VALIDATE_PYTHON_BLACK: true
+          VALIDATE_JSON: true
+          VALIDATE_YAML: true
           VALIDATE_ALL_CODEBASE: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
