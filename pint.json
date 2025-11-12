@@ -1,0 +1,8 @@
+{
+    "preset": "laravel",
+    "rules": {
+        "concat_space": {
+            "spacing": "one"
+        }
+    }
+}

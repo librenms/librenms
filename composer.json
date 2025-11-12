@@ -66,6 +66,7 @@
         "friendsofphp/php-cs-fixer": "^3.66",
         "larastan/larastan": "^3.1",
         "laravel/dusk": "^8.2.2",
+        "laravel/pint": "^1.25",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
         "pestphp/pest": "^3.8 || ^4.0",
