@@ -82,6 +82,18 @@ modules:
                     descr: 'Apparent Power {{ $lgpPduRcpEntryUsrLabel }}'
                     index: 'lgpPduRcpEntryApOut.{{ $index }}'
                     group: ApparentPower
+                -
+                    oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleBasicTable
+                    value: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryValue
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.9.20.1.20.{{ $index }}'
+                    descr: '{{ LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryDataLabel }}'
+                    index: 'lgpFlexibleEntryValue.{{ $index }}'
+                    multiplier: 1000
+                    skip_values:
+                        - 
+                            oid: LIEBERT-GP-FLEXIBLE-MIB::lgpFlexibleEntryDataLabel
+                            op: '!==' 
+                            value: 'System Output Power'
         current:
             data:
                 -
