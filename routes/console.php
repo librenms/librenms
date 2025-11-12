@@ -1,8 +1,8 @@
 <?php
 
 use App\Console\Commands\MaintenanceCleanupNetworks;
+use App\Console\Commands\MaintenanceCleanupSyslog;
 use App\Console\Commands\MaintenanceFetchOuis;
-use App\Console\Commands\MaintenanceSyslogCleanup;
 use App\Jobs\PingCheck;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
@@ -212,7 +212,7 @@ Schedule::command(MaintenanceCleanupNetworks::class)
     ->onOneServer()
     ->appendOutputTo($maintenance_log_file);
 
-Schedule::command(MaintenanceSyslogCleanup::class)
+Schedule::command(MaintenanceCleanupSyslog::class)
     ->dailyAt('03:30')
     ->onOneServer()
     ->appendOutputTo($maintenance_log_file);

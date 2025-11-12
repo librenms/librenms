@@ -101,11 +101,11 @@ class SyslogController extends TableController
         return [
             'label' => $this->setLabel($syslog),
             'timestamp' => $syslog->timestamp,
-            'level' => htmlentities($syslog->level),
+            'level' => htmlentities((string) $syslog->level),
             'device_id' => Blade::render('<x-device-link :device="$device"/>', ['device' => $syslog->device]),
-            'program' => htmlentities($syslog->program),
-            'msg' => htmlentities($syslog->msg),
-            'priority' => htmlentities($syslog->priority),
+            'program' => htmlentities((string) $syslog->program),
+            'msg' => htmlentities((string) $syslog->msg),
+            'priority' => htmlentities((string) $syslog->priority),
         ];
     }
 

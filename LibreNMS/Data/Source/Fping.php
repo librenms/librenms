@@ -34,13 +34,13 @@ use Symfony\Component\Process\Process;
 
 class Fping
 {
-    private string $fping_bin;
-    private string|false $fping6_bin;
-    private int $count;
-    private int $timeout;
-    private int $interval;
-    private int $tos;
-    private int $retries;
+    private readonly string $fping_bin;
+    private readonly string|false $fping6_bin;
+    private readonly int $count;
+    private readonly int $timeout;
+    private readonly int $interval;
+    private readonly int $tos;
+    private readonly int $retries;
 
     public function __construct()
     {

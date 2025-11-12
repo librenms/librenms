@@ -100,7 +100,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         if (Str::contains($oid, '"')) {
             $oid = preg_replace_callback('/"([^"]+)"/', fn ($matches) => Oid::encodeString($matches[1])->oid, $oid);
         }
-        $proc->processor_oid = '.' . ltrim($oid, '.');
+        $proc->processor_oid = '.' . ltrim((string) $oid, '.');
 
         $proc->processor_perc_warn = $warn_percent ?? LibrenmsConfig::get('processor_perc_warn', 75);
 
@@ -128,7 +128,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             $os->getDeviceId(),
             $data['num_oid'],
             $data['index'] ?? $index,
-            empty($data['descr']) ? 'Processor' : trim($data['descr']),
+            empty($data['descr']) ? 'Processor' : trim((string) $data['descr']),
             $precision,
             static::processData($data['value'], $precision),
             $data['warn_percent'] ?? null,
@@ -148,8 +148,8 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         }
 
         foreach ($processors as $processor) {
-            $processor->processor_descr = substr($processor->processor_descr, 0, 64);
-            $processor->processor_type = substr($processor->processor_type, 0, 16);
+            $processor->processor_descr = substr((string) $processor->processor_descr, 0, 64);
+            $processor->processor_type = substr((string) $processor->processor_type, 0, 16);
         }
 
         if (isset($processors) && is_array($processors)) {
@@ -237,7 +237,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
     private static function processData($data, $precision)
     {
-        if (preg_match('/([0-9]{1,5}(\.[0-9]+)?)/', $data, $matches) !== 1) {
+        if (preg_match('/([0-9]{1,5}(\.[0-9]+)?)/', (string) $data, $matches) !== 1) {
             return null;
         }
         $value = (float) $matches[1];

@@ -22,7 +22,7 @@ if (! Auth::check()) {
     exit('Unauthorized');
 }
 
-Debug::set(strpos($_SERVER['PATH_INFO'], 'debug'));
+Debug::set(strpos((string) $_SERVER['PATH_INFO'], 'debug'));
 
 $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 

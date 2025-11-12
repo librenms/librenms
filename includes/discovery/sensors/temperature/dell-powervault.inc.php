@@ -12,8 +12,8 @@ $oids = SnmpQuery::cache()->hideMib()->numericIndex()->walk('FCMGMT-MIB::connUni
 
 if (is_array($oids)) {
     foreach ($oids as $index => $entry) {
-        if (str_contains($entry['connUnitSensorMessage'], 'Temp')) {
-            $connUnitSensorMessage = explode(':', $entry['connUnitSensorMessage']);
+        if (str_contains((string) $entry['connUnitSensorMessage'], 'Temp')) {
+            $connUnitSensorMessage = explode(':', (string) $entry['connUnitSensorMessage']);
             preg_match('/^ ([0-9]+) C ([0-9]+\.[0-9]+)F$/', array_pop($connUnitSensorMessage), $matches);
             $value = $matches[1];
             $descr = implode(':', $connUnitSensorMessage);

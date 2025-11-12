@@ -75,8 +75,8 @@ class Module
 
         foreach ($overrides as $module) {
             // parse submodules (only supported by some modules)
-            if (str_contains($module, '/')) {
-                [$module, $submodule] = explode('/', $module, 2);
+            if (str_contains((string) $module, '/')) {
+                [$module, $submodule] = explode('/', (string) $module, 2);
                 $modules[$module][] = $submodule;
             } elseif (self::exists($module)) {
                 $modules[$module] = true;

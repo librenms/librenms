@@ -164,7 +164,7 @@ class AppServiceProvider extends ServiceProvider
 
     private function bootCustomValidators()
     {
-        Validator::extend('alpha_space', fn ($attribute, $value) => preg_match('/^[\w\s]+$/u', $value));
+        Validator::extend('alpha_space', fn ($attribute, $value) => preg_match('/^[\w\s]+$/u', (string) $value));
 
         Validator::extend('ip_or_hostname', function ($attribute, $value, $parameters, $validator) {
             $ip = substr($value, 0, strpos($value, '/') ?: strlen($value)); // allow prefixes too

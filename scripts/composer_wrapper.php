@@ -67,7 +67,7 @@ if (is_file($install_dir . '/composer.phar')) {
     $sig_url = ($use_https ? 'https' : 'http') . '://composer.github.io/installer.sig';
 
     // Download installer signature from github
-    $good_sha = trim(curl_fetch($sig_url, $proxy, $use_https));
+    $good_sha = trim((string) curl_fetch($sig_url, $proxy, $use_https));
 
     if (empty($good_sha)) {
         echo "Error: Failed to download installer signature from $sig_url\n";

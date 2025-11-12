@@ -30,7 +30,7 @@ if (is_numeric($group_id) && $group_id > 0) {
     foreach (dbFetchRows($query, [$group_id]) as $member) {
         $members[] = [
             'id' => $member['transport_id'],
-            'text' => ucfirst($member['transport_type']) . ': ' . $member['transport_name'],
+            'text' => ucfirst((string) $member['transport_type']) . ': ' . $member['transport_name'],
         ];
     }
 }

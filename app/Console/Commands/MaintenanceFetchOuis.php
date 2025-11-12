@@ -109,7 +109,7 @@ class MaintenanceFetchOuis extends LnmsCommand
 
                 $oui = substr($oui, 0, $substring_length);
             }
-            $vendor = trim($vendor);
+            $vendor = trim((string) $vendor);
             $oui = trim($oui);
 
             // Add to the list of vendor ids

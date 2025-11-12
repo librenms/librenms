@@ -62,7 +62,7 @@ class FpingResponse implements \Stringable
         public readonly int $duplicates,
         public int $exit_code,
         public readonly ?string $host = null,
-        private bool $skipped = false)
+        private readonly bool $skipped = false)
     {
     }
 

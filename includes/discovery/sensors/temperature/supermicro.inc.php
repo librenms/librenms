@@ -2,7 +2,7 @@
 
 // Supermicro sensors
 $oids = snmp_walk($device, '.1.3.6.1.4.1.10876.2.1.1.1.1.3', '-Osqn', 'SUPERMICRO-HEALTH-MIB', 'supermicro');
-$oids = trim($oids);
+$oids = trim((string) $oids);
 if ($oids) {
     echo 'Supermicro ';
     foreach (explode("\n", $oids) as $data) {

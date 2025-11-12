@@ -9,7 +9,7 @@ foreach ($voltageTable as $ifIndex => $current) {
     $ifName = $ifIndexToName[$ifIndex] ?? $ifIndex;
 
     if (! empty($current['FS-SWITCH-V2-MIB::voltageCurrent']) && $current['FS-SWITCH-V2-MIB::voltageCurrent'] !== '0.00') {
-        foreach (explode(',', $current['FS-SWITCH-V2-MIB::voltageCurrent']) as $channel => $value) {
+        foreach (explode(',', (string) $current['FS-SWITCH-V2-MIB::voltageCurrent']) as $channel => $value) {
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
                 'sensor_class' => 'voltage',

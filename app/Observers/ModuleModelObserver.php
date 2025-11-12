@@ -33,7 +33,7 @@ use Psr\Log\LoggerInterface;
 
 class ModuleModelObserver
 {
-    private LoggerInterface $logger;
+    private readonly LoggerInterface $logger;
 
     public function __construct(
         ?Logger $logger = null,

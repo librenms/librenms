@@ -5,7 +5,7 @@ $temps = snmp_walk($device, '.1.3.6.1.4.1.674.10895.5000.2.6132.1.1.43.1.8.1.5',
 
 $counter = 0;
 if (! empty($temps)) {
-    foreach (explode("\n", $temps) as $t) {
+    foreach (explode("\n", (string) $temps) as $t) {
         $t = explode(' ', $t);
         $oid = $t[0];
         $val = $t[1];

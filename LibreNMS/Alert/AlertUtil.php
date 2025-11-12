@@ -113,8 +113,8 @@ class AlertUtil
 
         $tmp_contacts = [];
         foreach ($contacts as $email => $name) {
-            if (strstr($email, ',')) {
-                $split_contacts = preg_split('/[,\s]+/', $email);
+            if (strstr((string) $email, ',')) {
+                $split_contacts = preg_split('/[,\s]+/', (string) $email);
                 foreach ($split_contacts as $split_email) {
                     if (! empty($split_email)) {
                         $tmp_contacts[$split_email] = $name;
@@ -238,7 +238,7 @@ class AlertUtil
         $macros = LibrenmsConfig::get('alert.macros.rule', []);
         krsort($macros);
         foreach ($macros as $macro => $value) {
-            if (! strstr($macro, ' ')) {
+            if (! strstr((string) $macro, ' ')) {
                 $rule = str_replace('%macros.' . $macro, '(' . $value . ')', $rule);
             }
         }

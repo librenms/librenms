@@ -101,7 +101,7 @@ function shorthost($hostname, $len = 12)
     }
     $len = LibrenmsConfig::get('shorthost_target_length', $len);
 
-    $parts = explode('.', $hostname);
+    $parts = explode('.', (string) $hostname);
     $shorthost = $parts[0];
     $i = 1;
     while ($i < count($parts) && strlen($shorthost . '.' . $parts[$i]) < $len) {
@@ -293,7 +293,7 @@ function is_client_authorized($clientip)
  */
 function get_graph_subtypes($type, $device = null)
 {
-    $type = basename($type);
+    $type = basename((string) $type);
     $types = [];
 
     // find the subtypes defined in files
@@ -491,10 +491,10 @@ function ResolveGlues($tables, $target, $x = 0, $hist = [], $last = [])
             if (count($glues) == 1 && $glues[0]['COLUMN_NAME'] != $target) {
                 //Search for new candidates to expand
                 $ntables = [];
-                [$tmp] = explode('_', $glues[0]['COLUMN_NAME'], 2);
+                [$tmp] = explode('_', (string) $glues[0]['COLUMN_NAME'], 2);
                 $ntables[] = $tmp;
                 $ntables[] = $tmp . 's';
-                $tmp = dbFetchRows('SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_NAME LIKE "' . substr($table, 0, -1) . '_%" && TABLE_NAME != "' . $table . '"');
+                $tmp = dbFetchRows('SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_NAME LIKE "' . substr((string) $table, 0, -1) . '_%" && TABLE_NAME != "' . $table . '"');
                 foreach ($tmp as $expand) {
                     $ntables[] = $expand['TABLE_NAME'];
                 }
@@ -507,7 +507,7 @@ function ResolveGlues($tables, $target, $x = 0, $hist = [], $last = [])
                     if ($glue['COLUMN_NAME'] == $target) {
                         return array_merge($last, [$table . '.' . $target]);
                     } else {
-                        [$tmp] = explode('_', $glue['COLUMN_NAME']);
+                        [$tmp] = explode('_', (string) $glue['COLUMN_NAME']);
                         $tmp .= 's';
                         if (! in_array($tmp, $tables) && ! in_array($tmp, $hist)) {
                             //Expand table

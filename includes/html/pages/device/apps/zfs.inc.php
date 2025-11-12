@@ -22,7 +22,7 @@ $status_info = $app->data['status_info'] ?? [];
 $version = $app->data['version'] ?? 2;
 sort($pools);
 foreach ($pools as $index => $pool) {
-    $pool = htmlspecialchars($pool);
+    $pool = htmlspecialchars((string) $pool);
     $label = $vars['pool'] == $pool
         ? '<span class="pagemenu-selected">' . $pool . '</span>'
         : $pool;

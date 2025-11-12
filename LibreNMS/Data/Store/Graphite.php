@@ -93,12 +93,12 @@ class Graphite extends BaseDatastore
         // metric fields can not contain . as this is used by graphite as a field separator
         $hostname = preg_replace('/\./', '_', (string) $hostname);
         $measurement = preg_replace(['/\./', '/\//'], '_', $measurement);
-        $measurement = preg_replace('/\|/', '.', $measurement);
+        $measurement = preg_replace('/\|/', '.', (string) $measurement);
 
         $measurement_name = preg_replace('/\./', '_', $meta['rrd_name'] ?? ''); // FIXME don't use rrd_name
         $ms_name = is_array($measurement_name) ? implode('.', $measurement_name) : $measurement_name;
         // remove the port-id tags from the metric
-        if (preg_match('/^port-id\d+/', $ms_name)) {
+        if (preg_match('/^port-id\d+/', (string) $ms_name)) {
             $ms_name = '';
         }
 

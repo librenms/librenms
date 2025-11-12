@@ -117,10 +117,10 @@ $lineplot_out->SetColor('darkblue');
 $lineplot_out->SetFillColor('lightblue@0.4');
 $lineplot_out->SetWeight(1);
 
-if (strtolower($graph_data['bill_type']) == 'cdr') {
+if (strtolower((string) $graph_data['bill_type']) == 'cdr') {
     $lineplot_95th = new LinePlot([$graph_data['rate_95th'], $graph_data['rate_95th']], [$xmin, $xmax]);
     $lineplot_95th->SetColor('red');
-} elseif (strtolower($graph_data['bill_type']) == 'quota') {
+} elseif (strtolower((string) $graph_data['bill_type']) == 'quota') {
     $lineplot_ave = new LinePlot([$graph_data['rate_average'], $graph_data['rate_average']], [$xmin, $xmax]);
     $lineplot_ave->SetColor('red');
 }
@@ -132,9 +132,9 @@ $graph->Add($lineplot);
 $graph->Add($lineplot_in);
 $graph->Add($lineplot_out);
 
-if (strtolower($graph_data['bill_type']) == 'cdr') {
+if (strtolower((string) $graph_data['bill_type']) == 'cdr') {
     $graph->Add($lineplot_95th);
-} elseif (strtolower($graph_data['bill_type']) == 'quota') {
+} elseif (strtolower((string) $graph_data['bill_type']) == 'quota') {
     $graph->Add($lineplot_ave);
 }
 

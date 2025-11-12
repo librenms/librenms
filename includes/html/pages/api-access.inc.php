@@ -57,7 +57,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 <select class="form-control" id="user_id" name="user_id">
     <?php
     foreach ($userlist = User::all() as $user) {
-        echo '<option value="' . $user->user_id . '">' . htmlentities($user->username) . ' (' . htmlentities($user->auth_type) . ')</option>';
+        echo '<option value="' . $user->user_id . '">' . htmlentities((string) $user->username) . ' (' . htmlentities((string) $user->auth_type) . ')</option>';
     } ?>
                 </select>
               </div>
@@ -137,11 +137,11 @@ if (Auth::user()->hasGlobalAdmin()) {
 
         echo '
         <tr id="' . $api->id . '" ' . $color . '>
-          <td>' . htmlentities($user_details->username) . '</td>
-          <td>' . htmlentities($user_details->auth_type) . '</td>
-          <td>' . htmlentities($api->token_hash) . '</td>
-          <td><button class="btn btn-info btn-xs" data-toggle="modal" data-target="#display-qr" data-token_hash="' . htmlentities($api->token_hash) . '"><i class="fa fa-qrcode" ></i></button></td>
-          <td>' . htmlspecialchars($api->description) . '</td>
+          <td>' . htmlentities((string) $user_details->username) . '</td>
+          <td>' . htmlentities((string) $user_details->auth_type) . '</td>
+          <td>' . htmlentities((string) $api->token_hash) . '</td>
+          <td><button class="btn btn-info btn-xs" data-toggle="modal" data-target="#display-qr" data-token_hash="' . htmlentities((string) $api->token_hash) . '"><i class="fa fa-qrcode" ></i></button></td>
+          <td>' . htmlspecialchars((string) $api->description) . '</td>
           <td><input type="checkbox" name="token-status" data-token_id="' . $api->id . '" data-off-text="No" data-on-text="Yes" data-on-color="danger" ' . $api_disabled . ' data-size="mini"></td>
           <td><button type="button" class="btn btn-danger btn-xs" id="' . $api->id . '" data-token_id="' . $api->id . '" data-toggle="modal" data-target="#confirm-delete">Delete</button></td>
         </tr>
