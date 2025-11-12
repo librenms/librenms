@@ -265,7 +265,7 @@ class StringHelpers
     public static function linksRemPortName($remDevice, $remPort): string
     {
         if (str_ireplace(['mikrotik', 'routeros'], '', $remDevice) != $remDevice) {
-            $tmp = explode('/', $remPort);
+            $tmp = explode('/', (string) $remPort);
             $remPort = $tmp[max(array_keys($tmp))];
         }
 

@@ -795,7 +795,7 @@ class Routeros extends OS implements
             foreach ($lldpRows as $key => $data) {
                 $data['lldpRemSysName'] = StringHelpers::linksRemSysName($data['lldpRemSysName']);
                 $data['lldpRemPortId'] = StringHelpers::linksRemPortName($data['lldpRemSysDesc'], $data['lldpRemPortId']);
-                $local_port_ifName = $lldp_ports['mtxrInterfaceStatsName'][hexdec($lldp_ports_num['mtxrNeighborInterfaceID'][$key])];
+                $local_port_ifName = $lldp_ports['mtxrInterfaceStatsName'][hexdec((string) $lldp_ports_num['mtxrNeighborInterfaceID'][$key])];
                 $local_port_id = PortCache::getIdFromIfName($local_port_ifName);
                 $interface = PortCache::get($local_port_id);
                 $remote_port_mac = '';

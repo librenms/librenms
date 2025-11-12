@@ -153,13 +153,13 @@ class Links implements Module
         if (! empty($lldpRows)) {
             $oidsremadd = SnmpQuery::hideMib()->numeric()->walk('LLDP-MIB::lldpRemManAddrIfSubtype')->values();
             foreach ($oidsremadd as $key => $tmp1) {
-                $res = preg_match("/1\.0\.8802\.1\.1\.2\.1\.4\.2\.1\.3\.([^\.]*)\.([^\.]*)\.([^\.]*)\.([^\.]*)\.([^\.]*).(([^\.]*)(\.([^\.]*))+)/", $key, $matches);
+                $res = preg_match("/1\.0\.8802\.1\.1\.2\.1\.4\.2\.1\.3\.([^\.]*)\.([^\.]*)\.([^\.]*)\.([^\.]*)\.([^\.]*).(([^\.]*)(\.([^\.]*))+)/", (string) $key, $matches);
                 if ($res) {
                     //collect the Management IP address from the OID
                     if ($matches[5] == 4) {
                         $addr = $matches[6];
                     } else {
-                        $ipv6 = implode(':', array_map(fn($v) => sprintf('%02x', $v),
+                        $ipv6 = implode(':', array_map(fn ($v) => sprintf('%02x', $v),
                             explode('.', $matches[6])
                         ));
                         $addr = preg_replace('/([^:]{2}):([^:]{2})/i', '$1$2', $ipv6);
@@ -260,15 +260,15 @@ class Links implements Module
                     }
 
                     if ($data['lldpRemChassisIdSubtype'] == 'macAddress') {
-                        $remoteMac = (strlen($data['lldpRemChassisId']) < 18)
+                        $remoteMac = (strlen((string) $data['lldpRemChassisId']) < 18)
                             ? Mac::parse($data['lldpRemChassisId'])->hex()
-                            : str_replace([' ', ':', '-'], '', strtolower($data['lldpRemChassisId']));
+                            : str_replace([' ', ':', '-'], '', strtolower((string) $data['lldpRemChassisId']));
                     }
 
                     if ($data['lldpRemPortIdSubtype'] == 'macAddress') {
-                        $remoteMac = (strlen($data['lldpRemPortId']) < 18)
+                        $remoteMac = (strlen((string) $data['lldpRemPortId']) < 18)
                             ? Mac::parse($data['lldpRemPortId'])->hex()
-                            : str_replace([' ', ':', '-'], '', strtolower($data['lldpRemPortId']));
+                            : str_replace([' ', ':', '-'], '', strtolower((string) $data['lldpRemPortId']));
                         $remotePortName = $data['lldpRemPortId'];
                     }
 
