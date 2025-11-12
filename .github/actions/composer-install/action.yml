@@ -14,12 +14,19 @@ runs:
       shell: bash
       run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
-    - name: Cache composer
+    - name: Cache composer cache
       uses: actions/cache@v4
       with:
         path: ${{ steps.composer-cache.outputs.dir }}
         key: ${{ runner.os }}-composer-${{ inputs.cache-version }}-${{ hashFiles('**/composer.lock') }}
         restore-keys: ${{ runner.os }}-composer-${{ inputs.cache-version }}-
+
+    - name: Cache vendor directory
+      uses: actions/cache@v4
+      with:
+        path: vendor
+        key: ${{ runner.os }}-vendor-${{ inputs.cache-version }}-${{ hashFiles('**/composer.lock') }}
+        restore-keys: ${{ runner.os }}-vendor-${{ inputs.cache-version }}-
 
     - name: Composer install
       shell: bash
