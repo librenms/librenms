@@ -55,7 +55,7 @@ class ModuleList
     public function printOverrides(ProcessType $type): void
     {
         if ($this->hasOverride()) {
-            $modules = array_map(fn($module, $status) => $module . (is_array($status) ? '(' . implode(',', $status) . ')' : ''), array_keys($this->overrides), array_values($this->overrides));
+            $modules = array_map(fn ($module, $status) => $module . (is_array($status) ? '(' . implode(',', $status) . ')' : ''), array_keys($this->overrides), array_values($this->overrides));
 
             Log::debug(sprintf('Override %s modules: %s', $type->name, implode(', ', $modules)));
         }
