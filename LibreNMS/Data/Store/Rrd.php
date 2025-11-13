@@ -67,7 +67,6 @@ class Rrd extends BaseDatastore
     {
         parent::__construct();
         $this->loadConfig();
-        $this->init();
     }
 
     public function getName(): string
