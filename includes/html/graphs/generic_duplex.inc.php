@@ -96,8 +96,8 @@ if ($graph_params->visible('previous')) {
 }//end if
 
 $rrd_options[] = 'AREA:in#' . $colour_area_in . $stacked['transparency'] . ':';
-$rrd_options[] = "COMMENT:'" . $unit_text . '      Now       Ave      Max' . ($percentile ? '     ' . $percentile . 'th %' : '') . "\\n'";
-$rrd_options[] = 'LINE1.25:in#' . $colour_line_in . ":'" . $in_text . "'";
+$rrd_options[] = "COMMENT:" . $unit_text . '      Now       Ave      Max' . ($percentile ? '     ' . $percentile . 'th %' : '') . "\\n";
+$rrd_options[] = 'LINE1.25:in#' . $colour_line_in . ":" . $in_text;
 $rrd_options[] = 'GPRINT:in:LAST:%6.' . $float_precision . 'lf%s';
 $rrd_options[] = 'GPRINT:in:AVERAGE:%6.' . $float_precision . 'lf%s';
 $rrd_options[] = 'GPRINT:in_max:MAX:%6.' . $float_precision . 'lf%s';
@@ -108,7 +108,7 @@ if ($percentile) {
 
 $rrd_options[] = 'COMMENT:\\n';
 $rrd_options[] = 'AREA:dout#' . $colour_area_out . $stacked['transparency'] . ':';
-$rrd_options[] = 'LINE1.25:dout#' . $colour_line_out . ":'" . $out_text . "'";
+$rrd_options[] = 'LINE1.25:dout#' . $colour_line_out . ":" . $out_text;
 $rrd_options[] = 'GPRINT:out:LAST:%6.' . $float_precision . 'lf%s';
 $rrd_options[] = 'GPRINT:out:AVERAGE:%6.' . $float_precision . 'lf%s';
 $rrd_options[] = 'GPRINT:out_max:MAX:%6.' . $float_precision . 'lf%s';
@@ -120,9 +120,9 @@ if ($percentile) {
 $rrd_options[] = 'COMMENT:\\n';
 
 if ($print_total) {
-    $rrd_options[] = "GPRINT:tot:'Total %6." . $float_precision . "lf%s'";
-    $rrd_options[] = "GPRINT:totin:'(In %6." . $float_precision . "lf%s'";
-    $rrd_options[] = "GPRINT:totout:'Out %6." . $float_precision . "lf%s)\l'";
+    $rrd_options[] = "GPRINT:tot:Total %6." . $float_precision . "lf%s";
+    $rrd_options[] = "GPRINT:totin:(In %6." . $float_precision . "lf%s";
+    $rrd_options[] = "GPRINT:totout:Out %6." . $float_precision . "lf%s)\l";
 }
 
 if ($percentile) {
@@ -131,9 +131,9 @@ if ($percentile) {
 }
 
 if ($graph_params->visible('previous')) {
-    $rrd_options[] = 'LINE1.25:in' . $format . "X#666666:'Prev In \\\\n'";
+    $rrd_options[] = 'LINE1.25:in' . $format . "X#666666:Prev In \\n";
     $rrd_options[] = 'AREA:in' . $format . 'X#99999966' . $stacked['transparency'] . ':';
-    $rrd_options[] = 'LINE1.25:dout' . $format . "X#666666:'Prev Out'";
+    $rrd_options[] = 'LINE1.25:dout' . $format . "X#666666:Prev Out";
     $rrd_options[] = 'AREA:dout' . $format . 'X#99999966' . $stacked['transparency'] . ':';
 }
 
