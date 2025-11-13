@@ -50,7 +50,7 @@ class CommandStartingListener
         }
 
         $current_user = posix_getpwuid(posix_geteuid())['name'];
-        $executable = basename($_SERVER['argv'][0] ?? $_SERVER['SCRIPT_FILENAME'] ?? 'this');
+        $executable = basename((string) ($_SERVER['argv'][0] ?? $_SERVER['SCRIPT_FILENAME'] ?? 'this'));
 
         if ($current_user == 'root') {
             throw new RunningAsIncorrectUserException("Error: $executable must not run as root.");

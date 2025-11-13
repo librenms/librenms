@@ -19,7 +19,7 @@ $oidsFreqIn = SnmpQuery::hideMib()->walk([
 foreach ($oidsFreqIn as $index => $entry) {
     $oid = '.1.3.6.1.4.1.2468.1.4.2.1.3.1.3.1.4.' . $index;
     $divisor = 10;
-    $descr = (trim($oidsIn[$index]['inletConfigDesc'], '"') != '' ? trim($oidsIn[$index]['inletConfigDesc'], '"') : "Inlet $index");
+    $descr = (trim((string) $oidsIn[$index]['inletConfigDesc'], '"') != '' ? trim((string) $oidsIn[$index]['inletConfigDesc'], '"') : "Inlet $index");
     $value = ($entry['inletStatusFrequency'] / 10);
     $low_limit = $entry['inletConfigFrequencyLow'];
     $high_limit = $entry['inletConfigFrequencyHigh'];

@@ -49,7 +49,7 @@ foreach ($graphs as $thisQos) {
 
     $rrd_additions .= ' DEF:DS' . $count . '=' . $rrd_filename . ':' . $cbqos_parameter_name . ':AVERAGE ';
     $rrd_additions .= ' CDEF:MOD' . $count . '=DS' . $count . ',' . $cbqos_operator_param . ',' . $cbqos_operator . ' ';
-    $rrd_additions .= ' AREA:MOD' . $count . '#' . $colour . ":'" . str_pad(substr($thisQos->title, 0, 15), 15) . "'" . $stack;
+    $rrd_additions .= ' AREA:MOD' . $count . '#' . $colour . ":'" . str_pad(substr((string) $thisQos->title, 0, 15), 15) . "'" . $stack;
     $rrd_additions .= ' GPRINT:MOD' . $count . ':LAST:%6.2lf%s ';
     $rrd_additions .= ' GPRINT:MOD' . $count . ':AVERAGE:%6.2lf%s ';
     $rrd_additions .= ' GPRINT:MOD' . $count . ":MAX:%6.2lf%s\l ";

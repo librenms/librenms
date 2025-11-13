@@ -69,31 +69,16 @@ class TopDevicesController extends WidgetController
         // We use raw() function below, validate input and default to sane value.
         $sort = Validate::ascDesc($sort, 'ASC');
 
-        switch ($settings['top_query']) {
-            case 'traffic':
-                $data = $this->getTrafficData($sort);
-                break;
-            case 'uptime':
-                $data = $this->getUptimeData($sort);
-                break;
-            case 'ping':
-                $data = $this->getPingData($sort);
-                break;
-            case 'cpu':
-                $data = $this->getProcessorData($sort);
-                break;
-            case 'ram':
-                $data = $this->getMemoryData($sort);
-                break;
-            case 'poller':
-                $data = $this->getPollerData($sort);
-                break;
-            case 'storage':
-                $data = $this->getStorageData($sort);
-                break;
-            default:
-                $data = [];
-        }
+        $data = match ($settings['top_query']) {
+            'traffic' => $this->getTrafficData($sort),
+            'uptime' => $this->getUptimeData($sort),
+            'ping' => $this->getPingData($sort),
+            'cpu' => $this->getProcessorData($sort),
+            'ram' => $this->getMemoryData($sort),
+            'poller' => $this->getPollerData($sort),
+            'storage' => $this->getStorageData($sort),
+            default => [],
+        };
 
         return view('widgets.top-devices', $data);
     }
@@ -121,16 +106,12 @@ class TopDevicesController extends WidgetController
         $settings = $this->getSettings();
 
         /** @var Builder<\App\Models\DeviceRelatedModel> $query */
-        return $query->with(['device' => function ($query) {
-            return $query->select('device_id', 'hostname', 'sysName', 'display', 'status', 'os');
-        }])
+        return $query->with(['device' => fn ($query) => $query->select('device_id', 'hostname', 'sysName', 'display', 'status', 'os')])
             ->select("$left_table.device_id")
             ->leftJoin('devices', "$left_table.device_id", 'devices.device_id')
             ->groupBy("$left_table.device_id")
             ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings['time_interval']))
-            ->when($settings['device_group'], function (Builder $query) use ($settings) {
-                return $query->inDeviceGroup($settings['device_group']);
-            });
+            ->when($settings['device_group'], fn (Builder $query) => $query->inDeviceGroup($settings['device_group']));
     }
 
     /**
@@ -142,9 +123,7 @@ class TopDevicesController extends WidgetController
 
         return Device::hasAccess(Auth::user())->select('device_id', 'hostname', 'sysName', 'display', 'status', 'os')
             ->where('devices.last_polled', '>', Carbon::now()->subMinutes($settings['time_interval']))
-            ->when($settings['device_group'], function ($query) use ($settings) {
-                return $query->inDeviceGroup($settings['device_group']);
-            })
+            ->when($settings['device_group'], fn ($query) => $query->inDeviceGroup($settings['device_group']))
             ->limit($settings['device_count']);
     }
 
@@ -180,18 +159,12 @@ class TopDevicesController extends WidgetController
             ->select('device_id')
             ->groupBy('device_id')
             ->where('poll_time', '>', Carbon::now()->subMinutes($settings['time_interval'])->timestamp)
-            ->when($settings['device_group'], function ($query) use ($settings) {
-                return $query->inDeviceGroup($settings['device_group']);
-            }, function ($query) {
-                return $query->has('device');
-            })
+            ->when($settings['device_group'], fn ($query) => $query->inDeviceGroup($settings['device_group']), fn ($query) => $query->has('device'))
             ->where('ifOperStatus', 'up')
             ->orderByRaw('SUM(ifInOctets_rate + ifOutOctets_rate) ' . $sort)
             ->limit($settings['device_count']);
 
-        $results = $query->get()->map(function ($port) {
-            return $this->standardRow($port->device, 'device_bits');
-        });
+        $results = $query->get()->map(fn ($port) => $this->standardRow($port->device, 'device_bits'));
 
         return $this->formatData('Traffic', $results);
     }
@@ -235,9 +208,7 @@ class TopDevicesController extends WidgetController
             ->orderByRaw('AVG(`processor_usage`) ' . $sort)
             ->limit($settings['device_count']);
 
-        $results = $query->get()->map(function ($port) {
-            return $this->standardRow($port->device, 'device_processor', ['tab' => 'health', 'metric' => 'processor']);
-        });
+        $results = $query->get()->map(fn ($port) => $this->standardRow($port->device, 'device_processor', ['tab' => 'health', 'metric' => 'processor']));
 
         return $this->formatData('CPU Load', $results);
     }
@@ -251,9 +222,7 @@ class TopDevicesController extends WidgetController
             ->orderBy('mempool_perc', $sort)
             ->limit($settings['device_count']);
 
-        $results = $query->get()->map(function ($port) {
-            return $this->standardRow($port->device, 'device_mempool', ['tab' => 'health', 'metric' => 'mempool']);
-        });
+        $results = $query->get()->map(fn ($port) => $this->standardRow($port->device, 'device_mempool', ['tab' => 'health', 'metric' => 'mempool']));
 
         return $this->formatData('Memory usage', $results);
     }

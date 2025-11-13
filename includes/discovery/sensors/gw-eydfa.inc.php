@@ -33,7 +33,7 @@ if ($oids) {
     echo 'GW EYDFA PUMP ';
 }
 
-foreach (explode("\n", $oids) as $data) {
+foreach (explode("\n", (string) $oids) as $data) {
     [$oid, $value] = explode(' ', $data);
     $split_oid = explode('.', $oid);
     $index = $split_oid[1];
@@ -83,7 +83,7 @@ foreach (explode("\n", $oids) as $data) {
     unset($oids, $split_oid, $index, $divisor, $descr, $low_limit, $low_warn, $high_warn, $sensor_index);
 }
 
-$oids = trim(snmp_walk($device, 'oaDCPowerTable', '-Osq', 'NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB'));
+$oids = trim((string) snmp_walk($device, 'oaDCPowerTable', '-Osq', 'NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB'));
 Log::debug($oids);
 
 if ($oids) {

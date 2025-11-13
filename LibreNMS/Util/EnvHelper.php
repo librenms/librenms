@@ -140,7 +140,7 @@ class EnvHelper
 
                 try {
                     config(['app.key' => $key]);
-                } catch (BindingResolutionException $e) {
+                } catch (BindingResolutionException) {
                     // called outside of Laravel, ignore config() failure
                 }
 

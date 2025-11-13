@@ -1,7 +1,7 @@
 <?php
 
 foreach ($datas as $type) {
-    $type = basename($type);
+    $type = basename((string) $type);
     if ($type != 'overview') {
         if (is_file("includes/html/pages/routing/overview/$type.inc.php")) {
             $g_i++;

@@ -53,7 +53,7 @@ foreach (['eth100g', 'eth40g', 'eth10g', 'fc16g', 'fc8g'] as $infineratype) {
     ];
 
     foreach ($cg_stats as $index => $tmp_stats) {
-        $indexids = explode('.', $index);
+        $indexids = explode('.', (string) $index);
 
         if (! isset($cg_stats[$index][$infineratype . 'AdminStatus'])) {
             continue;

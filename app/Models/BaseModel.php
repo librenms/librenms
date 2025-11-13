@@ -92,10 +92,8 @@ abstract class BaseModel extends Model
             $table = $this->getTable();
         }
 
-        return $query->where(function ($query) use ($table, $user) {
-            return $query->whereIntegerInRaw("$table.port_id", \Permissions::portsForUser($user))
-                ->orWhereIntegerInRaw("$table.device_id", \Permissions::devicesForUser($user));
-        });
+        return $query->where(fn ($query) => $query->whereIntegerInRaw("$table.port_id", \Permissions::portsForUser($user))
+            ->orWhereIntegerInRaw("$table.device_id", \Permissions::devicesForUser($user)));
     }
 
     public static function definedRelations(): array

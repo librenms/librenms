@@ -100,9 +100,7 @@ class MapDataController extends Controller
         }
 
         return $linkQuery->get()
-            ->groupBy(function (Link $i) {
-                return $i->device->location->lat . '.' . $i->device->location->lng . '.' . $i->remoteDevice->location->lat . '.' . $i->remoteDevice->location->lng;
-            });
+            ->groupBy(fn (Link $i) => $i->device->location->lat . '.' . $i->device->location->lng . '.' . $i->remoteDevice->location->lat . '.' . $i->remoteDevice->location->lng);
     }
 
     protected static function portsWithLinks(Request $request, string $remote_port_attr)
@@ -465,11 +463,9 @@ class MapDataController extends Controller
                 'locations.devices:location_id,device_id',
                 'deviceGroups.devices:device_id',
             ])->get()
-            ->map(function ($schedule) {
-                return $schedule->devices->pluck('device_id')
-                    ->merge($schedule->locations->pluck('devices.*.device_id'))
-                    ->merge($schedule->deviceGroups->pluck('devices.*.device_id'));
-            })->flatten();
+            ->map(fn ($schedule) => $schedule->devices->pluck('device_id')
+                ->merge($schedule->locations->pluck('devices.*.device_id'))
+                ->merge($schedule->deviceGroups->pluck('devices.*.device_id')))->flatten();
 
         // For manual level we need to track some items
         $no_parent_devices = collect();
@@ -482,7 +478,7 @@ class MapDataController extends Controller
             if ($device->status) {
                 $updowntime = \LibreNMS\Util\Time::formatInterval($device->uptime);
             } elseif ($device->last_polled) {
-                $updowntime = \LibreNMS\Util\Time::formatInterval(time() - strtotime($device->last_polled));
+                $updowntime = \LibreNMS\Util\Time::formatInterval(time() - strtotime((string) $device->last_polled));
             } else {
                 $updowntime = '';
             }
@@ -493,7 +489,7 @@ class MapDataController extends Controller
                 'id' => $device->device_id,
                 'icon' => $device->icon,
                 'typeIcon' => $deviceTypes->get($device->type, 'server'),
-                'icontitle' => $device->icon ? str_replace(['.svg', '.png'], '', basename($device->icon)) : $device->os,
+                'icontitle' => $device->icon ? str_replace(['.svg', '.png'], '', basename((string) $device->icon)) : $device->os,
                 'sname' => $device->shortDisplayName(),
                 'status' => $device->status,
                 'uptime' => $device->uptime,
@@ -521,9 +517,7 @@ class MapDataController extends Controller
                 $parent_only_ids = $parent_ids;
                 if ($device->children->count()) {
                     $child_ids = $device_list[$device->device_id]['children'];
-                    $parent_only_ids = $parent_only_ids->filter(function (int $parent_id, int $k) use ($child_ids) {
-                        return ! $child_ids->has($parent_id);
-                    });
+                    $parent_only_ids = $parent_only_ids->filter(fn (int $parent_id, int $k) => ! $child_ids->has($parent_id));
                 }
 
                 // All parents are peers becuase they are also children
@@ -734,15 +728,9 @@ class MapDataController extends Controller
         $link_list = [];
         foreach (self::geoLinks($request) as $location) {
             $link = $location[0];
-            $capacity = $location->sum(function (Link $l) {
-                return $l->port->ifSpeed;
-            });
-            $inRate = $location->sum(function (Link $l) {
-                return $l->port->ifInOctets_rate * 8;
-            });
-            $outRate = $location->sum(function (Link $l) {
-                return $l->port->ifOutOctets_rate * 8;
-            });
+            $capacity = $location->sum(fn (Link $l) => $l->port->ifSpeed);
+            $inRate = $location->sum(fn (Link $l) => $l->port->ifInOctets_rate * 8);
+            $outRate = $location->sum(fn (Link $l) => $l->port->ifOutOctets_rate * 8);
             if ($capacity > 0) {
                 $link_used = max($inRate / $capacity * 100, $outRate / $capacity * 100);
             } elseif ($inRate > 0 || $outRate > 0) {
@@ -782,7 +770,7 @@ class MapDataController extends Controller
             if ($service->device->status) {
                 $updowntime = \LibreNMS\Util\Time::formatInterval($service->device->uptime);
             } elseif ($service->device->last_polled) {
-                $updowntime = \LibreNMS\Util\Time::formatInterval(time() - strtotime($service->device->last_polled));
+                $updowntime = \LibreNMS\Util\Time::formatInterval(time() - strtotime((string) $service->device->last_polled));
             } else {
                 $updowntime = '';
             }
@@ -793,7 +781,7 @@ class MapDataController extends Controller
                 'type' => $service->service_type,
                 'status' => $service->service_status,
                 'icon' => $service->device->icon,
-                'icontitle' => $service->device->icon ? str_replace(['.svg', '.png'], '', basename($service->device->icon)) : $service->device->os,
+                'icontitle' => $service->device->icon ? str_replace(['.svg', '.png'], '', basename((string) $service->device->icon)) : $service->device->os,
                 'device_name' => $service->device->shortDisplayName(),
                 'url' => \Blade::render('<x-device-link-map :device="$device" />', ['device' => $service->device]),
                 'updowntime' => $updowntime,

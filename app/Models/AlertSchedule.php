@@ -236,7 +236,7 @@ class AlertSchedule extends Model
         return $this->morphedByMany(Location::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'alert_schedulable_id');
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return ($this->recurring ?
             'Recurring Alert Schedule (' . implode(',', $this->recurring_day) . ') ' :

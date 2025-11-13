@@ -215,13 +215,10 @@ abstract class PaginatedAjaxController extends Controller
      */
     protected function adjustFilterValue($field, $value)
     {
-        switch ($field) {
-            case 'device':
-            case 'device_id':
-            case 'port_id':
-                $value = (int) $value;
-                break;
-        }
+        $value = match ($field) {
+            'device', 'device_id', 'port_id' => (int) $value,
+            default => $value,
+        };
 
         return $value;
     }

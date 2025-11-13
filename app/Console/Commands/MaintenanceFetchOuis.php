@@ -75,7 +75,7 @@ class MaintenanceFetchOuis extends LnmsCommand
             return 0;
         } catch (\Exception|\ErrorException $e) {
             $this->error(trans('commands.maintenance:fetch-ouis.error'));
-            $this->error('Exception: ' . get_class($e));
+            $this->error('Exception: ' . $e::class);
             $this->error($e);
 
             $lock->release(); // We did not succeed, so we'll try again next time
@@ -109,7 +109,7 @@ class MaintenanceFetchOuis extends LnmsCommand
 
                 $oui = substr($oui, 0, $substring_length);
             }
-            $vendor = trim($vendor);
+            $vendor = trim((string) $vendor);
             $oui = trim($oui);
 
             // Add to the list of vendor ids

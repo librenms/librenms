@@ -21,8 +21,8 @@ require 'includes/html/graphs/common.inc.php';
 $stacked = generate_stacked_graphs();
 
 $length = 10;
-$percentile = $percentile ?? false;
-$print_total = $print_total ?? false;
+$percentile ??= false;
+$print_total ??= false;
 
 if (! isset($percentile)) {
     $length += 2;

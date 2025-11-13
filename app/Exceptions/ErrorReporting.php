@@ -56,18 +56,16 @@ class ErrorReporting
 
         $exceptions->dontReportDuplicates();
         $exceptions->throttle(fn (Throwable $e) => Limit::perMinute(LibrenmsConfig::get('reporting.throttle', 30)));
-        $exceptions->reportable([$this, 'reportable']);
-        $exceptions->report([$this, 'report']);
-        $exceptions->render([$this, 'render']);
+        $exceptions->reportable($this->reportable(...));
+        $exceptions->report($this->report(...));
+        $exceptions->render($this->render(...));
 
-        Flare::determineVersionUsing(function () {
-            return \LibreNMS\Util\Version::VERSION;
-        });
+        Flare::determineVersionUsing(fn () => \LibreNMS\Util\Version::VERSION);
     }
 
     public function reportable(Throwable $e): bool
     {
-        \Log::critical('%RException: ' . get_class($e) . ' ' . $e->getMessage() . '%n @ %G' . $e->getFile() . ':' . $e->getLine() . '%n' . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
+        \Log::critical('%RException: ' . $e::class . ' ' . $e->getMessage() . '%n @ %G' . $e->getFile() . ':' . $e->getLine() . '%n' . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
 
         return false; // false = block default log message
     }

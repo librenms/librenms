@@ -18,10 +18,10 @@ use App\Facades\LibrenmsConfig;
 
 require 'includes/html/graphs/common.inc.php';
 
-$format = $format ?? '';
+$format ??= '';
 $previous = $graph_params->visible('previous');
-$transparency = $transparency ?? false;
-$stack = $stack ?? '';
+$transparency ??= false;
+$stack ??= '';
 
 $rrd_optionsb = '';
 $in_thing = '';

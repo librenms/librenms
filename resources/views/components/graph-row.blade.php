@@ -3,7 +3,8 @@
         {{ $title }}
     </div>
 @endisset
-<div class="tw:flex tw:flex-wrap" @if(! $responsive) style="width: {{ $rowWidth }}px;" @endif {{ $attributes->filter(fn ($value) => ! is_array($value)) }}>
+<div @if(! $responsive) style="width: {{ $rowWidth }}px;" @endif {{ $attributes->filter(fn ($value) => ! is_array($value)) }}
+     class="{{ $responsive ? 'tw:grid tw:grid-cols-1 tw:sm:grid-cols-2 tw:lg:grid-cols-4 tw:gap-2' : 'tw:flex tw:flex-wrap' }}">
     @foreach($graphs as $graph)
         <x-graph
                 :type="$type"
@@ -14,6 +15,7 @@
                 :legend="$attributes->get('legend', 'no')"
                 :height="$attributes->get('height', 150)"
                 :vars="array_merge($graph, $attributes->get('vars', []))"
-                {{ $attributes->class(['tw:lg:w-1/4 tw:sm:w-1/2 tw:w-full' => $responsive]) }}></x-graph>
+                :img-class="$responsive ? 'tw:w-full tw:h-auto' : null"
+        ></x-graph>
     @endforeach
 </div>

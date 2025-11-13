@@ -196,14 +196,12 @@ final class ComponentTest extends DBTestCase
     {
         $collection = $target instanceof \App\Models\Component ? collect([$target]) : $target;
 
-        return $collection->groupBy('device_id')->map(function ($group) {
-            return $group->keyBy('id')->map(function ($model) {
-                $base = ['type' => null, 'label' => null, 'status' => 0, 'ignore' => 0, 'disabled' => 0, 'error' => null];
-                $merge = $model->toArray();
-                unset($merge['device_id'], $merge['id']);
+        return $collection->groupBy('device_id')->map(fn ($group) => $group->keyBy('id')->map(function ($model) {
+            $base = ['type' => null, 'label' => null, 'status' => 0, 'ignore' => 0, 'disabled' => 0, 'error' => null];
+            $merge = $model->toArray();
+            unset($merge['device_id'], $merge['id']);
 
-                return array_merge($base, $merge);
-            });
-        })->toArray();
+            return array_merge($base, $merge);
+        }))->toArray();
     }
 }

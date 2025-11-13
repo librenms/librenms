@@ -29,6 +29,7 @@ namespace App\Http\Controllers\Widgets;
 use App\Facades\LibrenmsConfig;
 use App\Models\Application;
 use App\Models\Bill;
+use App\Models\Customoid;
 use App\Models\Device;
 use App\Models\MuninPlugin;
 use App\Models\Port;
@@ -53,6 +54,7 @@ class GraphController extends WidgetController
         'graph_application' => null,
         'graph_munin' => null,
         'graph_service' => null,
+        'graph_customoid' => null,
         'graph_ports' => [],
         'graph_custom' => [],
         'graph_manual' => null,
@@ -95,11 +97,15 @@ class GraphController extends WidgetController
             if ($service = Service::find($settings['graph_service'])) {
                 return $service->device->displayName() . ' / ' . $service->service_type . ' (' . $service->service_desc . ')' . ' / ' . $settings['graph_type'];
             }
+        } elseif ($type == 'customoid') {
+            if ($customoid = Customoid::find($settings['graph_customoid'])) {
+                return $customoid->device?->displayName() . ' / ' . $type . ' / ' . $customoid->customoid_descr;
+            }
         }
 
         // fall back for types where we couldn't find the item
         if ($settings['graph_type']) {
-            return 'Device / ' . ucfirst($type) . ' / ' . $settings['graph_type'];
+            return 'Device / ' . ucfirst((string) $type) . ' / ' . $settings['graph_type'];
         }
 
         return parent::getTitle();
@@ -110,7 +116,7 @@ class GraphController extends WidgetController
         $data = $this->getSettings(true);
 
         // format display name for selected graph type
-        $type_parts = explode('_', $data['graph_type']);
+        $type_parts = explode('_', (string) $data['graph_type']);
         $primary = array_shift($type_parts);
         $secondary = implode('_', $type_parts);
         $name = $primary . ' ' . (Graph::isMibGraph($primary, $secondary) ? $secondary : implode(' ', $type_parts));
@@ -145,6 +151,11 @@ class GraphController extends WidgetController
             $service = Service::with('device')->find($data['graph_service']);
         }
         $data['service_text'] = isset($service) ? $service->device->displayName() . ' - ' . $service->service_type . ' (' . $service->service_desc . ')' : __('Service does not exist');
+
+        if ($primary == 'customoid' && $data['graph_customoid']) {
+            $customoid = Customoid::with('device')->find($data['graph_customoid']);
+        }
+        $data['customoid_text'] = isset($customoid) ? $customoid->device?->displayName() . ' - ' . $customoid->customoid_descr : __('Custom OID does not exist');
 
         $data['graph_ports'] = Port::whereIntegerInRaw('port_id', $data['graph_ports'])
             ->select('ports.device_id', 'port_id', 'ifAlias', 'ifName', 'ifDescr')
@@ -188,6 +199,12 @@ class GraphController extends WidgetController
             if ($service = Service::find($settings['graph_service'])) {
                 $params[] = 'device=' . $service->device_id;
                 $params[] = 'id=' . $service->service_id;
+            }
+        } elseif ($type == 'customoid') {
+            if ($customoid = Customoid::find($settings['graph_customoid'])) {
+                $params[] = 'device=' . $customoid->device_id;
+                $params[] = 'id=' . $customoid->customoid_id;
+                $settings['graph_type'] = 'customoid_' . $customoid->customoid_descr;
             }
         } elseif ($type == 'aggregate') {
             $aggregate_type = $this->getGraphType(false);
@@ -238,7 +255,7 @@ class GraphController extends WidgetController
             return $graph_type;
         }
 
-        $type = explode('_', $graph_type, 2)[0];
+        $type = explode('_', (string) $graph_type, 2)[0];
 
         if ($summarize && in_array($type, ['transit', 'peering', 'core', 'ports', 'custom'])) {
             return 'aggregate';
@@ -265,7 +282,7 @@ class GraphController extends WidgetController
             // legacy data conversions
             if ($settings['graph_type'] == 'manual') {
                 $settings['graph_type'] = 'custom';
-                $settings['graph_custom'] = explode(',', $settings['graph_manual']);
+                $settings['graph_custom'] = explode(',', (string) $settings['graph_manual']);
             }
             if ($settings['graph_type'] == 'transpeer') {
                 $settings['graph_type'] = 'custom';
@@ -291,7 +308,7 @@ class GraphController extends WidgetController
     private function convertLegacySettingId($setting, $key)
     {
         if ($setting && ! is_numeric($setting)) {
-            $data = json_decode($setting, true);
+            $data = json_decode((string) $setting, true);
 
             return $data[$key] ?? 0;
         }

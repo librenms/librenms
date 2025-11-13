@@ -134,11 +134,7 @@ class DevSimulate extends LnmsCommand
     public function completeArgument($name, $value)
     {
         if ($name == 'file') {
-            return collect(glob(base_path('tests/snmpsim/*.snmprec')))->map(function ($file) {
-                return basename($file, '.snmprec');
-            })->filter(function ($snmprec) use ($value) {
-                return ! $value || Str::startsWith($snmprec, $value);
-            })->all();
+            return collect(glob(base_path('tests/snmpsim/*.snmprec')))->map(fn ($file) => basename($file, '.snmprec'))->filter(fn ($snmprec) => ! $value || Str::startsWith($snmprec, $value))->all();
         }
 
         return false;

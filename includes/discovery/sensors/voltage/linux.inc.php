@@ -34,7 +34,7 @@ if (! empty($pre_cache['raspberry_pi_sensors'])) {
 $oids = snmp_walk($device, '.1.3.6.1.4.1.10876.2.1.1.1.1.3', '-OsqnU', 'SUPERMICRO-HEALTH-MIB', 'supermicro');
 d_echo($oids . "\n");
 
-$oids = trim($oids);
+$oids = trim((string) $oids);
 if ($oids) {
     echo 'Supermicro ';
 }
@@ -68,7 +68,7 @@ foreach (explode("\n", $oids) as $data) {
     }//end if
 }
 
-if (preg_match('/(Linux).+(ntc)/', $device['sysDescr'])) {
+if (preg_match('/(Linux).+(ntc)/', (string) $device['sysDescr'])) {
     $sensor_type = 'chip_volts';
     $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.10.112.111.119.101.114.45.115.116.97.';
     $lowlimit = 3.8;

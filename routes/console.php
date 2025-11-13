@@ -1,6 +1,7 @@
 <?php
 
 use App\Console\Commands\MaintenanceCleanupNetworks;
+use App\Console\Commands\MaintenanceCleanupSyslog;
 use App\Console\Commands\MaintenanceFetchOuis;
 use App\Console\Commands\MaintenanceFetchRSS;
 use App\Console\Commands\MaintenanceSyslogCleanup;
@@ -218,12 +219,7 @@ Schedule::command(MaintenanceFetchRSS::class)
     ->onOneServer()
     ->appendOutputTo($maintenance_log_file);
 
-Schedule::command(MaintenanceCleanupNetworks::class)
-    ->weeklyOn(0, Time::pseudoRandomBetween('02:00', '02:59'))
-    ->onOneServer()
-    ->appendOutputTo($maintenance_log_file);
-
-Schedule::command(MaintenanceSyslogCleanup::class)
+Schedule::command(MaintenanceCleanupSyslog::class)
     ->dailyAt('03:30')
     ->onOneServer()
     ->appendOutputTo($maintenance_log_file);

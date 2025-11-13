@@ -43,7 +43,7 @@ class Ligoos extends OS implements
         $data = $this->getCacheTable('LIGO-WIRELESS-MIB::ligoWiIfConfTable');
 
         foreach ($data as $index => $entry) {
-            $freq = $entry['ligoWiIfFrequency'] ? substr($entry['ligoWiIfFrequency'], 0, 1) . 'G' : 'SSID';
+            $freq = $entry['ligoWiIfFrequency'] ? substr((string) $entry['ligoWiIfFrequency'], 0, 1) . 'G' : 'SSID';
             $sensors[] = new WirelessSensor(
                 'clients',
                 $this->getDeviceId(),
@@ -64,7 +64,7 @@ class Ligoos extends OS implements
         $data = $this->getCacheTable('LIGO-WIRELESS-MIB::ligoWiIfConfTable');
 
         foreach ($data as $index => $entry) {
-            $freq = substr($entry['ligoWiIfFrequency'], 0, 1) . 'G';
+            $freq = substr((string) $entry['ligoWiIfFrequency'], 0, 1) . 'G';
             $sensors[] = new WirelessSensor(
                 'frequency',
                 $this->getDeviceId(),
@@ -85,7 +85,7 @@ class Ligoos extends OS implements
         $data = $this->getCacheTable('LIGO-WIRELESS-MIB::ligoWiIfConfTable');
 
         foreach ($data as $index => $entry) {
-            $freq = $entry['ligoWiIfFrequency'] ? substr($entry['ligoWiIfFrequency'], 0, 1) . 'G' : 'SSID';
+            $freq = $entry['ligoWiIfFrequency'] ? substr((string) $entry['ligoWiIfFrequency'], 0, 1) . 'G' : 'SSID';
             $sensors[] = new WirelessSensor(
                 'noise-floor',
                 $this->getDeviceId(),
@@ -106,7 +106,7 @@ class Ligoos extends OS implements
         $data = $this->getCacheTable('LIGO-WIRELESS-MIB::ligoWiIfConfTable');
 
         foreach ($data as $index => $entry) {
-            $freq = $entry['ligoWiIfFrequency'] ? substr($entry['ligoWiIfFrequency'], 0, 1) . 'G' : 'SSID';
+            $freq = $entry['ligoWiIfFrequency'] ? substr((string) $entry['ligoWiIfFrequency'], 0, 1) . 'G' : 'SSID';
             $sensors[] = new WirelessSensor(
                 'quality',
                 $this->getDeviceId(),

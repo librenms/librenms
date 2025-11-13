@@ -166,11 +166,6 @@ parameters:
 			path: app/Models/UserPref.php
 
 		-
-			message: "#^Variable \\$username on left side of \\?\\? is never defined\\.$#"
-			count: 1
-			path: app/Providers/LegacyUserProvider.php
-
-		-
 			message: "#^Parameter \\#1 \\$attr of method LibreNMS\\\\Authentication\\\\SSOAuthorizer\\:\\:authSSOGetAttr\\(\\) expects string, int given\\.$#"
 			count: 2
 			path: tests/AuthSSOTest.php

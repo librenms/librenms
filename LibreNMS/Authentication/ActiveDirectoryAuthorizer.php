@@ -93,7 +93,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         }
 
         // special character handling
-        $group_dn = addcslashes($result[0]['dn'], '()#');
+        $group_dn = addcslashes((string) $result[0]['dn'], '()#');
 
         $search = ldap_search(
             $connection,
@@ -118,6 +118,11 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
             $this->userFilter($username),
             ['samaccountname']
         );
+
+        if ($search === false) {
+            throw new AuthenticationException('User search failed: ' . ldap_error($connection));
+        }
+
         $entries = ldap_get_entries($connection, $search);
 
         if ($entries['count']) {
@@ -149,7 +154,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
                         }
                     }
                 }
-            } catch (AuthenticationException $e) {
+            } catch (AuthenticationException) {
             }
         }
 
