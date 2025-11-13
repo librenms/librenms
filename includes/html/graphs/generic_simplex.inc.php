@@ -79,23 +79,23 @@ if (\App\Facades\LibrenmsConfig::get('old_graphs')) {
         }
     }
 
-    $rrd_options[] = "COMMENT:'" . $unit_text . 'Now       Ave      Max';
-
     if ($percentile) {
-        $rrd_options[] = '     ' . $percentile . 'th %';
+        $rrd_options[] = "COMMENT:" . $unit_text . 'Now       Ave      Max     ' . $percentile . 'th %\\n';
+    } else {
+        $rrd_options[] = "COMMENT:" . $unit_text . 'Now       Ave      Max\\n';
     }
 
-    $rrd_options[] = "\\n'";
     $rrd_options[] = 'LINE1.25:' . $ds . '#' . $colour_line . ":'" . $line_text . "'";
     $rrd_options[] = 'GPRINT:' . $ds . ':LAST:%6.' . $float_precision . 'lf%s';
     $rrd_options[] = 'GPRINT:' . $ds . ':AVERAGE:%6.' . $float_precision . 'lf%s';
-    $rrd_options[] = 'GPRINT:' . $ds . '_max:MAX:%6.' . $float_precision . 'lf%s';
 
     if ($percentile) {
-        $rrd_options[] = 'GPRINT:' . $ds . '_percentile:%6.' . $float_precision . 'lf%s';
+        $rrd_options[] = 'GPRINT:' . $ds . '_max:MAX:%6.' . $float_precision . 'lf%s';
+        $rrd_options[] = 'GPRINT:' . $ds . '_percentile:%6.' . $float_precision . 'lf%s\\n';
+    } else {
+        $rrd_options[] = 'GPRINT:' . $ds . '_max:MAX:%6.' . $float_precision . 'lf%s\\n';
     }
 
-    $rrd_options[] = '\\\\n';
     $rrd_options[] = 'COMMENT:\\n';
 
     if ($print_total) {

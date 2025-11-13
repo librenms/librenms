@@ -262,7 +262,7 @@ if ($height > 25) {
             $rrd_optionsb [] = 'GPRINT:' . $id . '1dmin:MAX:%5.' . $float_precision . 'lf%s' . $units;
             $rrd_optionsb [] = 'GPRINT:' . $id . "1dmin:AVERAGE:%5." . $float_precision . "lf%s$units\\n";
             // 1 hour max
-            $rrd_optionsb [] = 'COMMENT:  " . $descr_1d_max . "';
+            $rrd_optionsb [] = 'COMMENT:  ' . $descr_1d_max;
             $rrd_optionsb [] = 'GPRINT:' . $id . '1dmax:LAST:%5.' . $float_precision . 'lf%s' . $units;
             $rrd_optionsb [] = 'GPRINT:' . $id . '1dmax:MIN:%5.' . $float_precision . 'lf%s' . $units;
             $rrd_optionsb [] = 'GPRINT:' . $id . '1dmax:MAX:%5.' . $float_precision . 'lf%s' . $units;

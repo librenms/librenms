@@ -65,27 +65,27 @@ if ($format == 'octets' || $format == 'bytes') {
 $i = 0;
 
 if ($width > '500') {
-    $rrd_options[] = sprintf("COMMENT:'%s'", $units_descr);
-    $rrd_options[] = sprintf("COMMENT:'%12s'", 'Current');
-    $rrd_options[] = sprintf("COMMENT:'%10s'", 'Average');
-    $rrd_options[] = sprintf("COMMENT:'%10s'", 'Maximum');
+    $rrd_options[] = sprintf("COMMENT:%s", $units_descr);
+    $rrd_options[] = sprintf("COMMENT:%11s", 'Current');
+    $rrd_options[] = sprintf("COMMENT:%10s", 'Average');
+    $rrd_options[] = sprintf("COMMENT:%10s", 'Maximum');
     if (! $nototal) {
-        $rrd_options[] = sprintf("COMMENT:'%8s'", 'Total');
+        $rrd_options[] = sprintf("COMMENT:%8s", 'Total');
     }
 } else {
     $nototal = true;
-    $rrd_options[] = sprintf("COMMENT:'%s'", $units_descr);
-    $rrd_options[] = sprintf("COMMENT:'%12s'", 'Now');
-    $rrd_options[] = sprintf("COMMENT:'%10s'", 'Avg');
-    $rrd_options[] = sprintf("COMMENT:'%10s'", 'Max');
+    $rrd_options[] = sprintf("COMMENT:%s", $units_descr);
+    $rrd_options[] = sprintf("COMMENT:%12s", 'Now');
+    $rrd_options[] = sprintf("COMMENT:%10s", 'Avg');
+    $rrd_options[] = sprintf("COMMENT:%10s", 'Max');
 }
 
 if ($previous) {
-    $rrd_options[] = sprintf("COMMENT:'\t'");
-    $rrd_options[] = sprintf("COMMENT:'%10s'", 'P Avg');
-    $rrd_options[] = sprintf("COMMENT:'%10s'", 'P Max');
+    $rrd_options[] = sprintf("COMMENT:\t");
+    $rrd_options[] = sprintf("COMMENT:%10s", 'P Avg');
+    $rrd_options[] = sprintf("COMMENT:%10s", 'P Max');
     if (! $nototal) {
-        $rrd_options[] = sprintf("COMMENT:'%8s'", 'P Total');
+        $rrd_options[] = sprintf("COMMENT:%8s", 'P Total');
     }
 }
 
@@ -161,7 +161,7 @@ foreach ($rrd_list ?? [] as $rrd) {
     }
 
     if ($previous) {
-        $rrd_options[] = "COMMENT:' \t'";
+        $rrd_options[] = "COMMENT:\t";
         $rrd_options[] = 'GPRINT:inbits' . $i . 'X:AVERAGE:%6.' . $float_precision . "lf%s$units";
         $rrd_options[] = 'GPRINT:inbits' . $i . 'X:MAX:%6.' . $float_precision . "lf%s$units";
         if (! $nototal) {
@@ -181,7 +181,7 @@ foreach ($rrd_list ?? [] as $rrd) {
     }
 
     if ($previous) {
-        $rrd_options[] = "COMMENT:' \t'";
+        $rrd_options[] = "COMMENT:\t";
         $rrd_options[] = 'GPRINT:outbits' . $i . 'X:AVERAGE:%6.' . $float_precision . "lf%s$units";
         $rrd_options[] = 'GPRINT:outbits' . $i . 'X:MAX:%6.' . $float_precision . "lf%s$units";
         if (! $nototal) {
