@@ -471,7 +471,7 @@ modules:
                     index: 'current.{{ $index }}'
                     group: Rectifier
                     warn_limit: SP2-MIB::rectifiersCurrentMinorAlarmLevel
-                    high_limit: rectifiersCurrentMajorAlarmLevel
+                    high_limit: SP2-MIB::rectifiersCurrentMajorAlarmLevel
                     skip_values:
                         -
                             device: hardware
