@@ -47,7 +47,7 @@ $colors = \App\Facades\LibrenmsConfig::get('graph_colours.varied');
 $legend_sections = [0 => [], 1 => [], 2 => []];
 $section = 0;
 $free_indexes = [];
-$rrd_options[] = "COMMENT:'                            Min   Max    Cur      \\n'";
+$rrd_options[] = "COMMENT:                            Min   Max    Cur      \\n";
 
 /** @var \App\Models\Mempool $mempool */
 foreach ($mempools as $index => $mempool) {
@@ -71,19 +71,19 @@ foreach ($mempools as $index => $mempool) {
 
         if ($mempool->mempool_class == 'system') {
             // add system
-            $legend_sections[1][] = "LINE1:mempooltotal$index#AAAAAA:'Total                                     '";
+            $legend_sections[1][] = "LINE1:mempooltotal$index#AAAAAA:Total                                     ";
             $legend_sections[1][] = "GPRINT:mempooltotal$index:LAST:%6.2lf%siB\\l";
         }
         if ($mempool->mempool_class == 'swap') {
             $section = 2;
             $rrd_options[] = "CDEF:mempoolswap$index=mempoolused$index,-1,*";
             $rrd_options[] = "AREA:mempoolswap$index#{$color}70:$stack";
-            $legend_sections[$section][] = "LINE1.5:mempoolswap$index#$color:'$descr'$stack";
+            $legend_sections[$section][] = "LINE1.5:mempoolswap$index#$color:$descr$stack";
         } elseif ($mempool->mempool_class == 'virtual') {
             $section = 2;
-            $legend_sections[$section][] = "COMMENT:'  $descr'";
+            $legend_sections[$section][] = "COMMENT:  $descr";
         } else {
-            $legend_sections[$section][] = "LINE1.5:mempoolused$index#$color:'$descr'$stack";
+            $legend_sections[$section][] = "LINE1.5:mempoolused$index#$color:$descr$stack";
         }
 
         $legend_sections[$section][] = "GPRINT:mempoolpercent$index:MIN:%3.0lf%%";
@@ -99,7 +99,7 @@ if (! empty($free_indexes)) {
     if ($mempool_classes->contains('buffers') || $mempool_classes->contains('cached')) {
         $rrd_options[] = 'CDEF:mempoolfree=100,mempoolpercent' . implode(',mempoolpercent', $free_indexes) . str_repeat(',-', count($free_indexes));
         $rrd_options[] = "CDEF:mempoolfreebytes=mempoolfree{$free_indexes[0]},mempoolused{$free_indexes[0]},+,mempoolfree,100,/,*";
-        $legend_sections[1][] = "COMMENT:'  Free memory            '";
+        $legend_sections[1][] = "COMMENT:  Free memory            ";
         $legend_sections[1][] = 'GPRINT:mempoolfree:MIN:%3.0lf%%';
         $legend_sections[1][] = 'GPRINT:mempoolfree:LAST:%3.0lf%%';
         $legend_sections[1][] = 'GPRINT:mempoolfree:MAX:%3.0lf%%';
@@ -113,7 +113,7 @@ if (! empty($free_indexes)) {
         }
 
         $rrd_options[] = "CDEF:mempoolavailable=100,mempoolpercent{$free_indexes[0]},-";
-        $legend_sections[1][] = "COMMENT:'  Available memory       '";
+        $legend_sections[1][] = "COMMENT:  Available memory       ";
         $legend_sections[1][] = 'GPRINT:mempoolavailable:MIN:%3.0lf%%';
         $legend_sections[1][] = 'GPRINT:mempoolavailable:LAST:%3.0lf%%';
         $legend_sections[1][] = 'GPRINT:mempoolavailable:MAX:%3.0lf%%';
