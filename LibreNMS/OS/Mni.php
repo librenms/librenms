@@ -21,7 +21,7 @@ class Mni extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessPower()
+    public function discoverWirelessPower(): array
     {
         $radio_index = \SnmpQuery::cache()->get('MNI-PROTEUS-AMT-MIB::mnPrLinkStatLocalRadioIndex.0')->value();
         $transmit_oid_raw = '.1.3.6.1.4.1.3323.13.1.4.1.1.2.'; //"MNI-PROTEUS-AMT-MIB::mnPrPerfBaseTxPower"
@@ -29,7 +29,7 @@ class Mni extends OS implements
         $receive_oid = $receive_oid_raw . $radio_index;
         $transmit_oid = $transmit_oid_raw . $radio_index;
 
-        $wirelessSensors = [
+        return [
             new WirelessSensor(
                 'power',
                 $this->getDeviceId(),
@@ -61,7 +61,7 @@ class Mni extends OS implements
      *
      * @return array
      */
-    public function discoverWirelessRate()
+    public function discoverWirelessRate(): array
     {
         $radio_index = \SnmpQuery::cache()->get('MNI-PROTEUS-AMT-MIB::mnPrLinkStatLocalRadioIndex.0')->value();
         $receive_oid_raw = '.1.3.6.1.4.1.3323.13.1.4.1.1.17.'; //"MNI-PROTEUS-AMT-MIB::mnPrPerfBaseLinkCapMbps";
@@ -82,7 +82,7 @@ class Mni extends OS implements
         ];
     }
 
-    public function discoverWirelessCapacity()
+    public function discoverWirelessCapacity(): array
     {
         return \SnmpQuery::walk('MNI-PROTEUS-AMT-MIB::mnPrPerfBaseLinkCapMbps')
             ->mapTable(function ($data, $mnInterfaceIndex) {
@@ -99,7 +99,7 @@ class Mni extends OS implements
             })->all();
     }
 
-    public function discoverWirelessFrequency()
+    public function discoverWirelessFrequency(): array
     {
         return \SnmpQuery::walk('MNI-PROTEUS-AMT-MIB::mnPrRadStatODUFreqBand')
             ->mapTable(function ($data, $mnRadioIndex) {
@@ -113,6 +113,6 @@ class Mni extends OS implements
                     $data['MNI-PROTEUS-AMT-MIB::mnPrRadStatODUFreqBand'] ?? 0,
                     1000000000
                 );
-            });
+            })->all();
     }
 }
