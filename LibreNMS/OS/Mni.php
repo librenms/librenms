@@ -85,7 +85,7 @@ class Mni extends OS implements
     public function discoverWirelessCapacity(): array
     {
         return \SnmpQuery::walk('MNI-PROTEUS-AMT-MIB::mnPrPerfBaseLinkCapMbps')
-            ->mapTable(fn($data, $mnInterfaceIndex) => new WirelessSensor(
+            ->mapTable(fn ($data, $mnInterfaceIndex) => new WirelessSensor(
                 'capacity',
                 $this->getDeviceId(),
                 ".1.3.6.1.4.1.3323.13.1.4.1.1.17.$mnInterfaceIndex",
@@ -100,7 +100,7 @@ class Mni extends OS implements
     public function discoverWirelessFrequency(): array
     {
         return \SnmpQuery::walk('MNI-PROTEUS-AMT-MIB::mnPrRadStatODUFreqBand')
-            ->mapTable(fn($data, $mnRadioIndex) => new WirelessSensor(
+            ->mapTable(fn ($data, $mnRadioIndex) => new WirelessSensor(
                 'frequency',
                 $this->getDeviceId(),
                 ".1.3.6.1.4.1.3323.13.1.1.2.1.17.$mnRadioIndex",
