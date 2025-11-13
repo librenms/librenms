@@ -590,11 +590,14 @@ class ModuleTestHelper
         // Run discovery
         $save_debug = Debug::isEnabled();
         $save_vedbug = Debug::isVerbose();
+        $log_driver = Log::getDefaultDriver();
+
         if ($this->quiet) {
             Debug::setOnly();
             Debug::setVerbose();
         }
         ob_start();
+        Log::setDefaultDriver('console');
 
         (new DiscoverDevice($device_id, $this->modules))->handle();
 
@@ -605,6 +608,7 @@ class ModuleTestHelper
         } else {
             ob_flush();
         }
+        Log::setDefaultDriver($log_driver);
         ob_end_clean();
 
         $this->qPrint(PHP_EOL);
@@ -623,8 +627,8 @@ class ModuleTestHelper
             Debug::setVerbose();
         }
         ob_start();
+        Log::setDefaultDriver('console');
 
-        \Log::setDefaultDriver('console');
         (new PollDevice($device_id, $this->modules))->handle();
 
         $this->poller_output = ob_get_contents();
@@ -634,6 +638,7 @@ class ModuleTestHelper
         } else {
             ob_flush();
         }
+        Log::setDefaultDriver($log_driver);
         ob_end_clean();
 
         // Parse polled modules
