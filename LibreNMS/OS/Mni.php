@@ -85,34 +85,30 @@ class Mni extends OS implements
     public function discoverWirelessCapacity(): array
     {
         return \SnmpQuery::walk('MNI-PROTEUS-AMT-MIB::mnPrPerfBaseLinkCapMbps')
-            ->mapTable(function ($data, $mnInterfaceIndex) {
-                return new WirelessSensor(
-                    'capacity',
-                    $this->getDeviceId(),
-                    ".1.3.6.1.4.1.3323.13.1.4.1.1.17.$mnInterfaceIndex",
-                    'mni-capacity',
-                    $mnInterfaceIndex,
-                    "Rx capacity $mnInterfaceIndex",
-                    $data['MNI-PROTEUS-AMT-MIB::mnPrPerfBaseLinkCapMbps'] ?? 0,
-                    100000
-                );
-            })->all();
+            ->mapTable(fn($data, $mnInterfaceIndex) => new WirelessSensor(
+                'capacity',
+                $this->getDeviceId(),
+                ".1.3.6.1.4.1.3323.13.1.4.1.1.17.$mnInterfaceIndex",
+                'mni-capacity',
+                $mnInterfaceIndex,
+                "Rx capacity $mnInterfaceIndex",
+                $data['MNI-PROTEUS-AMT-MIB::mnPrPerfBaseLinkCapMbps'] ?? 0,
+                100000
+            ))->all();
     }
 
     public function discoverWirelessFrequency(): array
     {
         return \SnmpQuery::walk('MNI-PROTEUS-AMT-MIB::mnPrRadStatODUFreqBand')
-            ->mapTable(function ($data, $mnRadioIndex) {
-                return new WirelessSensor(
-                    'frequency',
-                    $this->getDeviceId(),
-                    ".1.3.6.1.4.1.3323.13.1.1.2.1.17.$mnRadioIndex",
-                    'mni-frequency',
-                    $mnRadioIndex,
-                    "ODU Frequency Band $mnRadioIndex",
-                    $data['MNI-PROTEUS-AMT-MIB::mnPrRadStatODUFreqBand'] ?? 0,
-                    1000000000
-                );
-            })->all();
+            ->mapTable(fn($data, $mnRadioIndex) => new WirelessSensor(
+                'frequency',
+                $this->getDeviceId(),
+                ".1.3.6.1.4.1.3323.13.1.1.2.1.17.$mnRadioIndex",
+                'mni-frequency',
+                $mnRadioIndex,
+                "ODU Frequency Band $mnRadioIndex",
+                $data['MNI-PROTEUS-AMT-MIB::mnPrRadStatODUFreqBand'] ?? 0,
+                1000000000
+            ))->all();
     }
 }
