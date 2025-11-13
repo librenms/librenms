@@ -599,9 +599,7 @@ class Rrd extends BaseDatastore
     {
         if ($this->rrdcached) {
             // only relative paths if using rrdcached
-            $options = array_merge(str_replace([$this->rrd_dir . '/', $this->rrd_dir, '"', "'"], '', $options), ['--daemon', $this->rrdcached]);
-        } else {
-            $options = str_replace(['"', "'"], '', $options);
+            $options = array_merge(str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $options), ['--daemon', $this->rrdcached]);
         }
 
         $process = new Process(array_merge([$this->rrdtool_executable, 'graph', '-'], $options), $this->rrd_dir, $env);
