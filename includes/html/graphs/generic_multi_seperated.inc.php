@@ -43,7 +43,7 @@ if ($width > '1500') {
     $rrddescr_len += min(30, round(($width - 320) / 15));
 } else {
     $rrddescr_len = 8;
-    $rrddescr_len += min(20, round(($width - 260) / 9.5));
+    $rrddescr_len += min(15, round(($width) / 30));
 }
 
 $stacked = generate_stacked_graphs();
