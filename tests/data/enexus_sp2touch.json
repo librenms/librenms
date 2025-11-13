@@ -10,7 +10,7 @@
                     "version": "1.5",
                     "hardware": "SmartPack2 Touch",
                     "features": "Rectifier type: 4, Rectifier model: SmartPack2 Touch, Battery: Eltek Std",
-                    "location": "<LOCATION>",
+                    "location": "<location>",
                     "os": "enexus",
                     "type": "power",
                     "serial": "<serial>",
