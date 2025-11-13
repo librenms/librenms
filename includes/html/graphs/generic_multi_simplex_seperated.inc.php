@@ -23,7 +23,7 @@ if ($nototal) {
     $unitlen += 2;
 }
 
-$rrd_options[] = "COMMENT:" . Rrd::fixedSafeDescr($unit_text, $descr_len) . "        Now      Min     Max     Avg\l";
+$rrd_options[] = 'COMMENT:' . Rrd::fixedSafeDescr($unit_text, $descr_len) . "        Now      Min     Max     Avg\l";
 
 $unitlen = 10;
 if ($nototal) {
@@ -100,18 +100,18 @@ foreach ($rrd_list ?? [] as $i => $rrd) {
         $t_defname = $g_defname;
     }
 
-    $rrd_options[] = 'AREA:' . $g_defname . $i . '#' . $colour . ":" . $descr . "$stack";
+    $rrd_options[] = 'AREA:' . $g_defname . $i . '#' . $colour . ':' . $descr . "$stack";
 
     $rrd_options[] = 'GPRINT:' . $t_defname . $i . ':LAST:%5.' . $float_precision . 'lf%s';
     $rrd_options[] = 'GPRINT:' . $t_defname . $i . 'min:MIN:%5.' . $float_precision . 'lf%s';
     $rrd_options[] = 'GPRINT:' . $t_defname . $i . 'max:MAX:%5.' . $float_precision . 'lf%s';
-    $rrd_options[] = 'GPRINT:' . $t_defname . $i . ":AVERAGE:%5." . $float_precision . "lf%s\\n";
+    $rrd_options[] = 'GPRINT:' . $t_defname . $i . ':AVERAGE:%5.' . $float_precision . 'lf%s\\n';
 
     if (! $nototal) {
-        $rrd_options[] = 'GPRINT:tot' . $rrd['ds'] . $i . ':%6.' . $float_precision . "lf%s" . \Rrd::safeDescr($total_units);
+        $rrd_options[] = 'GPRINT:tot' . $rrd['ds'] . $i . ':%6.' . $float_precision . 'lf%s' . \Rrd::safeDescr($total_units);
     }
 
-    $rrd_options[] = "COMMENT:\\n";
+    $rrd_options[] = 'COMMENT:\\n';
 }//end foreach
 
 if ($previous) {

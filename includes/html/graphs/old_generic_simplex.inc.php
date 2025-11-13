@@ -64,12 +64,12 @@ if ($previous) {
 $rrd_options[] = 'AREA:' . $ds . '#' . $colour_area . ':';
 
 if ($percentile) {
-    $rrd_options[] = "COMMENT:" . $unit_text . 'Now       Ave      Max     ' . $percentile . 'th %\n';
+    $rrd_options[] = 'COMMENT:' . $unit_text . 'Now       Ave      Max     ' . $percentile . 'th %\n';
 } else {
-    $rrd_options[] = "COMMENT:" . $unit_text . 'Now       Ave      Max\n';
+    $rrd_options[] = 'COMMENT:' . $unit_text . 'Now       Ave      Max\n';
 }
 
-$rrd_options[] = 'LINE1.25:' . $ds . '#' . $colour_line . ":" . $line_text;
+$rrd_options[] = 'LINE1.25:' . $ds . '#' . $colour_line . ':' . $line_text;
 $rrd_options[] = 'GPRINT:' . $ds . ':LAST:%6.' . $float_precision . 'lf%s';
 $rrd_options[] = 'GPRINT:' . $ds . ':AVERAGE:%6.' . $float_precision . 'lf%s';
 
@@ -91,6 +91,6 @@ if ($percentile) {
 }
 
 if ($previous) {
-    $rrd_options[] = 'LINE1.25:' . $ds . "X#666666:Prev \\n";
+    $rrd_options[] = 'LINE1.25:' . $ds . 'X#666666:Prev \\n';
     $rrd_options[] = 'AREA:' . $ds . 'X#99999966:';
 }

@@ -47,7 +47,7 @@ $colors = \App\Facades\LibrenmsConfig::get('graph_colours.varied');
 $legend_sections = [0 => [], 1 => [], 2 => []];
 $section = 0;
 $free_indexes = [];
-$rrd_options[] = "COMMENT:                            Min   Max    Cur      \\n";
+$rrd_options[] = 'COMMENT:                            Min   Max    Cur      \\n';
 
 /** @var \App\Models\Mempool $mempool */
 foreach ($mempools as $index => $mempool) {
@@ -99,7 +99,7 @@ if (! empty($free_indexes)) {
     if ($mempool_classes->contains('buffers') || $mempool_classes->contains('cached')) {
         $rrd_options[] = 'CDEF:mempoolfree=100,mempoolpercent' . implode(',mempoolpercent', $free_indexes) . str_repeat(',-', count($free_indexes));
         $rrd_options[] = "CDEF:mempoolfreebytes=mempoolfree{$free_indexes[0]},mempoolused{$free_indexes[0]},+,mempoolfree,100,/,*";
-        $legend_sections[1][] = "COMMENT:  Free memory            ";
+        $legend_sections[1][] = 'COMMENT:  Free memory            ';
         $legend_sections[1][] = 'GPRINT:mempoolfree:MIN:%3.0lf%%';
         $legend_sections[1][] = 'GPRINT:mempoolfree:LAST:%3.0lf%%';
         $legend_sections[1][] = 'GPRINT:mempoolfree:MAX:%3.0lf%%';
@@ -113,7 +113,7 @@ if (! empty($free_indexes)) {
         }
 
         $rrd_options[] = "CDEF:mempoolavailable=100,mempoolpercent{$free_indexes[0]},-";
-        $legend_sections[1][] = "COMMENT:  Available memory       ";
+        $legend_sections[1][] = 'COMMENT:  Available memory       ';
         $legend_sections[1][] = 'GPRINT:mempoolavailable:MIN:%3.0lf%%';
         $legend_sections[1][] = 'GPRINT:mempoolavailable:LAST:%3.0lf%%';
         $legend_sections[1][] = 'GPRINT:mempoolavailable:MAX:%3.0lf%%';

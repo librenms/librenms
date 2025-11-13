@@ -65,31 +65,31 @@ if ($format == 'octets' || $format == 'bytes') {
 $i = 0;
 
 if ($width > '500') {
-    $rrd_options[] = sprintf("COMMENT:%s", $units_descr);
-    $rrd_options[] = sprintf("COMMENT:%11s", 'Current');
-    $rrd_options[] = sprintf("COMMENT:%10s", 'Average');
-    $rrd_options[] = sprintf("COMMENT:%10s", 'Maximum');
+    $rrd_options[] = sprintf('COMMENT:%s', $units_descr);
+    $rrd_options[] = sprintf('COMMENT:%11s', 'Current');
+    $rrd_options[] = sprintf('COMMENT:%10s', 'Average');
+    $rrd_options[] = sprintf('COMMENT:%10s', 'Maximum');
     if (! $nototal) {
-        $rrd_options[] = sprintf("COMMENT:%8s", 'Total');
+        $rrd_options[] = sprintf('COMMENT:%8s', 'Total');
     }
 } else {
     $nototal = true;
-    $rrd_options[] = sprintf("COMMENT:%s", $units_descr);
-    $rrd_options[] = sprintf("COMMENT:%12s", 'Now');
-    $rrd_options[] = sprintf("COMMENT:%10s", 'Avg');
-    $rrd_options[] = sprintf("COMMENT:%10s", 'Max');
+    $rrd_options[] = sprintf('COMMENT:%s', $units_descr);
+    $rrd_options[] = sprintf('COMMENT:%12s', 'Now');
+    $rrd_options[] = sprintf('COMMENT:%10s', 'Avg');
+    $rrd_options[] = sprintf('COMMENT:%10s', 'Max');
 }
 
 if ($previous) {
     $rrd_options[] = sprintf("COMMENT:\t");
-    $rrd_options[] = sprintf("COMMENT:%10s", 'P Avg');
-    $rrd_options[] = sprintf("COMMENT:%10s", 'P Max');
+    $rrd_options[] = sprintf('COMMENT:%10s', 'P Avg');
+    $rrd_options[] = sprintf('COMMENT:%10s', 'P Max');
     if (! $nototal) {
-        $rrd_options[] = sprintf("COMMENT:%8s", 'P Total');
+        $rrd_options[] = sprintf('COMMENT:%8s', 'P Total');
     }
 }
 
-$rrd_options[] = "COMMENT:\\n";
+$rrd_options[] = 'COMMENT:\\n';
 
 $iter = 0;
 foreach ($rrd_list ?? [] as $rrd) {
@@ -169,7 +169,7 @@ foreach ($rrd_list ?? [] as $rrd) {
         }
     }
 
-    $rrd_options[] = "COMMENT:\\n";
+    $rrd_options[] = 'COMMENT:\\n';
     $rrd_optionsb[] = 'AREA:outbits' . $i . '_neg#' . $colour_out . $stacked['transparency'] . ":$stack";
     $rrd_options[] = 'HRULE:999999999999999#' . $colour_out . ":$descr_out";
     $rrd_options[] = 'GPRINT:outbits' . $i . ':LAST:%6.' . $float_precision . "lf%s$units";
@@ -189,7 +189,7 @@ foreach ($rrd_list ?? [] as $rrd) {
         }
     }
 
-    $rrd_options[] = "COMMENT:\\n";
+    $rrd_options[] = 'COMMENT:\\n';
     $i++;
     $iter++;
 }
@@ -244,9 +244,9 @@ if (! $nototal && ! empty($rrd_list)) {
     $rrd_options[] = 'VDEF:aveout=outbits,AVERAGE';
     $rrd_options[] = 'VDEF:tot=octets,TOTAL';
 
-    $rrd_options[] = "COMMENT: \\n";
+    $rrd_options[] = 'COMMENT: \\n';
 
-    $rrd_options[] = "HRULE:999999999999999#FFFFFF:" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr('Total', $rrddescr_len) . "  In";
+    $rrd_options[] = 'HRULE:999999999999999#FFFFFF:' . \LibreNMS\Data\Store\Rrd::fixedSafeDescr('Total', $rrddescr_len) . '  In';
     $rrd_options[] = 'GPRINT:inbits:LAST:%6.' . $float_precision . "lf%s$units";
     $rrd_options[] = 'GPRINT:inbits:AVERAGE:%6.' . $float_precision . "lf%s$units";
     $rrd_options[] = 'GPRINT:inbits:MAX:%6.' . $float_precision . "lf%s$units";
@@ -257,9 +257,9 @@ if (! $nototal && ! empty($rrd_list)) {
         $rrd_options[] = 'GPRINT:inbitsX:MAX:%6.' . $float_precision . "lf%s$units";
         $rrd_options[] = 'GPRINT:totinX:%6.' . $float_precision . "lf%s$total_units";
     }
-    $rrd_options[] = "COMMENT:\\n";
+    $rrd_options[] = 'COMMENT:\\n';
 
-    $rrd_options[] = "HRULE:999999999999990#FFFFFF:" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr('', $rrddescr_len) . " Out";
+    $rrd_options[] = 'HRULE:999999999999990#FFFFFF:' . \LibreNMS\Data\Store\Rrd::fixedSafeDescr('', $rrddescr_len) . ' Out';
     $rrd_options[] = 'GPRINT:outbits:LAST:%6.' . $float_precision . "lf%s$units";
     $rrd_options[] = 'GPRINT:outbits:AVERAGE:%6.' . $float_precision . "lf%s$units";
     $rrd_options[] = 'GPRINT:outbits:MAX:%6.' . $float_precision . "lf%s$units";
@@ -270,9 +270,9 @@ if (! $nototal && ! empty($rrd_list)) {
         $rrd_options[] = 'GPRINT:outbitsX:MAX:%6.' . $float_precision . "lf%s$units";
         $rrd_options[] = 'GPRINT:totoutX:%6.' . $float_precision . "lf%s$total_units";
     }
-    $rrd_options[] = "COMMENT:\\n";
+    $rrd_options[] = 'COMMENT:\\n';
 
-    $rrd_options[] = "HRULE:999999999999990#FFFFFF:" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr('', $rrddescr_len) . " Agg";
+    $rrd_options[] = 'HRULE:999999999999990#FFFFFF:' . \LibreNMS\Data\Store\Rrd::fixedSafeDescr('', $rrddescr_len) . ' Agg';
     $rrd_options[] = 'GPRINT:bits:LAST:%6.' . $float_precision . "lf%s$units";
     $rrd_options[] = 'GPRINT:bits:AVERAGE:%6.' . $float_precision . "lf%s$units";
     $rrd_options[] = 'GPRINT:bits:MAX:%6.' . $float_precision . "lf%s$units";
@@ -283,7 +283,7 @@ if (! $nototal && ! empty($rrd_list)) {
         $rrd_options[] = 'GPRINT:bitsX:MAX:%6.' . $float_precision . "lf%s$units";
         $rrd_options[] = 'GPRINT:totX:%6.' . $float_precision . "lf%s$total_units";
     }
-    $rrd_options[] = "COMMENT:\\n";
+    $rrd_options[] = 'COMMENT:\\n';
 }
 
 array_push($rrd_options, ...$rrd_optionsb);

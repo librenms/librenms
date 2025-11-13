@@ -80,9 +80,9 @@ if (\App\Facades\LibrenmsConfig::get('old_graphs')) {
     }
 
     if ($percentile) {
-        $rrd_options[] = "COMMENT:" . $unit_text . 'Now       Ave      Max     ' . $percentile . 'th %\\n';
+        $rrd_options[] = 'COMMENT:' . $unit_text . 'Now       Ave      Max     ' . $percentile . 'th %\\n';
     } else {
-        $rrd_options[] = "COMMENT:" . $unit_text . 'Now       Ave      Max\\n';
+        $rrd_options[] = 'COMMENT:' . $unit_text . 'Now       Ave      Max\\n';
     }
 
     $rrd_options[] = 'LINE1.25:' . $ds . '#' . $colour_line . ":'" . $line_text . "'";
@@ -107,7 +107,7 @@ if (\App\Facades\LibrenmsConfig::get('old_graphs')) {
     }
 
     if ($graph_params->visible('previous')) {
-        $rrd_options[] = 'LINE1.25:' . $ds . "X#666666:Prev\\n";
+        $rrd_options[] = 'LINE1.25:' . $ds . 'X#666666:Prev\\n';
         $rrd_options[] = 'AREA:' . $ds . 'X#99999966:';
     }
 }//end if
