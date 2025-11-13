@@ -610,7 +610,7 @@ class ModuleTestHelper
         $this->qPrint(PHP_EOL);
 
         // Parse discovered modules
-        $this->discovery_module_output = $this->extractModuleOutput($this->discovery_output, 'disco');
+        $this->discovery_module_output = $this->extractModuleOutput($this->discovery_output, 'discovery');
         $discovered_modules = array_keys($this->discovery_module_output);
 
         // Dump the discovered data
