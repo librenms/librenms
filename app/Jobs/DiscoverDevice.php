@@ -118,6 +118,12 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
                     }
 
                     $instance->discover($os);
+
+                    // check for changed OS
+                    if ($module == 'core') {
+                        $os = $this->checkForOsChange($os);
+                        $this->device->save(); // save deferred core changes
+                    }
                 }
             } catch (Throwable $e) {
                 // Re-throw exception if we're in running tests
@@ -137,5 +143,27 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
                 Log::info("#### Unload discovery module $module ####\n");
             }
         }
+    }
+
+    private function checkForOsChange(OS $os): OS
+    {
+        if ($this->device->isDirty('os')) {
+            Eventlog::log('Device OS changed: ' . $this->device->getOriginal('os') . ' -> ' . $this->device->os, $this->device, 'system', Severity::Notice);
+            $this->deviceArray['os'] = $this->device->os;
+            $this->deviceArray['os_group'] = LibrenmsConfig::get("os.{$this->device->os}.group");
+            $os = OS::make($this->deviceArray);
+
+            Log::info('OS Changed ');
+            Log::notice('OS: ' . LibrenmsConfig::getOsSetting($this->device->os, 'text') . " ({$this->device->os})\n");
+        }
+
+        // Set type to a predefined type for the OS if it's not already set
+        $loaded_os_type = LibrenmsConfig::get("os.{$this->device->os}.type");
+        if (! $this->device->getAttrib('override_device_type') && $loaded_os_type != $this->device->type) {
+            $this->device->type = $loaded_os_type;
+            Log::debug("Device type changed to $loaded_os_type!");
+        }
+
+        return $os;
     }
 }
