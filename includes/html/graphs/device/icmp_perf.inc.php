@@ -31,13 +31,13 @@ $rrd_filename = Rrd::name($device['hostname'], 'icmp-perf');
 $rrd_options[] = '-X';
 $rrd_options[] = '0';
 $rrd_options[] = '--left-axis-format';
-$rrd_options[] = '\'%4.0lfms\'';
+$rrd_options[] = '%4.0lfms';
 $rrd_options[] = '--vertical-label';
 $rrd_options[] = 'Latency';
 $rrd_options[] = '--right-axis';
 $rrd_options[] = '1:0';
 $rrd_options[] = '--right-axis-label';
-$rrd_options[] = '\'Loss %\'';
+$rrd_options[] = 'Loss %';
 
 $rrd_options[] = 'DEF:ping=' . $rrd_filename . ':avg:AVERAGE';
 $rrd_options[] = 'DEF:min=' . $rrd_filename . ':min:MIN';
@@ -48,7 +48,7 @@ $rrd_options[] = 'CDEF:top=max,min,-';
 $rrd_options[] = 'CDEF:loss=xmt,rcv,-,xmt,/,100,*';
 
 // Legend Header
-$rrd_options[] = "'COMMENT:Milliseconds      Cur      Min     Max     Avg\\n'";
+$rrd_options[] = "COMMENT:Milliseconds      Cur      Min     Max     Avg\\n";
 
 // Min/Max area invisible min line with max (-min) area stacked on top
 $rrd_options[] = 'LINE:min#00000000:';
@@ -70,10 +70,10 @@ $rrd_options[] = 'GPRINT:loss:AVERAGE:%6.2lf\\n';
 
 // previous time period before this one
 if ($graph_params->visible('previous')) {
-    $rrd_options[] = "COMMENT:' \\n'";
+    $rrd_options[] = "COMMENT:\\n";
     $rrd_options[] = "DEF:pingX=$rrd_filename:avg:AVERAGE:start=$prev_from:end=$from";
     $rrd_options[] = "SHIFT:pingX:$period";
-    $rrd_options[] = "LINE1.25:pingX#CCCCCC:'Prev RTT             '";
+    $rrd_options[] = "LINE1.25:pingX#CCCCCC:Prev RTT             ";
     $rrd_options[] = 'GPRINT:pingX:AVERAGE:%6.2lf';
     $rrd_options[] = 'GPRINT:pingX:MAX:%6.2lf';
     $rrd_options[] = 'GPRINT:pingX:AVERAGE:%6.2lf\\n';

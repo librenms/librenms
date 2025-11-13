@@ -74,28 +74,28 @@ foreach ($modules as $module_index => $module) {
     }
 }
 
-$rrd_options[] = "'COMMENT:Seconds                 Cur     Min     Max      Avg'";
+$rrd_options[] = "COMMENT:Seconds                 Cur     Min     Max      Avg";
 
 if ($graph_params->visible('previous')) {
-    $rrd_options[] = "COMMENT:' \t    P Min   P Max   P Avg'";
+    $rrd_options[] = "COMMENT:\t    P Min   P Max   P Avg";
 }
 
-$rrd_options[] = "COMMENT:'\\n'";
+$rrd_options[] = "COMMENT:\\n";
 
 foreach ($modules as $index => $module) {
     $color = $colors[$index % count($colors)];
-    $rrd_options[] = "AREA:$module#$color:'" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr($module, 16) . "':STACK";
+    $rrd_options[] = "AREA:$module#$color:" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr($module, 16) . ":STACK";
     $rrd_options[] = "GPRINT:$module:LAST:%6.2lf";
     $rrd_options[] = "GPRINT:$module:MIN:%6.2lf";
     $rrd_options[] = "GPRINT:$module:MAX:%6.2lf";
-    $rrd_options[] = "'GPRINT:$module:AVERAGE:%6.2lf'";
+    $rrd_options[] = "GPRINT:$module:AVERAGE:%6.2lf";
     if ($graph_params->visible('previous')) {
         $rrd_options[] = 'AREA:' . $module . 'X#99999999' . $stacked['transparency'] . ':';
         $rrd_options[] = 'LINE1.25:' . $module . 'X#666666:';
-        $rrd_options[] = "COMMENT:'\t'";
+        $rrd_options[] = "COMMENT:\t";
         $rrd_options[] = "GPRINT:{$module}X:MIN:%6.2lf";
         $rrd_options[] = "GPRINT:{$module}X:MAX:%6.2lf";
         $rrd_options[] = "GPRINT:{$module}X:AVERAGE:%6.2lf";
     }
-    $rrd_options[] = "COMMENT:'\\n'";
+    $rrd_options[] = "COMMENT:\\n";
 }
