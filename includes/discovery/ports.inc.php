@@ -52,6 +52,11 @@ if ($device['os'] == 'loop-telecom') {
     require base_path('includes/discovery/ports/loop-telecom.inc.php');
 }
 
+//Better interface names for Alteon OS
+if ($device['os'] == 'alteonos') {
+    require base_path('includes/discovery/ports/alteonos.inc.php');
+}
+
 //Change Zynos ports from swp to 1/1
 if ($device['os'] == 'zynos') {
     require base_path('includes/discovery/ports/zynos.inc.php');
