@@ -135,44 +135,6 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
                 }
             }
 
-            if (! $bgp4_mib && $device['os'] == 'timos') {
-                // AFI / SAFI maps for Nokia (TIMETRA-BGP-MIB)
-                $afis = [
-                    1 => 'ipv4',
-                    2 => 'ipv6',
-                ];
-
-                $safis = [
-                    1 => 'unicast',
-                    2 => 'multicast',
-                    128 => 'vpn',
-                ];
-
-                // 1️Pull peer-level table first
-                $nokia_peers = snmpwalk_cache_multi_oid($device, 'tBgpPeerNgTable', [], 'TIMETRA-BGP-MIB', 'nokia', '-OQUbs');
-                d_echo($nokia_peers);
-
-                // 2️Build AFI/SAFI mapping table
-                $nokia_afisafi = snmpwalk_cache_multi_oid($device, 'tBgpPeerNgAfiSafiTable', [], 'TIMETRA-BGP-MIB', 'nokia', '-OQUbs');
-                d_echo($nokia_afisafi);
-
-                foreach ($nokia_afisafi as $index => $entry) {
-                    // Index pattern looks like: <PeerIndex>.<Afi>.<Safi>
-                    [$peer_index, $afi, $safi] = explode('.', $index);
-
-                    $afi_name = $afis[$afi] ?? "afi$afi";
-                    $safi_name = $safis[$safi] ?? "safi$safi";
-
-                    $peer = $nokia_peers[$peer_index] ?? null;
-                    if (! $peer) {
-                        continue;
-                    }
-
-                    d_echo("Adding cbgp for peer $peer_index ($afi_name/$safi_name)\n");
-                    add_cbgp_peer($device, $peer, $afi_name, $safi_name);
-                }
-            }
-
             $af_query = 'SELECT bgpPeerIdentifier, afi, safi FROM bgpPeers_cbgp WHERE `device_id`=? AND bgpPeerIdentifier=? AND context_name=?';
             foreach (dbFetchRows($af_query, [$device['device_id'], $peer['ip'], $device['context_name']]) as $entry) {
                 $afi = $entry['afi'];
