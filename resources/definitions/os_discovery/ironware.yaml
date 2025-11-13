@@ -1,7 +1,7 @@
 mib: FOUNDRY-SN-AGENT-MIB:FOUNDRY-SN-SWITCH-GROUP-MIB:FOUNDRY-SN-STACKING-MIB
 modules:
     mempools:
-        pre-cache:
+        additional_oids:
             oids:
                 - FOUNDRY-SN-AGENT-MIB::snAgentBrdMainBrdDescription
         data:
@@ -27,7 +27,7 @@ modules:
         version: FOUNDRY-SN-AGENT-MIB::snAgImgVer.0
 #        version: FOUNDRY-SN-AGENT-MIB::snAgBuildVer.0
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

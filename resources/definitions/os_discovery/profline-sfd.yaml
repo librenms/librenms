@@ -1,0 +1,112 @@
+modules:
+  os:
+    hardware: PROFLINE-SFD-MIB::sfdIdnOptions.0
+    serial: PROFLINE-SFD-MIB::sfdIdnSerialNumber.0
+    version: 
+      - PROFLINE-SFD-MIB::sfdIdnFirmwareVersion.1
+      - PROFLINE-SFD-MIB::sfdIdnFirmwareVersion.2
+    version_template: '{{ PROFLINE-SFD-MIB::sfdIdnFirmwareVersion.1 }}, {{ PROFLINE-SFD-MIB::sfdIdnFirmwareVersion.2 }}'
+  sensors:
+    frequency:
+      data:
+        -
+          oid: PROFLINE-SFD-MIB::sfdSetRfInFrequency
+          num_oid: '.1.3.6.1.4.1.21222.1.4.1.2.3.1.0'
+          descr: 'RF Input Frequency'
+          multiplier: 10000
+          index: 1
+    dbm:
+      data:
+        - oid: PROFLINE-SFD-MIB::sfdMsrRfInSignalStrength
+          num_oid: '.1.3.6.1.4.1.21222.1.4.1.3.3.2.0'
+          descr: RSSI
+          index: 1
+    state:
+      data:
+        - oid: PROFLINE-SFD-MIB::sfdMsrControlMode
+          num_oid: '.1.3.6.1.4.1.21222.1.4.1.3.7.1.0'
+          descr: Active control mode
+          states:
+            - { value: 1, generic: 2, graph: 0, descr: 'Local' }
+            - { value: 2, generic: 0, graph: 0, descr: 'Remote' }
+            - { value: 3, generic: 0, graph: 0, descr: 'LocalPlusRemote' }
+        - oid: PROFLINE-SFD-MIB::sfdMsrAlarmRfInLevelLow
+          num_oid: '.1.3.6.1.4.1.21222.1.4.1.3.1.1.0'
+          descr: RSSI low level
+          group: Alarm Status - RF
+          states:
+            - { value: 1, generic: 0, graph: 0, descr: 'Ok' }
+            - { value: 3, generic: 1, graph: 0, descr: 'Warning' }
+            - { value: 5, generic: 2, graph: 0, descr: 'Alarm' }
+        - oid: PROFLINE-SFD-MIB::sfdMsrAlarmRfInLevelHigh
+          num_oid: '.1.3.6.1.4.1.21222.1.4.1.3.1.2.0'
+          descr: RSSI high level
+          group: Alarm Status - RF
+          states:
+            - { value: 1, generic: 0, graph: 0, descr: 'Ok' }
+            - { value: 3, generic: 1, graph: 0, descr: 'Warning' }
+            - { value: 5, generic: 2, graph: 0, descr: 'Alarm' }
+        - oid: PROFLINE-SFD-MIB::sfdMsrAlarmPilotLevel
+          num_oid: '.1.3.6.1.4.1.21222.1.4.1.3.1.3.0'
+          descr: Pilot level
+          group: Alarm Status - Modulator
+          states:
+            - { value: 1, generic: 0, graph: 0, descr: 'Ok' }
+            - { value: 3, generic: 1, graph: 0, descr: 'Warning' }
+            - { value: 5, generic: 2, graph: 0, descr: 'Alarm' }
+        - oid: PROFLINE-SFD-MIB::sfdMsrAlarmMpxDeviation
+          num_oid: '.1.3.6.1.4.1.21222.1.4.1.3.1.4.0'
+          descr: MPX deviation
+          group: Alarm Status - Modulator
+          states:
+            - { value: 1, generic: 0, graph: 0, descr: 'Ok' }
+            - { value: 3, generic: 1, graph: 0, descr: 'Warning' }
+            - { value: 5, generic: 2, graph: 0, descr: 'Alarm' }
+        - oid: PROFLINE-SFD-MIB::sfdMsrAlarmRdsBer
+          num_oid: '.1.3.6.1.4.1.21222.1.4.1.3.1.5.0'
+          descr: RDS bit error rate
+          group: Alarm Status - RDS
+          states:
+            - { value: 1, generic: 0, graph: 0, descr: 'Ok' }
+            - { value: 3, generic: 1, graph: 0, descr: 'Warning' }
+            - { value: 5, generic: 2, graph: 0, descr: 'Alarm' }
+        - oid: PROFLINE-SFD-MIB::sfdMsrAlarmRdsLevel
+          num_oid: '.1.3.6.1.4.1.21222.1.4.1.3.1.6.0'
+          descr: RDS level
+          group: Alarm Status - RDS
+          states:
+            - { value: 1, generic: 0, graph: 0, descr: 'Ok' }
+            - { value: 3, generic: 1, graph: 0, descr: 'Warning' }
+            - { value: 5, generic: 2, graph: 0, descr: 'Alarm' }
+        - oid: PROFLINE-SFD-MIB::sfdMsrAlarmAudioLevelLeft
+          num_oid: '.1.3.6.1.4.1.21222.1.4.1.3.1.7.0'
+          descr: Left audio level
+          group: Alarm Status - Audio
+          states:
+            - { value: 1, generic: 0, graph: 0, descr: 'Ok' }
+            - { value: 3, generic: 1, graph: 0, descr: 'Warning' }
+            - { value: 5, generic: 2, graph: 0, descr: 'Alarm' }
+        - oid: PROFLINE-SFD-MIB::sfdMsrAlarmAudioLevelRight
+          num_oid: '.1.3.6.1.4.1.21222.1.4.1.3.1.8.0'
+          descr: Right audio level
+          group: Alarm Status - Audio
+          states:
+            - { value: 1, generic: 0, graph: 0, descr: 'Ok' }
+            - { value: 3, generic: 1, graph: 0, descr: 'Warning' }
+            - { value: 5, generic: 2, graph: 0, descr: 'Alarm' }
+        - oid: PROFLINE-SFD-MIB::sfdMsrAlarmAudioLevelBoth
+          num_oid: '.1.3.6.1.4.1.21222.1.4.1.3.1.9.0'
+          descr: Both audio level
+          group: Alarm Status - Audio
+          states:
+            - { value: 1, generic: 0, graph: 0, descr: 'Ok' }
+            - { value: 3, generic: 1, graph: 0, descr: 'Warning' }
+            - { value: 5, generic: 2, graph: 0, descr: 'Alarm' }
+        - oid: PROFLINE-SFD-MIB::sfdMsrAlarmRdsPi
+          num_oid: '.1.3.6.1.4.1.21222.1.4.1.3.1.10.0'
+          descr: RDS PI
+          group: Alarm Status - RDS
+          states:
+            - { value: 1, generic: 0, graph: 0, descr: 'Ok' }
+            - { value: 3, generic: 1, graph: 0, descr: 'Warning' }
+            - { value: 5, generic: 2, graph: 0, descr: 'Alarm' }

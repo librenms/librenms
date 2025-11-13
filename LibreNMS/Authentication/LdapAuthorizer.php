@@ -113,7 +113,7 @@ class LdapAuthorizer extends AuthorizerBase
             $group_names = array_keys($groups);
             $ldap_group_filter = '';
             foreach ($group_names as $group_name) {
-                $ldap_group_filter .= '(cn=' . trim($group_name) . ')';
+                $ldap_group_filter .= '(cn=' . trim((string) $group_name) . ')';
             }
             if (count($group_names) > 1) {
                 $ldap_group_filter = "(|{$ldap_group_filter})";
@@ -183,7 +183,15 @@ class LdapAuthorizer extends AuthorizerBase
 
         $search = ldap_search($connection, trim(LibrenmsConfig::get('auth_ldap_suffix'), ','), $filter);
         $entries = ldap_get_entries($connection, $search);
-        foreach ($entries as $entry) {
+        if (! $entries) {
+            return false;
+        }
+
+        foreach ($entries as $key => $entry) {
+            if ($key == 'count') {
+                continue;
+            }
+
             $user = $this->ldapToUser($entry);
             if ($user['user_id'] != $user_id) {
                 continue;
@@ -262,9 +270,14 @@ class LdapAuthorizer extends AuthorizerBase
         $base_dn = preg_replace('/,ou=[^,]+,/', ',', LibrenmsConfig::get('auth_ldap_suffix'));
         $base_dn = trim($base_dn, ',');
         $search = ldap_search($connection, $base_dn, $filter);
-        foreach (ldap_get_entries($connection, $search) as $entry) {
+        $results = ldap_get_entries($connection, $search);
+        if (! $results) {
+            return false;
+        }
+
+        foreach ($results as $entry) {
             if (isset($entry['uid'][0]) && $entry['uid'][0] == $username) {
-                preg_match('~,ou=([^,]+),~', $entry['dn'], $matches);
+                preg_match('~,ou=([^,]+),~', (string) $entry['dn'], $matches);
                 $user_ou = $matches[1] ?? '';
                 $new_auth_ldap_suffix = preg_replace('/,ou=[^,]+,/', ',ou=' . $user_ou . ',', LibrenmsConfig::get('auth_ldap_suffix'));
                 LibrenmsConfig::set('auth_ldap_suffix', $new_auth_ldap_suffix);
@@ -305,7 +318,7 @@ class LdapAuthorizer extends AuthorizerBase
      * @param  array  $entry  ldap entry array
      * @return array
      */
-    private function ldapToUser($entry): array
+    private function ldapToUser(array $entry): array
     {
         $uid_attr = strtolower(LibrenmsConfig::get('auth_ldap_uid_attribute', 'uidnumber'));
 

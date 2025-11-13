@@ -343,6 +343,14 @@ return [
             'description' => 'Active Directory Domain',
             'help' => 'Active Directory Domain Example: example.com',
         ],
+        'auth_ad_global_read' => [
+            'description' => 'Global Read',
+            'help' => 'Allow global-read access to all users',
+        ],
+        'auth_ad_group' => [
+            'description' => 'Access group DN',
+            'help' => 'Distinguished name for a group to give normal level access. Example: cn=groupname,ou=groups,dc=example,dc=com',
+        ],
         'auth_ad_group_filter' => [
             'description' => 'Group LDAP filter',
             'help' => 'Active Directory LDAP filter for selecting groups',
@@ -354,6 +362,10 @@ return [
         'auth_ad_require_groupmembership' => [
             'description' => 'Require group membership',
             'help' => 'Only allow users to log in if they are part of a defined group',
+        ],
+        'auth_ad_timeout' => [
+            'description' => 'Connection timeout',
+            'help' => 'If one or more servers are unresponsive, higher timeouts will cause slow logins. To low may cause connection failures in some cases',
         ],
         'auth_ad_user_filter' => [
             'description' => 'User LDAP filter',
@@ -818,6 +830,9 @@ return [
             'description' => 'Memcached port',
             'help' => 'The port for the memcached server. Default is 11211',
         ],
+        'enable_ports_etherlike' => [
+            'description' => 'Enable etherlike graphs for ports',
+        ],
         'email_auto_tls' => [
             'description' => 'Auto TLS support',
             'help' => 'Tries to use TLS before falling back to un-encrypted',
@@ -1167,9 +1182,21 @@ return [
                 'description' => 'Username',
                 'help' => 'Username to connect to InfluxDB, if required',
             ],
+            'batch_size' => [
+                'description' => 'Batch Size',
+                'help' => 'Number of metrics to send in a single batch, 0 means no batching',
+            ],
+            'measurements' => [
+                'description' => 'Measurements',
+                'help' => 'List of measurements to send to InfluxDB, leave empty to send all',
+            ],
             'verifySSL' => [
                 'description' => 'Verify SSL',
                 'help' => 'Verify the SSL certificate is valid and trusted',
+            ],
+            'debug' => [
+                'description' => 'Debug',
+                'help' => 'To enable or disable verbose output to CLI',
             ],
         ],
         'influxdbv2' => [
@@ -1564,6 +1591,10 @@ return [
                 'description' => 'Minimum password length',
                 'help' => 'Passwords shorter than the given length will be rejected',
             ],
+            'uncompromised' => [
+                'description' => 'Require password to be uncompromised',
+                'help' => 'Checks password against HaveIBeenPwned database using k-anonymity',
+            ],
         ],
         'peeringdb' => [
             'enabled' => [
@@ -1755,6 +1786,9 @@ return [
             'printer-supplies' => [
                 'description' => 'Printer Supplies',
             ],
+            'port-security' => [
+                'description' => 'Port Security',
+            ],
         ],
         'polling.selected_ports' => [
             'description' => 'Selected Port Polling',
@@ -1767,6 +1801,10 @@ return [
         'ports_nac_purge' => [
             'description' => 'Port NAC entries older than',
             'help' => 'Cleanup done by daily.sh',
+        ],
+        'ports_page_default' => [
+            'description' => 'Default ports tab',
+            'help' => 'Default tab to open when viewing ports on the device page',
         ],
         'ports_purge' => [
             'description' => 'Purge ports deleted',

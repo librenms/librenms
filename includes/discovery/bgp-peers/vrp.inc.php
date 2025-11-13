@@ -54,7 +54,7 @@ if (count($bgpPeersCache) > 0 || count($bgpPeersCache_ietf) == 0) {
     $bgpPeersDesc = snmpwalk_cache_oid($device, 'hwBgpPeerSessionExtDescription', [], 'HUAWEI-BGP-VPN-MIB');
 
     foreach ($bgpPeersCache as $key => $value) {
-        $oid = explode('.', $key);
+        $oid = explode('.', (string) $key);
         $vrfInstance = $value['hwBgpPeerVrfName'];
         if ($oid[0] == 0) {
             $vrfInstance = '';

@@ -265,7 +265,7 @@ return [
         'success' => 'Успешно добавлен пользователь: :username',
         'wrong-auth' => 'Предупреждение! Вы не сможете войти с этим пользователем, потому что вы не используете аутентификацию MySQL',
     ],
-    'maintenance:database-cleanup' => [
+    'maintenance:cleanup-database' => [
         'description' => 'Очистка базы данных от сиротских элементов.',
     ],
 ];

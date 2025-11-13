@@ -20,13 +20,39 @@ products OBJECT IDENTIFIER ::= { eaton 6  }
 pduAgent OBJECT IDENTIFIER ::= { products 6  }
 
 eatonEpdu MODULE-IDENTITY
-	LAST-UPDATED "201805301500Z"
+	LAST-UPDATED "202303311500Z"
 	ORGANIZATION 
 		"Eaton Corporation"
 	CONTACT-INFO 
 		"www.eaton.com/epdu"
 	DESCRIPTION 
 		"The MIB module for Eaton ePDUs (Enclosure Power Distribution Units)."
+
+	REVISION "202303311500Z"
+	DESCRIPTION 
+		"- Add a new outlet type comboC39 (3)."
+
+	REVISION "202205161500Z"
+	DESCRIPTION 
+		"- Changed input type from iec360P6 (105) to iec363P6 (105).
+		- Add a new input type nemaL2530 (131).
+		- Add a new input type other208V2P3W (140).
+		- Add a new input type other230V1P3W (141).
+		- Add a new input type field208V2P3W (160).
+		- Add a new input type field230V1P3W (161).
+		- Add a new input type iec4100P9 (307).
+		- Add a new input type nemaL2630 (327).
+		- Add a new input type other208V3P4W (340).
+		- Add a new input type other208V3P5W (341).
+		- Add a new input type other400V3P5W (342).
+		- Add a new input type other480V3P5W (343).
+		- Add a new input type field208V3P4W (360).
+		- Add a new input type field400V3P5W (361).
+		- Add a new input type universalUTP8pin (400)."
+		
+	REVISION "201907121500Z"
+	DESCRIPTION 
+		"- Add a new outlet type sdg400 (32)."
 
 	REVISION "201805301500Z"
 	DESCRIPTION 
@@ -786,7 +812,7 @@ inputPlugType  OBJECT-TYPE
         iecC20Inlet (102),
         iec316P6 (103),
         iec332P6 (104),
-        iec360P6 (105),
+        iec363P6 (105),
         iecC14Plug (106),
         iecC20Plug (107),
         nema515 (120),
@@ -800,9 +826,14 @@ inputPlugType  OBJECT-TYPE
         nemaL620 (128),
         nemaL630 (129),
         cs8265 (130),
+        nemaL2530 (131),
+        other208V2P3W (140),
+        other230V1P3W (141),        
         french (150),
         schuko (151),
         uk (152),
+        field208V2P3W (160),
+        field230V1P3W (161),
         nemaL1420 (201),
         nemaL1430 (202),
         iec516P6 (301),
@@ -810,6 +841,7 @@ inputPlugType  OBJECT-TYPE
         iec560P9 (303),
         iec532P6 (304),
         iec563P6 (306),
+        iec4100P9 (307),
         nemaL1520 (320),
         nemaL2120 (321),
         nemaL1530 (322),
@@ -817,8 +849,16 @@ inputPlugType  OBJECT-TYPE
         cs8365 (324),
         nemaL2220 (325),
         nemaL2230 (326),
+        nemaL2630 (327),
+        other208V3P4W (340),
+        other208V3P5W (341),
+        other400V3P5W (342),
+        other480V3P5W (343),
         bladeUps208V (350),
-        bladeUps400V (351)
+        bladeUps400V (351),
+        field208V3P4W (360),
+        field400V3P5W (361),
+        universalUTP8pin (400)
 	}
 	MAX-ACCESS read-only
 	STATUS     current
@@ -2044,6 +2084,7 @@ outletType  OBJECT-TYPE
 		unknown (0),
 		iecC13 (1),
 		iecC19 (2),
+        comboC39 (3),
         uk (10),
 		french (11),
 		schuko (12),
@@ -2056,9 +2097,10 @@ outletType  OBJECT-TYPE
 		nema620 (26),
 		nemaL620 (27),
 		nemaL630 (28),
-    nemaL715 (29),
-    rf203p277 (30),
-       sdg300 (31)
+        nemaL715 (29),
+        rf203p277 (30),
+        sdg300 (31),
+        sdg400 (32)
 	}
 	MAX-ACCESS read-only
 	STATUS     current

@@ -171,9 +171,7 @@ class OS implements
         }
 
         // create missing graphs
-        $device->graphs()->saveMany($graphs->diff($device->graphs->pluck('graph'))->map(function ($graph) {
-            return new DeviceGraph(['graph' => $graph]);
-        }));
+        $device->graphs()->saveMany($graphs->diff($device->graphs->pluck('graph'))->map(fn ($graph) => new DeviceGraph(['graph' => $graph])));
     }
 
     public function preCache()
@@ -318,13 +316,15 @@ class OS implements
 
         $data = [];
         foreach ($oids as $id => $oid) {
-            if (isset($callback)) {
-                $channel = call_user_func($callback, $snmp_data[$oid]);
-            } else {
-                $channel = $snmp_data[$oid];
-            }
+            if (isset($snmp_data[$oid])) {
+                if (isset($callback)) {
+                    $channel = call_user_func($callback, $snmp_data[$oid]);
+                } else {
+                    $channel = $snmp_data[$oid];
+                }
 
-            $data[$id] = WirelessSensor::channelToFrequency($channel);
+                $data[$id] = WirelessSensor::channelToFrequency($channel);
+            }
         }
 
         return $data;

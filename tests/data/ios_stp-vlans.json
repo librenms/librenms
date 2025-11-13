@@ -7107,7 +7107,7 @@
                     "priority": 128,
                     "state": "forwarding",
                     "cost": 4,
-                    "untagged": 1
+                    "untagged": 0
                 }
             ]
         }

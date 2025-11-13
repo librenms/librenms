@@ -35,7 +35,8 @@ use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
-class YamlSchemaTest extends TestCase
+#[Group('yaml')]
+final class YamlSchemaTest extends TestCase
 {
     private array $excluded = [
         '/os_detection/default.yaml',
@@ -48,25 +49,22 @@ class YamlSchemaTest extends TestCase
         $this->validateFileAgainstSchema(resource_path('definitions/config_definitions.json'), resource_path('definitions/schema/config_schema.json'));
     }
 
-    #[Group('os')]
     public function testOSDefinitionSchema(): void
     {
         $this->validateYamlFilesAgainstSchema(resource_path('definitions/os_detection'), resource_path('definitions/schema/os_schema.json'));
     }
 
-    #[Group('os')]
     public function testOSMatchFilename(): void
     {
         foreach ($this->listFiles(resource_path('definitions/os_detection/*.yaml')) as $filename => $file) {
             $this->assertEquals(
                 Yaml::parseFile($file)['os'],
-                substr($filename, 0, -5),
+                substr((string) $filename, 0, -5),
                 "Parameter 'os' doesn't match the filename $filename"
             );
         }
     }
 
-    #[Group('os')]
     public function testDiscoveryDefinitionSchema(): void
     {
         $this->validateYamlFilesAgainstSchema(resource_path('definitions/os_discovery'), resource_path('definitions/schema/discovery_schema.json'));
@@ -129,9 +127,7 @@ class YamlSchemaTest extends TestCase
         }
 
         $errors = collect($validator->getErrors())
-            ->reduce(function ($out, $error) {
-                return sprintf("%s[%s] %s\n", $out, $error['property'], $error['message']);
-            }, '');
+            ->reduce(fn ($out, $error) => sprintf("%s[%s] %s\n", $out, $error['property'], $error['message']), '');
 
         $this->assertTrue($validator->isValid(), "$filename does not validate. Violations:\n$errors");
     }

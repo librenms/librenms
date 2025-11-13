@@ -27780,5 +27780,21 @@
                 }
             ]
         }
+    },
+    "ipv6-nd": {
+        "discovery": {
+            "ipv6_nd": [
+                {
+                    "mac_address": "18:de:d7:bf:64:0c",
+                    "ipv6_address": "2406:2b00:ffff:0001:0001:0000:0000:0002",
+                    "context_name": ""
+                },
+                {
+                    "mac_address": "18:de:d7:bf:64:0c",
+                    "ipv6_address": "fe80:0000:0000:0000:1ade:d7ff:febf:640c",
+                    "context_name": ""
+                }
+            ]
+        }
     }
 }

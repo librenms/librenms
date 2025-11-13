@@ -15,7 +15,6 @@ $init_modules = ['discovery'];
 require __DIR__ . '/includes/init.php';
 
 $start = microtime(true);
-Log::setDefaultDriver('console');
 $sqlparams = [];
 $options = getopt('h:m:i:n:d::v::a::q', ['os:', 'type:']);
 
@@ -24,6 +23,7 @@ if (! isset($options['q'])) {
 }
 
 $where = '';
+$doing = '';
 if (isset($options['h'])) {
     if ($options['h'] == 'odd') {
         $options['n'] = '1';

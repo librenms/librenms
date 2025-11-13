@@ -6,7 +6,7 @@ modules:
     version: Montclair-MIB::deviceFirmwareVersion.0
     sysDescr_regex: '/(?<hardware>.*)/'
   sensors:
-    pre-cache:
+    additional_oids:
       data:
         -
           oid:

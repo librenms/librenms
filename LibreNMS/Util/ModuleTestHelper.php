@@ -95,8 +95,8 @@ class ModuleTestHelper
 
     private static function compareOid($a, $b): int
     {
-        $a_oid = explode('.', $a);
-        $b_oid = explode('.', $b);
+        $a_oid = explode('.', (string) $a);
+        $b_oid = explode('.', (string) $b);
 
         foreach ($a_oid as $index => $a_part) {
             if (! isset($b_oid[$index])) {
@@ -200,7 +200,7 @@ class ModuleTestHelper
 
         // extract snmp queries
         $snmp_query_regex = '/SNMP\[\'.*snmp(?:bulk)?(walk|get|getnext)\' .+\'(udp|tcp|tcp6|udp6):(?:\[[0-9a-f:]+\]|[^:]+):[0-9]+\' \'(.+)\'\]/m';
-        preg_match_all($snmp_query_regex, $collection_output, $snmp_matches);
+        preg_match_all($snmp_query_regex, (string) $collection_output, $snmp_matches);
 
         // extract mibs and group with oids
         $snmp_oids = [
@@ -501,7 +501,7 @@ class ModuleTestHelper
 
         foreach ($snmprec_data as $line) {
             if (! empty($line)) {
-                [$oid] = explode('|', $line, 2);
+                [$oid] = explode('|', (string) $line, 2);
                 $result[$oid] = $line;
             }
         }
@@ -527,8 +527,8 @@ class ModuleTestHelper
 
         // IF-MIB::ifPhysAddress, Make sure it is in hex format
         foreach ($data as $oid => $oid_data) {
-            if (str_starts_with($oid, '1.3.6.1.2.1.2.2.1.6.')) {
-                $parts = explode('|', $oid_data, 3);
+            if (str_starts_with((string) $oid, '1.3.6.1.2.1.2.2.1.6.')) {
+                $parts = explode('|', (string) $oid_data, 3);
                 $mac = Mac::parse($parts[2])->hex();
                 if ($mac) {
                     $parts[2] = $mac;
@@ -555,9 +555,7 @@ class ModuleTestHelper
         app()->bind(AutonomousSystem::class, function ($app, $parameters) {
             $asn = $parameters['asn'] ?? '?';
             $mock = \Mockery::mock(AutonomousSystem::class);
-            $mock->shouldReceive('name')->withAnyArgs()->zeroOrMoreTimes()->andReturnUsing(function () use ($asn) {
-                return "AS$asn-MOCK-TEXT";
-            });
+            $mock->shouldReceive('name')->withAnyArgs()->zeroOrMoreTimes()->andReturnUsing(fn () => "AS$asn-MOCK-TEXT");
 
             return $mock;
         });
@@ -576,6 +574,7 @@ class ModuleTestHelper
             $new_device = new Device([
                 'hostname' => $snmpSimIp,
                 'snmpver' => 'v2c',
+                'transport' => 'udp',
                 'community' => $this->file_name,
                 'port' => $snmpSimPort,
                 'disabled' => 1, // disable to block normal pollers

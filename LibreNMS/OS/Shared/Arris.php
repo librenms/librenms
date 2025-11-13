@@ -14,7 +14,7 @@ class Arris extends OS
 
     public function discoverEntityPhysical(): \Illuminate\Support\Collection
     {
-        return $this->discoverBaseEntityPhysical()->each(function (EntPhysical $entity) {
+        return $this->discoverBaseEntityPhysical()->each(function (EntPhysical $entity): void {
             // clean garbage in Rev fields "...............\n00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
             $entity->entPhysicalHardwareRev = StringHelpers::trimHexGarbage($entity->entPhysicalHardwareRev);
             $entity->entPhysicalFirmwareRev = StringHelpers::trimHexGarbage($entity->entPhysicalFirmwareRev);

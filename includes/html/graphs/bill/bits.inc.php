@@ -3,12 +3,13 @@
 use LibreNMS\Billing;
 use LibreNMS\Util\Number;
 
-$datefrom = date('YmdHis', $vars['from']);
-$dateto = date('YmdHis', $vars['to']);
+$datefrom = date('YmdHis', $vars['from'] ?? null);
+$dateto = date('YmdHis', $vars['to'] ?? null);
+$bill_id = $vars['id'] ?? 0;
 
-$rates = Billing::getRates($vars['id'], $datefrom, $dateto, $vars['dir']);
+$rates = Billing::getRates($bill_id, $datefrom, $dateto, $vars['dir'] ?? null);
 
-$ports = dbFetchRows('SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D WHERE B.bill_id = ? AND P.port_id = B.port_id AND D.device_id = P.device_id', [$vars['id']]);
+$ports = dbFetchRows('SELECT * FROM `bill_ports` AS B, `ports` AS P, `devices` AS D WHERE B.bill_id = ? AND P.port_id = B.port_id AND D.device_id = P.device_id', [$bill_id]);
 
 // Generate a list of ports and then call the multi_bits grapher to generate from the list
 $i = 0;

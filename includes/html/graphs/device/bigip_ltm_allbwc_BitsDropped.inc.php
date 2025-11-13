@@ -28,7 +28,7 @@ $colcount = 0;
 $count = 0;
 
 // add all LTM VS on this device.
-foreach ($components as $compid => $comp) {
+foreach ($components as $comp) {
     $label = $comp['label'];
     $hash = $comp['hash'];
     $rrd_filename = Rrd::name($device['hostname'], [$comp['type'], $label, $hash]);
@@ -43,7 +43,7 @@ foreach ($components as $compid => $comp) {
 
         $rrd_options .= ' DEF:DS' . $count . '=' . $rrd_filename . ':bytesdropped:AVERAGE ';
         $rrd_options .= ' CDEF:MOD' . $count . '=DS' . $count . ',8,* ';
-        $rrd_options .= ' LINE1.25:MOD' . $count . '#' . $colour . ":'" . str_pad(substr($label, 0, 60), 60) . "'";
+        $rrd_options .= ' LINE1.25:MOD' . $count . '#' . $colour . ":'" . str_pad(substr((string) $label, 0, 60), 60) . "'";
         $rrd_options .= ' GPRINT:MOD' . $count . ':LAST:%6.2lf%s ';
         $rrd_options .= ' GPRINT:MOD' . $count . ':AVERAGE:%6.2lf%s ';
         $rrd_options .= ' GPRINT:MOD' . $count . ":MAX:%6.2lf%s\l ";

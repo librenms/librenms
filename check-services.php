@@ -25,7 +25,6 @@ $options = getopt('drfpgh:');
 if (Debug::set(isset($options['d']))) {
     echo "DEBUG!\n";
 }
-\Log::setDefaultDriver('console');
 
 $poller_start = microtime(true);
 

@@ -1299,11 +1299,9 @@ tr.search:nth-child(odd) {
 
 
 .scrollable-menu {
-    height: auto;
-    max-height: 600px;
+    overflow-y: auto;
     overflow-x: hidden;
 }
-
 
 .ui-autocomplete {
     max-height: 100px;

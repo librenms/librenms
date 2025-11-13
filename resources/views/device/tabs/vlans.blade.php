@@ -1,7 +1,12 @@
-@extends('device.submenu')
+@extends('layouts.librenmsv1')
 
-@section('tabcontent')
-    <table class="table table-hover table-condensed table-striped">
+@section('content')
+<x-device.page :device="$device">
+    @isset($data['submenu'])
+        <x-submenu :title="$title" :menu="$data['submenu']" :device-id="$device_id" :current-tab="$current_tab" :selected="$vars" />
+    @endisset
+
+        <table class="table table-hover table-condensed table-striped">
         <thead>
             <tr>
                 <th style="width: 150px;">{{ __('VLAN Number') }}</th>
@@ -42,6 +47,7 @@
         @endforeach
         </tbody>
     </table>
+</x-device.page>
 @endsection
 
 

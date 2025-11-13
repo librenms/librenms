@@ -107,7 +107,7 @@ class Plugins
         $plugin = self::getInstance($file, $pluginName);
 
         if (! is_null($plugin)) {
-            $class = get_class($plugin);
+            $class = $plugin::class;
             $hooks = get_class_methods($class);
 
             foreach ((array) $hooks as $hookName) {
@@ -196,7 +196,7 @@ class Plugins
                 } catch (\Exception|\Error $e) {
                     Log::error($e);
 
-                    $class = (string) get_class($plugin);
+                    $class = (string) $plugin::class;
                     $name = property_exists($class, 'name') ? $class::$name : basename(str_replace('\\', '/', $class));
 
                     Notifications::create("Plugin $name disabled", "$name caused an error and was disabled, please check with the plugin creator to fix the error. The error can be found in logs/librenms.log", 'plugins', 2);

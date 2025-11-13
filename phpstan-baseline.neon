@@ -166,11 +166,6 @@ parameters:
 			path: app/Models/UserPref.php
 
 		-
-			message: "#^Variable \\$username on left side of \\?\\? is never defined\\.$#"
-			count: 1
-			path: app/Providers/LegacyUserProvider.php
-
-		-
 			message: "#^Parameter \\#1 \\$attr of method LibreNMS\\\\Authentication\\\\SSOAuthorizer\\:\\:authSSOGetAttr\\(\\) expects string, int given\\.$#"
 			count: 2
 			path: tests/AuthSSOTest.php
@@ -184,8 +179,3 @@ parameters:
 			message: "#^Parameter \\#2 \\$default of function set_null expects null, int given\\.$#"
 			count: 2
 			path: tests/CommonFunctionsTest.php
-
-		-
-			message: "#^Parameter \\#1 \\$new_location of method App\\\\Models\\\\Device\\:\\:setLocation\\(\\) expects App\\\\Models\\\\Location\\|string, null given\\.$#"
-			count: 1
-			path: tests/Unit/LocationTest.php

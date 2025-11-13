@@ -38,11 +38,6 @@ use LibreNMS\Interfaces\Data\WriteInterface;
 class Datastore implements WriteInterface, DataStorageInterface
 {
     /**
-     * @var DatastoreContract[]
-     */
-    protected array $stores;
-
-    /**
      * Legacy factory method to initialize and create the Datastore(s)
      *
      * @param  array  $options
@@ -70,11 +65,10 @@ class Datastore implements WriteInterface, DataStorageInterface
     /**
      * Datastore constructor.
      *
-     * @param  DatastoreContract[]  $datastores
+     * @param  DatastoreContract[]  $stores
      */
-    public function __construct(array $datastores)
+    public function __construct(protected array $stores)
     {
-        $this->stores = $datastores;
     }
 
     public function terminate(): void
@@ -157,9 +151,7 @@ class Datastore implements WriteInterface, DataStorageInterface
      */
     private function rrdTagFilter(array &$tags): array
     {
-        [$metaTags, $filteredTags] = Arr::partition($tags, function ($value, string $tag) {
-            return str_starts_with($tag, 'rrd_');
-        });
+        [$metaTags, $filteredTags] = Arr::partition($tags, fn ($value, string $tag) => str_starts_with($tag, 'rrd_'));
 
         $tags = $filteredTags; // Update the original array with remaining tags
 
@@ -183,8 +175,6 @@ class Datastore implements WriteInterface, DataStorageInterface
      */
     public function getStats(): Collection
     {
-        return collect($this->stores)->mapWithKeys(function (DatastoreContract $store) {
-            return [$store->getName() => $store->getStats()];
-        });
+        return collect($this->stores)->mapWithKeys(fn (DatastoreContract $store) => [$store->getName() => $store->getStats()]);
     }
 }

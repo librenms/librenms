@@ -258,7 +258,7 @@ class CustomMapController extends Controller
         $nodes = $map->nodes()->get();
         $edges = $map->edges()->get();
 
-        DB::transaction(function () use ($newmap, $newbackground, $nodes, $edges) {
+        DB::transaction(function () use ($newmap, $newbackground, $nodes, $edges): void {
             $newmap->save();
 
             if ($newbackground) {
@@ -267,7 +267,7 @@ class CustomMapController extends Controller
             }
 
             $node_id_map = collect();
-            foreach ($nodes as $id => $node) {
+            foreach ($nodes as $node) {
                 $newnode = $node->replicate();
                 $newnode->custom_map_id = $newmap->custom_map_id;
                 $newnode->save();
@@ -275,7 +275,7 @@ class CustomMapController extends Controller
                 $node_id_map->put($node->custom_map_node_id, $newnode->custom_map_node_id);
             }
 
-            foreach ($edges as $id => $edge) {
+            foreach ($edges as $edge) {
                 $newedge = $edge->replicate();
                 $newedge->custom_map_id = $newmap->custom_map_id;
                 $newedge->custom_map_node1_id = $node_id_map->get($edge->custom_map_node1_id);
@@ -349,7 +349,7 @@ class CustomMapController extends Controller
             if (! is_numeric($key)) {
                 // Delete keys that are not numeric
                 unset($ret[$key]);
-            } elseif (! preg_match('/^#[A-Fa-f0-0]{6}$/', $ret[$key])) {
+            } elseif (! preg_match('/^#[A-Fa-f0-0]{6}$/', (string) $ret[$key])) {
                 // Delete keys that are not a valid hex HTML colour
                 unset($ret[$key]);
             }

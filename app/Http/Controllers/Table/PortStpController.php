@@ -46,13 +46,9 @@ class PortStpController extends TableController
     {
         return [
             'device_id',
-            'vlan' => function ($query, $vlan) {
-                $query->where(function ($query) use ($vlan) {
-                    $query->where('vlan', $vlan)->when($vlan == 1, function ($query) {
-                        return $query->orWhereNull('vlan');
-                    })->when($vlan === null, function ($query) {
-                        return $query->orWhere('vlan', 1);
-                    });
+            'vlan' => function ($query, $vlan): void {
+                $query->where(function ($query) use ($vlan): void {
+                    $query->where('vlan', $vlan)->when($vlan == 1, fn ($query) => $query->orWhereNull('vlan'))->when($vlan === null, fn ($query) => $query->orWhere('vlan', 1));
                 });
             },
         ];

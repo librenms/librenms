@@ -1,9 +1,9 @@
 mib: MIKROTIK-MIB
 modules:
     os:
-        sysDescr_regex: '/(?<hardware>.*)\sSwOS\s(?<version>.*)/'        
+        sysDescr_regex: '/(?<hardware>.*)\sSwOS\s(?<version>.*)/'
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

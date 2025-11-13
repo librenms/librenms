@@ -31,7 +31,6 @@ require $install_dir . '/includes/init.php';
 Debug::setVerbose(
     Debug::set(isset($options['d']) || isset($options['debug']))
 );
-\Log::setDefaultDriver('console');
 
 if (isset($options['h'])
     || isset($options['help'])
@@ -135,7 +134,7 @@ echo "\n";
 
 try {
     $no_save = isset($options['n']) || isset($options['no-save']);
-    foreach ($os_list as $full_os_name => $parts) {
+    foreach ($os_list as $parts) {
         [$target_os, $target_variant] = $parts;
         echo "OS: $target_os\n";
         echo "Module: $modules_input\n";

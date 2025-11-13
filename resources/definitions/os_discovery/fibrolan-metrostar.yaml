@@ -40,5 +40,4 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'fail' }
                         - { value: 2, generic: 0, graph: 0, descr: 'ok' }
                         - { value: 3, generic: 3, graph: 0, descr: 'uninstalled' }
-                    snmp_flags: '-OQUsbe'
                     group: 'Power Supplies'

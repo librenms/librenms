@@ -56,6 +56,7 @@ if (! $noagg || ! $nodetails) {
 }
 
 $iter = 0;
+$descr_out = '';
 foreach ($rrd_list as $rrd) {
     if (! \App\Facades\LibrenmsConfig::get("graph_colours.$colours_in.$iter") || ! \App\Facades\LibrenmsConfig::get("graph_colours.$colours_out.$iter")) {
         $iter = 0;
@@ -65,12 +66,8 @@ foreach ($rrd_list as $rrd) {
     $colour_out = \App\Facades\LibrenmsConfig::get("graph_colours.$colours_out.$iter");
 
     if (! $nodetails) {
-        if (isset($rrd['descr_in'])) {
-            $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr_in'], $descr_len) . '  In';
-        } else {
-            $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr'], $descr_len) . '  In';
-        }
-        $descr_out = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr_out'], $descr_len) . ' Out';
+        $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr_in'] ?? $rrd['descr'] ?? '', $descr_len) . '  In';
+        $descr_out = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr_out'] ?? '', $descr_len) . ' Out';
     }
 
     $rrd_options .= ' DEF:' . $in . $i . '=' . $rrd['filename'] . ':' . $ds_in . ':AVERAGE ';

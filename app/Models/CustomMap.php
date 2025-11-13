@@ -109,10 +109,10 @@ class CustomMap extends BaseModel
 
         // Allow only if the user has access to all devices on the map
         return $query->withCount([
-            'nodes as device_nodes_count' => function (Builder $q) {
+            'nodes as device_nodes_count' => function (Builder $q): void {
                 $q->whereNotNull('device_id');
             },
-            'nodes as device_nodes_allowed_count' => function (Builder $q) use ($user) {
+            'nodes as device_nodes_allowed_count' => function (Builder $q) use ($user): void {
                 $this->hasDeviceAccess($q, $user, 'custom_map_nodes');
             },
         ])

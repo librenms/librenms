@@ -21,7 +21,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.34774.4.1.23.5.1.1.11.{{ $index }}'
                     descr: '{{ $hwInfoDiskLocation }} {{ $hwInfoDiskManufacturer }} {{ $hwInfoDiskModel }}'
                     index: '{{ $index }}'
-                    snmp_flags: '-OteQUsb'
                     group: 'Disks'
         state:
             data:
@@ -30,7 +29,6 @@ modules:
                     value: hwInfoControllerHealthStatus
                     num_oid: '.1.3.6.1.4.1.34774.4.1.23.5.2.1.2.{{ $index }}'
                     descr: '{{ $hwInfoControllerLocation }}'
-                    snmp_flags: '-OteQUsb'
                     group: 'Controllers'
                     state_name: hwInfoControllerHealthStatus
                     states:
@@ -54,7 +52,6 @@ modules:
                     value: hwInfoStoragePoolHealthStatus
                     num_oid: '.1.3.6.1.4.1.34774.4.1.23.4.2.1.5.{{ $index }}'
                     descr: '{{ $hwInfoStoragePoolName }}'
-                    snmp_flags: '-OteQUsb'
                     group: 'Storage Pools'
                     state_name: hwInfoStoragePoolHealthStatus
                     states:
@@ -78,7 +75,6 @@ modules:
                     value: hwInfoLunHealthStatus
                     num_oid: '.1.3.6.1.4.1.34774.4.1.23.4.8.1.9.{{ $index }}'
                     descr: '{{ $hwInfoLunName }}'
-                    snmp_flags: '-OteQUsb'
                     group: 'LUNs'
                     state_name: hwInfoLunHealthStatus
                     states:
@@ -129,7 +125,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.34774.4.1.23.5.1.1.25.{{ $index }}'
                     descr: '{{ $hwInfoDiskLocation }} {{ $hwInfoDiskManufacturer }} {{ $hwInfoDiskModel }}'
                     index: '{{ $index }}'
-                    snmp_flags: '-OteQUsb'
                     group: 'Disk Life Cycle'
                     skip_values:
                         -

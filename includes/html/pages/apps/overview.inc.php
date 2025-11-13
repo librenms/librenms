@@ -16,11 +16,9 @@ foreach (Application::query()->hasAccess(Auth::user())->with('device')->get()->s
     echo '<div style="clear: both;">';
     echo $index > 0 ? '<hr />' : '';
     $index++;
-    echo '<h4>' . generate_link(htmlentities($groupedApps->first()->displayName()), ['page' => 'apps', 'app' => $type]) . '</h4>';
+    echo '<h4>' . generate_link(htmlentities((string) $groupedApps->first()->displayName()), ['page' => 'apps', 'app' => $type]) . '</h4>';
     /** @var \Illuminate\Support\Collection $groupedApps */
-    $groupedApps = $groupedApps->sortBy(function ($app) {
-        return $app->device->hostname;
-    });
+    $groupedApps = $groupedApps->sortBy(fn ($app) => $app->device->hostname);
     /** @var Application $app */
     foreach ($groupedApps as $app) {
         $graph_type = $graphs[$app->app_type][0] ?? '';
@@ -44,7 +42,7 @@ foreach (Application::query()->hasAccess(Auth::user())->with('device')->get()->s
 
         $overlib_link .= '<br/>';
         $overlib_link .= \LibreNMS\Util\Url::graphTag($graph_array);
-        $overlib_content = generate_overlib_content($graph_array, htmlentities($app->device?->shortDisplayName() ?? '') . ' - ' . htmlentities($app->displayName()) . $content_add);
+        $overlib_content = generate_overlib_content($graph_array, htmlentities($app->device?->shortDisplayName() ?? '') . ' - ' . htmlentities((string) $app->displayName()) . $content_add);
 
         echo "<div style='display: block; padding: 1px; padding-top: 3px; margin: 2px; min-height:165px; max-height:165px;
                       text-align: center; float: left;'>";

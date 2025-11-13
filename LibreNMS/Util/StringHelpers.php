@@ -73,7 +73,7 @@ class StringHelpers
             'zfs' => 'ZFS',
         ];
 
-        return isset($replacements[$string]) ? $replacements[$string] : ucwords(str_replace(['_', '-'], ' ', $string));
+        return $replacements[$string] ?? ucwords(str_replace(['_', '-'], ' ', $string));
     }
 
     /**
@@ -102,7 +102,7 @@ class StringHelpers
 
         $charset = config('app.charset');
 
-        if (($converted = @iconv($charset, 'UTF-8', $string)) !== false) {
+        if (($converted = @iconv((string) $charset, 'UTF-8', $string)) !== false) {
             return (string) $converted;
         }
 

@@ -1,0 +1,16 @@
+os: ecresofm-os
+text: 'Ecreso FM Transmitter'
+type: appliance
+icon: worldcastsystems
+group: worldcastsystems
+over:
+    - { graph: device_power, text: 'Power' }
+    - { graph: device_count, text: 'Counters' }
+    - { graph: device_temperature, text: 'Temperature' }
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+        snmpget:
+            oid: 1.3.6.1.4.1.6404.3.1.2.9.1.1.0
+            op: 'regex'
+            value: '(E01|E03|G20|G10)'

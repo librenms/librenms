@@ -8,7 +8,7 @@
                     "sysDescr": "Firewall Test150",
                     "sysContact": "<private>",
                     "version": "v7.2.10,build1706,240918 (GA.M)",
-                    "hardware": "FGT_60F",
+                    "hardware": "FortiGate 60F",
                     "features": null,
                     "location": "<private>",
                     "os": "fortigate",

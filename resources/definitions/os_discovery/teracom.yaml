@@ -16,7 +16,7 @@ modules:
             - TERACOM-TCW260-MIB::version.0
         hardware_regex: '/(?<hardware>.+)-(.*)?/'
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:
@@ -176,7 +176,7 @@ modules:
                         -
                             oid: s32Int
                             op: '<'
-                            value: 0 
+                            value: 0
                 -
                     oid: s41Al
                     value: s41Al
@@ -192,7 +192,7 @@ modules:
                         -
                             oid: s41Int
                             op: '<'
-                            value: 0 
+                            value: 0
                 -
                     oid: s42Al
                     value: s42Al

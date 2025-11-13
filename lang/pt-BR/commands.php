@@ -268,7 +268,7 @@ return [
         'success' => 'Usuário adicionado com sucesso: :username',
         'wrong-auth' => 'Aviso! Você não poderá fazer login com este usuário porque não está usando autenticação MySQL',
     ],
-    'maintenance:database-cleanup' => [
+    'maintenance:cleanup-database' => [
         'description' => 'Limpeza do banco de dados para remover itens órfãos.',
     ],
 ];

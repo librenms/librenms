@@ -104,7 +104,7 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
         echo '
             <tr>
                 <td></td>
-                <td><span style="font-weight: bold;" class="interface">' . date('Y-m-d', strtotime($datefrom)) . ' to ' . date('Y-m-d', strtotime($dateto)) . "</span></td>
+                <td><span style="font-weight: bold;" class="interface">' . date('Y-m-d', strtotime((string) $datefrom)) . ' to ' . date('Y-m-d', strtotime((string) $dateto)) . "</span></td>
                 <td>$type</td>
                 <td>$allowed</td>
                 <td>$in</td>
@@ -125,7 +125,7 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
             $img['bw_day'] = showDetails($bill_id, 'day', $history['bill_hist_id']);
             $img['bw_hour'] = showDetails($bill_id, 'hour', $history['bill_hist_id']);
             echo '
-                <tr style="background: #fff; border-top: 1px solid ' . $row_colour . '; border-bottom: 1px solid #ccc;">
+                <tr style="background: #fff; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc;">
                     <td colspan="11">
                     <!-- <b>Accuate Graph</b><br /> //-->
                     ' . $img['bitrate'] . '<br />

@@ -66,7 +66,7 @@ class WebServer extends BaseValidation
                 } else {
                     $validator->fail('base_url is not set correctly', "lnms config:set base_url $correct_base");
                 }
-            } elseif (preg_replace('#/$#', '', \config('app.url')) !== $correct_base) {
+            } elseif (preg_replace('#/$#', '', (string) \config('app.url')) !== $correct_base) {
                 $validator->fail("APP_URL is not set correctly. It should be set to $correct_base");
             }
 
@@ -83,6 +83,6 @@ class WebServer extends BaseValidation
 
     private function removeStandardPorts(string $url): string
     {
-        return preg_replace($this->http_regex, '$1/', preg_replace($this->https_regex, '$1/', $url));
+        return preg_replace($this->http_regex, '$1/', (string) preg_replace($this->https_regex, '$1/', $url));
     }
 }

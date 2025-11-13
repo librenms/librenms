@@ -30,10 +30,10 @@ Route: `/api/v0/logs/authlog/:hostname`
 Example:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/logs/eventlog/:hostname
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/logs/syslog/:hostname?limit=20
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/logs/eventlog/:hostname?limit=20&start=5&from=2017-07-22%2023:00:00
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/logs/eventlog/:hostname?sortorder=DESC
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/logs/eventlog/:hostname
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/logs/syslog/:hostname?limit=20
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/logs/eventlog/:hostname?limit=20&start=5&from=2017-07-22%2023:00:00
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/logs/eventlog/:hostname?sortorder=DESC
 ```
 
 Output:
@@ -85,7 +85,7 @@ Accept any json messages and passes to further syslog processing. single message
 
 Example
 ```
-curl -L -X POST 'https://sink.librenms.org/api/v0/syslogsink/' -H 'X-Auth-Token: xxxxxxxLibreNMSApiToken' --data-raw '[   
+curl -L -X POST 'https://sink.foo.example/api/v0/syslogsink/' -H 'X-Auth-Token: xxxxxxxLibreNMSApiToken' --data-raw '[   
     {
         "msg": "kernel: minimum Message",
         "host": "mydevice.fqdn.com"
@@ -105,4 +105,18 @@ curl -L -X POST 'https://sink.librenms.org/api/v0/syslogsink/' -H 'X-Auth-Token:
         "host": "unknown.fqdn.com"
     }
 ]'
+```
+### `add_eventlog`
+
+Route: `/api/v0/devices/:hostname/eventlog`
+
+Adds events to a device's eventlog.
+
+Example
+```
+curl -k -X POST -d '{"text": "Eventlog entry - Severity:Ok","severity":"1"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/127.0.0.1/eventlog
+curl -k -X POST -d '{"text": "Eventlog entry - Severity:Info","severity":"2"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/127.0.0.1/eventlog
+curl -k -X POST -d '{"text": "Eventlog entry - Severity:Notice","severity":"3"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/127.0.0.1/eventlog
+curl -k -X POST -d '{"text": "Eventlog entry - Severity:Warning","severity":"4"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/127.0.0.1/eventlog
+curl -k -X POST -d '{"text": "Eventlog entry - Severity:Error with CustomType","severity":"5","type":"CustomType"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/devices/127.0.0.1/eventlog
 ```

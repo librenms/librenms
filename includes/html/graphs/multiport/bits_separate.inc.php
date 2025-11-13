@@ -4,8 +4,12 @@ use LibreNMS\Util\Rewrite;
 
 $i = 0;
 
-foreach (explode(',', $vars['id']) as $ifid) {
+foreach (explode(',', (string) $vars['id']) as $ifid) {
     $port = dbFetchRow('SELECT * FROM `ports` AS I, devices as D WHERE I.port_id = ? AND I.device_id = D.device_id', [$ifid]);
+    if (! $port) {
+        continue;
+    }
+
     $rrd_file = get_port_rrdfile_path($port['hostname'], $ifid);
     if (Rrd::checkRrdExists($rrd_file)) {
         $port = cleanPort($port);

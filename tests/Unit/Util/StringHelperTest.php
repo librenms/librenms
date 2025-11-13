@@ -29,7 +29,7 @@ namespace LibreNMS\Tests\Unit\Util;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\StringHelpers;
 
-class StringHelperTest extends TestCase
+final class StringHelperTest extends TestCase
 {
     /**
      * A basic feature test example.
