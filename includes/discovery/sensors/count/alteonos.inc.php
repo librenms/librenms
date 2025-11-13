@@ -39,11 +39,6 @@ if (! function_exists('alteon_mib_names')) {
             }
         }
 
-        $defaultMib = $mibDir . '/ALTEON-CHEETAH-LAYER4-MIB';
-        if (is_file($defaultMib)) {
-            $addMib('ALTEON-CHEETAH-LAYER4-MIB');
-        }
-
         $addMib('layer4');
 
         return $mibs;

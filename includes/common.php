@@ -137,26 +137,6 @@ function get_sensor_rrd($device, $sensor)
 
 function get_sensor_rrd_name($device, $sensor)
 {
-    if (($device['os'] ?? null) === 'alteonos') {
-        $class = $sensor['sensor_class'] ?? 'unknown';
-        $sensorType = (string) ($sensor['sensor_type'] ?? '');
-        if (($pos = strrpos($sensorType, '::')) !== false) {
-            $sensorType = substr($sensorType, $pos + 2);
-        }
-        $sensorType = preg_replace('/(InfoState|State)$/', '', $sensorType) ?: $sensorType;
-
-        $index = (string) ($sensor['sensor_index'] ?? '');
-        $index = preg_replace('/^alteon[[:alnum:]]*\./i', '', $index);
-        $index = ltrim($index, '.');
-
-        $suffix = $sensorType !== '' ? $sensorType : 'value';
-        if ($index !== '') {
-            $suffix .= '.' . $index;
-        }
-
-        return ['sensor', $class, 'alteonos', $suffix];
-    }
-
     // For IPMI, sensors tend to change order, and there is no index, so we prefer to use the description as key here.
     if (LibrenmsConfig::getOsSetting($device['os'], 'sensor_descr') || $sensor['poller_type'] == 'ipmi') {
         return ['sensor', $sensor['sensor_class'], $sensor['sensor_type'], $sensor['sensor_descr']];
