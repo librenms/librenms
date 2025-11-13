@@ -34,7 +34,7 @@ try {
     $nototal = ! $graph_params->visible('total');
     $nodetails = ! $graph_params->visible('details');
     $noagg = ! $graph_params->visible('aggregate');
-    $rrd_options = $graph_params->toRrdOptions();
+    $rrd_options = [];
     $env = [];
 
     if (session('preferences.timezone')) {
@@ -53,6 +53,8 @@ try {
     } else {
         graph_error("$type*$subtype Graph Template Missing", "$type*$subtype");
     }
+
+    array_push($rrd_options, ...$graph_params->toRrdOptions());
 
     if ($auth === null) {
         // We are unauthenticated :(
