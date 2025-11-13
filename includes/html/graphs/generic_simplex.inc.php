@@ -107,7 +107,7 @@ if (\App\Facades\LibrenmsConfig::get('old_graphs')) {
     }
 
     if ($graph_params->visible('previous')) {
-        $rrd_options[] = 'LINE1.25:' . $ds . "X#666666:'Prev \\\\n'";
+        $rrd_options[] = 'LINE1.25:' . $ds . "X#666666:Prev\\n";
         $rrd_options[] = 'AREA:' . $ds . 'X#99999966:';
     }
 }//end if
