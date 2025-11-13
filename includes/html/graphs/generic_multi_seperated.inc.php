@@ -75,7 +75,7 @@ if ($width > '500') {
 } else {
     $nototal = true;
     $rrd_options[] = sprintf('COMMENT:%s', $units_descr);
-    $rrd_options[] = sprintf('COMMENT:%12s', 'Now');
+    $rrd_options[] = sprintf('COMMENT:%6s', 'Now');
     $rrd_options[] = sprintf('COMMENT:%10s', 'Avg');
     $rrd_options[] = sprintf('COMMENT:%10s', 'Max');
 }
