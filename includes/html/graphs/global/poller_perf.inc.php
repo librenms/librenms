@@ -71,7 +71,7 @@ $rrd_options[] = 'CDEF:datacountundef=datacount,0,EQ,UNKN,datacount,IF';
 // divide by count of datas to get accurate average
 $rrd_options[] = 'CDEF:avgpol=poller,datacountundef,/';
 // legend
-$rrd_options[] = "COMMENT:Seconds             Cur       Min        Max       Avg\\n";
+$rrd_options[] = 'COMMENT:Seconds             Cur       Min        Max       Avg\\n';
 $rrd_options[] = 'LINE1.25:pollerundef#' . $total_color . ":'Total      '";
 $rrd_options[] = 'AREA:pollerundef#' . $total_color . '70';
 $rrd_options[] = 'GPRINT:pollerundef:LAST:%8.2lf';
@@ -85,7 +85,7 @@ $rrd_options[] = 'GPRINT:avgpol:MIN:%8.2lf';
 $rrd_options[] = 'GPRINT:avgpol:MAX:%8.2lf';
 $rrd_options[] = 'GPRINT:avgpol:AVERAGE:%8.2lf\\n';
 if ($graph_params->visible('previous')) {
-    $rrd_options[] = "COMMENT:\\n";
+    $rrd_options[] = 'COMMENT:\\n';
     $pollerX_cdef = implode(',', $cdefX);
     $rrd_options[] = 'CDEF:pollerX=' . $pollerX_cdef;
     $rrd_options[] = 'CDEF:datacountX=' . str_replace('pollerX', 'datapresentX', $pollerX_cdef);
