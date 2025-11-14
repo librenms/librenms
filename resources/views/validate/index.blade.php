@@ -55,10 +55,11 @@
                     results: []
                 }));
 
-                // auto-run enabled groups
-                this.groups.forEach((g) => {
+                // auto-run enabled groups with a slight stagger to avoid blocking UI on load
+                this.groups.forEach((g, i) => {
                     if (g.enabled) {
-                        this.validateGroup(g);
+                        const delay = 150 + (i * 100); // start after 150ms, then stagger 100ms per group
+                        setTimeout(() => this.validateGroup(g), delay);
                     }
                 });
             }
