@@ -5,12 +5,14 @@ namespace App\Jobs;
 use App\Actions\Device\CheckDeviceAvailability;
 use App\Events\DevicePolled;
 use App\Events\PollingDevice;
+use App\Exceptions\PollingFailedException;
 use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
 use App\Polling\Measure\MeasurementManager;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -24,10 +26,13 @@ use LibreNMS\Util\Dns;
 use LibreNMS\Util\Module;
 use Throwable;
 
-class PollDevice implements ShouldQueue
+class PollDevice implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    protected $retries = 30;
+
+    public int $uniqueFor = 3600;
     private ?\App\Models\Device $device = null;
     private ?array $deviceArray = null;
     /**
@@ -43,6 +48,16 @@ class PollDevice implements ShouldQueue
         public int $device_id,
         public array $module_overrides = [],
     ) {
+    }
+
+    public function displayName(): string
+    {
+        return "PollDevice:$this->device_id";
+    }
+
+    public function uniqueId(): int
+    {
+        return $this->device_id;
     }
 
     /**
@@ -101,7 +116,21 @@ class PollDevice implements ShouldQueue
                 ' minutes!  This will cause gaps in graphs.', $this->device, 'system', Severity::Error);
         }
 
+        if (! $this->device->status) {
+            throw new PollingFailedException($this->device);
+        }
+
         DevicePolled::dispatch($this->device);
+    }
+
+    /**
+     * Calculate the number of seconds to wait before retrying the job.
+     *
+     * @return array<int, int>
+     */
+    public function backoff(): array
+    {
+        return [15, 30, 45, 60, 150];
     }
 
     private function pollModules(): void
