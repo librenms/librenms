@@ -56,48 +56,18 @@ jobs:
         ports:
           - 3306
     steps:
-      -
-        name: Checkout
+      - name: Checkout Code (sparse)
         uses: actions/checkout@v5
+
       -
         name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
-          tools: composer,php-cs-fixer
+          tools: composer
           coverage: none
-      -
-        name: Get composer cache directory
-        id: composer-cache
-        run: |
-          echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-      -
-        name: Cache composer
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-
-      -
-        name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-${{ secrets.CACHE_VERSION }}-
-      -
-        name: Pip install
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install --upgrade --user pylint python-memcached mysqlclient
-      -
-        name: Composer validate
-        run: |
-          composer validate
-      -
-        name: Init env
+
+      - name: Init env
         run: |
           cat > .env <<EOL
           APP_KEY=base64:vHI+YHgkyCDad31iPEErGSNEOWO21wNzV+zyENKQv04=
@@ -116,12 +86,27 @@ jobs:
           DB_TEST_USERNAME=librenms
           DB_TEST_PASSWORD=librenms
           EOL
-      -
-        name: Composer install
-        run: |
-          composer install --prefer-dist --no-interaction --no-progress
-      -
 
+      - name: Install PHP dependencies
+        uses: ./.github/actions/composer-install
+        with:
+          cache-version: ${{ secrets.CACHE_VERSION }}
+
+      -
+        name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ secrets.CACHE_VERSION }}-
+      -
+        name: Pip install
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install --upgrade --user pylint python-memcached mysqlclient
+
+      -
         name: Snmpsim setup
         run: |
           php lnms dev:simulate --setup-venv
