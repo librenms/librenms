@@ -104,7 +104,8 @@ class ModuleList
             $module_status[$module_name] = $this->moduleStatus($type, $module_name, $device);
         }
 
-        return $module_status;
+        // core is always enabled
+        return array_merge(['core' => new ModuleStatus(true)], $module_status);
     }
 
     private function moduleStatus(ProcessType $type, string $module_name, Device $device): ModuleStatus
