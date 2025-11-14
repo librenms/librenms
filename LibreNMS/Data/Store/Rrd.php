@@ -511,7 +511,7 @@ class Rrd extends BaseDatastore
         $rrdDir = $this->dirFromHost($hostname);
         $pattern = "$rrdDir/*.rrd";
 
-        $files = array_map(fn ($f) => basename($f), glob($pattern));
+        $files = array_map(basename(...), glob($pattern));
         sort($files);
 
         return $files;

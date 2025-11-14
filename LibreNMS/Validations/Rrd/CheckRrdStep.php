@@ -13,10 +13,10 @@ class CheckRrdStep implements Validation
     const DEFAULT_RRD_STEP = 300;
     const DEFAULT_PING_RRD_STEP = 300;
 
-    private int $ping_rrd_step;
-    private int $rrd_step;
+    private readonly int $ping_rrd_step;
+    private readonly int $rrd_step;
 
-    private RrdProcess $rrdtool;
+    private readonly RrdProcess $rrdtool;
 
     public function __construct()
     {

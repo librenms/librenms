@@ -12,15 +12,15 @@ class RrdProcess
 {
     const COMMAND_COMPLETE = 'OK u:';
 
-    private string $rrdcached;
-    private string $rrd_dir;
-    private string $rrdtool_exec;
+    private readonly string $rrdcached;
+    private readonly string $rrd_dir;
+    private readonly string $rrdtool_exec;
     private array $env = [];
-    private InputStream $input;
+    private readonly InputStream $input;
 
     private ?Process $process = null;
 
-    public function __construct(private LoggerInterface $logger, private int $timeout = 300)
+    public function __construct(private readonly LoggerInterface $logger, private readonly int $timeout = 300)
     {
         $this->rrdtool_exec = LibrenmsConfig::get('rrdtool', 'rrdtool');
         $this->rrdcached = (string) LibrenmsConfig::get('rrdcached', '');
