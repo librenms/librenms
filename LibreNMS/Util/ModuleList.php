@@ -106,7 +106,7 @@ class ModuleList
         }
 
         // core is always enabled
-        return array_merge(['core' => new ModuleStatus(true)], $module_status);
+        return ['core' => new ModuleStatus(true)] + $module_status;
     }
 
     private function moduleStatus(ProcessType $type, string $module_name, Device $device): ModuleStatus
