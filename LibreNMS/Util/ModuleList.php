@@ -34,12 +34,36 @@ use LibreNMS\Polling\ModuleStatus;
 
 class ModuleList
 {
-    public readonly array $overrides;
-
+    /**
+     * @param  array<string, bool|array<string>>  $overrides
+     */
     public function __construct(
-        array $overrides = [],
-    ) {
-        $this->overrides = $this->parseUserOverrides($overrides);
+        public readonly array $overrides = [],
+    ) {}
+
+    /**
+     * @param  array<string>  $overrides
+     */
+    public static function fromUserOverrides(array $overrides): self
+    {
+        $modules = [];
+        $flattened = array_merge(...array_map(fn($item) => explode(',', $item), $overrides));
+
+        foreach ($flattened as $module) {
+            $enabled = true;
+
+            if (str_contains($module, '/')) {
+                [$module, $submodule] = explode('/', $module, 2);
+                $enabled = $modules[$module] ?? []; // load existing submodules
+                $enabled[] = $submodule;
+            }
+
+            if (Module::exists($module)) {
+                $modules[$module] = $enabled;
+            }
+        }
+
+        return new self($modules);
     }
 
     public function hasOverride(): bool
@@ -103,22 +127,5 @@ class ModuleList
                 is_array($override) ? $override : null,
             ),
         };
-    }
-
-    private function parseUserOverrides(array $overrides): array
-    {
-        $modules = [];
-
-        foreach ($overrides as $module) {
-            // parse submodules (only supported by some modules)
-            if (str_contains((string) $module, '/')) {
-                [$module, $submodule] = explode('/', (string) $module, 2);
-                $modules[$module][] = $submodule;
-            } elseif (Module::exists($module)) {
-                $modules[$module] = true;
-            }
-        }
-
-        return $modules;
     }
 }

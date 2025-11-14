@@ -29,6 +29,7 @@ namespace App;
 use App\Models\Device;
 use App\Polling\Measure\MeasurementManager;
 use Illuminate\Console\OutputStyle;
+use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Facades\Event;
 use LibreNMS\Enum\ProcessType;
 use LibreNMS\Polling\Result;
@@ -38,17 +39,15 @@ class PerDeviceProcess
 {
     private ?int $current_device_id = null;
     public Result $results;
-    private readonly ModuleList $moduleList;
 
     public function __construct(
         public readonly ProcessType $type,
         private readonly string $deviceSpec,
         private readonly string $job,
         private readonly string $completionEvent,
-        array $overrides,
+        private readonly ModuleList $moduleList,
     ) {
         $this->results = new Result;
-        $this->moduleList = new ModuleList($overrides);
     }
 
     public function run(): Result
@@ -61,7 +60,7 @@ class PerDeviceProcess
                 $this->results->markCompleted($event->device->status);
             }
         });
-        $dispatcher = app(\Illuminate\Contracts\Bus\Dispatcher::class);
+        $dispatcher = app(Dispatcher::class);
 
         foreach (Device::whereDeviceSpec($this->deviceSpec)->pluck('device_id') as $device_id) {
             $this->current_device_id = $device_id;

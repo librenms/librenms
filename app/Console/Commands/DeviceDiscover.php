@@ -34,6 +34,7 @@ use App\PerDeviceProcess;
 use App\Polling\Measure\MeasurementManager;
 use Illuminate\Database\QueryException;
 use LibreNMS\Enum\ProcessType;
+use LibreNMS\Util\ModuleList;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -49,7 +50,7 @@ class DeviceDiscover extends LnmsCommand
         parent::__construct();
         $this->setAliases(['poller:discovery']); // TODO remove
         $this->addArgument('device spec', InputArgument::REQUIRED);
-        $this->addOption('module', 'm', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
+        $this->addOption('modules', 'm', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
     }
 
     public function handle(MeasurementManager $measurements): int
@@ -64,7 +65,7 @@ class DeviceDiscover extends LnmsCommand
                 $this->argument('device spec'),
                 DiscoverDevice::class,
                 DeviceDiscovered::class,
-                array_map(fn ($m) => trim($m), explode(',', implode(',', $this->option('module')))),
+                ModuleList::fromUserOverrides($this->option('modules'))
             );
 
             $this->line(__('commands.device:discover.starting'));
