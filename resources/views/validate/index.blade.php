@@ -6,38 +6,60 @@
     <div x-data="{
             groups: @js($groups),
             listItems: 10,
+            validateGroup(group) {
+                // reset state and run/re-run the given group
+                group.loading = true;
+                group.errorMessage = '';
+                group.status = null;
+                group.statusText = '';
+                group.results = [];
+
+                const urlTemplate = '{{ route('validate.results', ['group' => ':group']) }}';
+                const url = urlTemplate.replace(':group', encodeURIComponent(group.group));
+                fetch(url)
+                    .then(response => {
+                        if (! response.ok) {
+                            group.errorMessage = '{{ trans('validation.results.backend_failed') }}';
+                            response.text().then(console.log);
+                            group.loading = false;
+                            return;
+                        }
+                        response.json()
+                            .then(data => {
+                                const arr = Array.isArray(data) ? data : [data];
+                                const match = arr.find(item => item.group === group.group) ?? arr[0];
+                                if (match) {
+                                    group.status = match.status;
+                                    group.statusText = match.statusText;
+                                    group.results = match.results ?? [];
+                                } else {
+                                    group.errorMessage = '{{ trans('validation.results.backend_failed') }}';
+                                }
+                            })
+                            .catch(error => {
+                                group.errorMessage = (error instanceof SyntaxError ? '{{ trans('validation.results.backend_failed') }}' : String(error));
+                            })
+                            .finally(() => { group.loading = false; });
+                    })
+                    .catch(error => { group.errorMessage = String(error); group.loading = false; });
+            },
             init() {
                 // augment groups with state
-                this.groups = this.groups.map(g => ({...g, loading: true, errorMessage: '', status: null, statusText: '', results: []}));
-                const urlTemplate = '{{ route('validate.results', ['group' => ':group']) }}';
-                this.groups.forEach((g, i) => {
-                    const url = urlTemplate.replace(':group', encodeURIComponent(g.group));
-                    fetch(url)
-                        .then(response => {
-                            if (! response.ok) {
-                                g.errorMessage = '{{ trans('validation.results.backend_failed') }}';
-                                response.text().then(console.log);
-                                g.loading = false;
-                                return;
-                            }
-                            response.json()
-                                .then(data => {
-                                    const arr = Array.isArray(data) ? data : [data];
-                                    const match = arr.find(item => item.group === g.group) ?? arr[0];
-                                    if (match) {
-                                        g.status = match.status;
-                                        g.statusText = match.statusText;
-                                        g.results = match.results ?? [];
-                                    } else {
-                                        g.errorMessage = '{{ trans('validation.results.backend_failed') }}';
-                                    }
-                                })
-                                .catch(error => {
-                                    g.errorMessage = (error instanceof SyntaxError ? '{{ trans('validation.results.backend_failed') }}' : String(error));
-                                })
-                                .finally(() => { g.loading = false; });
-                        })
-                        .catch(error => { g.errorMessage = String(error); g.loading = false; });
+                this.groups = this.groups.map(g => ({
+                    ...g,
+                    loading: !!g.enabled,
+                    errorMessage: '',
+                    // If disabled, immediately mark as skipped (INFO)
+                    status: g.enabled ? null : 3,
+                    statusText: g.enabled ? '' : '{{ __('validation.results.skipped') }}',
+                    results: []
+                }));
+
+                // auto-run enabled groups
+                this.groups.forEach((g) => {
+                    if (g.enabled) {
+                        this.validateGroup(g);
+                    }
                 });
             }
         }">
@@ -46,15 +68,26 @@
                 <div class="panel-group" style="margin-bottom: 5px">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h4 class="panel-title">
+                            <h4 class="panel-title tw:flex tw:justify-between tw:items-center">
                                 <a data-toggle="collapse" x-bind:data-target="'#body-' + group.group">
                                     <span x-text="group.name"></span>
-                                    <span class="pull-right" x-show="! group.loading && ! group.errorMessage"
-                                          x-bind:class="{'text-success': group.status === 2, 'text-warning': group.status === 1, 'text-danger': group.status === 0}"
-                                          x-text="group.statusText"></span>
-                                    <span class="pull-right" x-show="group.loading"><i class="fa-solid fa-spinner fa-spin"></i> {{ __('validation.results.validating') }}</span>
-                                    <span class="pull-right text-danger" x-show="group.errorMessage"><i class="fa-solid fa-exclamation-triangle"></i> {{ __('validation.results.fetch_failed') }}</span>
                                 </a>
+                                <button type="button"
+                                        class="btn btn-default btn-sm tw:inline-flex tw:items-center tw:gap-2 tw:whitespace-nowrap"
+                                        title="{{ __('validation.results.run') }}"
+                                        x-on:click.stop="validateGroup(group)"
+                                        x-bind:disabled="group.loading"
+                                >
+                                    <i class="fa-solid" x-bind:class="group.loading ? 'fa-spinner fa-spin' : 'fa-play'"></i>
+                                    <span x-bind:class="{
+                                            'text-success': !group.loading && group.status === 2,
+                                            'text-warning': !group.loading && group.status === 1,
+                                            'text-danger': !group.loading && group.status === 0,
+                                            'text-info': !group.loading && group.status === 3
+                                        }" class="tw:font-bold">
+                                        <span x-text="group.loading ? '{{ __('validation.results.validating') }}' : (group.statusText || '{{ __('validation.results.run') }}')"></span>
+                                    </span>
+                                </button>
                             </h4>
                         </div>
                         <div x-bind:id="'body-' + group.group" class="panel-collapse collapse" x-bind:class="{'in': group.loading || group.status !== 2}">

@@ -60,6 +60,8 @@ return [
         'show_less' => 'Show less',
         'validate' => 'Validate',
         'validating' => 'Validating',
+        'skipped' => 'Skipped',
+        'run' => 'Run',
     ],
     'validations' => [
         // Display names for validation groups
