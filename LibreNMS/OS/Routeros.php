@@ -689,7 +689,7 @@ class Routeros extends OS implements
 
             foreach (preg_split("/((\r?\n)|(\r\n?))/", (string) $data) as $line) {
                 if (! empty($line)) {
-                    [$mtType, $vlanId, $mtData] = array_map('trim', explode(',', $line));
+                    [$mtType, $vlanId, $mtData] = array_map(trim(...), explode(',', $line));
 
                     if ($mtType == 'N') {
                         $vlanNames[$vlanId] = $mtData;
@@ -727,7 +727,7 @@ class Routeros extends OS implements
 
             foreach (preg_split("/((\r?\n)|(\r\n?))/", (string) $data) as $line) {
                 if (! empty($line)) {
-                    [$mtType, $vlanId, $mtData] = array_map('trim', explode(',', $line));
+                    [$mtType, $vlanId, $mtData] = array_map(trim(...), explode(',', $line));
 
                     if ($mtType == 'N') { // type 'N' is for vlan name, skip from processing
                         continue;

@@ -52,7 +52,7 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     sort($results);
     foreach ($results as $sensor) {
         // BB +1.1V IOH     | 1.089      | Volts      | ok    | na        | 1.027     | 1.054     | 1.146     | 1.177     | na
-        $values = array_map('trim', explode('|', (string) $sensor));
+        $values = array_map(trim(...), explode('|', (string) $sensor));
         [$desc,$current,$unit,$state,$low_nonrecoverable,$low_limit,$low_warn,$high_warn,$high_limit,$high_nonrecoverable] = $values;
 
         $index++;
