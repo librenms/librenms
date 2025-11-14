@@ -61,7 +61,6 @@ class Eventlog extends DeviceRelatedModel
      */
     public static function log(string $text, Device|int|null $device = null, ?string $type = null, Severity $severity = Severity::Info, int|string|null $reference = null): void
     {
-
         Log::channel('event')->log(
             $severity->toLogLevel(),
             $text,
