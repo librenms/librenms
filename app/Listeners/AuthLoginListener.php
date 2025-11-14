@@ -4,7 +4,6 @@ namespace App\Listeners;
 
 use App\Models\User;
 use Illuminate\Auth\Events\Login;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
 
