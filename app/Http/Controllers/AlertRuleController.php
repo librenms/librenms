@@ -41,7 +41,7 @@ class AlertRuleController extends Controller
         foreach ($rawCollection as $rule) {
             try {
                 $sql = QueryBuilderParser::fromJson($rule['builder'] ?? [])->toSql(false);
-            } catch (\Throwable $e) {
+            } catch (\Throwable) {
                 $sql = '';
             }
             $collectionRules[] = [
@@ -59,7 +59,7 @@ class AlertRuleController extends Controller
             } else {
                 try {
                     $rule_display = QueryBuilderParser::fromJson($rule->builder)->toSql(false);
-                } catch (\Throwable $e) {
+                } catch (\Throwable) {
                 }
             }
 
@@ -103,7 +103,7 @@ class AlertRuleController extends Controller
         foreach ($rawCollection as $rule) {
             try {
                 $sql = QueryBuilderParser::fromJson($rule['builder'] ?? [])->toSql(false);
-            } catch (\Throwable $e) {
+            } catch (\Throwable) {
                 $sql = '';
             }
             $collectionRules[] = [
@@ -121,7 +121,7 @@ class AlertRuleController extends Controller
             } else {
                 try {
                     $rule_display = QueryBuilderParser::fromJson($rule->builder)->toSql(false);
-                } catch (\Throwable $e) {
+                } catch (\Throwable) {
                 }
             }
 

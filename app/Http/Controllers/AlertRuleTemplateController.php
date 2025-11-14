@@ -12,13 +12,11 @@ class AlertRuleTemplateController extends Controller
     {
         $collection = self::templatesCollection();
 
-        return response()->json(collect($collection)->map(function ($rule, $index) {
-            return [
-                'id' => $index,
-                'name' => $rule['name'],
-                'builder' => $rule['builder'] ?? null,
-            ];
-        })->values()->all());
+        return response()->json(collect($collection)->map(fn($rule, $index) => [
+            'id' => $index,
+            'name' => $rule['name'],
+            'builder' => $rule['builder'] ?? null,
+        ])->values()->all());
     }
 
     public function show(int $template_id): JsonResponse

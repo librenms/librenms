@@ -461,10 +461,10 @@ foreach ($rule_list as $rule) {
     echo '<td>';
     echo "<div class='btn-group btn-group-sm' role='group'>";
     if (Gate::allows('alert-rule.update')) {
-        echo "<a class='btn btn-primary' href='" . route('alert-rule.edit', $rule['id']) . "' title='Edit alert rule' data-content='" . htmlentities($rule['name']) . "' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></a> ";
+        echo "<a class='btn btn-primary' href='" . route('alert-rule.edit', $rule['id']) . "' title='Edit alert rule' data-content='" . htmlentities((string) $rule['name']) . "' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></a> ";
     }
     if (Gate::allows('alert-rule.delete')) {
-        echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-placement='left' data-toggle='modal' data-target='#confirm-delete' data-alert_id='" . $rule['id'] . "' data-alert_name='" . htmlentities($rule['name']) . "' name='delete-alert-rule' title='Delete alert rule' data-content='" . htmlentities($rule['name']) . "' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
+        echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-placement='left' data-toggle='modal' data-target='#confirm-delete' data-alert_id='" . $rule['id'] . "' data-alert_name='" . htmlentities((string) $rule['name']) . "' name='delete-alert-rule' title='Delete alert rule' data-content='" . htmlentities((string) $rule['name']) . "' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
     }
     echo '</td>';
 
