@@ -39,7 +39,8 @@ class ModuleList
      */
     public function __construct(
         public readonly array $overrides = [],
-    ) {}
+    ) {
+    }
 
     /**
      * @param  array<string>  $overrides
@@ -47,7 +48,7 @@ class ModuleList
     public static function fromUserOverrides(array $overrides): self
     {
         $modules = [];
-        $flattened = array_merge(...array_map(fn($item) => explode(',', $item), $overrides));
+        $flattened = array_merge(...array_map(fn ($item) => explode(',', $item), $overrides));
 
         foreach ($flattened as $module) {
             $enabled = true;
