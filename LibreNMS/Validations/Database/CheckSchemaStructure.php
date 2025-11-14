@@ -114,7 +114,7 @@ class CheckSchemaStructure implements Validation, ValidationFixer
 
                     // MySQL 8 fix, remove DEFAULT_GENERATED from timestamp extra columns
                     if ($cdata['Type'] == 'timestamp') {
-                        $current_columns[$column]['Extra'] = preg_replace('/DEFAULT_GENERATED */', '', $current_columns[$column]['Extra']);
+                        $current_columns[$column]['Extra'] = preg_replace('/DEFAULT_GENERATED */', '', (string) $current_columns[$column]['Extra']);
                     }
 
                     if (empty($current_columns[$column])) {

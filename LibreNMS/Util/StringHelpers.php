@@ -102,7 +102,7 @@ class StringHelpers
 
         $charset = config('app.charset');
 
-        if (($converted = @iconv($charset, 'UTF-8', $string)) !== false) {
+        if (($converted = @iconv((string) $charset, 'UTF-8', $string)) !== false) {
             return (string) $converted;
         }
 
@@ -226,7 +226,7 @@ class StringHelpers
         if (! StringHelpers::isHex($hex_data)) {
             // could be malformed
             if (preg_match('/^(\d+)(,\d+)*$/', ltrim($hex_data, '0'), $matches)) {
-                return array_map(fn ($v) => intval($v), explode(',', $matches[0]));
+                return array_map(intval(...), explode(',', $matches[0]));
             }
 
             return [];

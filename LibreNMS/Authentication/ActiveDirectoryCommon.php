@@ -33,14 +33,14 @@ trait ActiveDirectoryCommon
 {
     protected function getUseridFromSid($sid)
     {
-        return preg_replace('/.*-(\d+)$/', '$1', $sid);
+        return preg_replace('/.*-(\d+)$/', '$1', (string) $sid);
     }
 
     protected function sidFromLdap($sid)
     {
-        $sidUnpacked = unpack('H*hex', $sid);
+        $sidUnpacked = unpack('H*hex', (string) $sid);
         $sidHex = array_shift($sidUnpacked);
-        $subAuths = unpack('H2/H2/n/N/V*', $sid);
+        $subAuths = unpack('H2/H2/n/N/V*', (string) $sid);
         if (PHP_INT_SIZE <= 4) {
             for ($i = 1; $i <= count($subAuths); $i++) {
                 if ($subAuths[$i] < 0) {
@@ -48,8 +48,8 @@ trait ActiveDirectoryCommon
                 }
             }
         }
-        $revLevel = hexdec(substr($sidHex, 0, 2));
-        $authIdent = hexdec(substr($sidHex, 4, 12));
+        $revLevel = hexdec(substr((string) $sidHex, 0, 2));
+        $authIdent = hexdec(substr((string) $sidHex, 4, 12));
 
         return 'S-' . $revLevel . '-' . $authIdent . '-' . implode('-', $subAuths);
     }

@@ -74,7 +74,7 @@ class Jira extends Transport
         }
 
         // Add Custom fileds to the payload
-        $custom = json_decode($this->config['jira-custom'], true);
+        $custom = json_decode((string) $this->config['jira-custom'], true);
         if (! empty($custom)) {
             $data['fields'] = array_merge($data['fields'], $custom);
         }

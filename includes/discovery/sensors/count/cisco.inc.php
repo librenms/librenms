@@ -30,7 +30,7 @@ foreach ($tables as $tablevalue) {
         if ($state_name == 'c3gGsmNumberOfNearbyCell' || $state_name == 'cwceLteCurrOperatingBand') {
             $descr = snmp_get($device, 'entPhysicalName.' . $index, '-Oqv', 'ENTITY-MIB') . ' - ' . $tablevalue['descr'];
         } else {
-            $descr = ucwords($temp[$index][$tablevalue['descr']]);
+            $descr = ucwords((string) $temp[$index][$tablevalue['descr']]);
         }
         discover_sensor(null, 'count', $device, $cur_oid . $index, $index, $state_name, $descr, 1, 1, null, null, null, null, $temp[$index][$tablevalue['state_name']], 'snmp', $index);
     }

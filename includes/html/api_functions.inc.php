@@ -223,7 +223,7 @@ function get_port_stats_by_port_hostname(Illuminate\Http\Request $request)
 
         //only return requested columns
         if ($request->has('columns')) {
-            $cols = explode(',', $request->get('columns'));
+            $cols = explode(',', (string) $request->get('columns'));
             foreach (array_keys($port) as $c) {
                 if (! in_array($c, $cols)) {
                     unset($port[$c]);
@@ -538,7 +538,7 @@ function maintenance_device(Illuminate\Http\Request $request)
     $duration = $data['duration'];
 
     if (Str::contains($duration, ':')) {
-        [$duration_hour, $duration_min] = explode(':', $duration);
+        [$duration_hour, $duration_min] = explode(':', (string) $duration);
         $alert_schedule->end = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $start)
             ->addHours((float) $duration_hour)->addMinutes((float) $duration_min)
             ->format('Y-m-d H:i:00');
@@ -679,18 +679,18 @@ function list_bgp(Illuminate\Http\Request $request)
     $bgp_state = $request->get('bgp_state');
     $bgp_adminstate = $request->get('bgp_adminstate');
     $bgp_family = $request->get('bgp_family');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = ctype_digit((string) $hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
         $sql .= ' AND `devices`.`device_id` = ?';
         $sql_params[] = $device_id;
     }
     if (! empty($asn)) {
         $sql .= ' AND `devices`.`bgpLocalAs` = ?';
-        $sql_params[] = preg_replace('/[^0-9]/', '', $asn);
+        $sql_params[] = preg_replace('/[^0-9]/', '', (string) $asn);
     }
     if (! empty($remote_asn)) {
         $sql .= ' AND `bgpPeers`.`bgpPeerRemoteAs` = ?';
-        $sql_params[] = preg_replace('/[^0-9]/', '', $remote_asn);
+        $sql_params[] = preg_replace('/[^0-9]/', '', (string) $remote_asn);
     }
     if (! empty($local_address)) {
         $sql .= ' AND `bgpPeers`.`bgpLocalAddr` = ?';
@@ -790,7 +790,7 @@ function list_cbgp(Illuminate\Http\Request $request)
     $sql = '';
     $sql_params = [];
     $hostname = $request->get('hostname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = ctype_digit((string) $hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
         $permission = check_device_permission($device_id);
         if ($permission !== true) {
@@ -818,7 +818,7 @@ function list_ospf(Illuminate\Http\Request $request)
     $sql = '';
     $sql_params = [];
     $hostname = $request->get('hostname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = ctype_digit((string) $hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
         $sql = ' AND `device_id`=?';
         $sql_params = [$device_id];
@@ -1037,7 +1037,7 @@ function list_available_health_graphs(Illuminate\Http\Request $request)
         } else {
             foreach (dbFetchRows('SELECT `sensor_class` FROM `sensors` WHERE `device_id` = ? AND `sensor_deleted` = 0 GROUP BY `sensor_class`', [$device_id]) as $graph) {
                 $graphs[] = [
-                    'desc' => ucfirst($graph['sensor_class']),
+                    'desc' => ucfirst((string) $graph['sensor_class']),
                     'name' => 'device_' . $graph['sensor_class'],
                 ];
             }
@@ -1098,7 +1098,7 @@ function list_available_wireless_graphs(Illuminate\Http\Request $request)
         } else {
             foreach (dbFetchRows('SELECT `sensor_class` FROM `wireless_sensors` WHERE `device_id` = ? AND `sensor_deleted` = 0 GROUP BY `sensor_class`', [$device_id]) as $graph) {
                 $graphs[] = [
-                    'desc' => ucfirst($graph['sensor_class']),
+                    'desc' => ucfirst((string) $graph['sensor_class']),
                     'name' => 'device_wireless_' . $graph['sensor_class'],
                 ];
             }
@@ -1396,7 +1396,7 @@ function list_alerts(Illuminate\Http\Request $request): JsonResponse
     $sql = 'SELECT `D`.`hostname`, `A`.*, `R`.`severity`,`R`.`name`,`R`.`proc`,`R`.`notes` FROM `alerts` AS `A`, `devices` AS `D`, `alert_rules` AS `R` WHERE `D`.`device_id` = `A`.`device_id` AND `A`.`rule_id` = `R`.`id` ';
     $sql .= 'AND `A`.`state` IN ';
     if ($request->has('state')) {
-        $param = explode(',', $request->get('state'));
+        $param = explode(',', (string) $request->get('state'));
     } else {
         $param = [1];
     }
@@ -1426,7 +1426,7 @@ function list_alerts(Illuminate\Http\Request $request): JsonResponse
     }
 
     if ($request->has('order')) {
-        [$sort_column, $sort_order] = explode(' ', $request->get('order'), 2);
+        [$sort_column, $sort_order] = explode(' ', (string) $request->get('order'), 2);
         validate_column_list($sort_column, 'alerts');
         if (in_array($sort_order, ['asc', 'desc'])) {
             $order = $request->get('order');
@@ -1459,7 +1459,7 @@ function add_edit_rule(Illuminate\Http\Request $request)
         if ($device == '-1') {
             continue;
         }
-        $devices[] = (ctype_digit($device) || is_int($device)) ? $device : getidbyname($device);
+        $devices[] = (ctype_digit((string) $device) || is_int($device)) ? $device : getidbyname($device);
     }
 
     if (isset($data['builder'])) {
@@ -1575,7 +1575,7 @@ function ack_alert(Illuminate\Http\Request $request)
 
     $alert = dbFetchRow('SELECT note, info FROM alerts WHERE id=?', [$alert_id]);
     $note = $alert['note'];
-    $info = json_decode($alert['info'], true);
+    $info = json_decode((string) $alert['info'], true);
     if (! empty($note)) {
         $note .= PHP_EOL;
     }
@@ -1808,7 +1808,7 @@ function list_bills(Illuminate\Http\Request $request)
         $percent = '';
         $overuse = '';
 
-        if (strtolower($bill['bill_type']) == 'cdr') {
+        if (strtolower((string) $bill['bill_type']) == 'cdr') {
             $allowed = Number::formatSi($bill['bill_cdr'], 2, 0, '') . 'bps';
             $used = Number::formatSi($rate_data['rate_95th'], 2, 0, '') . 'bps';
             if ($bill['bill_cdr'] > 0) {
@@ -1818,7 +1818,7 @@ function list_bills(Illuminate\Http\Request $request)
             }
             $overuse = $rate_data['rate_95th'] - $bill['bill_cdr'];
             $overuse = (($overuse <= 0) ? '-' : Number::formatSi($overuse, 2, 0, ''));
-        } elseif (strtolower($bill['bill_type']) == 'quota') {
+        } elseif (strtolower((string) $bill['bill_type']) == 'quota') {
             $allowed = Billing::formatBytes($bill['bill_quota']);
             $used = Billing::formatBytes($rate_data['total_data']);
             if ($bill['bill_quota'] > 0) {
@@ -2340,7 +2340,7 @@ function add_device_group(Illuminate\Http\Request $request)
 
     $deviceGroup = new DeviceGroup(['name' => $data['name'], 'type' => $data['type'], 'desc' => $data['desc']]);
     if ($data['type'] == 'dynamic') {
-        $deviceGroup->rules = json_decode($data['rules']);
+        $deviceGroup->rules = json_decode((string) $data['rules']);
     }
     $deviceGroup->save();
 
@@ -2399,7 +2399,7 @@ function update_device_group(Illuminate\Http\Request $request)
     }
 
     if ($deviceGroup->type == 'dynamic' && ! empty($data['rules'])) {
-        $deviceGroup->rules = json_decode($data['rules']);
+        $deviceGroup->rules = json_decode((string) $data['rules']);
     }
 
     try {
@@ -2571,7 +2571,7 @@ function maintenance_devicegroup(Illuminate\Http\Request $request)
     $duration = $data['duration'];
 
     if (Str::contains($duration, ':')) {
-        [$duration_hour, $duration_min] = explode(':', $duration);
+        [$duration_hour, $duration_min] = explode(':', (string) $duration);
         $alert_schedule->end = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $start)
             ->addHours((float) $duration_hour)->addMinutes((float) $duration_min)
             ->format('Y-m-d H:i:00');
@@ -2615,7 +2615,7 @@ function list_vrf(Illuminate\Http\Request $request)
     $sql_params = [];
     $hostname = $request->get('hostname');
     $vrfname = $request->get('vrfname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = ctype_digit((string) $hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
         $permission = check_device_permission($device_id);
         if ($permission !== true) {
@@ -2661,7 +2661,7 @@ function get_vrf(Illuminate\Http\Request $request)
 function list_mpls_services(Illuminate\Http\Request $request)
 {
     $hostname = $request->get('hostname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = ctype_digit((string) $hostname) ? $hostname : getidbyname($hostname);
 
     $mpls_services = MplsService::hasAccess(Auth::user())->when($device_id, fn ($query, $device_id) => $query->where('device_id', $device_id))->get();
 
@@ -2675,7 +2675,7 @@ function list_mpls_services(Illuminate\Http\Request $request)
 function list_mpls_saps(Illuminate\Http\Request $request)
 {
     $hostname = $request->get('hostname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = ctype_digit((string) $hostname) ? $hostname : getidbyname($hostname);
 
     $mpls_saps = MplsSap::hasAccess(Auth::user())->when($device_id, fn ($query, $device_id) => $query->where('device_id', $device_id))->get();
 
@@ -2705,7 +2705,7 @@ function list_vlans(Illuminate\Http\Request $request)
     $sql = '';
     $sql_params = [];
     $hostname = $request->get('hostname');
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device_id = ctype_digit((string) $hostname) ? $hostname : getidbyname($hostname);
     if (is_numeric($device_id)) {
         $permission = check_device_permission($device_id);
         if ($permission !== true) {
@@ -3172,7 +3172,7 @@ function validate_column_list(?string $columns, string $table, array $default = 
 
     $column_names = is_array($columns) ? $columns : explode(',', $columns);
     $valid_columns = $schema->getColumns($table);
-    $invalid_columns = array_diff(array_map('trim', $column_names), $valid_columns);
+    $invalid_columns = array_diff(array_map(trim(...), $column_names), $valid_columns);
 
     if (count($invalid_columns) > 0) {
         throw new InvalidTableColumnException($invalid_columns);
@@ -3276,7 +3276,7 @@ function add_parents_to_host(Illuminate\Http\Request $request)
     $device_id = ctype_digit($device_id) ? $device_id : getidbyname($device_id);
 
     $parent_ids = [];
-    foreach (explode(',', $data['parent_ids']) as $hostname) {
+    foreach (explode(',', (string) $data['parent_ids']) as $hostname) {
         $hostname = trim($hostname);
         $parent_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
         if (empty($parent_id)) {
@@ -3304,7 +3304,7 @@ function del_parents_from_host(Illuminate\Http\Request $request)
     }
     $device = Device::find($device_id);
     if (! empty($data['parent_ids'])) {
-        foreach (explode(',', $data['parent_ids']) as $hostname) {
+        foreach (explode(',', (string) $data['parent_ids']) as $hostname) {
             $hostname = trim($hostname);
             $parent_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
             if (empty($parent_id)) {
@@ -3456,7 +3456,7 @@ function maintenance_location(Illuminate\Http\Request $request)
     $duration = $data['duration'];
 
     if (Str::contains($duration, ':')) {
-        [$duration_hour, $duration_min] = explode(':', $duration);
+        [$duration_hour, $duration_min] = explode(':', (string) $duration);
         $alert_schedule->end = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $start)
             ->addHours((float) $duration_hour)->addMinutes((float) $duration_min)
             ->format('Y-m-d H:i:00');

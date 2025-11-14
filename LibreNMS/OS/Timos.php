@@ -239,7 +239,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             'TIMETRA-SERV-MIB::svcTlsInfoTable',
         ])->mapTable(function ($value) {
             // Workaround, remove some default entries we do not want to see
-            if (preg_match('/^\w* Service for internal purposes only/', $value['svcDescription'])) {
+            if (preg_match('/^\w* Service for internal purposes only/', (string) $value['svcDescription'])) {
                 return null;
             }
 
@@ -283,7 +283,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             }
 
             // remove some default entries we do not want to see
-            if (str_starts_with($value['sapDescription'], 'Internal SAP')) {
+            if (str_starts_with((string) $value['sapDescription'], 'Internal SAP')) {
                 return null;
             }
 
@@ -529,7 +529,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             'TIMETRA-SERV-MIB::svcTlsInfoTable',
         ])->mapTable(function ($value) {
             // Workaround, remove some default entries we do not want to see
-            if (preg_match('/^\w* Service for internal purposes only/', $value['svcDescription'])) {
+            if (preg_match('/^\w* Service for internal purposes only/', (string) $value['svcDescription'])) {
                 return null;
             }
 
@@ -576,7 +576,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             }
 
             // remove some default entries we do not want to see
-            if (str_starts_with($value['sapDescription'], 'Internal SAP')) {
+            if (str_starts_with((string) $value['sapDescription'], 'Internal SAP')) {
                 return null;
             }
 

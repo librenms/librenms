@@ -105,7 +105,7 @@ class GraphController extends WidgetController
 
         // fall back for types where we couldn't find the item
         if ($settings['graph_type']) {
-            return 'Device / ' . ucfirst($type) . ' / ' . $settings['graph_type'];
+            return 'Device / ' . ucfirst((string) $type) . ' / ' . $settings['graph_type'];
         }
 
         return parent::getTitle();
@@ -116,7 +116,7 @@ class GraphController extends WidgetController
         $data = $this->getSettings(true);
 
         // format display name for selected graph type
-        $type_parts = explode('_', $data['graph_type']);
+        $type_parts = explode('_', (string) $data['graph_type']);
         $primary = array_shift($type_parts);
         $secondary = implode('_', $type_parts);
         $name = $primary . ' ' . (Graph::isMibGraph($primary, $secondary) ? $secondary : implode(' ', $type_parts));
@@ -255,7 +255,7 @@ class GraphController extends WidgetController
             return $graph_type;
         }
 
-        $type = explode('_', $graph_type, 2)[0];
+        $type = explode('_', (string) $graph_type, 2)[0];
 
         if ($summarize && in_array($type, ['transit', 'peering', 'core', 'ports', 'custom'])) {
             return 'aggregate';
@@ -282,7 +282,7 @@ class GraphController extends WidgetController
             // legacy data conversions
             if ($settings['graph_type'] == 'manual') {
                 $settings['graph_type'] = 'custom';
-                $settings['graph_custom'] = explode(',', $settings['graph_manual']);
+                $settings['graph_custom'] = explode(',', (string) $settings['graph_manual']);
             }
             if ($settings['graph_type'] == 'transpeer') {
                 $settings['graph_type'] = 'custom';
@@ -308,7 +308,7 @@ class GraphController extends WidgetController
     private function convertLegacySettingId($setting, $key)
     {
         if ($setting && ! is_numeric($setting)) {
-            $data = json_decode($setting, true);
+            $data = json_decode((string) $setting, true);
 
             return $data[$key] ?? 0;
         }

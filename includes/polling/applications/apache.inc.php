@@ -13,7 +13,7 @@ if (! empty($agent_data['app'][$name])) {
     $apache = snmp_get($device, $oid, $options);
 }
 
-$apache_data = explode("\n", $apache);
+$apache_data = explode("\n", (string) $apache);
 if (count($apache_data) !== 20) {
     echo " Incorrect number of datapoints returned from device, skipping\n";
 

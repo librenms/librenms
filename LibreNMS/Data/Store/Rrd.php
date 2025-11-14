@@ -69,7 +69,6 @@ class Rrd extends BaseDatastore
     {
         parent::__construct();
         $this->loadConfig();
-        $this->init();
     }
 
     public function getName(): string
@@ -204,7 +203,7 @@ class Rrd extends BaseDatastore
     {
         $output = $this->command('lastupdate', $filename, '')[0];
 
-        if (preg_match('/((?: \w+)+)\n\n(\d+):((?: [\d.-]+)+)\nOK/', $output, $matches)) {
+        if (preg_match('/((?: \w+)+)\n\n(\d+):((?: [\d.-]+)+)\nOK/', (string) $output, $matches)) {
             $data = array_combine(
                 explode(' ', ltrim($matches[1])),
                 explode(' ', ltrim($matches[3])),
@@ -497,13 +496,16 @@ class Rrd extends BaseDatastore
         $safeHost = self::safeName($hostname);
 
         if ($this->rrdcached) {
-            $rrdFiles = $this->command('list', "/$safeHost", '');
-
-            $rrdFilesArray = explode("\n", trim($rrdFiles[0]));
-            array_pop($rrdFilesArray); // remove status line
-            sort($rrdFilesArray);
-
-            return $rrdFilesArray;
+            $filename = sprintf('/%s', self::safeName($device['hostname']));
+            $rrd_files = $this->command('list', $filename, '');
+            // Command output is an array, create new array with each filename as a item in array.
+            $rrd_files_array = explode("\n", trim((string) $rrd_files[0]));
+            // Remove status line from response
+            array_pop($rrd_files_array);
+        } else {
+            $rrddir = $this->dirFromHost($device['hostname']);
+            $pattern = sprintf('%s/*.rrd', $rrddir);
+            $rrd_files_array = glob($pattern);
         }
 
         $rrdDir = $this->dirFromHost($hostname);
@@ -540,8 +542,8 @@ class Rrd extends BaseDatastore
         $offset = substr_count($app_name, $separator);
 
         foreach ($rrdfile_array as $rrd) {
-            if (str_contains($rrd, $pattern)) {
-                $filename = basename($rrd, '.rrd');
+            if (str_contains((string) $rrd, $pattern)) {
+                $filename = basename((string) $rrd, '.rrd');
                 $entry = explode($separator, $filename, 4 + $offset)[3 + $offset];
                 if ($entry) {
                     array_push($entries, $entry);

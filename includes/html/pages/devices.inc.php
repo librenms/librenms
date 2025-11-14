@@ -13,18 +13,22 @@
  * @author     LibreNMS Contributors
 */
 
-function show_device_group($device_group_id) {
-    $device_group_name = DB::table('device_groups')->where('id', $device_group_id)->value('name') ?? 'Group not found';
+function show_device_group(int|string|null $device_group_id): void {
+    if (! $device_group_id) {
+        return;
+    }
+
+    if ($device_group_id === 'none') {
+        $pre_text = 'Ungrouped Devices';
+        $device_group_name = '';
+    } else {
+        $pre_text = 'Device Group: ';
+        $device_group_name = DB::table('device_groups')->where('id', $device_group_id)->value('name') ?? 'Group not found';
+    }
     ?>
     <div class="panel-heading">
         <span class="devices-font-bold">
-        <?php
-        if ($device_group_id == 'none') {
-            echo "Ungrouped Devices";
-        } elseif ($device_group_id) {
-            echo "Device Group: ";
-        }
-        ?>
+        <?php echo $pre_text ?>
         </span>
         <?php echo htmlentities($device_group_name) ?>
     </div>

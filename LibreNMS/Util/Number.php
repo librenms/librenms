@@ -214,7 +214,7 @@ class Number
     public static function extract(mixed $string): float|int
     {
         if (! is_numeric($string)) {
-            preg_match('/-?\d*\.?\d+/', $string, $matches);
+            preg_match('/-?\d*\.?\d+/', (string) $string, $matches);
             if (! empty($matches[0])) {
                 $string = $matches[0];
             }

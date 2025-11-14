@@ -217,7 +217,7 @@ function dbDeleteOrphans($target_table, $parents)
     $where = [];
 
     foreach ((array) $parents as $parent) {
-        $parent_parts = explode('.', $parent);
+        $parent_parts = explode('.', (string) $parent);
         if (count($parent_parts) == 2) {
             [$parent_table, $parent_column] = $parent_parts;
             $target_column = $parent_column;

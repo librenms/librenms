@@ -71,7 +71,7 @@ final class DatastoreTest extends TestCase
         $stores = $ds->getStores();
         $this->assertCount(5, $stores, 'Incorrect number of default stores enabled');
 
-        $enabled = array_map('get_class', $stores);
+        $enabled = array_map(get_class(...), $stores);
 
         $expected_enabled = [
             \LibreNMS\Data\Store\Graphite::class,

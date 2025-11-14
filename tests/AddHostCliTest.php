@@ -124,7 +124,7 @@ final class AddHostCliTest extends DBTestCase
             $device = Device::findByHostname($host);
             $this->assertNotNull($device);
 
-            $this->assertEquals(strtoupper($mode), $device->authalgo, 'Wrong snmp v3 password algorithm');
+            $this->assertEquals(strtoupper((string) $mode), $device->authalgo, 'Wrong snmp v3 password algorithm');
         }
     }
 
@@ -140,7 +140,7 @@ final class AddHostCliTest extends DBTestCase
             $device = Device::findByHostname($host);
             $this->assertNotNull($device);
 
-            $this->assertEquals(strtoupper($mode), $device->cryptoalgo, 'Wrong snmp v3 crypt algorithm');
+            $this->assertEquals(strtoupper((string) $mode), $device->cryptoalgo, 'Wrong snmp v3 crypt algorithm');
         }
     }
 

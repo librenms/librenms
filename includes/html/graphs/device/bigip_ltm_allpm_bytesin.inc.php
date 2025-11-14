@@ -46,7 +46,7 @@ if ($components[$vars['id']]['type'] == 'f5-ltm-pool') {
         if ($comp['type'] != 'f5-ltm-poolmember') {
             continue;
         }
-        if (! strstr($comp['UID'], (string) $parent)) {
+        if (! strstr((string) $comp['UID'], (string) $parent)) {
             continue;
         }
 
@@ -65,7 +65,7 @@ if ($components[$vars['id']]['type'] == 'f5-ltm-pool') {
 
             $rrd_options .= ' DEF:DS' . $count . '=' . $rrd_filename . ':bytesin:AVERAGE ';
             $rrd_options .= ' CDEF:MOD' . $count . '=DS' . $count . ',8,* ';
-            $rrd_options .= ' LINE1.25:MOD' . $count . '#' . $colour . ":'" . str_pad(substr($label, 0, 40), 40) . "'";
+            $rrd_options .= ' LINE1.25:MOD' . $count . '#' . $colour . ":'" . str_pad(substr((string) $label, 0, 40), 40) . "'";
             $rrd_options .= ' GPRINT:MOD' . $count . ':LAST:%6.2lf%s ';
             $rrd_options .= ' GPRINT:MOD' . $count . ':AVERAGE:%6.2lf%s ';
             $rrd_options .= ' GPRINT:MOD' . $count . ":MAX:%6.2lf%s\l ";

@@ -222,7 +222,7 @@ class Core implements Module
         // all items must be true
         foreach ($array as $key => $value) {
             if ($check = Str::endsWith($key, '_except')) {
-                $key = substr($key, 0, -7);
+                $key = substr((string) $key, 0, -7);
             }
 
             if ($key == 'sysObjectID') {
@@ -275,7 +275,7 @@ class Core implements Module
 
         $agent_data = Cache::driver('array')->get('agent_data');
         if (! empty($agent_data['uptime'])) {
-            $uptime = round((float) substr($agent_data['uptime'], 0, strpos($agent_data['uptime'], ' ')));
+            $uptime = round((float) substr((string) $agent_data['uptime'], 0, strpos((string) $agent_data['uptime'], ' ')));
             Log::info("Using UNIX Agent Uptime ($uptime)");
         } else {
             $uptime_data = SnmpQuery::make()->get(['SNMP-FRAMEWORK-MIB::snmpEngineTime.0', 'HOST-RESOURCES-MIB::hrSystemUptime.0'])->values();

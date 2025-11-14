@@ -14,10 +14,10 @@ if ($width > '500') {
 }
 
 if ($width > '500') {
-    $rrd_options .= " COMMENT:'" . substr(str_pad($mplug['mplug_vlabel'], $descr_len), 0, $descr_len) . "   Current   Average  Maximum\l'";
+    $rrd_options .= " COMMENT:'" . substr(str_pad((string) $mplug['mplug_vlabel'], $descr_len), 0, $descr_len) . "   Current   Average  Maximum\l'";
     $rrd_options .= " COMMENT:'\l'";
 } else {
-    $rrd_options .= " COMMENT:'" . substr(str_pad($mplug['mplug_vlabel'], $descr_len), 0, $descr_len) . "   Current   Average  Maximum\l'";
+    $rrd_options .= " COMMENT:'" . substr(str_pad((string) $mplug['mplug_vlabel'], $descr_len), 0, $descr_len) . "   Current   Average  Maximum\l'";
 }
 
 $c_i = 0;
