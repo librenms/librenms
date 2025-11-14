@@ -62,6 +62,26 @@ return [
         'validating' => 'Validating',
     ],
     'validations' => [
+        // Display names for validation groups
+        'groups' => [
+            'configuration' => 'Configuration',
+            'database' => 'Database',
+            'dependencies' => 'Dependencies',
+            'disk' => 'Disk',
+            'distributedpoller' => 'Distributed Poller',
+            'mail' => 'Mail',
+            'php' => 'PHP',
+            'poller' => 'Poller',
+            'programs' => 'Programs',
+            'python' => 'Python',
+            'rrd' => 'RRD',
+            'rrdcheck' => 'RRD Check',
+            'scheduler' => 'Scheduler',
+            'system' => 'System',
+            'updates' => 'Updates',
+            'user' => 'User',
+            'webserver' => 'Web Server',
+        ],
         'rrd' => [
             'CheckRrdVersion' => [
                 'fail' => 'The rrdtool version you have specified is newer than what is installed. Config: :config_version Installed :installed_version',

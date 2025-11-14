@@ -201,7 +201,7 @@ Route::middleware(['auth'])->group(function (): void {
 
         Route::resource('port-groups', PortGroupController::class);
         Route::get('validate', [ValidateController::class, 'index'])->name('validate');
-        Route::get('validate/results', [ValidateController::class, 'runValidation'])->name('validate.results');
+        Route::get('validate/results/{group?}', [ValidateController::class, 'runValidation'])->name('validate.results');
         Route::post('validate/fix', [ValidateController::class, 'runFixer'])->name('validate.fix');
     });
 

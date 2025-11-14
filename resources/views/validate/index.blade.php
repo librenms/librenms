@@ -3,43 +3,72 @@
 @section('title', __('validation.results.validate'))
 
 @section('content')
-    <div x-data="{results: [], listItems: 10, errorMessage: ''}" x-init="fetch('{{ route('validate.results') }}')
-                .then(response => {
-                    if (response.ok) {
-                        response.json()
-                            .then(data => results = data)
-                            .catch(error => errorMessage = (error instanceof SyntaxError ? '{{ trans('validation.results.backend_failed') }}' : error))
-                    } else {
-                        errorMessage = '{{ trans('validation.results.backend_failed') }}';
-                        response.text().then(console.log);
-                    }
-                });">
-        <div class="tw:grid tw:place-items-center" style="height: 80vh" x-show="! results.length">
-            <h3 x-show="! errorMessage"><i class="fa-solid fa-spinner fa-spin"></i> {{ __('validation.results.validating') }}</h3>
-            <div x-show="errorMessage" class="panel panel-danger">
-                <div class="panel-heading">
-                    <i class="fa-solid fa-exclamation-triangle"></i> {{ __('validation.results.fetch_failed') }}
-                </div>
-                <div class="panel-body" x-text="errorMessage"></div>
-            </div>
-        </div>
-        <div x-show="results.length" class="tw:mx-10">
-            <template x-for="(group, index) in results">
+    <div x-data="{
+            groups: @js($groups),
+            listItems: 10,
+            init() {
+                // augment groups with state
+                this.groups = this.groups.map(g => ({...g, loading: true, errorMessage: '', status: null, statusText: '', results: []}));
+                const urlTemplate = '{{ route('validate.results', ['group' => ':group']) }}';
+                this.groups.forEach((g, i) => {
+                    const url = urlTemplate.replace(':group', encodeURIComponent(g.group));
+                    fetch(url)
+                        .then(response => {
+                            if (! response.ok) {
+                                g.errorMessage = '{{ trans('validation.results.backend_failed') }}';
+                                response.text().then(console.log);
+                                g.loading = false;
+                                return;
+                            }
+                            response.json()
+                                .then(data => {
+                                    const arr = Array.isArray(data) ? data : [data];
+                                    const match = arr.find(item => item.group === g.group) ?? arr[0];
+                                    if (match) {
+                                        g.status = match.status;
+                                        g.statusText = match.statusText;
+                                        g.results = match.results ?? [];
+                                    } else {
+                                        g.errorMessage = '{{ trans('validation.results.backend_failed') }}';
+                                    }
+                                })
+                                .catch(error => {
+                                    g.errorMessage = (error instanceof SyntaxError ? '{{ trans('validation.results.backend_failed') }}' : String(error));
+                                })
+                                .finally(() => { g.loading = false; });
+                        })
+                        .catch(error => { g.errorMessage = String(error); g.loading = false; });
+                });
+            }
+        }">
+        <div class="tw:mx-10">
+            <template x-for="(group, index) in groups" :key="group.group">
                 <div class="panel-group" style="margin-bottom: 5px">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a data-toggle="collapse" x-bind:data-target="'#body-' + group.group">
                                     <span x-text="group.name"></span>
-                                    <span class="pull-right"
+                                    <span class="pull-right" x-show="! group.loading && ! group.errorMessage"
                                           x-bind:class="{'text-success': group.status === 2, 'text-warning': group.status === 1, 'text-danger': group.status === 0}"
                                           x-text="group.statusText"></span>
+                                    <span class="pull-right" x-show="group.loading"><i class="fa-solid fa-spinner fa-spin"></i> {{ __('validation.results.validating') }}</span>
+                                    <span class="pull-right text-danger" x-show="group.errorMessage"><i class="fa-solid fa-exclamation-triangle"></i> {{ __('validation.results.fetch_failed') }}</span>
                                 </a>
                             </h4>
                         </div>
-                        <div x-bind:id="'body-' + group.group" class="panel-collapse collapse" x-bind:class="{'in': group.status !== 2}">
+                        <div x-bind:id="'body-' + group.group" class="panel-collapse collapse" x-bind:class="{'in': group.loading || group.status !== 2}">
                             <div class="panel-body">
-                                <template x-for="result in group.results">
+                                <div class="tw:grid tw:place-items-center" style="min-height: 80px" x-show="group.loading">
+                                    <h4><i class="fa-solid fa-spinner fa-spin"></i> {{ __('validation.results.validating') }}</h4>
+                                </div>
+                                <div x-show="group.errorMessage && ! group.loading" class="panel panel-danger">
+                                    <div class="panel-heading">
+                                        <i class="fa-solid fa-exclamation-triangle"></i> {{ __('validation.results.fetch_failed') }}
+                                    </div>
+                                    <div class="panel-body" x-text="group.errorMessage"></div>
+                                </div>
+                                <template x-for="result in group.results" x-show="! group.loading && ! group.errorMessage">
                                     <div class="panel" x-bind:class="{'panel-info': result.status === 3, 'panel-success': result.status === 2, 'panel-warning': result.status === 1, 'panel-danger': result.status === 0}">
                                         <div class="panel-heading"
                                              x-text="result.statusText + ': ' + result.message"
