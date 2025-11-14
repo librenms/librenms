@@ -162,7 +162,7 @@
                         </li>
                     @endif
                         <li role="presentation" class="divider"></li>
-                        <li><a href="{{ url('outages') }}"><i class="fa fa-bar-chart fa-fw fa-lg"
+                        <li><a href="{{ url('outages') }}"><i class="fa fa-exclamation-triangle fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Outages') }}</a></li>
 
                         @admin
