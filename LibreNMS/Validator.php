@@ -72,9 +72,7 @@ class Validator
      */
     public function getValidationGroups(): array
     {
-        return array_map(function (ValidationGroup $validator) {
-            return $validator->isDefault();
-        }, $this->validation_groups);
+        return array_map(fn (ValidationGroup $validator) => $validator->isDefault(), $this->validation_groups);
     }
 
     /**

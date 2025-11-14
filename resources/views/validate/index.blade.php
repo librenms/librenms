@@ -37,7 +37,7 @@
                                 }
                             })
                             .catch(error => {
-                                group.errorMessage = (error instanceof SyntaxError ? '{{ trans('validation.results.backend_failed') }}' : String(error));
+                                group.errorMessage = ((error instanceof SyntaxError || error instanceof TypeError) ? '{{ trans('validation.results.backend_failed') }}' : String(error));
                             })
                             .finally(() => { group.loading = false; });
                     })
