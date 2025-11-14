@@ -143,7 +143,7 @@ class Validator
             return $this->results[$validation_group] ?? [];
         }
 
-        return array_reduce($this->results, 'array_merge', []);
+        return array_reduce($this->results, array_merge(...), []);
     }
 
     /**

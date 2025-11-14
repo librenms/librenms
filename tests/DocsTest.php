@@ -48,7 +48,7 @@ final class DocsTest extends TestCase
         ];
 
         // Build the exclusion part of the find command
-        $exclude_conditions = implode(' -not -path ', array_map(fn ($path) => escapeshellarg($path), $exclude_paths));
+        $exclude_conditions = implode(' -not -path ', array_map(escapeshellarg(...), $exclude_paths));
         $find_command = "find $dir -name '*.md' -not -path $exclude_conditions";
 
         // Run the find command with exclusions

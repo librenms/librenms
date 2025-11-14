@@ -88,7 +88,7 @@ function collectd_list_hosts()
         }
     }
     $hosts = array_unique($hosts);
-    usort($hosts, 'collectd_compare_host');
+    usort($hosts, collectd_compare_host(...));
 
     return $hosts;
 }
