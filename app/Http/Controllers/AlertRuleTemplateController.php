@@ -12,7 +12,7 @@ class AlertRuleTemplateController extends Controller
     {
         $collection = self::templatesCollection();
 
-        return response()->json(collect($collection)->map(fn($rule, $index) => [
+        return response()->json(collect($collection)->map(fn ($rule, $index) => [
             'id' => $index,
             'name' => $rule['name'],
             'builder' => $rule['builder'] ?? null,
