@@ -496,16 +496,13 @@ class Rrd extends BaseDatastore
         $safeHost = self::safeName($hostname);
 
         if ($this->rrdcached) {
-            $filename = sprintf('/%s', self::safeName($device['hostname']));
-            $rrd_files = $this->command('list', $filename, '');
-            // Command output is an array, create new array with each filename as a item in array.
-            $rrd_files_array = explode("\n", trim((string) $rrd_files[0]));
-            // Remove status line from response
-            array_pop($rrd_files_array);
-        } else {
-            $rrddir = $this->dirFromHost($device['hostname']);
-            $pattern = sprintf('%s/*.rrd', $rrddir);
-            $rrd_files_array = glob($pattern);
+            $rrdFiles = $this->command('list', "/$safeHost", '');
+
+            $rrdFilesArray = explode("\n", trim((string) $rrdFiles[0]));
+            array_pop($rrdFilesArray); // remove status line
+            sort($rrdFilesArray);
+
+            return $rrdFilesArray;
         }
 
         $rrdDir = $this->dirFromHost($hostname);
