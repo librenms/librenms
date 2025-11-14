@@ -74,7 +74,7 @@ class AlertTransportController extends Controller
             ->filter(fn ($member) => ! empty($member->transport_id))
             ->map(fn ($member) => [
                 'id' => $member->transport_id,
-                'text' => ucfirst($member->transport_type) . ': ' . $member->transport_name,
+                'text' => ucfirst((string) $member->transport_type) . ': ' . $member->transport_name,
             ])
             ->values()
             ->all();

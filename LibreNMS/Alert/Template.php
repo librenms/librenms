@@ -52,14 +52,14 @@ class Template
         $transportId = $obj['transport_id'] ?? null;
 
         if ($ruleId && $transportId) {
-            $this->template = AlertTemplate::whereHas('map', function ($query) use ($ruleId, $transportId) {
+            $this->template = AlertTemplate::whereHas('map', function ($query) use ($ruleId, $transportId): void {
                 $query->where('alert_rule_id', '=', $ruleId)
                     ->where('transport_id', '=', $transportId);
             })->first();
         }
 
         if (! $this->template && $ruleId) {
-            $this->template = AlertTemplate::whereHas('map', function ($query) use ($ruleId) {
+            $this->template = AlertTemplate::whereHas('map', function ($query) use ($ruleId): void {
                 $query->where('alert_rule_id', '=', $ruleId)
                     ->whereNull('transport_id');
             })->first();
