@@ -115,7 +115,7 @@ class VictoriaMetrics extends BaseDatastore
             }
         }
 
-        Log::debug("VictoriaMetrics put:", [
+        Log::debug('VictoriaMetrics put:', [
             'measurement' => $measurement,
             'tags' => $tags,
             'fields' => $fields,
@@ -146,6 +146,7 @@ class VictoriaMetrics extends BaseDatastore
         if (preg_match('/^[0-9]/', $name)) {
             $name = '_' . $name;
         }
+
         return $name;
     }
 
@@ -157,6 +158,7 @@ class VictoriaMetrics extends BaseDatastore
         $value = str_replace('\\', '\\\\', $value);
         $value = str_replace("\n", '\\n', $value);
         $value = str_replace('"', '\\"', $value);
+
         return $value;
     }
 
