@@ -67,7 +67,6 @@ class Rrd extends BaseDatastore
     {
         parent::__construct();
         $this->loadConfig();
-        $this->init();
     }
 
     public function getName(): string
@@ -442,6 +441,34 @@ class Rrd extends BaseDatastore
     }
 
     /**
+     * Build a command array for rrdtool
+     * Shortens the filename as needed
+     * Determines if --daemon should be used
+     *
+     * @param  string  $command  The base rrdtool command.  Usually create, update, last.
+     * @param  string  $filename  The full path to the rrd file
+     * @param  array  $options  Options for the command possibly including the rrd definition
+     * @return string returns a full command ready to be piped to rrdtool
+     *
+     * @throws FileExistsException if rrdtool <1.4.3 and the rrd file exists locally
+     */
+    public function buildCommandArray($command, $filename, $options): array
+    {
+        if ($this->rrdcached &&
+            ! ($command == 'create' && version_compare($this->version, '1.5.5', '<')) &&
+            ! ($command == 'tune' && $this->rrdcached && version_compare($this->version, '1.5', '<'))
+        ) {
+            // only relative paths if using rrdcached
+            $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
+            $options = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $options);
+
+            return array_merge([$command, $filename, "--daemon", $this->rrdcached], $options);
+        }
+
+        return array_merge([$command, $filename], $options);
+    }
+
+    /**
      * Build a command for rrdtool
      * Shortens the filename as needed
      * Determines if --daemon and -O should be used
@@ -589,7 +616,7 @@ class Rrd extends BaseDatastore
      * Generates a graph file at $graph_file using $options
      * Graphs are a single command per run, so this just runs rrdtool
      *
-     * @param  array  $options
+     * @param  array $options
      * @param  array|null  $env
      * @return string
      *
@@ -597,30 +624,26 @@ class Rrd extends BaseDatastore
      */
     public function graph(array $options, ?array $env = null): string
     {
-        if ($this->rrdcached) {
-            // only relative paths if using rrdcached
-            $options = array_merge(str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $options), ['--daemon', $this->rrdcached]);
-        }
-
-        $process = new Process(array_merge([$this->rrdtool_executable, 'graph', '-'], $options), $this->rrd_dir, $env);
+        $process = new Process([$this->rrdtool_executable, '-'], $this->rrd_dir, $env);
         $process->setTimeout(300);
         $process->setIdleTimeout(300);
 
         try {
+            $command = $this->buildCommandArray('graph', '-', $options);
+            $process->setInput('"' . implode('" "', $command) . "\"\nquit");
             $process->run();
-        } catch (\Exception $e) {
-            throw new RrdGraphException($e->getMessage());
+        } catch (FileExistsException $e) {
+            throw new RrdGraphException($e->getMessage(), 'File Exists');
         }
 
-        // Return the image if the process returns without an error code
-        if ($process->getExitCode() == 0) {
-            return $process->getOutput();
+        $feedback_position = strrpos($process->getOutput(), 'OK ');
+        if ($feedback_position !== false) {
+            return substr($process->getOutput(), 0, $feedback_position);
         }
 
-        // Make sure a valid image was returned
+        // if valid image is returned with error, extract image and feedback
         // rrdtool defaults to png if imgformat not specified
-        $matches = preg_grep('/--imgformat=([^\s]+)/', $options);
-        $graph_type = $matches ? strtolower((string) $matches[1]) : 'png';
+        $graph_type = preg_match('/--imgformat=([^\s]+)/', $options, $matches) ? strtolower($matches[1]) : 'png';
         $imageFormat = ImageFormat::forGraph($graph_type);
 
         $search = $imageFormat->getImageEnd();
@@ -637,7 +660,7 @@ class Rrd extends BaseDatastore
         }
 
         // only error text was returned
-        $error = trim($process->getErrorOutput());
+        $error = trim($process->getOutput() . PHP_EOL . $process->getErrorOutput());
         throw new RrdGraphException($error, null, null, null, $process->getExitCode());
     }
 
