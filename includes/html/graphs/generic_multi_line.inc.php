@@ -29,7 +29,7 @@ if ($nototal) {
     $unitlen += '2';
 }
 
-$rrd_options[] = "COMMENT:" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr($unit_text, $descr_len) . "      Now      Min      Max     Avg\l";
+$rrd_options[] = 'COMMENT:' . \LibreNMS\Data\Store\Rrd::fixedSafeDescr($unit_text, $descr_len) . "      Now      Min      Max     Avg\l";
 
 $i = 0;
 $iter = 0;
@@ -84,7 +84,7 @@ foreach ($rrd_list ?? [] as $rrd) {
     $rrd_optionsb[] = 'GPRINT:' . $id . ':LAST:%5.' . $float_precision . 'lf%s' . $units;
     $rrd_optionsb[] = 'GPRINT:' . $id . 'min:MIN:%5.' . $float_precision . 'lf%s' . $units;
     $rrd_optionsb[] = 'GPRINT:' . $id . 'max:MAX:%5.' . $float_precision . 'lf%s' . $units;
-    $rrd_optionsb[] = 'GPRINT:' . $id . ":AVERAGE:%5." . $float_precision . "lf%s$units\\n";
+    $rrd_optionsb[] = 'GPRINT:' . $id . ':AVERAGE:%5.' . $float_precision . "lf%s$units\\n";
 
     $i++;
 }
