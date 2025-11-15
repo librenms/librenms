@@ -29,7 +29,7 @@ $rrd_options[] = 'CDEF:usedreal=totalreal,availreal,-';
 $rrd_options[] = 'CDEF:usedswap=totalswap,availswap,-';
 $rrd_options[] = 'CDEF:cusedswap=usedswap,-1,*';
 $rrd_options[] = 'CDEF:cdeftot=availreal,shared,buffered,usedreal,cached,usedswap,+,+,+,+,+';
-$rrd_options[] = "COMMENT:'Bytes       Current    Average     Maximum\\n'";
+$rrd_options[] = "COMMENT:Bytes       Current    Average     Maximum\\n";
 $rrd_options[] = 'LINE1:usedreal#d0b080:';
 $rrd_options[] = 'AREA:usedreal#f0e0a0:used';
 $rrd_options[] = 'GPRINT:usedreal:LAST:\ \ \ %7.2lf%sB';
