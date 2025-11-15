@@ -448,7 +448,7 @@ class Rrd extends BaseDatastore
      * @param  string  $command  The base rrdtool command.  Usually create, update, last.
      * @param  string  $filename  The full path to the rrd file
      * @param  array  $options  Options for the command possibly including the rrd definition
-     * @return string returns a full command ready to be piped to rrdtool
+     * @return array returns a full command array ready to be used by rrdtool
      *
      * @throws FileExistsException if rrdtool <1.4.3 and the rrd file exists locally
      */
@@ -462,7 +462,7 @@ class Rrd extends BaseDatastore
             $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
             $options = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $options);
 
-            return array_merge([$command, $filename, "--daemon", $this->rrdcached], $options);
+            return array_merge([$command, $filename, '--daemon', $this->rrdcached], $options);
         }
 
         return array_merge([$command, $filename], $options);
@@ -616,7 +616,7 @@ class Rrd extends BaseDatastore
      * Generates a graph file at $graph_file using $options
      * Graphs are a single command per run, so this just runs rrdtool
      *
-     * @param  array $options
+     * @param  array  $options
      * @param  array|null  $env
      * @return string
      *
