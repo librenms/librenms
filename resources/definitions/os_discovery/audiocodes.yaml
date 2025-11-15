@@ -18,12 +18,27 @@ modules:
         count:
             data:
                 -
-# MIB not supplied by vendor
-                    oid: audioCodes.15.3.1.1.1.2.0
+#                    oid: audioCodes
+#                    index: 15.3.1.1.1.2.0
+                    oid: {{ audioCodes.15.3.1.1.1.2.0 }} # MIB not supplied by vendor
                     num_oid: '.1.3.6.1.4.1.5003.15.3.1.1.1.2.0'
                     descr: 'Active Calls'
         state:
             data:
+# working with manual discovery, not working with automatic discovery
+                -
+                    oid: accountTable
+                    value: accountRowStatus
+                    num_oid: '.1.3.6.1.4.1.5003.9.10.3.1.1.22.21'
+                    index: 'accountTable.{{ $index }}.2'
+                    descr: 'System Account Status {{ $index }}'
+                    states:
+                        - { descr: active, graph: 0, value: 1, generic: 0 }
+                        - { descr: notInService, graph: 0, value: 2, generic: 2 }
+                        - { descr: notReady, graph: 0, value: 3, generic: 2 }
+                        - { descr: createAndGo, graph: 0, value: 4, generic: 1 }
+                        - { descr: createAndWait, graph: 0, value: 5, generic: 1 }
+                        - { descr: destroy, graph: 0, value: 6, generic: 2 }
                 -
                     oid: acSysStateOperational
                     value: acSysStateOperational
@@ -53,19 +68,6 @@ modules:
                         - { descr: no, graph: 0, value: 3, generic: 2 }
                         - { descr: yes, graph: 0, value: 2, generic: 0 }
                         - { descr: notAppicable, graph: 0, value: 1, generic: 3 }
-                -
-                    oid: accountTable
-                    value: accountRowStatus
-                    index: 'accountRowStatus.{{ $index }}'
-                    num_oid: '.1.3.6.1.4.1.5003.9.10.3.1.1.22.21.{{ $index }}'
-                    descr: 'System Account Status {{ $index }}'
-                    states:
-                        - { descr: active, graph: 0, value: 1, generic: 0 }
-                        - { descr: notInService, graph: 0, value: 2, generic: 2 }
-                        - { descr: notReady, graph: 0, value: 3, generic: 2 }
-                        - { descr: createAndGo, graph: 0, value: 4, generic: 1 }
-                        - { descr: createAndWait, graph: 0, value: 5, generic: 1 }
-                        - { descr: destroy, graph: 0, value: 6, generic: 2 }
                 -
                     oid: channelStatusTable
                     value: rTPActive
