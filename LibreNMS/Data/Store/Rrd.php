@@ -456,7 +456,7 @@ class Rrd extends BaseDatastore
     {
         if ($this->rrdcached &&
             ! ($command == 'create' && version_compare($this->version, '1.5.5', '<')) &&
-            ! ($command == 'tune' && $this->rrdcached && version_compare($this->version, '1.5', '<'))
+            ! ($command == 'tune' && version_compare($this->version, '1.5', '<'))
         ) {
             // only relative paths if using rrdcached
             $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
@@ -498,7 +498,7 @@ class Rrd extends BaseDatastore
         // no remote for create < 1.5.5 and tune < 1.5
         if ($this->rrdcached &&
             ! ($command == 'create' && version_compare($this->version, '1.5.5', '<')) &&
-            ! ($command == 'tune' && $this->rrdcached && version_compare($this->version, '1.5', '<'))
+            ! ($command == 'tune' && version_compare($this->version, '1.5', '<'))
         ) {
             // only relative paths if using rrdcached
             $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
@@ -643,7 +643,8 @@ class Rrd extends BaseDatastore
 
         // if valid image is returned with error, extract image and feedback
         // rrdtool defaults to png if imgformat not specified
-        $graph_type = preg_match('/--imgformat=([^\s]+)/', $options, $matches) ? strtolower($matches[1]) : 'png';
+        $matches = preg_grep('/--imgformat=([^\s]+)/', $options);
+        $graph_type = $matches ? strtolower((string) $matches[1]) : 'png';
         $imageFormat = ImageFormat::forGraph($graph_type);
 
         $search = $imageFormat->getImageEnd();
