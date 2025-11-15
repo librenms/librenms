@@ -222,6 +222,7 @@ nav:
       - InfluxDBv2: Extensions/metrics/InfluxDBv2.md
       - OpenTSDB: Extensions/metrics/OpenTSDB.md
       - Prometheus: Extensions/metrics/Prometheus.md
+      - VictoriaMetrics: Extensions/metrics/VictoriaMetrics.md
       - Kafka: Extensions/metrics/Kafka.md
 
   - Alerting:

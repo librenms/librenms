@@ -21,7 +21,7 @@ use LibreNMS\Util\Debug;
 $init_modules = [];
 require __DIR__ . '/includes/init.php';
 
-$options = getopt('drfpgh:');
+$options = getopt('drfpVgh:');
 if (Debug::set(isset($options['d']))) {
     echo "DEBUG!\n";
 }

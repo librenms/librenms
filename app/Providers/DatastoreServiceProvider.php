@@ -40,6 +40,7 @@ class DatastoreServiceProvider extends ServiceProvider
         \LibreNMS\Data\Store\InfluxDBv2::class,
         \LibreNMS\Data\Store\OpenTSDB::class,
         \LibreNMS\Data\Store\Prometheus::class,
+        \LibreNMS\Data\Store\VictoriaMetrics::class,
         \LibreNMS\Data\Store\Rrd::class,
         \LibreNMS\Data\Store\Kafka::class,
     ];

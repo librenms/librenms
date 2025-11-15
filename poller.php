@@ -27,7 +27,7 @@
 $init_modules = ['polling', 'alerts', 'laravel'];
 require __DIR__ . '/includes/init.php';
 
-$options = getopt('h:rfpdvm:q');
+$options = getopt('h:rfpdVm:q');
 
 c_echo('%RWarning: poller.php is deprecated!%n Use %9lnms device:poll%n instead.' . PHP_EOL . PHP_EOL);
 
@@ -45,6 +45,7 @@ if (empty($options['h'])) {
     echo "-r                 Do not create or update RRDs\n";
     echo "-f                 Do not insert data into InfluxDB\n";
     echo "-p                 Do not insert data into Prometheus\n";
+    echo "-V                 Do not insert data into VictoriaMetrics\n";
     echo "-d                 Enable debugging output\n";
     echo "-v                 Enable verbose debugging output\n";
     echo "-m                 Specify module(s) to be run. Comma separate modules, submodules may be added with /\n";
@@ -67,7 +68,7 @@ if (isset($options['q'])) {
     $arguments['--quiet'] = true;
 }
 
-if (isset($options['r']) || isset($options['f']) || isset($options['p'])) {
+if (isset($options['r']) || isset($options['f']) || isset($options['p']) || isset($options['V'])) {
     $arguments['--no-data'] = true;
 }
 

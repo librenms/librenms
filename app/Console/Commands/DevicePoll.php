@@ -51,6 +51,7 @@ class DevicePoll extends LnmsCommand
             LibrenmsConfig::set('prometheus.enable', false);
             LibrenmsConfig::set('graphite.enable', false);
             LibrenmsConfig::set('kafka.enable', false);
+            LibrenmsConfig::set('victoriametrics.enable', false);
         }
 
         try {

@@ -91,6 +91,7 @@ class ModuleTestHelper
         LibrenmsConfig::set('graphite.enable', false);
         LibrenmsConfig::set('prometheus.enable', false);
         LibrenmsConfig::set('kafka.enable', false);
+        LibrenmsConfig::set('victoriametrics.enable', false);
     }
 
     private static function compareOid($a, $b): int

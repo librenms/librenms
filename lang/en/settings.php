@@ -74,6 +74,7 @@ return [
             'opentsdb' => ['name' => 'Datastore: OpenTSDB'],
             'ping' => ['name' => 'Ping'],
             'prometheus' => ['name' => 'Datastore: Prometheus'],
+            'victoriametrics' => ['name' => 'Datastore: VictoriaMetrics'],
             'rrdtool' => ['name' => 'Datastore: RRDTool'],
             'snmp' => ['name' => 'SNMP'],
             'dispatcherservice' => ['name' => 'Dispatcher Service'],
@@ -1830,6 +1831,32 @@ return [
             'attach_sysname' => [
                 'description' => 'Attach Device sysName',
                 'help' => 'Attach sysName information put to Prometheus.',
+            ],
+            'prefix' => [
+                'description' => 'Prefix',
+                'help' => 'Optional text to prepend to exported metric names',
+            ],
+        ],
+        'victoriametrics' => [
+            'enable' => [
+                'description' => 'Enable',
+                'help' => 'Exports metrics to VictoriaMetrics',
+            ],
+            'url' => [
+                'description' => 'URL',
+                'help' => 'The URL of the VictoriaMetrics server to send data to',
+            ],
+            'user' => [
+                'description' => 'Username',
+                'help' => 'Username for basic authentication (optional)',
+            ],
+            'password' => [
+                'description' => 'Password',
+                'help' => 'Password for basic authentication (optional)',
+            ],
+            'attach_sysname' => [
+                'description' => 'Attach Device sysName',
+                'help' => 'Attach sysName information to VictoriaMetrics metrics.',
             ],
             'prefix' => [
                 'description' => 'Prefix',

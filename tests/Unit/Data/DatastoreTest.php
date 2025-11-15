@@ -44,6 +44,7 @@ final class DatastoreTest extends TestCase
             'kafka',
             'opentsdb',
             'prometheus',
+            'victoriametrics',
             'rrd',
         ]);
     }
@@ -66,10 +67,11 @@ final class DatastoreTest extends TestCase
         LibrenmsConfig::set('opentsdb.enable', true);
         LibrenmsConfig::set('prometheus.enable', true);
         LibrenmsConfig::set('kafka.enable', false);
+        LibrenmsConfig::set('victoriametrics.enable', true);
 
         $ds = $this->app->make('Datastore');
         $stores = $ds->getStores();
-        $this->assertCount(5, $stores, 'Incorrect number of default stores enabled');
+        $this->assertCount(6, $stores, 'Incorrect number of default stores enabled');
 
         $enabled = array_map(get_class(...), $stores);
 
@@ -79,6 +81,7 @@ final class DatastoreTest extends TestCase
             \LibreNMS\Data\Store\InfluxDBv2::class,
             \LibreNMS\Data\Store\OpenTSDB::class,
             \LibreNMS\Data\Store\Prometheus::class,
+            \LibreNMS\Data\Store\VictoriaMetrics::class,
         ];
 
         $this->assertEquals($expected_enabled, $enabled, 'Expected all non-default stores to be initialized');

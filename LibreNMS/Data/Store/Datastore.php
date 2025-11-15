@@ -49,6 +49,7 @@ class Datastore implements WriteInterface, DataStorageInterface
             'r' => 'rrd.enable',
             'f' => 'influxdb.enable',
             'p' => 'prometheus.enable',
+            'V' => 'victoriametrics.enable',
             'g' => 'graphite.enable',
             '2' => 'influxdbv2.enable',
             'k' => 'kafka.enable',

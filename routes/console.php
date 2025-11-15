@@ -109,7 +109,7 @@ Artisan::command('poller:services
     /** @var Illuminate\Console\Command $this */
     $command = [base_path('check-services.php')];
     if ($this->option('no-data')) {
-        array_push($command, '-r', '-f', '-p');
+        array_push($command, '-r', '-f', '-p', '-V');
     }
     if ($this->argument('device spec') !== 'all') {
         $command[] = '-h';
