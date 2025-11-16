@@ -108,7 +108,7 @@ foreach ($rrd_list as $rrd) {
 }
 
 if ($custom_graph) {
-    $rrd_options[] = $custom_graph;
+    array_push($rrd_options, ...$custom_graph);
 }
 
 if (! $nototal) {

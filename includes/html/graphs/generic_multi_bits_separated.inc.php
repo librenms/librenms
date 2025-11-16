@@ -160,7 +160,7 @@ if (! $noagg) {
 }
 
 if (isset($custom_graph)) {
-    $rrd_options[] = $custom_graph;
+    array_push($rrd_options, ...$custom_graph);
 }
 
 array_push($rrd_options, ...$rrd_optionsb);
