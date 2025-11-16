@@ -23,7 +23,7 @@ $rrd_options[] = 'CDEF:sensor_max=t_sensor_max,1000,*';
 $rrd_options[] = 'CDEF:sensor_min=t_sensor_min,1000,*';
 $rrd_options[] = 'AREA:sensor_max#c5c5c5';
 $rrd_options[] = 'AREA:sensor_min#ffffffff';
-$rrd_options[] = 'COMMENT:"Alert thresholds\:"';
+$rrd_options[] = 'COMMENT:Alert thresholds\:';
 if ($sensor->sensor_limit_low) {
     $rrd_options[] = 'LINE1.5:' . $sensor->sensor_limit_low . '#00008b:low = ' . Number::formatSi($sensor->sensor_limit_low, 2, 3, $sensor->unit()) . ':dashes';
 }

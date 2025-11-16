@@ -45,8 +45,8 @@ foreach ($dbq as $ds) {
         $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($ds['ds_label'], $descr_len);
 
         $rrd_options[] = $ds['ds_draw'] . ':' . $ds_name . '#' . $colour . ':' . $descr;
-        $rrd_options[] = 'GPRINT:' . $ds_name . ':LAST:"%6.2lf%s"';
-        $rrd_options[] = 'GPRINT:' . $ds_name . ':AVERAGE:"%6.2lf%s"';
-        $rrd_options[] = 'GPRINT:' . $ds_name . ':MAX:"%6.2lf%s\\n"';
+        $rrd_options[] = 'GPRINT:' . $ds_name . ':LAST:%6.2lf%s';
+        $rrd_options[] = 'GPRINT:' . $ds_name . ':AVERAGE:%6.2lf%s';
+        $rrd_options[] = 'GPRINT:' . $ds_name . ':MAX:%6.2lf%s\\n';
     }
 }//end foreach

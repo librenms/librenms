@@ -15,7 +15,7 @@ $unit_short = str_replace('%', '%%', $sensors->first()->unit());
 $unit_long = str_replace('%', '%%', $sensors->first()->unitLong());
 
 $col_w = 7 + strlen($unit_short);
-$rrd_options[] = "COMMENT:'" . str_pad($unit_long, 19) . str_pad('Cur', $col_w) . str_pad('Min', $col_w) . str_pad('Max', $col_w) . "Avg\\n'";
+$rrd_options[] = "COMMENT:" . str_pad($unit_long, 19) . str_pad('Cur', $col_w) . str_pad('Min', $col_w) . str_pad('Max', $col_w) . "Avg\\n";
 
 foreach ($sensors as $index => $sensor) {
     // FIXME generic colour function
@@ -39,7 +39,7 @@ foreach ($sensors as $index => $sensor) {
         $field = 'far' . $sensor->sensor_id;
     }
 
-    $rrd_options[] = "LINE1:$field#$colour:'$sensor_descr_fixed'";
+    $rrd_options[] = "LINE1:$field#$colour:$sensor_descr_fixed";
     $rrd_options[] = "GPRINT:$field:LAST:%5.1lf$unit_short";
     $rrd_options[] = "GPRINT:$field:MIN:%5.1lf$unit_short";
     $rrd_options[] = "GPRINT:$field:MAX:%5.1lf$unit_short";

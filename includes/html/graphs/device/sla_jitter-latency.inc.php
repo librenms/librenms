@@ -21,10 +21,10 @@ $rrd_options[] = '-E';
 $rrd_filename = Rrd::name($device['hostname'], ['sla', $sla['sla_nr'], 'jitter']);
 
 if (Rrd::checkRrdExists($rrd_filename)) {
-    $rrd_options[] = "COMMENT:'                          Cur    Min    Max    Avg\\n'";
+    $rrd_options[] = "COMMENT:                          Cur    Min    Max    Avg\\n";
 
     $rrd_options[] = 'DEF:SD=' . $rrd_filename . ':OWAvgSD:AVERAGE';
-    $rrd_options[] = "LINE1.25:SD#0000ee:'Src to Dst (ms)    '";
+    $rrd_options[] = "LINE1.25:SD#0000ee:Src to Dst (ms)    ";
     $rrd_options[] = "GPRINT:SD:LAST:'%5.2lf'";
     $rrd_options[] = "GPRINT:SD:MIN:'%5.2lf'";
     $rrd_options[] = "GPRINT:SD:MAX:'%5.2lf'";

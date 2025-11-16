@@ -157,8 +157,8 @@ $rrd_options[] = 'GPRINT:out' . $format . '_max:MAX:%6.' . $float_precision . 'l
 $rrd_options[] = 'GPRINT:percentile_out:%6.' . $float_precision . 'lf%s\\n';
 
 if (LibrenmsConfig::get('rrdgraph_real_percentile')) {
-    $rrd_options[] = 'HRULE:percentilehigh#FF0000:"Highest"';
-    $rrd_options[] = 'GPRINT:percentilehigh:"%30.' . $float_precision . 'lf%s\\n"';
+    $rrd_options[] = 'HRULE:percentilehigh#FF0000:Highest';
+    $rrd_options[] = 'GPRINT:percentilehigh:%30.' . $float_precision . 'lf%s\\n';
 }
 
 $rrd_options[] = 'GPRINT:tot:Total %6.' . $float_precision . 'lf%sB';
