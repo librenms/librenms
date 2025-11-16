@@ -23,7 +23,7 @@ include 'includes/html/graphs/common.inc.php';
 $rrd_options[] = '-l';
 $rrd_options[] = '0';
 $rrd_options[] = '-E';
-$rrd_options[] = "COMMENT:VLANs               Now     Min    Max\\n";
+$rrd_options[] = 'COMMENT:VLANs               Now     Min    Max\\n';
 $rrd_additions = '';
 
 $count = 0;
@@ -42,7 +42,7 @@ foreach ($components as $id => $array) {
             $color = \App\Facades\LibrenmsConfig::get("graph_colours.mixed.$count", \App\Facades\LibrenmsConfig::get('graph_colours.oranges.' . ($count - 7)));
 
             $rrd_options[] = 'DEF:DS' . $count . '=' . $rrd_filename . ':count:AVERAGE';
-            $rrd_options[] = 'AREA:DS' . $count . '#' . $color . ":" . str_pad(substr((string) $components[$id]['label'], 0, 15), 15) . $stack;
+            $rrd_options[] = 'AREA:DS' . $count . '#' . $color . ':' . str_pad(substr((string) $components[$id]['label'], 0, 15), 15) . $stack;
             $rrd_options[] = 'GPRINT:DS' . $count . ':LAST:%4.0lf%s';
             $rrd_options[] = 'GPRINT:DS' . $count . ':MIN:%4.0lf%s';
             $rrd_options[] = 'GPRINT:DS' . $count . ":MAX:%4.0lf%s\\\l";

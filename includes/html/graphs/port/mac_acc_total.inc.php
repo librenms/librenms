@@ -99,7 +99,7 @@ foreach ($accs as $acc) {
         $rrd_options[] = 'VDEF:totin' . $this_id . '=inB' . $this_id . ',TOTAL';
         $rrd_options[] = 'VDEF:totout' . $this_id . '=outB' . $this_id . 'temp,TOTAL';
         $rrd_options[] = 'VDEF:tot' . $this_id . '=octets' . $this_id . ',TOTAL';
-        $rrd_options[] = 'AREA:inB' . $this_id . '#' . $colour . ":" . $descr . ":STACK";
+        $rrd_options[] = 'AREA:inB' . $this_id . '#' . $colour . ':' . $descr . ':STACK';
         if ($rrd_optionsb) {
             $stack = ':STACK';
         }
@@ -108,7 +108,7 @@ foreach ($accs as $acc) {
         $rrd_options[] = 'GPRINT:inB' . $this_id . ":LAST:%6.2lf%s$units";
         $rrd_options[] = 'GPRINT:inB' . $this_id . ":MAX:%6.2lf%s$units";
         $rrd_options[] = 'GPRINT:totin' . $this_id . ":%6.2lf%s$unit";
-        $rrd_options[] = "COMMENT:    ";
+        $rrd_options[] = 'COMMENT:    ';
         $rrd_options[] = 'GPRINT:outB' . $this_id . "temp:LAST:%6.2lf%s$units";
         $rrd_options[] = 'GPRINT:outB' . $this_id . "temp:MAX:%6.2lf%s$units";
         $rrd_options[] = 'GPRINT:totout' . $this_id . ":%6.2lf%s$unit\\\\n";

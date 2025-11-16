@@ -16,7 +16,7 @@ include 'includes/html/graphs/common.inc.php';
 $rrd_options[] = '-l';
 $rrd_options[] = '0';
 $rrd_options[] = '-E';
-$rrd_options[] = "COMMENT:Class-Map              Now      Avg      Max\\n";
+$rrd_options[] = 'COMMENT:Class-Map              Now      Avg      Max\\n';
 $rrd_additions = '';
 
 $colours = array_merge(\App\Facades\LibrenmsConfig::get('graph_colours.mixed'), \App\Facades\LibrenmsConfig::get('graph_colours.manycolours'), \App\Facades\LibrenmsConfig::get('graph_colours.manycolours'));
@@ -51,7 +51,7 @@ foreach ($graphs as $thisQos) {
 
     $rrd_options[] = 'DEF:DS' . $count . '=' . $rrd_filename . ':' . $cbqos_parameter_name . ':AVERAGE';
     $rrd_options[] = 'CDEF:MOD' . $count . '=DS' . $count . ',' . $cbqos_operator_param . ',' . $cbqos_operator;
-    $rrd_options[] = 'AREA:MOD' . $count . '#' . $colour . ":" . str_pad(substr((string) $thisQos->title, 0, 15), 15) . $stack;
+    $rrd_options[] = 'AREA:MOD' . $count . '#' . $colour . ':' . str_pad(substr((string) $thisQos->title, 0, 15), 15) . $stack;
     $rrd_options[] = 'GPRINT:MOD' . $count . ':LAST:%6.2lf%s';
     $rrd_options[] = 'GPRINT:MOD' . $count . ':AVERAGE:%6.2lf%s';
     $rrd_options[] = 'GPRINT:MOD' . $count . ":MAX:%6.2lf%s\l";

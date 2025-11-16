@@ -30,14 +30,14 @@ if ($nototal) {
 }
 
 if ($width > '500') {
-    $rrd_options[] = "COMMENT:" . substr(str_pad((string) $unit_text, $descr_len + 5), 0, $descr_len + 5) . "Now      Min      Max     Avg\l";
+    $rrd_options[] = 'COMMENT:' . substr(str_pad((string) $unit_text, $descr_len + 5), 0, $descr_len + 5) . "Now      Min      Max     Avg\l";
     if (! $nototal) {
-        $rrd_options[] = "COMMENT:Total      ";
+        $rrd_options[] = 'COMMENT:Total      ';
     }
 
     $rrd_options[] = "COMMENT:\l";
 } else {
-    $rrd_options[] = "COMMENT:" . substr(str_pad((string) $unit_text, $descr_len + 5), 0, $descr_len + 5) . "Now      Min      Max     Avg\l";
+    $rrd_options[] = 'COMMENT:' . substr(str_pad((string) $unit_text, $descr_len + 5), 0, $descr_len + 5) . "Now      Min      Max     Avg\l";
 }
 
 $i = 0;
@@ -78,14 +78,14 @@ foreach ($rrd_list as $rrd) {
         $rrd_optionsc[] = 'GPRINT:' . $id . ':LAST:%5.1lf%s';
         $rrd_optionsc[] = 'GPRINT:' . $id . 'min:MIN:%5.1lf%s';
         $rrd_optionsc[] = 'GPRINT:' . $id . 'max:MAX:%5.1lf%s';
-        $rrd_optionsc[] = 'GPRINT:' . $id . ":AVERAGE:%5.1lf%s\\n";
+        $rrd_optionsc[] = 'GPRINT:' . $id . ':AVERAGE:%5.1lf%s\\n';
         $cstack = ':STACK';
     } else {
         $rrd_optionsb[] = 'AREA:' . $id . '#' . $colour . $stacked['transparency'] . ":$descr" . $bstack;
         $rrd_optionsb[] = 'GPRINT:' . $id . ':LAST:%5.1lf%s';
         $rrd_optionsb[] = 'GPRINT:' . $id . 'min:MIN:%5.1lf%s';
         $rrd_optionsb[] = 'GPRINT:' . $id . 'max:MAX:%5.1lf%s';
-        $rrd_optionsb[] = 'GPRINT:' . $id . ":AVERAGE:%5.1lf%s\\n";
+        $rrd_optionsb[] = 'GPRINT:' . $id . ':AVERAGE:%5.1lf%s\\n';
         $bstack = ':STACK';
     }
 
