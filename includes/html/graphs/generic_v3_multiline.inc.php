@@ -20,13 +20,13 @@ $unit_text = Rrd::fixedSafeDescr($unit_text, $unitlen);
 $stack = '';
 
 if ($width > '500') {
-    $rrd_options[] = "COMMENT:'" . substr(str_pad($unit_text, $descr_len + 10), 0, $descr_len + 10) . "Now         Min         Max        Avg\l'";
+    $rrd_options[] = "COMMENT:" . substr(str_pad($unit_text, $descr_len + 10), 0, $descr_len + 10) . "Now         Min         Max        Avg\l";
     if ($printtotal === 1) {
-        $rrd_options[] = "COMMENT:'Total      '";
+        $rrd_options[] = "COMMENT:Total      ";
     }
-    $rrd_options[] = "COMMENT:'\l'";
+    $rrd_options[] = "COMMENT:\l";
 } else {
-    $rrd_options[] = "COMMENT:'" . substr(str_pad($unit_text, $descr_len + 10), 0, $descr_len + 10) . "Now         Min         Max        Avg\l'";
+    $rrd_options[] = "COMMENT:" . substr(str_pad($unit_text, $descr_len + 10), 0, $descr_len + 10) . "Now         Min         Max        Avg\l";
 }
 
 foreach ($rrd_list as $rrd) {
@@ -93,20 +93,20 @@ foreach ($rrd_list as $rrd) {
         $stack = ':STACK';
     }
 
-    $rrd_options[] = 'LINE2:' . $g_defname . $i . '#' . $colour . ":'" . $descr . "'$stack";
+    $rrd_options[] = 'LINE2:' . $g_defname . $i . '#' . $colour . ":" . $descr . "$stack";
     if ($addarea === 1) {
-        $rrd_options[] = 'AREA:' . $g_defname . $i . '#' . $colour . $transparency . ":''$stack";
+        $rrd_options[] = 'AREA:' . $g_defname . $i . '#' . $colour . $transparency . ":$stack";
     }
     $rrd_options[] = 'GPRINT:' . $t_defname . $i . ':LAST:%8.0lf%s';
     $rrd_options[] = 'GPRINT:' . $t_defname . $i . 'min:MIN:%8.0lf%s';
     $rrd_options[] = 'GPRINT:' . $t_defname . $i . 'max:MAX:%8.0lf%s';
-    $rrd_options[] = 'GPRINT:' . $t_defname . $i . ":AVERAGE:'%8.0lf%s\\n'";
+    $rrd_options[] = 'GPRINT:' . $t_defname . $i . ":AVERAGE:%8.0lf%s\\n";
 
     if ($printtotal === 1) {
-        $rrd_options[] = 'GPRINT:tot' . $rrd['ds'] . $i . ":%8.0lf%s'" . Rrd::safeDescr($total_units) . "'";
+        $rrd_options[] = 'GPRINT:tot' . $rrd['ds'] . $i . ":%8.0lf%s" . Rrd::safeDescr($total_units);
     }
 
-    $rrd_options[] = "COMMENT:'\\n'";
+    $rrd_options[] = "COMMENT:\\n";
 }//end foreach
 
 if ($graph_params->visible('previous')) {

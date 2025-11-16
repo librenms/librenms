@@ -85,7 +85,7 @@ if (\App\Facades\LibrenmsConfig::get('old_graphs')) {
         $rrd_options[] = 'COMMENT:' . $unit_text . 'Now       Ave      Max\\n';
     }
 
-    $rrd_options[] = 'LINE1.25:' . $ds . '#' . $colour_line . ":'" . $line_text . "'";
+    $rrd_options[] = LINE1.25:' . $ds . '#' . $colour_line . ":" . $line_text;
     $rrd_options[] = 'GPRINT:' . $ds . ':LAST:%6.' . $float_precision . 'lf%s';
     $rrd_options[] = 'GPRINT:' . $ds . ':AVERAGE:%6.' . $float_precision . 'lf%s';
 

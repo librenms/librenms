@@ -25,7 +25,7 @@ include 'includes/html/graphs/common.inc.php';
 $rrd_options[] = '-l';
 $rrd_options[] = '0';
 $rrd_options[] = '-E';
-$rrd_options[] = "COMMENT:'GTM Pool Dropped Requests       Now      Avg      Max\\n'";
+$rrd_options[] = "COMMENT:GTM Pool Dropped Requests       Now      Avg      Max\\n";
 $colours = array_merge(\App\Facades\LibrenmsConfig::get('graph_colours.mixed'), \App\Facades\LibrenmsConfig::get('graph_colours.manycolours'));
 $colcount = 0;
 $count = 0;
@@ -45,7 +45,7 @@ foreach ($components as $comp) {
         }
 
         $rrd_options[] = 'DEF:DS' . $count . '=' . $rrd_filename . ':dropped:AVERAGE';
-        $rrd_options[] = 'LINE1.25:DS' . $count . '#' . $colour . ":'" . str_pad(substr((string) $label, 0, 60), 60) . "'";
+        $rrd_options[] = 'LINE1.25:DS' . $count . '#' . $colour . ":" . str_pad(substr((string) $label, 0, 60), 60);
         $rrd_options[] = 'GPRINT:DS' . $count . ':LAST:%6.2lf%s';
         $rrd_options[] = 'GPRINT:DS' . $count . ':AVERAGE:%6.2lf%s';
         $rrd_options[] = 'GPRINT:DS' . $count . ":MAX:%6.2lf%s\l";

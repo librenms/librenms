@@ -29,14 +29,14 @@ if ($width > '500') {
 $unit_text = 'Bits/sec';
 
 if ($width > '500') {
-    $rrd_options[] = "COMMENT:'" . substr(str_pad($unit_text, $descr_len + 5), 0, $descr_len + 5) . "    Current      Average     Maximum      '";
+    $rrd_options[] = "COMMENT:" . substr(str_pad($unit_text, $descr_len + 5), 0, $descr_len + 5) . "    Current      Average     Maximum      ";
     if (! $nototal) {
-        $rrd_options[] = "COMMENT:'Total      '";
+        $rrd_options[] = "COMMENT:Total      ";
     }
 
-    $rrd_options[] = "COMMENT:'\l'";
+    $rrd_options[] = "COMMENT:\l";
 } else {
-    $rrd_options[] = "COMMENT:'" . substr(str_pad($unit_text, $descr_len + 5), 0, $descr_len + 5) . "     Now         Ave          Max\l'";
+    $rrd_options[] = "COMMENT:" . substr(str_pad($unit_text, $descr_len + 5), 0, $descr_len + 5) . "     Now         Ave          Max\l";
 }
 
 if (! isset($multiplier)) {
@@ -83,7 +83,7 @@ foreach ($rrd_list as $rrd) {
         $stack = ':STACK';
     }
 
-    $rrd_options[] = 'AREA:inB' . $i . '#' . $colour_in . $stacked['transparency'] . ":'" . $descr . "'$stack";
+    $rrd_options[] = 'AREA:inB' . $i . '#' . $colour_in . $stacked['transparency'] . ":" . $descr . "$stack";
     $rrd_options[] = 'GPRINT:inB' . $i . ':LAST:%6.' . $float_precision . "lf%s$units";
     $rrd_options[] = 'GPRINT:inB' . $i . ':AVERAGE:%6.' . $float_precision . "lf%s$units";
     $rrd_options[] = 'GPRINT:inB' . $i . ':MAX:%6.' . $float_precision . "lf%s$units\l";
@@ -92,8 +92,8 @@ foreach ($rrd_list as $rrd) {
         $rrd_options[] = 'GPRINT:totin' . $i . ':%6.' . $float_precision . "lf%s$total_units";
     }
 
-    $rrd_options[] = "'HRULE:0#" . $colour_out . ':' . $descr_out . "'";
-    $rrd_optionsb[] = "'AREA:outB" . $i . '_neg#' . $colour_out . $stacked['transparency'] . ":$stack'";
+    $rrd_options[] = "HRULE:0#" . $colour_out . ':' . $descr_out;
+    $rrd_optionsb[] = "AREA:outB" . $i . '_neg#' . $colour_out . $stacked['transparency'] . ":$stack";
     $rrd_options[] = 'GPRINT:outB' . $i . ':LAST:%6.' . $float_precision . "lf%s$units";
     $rrd_options[] = 'GPRINT:outB' . $i . ':AVERAGE:%6.' . $float_precision . "lf%s$units";
     $rrd_options[] = 'GPRINT:outB' . $i . ':MAX:%6.' . $float_precision . "lf%s$units\l";
@@ -102,7 +102,7 @@ foreach ($rrd_list as $rrd) {
         $rrd_options[] = 'GPRINT:totout' . $i . ':%6.' . $float_precision . "lf%s$total_units";
     }
 
-    $rrd_options[] = "'COMMENT:\l'";
+    $rrd_options[] = "COMMENT:\l";
     $i++;
     $iter++;
 }

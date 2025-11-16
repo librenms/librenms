@@ -57,13 +57,13 @@ $rrd_options[] = 'CDEF:out_avg_tmp=out_throughput,out_packets,/';
 $rrd_options[] = 'CDEF:out_avg=out_avg_tmp,-1,*';
 
 $rrd_options[] = 'AREA:in_avg#' . $colour_area_in . $stacked['transparency'] . ':';
-$rrd_options[] = "COMMENT:'Average packet size\\n'";
-$rrd_options[] = 'LINE1.25:in_avg#' . $colour_line_in . ":'" . $in_text . "'";
+$rrd_options[] = "COMMENT:Average packet size\\n";
+$rrd_options[] = 'LINE1.25:in_avg#' . $colour_line_in . ":" . $in_text;
 $rrd_options[] = 'GPRINT:in_avg:AVERAGE:%6.2lf%sB';
 $rrd_options[] = 'COMMENT:\\n';
 
 $rrd_options[] = 'AREA:out_avg#' . $colour_area_out . $stacked['transparency'] . ':';
-$rrd_options[] = 'LINE1.25:out_avg#' . $colour_line_out . ":'" . $out_text . "'";
+$rrd_options[] = 'LINE1.25:out_avg#' . $colour_line_out . ":" . $out_text;
 $rrd_options[] = 'GPRINT:out_avg_tmp:AVERAGE:%6.2lf%sB';
 $rrd_options[] = 'COMMENT:\\n';
 

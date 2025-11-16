@@ -26,7 +26,7 @@ $rrd_options[] = '0';
 $rrd_options[] = '-u';
 $rrd_options[] = '16';
 $rrd_options[] = '-E';
-$rrd_options[] = "COMMENT:'Stratum               Now      Min      Max\\n'";
+$rrd_options[] = "COMMENT:Stratum               Now      Min      Max\\n";
 
 $count = 0;
 foreach ($components as $array) {
@@ -37,7 +37,7 @@ foreach ($components as $array) {
         $color = \App\Facades\LibrenmsConfig::get("graph_colours.mixed.$count", \App\Facades\LibrenmsConfig::get('graph_colours.oranges.' . ($count - 7)));
 
         $rrd_options[] = 'DEF:DS' . $count . '=' . $rrd_filename . ':stratum:AVERAGE';
-        $rrd_options[] = 'LINE1.25:DS' . $count . '#' . $color . ":'" . str_pad(substr((string) $array['peer'], 0, 15), 15) . "'" . $stack;
+        $rrd_options[] = 'LINE1.25:DS' . $count . '#' . $color . ":" . str_pad(substr((string) $array['peer'], 0, 15), 15) $stack;
         $rrd_options[] = 'GPRINT:DS' . $count . ':LAST:%5.0lf';
         $rrd_options[] = 'GPRINT:DS' . $count . ':MIN:%7.0lf';
         $rrd_options[] = 'GPRINT:DS' . $count . ':MAX:%7.0lf\\l';

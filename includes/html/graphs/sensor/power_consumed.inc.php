@@ -11,9 +11,9 @@ $sensor['sensor_descr_fixed'] = Rrd::fixedSafeDescr($sensor->sensor_descr, 25);
 // https://github.com/oetiker/rrdtool-1.x/issues/1271
 //$rrd_options[] = '--left-axis-format "%4.1lF%S' . str_replace('%', '%%', $sensor->unit()) . '"';
 $rrd_options[] = '--left-axis-format';
-$rrd_options[] = '"%5.4lf' . trim(substr(Number::formatSi($sensor->sensor_current * 1000, 0, 0, ''), -1)) . 'Wh"';
+$rrd_options[] = '%5.4lf' . trim(substr(Number::formatSi($sensor->sensor_current * 1000, 0, 0, ''), -1)) . 'Wh';
 $rrd_options[] = '--vertical-label';
-$rrd_options[] = '"' . $sensor->classDescr() . '"';
+$rrd_options[] = $sensor->classDescr();
 $rrd_options[] = '--units-length=11';
 $rrd_options[] = 'DEF:t_sensor=' . $rrd_filename . ':sensor:AVERAGE';
 $rrd_options[] = 'DEF:t_sensor_max=' . $rrd_filename . ':sensor:MAX';
@@ -25,20 +25,20 @@ $rrd_options[] = 'AREA:sensor_max#c5c5c5';
 $rrd_options[] = 'AREA:sensor_min#ffffffff';
 $rrd_options[] = 'COMMENT:"Alert thresholds\:"';
 if ($sensor->sensor_limit_low) {
-    $rrd_options[] = 'LINE1.5:' . $sensor->sensor_limit_low . '#00008b:"low = ' . Number::formatSi($sensor->sensor_limit_low, 2, 3, $sensor->unit()) . '":dashes';
+    $rrd_options[] = 'LINE1.5:' . $sensor->sensor_limit_low . '#00008b:low = ' . Number::formatSi($sensor->sensor_limit_low, 2, 3, $sensor->unit()) . ':dashes';
 }
 if ($sensor->sensor_limit_low_warn) {
-    $rrd_options[] = 'LINE1.5:' . $sensor->sensor_limit_low_warn . '#005bdf:"low_warn = ' . Number::formatSi($sensor->sensor_limit_low_warn, 2, 3, $sensor->unit()) . '":dashes';
+    $rrd_options[] = 'LINE1.5:' . $sensor->sensor_limit_low_warn . '#005bdf:low_warn = ' . Number::formatSi($sensor->sensor_limit_low_warn, 2, 3, $sensor->unit()) . ':dashes';
 }
 if ($sensor->sensor_limit_warn) {
-    $rrd_options[] = 'LINE1.5:' . $sensor->sensor_limit_warn . '#ffa420:"high_warn = ' . Number::formatSi($sensor->sensor_limit_warn, 2, 3, $sensor->unit()) . '":dashes';
+    $rrd_options[] = 'LINE1.5:' . $sensor->sensor_limit_warn . '#ffa420:high_warn = ' . Number::formatSi($sensor->sensor_limit_warn, 2, 3, $sensor->unit()) . ':dashes';
 }
 if ($sensor->sensor_limit) {
-    $rrd_options[] = 'LINE1.5:' . $sensor->sensor_limit . '#ff0000:"high = ' . Number::formatSi($sensor->sensor_limit, 2, 3, $sensor->unit()) . '":dashes';
+    $rrd_options[] = 'LINE1.5:' . $sensor->sensor_limit . '#ff0000:high = ' . Number::formatSi($sensor->sensor_limit, 2, 3, $sensor->unit()) . ':dashes';
 }
-$rrd_options[] = 'COMMENT:"\n"';
-$rrd_options[] = 'COMMENT:"' . Rrd::fixedSafeDescr('', 25) . '       Now        Avg       Min       Max\n"';
-$rrd_options[] = 'LINE2:sensor#000000:"' . $sensor->sensor_descr_fixed . '"';
+$rrd_options[] = 'COMMENT:\n';
+$rrd_options[] = 'COMMENT:' . Rrd::fixedSafeDescr('', 25) . '       Now        Avg       Min       Max\n';
+$rrd_options[] = 'LINE2:sensor#000000:' . $sensor->sensor_descr_fixed;
 $rrd_options[] = 'GPRINT:sensor:LAST:%7.4lf%SWh';
 $rrd_options[] = 'GPRINT:sensor:AVERAGE:%7.4lf%SWh';
 $rrd_options[] = 'GPRINT:sensor:MIN:%7.4lf%SWh';

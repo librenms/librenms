@@ -8,7 +8,7 @@ $rrd_options[] = '-l';
 $rrd_options[] = '0';
 $rrd_options[] = '-b';
 $rrd_options[] = '1024';
-$rrd_options[] = "'COMMENT:Bytes         Min         Cur        Max\\n'";
+$rrd_options[] = "COMMENT:Bytes         Min         Cur        Max\\n";
 
 $usedc = 'CC0000';
 $availc = '008C00';

@@ -14,10 +14,10 @@ if ($width > '500') {
 }
 
 if ($width > '500') {
-    $rrd_options[] = "COMMENT:'" . substr(str_pad((string) $mplug['mplug_vlabel'], $descr_len), 0, $descr_len) . "   Current   Average  Maximum\l'";
-    $rrd_options[] = "COMMENT:'\l'";
+    $rrd_options[] = "COMMENT:" . substr(str_pad((string) $mplug['mplug_vlabel'], $descr_len), 0, $descr_len) . "   Current   Average  Maximum\l";
+    $rrd_options[] = "COMMENT:\l";
 } else {
-    $rrd_options[] = "COMMENT:'" . substr(str_pad((string) $mplug['mplug_vlabel'], $descr_len), 0, $descr_len) . "   Current   Average  Maximum\l'";
+    $rrd_options[] = "COMMENT:" . substr(str_pad((string) $mplug['mplug_vlabel'], $descr_len), 0, $descr_len) . "   Current   Average  Maximum\l";
 }
 
 $c_i = 0;
@@ -44,7 +44,7 @@ foreach ($dbq as $ds) {
 
         $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($ds['ds_label'], $descr_len);
 
-        $rrd_options[] = $ds['ds_draw'] . ':' . $ds_name . '#' . $colour . ":'" . $descr . "'";
+        $rrd_options[] = $ds['ds_draw'] . ':' . $ds_name . '#' . $colour . ":" . $descr;
         $rrd_options[] = 'GPRINT:' . $ds_name . ':LAST:"%6.2lf%s"';
         $rrd_options[] = 'GPRINT:' . $ds_name . ':AVERAGE:"%6.2lf%s"';
         $rrd_options[] = 'GPRINT:' . $ds_name . ':MAX:"%6.2lf%s\\n"';

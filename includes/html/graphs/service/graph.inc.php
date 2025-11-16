@@ -50,7 +50,7 @@ include 'includes/html/graphs/common.inc.php';
 $rrd_options[] = '-l';
 $rrd_options[] = '0';
 $rrd_options[] = '-E';
-$rrd_options[] = "COMMENT:'                      Now     Avg      Max\\n'";
+$rrd_options[] = "COMMENT:                      Now     Avg      Max\\n";
 $rrd_additions = '';
 
 // Remove encoded characters
@@ -88,7 +88,7 @@ if ($services[$vars['service']]['service_ds'] != '') {
             $rrd_options[] = 'DEF:DS=' . $rrd_filename . ':' . $ds . ':AVERAGE';
             $rrd_options[] = 'DEF:DS_MAX=' . $rrd_filename . ':' . $ds . ':MAX';
             $rrd_options[] = 'AREA:DS_MAX#' . $color_max . ':';
-            $rrd_options[] = 'AREA:DS#' . $color_avg . ":'" . str_pad(substr(ucfirst((string) $ds) . ' (' . $label . ')', 0, 15), 15) . "' ";
+            $rrd_options[] = 'AREA:DS#' . $color_avg . ":" . str_pad(substr(ucfirst((string) $ds) . ' (' . $label . ')', 0, 15), 15);
             $rrd_options[] = 'GPRINT:DS:LAST:%5.2lf%s';
             $rrd_options[] = 'GPRINT:DS:AVERAGE:%5.2lf%s';
             $rrd_options[] = 'GPRINT:DS_MAX:MAX:%5.2lf%s\\l';
