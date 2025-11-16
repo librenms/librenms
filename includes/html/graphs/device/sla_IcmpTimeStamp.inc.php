@@ -29,7 +29,7 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_options[] = 'CDEF:ProbeCount=ProbeResponses,ProbeLoss,+';
     $rrd_options[] = 'CDEF:PercentageLoss=ProbeLoss,UNKN,NE,0,ProbeLoss,IF,ProbeCount,/,100,*,CEIL';
 
-    $rrd_options[] = "LINE1:PercentageLoss#CC0000:PercentageLoss";
+    $rrd_options[] = 'LINE1:PercentageLoss#CC0000:PercentageLoss';
     $rrd_options[] = 'GPRINT:PercentageLoss:LAST:%6.1lf%%';
     $rrd_options[] = 'GPRINT:PercentageLoss:AVERAGE:%6.1lf%%';
     $rrd_options[] = 'GPRINT:PercentageLoss:MIN:%6.1lf%%';

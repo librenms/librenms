@@ -29,12 +29,12 @@ if (isset($components[$vars['id']])) {
     $rrd_options[] = '-l';
     $rrd_options[] = '0';
     $rrd_options[] = '-E';
-    $rrd_options[] = "COMMENT:Bits           Now      Ave      Max\\n";
+    $rrd_options[] = 'COMMENT:Bits           Now      Ave      Max\\n';
 
     $rrd_filename = Rrd::name($device['hostname'], ['f5-ltm-bwc', $label, $hash]);
     if (Rrd::checkRrdExists($rrd_filename)) {
         $rrd_options[] = 'DEF:DS=' . $rrd_filename . ':pktsin:AVERAGE';
-        $rrd_options[] = "LINE1.25:DS#205F9A:Packets In ";
+        $rrd_options[] = 'LINE1.25:DS#205F9A:Packets In ';
         $rrd_options[] = 'GPRINT:DS:LAST:%6.2lf%s';
         $rrd_options[] = 'GPRINT:DS:AVERAGE:%6.2lf%s';
         $rrd_options[] = "GPRINT:DS:MAX:%6.2lf%s\l";

@@ -118,7 +118,7 @@ if ($i) {
         $rrd_options[] = 'AREA:in' . $format . '#' . $colour_area_in . $stacked['transparency'] . ':';
         $rrd_options[] = 'AREA:dout' . $format . '#' . $colour_area_out . $stacked['transparency'] . ':';
     } else {
-        $rrd_options[] = "COMMENT:bps      Now       Ave      Max      " . \App\Facades\LibrenmsConfig::get('percentile_value') . "th %\\n";
+        $rrd_options[] = 'COMMENT:bps      Now       Ave      Max      ' . \App\Facades\LibrenmsConfig::get('percentile_value') . 'th %\\n';
         $rrd_options[] = 'AREA:in' . $format . '#' . $colour_area_in . $stacked['transparency'] . ':In ';
         $rrd_options[] = 'GPRINT:in' . $format . ':LAST:%6.' . $float_precision . 'lf%s';
         $rrd_options[] = 'GPRINT:in' . $format . ':AVERAGE:%6.' . $float_precision . 'lf%s';
@@ -129,9 +129,9 @@ if ($i) {
         $rrd_options[] = 'GPRINT:out' . $format . ':AVERAGE:%6.' . $float_precision . 'lf%s';
         $rrd_options[] = 'GPRINT:out' . $format . ':MAX:%6.' . $float_precision . 'lf%s';
         $rrd_options[] = 'GPRINT:percentile_out:%6.' . $float_precision . 'lf%s\\n';
-        $rrd_options[] = "GPRINT:tot:Total %6." . $float_precision . "lf%sB";
-        $rrd_options[] = "GPRINT:totin:(In %6." . $float_precision . "lf%sB";
-        $rrd_options[] = "GPRINT:totout:Out %6." . $float_precision . "lf%sB)\\l";
+        $rrd_options[] = 'GPRINT:tot:Total %6.' . $float_precision . 'lf%sB';
+        $rrd_options[] = 'GPRINT:totin:(In %6.' . $float_precision . 'lf%sB';
+        $rrd_options[] = 'GPRINT:totout:Out %6.' . $float_precision . 'lf%sB)\\l';
     }
 
     $rrd_options[] = 'LINE1:percentile_in#aa0000';

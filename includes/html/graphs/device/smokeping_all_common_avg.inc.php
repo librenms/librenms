@@ -23,9 +23,9 @@ if ($width > '500') {
 
 // FIXME str_pad really needs a "limit to length" so we can rid of all the substrs all over the code to limit the length as below...
 if ($width > '500') {
-    $rrd_options[] = "COMMENT:" . substr(str_pad((string) $unit_text, $descr_len + 5), 0, $descr_len + 5) . " RTT      Loss    SDev   RTT\:SDev\l";
+    $rrd_options[] = 'COMMENT:' . substr(str_pad((string) $unit_text, $descr_len + 5), 0, $descr_len + 5) . " RTT      Loss    SDev   RTT\:SDev\l";
 } else {
-    $rrd_options[] = "COMMENT:" . substr(str_pad((string) $unit_text, $descr_len + 5), 0, $descr_len + 5) . " RTT      Loss    SDev   RTT\:SDev\l";
+    $rrd_options[] = 'COMMENT:' . substr(str_pad((string) $unit_text, $descr_len + 5), 0, $descr_len + 5) . " RTT      Loss    SDev   RTT\:SDev\l";
 }
 
 foreach ($smokeping_files[$direction][$device['hostname']] as $source => $filename) {
@@ -91,7 +91,7 @@ $rrd_options[] = 'VDEF:avsd=sd_all,AVERAGE';
 $rrd_options[] = 'CDEF:msr=dm_all,POP,avmed,avsd,/';
 $rrd_options[] = 'VDEF:avmsr=msr,AVERAGE';
 
-$rrd_options[] = "GPRINT:avmed:%5.1lf%ss";
-$rrd_options[] = "GPRINT:ploss_all:AVERAGE:%5.1lf%%";
-$rrd_options[] = "GPRINT:avsd:%5.1lf%Ss";
-$rrd_options[] = "GPRINT:avmsr:%5.1lf%s\\l";
+$rrd_options[] = 'GPRINT:avmed:%5.1lf%ss';
+$rrd_options[] = 'GPRINT:ploss_all:AVERAGE:%5.1lf%%';
+$rrd_options[] = 'GPRINT:avsd:%5.1lf%Ss';
+$rrd_options[] = 'GPRINT:avmsr:%5.1lf%s\\l';
