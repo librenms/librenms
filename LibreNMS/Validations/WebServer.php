@@ -47,8 +47,8 @@ class WebServer extends BaseValidation
         if (! app()->runningInConsole()) {
             $url = $this->removeStandardPorts(request()->url());
             $base_url = LibrenmsConfig::get('base_url');
-            $expected = $this->removeStandardPorts(Str::finish($base_url, '/') . 'validate/results');
-            $correct_base = str_replace('/validate/results', '', $url);
+            $expected = $this->removeStandardPorts(Str::finish($base_url, '/') . 'validate/results/webserver');
+            $correct_base = str_replace('/validate/results/webserver', '', $url);
 
             if ($url !== $expected) {
                 preg_match($this->host_regex, $url, $actual_host_match);
