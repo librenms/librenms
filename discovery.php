@@ -40,11 +40,11 @@ if (isset($options['h'])) {
         $doing = 'new';
     } elseif ($options['h']) {
         if (is_numeric($options['h'])) {
-            $where = "AND `device_id` = ?";
+            $where = 'AND `device_id` = ?';
             $sqlparams[] = $options['h'];
             $doing = $options['h'];
         } else {
-            $where = "AND `hostname` LIKE ?";
+            $where = 'AND `hostname` LIKE ?';
             $sqlparams[] = str_replace('*', '%', $options['h']);
             $doing = $options['h'];
         }
