@@ -17,14 +17,14 @@ return new class extends Migration
             $table->timestamps();
             $table->unsignedInteger('device_id')->unique();
             $table->timestamp('ping_last_timestamp');
-            $table->float('ping_rtt_last')->unsigned();
-            $table->float('ping_rtt_prev')->unsigned();
-            $table->float('ping_rtt_avg')->unsigned();
+            $table->float('ping_rtt_last')->unsigned()->nullable();
+            $table->float('ping_rtt_prev')->unsigned()->nullable();
+            $table->float('ping_rtt_avg')->unsigned()->nullable();
             $table->float('ping_rtt_diff_avg_last')->virtualAs('ping_rtt_last - ping_rtt_avg');
             $table->float('ping_rtt_diff_prev_last')->virtualAs('ping_rtt_last - ping_rtt_prev');
-            $table->float('ping_loss_last')->unsigned();
-            $table->float('ping_loss_prev')->unsigned();
-            $table->float('ping_loss_avg')->unsigned();
+            $table->float('ping_loss_last')->unsigned()->nullable();
+            $table->float('ping_loss_prev')->unsigned()->nullable();
+            $table->float('ping_loss_avg')->unsigned()->nullable();
             $table->foreign('device_id')->references('device_id')->on('devices')->onDelete('cascade');
         });
     }
