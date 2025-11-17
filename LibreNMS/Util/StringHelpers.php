@@ -43,6 +43,7 @@ class StringHelpers
             'gpsd' => 'GPSD',
             'hv-monitor' => 'HV Monitor',
             'http_access_log_combined' => 'HTTP Access Log Combined',
+            'i2pd' => 'I2PD Router',
             'mojo_cape_submit' => 'Mojo CAPE Submit',
             'mailcow-postfix' => 'mailcow-dockerized postfix',
             'mysql' => 'MySQL',
