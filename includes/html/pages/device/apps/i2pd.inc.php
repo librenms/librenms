@@ -30,14 +30,14 @@ print_optionbar_start();
 if (! isset($app->data['net_stat_code'])) {
     // no data?
     $netstatus = '<div style="display: inline-block; font-style: italic;">NO DATA</div>';
-} elseif ($app->data['net_stat_code'] >= 4) {
-    // fuken errored
+} elseif ($app->data['net_stat_code'] >= 8) {
+    // Network status critical or failed
     $netstatus = '<div style="display: inline-block; color: red;">ERROR: '.$app->data['net_stat_msg'].' ('.$app->data['net_stat_code'].')</div>';
-} elseif ($app->data['net_stat_code'] > 0) {
-    // semi
+} elseif ($app->data['net_stat_code'] > 1) {
+    // Network status degraded
     $netstatus = '<div style="display: inline-block; color: yellow;">WARN: '.$app->data['net_stat_msg'].' ('.$app->data['net_stat_code'].')</div>';
 } else {
-    // ok
+    // Network works perfectly
     $netstatus = '<div style="display: inline-block; color: green;">'.$app->data['net_stat_msg'].' ('.$app->data['net_stat_code'].')</div>';
 }
 echo '<h4>Network status: '.$netstatus.'</h4>';

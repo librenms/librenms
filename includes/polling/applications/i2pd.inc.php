@@ -4,7 +4,7 @@
 
 LibreNMS Application for I2PD
 Poller
-  Fetches data vai SNMP EXTEND
+  Fetches data via SNMP EXTEND using remote agent i2pd-stats.py
 
 @author     Kossusukka <kossusukka@kossulab.net>
 
@@ -16,18 +16,30 @@ version 3. See https://www.gnu.org/licenses/gpl-3.0.txt
 
 */
 
+use App\Models\Eventlog;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\JsonAppException;
+use LibreNMS\Exceptions\JsonAppExtendErroredException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'i2pd';
-$version = '1';
+$JSONVER = '1';
 
 try {
-    $i2pd = json_app_get($device, $name, $version);
-} catch (JsonAppException $e) {
-    echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
-    update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
+    $i2pd = json_app_get($device, $name, $JSONVER);
+} catch (JsonAppExtendErroredException $e) {
+    // Remote agent error, probably I2PC API error. Log and stop
+    $err = 'ERROR('.$e->getParsedJson()['error'].'): '.$e->getParsedJson()['errorString'];
 
+    update_application($app, $err, []);
+    Eventlog::log('App '.$name.' failed at remote agent! '.$err, $device['device_id'], 'application', Severity::Error);
+    return;
+} catch (JsonAppException $e) {
+    // Unhandled exception. Log and stop
+    $err = 'ERROR('.$e->getCode().'): '.$e->getMessage();
+
+    update_application($app, $err, []);
+    Eventlog::log('App '.$name.' failed for JsonAppException! '.$err, $device['device_id'], 'application', Severity::Error);
     return;
 }
 
@@ -85,24 +97,19 @@ $net_status_codes = [
     '14' => 'ERROR_UDP_DISABLED_AND_TCP_UNSET',
 ];
 $net_status_resp = $i2pd['data']['i2p.router.net.status'] ?? null;
+app('Datastore')->put($device, 'app', $tags, $fields);
 
 if (is_numeric($net_status_resp) && array_key_exists($net_status_resp, $net_status_codes)) {
-    // Save network status if applicable
+    // Save network status for health monitoring
     $app->data = [  'net_stat_code' => $net_status_resp,
                     'net_stat_msg' => $net_status_codes[$net_status_resp] ];
 
-    if ($net_status_resp >= 4) {
-        $resp = "ERROR";
-    } else {
-        $resp = "OK";
-    }
+    $resp = $net_status_resp >= 8 ? "ERROR" : "OK"; // Error8 is first fatal error, errors 2-7 are only degraded
 
-    app('Datastore')->put($device, 'app', $tags, $fields);
     update_application($app, $resp, $fields, $net_status_codes[$net_status_resp]);
 } else {
     $app->data = [  'net_stat_code' => null,
                     'net_stat_msg' => null ];
 
-    app('Datastore')->put($device, 'app', $tags, $fields);
     update_application($app, 'ERROR', $fields, 'No data received.');
 }
