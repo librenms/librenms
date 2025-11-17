@@ -43,34 +43,6 @@ Artisan::command('poller:ping
     PingCheck::dispatch($this->argument('groups'));
 })->purpose(__('Check if devices are up or down via icmp'));
 
-Artisan::command('poller:discovery
-    {device spec : ' . __('Device spec to discover: device_id, hostname, wildcard, odd, even, all, new') . '}
-    {--o|os= : ' . __('Only devices with the specified operating system') . '}
-    {--t|type= : ' . __('Only devices with the specified type') . '}
-    {--m|modules= : ' . __('Specify single module to be run. Comma separate modules, submodules may be added with /') . '}
-', function (): void {
-    $command = [base_path('discovery.php'), '-h', $this->argument('device spec')];
-    if ($this->option('os')) {
-        $command[] = '-o';
-        $command[] = $this->option('os');
-    }
-    if ($this->option('type')) {
-        $command[] = '-t';
-        $command[] = $this->option('type');
-    }
-    if ($this->option('modules')) {
-        $command[] = '-m';
-        $command[] = $this->option('modules');
-    }
-    if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {
-        $command[] = '-d';
-        if ($verbosity >= 256) {
-            $command[] = '-v';
-        }
-    }
-    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
-})->purpose(__('Discover information about existing devices, defines what will be polled'));
-
 Artisan::command('poller:alerts', function (): void {
     $command = [base_path('alerts.php')];
     if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {

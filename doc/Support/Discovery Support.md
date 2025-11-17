@@ -5,7 +5,7 @@ manually running to process data.
 
 The basic command to get started is:
 
-`lnms poller:discovery HOSTNAME`
+`lnms device:discover HOSTNAME`
 
 ## Command options
 
@@ -14,23 +14,21 @@ Description:
   Discover information about existing devices, defines what will be polled
 
 Usage:
-  poller:discovery [options] [--] <device spec>
+  device:discover [options] [--] <device spec>
 
 Arguments:
-  device spec              Device spec to discover: device_id, hostname, wildcard, odd, even, all, new
+  device spec            Device spec to discover: device_id, hostname, wildcard (*), odd, even, all
 
 Options:
-  -o, --os[=OS]            Only devices with the specified operating system
-  -t, --type[=TYPE]        Only devices with the specified type
-  -m, --modules[=MODULES]  Specify single module to be run. Comma separate modules, submodules may be added with /
-  -h, --help               Display help for the given command. When no command is given display help for the list command
-      --silent             Do not output any message
-  -q, --quiet              Only errors are displayed. All other output is suppressed
-  -V, --version            Display this application version
-      --ansi|--no-ansi     Force (or disable --no-ansi) ANSI output
-  -n, --no-interaction     Do not ask any interactive question
-      --env[=ENV]          The environment the command should run under
-  -v|vv|vvv, --verbose     Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+  -m, --module=MODULE   Specify module(s) to be run. submodules may be added with /.  Multiple values allowed. (multiple values allowed)
+  -h, --help            Display help for the given command. When no command is given display help for the list command
+      --silent          Do not output any message
+  -q, --quiet           Only errors are displayed. All other output is suppressed
+  -V, --version         Display this application version
+      --ansi|--no-ansi  Force (or disable --no-ansi) ANSI output
+  -n, --no-interaction  Do not ask any interactive question
+      --env[=ENV]       The environment the command should run under
+  -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 ```
 
 `<device spec>` Use this to specify a device via either id or hostname (including
@@ -59,16 +57,16 @@ add `-d` to the end of the command - it is NOT recommended to do this
 in cron.
 
 You also may use `-m` to pass a list of comma-separated modules.
-Please refer to [Command options](#command-options) of discovery.php.
+Please refer to [Command options](#command-options) of `lnms device:discover -h`.
 Example: `/opt/librenms/discovery-wrapper.py 1 -m bgp-peers`
 
-If you want to switch back to discovery.php then you can replace (not recommended):
+If you want to switch back to `lnms device:discover` (not recommended), then you can replace:
 
 `33  */6   * * *   librenms    /opt/librenms/discovery-wrapper.py 1 >> /dev/null 2>&1`
 
 With:
 
-`33  */6   * * *   librenms    /opt/librenms/discovery.php -h all >> /dev/null 2>&1`
+`33  */6   * * *   librenms    /opt/librenms/lnms device:discover all >> /dev/null 2>&1`
 
 ## Discovery config
 
@@ -206,9 +204,9 @@ device, with history data.
 Here are some examples of running discovery from within your install directory.
 
 ```bash
-lnms poller:discovery localhost
+lnms device:discover localhost
 
-lnms poller:discovery localhost -m ports
+lnms device:discover localhost -m ports
 ```
 
 ## Debugging
@@ -220,19 +218,19 @@ or multiple modules:
 All Modules
 
 ```bash
-lnms poller:discovery localhost -vv
+lnms device:discover localhost -vv
 ```
 
 Single Module
 
 ```bash
-lnms poller:discovery localhost -m ports -vv
+lnms device:discover localhost -m ports -vv
 ```
 
 Multiple Modules
 
 ```bash
-lnms poller:discovery localhost -m ports,entity-physical -vv
+lnms device:discover localhost -m ports,entity-physical -vv
 ```
 
 Using `-vv` shouldn't output much sensitive information, `-vvv` will so
