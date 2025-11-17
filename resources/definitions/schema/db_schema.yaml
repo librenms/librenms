@@ -740,14 +740,14 @@ device_stats:
     - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: ping_last_timestamp, Type: timestamp, 'Null': false, Extra: '' }
-    - { Field: ping_rtt_last, Type: 'double unsigned', 'Null': false, Extra: '' }
-    - { Field: ping_rtt_prev, Type: 'double unsigned', 'Null': false, Extra: '' }
-    - { Field: ping_rtt_avg, Type: 'double unsigned', 'Null': false, Extra: '' }
+    - { Field: ping_rtt_last, Type: 'double unsigned', 'Null': true, Extra: '' }
+    - { Field: ping_rtt_prev, Type: 'double unsigned', 'Null': true, Extra: '' }
+    - { Field: ping_rtt_avg, Type: 'double unsigned', 'Null': true, Extra: '' }
     - { Field: ping_rtt_diff_avg_last, Type: double, 'Null': true, Extra: 'VIRTUAL GENERATED' }
     - { Field: ping_rtt_diff_prev_last, Type: double, 'Null': true, Extra: 'VIRTUAL GENERATED' }
-    - { Field: ping_loss_last, Type: 'double unsigned', 'Null': false, Extra: '' }
-    - { Field: ping_loss_prev, Type: 'double unsigned', 'Null': false, Extra: '' }
-    - { Field: ping_loss_avg, Type: 'double unsigned', 'Null': false, Extra: '' }
+    - { Field: ping_loss_last, Type: 'double unsigned', 'Null': true, Extra: '' }
+    - { Field: ping_loss_prev, Type: 'double unsigned', 'Null': true, Extra: '' }
+    - { Field: ping_loss_avg, Type: 'double unsigned', 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_stats_device_id_unique: { Name: device_stats_device_id_unique, Columns: [device_id], Unique: true, Type: BTREE }
