@@ -142,38 +142,25 @@ class FpingResponse implements \Stringable
 
     public function saveStats(Device $device): void
     {
-        if ($device->stats) {
-            $stats = $device->stats;
-            $stats->ping_last_timestamp = Carbon::now();
-            // Only update the latency if we have data
-            if ($this->avg_latency) {
-                $stats->ping_rtt_prev = $stats->ping_rtt_last ?: $this->avg_latency;
-                $stats->ping_rtt_last = $this->avg_latency;
-                // Average is calcualted as the exponential weighted moving average
-                $stats->ping_rtt_avg = $stats->ping_rtt_avg ? $stats->ping_rtt_avg + (($stats->ping_rtt_last - $stats->ping_rtt_avg) * LibrenmsConfig::get('device_stats_avg_factor')) : $stats->ping_rtt_last;
-            }
-            // Only update loss if we transmitted a packet
-            if ($this->transmitted) {
-                $stats->ping_loss_prev = $stats->ping_loss_last ?: 100 * ($this->transmitted - $this->received) / $this->transmitted;
-                $stats->ping_loss_last = 100 * ($this->transmitted - $this->received) / $this->transmitted;
-                // Average is calcualted as the exponential weighted moving average
-                $stats->ping_loss_avg = $stats->ping_loss_avg ? $stats->ping_loss_avg + (($stats->ping_loss_last - $stats->ping_loss_avg) * LibrenmsConfig::get('device_stats_avg_factor')) : $stats->ping_loss_last;
-            }
-
-            $stats->save();
-        } else {
-            // Use updateOrCreate because we have a device cache that may not reflect the DB
-            DeviceStats::updateOrCreate([
-                'device_id' => $device->device_id,
-                'ping_last_timestamp' => Carbon::now(),
-                'ping_rtt_last' => $this->avg_latency,
-                'ping_rtt_prev' => $this->avg_latency,
-                'ping_rtt_avg' => $this->avg_latency,
-                'ping_loss_last' => $this->transmitted ? 100 * ($this->transmitted - $this->received) / $this->transmitted : null,
-                'ping_loss_prev' => $this->transmitted ? 100 * ($this->transmitted - $this->received) / $this->transmitted : null,
-                'ping_loss_avg' => $this->transmitted ? 100 * ($this->transmitted - $this->received) / $this->transmitted : null,
-            ]);
+        $stats = $device->stats ?? new DeviceStats;
+        $stats->ping_last_timestamp = Carbon::now();
+        // Only update the latency if we have data
+        if ($this->avg_latency) {
+            $stats->ping_rtt_prev = $stats->ping_rtt_last ?: $this->avg_latency;
+            $stats->ping_rtt_last = $this->avg_latency;
+            // Average is calcualted as the exponential weighted moving average
+            $stats->ping_rtt_avg = $stats->ping_rtt_avg ? $stats->ping_rtt_avg + (($stats->ping_rtt_last - $stats->ping_rtt_avg) * LibrenmsConfig::get('device_stats_avg_factor')) : $stats->ping_rtt_last;
         }
+        // Only update loss if we transmitted a packet
+        if ($this->transmitted) {
+            $stats->ping_loss_prev = $stats->ping_loss_last ?: 100 * ($this->transmitted - $this->received) / $this->transmitted;
+            $stats->ping_loss_last = 100 * ($this->transmitted - $this->received) / $this->transmitted;
+            // Average is calcualted as the exponential weighted moving average
+            $stats->ping_loss_avg = $stats->ping_loss_avg ? $stats->ping_loss_avg + (($stats->ping_loss_last - $stats->ping_loss_avg) * LibrenmsConfig::get('device_stats_avg_factor')) : $stats->ping_loss_last;
+        }
+        $stats->save();
+
+        // Update the stats stored in the device table until the field is removed
         $device->last_ping = Carbon::now();
         $device->last_ping_timetaken = $this->avg_latency ?: $device->last_ping_timetaken;
         $device->save();
