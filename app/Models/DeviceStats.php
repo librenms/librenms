@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class DeviceStats extends Model
+class DeviceStats extends DeviceRelatedModel
 {
     use HasFactory;
+
     protected $fillable = [
         'device_id',
         'ping_last_timestamp',
@@ -19,12 +19,4 @@ class DeviceStats extends Model
         'ping_loss_prev',
         'ping_loss_avg',
     ];
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Device, $this>
-     */
-    public function device(): BelongsTo
-    {
-        return $this->belongsTo(Device::class, 'device_id');
-    }
 }
