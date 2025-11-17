@@ -117,7 +117,7 @@ class Device extends BaseModel
 
     public function pollerTarget(): string
     {
-        return ($this->overwrite_ip ?: $this->hostname) ?: '';
+        return $this->overwrite_ip ?: $this->ip ?: $this->hostname ?: '';
     }
 
     public function ipFamily(): AddressFamily
