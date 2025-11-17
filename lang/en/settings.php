@@ -830,6 +830,9 @@ return [
             'description' => 'Memcached port',
             'help' => 'The port for the memcached server. Default is 11211',
         ],
+        'enable_ports_etherlike' => [
+            'description' => 'Enable etherlike graphs for ports',
+        ],
         'email_auto_tls' => [
             'description' => 'Auto TLS support',
             'help' => 'Tries to use TLS before falling back to un-encrypted',
@@ -1588,6 +1591,10 @@ return [
                 'description' => 'Minimum password length',
                 'help' => 'Passwords shorter than the given length will be rejected',
             ],
+            'uncompromised' => [
+                'description' => 'Require password to be uncompromised',
+                'help' => 'Checks password against HaveIBeenPwned database using k-anonymity',
+            ],
         ],
         'peeringdb' => [
             'enabled' => [
@@ -1794,6 +1801,10 @@ return [
         'ports_nac_purge' => [
             'description' => 'Port NAC entries older than',
             'help' => 'Cleanup done by daily.sh',
+        ],
+        'ports_page_default' => [
+            'description' => 'Default ports tab',
+            'help' => 'Default tab to open when viewing ports on the device page',
         ],
         'ports_purge' => [
             'description' => 'Purge ports deleted',

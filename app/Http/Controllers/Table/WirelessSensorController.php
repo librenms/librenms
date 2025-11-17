@@ -51,7 +51,7 @@ class WirelessSensorController extends SensorsController
         return WirelessSensor::query()
             ->hasAccess($request->user())
             ->where('sensor_class', $class)
-            ->when($request->get('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'sensors.device_id'))
+            ->when($request->get('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'wireless_sensors.device_id'))
             ->withAggregate('device', 'hostname');
     }
 }

@@ -135,17 +135,17 @@ $tmp_output .= '
         post: function ()
         {
             return {
-                stream: "' . (isset($_POST['stream']) ? $_POST['stream'] : '') . '",
-                device: "' . (isset($filter_device) ? $filter_device : '') . '",
-                range: "' . (isset($_POST['range']) ? $_POST['range'] : 0) . '",
-                loglevel: "' . (isset($_POST['loglevel']) ? $_POST['loglevel'] : '') . '",
+                stream: "' . ($_POST['stream'] ?? '') . '",
+                device: "' . ($filter_device ?? '') . '",
+                range: "' . ($_POST['range'] ?? 0) . '",
+                loglevel: "' . ($_POST['loglevel'] ?? '') . '",
             };
         },
         url: "' . url('/ajax/table/graylog') . '",
     });
 
-    init_select2("#stream", "graylog-streams", {}, "' . (isset($_POST['stream']) ? $_POST['stream'] : '') . '");
-    init_select2("#device", "device", {limit: 100}, "' . (isset($filter_device) ? $filter_device : '') . '");
+    init_select2("#stream", "graylog-streams", {}, "' . ($_POST['stream'] ?? '') . '");
+    init_select2("#device", "device", {limit: 100}, "' . ($filter_device ?? '') . '");
 </script>
 
 ';

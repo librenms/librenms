@@ -175,16 +175,12 @@ class Html
     {
         $state = is_string($state) ? PowerState::STATES[$state] : $state;
 
-        switch ($state) {
-            case PowerState::OFF:
-                return ['OFF', 'label-default'];
-            case PowerState::ON:
-                return ['ON', 'label-success'];
-            case PowerState::SUSPENDED:
-                return ['SUSPENDED', 'label-warning'];
-            default:
-                return ['UNKNOWN', 'label-default'];
-        }
+        return match ($state) {
+            PowerState::OFF => ['OFF', 'label-default'],
+            PowerState::ON => ['ON', 'label-success'],
+            PowerState::SUSPENDED => ['SUSPENDED', 'label-warning'],
+            default => ['UNKNOWN', 'label-default'],
+        };
     }
 
     public static function severityToLabel(Severity $severity, string $text): string

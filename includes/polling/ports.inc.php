@@ -287,7 +287,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
         $fetched_data_string .= '(Full ports polling): ';
         // For devices that are on the bad_ifXentry list, try fetching ifAlias to have nice interface descriptions.
 
-        if (! in_array(strtolower($device['hardware'] ?? ''), array_map('strtolower', (array) LibrenmsConfig::getOsSetting($device['os'], 'bad_ifXEntry', [])))) {
+        if (! in_array(strtolower($device['hardware'] ?? ''), array_map(strtolower(...), (array) LibrenmsConfig::getOsSetting($device['os'], 'bad_ifXEntry', [])))) {
             $port_stats = snmpwalk_cache_oid($device, 'ifXEntry', $port_stats, 'IF-MIB');
         } else {
             $port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB', null, '-OQUst');
@@ -345,7 +345,7 @@ if (LibrenmsConfig::get('enable_ports_poe')) {
                 are cpeExtStuff.X.Z instead of cpeExtStuff.X.Y.Z
                 We need to ignore the middle subslot number so this is slot.port
                 */
-                if (preg_match('/^[a-z]+ethernet(\d+)\/(\d+)(?:\/(\d+))?$/i', $if_descr['ifDescr'], $matches)) {
+                if (preg_match('/^[a-z]+ethernet(\d+)\/(\d+)(?:\/(\d+))?$/i', (string) $if_descr['ifDescr'], $matches)) {
                     $port_ent_to_if[$matches[1] . '.' . ($matches[3] ?? $matches[2])] = ['portIfIndex' => $if_index];
                 }
             }
@@ -387,7 +387,7 @@ if (LibrenmsConfig::get('enable_ports_poe')) {
         }
         foreach ($port_stats_temp as $key => $value) {
             //remove the group index and only keep the ifIndex
-            [$group_id, $if_id] = explode('.', $key);
+            [$group_id, $if_id] = explode('.', (string) $key);
             $port_stats[$if_id] = array_merge($port_stats[$if_id], $value);
         }
     } elseif ($device['os'] == 'jetstream') {
@@ -397,7 +397,7 @@ if (LibrenmsConfig::get('enable_ports_poe')) {
 
         $port_ent_to_if = [];
         foreach ($ifTable_ifDescr as $if_index => $if_descr) {
-            if (preg_match('/^[a-z]+ethernet \d+\/\d+\/(\d+)$/i', $if_descr['ifDescr'], $matches)) {
+            if (preg_match('/^[a-z]+ethernet \d+\/\d+\/(\d+)$/i', (string) $if_descr['ifDescr'], $matches)) {
                 $port_ent_to_if[$matches[1]] = $if_index;
             }
         }
@@ -574,7 +574,7 @@ foreach ($ports as $port) {
         // Check to make sure Port data is cached.
         $this_port = &$port_stats[$ifIndex];
 
-        if ($device['os'] == 'vmware-vcsa' && preg_match('/Device ([a-z0-9]+) at .*/', $this_port['ifDescr'], $matches)) {
+        if ($device['os'] == 'vmware-vcsa' && preg_match('/Device ([a-z0-9]+) at .*/', (string) $this_port['ifDescr'], $matches)) {
             $this_port['ifName'] = $matches[1];
         }
 

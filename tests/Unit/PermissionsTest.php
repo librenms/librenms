@@ -60,9 +60,7 @@ final class PermissionsTest extends TestCase
     public function testUserCanAccessDevice(): void
     {
         $perms = \Mockery::mock(\LibreNMS\Cache\PermissionsCache::class)->makePartial();
-        $perms->shouldReceive('getDevicePermissions')->andReturnUsing(function ($user) {
-            return self::devicePermissionData($user);
-        });
+        $perms->shouldReceive('getDevicePermissions')->andReturnUsing(fn ($user) => self::devicePermissionData($user));
 
         $device = Device::factory()->make(['device_id' => 54]); /** @var Device $device */
         $user = User::factory()->make(['user_id' => 43]); /** @var User $user */
@@ -84,9 +82,7 @@ final class PermissionsTest extends TestCase
     public function testDevicesForUser(): void
     {
         $perms = \Mockery::mock(\LibreNMS\Cache\PermissionsCache::class)->makePartial();
-        $perms->shouldReceive('getDevicePermissions')->andReturnUsing(function ($user) {
-            return self::devicePermissionData($user);
-        });
+        $perms->shouldReceive('getDevicePermissions')->andReturnUsing(fn ($user) => self::devicePermissionData($user));
 
         $this->assertEquals(collect([54, 32]), $perms->devicesForUser(43));
         $user = User::factory()->make(['user_id' => 43]); /** @var User $user */

@@ -35,7 +35,6 @@ use LibreNMS\Util\IP;
 
 class Trap
 {
-    public readonly string $raw;
     public readonly string $hostname;
     public readonly ?string $ip;
     protected Collection $oid_data;
@@ -44,11 +43,9 @@ class Trap
     /**
      * Construct a trap from raw trap text
      */
-    public function __construct(string $trap)
+    public function __construct(public readonly string $raw)
     {
-        $this->raw = $trap;
-
-        $lines = explode(PHP_EOL, trim($trap));
+        $lines = explode(PHP_EOL, trim($this->raw));
 
         $this->hostname = array_shift($lines);
 
@@ -74,9 +71,7 @@ class Trap
      */
     public function findOid(array|string $search): string
     {
-        return $this->oid_data->keys()->first(function ($oid) use ($search) {
-            return Str::contains($oid, $search);
-        }, '');
+        return $this->oid_data->keys()->first(fn ($oid) => Str::contains($oid, $search), '');
     }
 
     /**
@@ -87,9 +82,7 @@ class Trap
      */
     public function findOids(array|string $search): array
     {
-        return $this->oid_data->keys()->filter(function ($oid) use ($search) {
-            return Str::contains($oid, $search);
-        })->all();
+        return $this->oid_data->keys()->filter(fn ($oid) => Str::contains($oid, $search))->all();
     }
 
     public function getOidData(string $oid): string
@@ -120,9 +113,7 @@ class Trap
     public function toString(bool $detailed = false): string
     {
         if ($detailed) {
-            return $this->getTrapOid() . "\n" . json_encode($this->oid_data->reject(function ($value, $key) {
-                return Str::contains($key, 'SNMPv2-MIB::snmpTrapOID.0');
-            })->all());
+            return $this->getTrapOid() . "\n" . json_encode($this->oid_data->reject(fn ($value, $key) => Str::contains($key, 'SNMPv2-MIB::snmpTrapOID.0'))->all());
         }
 
         return $this->getTrapOid();

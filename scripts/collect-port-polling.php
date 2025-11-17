@@ -42,8 +42,8 @@ if (isset($options['h'])) {
         $where = 'AND `device_id` = ?';
         $params = [$options['h']];
     } elseif (Str::contains($options['h'], ',')) {
-        $device_ids = array_map('trim', explode(',', $options['h']));
-        $device_ids = array_filter($device_ids, 'is_numeric');
+        $device_ids = array_map(trim(...), explode(',', $options['h']));
+        $device_ids = array_filter($device_ids, is_numeric(...));
         $where = 'AND `device_id` in ' . dbGenPlaceholders(count($device_ids));
         $params = $device_ids;
     } else {
@@ -137,7 +137,7 @@ $stats = [
 
 echo PHP_EOL;
 $header = "| %9.9s | %-11.11s | %10.10s | %14.14s | %10.10s | %14.14s | %8.10s | %5.9s | %5.5s |\n";
-call_user_func_array('printf', array_merge([$header], $stats));
+call_user_func_array(printf(...), array_merge([$header], $stats));
 
 $mask = "| %9.9s | %-11.11s | %10.10s | %14.3f | %9.3fs | %13.3fs | %s%+7.3fs\e[0m | %s%+4.0f%%\e[0m | %5.5s |\n";
 foreach ($devices as $device) {

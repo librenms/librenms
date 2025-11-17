@@ -506,9 +506,7 @@ class NetSnmpQuery implements SnmpQueryInterface
         }
 
         // remove trailing /, remove empty dirs, and remove duplicates
-        $dirs = array_unique(array_filter(array_map(function ($dir) {
-            return rtrim($dir, '/');
-        }, $dirs)));
+        $dirs = array_unique(array_filter(array_map(fn ($dir) => rtrim((string) $dir, '/'), $dirs)));
 
         return implode(':', $dirs);
     }
@@ -528,7 +526,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     private function logCommand(string $command): void
     {
         if (Debug::isEnabled() && ! Debug::isVerbose()) {
-            $debug_command = preg_replace($this->cleanup['command'][0], $this->cleanup['command'][1], $command);
+            $debug_command = preg_replace($this->cleanup['command'][0], (string) $this->cleanup['command'][1], $command);
             Log::debug('SNMP[%c' . $debug_command . '%n]', ['color' => true]);
         } elseif (Debug::isVerbose()) {
             Log::debug('SNMP[%c' . $command . '%n]', ['color' => true]);
@@ -538,7 +536,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     private function logOutput(string $output, string $error): void
     {
         if (Debug::isEnabled() && ! Debug::isVerbose()) {
-            Log::debug(preg_replace($this->cleanup['output'][0], $this->cleanup['output'][1], $output));
+            Log::debug(preg_replace($this->cleanup['output'][0], (string) $this->cleanup['output'][1], $output));
         } elseif (Debug::isVerbose()) {
             Log::debug($output);
         }

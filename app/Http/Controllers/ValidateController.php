@@ -12,13 +12,26 @@ class ValidateController extends Controller
 {
     public function index(): View
     {
-        return view('validate.index');
+        $validationGroups = (new Validator())->getValidationGroups();
+
+        $groups = collect($validationGroups)
+            ->map(fn (bool $enabled, string $group) => [
+                'group' => $group,
+                'enabled' => $enabled,
+                'name' => trans("validation.validations.groups.{$group}"),
+            ])
+            ->values()
+            ->all();
+
+        return view('validate.index', [
+            'groups' => $groups,
+        ]);
     }
 
-    public function runValidation(): JsonResponse
+    public function runValidation(?string $group = null): JsonResponse
     {
         $validator = new Validator();
-        $validator->validate();
+        $validator->validate($group ? [$group] : []);
 
         return response()->json($validator->toArray());
     }

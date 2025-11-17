@@ -210,12 +210,8 @@ class FdbTablesController extends TableController
         $device_id = \Request::get('device_id');
 
         return Ipv4Mac::where('ipv4_address', 'like', "%$ip%")
-            ->when($device_id, function ($query) use ($device_id) {
-                return $query->where('device_id', $device_id);
-            })
-            ->when($port_id, function ($query) use ($port_id) {
-                return $query->where('port_id', $port_id);
-            })
+            ->when($device_id, fn ($query) => $query->where('device_id', $device_id))
+            ->when($port_id, fn ($query) => $query->where('port_id', $port_id))
             ->pluck('mac_address');
     }
 
@@ -229,14 +225,10 @@ class FdbTablesController extends TableController
         $device_id = \Request::get('device_id');
 
         return Vlan::where('vlan_vlan', $vlan)
-            ->when($device_id, function ($query) use ($device_id) {
-                return $query->where('device_id', $device_id);
-            })
-            ->when($port_id, function ($query) use ($port_id) {
-                return $query->whereIn('device_id', function ($query) use ($port_id): void {
-                    $query->select('device_id')->from('ports')->where('port_id', $port_id);
-                });
-            })
+            ->when($device_id, fn ($query) => $query->where('device_id', $device_id))
+            ->when($port_id, fn ($query) => $query->whereIn('device_id', function ($query) use ($port_id): void {
+                $query->select('device_id')->from('ports')->where('port_id', $port_id);
+            }))
             ->pluck('vlan_id');
     }
 
@@ -250,12 +242,8 @@ class FdbTablesController extends TableController
         $device_id = \Request::get('device_id');
 
         return Port::where('ifAlias', 'like', "%$ifAlias%")
-            ->when($device_id, function ($query) use ($device_id) {
-                return $query->where('device_id', $device_id);
-            })
-            ->when($port_id, function ($query) use ($port_id) {
-                return $query->where('port_id', $port_id);
-            })
+            ->when($device_id, fn ($query) => $query->where('device_id', $device_id))
+            ->when($port_id, fn ($query) => $query->where('port_id', $port_id))
             ->pluck('port_id');
     }
 

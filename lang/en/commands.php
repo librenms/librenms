@@ -202,6 +202,9 @@ return [
         'error' => 'Error processing Mac OUI:',
         'vendor_update' => 'Adding OUI :oui for :vendor',
     ],
+    'maintenance:cleanup-syslog' => [
+        'delete' => 'Cleared syslog entries older than :days days (:count rows)',
+    ],
     'plugin:disable' => [
         'description' => 'Disable all plugins with the given name',
         'arguments' => [
@@ -300,7 +303,14 @@ return [
             'full-name' => 'Full name for the user',
             'role' => 'Set the user to the desired role :roles',
         ],
-        'password-request' => "Please enter the user's password",
+        'form' => [
+            'username' => 'Username',
+            'password' => 'Password',
+            'roles' => 'Select user role(s)',
+            'email' => 'Email (optional)',
+            'full-name' => 'Full name (optional)',
+            'descr' => 'Description (optional)',
+        ],
         'success' => 'Successfully added user: :username',
         'wrong-auth' => 'Warning! You will not be able to log in with this user because you are not using MySQL auth',
     ],

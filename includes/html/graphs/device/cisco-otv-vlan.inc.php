@@ -40,7 +40,7 @@ foreach ($components as $id => $array) {
             $color = \App\Facades\LibrenmsConfig::get("graph_colours.mixed.$count", \App\Facades\LibrenmsConfig::get('graph_colours.oranges.' . ($count - 7)));
 
             $rrd_additions .= ' DEF:DS' . $count . '=' . $rrd_filename . ':count:AVERAGE ';
-            $rrd_additions .= ' AREA:DS' . $count . '#' . $color . ":'" . str_pad(substr($components[$id]['label'], 0, 15), 15) . "'" . $stack;
+            $rrd_additions .= ' AREA:DS' . $count . '#' . $color . ":'" . str_pad(substr((string) $components[$id]['label'], 0, 15), 15) . "'" . $stack;
             $rrd_additions .= ' GPRINT:DS' . $count . ':LAST:%4.0lf%s ';
             $rrd_additions .= ' GPRINT:DS' . $count . ':MIN:%4.0lf%s ';
             $rrd_additions .= ' GPRINT:DS' . $count . ":MAX:%4.0lf%s\\\l ";

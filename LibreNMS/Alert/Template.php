@@ -93,7 +93,7 @@ class Template
         $alert['alert'] = new AlertData($data['alert']);
         try {
             return Blade::render($data['title'], $alert);
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return $data['title'] ?: Blade::render('Template ' . $data['name'], $alert);
         }
     }

@@ -10,7 +10,7 @@ if (is_numeric($vars['id'])) {
         $rrd_filename = Rrd::name($device['hostname'], ['service', $service['service_type'], $service['service_id']]);
 
         $title = generate_device_link($device);
-        $title .= ' :: Service :: ' . htmlentities($service['service_type']) . ' - ' . htmlentities($service['service_desc']);
+        $title .= ' :: Service :: ' . htmlentities((string) $service['service_type']) . ' - ' . htmlentities((string) $service['service_desc']);
         $auth = true;
     }
 }

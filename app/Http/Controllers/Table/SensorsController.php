@@ -41,6 +41,7 @@ class SensorsController extends TableController
     {
         return [
             'hostname',
+            'display',
             'sensor_descr',
             'sensor_current',
         ];

@@ -29,10 +29,10 @@ namespace LibreNMS\OS;
 use App\Models\Device;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
-use LibreNMS\OS\Shared\Fortinet;
+use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 
-class Fortios extends Fortinet implements OSPolling
+class Fortios extends OS implements OSPolling
 {
     public function discoverOS(Device $device): void
     {

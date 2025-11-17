@@ -25,31 +25,14 @@
  * @subpackage Pages
  */
 
-switch ($vars['order'] ?? '') {
-    case 'vsz':
-        $order = '`vsz`';
-        break;
-
-    case 'rss':
-        $order = '`rss`';
-        break;
-
-    case 'cputime':
-        $order = '`cputime`';
-        break;
-
-    case 'user':
-        $order = '`user`';
-        break;
-
-    case 'command':
-        $order = '`command`';
-        break;
-
-    default:
-        $order = '`pid`';
-        break;
-}//end switch
+$order = match ($vars['order'] ?? '') {
+    'vsz' => '`vsz`',
+    'rss' => '`rss`',
+    'cputime' => '`cputime`',
+    'user' => '`user`',
+    'command' => '`command`',
+    default => '`pid`',
+}; //end switch
 
 if (isset($vars['by']) && $vars['by'] == 'desc') {
     $by = 'desc';

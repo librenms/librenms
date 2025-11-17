@@ -22,7 +22,7 @@ $graph_max = 1;
 $line_text = $components['name'];
 include 'includes/html/graphs/common.inc.php';
 
-$line_text = str_pad(substr($line_text, 0, 12), 12);
+$line_text = str_pad(substr((string) $line_text, 0, 12), 12);
 
 $rrd_options .= ' DEF:in_pkts=' . $rrd_filename . ':InTotalPps:AVERAGE';
 $rrd_options .= ' DEF:out_pkts=' . $rrd_filename . ':OutTotalPps:AVERAGE';

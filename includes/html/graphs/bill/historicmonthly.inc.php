@@ -12,7 +12,7 @@ $graph_data = Billing::getHistoricTransferGraphData($vars['id']);
 // Reformat date labels
 for ($i = 0; $i < count($graph_data['ticklabels']); $i++) {
     if ($graph_data['ticklabels'][$i]) {
-        $parts = explode(' - ', $graph_data['ticklabels'][$i]);
+        $parts = explode(' - ', (string) $graph_data['ticklabels'][$i]);
         $start = strtotime($parts[0]);
         $end = strtotime($parts[1]);
 
