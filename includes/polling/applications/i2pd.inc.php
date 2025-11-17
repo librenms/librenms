@@ -29,17 +29,19 @@ try {
     $i2pd = json_app_get($device, $name, $JSONVER);
 } catch (JsonAppExtendErroredException $e) {
     // Remote agent error, probably I2PC API error. Log and stop
-    $err = 'ERROR('.$e->getParsedJson()['error'].'): '.$e->getParsedJson()['errorString'];
+    $err = 'ERROR(' . $e->getParsedJson()['error'] . '): ' . $e->getParsedJson()['errorString'];
 
     update_application($app, $err, []);
-    Eventlog::log('App '.$name.' failed at remote agent! '.$err, $device['device_id'], 'application', Severity::Error);
+    Eventlog::log('App ' . $name . ' failed at remote agent! ' . $err, $device['device_id'], 'application', Severity::Error);
+
     return;
 } catch (JsonAppException $e) {
     // Unhandled exception. Log and stop
-    $err = 'ERROR('.$e->getCode().'): '.$e->getMessage();
+    $err = 'ERROR(' . $e->getCode() . '): ' . $e->getMessage();
 
     update_application($app, $err, []);
-    Eventlog::log('App '.$name.' failed for JsonAppException! '.$err, $device['device_id'], 'application', Severity::Error);
+    Eventlog::log('App ' . $name . ' failed for JsonAppException! ' . $err, $device['device_id'], 'application', Severity::Error);
+
     return;
 }
 
@@ -101,15 +103,15 @@ app('Datastore')->put($device, 'app', $tags, $fields);
 
 if (is_numeric($net_status_resp) && array_key_exists($net_status_resp, $net_status_codes)) {
     // Save network status for health monitoring
-    $app->data = [  'net_stat_code' => $net_status_resp,
-                    'net_stat_msg' => $net_status_codes[$net_status_resp] ];
+    $app->data = ['net_stat_code' => $net_status_resp,
+        'net_stat_msg' => $net_status_codes[$net_status_resp]];
 
-    $resp = $net_status_resp >= 8 ? "ERROR" : "OK"; // Error8 is first fatal error, errors 2-7 are only degraded
+    $resp = $net_status_resp >= 8 ? 'ERROR' : 'OK'; // Error8 is first fatal error, errors 2-7 are only degraded
 
     update_application($app, $resp, $fields, $net_status_codes[$net_status_resp]);
 } else {
-    $app->data = [  'net_stat_code' => null,
-                    'net_stat_msg' => null ];
+    $app->data = ['net_stat_code' => null,
+        'net_stat_msg' => null];
 
     update_application($app, 'ERROR', $fields, 'No data received.');
 }
