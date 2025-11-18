@@ -30,7 +30,7 @@
                     "features": null,
                     "location": null,
                     "os": "alteonos",
-                    "type": "network",
+                    "type": "loadbalancer",
                     "serial": null,
                     "icon": "radware.svg"
                 }

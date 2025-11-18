@@ -1,49 +1,9 @@
 <?php
 
-use App\Facades\LibrenmsConfig;
-
 if ($device['os'] !== 'alteonos') {
     return;
 }
-
-if (! function_exists('alteon_mib_dirs')) {
-    function alteon_mib_dirs(): array
-    {
-        return ['alteonos', 'radware', 'nortel'];
-    }
-}
-
-if (! function_exists('alteon_mib_names')) {
-    function alteon_mib_names(): array
-    {
-        static $mibs;
-
-        if ($mibs !== null) {
-            return $mibs;
-        }
-
-        $mibs = [];
-        $installDir = rtrim(LibrenmsConfig::get('install_dir') ?: dirname(__DIR__, 4), '/');
-        $mibDir = $installDir . '/mibs/alteonos';
-
-        $addMib = static function (string $mib) use (&$mibs): void {
-            if (! in_array($mib, $mibs, true)) {
-                $mibs[] = $mib;
-            }
-        };
-
-        foreach (['Radware', 'Nortel'] as $variant) {
-            $mibFile = $mibDir . "/ALTEON-CHEETAH-LAYER4-$variant-MIB";
-            if (is_file($mibFile)) {
-                $addMib('+' . $mibFile);
-            }
-        }
-
-        $addMib('layer4');
-
-        return $mibs;
-    }
-}
+require_once base_path('includes/common/alteon-snmp.inc.php');
 
 if (! function_exists('alteon_sensor_type_name')) {
     function alteon_sensor_type_name(string $type): string
@@ -55,54 +15,7 @@ if (! function_exists('alteon_sensor_type_name')) {
     }
 }
 
-if (! function_exists('alteon_snmpwalk_multi')) {
-    function alteon_snmpwalk_multi($device, $oid, $array = [])
-    {
-        foreach (alteon_mib_dirs() as $mibDir) {
-            foreach (alteon_mib_names() as $mibName) {
-                $data = snmpwalk_cache_multi_oid($device, $oid, $array, $mibName, $mibDir);
-                if (! empty($data)) {
-                    return $data;
-                }
-            }
-        }
-
-        return [];
-    }
-}
-
-if (! function_exists('alteon_snmp_get')) {
-    function alteon_snmp_get($device, $oid, $options = '-OQv')
-    {
-        foreach (alteon_mib_dirs() as $mibDir) {
-            foreach (alteon_mib_names() as $mibName) {
-                $value = snmp_get($device, $oid, $options, $mibName, $mibDir);
-
-                if ($value !== false && $value !== '' && stripos($value, 'No Such') === false) {
-                    return $value;
-                }
-            }
-        }
-
-        return false;
-    }
-}
-
-if (! function_exists('alteon_snmpwalk_twopart')) {
-    function alteon_snmpwalk_twopart($device, $oid, $array = [])
-    {
-        foreach (alteon_mib_dirs() as $mibDir) {
-            foreach (alteon_mib_names() as $mibName) {
-                $data = snmpwalk_cache_twopart_oid($device, $oid, $array, $mibName, $mibDir);
-                if (! empty($data)) {
-                    return $data;
-                }
-            }
-        }
-
-        return [];
-    }
-}
+// Legacy SNMP helper functions replaced by SnmpQuery wrappers above.
 
 if (! function_exists('alteon_enum_to_int')) {
     function alteon_enum_to_int($value, array $map = []): ?int
@@ -159,11 +72,11 @@ if (! function_exists('alteon_real_server_definitions')) {
             return $cache[$deviceId];
         }
 
-        $entries = alteon_snmpwalk_multi($device, 'slbCurCfgEnhRealServerEntry');
+        $entries = alteon_walk_table($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgEnhRealServerEntry');
         $nameKey = 'slbCurCfgEnhRealServerName';
         $ipKey = 'slbCurCfgEnhRealServerIpAddr';
         if (empty($entries)) {
-            $entries = alteon_snmpwalk_multi($device, 'slbCurCfgRealServerEntry');
+            $entries = alteon_walk_table($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgRealServerEntry');
             $nameKey = 'slbCurCfgRealServerName';
             $ipKey = 'slbCurCfgRealServerIpAddr';
         }
@@ -214,10 +127,10 @@ if (! function_exists('alteon_real_group_definitions')) {
             return $cache[$deviceId];
         }
 
-        $entries = alteon_snmpwalk_multi($device, 'slbCurCfgEnhGroupEntry');
+        $entries = alteon_walk_table($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgEnhGroupEntry');
         $nameKey = 'slbCurCfgEnhGroupName';
         if (empty($entries)) {
-            $entries = alteon_snmpwalk_multi($device, 'slbCurCfgGroupEntry');
+            $entries = alteon_walk_table($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgGroupEntry');
             $nameKey = 'slbCurCfgGroupName';
         }
 
@@ -244,9 +157,9 @@ if (! function_exists('alteon_real_group_members')) {
             return $cache[$deviceId];
         }
 
-        $members = alteon_snmpwalk_twopart($device, 'slbCurCfgEnhGroupRealServerEntry');
+        $members = alteon_walk_twopart($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgEnhGroupRealServerEntry');
         if (empty($members)) {
-            $members = alteon_snmpwalk_twopart($device, 'slbCurCfgGroupRealServerEntry');
+            $members = alteon_walk_twopart($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgGroupRealServerEntry');
         }
 
         $map = [];
@@ -275,11 +188,11 @@ if (! function_exists('alteon_virtual_server_definitions')) {
             return $cache[$deviceId];
         }
 
-        $entries = alteon_snmpwalk_multi($device, 'slbCurCfgEnhVirtualServerEntry');
+        $entries = alteon_walk_table($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgEnhVirtualServerEntry');
         $nameKey = 'slbCurCfgEnhVirtServerDname';
         $vipKey = 'slbCurCfgEnhVirtServerIpAddress';
         if (empty($entries)) {
-            $entries = alteon_snmpwalk_multi($device, 'slbCurCfgVirtualServerEntry');
+            $entries = alteon_walk_table($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgVirtualServerEntry');
             $nameKey = 'slbCurCfgVirtServerDname';
             $vipKey = 'slbCurCfgVirtServerIpAddress';
         }
@@ -329,14 +242,14 @@ if (! function_exists('alteon_virtual_service_definitions')) {
             return $cache[$deviceId];
         }
 
-        $entries = alteon_snmpwalk_twopart($device, 'slbCurCfgEnhVirtServicesEntry');
+        $entries = alteon_walk_twopart($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgEnhVirtServicesEntry');
         $portKey = 'slbCurCfgEnhVirtServiceVirtPort';
         $realGroupKey = 'slbCurCfgEnhVirtServiceRealGroup';
         $realPortKey = 'slbCurCfgEnhVirtServiceRealPort';
         $protoKey = 'slbCurCfgEnhVirtServiceUDPBalance';
         $nameKey = 'slbCurCfgEnhVirtServiceDname';
         if (empty($entries)) {
-            $entries = alteon_snmpwalk_twopart($device, 'slbCurCfgVirtServicesEntry');
+            $entries = alteon_walk_twopart($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgVirtServicesEntry');
             $portKey = 'slbCurCfgVirtServiceVirtPort';
             $realGroupKey = 'slbCurCfgVirtServiceRealGroup';
             $realPortKey = 'slbCurCfgVirtServiceRealPort';
@@ -500,8 +413,8 @@ if (! function_exists('alteon_virtual_service_protocol_lookup')) {
     function alteon_virtual_service_protocol_lookup($device, string $virtIndex, string $serviceIndex): ?string
     {
         $oids = [
-            "slbCurCfgEnhVirtServiceUDPBalance.$virtIndex.$serviceIndex",
-            "slbCurCfgVirtServiceUDPBalance.$virtIndex.$serviceIndex",
+            "ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgEnhVirtServiceUDPBalance.$virtIndex.$serviceIndex",
+            "ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgVirtServiceUDPBalance.$virtIndex.$serviceIndex",
         ];
         $protoEnumMap = [
             2 => 'udp',
@@ -550,50 +463,23 @@ foreach ($virtualServices as $serviceEntry) {
 
 // Real server runtime state (running/failed/disabled)
 $realServerRuntimeIps = [];
-$realInfo = alteon_snmpwalk_multi($device, 'slbEnhRealServerInfoEntry');
-$realInfoStateKey = 'slbEnhRealServerInfoState';
-$realInfoType = alteon_sensor_type_name('ALTEON-CHEETAH-LAYER4-MIB::slbEnhRealServerInfoState');
-$realInfoOidBase = '.1.3.6.1.4.1.1872.2.5.4.3.13.1.7';
+$realInfo = alteon_walk_table($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbEnhRealServerInfoEntry');
 $realInfoIpKey = 'slbEnhRealServerInfoIpAddr';
 if (empty($realInfo)) {
-    $realInfo = alteon_snmpwalk_multi($device, 'slbRealServerInfoEntry');
-    $realInfoStateKey = 'slbRealServerInfoState';
-    $realInfoType = alteon_sensor_type_name('ALTEON-CHEETAH-LAYER4-MIB::slbRealServerInfoState');
-    $realInfoOidBase = '.1.3.6.1.4.1.1872.2.5.4.3.1.1.7';
+    $realInfo = alteon_walk_table($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbRealServerInfoEntry');
     $realInfoIpKey = 'slbRealServerInfoIpAddr';
 }
 
-if (! empty($realInfo)) {
-    $states = [
-        ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'running'],
-        ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'failed'],
-        ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'disabled'],
-        ['value' => 2147483647, 'generic' => 3, 'graph' => 0, 'descr' => 'unsupported'],
-    ];
-    create_state_index($realInfoType, $states);
-    $stateMap = alteon_state_text_map($states);
-
-    foreach ($realInfo as $index => $entry) {
-        $value = alteon_enum_to_int($entry[$realInfoStateKey] ?? null, $stateMap);
-        if ($value === null) {
-            continue;
-        }
-
-        $indexKey = (string) $index;
-        $runtimeIp = trim((string) ($entry[$realInfoIpKey] ?? ''));
-        if ($runtimeIp !== '') {
-            $realServerRuntimeIps[$indexKey] = $runtimeIp;
-        }
-        $label = $realServers[$indexKey]['label'] ?? "Real Server $indexKey";
-        $oid = $realInfoOidBase . '.' . $index;
-        $sensorIndex = (string) $indexKey;
-
-        discover_sensor(null, 'state', $device, $oid, $sensorIndex, $realInfoType, $label, 1, 1, null, null, null, null, $value);
+foreach ($realInfo as $index => $entry) {
+    $indexKey = (string) $index;
+    $runtimeIp = trim((string) ($entry[$realInfoIpKey] ?? ''));
+    if ($runtimeIp !== '') {
+        $realServerRuntimeIps[$indexKey] = $runtimeIp;
     }
 }
 
 // Real group member runtime/config state
-$groupRuntime = alteon_snmpwalk_twopart($device, 'slbOperEnhGroupRealServerEntry');
+$groupRuntime = alteon_walk_twopart($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbOperEnhGroupRealServerEntry');
 $groupStateKey = 'slbOperEnhGroupRealServerRuntimeStatus';
 $groupStateType = alteon_sensor_type_name('ALTEON-CHEETAH-LAYER4-MIB::slbOperEnhGroupRealServerRuntimeStatus');
 $groupOidBase = '.1.3.6.1.4.1.1872.2.5.4.4.9.1.7';
@@ -605,10 +491,10 @@ $groupStates = [
     ['value' => 2147483647, 'generic' => 3, 'graph' => 0, 'descr' => 'unsupported'],
 ];
 if (empty($groupRuntime)) {
-    $groupRuntime = alteon_snmpwalk_twopart($device, 'slbOperGroupRealServerEntry');
+    $groupRuntime = alteon_walk_twopart($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbOperGroupRealServerEntry');
     $groupStateKey = 'slbOperGroupRealServerState';
     $groupStateType = alteon_sensor_type_name('ALTEON-CHEETAH-LAYER4-MIB::slbOperGroupRealServerState');
-    $groupOidBase = '.1.3.6.1.4.1.1872.2.5.4.4.5.1.4';
+    $groupOidBase = '.1.3.6.1.4.1.1872.2.5.4.4.5.1.3';
     $groupStates = [
         ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'enable'],
         ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'disable'],
@@ -649,48 +535,13 @@ if (! empty($groupRuntime)) {
     }
 }
 
-// Virtual server administrative state
-$virtualServerEntries = alteon_snmpwalk_multi($device, 'slbCurCfgEnhVirtualServerEntry');
-$virtServerStateKey = 'slbCurCfgEnhVirtServerState';
-$virtServerType = alteon_sensor_type_name('ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgEnhVirtServerState');
-$virtServerOidBase = '.1.3.6.1.4.1.1872.2.5.4.1.1.4.22.1.4';
-if (empty($virtualServerEntries)) {
-    $virtualServerEntries = alteon_snmpwalk_multi($device, 'slbCurCfgVirtualServerEntry');
-    $virtServerStateKey = 'slbCurCfgVirtServerState';
-    $virtServerType = alteon_sensor_type_name('ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgVirtServerState');
-    $virtServerOidBase = '.1.3.6.1.4.1.1872.2.5.4.1.1.4.2.1.4';
-}
-
-if (! empty($virtualServerEntries)) {
-    $states = [
-        ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'enabled'],
-        ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'disabled'],
-        ['value' => 2147483647, 'generic' => 3, 'graph' => 0, 'descr' => 'unsupported'],
-    ];
-    create_state_index($virtServerType, $states);
-    $stateMap = alteon_state_text_map($states);
-
-    foreach ($virtualServerEntries as $index => $entry) {
-        $value = alteon_enum_to_int($entry[$virtServerStateKey] ?? null, $stateMap);
-        if ($value === null) {
-            continue;
-        }
-
-        $idx = (string) $index;
-        $label = $virtualServers[$idx]['label'] ?? "Virt Server $idx";
-        $oid = $virtServerOidBase . '.' . $index;
-        $sensorIndex = $idx;
-        discover_sensor(null, 'state', $device, $oid, $sensorIndex, $virtServerType, $label, 1, 1, null, null, null, null, $value);
-    }
-}
-
 // Virtual service state derived from runtime tables (per real server membership)
-$virtServiceRuntime = alteon_snmpwalk_multi($device, 'slbEnhVirtServicesInfoEntry');
+$virtServiceRuntime = alteon_walk_table($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbEnhVirtServicesInfoEntry');
 $runtimeStateType = alteon_sensor_type_name('ALTEON-CHEETAH-LAYER4-MIB::slbVirtServicesInfoState');
 $runtimeStateKey = 'slbEnhVirtServicesInfoState';
 $runtimeOidBase = '.1.3.6.1.4.1.1872.2.5.4.3.14.1.6';
 if (empty($virtServiceRuntime)) {
-    $virtServiceRuntime = alteon_snmpwalk_multi($device, 'slbVirtServicesInfoEntry');
+    $virtServiceRuntime = alteon_walk_table($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbVirtServicesInfoEntry');
     $runtimeStateKey = 'slbVirtServicesInfoState';
     $runtimeOidBase = '.1.3.6.1.4.1.1872.2.5.4.3.4.1.6';
 }
@@ -762,13 +613,13 @@ if (! empty($virtServiceRuntime)) {
 
 // Fallback: if runtime data missing, keep existing sensors for backward compatibility (service-level only)
 if (empty($virtServiceRuntime)) {
-    $virtualServicesRaw = alteon_snmpwalk_twopart($device, 'slbCurCfgEnhVirtServicesEntry');
+    $virtualServicesRaw = alteon_walk_twopart($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgEnhVirtServicesEntry');
     if (empty($virtualServicesRaw)) {
-        $virtualServicesRaw = alteon_snmpwalk_twopart($device, 'slbCurCfgVirtServicesEntry');
+        $virtualServicesRaw = alteon_walk_twopart($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgVirtServicesEntry');
     }
 
     if (! empty($virtualServicesRaw)) {
-    $stateType = alteon_sensor_type_name('ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgEnhVirtServiceStatus');
+        $stateType = alteon_sensor_type_name('ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgEnhVirtServiceStatus');
         $stateKey = 'slbCurCfgEnhVirtServiceStatus';
         $oidBase = '.1.3.6.1.4.1.1872.2.5.4.1.1.4.24.1.40';
         $states = [
@@ -810,26 +661,27 @@ if (empty($virtServiceRuntime)) {
         }
     }
 }
-// Chassis-level state sensors remain as-is
-$tempStatus = snmp_get($device, 'hwTemperatureStatus.0', '-OQv', 'ALTEON-CHEETAH-SWITCH-MIB', 'alteonos');
+
+// Chassis fan/temperature states (legacy scalar OIDs)
+$tempStatus = alteon_snmp_get($device, 'ALTEON-CHEETAH-SWITCH-MIB::hwTemperatureStatus.0');
 if ($tempStatus !== false && $tempStatus !== '') {
-    $state_name = alteon_sensor_type_name('ALTEON-CHEETAH-SWITCH-MIB::hwTemperatureStatus');
+    $stateName = alteon_sensor_type_name('ALTEON-CHEETAH-SWITCH-MIB::hwTemperatureStatus');
     $states = [
         ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'notRelevant'],
         ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'ok'],
         ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'exceed'],
         ['value' => 2147483647, 'generic' => 3, 'graph' => 0, 'descr' => 'unsupported'],
     ];
-    create_state_index($state_name, $states);
+    create_state_index($stateName, $states);
     $value = alteon_enum_to_int($tempStatus, alteon_state_text_map($states));
     if ($value !== null) {
-        discover_sensor(null, 'state', $device, '.1.3.6.1.4.1.1872.2.5.1.3.1.3.0', 'alteonHwTempStatus.0', $state_name, 'Chassis Temperature Status', 1, 1, null, null, null, null, $value);
+        discover_sensor(null, 'state', $device, '.1.3.6.1.4.1.1872.2.5.1.3.1.3.0', 'alteonHwTempStatus.0', $stateName, 'Chassis Temperature Status', 1, 1, null, null, null, null, $value);
     }
 }
 
-$fanStatus = snmp_get($device, 'hwFanStatus.0', '-OQv', 'ALTEON-CHEETAH-SWITCH-MIB', 'alteonos');
+$fanStatus = alteon_snmp_get($device, 'ALTEON-CHEETAH-SWITCH-MIB::hwFanStatus.0');
 if ($fanStatus !== false && $fanStatus !== '') {
-    $state_name = alteon_sensor_type_name('ALTEON-CHEETAH-SWITCH-MIB::hwFanStatus');
+    $stateName = alteon_sensor_type_name('ALTEON-CHEETAH-SWITCH-MIB::hwFanStatus');
     $states = [
         ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'notRelevant'],
         ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'ok'],
@@ -837,9 +689,9 @@ if ($fanStatus !== false && $fanStatus !== '') {
         ['value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'unplug'],
         ['value' => 2147483647, 'generic' => 3, 'graph' => 0, 'descr' => 'unsupported'],
     ];
-    create_state_index($state_name, $states);
+    create_state_index($stateName, $states);
     $value = alteon_enum_to_int($fanStatus, alteon_state_text_map($states));
     if ($value !== null) {
-        discover_sensor(null, 'state', $device, '.1.3.6.1.4.1.1872.2.5.1.3.1.4.0', 'alteonHwFanStatus.0', $state_name, 'Chassis Fan Status', 1, 1, null, null, null, null, $value);
+        discover_sensor(null, 'state', $device, '.1.3.6.1.4.1.1872.2.5.1.3.1.4.0', 'alteonHwFanStatus.0', $stateName, 'Chassis Fan Status', 1, 1, null, null, null, null, $value);
     }
 }

@@ -1,4 +1,4 @@
-mib: ALTEON-CHEETAH-SWITCH-MIB
+mib: ALTEON-CHEETAH-LAYER4-MIB:ALTEON-CHEETAH-SWITCH-MIB
 modules:
     mempools:
         data:
@@ -19,3 +19,77 @@ modules:
             -
                 oid: mpCpuStatsUtil1Second
                 num_oid: '.1.3.6.1.4.1.1872.2.5.1.2.2.1.{{ $index }}'
+    sensors:
+        state:
+            data:
+                -
+                    oid: ALTEON-CHEETAH-LAYER4-MIB::slbEnhRealServerInfoEntry
+                    value: ALTEON-CHEETAH-LAYER4-MIB::slbEnhRealServerInfoState
+                    num_oid: '.1.3.6.1.4.1.1872.2.5.4.3.13.1.7.{{ $index }}'
+                    index: 'slbEnhRealServerInfoState.{{ $index }}'
+                    descr: "Real Server {{ $index }} {{ $slbEnhRealServerInfoIpAddr }}"
+                    state_name: slbRealServer
+                    states:
+                        - { value: 2, generic: 0, graph: 0, descr: running }
+                        - { value: 3, generic: 2, graph: 0, descr: failed }
+                        - { value: 4, generic: 1, graph: 0, descr: disabled }
+                        - { value: 2147483647, generic: 3, graph: 0, descr: unsupported }
+                -
+                    oid: ALTEON-CHEETAH-LAYER4-MIB::slbRealServerInfoEntry
+                    value: ALTEON-CHEETAH-LAYER4-MIB::slbRealServerInfoState
+                    num_oid: '.1.3.6.1.4.1.1872.2.5.4.3.1.1.7.{{ $index }}'
+                    index: 'slbRealServerInfoState.{{ $index }}'
+                    descr: "Real Server {{ $index }} {{ $slbRealServerInfoIpAddr }}"
+                    state_name: slbRealServer
+                    states:
+                        - { value: 2, generic: 0, graph: 0, descr: running }
+                        - { value: 3, generic: 2, graph: 0, descr: failed }
+                        - { value: 4, generic: 1, graph: 0, descr: disabled }
+                        - { value: 2147483647, generic: 3, graph: 0, descr: unsupported }
+                -
+                    oid: ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgEnhVirtualServerEntry
+                    value: ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgEnhVirtServerState
+                    num_oid: '.1.3.6.1.4.1.1872.2.5.4.1.1.4.22.1.4.{{ $index }}'
+                    index: 'slbCurCfgEnhVirtServerState.{{ $index }}'
+                    descr: "Virt Server {{ $index }} {{ $slbCurCfgEnhVirtServerIpAddress }}"
+                    state_name: slbCurCfgVirtServer
+                    states:
+                        - { value: 2, generic: 0, graph: 0, descr: enabled }
+                        - { value: 3, generic: 2, graph: 0, descr: disabled }
+                        - { value: 2147483647, generic: 3, graph: 0, descr: unsupported }
+                -
+                    oid: ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgVirtualServerEntry
+                    value: ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgVirtServerState
+                    num_oid: '.1.3.6.1.4.1.1872.2.5.4.1.1.4.2.1.4.{{ $index }}'
+                    index: 'slbCurCfgVirtServerState.{{ $index }}'
+                    descr: "Virt Server {{ $index }} {{ $slbCurCfgVirtServerIpAddress }}"
+                    state_name: slbCurCfgVirtServer
+                    states:
+                        - { value: 2, generic: 0, graph: 0, descr: enabled }
+                        - { value: 3, generic: 2, graph: 0, descr: disabled }
+                        - { value: 2147483647, generic: 3, graph: 0, descr: unsupported }
+                -
+                    oid: ALTEON-CHEETAH-SWITCH-MIB::hwFanStatus
+                    value: ALTEON-CHEETAH-SWITCH-MIB::hwFanStatus.0
+                    num_oid: '.1.3.6.1.4.1.1872.2.5.1.3.1.4.0'
+                    index: 'alteonHwFanStatus.0'
+                    descr: 'Chassis Fan Status'
+                    state_name: hwFanStatus
+                    states:
+                        - { value: 0, generic: 3, graph: 0, descr: notRelevant }
+                        - { value: 1, generic: 0, graph: 0, descr: ok }
+                        - { value: 2, generic: 2, graph: 0, descr: fail }
+                        - { value: 3, generic: 1, graph: 0, descr: unplug }
+                        - { value: 2147483647, generic: 3, graph: 0, descr: unsupported }
+                -
+                    oid: ALTEON-CHEETAH-SWITCH-MIB::hwTemperatureStatus
+                    value: ALTEON-CHEETAH-SWITCH-MIB::hwTemperatureStatus.0
+                    num_oid: '.1.3.6.1.4.1.1872.2.5.1.3.1.3.0'
+                    index: 'alteonHwTempStatus.0'
+                    descr: 'Chassis Temperature Status'
+                    state_name: hwTemperatureStatus
+                    states:
+                        - { value: 0, generic: 3, graph: 0, descr: notRelevant }
+                        - { value: 1, generic: 0, graph: 0, descr: ok }
+                        - { value: 2, generic: 2, graph: 0, descr: exceed }
+                        - { value: 2147483647, generic: 3, graph: 0, descr: unsupported }

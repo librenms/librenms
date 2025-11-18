@@ -1,24 +1,29 @@
 <?php
 
-$port_names = snmpwalk_cache_oid($device, 'agPortCurCfgPortName', [], 'ALTEON-CHEETAH-SWITCH-MIB', 'alteonos');
-if (empty($port_names)) {
+require_once base_path('includes/common/alteon-snmp.inc.php');
+
+$portData = alteon_snmp($device)
+    ->walk([
+        'ALTEON-CHEETAH-SWITCH-MIB::agPortCurCfgPortName',
+        'ALTEON-CHEETAH-SWITCH-MIB::agPortCurCfgPortAlias',
+    ])->valuesByIndex();
+
+if (empty($portData)) {
     return;
 }
 
-$port_aliases = snmpwalk_cache_oid($device, 'agPortCurCfgPortAlias', $port_names, 'ALTEON-CHEETAH-SWITCH-MIB', 'alteonos');
-
-foreach ($port_aliases as $portNumber => $entry) {
+foreach ($portData as $portNumber => $entry) {
     $ifIndex = 256 + (int) $portNumber;
     if ($ifIndex <= 0) {
         continue;
     }
 
-    $name = trim((string) ($entry['agPortCurCfgPortName'] ?? ''));
-    $alias = trim((string) ($entry['agPortCurCfgPortAlias'] ?? ''));
+    $name = trim((string) ($entry['ALTEON-CHEETAH-SWITCH-MIB::agPortCurCfgPortName'] ?? ''));
+    $alias = trim((string) ($entry['ALTEON-CHEETAH-SWITCH-MIB::agPortCurCfgPortAlias'] ?? ''));
 
     if ($alias !== '') {
-        $trimmedAlias = preg_replace('/^Port\\s+/i', '', $alias);
-        $port_stats[$ifIndex]['ifName'] = 'Port ' . trim($trimmedAlias);
+        $trimmedAlias = preg_replace('/^Port\s+/i', '', $alias);
+        $port_stats[$ifIndex]['ifName'] = 'Port ' . trim((string) $trimmedAlias);
     }
 
     if ($name !== '') {

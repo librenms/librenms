@@ -15,14 +15,35 @@ foreach ($rows as $row) {
         continue;
     }
 
+    $sensorDescr = (string) ($row['sensor_descr'] ?? '');
     $ip = null;
-    if (! empty($row['sensor_descr']) && preg_match('/\(([^)]+)\)\s*$/', $row['sensor_descr'], $match)) {
+    if ($sensorDescr !== '' && preg_match('/\(([^)]+)\)\s*$/', $sensorDescr, $match)) {
         $ip = $match[1];
+    }
+
+    $groups[$groupId]['heading'] = $groups[$groupId]['heading']
+        ?? trim(preg_replace('/\s*\([^)]*\)\s*$/', '', $sensorDescr))
+        ?: sprintf('Real Server Group %s', $groupId);
+
+    $stateDescrRaw = trim((string) ($row['state_descr'] ?? ''));
+    $stateDescr = $stateDescrRaw !== '' ? $stateDescrRaw : null;
+    $stateGeneric = isset($row['state_generic_value']) ? (int) $row['state_generic_value'] : null;
+    $needsFallback = $stateDescr === null || strtolower($stateDescr) === 'unknown';
+    if ($needsFallback) {
+        if ($fallback = alteonos_state_lookup((string) ($row['sensor_type'] ?? ''), $row['sensor_current'] ?? null)) {
+            $stateDescr = $fallback['descr'];
+            $stateGeneric = $fallback['generic'];
+        }
     }
 
     $groups[$groupId]['members'][] = [
         'member' => $memberId,
         'ip' => $ip,
+        'sensor_id' => $row['sensor_id'] ?? null,
+        'state_descr' => $stateDescr ?? __('Unknown'),
+        'state_generic' => $stateGeneric,
+        'value' => $row['sensor_current'] ?? null,
+        'updated' => $row['lastupdate'] ?? null,
     ];
 }
 
@@ -36,17 +57,34 @@ if (empty($groups)) {
 
 foreach ($groups as $groupId => $group) {
     echo '<div class="panel panel-default">';
-    echo '<div class="panel-heading"><h3 class="panel-title">' . htmlspecialchars(sprintf('Real Server Group %s', $groupId), ENT_QUOTES, 'UTF-8') . '</h3></div>';
-    echo '<div class="panel-body"><div class="text-monospace">';
-    echo htmlspecialchars(sprintf('Real Server Group %s', $groupId), ENT_QUOTES, 'UTF-8') . '<br>';
+    echo '<div class="panel-heading"><h3 class="panel-title">' . htmlspecialchars($group['heading'], ENT_QUOTES, 'UTF-8') . '</h3></div>';
+    echo '<div class="panel-body">';
+
+    echo '<div class="table-responsive">';
+    echo '<table class="table table-striped table-condensed">';
+    echo '<thead><tr>';
+    echo '<th>' . htmlspecialchars(__('Member'), ENT_QUOTES, 'UTF-8') . '</th>';
+    echo '<th>' . htmlspecialchars(__('IP Address'), ENT_QUOTES, 'UTF-8') . '</th>';
+    echo '<th>' . htmlspecialchars(__('State'), ENT_QUOTES, 'UTF-8') . '</th>';
+    echo '<th>' . htmlspecialchars(__('Value'), ENT_QUOTES, 'UTF-8') . '</th>';
+    echo '<th>' . htmlspecialchars(__('Last Updated'), ENT_QUOTES, 'UTF-8') . '</th>';
+    echo '</tr></thead><tbody>';
 
     foreach ($group['members'] as $member) {
-        $line = '&gt; Real Server ' . htmlspecialchars($member['member'], ENT_QUOTES, 'UTF-8');
-        if (! empty($member['ip'])) {
-            $line .= ' (' . htmlspecialchars($member['ip'], ENT_QUOTES, 'UTF-8') . ')';
-        }
-        echo $line . '<br>';
+        $stateClass = alteonos_state_class($member['state_generic']);
+        $stateText = htmlspecialchars($member['state_descr'], ENT_QUOTES, 'UTF-8');
+        $value = $member['value'] !== null ? htmlspecialchars((string) $member['value'], ENT_QUOTES, 'UTF-8') : '-';
+        $updated = $member['updated'] ? htmlspecialchars((string) $member['updated'], ENT_QUOTES, 'UTF-8') : '-';
+
+        echo '<tr>';
+        echo '<td>' . htmlspecialchars('Real Server ' . $member['member'], ENT_QUOTES, 'UTF-8') . '</td>';
+        echo '<td>' . ($member['ip'] !== null ? htmlspecialchars($member['ip'], ENT_QUOTES, 'UTF-8') : '-') . '</td>';
+        echo '<td><span class="' . $stateClass . '">' . $stateText . '</span></td>';
+        echo '<td>' . $value . '</td>';
+        echo '<td class="text-nowrap">' . $updated . '</td>';
+        echo '</tr>';
     }
 
-    echo '</div></div></div>';
+    echo '</tbody></table></div>';
+    echo '</div></div>';
 }

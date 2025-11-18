@@ -20,7 +20,7 @@ $type_text['alteonos_real_groups'] = 'Alteon Real Server Groups';       // Radwa
 $type_text['alteonos_virtual_servers'] = 'Alteon Virtual Servers';      // Radware Alteon
 $type_text['alteonos_virtual_services'] = 'Alteon Virtual Services';    // Radware Alteon
 
-$device_loadbalancer_count = $device_loadbalancer_count ?? [];
+$device_loadbalancer_count ??= [];
 
 print_optionbar_start();
 

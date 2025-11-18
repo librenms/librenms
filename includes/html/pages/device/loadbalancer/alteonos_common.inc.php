@@ -33,6 +33,58 @@ if (! function_exists('alteonos_sensor_types_for_tab')) {
     }
 }
 
+if (! function_exists('alteonos_parse_state_value')) {
+    function alteonos_parse_state_value($value): ?int
+    {
+        if (is_numeric($value)) {
+            return (int) $value;
+        }
+
+        if (is_string($value)) {
+            if (preg_match('/(-?\d+)(?!.*\d)/', $value, $m)) {
+                return (int) $m[1];
+            }
+        }
+
+        return null;
+    }
+}
+
+if (! function_exists('alteonos_state_lookup')) {
+    function alteonos_state_lookup(string $sensorType, $value): ?array
+    {
+        $maps = [
+            'slbOperEnhGroupRealServerRuntimeStatus' => [
+                1 => ['descr' => 'running', 'generic' => 0],
+                2 => ['descr' => 'failed', 'generic' => 2],
+                3 => ['descr' => 'disabled', 'generic' => 1],
+                4 => ['descr' => 'overloaded', 'generic' => 1],
+            ],
+            'slbOperGroupRealServer' => [
+                1 => ['descr' => 'enable', 'generic' => 0],
+                2 => ['descr' => 'disable', 'generic' => 1],
+                3 => ['descr' => 'shutdown-connection', 'generic' => 2],
+                4 => ['descr' => 'shutdown-persistent-sessions', 'generic' => 2],
+            ],
+            'slbCurCfgEnhVirtServiceStatus' => [
+                1 => ['descr' => 'up', 'generic' => 0],
+                2 => ['descr' => 'down', 'generic' => 2],
+                3 => ['descr' => 'adminDown', 'generic' => 1],
+                4 => ['descr' => 'warning', 'generic' => 1],
+                5 => ['descr' => 'shutdown', 'generic' => 2],
+                6 => ['descr' => 'error', 'generic' => 2],
+            ],
+        ];
+
+        $intVal = alteonos_parse_state_value($value);
+        if ($intVal === null) {
+            return null;
+        }
+
+        return $maps[$sensorType][$intVal] ?? null;
+    }
+}
+
 if (! function_exists('alteonos_loadbalancer_fetch')) {
     function alteonos_loadbalancer_fetch(array $device, string $tab): array
     {
@@ -102,7 +154,7 @@ if (! function_exists('alteonos_render_sensor_table')) {
 
             echo '<tr>';
             echo '<td class="small">' . $descr . '</td>';
-            echo '<td><span class="' . $statusClass . '">' . htmlspecialchars($statusText, ENT_QUOTES, 'UTF-8') . '</span></td>';
+            echo '<td><span class="' . $statusClass . '">' . htmlspecialchars((string) $statusText, ENT_QUOTES, 'UTF-8') . '</span></td>';
             echo '<td>' . $value . '</td>';
             echo '<td class="text-nowrap">' . $updated . '</td>';
             echo '</tr>';
