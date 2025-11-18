@@ -35,7 +35,10 @@ if (! function_exists('alteon_real_server_definitions')) {
                 $label .= ' (' . $ip . ')';
             }
 
-            $map[$uid] = ['label' => $label];
+            $map[$uid] = [
+                'label' => $label,
+                'ip' => $ip,
+            ];
         }
 
         return $cache[$deviceId] = $map;
@@ -106,6 +109,13 @@ echo 'Alteon ';
 $realServers = alteon_real_server_definitions($device);
 $realGroups = alteon_real_group_definitions($device);
 $groupMembers = alteon_real_group_members($device);
+$groupFailureTotals = [];
+$serverGroupMap = [];
+foreach ($groupMembers as $groupIndex => $members) {
+    foreach ((array) $members as $serverIndex) {
+        $serverGroupMap[(string) $serverIndex][] = (string) $groupIndex;
+    }
+}
 
 // Real server current session counts
 $sessionData = alteon_walk_table($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbStatEnhRServerCurrSessions');
@@ -122,11 +132,16 @@ if (empty($sessionData)) {
 foreach ($sessionData as $index => $entry) {
     $value = (int) ($entry[$sessionKey] ?? $entry ?? 0);
     $idx = (string) $index;
-    $label = ($realServers[$idx]['label'] ?? "Real Server $idx") . ' Sessions';
+    $heading = 'Real Server ' . $idx;
+    $ip = $realServers[$idx]['ip'] ?? '';
+    if ($ip !== '') {
+        $heading .= ' (' . $ip . ')';
+    }
+    $label = $heading . ' Sessions';
     $sensorIndex = (string) $idx;
     $oid = $sessionOidBase . '.' . $index;
 
-    discover_sensor(null, 'count', $device, $oid, $sensorIndex, $sessionType, $label, 1, 1, null, null, null, null, $value);
+    discover_sensor(null, 'count', $device, $oid, $sensorIndex, $sessionType, $label, 1, 1, null, null, null, null, $value, 'snmp', null, null, null, $heading);
 }
 
 // Real group session counts
@@ -134,11 +149,13 @@ $groupSessions = alteon_walk_table($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbStatE
 $groupSessionKey = 'slbStatEnhGroupCurrSessions';
 $groupSessionType = 'slbStatEnhGroupCurrSessions';
 $groupSessionOidBase = '.1.3.6.1.4.1.1872.2.5.4.2.29.1.2';
+$groupFailureOidBase = '.1.3.6.1.4.1.1872.2.5.4.2.29.1.3';
 if (empty($groupSessions)) {
     $groupSessions = alteon_walk_table($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbStatGroupCurrSessions');
     $groupSessionKey = 'slbStatGroupCurrSessions';
     $groupSessionType = 'slbStatGroupCurrSessions';
     $groupSessionOidBase = '.1.3.6.1.4.1.1872.2.5.4.2.3.1.2';
+    $groupFailureOidBase = '.1.3.6.1.4.1.1872.2.5.4.2.3.1.3';
 }
 
 foreach ($groupSessions as $index => $entry) {
@@ -168,11 +185,38 @@ if (empty($failureData)) {
 foreach ($failureData as $index => $entry) {
     $value = (int) ($entry[$failureKey] ?? $entry ?? 0);
     $idx = (string) $index;
-    $label = ($realServers[$idx]['label'] ?? "Real Server $idx") . ' Failures';
+    $heading = 'Real Server ' . $idx;
+    $ip = $realServers[$idx]['ip'] ?? '';
+    if ($ip !== '') {
+        $heading .= ' (' . $ip . ')';
+    }
+    $label = $heading . ' Failures';
     $sensorIndex = (string) $idx;
     $oid = $failureOidBase . '.' . $index;
 
-    discover_sensor(null, 'count', $device, $oid, $sensorIndex, $failureType, $label, 1, 1, null, null, null, null, $value);
+    discover_sensor(null, 'count', $device, $oid, $sensorIndex, $failureType, $label, 1, 1, null, null, null, null, $value, 'snmp', null, null, null, $heading);
+
+    foreach ($serverGroupMap[$idx] ?? [] as $groupIndex) {
+        $groupFailureTotals[$groupIndex] = ($groupFailureTotals[$groupIndex] ?? 0) + $value;
+    }
+}
+
+$groupLabels = $realGroups;
+if (empty($groupLabels)) {
+    foreach (array_keys($groupSessions) as $groupIndex) {
+        $groupLabels[(string) $groupIndex] = ['label' => "Real Group $groupIndex"];
+    }
+}
+
+foreach ($groupLabels as $groupIndex => $groupInfo) {
+    $value = $groupFailureTotals[$groupIndex] ?? 0;
+    $groupLabel = $groupInfo['label'] ?? "Real Group $groupIndex";
+    $heading = 'SLB ' . $groupLabel;
+    $descr = $heading . ' Failures';
+    $sensorIndex = (string) $groupIndex;
+    $oid = $groupFailureOidBase . '.' . $groupIndex;
+
+    discover_sensor(null, 'count', $device, $oid, $sensorIndex, 'alteonSlbGroupFailures', $descr, 1, 1, null, null, null, null, $value, 'snmp', null, null, null, $heading);
 }
 
 // Real server health-check failure counters per service
