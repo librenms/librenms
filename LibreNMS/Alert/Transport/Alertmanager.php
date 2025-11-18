@@ -67,6 +67,9 @@ class Alertmanager extends Transport
                 )) 
                 ?? $value
             );
+            if(str_starts_with($label,'dyn_') && $data[0]['labels'][$label] == $value) {
+                unset($data[0]['labels'][$label]);
+            }
         }
 
         $client = Http::client()->timeout(5);
