@@ -21,9 +21,12 @@ the variable you want to get (you can see all the variables in
 Alerts->Notifications by clicking on the Details icon of your alert
 when it is pending). 
 
-Labels prefixed with “dyn_” are omitted from the transport message
+Labels prefixed with "dyn_" are omitted from the transport message
 if no matching value exists in the alert data. Labels without this
 prefix are always included, using their fixed string value when a match is not found.
+
+Labels prefixed with "stc_" are considered static, 
+and will never be considered for value substitution.
 
 Multiple Alertmanager URLs (comma separated) are supported. Each
 URL will be tried and the search will stop at the first success.
