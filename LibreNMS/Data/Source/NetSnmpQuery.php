@@ -353,7 +353,7 @@ class NetSnmpQuery implements SnmpQueryInterface
             array_push($cmd, '-r', $retries);
         }
 
-        $hostname = Rewrite::addIpv6Brackets((string) ($this->device->overwrite_ip ?: $this->device->hostname));
+        $hostname = Rewrite::addIpv6Brackets($this->device->pollerTarget());
         $cmd[] = ($this->device->transport ?? 'udp') . ':' . $hostname . ':' . $this->device->port;
 
         return array_merge($cmd, $oids);
