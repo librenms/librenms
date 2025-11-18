@@ -59,13 +59,14 @@ class Alertmanager extends Transport
         $alertmanager_opts = $this->parseUserOptions($this->config['alertmanager-options']);
         foreach ($alertmanager_opts as $label => $value) {
             // To allow dynamic values
-            if (preg_match('/^extra_[A-Za-z0-9_]+$/', (string) $label) && ! empty($alert_data['faults'][1][$value])) {
-                $data[0]['labels'][$label] = strip_tags((string) $alert_data['faults'][1][$value]);
-            } elseif (preg_match('/^extra_[A-Za-z0-9_]+$/', (string) $label) && ! empty($alert_data[$value])) {
-                $data[0]['labels'][$label] = strip_tags((string) $alert_data[$value]);
-            } else {
-                $data[0]['labels'][$label] = strip_tags((string) $value);
-            }
+            $data[0]['labels'][$label] = strip_tags(
+                $alert_data[$value] 
+                ?? current(array_filter(
+                    array_column($alert_data['faults'] ?? [], $value),
+                    fn($v) => ! empty($v)
+                )) 
+                ?? $value
+            );
         }
 
         $client = Http::client()->timeout(5);
