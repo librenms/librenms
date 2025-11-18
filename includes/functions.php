@@ -400,6 +400,17 @@ function dnslookup($device, $type = false, $return = false)
     return $record[0][$return] ?? null;
 }//end dnslookup
 
+function normalize_state_sensor_value($value)
+{
+    if (! is_numeric($value)) {
+        return $value;
+    }
+
+    $intValue = (int) $value;
+
+    return max(-32768, min(32767, $intValue));
+}
+
 /**
  * Create a new state index.  Update translations if $states is given.
  *
@@ -412,12 +423,18 @@ function dnslookup($device, $type = false, $return = false)
  */
 function create_state_index($state_name, $states = []): void
 {
-    app('sensor-discovery')->withStateTranslations($state_name, array_map(fn ($state) => new StateTranslation([
-        'state_descr' => $state['descr'],
-        'state_draw_graph' => $state['graph'],
-        'state_value' => $state['value'],
-        'state_generic_value' => $state['generic'],
-    ]), $states));
+    app('sensor-discovery')->withStateTranslations($state_name, array_map(function ($state) {
+        if (isset($state['value'])) {
+            $state['value'] = normalize_state_sensor_value($state['value']);
+        }
+
+        return new StateTranslation([
+            'state_descr' => $state['descr'],
+            'state_draw_graph' => $state['graph'],
+            'state_value' => $state['value'],
+            'state_generic_value' => $state['generic'],
+        ]);
+    }, $states));
 }
 
 function delta_to_bits($delta, $period)

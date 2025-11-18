@@ -15,13 +15,47 @@ if (! function_exists('alteon_sensor_type_name')) {
     }
 }
 
+if (! function_exists('alteon_normalize_state_int')) {
+    function alteon_normalize_state_int($value): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (! is_numeric($value)) {
+            return null;
+        }
+
+        $intValue = (int) $value;
+
+        return max(-32768, min(32767, $intValue));
+    }
+}
+
+if (! function_exists('alteon_normalize_state_definitions')) {
+    function alteon_normalize_state_definitions(array $states): array
+    {
+        foreach ($states as &$state) {
+            if (array_key_exists('value', $state)) {
+                $normalized = alteon_normalize_state_int($state['value']);
+                if ($normalized !== null) {
+                    $state['value'] = $normalized;
+                }
+            }
+        }
+        unset($state);
+
+        return $states;
+    }
+}
+
 // Legacy SNMP helper functions replaced by SnmpQuery wrappers above.
 
 if (! function_exists('alteon_enum_to_int')) {
     function alteon_enum_to_int($value, array $map = []): ?int
     {
         if (is_numeric($value)) {
-            return (int) $value;
+            return alteon_normalize_state_int($value);
         }
 
         $value = trim((string) $value, "\" \t\n\r\0\x0B");
@@ -30,18 +64,18 @@ if (! function_exists('alteon_enum_to_int')) {
         }
 
         if (preg_match('/\(([-\d]+)\)$/', $value, $matches)) {
-            return (int) $matches[1];
+            return alteon_normalize_state_int((int) $matches[1]);
         }
 
         $lower = strtolower($value);
         foreach ($map as $int => $text) {
             if ($lower === strtolower((string) $text)) {
-                return (int) $int;
+                return alteon_normalize_state_int((int) $int);
             }
         }
 
         if (preg_match('/(-?\d+)\s*$/', $value, $matches)) {
-            return (int) $matches[1];
+            return alteon_normalize_state_int((int) $matches[1]);
         }
 
         return null;
@@ -483,25 +517,25 @@ $groupRuntime = alteon_walk_twopart($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbOper
 $groupStateKey = 'slbOperEnhGroupRealServerRuntimeStatus';
 $groupStateType = alteon_sensor_type_name('ALTEON-CHEETAH-LAYER4-MIB::slbOperEnhGroupRealServerRuntimeStatus');
 $groupOidBase = '.1.3.6.1.4.1.1872.2.5.4.4.9.1.7';
-$groupStates = [
+$groupStates = alteon_normalize_state_definitions([
     ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'running'],
     ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'failed'],
     ['value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'disabled'],
     ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'overloaded'],
     ['value' => 2147483647, 'generic' => 3, 'graph' => 0, 'descr' => 'unsupported'],
-];
+]);
 if (empty($groupRuntime)) {
     $groupRuntime = alteon_walk_twopart($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbOperGroupRealServerEntry');
     $groupStateKey = 'slbOperGroupRealServerState';
     $groupStateType = alteon_sensor_type_name('ALTEON-CHEETAH-LAYER4-MIB::slbOperGroupRealServerState');
     $groupOidBase = '.1.3.6.1.4.1.1872.2.5.4.4.5.1.3';
-    $groupStates = [
+    $groupStates = alteon_normalize_state_definitions([
         ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'enable'],
         ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'disable'],
         ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'shutdown-connection'],
         ['value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'shutdown-persistent-sessions'],
         ['value' => 2147483647, 'generic' => 3, 'graph' => 0, 'descr' => 'unsupported'],
-    ];
+    ]);
 }
 
 $groupStatusMap = [];
@@ -547,7 +581,7 @@ if (empty($virtServiceRuntime)) {
 }
 
 if (! empty($virtServiceRuntime)) {
-    $states = [
+    $states = alteon_normalize_state_definitions([
         ['value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'blocked'],
         ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'running'],
         ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'failed'],
@@ -556,7 +590,7 @@ if (! empty($virtServiceRuntime)) {
         ['value' => 6, 'generic' => 1, 'graph' => 0, 'descr' => 'overflow'],
         ['value' => 7, 'generic' => 2, 'graph' => 0, 'descr' => 'noinstance'],
         ['value' => 2147483647, 'generic' => 3, 'graph' => 0, 'descr' => 'unsupported'],
-    ];
+    ]);
     create_state_index($runtimeStateType, $states);
     $stateMap = alteon_state_text_map($states);
 
@@ -622,7 +656,7 @@ if (empty($virtServiceRuntime)) {
         $stateType = alteon_sensor_type_name('ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgEnhVirtServiceStatus');
         $stateKey = 'slbCurCfgEnhVirtServiceStatus';
         $oidBase = '.1.3.6.1.4.1.1872.2.5.4.1.1.4.24.1.40';
-        $states = [
+        $states = alteon_normalize_state_definitions([
             ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'up'],
             ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'down'],
             ['value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'adminDown'],
@@ -630,7 +664,7 @@ if (empty($virtServiceRuntime)) {
             ['value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'shutdown'],
             ['value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'error'],
             ['value' => 2147483647, 'generic' => 3, 'graph' => 0, 'descr' => 'unsupported'],
-        ];
+        ]);
         create_state_index($stateType, $states);
         $stateMap = alteon_state_text_map($states);
 
@@ -666,12 +700,12 @@ if (empty($virtServiceRuntime)) {
 $tempStatus = alteon_snmp_get($device, 'ALTEON-CHEETAH-SWITCH-MIB::hwTemperatureStatus.0');
 if ($tempStatus !== false && $tempStatus !== '') {
     $stateName = alteon_sensor_type_name('ALTEON-CHEETAH-SWITCH-MIB::hwTemperatureStatus');
-    $states = [
+    $states = alteon_normalize_state_definitions([
         ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'notRelevant'],
         ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'ok'],
         ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'exceed'],
         ['value' => 2147483647, 'generic' => 3, 'graph' => 0, 'descr' => 'unsupported'],
-    ];
+    ]);
     create_state_index($stateName, $states);
     $value = alteon_enum_to_int($tempStatus, alteon_state_text_map($states));
     if ($value !== null) {
@@ -682,13 +716,13 @@ if ($tempStatus !== false && $tempStatus !== '') {
 $fanStatus = alteon_snmp_get($device, 'ALTEON-CHEETAH-SWITCH-MIB::hwFanStatus.0');
 if ($fanStatus !== false && $fanStatus !== '') {
     $stateName = alteon_sensor_type_name('ALTEON-CHEETAH-SWITCH-MIB::hwFanStatus');
-    $states = [
+    $states = alteon_normalize_state_definitions([
         ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'notRelevant'],
         ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'ok'],
         ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'fail'],
         ['value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'unplug'],
         ['value' => 2147483647, 'generic' => 3, 'graph' => 0, 'descr' => 'unsupported'],
-    ];
+    ]);
     create_state_index($stateName, $states);
     $value = alteon_enum_to_int($fanStatus, alteon_state_text_map($states));
     if ($value !== null) {

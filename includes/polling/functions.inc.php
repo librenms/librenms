@@ -80,6 +80,10 @@ function poll_sensor($device, $class)
                         $sensor_value = $state_value;
                     }
                 }
+
+                if (is_numeric($sensor_value)) {
+                    $sensor_value = normalize_state_sensor_value($sensor_value);
+                }
             }//end if
             if (isset($mib)) {
                 // @phpstan-ignore unset.variable
