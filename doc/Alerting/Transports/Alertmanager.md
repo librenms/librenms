@@ -19,9 +19,11 @@ Labels can be a fixed string or a dynamic variable from the alert and its faults
 To set dynamic variables, the label's value must be the name of
 the variable you want to get (you can see all the variables in
 Alerts->Notifications by clicking on the Details icon of your alert
-when it is pending). If the variable's name does not match with an
-existing value the label's value will be the string you provided just
-as it was a fixed string.
+when it is pending). 
+
+Labels prefixed with “dyn_” are omitted from the transport message
+if no matching value exists in the alert data. Labels without this
+prefix are always included, using their fixed string value when a match is not found.
 
 Multiple Alertmanager URLs (comma separated) are supported. Each
 URL will be tried and the search will stop at the first success.
