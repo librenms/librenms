@@ -40,7 +40,7 @@ modules:
             data:
             -
                     oid: ENDACE-HWMON-MIB::hwmonSystemTemp
-                    num_oid: '.1.3.6.1.4.1.18418.16.1.4.0'
+                    num_oid: '.1.3.6.1.4.1.18418.16.1.4.{{ $index }}'
                     descr: "System Temperature (C)"
                     index: 0
             -
@@ -54,7 +54,7 @@ modules:
             data:
                 -
                     oid: ENDACE-HWMON-MIB::hwmonFanRedundancy
-                    num_oid: '.1.3.6.1.4.1.18418.16.1.1.0'
+                    num_oid: '.1.3.6.1.4.1.18418.16.1.1.{{ $index }}'
                     descr: "Fan Redundancy"
                     index: 0
                     state_name: hwmonFanRedundancy
@@ -63,7 +63,7 @@ modules:
                         - { value: 2, generic: 2, graph: 0, descr: 'fault' }
                 -
                     oid: ENDACE-HWMON-MIB::hwmonPsuRedundancy
-                    num_oid: '.1.3.6.1.4.1.18418.16.1.2.0'
+                    num_oid: '.1.3.6.1.4.1.18418.16.1.2.{{ $index }}'
                     descr: "PSU Redundancy"
                     index: 0
                     state_name: hwmonPsuRedundancy
@@ -72,7 +72,7 @@ modules:
                         - { value: 2, generic: 2, graph: 0, descr: 'fault' }
                 -
                     oid: ENDACE-HWMON-MIB::hwmonIntrusionStatus
-                    num_oid: '.1.3.6.1.4.1.18418.16.1.3.0'
+                    num_oid: '.1.3.6.1.4.1.18418.16.1.3.{{ $index }}'
                     descr: "Intrusion Status"
                     index: 0
                     state_name: hwmonIntrusionStatus

@@ -27,7 +27,7 @@ modules:
                 -
                     oid: l1BriTable
                     value: l1BriState
-                    num_oid: '.1.3.6.1.4.1.6666.1.1.1.3'
+                    num_oid: '.1.3.6.1.4.1.6666.1.3.1.2.{{ $index }}'
                     descr: 'Basic rate interface {{ $l1BriLabel }}'
                     state_name: l1BriLabel
                     group: '{{ $l1BriLabel }}'

@@ -9,7 +9,7 @@ modules:
 #            -
 #                # snMspsDiagnosticsUsageTable contains multiple disaparate items with no formal type identifiers, specific OIDs used
 #                oid: SN-MSPS-SCX200-MIB::snMspsDiagnosticsUsageValue.0
-#                num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.79.3.1.13.0'
+#                num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.79.3.1.13.{{ $index }}'
 #    mempools:
 #        additional_oids:
 #            data:
@@ -114,7 +114,7 @@ modules:
             data:
                 -
                     oid: snMspsFaultState
-                    num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.28.1.0'
+                    num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.28.1.{{ $index }}'
                     descr: "Faults"
                     group: System
                     state_name: "Faults"
@@ -141,7 +141,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'inactive' }
                 -
                     oid: snMspsCplugState
-                    num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.35.1.0'
+                    num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.35.1.{{ $index }}'
                     descr: 'C-Plug'
                     group: Plugs
                     state_name: "C-Plug"
@@ -154,7 +154,7 @@ modules:
 # probable KEY-PLUG only supported for Scalance W series
 #                -
 #                    oid: snMspsKeyPlugState
-#                    num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.35.1.0'
+#                    num_oid: '.1.3.6.1.4.1.4329.20.1.1.1.1.35.1.{{ $index }}'
 #                    descr: 'KEY-PLUG [{{ $snMspsKeyPlugHwSerialNumber }}]'
 #                    group: Plugs
 #                    state_name: "KEY-Plug"
