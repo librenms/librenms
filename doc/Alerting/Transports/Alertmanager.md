@@ -15,10 +15,8 @@ It is possible to configure as many label values as required in
 Alertmanager Options section. Every label and its value should be
 entered as a new line.
 
-Labels can be a fixed string or a dynamic variable from the alert.
-To set a dynamic variable your label must start with extra_ then
-complete with the name of your label (only characters, figures and
-underscore are allowed here). The value must be the name of
+Labels can be a fixed string or a dynamic variable from the alert and its faults.
+To set dynamic variables, the label's value must be the name of
 the variable you want to get (you can see all the variables in
 Alerts->Notifications by clicking on the Details icon of your alert
 when it is pending). If the variable's name does not match with an
