@@ -78,7 +78,6 @@ class DiscoverDevice implements ShouldQueue
             $this->deviceArray['os_group'] = $os_group;
         }
 
-
         Log::info(sprintf(<<<'EOH'
 Hostname:  %s %s
 ID:        %s
@@ -88,12 +87,13 @@ IP:        %s
 EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->device_id, $this->device->os, $this->device->ip));
 
         $poller_group = \App\Facades\LibrenmsConfig::get('distributed_poller_group');
-        if (!empty($poller_group) && $this->device->poller_group != $poller_group) {
+        if (! empty($poller_group) && $this->device->poller_group != $poller_group) {
             Log::info("Device does not belong in poller group: $poller_group\n");
+
             return false;
         }
 
-    return true;
+        return true;
     }
 
     private function discoverModules(): void
