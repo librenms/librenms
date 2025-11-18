@@ -62,10 +62,10 @@ class Alertmanager extends Transport
             $data[0]['labels'][$label] = strip_tags(
                 (string) ($alert_data[$value] ?? current(array_filter(
                     array_column($alert_data['faults'] ?? [], $value),
-                    fn($v) => ! empty($v)
+                    fn ($v) => ! empty($v)
                 )) ?? $value)
             );
-            if(str_starts_with((string) $label,'dyn_') && $data[0]['labels'][$label] == $value) {
+            if (str_starts_with((string) $label, 'dyn_') && $data[0]['labels'][$label] == $value) {
                 unset($data[0]['labels'][$label]);
             }
         }
