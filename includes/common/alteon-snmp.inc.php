@@ -1,12 +1,12 @@
 <?php
 
-use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Source\SnmpQueryInterface;
 
 if (! function_exists('alteon_snmp')) {
     function alteon_snmp(array $device): SnmpQueryInterface
     {
-        return \SnmpQuery::deviceArray($device)
+        return \SnmpQuery::cache()
+            ->deviceArray($device)
             ->mibDir('alteonos')
             ->mibDir('radware')
             ->mibDir('nortel')
@@ -29,11 +29,7 @@ if (! function_exists('alteon_walk_table')) {
             $rows[$index] = alteon_normalize_row((array) $entry);
         }
 
-        if (! empty($rows)) {
-            return $rows;
-        }
-
-        return alteon_legacy_walk_table($device, $oid);
+        return $rows;
     }
 }
 
@@ -48,11 +44,7 @@ if (! function_exists('alteon_walk_twopart')) {
             }
         }
 
-        if (! empty($table)) {
-            return $table;
-        }
-
-        return alteon_legacy_walk_twopart($device, $oid);
+        return $table;
     }
 }
 
@@ -61,20 +53,11 @@ if (! function_exists('alteon_snmp_get')) {
     {
         $value = alteon_snmp($device)->get($oid)->value();
 
-        if ($value !== null && $value !== '' && stripos((string) $value, 'No Such') === false) {
-            return $value;
+        if ($value === null || $value === '' || stripos((string) $value, 'No Such') !== false) {
+            return false;
         }
 
-        foreach (alteon_mib_dirs() as $mibDir) {
-            foreach (alteon_mib_names() as $mibName) {
-                $legacy = snmp_get($device, $oid, '-OQv', $mibName, $mibDir);
-                if ($legacy !== false && $legacy !== '' && stripos((string) $legacy, 'No Such') === false) {
-                    return $legacy;
-                }
-            }
-        }
-
-        return false;
+        return $value;
     }
 }
 
@@ -93,76 +76,5 @@ if (! function_exists('alteon_normalize_row')) {
         }
 
         return $normalized;
-    }
-}
-
-if (! function_exists('alteon_mib_dirs')) {
-    function alteon_mib_dirs(): array
-    {
-        return ['alteonos', 'radware', 'nortel'];
-    }
-}
-
-if (! function_exists('alteon_mib_names')) {
-    function alteon_mib_names(): array
-    {
-        static $mibs;
-
-        if ($mibs !== null) {
-            return $mibs;
-        }
-
-        $mibs = [];
-        $installDir = rtrim(LibrenmsConfig::get('install_dir') ?: base_path(), '/');
-        $mibDir = $installDir . '/mibs/alteonos';
-
-        $addMib = static function (string $mib) use (&$mibs): void {
-            if (! in_array($mib, $mibs, true)) {
-                $mibs[] = $mib;
-            }
-        };
-
-        foreach (['Radware', 'Nortel'] as $variant) {
-            $mibFile = $mibDir . "/ALTEON-CHEETAH-LAYER4-$variant-MIB";
-            if (is_file($mibFile)) {
-                $addMib('+' . $mibFile);
-            }
-        }
-
-        $addMib('layer4');
-
-        return $mibs;
-    }
-}
-
-if (! function_exists('alteon_legacy_walk_table')) {
-    function alteon_legacy_walk_table(array $device, array|string $oid): array
-    {
-        foreach (alteon_mib_dirs() as $mibDir) {
-            foreach (alteon_mib_names() as $mibName) {
-                $data = snmpwalk_cache_multi_oid($device, $oid, [], $mibName, $mibDir);
-                if (! empty($data)) {
-                    return $data;
-                }
-            }
-        }
-
-        return [];
-    }
-}
-
-if (! function_exists('alteon_legacy_walk_twopart')) {
-    function alteon_legacy_walk_twopart(array $device, array|string $oid): array
-    {
-        foreach (alteon_mib_dirs() as $mibDir) {
-            foreach (alteon_mib_names() as $mibName) {
-                $data = snmpwalk_cache_twopart_oid($device, $oid, [], $mibName, $mibDir);
-                if (! empty($data)) {
-                    return $data;
-                }
-            }
-        }
-
-        return [];
     }
 }

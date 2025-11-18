@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Sensor;
+
 if (! function_exists('alteonos_sensor_types')) {
     function alteonos_sensor_types(): array
     {
@@ -89,26 +91,38 @@ if (! function_exists('alteonos_loadbalancer_fetch')) {
     function alteonos_loadbalancer_fetch(array $device, string $tab): array
     {
         $deviceId = (int) ($device['device_id'] ?? 0);
-
         $types = alteonos_sensor_types_for_tab($tab);
+
         if ($deviceId <= 0 || empty($types)) {
             return [];
         }
 
-        $placeholders = implode(',', array_fill(0, count($types), '?'));
-        $params = array_merge([$deviceId, 'state'], $types);
+        return Sensor::query()
+            ->with('translations')
+            ->where('device_id', $deviceId)
+            ->where('sensor_class', 'state')
+            ->whereIn('sensor_type', $types)
+            ->orderBy('sensor_descr')
+            ->get()
+            ->map(function (Sensor $sensor) {
+                $translation = $sensor->translations->firstWhere('state_value', $sensor->sensor_current);
 
-        $sql = 'SELECT s.sensor_id, s.sensor_descr, s.sensor_current, s.sensor_prev, s.sensor_limit, '
-            . 's.sensor_limit_low, s.sensor_index, s.sensor_type, s.lastupdate, '
-            . 'st.state_descr, st.state_value, st.state_generic_value '
-            . 'FROM sensors AS s '
-            . 'LEFT JOIN sensors_to_state_indexes AS sidx ON s.sensor_id = sidx.sensor_id '
-            . 'LEFT JOIN state_translations AS st '
-            . 'ON sidx.state_index_id = st.state_index_id AND st.state_value = s.sensor_current '
-            . 'WHERE s.device_id = ? AND s.sensor_class = ? AND s.sensor_type IN (' . $placeholders . ') '
-            . 'ORDER BY s.sensor_descr';
-
-        return dbFetchRows($sql, $params);
+                return [
+                    'sensor_id' => $sensor->sensor_id,
+                    'sensor_descr' => $sensor->sensor_descr,
+                    'sensor_current' => $sensor->sensor_current,
+                    'sensor_prev' => $sensor->sensor_prev,
+                    'sensor_limit' => $sensor->sensor_limit,
+                    'sensor_limit_low' => $sensor->sensor_limit_low,
+                    'sensor_index' => $sensor->sensor_index,
+                    'sensor_type' => $sensor->sensor_type,
+                    'lastupdate' => $sensor->lastupdate,
+                    'state_descr' => $translation->state_descr ?? null,
+                    'state_value' => $translation->state_value ?? null,
+                    'state_generic_value' => $translation->state_generic_value ?? null,
+                ];
+            })
+            ->all();
     }
 }
 

@@ -22,7 +22,7 @@ foreach ($rows as $row) {
     }
 
     $groups[$groupId]['heading'] = $groups[$groupId]['heading']
-        ?? trim(preg_replace('/\s*\([^)]*\)\s*$/', '', $sensorDescr))
+        ?? trim((string) preg_replace('/\s*\([^)]*\)\s*$/', '', $sensorDescr))
         ?: sprintf('Real Server Group %s', $groupId);
 
     $stateDescrRaw = trim((string) ($row['state_descr'] ?? ''));
@@ -55,7 +55,7 @@ if (empty($groups)) {
     return;
 }
 
-foreach ($groups as $groupId => $group) {
+foreach ($groups as $group) {
     echo '<div class="panel panel-default">';
     echo '<div class="panel-heading"><h3 class="panel-title">' . htmlspecialchars($group['heading'], ENT_QUOTES, 'UTF-8') . '</h3></div>';
     echo '<div class="panel-body">';
@@ -72,7 +72,7 @@ foreach ($groups as $groupId => $group) {
 
     foreach ($group['members'] as $member) {
         $stateClass = alteonos_state_class($member['state_generic']);
-        $stateText = htmlspecialchars($member['state_descr'], ENT_QUOTES, 'UTF-8');
+        $stateText = htmlspecialchars((string) $member['state_descr'], ENT_QUOTES, 'UTF-8');
         $value = $member['value'] !== null ? htmlspecialchars((string) $member['value'], ENT_QUOTES, 'UTF-8') : '-';
         $updated = $member['updated'] ? htmlspecialchars((string) $member['updated'], ENT_QUOTES, 'UTF-8') : '-';
 
