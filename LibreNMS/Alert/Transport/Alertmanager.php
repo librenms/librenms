@@ -60,14 +60,12 @@ class Alertmanager extends Transport
         foreach ($alertmanager_opts as $label => $value) {
             // To allow dynamic values
             $data[0]['labels'][$label] = strip_tags(
-                $alert_data[$value] 
-                ?? current(array_filter(
+                (string) ($alert_data[$value] ?? current(array_filter(
                     array_column($alert_data['faults'] ?? [], $value),
                     fn($v) => ! empty($v)
-                )) 
-                ?? $value
+                )) ?? $value)
             );
-            if(str_starts_with($label,'dyn_') && $data[0]['labels'][$label] == $value) {
+            if(str_starts_with((string) $label,'dyn_') && $data[0]['labels'][$label] == $value) {
                 unset($data[0]['labels'][$label]);
             }
         }
