@@ -96,7 +96,7 @@ foreach ($rrd_list as $rrd) {
             $rrd_options[] = 'GPRINT:totin' . $i . ':%6.' . $float_precision . "lf%s$total_units";
         }
 
-        $rrd_options[] = '\l';
+        $rrd_options[] = 'COMMENT:\l';
     }
 
     $rrd_options[] = 'HRULE:0#' . $colour_out . ':' . $descr_out;
