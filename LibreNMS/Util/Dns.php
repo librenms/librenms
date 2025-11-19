@@ -26,31 +26,50 @@
 
 namespace LibreNMS\Util;
 
+use AddressInfo;
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Interfaces\Geocoder;
+use Net_DNS2_Exception;
+use Net_DNS2_Lookups;
 use Net_DNS2_Resolver;
 
 class Dns implements Geocoder
 {
+    /**
+     * @var array<string, array<AddressInfo>>
+     */
+    private array $cache = [];
+
     public function __construct(protected Net_DNS2_Resolver $resolver)
     {
     }
 
-    public static function lookupIp(Device $device): ?string
+    public function lookupIp(Device $device): ?string
     {
+        if ($device->overwrite_ip) {
+            return $device->overwrite_ip;
+        }
+
         if (IP::isValid($device->hostname)) {
             return $device->hostname;
         }
 
-        try {
-            if ($device->transport == 'udp6' || $device->transport == 'tcp6') {
-                return dns_get_record($device['hostname'], DNS_AAAA)[0]['ipv6'] ?? null;
-            }
+        $result = match (LibrenmsConfig::get('dns.resolution_mode')) {
+            'prefer_ipv6' => $this->resolveIP($device->hostname, AddressFamily::IPv6) ?? $this->resolveIP($device->hostname),
+            'ipv6_only' => $this->resolveIP($device->hostname, AddressFamily::IPv6),
+            'prefer_ipv4' => $this->resolveIP($device->hostname, AddressFamily::IPv4) ?? $this->resolveIP($device->hostname),
+            'ipv4_only' => $this->resolveIP($device->hostname, AddressFamily::IPv4),
+            default => $this->resolveIP($device->hostname),
+        };
 
-            return dns_get_record($device['hostname'], DNS_A)[0]['ip'] ?? null;
-        } catch (\Exception) {
-            return null;
+        if ($result === false)  {
+            // failed to resolve IP, if ip is set, determine if we should clear it
+            return $this->lookupFailedShouldClearIpCache($device) ? null : $device->ip;
         }
+
+        return $result;
     }
 
     /**
@@ -58,13 +77,13 @@ class Dns implements Geocoder
      * @param  string  $record  DNS Record which should be searched
      * @return array List of matching records
      */
-    public function getRecord($domain, $record = 'A')
+    public function getRecord(string $domain, string $record = 'A'): array
     {
         try {
             $ret = $this->resolver->query($domain, $record);
 
             return $ret->answer;
-        } catch (\Net_DNS2_Exception $e) {
+        } catch (Net_DNS2_Exception $e) {
             d_echo('::query() failed: ' . $e->getMessage());
 
             return [];
@@ -73,7 +92,7 @@ class Dns implements Geocoder
 
     public function getCoordinates($hostname)
     {
-        $r = $this->getRecord($hostname, 'LOC');
+        $r = $this->getRecord((string) $hostname, 'LOC');
 
         foreach ($r as $record) {
             return [
@@ -83,5 +102,62 @@ class Dns implements Geocoder
         }
 
         return [];
+    }
+
+    public function resolveIP(string $hostname, ?AddressFamily $addressFamily = null): string|null|false
+    {
+        $cacheKey = $hostname . ($addressFamily ? ":{$addressFamily->value}" : '');
+
+        if (isset($this->cache[$cacheKey])) {
+            $info = $this->cache[$cacheKey];
+        } else {
+            $hints = match ($addressFamily) {
+                AddressFamily::IPv4 => ['ai_family' => AF_INET],
+                AddressFamily::IPv6 => ['ai_family' => AF_INET6],
+                default => [],
+            };
+
+            $info = socket_addrinfo_lookup($hostname, null, $hints);
+
+            if ($info === false) {
+                return false;
+            }
+
+            $this->cache[$cacheKey] = $info;
+        }
+
+        $addr_info = socket_addrinfo_explain($info[0]);
+        $ai_addr = $addr_info['ai_addr'];
+
+        return $ai_addr['sin6_addr'] ?? $ai_addr['sin_addr'] ?? null;
+    }
+
+    private function lookupFailedShouldClearIpCache(Device $device): bool
+    {
+        if ($device->ip === null) {
+            return false; // if IP is already cleared, we don't need to check again
+        }
+
+        try {
+            $types = match (LibrenmsConfig::get('dns.resolution_mode')) {
+                'prefer_ipv4' => ['A', 'AAAA'],
+                'ipv6_only' => ['AAAA'],
+                'ipv4_only' => ['A'],
+                'os' => in_array($device->transport, ['udp', 'tcp']) ? ['A', 'AAAA'] : ['AAAA', 'A'], // if the setting is default try to detect order
+                default => ['AAAA', 'A'],
+            };
+
+            foreach ($types as $type) {
+                $this->resolver->query($device->ip, $type);
+            }
+        } catch (\Net_DNS2_Exception $e) {
+            if ($e->getCode() === Net_DNS2_Lookups::RCODE_NXDOMAIN) {
+                return true;
+            }
+
+            // ignore other errors such as temp fail
+        }
+
+        return false;
     }
 }

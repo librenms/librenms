@@ -1942,6 +1942,20 @@
             "order": 2,
             "type": "integer"
         },
+        "dns.resolution_mode": {
+            "default": "os_default",
+            "group": "system",
+            "section": "dns",
+            "order": 0,
+            "type": "select",
+            "options": {
+                "os": "OS (Default)",
+                "prefer_ipv6": "Prefer IPv6",
+                "ipv6_only": "IPv6 Only",
+                "prefer_ipv4": "Prefer IPv4",
+                "ipv4_only": "IPv4 Only"
+            }
+        },
         "graphing.availability": {
             "group": "poller",
             "section": "availability",

@@ -84,6 +84,7 @@ return [
             'billing' => ['name' => 'Billing'],
             'cleanup' => ['name' => 'Cleanup'],
             'proxy' => ['name' => 'Proxy'],
+            'dns' => ['name' => 'DNS'],
             'updates' => ['name' => 'Updates'],
             'scheduledtasks' => ['name' => 'Scheduled Tasks'],
             'server' => ['name' => 'Server'],
@@ -829,6 +830,17 @@ return [
         'distributed_poller_memcached_port' => [
             'description' => 'Memcached port',
             'help' => 'The port for the memcached server. Default is 11211',
+        ],
+        'dns.resolution_mode' => [
+            'description' => 'DNS Resolution Mode',
+            'help' => 'Set the DNS resolution mode. This is used to determine how LibreNMS resolves DNS names. It is highly suggested to leave this to OS as all OS now implement RFC-6555 "Happy Eyeballs"',
+            'options' => [
+                'os' => 'OS (default)',
+                'prefer_ipv6' => 'IPv6 preferred',
+                'ipv6_only' => 'IPv6 only',
+                'prefer_ipv4' => 'IPv4 preferred',
+                'ipv4_only' => 'IPv4 only',
+            ]
         ],
         'enable_ports_etherlike' => [
             'description' => 'Enable etherlike graphs for ports',
