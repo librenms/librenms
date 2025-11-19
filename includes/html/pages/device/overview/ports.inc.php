@@ -31,7 +31,7 @@ if (ObjectCache::portCounts(['total'], $device['device_id'])['total'] > 0) {
     $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . ' - Device Traffic');
 
     echo \LibreNMS\Util\Url::overlibLink($link, $graph, $overlib_content);
-    
+
     $ports = ObjectCache::portCounts(['total', 'up', 'down', 'disabled'], $device['device_id']);
     echo '<div class="panel-body">
     <a class="btn btn-default" role="button" href="' . \LibreNMS\Util\Url::deviceUrl($device['device_id'], ['tab' => 'ports']) . '">Total: <span class="badge">' . $ports['total'] . '</span></a>
