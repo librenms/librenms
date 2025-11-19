@@ -110,7 +110,7 @@ foreach ($rrd_list as $rrd) {
             $rrd_options[] = 'GPRINT:totout' . $i . ':%6.' . $float_precision . "lf%s$total_units";
         }
 
-        $rrd_options[] = '\l';
+        $rrd_options[] = 'COMMENT:\l';
     }
 
     $rrd_options[] = "COMMENT:\l";
