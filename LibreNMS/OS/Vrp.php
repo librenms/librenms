@@ -755,7 +755,7 @@ class Vrp extends OS implements
                         $vlansOnPort = StringHelpers::bitsToIndices($vlanArray[$oid]);
                         foreach ($vlansOnPort as $vlanIdOnPort) {
                             $vlanIdOnPort = ($hilo == 'High') ? ($vlanIdOnPort + 2047) : ($vlanIdOnPort - 1);
-                            $ports->push(new PortVlan([
+                            if ($vlans->firstWhere('vlan_vlan', $vlanIdOnPort) !== null) $ports->push(new PortVlan([
                                 'vlan' => $vlanIdOnPort,
                                 'baseport' => $baseport,
                                 'untagged' => 0,
