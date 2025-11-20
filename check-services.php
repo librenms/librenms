@@ -34,14 +34,14 @@ $datastore = Datastore::init($options);
 echo "Starting service polling run:\n\n";
 $polled_services = 0;
 
-$where = '';
-$params = [];
-$services = Device::orderBy('devices.device_id', 'DESC')
+$services = Device::select('devices.*', 'services.*', 'devices_attribs.attrib_value')
     ->join('services', 'devices.device_id', '=', 'services.device_id')
     ->leftJoin('devices_attribs', function($join) {
         $join->on('devices.device_id', '=', 'devices_attribs.device_id')
              ->where('devices_attribs.attrib_type', '=', 'override_icmp_disable');
-    });
+    })
+    ->where('devices.disabled', 0)
+    ->orderBy('devices.device_id', 'DESC');
 
 if (isset($options['h'])) {
     if (is_numeric($options['h'])) {
