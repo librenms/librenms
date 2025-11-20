@@ -487,7 +487,8 @@ class DnsTest extends TestCase
             ->andReturn($mode);
     }
 
-    private function expectAddrInfo(string $hostname, ?AddressFamily $af, array $result, int $times = 1): void {
+    private function expectAddrInfo(string $hostname, ?AddressFamily $af, array $result, int $times = 1): void
+    {
         $this->socketMock->shouldReceive('getAddrInfo')
             ->with($hostname, $af)
             ->times($times)
