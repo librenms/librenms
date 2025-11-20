@@ -36,7 +36,7 @@ $polled_services = 0;
 
 $services = Device::select('devices.*', 'services.*', 'devices_attribs.attrib_value')
     ->join('services', 'devices.device_id', '=', 'services.device_id')
-    ->leftJoin('devices_attribs', function($join) {
+    ->leftJoin('devices_attribs', function ($join): void {
         $join->on('devices.device_id', '=', 'devices_attribs.device_id')
              ->where('devices_attribs.attrib_type', '=', 'override_icmp_disable');
     })
