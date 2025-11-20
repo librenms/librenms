@@ -134,7 +134,7 @@ class Billing
     private static function get95thagg($bill_id, $datefrom, $dateto): float
     {
         $measurements = DB::table('bill_data')->where('bill_id', $bill_id)->where('timestamp', '>', $datefrom)->where('timestamp', '<=', $dateto)->count();
-        $measurement_95th = max(1,round($measurements / 100 * 95) - 1);
+        $measurement_95th = max(1, round($measurements / 100 * 95) - 1);
 
         $a_95th = DB::table('bill_data')
             ->selectRaw('(delta / period * 8) AS rate')
@@ -151,7 +151,7 @@ class Billing
     private static function get95thIn($bill_id, $datefrom, $dateto): float
     {
         $measurements = DB::table('bill_data')->where('bill_id', $bill_id)->where('timestamp', '>', $datefrom)->where('timestamp', '<=', $dateto)->count();
-        $measurement_95th = max(1,round($measurements / 100 * 95) - 1);
+        $measurement_95th = max(1, round($measurements / 100 * 95) - 1);
 
         $a_95th = DB::table('bill_data')
             ->selectRaw('(in_delta / period * 8) AS rate')
