@@ -1,6 +1,7 @@
 <?php
 
 use DeviceCache;
+
 if (! function_exists('alteonos_sensor_types')) {
     function alteonos_sensor_types(): array
     {

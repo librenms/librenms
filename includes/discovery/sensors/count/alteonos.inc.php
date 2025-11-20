@@ -6,7 +6,6 @@ if ($device['os'] !== 'alteonos') {
 
 require_once base_path('includes/common/alteon-snmp.inc.php');
 
-
 echo 'Alteon ';
 
 $realServers = alteon_real_server_definitions($device);
@@ -72,8 +71,8 @@ foreach ($groupSessions as $index => $entry) {
     $oidIndex = $groupSessionIsEnh ? alteon_snmp_string_index($entryIndex !== '' ? $entryIndex : $groupKey) : (string) $index;
     $groupLabel = $realGroups[$groupKey]['label'] ?? "Real Group $groupKey";
     $heading = $groupLabel;
-    if (stripos($heading, 'real group') === 0) {
-        $heading = preg_replace('/^Real Group/i', 'Real Server Group', $heading);
+    if (stripos((string) $heading, 'real group') === 0) {
+        $heading = preg_replace('/^Real Group/i', 'Real Server Group', (string) $heading);
     } else {
         $heading = 'Real Server Group ' . $heading;
     }
@@ -131,8 +130,8 @@ foreach ($groupLabels as $groupIndex => $groupInfo) {
     $value = $groupFailureTotals[$groupKey] ?? 0;
     $groupLabel = $groupInfo['label'] ?? "Real Group $groupKey";
     $heading = $groupLabel;
-    if (stripos($heading, 'real group') === 0) {
-        $heading = preg_replace('/^Real Group/i', 'Real Server Group', $heading);
+    if (stripos((string) $heading, 'real group') === 0) {
+        $heading = preg_replace('/^Real Group/i', 'Real Server Group', (string) $heading);
     } else {
         $heading = 'Real Server Group ' . $heading;
     }

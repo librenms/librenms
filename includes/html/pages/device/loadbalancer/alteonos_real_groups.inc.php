@@ -21,8 +21,7 @@ foreach ($rows as $row) {
         $ip = $match[1];
     }
 
-    $groups[$groupId]['heading'] = $groups[$groupId]['heading']
-        ?? sprintf('Real Server Group %s', $groupId);
+    $groups[$groupId]['heading'] ??= sprintf('Real Server Group %s', $groupId);
 
     $stateDescrRaw = trim((string) ($row['state_descr'] ?? ''));
     $stateDescr = $stateDescrRaw !== '' ? $stateDescrRaw : null;

@@ -81,7 +81,6 @@ if (! function_exists('alteon_enum_to_int')) {
         return null;
     }
 }
-
 if (! function_exists('alteon_state_text_map')) {
     function alteon_state_text_map(array $states): array
     {
@@ -95,9 +94,6 @@ if (! function_exists('alteon_state_text_map')) {
         return $map;
     }
 }
-
-
-
 
 if (! function_exists('alteon_format_virtual_service_label')) {
     function alteon_format_virtual_service_label(

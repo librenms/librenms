@@ -354,7 +354,7 @@ if (! function_exists('alteon_snmp_string_index')) {
     function alteon_snmp_string_index(string $value): string
     {
         $value = (string) $value;
-        $chars = array_map('ord', str_split($value));
+        $chars = array_map(ord(...), str_split($value));
         array_unshift($chars, count($chars));
 
         return implode('.', $chars);
@@ -369,7 +369,7 @@ if (! function_exists('alteon_decode_display_index')) {
             return $index;
         }
 
-        $parts = array_map('intval', explode('.', $index));
+        $parts = array_map(intval(...), explode('.', $index));
         if (count($parts) < 2) {
             return $index;
         }
