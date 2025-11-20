@@ -1,7 +1,6 @@
 <?php
 
-use App\Models\Sensor;
-
+use DeviceCache;
 if (! function_exists('alteonos_sensor_types')) {
     function alteonos_sensor_types(): array
     {
@@ -163,21 +162,27 @@ if (! function_exists('alteonos_state_lookup')) {
 if (! function_exists('alteonos_loadbalancer_fetch')) {
     function alteonos_loadbalancer_fetch(array $device, string $tab): array
     {
-        $deviceId = (int) ($device['device_id'] ?? 0);
         $types = alteonos_sensor_types_for_tab($tab);
 
-        if ($deviceId <= 0 || empty($types)) {
+        if (empty($types)) {
             return [];
         }
 
-        return Sensor::query()
-            ->with('translations')
-            ->where('device_id', $deviceId)
+        $cacheDevice = DeviceCache::hasPrimary()
+            ? DeviceCache::getPrimary()
+            : DeviceCache::get($device['device_id'] ?? null);
+
+        if (! $cacheDevice->device_id) {
+            return [];
+        }
+
+        return $cacheDevice->sensors()
             ->where('sensor_class', 'state')
             ->whereIn('sensor_type', $types)
+            ->with('translations')
             ->orderBy('sensor_descr')
             ->get()
-            ->map(function (Sensor $sensor) {
+            ->map(function ($sensor) {
                 $translation = $sensor->translations->firstWhere('state_value', $sensor->sensor_current);
                 $stateDescr = $translation->state_descr ?? null;
                 $stateValue = $translation->state_value ?? null;
@@ -280,18 +285,17 @@ if (! function_exists('alteonos_strip_multiindex')) {
     function alteonos_strip_multiindex(string $descr, string $sensorType): string
     {
         $map = [
-            'slbRealServer' => 'Real Server',
-            'slbEnhRealServer' => 'Real Server',
-            'slbStatRealServer' => 'Real Server',
             'slbStatEnhRServer' => 'Real Server',
-            'slbCurCfgEnhVirtServer' => 'Virt Server',
-            'slbCurCfgVirtServer' => 'Virt Server',
+            'slbEnhRealServer' => 'Real Server',
+            'slbStatEnhGroup' => 'Real Server Group',
             'slbOperEnhGroupRealServerRuntime' => 'Real Server Group',
             'slbOperEnhGroupRealServerRuntimeStatus' => 'Real Server Group',
+            'slbCurCfgEnhVirtServer' => 'Virt Server',
+            'slbRealServer' => 'Real Server',
+            'slbStatGroup' => 'Real Server Group',
             'slbOperGroupRealServer' => 'Real Server Group',
             'slbOperGroupRealServerState' => 'Real Server Group',
-            'slbStatEnhGroup' => 'Real Server Group',
-            'slbStatGroup' => 'Real Server Group',
+            'slbCurCfgVirtServer' => 'Virt Server',
         ];
 
         foreach ($map as $typePrefix => $label) {
