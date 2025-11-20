@@ -26,7 +26,6 @@
 
 namespace LibreNMS\Util;
 
-use AddressInfo;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use LibreNMS\Enum\AddressFamily;
@@ -37,12 +36,7 @@ use Net_DNS2_Resolver;
 
 class Dns implements Geocoder
 {
-    /**
-     * @var array<string, array<AddressInfo>>
-     */
-    private array $cache = [];
-
-    public function __construct(protected Net_DNS2_Resolver $resolver)
+    public function __construct(protected Net_DNS2_Resolver $resolver, protected Socket $socket)
     {
     }
 
@@ -90,7 +84,7 @@ class Dns implements Geocoder
         }
     }
 
-    public function getCoordinates($hostname)
+    public function getCoordinates($hostname): array
     {
         $r = $this->getRecord((string) $hostname, 'LOC');
 
@@ -106,33 +100,18 @@ class Dns implements Geocoder
 
     public function resolveIP(string $hostname, ?AddressFamily $addressFamily = null): string|null|false
     {
-        $cacheKey = $hostname . ($addressFamily ? ":{$addressFamily->value}" : '');
+        $info = $this->socket->getAddrInfo($hostname, $addressFamily);
 
-        if (isset($this->cache[$cacheKey])) {
-            $info = $this->cache[$cacheKey];
-        } else {
-            $hints = match ($addressFamily) {
-                AddressFamily::IPv4 => ['ai_family' => AF_INET],
-                AddressFamily::IPv6 => ['ai_family' => AF_INET6],
-                default => [],
-            };
-
-            $info = socket_addrinfo_lookup($hostname, null, $hints);
-
-            if ($info === false) {
-                return false;
-            }
-
-            $this->cache[$cacheKey] = $info;
+        if ($info === false) {
+            return false;
         }
 
-        $addr_info = socket_addrinfo_explain($info[0]);
-        $ai_addr = $addr_info['ai_addr'];
+        $ai_addr = $info[0]['ai_addr'] ?? [];
 
         return $ai_addr['sin6_addr'] ?? $ai_addr['sin_addr'] ?? null;
     }
 
-    private function lookupFailedShouldClearIpCache(Device $device): bool
+    public function lookupFailedShouldClearIpCache(Device $device): bool
     {
         if ($device->ip === null) {
             return false; // if IP is already cleared, we don't need to check again
