@@ -70,7 +70,7 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
             ->get();
     }
 
-    $now = DB::table('bills')->selectRaw("NOW() as now")->first()->now;
+    $now = DB::table('bills')->selectRaw('NOW() as now')->first()->now;
 
     $delta = 0;
     $in_delta = 0;
@@ -92,7 +92,7 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
             $port_data->last_out_measurement = $last_counters['out_counter'];
             $port_data->last_out_delta = $last_counters['out_delta'];
 
-            $tmp_period = DB::table('bills')->selectRaw("UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) - UNIX_TIMESTAMP('" . $last_counters['timestamp'] . "') as period")->first()->period ?: 1;// Safe guard for no period
+            $tmp_period = DB::table('bills')->selectRaw('UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) - UNIX_TIMESTAMP(?) as period', [$last_counters['timestamp']])->first()->period ?: 1;// Safe guard for no period
 
             if ($port_data->ifSpeed > 0 && (delta_to_bits($port_data->in_measurement, $tmp_period) - delta_to_bits($port_data->last_in_measurement, $tmp_period)) > $port_data->ifSpeed) {
                 $port_data->in_delta = $port_data->last_in_delta;
@@ -128,7 +128,7 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
             // NOTE: casting to string for mysqli bug (fixed by mysqlnd)
             $fields = ['timestamp' => $now, 'in_counter' => (string) set_numeric($port_data->in_measurement), 'out_counter' => (string) set_numeric($port_data->out_measurement), 'in_delta' => (string) set_numeric($port_data->in_delta), 'out_delta' => (string) set_numeric($port_data->out_delta)];
             DB::table('bill_port_counters')->updateOrInsert(['port_id' => $port_id, 'bill_id' => $bill_id], $fields);
-            
+
         } else {
             echo "WATCH out! - Wrong counters. Table 'bill_port_counters' not updated\n";
             logfile("WATCH out! - Wrong counters. Table 'bill_port_counters' not updated");
@@ -146,7 +146,7 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
         $prev_in_delta = $last_data['in_delta'];
         $prev_out_delta = $last_data['out_delta'];
         $prev_timestamp = $last_data['timestamp'];
-        $period = DB::table('bills')->selectRaw("UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) - UNIX_TIMESTAMP('" . $prev_timestamp . "') as period")->first()->period ?: 1;// Safe guard for no period
+        $period = DB::table('bills')->selectRaw('UNIX_TIMESTAMP(CURRENT_TIMESTAMP()) - UNIX_TIMESTAMP(?) as period', [$prev_timestamp])->first()->period ?: 1;// Safe guard for no period
     } else {
         $prev_delta = '0';
         $period = '0';
