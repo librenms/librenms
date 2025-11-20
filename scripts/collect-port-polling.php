@@ -38,8 +38,6 @@ if (isset($options['help'])) {
     exit(0);
 }
 
-$where = '';
-$params = [];
 $devices = Device::where('status', 1)->where('disabled', 0)->orderBy('hostname', 'ASC');
 if (isset($options['h'])) {
     if (is_numeric($options['h'])) {
