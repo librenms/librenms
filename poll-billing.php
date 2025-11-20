@@ -128,7 +128,6 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
             // NOTE: casting to string for mysqli bug (fixed by mysqlnd)
             $fields = ['timestamp' => $now, 'in_counter' => (string) set_numeric($port_data->in_measurement), 'out_counter' => (string) set_numeric($port_data->out_measurement), 'in_delta' => (string) set_numeric($port_data->in_delta), 'out_delta' => (string) set_numeric($port_data->out_delta)];
             DB::table('bill_port_counters')->updateOrInsert(['port_id' => $port_id, 'bill_id' => $bill_id], $fields);
-
         } else {
             echo "WATCH out! - Wrong counters. Table 'bill_port_counters' not updated\n";
             logfile("WATCH out! - Wrong counters. Table 'bill_port_counters' not updated");
