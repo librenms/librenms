@@ -15,6 +15,7 @@ foreach ($portData as $portNumber => $entry) {
 
     $alias = $entry['ALTEON-CHEETAH-SWITCH-MIB::agPortCurCfgPortAlias'] ?? '';
     if ($alias !== '') {
-        $port_stats[$ifIndex]['ifAlias'] = $alias;
+        $aliasValue = ctype_digit((string) $alias) ? 'Port ' . $alias : $alias;
+        $port_stats[$ifIndex]['ifAlias'] = $aliasValue;
     }
 }
