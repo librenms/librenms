@@ -38,8 +38,10 @@ $where = '';
 $params = [];
 $services = Device::orderBy('devices.device_id', 'DESC')
     ->join('services', 'devices.device_id', '=', 'services.device_id')
-    ->leftJoin('devices_attribs', 'devices.device_id', '=', 'devices_attribs.device_id')
-    ->where('devices_attribs.attrib_type', 'override_icmp_disable');
+    ->leftJoin('devices_attribs', function($join) {
+        $join->on('devices.device_id', '=', 'devices_attribs.device_id')
+             ->where('devices_attribs.attrib_type', '=', 'override_icmp_disable');
+    });
 
 if (isset($options['h'])) {
     if (is_numeric($options['h'])) {
