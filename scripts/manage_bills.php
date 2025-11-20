@@ -28,10 +28,11 @@ function list_bills($bill_name)
             exit(1);
         } else {
             echo "Found bill {$bill[0]->bill_name} ({$bill[0]->bill_id})\n";
+            $bill = $bill[0];
         }
     }
 
-    return $bill[0]->bill_id;
+    return $bill->bill_id;
 }
 
 // Create a new bill.
@@ -108,7 +109,7 @@ function print_help(): never
     echo "-s <sysName glob>     sysName to match (Cannot be used with -h)\n";
     echo "-h <hostname glob>    Hostname to match (Cannot be used with -s)\n";
     echo "-i <Interface description glob>   Interface description to match\n";
-    echo "-f flush     Flush all ports from a bill before adding adding ports\n";
+    echo "-f flush     Flush all ports from a bill before adding ports\n";
     echo "Creating bills\n";
     echo "-n Create new bill\n";
     echo "-t bill type (cdr or quota)\n";
@@ -155,7 +156,7 @@ $bill_name = str_replace('*', '%', $options['b']);
 $intf_glob = str_replace('*', '%', $options['i']);
 $id = list_bills($bill_name);
 
-if (isset($options['f'])) {
+if (isset($options['f']) && $id !== null) {
     $flush_ret = flush_bill($id);
     exit;
 }

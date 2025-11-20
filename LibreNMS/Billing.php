@@ -83,6 +83,9 @@ class Billing
     {
         $oid = 'IF-MIB::ifHC' . $inout . 'Octets.' . $id;
         $device = DeviceCache::get($host);
+        if ($device === null) {
+            return 0;
+        }
         $value = SnmpQuery::device($device)->get($oid)->value();
 
         if (! is_numeric($value)) {
@@ -131,7 +134,7 @@ class Billing
     private static function get95thagg($bill_id, $datefrom, $dateto): float
     {
         $measurements = DB::table('bill_data')->where('bill_id', $bill_id)->where('timestamp', '>', $datefrom)->where('timestamp', '<=', $dateto)->count();
-        $measurement_95th = (round($measurements / 100 * 95) - 1);
+        $measurement_95th = (max(1,round($measurements / 100 * 95) - 1));
 
         $a_95th = DB::table('bill_data')
             ->selectRaw('(delta / period * 8) AS rate')
@@ -148,7 +151,7 @@ class Billing
     private static function get95thIn($bill_id, $datefrom, $dateto): float
     {
         $measurements = DB::table('bill_data')->where('bill_id', $bill_id)->where('timestamp', '>', $datefrom)->where('timestamp', '<=', $dateto)->count();
-        $measurement_95th = (round($measurements / 100 * 95) - 1);
+        $measurement_95th = (max(1,round($measurements / 100 * 95) - 1));
 
         $a_95th = DB::table('bill_data')
             ->selectRaw('(in_delta / period * 8) AS rate')
@@ -184,10 +187,10 @@ class Billing
         $data = [];
 
         $sum_data = self::getSum($bill_id, $datefrom, $dateto);
-        $mtot = $sum_data->total;
-        $mtot_in = $sum_data->inbound;
-        $mtot_out = $sum_data->outbound;
-        $ptot = $sum_data->period;
+        $mtot = $sum_data->total ?? 0;
+        $mtot_in = $sum_data->inbound ?? 0;
+        $mtot_out = $sum_data->outbound ?? 0;
+        $ptot = $sum_data->period ?? 1;
 
         $data['rate_95th_in'] = self::get95thIn($bill_id, $datefrom, $dateto);
         $data['rate_95th_out'] = self::get95thout($bill_id, $datefrom, $dateto);
@@ -463,7 +466,7 @@ class Billing
                 array_push($tot_data, 0);
             }
         } elseif ($imgtype == 'hour') {
-            foreach (DB::table('bill_data')->selectRaw('DISTINCT HOUR(timestamp) as hour, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out')->where('bill_id', $bill_id)->whereRaw('timestamp >= FROM_UNIXTIME( ? )', [$from])->whereRaw('timestamp <= FROM_UNIXTIME( ? )', [$to])->groupByRaw('HOUR(timestamp)')->orderBy('timestamp', 'asc')->get() as $data) {
+            foreach (DB::table('bill_data')->selectRaw('DISTINCT HOUR(timestamp) as hour, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out')->where('bill_id', $bill_id)->whereRaw('timestamp >= FROM_UNIXTIME( ? )', [$from])->whereRaw('timestamp <= FROM_UNIXTIME( ? )', [$to])->groupByRaw('HOUR(timestamp)')->orderByRaw('HOUR(timestamp) ASC')->get() as $data) {
                 array_push($ticklabels, sprintf('%02d', $data->hour) . ':00');
                 array_push($in_data, $data->traf_in ?? 0);
                 array_push($out_data, $data->traf_out ?? 0);

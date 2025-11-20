@@ -123,6 +123,8 @@ foreach (Bill::orderBy('bill_id')->get() as $bill) {
                 'bill_overuse' => $overuse,
                 'bill_percent' => $percent,
                 'bill_id' => $bill->bill_id,
+                'bill_peak_out' => $period->peak_out,
+                'bill_peak_in' => $period->peak_in,
                 'updated' => now(),
             ];
             DB::table('bill_history')->updateOrInsert(
