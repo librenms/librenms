@@ -140,10 +140,8 @@ class Billing
             ->where('timestamp', '>', $datefrom)
             ->where('timestamp', '<=', $dateto)
             ->orderBy('rate', 'asc')
-            ->get()
-            ->pluck('rate')
-            ->toArray();
-        $m_95th = $a_95th[$measurement_95th];
+            ->get();
+        $m_95th = $a_95th[$measurement_95th]->rate ?? 0;
 
         return round($m_95th, 2);
     }
@@ -159,10 +157,8 @@ class Billing
             ->where('timestamp', '>', $datefrom)
             ->where('timestamp', '<=', $dateto)
             ->orderBy('rate', 'asc')
-            ->get()
-            ->pluck('rate')
-            ->toArray();
-        $m_95th = $a_95th[$measurement_95th] ?? 0;
+            ->get();
+        $m_95th = $a_95th[$measurement_95th]->rate ?? 0;
 
         return round($m_95th, 2);
     }
@@ -178,10 +174,8 @@ class Billing
             ->where('timestamp', '>', $datefrom)
             ->where('timestamp', '<=', $dateto)
             ->orderBy('rate', 'asc')
-            ->get()
-            ->pluck('rate')
-            ->toArray();
-        $m_95th = $a_95th[$measurement_95th] ?? 0;
+            ->get();
+        $m_95th = $a_95th[$measurement_95th]->rate ?? 0;
 
         return round($m_95th, 2);
     }
