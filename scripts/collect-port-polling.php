@@ -2,6 +2,9 @@
 <?php
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Device;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Number;
@@ -37,21 +40,20 @@ if (isset($options['help'])) {
 
 $where = '';
 $params = [];
+$devices = Device::where('status', 1)->where('disabled', 0)->orderBy('hostname', 'ASC');
 if (isset($options['h'])) {
     if (is_numeric($options['h'])) {
-        $where = 'AND `device_id` = ?';
-        $params = [$options['h']];
+        $devices->where('device_id', $options['h']);
     } elseif (Str::contains($options['h'], ',')) {
         $device_ids = array_map(trim(...), explode(',', $options['h']));
         $device_ids = array_filter($device_ids, is_numeric(...));
-        $where = 'AND `device_id` in ' . dbGenPlaceholders(count($device_ids));
-        $params = $device_ids;
+        $devices->whereIn('device_id', $device_ids);
     } else {
-        $where = 'AND `hostname` LIKE ?';
-        $params = [str_replace('*', '%', $options['h'])];
+        $devices->where('hostname', 'like', str_replace('*', '%', $options['h']));
     }
 }
-$devices = dbFetchRows("SELECT * FROM `devices` WHERE status = 1 AND disabled = 0 $where ORDER BY `hostname` ASC", $params);
+
+$devices = $devices->get()->toArray();
 
 if (isset($options['e'])) {
     if (! is_numeric($options['e']) || $options['e'] < 0) {
@@ -95,11 +97,10 @@ echo PHP_EOL;
 $inactive_sql = "`deleted` = 1 OR `ifAdminStatus` != 'up' OR `disabled` = 1";
 $set_count = 0;
 foreach ($devices as &$device) {
-    $count = dbFetchCell('SELECT COUNT(*) FROM `ports` WHERE `device_id`=?', [$device['device_id']]);
-    $inactive = dbFetchCell(
-        "SELECT COUNT(*) FROM `ports` WHERE `device_id`=? AND ($inactive_sql)",
-        [$device['device_id']]
-    );
+    $count = DB::table('ports')->where('device_id', $device['device_id'])->count();
+    $inactive = DB::table('ports')->where('device_id', $device['device_id'])->where(function (Builder $query) {
+        $query->where('deleted', 1)->orWhere('ifAdminStatus', '!=', 'up')->orWhere('disabled', 1);
+    })->count();
 
     $device['port_count'] = $count;
     $device['inactive_ratio'] = ($inactive == 0 ? 0 : ($inactive / $count));

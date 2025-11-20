@@ -7,6 +7,7 @@
  */
 
 use App\Facades\LibrenmsConfig;
+use App\Models\AlertRule;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Database\Eloquent\Collection;
@@ -272,14 +273,12 @@ if ($options['f'] === 'refresh_alert_rules') {
     $lock = Cache::lock('refresh_alert_rules', 86000);
     if ($lock->get()) {
         echo 'Refreshing alert rules queries' . PHP_EOL;
-        $rules = dbFetchRows('SELECT `id`, `builder`, `extra` FROM `alert_rules`');
+        $rules = AlertRule::all();
         foreach ($rules as $rule) {
-            $rule_options = json_decode($rule['extra'], true);
-            if ($rule_options['options']['override_query'] !== 'on' && $rule_options['options']['override_query'] !== true) {
-                $data['query'] = QueryBuilderParser::fromJson($rule['builder'])->toSql();
-                if (! empty($data['query'])) {
-                    dbUpdate($data, 'alert_rules', 'id=?', [$rule['id']]);
-                    unset($data);
+            if ($rule->extra['options']['override_query'] !== 'on' && $rule->extra['options']['override_query'] !== true) {
+                $rule->query = QueryBuilderParser::fromJson($rule->builder)->toSql();
+                if ($rule->isDirty('query')) {
+                    $rule->save();
                 }
             }
         }
