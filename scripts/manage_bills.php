@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+use Illuminate\Support\Facades\DB;
+
 $init_modules = [];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
@@ -16,16 +18,20 @@ require realpath(__DIR__ . '/..') . '/includes/init.php';
 // Find the correct bill, exit if we get anything other than 1 result.
 function list_bills($bill_name)
 {
-    $bill = dbFetchRows('SELECT `bill_id`,`bill_name` FROM `bills` WHERE `bill_name` LIKE ?', ["$bill_name"]);
-    if (count($bill) != 1) {
-        echo "Did not find exactly 1 bill, exiting\n";
-        echo 'Query:' . $bill . "\n";
-        exit(1);
+    if (is_numeric($bill_name)) {
+        $bill = DB::table('bills')->where('bill_id', $bill_name)->first();
     } else {
-        echo "Found bill {$bill[0]['bill_name']} ({$bill[0]['bill_id']})\n";
+        $bill = DB::table('bills')->where('bill_name', 'like', "%$bill_name%")->get();
+        if (count($bill) != 1) {
+            echo "Did not find exactly 1 bill, exiting\n";
+            echo 'Query:' . $bill_name . "\n";
+            exit(1);
+        } else {
+            echo "Found bill {$bill[0]->bill_name} ({$bill[0]->bill_id})\n";
+        }
     }
 
-    return $bill[0]['bill_id'];
+    return $bill[0]->bill_id;
 }
 
 // Create a new bill.
@@ -45,7 +51,7 @@ function create_bill($bill_name, $bill_type, $bill_cdr, $bill_day)
         'bill_cdr' => $bill_cdr,
         'bill_day' => '1',
     ];
-    $create_bill = dbInsert($insert, 'bills');
+    $create_bill = DB::table('bills')->insertGetId($insert);
     echo 'Created bill ID ' . $create_bill . "\n";
 
     return $create_bill;
@@ -54,7 +60,7 @@ function create_bill($bill_name, $bill_type, $bill_cdr, $bill_day)
 // This will get an array of devices we are interested in from the CLI glob
 function get_devices($host_glob, $nameType)
 {
-    return dbFetchRows('SELECT `device_id`,`hostname`,`sysName` FROM `devices` WHERE `' . $nameType . '` LIKE ?', ["%$host_glob%"]);
+    return DB::table('devices')->where($nameType, 'like', "%$host_glob%")->pluck('device_id');
 }
 
 // This will flush bill ports if -r is set on cli
@@ -62,7 +68,7 @@ function flush_bill($id)
 {
     echo "Removing ports from bill ID $id\n";
 
-    return dbDelete('bill_ports', '`bill_id` = ?', [$id]);
+    return DB::table('bill_ports')->where('bill_id', $id)->delete();
 }
 
 function add_ports_to_bill($devs, $intf_glob, $id)
@@ -75,20 +81,20 @@ function add_ports_to_bill($devs, $intf_glob, $id)
 
     // Expected interface glob:
     echo "Interface glob: $intf_glob\n";
-    $device_ids = array_column($devs, 'device_id');
-    $ids = implode(',', $device_ids);
-
     // Find the devices which match the list of IDS and also the interface glob
-    $query = "SELECT ports.port_id,ports.ifName,ports.ifAlias FROM ports INNER JOIN devices ON ports.device_id = devices.device_id WHERE ports.ifAlias LIKE '%$intf_glob%' AND ports.device_id in ($ids)";
-    echo "Query: $query\n";
-    foreach (dbFetchRows($query) as $ports) {
-        echo "Inserting {$ports['ifName']} ({$ports['ifAlias']}) into bill $id\n";
+    $query = DB::table('ports')
+        ->join('devices', 'ports.device_id', '=', 'devices.device_id')
+        ->where('ports.ifAlias', 'like', "%$intf_glob%")
+        ->whereIn('ports.device_id', $devs)
+        ->get();
+    foreach ($query as $ports) {
+        echo "Inserting {$ports->ifName} ({$ports->ifAlias}) into bill $id\n";
         $insert = [
             'bill_id' => $id,
-            'port_id' => $ports['port_id'],
+            'port_id' => $ports->port_id,
             'bill_port_autoadded' => '1',
         ];
-        dbInsert($insert, 'bill_ports');
+        DB::table('bill_ports')->insert($insert);
     }
 
     return true;
@@ -102,7 +108,7 @@ function print_help(): never
     echo "-s <sysName glob>     sysName to match (Cannot be used with -h)\n";
     echo "-h <hostname glob>    Hostname to match (Cannot be used with -s)\n";
     echo "-i <Interface description glob>   Interface description to match\n";
-    echo "-f Flush all ports from a bill before adding adding ports\n";
+    echo "-f flush     Flush all ports from a bill before adding adding ports\n";
     echo "Creating bills\n";
     echo "-n Create new bill\n";
     echo "-t bill type (cdr or quota)\n";
@@ -147,12 +153,19 @@ if (! empty($options['q'])) {
 
 $bill_name = str_replace('*', '%', $options['b']);
 $intf_glob = str_replace('*', '%', $options['i']);
+$id = list_bills($bill_name);
+
+if (isset($options['f'])) {
+    $flush_ret = flush_bill($id);
+    exit;
+}
 
 // Exit if no bill
 if (empty($bill_name)) {
     echo "Please set -b (bill name)\n";
     print_help();
 }
+
 if ($create_bill) {
     create_bill($bill_name, $bill_type, $bill_cdr, '1');
     exit(1);
@@ -180,23 +193,12 @@ if ($intf_glob == 'all') {
 if ($host_glob == 'all') {
     $host_glob = '%';
 }
-if (isset($options['f'])) {
-    $flush = true;
-} else {
-    $flush = false;
-}
-
-$id = list_bills($bill_name);
 
 $devices = get_devices($host_glob, $nameType);
 
 if (empty($devices)) {
     echo "No devices found\n";
     exit(1);
-}
-
-if ($flush) {
-    $flush_ret = flush_bill($id);
 }
 
 $ret = add_ports_to_bill($devices, $intf_glob, $id);
