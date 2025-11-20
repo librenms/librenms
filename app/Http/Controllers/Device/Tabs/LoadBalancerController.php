@@ -82,9 +82,7 @@ class LoadBalancerController implements DeviceTab
         }
 
         if ($device->os == 'alteonos') {
-            $stateSensors = $device->sensors
-                ? $device->sensors->where('sensor_class', 'state')
-                : collect();
+            $stateSensorsQuery = $device->sensors()->where('sensor_class', 'state');
 
             $tabs = [
                 'alteonos_real_servers' => ['slbEnhRealServer', 'slbRealServer'],
@@ -102,16 +100,18 @@ class LoadBalancerController implements DeviceTab
             ];
 
             foreach ($tabs as $tab => $types) {
-                $matching = $stateSensors->whereIn('sensor_type', $types);
+                $query = clone $stateSensorsQuery;
+                $query->whereIn('sensor_type', $types);
 
-                $count = $tab === 'alteonos_real_groups'
-                    ? $matching->pluck('sensor_index')
-                        ->map(fn ($index) => ltrim((string) $index, '.'))
-                        ->map(fn ($index) => explode('.', (string) $index)[0] ?? null)
+                if ($tab === 'alteonos_real_groups') {
+                    $count = $query->pluck('sensor_index')
+                        ->map(fn ($index) => explode('.', ltrim((string) $index, '.'))[0] ?? null)
                         ->filter()
                         ->unique()
-                        ->count()
-                    : $matching->count();
+                        ->count();
+                } else {
+                    $count = $query->count();
+                }
 
                 if ($count > 0) {
                     $this->addTab($tab, $count);
