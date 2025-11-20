@@ -487,12 +487,7 @@ class DnsTest extends TestCase
             ->andReturn($mode);
     }
 
-    private function expectAddrInfo(
-        string $hostname,
-        ?AddressFamily $af,
-        array $result,
-        int $times = 1
-    ): void {
+    private function expectAddrInfo(string $hostname, ?AddressFamily $af, array $result, int $times = 1): void {
         $this->socketMock->shouldReceive('getAddrInfo')
             ->with($hostname, $af)
             ->times($times)
@@ -519,7 +514,7 @@ class DnsTest extends TestCase
         ];
     }
 
-    protected function dnsResponse(array $answer = [], array $authority = [], array $additional = []): object
+    private function dnsResponse(array $answer = [], array $authority = [], array $additional = []): object
     {
         return new class($answer, $authority, $additional)
         {
