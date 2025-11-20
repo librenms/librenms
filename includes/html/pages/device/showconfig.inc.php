@@ -5,7 +5,26 @@ use App\Facades\LibrenmsConfig;
 use Symfony\Component\Process\Process;
 
 if (Auth::user()->hasGlobalAdmin()) {
-    if (! empty($rancid_file)) {
+    if (LibrenmsConfig::get('rancid_repo_type') == 'git-bare' && ! is_null(LibrenmsConfig::get('rancid_repo_url')) && is_dir($rancid_path)) {
+        echo '<div style="clear: both;">';
+
+        print_optionbar_start('', '');
+        echo '<a href="' . LibrenmsConfig::get('rancid_repo_url') . '/?a=blob;hb=HEAD;p=' . basename((string) $rancid_path) . ';f=' . $rancid_file . '">Repo</a>';
+        print_optionbar_end();
+
+        $process = new Process(['git', 'ls-tree', '-r', 'HEAD'], $rancid_path);
+        $process->run();
+        $full_tree = explode(PHP_EOL, $process->getOutput());
+        foreach ($full_tree as $ft) {
+            [$perm, $type, $hash_path] = explode(' ', $ft, 3);
+            [$hash, $file] = explode("\t", $hash_path);
+            if (strcmp($file, (string) $rancid_file) === 0) {
+                $process = new Process(['git', 'cat-file', $type, $hash], $rancid_path);
+                $process->run();
+                $text = $process->getOutput();
+            }
+        }
+    } elseif (! empty($rancid_file)) {
         echo '<div style="clear: both;">';
 
         print_optionbar_start('', '');
