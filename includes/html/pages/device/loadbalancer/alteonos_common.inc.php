@@ -11,8 +11,10 @@ if (! function_exists('alteonos_sensor_types')) {
                 'slbRealServer',
             ],
             'alteonos_real_groups' => [
+                'slbOperEnhGroupRealServerRuntime',
                 'slbOperEnhGroupRealServerRuntimeStatus',
                 'slbOperGroupRealServer',
+                'slbOperGroupRealServerState',
             ],
             'alteonos_virtual_servers' => [
                 'slbCurCfgEnhVirtServer',
@@ -20,7 +22,12 @@ if (! function_exists('alteonos_sensor_types')) {
             ],
             'alteonos_virtual_services' => [
                 'slbVirtServices',
+                'slbVirtServicesInfo',
+                'slbVirtServicesInfoState',
+                'slbCurCfgEnhVirtService',
                 'slbCurCfgEnhVirtServiceStatus',
+                'slbCurCfgVirtService',
+                'slbCurCfgVirtServiceStatus',
             ],
         ];
     }
@@ -56,6 +63,12 @@ if (! function_exists('alteonos_state_lookup')) {
     function alteonos_state_lookup(string $sensorType, $value): ?array
     {
         $maps = [
+            'slbOperEnhGroupRealServerRuntime' => [
+                1 => ['descr' => 'running', 'generic' => 0],
+                2 => ['descr' => 'failed', 'generic' => 2],
+                3 => ['descr' => 'disabled', 'generic' => 1],
+                4 => ['descr' => 'overloaded', 'generic' => 1],
+            ],
             'slbOperEnhGroupRealServerRuntimeStatus' => [
                 1 => ['descr' => 'running', 'generic' => 0],
                 2 => ['descr' => 'failed', 'generic' => 2],
@@ -68,6 +81,20 @@ if (! function_exists('alteonos_state_lookup')) {
                 3 => ['descr' => 'shutdown-connection', 'generic' => 2],
                 4 => ['descr' => 'shutdown-persistent-sessions', 'generic' => 2],
             ],
+            'slbOperGroupRealServerState' => [
+                1 => ['descr' => 'enable', 'generic' => 0],
+                2 => ['descr' => 'disable', 'generic' => 1],
+                3 => ['descr' => 'shutdown-connection', 'generic' => 2],
+                4 => ['descr' => 'shutdown-persistent-sessions', 'generic' => 2],
+            ],
+            'slbCurCfgEnhVirtService' => [
+                1 => ['descr' => 'up', 'generic' => 0],
+                2 => ['descr' => 'down', 'generic' => 2],
+                3 => ['descr' => 'adminDown', 'generic' => 1],
+                4 => ['descr' => 'warning', 'generic' => 1],
+                5 => ['descr' => 'shutdown', 'generic' => 2],
+                6 => ['descr' => 'error', 'generic' => 2],
+            ],
             'slbCurCfgEnhVirtServiceStatus' => [
                 1 => ['descr' => 'up', 'generic' => 0],
                 2 => ['descr' => 'down', 'generic' => 2],
@@ -75,6 +102,52 @@ if (! function_exists('alteonos_state_lookup')) {
                 4 => ['descr' => 'warning', 'generic' => 1],
                 5 => ['descr' => 'shutdown', 'generic' => 2],
                 6 => ['descr' => 'error', 'generic' => 2],
+            ],
+            'slbCurCfgVirtService' => [
+                1 => ['descr' => 'up', 'generic' => 0],
+                2 => ['descr' => 'down', 'generic' => 2],
+                3 => ['descr' => 'adminDown', 'generic' => 1],
+                4 => ['descr' => 'warning', 'generic' => 1],
+                5 => ['descr' => 'shutdown', 'generic' => 2],
+                6 => ['descr' => 'error', 'generic' => 2],
+            ],
+            'slbCurCfgVirtServiceStatus' => [
+                1 => ['descr' => 'up', 'generic' => 0],
+                2 => ['descr' => 'down', 'generic' => 2],
+                3 => ['descr' => 'adminDown', 'generic' => 1],
+                4 => ['descr' => 'warning', 'generic' => 1],
+                5 => ['descr' => 'shutdown', 'generic' => 2],
+                6 => ['descr' => 'error', 'generic' => 2],
+            ],
+            'slbVirtServices' => [
+                1 => ['descr' => 'blocked', 'generic' => 1],
+                2 => ['descr' => 'running', 'generic' => 0],
+                3 => ['descr' => 'failed', 'generic' => 2],
+                4 => ['descr' => 'disabled', 'generic' => 1],
+                5 => ['descr' => 'slowstart', 'generic' => 1],
+                6 => ['descr' => 'overflow', 'generic' => 1],
+                7 => ['descr' => 'noinstance', 'generic' => 2],
+                2147483647 => ['descr' => 'unsupported', 'generic' => 3],
+            ],
+            'slbVirtServicesInfo' => [
+                1 => ['descr' => 'blocked', 'generic' => 1],
+                2 => ['descr' => 'running', 'generic' => 0],
+                3 => ['descr' => 'failed', 'generic' => 2],
+                4 => ['descr' => 'disabled', 'generic' => 1],
+                5 => ['descr' => 'slowstart', 'generic' => 1],
+                6 => ['descr' => 'overflow', 'generic' => 1],
+                7 => ['descr' => 'noinstance', 'generic' => 2],
+                2147483647 => ['descr' => 'unsupported', 'generic' => 3],
+            ],
+            'slbVirtServicesInfoState' => [
+                1 => ['descr' => 'blocked', 'generic' => 1],
+                2 => ['descr' => 'running', 'generic' => 0],
+                3 => ['descr' => 'failed', 'generic' => 2],
+                4 => ['descr' => 'disabled', 'generic' => 1],
+                5 => ['descr' => 'slowstart', 'generic' => 1],
+                6 => ['descr' => 'overflow', 'generic' => 1],
+                7 => ['descr' => 'noinstance', 'generic' => 2],
+                2147483647 => ['descr' => 'unsupported', 'generic' => 3],
             ],
         ];
 
@@ -106,8 +179,20 @@ if (! function_exists('alteonos_loadbalancer_fetch')) {
             ->get()
             ->map(function (Sensor $sensor) {
                 $translation = $sensor->translations->firstWhere('state_value', $sensor->sensor_current);
+                $stateDescr = $translation->state_descr ?? null;
+                $stateValue = $translation->state_value ?? null;
+                $stateGeneric = $translation->state_generic_value ?? null;
 
-                return [
+                $needsFallback = $stateDescr === null || strtolower($stateDescr) === 'unknown';
+                if ($needsFallback) {
+                    if ($fallback = alteonos_state_lookup($sensor->sensor_type, $sensor->sensor_current)) {
+                        $stateDescr = $fallback['descr'];
+                        $stateGeneric = $fallback['generic'];
+                        $stateValue = $sensor->sensor_current;
+                    }
+                }
+
+                $row = [
                     'sensor_id' => $sensor->sensor_id,
                     'sensor_descr' => $sensor->sensor_descr,
                     'sensor_current' => $sensor->sensor_current,
@@ -115,12 +200,15 @@ if (! function_exists('alteonos_loadbalancer_fetch')) {
                     'sensor_limit' => $sensor->sensor_limit,
                     'sensor_limit_low' => $sensor->sensor_limit_low,
                     'sensor_index' => $sensor->sensor_index,
-                    'sensor_type' => $sensor->sensor_type,
                     'lastupdate' => $sensor->lastupdate,
-                    'state_descr' => $translation->state_descr ?? null,
-                    'state_value' => $translation->state_value ?? null,
-                    'state_generic_value' => $translation->state_generic_value ?? null,
+                    'state_descr' => $stateDescr,
+                    'state_value' => $stateValue,
+                    'state_generic_value' => $stateGeneric,
                 ];
+
+                $row['sensor_descr'] = alteonos_normalize_description($row);
+
+                return $row;
             })
             ->all();
     }
@@ -175,5 +263,45 @@ if (! function_exists('alteonos_render_sensor_table')) {
         }
 
         echo '</tbody></table></div>';
+    }
+}
+
+if (! function_exists('alteonos_normalize_description')) {
+    function alteonos_normalize_description(array $row): string
+    {
+        $descr = (string) ($row['sensor_descr'] ?? '');
+        $type = (string) ($row['sensor_type'] ?? '');
+
+        return alteonos_strip_multiindex($descr, $type);
+    }
+}
+
+if (! function_exists('alteonos_strip_multiindex')) {
+    function alteonos_strip_multiindex(string $descr, string $sensorType): string
+    {
+        $map = [
+            'slbRealServer' => 'Real Server',
+            'slbEnhRealServer' => 'Real Server',
+            'slbStatRealServer' => 'Real Server',
+            'slbStatEnhRServer' => 'Real Server',
+            'slbCurCfgEnhVirtServer' => 'Virt Server',
+            'slbCurCfgVirtServer' => 'Virt Server',
+            'slbOperEnhGroupRealServerRuntime' => 'Real Server Group',
+            'slbOperEnhGroupRealServerRuntimeStatus' => 'Real Server Group',
+            'slbOperGroupRealServer' => 'Real Server Group',
+            'slbOperGroupRealServerState' => 'Real Server Group',
+            'slbStatEnhGroup' => 'Real Server Group',
+            'slbStatGroup' => 'Real Server Group',
+        ];
+
+        foreach ($map as $typePrefix => $label) {
+            if (stripos($sensorType, $typePrefix) === 0) {
+                $pattern = '/^(' . preg_quote($label, '/') . '\s+)(\d+)(?:\.\d+)+/i';
+                $descr = preg_replace($pattern, '$1$2', $descr);
+                break;
+            }
+        }
+
+        return $descr;
     }
 }

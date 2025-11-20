@@ -22,8 +22,7 @@ foreach ($rows as $row) {
     }
 
     $groups[$groupId]['heading'] = $groups[$groupId]['heading']
-        ?? trim((string) preg_replace('/\s*\([^)]*\)\s*$/', '', $sensorDescr))
-        ?: sprintf('Real Server Group %s', $groupId);
+        ?? sprintf('Real Server Group %s', $groupId);
 
     $stateDescrRaw = trim((string) ($row['state_descr'] ?? ''));
     $stateDescr = $stateDescrRaw !== '' ? $stateDescrRaw : null;

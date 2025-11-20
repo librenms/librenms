@@ -21,7 +21,9 @@ if (! function_exists('alteonos_collect_group_failures')) {
         $serverGroups = [];
         foreach ($groupMembers as $groupIndex => $members) {
             foreach ((array) $members as $serverIndex) {
-                $serverGroups[(string) $serverIndex][] = (string) $groupIndex;
+                $normalizedGroup = alteon_normalize_index((string) $groupIndex) ?: (string) $groupIndex;
+                $normalizedServer = alteon_normalize_index((string) $serverIndex) ?: (string) $serverIndex;
+                $serverGroups[$normalizedServer][] = $normalizedGroup;
             }
         }
 
@@ -35,7 +37,7 @@ if (! function_exists('alteonos_collect_group_failures')) {
         $totals = [];
         foreach ($failureData as $index => $entry) {
             $value = (int) ($entry[$failureKey] ?? $entry ?? 0);
-            $serverIdx = (string) $index;
+            $serverIdx = alteon_normalize_index((string) ($entry['slbStatEnhRServerIndex'] ?? $index)) ?: (string) $index;
             foreach ($serverGroups[$serverIdx] ?? [] as $groupIdx) {
                 $totals[$groupIdx] = ($totals[$groupIdx] ?? 0) + $value;
             }
@@ -62,13 +64,14 @@ if (! function_exists('alteonos_get_group_members')) {
 
         $map = [];
         foreach ($members as $groupIndex => $servers) {
+            $groupKey = alteon_normalize_index((string) $groupIndex) ?: (string) $groupIndex;
             foreach (array_keys((array) $servers) as $serverIndex) {
-                $serverKey = (string) $serverIndex;
+                $serverKey = alteon_normalize_index((string) $serverIndex) ?: (string) $serverIndex;
                 if ($serverKey === '0' || $serverKey === '') {
                     continue;
                 }
 
-                $map[(string) $groupIndex][] = $serverKey;
+                $map[$groupKey][] = $serverKey;
             }
         }
 

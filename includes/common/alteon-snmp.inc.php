@@ -78,3 +78,57 @@ if (! function_exists('alteon_normalize_row')) {
         return $normalized;
     }
 }
+
+if (! function_exists('alteon_decode_display_index')) {
+    function alteon_decode_display_index(string $index): string
+    {
+        $index = trim($index);
+        if ($index === '' || ! str_contains($index, '.')) {
+            return $index;
+        }
+
+        $parts = array_map('intval', explode('.', $index));
+        if (count($parts) < 2) {
+            return $index;
+        }
+
+        $length = array_shift($parts);
+        if ($length <= 0 || $length > count($parts)) {
+            return $index;
+        }
+
+        $chars = array_slice($parts, 0, $length);
+        if (count($chars) !== $length) {
+            return $index;
+        }
+
+        $decoded = '';
+        foreach ($chars as $char) {
+            if ($char < 32 || $char > 126) {
+                return $index;
+            }
+
+            $decoded .= chr($char);
+        }
+
+        if (count($parts) !== $length) {
+            return $index;
+        }
+
+        return trim($decoded);
+    }
+}
+
+if (! function_exists('alteon_normalize_index')) {
+    function alteon_normalize_index(?string $index): string
+    {
+        $index = trim((string) $index);
+        if ($index === '') {
+            return '';
+        }
+
+        $decoded = alteon_decode_display_index($index);
+
+        return $decoded !== '' ? $decoded : $index;
+    }
+}

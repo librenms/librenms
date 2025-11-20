@@ -85,9 +85,17 @@ class LoadBalancerController implements DeviceTab
         if ($device->os == 'alteonos') {
             $tabs = [
                 'alteonos_real_servers' => ['slbEnhRealServer', 'slbRealServer'],
-                'alteonos_real_groups' => ['slbOperEnhGroupRealServerRuntimeStatus', 'slbOperGroupRealServer'],
+                'alteonos_real_groups' => ['slbOperEnhGroupRealServerRuntime', 'slbOperEnhGroupRealServerRuntimeStatus', 'slbOperGroupRealServer', 'slbOperGroupRealServerState'],
                 'alteonos_virtual_servers' => ['slbCurCfgEnhVirtServer', 'slbCurCfgVirtServer'],
-                'alteonos_virtual_services' => ['slbVirtServices', 'slbCurCfgEnhVirtServiceStatus'],
+                'alteonos_virtual_services' => [
+                    'slbVirtServices',
+                    'slbVirtServicesInfo',
+                    'slbVirtServicesInfoState',
+                    'slbCurCfgEnhVirtService',
+                    'slbCurCfgEnhVirtServiceStatus',
+                    'slbCurCfgVirtService',
+                    'slbCurCfgVirtServiceStatus',
+                ],
             ];
 
             foreach ($tabs as $tab => $types) {

@@ -20,6 +20,18 @@ modules:
                 oid: mpCpuStatsUtil1Second
                 num_oid: '.1.3.6.1.4.1.1872.2.5.1.2.2.1.{{ $index }}'
     sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - ALTEON-CHEETAH-LAYER4-MIB::slbEnhRealServerInfoIndex
+                        - ALTEON-CHEETAH-LAYER4-MIB::slbRealServerInfoIndex
+                        - ALTEON-CHEETAH-LAYER4-MIB::slbEnhRealServerInfoIpAddr
+                        - ALTEON-CHEETAH-LAYER4-MIB::slbRealServerInfoIpAddr
+                        - ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgEnhVirtServerIndex
+                        - ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgVirtServerIndex
+                        - ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgEnhVirtServerIpAddress
+                        - ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgVirtServerIpAddress
         state:
             data:
                 -
@@ -27,7 +39,7 @@ modules:
                     value: ALTEON-CHEETAH-LAYER4-MIB::slbEnhRealServerInfoState
                     num_oid: '.1.3.6.1.4.1.1872.2.5.4.3.13.1.7.{{ $index }}'
                     index: 'slbEnhRealServerInfoState.{{ $index }}'
-                    descr: "Real Server {{ $index }} {{ $slbEnhRealServerInfoIpAddr }}"
+                    descr: 'Real Server {{ ALTEON-CHEETAH-LAYER4-MIB::slbEnhRealServerInfoIndex }} ({{ ALTEON-CHEETAH-LAYER4-MIB::slbEnhRealServerInfoIpAddr }})'
                     state_name: slbRealServer
                     states:
                         - { value: 2, generic: 0, graph: 0, descr: running }
@@ -39,7 +51,7 @@ modules:
                     value: ALTEON-CHEETAH-LAYER4-MIB::slbRealServerInfoState
                     num_oid: '.1.3.6.1.4.1.1872.2.5.4.3.1.1.7.{{ $index }}'
                     index: 'slbRealServerInfoState.{{ $index }}'
-                    descr: "Real Server {{ $index }} {{ $slbRealServerInfoIpAddr }}"
+                    descr: 'Real Server {{ ALTEON-CHEETAH-LAYER4-MIB::slbRealServerInfoIndex }} ({{ ALTEON-CHEETAH-LAYER4-MIB::slbRealServerInfoIpAddr }})'
                     state_name: slbRealServer
                     states:
                         - { value: 2, generic: 0, graph: 0, descr: running }
@@ -51,7 +63,7 @@ modules:
                     value: ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgEnhVirtServerState
                     num_oid: '.1.3.6.1.4.1.1872.2.5.4.1.1.4.22.1.4.{{ $index }}'
                     index: 'slbCurCfgEnhVirtServerState.{{ $index }}'
-                    descr: "Virt Server {{ $index }} {{ $slbCurCfgEnhVirtServerIpAddress }}"
+                    descr: 'Virt Server {{ ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgEnhVirtServerIndex }} ({{ ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgEnhVirtServerIpAddress }})'
                     state_name: slbCurCfgVirtServer
                     states:
                         - { value: 2, generic: 0, graph: 0, descr: enabled }
@@ -62,7 +74,7 @@ modules:
                     value: ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgVirtServerState
                     num_oid: '.1.3.6.1.4.1.1872.2.5.4.1.1.4.2.1.4.{{ $index }}'
                     index: 'slbCurCfgVirtServerState.{{ $index }}'
-                    descr: "Virt Server {{ $index }} {{ $slbCurCfgVirtServerIpAddress }}"
+                    descr: 'Virt Server {{ ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgVirtServerIndex }} ({{ ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgVirtServerIpAddress }})'
                     state_name: slbCurCfgVirtServer
                     states:
                         - { value: 2, generic: 0, graph: 0, descr: enabled }

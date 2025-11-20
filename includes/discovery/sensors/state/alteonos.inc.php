@@ -117,7 +117,8 @@ if (! function_exists('alteon_real_server_definitions')) {
 
         $map = [];
         foreach ($entries as $index => $entry) {
-            $uid = (string) $index;
+            $rawIndex = (string) $index;
+            $uid = alteon_normalize_index($rawIndex) ?: $rawIndex;
             $rawName = trim((string) ($entry[$nameKey] ?? ''));
             $name = $rawName !== '' ? $rawName : "Real Server $uid";
             $ip = trim((string) ($entry[$ipKey] ?? ''));
@@ -144,6 +145,8 @@ if (! function_exists('alteon_real_server_definitions')) {
                 'label' => $label,
                 'name' => $name,
                 'ip' => $ip,
+                'index' => $uid,
+                'oid_index' => $rawIndex,
             ];
         }
 
@@ -170,10 +173,13 @@ if (! function_exists('alteon_real_group_definitions')) {
 
         $map = [];
         foreach ($entries as $index => $entry) {
-            $uid = (string) $index;
+            $rawIndex = (string) $index;
+            $uid = alteon_normalize_index($rawIndex) ?: $rawIndex;
             $name = trim((string) ($entry[$nameKey] ?? ''));
             $map[$uid] = [
                 'label' => $name !== '' ? $name : "Real Group $uid",
+                'index' => $uid,
+                'oid_index' => $rawIndex,
             ];
         }
 
@@ -198,19 +204,37 @@ if (! function_exists('alteon_real_group_members')) {
 
         $map = [];
         foreach ($members as $groupIndex => $servers) {
+            $groupKey = alteon_normalize_index((string) $groupIndex) ?: (string) $groupIndex;
             foreach (array_keys((array) $servers) as $serverIndex) {
-                $serverKey = (string) $serverIndex;
+                $serverKey = alteon_normalize_index((string) $serverIndex) ?: (string) $serverIndex;
                 if ($serverKey === '0' || $serverKey === '') {
                     continue;
                 }
 
-                $map[(string) $groupIndex][] = $serverKey;
+                $map[$groupKey][] = $serverKey;
             }
         }
+
+        foreach ($map as &$serverList) {
+            $serverList = array_values(array_unique($serverList));
+        }
+        unset($serverList);
 
         return $cache[$deviceId] = $map;
     }
 }
+
+if (! function_exists('alteon_snmp_string_index')) {
+    function alteon_snmp_string_index(string $value): string
+    {
+        $value = (string) $value;
+        $chars = array_map('ord', str_split($value));
+        array_unshift($chars, count($chars));
+
+        return implode('.', $chars);
+    }
+}
+
 
 if (! function_exists('alteon_virtual_server_definitions')) {
     function alteon_virtual_server_definitions(array $device): array
@@ -233,7 +257,8 @@ if (! function_exists('alteon_virtual_server_definitions')) {
 
         $map = [];
         foreach ($entries as $index => $entry) {
-            $uid = (string) $index;
+            $rawIndex = (string) $index;
+            $uid = alteon_normalize_index($rawIndex) ?: $rawIndex;
             $name = trim((string) ($entry[$nameKey] ?? $entry['slbCurCfgEnhVirtServerVname'] ?? $entry['slbCurCfgVirtServerVname'] ?? '')) ?: "Virt Server $uid";
             $vip = trim((string) ($entry[$vipKey] ?? ''));
             $label = 'Virt Server ' . $uid;
@@ -245,6 +270,8 @@ if (! function_exists('alteon_virtual_server_definitions')) {
                 'label' => $label,
                 'name' => $name,
                 'vip' => $vip,
+                'index' => $uid,
+                'oid_index' => $rawIndex,
             ];
         }
 
@@ -301,19 +328,22 @@ if (! function_exists('alteon_virtual_service_definitions')) {
         ];
 
         foreach ($entries as $serverIndex => $services) {
+            $serverKey = alteon_normalize_index((string) $serverIndex) ?: (string) $serverIndex;
             foreach ((array) $services as $serviceIndex => $entry) {
-                $key = (string) $serverIndex . '.' . (string) $serviceIndex;
+                $serviceKey = (string) $serviceIndex;
+                $key = $serverKey . '.' . $serviceKey;
                 $protoValue = alteon_enum_to_int($entry[$protoKey] ?? null, $protoEnumMap);
                 $protocol = $protoValue !== null ? alteon_virtual_service_protocol($protoValue) : null;
                 if ($protocol === null) {
-                    $protocol = alteon_virtual_service_protocol_lookup($device, (string) $serverIndex, (string) $serviceIndex) ?? 'TCP';
+                    $protocol = alteon_virtual_service_protocol_lookup($device, $serverKey, $serviceKey) ?? 'TCP';
                 }
 
                 $map[$key] = [
-                    'server_index' => (string) $serverIndex,
-                    'service_index' => (string) $serviceIndex,
+                    'server_index' => $serverKey,
+                    'server_oid_index' => (string) $serverIndex,
+                    'service_index' => $serviceKey,
                     'virtual_port' => (int) ($entry[$portKey] ?? 0),
-                    'real_group' => (string) ($entry[$realGroupKey] ?? ''),
+                    'real_group' => alteon_normalize_index((string) ($entry[$realGroupKey] ?? '')),
                     'real_port' => (int) ($entry[$realPortKey] ?? 0),
                     'protocol' => $protocol,
                     'name' => trim((string) ($entry[$nameKey] ?? '')),
@@ -446,7 +476,9 @@ if (! function_exists('alteon_real_group_status_text')) {
 if (! function_exists('alteon_virtual_service_protocol_lookup')) {
     function alteon_virtual_service_protocol_lookup($device, string $virtIndex, string $serviceIndex): ?string
     {
+        $encodedVirtIndex = alteon_snmp_string_index($virtIndex);
         $oids = [
+            "ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgEnhVirtServiceUDPBalance.$encodedVirtIndex.$serviceIndex",
             "ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgEnhVirtServiceUDPBalance.$virtIndex.$serviceIndex",
             "ALTEON-CHEETAH-LAYER4-MIB::slbCurCfgVirtServiceUDPBalance.$virtIndex.$serviceIndex",
         ];
@@ -505,7 +537,7 @@ if (empty($realInfo)) {
 }
 
 foreach ($realInfo as $index => $entry) {
-    $indexKey = (string) $index;
+    $indexKey = alteon_normalize_index((string) $index) ?: (string) $index;
     $runtimeIp = trim((string) ($entry[$realInfoIpKey] ?? ''));
     if ($runtimeIp !== '') {
         $realServerRuntimeIps[$indexKey] = $runtimeIp;
@@ -545,7 +577,8 @@ if (! empty($groupRuntime)) {
     $stateMap = alteon_state_text_map($groupStates);
 
     foreach ($groupRuntime as $groupIndex => $servers) {
-        $groupKey = (string) $groupIndex;
+        $groupIndexRaw = (string) $groupIndex;
+        $groupKey = alteon_normalize_index($groupIndexRaw) ?: $groupIndexRaw;
         $groupLabel = $realGroups[$groupKey]['label'] ?? "Real Group $groupKey";
         $memberList = $groupMembers[$groupKey] ?? array_keys((array) $servers);
         $singleMember = count($memberList) <= 1;
@@ -556,13 +589,21 @@ if (! empty($groupRuntime)) {
                 continue;
             }
 
-            $serverKey = (string) $serverIndex;
+            $serverIndexRaw = (string) $serverIndex;
+            $serverKey = alteon_normalize_index($serverIndexRaw) ?: $serverIndexRaw;
             $groupStatusMap[$groupKey][$serverKey] = $value;
             $memberIp = $realServerRuntimeIps[$serverKey] ?? ($realServers[$serverKey]['ip'] ?? '');
             $ipDisplay = $memberIp !== '' ? $memberIp : ($realServers[$serverKey]['name'] ?? "Real Server $serverKey");
             $descr = sprintf('Real Server Group %s.%s (%s)', $groupKey, $serverKey, $ipDisplay);
             $sensorIndex = $groupKey . '.' . $serverKey;
-            $oid = $groupOidBase . '.' . $groupIndex . '.' . $serverIndex;
+            if ($groupStateKey === 'slbOperEnhGroupRealServerRuntimeStatus') {
+                $groupOidIndex = alteon_snmp_string_index($groupKey);
+                $serverOidIndex = alteon_snmp_string_index($serverKey);
+            } else {
+                $groupOidIndex = $groupIndexRaw;
+                $serverOidIndex = $serverIndexRaw;
+            }
+            $oid = $groupOidBase . '.' . $groupOidIndex . '.' . $serverOidIndex;
 
             discover_sensor(null, 'state', $device, $oid, $sensorIndex, $groupStateType, $descr, 1, 1, null, null, null, null, $value);
         }
@@ -570,15 +611,23 @@ if (! empty($groupRuntime)) {
 }
 
 // Virtual service state derived from runtime tables (per real server membership)
-$virtServiceRuntime = alteon_walk_table($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbEnhVirtServicesInfoEntry');
-$runtimeStateType = alteon_sensor_type_name('ALTEON-CHEETAH-LAYER4-MIB::slbVirtServicesInfoState');
-$runtimeStateKey = 'slbEnhVirtServicesInfoState';
-$runtimeOidBase = '.1.3.6.1.4.1.1872.2.5.4.3.14.1.6';
-if (empty($virtServiceRuntime)) {
-    $virtServiceRuntime = alteon_walk_table($device, 'ALTEON-CHEETAH-LAYER4-MIB::slbVirtServicesInfoEntry');
-    $runtimeStateKey = 'slbVirtServicesInfoState';
-    $runtimeOidBase = '.1.3.6.1.4.1.1872.2.5.4.3.4.1.6';
+$virtServiceRuntime = [];
+$runtimeStateKey = null;
+$runtimeOidBase = null;
+$runtimeSources = [
+    ['entry' => 'ALTEON-CHEETAH-LAYER4-MIB::slbEnhVirtServicesInfoEntry', 'state_key' => 'slbEnhVirtServicesInfoState', 'oid_base' => '.1.3.6.1.4.1.1872.2.5.4.3.18.1.6'],
+    ['entry' => 'ALTEON-CHEETAH-LAYER4-MIB::slbEnhVirtServicesInfoEntry', 'state_key' => 'slbEnhVirtServicesInfoState', 'oid_base' => '.1.3.6.1.4.1.1872.2.5.4.3.14.1.6'],
+    ['entry' => 'ALTEON-CHEETAH-LAYER4-MIB::slbVirtServicesInfoEntry', 'state_key' => 'slbVirtServicesInfoState', 'oid_base' => '.1.3.6.1.4.1.1872.2.5.4.3.4.1.6'],
+];
+foreach ($runtimeSources as $source) {
+    $virtServiceRuntime = alteon_walk_table($device, $source['entry']);
+    if (! empty($virtServiceRuntime)) {
+        $runtimeStateKey = $source['state_key'];
+        $runtimeOidBase = $source['oid_base'];
+        break;
+    }
 }
+$runtimeStateType = alteon_sensor_type_name('ALTEON-CHEETAH-LAYER4-MIB::slbVirtServicesInfoState');
 
 if (! empty($virtServiceRuntime)) {
     $states = alteon_normalize_state_definitions([
@@ -600,16 +649,33 @@ if (! empty($virtServiceRuntime)) {
             continue;
         }
 
-        $parts = explode('.', (string) $index);
-        $virtIndex = (string) array_shift($parts);
-        $serviceIndex = (string) array_shift($parts);
-        $realIndex = (string) array_shift($parts);
-        if ($realIndex === '') {
+        if ($runtimeStateKey === 'slbEnhVirtServicesInfoState') {
+            $virtIndexRaw = (string) ($entry['slbEnhVirtServicesInfoVirtServIndex'] ?? '');
+            $serviceIndexRaw = (string) ($entry['slbEnhVirtServicesInfoSvcIndex'] ?? '');
+            $realIndexRaw = (string) ($entry['slbEnhVirtServicesInfoRealServIndex'] ?? '');
+        } else {
+            $virtIndexRaw = (string) ($entry['slbVirtServicesInfoVirtServIndex'] ?? '');
+            $serviceIndexRaw = (string) ($entry['slbVirtServicesInfoSvcIndex'] ?? '');
+            $realIndexRaw = (string) ($entry['slbVirtServicesInfoRealServIndex'] ?? '');
+        }
+
+        if ($virtIndexRaw === '' || $serviceIndexRaw === '' || $realIndexRaw === '') {
+            $parts = explode('.', (string) $index);
+            $virtIndexRaw = $virtIndexRaw !== '' ? $virtIndexRaw : (string) array_shift($parts);
+            $serviceIndexRaw = $serviceIndexRaw !== '' ? $serviceIndexRaw : (string) array_shift($parts);
+            $realIndexRaw = $realIndexRaw !== '' ? $realIndexRaw : (string) array_shift($parts);
+        }
+
+        if ($realIndexRaw === '') {
             continue;
         }
 
-        $allowedMembers = $serviceMemberMap[$virtIndex][$serviceIndex] ?? [];
-        if (empty($allowedMembers) || ! in_array($realIndex, $allowedMembers, true)) {
+        $virtIndex = alteon_normalize_index($virtIndexRaw) ?: $virtIndexRaw;
+        $serviceIndex = (string) $serviceIndexRaw;
+        $realIndex = alteon_normalize_index($realIndexRaw) ?: $realIndexRaw;
+
+        $allowedMembers = $serviceMemberMap[$virtIndex][$serviceIndex] ?? null;
+        if (is_array($allowedMembers) && $allowedMembers !== [] && ! in_array($realIndex, $allowedMembers, true)) {
             continue;
         }
 
@@ -619,9 +685,21 @@ if (! empty($virtServiceRuntime)) {
             continue;
         }
 
-        $memberGroup = (string) ($serviceMeta['real_group'] ?? '');
+        $runtimeVirtPort = (int) ($entry['slbEnhVirtServicesInfoVport'] ?? $entry['slbVirtServicesInfoVport'] ?? 0);
+        $runtimeRealPort = (int) ($entry['slbEnhVirtServicesInfoRport'] ?? $entry['slbVirtServicesInfoRport'] ?? 0);
+        if ($runtimeVirtPort > 0) {
+            $serviceMeta['virtual_port'] = $runtimeVirtPort;
+        }
+        if ($runtimeRealPort > 0) {
+            $serviceMeta['real_port'] = $runtimeRealPort;
+        }
+
+        $memberGroup = trim((string) ($serviceMeta['real_group'] ?? ''));
         if ($memberGroup === '') {
             $memberGroup = (string) ($serverGroupMap[$realIndex] ?? '');
+        }
+        if ($memberGroup !== '') {
+            $serviceMeta['real_group'] = $memberGroup;
         }
         $memberIp = $realServerRuntimeIps[$realIndex] ?? ($realServers[$realIndex]['ip'] ?? '');
         $memberDetail = [
@@ -640,7 +718,16 @@ if (! empty($virtServiceRuntime)) {
 
         $label = alteon_format_virtual_service_label($serviceMeta, $virtualServers, $groupMembers, $realServers, $groupStatusMap, $virtIndex, $serviceIndex, $memberDetail);
         $sensorIndex = $comboKey;
-        $oid = $runtimeOidBase . '.' . $index;
+        if ($runtimeStateKey === 'slbEnhVirtServicesInfoState') {
+            $virtIndexOid = alteon_snmp_string_index($virtIndexRaw !== '' ? $virtIndexRaw : $virtIndex);
+            $serviceIndexOid = $serviceIndex;
+            $realOidIndex = alteon_snmp_string_index($realIndexRaw !== '' ? $realIndexRaw : $realIndex);
+        } else {
+            $virtIndexOid = $virtIndexRaw !== '' ? $virtIndexRaw : $virtIndex;
+            $serviceIndexOid = $serviceIndex;
+            $realOidIndex = $realIndexRaw !== '' ? $realIndexRaw : $realIndex;
+        }
+        $oid = $runtimeOidBase . '.' . $virtIndexOid . '.' . $serviceIndexOid . '.' . $realOidIndex;
         discover_sensor(null, 'state', $device, $oid, $sensorIndex, $runtimeStateType, $label, 1, 1, null, null, null, null, $value);
     }
 }
