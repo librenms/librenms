@@ -192,11 +192,7 @@ class DnsTest extends TestCase
 
     public function testGetRecordReturnsAnswerOnSuccess(): void
     {
-        $mockResponse = Mockery::mock()->allows([
-            'answer' => [
-                (object) ['type' => 'A', 'address' => '192.168.1.1'],
-            ],
-        ]);
+        $mockResponse = $this->dnsResponse([(object) ['type' => 'A', 'address' => '192.168.1.1']]);
 
         $this->resolverMock->shouldReceive('query')
             ->with('example.com', 'A')
@@ -224,9 +220,7 @@ class DnsTest extends TestCase
 
     public function testGetRecordUsesARecordByDefault(): void
     {
-        $mockResponse = Mockery::mock()->allows([
-            'answer' => [],
-        ]);
+        $mockResponse = $this->dnsResponse();
 
         $this->resolverMock->shouldReceive('query')
             ->with('example.com', 'A')
@@ -241,14 +235,7 @@ class DnsTest extends TestCase
 
     public function testGetCoordinatesReturnsLatLngFromLocRecord(): void
     {
-        $mockRecord = Mockery::mock()->allows([
-            'latitude' => 40.7128,
-            'longitude' => -74.0060,
-        ]);
-
-        $mockResponse = Mockery::mock()->allows([
-            'answer' => [$mockRecord],
-        ]);
+        $mockResponse = $this->dnsResponse([(object) ['latitude' => 40.7128, 'longitude' => -74.0060]]);
 
         $this->resolverMock->shouldReceive('query')
             ->with('example.com', 'LOC')
@@ -262,9 +249,7 @@ class DnsTest extends TestCase
 
     public function testGetCoordinatesReturnsEmptyArrayWhenNoRecordsFound(): void
     {
-        $mockResponse = Mockery::mock()->allows([
-            'answer' => [],
-        ]);
+        $mockResponse = $this->dnsResponse();
 
         $this->resolverMock->shouldReceive('query')
             ->with('example.com', 'LOC')
@@ -278,11 +263,7 @@ class DnsTest extends TestCase
 
     public function testGetCoordinatesReturnsNullValuesWhenRecordMissingCoordinates(): void
     {
-        $mockRecord = Mockery::mock();
-
-        $mockResponse = Mockery::mock()->allows([
-            'answer' => [$mockRecord],
-        ]);
+        $mockResponse = $this->dnsResponse([(object) []]);
 
         $this->resolverMock->shouldReceive('query')
             ->with('example.com', 'LOC')
@@ -400,10 +381,7 @@ class DnsTest extends TestCase
     {
         $this->mockConfig('ipv4_only');
         $device = $this->device(ip: '192.168.1.1');
-
-        $mockResponse = Mockery::mock()->allows([
-            'answer' => [],
-        ]);
+        $mockResponse = $this->dnsResponse();
 
         $this->resolverMock->shouldReceive('query')
             ->with('192.168.1.1', 'A')
@@ -422,10 +400,7 @@ class DnsTest extends TestCase
     {
         $this->mockConfig('prefer_ipv4');
         $device = $this->device(ip: '192.168.1.1');
-
-        $mockResponse = Mockery::mock()->allows([
-            'answer' => [],
-        ]);
+        $mockResponse = $this->dnsResponse();
 
         $this->resolverMock->shouldReceive('query')
             ->with('192.168.1.1', 'A')
@@ -449,10 +424,7 @@ class DnsTest extends TestCase
     {
         $this->mockConfig('ipv6_only');
         $device = $this->device(ip: '2001:db8::1');
-
-        $mockResponse = Mockery::mock()->allows([
-            'answer' => [],
-        ]);
+        $mockResponse = $this->dnsResponse();
 
         $this->resolverMock->shouldReceive('query')
             ->with('2001:db8::1', 'AAAA')
@@ -471,10 +443,7 @@ class DnsTest extends TestCase
     {
         $this->mockConfig('os');
         $device = $this->device(ip: '192.168.1.1', transport: 'udp');
-
-        $mockResponse = Mockery::mock()->allows([
-            'answer' => [],
-        ]);
+        $mockResponse = $this->dnsResponse();
 
         $this->resolverMock->shouldReceive('query')
             ->with('192.168.1.1', 'A')
@@ -548,5 +517,16 @@ class DnsTest extends TestCase
                 'ai_addr' => ['sin6_addr' => $ip, 'sin6_port' => 0],
             ],
         ];
+    }
+
+    protected function dnsResponse(array $answer = [], array $authority = [], array $additional = []): object
+    {
+        return new class($answer, $authority, $additional) {
+            public function __construct(
+                public array $answer,
+                public array $authority,
+                public array $additional,
+            ) {}
+        };
     }
 }
