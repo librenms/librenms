@@ -28,7 +28,6 @@ namespace App\Http\Controllers\Device\Tabs;
 
 use App\Facades\DeviceCache;
 use App\Models\Device;
-use App\Models\Sensor;
 use Illuminate\Http\Request;
 use LibreNMS\Component;
 use LibreNMS\Interfaces\UI\DeviceTab;
@@ -83,6 +82,10 @@ class LoadBalancerController implements DeviceTab
         }
 
         if ($device->os == 'alteonos') {
+            $stateSensors = $device->sensors
+                ? $device->sensors->where('sensor_class', 'state')
+                : collect();
+
             $tabs = [
                 'alteonos_real_servers' => ['slbEnhRealServer', 'slbRealServer'],
                 'alteonos_real_groups' => ['slbOperEnhGroupRealServerRuntime', 'slbOperEnhGroupRealServerRuntimeStatus', 'slbOperGroupRealServer', 'slbOperGroupRealServerState'],
@@ -99,21 +102,16 @@ class LoadBalancerController implements DeviceTab
             ];
 
             foreach ($tabs as $tab => $types) {
-                $query = Sensor::query()
-                    ->where('device_id', $device->device_id)
-                    ->where('sensor_class', 'state')
-                    ->whereIn('sensor_type', $types);
+                $matching = $stateSensors->whereIn('sensor_type', $types);
 
-                if ($tab === 'alteonos_real_groups') {
-                    $count = $query->pluck('sensor_index')
+                $count = $tab === 'alteonos_real_groups'
+                    ? $matching->pluck('sensor_index')
                         ->map(fn ($index) => ltrim((string) $index, '.'))
                         ->map(fn ($index) => explode('.', (string) $index)[0] ?? null)
                         ->filter()
                         ->unique()
-                        ->count();
-                } else {
-                    $count = $query->count();
-                }
+                        ->count()
+                    : $matching->count();
 
                 if ($count > 0) {
                     $this->addTab($tab, $count);
