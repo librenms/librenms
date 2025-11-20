@@ -98,7 +98,7 @@ $inactive_sql = "`deleted` = 1 OR `ifAdminStatus` != 'up' OR `disabled` = 1";
 $set_count = 0;
 foreach ($devices as &$device) {
     $count = DB::table('ports')->where('device_id', $device['device_id'])->count();
-    $inactive = DB::table('ports')->where('device_id', $device['device_id'])->where(function (Builder $query) {
+    $inactive = DB::table('ports')->where('device_id', $device['device_id'])->where(function (Builder $query): void {
         $query->where('deleted', 1)->orWhere('ifAdminStatus', '!=', 'up')->orWhere('disabled', 1);
     })->count();
 
