@@ -34,6 +34,19 @@ function bulk_sensor_snmpget($device, $sensors)
     return $cache;
 }
 
+if (! function_exists('normalize_state_sensor_value')) {
+    function normalize_state_sensor_value($value)
+    {
+        if (! is_numeric($value)) {
+            return $value;
+        }
+
+        $intValue = (int) $value;
+
+        return max(-32768, min(32767, $intValue));
+    }
+}
+
 function poll_sensor($device, $class)
 {
     $sensors = [];

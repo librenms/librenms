@@ -370,48 +370,6 @@ function host_exists(string $hostname, ?string $sysName = null): bool
 }
 
 /**
- * Perform DNS lookup
- *
- * @param  array  $device  Device array from database
- * @param  string  $type  The type of record to lookup
- * @return string ip
- *
- **/
-function dnslookup($device, $type = false, $return = false)
-{
-    if (filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
-        return false;
-    }
-    if (empty($type)) {
-        // We are going to use the transport to work out the record type
-        if ($device['transport'] == 'udp6' || $device['transport'] == 'tcp6') {
-            $type = DNS_AAAA;
-            $return = 'ipv6';
-        } else {
-            $type = DNS_A;
-            $return = 'ip';
-        }
-    }
-    if (empty($return)) {
-        return false;
-    }
-    $record = dns_get_record($device['hostname'], $type);
-
-    return $record[0][$return] ?? null;
-}//end dnslookup
-
-function normalize_state_sensor_value($value)
-{
-    if (! is_numeric($value)) {
-        return $value;
-    }
-
-    $intValue = (int) $value;
-
-    return max(-32768, min(32767, $intValue));
-}
-
-/**
  * Create a new state index.  Update translations if $states is given.
  *
  * For for backward compatibility:
@@ -423,18 +381,12 @@ function normalize_state_sensor_value($value)
  */
 function create_state_index($state_name, $states = []): void
 {
-    app('sensor-discovery')->withStateTranslations($state_name, array_map(function ($state) {
-        if (isset($state['value'])) {
-            $state['value'] = normalize_state_sensor_value($state['value']);
-        }
-
-        return new StateTranslation([
-            'state_descr' => $state['descr'],
-            'state_draw_graph' => $state['graph'],
-            'state_value' => $state['value'],
-            'state_generic_value' => $state['generic'],
-        ]);
-    }, $states));
+    app('sensor-discovery')->withStateTranslations($state_name, array_map(fn ($state) => new StateTranslation([
+        'state_descr' => $state['descr'],
+        'state_draw_graph' => $state['graph'],
+        'state_value' => $state['value'],
+        'state_generic_value' => $state['generic'],
+    ]), $states));
 }
 
 function delta_to_bits($delta, $period)
