@@ -4,8 +4,6 @@ if ($device['os'] !== 'alteonos') {
     return;
 }
 
-require_once base_path('includes/common/alteon-snmp.inc.php');
-
 echo 'Alteon ';
 
 $tempSensors = [
@@ -24,12 +22,12 @@ $tempSensors = [
 ];
 
 foreach ($tempSensors as $sensor) {
-    $value = alteon_snmp_get($device, $sensor['oid']);
-
-    if ($value === false || $value === '' || stripos((string) $value, 'No Such') !== false) {
+    $response = \SnmpQuery::get($sensor['oid']);
+    if (! $response->isValid()) {
         continue;
     }
 
+    $value = $response->value();
     if (! preg_match('/-?\d+(\.\d+)?/', (string) $value, $matches)) {
         continue;
     }
