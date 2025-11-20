@@ -84,7 +84,7 @@ class Billing
         $oid = 'IF-MIB::ifHC' . $inout . 'Octets.' . $id;
         $device = DeviceCache::get($host);
         $value = SnmpQuery::device($device)->get($oid)->value();
-        
+
         if (! is_numeric($value)) {
             $oid = 'IF-MIB::if' . $inout . 'Octets.' . $id;
             $value = SnmpQuery::device($device)->get($oid)->value();
