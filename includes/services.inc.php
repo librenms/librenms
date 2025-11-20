@@ -20,7 +20,7 @@ function add_service($device, $type, $desc, $ip = '', $param = '', $ignore = 0, 
 
     $insert = ['device_id' => $device->device_id, 'service_ip' => $ip, 'service_type' => $type, 'service_changed' => DB::raw('UNIX_TIMESTAMP(NOW())'), 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked', 'service_ds' => '{}', 'service_disabled' => $disabled, 'service_template_id' => $template_id, 'service_name' => $name];
 
-    return DB::table('services')->insert($insert);
+    return DB::table('services')->insertGetId($insert);
 }
 
 function service_get($device = null, $service = null)
