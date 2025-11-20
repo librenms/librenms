@@ -58,7 +58,7 @@ class Dns implements Geocoder
             default => $this->resolveIP($device->hostname),
         };
 
-        if ($result === false)  {
+        if ($result === false) {
             // failed to resolve IP, if ip is set, determine if we should clear it
             return $this->lookupFailedShouldClearIpCache($device) ? null : $device->ip;
         }

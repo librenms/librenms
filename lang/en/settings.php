@@ -840,7 +840,7 @@ return [
                 'ipv6_only' => 'IPv6 only',
                 'prefer_ipv4' => 'IPv4 preferred',
                 'ipv4_only' => 'IPv4 only',
-            ]
+            ],
         ],
         'enable_ports_etherlike' => [
             'description' => 'Enable etherlike graphs for ports',

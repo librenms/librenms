@@ -225,7 +225,7 @@ class DnsTest extends TestCase
     public function testGetRecordUsesARecordByDefault(): void
     {
         $mockResponse = Mockery::mock()->allows([
-            'answer' => []
+            'answer' => [],
         ]);
 
         $this->resolverMock->shouldReceive('query')
@@ -507,6 +507,7 @@ class DnsTest extends TestCase
         $d->overwrite_ip = $overwriteIp;
         $d->ip = $ip;
         $d->transport = $transport;
+
         return $d;
     }
 
@@ -535,7 +536,7 @@ class DnsTest extends TestCase
             [
                 'ai_family' => AF_INET,
                 'ai_addr' => ['sin_addr' => $ip, 'sin_port' => 0],
-            ]
+            ],
         ];
     }
 
@@ -545,7 +546,7 @@ class DnsTest extends TestCase
             [
                 'ai_family' => AF_INET6,
                 'ai_addr' => ['sin6_addr' => $ip, 'sin6_port' => 0],
-            ]
+            ],
         ];
     }
 }
