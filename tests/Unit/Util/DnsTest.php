@@ -521,12 +521,14 @@ class DnsTest extends TestCase
 
     protected function dnsResponse(array $answer = [], array $authority = [], array $additional = []): object
     {
-        return new class($answer, $authority, $additional) {
+        return new class($answer, $authority, $additional)
+        {
             public function __construct(
                 public array $answer,
                 public array $authority,
                 public array $additional,
-            ) {}
+            ) {
+            }
         };
     }
 }
