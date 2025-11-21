@@ -73,11 +73,11 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             }
         }
     }
+
 /**
-     * Poll BGP peers from BGP4-MIB (standard MIB), ensuring correct indexing.
-     *
-     * This implementation explicitly forces the use of BGP4-MIB and structures
-     * the peer keys correctly to allow RRD file creation (the cbgp-....rrd files).
+     * Poll BGP peers from BGP4-MIB (standard MIB) for both IPv4 and IPv6.
+     * This overrides the generic poller for Timos devices to ensure correct
+     * indexing and RRD file creation, fixing the "No data file" error.
      *
      * @return array
      */
@@ -85,35 +85,40 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     {
         $mib = 'BGP4-MIB';
 
-        $peerTable = SnmpQuery::walk($mib . '::bgpPeerTable')->valuesByIndex();
+        $data = SnmpQuery::hideMib()->walk([
+            $mib . '::bgpPeerTable',
+            $mib . '::bgpPeerEntry',
+        ])->mapTable(function ($value, $index) use ($mib) {
+            $peer_ip = $value[$mib . '::bgpPeerRemoteAddr'] ?? null;
 
-        $stats = SnmpQuery::walk($mib . '::bgpPeerEntry')->valuesByIndex();
-
-        $peers = [];
-        foreach ($peerTable as $index => $data) {
-            $peer_stats = $stats[$index] ?? [];
-
-            $peer_ip = $data[$mib . '::bgpPeerRemoteAddr'] ?? null;
-
-            if ($peer_ip) {
-                $peers[$peer_ip] = [
-                    'bgpPeerIdentifier' => $data[$mib . '::bgpPeerIdentifier'] ?? null,
-                    'bgpPeerState' => $data[$mib . '::bgpPeerState'] ?? null,
-                    'bgpPeerAdminStatus' => $data[$mib . '::bgpPeerAdminStatus'] ?? null,
-                    'bgpPeerLocalAs' => $data[$mib . '::bgpPeerLocalAs'] ?? null,
-                    'bgpPeerRemoteAs' => $data[$mib . '::bgpPeerRemoteAs'] ?? null,
-                    'bgpPeerLocalAddr' => $data[$mib . '::bgpPeerLocalAddr'] ?? null,
-                    'bgpPeerRemoteAddr' => $peer_ip, // Use this as the key for the graph
-
-                    'bgpPeerInUpdates' => $peer_stats[$mib . '::bgpPeerInUpdates'] ?? 0,
-                    'bgpPeerOutUpdates' => $peer_stats[$mib . '::bgpPeerOutUpdates'] ?? 0,
-                    'bgpPeerInTotalMessages' => $peer_stats[$mib . '::bgpPeerInTotalMessages'] ?? 0,
-                    'bgpPeerOutTotalMessages' => $peer_stats[$mib . '::bgpPeerOutTotalMessages'] ?? 0,
-                    'bgpPeerFsmEstablishedTime' => $peer_stats[$mib . '::bgpPeerFsmEstablishedTime'] ?? 0,
-                    'bgpPeerLastError' => $peer_stats[$mib . '::bgpPeerLastError'] ?? null,
-                ];
+            if (! $peer_ip) {
+                return null;
             }
+
+            return [
+                'bgpPeerIdentifier' => $value[$mib . '::bgpPeerIdentifier'] ?? null,
+                'bgpPeerState' => $value[$mib . '::bgpPeerState'] ?? null,
+                'bgpPeerAdminStatus' => $value[$mib . '::bgpPeerAdminStatus'] ?? null,
+                'bgpPeerLocalAs' => $value[$mib . '::bgpPeerLocalAs'] ?? null,
+                'bgpPeerRemoteAs' => $value[$mib . '::bgpPeerRemoteAs'] ?? null,
+                'bgpPeerLocalAddr' => $value[$mib . '::bgpPeerLocalAddr'] ?? null,
+                'bgpPeerRemoteAddr' => $peer_ip, // Peer address
+
+                'bgpPeerRemoteAddrType' => $value[$mib . '::bgpPeerRemoteAddrType'] ?? null,
+
+                'bgpPeerInUpdates' => $value[$mib . '::bgpPeerInUpdates'] ?? 0,
+                'bgpPeerOutUpdates' => $value[$mib . '::bgpPeerOutUpdates'] ?? 0,
+                'bgpPeerInTotalMessages' => $value[$mib . '::bgpPeerInTotalMessages'] ?? 0,
+                'bgpPeerOutTotalMessages' => $value[$mib . '::bgpPeerOutTotalMessages'] ?? 0,
+                'bgpPeerFsmEstablishedTime' => $value[$mib . '::bgpPeerFsmEstablishedTime'] ?? 0,
+                'bgpPeerLastError' => $value[$mib . '::bgpPeerLastError'] ?? null,
+            ];
+        })->filter()->all();
+        $peers = [];
+        foreach ($data as $peer) {
+            $peers[$peer['bgpPeerRemoteAddr']] = $peer;
         }
+
         return $peers;
     }
 
