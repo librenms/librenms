@@ -20,7 +20,7 @@ AC-BOARD-MIB DEFINITIONS ::= BEGIN
 
        
 acBoard        MODULE-IDENTITY       
-    LAST-UPDATED "201002-01649Z"          --Tuesday, February 02, 2010
+    LAST-UPDATED "201001201649Z"          --Tuesday, February 02, 2010
     ORGANIZATION "AudioCodes Ltd"
     CONTACT-INFO
     "Postal: Support
