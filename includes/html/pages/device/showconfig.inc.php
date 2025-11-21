@@ -5,11 +5,12 @@ use App\Facades\LibrenmsConfig;
 use Symfony\Component\Process\Process;
 
 if (Auth::user()->hasGlobalAdmin()) {
-    if (LibrenmsConfig::get('rancid_repo_type') == 'git-bare' && ! is_null(LibrenmsConfig::get('rancid_repo_url')) && is_dir($rancid_path)) {
+    if (LibrenmsConfig::get('rancid_repo_type') == 'git-bare' && is_dir($rancid_path)) {
         echo '<div style="clear: both;">';
 
         print_optionbar_start('', '');
-        echo '<a href="' . LibrenmsConfig::get('rancid_repo_url') . '/?a=blob;hb=HEAD;p=' . basename((string) $rancid_path) . ';f=' . $rancid_file . '">Repo</a>';
+        echo is_null(LibrenmsConfig::get('rancid_repo_url')) ? 'Git repository non-browsable'
+            : '<a href="' . LibrenmsConfig::get('rancid_repo_url') . '/?a=blob;hb=HEAD;p=' . basename((string) $rancid_path) . ';f=' . $rancid_file . '">Git repository</a>';
         print_optionbar_end();
 
         $process = new Process(['git', 'ls-tree', '-r', 'HEAD'], $rancid_path);
