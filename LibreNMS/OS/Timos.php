@@ -213,7 +213,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             'mplsLspFastReroute' => $value['vRtrMplsLspFastReroute'] ?? null,
         ]));
     }
-➡️
+
     /**
      * @param  Collection  $lsps  collecton of synchronized lsp objects from discoverMplsLsps()
      * @return Collection MplsLspPath objects
