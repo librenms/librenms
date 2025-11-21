@@ -1908,6 +1908,10 @@ return [
             'description' => 'RANCID Repository Type',
             'help' => 'Type of repository used by RANCID, used to display config diffs on device pages',
         ],
+        'rancid_repo_url' => [
+            'description' => 'RANCID Repository URL',
+            'help' => 'RANCID repository URL, used to point at GitWeb that visualizes a bare Git repository',
+        ],
         'rancid_ignorecomments' => [
             'description' => 'RANCID Ignore Comments',
             'help' => 'Ignore comments when comparing RANCID configs, used to display config diffs on device pages',

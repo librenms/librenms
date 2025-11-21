@@ -3766,7 +3766,7 @@
             },
             "type": "graph"
         },
-	"graph_types.device.purestorage_bandwidth": {
+        "graph_types.device.purestorage_bandwidth": {
             "default": {
                 "section": "storage",
                 "order": 0,
@@ -4247,70 +4247,70 @@
             "type": "graph"
         },
         "graph_types.device.purestorage_total_capacity": {
-	    "default": {
-	        "section": "storage",
-  	        "order": 0,
- 	        "descr": "Total Capacity"
-	    },
-	  "type": "graph"
-	},
-	"graph_types.device.purestorage_used_capacity": {
-  	    "default": {
-    		"section": "storage",
-    		"order": 1,
-    		"descr": "Used Capacity"
-  	    },
-  	  "type": "graph"
-	},
+            "default": {
+                "section": "storage",
+                "order": 0,
+                "descr": "Total Capacity"
+            },
+          "type": "graph"
+        },
+        "graph_types.device.purestorage_used_capacity": {
+            "default": {
+                "section": "storage",
+                "order": 1,
+                "descr": "Used Capacity"
+            },
+          "type": "graph"
+        },
         "graph_types.device.purestorage_read_iops": {
-    	    "default": {
-      		"section": "storage",
-      		"order": 2,
-      		"descr": "Read IOPS"
-    	},
-    	  "type": "graph"
-  	},
-  	"graph_types.device.purestorage_write_iops": {
-    	    "default": {
-      		"section": "storage",
-      		"order": 3,
-      		"descr": "Write IOPS"
-    	},
-    	  "type": "graph"
-  	},
-  	"graph_types.device.purestorage_read_bandwidth": {
-    	    "default": {
-      		"section": "storage",
-      		"order": 4,
-      		"descr": "Read Bandwidth"
-    	},
-    	  "type": "graph"
-  	},
-  	"graph_types.device.purestorage_write_bandwidth": {
-    	    "default": {
-      		"section": "storage",
-      		"order": 5,
-      		"descr": "Write Bandwidth"
-    	},
-    	  "type": "graph"
-  	},
-  	"graph_types.device.purestorage_read_latency": {
-    	    "default": {
-      		"section": "storage",
-      		"order": 6,
-      		"descr": "Read Latency"
-    	},
-    	  "type": "graph"
-  	},
-  	"graph_types.device.purestorage_write_latency": {
-    	    "default": {
-      	   "section": "storage",
+            "default": {
+                "section": "storage",
+                "order": 2,
+                "descr": "Read IOPS"
+        },
+          "type": "graph"
+        },
+        "graph_types.device.purestorage_write_iops": {
+            "default": {
+                "section": "storage",
+                "order": 3,
+                "descr": "Write IOPS"
+        },
+          "type": "graph"
+        },
+        "graph_types.device.purestorage_read_bandwidth": {
+            "default": {
+                "section": "storage",
+                "order": 4,
+                "descr": "Read Bandwidth"
+        },
+          "type": "graph"
+        },
+        "graph_types.device.purestorage_write_bandwidth": {
+            "default": {
+                "section": "storage",
+                "order": 5,
+                "descr": "Write Bandwidth"
+        },
+          "type": "graph"
+        },
+        "graph_types.device.purestorage_read_latency": {
+            "default": {
+                "section": "storage",
+                "order": 6,
+                "descr": "Read Latency"
+        },
+          "type": "graph"
+        },
+        "graph_types.device.purestorage_write_latency": {
+            "default": {
+           "section": "storage",
            "order": 7,
-      	   "descr": "Write Latency"
-    	},
-    	   "type": "graph"
-  	},
-	"graphite.enable": {
+           "descr": "Write Latency"
+        },
+           "type": "graph"
+        },
+        "graphite.enable": {
             "default": false,
             "type": "boolean",
             "group": "poller",
@@ -6432,11 +6432,19 @@
             "type": "select",
             "options": {
                 "svn": "SVN",
-                "git": "Git"
+                "git": "Git",
+                "git-bare": "Git bare"
             },
             "group": "external",
             "section": "rancid",
             "order": 2
+        },
+        "rancid_repo_url": {
+            "default": null,
+            "type": "text",
+            "group": "external",
+            "section": "rancid",
+            "order": 3
         },
         "reporting.error": {
             "group": "system",
