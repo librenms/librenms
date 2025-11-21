@@ -55,7 +55,7 @@ class MaximumExecutionTimeExceeded extends \Exception implements UpgradeableExce
      */
     public function render(Request $request): Response|JsonResponse
     {
-        $title = preg_match('/ (\d+) /', $this->message, $matches)
+        $title = preg_match('/ (\d+) /', (string) $this->message, $matches)
             ? trans_choice('exceptions.maximum_execution_time_exceeded.title', (int) $matches[1], ['seconds' => (int) $matches[1]])
             : $this->getMessage();
 

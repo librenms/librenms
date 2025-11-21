@@ -89,7 +89,7 @@ $rrd_def = RrdDefinition::make();
 $fields = [];
 foreach ($powerdns_metrics as $ds => $metric) {
     $rrd_def->addDataset($ds, 'DERIVE', 0, 125000000000);
-    $fields[$ds] = isset($powerdns[$metric]) ? $powerdns[$metric] : 'U';
+    $fields[$ds] = $powerdns[$metric] ?? 'U';
 }
 
 $tags = [

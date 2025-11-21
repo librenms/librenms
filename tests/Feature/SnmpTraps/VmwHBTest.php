@@ -31,7 +31,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 use App\Models\Device;
 use LibreNMS\Enum\Severity;
 
-class VmwHBTest extends SnmpTrapTestCase
+final class VmwHBTest extends SnmpTrapTestCase
 {
     public function testVmwVmHBLostTrap(): void
     {

@@ -1,7 +1,7 @@
 <table class="table table-condensed table-hover table-striped">
 <?php
 
-$types_array = explode(',', strip_tags($vars['type']));
+$types_array = explode(',', strip_tags((string) $vars['type']));
 $ports = get_ports_from_type($types_array);
 
 $if_list = implode(',', array_map(fn ($port) => $port['port_id'], $ports));
@@ -9,12 +9,12 @@ $if_list = implode(',', array_map(fn ($port) => $port['port_id'], $ports));
 // show title from config file (but ucwords it)
 $ctypes = collect(\App\Facades\LibrenmsConfig::get('custom_descr', []))->keyBy(function ($descr) {
     if (is_array($descr)) {
-        return strtolower($descr[0]);
+        return strtolower((string) $descr[0]);
     }
 
-    return strtolower($descr);
+    return strtolower((string) $descr);
 });
-array_walk($types_array, function (&$type) use ($ctypes) {
+array_walk($types_array, function (&$type) use ($ctypes): void {
     $name = $ctypes->get(strtolower($type), $type);
     $type = ucwords(is_array($name) ? $name[0] : $name);
 });

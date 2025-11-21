@@ -17,12 +17,12 @@ $multiplier = 1;
 $divisor = 1000000;
 
 foreach ($oids as $index => $ciscosb_data) {
-    foreach ($ciscosb_data as $key => $value) {
+    foreach ($ciscosb_data as $value) {
         if (! isset($value['rlPhyTestTableTransceiverTemp']) || $value['rlPhyTestTableTransceiverTemp'] == 0) {
             continue;
         }
         $oid = '.1.3.6.1.4.1.9.6.1.101.90.1.2.1.3.' . $index . '.7';
-        $port = \App\Facades\PortCache::getByIfIndex(preg_replace('/^\d+\./', '', $index), $device['device_id']);
+        $port = \App\Facades\PortCache::getByIfIndex(preg_replace('/^\d+\./', '', (string) $index), $device['device_id']);
         $descr = trim($port?->ifDescr . ' Bias Current');
         $current = $value['rlPhyTestTableTxBias'] / $divisor;
 

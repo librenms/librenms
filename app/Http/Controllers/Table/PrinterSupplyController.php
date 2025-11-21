@@ -30,6 +30,7 @@ class PrinterSupplyController extends TableController
     {
         return [
             'hostname',
+            'display',
             'supply_descr',
             'supply_type',
         ];

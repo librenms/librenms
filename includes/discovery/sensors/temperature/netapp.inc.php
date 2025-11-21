@@ -3,7 +3,7 @@
 $main_oid = '.1.3.6.1.4.1.789.1.21.1.2.1';
 $oids = snmp_walk($device, $main_oid . '.25', '-Osqn');
 d_echo($oids . "\n");
-$oids = trim($oids);
+$oids = trim((string) $oids);
 if ($oids) {
     echo 'NetApp ';
     foreach (explode("\n", $oids) as $data) {

@@ -13,7 +13,7 @@ if (! empty($agent_data['app'][$name])) {
     $bind = snmp_get($device, $oid, $options, $mib);
 }
 
-$bind_data = explode("\n", $bind);
+$bind_data = explode("\n", (string) $bind);
 if (count($bind_data) !== 8) {
     echo " Incorrect number of datapoints returned from device, skipping\n";
 

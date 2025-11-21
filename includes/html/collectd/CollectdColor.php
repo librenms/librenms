@@ -77,8 +77,8 @@ class CollectdColor
 
     public function randomize()
     {
-        $this->r = (rand(0, 255) / 255.0);
-        $this->g = (rand(0, 255) / 255.0);
+        $this->r = (random_int(0, 255) / 255.0);
+        $this->g = (random_int(0, 255) / 255.0);
         $this->b = 0.0;
         $min = 0.0;
         $max = 1.0;
@@ -89,7 +89,7 @@ class CollectdColor
             $max = (2.0 - ($this->r + $this->g));
         }
 
-        $this->b = ($min + ((rand(0, 255) / 255.0) * ($max - $min)));
+        $this->b = ($min + ((random_int(0, 255) / 255.0) * ($max - $min)));
     }
 
     //end randomize()

@@ -43,7 +43,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
 
         if (empty($peers_data)) {
             $bgp4_mib = true;
-            $peers_data = preg_replace('/= /', '', snmp_walk($device, 'bgpPeerRemoteAs', '-OQ', 'BGP4-MIB'));
+            $peers_data = preg_replace('/= /', '', (string) snmp_walk($device, 'bgpPeerRemoteAs', '-OQ', 'BGP4-MIB'));
         }
     } else {
         echo 'No BGP on host';
@@ -105,13 +105,13 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
                     $j_bgp = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PeerTable', [], 'BGP4-V2-MIB-JUNIPER', 'junos', '-OQUbs');
                     d_echo($j_bgp);
                     $j_peerIndexes = [];
-                    foreach ($j_bgp as $index => $entry) {
+                    foreach ($j_bgp as $entry) {
                         $peer_index = $entry['jnxBgpM2PeerIndex'];
                         try {
                             $ip = IP::fromHexString($entry['jnxBgpM2PeerRemoteAddr']);
                             d_echo('peerindex for ' . $ip->getFamily() . " $ip is $peer_index\n");
                             $j_peerIndexes[(string) $ip] = $peer_index;
-                        } catch (InvalidIpException $e) {
+                        } catch (InvalidIpException) {
                             d_echo("Unable to parse IP for peer $peer_index: " . $entry['jnxBgpM2PeerRemoteAddr'] . PHP_EOL);
                         }
                     }
@@ -121,13 +121,13 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
                     $j_prefixes = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PrefixCountersTable', [], 'BGP4-V2-MIB-JUNIPER', 'junos');
                     $j_afisafi = [];
                     foreach (array_keys($j_prefixes) as $key) {
-                        [$index,$afisafi] = explode('.', $key, 2);
+                        [$index,$afisafi] = explode('.', (string) $key, 2);
                         $j_afisafi[$index][] = $afisafi;
                     }
                 }
 
                 foreach ($j_afisafi[$j_peerIndexes[$peer['ip']]] ?? [] as $afisafi) {
-                    [$afi,$safi] = explode('.', $afisafi);
+                    [$afi,$safi] = explode('.', (string) $afisafi);
                     $afi = $afis[$afi];
                     $safi = $safis[$safi];
                     $af_list[$peer['ip']][$afi][$safi] = 1;

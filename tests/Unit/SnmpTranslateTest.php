@@ -29,7 +29,7 @@ namespace LibreNMS\Tests\Unit;
 use App\Models\Device;
 use LibreNMS\Tests\TestCase;
 
-class SnmpTranslateTest extends TestCase
+final class SnmpTranslateTest extends TestCase
 {
     public function testSimpleInput(): void
     {

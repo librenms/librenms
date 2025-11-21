@@ -28,6 +28,7 @@ namespace LibreNMS\Util;
 
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\LibrenmsConfig;
+use App\Jobs\DiscoverDevice;
 use App\Jobs\PollDevice;
 use App\Models\Device;
 use DeviceCache;
@@ -41,35 +42,31 @@ use LibreNMS\Exceptions\InvalidModuleException;
 
 class ModuleTestHelper
 {
-    private $quiet = false;
-    private $modules;
-    private $variant;
-    private $snmprec_file;
-    private $json_file;
-    private $snmprec_dir;
-    private $json_dir;
-    private $file_name;
-    private $discovery_module_output = [];
-    private $poller_module_output = [];
-    private $discovery_output;
-    private $poller_output;
+    private bool $quiet = false;
+    private readonly string $variant;
+    private string $snmprec_file;
+    private string $json_file;
+    private readonly string $snmprec_dir;
+    private readonly string $json_dir;
+    private readonly string $file_name;
+    private array $discovery_module_output = [];
+    private array $poller_module_output = [];
+    private string $discovery_output;
+    private string $poller_output;
 
     // Definitions
     // ignore these when dumping all modules
-    private $exclude_from_all = ['arp-table', 'availability', 'fdb-table'];
+    private array $exclude_from_all = ['arp-table', 'availability', 'fdb-table'];
 
     /**
      * ModuleTester constructor.
      *
-     * @param  array|string  $modules
+     * @param  ModuleList  $modules
      * @param  string  $os
      * @param  string  $variant
-     *
-     * @throws InvalidModuleException
      */
-    public function __construct($modules, $os, $variant = '')
+    public function __construct(private readonly ModuleList $modules, string $os, string $variant = '')
     {
-        $this->modules = self::resolveModuleDependencies((array) $modules);
         $this->variant = strtolower($variant);
 
         // preset the file names
@@ -93,10 +90,10 @@ class ModuleTestHelper
         LibrenmsConfig::set('kafka.enable', false);
     }
 
-    private static function compareOid($a, $b): int
+    private static function compareOid(mixed $a, mixed $b): int
     {
-        $a_oid = explode('.', $a);
-        $b_oid = explode('.', $b);
+        $a_oid = explode('.', (string) $a);
+        $b_oid = explode('.', (string) $b);
 
         foreach ($a_oid as $index => $a_part) {
             if (! isset($b_oid[$index])) {
@@ -119,17 +116,17 @@ class ModuleTestHelper
         return 0;
     }
 
-    public function setQuiet($quiet = true)
+    public function setQuiet(bool $quiet = true): void
     {
         $this->quiet = $quiet;
     }
 
-    public function setSnmprecSavePath($path)
+    public function setSnmprecSavePath(string $path): void
     {
         $this->snmprec_file = $path;
     }
 
-    public function setJsonSavePath($path)
+    public function setJsonSavePath(string $path): void
     {
         $this->json_file = $path;
     }
@@ -172,7 +169,7 @@ class ModuleTestHelper
         }
     }
 
-    private function collectOids($device_id)
+    private function collectOids(int $device_id): array
     {
         global $device;
 
@@ -185,7 +182,7 @@ class ModuleTestHelper
         $save_vdebug = Debug::isVerbose();
         Debug::set();
         Debug::setVerbose();
-        discover_device($device, $this->parseArgs('discovery'));
+        (new DiscoverDevice($device_id, $this->modules))->handle();
         (new PollDevice($device_id, $this->modules))->handle();
         Debug::set($save_debug);
         Debug::setVerbose($save_vdebug);
@@ -200,7 +197,7 @@ class ModuleTestHelper
 
         // extract snmp queries
         $snmp_query_regex = '/SNMP\[\'.*snmp(?:bulk)?(walk|get|getnext)\' .+\'(udp|tcp|tcp6|udp6):(?:\[[0-9a-f:]+\]|[^:]+):[0-9]+\' \'(.+)\'\]/m';
-        preg_match_all($snmp_query_regex, $collection_output, $snmp_matches);
+        preg_match_all($snmp_query_regex, (string) $collection_output, $snmp_matches);
 
         // extract mibs and group with oids
         $snmp_oids = [
@@ -242,12 +239,12 @@ class ModuleTestHelper
      * Each entry contains [$os, $variant, $valid_modules]
      * $valid_modules is an array of selected modules this os has test data for
      *
-     * @param  array  $modules
-     * @return array
+     * @param  string[]  $modules
+     * @return array{string, string, array<string, bool|string[]>}[]
      *
      * @throws InvalidModuleException
      */
-    public static function findOsWithData($modules = [], ?string $os_filter = null)
+    public static function findOsWithData(array $modules = [], ?string $os_filter = null): array
     {
         $os_list = [];
 
@@ -297,13 +294,13 @@ class ModuleTestHelper
      * Given a json filename or basename, extract os and variant
      *
      * @param  string  $os_file  Either a filename or the basename
-     * @return array [$os, $variant]
+     * @return array{string, string} [$os, $variant]
      */
-    public static function extractVariant($os_file)
+    public static function extractVariant(string $os_file): array
     {
         $full_name = basename($os_file, '.json');
 
-        if (! Str::contains($full_name, '_')) {
+        if (! str_contains($full_name, '_')) {
             return [$full_name, ''];
         } elseif (is_file(resource_path("definitions/os_detection/$full_name.yaml"))) {
             return [$full_name, ''];
@@ -345,16 +342,7 @@ class ModuleTestHelper
         return $full_list;
     }
 
-    private function parseArgs($type)
-    {
-        if (empty($this->modules)) {
-            return false;
-        }
-
-        return parse_modules($type, ['m' => implode(',', array_keys($this->modules))]);
-    }
-
-    private function qPrint($var)
+    private function qPrint(mixed $var): void
     {
         if ($this->quiet) {
             return;
@@ -432,7 +420,7 @@ class ModuleTestHelper
         return $result;
     }
 
-    private function getSnmprecType($text): ?string
+    private function getSnmprecType(string $text): ?string
     {
         return match ($text) {
             'STRING', 'OCTET STRING', 'BITS', 'Network Address' => '4',
@@ -450,7 +438,7 @@ class ModuleTestHelper
         };
     }
 
-    private function saveSnmprec(array $data, ?string $context = null, bool $write = true, bool $prefer_new = false): string
+    private function saveSnmprec(array $data, ?string $context = null, bool $write = true, bool $prefer_new = false): void
     {
         $filename = $this->snmprec_file;
 
@@ -491,17 +479,15 @@ class ModuleTestHelper
                 file_put_contents($filename, $output);
             }
         }
-
-        return $output;
     }
 
-    private function indexSnmprec(array $snmprec_data)
+    private function indexSnmprec(array $snmprec_data): array
     {
         $result = [];
 
         foreach ($snmprec_data as $line) {
             if (! empty($line)) {
-                [$oid] = explode('|', $line, 2);
+                [$oid] = explode('|', (string) $line, 2);
                 $result[$oid] = $line;
             }
         }
@@ -509,7 +495,7 @@ class ModuleTestHelper
         return $result;
     }
 
-    private function cleanSnmprecData(&$data)
+    private function cleanSnmprecData(array &$data): void
     {
         $private_oid = [
             '1.3.6.1.2.1.1.6.0',
@@ -527,8 +513,8 @@ class ModuleTestHelper
 
         // IF-MIB::ifPhysAddress, Make sure it is in hex format
         foreach ($data as $oid => $oid_data) {
-            if (str_starts_with($oid, '1.3.6.1.2.1.2.2.1.6.')) {
-                $parts = explode('|', $oid_data, 3);
+            if (str_starts_with((string) $oid, '1.3.6.1.2.1.2.2.1.6.')) {
+                $parts = explode('|', (string) $oid_data, 3);
                 $mac = Mac::parse($parts[2])->hex();
                 if ($mac) {
                     $parts[2] = $mac;
@@ -552,15 +538,20 @@ class ModuleTestHelper
         LibrenmsConfig::set('rrdtool_version', '1.7.2'); // don't detect rrdtool version, rrdtool is not install on ci
 
         // don't allow external DNS queries that could fail
-        app()->bind(AutonomousSystem::class, function ($app, $parameters) {
-            $asn = $parameters['asn'] ?? '?';
-            $mock = \Mockery::mock(AutonomousSystem::class);
-            $mock->shouldReceive('name')->withAnyArgs()->zeroOrMoreTimes()->andReturnUsing(function () use ($asn) {
-                return "AS$asn-MOCK-TEXT";
-            });
+        try {
+            app()->bind(AutonomousSystem::class, function ($app, $parameters) {
+                $asn = $parameters['asn'] ?? '?';
+                $mock = \Mockery::mock(AutonomousSystem::class);
+                $mock->shouldReceive('name')->withAnyArgs()->zeroOrMoreTimes()->andReturnUsing(fn (
+                ) => "AS$asn-MOCK-TEXT");
 
-            return $mock;
-        });
+                return $mock;
+            });
+        } catch (\ReflectionException) {
+            Log::error('Failed to mock AutonomousSystem');
+
+            return null;
+        }
 
         if (! is_file($this->snmprec_file)) {
             throw new FileNotFoundException("$this->snmprec_file does not exist!");
@@ -576,6 +567,7 @@ class ModuleTestHelper
             $new_device = new Device([
                 'hostname' => $snmpSimIp,
                 'snmpver' => 'v2c',
+                'transport' => 'udp',
                 'community' => $this->file_name,
                 'port' => $snmpSimPort,
                 'disabled' => 1, // disable to block normal pollers
@@ -599,13 +591,16 @@ class ModuleTestHelper
         // Run discovery
         $save_debug = Debug::isEnabled();
         $save_vedbug = Debug::isVerbose();
+        $log_driver = Log::getDefaultDriver();
+
         if ($this->quiet) {
             Debug::setOnly();
             Debug::setVerbose();
         }
         ob_start();
+        Log::setDefaultDriver('console');
 
-        discover_device($device, $this->parseArgs('discovery'));
+        (new DiscoverDevice($device_id, $this->modules))->handle();
 
         $this->discovery_output = ob_get_contents();
         if ($this->quiet) {
@@ -614,12 +609,13 @@ class ModuleTestHelper
         } else {
             ob_flush();
         }
+        Log::setDefaultDriver($log_driver);
         ob_end_clean();
 
         $this->qPrint(PHP_EOL);
 
         // Parse discovered modules
-        $this->discovery_module_output = $this->extractModuleOutput($this->discovery_output, 'disco');
+        $this->discovery_module_output = $this->extractModuleOutput($this->discovery_output, 'discovery');
         $discovered_modules = array_keys($this->discovery_module_output);
 
         // Dump the discovered data
@@ -632,8 +628,8 @@ class ModuleTestHelper
             Debug::setVerbose();
         }
         ob_start();
+        Log::setDefaultDriver('console');
 
-        \Log::setDefaultDriver('console');
         (new PollDevice($device_id, $this->modules))->handle();
 
         $this->poller_output = ob_get_contents();
@@ -643,6 +639,7 @@ class ModuleTestHelper
         } else {
             ob_flush();
         }
+        Log::setDefaultDriver($log_driver);
         ob_end_clean();
 
         // Parse polled modules
@@ -695,7 +692,7 @@ class ModuleTestHelper
      * @param  string  $type  poller|disco identified by "#### Load disco module" string
      * @return array
      */
-    private function extractModuleOutput($output, $type)
+    private function extractModuleOutput(string $output, string $type): array
     {
         $module_output = [];
         $module_start = "#### Load $type module ";
@@ -724,16 +721,16 @@ class ModuleTestHelper
      * Mostly used for testing
      *
      * @param  int  $device_id  The test device id
-     * @param  array  $modules  to capture data for (should be a list of modules that were actually run)
+     * @param  string[]  $modules  to capture data for (should be a list of modules that were actually run)
      * @param  string  $type  a key to store the data under the module key (usually discovery or poller)
      * @return array The dumped data keyed by module -> table
      */
-    public function dumpDb($device_id, $modules, $type)
+    public function dumpDb(int $device_id, array $modules, string $type): array
     {
         $data = [];
 
         // don't dump some modules by default unless they are manually listed
-        if (empty($this->modules)) {
+        if (! $this->modules->hasOverride()) {
             $modules = array_diff($modules, $this->exclude_from_all);
         }
 
@@ -748,11 +745,7 @@ class ModuleTestHelper
         return $data;
     }
 
-    /**
-     * @param  array|\Illuminate\Support\Collection|\stdClass  $data
-     * @return array
-     */
-    private function dumpToArray($data): array
+    private function dumpToArray(iterable $data): array
     {
         $output = [];
 
@@ -770,18 +763,12 @@ class ModuleTestHelper
     /**
      * Get the output from the last discovery that was run
      * If module was specified, only return that module's output
-     *
-     * @param  null  $module
-     * @return mixed
      */
-    public function getDiscoveryOutput($module = null)
+    public function getDiscoveryOutput(?string $module = null): string
     {
         if ($module) {
-            if (isset($this->discovery_module_output[$module])) {
-                return $this->discovery_module_output[$module];
-            } else {
-                return "Module $module not run. Modules: " . implode(',', array_keys($this->discovery_module_output));
-            }
+            return $this->discovery_module_output[$module]
+                ?? "Module $module not run. Modules: " . implode(',', array_keys($this->discovery_module_output));
         }
 
         return $this->discovery_output;
@@ -790,11 +777,8 @@ class ModuleTestHelper
     /**
      * Get output from the last poller that was run
      * If module was specified, only return that module's output
-     *
-     * @param  null  $module
-     * @return mixed
      */
-    public function getPollerOutput($module = null)
+    public function getPollerOutput(?string $module = null): string
     {
         if ($module) {
             if (isset($this->poller_module_output[$module])) {
@@ -807,12 +791,12 @@ class ModuleTestHelper
         return $this->poller_output;
     }
 
-    public function getTestData()
+    public function getTestData(): array
     {
         return json_decode(file_get_contents($this->json_file), true);
     }
 
-    public function getJsonFilepath($short = false)
+    public function getJsonFilepath(bool $short = false): string
     {
         if ($short) {
             return ltrim(str_replace(LibrenmsConfig::get('install_dir'), '', $this->json_file), '/');

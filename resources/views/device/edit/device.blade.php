@@ -70,14 +70,27 @@
                 <label for="type" class="col-sm-2 control-label">{{ __('device.edit.type') }}</label>
                 <div class="col-sm-6">
                     <select id="type" name="type" class="form-control">
-                        @foreach($types as $type => $text)
-                            <option value="{{ $type }}" {{ old('type', $device->type) == $type ? 'selected' : '' }}>
-                                {{ ucfirst($text) }}
+                        @foreach($types as $type => $type_data)
+                            <option value="{{ $type }}" {{ old('type', $device->type) == $type ? 'selected' : '' }} data-icon="{{ $type_data['icon'] }}">
+                                {{ $type_data['text'] }}
                             </option>
                         @endforeach
                     </select>
                 </div>
             </div>
+
+            @if($show_static_groups)
+            <div class="form-group">
+                <label for="static_groups" class="col-sm-2 control-label">{{ __('device.edit.static_groups') }}</label>
+                <div class="col-sm-6">
+                    <select id="static_groups" name="static_groups[]" class="form-control" multiple style="width: 100%">
+                        @foreach($static_groups as $group_id => $group_name)
+                            <option value="{{ $group_id }}" selected>{{ $group_name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            @endif
 
             <div class="form-group">
                 <label for="sysLocation" class="col-sm-2 control-label">{{ __('device.edit.override_sysLocation') }}</label>
@@ -112,7 +125,9 @@
                 <div class="col-sm-6">
                     <input id="override_sysContact_string" class="form-control" name="override_sysContact_string" size="32"
                            {{ old('override_sysContact', $override_sysContact_bool) ? '' : 'disabled' }}
-                           value="{{ old('override_sysContact_string', $override_sysContact_string) }}"
+                           data-override="{{ $override_sysContact_string }}"
+                           data-default="{{ $device->sysContact }}"
+                           value="{{ old('override_sysContact_string', $override_sysContact_bool ? $override_sysContact_string : $device->sysContact) }}"
                     />
                 </div>
             </div>
@@ -121,11 +136,8 @@
                 <label for="parent_id" class="col-sm-2 control-label">{{ __('device.edit.depends_on') }}</label>
                 <div class="col-sm-6">
                     <select multiple name="parent_id[]" id="parent_id" class="form-control" style="width: 100%">
-                        <option value="0" {{ empty($parents) ? 'selected' : '' }}>{{ __('device.edit.none') }}</option>
-                        @foreach ($devices as $dev)
-                            <option value="{{ $dev->device_id }}" {{ $parents->contains($dev->device_id) ? 'selected' : '' }}>
-                                {{ $dev->hostname }} ({{ $dev->sysName }})
-                            </option>
+                        @foreach ($parents as $parent_id => $parent_hostname)
+                            <option value="{{  $parent_id }}" selected>{{ $parent_hostname }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -218,7 +230,54 @@
 
 @push('scripts')
     <script>
+        init_select2('#parent_id', 'device', {exclude: {{ $device->device_id }}}, null, '{{ __('device.edit.none') }}');
+        init_select2('#static_groups', 'device-group', {type: 'static'}, null, '{{ __('device.edit.none') }}');
+        const defaultType = '{{ $default_type }}';
+        function templateTypeSelection(option) {
+            if (!option.id) { // placeholder
+                return option.text;
+            }
+            const iconClass = $(option.element).data('icon');
+            if (!iconClass) {
+                return option.text;
+            }
+
+            return $('<span>').append(
+                $('<i>', {
+                    class: `fa-solid fa-${iconClass} fa-fw fa-lg`
+                }),
+                $('<span>', {
+                    text: option.text
+                })
+            );
+        }
+        $('#type').select2({
+            placeholder: 'Select or enter a device type',
+            templateResult: templateTypeSelection,
+            templateSelection: templateTypeSelection,
+            tags: true,
+            allowClear: true,
+        }).on('select2:clearing', function(e) {
+            // reset to the default value when clearing
+            e.preventDefault();
+            setTimeout(function() {
+                $('#type').val(defaultType).trigger('change');
+            }, 10);
+        }).on('change select2:select initialized', function() {
+            // hide the clear button when default is selected
+            const currentValue = $(this).val();
+            $(this).parent().find('.select2-selection__clear').toggle(currentValue !== defaultType);
+        }).trigger('initialized');
+
         $('[type="checkbox"]').bootstrapSwitch('offColor', 'danger');
+        $('#override_sysContact').on('switchChange.bootstrapSwitch', function(event, state) {
+            var $input = $('#override_sysContact_string');
+            var newValue = state ? $input.data('override') : $input.data('default');
+
+            if (!state || newValue) {
+                $input.val(newValue);
+            }
+        });
         $("#rediscover").on("click", function() {
                 fetch('{{ route('device.rediscover', [$device->device_id]) }}', {
                     method: 'POST',
@@ -234,9 +293,6 @@
         function toggleHostnameEdit() {
             document.getElementById('edit-hostname-input').disabled = ! document.getElementById('edit-hostname-input').disabled;
         }
-        $('#parent_id').select2({
-            width: 'resolve'
-        });
     </script>
     @vuei18n
 @endpush

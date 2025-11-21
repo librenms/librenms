@@ -44,14 +44,14 @@ abstract class PortTabHook implements \LibreNMS\Interfaces\Plugins\Hooks\PortTab
     public function data(Port $port): array
     {
         return [
-            'title' => __CLASS__,
+            'title' => self::class,
             'port' => $port,
         ];
     }
 
     final public function handle(string $pluginName, Port $port, array $settings, Application $app): \Illuminate\Contracts\View\View
     {
-        return view(Str::start($this->view, "$pluginName::"), $app->call([$this, 'data'], [
+        return view(Str::start($this->view, "$pluginName::"), $app->call($this->data(...), [
             'port' => $port,
             'settings' => $settings,
         ]));

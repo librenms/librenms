@@ -18,10 +18,10 @@ use App\Facades\LibrenmsConfig;
 
 require 'includes/html/graphs/common.inc.php';
 
-$format = $format ?? '';
+$format ??= '';
 $previous = $graph_params->visible('previous');
-$transparency = $transparency ?? false;
-$stack = $stack ?? '';
+$transparency ??= false;
+$stack ??= '';
 
 $rrd_optionsb = '';
 $in_thing = '';
@@ -81,7 +81,7 @@ if ($width > '500') {
 }
 
 if ($previous) {
-    $rrd_options .= sprintf(" COMMENT:'\t'", '');
+    $rrd_options .= sprintf(" COMMENT:'\t'");
     $rrd_options .= sprintf(" COMMENT:'%10s'", 'P Avg');
     $rrd_options .= sprintf(" COMMENT:'%10s'", 'P Max');
     if (! $nototal) {

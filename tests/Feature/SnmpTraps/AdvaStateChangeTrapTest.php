@@ -26,7 +26,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class AdvaStateChangeTrapTest extends SnmpTrapTestCase
+final class AdvaStateChangeTrapTest extends SnmpTrapTestCase
 {
     public function testAccessPortChg(): void
     {

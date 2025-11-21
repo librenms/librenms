@@ -46,7 +46,7 @@ class Telegram extends Transport
 
         $format = $this->config['telegram-format'];
         $this->message['text'] = $format == 'Markdown'
-            ? preg_replace('/([a-z0-9]+)_([a-z0-9]+)/', "$1\_$2", $alert_data['msg'])
+            ? preg_replace('/([a-z0-9]+)_([a-z0-9]+)/', "$1\_$2", (string) $alert_data['msg'])
             : $alert_data['msg'];
 
         $this->embedGraphs();
@@ -116,7 +116,7 @@ class Telegram extends Transport
             $this->message['images'][] = Graph::getImage($match[1]);
 
             return '';
-        }, $this->message['text']);
+        }, (string) $this->message['text']);
 
         return $this->message;
     }

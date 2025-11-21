@@ -8,7 +8,7 @@ use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('external-dependencies')]
-class KafkaDBStoreTest extends TestCase
+final class KafkaDBStoreTest extends TestCase
 {
     protected function setUp(): void
     {
@@ -24,7 +24,7 @@ class KafkaDBStoreTest extends TestCase
         LibrenmsConfig::set('kafka.request.required.acks', 0);
     }
 
-    public function testDataPushToKafka()
+    public function testDataPushToKafka(): void
     {
         $producer = \Mockery::mock(Kafka::getClient());
         $producer->shouldReceive('newTopic')->once();

@@ -151,7 +151,7 @@ class AlertRuleController extends Controller
         foreach ($alertRule->transportSingles as $transport) {
             $transports[] = [
                 'id' => $transport->transport_id,
-                'text' => ucfirst($transport->transport_type) . ': ' . $transport->transport_name,
+                'text' => ucfirst((string) $transport->transport_type) . ': ' . $transport->transport_name,
             ];
         }
 
@@ -175,7 +175,7 @@ class AlertRuleController extends Controller
             'invert_map',
         ]));
         $alertRule->disabled ??= false;
-        $alertRule->builder = json_decode($request->validated('builder_json', '[]'), true);
+        $alertRule->builder = json_decode((string) $request->validated('builder_json', '[]'), true);
         $overrideQuery = $request->validated('override_query');
 
         // build SQL query
@@ -211,9 +211,9 @@ class AlertRuleController extends Controller
         $locationIds = [];
         foreach ($maps as $item) {
             if (Str::startsWith($item, 'l')) {
-                $locationIds[] = (int) substr($item, 1);
+                $locationIds[] = (int) substr((string) $item, 1);
             } elseif (Str::startsWith($item, 'g')) {
-                $groupIds[] = (int) substr($item, 1);
+                $groupIds[] = (int) substr((string) $item, 1);
             } else {
                 $deviceIds[] = (int) $item;
             }
@@ -229,7 +229,7 @@ class AlertRuleController extends Controller
         $transportGroupIds = [];
         foreach ($transports as $transport) {
             if (Str::startsWith($transport, 'g')) {
-                $transportGroupIds[] = (int) substr($transport, 1);
+                $transportGroupIds[] = (int) substr((string) $transport, 1);
             } else {
                 $transportIds[] = (int) $transport;
             }

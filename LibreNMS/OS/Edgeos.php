@@ -43,7 +43,7 @@ class Edgeos extends \LibreNMS\OS
 
         $hw = snmpwalk_cache_oid($this->getDeviceArray(), 'hrSWRunParameters', [], 'HOST-RESOURCES-MIB');
         foreach ($hw as $entry) {
-            if (preg_match('/(?<=UBNT )(.*)(?= running on)/', $entry['hrSWRunParameters'], $matches)) {
+            if (preg_match('/(?<=UBNT )(.*)(?= running on)/', (string) $entry['hrSWRunParameters'], $matches)) {
                 $this->getDevice()->hardware = $matches[0];
                 break;
             }
@@ -52,7 +52,7 @@ class Edgeos extends \LibreNMS\OS
 
     public function discoverEntityPhysical(): \Illuminate\Support\Collection
     {
-        return $this->discoverBaseEntityPhysical()->each(function (EntPhysical $entity) {
+        return $this->discoverBaseEntityPhysical()->each(function (EntPhysical $entity): void {
             // clean garbage in fields "...............\n00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00"
             $entity->entPhysicalDescr = StringHelpers::trimHexGarbage($entity->entPhysicalDescr);
             $entity->entPhysicalName = StringHelpers::trimHexGarbage($entity->entPhysicalName);

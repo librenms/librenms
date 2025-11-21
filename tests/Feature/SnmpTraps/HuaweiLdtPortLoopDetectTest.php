@@ -25,7 +25,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
 
-class HuaweiLdtPortLoopDetectTest extends SnmpTrapTestCase
+final class HuaweiLdtPortLoopDetectTest extends SnmpTrapTestCase
 {
     /**
      * Test HuaweiLdtPortLoopDetect.php handler

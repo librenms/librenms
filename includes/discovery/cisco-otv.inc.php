@@ -135,7 +135,7 @@ if ($device['os_group'] == 'cisco') {
         // Add each adjacency to the array.
         if ($tblAdjacentDevName) {
             foreach ((array) $tblAdjacentDevName as $key => $value) {
-                preg_match('/^1.3.6.1.4.1.9.9.810.1.3.1.1.4.(\d+).1.4.(\d+.\d+.\d+.\d+)$/', $key, $matches);
+                preg_match('/^1.3.6.1.4.1.9.9.810.1.3.1.1.4.(\d+).1.4.(\d+.\d+.\d+.\d+)$/', (string) $key, $matches);
                 $result = [];
                 $result['index'] = $matches[1];
                 $result['endpoint'] = $matches[2];
@@ -231,7 +231,7 @@ if ($device['os_group'] == 'cisco') {
             // Guilty until proven innocent
             $found = false;
 
-            foreach ($tblOTV as $k => $v) {
+            foreach ($tblOTV as $v) {
                 if ($array['UID'] == $v['UID']) {
                     // Yay, we found it...
                     $found = true;

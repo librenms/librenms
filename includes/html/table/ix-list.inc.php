@@ -21,7 +21,7 @@
  * @copyright  2018 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-$asn = strip_tags($vars['asn']);
+$asn = strip_tags((string) $vars['asn']);
 
 $sql = ' FROM `pdb_ix` WHERE `asn` = ?';
 $params = [$asn];

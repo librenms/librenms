@@ -5,7 +5,7 @@ $divisor = 10000;
 
 foreach ($pre_cache['sdbMgmtCtrlDevUnitAddress'] as $sdbMgmtCtrlDevUnitAddress => $sdbDevIdIndex) {
     foreach ($pre_cache['sdbDevInPowerFactor'][$sdbDevIdIndex] as $sdbDevInIndex => $sdbDevInPowerFactor) {
-        $name = trim($pre_cache['sdbDevInName'][$sdbDevIdIndex][$sdbDevInIndex], '"');
+        $name = trim((string) $pre_cache['sdbDevInName'][$sdbDevIdIndex][$sdbDevInIndex], '"');
         $power_factor_oid = ".1.3.6.1.4.1.31034.12.1.1.2.6.1.1.4.$sdbDevIdIndex.$sdbDevInIndex";
         $power_factor = $sdbDevInPowerFactor / $divisor;
         $serial_input = $pre_cache['sdbDevIdSerialNumber'][$sdbDevIdIndex] . '-L' . $sdbDevInIndex;
@@ -22,7 +22,7 @@ if (isset($pre_cache['sdbDevOutMtPowerFactor']) && is_array($pre_cache['sdbDevOu
     $unit = current($pre_cache['sdbMgmtCtrlDevUnitAddress']);
 
     foreach ($pre_cache['sdbDevOutMtPowerFactor'] as $sdbDevOutMtIndex => $sdbDevOutMtPowerFactor) {
-        $name = trim($pre_cache['sdbDevOutName'][$sdbDevOutMtIndex], '"');
+        $name = trim((string) $pre_cache['sdbDevOutName'][$sdbDevOutMtIndex], '"');
         $power_factor_oid = ".1.3.6.1.4.1.31034.12.1.1.2.7.2.1.4.$unit.$sdbDevOutMtIndex";
         $power_factor = $sdbDevOutMtPowerFactor / $divisor;
         $serial_input = $pre_cache['sdbDevIdSerialNumber'][$unit] . ' Outlet ' . $sdbDevOutMtIndex;

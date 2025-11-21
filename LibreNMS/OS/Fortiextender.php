@@ -31,9 +31,9 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSinrDiscovery;
-use LibreNMS\OS\Shared\Fortinet;
+use LibreNMS\OS;
 
-class Fortiextender extends Fortinet implements
+class Fortiextender extends OS implements
     WirelessSinrDiscovery,
     WirelessRsrpDiscovery,
     WirelessRsrqDiscovery,
