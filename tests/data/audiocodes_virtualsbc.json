@@ -17,7 +17,8 @@
                     "icon": "audiocodes.png"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "processors": {
         "discovery": {
@@ -34,7 +35,8 @@
                     "processor_perc_warn": 75
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "mempools": {
         "discovery": {
@@ -60,7 +62,8 @@
                     "mempool_perc_warn": 90
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {
@@ -826,7 +829,8 @@
                     "state_generic_value": 0
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "hr-device": {
         "discovery": {
