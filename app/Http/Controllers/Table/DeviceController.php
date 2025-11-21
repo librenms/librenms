@@ -97,7 +97,7 @@ class DeviceController extends TableController
         /** @var Builder $query */
         $query = Device::hasAccess($request->user())
             ->with(['location', 'groups'])
-            ->withCount(['ports', 'sensors', 'wirelessSensors']);
+            ->withCount(['ports', 'sensors', 'wirelesssensors']);
 
         // if searching or sorting the location field, join the locations table
         if ($request->get('searchPhrase') || in_array('location', array_keys($request->get('sort', [])))) {
@@ -222,7 +222,7 @@ class DeviceController extends TableController
     {
         $port_count = $device->ports_count;
         $sensor_count = $device->sensors_count;
-        $wireless_count = $device->wirelessSensors_count;
+        $wireless_count = $device->wirelesssensors_count;
 
         $metrics = [];
         if ($port_count) {
