@@ -73,12 +73,11 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             }
         }
     }
-
-    /**
-     * Poll BGP peers from BGP4-MIB (standard MIB).
+/**
+     * Poll BGP peers from BGP4-MIB (standard MIB), ensuring correct indexing.
      *
-     * This function overrides any problematic vendor-specific pollers
-     * and forces the use of the standard BGP MIBs to collect real data.
+     * This implementation explicitly forces the use of BGP4-MIB and structures
+     * the peer keys correctly to allow RRD file creation (the cbgp-....rrd files).
      *
      * @return array
      */
@@ -86,32 +85,34 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     {
         $mib = 'BGP4-MIB';
 
-        // Fetch the main BGP peer table
         $peerTable = SnmpQuery::walk($mib . '::bgpPeerTable')->valuesByIndex();
 
-        // Fetch the BGP statistics (updates, messages, etc.)
         $stats = SnmpQuery::walk($mib . '::bgpPeerEntry')->valuesByIndex();
 
         $peers = [];
         foreach ($peerTable as $index => $data) {
             $peer_stats = $stats[$index] ?? [];
 
-            $peers[] = [
-                'bgpPeerIdentifier' => $data[$mib . '::bgpPeerIdentifier'] ?? null,
-                'bgpPeerState' => $data[$mib . '::bgpPeerState'] ?? null,
-                'bgpPeerAdminStatus' => $data[$mib . '::bgpPeerAdminStatus'] ?? null,
-                'bgpPeerLocalAs' => $data[$mib . '::bgpPeerLocalAs'] ?? null,
-                'bgpPeerRemoteAs' => $data[$mib . '::bgpPeerRemoteAs'] ?? null,
-                'bgpPeerLocalAddr' => $data[$mib . '::bgpPeerLocalAddr'] ?? null,
-                'bgpPeerRemoteAddr' => $data[$mib . '::bgpPeerRemoteAddr'] ?? null,
+            $peer_ip = $data[$mib . '::bgpPeerRemoteAddr'] ?? null;
 
-                'bgpPeerInUpdates' => $peer_stats[$mib . '::bgpPeerInUpdates'] ?? 0,
-                'bgpPeerOutUpdates' => $peer_stats[$mib . '::bgpPeerOutUpdates'] ?? 0,
-                'bgpPeerInTotalMessages' => $peer_stats[$mib . '::bgpPeerInTotalMessages'] ?? 0,
-                'bgpPeerOutTotalMessages' => $peer_stats[$mib . '::bgpPeerOutTotalMessages'] ?? 0,
-                'bgpPeerFsmEstablishedTime' => $peer_stats[$mib . '::bgpPeerFsmEstablishedTime'] ?? 0,
-                'bgpPeerLastError' => $peer_stats[$mib . '::bgpPeerLastError'] ?? null,
-            ];
+            if ($peer_ip) {
+                $peers[$peer_ip] = [
+                    'bgpPeerIdentifier' => $data[$mib . '::bgpPeerIdentifier'] ?? null,
+                    'bgpPeerState' => $data[$mib . '::bgpPeerState'] ?? null,
+                    'bgpPeerAdminStatus' => $data[$mib . '::bgpPeerAdminStatus'] ?? null,
+                    'bgpPeerLocalAs' => $data[$mib . '::bgpPeerLocalAs'] ?? null,
+                    'bgpPeerRemoteAs' => $data[$mib . '::bgpPeerRemoteAs'] ?? null,
+                    'bgpPeerLocalAddr' => $data[$mib . '::bgpPeerLocalAddr'] ?? null,
+                    'bgpPeerRemoteAddr' => $peer_ip, // Use this as the key for the graph
+
+                    'bgpPeerInUpdates' => $peer_stats[$mib . '::bgpPeerInUpdates'] ?? 0,
+                    'bgpPeerOutUpdates' => $peer_stats[$mib . '::bgpPeerOutUpdates'] ?? 0,
+                    'bgpPeerInTotalMessages' => $peer_stats[$mib . '::bgpPeerInTotalMessages'] ?? 0,
+                    'bgpPeerOutTotalMessages' => $peer_stats[$mib . '::bgpPeerOutTotalMessages'] ?? 0,
+                    'bgpPeerFsmEstablishedTime' => $peer_stats[$mib . '::bgpPeerFsmEstablishedTime'] ?? 0,
+                    'bgpPeerLastError' => $peer_stats[$mib . '::bgpPeerLastError'] ?? null,
+                ];
+            }
         }
         return $peers;
     }
