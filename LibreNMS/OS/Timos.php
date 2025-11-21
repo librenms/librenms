@@ -73,45 +73,43 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             }
         }
     }
-
 /**
-     * Poll BGP peers from BGP4-MIB (standard MIB) for both IPv4 and IPv6.
-     * This overrides the generic poller for Timos devices to ensure correct
-     * indexing and RRD file creation, fixing the "No data file" error.
+     * Poll BGP peers from BGP4-MIB (standard MIB) for both IPv4 and IPv6,
+     * using the numerical OID (1.3.6.1.2.1.15) to bypass the MIB lookup error.
      *
      * @return array
      */
     public function pollBgp(): array
     {
-        $mib = 'BGP4-MIB';
+        $mib = '1.3.6.1.2.1.15';
 
         $data = SnmpQuery::hideMib()->walk([
-            $mib . '::bgpPeerTable',
-            $mib . '::bgpPeerEntry',
+            $mib . '.3',
+            $mib . '.9',
         ])->mapTable(function ($value, $index) use ($mib) {
-            $peer_ip = $value[$mib . '::bgpPeerRemoteAddr'] ?? null;
+            $peer_ip = $value[$mib . '.3.1.7'] ?? null;
 
             if (! $peer_ip) {
                 return null;
             }
 
             return [
-                'bgpPeerIdentifier' => $value[$mib . '::bgpPeerIdentifier'] ?? null,
-                'bgpPeerState' => $value[$mib . '::bgpPeerState'] ?? null,
-                'bgpPeerAdminStatus' => $value[$mib . '::bgpPeerAdminStatus'] ?? null,
-                'bgpPeerLocalAs' => $value[$mib . '::bgpPeerLocalAs'] ?? null,
-                'bgpPeerRemoteAs' => $value[$mib . '::bgpPeerRemoteAs'] ?? null,
-                'bgpPeerLocalAddr' => $value[$mib . '::bgpPeerLocalAddr'] ?? null,
-                'bgpPeerRemoteAddr' => $peer_ip, // Peer address
+                'bgpPeerIdentifier' => $value[$mib . '.3.1.2'] ?? null,
+                'bgpPeerState' => $value[$mib . '.3.1.3'] ?? null,
+                'bgpPeerAdminStatus' => $value[$mib . '.3.1.4'] ?? null,
+                'bgpPeerLocalAs' => $value[$mib . '.3.1.5'] ?? null,
+                'bgpPeerRemoteAs' => $value[$mib . '.3.1.6'] ?? null,
+                'bgpPeerLocalAddr' => $value[$mib . '.3.1.8'] ?? null,
+                'bgpPeerRemoteAddr' => $peer_ip,
 
-                'bgpPeerRemoteAddrType' => $value[$mib . '::bgpPeerRemoteAddrType'] ?? null,
+                'bgpPeerRemoteAddrType' => $value[$mib . '.3.1.1'] ?? null,
 
-                'bgpPeerInUpdates' => $value[$mib . '::bgpPeerInUpdates'] ?? 0,
-                'bgpPeerOutUpdates' => $value[$mib . '::bgpPeerOutUpdates'] ?? 0,
-                'bgpPeerInTotalMessages' => $value[$mib . '::bgpPeerInTotalMessages'] ?? 0,
-                'bgpPeerOutTotalMessages' => $value[$mib . '::bgpPeerOutTotalMessages'] ?? 0,
-                'bgpPeerFsmEstablishedTime' => $value[$mib . '::bgpPeerFsmEstablishedTime'] ?? 0,
-                'bgpPeerLastError' => $value[$mib . '::bgpPeerLastError'] ?? null,
+                'bgpPeerInUpdates' => $value[$mib . '.9.1.1'] ?? 0,
+                'bgpPeerOutUpdates' => $value[$mib . '.9.1.2'] ?? 0,
+                'bgpPeerInTotalMessages' => $value[$mib . '.9.1.3'] ?? 0,
+                'bgpPeerOutTotalMessages' => $value[$mib . '.9.1.4'] ?? 0,
+                'bgpPeerFsmEstablishedTime' => $value[$mib . '.9.1.5'] ?? 0,
+                'bgpPeerLastError' => $value[$mib . '.9.1.28'] ?? null,
             ];
         })->filter()->all();
         $peers = [];
