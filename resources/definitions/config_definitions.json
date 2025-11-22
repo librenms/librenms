@@ -1943,7 +1943,7 @@
             "type": "integer"
         },
         "dns.resolution_mode": {
-            "default": "os_default",
+            "default": "os",
             "group": "system",
             "section": "dns",
             "order": 0,
