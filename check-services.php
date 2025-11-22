@@ -34,7 +34,7 @@ $datastore = Datastore::init($options);
 echo "Starting service polling run:\n\n";
 $polled_services = 0;
 
-$services = Device::select('devices.*', 'services.*', 'devices_attribs.attrib_value')
+$query = Device::query()->select('devices.*', 'services.*', 'devices_attribs.attrib_value')
     ->join('services', 'devices.device_id', '=', 'services.device_id')
     ->leftJoin('devices_attribs', function ($join): void {
         $join->on('devices.device_id', '=', 'devices_attribs.device_id')
@@ -45,12 +45,12 @@ $services = Device::select('devices.*', 'services.*', 'devices_attribs.attrib_va
 
 if (isset($options['h'])) {
     if (is_numeric($options['h'])) {
-        $services->where('services.device_id', $options['h']);
+        $query->where('services.device_id', $options['h']);
     } else {
         if (preg_match('/\*/', $options['h'])) {
-            $services->where('devices.hostname', 'like', str_replace('*', '%', $options['h']));
+            $query->where('devices.hostname', 'like', str_replace('*', '%', $options['h']));
         } else {
-            $services->where('devices.hostname', $options['h']);
+            $query->where('devices.hostname', $options['h']);
         }
     }
 } else {
@@ -63,7 +63,9 @@ if (isset($options['h'])) {
     }
 }
 
-foreach ($services->get() as $service) {
+$services = $query->get();
+
+foreach ($services as $service) {
     // Run the polling function if service is enabled and the associated device is up, "Disable ICMP Test" option is not enabled,
     // or service hostname/ip is different from associated device
     if (! $service['service_disabled'] && ($service['status'] == 1 || ($service['status'] == 0 && $service['status_reason'] === 'snmp') ||

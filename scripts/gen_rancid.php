@@ -11,6 +11,8 @@
 * the source code distribution for details.
 */
 
+use App\Models\Device;
+
 $init_modules = [];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
@@ -56,7 +58,7 @@ $rancid_map['fs-switch'] = 'cisco';
 $rancid_map['vyos'] = 'vyos';
 $rancid_map['mrv-od'] = 'mrv';
 
-foreach (DB::table('devices')->where('ignore', 0)->where('type', '!=', '')->groupBy('hostname')->get() as $devices) {
+foreach (Device::query()->where('ignore', 0)->where('type', '!=', '')->groupBy('hostname')->get() as $devices) {
     if (isset($rancid_map[$devices->os])) {
         $status = 'up';
         if ($devices->disabled) {

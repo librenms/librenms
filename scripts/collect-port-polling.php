@@ -3,8 +3,8 @@
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use Illuminate\Database\Query\Builder;
-use Illuminate\Support\Facades\DB;
+use App\Models\Port;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Number;
@@ -38,7 +38,7 @@ if (isset($options['help'])) {
     exit(0);
 }
 
-$devices = Device::where('status', 1)->where('disabled', 0)->orderBy('hostname', 'ASC');
+$devices = Device::query()->where('status', 1)->where('disabled', 0)->orderBy('hostname', 'ASC');
 if (isset($options['h'])) {
     if (is_numeric($options['h'])) {
         $devices->where('device_id', $options['h']);
@@ -95,8 +95,8 @@ echo PHP_EOL;
 $inactive_sql = "`deleted` = 1 OR `ifAdminStatus` != 'up' OR `disabled` = 1";
 $set_count = 0;
 foreach ($devices as &$device) {
-    $count = DB::table('ports')->where('device_id', $device['device_id'])->count();
-    $inactive = DB::table('ports')->where('device_id', $device['device_id'])->where(function (Builder $query): void {
+    $count = Port::query()->where('device_id', $device['device_id'])->count();
+    $inactive = Port::query()->where('device_id', $device['device_id'])->where(function (Builder $query): void {
         $query->where('deleted', 1)->orWhere('ifAdminStatus', '!=', 'up')->orWhere('disabled', 1);
     })->count();
 

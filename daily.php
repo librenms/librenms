@@ -273,7 +273,7 @@ if ($options['f'] === 'refresh_alert_rules') {
     $lock = Cache::lock('refresh_alert_rules', 86000);
     if ($lock->get()) {
         echo 'Refreshing alert rules queries' . PHP_EOL;
-        $rules = AlertRule::all();
+        $rules = AlertRule::query()->get();
         foreach ($rules as $rule) {
             if (($rule->extra['options']['override_query'] ?? false) !== 'on' && ($rule->extra['options']['override_query'] ?? false) !== true) {
                 $rule->query = QueryBuilderParser::fromJson($rule->builder)->toSql();

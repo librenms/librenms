@@ -3,7 +3,6 @@
 use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use App\Models\Service;
-use Illuminate\Support\Facades\DB;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Enum\Severity;
 use LibreNMS\RRD\RrdDefinition;
@@ -18,20 +17,20 @@ function add_service($device, $type, $desc, $ip = '', $param = '', $ignore = 0, 
         $ip = $device->pollerTarget();
     }
 
-    $insert = ['device_id' => $device->device_id, 'service_ip' => $ip, 'service_type' => $type, 'service_changed' => DB::raw('UNIX_TIMESTAMP(NOW())'), 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked', 'service_ds' => '{}', 'service_disabled' => $disabled, 'service_template_id' => $template_id, 'service_name' => $name];
+    $insert = ['device_id' => $device->device_id, 'service_ip' => $ip, 'service_type' => $type, 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked', 'service_ds' => '{}', 'service_disabled' => $disabled, 'service_template_id' => $template_id, 'service_name' => $name];
 
-    return DB::table('services')->insertGetId($insert);
+    return Service::create($insert);
 }
 
 function service_get($device = null, $service = null)
 {
     if (! is_null($service)) {
         // Add a service filter to the SQL query.
-        $services = Service::where('service_id', $service)->get();
+        $services = Service::query()->where('service_id', $service)->get();
     } elseif (! is_null($device)) {
-        $services = Service::where('device_id', $device)->get();
+        $services = Service::query()->where('device_id', $device)->get();
     } else {
-        $services = Service::get();
+        $services = Service::query()->get();
     }
 
     d_echo('Service Array: ' . print_r($services, true) . "\n");
@@ -45,7 +44,7 @@ function edit_service($update = [], $service = null)
         return false;
     }
 
-    return DB::table('services')->where('service_id', $service)->update($update);
+    return Service::query()->where('service_id', $service)->update($update);
 }
 
 function delete_service($service = null)
@@ -54,12 +53,12 @@ function delete_service($service = null)
         return false;
     }
 
-    return DB::table('services')->where('service_id', $service)->delete();
+    return Service::query()->where('service_id', $service)->delete();
 }
 
 function discover_service($device, $service)
 {
-    if (DB::table('services')->where('service_type', $service)->where('device_id', $device['device_id'])->doesntExist()) {
+    if (Service::query()->where('service_type', $service)->where('device_id', $device['device_id'])->doesntExist()) {
         add_service($device, $service, "$service Monitoring (Auto Discovered)", null, null, 0, 0, 0, "AUTO: $service");
         Eventlog::log('Autodiscovered service: type ' . $service, $device['device_id'], 'service', Severity::Info);
         echo '+';
