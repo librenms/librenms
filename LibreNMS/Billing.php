@@ -83,7 +83,7 @@ class Billing
     {
         $oid = 'IF-MIB::ifHC' . $inout . 'Octets.' . $id;
         $device = DeviceCache::get($host);
-        if (! $device->exist) {
+        if (! $device->exists) {
             return 0;
         }
         $value = SnmpQuery::device($device)->get($oid)->value();
