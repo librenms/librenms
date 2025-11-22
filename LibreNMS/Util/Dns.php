@@ -36,7 +36,7 @@ use Net_DNS2_Resolver;
 
 class Dns implements Geocoder
 {
-    public function __construct(protected Net_DNS2_Resolver $resolver, protected Socket $socket)
+    public function __construct(protected Net_DNS2_Resolver $resolver, protected SocketWrapper $socket)
     {
     }
 
@@ -96,6 +96,55 @@ class Dns implements Geocoder
         }
 
         return [];
+    }
+
+    /**
+     * Resolve IPs for hostname IPv4 and IPv6. Respecting the order for dns.resolution_mode
+     * @return string[]
+     */
+    public function resolveIPs(string $hostname, ?string $preferredIpFirst = null): array
+    {
+        $info = $this->socket->getAddrInfo($hostname);
+        if ($info === false) {
+            return [];
+        }
+
+        $addresses = array_column($info, 'ai_addr');
+        $orig = array_filter(array_map(fn ($addr) => $addr['sin6_addr'] ?? $addr['sin_addr'] ?? null, $addresses));
+        $ipv4 = array_filter(array_column($addresses, 'sin_addr'));
+        $ipv6 = array_filter(array_column($addresses, 'sin6_addr'));
+
+        // move preferred IP to the beginning of the list respecting resolution mode
+        if ($preferredIpFirst !== null && ($orig_key = array_search($preferredIpFirst, $orig, true)) !== false) {
+            $target_is_ipv4 = false;
+            if (($key = array_search($preferredIpFirst, $ipv4, true)) !== false) {
+                unset($ipv4[$key]);
+                array_unshift($ipv4, $preferredIpFirst);
+                $target_is_ipv4 = true;
+            } elseif (($key = array_search($preferredIpFirst, $ipv6, true)) !== false) {
+                unset($ipv6[$key]);
+                array_unshift($ipv6, $preferredIpFirst);
+            }
+
+            // only put preferred IP in front of the same type of IPs
+            foreach($orig as $k => $ip) {
+                $is_ipv4 = IPv4::isValid($ip);
+                if ($is_ipv4 === $target_is_ipv4 && $k < $orig_key) {
+                    unset($orig[$orig_key]);
+                    $orig = [...array_slice($orig, 0, $k), $preferredIpFirst, ...array_slice($orig, $k)];
+                }
+            }
+        }
+
+        $mode = LibrenmsConfig::get('dns.resolution_mode');
+
+        return array_values(match ($mode) {
+            'ipv4_only' => $ipv4,
+            'ipv6_only' => $ipv6,
+            'prefer_ipv4' => [...$ipv4, ...$ipv6],
+            'prefer_ipv6' => [...$ipv6, ...$ipv4],
+            default => $orig,
+        });
     }
 
     public function resolveIP(string $hostname, ?AddressFamily $addressFamily = null): string|null|false

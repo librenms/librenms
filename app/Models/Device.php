@@ -21,6 +21,7 @@ use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\Dns;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
@@ -119,6 +120,25 @@ class Device extends BaseModel
     {
         return $this->overwrite_ip ?: $this->ip ?: $this->hostname ?: '';
     }
+
+    /**
+     * @return string[]
+     */
+    public function resolvedIps(): array
+    {
+        if ($this->overwrite_ip) {
+            return [$this->overwrite_ip];
+        }
+
+        if (IP::isValid($this->hostname)) {
+            return [$this->hostname];
+        }
+
+        $resolvedIps = app(Dns::class)->resolveIPs($this->hostname, $this->ip ?? null);
+
+        return $resolvedIps ?: [$this->hostname];
+    }
+
 
     public function ipFamily(): AddressFamily
     {

@@ -28,7 +28,7 @@ namespace LibreNMS\Util;
 
 use LibreNMS\Enum\AddressFamily;
 
-class Socket
+class SocketWrapper
 {
     private array $cache = [];
 

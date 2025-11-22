@@ -7,7 +7,7 @@ use App\Models\Device;
 use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\Dns;
-use LibreNMS\Util\Socket;
+use LibreNMS\Util\SocketWrapper;
 use Mockery;
 use Net_DNS2_Exception;
 use Net_DNS2_Lookups;
@@ -24,7 +24,7 @@ class DnsTest extends TestCase
         parent::setUp();
 
         $this->resolverMock = Mockery::mock(Net_DNS2_Resolver::class);
-        $this->socketMock = Mockery::mock(Socket::class);
+        $this->socketMock = Mockery::mock(SocketWrapper::class);
         $this->dns = new Dns($this->resolverMock, $this->socketMock);
     }
 
@@ -323,6 +323,118 @@ class DnsTest extends TestCase
 
         $this->assertNull($result);
     }
+    public function testResolveIpsReturnsEmptyArrayOnLookupFailure(): void
+    {
+        $this->mockConfig('os');
+
+        $this->socketMock->shouldReceive('getAddrInfo')
+            ->with('nonexistent.example')
+            ->once()
+            ->andReturn(false);
+
+        $this->assertSame([], $this->dns->resolveIPs('nonexistent.example'));
+    }
+
+    public function testResolveIpsDefaultModeReturnsAddressesInGetaddrinfoOrder(): void
+    {
+        $this->mockConfig('os');
+        $this->mockRealAddrInfo('example.com', [
+            '2001:db8::1',
+            '192.0.2.10',
+            '2001:db8::2',
+            '192.0.2.20',
+        ]);
+
+        $result = $this->dns->resolveIPs('example.com');
+        $this->assertSame(['2001:db8::1', '192.0.2.10', '2001:db8::2', '192.0.2.20'], $result);
+    }
+
+    public function testResolveIpsPreferIpv4ModePutsAllIpv4First(): void
+    {
+        $this->mockConfig('prefer_ipv4');
+        $this->mockRealAddrInfo('dual.example', [
+            '2001:db8::a',
+            '192.168.1.1',
+            '2001:db8::b',
+            '10.0.0.1',
+        ]);
+
+        $result = $this->dns->resolveIPs('dual.example');
+        $this->assertSame(['192.168.1.1', '10.0.0.1', '2001:db8::a', '2001:db8::b'], $result);
+    }
+
+    public function testResolveIpsPreferIpv6ModePutsAllIpv6First(): void
+    {
+        $this->mockConfig('prefer_ipv6');
+        $this->mockRealAddrInfo('dual.example', [
+            '192.168.1.1',
+            '2001:db8::ffff',
+            '10.0.0.1',
+        ]);
+
+        $result = $this->dns->resolveIPs('dual.example');
+        $this->assertSame(['2001:db8::ffff', '192.168.1.1', '10.0.0.1'], $result);
+    }
+
+    public function testResolveIpsIpv4OnlyReturnsOnlyIpv4(): void
+    {
+        $this->mockConfig('ipv4_only');
+        $this->mockRealAddrInfo('mixed.example', ['2001:db8::1', '127.0.0.1', 'fe80::1']);
+
+        $this->assertSame(['127.0.0.1'], $this->dns->resolveIPs('mixed.example'));
+    }
+
+    public function testResolveIpsIpv6OnlyReturnsOnlyIpv6(): void
+    {
+        $this->mockConfig('ipv6_only');
+        $this->mockRealAddrInfo('mixed.example', ['192.168.1.1', '2001:db8::abcd']);
+
+        $this->assertSame(['2001:db8::abcd'], $this->dns->resolveIPs('mixed.example'));
+    }
+
+    public function testResolveIpsPreferredIpFirstMovesMatchingIpv4ToFront(): void
+    {
+        $this->mockConfig('os');
+        $this->mockRealAddrInfo('test.example', ['192.0.2.1', '192.0.2.2', '2001:db8::1']);
+
+        $result = $this->dns->resolveIPs('test.example', '192.0.2.2');
+        $this->assertSame(['192.0.2.2', '192.0.2.1', '2001:db8::1'], $result);
+    }
+
+    public function testResolveIpsPreferredIpFirstMovesMatchingIpv6ToFront(): void
+    {
+        $this->mockConfig('os');
+        $this->mockRealAddrInfo('test.example', ['192.168.2.1', '2001:db8::aaaa', '2001:db8::bbbb']);
+
+        $result = $this->dns->resolveIPs('test.example', '2001:db8::bbbb');
+        $this->assertSame(['192.168.2.1', '2001:db8::bbbb', '2001:db8::aaaa'], $result);
+    }
+
+    public function testResolveIpsPreferredIpFirstDoesNothingIfNotFound(): void
+    {
+        $this->mockConfig('os');
+        $this->mockRealAddrInfo('test.example', ['203.0.113.1']);
+
+        $result = $this->dns->resolveIPs('test.example', '1.2.3.4');
+        $this->assertSame(['203.0.113.1'], $result);
+    }
+
+    public function testResolveIpsPreferredIpFirstWorksInPreferIpv4Mode(): void
+    {
+        $this->mockConfig('prefer_ipv4');
+        $this->mockRealAddrInfo('test.example', ['2001:db8::1', '10.0.0.5', '172.16.0.1']);
+
+        $result = $this->dns->resolveIPs('test.example', '172.16.0.1');
+        $this->assertSame(['172.16.0.1', '10.0.0.5', '2001:db8::1'], $result);
+    }
+
+    public function testResolveIpsUnknownResolutionModeFallsBackToOriginalOrder(): void
+    {
+        $this->mockConfig('something_completely_wrong');
+        $this->mockRealAddrInfo('fallback.example', ['2001:db8::1', '192.0.2.1']);
+
+        $this->assertSame(['2001:db8::1', '192.0.2.1'], $this->dns->resolveIPs('fallback.example'));
+    }
 
     public function testLookupFailedShouldClearIpCacheReturnsFalseWhenIpIsNull(): void
     {
@@ -526,5 +638,34 @@ class DnsTest extends TestCase
             ) {
             }
         };
+    }
+
+    // Helper: creates realistic addrinfo structures exactly like socket_addrinfo_explain()
+    private function mockRealAddrInfo(string $hostname, array $ips): void
+    {
+        $records = [];
+        foreach ($ips as $ip) {
+            if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                $records[] = [
+                    'ai_family'    => AF_INET,
+                    'ai_socktype'  => SOCK_STREAM,
+                    'ai_protocol'  => 6,
+                    'ai_addr'      => ['sin_addr' => $ip, 'sin_port' => 0],
+                    'ai_flags'     => 0,
+                ];
+            } else {
+                $records[] = [
+                    'ai_family'    => AF_INET6,
+                    'ai_socktype'  => SOCK_STREAM,
+                    'ai_protocol'  => 6,
+                    'ai_addr'      => ['sin6_addr' => $ip, 'sin6_port' => 0],
+                    'ai_flags'     => 0,
+                ];
+            }
+        }
+
+        $this->socketMock->shouldReceive('getAddrInfo')
+            ->with($hostname)
+            ->andReturn($records);
     }
 }
