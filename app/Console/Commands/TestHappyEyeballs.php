@@ -42,11 +42,14 @@ class TestHappyEyeballs extends LnmsCommand
         $start_time = microtime(true);
 
         if ($codec === null) {
-            return $this->reactTcp($hostname, $port);
+            $result = $this->reactTcp($hostname, $port);
+            $this->info("Elapsed time: " . (microtime(true) - $start_time) . " seconds");
+
+            return $result;
         }
 
-        $dns = new Resolver(new AddrInfoResolver);
-        $connector = new UdpHappyEyeballsConnector($dns);
+        $reactDns = new Resolver(new AddrInfoResolver);
+        $connector = new UdpHappyEyeballsConnector($reactDns);
 
         await($connector->connect($hostname, $port, $codec)->then(
             function ($result) {
@@ -148,11 +151,11 @@ class TestHappyEyeballs extends LnmsCommand
                     return new SnmpCodec(
                         $device->snmpver,
                         $device->community,
-                        $device->only(['authname', 'authpass', 'authlevel', 'cryptoalgo', 'cryptopass'])
+                        $device->only(['authname', 'authalgo', 'authpass', 'authlevel', 'cryptoalgo', 'cryptopass'])
                     );
                 }
             } catch (\Exception $e) {
-                //
+                $this->error("Error: " . $e->getMessage());
             }
         }
 

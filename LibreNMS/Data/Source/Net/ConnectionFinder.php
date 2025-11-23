@@ -33,7 +33,8 @@ use Socket;
 use Throwable;
 
 class ConnectionFinder {
-    private const TIMEOUT_MS = 300; // Short timeout as per RFC 6555 recommendations (around 300ms)
+    private const TIMEOUT_SECONDS = 3;
+    private const TIMEOUT_MS = 0;
 
     /** @var Connection[] */
     private array $connections = [];
@@ -78,7 +79,7 @@ class ConnectionFinder {
             if (empty($read) && empty($write)) {
                 $numChanged = 0;
             } else {
-                $numChanged = socket_select($read, $write, $except, seconds: 0, microseconds: self::TIMEOUT_MS * 1000);
+                $numChanged = socket_select($read, $write, $except, seconds: self::TIMEOUT_SECONDS, microseconds: self::TIMEOUT_MS * 1000);
             }
 
             if ($numChanged === false) {

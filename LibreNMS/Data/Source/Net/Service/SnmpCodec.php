@@ -27,8 +27,6 @@ namespace LibreNMS\Data\Source\Net\Service;
 
 class SnmpCodec implements UdpCodec
 {
-    private string $community;
-    private string $version;
     private ?string $securityName = null;
     private ?string $securityLevel = null;
     private ?string $authProtocol = null;
@@ -37,15 +35,19 @@ class SnmpCodec implements UdpCodec
     private ?string $privPassphrase = null;
     private readonly int $requestId;
 
+    // SNMPv3 engine discovery state
+    private string $engineId = '';
+    private int $engineBoots = 0;
+    private int $engineTime = 0;
+    private bool $engineDiscovered = false;
+
     public function __construct(
-        string $version = 'v2c',
-        string $community = 'public',
+        private string $version = 'v2c',
+        private string $community = 'public',
         array $v3Config = [],
         private readonly string $oid = '.1.3.6.1.2.1.1.2.0',
     ) {
         $this->requestId = mt_rand(1, 65535);
-        $this->version = $version;
-        $this->community = $community;
 
         if ($version === 'v3') {
             $this->securityName = $v3Config['authname'] ?? '';
@@ -54,7 +56,21 @@ class SnmpCodec implements UdpCodec
             $this->authPassphrase = $v3Config['authpass'] ?? null;
             $this->privProtocol = $v3Config['cryptoalgo'] ?? null;
             $this->privPassphrase = $v3Config['cryptopass'] ?? null;
+
+            // Validate security level configuration
+            $this->validateV3Config();
         }
+    }
+
+    /**
+     * Set engine parameters (typically after discovery)
+     */
+    public function setEngineParameters(string $engineId, int $engineBoots, int $engineTime): void
+    {
+        $this->engineId = $engineId;
+        $this->engineBoots = $engineBoots;
+        $this->engineTime = $engineTime;
+        $this->engineDiscovered = true;
     }
 
     public function getPayload(): string
@@ -82,6 +98,31 @@ class SnmpCodec implements UdpCodec
         return str_contains($payload, chr(0xA2));
     }
 
+    /**
+     * Validate SNMPv3 configuration
+     */
+    private function validateV3Config(): void
+    {
+        if ($this->securityLevel === 'authNoPriv' || $this->securityLevel === 'authPriv') {
+            if (empty($this->authProtocol) || empty($this->authPassphrase)) {
+                throw new \InvalidArgumentException('Authentication requires authProtocol and authPassphrase');
+            }
+
+            if (!in_array($this->authProtocol, ['MD5', 'SHA', 'SHA-224', 'SHA-256', 'SHA-384', 'SHA-512'])) {
+                throw new \InvalidArgumentException('Invalid auth protocol: ' . $this->authProtocol);
+            }
+        }
+
+        if ($this->securityLevel === 'authPriv') {
+            if (empty($this->privProtocol) || empty($this->privPassphrase)) {
+                throw new \InvalidArgumentException('Privacy requires privProtocol and privPassphrase');
+            }
+
+            if (!in_array($this->privProtocol, ['DES', 'AES', 'AES-128', 'AES-192', 'AES-256'])) {
+                throw new \InvalidArgumentException('Invalid privacy protocol: ' . $this->privProtocol);
+            }
+        }
+    }
 
     /**
      * Build SNMPv1 GET request packet
@@ -110,7 +151,7 @@ class SnmpCodec implements UdpCodec
     }
 
     /**
-     * Build SNMPv3 GET request packet (simplified, basic implementation)
+     * Build SNMPv3 GET request packet with full USM support
      */
     private function buildSnmpV3Packet(): string
     {
@@ -125,26 +166,46 @@ class SnmpCodec implements UdpCodec
         $globalData = $msgId . $msgMaxSize . $msgFlags . $msgSecurityModel;
         $headerData = $this->encodeSequence($globalData);
 
-        // Security parameters (simplified for noAuthNoPriv)
-        $engineId = $this->encodeOctetString('');
-        $engineBoots = $this->encodeInteger(0);
-        $engineTime = $this->encodeInteger(0);
-        $userName = $this->encodeOctetString($this->securityName);
-        $authParams = $this->encodeOctetString('');
-        $privParams = $this->encodeOctetString('');
-
-        $secParams = $engineId . $engineBoots . $engineTime . $userName . $authParams . $privParams;
-        $msgSecurityParameters = $this->encodeOctetString($this->encodeSequence($secParams));
-
-        // Scoped PDU
-        $contextEngineId = $this->encodeOctetString('');
+        // Build scoped PDU (before encryption)
+        $contextEngineId = $this->encodeOctetString($this->engineId);
         $contextName = $this->encodeOctetString('');
         $pdu = $this->buildGetRequestPdu();
-
         $scopedPdu = $this->encodeSequence($contextEngineId . $contextName . $pdu);
 
+        // Encrypt scoped PDU if privacy is enabled
+        $privParams = '';
+        if ($this->securityLevel === 'authPriv') {
+            $privKey = $this->generatePrivacyKey();
+            [$scopedPdu, $privParams] = $this->encryptScopedPdu($scopedPdu, $privKey);
+        }
+
+        // Build security parameters
+        $engineId = $this->encodeOctetString($this->engineId);
+        $engineBoots = $this->encodeInteger($this->engineBoots);
+        $engineTime = $this->encodeInteger($this->engineTime);
+        $userName = $this->encodeOctetString($this->securityName ?? '');
+
+        // Placeholder for authentication parameters (12 bytes of zeros)
+        $authParams = $this->encodeOctetString(str_repeat("\x00", 12));
+        $privParamsEncoded = $this->encodeOctetString($privParams);
+
+        $secParams = $engineId . $engineBoots . $engineTime . $userName . $authParams . $privParamsEncoded;
+        $msgSecurityParameters = $this->encodeOctetString($this->encodeSequence($secParams));
+
+        // Build complete message
         $message = $version . $headerData . $msgSecurityParameters . $scopedPdu;
-        return $this->encodeSequence($message);
+        $wholeMsg = $this->encodeSequence($message);
+
+        // Calculate and insert authentication parameters if needed
+        if ($this->securityLevel === 'authNoPriv' || $this->securityLevel === 'authPriv') {
+            $authKey = $this->generateAuthKey();
+            $authParams = $this->calculateAuthParams($wholeMsg, $authKey);
+
+            // Replace placeholder auth params with real ones
+            $wholeMsg = $this->replaceAuthParams($wholeMsg, $authParams);
+        }
+
+        return $wholeMsg;
     }
 
     /**
@@ -152,17 +213,208 @@ class SnmpCodec implements UdpCodec
      */
     private function getMsgFlags(): string
     {
-        $flags = 0x00;
+        $flags = 0x04; // reportable flag
 
         if ($this->securityLevel === 'authNoPriv') {
-            $flags = 0x01; // auth, no priv
+            $flags |= 0x01; // auth, no priv
         } elseif ($this->securityLevel === 'authPriv') {
-            $flags = 0x03; // auth and priv
+            $flags |= 0x03; // auth and priv
         }
 
-        $flags |= 0x04; // reportable
-
         return chr($flags);
+    }
+
+    /**
+     * Generate localized authentication key using password-to-key algorithm
+     */
+    private function generateAuthKey(): string
+    {
+        $password = $this->authPassphrase;
+        $algo = $this->getHashAlgorithm($this->authProtocol);
+
+        // Password to key transformation (RFC 3414)
+        $passwordHash = $this->passwordToKey($password, $algo);
+
+        // Localize the key with engineID
+        return $this->localizeKey($passwordHash, $this->engineId, $algo);
+    }
+
+    /**
+     * Generate localized privacy key
+     */
+    private function generatePrivacyKey(): string
+    {
+        $password = $this->privPassphrase;
+        $algo = $this->getHashAlgorithm($this->authProtocol); // Use auth algo for key derivation
+
+        // Password to key transformation
+        $passwordHash = $this->passwordToKey($password, $algo);
+
+        // Localize the key with engineID
+        return $this->localizeKey($passwordHash, $this->engineId, $algo);
+    }
+
+    /**
+     * Password-to-key algorithm (RFC 3414)
+     */
+    private function passwordToKey(string $password, string $hashAlgo): string
+    {
+        $passwordLength = strlen($password);
+        $count = 0;
+        $buffer = '';
+
+        // Generate 1MB of hashed data
+        while ($count < 1048576) {
+            for ($i = 0; $i < $passwordLength; $i++) {
+                $buffer .= $password[$i];
+                $count++;
+                if ($count >= 1048576) {
+                    break;
+                }
+            }
+        }
+
+        return hash($hashAlgo, $buffer, true);
+    }
+
+    /**
+     * Localize key with engineID
+     */
+    private function localizeKey(string $passwordKey, string $engineId, string $hashAlgo): string
+    {
+        return hash($hashAlgo, $passwordKey . $engineId . $passwordKey, true);
+    }
+
+    /**
+     * Calculate authentication parameters (HMAC)
+     */
+    private function calculateAuthParams(string $wholeMsg, string $authKey): string
+    {
+        $algo = $this->getHashAlgorithm($this->authProtocol);
+        $hmac = hash_hmac($algo, $wholeMsg, $authKey, true);
+
+        // Use first 12 bytes (96 bits) for MD5/SHA-1, first 16/24/32 bytes for SHA-2
+        return substr($hmac, 0, 12);
+    }
+
+    /**
+     * Replace authentication parameters placeholder with actual HMAC
+     */
+    private function replaceAuthParams(string $message, string $authParams): string
+    {
+        // Find the authentication parameters field (12 zero bytes) and replace it
+        $placeholder = $this->encodeOctetString(str_repeat("\x00", 12));
+        $replacement = $this->encodeOctetString($authParams);
+
+        // Find position of placeholder in message
+        $pos = strpos($message, $placeholder);
+        if ($pos !== false) {
+            return substr_replace($message, $replacement, $pos, strlen($placeholder));
+        }
+
+        return $message;
+    }
+
+    /**
+     * Encrypt scoped PDU using privacy protocol
+     */
+    private function encryptScopedPdu(string $scopedPdu, string $privKey): array
+    {
+        $protocol = $this->privProtocol;
+
+        if ($protocol === 'DES') {
+            return $this->encryptDES($scopedPdu, $privKey);
+        } elseif (str_starts_with($protocol, 'AES')) {
+            return $this->encryptAES($scopedPdu, $privKey, $protocol);
+        }
+
+        throw new \RuntimeException('Unsupported privacy protocol: ' . $protocol);
+    }
+
+    /**
+     * Encrypt using DES in CBC mode
+     */
+    private function encryptDES(string $data, string $privKey): array
+    {
+        // DES key is first 8 bytes of privacy key
+        $desKey = substr($privKey, 0, 8);
+
+        // Pre-IV is last 8 bytes of privacy key
+        $preIV = substr($privKey, 8, 8);
+
+        // Generate salt (8 bytes)
+        $salt = random_bytes(8);
+
+        // IV is XOR of pre-IV and salt
+        $iv = $preIV ^ $salt;
+
+        // Pad data to 8-byte boundary
+        $paddedData = $this->padData($data, 8);
+
+        // Encrypt
+        $encrypted = openssl_encrypt($paddedData, 'des-cbc', $desKey, OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING, $iv);
+
+        return [$encrypted, $salt];
+    }
+
+    /**
+     * Encrypt using AES in CFB mode
+     */
+    private function encryptAES(string $data, string $privKey, string $protocol): array
+    {
+        // Determine key size
+        $keySize = match($protocol) {
+            'AES-192' => 24,
+            'AES-256' => 32,
+            default => 16,
+        };
+
+        $aesKey = substr($privKey, 0, $keySize);
+
+        // Generate salt (8 bytes for AES-128, varies for others)
+        $salt = random_bytes(8);
+
+        // Build IV (engine boots + engine time + salt)
+        $iv = pack('N', $this->engineBoots) . pack('N', $this->engineTime) . $salt;
+
+        // Encrypt using AES-CFB
+        $cipher = match($protocol) {
+            'AES-192' => 'aes-192-cfb',
+            'AES-256' => 'aes-256-cfb',
+            default => 'aes-128-cfb',
+        };
+
+        $encrypted = openssl_encrypt($data, $cipher, $aesKey, OPENSSL_RAW_DATA, $iv);
+
+        return [$encrypted, $salt];
+    }
+
+    /**
+     * Pad data to block size boundary
+     */
+    private function padData(string $data, int $blockSize): string
+    {
+        $padLength = $blockSize - (strlen($data) % $blockSize);
+        if ($padLength === $blockSize) {
+            return $data;
+        }
+        return $data . str_repeat("\x00", $padLength);
+    }
+
+    /**
+     * Get hash algorithm name for hash/hash_hmac functions
+     */
+    private function getHashAlgorithm(string $protocol): string
+    {
+        return match(strtoupper($protocol)) {
+            'MD5' => 'md5',
+            'SHA', 'SHA-1' => 'sha1',
+            'SHA-224' => 'sha224',
+            'SHA-256' => 'sha256',
+            'SHA-384' => 'sha384',
+            'SHA-512' => 'sha512',
+            default => 'sha1',
+        };
     }
 
     /**
@@ -289,24 +541,6 @@ class SnmpCodec implements UdpCodec
         }
 
         return chr(0x80 | strlen($bytes)) . $bytes;
-    }
-
-    /**
-     * Validate SNMP response
-     */
-    private function isValidSnmpResponse(string $response): bool
-    {
-        if (strlen($response) < 2) {
-            return false;
-        }
-
-        // Check for SEQUENCE tag (0x30)
-        if (ord($response[0]) !== 0x30) {
-            return false;
-        }
-
-        // Basic validation passed
-        return true;
     }
 }
 
