@@ -151,7 +151,7 @@ class TestHappyEyeballs extends LnmsCommand
                     return new SnmpCodec(
                         $device->snmpver,
                         $device->community,
-                        $device->only(['authname', 'authalgo', 'authpass', 'authlevel', 'cryptoalgo', 'cryptopass'])
+                        $device->authname,
                     );
                 }
             } catch (\Exception $e) {
