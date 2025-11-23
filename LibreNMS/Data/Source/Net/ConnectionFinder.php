@@ -1,8 +1,8 @@
 <?php
 /**
- * HappyEyeballsConnector.php
+ * ConnectionFinder.php
  *
- * -Description-
+ * Implementation of RFC 6555 algorithm to find the best IP to connect to
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,15 +27,15 @@ namespace LibreNMS\Data\Source\Net;
 
 use Fiber;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Data\Source\Net\Service\HttpConnector;
 use LibreNMS\Data\Source\Net\Service\ServiceConnector;
+use LibreNMS\Data\Source\Net\Service\TcpConnector;
 use Socket;
 use Throwable;
 
-class HappyEyeballsConnector {
+class ConnectionFinder {
     private const TIMEOUT_MS = 300; // Short timeout as per RFC 6555 recommendations (around 300ms)
 
-    /** @var HappyEyeballsConnection[] */
+    /** @var Connection[] */
     private array $connections = [];
 
     private ?string $connectedIp = null;
@@ -48,14 +48,14 @@ class HappyEyeballsConnector {
      * @return string|null The first successfully connected IP address, or null if all fail.
      * @throws Throwable
      */
-    public function connect(array $ips, string $connectorClass = HttpConnector::class, ...$args): ?string {
+    public function connect(array $ips, string $connectorClass = TcpConnector::class, ...$args): ?string {
         Log::info("Starting Happy Eyeballs connection attempt to " . count($ips) . " IPs.");
         $startTime = microtime(true);
 
         // initiate fibers and connectors for each IP
         foreach ($ips as $ip) {
             $connector = new $connectorClass($ip, ...$args);
-            $connection = new HappyEyeballsConnection($connector, fn () => $this->fiberWorker($connector));
+            $connection = new Connection($connector, fn () => $this->fiberWorker($connector));
             $this->connections[$ip] = $connection;
             $connection->fiber->start();
         }
@@ -124,7 +124,7 @@ class HappyEyeballsConnector {
         return $this->connectedIp;
     }
 
-    protected function getConnection(string|Socket $search): HappyEyeballsConnection|null
+    protected function getConnection(string|Socket $search): Connection|null
     {
         if (is_string($search)) {
             return $this->connections[$search] ?? null;
@@ -133,9 +133,9 @@ class HappyEyeballsConnector {
         return array_find($this->connections, fn ($connection) => $connection->connector->hasSocket($search));
     }
 
-    protected function forgetConnection(string|HappyEyeballsConnection $ip): void
+    protected function forgetConnection(string|Connection $ip): void
     {
-        if ($ip instanceof HappyEyeballsConnection) {
+        if ($ip instanceof Connection) {
             $ip = $ip->ip;
         }
 

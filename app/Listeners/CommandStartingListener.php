@@ -33,6 +33,7 @@ class CommandStartingListener
 {
     private array $skip_user_check = [
         'list:bash-completion',
+        'test:happy-eyeballs',
     ];
 
     /**

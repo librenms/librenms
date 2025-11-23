@@ -1943,13 +1943,12 @@
             "type": "integer"
         },
         "dns.resolution_mode": {
-            "default": "os",
+            "default": "prefer_ipv6",
             "group": "system",
             "section": "dns",
             "order": 0,
             "type": "select",
             "options": {
-                "os": "OS (Default)",
                 "prefer_ipv6": "Prefer IPv6",
                 "ipv6_only": "IPv6 Only",
                 "prefer_ipv4": "Prefer IPv4",

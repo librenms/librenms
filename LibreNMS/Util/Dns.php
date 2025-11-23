@@ -28,13 +28,17 @@ namespace LibreNMS\Util;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use Illuminate\Support\Arr;
 use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Interfaces\Geocoder;
 use Net_DNS2_Exception;
 use Net_DNS2_Lookups;
 use Net_DNS2_Resolver;
+use React\Dns\Resolver\ResolverInterface;
+use React\Promise\Promise;
+use React\Promise\PromiseInterface;
 
-class Dns implements Geocoder
+class Dns implements Geocoder, ResolverInterface
 {
     public function __construct(protected Net_DNS2_Resolver $resolver, protected SocketWrapper $socket)
     {
@@ -177,5 +181,26 @@ class Dns implements Geocoder
         }
 
         return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function resolve($domain): PromiseInterface|Promise
+    {
+        return new Promise(fn () => $this->resolveIP($domain));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function resolveAll($domain, $type): PromiseInterface|Promise
+    {
+        return new Promise(function () use ($domain) {
+            $dns = Arr::flatten($this->resolveIPs($domain));
+            dump($dns);
+
+            return $dns;
+        });
     }
 }

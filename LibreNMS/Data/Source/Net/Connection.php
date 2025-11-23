@@ -1,6 +1,6 @@
 <?php
 /**
- * HappyEyeballsConnection.php
+ * Connection.php
  *
  * -Description-
  *
@@ -28,7 +28,7 @@ namespace LibreNMS\Data\Source\Net;
 use Fiber;
 use LibreNMS\Data\Source\Net\Service\ServiceConnector;
 
-readonly class HappyEyeballsConnection
+readonly class Connection
 {
     public string $ip;
     public Fiber $fiber;
