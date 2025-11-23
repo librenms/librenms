@@ -41,18 +41,18 @@ class SocketWrapper
      *      ai_addr: array{sin_port: int, sin_addr: string}|array{sin6_port: int, sin6_addr: string}
      *  }>|false
      */
-    public function getAddrInfo(string $hostname, ?AddressFamily $family = null): array|false
+    public function getAddrInfo(string $hostname, ?AddressFamily $family = null, ?string $service = null, int $socktype = SOCK_DGRAM): array|false
     {
         $cacheKey = $hostname . ($family ? ":{$family->value}" : '');
 
         if (! array_key_exists($cacheKey, $this->cache)) {
             $hints = match ($family) {
-                AddressFamily::IPv4 => ['ai_family' => AF_INET],
-                AddressFamily::IPv6 => ['ai_family' => AF_INET6],
-                default => [],
+                AddressFamily::IPv4 => ['ai_family' => AF_INET, 'ai_socktype' => $socktype],
+                AddressFamily::IPv6 => ['ai_family' => AF_INET6, 'ai_socktype' => $socktype],
+                default => ['ai_socktype' => $socktype],
             };
 
-            $info = socket_addrinfo_lookup($hostname, null, $hints);
+            $info = socket_addrinfo_lookup($hostname, $service, $hints);
             $this->cache[$cacheKey] = $info === false ? false : array_map(socket_addrinfo_explain(...), $info);
         }
 
