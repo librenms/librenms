@@ -7,13 +7,15 @@ use App\Facades\DeviceCache;
 use Illuminate\Support\Arr;
 use LibreNMS\Data\Source\Net\AddrInfoResolver;
 use LibreNMS\Data\Source\Net\ConnectionFinder;
-use LibreNMS\Data\Source\Net\Service\DnsRequestMessage;
+use LibreNMS\Data\Source\Net\Service\DnsCodec;
 use LibreNMS\Data\Source\Net\Service\IcmpConnector;
+use LibreNMS\Data\Source\Net\Service\NtpCodec;
 use LibreNMS\Data\Source\Net\Service\NtpConnector;
-use LibreNMS\Data\Source\Net\Service\NtpRequestMessage;
+use LibreNMS\Data\Source\Net\Service\SnmpCodec;
 use LibreNMS\Data\Source\Net\Service\SnmpConnector;
-use LibreNMS\Data\Source\Net\Service\SnmpRequestMessage;
 use LibreNMS\Data\Source\Net\Service\TcpConnector;
+use LibreNMS\Data\Source\Net\Service\UdpCodec;
+use LibreNMS\Data\Source\Net\Service\UdpConnector;
 use LibreNMS\Data\Source\Net\UdpHappyEyeballsConnector;
 use LibreNMS\Util\Dns;
 use React\Dns\Resolver\Resolver;
@@ -34,50 +36,26 @@ class TestHappyEyeballs extends LnmsCommand
         }
 
         $hostname = $this->argument('hostname');
-        if ($hostname) {
-            try {
-
-            $device = DeviceCache::get($hostname);
-            if ($device->exists) {
-                DeviceCache::setPrimary($device->device_id);
-            }
-            } catch (\Exception $e) {
-                // device not found
-            }
-        }
-        $default_port = match($this->argument('service')) {
-            'ntp' => 123,
-            'dns' => 53,
-            'snmp' => 161,
-            default => 80,
-        };
-
-        $port = (int) $this->option('port') ?: $default_port;
-        $service = match ($this->argument('service')) {
-            'ntp' => NtpRequestMessage::class,
-            'dns' => DnsRequestMessage::class,
-            'snmp' => SnmpRequestMessage::class,
-            default => TcpConnector::class,
-        };
+        $port = $this->resolvePort();
+        $codec = $this->resolveUdpCodec();
 
         $start_time = microtime(true);
 
-        if ($service === TcpConnector::class) {
+        if ($codec === null) {
             return $this->reactTcp($hostname, $port);
         }
 
         $dns = new Resolver(new AddrInfoResolver);
         $connector = new UdpHappyEyeballsConnector($dns);
-        $request = new $service();
 
-        await($connector->connect($hostname, $port, $request)->then(
-            function ($result) use ($service) {
-                echo "$service connected via: " . $result['address'] . "\n";
+        await($connector->connect($hostname, $port, $codec)->then(
+            function ($result) {
+                echo "connected via: " . $result['address'] . "\n";
                 echo "Response length: " . strlen($result['response']) . " bytes\n";
                 $result['socket']->close();
             },
-            function ($error) use ($service) {
-                echo "$service connection failed: " . $error->getMessage() . "\n";
+            function ($error) {
+                echo "connection failed: " . $error->getMessage() . "\n";
             }
         ));
 
@@ -105,35 +83,20 @@ class TestHappyEyeballs extends LnmsCommand
         $this->configureOutputOptions();
 
         $hostname = $this->argument('hostname');
-        if ($hostname) {
-            try {
-                $device = DeviceCache::get($hostname);
-                if ($device->exists) {
-                    DeviceCache::setPrimary($device->device_id);
-                }
-            } catch (\Exception $e) {
-                //
-            }
-        }
-
+        $port = $this->resolvePort();
         $resolved_ips = $dns->resolveIPs($hostname ?? 'localhost');
         $target_ips = Arr::flatten($resolved_ips);
 
-        $service = match ($this->argument('service')) {
-            'icmp' => IcmpConnector::class,
-            'ntp' => NtpConnector::class,
-            'snmp' => SnmpConnector::class,
-            default => TcpConnector::class,
-        };
+        $codec = $this->resolveUdpCodec();
+        $socketConnector = $codec === null ? TcpConnector::class : UdpConnector::class;
 
         $this->info('Target IPs: ' . implode(', ', $target_ips));
         $start_time = microtime(true);
 
         // Execute the happy eyeballs function
-        $connector = new ConnectionFinder();
-        $port = (int) $this->option('port');
-        $args = $port ? [$port] : [];
-        $firstConnectedIp = $connector->connect($target_ips, $service, ...$args);
+        $finder = new ConnectionFinder();
+
+        $firstConnectedIp = $finder->connect($target_ips, $port, $socketConnector, $codec);
 
         $elapsed_time = microtime(true) - $start_time;
         $this->info("Elapsed time: $elapsed_time seconds");
@@ -147,5 +110,52 @@ class TestHappyEyeballs extends LnmsCommand
         $this->error("Failed to connect to any IP address within the timeout.");
 
         return 1;
+    }
+
+    private function resolvePort(): int
+    {
+        $default_port = match($this->argument('service')) {
+            'ntp' => 123,
+            'dns' => 53,
+            'snmp' => 161,
+            default => 80,
+        };
+
+        return (int) $this->option('port') ?: $default_port;
+    }
+
+    private function resolveUdpCodec(): ?UdpCodec
+    {
+        return match($this->argument('service')) {
+            'ntp' => new NtpCodec(),
+            'dns' => new DnsCodec(),
+            'snmp' => $this->createSnmpCodec(),
+            default => null,
+        };
+    }
+
+    private function createSnmpCodec(): ?SnmpCodec
+    {
+        $hostname = $this->argument('hostname');
+        if ($hostname) {
+            try {
+                $device = DeviceCache::get($hostname);
+                if ($device->exists) {
+                    if (str_starts_with($device->transport, 'tcp')) {
+                        return null;
+                    }
+
+                    return new SnmpCodec(
+                        $device->snmpver,
+                        $device->community,
+                        $device->only(['authname', 'authpass', 'authlevel', 'cryptoalgo', 'cryptopass'])
+                    );
+                }
+            } catch (\Exception $e) {
+                //
+            }
+        }
+
+        return new SnmpCodec();
     }
 }

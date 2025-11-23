@@ -27,7 +27,7 @@ namespace LibreNMS\Data\Source\Net\Service;
 
 class TcpConnector extends BaseConnector
 {
-    public function __construct(string $ip, int $port = 80)
+    public function __construct(string $ip, int $port)
     {
         parent::__construct($ip, $port);
     }

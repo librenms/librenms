@@ -27,7 +27,7 @@ namespace LibreNMS\Data\Source\Net;
 
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Data\Source\Net\Service\UdpRequestMessage;
+use LibreNMS\Data\Source\Net\Service\UdpCodec;
 use React\Dns\Resolver\ResolverInterface;
 use React\EventLoop\Loop;
 use React\Promise\Deferred;
@@ -49,7 +49,7 @@ class UdpHappyEyeballsConnector
         $this->responseTimeout = $responseTimeout;
     }
 
-    public function connect(string $hostname, int $port, UdpRequestMessage $requestMessage): Promise
+    public function connect(string $hostname, int $port, UdpCodec $requestMessage): Promise
     {
         $deferred = new Deferred();
 
@@ -86,7 +86,7 @@ class UdpHappyEyeballsConnector
         return $deferred->promise();
     }
 
-    private function attemptConnections(array $ipv4Addresses, array $ipv6Addresses, int $port, UdpRequestMessage $requestMessage, Deferred $deferred)
+    private function attemptConnections(array $ipv4Addresses, array $ipv6Addresses, int $port, UdpCodec $requestMessage, Deferred $deferred)
     {
         $attempts = [];
         $timers = [];
@@ -169,7 +169,7 @@ class UdpHappyEyeballsConnector
         });
     }
 
-    private function connectToAddress(string $address, int $port, UdpRequestMessage $requestMessage): Promise
+    private function connectToAddress(string $address, int $port, UdpCodec $requestMessage): Promise
     {
         $deferred = new Deferred();
 

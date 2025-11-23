@@ -1,6 +1,6 @@
 <?php
 /**
- * NtpConnector.php
+ * UdpConnector.php
  *
  * -Description-
  *
@@ -27,9 +27,9 @@ namespace LibreNMS\Data\Source\Net\Service;
 
 use Illuminate\Support\Facades\Log;
 
-class NtpConnector extends BaseConnector
+class UdpConnector extends BaseConnector
 {
-    public function __construct(string $ip, int $port = 123)
+    public function __construct(string $ip, int $port, private UdpCodec $requestMessage)
     {
         parent::__construct($ip, $port);
     }
@@ -38,14 +38,13 @@ class NtpConnector extends BaseConnector
     {
         $this->createSocket(SOCK_DGRAM, SOL_UDP);
 
-        $ntpPacket = chr(0x1B) . str_repeat(chr(0x00), 47);
+        $payload = $this->requestMessage->getPayload();
 
-        // Send the packet immediately, as UDP is connectionless
-        $bytesSent = socket_sendto($this->socket, $ntpPacket, strlen($ntpPacket), 0, $this->ip, $this->port);
+        $bytesSent = socket_sendto($this->socket, $payload, strlen($payload), 0, $this->ip, $this->port);
         $this->waitForRead();
 
         if ($bytesSent === false) {
-            throw new \RuntimeException("Failed to send NTP packet to $this ".socket_strerror(socket_last_error()));
+            throw new \RuntimeException("Failed to send UDP packet to $this " . socket_strerror(socket_last_error()));
         }
 
         return true;
@@ -56,15 +55,17 @@ class NtpConnector extends BaseConnector
         $response = '';
         $from = '';
         $portFrom = 0;
-        // Attempt to read the response now that we know data is available
-        $bytesReceived = socket_recvfrom($this->socket, $response, 255, 0, $from, $portFrom);
 
-        if ($bytesReceived > 0 && strlen((string) $response) == 48 && $from === $this->ip) {
-            Log::info("Received valid NTP response from the first responsive IP: $this->ip");
-            return true;
+        $bytesReceived = socket_recvfrom($this->socket, $response, 4096, 0, $from, $portFrom);
+
+        if ($bytesReceived > 0 && $from === $this->ip) {
+            // Basic validation: check if response is valid SNMP
+            if ($this->requestMessage->validateResponse($response)) {
+                Log::info("Received valid UDP response from $this->ip");
+                return true;
+            }
         }
 
         throw new \RuntimeException("Failed to verify peer for $this " . socket_strerror(socket_last_error($this->socket)));
     }
-
 }

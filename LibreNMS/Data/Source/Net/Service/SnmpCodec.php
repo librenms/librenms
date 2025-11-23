@@ -1,6 +1,6 @@
 <?php
 /**
- * SnmpConnector.php
+ * SnmpCodec.php
  *
  * -Description-
  *
@@ -25,9 +25,7 @@
 
 namespace LibreNMS\Data\Source\Net\Service;
 
-use Illuminate\Support\Facades\Log;
-
-class SnmpConnector extends BaseConnector
+class SnmpCodec implements UdpCodec
 {
     private string $community;
     private string $version;
@@ -39,111 +37,51 @@ class SnmpConnector extends BaseConnector
     private ?string $privPassphrase = null;
     private readonly int $requestId;
 
-    /**
-     * @param string $ip
-     * @param int $port
-     * @param string $version SNMP version: '1', '2c', or '3'
-     * @param string $community Community string for v1/v2c
-     * @param string $oid OID to query (default: system.sysDescr.0)
-     * @param array $v3Config SNMPv3 configuration array with keys:
-     *                        - securityName
-     *                        - securityLevel: 'noAuthNoPriv', 'authNoPriv', or 'authPriv'
-     *                        - authProtocol: 'MD5' or 'SHA'
-     *                        - authPassphrase
-     *                        - privProtocol: 'DES' or 'AES'
-     *                        - privPassphrase
-     */
     public function __construct(
-        string $ip,
-        int $port = 161,
-        string $version = '2c',
+        string $version = 'v2c',
         string $community = 'public',
-        private readonly string $oid = '1.3.6.1.2.1.1.1.0',
-        array $v3Config = []
+        array $v3Config = [],
+        private readonly string $oid = '.1.3.6.1.2.1.1.2.0',
     ) {
-        $device = \DeviceCache::getPrimary();
-        if ($device->exists) {
-            $port = $device->port;
-        }
-
-        parent::__construct($ip, $port);
         $this->requestId = mt_rand(1, 65535);
+        $this->version = $version;
+        $this->community = $community;
 
-        if ($device->exists) {
-            $this->version = substr((string) $device->snmpver, 1);
-            $this->community = $device->community;
-
-            if ($this->version === '3') {
-                $this->securityName = $device->authname;
-                $this->securityLevel = $device->authlevel;
-                $this->authProtocol = $device->authalgo;
-                $this->authPassphrase = $device->authpass;
-                $this->privProtocol = $device->cryptoalgo;
-                $this->privPassphrase = $device->cryptopass;
-            }
-
-        } else {
-            $this->version = $version;
-            $this->community = $community;
-
-            if ($version === '3') {
-                $this->securityName = $v3Config['securityName'] ?? '';
-                $this->securityLevel = $v3Config['securityLevel'] ?? 'noAuthNoPriv';
-                $this->authProtocol = $v3Config['authProtocol'] ?? null;
-                $this->authPassphrase = $v3Config['authPassphrase'] ?? null;
-                $this->privProtocol = $v3Config['privProtocol'] ?? null;
-                $this->privPassphrase = $v3Config['privPassphrase'] ?? null;
-            }
+        if ($version === 'v3') {
+            $this->securityName = $v3Config['authname'] ?? '';
+            $this->securityLevel = $v3Config['authlevel'] ?? 'noAuthNoPriv';
+            $this->authProtocol = $v3Config['authalgo'] ?? null;
+            $this->authPassphrase = $v3Config['authpass'] ?? null;
+            $this->privProtocol = $v3Config['cryptoalgo'] ?? null;
+            $this->privPassphrase = $v3Config['cryptopass'] ?? null;
         }
     }
 
-    public function connect(): bool
-    {
-        $this->createSocket(SOCK_DGRAM, SOL_UDP);
-
-        $snmpPacket = $this->buildSnmpPacket();
-
-        $bytesSent = socket_sendto($this->socket, $snmpPacket, strlen($snmpPacket), 0, $this->ip, $this->port);
-        $this->waitForRead();
-
-        if ($bytesSent === false) {
-            throw new \RuntimeException("Failed to send SNMP packet to $this " . socket_strerror(socket_last_error()));
-        }
-
-        return true;
-    }
-
-    public function isServiceAvailable(): bool
-    {
-        $response = '';
-        $from = '';
-        $portFrom = 0;
-
-        $bytesReceived = socket_recvfrom($this->socket, $response, 4096, 0, $from, $portFrom);
-
-        if ($bytesReceived > 0 && $from === $this->ip) {
-            // Basic validation: check if response is valid SNMP
-            if ($this->isValidSnmpResponse($response)) {
-                Log::info("Received valid SNMP response from $this->ip");
-                return true;
-            }
-        }
-
-        throw new \RuntimeException("Failed to verify peer for $this " . socket_strerror(socket_last_error($this->socket)));
-    }
-
-    /**
-     * Build SNMP packet based on version
-     */
-    private function buildSnmpPacket(): string
+    public function getPayload(): string
     {
         return match ($this->version) {
-            '1' => $this->buildSnmpV1Packet(),
-            '2c' => $this->buildSnmpV2cPacket(),
-            '3' => $this->buildSnmpV3Packet(),
+            'v1' => $this->buildSnmpV1Packet(),
+            'v2c' => $this->buildSnmpV2cPacket(),
+            'v3' => $this->buildSnmpV3Packet(),
             default => throw new \InvalidArgumentException("Unsupported SNMP version: {$this->version}"),
         };
     }
+
+    public function validateResponse(string $payload): bool
+    {
+        if (strlen($payload) < 10) {
+            return false;
+        }
+
+        // Check if it starts with SEQUENCE tag (0x30)
+        if (ord($payload[0]) !== 0x30) {
+            return false;
+        }
+
+        // Check for Get-Response PDU type (0xA2)
+        return str_contains($payload, chr(0xA2));
+    }
+
 
     /**
      * Build SNMPv1 GET request packet
@@ -302,7 +240,7 @@ class SnmpConnector extends BaseConnector
      */
     private function encodeOid(string $oid): string
     {
-        $parts = explode('.', $oid);
+        $parts = explode('.', trim($oid, '.'));
         $encoded = '';
 
         // First two parts are combined: 40*first + second
@@ -371,3 +309,4 @@ class SnmpConnector extends BaseConnector
         return true;
     }
 }
+

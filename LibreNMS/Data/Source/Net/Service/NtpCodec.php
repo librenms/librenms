@@ -1,6 +1,6 @@
 <?php
 /**
- * UdpRequestMessage.php
+ * NtpCodec.php
  *
  * -Description-
  *
@@ -25,9 +25,29 @@
 
 namespace LibreNMS\Data\Source\Net\Service;
 
-interface UdpRequestMessage
+class NtpCodec implements UdpCodec
 {
-    public function getPayload(): string;
+    public function getPayload(): string
+    {
+        // NTP packet format (48 bytes)
+        // LI = 0, VN = 3, Mode = 3 (client)
+        $packet = chr(0x1b); // 00011011 in binary
+        $packet .= str_repeat(chr(0), 47);
+        return $packet;
+    }
 
-    public function validateResponse(string $payload): bool;
+    public function validateResponse(string $payload): bool
+    {
+        // NTP response should be 48 bytes
+        // and have mode = 4 (server) or mode = 5 (broadcast)
+        if (strlen($payload) < 48) {
+            return false;
+        }
+
+        $firstByte = ord($payload[0]);
+        $mode = $firstByte & 0x07;
+
+        // Valid modes: 4 (server) or 5 (broadcast)
+        return $mode === 4 || $mode === 5;
+    }
 }

@@ -28,7 +28,7 @@ namespace LibreNMS\Data\Source\Net;
 use Fiber;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Data\Source\Net\Service\ServiceConnector;
-use LibreNMS\Data\Source\Net\Service\TcpConnector;
+use LibreNMS\Data\Source\Net\Service\UdpCodec;
 use Socket;
 use Throwable;
 
@@ -45,16 +45,17 @@ class ConnectionFinder {
      *
      * @param  array  $ips  Ordered list of IPv4 and IPv6 addresses.
      * @param  class-string<ServiceConnector>  $connectorClass
+     * @param  UdpCodec  $codec
      * @return string|null The first successfully connected IP address, or null if all fail.
      * @throws Throwable
      */
-    public function connect(array $ips, string $connectorClass = TcpConnector::class, ...$args): ?string {
+    public function connect(array $ips, int $port, string $connectorClass, UdpCodec $codec): ?string {
         Log::info("Starting Happy Eyeballs connection attempt to " . count($ips) . " IPs.");
         $startTime = microtime(true);
 
         // initiate fibers and connectors for each IP
         foreach ($ips as $ip) {
-            $connector = new $connectorClass($ip, ...$args);
+            $connector = new $connectorClass($ip, $port, $codec);
             $connection = new Connection($connector, fn () => $this->fiberWorker($connector));
             $this->connections[$ip] = $connection;
             $connection->fiber->start();

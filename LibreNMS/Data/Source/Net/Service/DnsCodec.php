@@ -1,6 +1,6 @@
 <?php
 /**
- * DnsRequestMessage.php
+ * DnsCodec.php
  *
  * -Description-
  *
@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Data\Source\Net\Service;
 
-class DnsRequestMessage implements UdpRequestMessage
+class DnsCodec implements UdpCodec
 {
     private $domain;
     private $transactionId;
