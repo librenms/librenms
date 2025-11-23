@@ -73,52 +73,6 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             }
         }
     }
-/**
-     * Poll BGP peers from BGP4-MIB (standard MIB) for both IPv4 and IPv6,
-     * using the numerical OID (1.3.6.1.2.1.15) to bypass the MIB lookup error.
-     *
-     * @return array
-     */
-    public function pollBgp(): array
-    {
-        $mib = '1.3.6.1.2.1.15';
-
-        $data = SnmpQuery::hideMib()->walk([
-            $mib . '.3',
-            $mib . '.9',
-        ])->mapTable(function ($value, $index) use ($mib) {
-            $peer_ip = $value[$mib . '.3.1.7'] ?? null;
-
-            if (! $peer_ip) {
-                return null;
-            }
-
-            return [
-                'bgpPeerIdentifier' => $value[$mib . '.3.1.2'] ?? null,
-                'bgpPeerState' => $value[$mib . '.3.1.3'] ?? null,
-                'bgpPeerAdminStatus' => $value[$mib . '.3.1.4'] ?? null,
-                'bgpPeerLocalAs' => $value[$mib . '.3.1.5'] ?? null,
-                'bgpPeerRemoteAs' => $value[$mib . '.3.1.6'] ?? null,
-                'bgpPeerLocalAddr' => $value[$mib . '.3.1.8'] ?? null,
-                'bgpPeerRemoteAddr' => $peer_ip,
-
-                'bgpPeerRemoteAddrType' => $value[$mib . '.3.1.1'] ?? null,
-
-                'bgpPeerInUpdates' => $value[$mib . '.9.1.1'] ?? 0,
-                'bgpPeerOutUpdates' => $value[$mib . '.9.1.2'] ?? 0,
-                'bgpPeerInTotalMessages' => $value[$mib . '.9.1.3'] ?? 0,
-                'bgpPeerOutTotalMessages' => $value[$mib . '.9.1.4'] ?? 0,
-                'bgpPeerFsmEstablishedTime' => $value[$mib . '.9.1.5'] ?? 0,
-                'bgpPeerLastError' => $value[$mib . '.9.1.28'] ?? null,
-            ];
-        })->filter()->all();
-        $peers = [];
-        foreach ($data as $peer) {
-            $peers[$peer['bgpPeerRemoteAddr']] = $peer;
-        }
-
-        return $peers;
-    }
 
     /**
      * Discover wireless Rx & Tx (Signal Strength). This is in dBm. Type is power.

@@ -28,7 +28,8 @@ use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\IP;
 
 if ($device['os'] == 'timos') {
-    $bgpPeersCache = SnmpQuery::numericIndex()->walk('TIMETRA-BGP-MIB::tBgpPeerNgTable')->valuesByIndex();
+    $mib_root = '.1.3.6.1.4.1.6527.3.1.2.14.4.8';
+    $bgpPeersCache = SnmpQuery::numericIndex()->walk($mib_root)->valuesByIndex();
     foreach ($bgpPeersCache as $key => $value) {
         $oid = explode('.', (string) $key);
         $vrfInstance = $oid[0];
@@ -52,13 +53,13 @@ if ($device['os'] == 'timos') {
         d_echo($vrfId);
 
         foreach ($vrf as $address => $value) {
-            $astext = \LibreNMS\Util\AutonomousSystem::get($value['TIMETRA-BGP-MIB::tBgpPeerNgPeerAS4Byte'])->name();
+            $astext = \LibreNMS\Util\AutonomousSystem::get($value[$mib_root . '.1.18'] ?? $value['TIMETRA-BGP-MIB::tBgpPeerNgPeerAS4Byte'] ?? null)->name();
             if (! DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->exists()) {
                 $peers = [
                     'device_id' => $device['device_id'],
                     'vrf_id' => $vrfId,
                     'bgpPeerIdentifier' => $address,
-                    'bgpPeerRemoteAs' => $value['TIMETRA-BGP-MIB::tBgpPeerNgPeerAS4Byte'],
+                    'bgpPeerRemoteAs' => $value[$mib_root . '.1.18'] ?? $value['TIMETRA-BGP-MIB::tBgpPeerNgPeerAS4Byte'] ?? null,
                     'bgpPeerState' => 'idle',
                     'bgpPeerAdminStatus' => 'stop',
                     'bgpLocalAddr' => '0.0.0.0',
@@ -84,7 +85,7 @@ if ($device['os'] == 'timos') {
                 echo '+';
             } else {
                 $peers = [
-                    'bgpPeerRemoteAs' => $value['TIMETRA-BGP-MIB::tBgpPeerNgPeerAS4Byte'],
+                    'bgpPeerRemoteAs' => $value[$mib_root . '.1.18'] ?? $value['TIMETRA-BGP-MIB::tBgpPeerNgPeerAS4Byte'] ?? null,
                     'astext' => $astext,
                 ];
                 $affected = DeviceCache::getPrimary()->bgppeers()->where('bgpPeerIdentifier', $address)->where('vrf_id', $vrfId)->update($peers);
@@ -101,79 +102,80 @@ if ($device['os'] == 'timos') {
     }
 
     unset($bgpPeers);
-$afi_map = [
-    1 => 'ipv4',
-    2 => 'ipv6',
-];
-$safi_map = [
-    1 => 'unicast',
-    2 => 'multicast',
-    128 => 'vpn',
-];
+    $afi_map = [
+        1 => 'ipv4',
+        2 => 'ipv6',
+    ];
+    $safi_map = [
+        1 => 'unicast',
+        2 => 'multicast',
+        128 => 'vpn',
+    ];
 
-// Step 1: Gather peer table (for IP lookup)
-$peer_table = snmpwalk_cache_multi_oid($device, 'tBgpPeerNgTable', [], 'TIMETRA-BGP-MIB', 'nokia', '-OQUsb');
-d_echo($peer_table);
+    // Numerical OID for tBgpPeerNgTable (Peer Table)
+    $peer_table_oid = '.1.3.6.1.4.1.6527.3.1.2.14.4.8';
+    // Numerical OID for tBgpPeerNgAfiSafiTable (AFI/SAFI Table, using MaxPfxs OID)
+    $afisafi_table_oid = '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.24';
 
-// Step 2: Gather AFI/SAFI combinations
-$afisafi_table = snmpwalk_cache_multi_oid($device, 'tBgpPeerNgAfiSafiTable', [], 'TIMETRA-BGP-MIB', 'nokia', '-OQUsb');
-d_echo($afisafi_table);
+    // Step 1: Gather peer table (for IP lookup) - NOW USING NUMERICAL OID
+    $peer_table = snmpwalk_cache_multi_oid($device, $peer_table_oid, [], '', 'nokia', '-OQUsb');
+    d_echo($peer_table);
 
-// 1. Define the OID mapping based on your NOC team's data:
-// Key Format: <afi>_<safi> (e.g., 1_1 for ipv4_unicast)
-$prefix_oids = [
-    '1_1'   => ['recv' => 'tBgpPeerNgOperReceivedPrefixes', 'sent' => 'tBgpPeerNgOperSentPrefixes'],   // IPv4 Unicast
-    '1_2'   => ['recv' => 'tBgpPeerNgOperMCastV4RecvPfxs',  'sent' => 'tBgpPeerNgOperMCastV4SentPfxs'],  // IPv4 Multicast
-    '1_128' => ['recv' => 'tBgpPeerNgOperVpnRecvPrefixes',  'sent' => 'tBgpPeerNgOperVpnSentPrefixes'],  // IPv4 VPN
+    // Step 2: Gather AFI/SAFI combinations - NOW USING NUMERICAL OID
+    $afisafi_table = snmpwalk_cache_multi_oid($device, $afisafi_table_oid, [], '', 'nokia', '-OQUsb');
+    d_echo($afisafi_table);
 
-    '2_1'   => ['recv' => 'tBgpPeerNgOperV6ReceivedPrefixes', 'sent' => 'tBgpPeerNgOperV6SentPrefixes'], // IPv6 Unicast
-    '2_2'   => ['recv' => 'tBgpPeerNgOperMcastV6RecvPfxs',  'sent' => 'tBgpPeerNgOperMcastV6SentPfxs'],  // IPv6 Multicast
-    '2_128' => ['recv' => 'tBgpPeerNgOperVpnIpv6RecvPfxs',  'sent' => 'tBgpPeerNgOperVpnIpv6SentPfxs'],  // IPv6 VPN
-];
+    // 1. Define the OID mapping using your provided NUMERICAL OIDs:
+    $prefix_oids = [
+        '1_1'   => ['recv' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.5',  'sent' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.6'],   // IPv4 Unicast
+        '1_2'   => ['recv' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.37', 'sent' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.38'],  // IPv4 Multicast
+        '1_128' => ['recv' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.13', 'sent' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.14'],  // IPv4 VPN
 
-// 2. Poll ALL the required Nokia OIDs once for efficiency
-$nokia_prefix_data = [];
-foreach ($prefix_oids as $oid_set) {
-    // Poll the Received OID
-    $data_recv = snmpwalk_cache_multi_oid($device, $oid_set['recv'], [], 'TIMETRA-BGP-MIB', 'nokia', '-OQUsb');
-    // The key is the OID name itself
-    $nokia_prefix_data[$oid_set['recv']] = $data_recv;
+        '2_1'   => ['recv' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.27', 'sent' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.28'], // IPv6 Unicast
+        '2_2'   => ['recv' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.95', 'sent' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.96'],  // IPv6 Multicast
+        '2_128' => ['recv' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.40', 'sent' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.41'],  // IPv6 VPN
+    ];
 
-    // Poll the Sent OID
-    $data_sent = snmpwalk_cache_multi_oid($device, $oid_set['sent'], [], 'TIMETRA-BGP-MIB', 'nokia', '-OQUsb');
-    $nokia_prefix_data[$oid_set['sent']] = $data_sent;
-}
-d_echo($nokia_prefix_data);
+    // 2. Poll ALL the required Nokia OIDs once for efficiency
+    $nokia_prefix_data = [];
+    foreach ($prefix_oids as $oid_set) {
+        // Poll the Received OID
+        $data_recv = snmpwalk_cache_multi_oid($device, $oid_set['recv'], [], '', 'nokia', '-OQUsb');
+        $nokia_prefix_data[$oid_set['recv']] = $data_recv;
 
-// Step 3: Process AFI/SAFI and use the new OID map
-foreach ($afisafi_table as $index => $entry) {
-    $parts = explode('.', $index);
-    if (count($parts) < 3) {
-        continue;
+        // Poll the Sent OID
+        $data_sent = snmpwalk_cache_multi_oid($device, $oid_set['sent'], [], '', 'nokia', '-OQUsb');
+        $nokia_prefix_data[$oid_set['sent']] = $data_sent;
     }
+    d_echo($nokia_prefix_data);
 
-    $safi = array_pop($parts);
-    $afi = array_pop($parts);
-    $peer_index = implode('.', $parts);
+    // Step 3: Process AFI/SAFI and use the new OID map
+    foreach ($afisafi_table as $index => $entry) {
+        $parts = explode('.', $index);
+        if (count($parts) < 3) {
+            continue;
+        }
 
-    $afi_name = $afi_map[$afi] ?? "afi$afi";
-    $safi_name = $safi_map[$safi] ?? "safi$safi";
+        $safi = array_pop($parts);
+        $afi = array_pop($parts);
+        $peer_index = implode('.', $parts);
 
-    // Key to look up the correct OIDs
-    $oid_key = $afi . '_' . $safi;
+        $afi_name = $afi_map[$afi] ?? "afi$afi";
+        $safi_name = $safi_map[$safi] ?? "safi$safi";
 
-    if (isset($peer_table[$peer_index]) && isset($prefix_oids[$oid_key])) {
-        $peer = $peer_table[$peer_index];
-        $oids = $prefix_oids[$oid_key];
+        // Key to look up the correct OIDs
+        $oid_key = $afi . '_' . $safi;
 
-        // Get the specific prefix counts for this peer index and OID
-        $pfxRcv = $nokia_prefix_data[$oids['recv']][$index][$oids['recv']] ?? 0;
-        $pfxSent = $nokia_prefix_data[$oids['sent']][$index][$oids['sent']] ?? 0;
+        if (isset($peer_table[$peer_index]) && isset($prefix_oids[$oid_key])) {
+            $peer = $peer_table[$peer_index];
+            $oids = $prefix_oids[$oid_key];
 
-        d_echo("Adding cbgp for $peer_index ($afi_name/$safi_name): recv=$pfxRcv sent=$pfxSent\n");
+            $pfxRcv = $nokia_prefix_data[$oids['recv']][$index][$oids['recv']] ?? 0;
+            $pfxSent = $nokia_prefix_data[$oids['sent']][$index][$oids['sent']] ?? 0;
 
-        add_cbgp_peer($device, $peer, $afi_name, $safi_name, $pfxRcv, $pfxSent);
+            d_echo("Adding cbgp for $peer_index ($afi_name/$safi_name): recv=$pfxRcv sent=$pfxSent\n");
+
+            add_cbgp_peer($device, $peer, $afi_name, $safi_name, $pfxRcv, $pfxSent);
+        }
     }
-}
-    // No return statement here, so standard BGP mib will still be polled after this file is executed.
 }
