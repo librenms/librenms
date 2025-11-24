@@ -14,6 +14,7 @@ modules:
                         - AC-ANALOG-MIB::acAnalogFxsFxoType
                         - AC-PSTN-MIB::acTrunkDialPlanName
                         - AC-PM-PSTN-MIB::acPMTrunkUtilizationAttributes
+                        - DS1-MIB::dsx1CircuitIdentifier
         count:
             data:
                 -
@@ -205,3 +206,17 @@ modules:
                         - { descr: Rai , graph: 0, value: 4 , generic: 2 }
                         - { descr: DChannel , graph: 0, value: 5 , generic: 2 }
                         - { descr: LowerLayerDown , graph: 0, value: 6 , generic: 2 }
+                -
+                    oid: DS1-MIB::dsx1ConfigTable
+                    value: DS1-MIB::dsx1LoopbackConfig
+                    num_oid: '.1.3.6.1.2.1.10.18.6.1.9.{{ $index }}'
+                    descr: 'DS1 LoopbackConfig ({{ $DS1-MIB::dsx1CircuitIdentifier }}){{ $index }}'
+                    index: 'DS1loopback{{ $index }}'
+                    state_name: dsx1LoopbackConfig
+                    states:
+                        - { descr: No Loop , graph: 0, value: 1 , generic: 0 }
+                        - { descr: Payload Loop , graph: 0, value: 2 , generic: 3 }
+                        - { descr: Line Loop , graph: 0, value: 3 , generic: 3 }
+                        - { descr: Other Loop , graph: 0, value: 4 , generic: 3 }
+                        - { descr: Inward Loop , graph: 0, value: 5 , generic: 3 }
+                        - { descr: Dual Loop , graph: 0, value: 6 , generic: 3 }
