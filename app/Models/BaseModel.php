@@ -96,6 +96,22 @@ abstract class BaseModel extends Model
             ->orWhereIntegerInRaw("$table.device_id", \Permissions::devicesForUser($user)));
     }
 
+    /**
+     * Helper function to determine if user has access based on bill permissions
+     */
+    protected function hasBillAccess(Builder $query, User $user, ?string $table = null): Builder
+    {
+        if ($user->hasGlobalRead()) {
+            return $query;
+        }
+
+        if (is_null($table)) {
+            $table = $this->getTable();
+        }
+
+        return $query->whereIntegerInRaw("$table.bill_id", \Permissions::billsForUser($user));
+    }
+
     public static function definedRelations(): array
     {
         $reflector = new \ReflectionClass(static::class);
