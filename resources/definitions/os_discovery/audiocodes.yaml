@@ -1,4 +1,3 @@
-mib: AC-ANALOG-MIB:AC-SYSTEM-MIB:AC-KPI-MIB:AC-PSTN-MIB # Needed for audioCodes
 modules:
     os:
         hardware: AC-SYSTEM-MIB::acSysIdName.0
@@ -20,7 +19,7 @@ modules:
                 -
                     oid: 'AC-KPI-MIB::acKpiSbcCallStatsCurrentSrdActiveCallsIn' # MIB not supplied by vendor
                     value: 'AC-KPI-MIB::acKpiSbcCallStatsCurrentSrdActiveCallsIn'
-                    num_oid: '.1.3.6.1.4.1.5003.15.3.1.1.2.2.1.3.0.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.5003.15.3.1.1.2.2.1.3.{{ $index }}'
                     descr: 'Active Calls'
         state:
             data:
