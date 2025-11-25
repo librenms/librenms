@@ -112,20 +112,18 @@ if ($device['os'] == 'timos') {
         128 => 'vpn',
     ];
 
-    // Numerical OID for tBgpPeerNgTable (Peer Table)
     $peer_table_oid = '.1.3.6.1.4.1.6527.3.1.2.14.4.8';
-    // Numerical OID for tBgpPeerNgAfiSafiTable (AFI/SAFI Table, using MaxPfxs OID)
     $afisafi_table_oid = '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.24';
 
-    // Step 1: Gather peer table (for IP lookup) - NOW USING NUMERICAL OID
+    // Step 1: Gather peer table (for IP lookup)
     $peer_table = snmpwalk_cache_multi_oid($device, $peer_table_oid, [], '', 'nokia', '-OQUsb');
     d_echo($peer_table);
 
-    // Step 2: Gather AFI/SAFI combinations - NOW USING NUMERICAL OID
+    // Step 2: Gather AFI/SAFI combinations
     $afisafi_table = snmpwalk_cache_multi_oid($device, $afisafi_table_oid, [], '', 'nokia', '-OQUsb');
     d_echo($afisafi_table);
 
-    // 1. Define the OID mapping using your provided NUMERICAL OIDs:
+    // 1. Define the OID mapping
     $prefix_oids = [
         '1_1'   => ['recv' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.5',  'sent' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.6'],   // IPv4 Unicast
         '1_2'   => ['recv' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.37', 'sent' => '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.38'],  // IPv4 Multicast
