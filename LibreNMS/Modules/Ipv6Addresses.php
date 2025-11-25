@@ -136,9 +136,14 @@ class Ipv6Addresses implements Module
             'ipv6_addresses' => $device->ipv6()
                 ->leftJoin('ipv6_networks', 'ipv6_addresses.ipv6_network_id', 'ipv6_networks.ipv6_network_id')
                 ->select(['ipv6_addresses.*', 'ipv6_network', 'ifIndex']) // already joined with ports
-                ->orderBy('ipv6_address')->orderBy('ipv6_prefixlen')->orderBy('ifIndex')->orderBy('ipv6_addresses.context_name')
+                ->orderByColumns($this->getSortColumns('ipv6_addresses'))
                 ->get()->map->makeHidden(['ipv6_address_id', 'ipv6_network_id', 'port_id', 'laravel_through_key']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return ['ipv6_address', 'ipv6_prefixlen', 'ifIndex', 'ipv6_addresses.context_name'];
     }
 
     private function discoverIpMib(Device $device): Collection

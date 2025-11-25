@@ -249,6 +249,11 @@ class Netstats implements Module
         return null; // no database data to dump (may add rrd later)
     }
 
+    public function getSortColumns(string $table): array
+    {
+        return [];
+    }
+
     private function statName(string $oid): string
     {
         $start = strpos($oid, '::') + 2;

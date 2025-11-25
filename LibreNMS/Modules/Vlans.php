@@ -131,11 +131,21 @@ class Vlans implements Module
         }
 
         return [
-            'vlans' => $device->vlans()->orderBy('vlan_vlan')
+            'vlans' => $device->vlans()
+                ->orderByColumns($this->getSortColumns('vlans'))
                 ->get()->map->makeHidden(['device_id', 'vlan_id']),
             'ports_vlans' => $device->portsVlan()
-                ->orderBy('vlan')->orderBy('baseport')
+                ->orderByColumns($this->getSortColumns('ports_vlans'))
                 ->get()->map->makeHidden(['port_vlan_id', 'created_at', 'updated_at', 'device_id', 'port_id']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return match($table) {
+            'vlans' => ['vlan_vlan'],
+            'ports_vlans' => ['vlan', 'baseport'],
+            default => [],
+        };
     }
 }

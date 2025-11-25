@@ -89,4 +89,9 @@ interface Module
      * @param  string  $type  Type is either discovery or poller
      */
     public function dump(Device $device, string $type): ?array;
+
+    /**
+     * @return  string[]  an array of column names that can be used for sorting
+     */
+    public function getSortColumns(string $table): array;
 }

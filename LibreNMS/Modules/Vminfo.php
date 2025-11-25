@@ -113,8 +113,14 @@ class Vminfo implements \LibreNMS\Interfaces\Module
     public function dump(Device $device, string $type): ?array
     {
         return [
-            'vminfo' => $device->vminfo()->orderBy('vmwVmVMID')
+            'vminfo' => $device->vminfo()
+                ->orderByColumns($this->getSortColumns('vminfo'))
                 ->get()->map->makeHidden(['id', 'device_id']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return ['vmwVmVMID'];
     }
 }

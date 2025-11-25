@@ -91,9 +91,14 @@ class ArpTable implements Module
     {
         return [
             'ipv4_mac' => $device->macs()
-                ->orderBy('context_name')->orderBy('ipv4_address')->orderBy('mac_address')
+                ->orderByColumns($this->getSortColumns('ipv4_mac'))
                 ->get()->map->makeHidden(['id', 'device_id', 'port_id']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return ['context_name', 'ipv4_address', 'mac_address'];
     }
 
     private function discoverArpFromIpMib(Device $device): Collection

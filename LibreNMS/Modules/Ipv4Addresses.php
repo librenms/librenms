@@ -183,9 +183,14 @@ class Ipv4Addresses implements Module
             'ipv4_addresses' => $device->ipv4()
                 ->leftJoin('ipv4_networks', 'ipv4_addresses.ipv4_network_id', 'ipv4_networks.ipv4_network_id')
                 ->select(['ipv4_addresses.*', 'ipv4_network', 'ifIndex']) // already joined with ports
-                ->orderBy('ipv4_address')->orderBy('ipv4_prefixlen')->orderBy('ifIndex')->orderBy('ipv4_addresses.context_name')
+                ->orderByColumns($this->getSortColumns('ipv4_addresses'))
                 ->get()->map->makeHidden(['ipv4_address_id', 'ipv4_network_id', 'port_id', 'laravel_through_key']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return ['ipv4_address', 'ipv4_prefixlen', 'ifIndex', 'ipv4_addresses.context_name'];
     }
 
     private function discoverIpMib(Device $device): Collection
