@@ -11,14 +11,14 @@ $name = 'sneck';
 
 $old_checks = [];
 $old_checks_data = [];
-if (isset($app->data['data']) && isset($app->data['data']['checks'])) {
-    $old_checks = array_keys($app->data['data']['checks']);
-    $old_checks_data = $app->data['data']['checks'];
+if (isset($app->data['checks'])) {
+    $old_checks = array_keys($app->data['checks']);
+    $old_checks_data = $app->data['checks'];
 }
 
 $old_debugs = [];
-if (isset($app->data['data']) && isset($app->data['data']['debugs'])) {
-    $old_debugs = array_keys($app->data['data']['debugs']);
+if (isset($app->data['debugs'])) {
+    $old_debugs = array_keys($app->data['debugs']);
 }
 
 if (LibrenmsConfig::has('apps.sneck.polling_time_diff')) {
@@ -37,7 +37,7 @@ try {
     return;
 }
 
-$app->data = $json_return;
+$app->data = $json_return['data'];
 
 $new_checks = [];
 if (isset($json_return['data']) and isset($json_return['data']['checks'])) {
@@ -111,7 +111,7 @@ foreach ($json_return['data']['checks'] as $key => $value) {
 $fields['time_to_polling_abs'] = abs($time_to_polling);
 
 if (abs($time_to_polling) > 540) {
-    $json_return['data']['alertString'] = $json_return['data']['alertString'] . "\nGreater than 540 seconds since the polled data was generated";
+    $json_return['data']['alertString'] .= "\nGreater than 540 seconds since the polled data was generated";
     $json_return['data']['alert'] = 1;
 }
 

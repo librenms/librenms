@@ -50,7 +50,7 @@ class CheckSchemaCollation implements Validation, ValidationFixer
             return ValidationResult::fail(
                 "MySQL Database collation is wrong: $collation->DEFAULT_CHARACTER_SET_NAME $collation->DEFAULT_COLLATION_NAME",
                 'Check https://community.librenms.org/t/new-default-database-charset-collation/14956 for info on how to fix.'
-            )->setFixer(__CLASS__);
+            )->setFixer(self::class);
         }
 
         $table_collation_sql = "SELECT T.TABLE_NAME, C.CHARACTER_SET_NAME, C.COLLATION_NAME
@@ -61,10 +61,8 @@ class CheckSchemaCollation implements Validation, ValidationFixer
         if (empty($collation_tables) !== true) {
             return ValidationResult::fail('MySQL tables collation is wrong: ')
                 ->setFix('Check https://community.librenms.org/t/new-default-database-charset-collation/14956 for info on how to fix.')
-                ->setFixer(__CLASS__)
-                ->setList('Tables', array_map(function ($row) {
-                    return "$row->TABLE_NAME   $row->CHARACTER_SET_NAME   $row->COLLATION_NAME";
-                }, $collation_tables));
+                ->setFixer(self::class)
+                ->setList('Tables', array_map(fn ($row) => "$row->TABLE_NAME   $row->CHARACTER_SET_NAME   $row->COLLATION_NAME", $collation_tables));
         }
 
         $column_collation_sql = "SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME
@@ -74,10 +72,8 @@ class CheckSchemaCollation implements Validation, ValidationFixer
         if (empty($collation_columns) !== true) {
             return ValidationResult::fail('MySQL column collation is wrong: ')
                 ->setFix('Check https://community.librenms.org/t/new-default-database-charset-collation/14956 for info on how to fix.')
-                ->setFixer(__CLASS__)
-                ->setList('Columns', array_map(function ($row) {
-                    return "$row->TABLE_NAME: $row->COLUMN_NAME   $row->CHARACTER_SET_NAME   $row->COLLATION_NAME";
-                }, $collation_columns));
+                ->setFixer(self::class)
+                ->setList('Columns', array_map(fn ($row) => "$row->TABLE_NAME: $row->COLUMN_NAME   $row->CHARACTER_SET_NAME   $row->COLLATION_NAME", $collation_columns));
         }
 
         return ValidationResult::ok(trans('validation.validations.database.CheckSchemaCollation.ok'));

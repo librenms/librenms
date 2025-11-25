@@ -36,7 +36,7 @@ class Rocket extends Transport
     {
         $rocket_opts = $this->parseUserOptions($this->config['rocket-options']);
 
-        $rocket_msg = strip_tags($alert_data['msg']);
+        $rocket_msg = strip_tags((string) $alert_data['msg']);
         $data = [
             'attachments' => [
                 0 => [

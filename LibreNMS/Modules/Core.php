@@ -77,24 +77,6 @@ class Core implements Module
 
         // detect OS
         $device->os = self::detectOS($device, false);
-
-        if ($device->isDirty('os')) {
-            Eventlog::log('Device OS changed: ' . $device->getOriginal('os') . ' -> ' . $device->os, $device, 'system', Severity::Notice);
-            $os->getDeviceArray()['os'] = $device->os;
-
-            Log::info('OS Changed ');
-        }
-
-        // Set type to a predefined type for the OS if it's not already set
-        $loaded_os_type = LibrenmsConfig::get("os.$device->os.type");
-        if (! $device->getAttrib('override_device_type') && $loaded_os_type != $device->type) {
-            $device->type = $loaded_os_type;
-            Log::debug("Device type changed to $loaded_os_type!");
-        }
-
-        $device->save();
-
-        Log::notice('OS: ' . LibrenmsConfig::getOsSetting($device->os, 'text') . " ($device->os)\n");
     }
 
     public function shouldPoll(OS $os, ModuleStatus $status): bool
@@ -222,7 +204,7 @@ class Core implements Module
         // all items must be true
         foreach ($array as $key => $value) {
             if ($check = Str::endsWith($key, '_except')) {
-                $key = substr($key, 0, -7);
+                $key = substr((string) $key, 0, -7);
             }
 
             if ($key == 'sysObjectID') {
@@ -275,7 +257,7 @@ class Core implements Module
 
         $agent_data = Cache::driver('array')->get('agent_data');
         if (! empty($agent_data['uptime'])) {
-            $uptime = round((float) substr($agent_data['uptime'], 0, strpos($agent_data['uptime'], ' ')));
+            $uptime = round((float) substr((string) $agent_data['uptime'], 0, strpos((string) $agent_data['uptime'], ' ')));
             Log::info("Using UNIX Agent Uptime ($uptime)");
         } else {
             $uptime_data = SnmpQuery::make()->get(['SNMP-FRAMEWORK-MIB::snmpEngineTime.0', 'HOST-RESOURCES-MIB::hrSystemUptime.0'])->values();

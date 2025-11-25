@@ -303,14 +303,8 @@ $("#maps").select2({
     width: '100%',
     placeholder: "Devices, Groups or Locations",
     ajax: {
-        url: 'ajax_list.php',
-        delay: 250,
-        data: function (params) {
-            return {
-                type: 'devices_groups_locations',
-                search: params.term
-            };
-        }
+        url: '<?php echo route('ajax.select.devices-groups-locations'); ?>',
+        delay: 150
     }
 });
 

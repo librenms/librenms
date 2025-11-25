@@ -15,7 +15,7 @@ modules:
         data:
             -
                 oid: V1600D::cpuLoad
-                num_oid: '1.3.6.1.4.1.37950.1.1.5.10.12.3.{{ $index }}'
+                num_oid: '.1.3.6.1.4.1.37950.1.1.5.10.12.3.{{ $index }}'
                 descr: 'CPU Load'
 
     sensors:

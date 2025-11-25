@@ -54,7 +54,7 @@ function get_mib_dir($device)
 
         if ($group_mibdir = LibrenmsConfig::get("os_groups.{$device['os_group']}.mib_dir")) {
             if (is_array($group_mibdir)) {
-                foreach ($group_mibdir as $k => $dir) {
+                foreach ($group_mibdir as $dir) {
                     $dirs[] = LibrenmsConfig::get('mib_dir') . '/' . $dir;
                 }
             }
@@ -90,9 +90,7 @@ function mibdir($mibdir = null, $device = null)
     array_unshift($dirs, $base);
 
     // remove trailing /, remove empty dirs, and remove duplicates
-    $dirs = array_unique(array_filter(array_map(function ($dir) {
-        return rtrim($dir, '/');
-    }, $dirs)));
+    $dirs = array_unique(array_filter(array_map(fn ($dir) => rtrim((string) $dir, '/'), $dirs)));
 
     return implode(':', $dirs);
 }//end mibdir()
@@ -204,11 +202,11 @@ function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir
     $measure = Measurement::start('snmpget');
 
     if (! is_array($oids)) {
-        $oids = explode(' ', $oids);
+        $oids = explode(' ', (string) $oids);
     }
 
     $cmd = gen_snmpget_cmd($device, $oids, $options, $mib, $mibdir);
-    $data = trim(external_exec($cmd));
+    $data = trim((string) external_exec($cmd));
 
     foreach (explode("\n", $data) as $entry) {
         if (! Str::contains($entry, ' =')) {
@@ -250,7 +248,7 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
     $oid_limit = get_device_oid_limit($device);
 
     if (! is_array($oids)) {
-        $oids = explode(' ', $oids);
+        $oids = explode(' ', (string) $oids);
     }
 
     $data = [];
@@ -344,7 +342,7 @@ function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = nul
 
     $snmpcmd = [LibrenmsConfig::get('snmpgetnext', 'snmpgetnext')];
     $cmd = gen_snmp_cmd($snmpcmd, $device, $oid, $options, $mib, $mibdir);
-    $data = trim(external_exec($cmd), "\" \n\r");
+    $data = trim((string) external_exec($cmd), "\" \n\r");
 
     $measure->manager()->recordSnmp($measure->end());
     if (preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure)/i', $data)) {
@@ -364,7 +362,7 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
     $measure = Measurement::start('snmpwalk');
 
     $cmd = gen_snmpwalk_cmd($device, $oid, $options, $mib, $mibdir);
-    $data = trim(external_exec($cmd));
+    $data = trim((string) external_exec($cmd));
 
     $data = str_replace('"', '', $data);
     $data = str_replace('End of MIB', '', $data);
@@ -397,7 +395,7 @@ function snmpwalk_cache_oid($device, $oid, $array = [], $mib = null, $mibdir = n
         return $array;
     }
 
-    foreach (explode("\n", $data) as $entry) {
+    foreach (explode("\n", (string) $data) as $entry) {
         if (! Str::contains($entry, ' =')) {
             if (! empty($entry) && isset($index, $oid)) {
                 $array[$index][$oid] .= "\n$entry";
@@ -453,7 +451,7 @@ function snmpwalk_cache_multi_oid($device, $oid, $array = [], $mib = null, $mibd
         $data = snmp_walk($device, $oid, $snmpflags, $mib, $mibdir);
 
         if (! empty($data)) {
-            foreach (explode("\n", $data) as $entry) {
+            foreach (explode("\n", (string) $data) as $entry) {
                 if (! Str::contains($entry, ' =')) {
                     if (! empty($entry) && isset($index, $r_oid)) {
                         $array[$index][$r_oid] .= "\n$entry"; // multi-line value, append to previous entry
@@ -510,7 +508,7 @@ function snmpwalk_cache_multi_oid($device, $oid, $array = [], $mib = null, $mibd
 function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibdir = null, $snmpFlags = '-OQUsetX')
 {
     $cmd = gen_snmpwalk_cmd($device, $oid, $snmpFlags, $mib, $mibdir);
-    $data = rtrim(external_exec($cmd));
+    $data = rtrim((string) external_exec($cmd));
 
     if (empty($data)) {
         return $array;
@@ -553,7 +551,7 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibd
 function snmpwalk_cache_twopart_oid($device, $oid, $array = [], $mib = 0, $mibdir = null, $snmpflags = '-OQUs')
 {
     $cmd = gen_snmpwalk_cmd($device, $oid, $snmpflags, $mib, $mibdir);
-    $data = trim(external_exec($cmd));
+    $data = trim((string) external_exec($cmd));
 
     if (empty($data)) {
         return $array;
@@ -595,9 +593,9 @@ function snmp_gen_auth(&$device, $cmd = [])
 {
     if ($device['snmpver'] === 'v3') {
         array_push($cmd, '-v3', '-l', $device['authlevel']);
-        array_push($cmd, '-n', isset($device['context_name']) ? $device['context_name'] : '');
+        array_push($cmd, '-n', $device['context_name'] ?? '');
 
-        $authlevel = strtolower($device['authlevel']);
+        $authlevel = strtolower((string) $device['authlevel']);
         if ($authlevel === 'noauthnopriv') {
             // We have to provide a username anyway (see Net-SNMP doc)
             array_push($cmd, '-u', ! empty($device['authname']) ? $device['authname'] : 'root');
@@ -664,7 +662,7 @@ function snmpwalk_array_num($device, $oid, $indexes = 1)
     }
 
     // Let's turn the string into something we can work with.
-    foreach (explode("\n", $string) as $line) {
+    foreach (explode("\n", (string) $string) as $line) {
         if ($line[0] == '.') {
             // strip the leading . if it exists.
             $line = substr($line, 1);

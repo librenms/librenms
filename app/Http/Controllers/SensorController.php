@@ -51,7 +51,7 @@ class SensorController
         $title = 'Health :: ' . match ($metric) {
             'dbm' => 'dBm',
             'snr' => 'SNR',
-            default => ucfirst($metric),
+            default => ucfirst((string) $metric),
         };
 
         $blade_view = match ($metric) {

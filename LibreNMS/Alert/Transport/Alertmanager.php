@@ -40,7 +40,7 @@ class Alertmanager extends Transport
         $password = $this->config['alertmanager-password'];
 
         $alertmanager_status = $alert_data['state'] == AlertState::RECOVERED ? 'endsAt' : 'startsAt';
-        $alertmanager_msg = strip_tags($alert_data['msg']);
+        $alertmanager_msg = strip_tags((string) $alert_data['msg']);
         $data = [[
             $alertmanager_status => date('c'),
             'generatorURL' => Url::deviceUrl($alert_data['device_id']),
@@ -58,13 +58,18 @@ class Alertmanager extends Transport
 
         $alertmanager_opts = $this->parseUserOptions($this->config['alertmanager-options']);
         foreach ($alertmanager_opts as $label => $value) {
-            // To allow dynamic values
-            if (preg_match('/^extra_[A-Za-z0-9_]+$/', $label) && ! empty($alert_data['faults'][1][$value])) {
-                $data[0]['labels'][$label] = strip_tags($alert_data['faults'][1][$value]);
-            } elseif (preg_match('/^extra_[A-Za-z0-9_]+$/', $label) && ! empty($alert_data[$value])) {
-                $data[0]['labels'][$label] = strip_tags($alert_data[$value]);
+            if (str_starts_with((string) $label, 'stc_')) {
+                $data[0]['labels'][$label] = strip_tags((string) $value);
             } else {
-                $data[0]['labels'][$label] = strip_tags($value);
+                $data[0]['labels'][$label] = strip_tags(
+                    (string) ($alert_data[$value] ?? current(array_filter(
+                        array_column($alert_data['faults'] ?? [], $value),
+                        fn ($v) => ! empty($v)
+                    )) ?? $value)
+                );
+                if (str_starts_with((string) $label, 'dyn_') && $data[0]['labels'][$label] == $value) {
+                    unset($data[0]['labels'][$label]);
+                }
             }
         }
 
@@ -74,7 +79,7 @@ class Alertmanager extends Transport
             $client->withBasicAuth($username, $password);
         }
 
-        foreach (explode(',', $url) as $am) {
+        foreach (explode(',', (string) $url) as $am) {
             $post_url = ($am . '/api/v2/alerts');
             $res = $client->post($post_url, $data);
 

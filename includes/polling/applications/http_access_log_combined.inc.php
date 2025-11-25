@@ -130,7 +130,7 @@ $gauge_rrd_def = RrdDefinition::make()
     ->addDataset('data', 'GAUGE', 0);
 
 // process total stats, .data.totals
-foreach ($stat_vars as $key => $stat) {
+foreach ($stat_vars as $stat) {
     $var_name = 'totals_' . $stat;
     $value = $data['totals'][$stat];
     $rrd_name = ['app', $name, $app->app_id, $var_name];
@@ -144,7 +144,7 @@ foreach ($stat_vars as $key => $stat) {
 $logs = [];
 foreach ($data['logs'] as $logs_key => $log_stats) {
     $logs[] = $logs_key;
-    foreach ($stat_vars as $key => $stat) {
+    foreach ($stat_vars as $stat) {
         $var_name = 'logs___' . $logs_key . '___' . $stat;
         $value = $log_stats[$stat];
         $rrd_name = ['app', $name, $app->app_id, $var_name];

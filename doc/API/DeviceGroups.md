@@ -216,13 +216,15 @@ Route: `/api/v0/devicegroups/:name/maintenance`
 
 Input (JSON):
 
-- `title`: *optional* - Some title for the Maintenance  
+- `title`: *optional* - Some title for the Maintenance
   Will be replaced with device group name if omitted
+- `behavior`: *optional* - id of maintenance behavior desired
+  Defaults to alert.scheduled_maintenance_default_behavior if omitted
 - `notes`: *optional* - Some description for the Maintenance
-- `start`: *optional* - start time of Maintenance in full format `Y-m-d H:i:00`  
-  eg: 2022-08-01 22:45:00  
+- `start`: *optional* - start time of Maintenance in full format `Y-m-d H:i:00`
+  eg: 2022-08-01 22:45:00
   Current system time `now()` will be used if omitted
-- `duration`: *required* - Duration of Maintenance in format `H:i` / `Hrs:Mins`  
+- `duration`: *required* - Duration of Maintenance in format `H:i` / `Hrs:Mins`
   eg: 02:00
 
 Example with start time:

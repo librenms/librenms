@@ -39,7 +39,7 @@ class MempoolsController extends TableController
 {
     protected function searchFields($request)
     {
-        return ['hostname', 'mempool_descr'];
+        return ['hostname', 'display', 'mempool_descr'];
     }
 
     protected function sortFields($request)

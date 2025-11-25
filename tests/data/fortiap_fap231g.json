@@ -8,7 +8,7 @@
                     "sysDescr": "DE-HIDDEN-DMN-OFF-OP-AP02",
                     "sysContact": "<private>",
                     "version": "FP231G-v7.4-build0771",
-                    "hardware": null,
+                    "hardware": "FortiAP 231G",
                     "features": null,
                     "location": "<private>",
                     "os": "fortiap",

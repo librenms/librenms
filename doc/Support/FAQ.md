@@ -490,8 +490,8 @@ COMMUNITY. Use `snmpwalk` instead of `snmpbulkwalk` for v1 devices.
 > Feel free to use another service!
 
 ```bash
-./discovery.php -h HOSTNAME -d | curl --data-binary @- https://paste.rs/
-lnms device:poll HOSTNAME -vv | curl --data-binary @- https://paste.rs/
+lnms device:discover -vv HOSTNAME | curl --data-binary @- https://paste.rs/
+lnms device:poll -vv HOSTNAME | curl --data-binary @- https://paste.rs/
 snmpbulkwalk -OUneb -v2c -c COMMUNITY HOSTNAME . | curl --data-binary @- https://paste.rs/
 ```
 

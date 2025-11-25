@@ -26,7 +26,7 @@ $rrd_options .= " COMMENT:'Stratum               Now      Min      Max\\n'";
 $rrd_additions = '';
 
 $count = 0;
-foreach ($components as $id => $array) {
+foreach ($components as $array) {
     $rrd_filename = Rrd::name($device['hostname'], ['ntp', $array['peer']]);
 
     if (Rrd::checkRrdExists($rrd_filename)) {
@@ -34,7 +34,7 @@ foreach ($components as $id => $array) {
         $color = \App\Facades\LibrenmsConfig::get("graph_colours.mixed.$count", \App\Facades\LibrenmsConfig::get('graph_colours.oranges.' . ($count - 7)));
 
         $rrd_additions .= ' DEF:DS' . $count . '=' . $rrd_filename . ':stratum:AVERAGE ';
-        $rrd_additions .= ' LINE1.25:DS' . $count . '#' . $color . ":'" . str_pad(substr($array['peer'], 0, 15), 15) . "'" . $stack;
+        $rrd_additions .= ' LINE1.25:DS' . $count . '#' . $color . ":'" . str_pad(substr((string) $array['peer'], 0, 15), 15) . "'" . $stack;
         $rrd_additions .= ' GPRINT:DS' . $count . ':LAST:%5.0lf ';
         $rrd_additions .= ' GPRINT:DS' . $count . ':MIN:%7.0lf ';
         $rrd_additions .= ' GPRINT:DS' . $count . ':MAX:%7.0lf\\l ';

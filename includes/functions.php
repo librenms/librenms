@@ -32,7 +32,7 @@ function parse_modules($type, $options)
         // get all modules in the correct order and disable all
         $modules = array_map(fn ($v) => false, LibrenmsConfig::get("{$type}_modules", []));
 
-        foreach (explode(',', $options['m']) as $module) {
+        foreach (explode(',', (string) $options['m']) as $module) {
             // parse submodules (only supported by some modules)
             if (Str::contains($module, '/')) {
                 [$module, $submodule] = explode('/', $module, 2);
@@ -75,7 +75,7 @@ function logfile($string)
         return;
     }
 
-    fputs($fd, $string . "\n");
+    fwrite($fd, $string . "\n");
     fclose($fd);
 }
 
@@ -151,9 +151,9 @@ function match_network($nets, $ip, $first = false)
         $nets = [$nets];
     }
     foreach ($nets as $net) {
-        $rev = (preg_match("/^\!/", $net)) ? true : false;
-        $net = preg_replace("/^\!/", '', $net);
-        $ip_arr = explode('/', $net);
+        $rev = (preg_match("/^\!/", (string) $net)) ? true : false;
+        $net = preg_replace("/^\!/", '', (string) $net);
+        $ip_arr = explode('/', (string) $net);
         $net_long = ip2long($ip_arr[0]);
         $x = ip2long($ip_arr[1]);
         $mask = long2ip($x) == $ip_arr[1] ? $x : 0xFFFFFFFF << (32 - $ip_arr[1]);
@@ -180,7 +180,7 @@ function snmp2ipv6($ipv6_snmp)
 {
     // Workaround stupid Microsoft bug in Windows 2008 -- this is fixed length!
     // < fenestro> "because whoever implemented this mib for Microsoft was ignorant of RFC 2578 section 7.7 (2)"
-    $ipv6 = array_slice(explode('.', $ipv6_snmp), -16);
+    $ipv6 = array_slice(explode('.', (string) $ipv6_snmp), -16);
     $ipv6_2 = [];
 
     for ($i = 0; $i <= 15; $i++) {
@@ -197,8 +197,8 @@ function hex2str($hex)
 {
     $string = '';
 
-    for ($i = 0; $i < strlen($hex) - 1; $i += 2) {
-        $string .= chr(hexdec(substr($hex, $i, 2)));
+    for ($i = 0; $i < strlen((string) $hex) - 1; $i += 2) {
+        $string .= chr(hexdec(substr((string) $hex, $i, 2)));
     }
 
     return $string;
@@ -256,7 +256,7 @@ function is_port_valid($port, $device)
     }
 
     foreach (LibrenmsConfig::getCombined($device['os'], 'bad_if_regexp') as $bir) {
-        if (preg_match($bir . 'i', $ifDescr)) {
+        if (preg_match($bir . 'i', (string) $ifDescr)) {
             Log::debug("ignored by ifDescr: $ifDescr (matched: $bir)");
 
             return false;
@@ -343,7 +343,7 @@ function normalize_snmp_ip_address($data)
     // $data is received from snmpwalk, can be ipv4 xxx.xxx.xxx.xxx or ipv6 xx:xx:...:xx (16 chunks)
     // ipv4 is returned unchanged, ipv6 is returned with one ':' removed out of two, like
     //  xxxx:xxxx:...:xxxx (8 chuncks)
-    return preg_replace('/([0-9a-fA-F]{2}):([0-9a-fA-F]{2})/', '\1\2', explode('%', $data, 2)[0]);
+    return preg_replace('/([0-9a-fA-F]{2}):([0-9a-fA-F]{2})/', '\1\2', explode('%', (string) $data, 2)[0]);
 }
 
 function fix_integer_value($value)
@@ -363,42 +363,11 @@ function fix_integer_value($value)
 function host_exists(string $hostname, ?string $sysName = null): bool
 {
     return Device::where('hostname', $hostname)
-        ->when(! empty($sysName), function ($query) use ($sysName) {
+        ->when(! empty($sysName), function ($query) use ($sysName): void {
             $query->when(! LibrenmsConfig::get('allow_duplicate_sysName'), fn ($q) => $q->orWhere('sysName', $sysName))
-                  ->when(! empty(LibrenmsConfig::get('mydomain')), fn ($q) => $q->orWhere('sysName', rtrim($sysName, '.') . '.' . LibrenmsConfig::get('mydomain')));
+                  ->when(! empty(LibrenmsConfig::get('mydomain')), fn ($q) => $q->orWhere('sysName', rtrim((string) $sysName, '.') . '.' . LibrenmsConfig::get('mydomain')));
         })->exists();
 }
-
-/**
- * Perform DNS lookup
- *
- * @param  array  $device  Device array from database
- * @param  string  $type  The type of record to lookup
- * @return string ip
- *
- **/
-function dnslookup($device, $type = false, $return = false)
-{
-    if (filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) == true || filter_var($device['hostname'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) == true) {
-        return false;
-    }
-    if (empty($type)) {
-        // We are going to use the transport to work out the record type
-        if ($device['transport'] == 'udp6' || $device['transport'] == 'tcp6') {
-            $type = DNS_AAAA;
-            $return = 'ipv6';
-        } else {
-            $type = DNS_A;
-            $return = 'ip';
-        }
-    }
-    if (empty($return)) {
-        return false;
-    }
-    $record = dns_get_record($device['hostname'], $type);
-
-    return $record[0][$return] ?? null;
-}//end dnslookup
 
 /**
  * Create a new state index.  Update translations if $states is given.
@@ -412,14 +381,12 @@ function dnslookup($device, $type = false, $return = false)
  */
 function create_state_index($state_name, $states = []): void
 {
-    app('sensor-discovery')->withStateTranslations($state_name, array_map(function ($state) {
-        return new StateTranslation([
-            'state_descr' => $state['descr'],
-            'state_draw_graph' => $state['graph'],
-            'state_value' => $state['value'],
-            'state_generic_value' => $state['generic'],
-        ]);
-    }, $states));
+    app('sensor-discovery')->withStateTranslations($state_name, array_map(fn ($state) => new StateTranslation([
+        'state_descr' => $state['descr'],
+        'state_draw_graph' => $state['graph'],
+        'state_value' => $state['value'],
+        'state_generic_value' => $state['generic'],
+    ]), $states));
 }
 
 function delta_to_bits($delta, $period)
@@ -433,7 +400,7 @@ function hytera_h2f($number, $nd)
         $number = \LibreNMS\Util\StringHelpers::asciiToHex($number, ' ');
     }
     $r = '';
-    $y = explode(' ', $number);
+    $y = explode(' ', (string) $number);
     foreach ($y as $z) {
         $r = $z . '' . $r;
     }
@@ -499,7 +466,7 @@ function cache_peeringdb()
         // We cache for 71 hours
         $cached = dbFetchCell('SELECT count(*) FROM `pdb_ix` WHERE (UNIX_TIMESTAMP() - timestamp) < 255600');
         if ($cached == 0) {
-            $rand = rand(3, 30);
+            $rand = random_int(3, 30);
             echo "No cached PeeringDB data found, sleeping for $rand seconds" . PHP_EOL;
             sleep($rand);
             $peer_keep = [];
@@ -536,7 +503,7 @@ function cache_peeringdb()
                     $ix_json = $get_ix->body();
                     $ix_data = json_decode($ix_json);
                     $peers = $ix_data->{'data'};
-                    foreach ($peers ?? [] as $index => $peer) {
+                    foreach ($peers ?? [] as $peer) {
                         $peer_name = \LibreNMS\Util\AutonomousSystem::get($peer->{'asn'})->name();
                         $tmp_peer = dbFetchRow('SELECT * FROM `pdb_ix_peers` WHERE `peer_id` = ? AND `ix_id` = ?', [$peer->{'id'}, $ixid]);
                         if ($tmp_peer) {
@@ -675,7 +642,7 @@ function lock_and_purge_query($table, $sql, $msg)
 function is_disk_valid($disk, $device)
 {
     foreach (LibrenmsConfig::getCombined($device['os'], 'bad_disk_regexp') as $bir) {
-        if (preg_match($bir . 'i', $disk['diskIODevice'])) {
+        if (preg_match($bir . 'i', (string) $disk['diskIODevice'])) {
             Log::debug('Ignored Disk: ' . $disk['diskIODevice'] . ' (matched: ' . $bir . ')');
 
             return false;

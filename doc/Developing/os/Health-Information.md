@@ -91,7 +91,6 @@ are as follows:
   automatically by discovery process. This parameter is still required to
   submit a pull request. This is the numerical OID that contains
   `value`. This should usually include `{{ $index }}`.
-  In case the index is a string, `{{ $str_index_as_numeric }}` can be used instead and will convert
 the string to the equivalent OID representation.
 - `divisor` (optional): This is the divisor to use against the returned `value`.
 - `multiplier` (optional): This is the multiplier to use against the returned `value`.
@@ -114,8 +113,8 @@ the string to the equivalent OID representation.
   the default group. If group is set to `transceiver` it will be shown with the port
   instead of in with all the generic sensors (You must also set `entPhysicalIndex` to ifIndex)
 - `index` (optional): This is the index value we use to uniquely
-  identify this sensor. `{{ $index }}` will be replaced by the `index`
-  from the snmp walk.
+  identify this sensor. `{{ $index }}` will be replaced by the numeric
+  `index` of this row in the table the snmp walk.
 - `skip_values` (optional): This is an array of values we should skip
   over (see note below).
 - `skip_value_lt` (optional): If sensor value is less than this, skip the discovery.
@@ -150,6 +149,12 @@ is `{{ $variable }}`. Any oid in the current table can be used, as
 well as pre-fetched data. The index ($index) and the sub_indexes (in
 case the oid is indexed multiple times) are also available: if
 $index="1.20", then $subindex0="1" and $subindex1="20".
+
+If you want access a string in an index, `{{ $index_string }}` can be used,
+optionally suffixed with a format string to specify how to extract the string.
+`{{ $index_string:nns }}` will skip two numeric indexes and return the string after.
+`{{ $index_string:nss }}` will skip one numeric index and one string index and return
+next string after.
 
 #### Fetching values from other tables/oids
 
@@ -447,7 +452,7 @@ Lastly the program calls `discover_sensor()` and passes the information collecte
 steps. The `null` values are for low, low warning, high, and high warning values, which are not
 collected in the Adva's MIB.
 
-You can manually run discovery to verify the code works by running `./discovery.php -h $device_id -m sensors`.
+You can manually run discovery to verify the code works by running `lnms device:discover $device_id -m sensors`.
 You can use `-v` to see what calls are being used during discovery and `-d` to see debug output.
 In the output under `#### Load disco module sensors ####` you can see a list of sensors types. If
 there is a `+` a sensor is added, if there is a `-` one was deleted, and a `.` means no change. If
@@ -455,7 +460,7 @@ there is nothing next to the sensor type then the sensor was not discovered. The
 information about changes to the database and RRD files at the bottom.
 
 ```
-[librenms@nms-test ~]$ ./discovery.php -h 2 -m sensors
+[librenms@nms-test ~]$ lnms device:discover 2 -m sensors
 LibreNMS Discovery
 164.113.194.250 2 adva_fsp150
 

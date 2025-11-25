@@ -26,7 +26,7 @@ final class TimeUtilityTest extends TestCase
         $this->assertSame('2 weeks 3 days', Time::formatInterval(17 * 24 * 60 * 60 + 1456, parts: 2));
 
         // different months could change this
-        $this->travelTo(Carbon::createFromTimestampUTC(30042), function () {
+        $this->travelTo(Carbon::createFromTimestampUTC(30042), function (): void {
             $this->assertSame('1 month 1 week 2 days 24 minutes', Time::formatInterval(39 * 24 * 60 * 60 + 1456));
             $this->assertSame('1mo 1w 2d 24m 16s', Time::formatInterval(39 * 24 * 60 * 60 + 1456, true, 5));
         });
@@ -61,5 +61,46 @@ final class TimeUtilityTest extends TestCase
         $this->assertEquals(0, Time::parseAt('invalid'));
         $this->assertEquals(606614400, Time::parseAt('March 23 1989 UTC'));
         $this->assertEquals(time() + 86400, Time::parseAt('+1 day'));
+    }
+
+    public function testParseInput(): void
+    {
+        $this->assertNull(Time::parseInput(null));
+        $this->assertNull(Time::parseInput(''));
+
+        $this->assertSame(315532800, Time::parseInput(315532800));
+
+        $this->travelTo(Carbon::createFromTimestampUTC(1700000000), function (): void {
+            $now = 1700000000;
+            $this->assertSame($now - 600, Time::parseInput('10m'));
+            $this->assertSame($now + 3600, Time::parseInput('+1h'));
+            $this->assertSame($now - 86400, Time::parseInput('-1d'));
+            $this->assertSame($now - 604800, Time::parseInput('-1w'));
+            $this->assertSame($now + 31622400, Time::parseInput('+1y'));
+        });
+
+        $expected = Carbon::parse('2023-01-02 03:04:05 UTC')->getTimestamp();
+        $this->assertSame($expected, Time::parseInput('2023-01-02 03:04:05 UTC'));
+
+        $this->assertNull(Time::parseInput('not a date'));
+    }
+
+    public function testRandomTimeBetween(): void
+    {
+        $start = time();
+        $end = time() + 3600;
+        $randomTime = Time::randomBetween($start, $end)->format('U');
+        $this->assertGreaterThanOrEqual($start, $randomTime);
+        $this->assertLessThanOrEqual($end, $randomTime);
+
+        // test with pesudo random
+        $randomTime = Time::pseudoRandomBetween($start, $end, 'U');
+        $this->assertGreaterThanOrEqual($start, $randomTime);
+        $this->assertLessThanOrEqual($end, $randomTime);
+
+        $this->assertEquals(
+            Time::pseudoRandomBetween($start, $end),
+            Time::pseudoRandomBetween($start, $end),
+        );
     }
 }

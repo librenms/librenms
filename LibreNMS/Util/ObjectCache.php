@@ -144,30 +144,21 @@ class ObjectCache
     private static function getPortCount($field, $device_id)
     {
         return Cache::remember("ObjectCache:port_{$field}_count:$device_id:" . auth()->id(), self::$cache_time, function () use ($field, $device_id) {
-            $query = Port::hasAccess(auth()->user())->when($device_id, function ($query) use ($device_id) {
+            $query = Port::hasAccess(auth()->user())->when($device_id, function ($query) use ($device_id): void {
                 $query->where('device_id', $device_id);
             });
-            switch ($field) {
-                case 'down':
-                    return $query->isDown()->count();
-                case 'up':
-                    return $query->isUp()->count();
-                case 'ignored':
-                    return $query->isIgnored()->count();
-                case 'shutdown':
-                    return $query->isShutdown()->count();
-                case 'disabled':
-                    return $query->isDisabled()->count();
-                case 'deleted':
-                    return $query->isDeleted()->count();
-                case 'errored':
-                    return $query->hasErrors()->count();
-                case 'pseudowire':
-                    return Pseudowire::hasAccess(auth()->user())->count();
-                case 'total':
-                default:
-                    return $query->isNotDeleted()->count();
-            }
+
+            return match ($field) {
+                'down' => $query->isDown()->count(),
+                'up' => $query->isUp()->count(),
+                'ignored' => $query->isIgnored()->count(),
+                'shutdown' => $query->isShutdown()->count(),
+                'disabled' => $query->isDisabled()->count(),
+                'deleted' => $query->isDeleted()->count(),
+                'errored' => $query->hasErrors()->count(),
+                'pseudowire' => Pseudowire::hasAccess(auth()->user())->count(),
+                default => $query->isNotDeleted()->count(),
+            };
         });
     }
 
@@ -189,21 +180,15 @@ class ObjectCache
     {
         return Cache::remember("ObjectCache:device_{$field}_count:" . auth()->id(), self::$cache_time, function () use ($field) {
             $query = Device::hasAccess(auth()->user());
-            switch ($field) {
-                case 'down':
-                    return $query->isDown()->count();
-                case 'up':
-                    return $query->isUp()->count();
-                case 'ignored':
-                    return $query->isIgnored()->count();
-                case 'disabled':
-                    return $query->isDisabled()->count();
-                case 'disable_notify':
-                    return $query->isDisableNotify()->count();
-                case 'total':
-                default:
-                    return $query->count();
-            }
+
+            return match ($field) {
+                'down' => $query->isDown()->count(),
+                'up' => $query->isUp()->count(),
+                'ignored' => $query->isIgnored()->count(),
+                'disabled' => $query->isDisabled()->count(),
+                'disable_notify' => $query->isDisableNotify()->count(),
+                default => $query->count(),
+            };
         });
     }
 
@@ -224,24 +209,18 @@ class ObjectCache
     private static function getServiceCount($field, $device_id)
     {
         return Cache::remember("ObjectCache:service_{$field}_count:$device_id:" . auth()->id(), self::$cache_time, function () use ($field, $device_id) {
-            $query = Service::hasAccess(auth()->user())->when($device_id, function ($query) use ($device_id) {
+            $query = Service::hasAccess(auth()->user())->when($device_id, function ($query) use ($device_id): void {
                 $query->where('device_id', $device_id);
             });
-            switch ($field) {
-                case 'ok':
-                    return $query->isOk()->count();
-                case 'warning':
-                    return $query->isWarning()->count();
-                case 'critical':
-                    return $query->isCritical()->count();
-                case 'ignored':
-                    return $query->isIgnored()->count();
-                case 'disabled':
-                    return $query->isDisabled()->count();
-                case 'total':
-                default:
-                    return $query->count();
-            }
+
+            return match ($field) {
+                'ok' => $query->isOk()->count(),
+                'warning' => $query->isWarning()->count(),
+                'critical' => $query->isCritical()->count(),
+                'ignored' => $query->isIgnored()->count(),
+                'disabled' => $query->isDisabled()->count(),
+                default => $query->count(),
+            };
         });
     }
 
@@ -262,20 +241,16 @@ class ObjectCache
     private static function getSensorCount($field, $device_id)
     {
         return Cache::remember("ObjectCache:sensor_{$field}_count:$device_id:" . auth()->id(), self::$cache_time, function () use ($field, $device_id) {
-            $query = Sensor::hasAccess(auth()->user())->when($device_id, function ($query) use ($device_id) {
+            $query = Sensor::hasAccess(auth()->user())->when($device_id, function ($query) use ($device_id): void {
                 $query->where('device_id', $device_id);
             });
-            switch ($field) {
-                case 'ok':
-                    return $query->count() - $query->isCritical()->count();
-                case 'critical':
-                    return $query->isCritical()->count();
-                case 'disable_notify':
-                    return $query->isDisabled()->count();
-                case 'total':
-                default:
-                    return $query->count();
-            }
+
+            return match ($field) {
+                'ok' => $query->count() - $query->isCritical()->count(),
+                'critical' => $query->isCritical()->count(),
+                'disable_notify' => $query->isDisabled()->count(),
+                default => $query->count(),
+            };
         });
     }
 }

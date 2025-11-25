@@ -13,17 +13,14 @@ use RdKafka\Producer;
 
 class Kafka extends BaseDatastore
 {
-    private $client = null;
     private $topicName = null;
     private $kafkaFlushTimeout = 100;
     private $excluded_groups = [];
     private $excluded_measurement = [];
 
-    public function __construct(Producer $client)
+    public function __construct(private Producer $client)
     {
         parent::__construct();
-
-        $this->client = $client;
 
         // Load the topic name from config
         $this->topicName = LibrenmsConfig::get('kafka.topic', 'librenms');
@@ -223,9 +220,7 @@ class Kafka extends BaseDatastore
             $stat = Measurement::start('write');
 
             // remove tags with empty values
-            $tags = array_filter($tags, function ($value) {
-                return $value !== '' && $value !== null;
-            });
+            $tags = array_filter($tags, fn ($value) => $value !== '' && $value !== null);
 
             if (empty($fields)) {
                 Log::warning('KAFKA: All fields empty, skipping update', [

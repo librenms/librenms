@@ -141,9 +141,7 @@
                                 "type": "object",
                                 "properties": {
                                     "oid": {"$ref": "#/$defs/oid"},
-                                    "num_oid": {
-                                        "type": "string"
-                                    },
+                                    "num_oid": {"$ref": "#/$defs/num_oid"},
                                     "index": {
                                         "type": [
                                             "integer",
@@ -229,10 +227,7 @@
                                             "skip_value_gt": {
                                                 "type": "number"
                                             },
-                                            "num_oid": {
-                                                "type": "string",
-                                                "pattern": "^(\\.\\d+)+(\\.?\\{\\{ \\$(index|str_index_as_numeric|subindex\\d) \\}\\})?(\\.\\d+)*$"
-                                            },
+                                            "num_oid": {"$ref": "#/$defs/num_oid"},
                                             "descr": {
                                                 "type": "string"
                                             },
@@ -313,28 +308,39 @@
                                 "data"
                             ]
                         },
-                        "voltage": {"$ref": "#/$defs/sensor"},
-                        "fanspeed": {"$ref": "#/$defs/sensor"},
-                        "temperature": {"$ref": "#/$defs/sensor"},
                         "additional_oids": {"$ref":  "#/$defs/sensor_additional_oids"},
-                        "humidity": {"$ref": "#/$defs/sensor"},
                         "airflow": {"$ref": "#/$defs/sensor"},
-                        "current": {"$ref": "#/$defs/sensor"},
-                        "frequency": {"$ref": "#/$defs/sensor"},
-                        "power": {"$ref": "#/$defs/sensor"},
-                        "pressure": {"$ref": "#/$defs/sensor"},
-                        "cooling": {"$ref": "#/$defs/sensor"},
+                        "ber": {"$ref": "#/$defs/sensor"},
+                        "bitrate": {"$ref": "#/$defs/sensor"},
                         "charge": {"$ref": "#/$defs/sensor"},
-                        "runtime": {"$ref": "#/$defs/sensor"},
-                        "dbm": {"$ref": "#/$defs/sensor"},
-                        "load": {"$ref": "#/$defs/sensor"},
                         "chromatic_dispersion": {"$ref": "#/$defs/sensor"},
+                        "cooling": {"$ref": "#/$defs/sensor"},
+                        "count": {"$ref":  "#/$defs/sensor"},
+                        "current": {"$ref": "#/$defs/sensor"},
+                        "dbm": {"$ref": "#/$defs/sensor"},
                         "delay": {"$ref": "#/$defs/sensor"},
+                        "eer": {"$ref": "#/$defs/sensor"},
+                        "fanspeed": {"$ref": "#/$defs/sensor"},
+                        "frequency": {"$ref": "#/$defs/sensor"},
+                        "humidity": {"$ref": "#/$defs/sensor"},
+                        "load": {"$ref": "#/$defs/sensor"},
+                        "loss": {"$ref": "#/$defs/sensor"},
+                        "percent": {"$ref": "#/$defs/sensor"},
+                        "power": {"$ref": "#/$defs/sensor"},
+                        "power_factor": {"$ref": "#/$defs/sensor"},
+                        "power_consumed": {"$ref": "#/$defs/sensor"},
+                        "pressure": {"$ref": "#/$defs/sensor"},
                         "quality_factor": {"$ref": "#/$defs/sensor"},
+                        "runtime": {"$ref": "#/$defs/sensor"},
+                        "signal": {"$ref": "#/$defs/sensor"},
+                        "signal_loss": {"$ref": "#/$defs/sensor"},
                         "snr": {"$ref": "#/$defs/sensor"},
-                        "waterflow": {"$ref": "#/$defs/sensor"},
-                        "eer": {"$ref": "#/$defs/sensor"}
-                    }
+                        "temperature": {"$ref": "#/$defs/sensor"},
+                        "tv_signal": {"$ref": "#/$defs/sensor"},
+                        "voltage": {"$ref": "#/$defs/sensor"},
+                        "waterflow": {"$ref": "#/$defs/sensor"}
+                    },
+                    "additionalProperties": false
                 },
                 "storage": {
                     "type": "object",
@@ -412,7 +418,7 @@
         },
         "num_oid": {
             "type": "string",
-            "pattern": "^(\\.\\d+)+(\\.?\\{\\{ \\$(index|str_index_as_numeric) \\}\\})?(\\.\\d+)*$"
+            "pattern": "^(\\.\\d+)+(\\.\\{\\{ \\$(index|subindex\\d) }}|\\{\\{ \\$noindex }})$"
         },
         "oids": {
             "type": ["string", "array"],

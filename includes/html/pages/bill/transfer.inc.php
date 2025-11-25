@@ -33,8 +33,8 @@ $lastmonth = dbFetchCell('SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 MONTH
 $yesterday = dbFetchCell('SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 DAY))');
 $rightnow = date('U');
 
-$cur_days = date('d', (strtotime('now') - strtotime($datefrom)));
-$total_days = round((strtotime($dateto) - strtotime($datefrom)) / (60 * 60 * 24));
+$cur_days = date('d', (strtotime('now') - strtotime((string) $datefrom)));
+$total_days = round((strtotime((string) $dateto) - strtotime((string) $datefrom)) / (60 * 60 * 24));
 
 $total['data'] = Billing::formatBytes($bill_data['total_data']);
 if ($bill_data['bill_type'] == 'quota') {

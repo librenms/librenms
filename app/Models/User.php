@@ -153,7 +153,7 @@ class User extends Authenticatable
 
         return AlertTransport::query()
             ->where('transport_type', 'browserpush')
-            ->where(function ($query) use ($user_id) {
+            ->where(function ($query) use ($user_id): void {
                 $query->whereJsonContains('transport_config->user', '0')
                       ->orWhereJsonContains('transport_config->user', "$user_id");
             })
@@ -174,7 +174,7 @@ class User extends Authenticatable
         // find user including ones where we might not know the auth type
         $type = LegacyAuth::getType();
 
-        return $query->where(function ($query) use ($type) {
+        return $query->where(function ($query) use ($type): void {
             $query->where('auth_type', $type)
                 ->orWhereNull('auth_type')
                 ->orWhere('auth_type', '');
@@ -243,9 +243,7 @@ class User extends Authenticatable
     public function devices()
     {
         // pseudo relation
-        return Device::query()->when(! $this->hasGlobalRead(), function ($query) {
-            return $query->whereIntegerInRaw('device_id', Permissions::devicesForUser($this));
-        });
+        return Device::query()->when(! $this->hasGlobalRead(), fn ($query) => $query->whereIntegerInRaw('device_id', Permissions::devicesForUser($this)));
     }
 
     /**

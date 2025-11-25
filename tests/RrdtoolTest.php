@@ -90,7 +90,7 @@ final class RrdtoolTest extends TestCase
         LibrenmsConfig::set('rrdcached', '');
         LibrenmsConfig::set('rrdtool_version', '1.4');
 
-        $this->expectException('LibreNMS\Exceptions\FileExistsException');
+        $this->expectException(\LibreNMS\Exceptions\FileExistsException::class);
         // use this file, since it is guaranteed to exist
         $this->buildCommandProxy('create', __FILE__, 'o');
     }

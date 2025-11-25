@@ -99,6 +99,6 @@ if (! empty($oids)) {
         }
 
         discover_sensor(null, 'state', $device, $num_oid . $num_index, $index, $state_name, $description, '1', '1', null, null, null, null, $currentValue, 'snmp', null, null, null, 'Line cards');
-        $num_index = $num_index + 1;
+        $num_index += 1;
     }
 }

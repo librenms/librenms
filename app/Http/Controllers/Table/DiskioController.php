@@ -45,6 +45,7 @@ class DiskioController extends TableController
     {
         return [
             'hostname',
+            'display',
             'diskio_descr',
         ];
     }
@@ -53,7 +54,7 @@ class DiskioController extends TableController
     {
         return UcdDiskio::query()
             ->hasAccess($request->user())
-            ->when($request->get('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'sensors.device_id'))
+            ->when($request->get('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'ucd_diskio.device_id'))
             ->withAggregate('device', 'hostname');
     }
 

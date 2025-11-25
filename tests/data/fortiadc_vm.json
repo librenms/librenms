@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "fortiadc",
-                    "type": "appliance",
+                    "type": "loadbalancer",
                     "serial": "FADV040000000000",
                     "icon": "fortinet.svg"
                 }

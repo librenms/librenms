@@ -66,7 +66,7 @@ class CheckSchemaStructure implements Validation, ValidationFixer
 
         return ValidationResult::fail("We have detected that your database schema may be wrong\n" . implode("\n", $this->descriptions))
             ->setFix('Run the following SQL statements to fix it')
-            ->setFixer(__CLASS__)
+            ->setFixer(self::class)
             ->setList('SQL Statements', $this->schema_update);
     }
 
@@ -78,7 +78,7 @@ class CheckSchemaStructure implements Validation, ValidationFixer
             foreach ($this->schema_update as $query) {
                 DB::statement($query);
             }
-        } catch (QueryException $e) {
+        } catch (QueryException) {
             return false;
         }
 
@@ -114,7 +114,7 @@ class CheckSchemaStructure implements Validation, ValidationFixer
 
                     // MySQL 8 fix, remove DEFAULT_GENERATED from timestamp extra columns
                     if ($cdata['Type'] == 'timestamp') {
-                        $current_columns[$column]['Extra'] = preg_replace('/DEFAULT_GENERATED */', '', $current_columns[$column]['Extra']);
+                        $current_columns[$column]['Extra'] = preg_replace('/DEFAULT_GENERATED */', '', (string) $current_columns[$column]['Extra']);
                     }
 
                     if (empty($current_columns[$column])) {
@@ -303,9 +303,7 @@ class CheckSchemaStructure implements Validation, ValidationFixer
             $index = "INDEX `{$index_data['Name']}` (%s)";
         }
 
-        $columns = implode(',', array_map(function ($col) {
-            return "`$col`";
-        }, $index_data['Columns']));
+        $columns = implode(',', array_map(fn ($col) => "`$col`", $index_data['Columns']));
 
         return sprintf($index, $columns);
     }

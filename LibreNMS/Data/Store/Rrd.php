@@ -67,7 +67,6 @@ class Rrd extends BaseDatastore
     {
         parent::__construct();
         $this->loadConfig();
-        $this->init();
     }
 
     public function getName(): string
@@ -202,7 +201,7 @@ class Rrd extends BaseDatastore
     {
         $output = $this->command('lastupdate', $filename, '')[0];
 
-        if (preg_match('/((?: \w+)+)\n\n(\d+):((?: [\d.-]+)+)\nOK/', $output, $matches)) {
+        if (preg_match('/((?: \w+)+)\n\n(\d+):((?: [\d.-]+)+)\nOK/', (string) $output, $matches)) {
             $data = array_combine(
                 explode(' ', ltrim($matches[1])),
                 explode(' ', ltrim($matches[3])),
@@ -266,7 +265,7 @@ class Rrd extends BaseDatastore
             if ($max < 10000000) {
                 return false;
             }
-            $max = $max / 8;
+            $max /= 8;
             $fields = [
                 'INOCTETS',
                 'OUTOCTETS',
@@ -401,7 +400,7 @@ class Rrd extends BaseDatastore
 
         try {
             $cmd = self::buildCommand($command, $filename, $options);
-        } catch (FileExistsException $e) {
+        } catch (FileExistsException) {
             Log::debug("RRD[%g$filename already exists%n]", ['color' => true]);
 
             return [null, null];
@@ -496,7 +495,7 @@ class Rrd extends BaseDatastore
             $filename = sprintf('/%s', self::safeName($device['hostname']));
             $rrd_files = $this->command('list', $filename, '');
             // Command output is an array, create new array with each filename as a item in array.
-            $rrd_files_array = explode("\n", trim($rrd_files[0]));
+            $rrd_files_array = explode("\n", trim((string) $rrd_files[0]));
             // Remove status line from response
             array_pop($rrd_files_array);
         } else {
@@ -535,8 +534,8 @@ class Rrd extends BaseDatastore
         $offset = substr_count($app_name, $separator);
 
         foreach ($rrdfile_array as $rrd) {
-            if (str_contains($rrd, $pattern)) {
-                $filename = basename($rrd, '.rrd');
+            if (str_contains((string) $rrd, $pattern)) {
+                $filename = basename((string) $rrd, '.rrd');
                 $entry = explode($separator, $filename, 4 + $offset)[3 + $offset];
                 if ($entry) {
                     array_push($entries, $entry);
@@ -557,7 +556,7 @@ class Rrd extends BaseDatastore
     public function checkRrdExists($filename): bool
     {
         if ($this->rrdcached && version_compare($this->version, '1.5', '>=')) {
-            $check_output = implode($this->command('last', $filename, ''));
+            $check_output = implode('', $this->command('last', $filename, ''));
             $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
 
             return ! (str_contains($check_output, $filename) && str_contains($check_output, 'No such file or directory'));

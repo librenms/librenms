@@ -116,11 +116,11 @@ EKINOPS-MGNT2-NMS-MIB::mgnt2EventLogChassisId {{ ip }}",
     public static function genEkiEvent(): array
     {
         return [
-            'slotNum' => rand(1, 32),
+            'slotNum' => random_int(1, 32),
             'srcPm' => str_shuffle('0123456789abcdefg'),
             'reason' => str_shuffle('0123456789abcdefg'),
             'portType' => str_shuffle('0123456789abcdefg'),
-            'portNum' => rand(1, 32),
+            'portNum' => random_int(1, 32),
             'addText' => str_shuffle('0123456789abcdefg'),
         ];
     }

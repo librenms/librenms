@@ -596,7 +596,7 @@ Output:
 Output is an image.
 
 
-### `get_port_graphs`
+### `get_device_ports`
 
 Get a list of ports for a particular device.
 
@@ -1018,7 +1018,7 @@ Route: `/api/v0/devices/:hostname/ports/:ifname`
 - hostname can be either the device hostname or id
 - ifname can be any of the interface names for the device which can be
   obtained using
-  [`get_port_graphs`](#get_port_graphs). Please ensure that
+  [`get_device_ports`](#get_device_ports). Please ensure that
   the ifname is urlencoded if it needs to be (i.e Gi0/1/0 would need to be urlencoded.
 
 Input:
@@ -1256,6 +1256,8 @@ Input (JSON):
 
 - `title`: *optional* -  Some title for the Maintenance  
   Will be replaced with hostname if omitted
+- `behavior`: *optional* - id of maintenance behavior desired
+  Defaults to alert.scheduled_maintenance_default_behavior if omitted
 - `notes`: *optional* -  Some description for the Maintenance  
   Will also be added to device notes if user prefs "Add schedule notes to devices notes" is set
 - `start`: *optional* - start time of Maintenance in full format `Y-m-d H:i:00`  
@@ -1270,6 +1272,7 @@ Example with start time:
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' \
   -X POST https://foo.example/api/v0/devices/localhost/maintenance/ \
   --data-raw '
+{
  "title":"Device Maintenance",
   "notes":"A 2 hour Maintenance triggered via API with start time",
   "start":"2022-08-01 08:00:00",

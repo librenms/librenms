@@ -48,7 +48,7 @@ if ($agent_data['app'][$name]) {
     }
     if (strlen($data) < 100) {
         $socket = \App\Facades\LibrenmsConfig::get('rrdcached');
-        if (substr($socket, 0, 6) == 'unix:/') {
+        if (str_starts_with($socket, 'unix:/')) {
             $socket_file = substr($socket, 5);
             if (file_exists($socket_file)) {
                 $sock = fsockopen('unix://' . $socket_file);
@@ -86,10 +86,10 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('journal_rotate', 'COUNTER', 0);
 
 $fields = [];
-foreach (explode("\n", $data) as $line) {
+foreach (explode("\n", (string) $data) as $line) {
     $split = explode(': ', $line);
     if (count($split) == 2) {
-        $ds = strtolower(preg_replace('/[A-Z]/', '_$0', lcfirst($split[0])));
+        $ds = strtolower((string) preg_replace('/[A-Z]/', '_$0', lcfirst($split[0])));
         $fields[$ds] = $split[1];
     }
 }

@@ -96,7 +96,7 @@ foreach ($results as $extend => $result) {
 
 // remove non-existing apps
 $apps_to_remove = array_diff($discovered_apps, $current_apps);
-DeviceCache::getPrimary()->applications()->whereIn('app_type', $apps_to_remove)->get()->each(function (Application $app) {
+DeviceCache::getPrimary()->applications()->whereIn('app_type', $apps_to_remove)->get()->each(function (Application $app): void {
     $app->delete();
     \App\Models\Eventlog::log("Application disabled by discovery: $app->app_type", DeviceCache::getPrimary(), 'application', \LibreNMS\Enum\Severity::Notice);
 });

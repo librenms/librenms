@@ -295,7 +295,7 @@ return [
         'success' => '已成功新增使用者：:username',
         'wrong-auth' => '警告！由於未使用 MySQL 驗證，您將無法以此使用者登入',
     ],
-    'maintenance:database-cleanup' => [
+    'maintenance:cleanup-database' => [
         'description' => '清理資料庫中的孤立項目。',
     ],
 ];

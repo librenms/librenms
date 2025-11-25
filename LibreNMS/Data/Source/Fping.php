@@ -34,13 +34,13 @@ use Symfony\Component\Process\Process;
 
 class Fping
 {
-    private string $fping_bin;
-    private string|false $fping6_bin;
-    private int $count;
-    private int $timeout;
-    private int $interval;
-    private int $tos;
-    private int $retries;
+    private readonly string $fping_bin;
+    private readonly string|false $fping6_bin;
+    private readonly int $count;
+    private readonly int $timeout;
+    private readonly int $interval;
+    private readonly int $tos;
+    private readonly int $retries;
 
     public function __construct()
     {
@@ -115,7 +115,7 @@ class Fping
         Log::debug('[FPING] ' . $process->getCommandLine() . PHP_EOL);
 
         $partial = '';
-        $process->run(function ($type, $output) use ($callback, &$partial) {
+        $process->run(function ($type, $output) use ($callback, &$partial): void {
             // stdout contains individual ping responses, stderr contains summaries
             if ($type == Process::ERR) {
                 $lines = explode(PHP_EOL, $output);

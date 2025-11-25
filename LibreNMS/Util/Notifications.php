@@ -99,7 +99,7 @@ class Notifications
             $feed = json_decode(json_encode(simplexml_load_string(file_get_contents($url))), true);
             $feed = isset($feed['channel']) ? self::parseRss($feed) : self::parseAtom($feed);
 
-            array_walk($feed, function (&$items, $key, $url) {
+            array_walk($feed, function (&$items, $key, $url): void {
                 $items['source'] = $url;
             }, $url);
             $notifications = array_merge($notifications, $feed);
@@ -121,7 +121,7 @@ class Notifications
                 'title' => $item['title'],
                 'body' => $item['description'],
                 'checksum' => hash('sha512', $item['title'] . $item['description']),
-                'datetime' => date('Y-m-d', strtotime($item['pubDate']) ?: time()),
+                'datetime' => date('Y-m-d', strtotime((string) $item['pubDate']) ?: time()),
             ];
         }
 
@@ -145,7 +145,7 @@ class Notifications
                 'title' => $item['title'],
                 'body' => $item['content'],
                 'checksum' => hash('sha512', $item['title'] . $item['content']),
-                'datetime' => date('Y-m-d', strtotime($item['updated']) ?: time()),
+                'datetime' => date('Y-m-d', strtotime((string) $item['updated']) ?: time()),
             ];
         }
 
