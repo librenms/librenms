@@ -75,7 +75,14 @@ trait ManipulatesModuleTestData
 
         $keyParts = [];
         foreach ($sortColumns as $column) {
-            $keyParts[] = $row[$column] ?? '';
+            // Remove table qualifier if present
+            $columnName = array_last(explode('.', $column));
+
+            if (! array_key_exists($columnName, $row)) {
+                throw new \RuntimeException("Module Test Data: Column '$columnName' does not exist in row data. Update getSortColumns()");
+            }
+
+            $keyParts[] = $row[$columnName];
         }
 
         return implode('|', $keyParts);
@@ -83,7 +90,7 @@ trait ManipulatesModuleTestData
 
     /**
      * Flatten nested arrays into dot-notation for side-by-side comparison.
-     * Only includes rows that exist in BOTH left and right datasets.
+     * Processes all keys from both datasets, skipping rows missing from either side.
      */
     private function flattenForComparison(array $left, array $right): array
     {
@@ -96,13 +103,12 @@ trait ManipulatesModuleTestData
             $leftTable = $left[$table] ?? [];
             $rightTable = $right[$table] ?? [];
 
-            // Only process keys that exist in BOTH left and right
-            $commonKeys = array_intersect(array_keys($leftTable), array_keys($rightTable));
-            sort($commonKeys);
+            $allKeys = array_unique(array_merge(array_keys($leftTable), array_keys($rightTable)));
+            sort($allKeys);
 
-            foreach ($commonKeys as $index => $key) {
-                $this->flattenRow($leftTable[$key], $table, $index, $leftFlat);
-                $this->flattenRow($rightTable[$key], $table, $index, $rightFlat);
+            foreach ($allKeys as $index => $key) {
+                $this->flattenRow($leftTable[$key] ?? [], $table, $index, $leftFlat);
+                $this->flattenRow($rightTable[$key] ?? [], $table, $index, $rightFlat);
             }
         }
 
