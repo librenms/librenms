@@ -32,6 +32,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Device;
 use Illuminate\Http\Request;
 use LibreNMS\Interfaces\UI\DeviceTab;
+use Symfony\Component\Process\Process;
 
 class ShowConfigController extends Controller implements DeviceTab
 {
@@ -106,24 +107,57 @@ class ShowConfigController extends Controller implements DeviceTab
         if (LibrenmsConfig::has('rancid_configs.0')) {
             $device = DeviceCache::getPrimary();
             foreach (LibrenmsConfig::get('rancid_configs') as $configs) {
-                if ($configs[strlen($configs) - 1] != '/') {
-                    $configs .= '/';
-                }
-
-                if (is_file($configs . $device['hostname'])) {
-                    $this->rancidPath = $configs;
-
-                    return $configs . $device['hostname'];
-                } elseif (is_file($configs . strtok($device['hostname'], '.'))) { // Strip domain
-                    $this->rancidPath = $configs;
-
-                    return $configs . strtok($device['hostname'], '.');
+                if (LibrenmsConfig::get('rancid_repo_type') == 'git-bare') {
+                    $topLevel = strpos($configs, '.git');
+                    $configPath = '';
+                    if ($topLevel === false) {
+                        if (is_dir($configs . '.git')) {
+                            $configs .= '.git';
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        $configPath = substr($configs, $topLevel + 5);
+                        $configs = substr($configs, 0, $topLevel + 4);
+                    }
+                    if (strlen($configPath) > 0 && $configPath[strlen($configPath) - 1] != '/') {
+                        $configPath .= '/';
+                    }
+                    $process = new Process(['git', 'ls-tree', '--name-only', '-r', 'HEAD'], $configs);
+                    $process->run();
+                    $config_files = explode(PHP_EOL, $process->getOutput());
+                    if (count($config_files) > 0) {
+                        $this->rancidPath = $configs;
+                    }
+                    if (in_array($configPath . $device['hostname'], $config_files)) {
+                        return $configPath . $device['hostname'];
+                    }
+                    if (in_array($configPath . strtok($device['hostname'], '.'), $config_files)) {
+                        return $configPath . strtok($device['hostname'], '.');
+                    }
+                    if (! empty(LibrenmsConfig::get('mydomain')) && in_array($configPath . $device['hostname'] . '.' . LibrenmsConfig::get('mydomain'), $config_files)) {
+                        return $configPath . $device['hostname'] . '.' . LibrenmsConfig::get('mydomain');
+                    }
                 } else {
-                    if (! empty(LibrenmsConfig::get('mydomain'))) { // Try with domain name if set
-                        if (is_file($configs . $device['hostname'] . '.' . LibrenmsConfig::get('mydomain'))) {
-                            $this->rancidPath = $configs;
+                    if ($configs[strlen($configs) - 1] != '/') {
+                        $configs .= '/';
+                    }
 
-                            return $configs . $device['hostname'] . '.' . LibrenmsConfig::get('mydomain');
+                    if (is_file($configs . $device['hostname'])) {
+                        $this->rancidPath = $configs;
+
+                        return $configs . $device['hostname'];
+                    } elseif (is_file($configs . strtok($device['hostname'], '.'))) { // Strip domain
+                        $this->rancidPath = $configs;
+
+                        return $configs . strtok($device['hostname'], '.');
+                    } else {
+                        if (! empty(LibrenmsConfig::get('mydomain'))) { // Try with domain name if set
+                            if (is_file($configs . $device['hostname'] . '.' . LibrenmsConfig::get('mydomain'))) {
+                                $this->rancidPath = $configs;
+
+                                return $configs . $device['hostname'] . '.' . LibrenmsConfig::get('mydomain');
+                            }
                         }
                     }
                 }
