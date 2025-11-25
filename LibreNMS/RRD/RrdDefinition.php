@@ -92,11 +92,11 @@ class RrdDefinition implements \Stringable
     {
         $def = [];
 
-        foreach($this->sources as $source) {
+        foreach ($this->sources as $source) {
             array_push($def, '--source', $source);
         }
 
-        foreach($this->dataSets as $ds) {
+        foreach ($this->dataSets as $ds) {
             $name = $ds['name'] . $this->createSource($ds['source_ds'], $ds['source_file']);
             $def[] = "DS:$name:{$ds['type']}:{$ds['hb']}:{$ds['min']}:{$ds['max']}";
         }

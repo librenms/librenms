@@ -70,7 +70,7 @@ try {
 
     // command output requested
     if (! empty($command_only)) {
-        $command = implode(' ', array_map(escapeshellarg(...), ['rrdtool', ...Rrd::buildCommand('graph', LibrenmsConfig::get('temp_dir') . '/' . Str::random(),  $rrd_options)]));
+        $command = implode(' ', array_map(escapeshellarg(...), ['rrdtool', ...Rrd::buildCommand('graph', LibrenmsConfig::get('temp_dir') . '/' . Str::random(), $rrd_options)]));
 
         echo "<div class='infobox'>";
         echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Command</p>";

@@ -427,7 +427,7 @@ class Rrd extends BaseDatastore
             $output = $this->sync_process->sendCommand(implode(' ', $cmd));
         } elseif ($this->init()) {
             // don't care about the return of other commands, so send them to the faster async process
-            $output = $this->async_process->sendCommand(implode(' ', $cmd));;
+            $output = $this->async_process->sendCommand(implode(' ', $cmd));
         } else {
             Log::error('rrdtool could not start');
         }
