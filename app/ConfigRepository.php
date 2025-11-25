@@ -260,12 +260,12 @@ class ConfigRepository
     {
         $this->forget($key);
         try {
-            $deleted = Models\Config::withChildren($key)->delete();
-            if ($deleted > 0) {
+            $deleted = Models\Config::withChildren($key)->delete() > 0;
+            if ($deleted) {
                 $this->invalidateCache();
             }
 
-            return $deleted > 0;
+            return $deleted;
         } catch (Exception) {
             return false;
         }
