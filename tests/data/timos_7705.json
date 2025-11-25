@@ -3531,7 +3531,7 @@
                     "port_descr_type": "mob",
                     "port_descr_descr": "DPAC-GU-LTE",
                     "port_descr_circuit": null,
-                    "port_descr_speed": "Tam-NOC-TOYCELL-GLTAM869-LTE-668",
+                    "port_descr_speed": "Tam-NOC-TOYCELL-GLTAM869-LTE-66869",
                     "port_descr_notes": null,
                     "ifDescr": "1/3/5, 10/100/Gig Ethernet SFP, \\Mob: DPAC-GU-LTE [Tam-NOC-TOYCELL-GLTAM869-LTE-66869]",
                     "ifName": "1/3/5",
@@ -7657,7 +7657,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": 65000
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "AS65000-MOCK-TEXT",
@@ -7680,60 +7680,11 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": null,
                     "bgpLocalAs": 65000,
-                    "vrfLocalAs": 65000
+                    "vrfLocalAs": null
                 }
             ]
         },
-        "poller": {
-            "bgpPeers": [
-                {
-                    "astext": "AS65000-MOCK-TEXT",
-                    "bgpPeerIdentifier": "10.15.0.1",
-                    "bgpPeerRemoteAs": 65000,
-                    "bgpPeerState": "established",
-                    "bgpPeerAdminStatus": "receiveKeepAlive",
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null,
-                    "bgpPeerIface": null,
-                    "bgpLocalAddr": "0.0.0.0",
-                    "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerDescr": "",
-                    "bgpPeerInUpdates": 0,
-                    "bgpPeerOutUpdates": 0,
-                    "bgpPeerInTotalMessages": 78954664,
-                    "bgpPeerOutTotalMessages": 5243874,
-                    "bgpPeerFsmEstablishedTime": 3,
-                    "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
-                    "bgpLocalAs": 65000,
-                    "vrfLocalAs": 65000
-                },
-                {
-                    "astext": "AS65000-MOCK-TEXT",
-                    "bgpPeerIdentifier": "10.18.3.1",
-                    "bgpPeerRemoteAs": 65000,
-                    "bgpPeerState": "established",
-                    "bgpPeerAdminStatus": "receiveKeepAlive",
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null,
-                    "bgpPeerIface": null,
-                    "bgpLocalAddr": "0.0.0.0",
-                    "bgpPeerRemoteAddr": "0.0.0.0",
-                    "bgpPeerDescr": "",
-                    "bgpPeerInUpdates": 0,
-                    "bgpPeerOutUpdates": 0,
-                    "bgpPeerInTotalMessages": 4828014,
-                    "bgpPeerOutTotalMessages": 5243447,
-                    "bgpPeerFsmEstablishedTime": 3,
-                    "bgpPeerInUpdateElapsedTime": 0,
-                    "context_name": null,
-                    "bgpLocalAs": 65000,
-                    "vrfLocalAs": 65000
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "mpls": {
         "discovery": {
