@@ -133,6 +133,7 @@ class Port extends DeviceRelatedModel
 
     /**
      * Get port speeds, respecting parsed interface circuit speeds as bps
+     *
      * @return array{int, int} [egress bps, ingress bps]
      */
     public function getSpeeds(): array
