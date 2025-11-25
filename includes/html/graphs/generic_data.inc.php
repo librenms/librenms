@@ -169,7 +169,6 @@ $rrd_options .= " GPRINT:totout:'Out %6." . $float_precision . "lf%sB)\\l'";
 $rrd_options .= ' LINE1:percentile_in#aa0000';
 $rrd_options .= ' LINE1:dpercentile_out#aa0000';
 
-
 $speed_line_type = ($vars['port_speed_zoom'] ?? LibrenmsConfig::get('graphs.port_speed_zoom')) ? 'LINE2' : 'HRULE';
 if ($egress_speed && $ingress_speed && $ingress_speed != $egress_speed) {
     $rrd_options .= " $speed_line_type:$ingress_speed#000000:'In Port Speed " . Number::formatSi($ingress_speed, 2, 0, 'bps') . "\\n'";
