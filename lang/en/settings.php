@@ -2364,6 +2364,10 @@ return [
             'description' => 'Show devices dependecies on location map',
             'help' => 'Show links between devices on the location map based on parent dependencies',
         ],
+        'device_stats_avg_factor' => [
+            'description' => 'Averaging factor',
+            'help' => 'We calculate a moving average using an exponential weighted moving average function.  This is the factor used by the function to control how much the current value affects the average.  Values closer to 1 will make the average change quicker.',
+        ],
         'whois' => [
             'description' => 'Path to whois',
         ],

@@ -1156,6 +1156,28 @@ is discovered.
     lnms config:set storage_perc_warn 60
     ```
 
+## Averaging Factor
+
+LibreNMS keeps track of average values in the database for some metrics so we
+can alert on changes (e.g. if the ping time increases from the average). To 
+achieve this goal we want the average to move slowly when there is a change
+to the values being recorded so there is time to alert, but we also need to
+eventually stop alerting if the average value becomes the new normal.
+
+The following configuration variable can be adjusted if you make use of the
+average values, and find that they either change too quickly or slowly. If
+you make this setting bigger (closer to 1) the averages will change faster,
+and if you make it smaller (closer to 0) the average will change slower.
+
+```bash
+lnms config:set device_stats_avg_factor 0.05
+```
+
+If you want to understand more about this, the device statistics uses an
+exponential weighted moving average function to update the average without
+needing to keep multiple values. You can look up independently if you want
+to understand more about this option.
+
 ## IRC Bot
 
 Please refer to [IRC Bot](../Extensions/IRC-Bot.md)
