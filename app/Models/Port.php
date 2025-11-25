@@ -141,7 +141,7 @@ class Port extends DeviceRelatedModel
         $egress = $ingress = (int) $this->ifSpeed;
 
         if (! empty($this->port_descr_speed)) {
-            $speed_parts = explode('/', $this->port_descr_speed, 2);
+            $speed_parts = explode('/', (string) $this->port_descr_speed, 2);
             $parsed_egress = Number::toBytes($speed_parts[0]);
             $parsed_ingress = isset($speed_parts[1]) ? Number::toBytes($speed_parts[1]) : $parsed_egress;
 
