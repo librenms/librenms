@@ -150,21 +150,16 @@ function get_port_rrdfile_path($hostname, $port_id, $suffix = '')
     return Rrd::name($hostname, Rrd::portName($port_id, $suffix));
 }
 
-function get_port_by_ifIndex($device_id, $ifIndex)
-{
-    return dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device_id, $ifIndex]);
-}
-
-function get_port_by_id($port_id)
+function get_port_by_id($port_id): array|false
 {
     if (is_numeric($port_id)) {
-        $port = dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', [$port_id]);
-        if (is_array($port)) {
-            return $port;
-        } else {
-            return false;
+        $port = PortCache::get($port_id);
+        if ($port !== null) {
+            return $port->toArray();
         }
     }
+
+    return false;
 }
 
 function ifclass($ifOperStatus, $ifAdminStatus)
@@ -193,11 +188,6 @@ function device_by_id_cache($device_id, $refresh = false)
 function gethostbyid($device_id)
 {
     return DeviceCache::get((int) $device_id)->hostname;
-}
-
-function getifbyid($id)
-{
-    return dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', [$id]);
 }
 
 function getidbyname($hostname)
