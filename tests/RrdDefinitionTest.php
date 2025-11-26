@@ -49,7 +49,7 @@ final class RrdDefinitionTest extends TestCase
     {
         LibrenmsConfig::set('rrd.step', 300);
         LibrenmsConfig::set('rrd.heartbeat', 600);
-        $expected = 'DS:bad_name-is_too_lon:GAUGE:600:0:100 ';
+        $expected = 'DS:bad_name-is_too_lon:GAUGE:600:0:100';
         $def = RrdDefinition::make()->addDataset('b a%d$_n:a^me-is_too_lon%g.', 'GAUGE', 0, 100, 600);
 
         $this->assertEquals($expected, (string) $def);
