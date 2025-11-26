@@ -11,7 +11,7 @@
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Bill;
-use Illuminate\Support\Facades\DB;
+use App\Models\BillHistory;
 use LibreNMS\Billing;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Number;
@@ -23,7 +23,7 @@ $options = getopt('frd');
 
 if (isset($options['r'])) {
     echo "Clearing history table.\n";
-    DB::table('bill_history')->truncate();
+    BillHistory::truncate();
 }
 
 Debug::set(isset($options['d']));
@@ -49,7 +49,7 @@ foreach (Bill::orderBy('bill_id')->get() as $bill) {
         $datefrom = $day_data['0'];
         $dateto = $day_data['1'];
 
-        $check = DB::table('bill_history')->where('bill_id', $bill->bill_id)->where('bill_datefrom', $datefrom)->where('bill_dateto', $dateto)->first();
+        $check = BillHistory::query()->where('bill_id', $bill->bill_id)->where('bill_datefrom', $datefrom)->where('bill_dateto', $dateto)->first();
 
         $period = Billing::getPeriod($bill->bill_id, $datefrom, $dateto);
 
@@ -127,7 +127,7 @@ foreach (Bill::orderBy('bill_id')->get() as $bill) {
                 'bill_peak_in' => $period->peak_in,
                 'updated' => now(),
             ];
-            DB::table('bill_history')->updateOrInsert(
+            BillHistory::updateOrCreate(
                 ['bill_hist_id' => $check->bill_hist_id],
                 $history);
             echo "Billing history updated!\n\n";

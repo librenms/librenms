@@ -4,9 +4,12 @@ namespace LibreNMS;
 
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use App\Models\Bill;
+use App\Models\BillData;
+use App\Models\BillHistory;
+use App\Models\BillPortCounter;
 use DateTime;
 use DateTimeZone;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Number;
 use SnmpQuery;
@@ -99,7 +102,7 @@ class Billing
     public static function getLastPortCounter($port_id, $bill_id): array
     {
         $return = [];
-        $row = DB::table('bill_port_counters')->where('port_id', $port_id)->where('bill_id', $bill_id)->first();
+        $row = BillPortCounter::query()->where('port_id', $port_id)->where('bill_id', $bill_id)->first();
         if (! is_null($row)) {
             $return['timestamp'] = $row->timestamp;
             $return['in_counter'] = $row->in_counter;
@@ -117,7 +120,7 @@ class Billing
     public static function getLastMeasurement($bill_id): array
     {
         $return = [];
-        $row = DB::table('bill_data')->where('bill_id', $bill_id)->orderBy('timestamp', 'desc')->first();
+        $row = BillData::query()->where('bill_id', $bill_id)->orderBy('timestamp', 'desc')->first();
         if (! is_null($row)) {
             $return['delta'] = $row->delta;
             $return['in_delta'] = $row->in_delta;
@@ -133,10 +136,10 @@ class Billing
 
     private static function get95thagg($bill_id, $datefrom, $dateto): float
     {
-        $measurements = DB::table('bill_data')->where('bill_id', $bill_id)->where('timestamp', '>', $datefrom)->where('timestamp', '<=', $dateto)->count();
+        $measurements = BillData::query()->where('bill_id', $bill_id)->where('timestamp', '>', $datefrom)->where('timestamp', '<=', $dateto)->count();
         $measurement_95th = max(1, round($measurements / 100 * 95) - 1);
 
-        $a_95th = DB::table('bill_data')
+        $a_95th = BilLData::query()
             ->selectRaw('(delta / period * 8) AS rate')
             ->where('bill_id', $bill_id)
             ->where('timestamp', '>', $datefrom)
@@ -150,10 +153,10 @@ class Billing
 
     private static function get95thIn($bill_id, $datefrom, $dateto): float
     {
-        $measurements = DB::table('bill_data')->where('bill_id', $bill_id)->where('timestamp', '>', $datefrom)->where('timestamp', '<=', $dateto)->count();
+        $measurements = BillData::query()->where('bill_id', $bill_id)->where('timestamp', '>', $datefrom)->where('timestamp', '<=', $dateto)->count();
         $measurement_95th = max(1, round($measurements / 100 * 95) - 1);
 
-        $a_95th = DB::table('bill_data')
+        $a_95th = BillData::query()
             ->selectRaw('(in_delta / period * 8) AS rate')
             ->where('bill_id', $bill_id)
             ->where('timestamp', '>', $datefrom)
@@ -167,10 +170,10 @@ class Billing
 
     private static function get95thout($bill_id, $datefrom, $dateto): float
     {
-        $measurements = DB::table('bill_data')->where('bill_id', $bill_id)->where('timestamp', '>', $datefrom)->where('timestamp', '<=', $dateto)->count();
+        $measurements = BillData::query()->where('bill_id', $bill_id)->where('timestamp', '>', $datefrom)->where('timestamp', '<=', $dateto)->count();
         $measurement_95th = (round($measurements / 100 * 95) - 1);
 
-        $a_95th = DB::table('bill_data')
+        $a_95th = BillData::query()
             ->selectRaw('(out_delta / period * 8) AS rate')
             ->where('bill_id', $bill_id)
             ->where('timestamp', '>', $datefrom)
@@ -220,7 +223,7 @@ class Billing
 
     private static function getSum($bill_id, $datefrom, $dateto)
     {
-        $sum = DB::table('bill_data')
+        $sum = BillData::query()
             ->selectRaw('SUM(period) as period, SUM(delta) as total, SUM(in_delta) as inbound, SUM(out_delta) as outbound')
             ->where('bill_id', $bill_id)
             ->where('timestamp', '>', $datefrom)
@@ -232,7 +235,7 @@ class Billing
 
     public static function getPeriod($bill_id, $datefrom, $dateto): object
     {
-        $ptot = DB::table('bill_data')
+        $ptot = BillData::query()
             ->selectRaw('SUM(period) as period, MAX(in_delta) as peak_in, MAX(out_delta) as peak_out')
             ->where('bill_id', $bill_id)
             ->where('timestamp', '>', $datefrom)
@@ -244,7 +247,7 @@ class Billing
 
     public static function getHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor): ?array
     {
-        $histrow = DB::table('bill_history')
+        $histrow = BillHistory::query()
             ->selectRaw('UNIX_TIMESTAMP(bill_datefrom) as `from`, UNIX_TIMESTAMP(bill_dateto) AS `to`, rate_95th, rate_average, bill_type')
             ->where('bill_id', $bill_id)
             ->where('bill_hist_id', $bill_hist_id)
@@ -293,9 +296,9 @@ class Billing
             $reducefactor = max(1, floor($expectedpoints / $desiredpoints));
         }
 
-        $bill_data = DB::table('bills')->where('bill_id', $bill_id)->first();
+        $bill_data = Bill::query()->where('bill_id', $bill_id)->first();
 
-        foreach (DB::table('bill_data')->selectRaw('*, UNIX_TIMESTAMP(timestamp) AS formatted_date')->where('bill_id', $bill_id)->whereRaw('timestamp >= FROM_UNIXTIME( ? )', [$from])->whereRaw('timestamp <= FROM_UNIXTIME( ? )', [$to])->orderBy('timestamp', 'asc')->get() as $row) {
+        foreach (BillData::query()->selectRaw('*, UNIX_TIMESTAMP(timestamp) AS formatted_date')->where('bill_id', $bill_id)->whereRaw('timestamp >= FROM_UNIXTIME( ? )', [$from])->whereRaw('timestamp <= FROM_UNIXTIME( ? )', [$to])->orderBy('timestamp', 'asc')->get() as $row) {
             $timestamp = $row->formatted_date;
             if (! $first) {
                 $first = $timestamp;
@@ -379,7 +382,7 @@ class Billing
         $ticklabels = [];
         $allowed_val = null;
 
-        foreach (DB::table('bill_history')->where('bill_id', $bill_id)->orderBy('bill_datefrom', 'desc')->limit(12)->get() as $data) {
+        foreach (BillHistory::query()->where('bill_id', $bill_id)->orderBy('bill_datefrom', 'desc')->limit(12)->get() as $data) {
             $datefrom = date('Y-m-d', strtotime((string) $data->bill_datefrom));
             $dateto = date('Y-m-d', strtotime((string) $data->bill_dateto));
             $datelabel = $datefrom . ' - ' . $dateto;
@@ -423,7 +426,7 @@ class Billing
     public static function getBandwidthGraphData($bill_id, $bill_hist_id, $from, $to, $imgtype): ?array
     {
         if (is_numeric($bill_hist_id)) {
-            $histrow = DB::table('bill_history')->selectRaw('UNIX_TIMESTAMP(bill_datefrom) as `from`, UNIX_TIMESTAMP(bill_dateto) AS `to`, rate_95th, rate_average')->where('bill_id', $bill_id)->where('bill_hist_id', $bill_hist_id)->first();
+            $histrow = BillHistory::query()->selectRaw('UNIX_TIMESTAMP(bill_datefrom) as `from`, UNIX_TIMESTAMP(bill_dateto) AS `to`, rate_95th, rate_average')->where('bill_id', $bill_id)->where('bill_hist_id', $bill_hist_id)->first();
 
             if (is_null($histrow)) {
                 return null;
@@ -447,7 +450,7 @@ class Billing
         $data = [];
         $average = 0;
         if ($imgtype == 'day') {
-            foreach (DB::table('bill_data')->selectRaw('DISTINCT UNIX_TIMESTAMP(timestamp) as timestamp, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out')->where('bill_id', $bill_id)->whereRaw('timestamp >= FROM_UNIXTIME( ? )', [$from])->whereRaw('timestamp <= FROM_UNIXTIME( ? )', [$to])->groupByRaw('DATE(timestamp)')->orderBy('timestamp', 'asc')->get() as $data) {
+            foreach (BillData::query()->selectRaw('DISTINCT UNIX_TIMESTAMP(timestamp) as timestamp, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out')->where('bill_id', $bill_id)->whereRaw('timestamp >= FROM_UNIXTIME( ? )', [$from])->whereRaw('timestamp <= FROM_UNIXTIME( ? )', [$to])->groupByRaw('DATE(timestamp)')->orderBy('timestamp', 'asc')->get() as $data) {
                 array_push($ticklabels, date('Y-m-d', $data->timestamp));
                 array_push($in_data, $data->traf_in ?? 0);
                 array_push($out_data, $data->traf_out ?? 0);
@@ -466,7 +469,7 @@ class Billing
                 array_push($tot_data, 0);
             }
         } elseif ($imgtype == 'hour') {
-            foreach (DB::table('bill_data')->selectRaw('DISTINCT HOUR(timestamp) as hour, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out')->where('bill_id', $bill_id)->whereRaw('timestamp >= FROM_UNIXTIME( ? )', [$from])->whereRaw('timestamp <= FROM_UNIXTIME( ? )', [$to])->groupByRaw('HOUR(timestamp)')->orderByRaw('HOUR(timestamp) ASC')->get() as $data) {
+            foreach (BillData::query()->selectRaw('DISTINCT HOUR(timestamp) as hour, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out')->where('bill_id', $bill_id)->whereRaw('timestamp >= FROM_UNIXTIME( ? )', [$from])->whereRaw('timestamp <= FROM_UNIXTIME( ? )', [$to])->groupByRaw('HOUR(timestamp)')->orderByRaw('HOUR(timestamp) ASC')->get() as $data) {
                 array_push($ticklabels, sprintf('%02d', $data->hour) . ':00');
                 array_push($in_data, $data->traf_in ?? 0);
                 array_push($out_data, $data->traf_out ?? 0);
