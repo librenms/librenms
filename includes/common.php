@@ -281,25 +281,29 @@ function is_client_authorized($clientip)
 /*
  * @return an array of all graph subtypes for the given type
  */
-function get_graph_subtypes($type, $device = null)
+function get_graph_subtypes(string $type): array
 {
-    $type = basename((string) $type);
+    $dir = base_path('includes/html/graphs/' . basename($type));
+
+    if (! is_dir($dir)) {
+        return [];
+    }
+
     $types = [];
 
-    // find the subtypes defined in files
-    if ($handle = opendir(LibrenmsConfig::get('install_dir') . "/includes/html/graphs/$type/")) {
-        while (false !== ($file = readdir($handle))) {
-            if ($file != '.' && $file != '..' && $file != 'auth.inc.php' && strstr($file, '.inc.php')) {
-                $types[] = str_replace('.inc.php', '', $file);
+    foreach (new DirectoryIterator($dir) as $file) {
+        if ($file->isFile() && str_ends_with($file->getFilename(), '.inc.php')) {
+            $name = $file->getBasename('.inc.php');
+            if ($name !== 'auth') {
+                $types[] = $name;
             }
         }
-        closedir($handle);
     }
 
     sort($types);
 
     return $types;
-} // get_graph_subtypes
+}
 
 function generate_smokeping_file($device, $file = '')
 {
