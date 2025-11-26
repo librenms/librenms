@@ -60,12 +60,12 @@ final class RrdDefinitionTest extends TestCase
         LibrenmsConfig::set('rrd.step', 300);
         LibrenmsConfig::set('rrd.heartbeat', 600);
         $expected = 'DS:pos:COUNTER:600:0:125000000000 ' .
-            'DS:unbound:DERIVE:600:U:U ';
+            'DS:unbound:DERIVE:600:U:U';
 
         $def = new RrdDefinition();
         $def->addDataset('pos', 'COUNTER', 0, 125000000000);
         $def->addDataset('unbound', 'DERIVE');
 
-        $this->assertEquals($expected, $def);
+        $this->assertEquals($expected, (string) $def);
     }
 }
