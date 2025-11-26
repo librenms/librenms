@@ -46,13 +46,11 @@ class Sensor
     /** @var bool[] */
     private array $discovered = [];
     private string $relationship = 'sensors';
-    private Device $device;
     /** @var array<string, Collection<StateTranslation>> */
     private array $states = [];
 
-    public function __construct(Device $device)
+    public function __construct(private Device $device)
     {
-        $this->device = $device;
         $this->models = new Collection;
     }
 
@@ -117,12 +115,12 @@ class Sensor
             return true;
         }
         foreach (LibrenmsConfig::getCombined($this->device->os, 'disabled_sensors_regex') as $skipRegex) {
-            if (! empty($sensor->sensor_descr) && preg_match($skipRegex, $sensor->sensor_descr)) {
+            if (! empty($sensor->sensor_descr) && preg_match($skipRegex, (string) $sensor->sensor_descr)) {
                 return true;
             }
         }
         foreach (LibrenmsConfig::getCombined($this->device->os, "disabled_sensors_regex.$sensor->sensor_class") as $skipRegex) {
-            if (! empty($sensor->sensor_descr) && preg_match($skipRegex, $sensor->sensor_descr)) {
+            if (! empty($sensor->sensor_descr) && preg_match($skipRegex, (string) $sensor->sensor_descr)) {
                 return true;
             }
         }

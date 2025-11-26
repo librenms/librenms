@@ -9,7 +9,7 @@ use Exception;
 
 class MaintenanceDatabaseCleanup extends LnmsCommand
 {
-    protected $name = 'maintenance:database-cleanup';
+    protected $name = 'maintenance:cleanup-database';
 
     /**
      * Create a new command instance.

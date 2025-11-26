@@ -4,6 +4,7 @@
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\ModuleList;
 use LibreNMS\Util\ModuleTestHelper;
 use LibreNMS\Util\Snmpsim;
 
@@ -134,7 +135,7 @@ echo "\n";
 
 try {
     $no_save = isset($options['n']) || isset($options['no-save']);
-    foreach ($os_list as $full_os_name => $parts) {
+    foreach ($os_list as $parts) {
         [$target_os, $target_variant] = $parts;
         echo "OS: $target_os\n";
         echo "Module: $modules_input\n";
@@ -144,7 +145,7 @@ try {
         echo PHP_EOL;
 
         LibrenmsConfig::invalidateAndReload();
-        $tester = new ModuleTestHelper($modules, $target_os, $target_variant);
+        $tester = new ModuleTestHelper(ModuleList::fromUserOverrides($modules), $target_os, $target_variant);
         if (! $no_save && ! empty($output_file)) {
             $tester->setJsonSavePath($output_file);
         }

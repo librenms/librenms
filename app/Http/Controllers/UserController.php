@@ -188,7 +188,7 @@ class UserController extends Controller
 
         $user->fill($request->validated());
 
-        if ($request->user()->can('manage', Role::class)) {
+        if ($request->user()->can('manage', Role::class) && $request->has('roles')) {
             $user->syncRoles($request->get('roles', []));
         }
 

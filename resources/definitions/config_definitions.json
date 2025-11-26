@@ -1447,6 +1447,16 @@
                 "{{ $ip }}":  "ip"
             }
         },
+        "device_stats_avg_factor": {
+            "default": 0.05,
+            "group": "poller",
+            "section": "ping",
+            "order": 4,
+            "type": "float",
+            "validate": {
+                "value": "numeric|between:0.000001,0.9"
+            }
+        },
         "device_traffic_descr": {
             "default": [
                 "/loopback/",
@@ -1496,9 +1506,14 @@
                     "type": "firewall"
                 },
                 {
-                    "icon": "scale-blanaced",
+                    "icon": "scale-balanced",
                     "text": "Load Balancers",
                     "type": "loadbalancer"
+                },
+                {
+                    "icon": "door-open",
+                    "text": "Management",
+                    "type": "management"
                 },
                 {
                     "icon": "network-wired",
@@ -2238,6 +2253,9 @@
             "type": "boolean"
         },
         "enable_ports_etherlike": {
+            "group": "webui",
+            "section": "device",
+            "order": 22,
             "default": false,
             "type": "boolean"
         },
@@ -3758,6 +3776,30 @@
             },
             "type": "graph"
         },
+        "graph_types.device.purestorage_bandwidth": {
+            "default": {
+                "section": "storage",
+                "order": 0,
+                "descr": "Array Bandwidth"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.purestorage_iops": {
+            "default": {
+                "section": "storage",
+                "order": 1,
+                "descr": "Array IOPS"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.purestorage_latency": {
+            "default": {
+                "section": "storage",
+                "order": 2,
+                "descr": "Array Latency"
+            },
+            "type": "graph"
+        },
         "graph_types.device.riverbed_connections": {
             "default": {
                 "section": "network",
@@ -4213,6 +4255,70 @@
                 "descr": "Sessions"
             },
             "type": "graph"
+        },
+        "graph_types.device.purestorage_total_capacity": {
+            "default": {
+                "section": "storage",
+                "order": 0,
+                "descr": "Total Capacity"
+            },
+          "type": "graph"
+        },
+        "graph_types.device.purestorage_used_capacity": {
+            "default": {
+                "section": "storage",
+                "order": 1,
+                "descr": "Used Capacity"
+            },
+          "type": "graph"
+        },
+        "graph_types.device.purestorage_read_iops": {
+            "default": {
+                "section": "storage",
+                "order": 2,
+                "descr": "Read IOPS"
+        },
+          "type": "graph"
+        },
+        "graph_types.device.purestorage_write_iops": {
+            "default": {
+                "section": "storage",
+                "order": 3,
+                "descr": "Write IOPS"
+        },
+          "type": "graph"
+        },
+        "graph_types.device.purestorage_read_bandwidth": {
+            "default": {
+                "section": "storage",
+                "order": 4,
+                "descr": "Read Bandwidth"
+        },
+          "type": "graph"
+        },
+        "graph_types.device.purestorage_write_bandwidth": {
+            "default": {
+                "section": "storage",
+                "order": 5,
+                "descr": "Write Bandwidth"
+        },
+          "type": "graph"
+        },
+        "graph_types.device.purestorage_read_latency": {
+            "default": {
+                "section": "storage",
+                "order": 6,
+                "descr": "Read Latency"
+        },
+          "type": "graph"
+        },
+        "graph_types.device.purestorage_write_latency": {
+            "default": {
+           "section": "storage",
+           "order": 7,
+           "descr": "Write Latency"
+        },
+           "type": "graph"
         },
         "graphite.enable": {
             "default": false,
@@ -5293,7 +5399,7 @@
             "default": "xdp",
             "group": "webui",
             "section": "worldmap",
-            "order": 3,
+            "order": 2,
             "type": "select",
             "options": {
                 "xdp": "CDP/LLDP Neighbours",
@@ -5310,7 +5416,7 @@
             "type": "boolean",
             "group": "webui",
             "section": "worldmap",
-            "order": 2
+            "order": 10
         },
         "nfdump": {
             "default": "/usr/bin/nfdump",
@@ -5639,7 +5745,7 @@
             "type": "oxidized-maps",
             "validate": {
                 "value": "array",
-                "value.*": "array:hostname,sysName,sysDescr,sysObjectID,hardware,os,location,ip,purpose,notes,poller_group",
+                "value.*": "array:hostname,sysName,sysDescr,sysObjectID,hardware,type,os,location,ip,purpose,notes,poller_group",
                 "value.*.*": "array|min:1",
                 "value.*.*.*": "array:match,regex,value|size:2",
                 "value.*.*.*.value": "required|string",
@@ -5679,8 +5785,9 @@
             "type": "integer"
         },
         "radius.users_purge": {
-            "default": null,
-            "type": "boolean"
+            "default": 0,
+            "units": "days",
+            "type": "integer"
         },
         "radius.secret": {
             "default": null,
@@ -5742,6 +5849,13 @@
             "group": "auth",
             "section": "general",
             "order": 6
+        },
+        "password.uncompromised": {
+            "default": true,
+            "type": "boolean",
+            "group": "auth",
+            "section": "general",
+            "order": 7
         },
         "peering_descr": {
             "default": [
@@ -6156,6 +6270,13 @@
             "default": true,
             "type": "boolean"
         },
+        "poller_modules.port-security": {
+            "order": 460,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
         "polling.selected_ports": {
             "default": false,
             "type": "boolean",
@@ -6184,11 +6305,14 @@
             "type": "integer"
         },
         "ports_page_default": {
-            "default": "details",
+            "default": "detail",
             "type": "select",
+            "group": "webui",
+            "section": "device",
+            "order": 21,
             "options":{
                 "basic": "Basic",
-                "details": "Details",
+                "detail": "Details",
                 "arp": "ARP",
                 "fdb": "FDB"
             }
@@ -6282,7 +6406,7 @@
             "default": false,
             "group": "auth",
             "section": "general",
-            "order": 7,
+            "order": 20,
             "type": "boolean"
         },
         "radius.default_roles": {
@@ -6318,11 +6442,19 @@
             "type": "select",
             "options": {
                 "svn": "SVN",
-                "git": "Git"
+                "git": "Git",
+                "git-bare": "Git bare"
             },
             "group": "external",
             "section": "rancid",
             "order": 2
+        },
+        "rancid_repo_url": {
+            "default": null,
+            "type": "text",
+            "group": "external",
+            "section": "rancid",
+            "order": 3
         },
         "reporting.error": {
             "group": "system",
@@ -6624,7 +6756,7 @@
             "units": "Seconds"
         },
         "ping_rrd_step": {
-            "default": 60,
+            "default": 300,
             "group": "poller",
             "section": "dispatcherservice",
             "order": 21,

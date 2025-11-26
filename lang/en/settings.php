@@ -343,6 +343,14 @@ return [
             'description' => 'Active Directory Domain',
             'help' => 'Active Directory Domain Example: example.com',
         ],
+        'auth_ad_global_read' => [
+            'description' => 'Global Read',
+            'help' => 'Allow global-read access to all users',
+        ],
+        'auth_ad_group' => [
+            'description' => 'Access group DN',
+            'help' => 'Distinguished name for a group to give normal level access. Example: cn=groupname,ou=groups,dc=example,dc=com',
+        ],
         'auth_ad_group_filter' => [
             'description' => 'Group LDAP filter',
             'help' => 'Active Directory LDAP filter for selecting groups',
@@ -354,6 +362,10 @@ return [
         'auth_ad_require_groupmembership' => [
             'description' => 'Require group membership',
             'help' => 'Only allow users to log in if they are part of a defined group',
+        ],
+        'auth_ad_timeout' => [
+            'description' => 'Connection timeout',
+            'help' => 'If one or more servers are unresponsive, higher timeouts will cause slow logins. To low may cause connection failures in some cases',
         ],
         'auth_ad_user_filter' => [
             'description' => 'User LDAP filter',
@@ -817,6 +829,9 @@ return [
         'distributed_poller_memcached_port' => [
             'description' => 'Memcached port',
             'help' => 'The port for the memcached server. Default is 11211',
+        ],
+        'enable_ports_etherlike' => [
+            'description' => 'Enable etherlike graphs for ports',
         ],
         'email_auto_tls' => [
             'description' => 'Auto TLS support',
@@ -1576,6 +1591,10 @@ return [
                 'description' => 'Minimum password length',
                 'help' => 'Passwords shorter than the given length will be rejected',
             ],
+            'uncompromised' => [
+                'description' => 'Require password to be uncompromised',
+                'help' => 'Checks password against HaveIBeenPwned database using k-anonymity',
+            ],
         ],
         'peeringdb' => [
             'enabled' => [
@@ -1767,6 +1786,9 @@ return [
             'printer-supplies' => [
                 'description' => 'Printer Supplies',
             ],
+            'port-security' => [
+                'description' => 'Port Security',
+            ],
         ],
         'polling.selected_ports' => [
             'description' => 'Selected Port Polling',
@@ -1779,6 +1801,10 @@ return [
         'ports_nac_purge' => [
             'description' => 'Port NAC entries older than',
             'help' => 'Cleanup done by daily.sh',
+        ],
+        'ports_page_default' => [
+            'description' => 'Default ports tab',
+            'help' => 'Default tab to open when viewing ports on the device page',
         ],
         'ports_purge' => [
             'description' => 'Purge ports deleted',
@@ -1882,6 +1908,10 @@ return [
             'description' => 'RANCID Repository Type',
             'help' => 'Type of repository used by RANCID, used to display config diffs on device pages',
         ],
+        'rancid_repo_url' => [
+            'description' => 'RANCID Repository URL',
+            'help' => 'RANCID repository URL, used to point at GitWeb that visualizes a bare Git repository',
+        ],
         'rancid_ignorecomments' => [
             'description' => 'RANCID Ignore Comments',
             'help' => 'Ignore comments when comparing RANCID configs, used to display config diffs on device pages',
@@ -1971,7 +2001,7 @@ return [
                 'help' => 'Discovery task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_discovery_enabled is set to true.',
                 'options' => [
                     'legacy' => 'Legacy (Unrestricted)',
-                    'cron' => 'Cron (discovery.php)',
+                    'cron' => 'Cron (lnms device:discover)',
                     'dispatcher' => 'Dispatcher Service',
                 ],
             ],
@@ -2333,6 +2363,10 @@ return [
         'device_location_map_show_device_dependencies' => [
             'description' => 'Show devices dependecies on location map',
             'help' => 'Show links between devices on the location map based on parent dependencies',
+        ],
+        'device_stats_avg_factor' => [
+            'description' => 'Averaging factor',
+            'help' => 'We calculate a moving average using an exponential weighted moving average function.  This is the factor used by the function to control how much the current value affects the average.  Values closer to 1 will make the average change quicker.',
         ],
         'whois' => [
             'description' => 'Path to whois',

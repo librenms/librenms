@@ -33,11 +33,9 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
         // Check if the IPMI type is available, catch segfaults of ipmitool/freeipmi.
         try {
             Log::debug('Trying IPMI type: ' . $ipmi_type);
-            $results = explode(PHP_EOL, external_exec(array_merge($cmd, ['-I', $ipmi_type, 'sensor'])));
+            $results = explode(PHP_EOL, (string) external_exec(array_merge($cmd, ['-I', $ipmi_type, 'sensor'])));
 
-            $results = array_values(array_filter($results, function ($line) {
-                return ! Str::contains($line, 'discrete') && trim($line) !== '';
-            }));
+            $results = array_values(array_filter($results, fn ($line) => ! Str::contains($line, 'discrete') && trim($line) !== ''));
 
             if (! empty($results)) {
                 set_dev_attrib($device, 'ipmi_type', $ipmi_type);
@@ -54,7 +52,7 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     sort($results);
     foreach ($results as $sensor) {
         // BB +1.1V IOH     | 1.089      | Volts      | ok    | na        | 1.027     | 1.054     | 1.146     | 1.177     | na
-        $values = array_map('trim', explode('|', $sensor));
+        $values = array_map(trim(...), explode('|', (string) $sensor));
         [$desc,$current,$unit,$state,$low_nonrecoverable,$low_limit,$low_warn,$high_warn,$high_limit,$high_nonrecoverable] = $values;
 
         $index++;

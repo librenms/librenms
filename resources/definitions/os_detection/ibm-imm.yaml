@@ -1,6 +1,6 @@
 os: ibm-imm
 text: 'IBM IMM'
-type: appliance
+type: management
 icon: ibmos
 mib_dir: ibm
 over:

@@ -1,7 +1,7 @@
 mib: INFINERA-ENTITY-CHASSIS-MIB:INFINERA-PM-BANDCTP-MIB:IF-MIB:INFINERA-PM-OSCCTP-MIB:INFINERA-PM-SCHCTP-MIB
 modules:
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

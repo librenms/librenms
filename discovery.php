@@ -23,6 +23,7 @@ if (! isset($options['q'])) {
 }
 
 $where = '';
+$doing = '';
 if (isset($options['h'])) {
     if ($options['h'] == 'odd') {
         $options['n'] = '1';
@@ -39,10 +40,12 @@ if (isset($options['h'])) {
         $doing = 'new';
     } elseif ($options['h']) {
         if (is_numeric($options['h'])) {
-            $where = "AND `device_id` = '" . $options['h'] . "'";
+            $where = 'AND `device_id` = ?';
+            $sqlparams[] = $options['h'];
             $doing = $options['h'];
         } else {
-            $where = "AND `hostname` LIKE '" . str_replace('*', '%', $options['h']) . "'";
+            $where = 'AND `hostname` LIKE ?';
+            $sqlparams[] = str_replace('*', '%', $options['h']);
             $doing = $options['h'];
         }
     }//end if
@@ -59,7 +62,9 @@ if (isset($options['type'])) {
 }
 
 if (isset($options['i']) && $options['i'] && isset($options['n'])) {
-    $where .= ' AND MOD(device_id,' . $options['i'] . ") = '" . $options['n'] . "'";
+    $where .= ' AND MOD(device_id,?) = ?';
+    $sqlparams[] = $options['i'];
+    $sqlparams[] = $options['n'];
     $doing = $options['n'] . '/' . $options['i'];
 }
 

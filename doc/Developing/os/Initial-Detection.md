@@ -242,7 +242,7 @@ is also an [online version](https://jakearchibald.github.io/svgomg/).
 Discovery
 
 ```bash
-./discovery.php -d -h HOSTNAME
+lnms device:discover -vv HOSTNAME
 ```
 
 Polling
@@ -259,5 +259,5 @@ such, if you do not get expected behaviour when completing the final
 check above, try removing the cache file first:
 
 ```bash
-rm -f cache/os_defs.cache
+lnms config:clear
 ```

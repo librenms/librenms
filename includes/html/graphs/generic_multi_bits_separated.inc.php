@@ -56,6 +56,7 @@ if (! $noagg || ! $nodetails) {
 }
 
 $iter = 0;
+$descr_out = '';
 foreach ($rrd_list as $rrd) {
     if (! \App\Facades\LibrenmsConfig::get("graph_colours.$colours_in.$iter") || ! \App\Facades\LibrenmsConfig::get("graph_colours.$colours_out.$iter")) {
         $iter = 0;

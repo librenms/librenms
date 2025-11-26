@@ -10,7 +10,7 @@ modules:
         serial: UPS-MIB::upsIdentAgentSoftwareVersion.0
         serial_regex: '/SN (?<serial>[0-9]+)/'
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

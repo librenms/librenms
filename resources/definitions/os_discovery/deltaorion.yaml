@@ -3,7 +3,7 @@ modules:
     os:
         version: ORION-BASE-MIB::dcSoftwareVersion.0
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:
@@ -22,7 +22,7 @@ modules:
                         - { value: 3, descr: on, graph: 1, generic: 2 }
         temperature:
             options:
-                skip_values: 
+                skip_values:
                 -
                   oid: dcMeasurementUnit
                   op: '!='
@@ -42,12 +42,12 @@ modules:
                   high_limit: 50
         voltage:
             options:
-                skip_values: 
+                skip_values:
                 -
                   oid: dcMeasurementUnit
                   op: '!='
                   value: 3
-                - 
+                -
                   oid: dcMeasurementValue
                   op: 'in_array'
                   value: [0, 2147483647]

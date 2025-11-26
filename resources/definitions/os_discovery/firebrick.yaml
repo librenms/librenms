@@ -725,9 +725,9 @@ modules:
         count:
             data:
                 -
-                    oid: fbL2tpGeneralTunnels
-                    value: fbL2tpFreeTunnels
-                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.1.0'
+                    oid: FIREBRICK-L2TP-MIB::fbL2tpGeneralTunnels
+                    value: FIREBRICK-L2TP-MIB::fbL2tpFreeTunnels
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.1.0{{ $noindex }}'
                     index: 'l2tp.tunnels.0'
                     descr: Free Tunnels
                     group: L2TP Tunnels
@@ -736,151 +736,151 @@ modules:
                     warn_limit: 30000
                     high_limit: 30000
                 -
-                    oid: fbL2tpGeneralTunnels
-                    value: fbL2tpOpeningTunnels
-                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.1.1'
+                    oid: FIREBRICK-L2TP-MIB::fbL2tpGeneralTunnels
+                    value: FIREBRICK-L2TP-MIB::fbL2tpOpeningTunnels
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.1.1{{ $noindex }}'
                     index: 'l2tp.tunnels.1'
                     descr: Opening Tunnels
                     group: L2TP Tunnels
                     warn_limit: 15
                     high_limit: 20
                 -
-                    oid: fbL2tpGeneralTunnels
-                    value: fbL2tpLiveIncomingTunnels
-                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.1.2'
+                    oid: FIREBRICK-L2TP-MIB::fbL2tpGeneralTunnels
+                    value: FIREBRICK-L2TP-MIB::fbL2tpLiveIncomingTunnels
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.1.2{{ $noindex }}'
                     index: 'l2tp.tunnels.2'
                     descr: Live Incoming Tunnels
                     group: L2TP Tunnels
                     warn_limit: 15
                     high_limit: 20
                 -
-                    oid: fbL2tpGeneralTunnels
-                    value: fbL2tpLiveOutgoingTunnels
-                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.1.3'
+                    oid: FIREBRICK-L2TP-MIB::fbL2tpGeneralTunnels
+                    value: FIREBRICK-L2TP-MIB::fbL2tpLiveOutgoingTunnels
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.1.3{{ $noindex }}'
                     index: 'l2tp.tunnels.3'
                     descr: Live Outgoing Tunnels
                     group: L2TP Tunnels
                     warn_limit: 15
                     high_limit: 20
                 -
-                    oid: fbL2tpGeneralTunnels
-                    value: fbL2tpClosingTunnels
-                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.1.4'
+                    oid: FIREBRICK-L2TP-MIB::fbL2tpGeneralTunnels
+                    value: FIREBRICK-L2TP-MIB::fbL2tpClosingTunnels
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.1.4{{ $noindex }}'
                     index: 'l2tp.tunnels.4'
                     descr: Closing Tunnels
                     group: L2TP Tunnels
                     warn_limit: 15
                     high_limit: 20
                 -
-                    oid: fbL2tpGeneralTunnels
-                    value: fbL2tpFailedTunnels
-                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.1.5'
+                    oid: FIREBRICK-L2TP-MIB::fbL2tpGeneralTunnels
+                    value: FIREBRICK-L2TP-MIB::fbL2tpFailedTunnels
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.1.5{{ $noindex }}'
                     index: 'l2tp.tunnels.5'
                     descr: Failed Tunnels
                     group: L2TP Tunnels
                     warn_limit: 15
                     high_limit: 20
                 -
-                    oid: fbL2tpGeneralTunnels
-                    value: fbL2tpClosedTunnels
-                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.1.6'
+                    oid: FIREBRICK-L2TP-MIB::fbL2tpGeneralTunnels
+                    value: FIREBRICK-L2TP-MIB::fbL2tpClosedTunnels
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.1.6{{ $noindex }}'
                     index: 'l2tp.tunnels.6'
                     descr: Closed Tunnels
                     group: L2TP Tunnels
                     warn_limit: 15
                     high_limit: 20
                 -
-                    oid: fbL2tpGeneralSessions
-                    value: fbL2tpFreeSessions
-                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.0'
+                    oid: FIREBRICK-L2TP-MIB::fbL2tpGeneralSessions
+                    value: FIREBRICK-L2TP-MIB::fbL2tpFreeSessions
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.0{{ $noindex }}'
                     index: 'l2tp.sessions.0'
                     descr: Free Sessions
                     group: L2TP Sessions
                     low_limit: 10
                     low_warn_limit: 20
                 -
-                    oid: fbL2tpGeneralSessions
-                    value: fbL2tpWaitingSessions
-                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.1'
+                    oid: FIREBRICK-L2TP-MIB::fbL2tpGeneralSessions
+                    value: FIREBRICK-L2TP-MIB::fbL2tpWaitingSessions
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.1{{ $noindex }}'
                     index: 'l2tp.sessions.1'
                     descr: Waiting Sessions
                     group: L2TP Sessions
                     warn_limit: 15
                     high_limit: 20
                 -
-                    oid: fbL2tpGeneralSessions
-                    value: fbL2tpOpeningSessions
-                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.2'
+                    oid: FIREBRICK-L2TP-MIB::fbL2tpGeneralSessions
+                    value: FIREBRICK-L2TP-MIB::fbL2tpOpeningSessions
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.2{{ $noindex }}'
                     index: 'l2tp.sessions.2'
                     descr: Opening Sessions
                     group: L2TP Sessions
                     warn_limit: 15
                     high_limit: 20
                 -
-                    oid: fbL2tpGeneralSessions
-                    value: fbL2tpNegotiatingSessions
-                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.3'
+                    oid: FIREBRICK-L2TP-MIB::fbL2tpGeneralSessions
+                    value: FIREBRICK-L2TP-MIB::fbL2tpNegotiatingSessions
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.3{{ $noindex }}'
                     index: 'l2tp.sessions.3'
                     descr: Negotiating Sessions
                     group: L2TP Sessions
                     warn_limit: 15
                     high_limit: 20
                 -
-                    oid: fbL2tpGeneralSessions
-                    value: fbL2tpAuthPendingSessions
-                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.4'
+                    oid: FIREBRICK-L2TP-MIB::fbL2tpGeneralSessions
+                    value: FIREBRICK-L2TP-MIB::fbL2tpAuthPendingSessions
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.4{{ $noindex }}'
                     index: 'l2tp.sessions.4'
                     descr: Authentication Pending Sessions
                     group: L2TP Sessions
                     warn_limit: 15
                     high_limit: 20
                 -
-                    oid: fbL2tpGeneralSessions
-                    value: fbL2tpStartedSessions
-                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.5'
+                    oid: FIREBRICK-L2TP-MIB::fbL2tpGeneralSessions
+                    value: FIREBRICK-L2TP-MIB::fbL2tpStartedSessions
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.5{{ $noindex }}'
                     index: 'l2tp.sessions.5'
                     descr: Started Sessions
                     group: L2TP Sessions
                     warn_limit: 15
                     high_limit: 20
                 -
-                    oid: fbL2tpGeneralSessions
-                    value: fbL2tpLiveSessions
-                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.6'
+                    oid: FIREBRICK-L2TP-MIB::fbL2tpGeneralSessions
+                    value: FIREBRICK-L2TP-MIB::fbL2tpLiveSessions
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.6{{ $noindex }}'
                     index: 'l2tp.sessions.6'
                     descr: Live Sessions
                     group: L2TP Sessions
                     warn_limit: 15
                     high_limit: 20
                 -
-                    oid: fbL2tpGeneralSessions
-                    value: fbL2tpAcctPendingSessions
-                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.7'
+                    oid: FIREBRICK-L2TP-MIB::fbL2tpGeneralSessions
+                    value: FIREBRICK-L2TP-MIB::fbL2tpAcctPendingSessions
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.7{{ $noindex }}'
                     index: 'l2tp.sessions.7'
                     descr: Accounting Pending Sessions
                     group: L2TP Sessions
                     warn_limit: 15
                     high_limit: 20
                 -
-                    oid: fbL2tpGeneralSessions
-                    value: fbL2tpClosingSessions
-                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.8'
+                    oid: FIREBRICK-L2TP-MIB::fbL2tpGeneralSessions
+                    value: FIREBRICK-L2TP-MIB::fbL2tpClosingSessions
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.8{{ $noindex }}'
                     index: 'l2tp.sessions.8'
                     descr: Closing Sessions
                     group: L2TP Sessions
                     warn_limit: 15
                     high_limit: 20
                 -
-                    oid: fbL2tpGeneralSessions
-                    value: fbL2tpClosedSessions
-                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.9'
+                    oid: FIREBRICK-L2TP-MIB::fbL2tpGeneralSessions
+                    value: FIREBRICK-L2TP-MIB::fbL2tpClosedSessions
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.9{{ $noindex }}'
                     index: 'l2tp.sessions.9'
                     descr: Closed Sessions
                     group: L2TP Sessions
                 -
-                    oid: fbL2tpGeneralSessions
-                    value: fbL2tpSessionNegotiationSlotsFree
-                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.10'
+                    oid: FIREBRICK-L2TP-MIB::fbL2tpGeneralSessions
+                    value: FIREBRICK-L2TP-MIB::fbL2tpSessionNegotiationSlotsFree
+                    num_oid: '.1.3.6.1.4.1.24693.100.1701.0.2.10{{ $noindex }}'
                     index: 'l2tp.sessions.10'
                     descr: Free Session Slots
                     group: L2TP Sessions
@@ -888,7 +888,7 @@ modules:
                     low_warn_limit: 20
                 -
                     oid: fbSipActiveLegs
-                    num_oid: '.1.3.6.1.4.1.24693.100.5060.1.0'
+                    num_oid: '.1.3.6.1.4.1.24693.100.5060.1.{{ $index }}'
                     index: '1'
                     descr: Total active call legs
                     group: VOIP
@@ -898,7 +898,7 @@ modules:
                     high_limit: 1000
                 -
                     oid: fbSipRadiusRegs
-                    num_oid: '.1.3.6.1.4.1.24693.100.5060.2.0'
+                    num_oid: '.1.3.6.1.4.1.24693.100.5060.2.{{ $index }}'
                     index: '2'
                     descr: RADIUS-based registrations
                     group: VOIP

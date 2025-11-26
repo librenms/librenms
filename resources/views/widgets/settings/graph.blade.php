@@ -78,6 +78,14 @@
         @endif
         </select>
     </div>
+    <div class="form-group graph_select_extra-{{ $id }}" id="graph_select_customoid-{{ $id }}" style="display: none;">
+        <label for="graph_customoid-{{ $id }}" class="control-label">{{ __('Customoid') }}</label>
+        <select class="form-control" id="graph_customoid-{{ $id }}" name="graph_customoid" data-placeholder="{{ __('Select a custom OID') }}">
+        @if($graph_customoid)
+            <option value="{{ $graph_customoid }}">{{ $customoid_text }}</option>
+        @endif
+        </select>
+    </div>
     <div class="form-group graph_select_extra-{{ $id }}" id="graph_select_bill-{{ $id }}" style="display: none;">
         <label for="graph_bill-{{ $id }}" class="control-label">{{ __('Bill') }}</label>
         <select class="form-control" id="graph_bill-{{ $id }}" name="graph_bill" data-placeholder="{{ __('Select a bill') }}">
@@ -121,6 +129,7 @@
         }, '{{ $graph_application ?: '' }}');
         init_select2('#graph_munin-{{ $id }}', 'munin', {limit: 100}, '{{ $graph_munin ?: '' }}');
         init_select2('#graph_service-{{ $id }}', 'service', {limit: 100}, '{{ $graph_service ?: '' }}');
+        init_select2('#graph_customoid-{{ $id }}', 'customoid', {limit: 100}, '{{ $graph_customoid ?: '' }}');
         init_select2('#graph_bill-{{ $id }}', 'bill', {limit: 100}, '{{ $graph_bill ?: '' }}');
         init_select2('#graph_custom-{{ $id }}', 'graph-aggregate', {}, false);
         init_select2('#graph_ports-{{ $id }}', 'port', {limit: 100}, {{ $graph_port_ids }});

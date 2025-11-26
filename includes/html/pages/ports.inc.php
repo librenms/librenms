@@ -92,7 +92,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
     $output .= "<div class='form-group'>";
     $output .= "<select name='device_id' id='device_id' class='form-control input-sm'></select>&nbsp;";
 
-    $hasvalue = ! empty($vars['hostname']) ? "value='" . htmlspecialchars($vars['hostname']) . "'" : '';
+    $hasvalue = ! empty($vars['hostname']) ? "value='" . htmlspecialchars((string) $vars['hostname']) . "'" : '';
 
     $output .= "<input type='text' name='hostname' id='hostname' title='Hostname' class='form-control input-sm' " . $hasvalue . " placeholder='Hostname'>";
 
@@ -186,7 +186,7 @@ if ((isset($vars['searchbar']) && $vars['searchbar'] != 'hide') || ! isset($vars
             } else {
                 $portdescrib = '';
             }
-            $output .= "<option value='" . clean_bootgrid($data['port_descr_type']) . "' " . $portdescrib . '>' . ucfirst(clean_bootgrid($data['port_descr_type'])) . '</option>';
+            $output .= "<option value='" . clean_bootgrid($data['port_descr_type']) . "' " . $portdescrib . '>' . ucfirst((string) clean_bootgrid($data['port_descr_type'])) . '</option>';
         }
     }
 
@@ -235,9 +235,9 @@ if (! isset($vars['deleted'])) {
 
 if (isset($vars['purge'])) {
     if ($vars['purge'] === 'all') {
-        Port::hasAccess(Auth::user())->with(['device' => function ($query) {
+        Port::hasAccess(Auth::user())->with(['device' => function ($query): void {
             $query->select('device_id', 'hostname');
-        }])->isDeleted()->chunkById(100, function ($ports) {
+        }])->isDeleted()->chunkById(100, function ($ports): void {
             foreach ($ports as $port) {
                 $port->delete();
             }
@@ -245,13 +245,13 @@ if (isset($vars['purge'])) {
     } else {
         try {
             Port::hasAccess(Auth::user())->where('port_id', $vars['purge'])->firstOrFail()->delete();
-        } catch (ModelNotFoundException $e) {
-            echo "<div class='alert alert-danger'>Port ID " . htmlspecialchars($vars['purge']) . ' not found! Could not purge port.</div>';
+        } catch (ModelNotFoundException) {
+            echo "<div class='alert alert-danger'>Port ID " . htmlspecialchars((string) $vars['purge']) . ' not found! Could not purge port.</div>';
         }
     }
 }
 
-[$format, $subformat] = explode('_', basename($vars['format']));
+[$format, $subformat] = explode('_', basename((string) $vars['format']));
 
 if (file_exists('includes/html/pages/ports/' . $format . '.inc.php')) {
     require 'includes/html/pages/ports/' . $format . '.inc.php';

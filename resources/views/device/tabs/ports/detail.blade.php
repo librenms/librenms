@@ -2,6 +2,7 @@
     <table id="ports-fdb" class="table table-condensed table-hover table-striped tw:mt-1 tw:mb-0!">
         <thead>
         <tr>
+            <th width="50"><a href="{{ $request->fullUrlWithQuery(['sort' => 'index', 'order' => $data['sort'] !== 'index' ? 'asc' : $data['next_order']]) }}">{{ __('Index') }}</a></th>
             <th width="350"><a href="{{ $request->fullUrlWithQuery(['sort' => 'port', 'order' => $data['sort'] == 'port' ? $data['next_order'] : 'asc']) }} ">{{ __('Port') }}</a></th>
             <th width="100" class="tw:hidden tw:md:table-cell">{{ __('Port Groups') }}</th>
             <th width="100">{{ __('Graphs') }}</th>

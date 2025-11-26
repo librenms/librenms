@@ -29,7 +29,7 @@ class Port extends DeviceRelatedModel
     {
         parent::boot();
 
-        static::deleting(function (Port $port) {
+        static::deleting(function (Port $port): void {
             // delete related data
             $port->adsl()->delete();
             $port->vdsl()->delete();
@@ -86,13 +86,13 @@ class Port extends DeviceRelatedModel
         }
 
         foreach ((array) \App\Facades\LibrenmsConfig::get('rewrite_if', []) as $src => $val) {
-            if (Str::contains(strtolower($label), strtolower($src))) {
+            if (Str::contains(strtolower($label), strtolower((string) $src))) {
                 $label = $val;
             }
         }
 
         foreach ((array) \App\Facades\LibrenmsConfig::get('rewrite_if_regexp', []) as $reg => $val) {
-            $label = preg_replace($reg . 'i', $val, $label);
+            $label = preg_replace($reg . 'i', (string) $val, $label);
         }
 
         return $label;
@@ -154,7 +154,7 @@ class Port extends DeviceRelatedModel
     public function getIfPhysAddressAttribute($mac)
     {
         if (! empty($mac)) {
-            return preg_replace('/(..)(..)(..)(..)(..)(..)/', '\\1:\\2:\\3:\\4:\\5:\\6', $mac);
+            return preg_replace('/(..)(..)(..)(..)(..)(..)/', '\\1:\\2:\\3:\\4:\\5:\\6', (string) $mac);
         }
 
         return null;
@@ -261,7 +261,7 @@ class Port extends DeviceRelatedModel
             [$this->qualifyColumn('deleted'), '=', 0],
             [$this->qualifyColumn('ignore'), '=', 0],
             [$this->qualifyColumn('disabled'), '=', 0],
-        ])->where(function ($query) {
+        ])->where(function ($query): void {
             /** @var Builder $query */
             $query->where($this->qualifyColumn('ifInErrors_delta'), '>', 0)
                 ->orWhere($this->qualifyColumn('ifOutErrors_delta'), '>', 0);
@@ -287,7 +287,7 @@ class Port extends DeviceRelatedModel
 
     public function scopeInPortGroup($query, $portGroup)
     {
-        return $query->whereIn($query->qualifyColumn('port_id'), function ($query) use ($portGroup) {
+        return $query->whereIn($query->qualifyColumn('port_id'), function ($query) use ($portGroup): void {
             $query->select('port_id')
                 ->from('port_group_port')
                 ->where('port_group_id', $portGroup);
@@ -402,7 +402,7 @@ class Port extends DeviceRelatedModel
     public function macLinkedPorts(): HasManyThrough
     {
         return $this->hasManyThrough(Port::class, Ipv4Mac::class, 'port_id', 'ifPhysAddress', 'port_id', 'mac_address')
-            ->join('ipv4_addresses', function ($j) {
+            ->join('ipv4_addresses', function ($j): void {
                 $j->on('ipv4_mac.ipv4_address', 'ipv4_addresses.ipv4_address');
                 $j->on('ports.port_id', 'ipv4_addresses.port_id');
             })
@@ -568,5 +568,13 @@ class Port extends DeviceRelatedModel
     public function vrf(): HasOne
     {
         return $this->hasOne(Vrf::class, 'vrf_id', 'ifVrf');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\PortSecurity, $this>
+     */
+    public function portSecurity(): HasOne
+    {
+        return $this->hasOne(PortSecurity::class, 'port_id');
     }
 }

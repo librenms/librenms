@@ -30,7 +30,7 @@ $oids = SnmpQuery::walk([
     'PowerNet-MIB::emsInputContactStatusEntry',
 ])->table(1);
 
-foreach ($oids as $id => $contact) {
+foreach ($oids as $contact) {
     $index = $contact['PowerNet-MIB::emsInputContactStatusInputContactIndex'];
     $oid = '.1.3.6.1.4.1.318.1.1.10.3.14.1.1.3.' . $index;
     $descr = $contact['PowerNet-MIB::emsInputContactStatusInputContactName'];
@@ -78,7 +78,7 @@ $oids = SnmpQuery::walk([
     'PowerNet-MIB::emsOutputRelayStatusEntry',
 ])->table(1);
 
-foreach ($oids as $id => $relay) {
+foreach ($oids as $relay) {
     $index = $relay['PowerNet-MIB::emsOutputRelayStatusOutputRelayIndex'];
     $oid = '.1.3.6.1.4.1.318.1.1.10.3.15.1.1.3.' . $index;
     $descr = $relay['PowerNet-MIB::emsOutputRelayStatusOutputRelayName'];
@@ -126,7 +126,7 @@ $oids = SnmpQuery::walk([
     'PowerNet-MIB::emsOutletStatusEntry',
 ])->table(1);
 
-foreach ($oids as $id => $outlet) {
+foreach ($oids as $outlet) {
     $index = $outlet['PowerNet-MIB::emsOutletStatusOutletIndex'];
     $oid = '.1.3.6.1.4.1.318.1.1.10.3.16.1.1.3.' . $index;
     $descr = $outlet['PowerNet-MIB::emsOutletStatusOutletName'];

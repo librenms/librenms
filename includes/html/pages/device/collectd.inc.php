@@ -39,7 +39,7 @@ function dhtml_response_list(&$items, $method)
     printf(" <method>%s</method>\n", htmlspecialchars($method));
     echo " <result>\n";
     foreach ($items as &$item) {
-        printf('  <option>%s</option>' . "\n", htmlspecialchars($item));
+        printf('  <option>%s</option>' . "\n", htmlspecialchars((string) $item));
     }
 
     echo " </result>\n";
@@ -66,7 +66,7 @@ foreach ($plugins as &$plugin) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link(htmlspecialchars($plugin), $link_array, ['plugin' => $plugin]);
+    echo generate_link(htmlspecialchars((string) $plugin), $link_array, ['plugin' => $plugin]);
     if ($vars['plugin'] == $plugin) {
         echo '</span>';
     }
@@ -92,7 +92,7 @@ foreach ($pinsts as &$instance) {
 
         foreach ($typeinstances as &$tinst) {
             $i++;
-            if (! is_integer($i / 2)) {
+            if (! is_int($i / 2)) {
                 $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
             } else {
                 $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');

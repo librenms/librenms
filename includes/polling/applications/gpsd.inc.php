@@ -65,7 +65,7 @@ if ($app->app_id > 0) {
 
         $gpsd_parsed = [];
 
-        foreach (explode("\n", $gpsd) as $line) {
+        foreach (explode("\n", (string) $gpsd) as $line) {
             [$field, $data] = explode(':', $line);
             $gpsd_parsed[$field] = $data;
         }
@@ -100,7 +100,7 @@ if ($app->app_id > 0) {
 
             [$gpsd['data']['mode'], $gpsd['data']['hdop'], $gpsd['data']['vdop'],
                 $gpsd['data']['latitude'], $gpsd['data']['longitude'], $gpsd['data']['altitude'],
-                $gpsd['data']['satellites'], $gpsd['data']['satellites_used']] = explode("\n", $legacy);
+                $gpsd['data']['satellites'], $gpsd['data']['satellites_used']] = explode("\n", (string) $legacy);
         } catch (JsonAppException $e) {
             // Set Empty metrics and error message
 

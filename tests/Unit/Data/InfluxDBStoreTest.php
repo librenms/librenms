@@ -33,7 +33,7 @@ use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Group;
 
 #[Group('datastores')]
-class InfluxDBStoreTest extends TestCase
+final class InfluxDBStoreTest extends TestCase
 {
     public function testBadSettings(): void
     {
@@ -70,7 +70,7 @@ class InfluxDBStoreTest extends TestCase
                     && $point->getMeasurement() === $measurement
                     && $point->getTags() == (['hostname' => $device->hostname] + $tags)
                     && $point->getFields() == $fields;
-            }), 'ms')
+            }), 's') // Expects second precision
             ->once();
         $influx->write($measurement, $fields, $tags, $meta);
     }

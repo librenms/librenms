@@ -1,6 +1,5 @@
 <?php
 
-use App\Models\Device;
 use Illuminate\Support\Facades\Cache;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -15,7 +14,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
     $agent_start = microtime(true);
     $agent = null;
     try {
-        $poller_target = \LibreNMS\Util\Rewrite::addIpv6Brackets(Device::pollerTarget($device['hostname']));
+        $poller_target = \LibreNMS\Util\Rewrite::addIpv6Brackets(DeviceCache::getPrimary()->pollerTarget());
         $agent = @fsockopen($poller_target, $agent_port, $errno, $errstr, \App\Facades\LibrenmsConfig::get('unix-agent.connection-timeout'));
     } catch (ErrorException $e) {
         echo $e->getMessage() . PHP_EOL; // usually connection timed out
@@ -76,7 +75,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
         ];
 
         $agent_data = [];
-        foreach (explode('<<<', $agent_raw) as $section) {
+        foreach (explode('<<<', (string) $agent_raw) as $section) {
             if (empty($section)) {
                 continue;
             }
@@ -131,7 +130,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
             $data = [];
             foreach (explode("\n", $agent_data['ps:sep(9)']) as $process) {
                 $process = preg_replace('/\(([^,;]+),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*)?,?([0-9]*)\)(.*)/', '\\1|\\2|\\3|\\4|\\5|\\6|\\7|\\8|\\9|\\10|\\11|\\12', $process);
-                [$user, $VirtualSize, $WorkingSetSize, $zero, $processId, $PageFileUsage, $UserModeTime, $KernelModeTime, $HandleCount, $ThreadCount, $uptime, $process_name] = explode('|', $process, 12);
+                [$user, $VirtualSize, $WorkingSetSize, $zero, $processId, $PageFileUsage, $UserModeTime, $KernelModeTime, $HandleCount, $ThreadCount, $uptime, $process_name] = explode('|', (string) $process, 12);
                 if (! empty($process_name)) {
                     $cputime = ($UserModeTime + $KernelModeTime) / 10000000;
                     $days = floor($cputime / 86400);

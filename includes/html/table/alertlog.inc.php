@@ -98,7 +98,7 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
     // If it's a new rule created, or a clear/RECOVERED
     if ($alert_state == '0') {
         // Get the latest active that is not a clear/RECOVERED
-        // @phpstan-ignore-next-line
+        // @phpstan-ignore function.deprecated
         $last_active_state = dbFetchRows('SELECT id, details FROM alert_log WHERE device_id = ? AND id < ? AND rule_id = ? AND `state` != 0 ORDER BY id DESC LIMIT 1', [$alertlog['device_id'], $alertlog['alert_log_id'], $alertlog['rule_id']]);
         // It's a real alarm, we can then used it for the details
         if ($last_active_state) {
@@ -134,7 +134,7 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
         'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . $rulei . '" data-parent="#alerts"></a>',
         'verbose_details' => "<button type='button' class='btn btn-alert-details verbose-alert-details' style='display:none' aria-label='Details' id='alert-details' data-alert_log_id='{$alert_log_id}'><i class='fa-solid fa-circle-info'></i></button>",
         'hostname' => '<div class="incident">' . generate_device_link($dev) . '<div id="incident' . $rulei . '" class="collapse">' . $fault_detail . '</div></div>',
-        'alert' => htmlspecialchars($alertlog['alert']),
+        'alert' => htmlspecialchars((string) $alertlog['alert']),
         'status' => "<i class='alert-status " . $status . "' title='" . ($alert_state ? 'active' : 'recovered') . "'></i>",
         'severity' => $alertlog['severity'],
     ];

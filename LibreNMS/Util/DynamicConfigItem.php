@@ -32,7 +32,6 @@ use Validator;
 #[\AllowDynamicProperties]
 class DynamicConfigItem implements \ArrayAccess
 {
-    public $name;
     public $group;
     public $section;
     public $value;
@@ -48,9 +47,8 @@ class DynamicConfigItem implements \ArrayAccess
     public $validate;
     public $units;
 
-    public function __construct($name, $settings = [])
+    public function __construct(public $name, $settings = [])
     {
-        $this->name = $name;
         $this->value = LibrenmsConfig::get($this->name, $this->default);
 
         foreach ($settings as $key => $value) {
@@ -78,7 +76,7 @@ class DynamicConfigItem implements \ArrayAccess
             return in_array($value, array_keys($this->options));
         } elseif ($this->type == 'email') {
             // allow email format that includes display text
-            if (preg_match('/.* <(.*)>/', $value, $matches)) {
+            if (preg_match('/.* <(.*)>/', (string) $value, $matches)) {
                 $value = $matches[1];
             }
 
@@ -103,7 +101,7 @@ class DynamicConfigItem implements \ArrayAccess
 
             return true;
         } elseif ($this->type == 'color') {
-            return (bool) preg_match('/^#?[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/', $value);
+            return (bool) preg_match('/^#?[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/', (string) $value);
         } elseif (in_array($this->type, ['text', 'password'])) {
             return ! is_array($value);
         } elseif ($this->type === 'executable') {
@@ -238,7 +236,7 @@ class DynamicConfigItem implements \ArrayAccess
     #[\ReturnTypeWillChange]
     public function offsetGet($offset): mixed
     {
-        return isset($this->$offset) ? $this->$offset : null;
+        return $this->$offset ?? null;
     }
 
     public function offsetSet($offset, $value): void

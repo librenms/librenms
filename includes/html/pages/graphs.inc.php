@@ -18,7 +18,7 @@ if (session('widescreen')) {
 $vars['from'] = Time::parseAt($vars['from'] ?? '') ?: LibrenmsConfig::get('time.day');
 $vars['to'] = Time::parseAt($vars['to'] ?? '') ?: LibrenmsConfig::get('time.now');
 
-preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', $vars['type'], $graphtype);
+preg_match('/^(?P<type>[A-Za-z0-9]+)_(?P<subtype>.+)/', (string) $vars['type'], $graphtype);
 
 $type = basename($graphtype['type']);
 $subtype = basename($graphtype['subtype']);
@@ -63,7 +63,7 @@ if (! $auth) {
     echo $title;
 
     // FIXME allow switching between types for sensor and wireless also restrict types to ones that have data
-    if ($type != 'sensor') {
+    if ($type != 'sensor' && ! empty($device)) {
         echo '<div style="float: right;"><form action="">';
         echo csrf_field();
         echo "<select name='type' id='type' onchange=\"window.open(this.options[this.selectedIndex].value,'_top')\" class='devices-graphs-select'>";
@@ -166,7 +166,7 @@ if (! $auth) {
         echo ' | To show trend, set to future date';
     }
 
-    if (str_contains($vars['type'], 'sensor_')) {
+    if (str_contains((string) $vars['type'], 'sensor_')) {
         echo ' | To show trend, set to future date';
     }
 

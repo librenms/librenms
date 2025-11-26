@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\OS;
+
 if (empty($os)) {
     $os = OS::make($device);
 }
