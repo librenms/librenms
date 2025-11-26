@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->unsignedInteger('device_id')->unique();
-            $table->timestamp('ping_last_timestamp');
+            $table->timestamp('ping_last_timestamp')->nullable();
             $table->float('ping_rtt_last')->unsigned()->nullable();
             $table->float('ping_rtt_prev')->unsigned()->nullable();
             $table->float('ping_rtt_avg')->unsigned()->nullable();

@@ -739,7 +739,7 @@ device_stats:
     - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: ping_last_timestamp, Type: timestamp, 'Null': false, Extra: '' }
+    - { Field: ping_last_timestamp, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: ping_rtt_last, Type: 'double unsigned', 'Null': true, Extra: '' }
     - { Field: ping_rtt_prev, Type: 'double unsigned', 'Null': true, Extra: '' }
     - { Field: ping_rtt_avg, Type: 'double unsigned', 'Null': true, Extra: '' }
