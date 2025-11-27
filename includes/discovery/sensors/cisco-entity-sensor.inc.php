@@ -92,7 +92,7 @@ if ($device['os_group'] == 'cisco') {
                 $type = $entitysensor[$entry['entSensorType']];
 
                 // Try to handle the scale
-                [$divisor, $multiplier] = match ($entry['entPhySensorScale']) {
+                [$divisor, $multiplier] = match ($entry['entSensorScale']) {
                     'zepto' => [1000000000000000000, 1],
                     'nano' => [1000000000, 1],
                     'micro' => [1000000, 1],
