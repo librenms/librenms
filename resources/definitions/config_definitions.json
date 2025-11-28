@@ -4609,7 +4609,8 @@
                 "/dev",
                 "/compat/linux/proc",
                 "/compat/linux/sys",
-                "/sys/fs/cgroup"
+                "/sys/fs/cgroup",
+                "/var/snap"
             ],
             "type": "array"
         },
