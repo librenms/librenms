@@ -62,6 +62,7 @@ class Dns implements Geocoder
 
     /**
      * Get all IPs for a hostname
+     *
      * @return string[]
      */
     public function getAddresses(string $hostname, ?AddressFamily $family = null): array
@@ -78,7 +79,7 @@ class Dns implements Geocoder
             return [];
         }
 
-        return array_map(fn($info) => socket_addrinfo_explain($info)['ai_addr']['sin_addr'], $result);
+        return array_map(fn ($info) => socket_addrinfo_explain($info)['ai_addr']['sin_addr'], $result);
     }
 
     /**
