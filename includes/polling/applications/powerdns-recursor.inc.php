@@ -128,7 +128,7 @@ if (! empty($data)) {
         if (isset($stats[$key])) {
             $fields[$key] = $stats[$key];
         } else {
-            $fields[$key] = 'U';
+            $fields[$key] = null;
         }
     }
 
