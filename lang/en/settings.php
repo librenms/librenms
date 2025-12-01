@@ -966,6 +966,10 @@ return [
             'description' => 'Path to fping6',
         ],
         'fping_options' => [
+            'bytes' => [
+                'description' => 'fping packet size',
+                'help' => 'Size of packets for fping in bytes',
+            ],
             'count' => [
                 'description' => 'fping count',
                 'help' => 'The number of pings to send when checking if a host is up or down via icmp',

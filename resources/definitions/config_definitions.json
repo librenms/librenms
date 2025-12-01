@@ -1451,7 +1451,7 @@
             "default": 0.05,
             "group": "poller",
             "section": "ping",
-            "order": 4,
+            "order": 5,
             "type": "float",
             "validate": {
                 "value": "numeric|between:0.000001,0.9"
@@ -2344,6 +2344,13 @@
             "section": "ping",
             "order": 3,
             "type": "text"
+        },
+        "fping_options.bytes": {
+            "default": 64,
+            "group": "poller",
+            "section": "ping",
+            "order": 4,
+            "type": "integer"
         },
         "front_page": {
             "default": "default",
@@ -4579,7 +4586,7 @@
             "default": true,
             "group": "poller",
             "section": "ping",
-            "order": 4,
+            "order": 6,
             "type": "boolean"
         },
         "ignore_bsd_os_drives": {
