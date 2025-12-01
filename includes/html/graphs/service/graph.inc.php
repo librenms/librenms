@@ -47,9 +47,9 @@ if (is_file($check_script)) {
 }
 
 include 'includes/html/graphs/common.inc.php';
-$rrd_options[] = '-l';
-$rrd_options[] = '0';
-$rrd_options[] = '-E';
+$graph_params->scale_min = 0;
+$graph_params->sloped_mode = true;
+
 $rrd_options[] = 'COMMENT:                      Now     Avg      Max\\n';
 $rrd_additions = '';
 

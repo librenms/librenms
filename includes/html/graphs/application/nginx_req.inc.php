@@ -5,10 +5,9 @@ require 'includes/html/graphs/common.inc.php';
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'nginx', $app->app_id]);
 
 if (Rrd::checkRrdExists($rrd_filename)) {
-    $rrd_options[] = '-b';
-    $rrd_options[] = '1000';
-    $rrd_options[] = '-l';
-    $rrd_options[] = '0';
+    $graph_params->scale_min = 0;
+    $graph_params->base = 1000;
+
     $rrd_options[] = 'DEF:a=' . $rrd_filename . ':Requests:AVERAGE';
 
     $rrd_options[] = 'COMMENT:Requests    Current    Average   Maximum\\n';
