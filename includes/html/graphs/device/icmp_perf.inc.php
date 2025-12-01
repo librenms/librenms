@@ -57,8 +57,8 @@ $rrd_options[] = "AREA:top$jitter_color::STACK";
 // Average RTT and legend
 $rrd_options[] = "LINE2:ping$line_color:RTT";
 $rrd_options[] = 'GPRINT:ping:LAST:%15.2lf';
-$rrd_options[] = 'GPRINT:min:LAST:%6.2lf';
-$rrd_options[] = 'GPRINT:max:LAST:%6.2lf';
+$rrd_options[] = 'GPRINT:min:MIN:%6.2lf';
+$rrd_options[] = 'GPRINT:max:MAX:%6.2lf';
 $rrd_options[] = 'GPRINT:ping:AVERAGE:%6.2lf\\n';
 
 // loss line and legend
