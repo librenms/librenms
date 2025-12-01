@@ -248,7 +248,8 @@ class Billing
     public static function getHistoryBitsGraphData($bill_id, $bill_hist_id, $reducefactor): ?array
     {
         $histrow = BillHistory::query()
-            ->selectRaw('UNIX_TIMESTAMP(bill_datefrom) as `from`, UNIX_TIMESTAMP(bill_dateto) AS `to`, rate_95th, rate_average, bill_type')
+            ->select(['rate_95th', 'rate_average', 'bill_type', 'bill_datefrom', 'bill_dateto'])
+            ->withCasts(['bill_datefrom' => 'timestamp', 'bill_dateto' => 'timestamp'])
             ->where('bill_id', $bill_id)
             ->where('bill_hist_id', $bill_hist_id)
             ->first();
@@ -257,7 +258,7 @@ class Billing
             return null;
         }
 
-        $graph_data = self::getBitsGraphData($bill_id, $histrow->from, $histrow->to, $reducefactor);
+        $graph_data = self::getBitsGraphData($bill_id, $histrow->bill_datefrom, $histrow->bill_dateto, $reducefactor);
 
         // Overwrite the rate data with the historical version
         $graph_data['rate_95th'] = $histrow->rate_95th;
@@ -269,6 +270,7 @@ class Billing
 
     public static function getBitsGraphData($bill_id, $from, $to, $reducefactor): array
     {
+        dd('test');
         $i = '0';
         $iter = 0;
         $first = null;
@@ -297,9 +299,17 @@ class Billing
         }
 
         $bill_data = Bill::query()->where('bill_id', $bill_id)->first();
+        $data = BillData::query()
+            ->select(['*'])
+            ->withCasts(['timestamp' => 'timestamp'])
+            ->where('bill_id', $bill_id)
+            ->where('timestamp', '>=', $from)
+            ->where('timestamp', '<=', $to)
+            ->orderBy('timestamp', 'asc')
+            ->get();
 
-        foreach (BillData::query()->selectRaw('*, UNIX_TIMESTAMP(timestamp) AS formatted_date')->where('bill_id', $bill_id)->whereRaw('timestamp >= FROM_UNIXTIME( ? )', [$from])->whereRaw('timestamp <= FROM_UNIXTIME( ? )', [$to])->orderBy('timestamp', 'asc')->get() as $row) {
-            $timestamp = $row->formatted_date;
+        foreach ( as $row) {
+            $timestamp = $row->timestamp;
             if (! $first) {
                 $first = $timestamp;
             }
