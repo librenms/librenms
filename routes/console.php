@@ -3,6 +3,7 @@
 use App\Console\Commands\MaintenanceCleanupNetworks;
 use App\Console\Commands\MaintenanceCleanupSyslog;
 use App\Console\Commands\MaintenanceFetchOuis;
+use App\Console\Commands\MaintenanceFetchRSS;
 use App\Jobs\PingCheck;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
@@ -181,6 +182,11 @@ Schedule::command(MaintenanceFetchOuis::class)
 
 Schedule::command(MaintenanceCleanupNetworks::class)
     ->weeklyOn(0, Time::pseudoRandomBetween('02:00', '02:59'))
+    ->onOneServer()
+    ->appendOutputTo($maintenance_log_file);
+
+Schedule::command(MaintenanceFetchRSS::class)
+    ->dailyAt(Time::pseudoRandomBetween('03:00', '03:59'))
     ->onOneServer()
     ->appendOutputTo($maintenance_log_file);
 
