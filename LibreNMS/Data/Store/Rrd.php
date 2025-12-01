@@ -596,24 +596,22 @@ class Rrd extends BaseDatastore
      */
     public function graph(array $options, ?array $env = null): string
     {
-        $process = new Process([$this->rrdtool_executable, '-'], $this->rrd_dir, $env);
+        $process = new Process([$this->rrdtool_executable, ...$this->buildCommand('graph', '-', $options)], $this->rrd_dir, $env);
         $process->setTimeout(300);
         $process->setIdleTimeout(300);
 
         try {
-            $command = $this->buildCommand('graph', '-', $options);
-            $process->setInput('"' . implode('" "', $command) . "\"\nquit");
             $process->run();
-        } catch (FileExistsException $e) {
-            throw new RrdGraphException($e->getMessage(), 'File Exists');
+        } catch (\Exception $e) {
+            throw new RrdGraphException($e->getMessage());
         }
 
-        $feedback_position = strrpos($process->getOutput(), 'OK ');
-        if ($feedback_position !== false) {
-            return substr($process->getOutput(), 0, $feedback_position);
+        // Return the image if the process returns without an error code
+        if ($process->getExitCode() == 0) {
+            return $process->getOutput();
         }
 
-        // if valid image is returned with error, extract image and feedback
+        // Check if a valid image was returned in the output
         // rrdtool defaults to png if imgformat not specified
         $imgformat_option = array_find($options, fn ($o) => str_starts_with((string) $o, '--imgformat='));
         $graph_type = $imgformat_option ? strtolower(substr((string) $imgformat_option, 12)) : 'png';
