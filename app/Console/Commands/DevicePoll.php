@@ -84,7 +84,7 @@ class DevicePoll extends LnmsCommand
 
     private function dispatchWork(): int
     {
-        $module_overrides = Module::parseUserOverrides(explode(',', $this->option('modules') ?? ''));
+        $modules = ModuleList::fromUserOverrides($this->option('modules'));
         $devices = Device::whereDeviceSpec($this->argument('device spec'))->select('device_id', 'poller_group')->get();
 
         if (\config('queue.default') == 'sync') {
@@ -93,7 +93,7 @@ class DevicePoll extends LnmsCommand
         }
 
         foreach ($devices as $device) {
-            PollDevice::dispatch($device->device_id, $module_overrides, $this->getOutput()->getVerbosity())->onQueue('poller-' . $device->poller_group);
+            PollDevice::dispatch($device->device_id, $modules, $this->getOutput()->getVerbosity())->onQueue('poller-' . $device->poller_group);
         }
 
         $this->line('Submitted work for ' . $devices->count() . ' devices');
