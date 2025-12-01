@@ -27,8 +27,8 @@ class DispatchPollJobs implements ShouldQueue
     public function __construct(
         public int $verbosity = -1,
         public int $lock_time = 30,
-        public bool|null $enabled = null,
-        public int|null $find_time = null,
+        public ?bool $enabled = null,
+        public ?int $find_time = null,
     ) {
         $this->find_time ??= Config::get('service_poller_frequency', Config::get('rrd.step', 300)) - 1;
         $this->enabled ??= Config::get('schedule_type.poller') == 'scheduler';

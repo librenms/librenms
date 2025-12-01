@@ -33,7 +33,7 @@ class PollDevice implements ShouldQueue, ShouldBeUnique
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public int $uniqueFor = 3600
+    public int $uniqueFor = 3600;
     private ?Device $device = null;
     private ?array $deviceArray = null;
     /**
