@@ -56,7 +56,7 @@ class DispatchPollJobs implements ShouldQueue
         $devices = DB::table('devices')
             ->select(['device_id', 'poller_group'])
             ->where('disabled', 0)
-            ->where(function (Builder $query) {
+            ->where(function (Builder $query): void {
                 $query->whereNull('last_polled')
                     ->orWhereRaw('`last_polled` <= DATE_ADD(DATE_ADD(NOW(), INTERVAL -? SECOND), INTERVAL COALESCE(`last_polled_timetaken`, 0) SECOND)', [$this->find_time]);
             })
@@ -68,7 +68,8 @@ class DispatchPollJobs implements ShouldQueue
             $lock = Cache::lock('device:poll:' . $device->device_id, $this->lock_time);
             if ($lock->get()) {
                 Log::debug('Submitted work for device ID ' . $device->device_id . ' to queue poller-' . $device->poller_group);
-                PollDevice::dispatch($device->device_id, verbosity: $this->verbosity)->onQueue('poller-' . $device->poller_group);
+                $modules = new ModuleList;
+                PollDevice::dispatch($device->device_id, $modules, $this->verbosity)->onQueue('poller-' . $device->poller_group);
             } else {
                 Log::warning('Device ID ' . $device->device_id . ' needs to wait more time before it can be queued again');
             }
