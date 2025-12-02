@@ -59,7 +59,7 @@ class LocationController extends TableController
      */
     public function baseQuery($request)
     {
-       return Location::hasAccess($request->user())->withCount([
+        return Location::hasAccess($request->user())->withCount([
             'devices',
             'devices as down_count' => fn ($q) => (new Device)->scopeIsDown($q),
         ]);
@@ -77,6 +77,7 @@ class LocationController extends TableController
             'lat' => $location->lat,
             'lng' => $location->lng,
             'devices' => $location->devices_count,
+            /** @phpstan-ignore property.notFound (dynamic property from withCount) */
             'down' => $location->down_count,
         ];
     }
