@@ -168,7 +168,7 @@ class Graph
             throw new RrdGraphException('Graph Definition Error', 'Def Error', $width, $height);
         }
 
-        array_push($rrd_options, ...$graph_params->toRrdOptions());
+        $rrd_options = [...$graph_params->toRrdOptions(), ...$rrd_options];
 
         // Generating the graph!
         try {
