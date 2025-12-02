@@ -150,7 +150,7 @@ class Html
         $left_color = $colors['left'] ?? $default['left'];
         $right_color = $colors['right'] ?? $default['right'];
 
-        $height = $height / 2;
+        $height /= 2;
 
         $output = [];
         $output[] = '<div style="width:' . $width . 'px">';
