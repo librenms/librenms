@@ -159,7 +159,7 @@ class Html
         $output[] = '<div class="progress-bar" role="progressbar" aria-valuenow="' . $percent . '" aria-valuemin="0" aria-valuemax="100" style="width:' . $percent . '%; background-color: #' . $left_color . '; height:' . $height . 'px;"></div>';
 
         if ($shadow !== null) {
-            $shadow_width = min(($shadow - $percent), 100);
+            $shadow_width = min($shadow - $percent, 100);
             $middle_color = $colors['middle'] ?? $default['middle'];
             $output[] = '<div class="progress-bar" role="progressbar" aria-valuenow="' . $shadow_width . '" aria-valuemin="0" aria-valuemax="100" style="width:' . $shadow_width . '%; background-color: #' . $middle_color . '; height:' . $height . 'px;"></div>';
         }
