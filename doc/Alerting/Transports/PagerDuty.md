@@ -16,8 +16,9 @@ Service you have created in the PagerDuty portal.
 | Integration Key | somerandomstring |
 
 **Fixed LibreNMS -> PagerDuty field mappings**
+
 | LibreNMS | PagerDuty |
-| ------ | ------- |
+| -------- | --------- |
 | DeviceGroupName | payload.group |
 | DeviceType | payload.class |
 | Hostname | payload.source |
