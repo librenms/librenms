@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Config;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\ModuleList;
 
 class DispatchPollJobs implements ShouldQueue
 {
