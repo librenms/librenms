@@ -44,7 +44,7 @@ class LocationController extends TableController
 
     protected function sortFields($request)
     {
-        return ['location', 'devices', 'down'];
+        return ['location', 'devices'];
     }
 
     /**
