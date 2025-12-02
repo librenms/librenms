@@ -62,12 +62,12 @@ Sentinel provides high availability and automatic failover.
 Authentication can (and should) be enabled for both Sentinel and Redis instances.
 
 ```dotenv
-REDIS_SENTINEL=redis-001.example.org:26379,redis-002.example.org:26379,redis-003.example.org:26379
-REDIS_SENTINEL_SERVICE=mymaster
+REDIS_SENTINEL=<Server List> # Comma separated with host:port format eg: redis-001.example.org:26379,redis-002.example.org:26379
+REDIS_SENTINEL_SERVICE=<Sentinel Instance Name>
 
 # If Sentinel authentication is enabled (recommended):
-REDIS_SENTINEL_PASSWORD=SentinelPasswordGoesHere
-REDIS_SENTINEL_USERNAME=SentinelUsernameGoesHere
+REDIS_SENTINEL_PASSWORD=<Sentinel Password>
+REDIS_SENTINEL_USERNAME=<Sentinel Username>
 ```
 
 ### Redis Security
@@ -92,18 +92,18 @@ Each node requires valid connection settings in `.env`.
 This file is generated after running Composer and setting both `APP_KEY` and `NODE_ID`.
 
 !!! warning
-    `APP_KEY` must be **identical** across all nodes.
+    `APP_KEY` must be **identical** across all nodes. You can generate one with `lnms key:generate --show`
 
     `NODE_ID` must be **unique** per node.
 
 ```dotenv
-APP_KEY=   # Required - same on all nodes
-NODE_ID=   # Required - unique per node
+APP_KEY=<Generated App Key>   # Required - same on all nodes
+NODE_ID=<Unique Node ID>      # Required - unique per node
 
-DB_HOST=localhost
+DB_HOST=<DB Server IP>
 DB_DATABASE=librenms
-DB_USERNAME=librenms
-DB_PASSWORD=
+DB_USERNAME=<DB Username>
+DB_PASSWORD=<DB Password>
 ```
 
 ---
