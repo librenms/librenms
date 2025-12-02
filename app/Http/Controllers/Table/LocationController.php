@@ -73,7 +73,7 @@ class LocationController extends TableController
     {
         return [
             'id' => $location->id,
-            'location' => htmlspecialchars((string) $location->location),
+            'location' => $location->location,
             'lat' => $location->lat,
             'lng' => $location->lng,
             'devices' => $location->devices_count,
