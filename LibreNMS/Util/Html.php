@@ -145,12 +145,10 @@ class Html
             $colors = Color::percentage($percent, $warn ?: null);
         }
         $default = Color::percentage(0);
-        $left_text_color = $colors['left_text'] ?? 'inherit';
-        $right_text_color = $colors['right_text'] ?? 'inherit';
+        $left_text_color = $colors['left_text'] ? "#".$colors['left_text'] : 'inherit';
+        $right_text_color = $colors['right_text'] ? "#".$colors['right_text'] : 'inherit';
         $left_color = $colors['left'] ?? $default['left'];
         $right_color = $colors['right'] ?? $default['right'];
-
-        $height /= 2;
 
         $output = [];
         $output[] = '<div style="width:' . $width . 'px">';
@@ -165,8 +163,8 @@ class Html
         }
         $output[] = '</div>';
         $output[] = '<div style="font-weight: lighter; margin-top: 4px;">
-            <span style="color:#' . $left_text_color . ';">' . $left_text . '</span>
-            <span style="color:#' . $right_text_color . '; float:right;">' . $right_text . '</span>
+            <span style="color:' . $left_text_color . ';">' . $left_text . '</span>
+            <span style="color:' . $right_text_color . '; float:right;">' . $right_text . '</span>
         </div>';
         $output[] = '</div>';
 
