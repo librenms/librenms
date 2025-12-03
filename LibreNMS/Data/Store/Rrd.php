@@ -601,14 +601,12 @@ class Rrd extends BaseDatastore
             if ($tmpname = tempnam('/tmp', 'LNMS_GRAPH')) {
                 // $rrd_options may contain quotes for shell processing.  Remove these when passing as arguments to rrd_graph()
                 if (! rrd_graph($tmpname, $options)) {
+                    unlink($tmpname);
                     throw new RrdGraphException(rrd_error());
                 }
 
-                $tmpfd = fopen($tmpname, 'rb');
+                $image = file_get_contents($tmpname);
                 unlink($tmpname);
-                $tmpstats = fstat($tmpfd);
-                $image = fread($tmpfd, $tmpstats['size']);
-                fclose($tmpfd);
 
                 return $image;
             }
