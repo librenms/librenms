@@ -194,7 +194,12 @@ if (!Bill::where('bill_id', $bill_id)->exists()) {
             <?php echo Number::formatSi($rate_95th, 2, 0, '') . 'bps' ?> of <?php echo Number::formatSi($cdr, 2, 0, '') . 'bps (' . $percent . '%)' ?> (95th%ile)
         </td>
         <td style="width: 210px;">
-            <?php echo print_percentage_bar(200, 10, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']) ?>
+            <?php echo \LibreNMS\Util\Html::percentageBar(200, 10, $percent, null, $percent . '%', null, null, [
+                'left' => $background['left'],
+                'left_text' => null,
+                'right' => $background['right'],
+                'right_text' => null,
+            ]); ?>
         </td>
         </tr>
         <tr>
