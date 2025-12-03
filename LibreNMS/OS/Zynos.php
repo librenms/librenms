@@ -83,7 +83,7 @@ class Zynos extends Zyxel implements OSDiscovery, FdbTableDiscovery
 
                 // We'll assume that 1st element is vlan, and last 6 are mac. This will remove the '6' in between them and be safe in case they
                 // fix the Q-BRIDGE implementation
-                $indexes = explode('.', $index);
+                $indexes = explode('.', (string) $index);
                 $lastSix = array_slice($indexes, -6); // Extract the last 6 elements from the array
                 $hexParts = array_map(fn ($i) => dechex((int) $i), $lastSix); // Convert each element to hexadecimal
                 $mac_address = implode(':', $hexParts); // Join them into a MAC address string
