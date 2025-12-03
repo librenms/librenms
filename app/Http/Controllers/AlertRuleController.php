@@ -2,16 +2,147 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use App\Http\Requests\AlertRuleRequest;
 use App\Models\AlertRule;
+use App\Models\AlertTemplate;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
+use LibreNMS\Alerting\QueryBuilderFilter;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Util\Time;
 
 class AlertRuleController extends Controller
 {
+    public function create(Request $request): View
+    {
+        $device_id = (int) $request->query('device_id', -1);
+        $deviceName = DeviceCache::get($device_id)->displayName();
+        $filters = json_encode(new QueryBuilderFilter('alert'));
+        $defaults = [
+            'default_severity' => LibrenmsConfig::get('alert_rule.severity'),
+            'default_max_alerts' => LibrenmsConfig::get('alert_rule.max_alerts'),
+            'default_delay' => LibrenmsConfig::get('alert_rule.delay') . 'm',
+            'default_interval' => LibrenmsConfig::get('alert_rule.interval') . 'm',
+            'default_mute_alerts' => LibrenmsConfig::get('alert_rule.mute_alerts'),
+            'default_invert_rule_match' => LibrenmsConfig::get('alert_rule.invert_rule_match'),
+            'default_recovery_alerts' => LibrenmsConfig::get('alert_rule.recovery_alerts'),
+            'default_acknowledgement_alerts' => LibrenmsConfig::get('alert_rule.acknowledgement_alerts'),
+            'default_invert_map' => LibrenmsConfig::get('alert_rule.invert_map'),
+        ];
+
+        // Alert rule collection (from definitions json)
+        $collectionRules = [];
+        $rawCollection = AlertRuleTemplateController::templatesCollection();
+        $tmpId = 0;
+        foreach ($rawCollection as $rule) {
+            try {
+                $sql = QueryBuilderParser::fromJson($rule['builder'] ?? [])->toSql(false);
+            } catch (\Throwable) {
+                $sql = '';
+            }
+            $collectionRules[] = [
+                'id' => $tmpId++,
+                'name' => $rule['name'] ?? ('Rule ' . $tmpId),
+                'sql' => $sql,
+            ];
+        }
+
+        // Existing DB rules for import
+        $dbRules = AlertRule::query()->orderBy('name')->get()->map(function (AlertRule $rule) {
+            $rule_display = '';
+            if (! empty($rule->extra['options']['override_query'])) {
+                $rule_display = 'Custom SQL Query';
+            } else {
+                try {
+                    $rule_display = QueryBuilderParser::fromJson($rule->builder)->toSql(false);
+                } catch (\Throwable) {
+                }
+            }
+
+            return [
+                'id' => $rule->id,
+                'name' => $rule->name,
+                'severity' => $rule->severity,
+                'display' => $rule_display,
+            ];
+        })->all();
+
+        return view('alerts.rules.create', array_merge([
+            'device_id' => $device_id,
+            'deviceName' => $deviceName,
+            'filters' => $filters,
+            'collectionRules' => $collectionRules,
+            'dbRules' => $dbRules,
+            'templates' => AlertTemplate::query()->orderBy('name')->get(['id', 'name']),
+        ], $defaults));
+    }
+
+    public function edit(AlertRule $alertRule): View
+    {
+        $filters = json_encode(new QueryBuilderFilter('alert'));
+        $defaults = [
+            'default_severity' => LibrenmsConfig::get('alert_rule.severity'),
+            'default_max_alerts' => LibrenmsConfig::get('alert_rule.max_alerts'),
+            'default_delay' => LibrenmsConfig::get('alert_rule.delay') . 'm',
+            'default_interval' => LibrenmsConfig::get('alert_rule.interval') . 'm',
+            'default_mute_alerts' => LibrenmsConfig::get('alert_rule.mute_alerts'),
+            'default_invert_rule_match' => LibrenmsConfig::get('alert_rule.invert_rule_match'),
+            'default_recovery_alerts' => LibrenmsConfig::get('alert_rule.recovery_alerts'),
+            'default_acknowledgement_alerts' => LibrenmsConfig::get('alert_rule.acknowledgement_alerts'),
+            'default_invert_map' => LibrenmsConfig::get('alert_rule.invert_map'),
+        ];
+
+        // Alert rule collection (from definitions json)
+        $collectionRules = [];
+        $rawCollection = AlertRuleTemplateController::templatesCollection();
+        $tmpId = 0;
+        foreach ($rawCollection as $rule) {
+            try {
+                $sql = QueryBuilderParser::fromJson($rule['builder'] ?? [])->toSql(false);
+            } catch (\Throwable) {
+                $sql = '';
+            }
+            $collectionRules[] = [
+                'id' => $tmpId++,
+                'name' => $rule['name'] ?? ('Rule ' . $tmpId),
+                'sql' => $sql,
+            ];
+        }
+
+        // Existing DB rules for import
+        $dbRules = AlertRule::query()->orderBy('name')->get()->map(function (AlertRule $rule) {
+            $rule_display = '';
+            if (! empty($rule->extra['options']['override_query'])) {
+                $rule_display = 'Custom SQL Query';
+            } else {
+                try {
+                    $rule_display = QueryBuilderParser::fromJson($rule->builder)->toSql(false);
+                } catch (\Throwable) {
+                }
+            }
+
+            return [
+                'id' => $rule->id,
+                'name' => $rule->name,
+                'severity' => $rule->severity,
+                'display' => $rule_display,
+            ];
+        })->all();
+
+        return view('alerts.rules.edit', array_merge([
+            'alertRule' => $alertRule,
+            'filters' => $filters,
+            'collectionRules' => $collectionRules,
+            'dbRules' => $dbRules,
+            'templates' => AlertTemplate::query()->orderBy('name')->get(['id', 'name']),
+        ], $defaults));
+    }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -24,6 +155,7 @@ class AlertRuleController extends Controller
 
             $this->syncMaps($request->input('maps', []), $alertRule);
             $this->syncTransports($request->input('transports', []), $alertRule);
+            $this->syncTemplates((int) $request->input('template_id'), $request->input('template_transports', []), $alertRule);
 
             return response()->json([
                 'status' => 'ok',
@@ -81,6 +213,7 @@ class AlertRuleController extends Controller
 
             $this->syncMaps($request->input('maps', []), $alertRule);
             $this->syncTransports($request->input('transports', []), $alertRule);
+            $this->syncTemplates((int) $request->input('template_id'), $request->input('template_transports', []), $alertRule);
 
             return response()->json([
                 'status' => 'ok',
@@ -237,5 +370,38 @@ class AlertRuleController extends Controller
 
         $alertRule->transportSingles()->syncWithPivotValues($transportIds, ['target_type' => 'single']);
         $alertRule->transportGroups()->syncWithPivotValues($transportGroupIds, ['target_type' => 'group']);
+    }
+
+    private function syncTemplates(?int $globalTemplateId, array $perTransportTemplates, AlertRule $alertRule): void
+    {
+        // Clear existing mappings for this rule
+        DB::table('alert_template_map')->where('alert_rule_id', $alertRule->id)->delete();
+
+        // Insert global template mapping (applies to all transports)
+        if (! empty($globalTemplateId)) {
+            DB::table('alert_template_map')->insert([
+                'alert_templates_id' => $globalTemplateId,
+                'alert_rule_id' => $alertRule->id,
+                'transport_id' => null,
+            ]);
+        }
+
+        // Insert per-transport mappings (only for single transports)
+        foreach ($perTransportTemplates as $key => $templateId) {
+            if (empty($templateId)) {
+                continue;
+            }
+
+            // Only accept numeric transport ids (ignore transport groups like g123)
+            if (! is_numeric($key)) {
+                continue;
+            }
+
+            DB::table('alert_template_map')->insert([
+                'alert_templates_id' => (int) $templateId,
+                'alert_rule_id' => $alertRule->id,
+                'transport_id' => (int) $key,
+            ]);
+        }
     }
 }
