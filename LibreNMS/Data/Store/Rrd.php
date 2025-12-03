@@ -666,7 +666,7 @@ class Rrd extends BaseDatastore
     }
 
     /**
-     * Returns a generated graph from $options using the php-rrd module
+     * Returns a generated graph from $options using the php-rrd module if available, otherwise it will run rrdtool
      *
      * @param  array  $options
      * @param  array|null  $env
