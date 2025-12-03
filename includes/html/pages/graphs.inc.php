@@ -63,20 +63,23 @@ if (! $auth) {
     echo $title;
 
     // FIXME allow switching between types for sensor and wireless also restrict types to ones that have data
-    if ($type != 'sensor' && ! empty($device)) {
-        echo '<div style="float: right;"><form action="">';
-        echo csrf_field();
-        echo "<select name='type' id='type' onchange=\"window.open(this.options[this.selectedIndex].value,'_top')\" class='devices-graphs-select'>";
+    if (! in_array($type, ['sensor', 'wireless'])) {
+        $graph_subtypes = get_graph_subtypes($type);
+        if (count($graph_subtypes) > 1) {
+            echo '<div style="float: right;"><form action="">';
+            echo csrf_field();
+            echo "<select name='type' id='type' onchange=\"window.open(this.options[this.selectedIndex].value,'_top')\" class='devices-graphs-select'>";
 
-        foreach (get_graph_subtypes($type, $device) as $avail_type) {
-            echo "<option value='" . \LibreNMS\Util\Url::generate($vars, ['type' => $type . '_' . $avail_type, 'page' => 'graphs']) . "'";
-            if ($avail_type == $subtype) {
-                echo ' selected';
+            foreach ($graph_subtypes as $avail_type) {
+                echo "<option value='" . \LibreNMS\Util\Url::generate($vars, ['type' => $type . '_' . $avail_type, 'page' => 'graphs']) . "'";
+                if ($avail_type == $subtype) {
+                    echo ' selected';
+                }
+                $display_type = \LibreNMS\Util\StringHelpers::niceCase($avail_type);
+                echo ">$display_type</option>";
             }
-            $display_type = \LibreNMS\Util\StringHelpers::niceCase($avail_type);
-            echo ">$display_type</option>";
+            echo '</select></form></div>';
         }
-        echo '</select></form></div>';
     }
 
     print_optionbar_end();

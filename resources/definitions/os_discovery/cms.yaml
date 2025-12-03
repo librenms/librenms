@@ -4,7 +4,7 @@ modules:
             data:
                 -
                     oid: CORERO-CMS-SYSTEM-STATUS-MIB::protection
-                    num_oid: '.1.3.6.1.4.1.41036.4.1.6.1.0'
+                    num_oid: '.1.3.6.1.4.1.41036.4.1.6.1.{{ $index }}'
                     descr: Protection Status
                     group: System Status
                     states:
@@ -13,7 +13,7 @@ modules:
                         - { value: 2, descr: Error, graph: 0, generic: 2 }
                 -
                     oid: CORERO-CMS-SYSTEM-STATUS-MIB::analytics
-                    num_oid: '.1.3.6.1.4.1.41036.4.1.6.5.0'
+                    num_oid: '.1.3.6.1.4.1.41036.4.1.6.5.{{ $index }}'
                     descr: Analytics Status
                     group: System Status
                     states:

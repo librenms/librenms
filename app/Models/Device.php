@@ -694,6 +694,8 @@ class Device extends BaseModel
             return $query;
         } elseif ($deviceSpec == 'all') {
             return $query;
+        } elseif ($deviceSpec == 'new') {
+            return $query->whereNull('last_discovered');
         } elseif ($deviceSpec == 'even') {
             return $query->whereRaw('device_id % 2 = 0');
         } elseif ($deviceSpec == 'odd') {
@@ -1176,6 +1178,14 @@ class Device extends BaseModel
     public function services(): HasMany
     {
         return $this->hasMany(Service::class, 'device_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\DeviceStats, $this>
+     */
+    public function stats(): HasOne
+    {
+        return $this->hasOne(DeviceStats::class, 'device_id');
     }
 
     /**

@@ -34,7 +34,7 @@ modules:
             -
                 oid: FS-MIB::cpuCurrentUti
                 value: FS-MIB::cpuCurrentUti
-                num_oid: '..1.3.6.1.4.1.52642.2.1.45.1.39.2.1.{{ $index }}'
+                num_oid: '.1.3.6.1.4.1.52642.2.1.45.1.39.2.1.{{ $index }}'
                 descr: 'Processor'
     sensors:
         additional_oids:
@@ -143,7 +143,7 @@ modules:
                         - { value: 6, generic: 2, descr: unrecoverable, graph: 0 }
                 -
                     oid: FS-MIB::swPowerStatus
-                    num_oid: '.1.3.6.1.4.1.52642.2.1.45.1.1.3.1.8.1'
+                    num_oid: '.1.3.6.1.4.1.52642.2.1.45.1.1.3.1.8.{{ $index }}'
                     descr: 'Power status'
                     state_name: FS-MIB::swPowerStatus
                     states:

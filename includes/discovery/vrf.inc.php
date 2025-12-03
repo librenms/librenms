@@ -145,6 +145,12 @@ if (LibrenmsConfig::get('enable_vrfs')) {
                 if (isset($port_table[$vrf_oid])) {
                     foreach ($port_table[$vrf_oid] as $if_id) {
                         $interface = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $if_id]);
+                        if (! $interface) {
+                            echo "Interface $if_id not found for $vrf_name\n";
+
+                            continue;
+                        }
+
                         echo Rewrite::shortenIfName($interface['ifDescr']) . ' ';
                         dbUpdate(['ifVrf' => $vrf_id], 'ports', 'port_id=?', [$interface['port_id']]);
                         $if = $interface['port_id'];

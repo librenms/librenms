@@ -17,6 +17,7 @@ use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
+use App\Models\Port;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Device\YamlDiscovery;
@@ -32,7 +33,7 @@ use LibreNMS\Util\UserFuncHelper;
  * @param  string  $hostname
  * @param  array  $device
  * @param  string  $method  name of process discoverying this device
- * @param  array|null  $interface  Interface this device was discovered on
+ * @param  array|Port|null  $interface  Interface this device was discovered on
  * @return false|int
  *
  * @throws InvalidIpException
@@ -102,7 +103,9 @@ function discover_new_device($hostname, $device, $method, $interface = null)
         if ($result) {
             echo '+[' . $remote_device->hostname . '(' . $remote_device->device_id . ')]';
 
-            $extra_log = is_array($interface) ? ' (port ' . cleanPort($interface)['label'] . ') ' : '';
+            $extra_log = is_array($interface)
+                ? ' (port ' . cleanPort($interface)['label'] . ') '
+                : ($interface instanceof Port ? ' (port ' . $interface->getLabel() . ') ' : '');
             Eventlog::log('Device ' . $remote_device->hostname . " ($ip) $extra_log autodiscovered through $method on " . $device['hostname'], $device['device_id'], 'discovery', Severity::Ok);
 
             return $remote_device->device_id;

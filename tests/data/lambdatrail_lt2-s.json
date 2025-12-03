@@ -2427,5 +2427,99 @@
             ]
         },
         "poller": "matches discovery"
+    },
+    "hr-device": {
+        "discovery": {
+            "hrDevice": [
+                {
+                    "hrDeviceIndex": 768,
+                    "hrDeviceDescr": "",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": 6
+                },
+                {
+                    "hrDeviceIndex": 1025,
+                    "hrDeviceDescr": "network interface lo",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1026,
+                    "hrDeviceDescr": "network interface bond0",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "down",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1027,
+                    "hrDeviceDescr": "network interface eth0",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1028,
+                    "hrDeviceDescr": "network interface sit0",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "down",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1029,
+                    "hrDeviceDescr": "network interface lan1",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1030,
+                    "hrDeviceDescr": "network interface lan2",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1031,
+                    "hrDeviceDescr": "network interface lan3",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "down",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1034,
+                    "hrDeviceDescr": "network interface br0",
+                    "hrDeviceType": "hrDeviceNetwork",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 1280,
+                    "hrDeviceDescr": "such file or directory",
+                    "hrDeviceType": "hrDevicePrinter",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 3072,
+                    "hrDeviceDescr": "Guessing that there's a floating point co-processor",
+                    "hrDeviceType": "hrDeviceCoprocessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                }
+            ]
+        }
     }
 }

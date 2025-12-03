@@ -86,7 +86,7 @@ if ($device['os'] == 'netscaler') {
                 if (is_numeric($vsvr[$oid])) {
                     $fields[$oid_ds] = $vsvr[$oid];
                 } else {
-                    $fields[$oid_ds] = 'U';
+                    $fields[$oid_ds] = null;
                 }
             }
 

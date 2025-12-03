@@ -114,7 +114,7 @@ if ((isset($options['l'])) || (
 $data = $json['data'];
 $metrics = data_flatten($data);
 $metrics_keys = array_keys($metrics);
-usort($metrics_keys, 'strcasecmp'); //orders them in the manner in which the test script compares them
+usort($metrics_keys, strcasecmp(...)); //orders them in the manner in which the test script compares them
 //print metrics if needed
 if (isset($options['m'])) {
     if (isset($options['k'])) {

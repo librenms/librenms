@@ -111,7 +111,7 @@ $lineplot_in->SetColor('darkgreen');
 $lineplot_in->SetFillColor('lightgreen@0.4');
 $lineplot_in->SetWeight(1);
 
-$lineplot_out = new LinePlot(array_map('InvertCallback', $graph_data['out_data']), $graph_data['ticks']);
+$lineplot_out = new LinePlot(array_map(InvertCallback(...), $graph_data['out_data']), $graph_data['ticks']);
 $lineplot_out->SetLegend('Traffic Out');
 $lineplot_out->SetColor('darkblue');
 $lineplot_out->SetFillColor('lightblue@0.4');

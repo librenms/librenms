@@ -32,7 +32,7 @@ if (in_array(explode('-', (string) $device['hardware'], 2)[0], ['GS1900'])) {
         // fix the Q-BRIDGE implementation
         $indexes = explode('.', (string) $index);
         $vlan = $indexes[0]; //1st element
-        $mac_address = Mac::parse((string) implode(':', array_map('dechex', array_splice($indexes, -6, 6))))->hex(); //last 6 elements
+        $mac_address = Mac::parse((string) implode(':', array_map(dechex(...), array_splice($indexes, -6, 6))))->hex(); //last 6 elements
 
         $port_id = PortCache::getIdFromIfIndex($port_data['Q-BRIDGE-MIB::dot1qTpFdbPort'], $device['device_id']);
 
