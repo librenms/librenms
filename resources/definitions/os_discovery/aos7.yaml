@@ -18,8 +18,11 @@ modules:
         data:
             -
                 oid: healthModuleCpu1MinAvg
-                num_oid: '.1.3.6.1.4.1.6486.801.1.2.1.16.1.1.1.1.1.11.0'  # force to CMM oid
+                num_oid: '.1.3.6.1.4.1.6486.801.1.2.1.16.1.1.1.1.1.11.{{ $index }}'
                 index: 0
+                # force to CMM oid
+                skip_values:
+                    - {'oid': 'index', 'op': '!=', 'value': '0'}
     sensors:
         additional_oids:
             data:

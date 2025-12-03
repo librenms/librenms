@@ -3172,7 +3172,7 @@ function validate_column_list(?string $columns, string $table, array $default = 
 
     $column_names = is_array($columns) ? $columns : explode(',', $columns);
     $valid_columns = $schema->getColumns($table);
-    $invalid_columns = array_diff(array_map('trim', $column_names), $valid_columns);
+    $invalid_columns = array_diff(array_map(trim(...), $column_names), $valid_columns);
 
     if (count($invalid_columns) > 0) {
         throw new InvalidTableColumnException($invalid_columns);

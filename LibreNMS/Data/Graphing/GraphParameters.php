@@ -192,7 +192,7 @@ class GraphParameters implements \Stringable
 
         if ($this->visible('title')) {
             // remove single quotes, because we can't drop out of the string if this is sent to rrdtool stdin
-            $options[] = '--title=' . escapeshellarg(str_replace("'", '', $this->getTitle()));
+            $options[] = '--title=' . str_replace("'", '', $this->getTitle());
         }
 
         return $options;

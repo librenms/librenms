@@ -168,7 +168,7 @@ class Mac implements \Stringable
      */
     public function oid(): string
     {
-        return implode('.', array_map('hexdec', $this->mac));
+        return implode('.', array_map(hexdec(...), $this->mac));
     }
 
     /**

@@ -30,6 +30,7 @@ class StoragesController extends TableController
     {
         return [
             'hostname',
+            'display',
             'storage_descr',
         ];
     }

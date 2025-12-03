@@ -33,8 +33,10 @@ class RolesSeeder extends Seeder
 {
     public function run(): void
     {
-        Role::findOrCreate('admin');
-        Role::findOrCreate('global-read');
-        Role::findOrCreate('user');
+        if (Role::query()->count() === 0) {
+            Role::findOrCreate('admin');
+            Role::findOrCreate('global-read');
+            Role::findOrCreate('user');
+        }
     }
 }

@@ -108,7 +108,7 @@ class IRCBot
         $this->server = $this->config['irc_host'];
         if ($this->config['irc_port'][0] == '+') {
             $this->ssl = true;
-            $this->port = substr($this->config['irc_port'], 1);
+            $this->port = substr((string) $this->config['irc_port'], 1);
         } else {
             $this->port = $this->config['irc_port'];
         }
@@ -118,8 +118,8 @@ class IRCBot
         }
 
         if ($this->config['irc_alert_chan']) {
-            if (strstr($this->config['irc_alert_chan'], ',')) {
-                $this->config['irc_alert_chan'] = explode(',', $this->config['irc_alert_chan']);
+            if (strstr((string) $this->config['irc_alert_chan'], ',')) {
+                $this->config['irc_alert_chan'] = explode(',', (string) $this->config['irc_alert_chan']);
             } elseif (! is_array($this->config['irc_alert_chan'])) {
                 $this->config['irc_alert_chan'] = [$this->config['irc_alert_chan']];
             }

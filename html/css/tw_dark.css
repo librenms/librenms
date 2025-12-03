@@ -6,10 +6,6 @@
     color: #bfc0c0
 }
 
-.dark a {
-    background-color: transparent
-}
-
 .dark mark {
     color: #000
 }
@@ -441,7 +437,6 @@
 
 .dark .btn {
     color: #fff;
-    border-color: rgba(0, 0, 0, 0.6);
 }
 
 .dark .btn-default {

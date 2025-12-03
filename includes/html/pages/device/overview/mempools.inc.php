@@ -10,10 +10,6 @@ $graph_type = 'mempool_usage';
 
 $mempools = \DeviceCache::getPrimary()->mempools;
 
-function print_mempool_percent_bar($mempool)
-{
-}
-
 if ($mempools->isNotEmpty()) {
     $mempools_url = url('device') . '/device=' . DeviceCache::getPrimary()->device_id . '/tab=health/metric=mempool/';
     echo '

@@ -28,6 +28,7 @@ class ProcessorsController extends TableController
     {
         return [
             'hostname',
+            'display',
             'processor_descr',
         ];
     }
