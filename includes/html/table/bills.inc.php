@@ -145,7 +145,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
 
     $bill_name = "<a href='$url'><span class='tw:font-bold tw:text-blue-900 tw:visited:textc-blue-900 tw:dark:text-dark-white-100 tw:dark:visited:text-dark-white-100'>" . htmlentities((string) $bill['bill_name']) . '</span></a><br />' .
                     date('Y-m-d', strtotime((string) $datefrom)) . ' to ' . date('Y-m-d', strtotime((string) $dateto));
-    $bar = print_percentage_bar(250, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']);
+    $bar = print_percentage_bar(250, 10, $percent, null, null, $background['left'], $percent . '%', null, $background['right']);
     $actions = '';
 
     if (! $prev && Auth::user()->hasGlobalAdmin()) {

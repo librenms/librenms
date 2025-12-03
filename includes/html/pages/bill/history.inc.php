@@ -114,7 +114,7 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
                 <td>$total_data</td>
                 <td>$rate_95th</td>
                 <td style=\"text-align: center;\">$overuse</td>
-                <td width=\"250\">" . print_percentage_bar(250, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']) . '</td>
+                <td width=\"250\">" . print_percentage_bar(250, 10, $percent, null, null, $background['left'], $percent . '%', null, $background['right']) . '</td>
                 <td>
                     <a href="' . $url . '"><i class="fa fa-bar-chart fa-lg icon-theme" aria-hidden="true" title="Show details"></i></a>
                 </td>

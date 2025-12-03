@@ -80,9 +80,11 @@ class StoragesController extends TableController
 
     private function usageBar(Storage $storage, array $graph_array): string
     {
-        $left_text = Number::formatBi($storage->storage_used) . ' / ' . Number::formatBi($storage->storage_size);
-        $right_text = Number::formatBi($storage->storage_free);
-        $bar = Html::percentageBar(400, 20, $storage->storage_perc, $left_text, $right_text, $storage->storage_perc_warn);
+        $storage_size = Number::formatBi($storage->storage_size);
+        $left_text = Number::formatBi($storage->storage_used) . ' / ' . $storage_size;
+        $storage_free = Number::formatBi($storage->storage_free);
+        $right_text = $storage_free !== $storage_size ? $storage_free : null;
+        $bar = Html::percentageBar(400, 10, $storage->storage_perc, $left_text, $right_text, $storage->storage_perc_warn);
 
         return Url::graphPopup($graph_array, $bar);
     }

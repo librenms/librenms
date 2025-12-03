@@ -49,7 +49,7 @@ foreach ($supplies as $type => $supply) {
             echo '<tr>
             <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $toner['supply_descr'], $overlib_content) . '</td>
             <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</td>
-            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']), $overlib_content) . '
+            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, print_percentage_bar(200, 10, $percent, null, null, $background['left'], $percent . '%', null, $background['right']), $overlib_content) . '
            </a></td>
          </tr>';
         }//end foreach

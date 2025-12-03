@@ -84,7 +84,7 @@ function showPercent($per)
     $background = \LibreNMS\Util\Color::percentage($per, null);
     $right_background = $background['right'];
     $left_background = $background['left'];
-    $res = print_percentage_bar(200, 20, $per, null, 'ffffff', $left_background, $per . '%', 'ffffff', $right_background);
+    $res = print_percentage_bar(200, 10, $per, null, null, $left_background, $per . '%', null, $right_background);
 
     return $res;
 }//end showPercent()
