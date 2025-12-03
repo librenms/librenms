@@ -99,8 +99,8 @@ if (count($processors)) {
 
             echo '
               <tr>
-                <td class="col-md-6">' . \LibreNMS\Util\Url::overlibLink($link, 'x' . $values['count'] . ' ' . $values['descr'], $overlib_content) . '</td>
-                <td class="col-md-6">' . \LibreNMS\Util\Url::overlibLink($link, print_percentage_bar(400, 10, $percent_usage, null, null, $background['left'], $percent_usage . '%', null, $background['right']), $overlib_content) . '</td>
+                <td class="col-md-8">' . \LibreNMS\Util\Url::overlibLink($link, 'x' . $values['count'] . ' ' . $values['descr'], $overlib_content) . '</td>
+                <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, print_percentage_bar(400, 10, $percent_usage, null, null, $background['left'], $percent_usage . '%', null, $background['right']), $overlib_content) . '</td>
               </tr>';
         }
     }
