@@ -585,7 +585,7 @@ class Rrd extends BaseDatastore
     }
 
     /**
-     * Generates a graph file at $graph_file using $options
+     * Returns a generated graph from $options using the rrdtool command
      * Graphs are a single command per run, so this just runs rrdtool
      *
      * @param  array  $options
@@ -594,24 +594,8 @@ class Rrd extends BaseDatastore
      *
      * @throws RrdGraphException
      */
-    public function graph(array $options, ?array $env = null): string
+    private function graphRrdtool(array $options, ?array $env = null): string
     {
-        // Use php-rrd if it is installed
-        if (function_exists('rrd_graph')) {
-            if ($tmpname = tempnam('/tmp', 'LNMS_GRAPH')) {
-                // $rrd_options may contain quotes for shell processing.  Remove these when passing as arguments to rrd_graph()
-                if (! rrd_graph($tmpname, $options)) {
-                    unlink($tmpname);
-                    throw new RrdGraphException(rrd_error());
-                }
-
-                $image = file_get_contents($tmpname);
-                unlink($tmpname);
-
-                return $image;
-            }
-        }
-
         $process = new Process([$this->rrdtool_executable, '-'], $this->rrd_dir, $env);
         $process->setTimeout(300);
         $process->setIdleTimeout(300);
@@ -651,6 +635,53 @@ class Rrd extends BaseDatastore
         // only error text was returned
         $error = trim($process->getOutput() . PHP_EOL . $process->getErrorOutput());
         throw new RrdGraphException($error, null, null, null, $process->getExitCode());
+    }
+
+    /**
+     * Returns a generated graph from $options using the php-rrd module
+     *
+     * @param  array  $options
+     * @param  array|null  $env
+     * @return string
+     *
+     * @throws RrdGraphException
+     */
+    private function graphPhprrd(array $options, ?array $env = null): string
+    {
+        if ($tmpname = tempnam('/tmp', 'LNMS_GRAPH')) {
+            // $rrd_options may contain quotes for shell processing.  Remove these when passing as arguments to rrd_graph()
+            if (! rrd_graph($tmpname, $options)) {
+                unlink($tmpname);
+                throw new RrdGraphException(rrd_error());
+            }
+
+            $image = file_get_contents($tmpname);
+            unlink($tmpname);
+
+            return $image;
+        }
+
+        // fall back to using rrdtool if we fail to create a temporary file
+        return self::graphRrdtool($options, $env);
+    }
+
+    /**
+     * Returns a generated graph from $options using the php-rrd module
+     *
+     * @param  array  $options
+     * @param  array|null  $env
+     * @return string
+     *
+     * @throws RrdGraphException
+     */
+    public function graph(array $options, ?array $env = null): string
+    {
+        // Use php-rrd if it is installed
+        if (function_exists('rrd_graph')) {
+            return self::graphPhprrd($options, $env);
+        }
+
+        return self::graphRrdtool($options, $env);
     }
 
     /**
