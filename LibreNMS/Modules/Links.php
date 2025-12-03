@@ -291,7 +291,7 @@ class Links implements Module
                             'local_port_id' => $data['localPortId'],
                             'remote_hostname' => $remoteSysName,
                             'remote_device_id' => $remoteDeviceId,
-                            'remote_port_id' => $remotePortId ?? 0,
+                            'remote_port_id' => $remotePortId,
                             'active' => 1,
                             'protocol' => 'lldp' . $suffix,
                             'remote_port' => $remotePortName,

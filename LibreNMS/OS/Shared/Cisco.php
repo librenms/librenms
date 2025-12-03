@@ -1107,7 +1107,7 @@ class Cisco extends OS implements
         $remote_device_id = 0;
 
         foreach ($cdp_array as $key => $cdp_if_array) {
-            $interface = get_port_by_ifIndex($this->getDeviceId(), $key);
+            $interface = \App\Facades\PortCache::getByIfIndex($key, $this->getDeviceId());
 
             foreach ($cdp_if_array as $data) {
                 $data['cdpCacheDeviceId'] = StringHelpers::linksRemSysName($data['cdpCacheDeviceId'] ?? '');
