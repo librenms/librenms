@@ -77,8 +77,14 @@ class EntityPhysical implements Module
     public function dump(Device $device, string $type): ?array
     {
         return [
-            'entPhysical' => $device->entityPhysical()->orderBy('entPhysicalIndex')
+            'entPhysical' => $device->entityPhysical()
+                ->orderByColumns($this->getSortColumns('entPhysical'))
                 ->get()->map->makeHidden(['device_id', 'entPhysical_id']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return ['entPhysicalIndex'];
     }
 }

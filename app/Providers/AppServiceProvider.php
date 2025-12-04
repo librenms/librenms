@@ -7,6 +7,7 @@ use App\Guards\ApiTokenGuard;
 use App\Models\Sensor;
 use App\Models\User;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Blade;
@@ -66,6 +67,7 @@ class AppServiceProvider extends ServiceProvider
         $this->bootCustomValidators();
         $this->configureMorphAliases();
         $this->bootObservers();
+        $this->bootBuilderMacros();
         Version::registerAboutCommand();
 
         Password::defaults(function () {
@@ -258,6 +260,23 @@ class AppServiceProvider extends ServiceProvider
             }
 
             return null;
+        });
+    }
+
+    private function bootBuilderMacros(): void
+    {
+        /**
+         * Dynamically apply multiple orderBy clauses from an array of columns.
+         *
+         * @param  string[]  $columns  An array of column names (e.g., ['name', 'email'])
+         * @param  string  $direction  The default direction for all columns ('asc' or 'desc')
+         * @return \Illuminate\Database\Eloquent\Builder
+         */
+        Builder::macro('orderByColumns', function (array $columns, string $direction = 'asc') {
+            foreach ($columns as $column) {
+                   $this->orderBy($column, $direction);
+            }
+            return $this;
         });
     }
 }
