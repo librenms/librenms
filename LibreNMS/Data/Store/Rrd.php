@@ -648,7 +648,7 @@ class Rrd extends BaseDatastore
      */
     private function graphPhprrd(array $options, ?array $env = null): string
     {
-        if ($tmpname = tempnam('/tmp', 'LNMS_GRAPH')) {
+        if ($tmpname = tempnam(sys_get_temp_dir(), 'LNMS_GRAPH')) {
             // $rrd_options may contain quotes for shell processing.  Remove these when passing as arguments to rrd_graph()
             if (! rrd_graph($tmpname, $options)) {
                 unlink($tmpname);
