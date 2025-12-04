@@ -40,19 +40,29 @@ class Pagerduty extends Transport
             AlertState::ACKNOWLEDGED => 'acknowledge',
             default => 'trigger'
         };
+        $msg_raw = (string) $alert_data['msg'];
+        $decoded = json_decode($msg_raw, true);
 
-        $safe_message = strip_tags((string) $alert_data['msg']) ?: 'Test';
-        $message = array_filter(explode("\n", $safe_message), fn ($value): bool => strlen($value) > 0);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            // Valid JSON: use as-is for custom_details
+            $custom_details = $decoded;
+        } else {
+            // Legacy behaviour: strip tags and split into non-empty lines
+            $safe_message = strip_tags($msg_raw) ?: 'Test';
+            $message = array_filter(explode("\n", $safe_message), fn ($value): bool => strlen($value) > 0);
+            $custom_details = ['message' => $message];
+        }
         $data = [
             'routing_key' => $this->config['service_key'],
             'event_action' => $event_action,
             'dedup_key' => (string) $alert_data['alert_id'],
             'payload' => [
-                'custom_details' => ['message' => $message],
+                'custom_details' => $custom_details,
                 'group' => (string) \DeviceCache::get($alert_data['device_id'])->groups->pluck('name'),
                 'source' => $alert_data['hostname'],
                 'severity' => $alert_data['severity'],
                 'summary' => ($alert_data['title'] ?: $alert_data['name'] . ' on ' . $alert_data['hostname']),
+                'class' => $alert_data['type'],
             ],
         ];
 
@@ -69,7 +79,7 @@ class Pagerduty extends Transport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), implode(PHP_EOL, $message), $data);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), implode(PHP_EOL, $custom_details), $data);
     }
 
     public static function configTemplate(): array

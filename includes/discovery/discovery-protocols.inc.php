@@ -11,8 +11,8 @@ if ($device['os'] == 'ironware') {
     echo ' Brocade FDP: ';
     $fdp_array = SnmpQuery::hideMib()->walk('FOUNDRY-SN-SWITCH-GROUP-MIB::snFdpCacheEntry')->table(2);
 
-    foreach ($fdp_array as $key => $fdp_if_array) {
-        $interface = get_port_by_ifIndex($device['device_id'], $key);
+    foreach ($fdp_array as $ifIndex => $fdp_if_array) {
+        $interface = \App\Facades\PortCache::getByIfIndex($ifIndex, $device['device_id']);
         d_echo($fdp_if_array);
 
         foreach ($fdp_if_array as $fdp) {
@@ -28,7 +28,7 @@ if ($device['os'] == 'ironware') {
 
             $remote_port_id = find_port_id($fdp['snFdpCacheDevicePort'], '', $remote_device_id);
             discover_link(
-                $interface['port_id'],
+                $interface->port_id,
                 $fdp['snFdpCacheVendorId'],
                 $remote_port_id,
                 $fdp['snFdpCacheDeviceId'],
@@ -47,8 +47,8 @@ if (isset($device['os_group']) && $device['os_group'] == 'cisco') {
     echo ' CISCO-CDP-MIB: ';
     $cdp_array = SnmpQuery::hideMib()->walk('CISCO-CDP-MIB::cdpCache')->table(2);
 
-    foreach ($cdp_array as $key => $cdp_if_array) {
-        $interface = get_port_by_ifIndex($device['device_id'], $key);
+    foreach ($cdp_array as $ifIndex => $cdp_if_array) {
+        $interface = PortCache::getByIfIndex($ifIndex, $device['device_id']);
 
         foreach ($cdp_if_array as $cdp) {
             d_echo($cdp);
@@ -76,10 +76,10 @@ if (isset($device['os_group']) && $device['os_group'] == 'cisco') {
                 }
             }
 
-            if ($interface['port_id'] && $cdp['cdpCacheDeviceId'] && $cdp['cdpCacheDevicePort']) {
+            if ($interface?->port_id && $cdp['cdpCacheDeviceId'] && $cdp['cdpCacheDevicePort']) {
                 $remote_port_id = find_port_id($cdp['cdpCacheDevicePort'], '', $remote_device_id);
                 discover_link(
-                    $interface['port_id'],
+                    $interface->port_id,
                     'cdp',
                     $remote_port_id,
                     $cdp['cdpCacheDeviceId'],
@@ -153,7 +153,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
     foreach ($lldp_array as $lldp_array_inner) {
         foreach ($lldp_array_inner as $lldp) {
             d_echo($lldp);
-            $interface = get_port_by_ifIndex($device['device_id'], $lldp['lldpRemLocalPortNum'] ?? null);
+            $interface = PortCache::getByIfIndex($lldp['lldpRemLocalPortNum'] ?? null, $device['device_id']);
             $remote_device_id = find_device_id($lldp['lldpRemSysName'] ?? null);
 
             if (LibrenmsConfig::get('autodiscovery.xdp') && isset($lldp['lldpRemSysName']) && ! $remote_device_id &&
@@ -163,10 +163,10 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                 $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
             }
 
-            if (is_array($interface) && $interface['port_id'] && $lldp['lldpRemSysName'] && $lldp['lldpRemPortId']) {
+            if ($interface?->port_id && $lldp['lldpRemSysName'] && $lldp['lldpRemPortId']) {
                 $remote_port_id = find_port_id($lldp['lldpRemPortDesc'], $lldp['lldpRemPortId'], $remote_device_id);
                 discover_link(
-                    $interface['port_id'],
+                    $interface->port_id,
                     'lldp',
                     $remote_port_id,
                     $lldp['lldpRemSysName'],
@@ -187,7 +187,7 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
         foreach ($sub_lldp_1 as $ifIndex => $sub_lldp_2) {
             foreach ($sub_lldp_2 as $sub_lldp_3) {
                 foreach ($sub_lldp_3 as $lldp) {
-                    $interface = get_port_by_ifIndex($device['device_id'], $ifIndex);
+                    $interface = PortCache::getByIfIndex($ifIndex, $device['device_id']);
                     $remote_device_id = find_device_id($lldp['tmnxLldpRemSysName']);
 
                     if (! $remote_device_id &&
@@ -198,10 +198,10 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                         $remote_device_id = discover_new_device($lldp['tmnxLldpRemSysName'], $device, 'LLDP', $interface);
                     }
 
-                    if ($interface['port_id'] && $lldp['tmnxLldpRemSysName'] && $lldp['tmnxLldpRemPortId']) {
+                    if ($interface?->port_id && $lldp['tmnxLldpRemSysName'] && $lldp['tmnxLldpRemPortId']) {
                         $remote_port_id = find_port_id($lldp['tmnxLldpRemPortDesc'], $lldp['tmnxLldpRemPortId'], $remote_device_id);
                         discover_link(
-                            $interface['port_id'],
+                            $interface->port_id,
                             'lldp',
                             $remote_port_id,
                             $lldp['tmnxLldpRemSysName'],
@@ -229,11 +229,11 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                 continue;
             }
 
-            $interface = get_port_by_ifIndex($device['device_id'], $IndexId);
-            if (! $interface['port_id']) {
+            $interface = PortCache::getByIfIndex($IndexId, $device['device_id']);
+            if (empty($interface->port_id)) {
                 $local_ifName = $lldp['lldpNeighborPortId'][$IndexId][1];
                 $local_port_id = find_port_id('gigabitEthernet ' . $local_ifName, null, $device['device_id']);
-                $interface = get_port_by_id($local_port_id);
+                $interface = PortCache::get($local_port_id);
             }
 
             $remote_device_id = find_device_id($lldp['lldpNeighborDeviceName'][$IndexId][1]);
@@ -250,9 +250,9 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
                 $remote_device_id = discover_new_device($remote_device_name, $device, 'LLDP', $interface);
             }
 
-            if ($interface['port_id'] && $remote_device_name && $remote_port_descr) {
+            if ($interface?->port_id && $remote_device_name && $remote_port_descr) {
                 discover_link(
-                    $interface['port_id'], //our port id from database
+                    $interface->port_id, //our port id from database
                     'lldp',
                     $remote_port_id, //remote port id from database if applicable
                     $remote_device_name, //remote device name from SNMP walk

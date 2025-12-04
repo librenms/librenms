@@ -11,11 +11,6 @@ parameters:
 			path: LibreNMS/Data/Store/Rrd.php
 
 		-
-			message: "#^Right side of && is always true\\.$#"
-			count: 1
-			path: LibreNMS/Data/Store/Rrd.php
-
-		-
 			message: "#^Parameter \\#1 \\$model of static method LibreNMS\\\\Model\\:\\:onCreate\\(\\) expects static\\(LibreNMS\\\\Device\\\\Processor\\), LibreNMS\\\\Device\\\\Processor given\\.$#"
 			count: 1
 			path: LibreNMS/Device/Processor.php
