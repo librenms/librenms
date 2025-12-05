@@ -45,6 +45,6 @@ class DeviceMtuTest
         Log::debug('[MTU] ' . implode(' ', $cmd) . PHP_EOL);
 
         $fping = proc_open($cmd, [], $pipes);
-	return (proc_close($fping) == 0);
+        return (proc_close($fping) == 0);
     }
 }
