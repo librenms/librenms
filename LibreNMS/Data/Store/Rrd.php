@@ -648,7 +648,7 @@ class Rrd extends BaseDatastore
      */
     private function graphPhprrd(array $options, ?array $env = null): string
     {
-        $rrd = new \RRDGraph("-");
+        $rrd = new \RRDGraph('-');
         $rrd->setOptions($options);
         try {
             $data = $rrd->saveVerbose();
@@ -656,7 +656,7 @@ class Rrd extends BaseDatastore
             throw new RrdGraphException($e->getMessage());
         }
 
-        return $data["image"];
+        return $data['image'];
     }
 
     /**
