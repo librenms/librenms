@@ -50,7 +50,12 @@ class DeviceMtuTest
 
         Log::debug('[MTU] ' . implode(' ', $cmd) . PHP_EOL);
 
-        $fping = proc_open($cmd, [], $pipes);
+        $descriptorspec = array(
+            0 => array("file", "/dev/null", "r"),
+            1 => array("file", "/dev/null", "w"),
+            2 => array("file", "/dev/null", "w")
+        );
+        $fping = proc_open($cmd, $descriptorspec, $pipes);
 
         return proc_close($fping) == 0;
     }
