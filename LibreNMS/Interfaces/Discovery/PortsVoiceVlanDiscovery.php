@@ -26,7 +26,7 @@
 
 namespace LibreNMS\Interfaces\Discovery;
 
-use App\Models\PortSecurity;
+use App\Models\PortsVoiceVlan;
 use Illuminate\Support\Collection;
 
 interface PortsVoiceVlanDiscovery

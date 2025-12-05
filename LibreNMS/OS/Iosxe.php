@@ -43,8 +43,10 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Polling\IsIsPolling;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\PortSecurityPolling;
+use LibreNMS\Interfaces\Polling\PortsVoiceVlanPolling;
 use LibreNMS\OS\Traits\CiscoCellular;
 use LibreNMS\OS\Traits\CiscoPortSecurity;
+use LibreNMS\OS\Traits\PortsVoiceVlan;
 use LibreNMS\Util\IP;
 use SnmpQuery;
 
@@ -63,6 +65,7 @@ class Iosxe extends Ciscowlc implements
     use SyncsModels;
     use CiscoCellular;
     use CiscoPortSecurity;
+    use PortsVoiceVlan;
 
     /**
      * Array of shortened ISIS codes

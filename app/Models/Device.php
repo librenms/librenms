@@ -1125,7 +1125,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\PortSecurity, \App\Models\Port, $this>
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\PortsVoiceVlan, \App\Models\Port, $this>
      */
     public function portsVoiceVlan(): HasManyThrough
     {
