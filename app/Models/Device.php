@@ -1125,6 +1125,14 @@ class Device extends BaseModel
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough<\App\Models\PortSecurity, \App\Models\Port, $this>
+     */
+    public function portsVoiceVlan(): HasManyThrough
+    {
+        return $this->hasManyThrough(PortsVoiceVlan::class, Port::class, 'device_id', 'port_id');
+    }
+
+    /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Process, $this>
      */
     public function processes(): HasMany
