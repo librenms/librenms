@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->integer('port_id')->unsigned()->default(0)->unique();
             $table->integer('device_id')->unsigned()->default(0)->index();
-            $table->string('voice_vlan')->unsigned()->default(4096);
+            $table->integer('voice_vlan')->unsigned()->default(4096);
         });
     }
 
