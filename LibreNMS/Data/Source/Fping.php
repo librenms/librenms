@@ -36,7 +36,6 @@ class Fping
 {
     private readonly string $fping_bin;
     private readonly string|false $fping6_bin;
-    private readonly int $bytes;
     private readonly int $count;
     private readonly int $timeout;
     private readonly int $interval;
@@ -54,7 +53,6 @@ class Fping
         $this->timeout = max(LibrenmsConfig::get('fping_options.timeout', 500), $this->interval);
         $this->retries = LibrenmsConfig::get('fping_options.retries', 2);
         $this->tos = LibrenmsConfig::get('fping_options.tos', 0);
-        $this->bytes = LibrenmsConfig::get('fping_options.bytes', 64) - 8;
     }
 
     /**
@@ -83,8 +81,6 @@ class Fping
             $this->timeout,
             '-O',
             $this->tos,
-            '-b',
-            $this->bytes,
             $host,
         ]);
 
@@ -109,7 +105,6 @@ class Fping
             '-r', $this->retries,
             '-O', $this->tos,
             '-c', $this->count,
-            '-b', $this->bytes,
         ]]);
 
         // twice polling interval
