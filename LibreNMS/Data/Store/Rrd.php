@@ -648,21 +648,15 @@ class Rrd extends BaseDatastore
      */
     private function graphPhprrd(array $options, ?array $env = null): string
     {
-        if ($tmpname = tempnam(sys_get_temp_dir(), 'LNMS_GRAPH')) {
-            // $rrd_options may contain quotes for shell processing.  Remove these when passing as arguments to rrd_graph()
-            if (! rrd_graph($tmpname, $options)) {
-                unlink($tmpname);
-                throw new RrdGraphException(rrd_error());
-            }
-
-            $image = file_get_contents($tmpname);
-            unlink($tmpname);
-
-            return $image;
+        $rrd = new \RRDGraph("-");
+        $rrd->setOptions($options);
+        try {
+            $data = $rrd->saveVerbose();
+        } catch (\Exception $e) {
+            throw new RrdGraphException($e->getMessage());
         }
 
-        // fall back to using rrdtool if we fail to create a temporary file
-        return self::graphRrdtool($options, $env);
+        return $data["image"];
     }
 
     /**
