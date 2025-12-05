@@ -76,6 +76,7 @@ class LegacyModule implements Module
         }
 
         $device = &$os->getDeviceArray();
+        $module = $this->name;
         Debug::disableErrorReporting(); // ignore errors in legacy code
 
         include_once base_path('includes/dbFacile.php');

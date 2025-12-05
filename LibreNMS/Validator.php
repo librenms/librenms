@@ -35,12 +35,12 @@ use ReflectionException;
 
 class Validator
 {
-    /** @var array */
-    private $validation_groups = [];
-    /** @var array */
-    private $results = [];
-    /** @var string|null */
-    private $username;
+    /** @var array<string, ValidationGroup> */
+    private array $validation_groups = [];
+    /** @var array<string, ValidationResult[]> */
+    private array $results = [];
+
+    private ?string $username = null;
 
     /**
      * Validator constructor.
@@ -65,6 +65,14 @@ class Validator
             } catch (ReflectionException) {
             }
         }
+    }
+
+    /**
+     * @return array<string, bool>
+     */
+    public function getValidationGroups(): array
+    {
+        return array_map(fn (ValidationGroup $validator) => $validator->isDefault(), $this->validation_groups);
     }
 
     /**
@@ -159,8 +167,6 @@ class Validator
 
     /**
      * Print all ValidationResults or a group of them.
-     *
-     * @param  string|null  $validation_group
      */
     public function printResults(?string $validation_group = null): void
     {

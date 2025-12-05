@@ -77,24 +77,6 @@ class Core implements Module
 
         // detect OS
         $device->os = self::detectOS($device, false);
-
-        if ($device->isDirty('os')) {
-            Eventlog::log('Device OS changed: ' . $device->getOriginal('os') . ' -> ' . $device->os, $device, 'system', Severity::Notice);
-            $os->getDeviceArray()['os'] = $device->os;
-
-            Log::info('OS Changed ');
-        }
-
-        // Set type to a predefined type for the OS if it's not already set
-        $loaded_os_type = LibrenmsConfig::get("os.$device->os.type");
-        if (! $device->getAttrib('override_device_type') && $loaded_os_type != $device->type) {
-            $device->type = $loaded_os_type;
-            Log::debug("Device type changed to $loaded_os_type!");
-        }
-
-        $device->save();
-
-        Log::notice('OS: ' . LibrenmsConfig::getOsSetting($device->os, 'text') . " ($device->os)\n");
     }
 
     public function shouldPoll(OS $os, ModuleStatus $status): bool

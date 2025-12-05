@@ -76,7 +76,7 @@ $sql = "SELECT `E`.*,DATE_FORMAT(datetime, '" . \App\Facades\LibrenmsConfig::get
 foreach (dbFetchRows($sql, $param) as $eventlog) {
     $dev = device_by_id_cache($eventlog['device_id']);
     if ($eventlog['type'] == 'interface') {
-        $this_if = cleanPort(getifbyid($eventlog['reference']));
+        $this_if = cleanPort(get_port_by_id($eventlog['reference']));
         $type = '<b>' . generate_port_link($this_if, Rewrite::shortenIfName(strtolower((string) $this_if['label']))) . '</b>';
     } else {
         $type = $eventlog['type'];

@@ -27,7 +27,7 @@ modules:
             data:
                 -
                     oid: ASAM-EQUIP-MIB::eqptFanMode
-                    num_oid: .1.3.6.1.4.1.637.61.1.23.1.9.0
+                    num_oid: '.1.3.6.1.4.1.637.61.1.23.1.9.{{ $index }}'
                     descr: Fan Mode
                     group: 'Hardware'
                     state_name: fanMode
@@ -38,7 +38,7 @@ modules:
                         - { value: 3, generic: 0, graph: 0, descr: 'classic' }
                 -
                     oid: ASAM-ALARM-MIB::asamNumberofAlarmEntries
-                    num_oid: .1.3.6.1.4.1.637.61.1.3.4.0
+                    num_oid: '.1.3.6.1.4.1.637.61.1.3.4.{{ $index }}'
                     descr: 'Alarm: Current Count'
                     group: 'Alarms'
                     state_name: alarmCount
@@ -52,7 +52,7 @@ modules:
                         - { value: 6, generic: 2, graph: 0, descr: '6' }
                 -
                     oid: ASAM-ALARM-MIB::asamCurrentAlarmSeverityStatus
-                    num_oid: .1.3.6.1.4.1.637.61.1.3.5.0
+                    num_oid: '.1.3.6.1.4.1.637.61.1.3.5.{{ $index }}'
                     descr: 'Alarm: Current Status'
                     group: 'Alarms'
                     state_name: alarmCurrentSeverityStatus

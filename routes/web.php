@@ -201,7 +201,7 @@ Route::middleware(['auth'])->group(function (): void {
 
         Route::resource('port-groups', PortGroupController::class);
         Route::get('validate', [ValidateController::class, 'index'])->name('validate');
-        Route::get('validate/results', [ValidateController::class, 'runValidation'])->name('validate.results');
+        Route::get('validate/results/{group?}', [ValidateController::class, 'runValidation'])->name('validate.results');
         Route::post('validate/fix', [ValidateController::class, 'runFixer'])->name('validate.fix');
     });
 
@@ -297,7 +297,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('graylog', Table\GraylogController::class)->name('table.graylog');
             Route::post('inventory', Table\InventoryController::class)->name('table.inventory');
             Route::get('inventory/export', [Table\InventoryController::class, 'export']);
-            Route::post('location', Table\LocationController::class);
+            Route::post('location', Table\LocationController::class)->name('table.location');
             Route::post('mempools', Table\MempoolsController::class)->name('table.mempools');
             Route::get('mempools/export', [Table\MempoolsController::class, 'export']);
             Route::post('outages', Table\OutagesController::class)->name('table.outages');

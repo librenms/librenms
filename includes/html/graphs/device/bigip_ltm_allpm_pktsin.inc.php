@@ -31,8 +31,10 @@ foreach ($components as $k => $v) {
 $components = $keep;
 
 include 'includes/html/graphs/common.inc.php';
-$rrd_options .= ' -l 0 -E ';
-$rrd_options .= " COMMENT:'LTM Pool Members                               Now      Avg      Max\\n'";
+$graph_params->scale_min = 0;
+$graph_params->sloped_mode = true;
+
+$rrd_options[] = 'COMMENT:LTM Pool Members                               Now      Avg      Max\\n';
 $colours = array_merge(\App\Facades\LibrenmsConfig::get('graph_colours.mixed'), \App\Facades\LibrenmsConfig::get('graph_colours.manycolours'), \App\Facades\LibrenmsConfig::get('graph_colours.manycolours'));
 $count = 0;
 d_echo('<pre>');
@@ -63,11 +65,11 @@ if ($components[$vars['id']]['type'] == 'f5-ltm-pool') {
                 d_echo("\nError: Out of colours. Have: " . (count($colours) - 1) . ', Requesting:' . $count);
             }
 
-            $rrd_options .= ' DEF:DS' . $count . '=' . $rrd_filename . ':pktsin:AVERAGE ';
-            $rrd_options .= ' LINE1.25:DS' . $count . '#' . $colour . ":'" . str_pad(substr((string) $label, 0, 40), 40) . "'";
-            $rrd_options .= ' GPRINT:DS' . $count . ':LAST:%6.2lf%s ';
-            $rrd_options .= ' GPRINT:DS' . $count . ':AVERAGE:%6.2lf%s ';
-            $rrd_options .= ' GPRINT:DS' . $count . ":MAX:%6.2lf%s\l ";
+            $rrd_options[] = 'DEF:DS' . $count . '=' . $rrd_filename . ':pktsin:AVERAGE';
+            $rrd_options[] = 'LINE1.25:DS' . $count . '#' . $colour . ':' . str_pad(substr((string) $label, 0, 40), 40);
+            $rrd_options[] = 'GPRINT:DS' . $count . ':LAST:%6.2lf%s';
+            $rrd_options[] = 'GPRINT:DS' . $count . ':AVERAGE:%6.2lf%s';
+            $rrd_options[] = 'GPRINT:DS' . $count . ":MAX:%6.2lf%s\l";
             $count++;
         }
     } // End Foreach

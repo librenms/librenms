@@ -58,8 +58,8 @@ class Rrd extends BaseDatastore
     private $version;
     /** @var string */
     private $rrdcached;
-    /** @var string */
-    private $rra;
+
+    private array $rra;
     /** @var int */
     private $step;
     /** @var string */
@@ -86,13 +86,13 @@ class Rrd extends BaseDatastore
         $this->rrdcached = LibrenmsConfig::get('rrdcached', false);
         $this->rrd_dir = LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd');
         $this->step = LibrenmsConfig::get('rrd.step', 300);
-        $this->rra = LibrenmsConfig::get(
+        $this->rra = preg_split('/s+/', trim(LibrenmsConfig::get(
             'rrd_rra',
             'RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440 ' .
             ' RRA:MIN:0.5:1:2016 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:1440     RRA:MIN:0.5:288:1440 ' .
             ' RRA:MAX:0.5:1:2016 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:1440     RRA:MAX:0.5:288:1440 ' .
             ' RRA:LAST:0.5:1:2016 '
-        );
+        )));
         $this->version = LibrenmsConfig::get('rrdtool_version', '1.4');
         $this->rrdtool_executable = LibrenmsConfig::get('rrdtool', 'rrdtool');
     }
@@ -191,8 +191,8 @@ class Rrd extends BaseDatastore
             }, ARRAY_FILTER_USE_KEY);
 
             if (! $this->checkRrdExists($rrd)) {
-                $newdef = "--step $step $rrd_def $this->rra";
-                $this->command('create', $rrd, $newdef);
+                $options = ['--step', $step, ...$rrd_def->getArguments(), ...$this->rra];
+                $this->command('create', $rrd, $options);
             }
         }
 
@@ -201,7 +201,7 @@ class Rrd extends BaseDatastore
 
     public function lastUpdate(string $filename): ?TimeSeriesPoint
     {
-        $output = $this->command('lastupdate', $filename, '')[0];
+        $output = $this->command('lastupdate', $filename)[0];
 
         if (preg_match('/((?: \w+)+)\n\n(\d+):((?: [\d.-]+)+)\nOK/', (string) $output, $matches)) {
             $data = array_combine(
@@ -244,7 +244,7 @@ class Rrd extends BaseDatastore
 
             $data = implode(':', $values);
 
-            return $this->command('update', $filename, $data);
+            return $this->command('update', $filename, [$data]);
         }
 
         throw new RrdException('Bad options passed to rrdtool_update');
@@ -287,7 +287,10 @@ class Rrd extends BaseDatastore
             ];
         }
         if (count($fields) > 0) {
-            $options = '--maximum ' . implode(":$max --maximum ", $fields) . ":$max";
+            $options = [];
+            foreach ($fields as $field) {
+                array_push($options, '--maximum', $field . ':' . $max);
+            }
             $this->command('tune', $filename, $options);
         }
 
@@ -390,12 +393,12 @@ class Rrd extends BaseDatastore
      *
      * @param  string  $command  create, update, updatev, graph, graphv, dump, restore, fetch, tune, first, last, lastupdate, info, resize, xport, flushcached
      * @param  string  $filename  The full patth to the rrd file
-     * @param  string  $options  rrdtool command options
+     * @param  array  $options  rrdtool command options
      * @return array the output of stdout and stderr in an array
      *
      * @throws Exception thrown when the rrdtool process(s) cannot be started
      */
-    private function command($command, $filename, $options): array
+    private function command(string $command, string $filename, array $options = []): array
     {
         $stat = Measurement::start($this->coalesceStatisticType($command));
         $output = null;
@@ -408,7 +411,7 @@ class Rrd extends BaseDatastore
             return [null, null];
         }
 
-        Log::debug("RRD[%g$cmd%n]", ['color' => true]);
+        Log::debug('RRD[%g' . implode(' ', $cmd) . '%n]', ['color' => true]);
 
         // do not write rrd files, but allow read-only commands
         $ro_commands = ['graph', 'graphv', 'dump', 'fetch', 'first', 'last', 'lastupdate', 'info', 'xport'];
@@ -423,10 +426,10 @@ class Rrd extends BaseDatastore
         // send the command!
         if (in_array($command, ['last', 'list', 'lastupdate']) && $this->init(false)) {
             // send this to our synchronous process so output is guaranteed
-            $output = $this->sync_process->sendCommand($cmd);
+            $output = $this->sync_process->sendCommand(implode(' ', $cmd));
         } elseif ($this->init()) {
             // don't care about the return of other commands, so send them to the faster async process
-            $output = $this->async_process->sendCommand($cmd);
+            $output = $this->async_process->sendCommand(implode(' ', $cmd));
         } else {
             Log::error('rrdtool could not start');
         }
@@ -443,20 +446,18 @@ class Rrd extends BaseDatastore
     }
 
     /**
-     * Build a command for rrdtool
+     * Build a command array for rrdtool
      * Shortens the filename as needed
-     * Determines if --daemon and -O should be used
-     *
-     * @internal
+     * Determines if --daemon should be used
      *
      * @param  string  $command  The base rrdtool command.  Usually create, update, last.
      * @param  string  $filename  The full path to the rrd file
-     * @param  string  $options  Options for the command possibly including the rrd definition
-     * @return string returns a full command ready to be piped to rrdtool
+     * @param  array  $options  Options for the command possibly including the rrd definition
+     * @return array returns a full command array ready to be used by rrdtool
      *
      * @throws FileExistsException if rrdtool <1.4.3 and the rrd file exists locally
      */
-    public function buildCommand($command, $filename, $options): string
+    public function buildCommand(string $command, string $filename, array $options = []): array
     {
         if ($command == 'create') {
             // <1.4.3 doesn't support -O, so make sure the file doesn't exist
@@ -465,23 +466,22 @@ class Rrd extends BaseDatastore
                     throw new FileExistsException();
                 }
             } else {
-                $options .= ' -O';
+                $options[] = '-O';
             }
         }
 
-        // no remote for create < 1.5.5 and tune < 1.5
         if ($this->rrdcached &&
             ! ($command == 'create' && version_compare($this->version, '1.5.5', '<')) &&
-            ! ($command == 'tune' && $this->rrdcached && version_compare($this->version, '1.5', '<'))
+            ! ($command == 'tune' && version_compare($this->version, '1.5', '<'))
         ) {
             // only relative paths if using rrdcached
             $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
             $options = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $options);
 
-            return "$command $filename $options --daemon " . $this->rrdcached;
+            return [$command, $filename, '--daemon', $this->rrdcached, ...$options];
         }
 
-        return "$command $filename $options";
+        return [$command, $filename, ...$options];
     }
 
     /**
@@ -493,22 +493,15 @@ class Rrd extends BaseDatastore
      */
     public function getRrdFiles(string $hostname): array
     {
-        $safeHost = self::safeName($hostname);
-
         if ($this->rrdcached) {
-            $rrdFiles = $this->command('list', "/$safeHost", '');
+            $output = $this->command('list', '/' . self::safeName($hostname));
 
-            $rrdFilesArray = explode("\n", trim((string) $rrdFiles[0]));
-            array_pop($rrdFilesArray); // remove status line
-            sort($rrdFilesArray);
-
-            return $rrdFilesArray;
+            $files = explode("\n", trim($output[0] ?? ''));
+            array_pop($files); // remove rrdcached status line
+        } else {
+            $files = glob($this->dirFromHost($hostname) . '/*.rrd') ?: [];
         }
 
-        $rrdDir = $this->dirFromHost($hostname);
-        $pattern = "$rrdDir/*.rrd";
-
-        $files = array_map(basename(...), glob($pattern));
         sort($files);
 
         return $files;
@@ -561,7 +554,7 @@ class Rrd extends BaseDatastore
     public function checkRrdExists($filename): bool
     {
         if ($this->rrdcached && version_compare($this->version, '1.5', '>=')) {
-            $check_output = implode('', $this->command('last', $filename, ''));
+            $check_output = implode('', $this->command('last', $filename));
             $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
 
             return ! (str_contains($check_output, $filename) && str_contains($check_output, 'No such file or directory'));
@@ -593,13 +586,13 @@ class Rrd extends BaseDatastore
      * Generates a graph file at $graph_file using $options
      * Graphs are a single command per run, so this just runs rrdtool
      *
-     * @param  string  $options
+     * @param  array  $options
      * @param  array|null  $env
      * @return string
      *
      * @throws RrdGraphException
      */
-    public function graph(string $options, ?array $env = null): string
+    public function graph(array $options, ?array $env = null): string
     {
         $process = new Process([$this->rrdtool_executable, '-'], $this->rrd_dir, $env);
         $process->setTimeout(300);
@@ -607,7 +600,7 @@ class Rrd extends BaseDatastore
 
         try {
             $command = $this->buildCommand('graph', '-', $options);
-            $process->setInput($command . "\nquit");
+            $process->setInput('"' . implode('" "', $command) . "\"\nquit");
             $process->run();
         } catch (FileExistsException $e) {
             throw new RrdGraphException($e->getMessage(), 'File Exists');
@@ -620,7 +613,8 @@ class Rrd extends BaseDatastore
 
         // if valid image is returned with error, extract image and feedback
         // rrdtool defaults to png if imgformat not specified
-        $graph_type = preg_match('/--imgformat=([^\s]+)/', $options, $matches) ? strtolower($matches[1]) : 'png';
+        $imgformat_option = array_find($options, fn ($o) => str_starts_with((string) $o, '--imgformat='));
+        $graph_type = $imgformat_option ? strtolower(substr((string) $imgformat_option, 12)) : 'png';
         $imageFormat = ImageFormat::forGraph($graph_type);
 
         $search = $imageFormat->getImageEnd();

@@ -49,7 +49,12 @@ if (count($processors)) {
             echo '<tr>
                 <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $text_descr, $overlib_content) . '</td>
                 <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</td>
-                <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']), $overlib_content) . '
+                <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Html::percentageBar(200, 10, $percent, null, $percent . '%', null, null, [
+                'left' => $background['left'],
+                'left_text' => null,
+                'right' => $background['right'],
+                'right_text' => null,
+            ]), $overlib_content) . '
                 </a></td>
               </tr>';
         } else {
@@ -99,9 +104,13 @@ if (count($processors)) {
 
             echo '
               <tr>
-                <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $values['descr'], $overlib_content) . '</td>
-                <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, 'x' . $values['count'], $overlib_content) . '</td>
-                <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, print_percentage_bar(200, 20, $percent_usage, null, 'ffffff', $background['left'], $percent_usage . '%', 'ffffff', $background['right']), $overlib_content) . '</td>
+                <td class="col-md-8">' . \LibreNMS\Util\Url::overlibLink($link, 'x' . $values['count'] . ' ' . $values['descr'], $overlib_content) . '</td>
+                <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Html::percentageBar(400, 10, $percent_usage, null, $percent_usage . '%', null, null, [
+                'left' => $background['left'],
+                'left_text' => null,
+                'right' => $background['right'],
+                'right_text' => null,
+            ]), $overlib_content) . '</td>
               </tr>';
         }
     }

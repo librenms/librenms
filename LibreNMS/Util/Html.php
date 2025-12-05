@@ -145,27 +145,30 @@ class Html
             $colors = Color::percentage($percent, $warn ?: null);
         }
         $default = Color::percentage(0);
-        $left_text_color = $colors['left_text'] ?? 'ffffff';
-        $right_text_color = $colors['right_text'] ?? 'ffffff';
+        $left_text_color = $colors['left_text'] ? '#' . $colors['left_text'] : 'inherit';
+        $right_text_color = $colors['right_text'] ? '#' . $colors['right_text'] : 'inherit';
         $left_color = $colors['left'] ?? $default['left'];
         $right_color = $colors['right'] ?? $default['right'];
 
-        $output = '<div style="width:' . $width . 'px; height:' . $height . 'px; position: relative;">
-        <div class="progress" style="background-color:#' . $right_color . '; height:' . $height . 'px;margin-bottom:-' . $height . 'px;">';
+        $output = [];
+        $output[] = '<div style="width:' . $width . 'px">';
+        $output[] = '<div class="progress" style="background-color:#eaeaea; height:' . $height . 'px; margin-bottom: 4px;">';
+
+        $output[] = '<div class="progress-bar" role="progressbar" aria-valuenow="' . $percent . '" aria-valuemin="0" aria-valuemax="100" style="width:' . $percent . '%; background-color: #' . $left_color . '; height:' . $height . 'px;"></div>';
 
         if ($shadow !== null) {
-            $shadow = min($shadow, 100);
+            $shadow_width = min($shadow - $percent, 100);
             $middle_color = $colors['middle'] ?? $default['middle'];
-            $output .= '<div class="progress-bar" role="progressbar" aria-valuenow="' . $shadow . '" aria-valuemin="0" aria-valuemax="100" style="width:' . $shadow . '%; background-color: #' . $middle_color . ';">';
+            $output[] = '<div class="progress-bar" role="progressbar" aria-valuenow="' . $shadow_width . '" aria-valuemin="0" aria-valuemax="100" style="width:' . $shadow_width . '%; background-color: #' . $middle_color . '; height:' . $height . 'px;"></div>';
         }
-
-        $output .= '<div class="progress-bar" role="progressbar" aria-valuenow="' . $percent . '" aria-valuemin="0" aria-valuemax="100" style="width:' . $percent . '%; background-color: #' . $left_color . ';">
-        </div></div>
-        <b style="padding-left: 2%; position: absolute; top: 0; left: 0;color:#' . $left_text_color . ';">' . $left_text . '</b>
-        <b style="padding-right: 2%; position: absolute; top: 0; right: 0;color:#' . $right_text_color . ';">' . $right_text . '</b>
+        $output[] = '</div>';
+        $output[] = '<div style="font-weight: lighter; margin-top: 4px;">
+            <span style="color:' . $left_text_color . ';">' . $left_text . '</span>
+            <span style="color:' . $right_text_color . '; float:right;">' . $right_text . '</span>
         </div>';
+        $output[] = '</div>';
 
-        return $output;
+        return implode('', $output);
     }
 
     /**
