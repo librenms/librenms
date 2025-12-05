@@ -45,7 +45,7 @@ use some snmp configuration as an example:
 `lnms config:get <setting>` will fetch the current config settings (composite of database, config.php, and defaults).  
 `lnms config:set <setting> <value>` will set the config setting in the database.
 Calling `lnms config:set <setting>` on a setting with no value will prompt you to reset
-it to it's default.
+it to its default.
 
 If you set up bash completion, you can use tab completion to find config settings.
 
@@ -222,7 +222,7 @@ value is in Megabytes and should just be an int value:
 
 ### Programs
 
-A lot of these are self explanatory so no further information may be
+A lot of these are self-explanatory so no further information may be
 provided. Any extensions that have dedicated documentation page will
 be linked to rather than having the config provided.
 
@@ -263,7 +263,7 @@ configuring your install to record data more frequently.
   to each target.
 * `interval` (`fping` parameter `-p`): Time in milliseconds that fping
   waits between successive packets to an individual target.
-* `tos` (`fping`parameter `-O`): Set the type of service flag (TOS). Value can be either decimal or hexadecimal (0xh) format. Can be used to ensure that ping packets are queued in following QOS mecanisms in the network. Table is accessible in the [TOS Wikipedia page](https://en.wikipedia.org/wiki/Type_of_service).
+* `tos` (`fping`parameter `-O`): Set the type of service flag (TOS). Value can be either decimal or hexadecimal (0xh) format. Can be used to ensure that ping packets are queued in following QOS mechanisms in the network. Table is accessible in the [TOS Wikipedia page](https://en.wikipedia.org/wiki/Type_of_service).
 
 !!! note
     Setting a higher timeout value than the interval value can
@@ -294,7 +294,7 @@ Globally disable fping / icmp check:
     lnms config:set icmp_check false
     ```
 
-If you would like to do this on a per device basis then you can do so
+If you would like to do this on a per-device basis then you can do so
 under Device -> Edit -> Misc -> Disable ICMP Test? On
 
 #### SNMP
@@ -337,7 +337,7 @@ Password minimum length for auth that allows user creation
 
 ## Proxy support
 
-For alerting and the callback functionality, we support the use of a
+For alerting and the callback functionality, we support the use of an
 http proxy setting. These can be any one of the following:
 
 !!! setting "system/proxy"
@@ -364,14 +364,14 @@ Please refer to [RRDCached](../Extensions/RRDCached.md)
     lnms config:set base_url http://demo.librenms.org
     ```
 
-LibreNMS will attempt to detect the URL you are using but you can override that here.
+LibreNMS will attempt to detect the URL you are using, but you can override that here.
 
 !!! setting "webui/style"
     ```bash
     lnms config:set site_style light
     ```
 
-Currently we have a number of styles which can be set which will alter
+Currently, we have a number of styles which can be set which will alter
 the navigation bar look. device, blue, dark, light and mono with light being the default.
 
 You can override a large number of visual elements by creating your
@@ -402,7 +402,7 @@ minutes. Some pages don't refresh at all by design.
     ```
 
 You can create your own front page by adding a blade file in `resources/views/overview/custom/`
-and setting `front_page` to it's name.
+and setting `front_page` to its name.
 For example, if you create `resources/views/overview/custom/foobar.blade.php`, set `front_page` to `foobar`.
 
 !!! setting "webui/front-page"
@@ -584,7 +584,7 @@ generation if this is very long.
     ```
 
 You can enable dynamic graphs which allow you to zoom in/out and scroll through
-the timeline of the graphs quite easiy.
+the timeline of the graphs quite easily.
 
 !!! setting "webui/graph"
     ```bash
@@ -619,7 +619,7 @@ prevents accidental duplicate hosts.
                                                 # false- only check when adding host by ip.
     ```
 
-By default we allow hosts to be added with duplicate sysName's, you
+By default, we allow hosts to be added with duplicate sysName's, you
 can disable this with the following config:
 
 !!! setting "discovery/general"
@@ -793,7 +793,7 @@ Assign a new discovered Port automatically to Port Group with this Port Group ID
 
 ### Rancid
 
-Rancid configuration, `rancid_configs` is an array containing all of
+Rancid configuration, `rancid_configs` is an array containing all
 the locations of your rancid files. Setting `rancid_ignorecomments`
 will disable showing lines that start with #
 
@@ -803,6 +803,21 @@ will disable showing lines that start with #
     lnms config:set rancid_repo_type svn
     lnms config:set rancid_ignorecomments false
     ```
+
+In case rancid repository is a bare Git repository, it must be stored in a
+directory with name ending `.git`. The path to that repository can then be
+combined with an additional path to rancid files in Git
+
+!!! setting "external/rancid"
+    ```bash
+    lnms config:set rancid_configs.+ /var/lib/rancid/git/rancid.git/configs/
+    lnms config:set rancid_repo_type git-bare
+    lnms config:set rancid_repo_url /rancid
+    lnms config:set rancid_ignorecomments false
+    ```
+
+An additional parameter, `rancid_repo_url`, must be set to the URL of GitWeb
+or a similar tool that visualizes the bare Git repository.
 
 ### Oxidized
 
@@ -859,7 +874,7 @@ Please refer to [NFSen](../Extensions/NFSen.md)
 
 ### Location parsing
 
-LibreNMS can interpret sysLocation information and map the device loction based on GeoCoordinates or GeoCoding information.
+LibreNMS can interpret sysLocation information and map the device location based on GeoCoordinates or GeoCoding information.
 
 - Info-keywords
   - `[]` contains optional Latitude and Longitude information if manual GeoCoordinate positioning is desired.
@@ -868,7 +883,7 @@ LibreNMS can interpret sysLocation information and map the device loction based 
 
 #### GeoCoordinates
 
-If device sysLocation information contains [lat, lng] (note the comma and square brackets), that is used to determin the GeoCoordinates.
+If device sysLocation information contains [lat, lng] (note the comma and square brackets), that is used to determine the GeoCoordinates.
 
 Example:
 ```bash
@@ -882,7 +897,7 @@ The coordinates will then be set to 40.424521 latitude and -86.912755 longitude.
 Next it will attempt to look up the sysLocation with a map engine provided you have configured one under
 `lnms config:get geoloc.engine`. The information has to be accurate or no result is returned, when it
 does it will ignore any information inside parentheses, allowing you to add details that would otherwise
-interfeeer with the lookup.
+interfere with the lookup.
 
 Example:
 ```bash
@@ -902,7 +917,7 @@ If you just want to set GPS coordinates on a location, you should
 visit Devices > Geo Locations > All Locations and edit the coordinates
 there.
 
-However you can replace the sysLocation value that is returned for a single device or many devices.
+However, you can replace the sysLocation value that is returned for a single device or many devices.
 
 For example, let's say that you have 100 devices which all contain the sysLocation value of `Under the Sink` which
 isn't the real address, rather than editing each device manually, you can specify a mapping to override the sysLocation
@@ -990,11 +1005,11 @@ Examples:
 ## Interfaces that shouldn't be ignored
 
 It's also possible to whitelist ports so they are not ignored. `good_if` can
-be configured both globally and per os just like `bad_if`.
+be configured both globally and per-os just like `bad_if`.
 
 As an examples, let's say we have `bad_if_regexp` set to ignore `Ethernet` ports
 but realise that we actually still want `FastEthernet` ports but not any others,
-we can add a `good_if` option to white list `FastEthernet`:
+we can add a `good_if` option to whitelist `FastEthernet`:
 
 !!! setting "discovery/ports"
     ```bash
@@ -1027,7 +1042,7 @@ Matches are compared case-insensitive.
 Some devices register bogus sensors as they are returned via SNMP but
 either don't exist or just don't return data. This allows you to
 ignore those based on the descr field in the database. You can either
-ignore globally or on a per os basis (recommended).
+ignore globally or on a per-os basis (recommended).
 
 As an example, if you have some sensors which contain the descriptions
 below:
@@ -1141,6 +1156,28 @@ is discovered.
     lnms config:set storage_perc_warn 60
     ```
 
+## Averaging Factor
+
+LibreNMS keeps track of average values in the database for some metrics so we
+can alert on changes (e.g. if the ping time increases from the average). To 
+achieve this goal we want the average to move slowly when there is a change
+to the values being recorded so there is time to alert, but we also need to
+eventually stop alerting if the average value becomes the new normal.
+
+The following configuration variable can be adjusted if you make use of the
+average values, and find that they either change too quickly or slowly. If
+you make this setting bigger (closer to 1) the averages will change faster,
+and if you make it smaller (closer to 0) the average will change slower.
+
+```bash
+lnms config:set device_stats_avg_factor 0.05
+```
+
+If you want to understand more about this, the device statistics uses an
+exponential weighted moving average function to update the average without
+needing to keep multiple values. You can look up independently if you want
+to understand more about this option.
+
 ## IRC Bot
 
 Please refer to [IRC Bot](../Extensions/IRC-Bot.md)
@@ -1164,10 +1201,10 @@ to indicate how you connect to libvirt.  You also need to:
 
 1. Generate a non-password-protected ssh key for use by LibreNMS, as the
     user which runs polling & discovery (usually `librenms`).
-1. On each VM host you wish to monitor:
+2. On each VM host you wish to monitor:
    1. Configure public key authentication from your LibreNMS server/poller by
       adding the librenms public key to `~root/.ssh/authorized_keys`.
-   1. (xen+ssh only) Enable libvirtd to gather data from xend by setting
+   2. (xen+ssh only) Enable libvirtd to gather data from xend by setting
       `(xend-unix-server yes)` in `/etc/xen/xend-config.sxp` and
       restarting xend and libvirtd.
 
@@ -1196,7 +1233,7 @@ Please refer to [Updating](../General/Updating.md)
 
 ## IPMI
 
-Setup the types of IPMI protocols to test a host for and in what
+Set up the types of IPMI protocols to test a host for and in what
 order. Don't forget to install ipmitool on the monitoring host.
 
 !!! setting "discovery/ipmi"

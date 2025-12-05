@@ -85,14 +85,23 @@ class RrdDefinition implements \Stringable
      */
     public function __toString(): string
     {
-        $def = array_reduce($this->dataSets, function ($carry, $ds) {
+        return implode(' ', $this->getArguments());
+    }
+
+    public function getArguments(): array
+    {
+        $def = [];
+
+        foreach ($this->dataSets as $ds) {
             $name = $ds['name'] . $this->createSource($ds['source_ds'], $ds['source_file']);
+            $def[] = "DS:$name:{$ds['type']}:{$ds['hb']}:{$ds['min']}:{$ds['max']}";
+        }
 
-            return $carry . "DS:$name:{$ds['type']}:{$ds['hb']}:{$ds['min']}:{$ds['max']} ";
-        }, '');
-        $sources = implode(' ', array_map(fn ($s) => "--source $s ", $this->sources));
+        foreach ($this->sources as $source) {
+            array_unshift($def, '--source', $source);
+        }
 
-        return $sources . $def;
+        return $def;
     }
 
     /**

@@ -23,6 +23,7 @@
         "ext-pdo": "*",
         "ext-session": "*",
         "ext-simplexml": "*",
+        "ext-sockets": "*",
         "ext-xml": "*",
         "ext-zlib": "*",
         "amenadiel/jpgraph": "^4",
@@ -134,8 +135,7 @@
             "@php artisan vue-i18n:generate --multi-locales --format=umd",
             "@php artisan view:cache",
             "@php artisan optimize",
-            "@php artisan config:clear",
-            "@python-requirements"
+            "@php artisan config:clear"
         ],
         "pre-update-cmd": "LibreNMS\\ComposerHelper::preUpdate",
         "post-update-cmd": [
@@ -148,9 +148,6 @@
         "post-root-package-install": "LibreNMS\\ComposerHelper::postRootPackageInstall",
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
-        ],
-        "python-requirements": [
-            "scripts/dynamic_check_requirements.py || pip3 install --user -r requirements.txt || :"
         ]
     },
     "support": {
