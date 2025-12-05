@@ -65,7 +65,7 @@ trait CiscoPortsVoiceVlan
         }
 
         // Assigning port_id and device_id to SNMP array for comparison
-        $port_voice_vlan = $device->portSecurity;
+        $port_voice_vlan = $device->portsVoiceVlan;
 
         foreach ($port_voice_vlan_snmp as $item) {
             $if_index = $item['ifIndex'];

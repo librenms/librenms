@@ -75,9 +75,9 @@ class PortsVoiceVlan implements Module
     {
         if ($os instanceof PortsVoiceVlanPolling) {
             $device = $os->getDevice();
-            $portsec = $os->pollPortsVoiceVlan($os, $device);
+            $port_voice_vlan = $os->pollPortsVoiceVlan($os, $device);
             ModuleModelObserver::observe(\App\Models\PortsVoiceVlan::class);
-            $this->syncModels($device, 'portsVoiceVlan', $portsec);
+            $this->syncModels($device, 'portsVoiceVlan', $port_voice_vlan);
         }
     }
 
