@@ -4,5 +4,5 @@ $class = 'ber';
 $unit = '';
 $unit_long = '';
 
-$rrd_options .= ' -o';
+$graph_params->logarithmic = true;
 require 'includes/html/graphs/device/sensor.inc.php';

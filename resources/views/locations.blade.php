@@ -81,10 +81,13 @@
             locations_grid = $("#locations").bootgrid({
                 ajax: true,
                 rowCount: [25, 50, 100, -1],
-                url: "{{ url('/ajax/table/location') }}",
+                url: "{{ route('table.location') }}",
                 formatters: {
                     "location": function (column, row) {
-                        return '<a href="{{ url('/devices') }}/location=' + row.id + '">' + row.location + '</a>';
+                        var a = document.createElement('a');
+                        a.href = '{{ url('/devices') }}/location=' + row.id;
+                        a.textContent = row.location;
+                        return a.outerHTML;
                     },
                     "coordinates": function (column, row) {
                         var text;

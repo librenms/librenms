@@ -733,6 +733,26 @@ device_relationships:
   Constraints:
     device_relationship_child_device_id_fk: { name: device_relationship_child_device_id_fk, foreign_key: child_device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
     device_relationship_parent_device_id_fk: { name: device_relationship_parent_device_id_fk, foreign_key: parent_device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
+device_stats:
+  Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: ping_last_timestamp, Type: timestamp, 'Null': true, Extra: '' }
+    - { Field: ping_rtt_last, Type: 'double unsigned', 'Null': true, Extra: '' }
+    - { Field: ping_rtt_prev, Type: 'double unsigned', 'Null': true, Extra: '' }
+    - { Field: ping_rtt_avg, Type: 'double unsigned', 'Null': true, Extra: '' }
+    - { Field: ping_rtt_diff_avg_last, Type: double, 'Null': true, Extra: 'VIRTUAL GENERATED' }
+    - { Field: ping_rtt_diff_prev_last, Type: double, 'Null': true, Extra: 'VIRTUAL GENERATED' }
+    - { Field: ping_loss_last, Type: 'double unsigned', 'Null': true, Extra: '' }
+    - { Field: ping_loss_prev, Type: 'double unsigned', 'Null': true, Extra: '' }
+    - { Field: ping_loss_avg, Type: 'double unsigned', 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    device_stats_device_id_unique: { Name: device_stats_device_id_unique, Columns: [device_id], Unique: true, Type: BTREE }
+  Constraints:
+    device_stats_device_id_foreign: { name: device_stats_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
 entityState:
   Columns:
     - { Field: entity_state_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

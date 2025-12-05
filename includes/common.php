@@ -150,21 +150,16 @@ function get_port_rrdfile_path($hostname, $port_id, $suffix = '')
     return Rrd::name($hostname, Rrd::portName($port_id, $suffix));
 }
 
-function get_port_by_ifIndex($device_id, $ifIndex)
-{
-    return dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device_id, $ifIndex]);
-}
-
-function get_port_by_id($port_id)
+function get_port_by_id($port_id): array|false
 {
     if (is_numeric($port_id)) {
-        $port = dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', [$port_id]);
-        if (is_array($port)) {
-            return $port;
-        } else {
-            return false;
+        $port = PortCache::get($port_id);
+        if ($port !== null) {
+            return $port->toArray();
         }
     }
+
+    return false;
 }
 
 function ifclass($ifOperStatus, $ifAdminStatus)
@@ -193,11 +188,6 @@ function device_by_id_cache($device_id, $refresh = false)
 function gethostbyid($device_id)
 {
     return DeviceCache::get((int) $device_id)->hostname;
-}
-
-function getifbyid($id)
-{
-    return dbFetchRow('SELECT * FROM `ports` WHERE `port_id` = ?', [$id]);
 }
 
 function getidbyname($hostname)
@@ -291,25 +281,29 @@ function is_client_authorized($clientip)
 /*
  * @return an array of all graph subtypes for the given type
  */
-function get_graph_subtypes($type, $device = null)
+function get_graph_subtypes(string $type): array
 {
-    $type = basename((string) $type);
+    $dir = base_path('includes/html/graphs/' . basename($type));
+
+    if (! is_dir($dir)) {
+        return [];
+    }
+
     $types = [];
 
-    // find the subtypes defined in files
-    if ($handle = opendir(LibrenmsConfig::get('install_dir') . "/includes/html/graphs/$type/")) {
-        while (false !== ($file = readdir($handle))) {
-            if ($file != '.' && $file != '..' && $file != 'auth.inc.php' && strstr($file, '.inc.php')) {
-                $types[] = str_replace('.inc.php', '', $file);
+    foreach (new DirectoryIterator($dir) as $file) {
+        if ($file->isFile() && str_ends_with($file->getFilename(), '.inc.php')) {
+            $name = $file->getBasename('.inc.php');
+            if ($name !== 'auth') {
+                $types[] = $name;
             }
         }
-        closedir($handle);
     }
 
     sort($types);
 
     return $types;
-} // get_graph_subtypes
+}
 
 function generate_smokeping_file($device, $file = '')
 {

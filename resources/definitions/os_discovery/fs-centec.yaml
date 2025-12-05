@@ -22,10 +22,6 @@ modules:
                 descr: 'Memory {{ $index }}'
                 precision: 1024
     sensors:
-        data:
-            -
-                oid:
-                 - ifName
         temperature:
             data:
                 -
@@ -47,7 +43,6 @@ modules:
                     index: 'devMFanSpeed.{{ index }}'
                     descr: 'Fan {{ $subindex2 }} speed'
                     group: 'Fans'
-                    state_name: FanSpeed
         state:
             data:
                 -

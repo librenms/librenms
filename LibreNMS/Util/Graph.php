@@ -143,7 +143,7 @@ class Graph
         $nodetails = ! $graph_params->visible('details');
         $noagg = ! $graph_params->visible('aggregate');
 
-        $rrd_options = '';
+        $rrd_options = [];
         $rrd_filename = null;
 
         $auth = Auth::guest(); // if user not logged in, assume we authenticated via signed url, allow_unauth_graphs or allow_unauth_graphs_cidr
@@ -168,7 +168,7 @@ class Graph
             throw new RrdGraphException('Graph Definition Error', 'Def Error', $width, $height);
         }
 
-        $rrd_options = $graph_params . ' ' . $rrd_options;
+        $rrd_options = [...$graph_params->toRrdOptions(), ...$rrd_options];
 
         // Generating the graph!
         try {

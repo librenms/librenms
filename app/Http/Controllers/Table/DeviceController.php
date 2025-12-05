@@ -222,7 +222,7 @@ class DeviceController extends TableController
     {
         $port_count = $device->ports_count;
         $sensor_count = $device->sensors_count;
-        $wireless_count = $device->wirelessSensors_count;
+        $wireless_count = $device->wireless_sensors_count;
 
         $metrics = [];
         if ($port_count) {

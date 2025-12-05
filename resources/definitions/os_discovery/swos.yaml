@@ -15,6 +15,9 @@ modules:
                     value: mtxrOpticalTemperature
                     num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.6.{{ $index }}'
                     descr: mtxrOpticalName
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
                     index: 'mtxrOpticalTemperature.{{ $index }}'
                     skip_value_gt: 25000
                     skip_values:
@@ -64,12 +67,19 @@ modules:
                     num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.7.{{ $index }}'
                     divisor: 1000
                     descr: mtxrOpticalName
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
                     index: 'mtxrOpticalSupplyVoltage.{{ $index }}'
                     skip_values:
                     -
                       oid: mtxrOpticalName
                       op: '=='
                       value: ""
+                    -
+                      oid: mtxrOpticalSupplyVoltage
+                      op: '=='
+                      value: 0
                 -
                     oid: mtxrPOETable
                     value: mtxrPOEVoltage
@@ -109,13 +119,20 @@ modules:
                     value: mtxrOpticalTxBiasCurrent
                     num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.8.{{ $index }}'
                     divisor: 1000
-                    descr: '{{ $mtxrOpticalName }} Tx'
+                    descr: '{{ $mtxrOpticalName }} Bias Current'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
                     index: 'mtxrOpticalTxBiasCurrent.{{ $index }}'
                     skip_values:
                     -
                       oid: mtxrOpticalName
                       op: '=='
                       value: ""
+                    -
+                      oid: mtxrOpticalTxBiasCurrent
+                      op: '=='
+                      value: 0
                 -
                     oid: mtxrPOETable
                     value: mtxrPOECurrent
@@ -137,6 +154,9 @@ modules:
                     num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.9.{{ $index }}'
                     divisor: 1000
                     descr: '{{ $mtxrOpticalName }} Tx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
                     index: 'mtxrOpticalTxPower.{{ $index }}'
                 -
                     oid: mtxrOpticalTable
@@ -144,6 +164,9 @@ modules:
                     num_oid: '.1.3.6.1.4.1.14988.1.1.19.1.1.10.{{ $index }}'
                     divisor: 1000
                     descr: '{{ $mtxrOpticalName }} Rx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: 'ports'
+                    group: transceiver
                     index: 'mtxrOpticalRxPower.{{ $index }}'
         state:
             data:
