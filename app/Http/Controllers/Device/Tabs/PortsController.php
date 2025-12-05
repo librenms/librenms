@@ -126,6 +126,7 @@ class PortsController implements DeviceTab
             $relationships[] = 'pseudowires.endpoints';
             $relationships[] = 'ipv4Networks.ipv4';
             $relationships[] = 'ipv6Networks.ipv6';
+            $relationships[] = 'macLinkedPorts';
             $relationships['stackParent'] = fn ($q) => $q->select('port_id');
             $relationships['stackChildren'] = fn ($q) => $q->select('port_id');
         }
@@ -178,24 +179,31 @@ class PortsController implements DeviceTab
             }
         }
 
-        if ($this->detail) {
-            // IPv4 + IPv6 subnet if detailed
-            // fa-arrow-right green portlink on devicelink
-            if ($port->ipv4Networks->isNotEmpty()) {
-                $ids = $port->ipv4Networks->map(fn ($net) => $net->ipv4->pluck('port_id'))->flatten();
-                foreach ($ids as $port_id) {
-                    if ($port_id !== $port->port_id) {
-                        $this->addPortNeighbor($neighbors, 'ipv4_network', $port_id);
-                    }
-                }
-            }
+        // IPv4 + IPv6 subnet
+        // fa-arrow-right green portlink on devicelink
+        $ids = [];
+        $ipv4_neighbours = $port->ipv4Networks->map(fn ($net) => $net->ipv4->where('port_id', '<>', $port->port_id)->pluck('ipv4_address'))->flatten();
 
-            if ($port->ipv6Networks->isNotEmpty()) {
-                $ids = $port->ipv6Networks->map(fn ($net) => $net->ipv6->pluck('port_id'))->flatten();
-                foreach ($ids as $port_id) {
-                    if ($port_id !== $port->port_id) {
-                        $this->addPortNeighbor($neighbors, 'ipv6_network', $port_id);
-                    }
+        if ($ipv4_neighbours->count() > 0 && $ipv4_neighbours->duplicates()->count() == 0) {
+            // Use the neighbours from IPv4 networks if we have found any, and there are no duplicates
+            $ids = $port->ipv4Networks->map(fn ($net) => $net->ipv4->where('port_id', '<>', $port->port_id)->pluck('port_id'))->flatten();
+        } else {
+            // Try using ports found through the ARP table as an alternative
+            $arp_neighbours = $port->macLinkedPorts->where('port_id', '<>', $port->port_id)->pluck('ipv4_address')->flatten();
+            if ($arp_neighbours->count() > 0 && $arp_neighbours->duplicates()->count() == 0) {
+                $ids = $port->macLinkedPorts->where('port_id', '<>', $port->port_id)->pluck('port_id');
+            }
+        }
+
+        foreach ($ids as $port_id) {
+            $this->addPortNeighbor($neighbors, 'ipv4_network', $port_id);
+        }
+
+        if ($port->ipv6Networks->isNotEmpty()) {
+            $ids = $port->ipv6Networks->map(fn ($net) => $net->ipv6->pluck('port_id'))->flatten();
+            foreach ($ids as $port_id) {
+                if ($port_id !== $port->port_id) {
+                    $this->addPortNeighbor($neighbors, 'ipv6_network', $port_id);
                 }
             }
         }
