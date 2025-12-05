@@ -50,6 +50,7 @@ poller_modules:
     ipmi: false
     xdsl: true
     port-security: false
+    port-ports-voice-vlan: false
 discovery_modules:
     cisco-cef: true
     slas: true

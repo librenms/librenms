@@ -215,6 +215,9 @@
                 },
                 "port-security": {
                     "type": "boolean"
+                },
+                "ports-voice-vlan": {
+                    "type": "boolean"
                 }
             },
             "additionalProperties": false

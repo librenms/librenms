@@ -6277,6 +6277,13 @@
             "default": false,
             "type": "boolean"
         },
+        "poller_modules.ports-voice-vlan": {
+            "order": 470,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
         "polling.selected_ports": {
             "default": false,
             "type": "boolean",
