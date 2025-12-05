@@ -30,7 +30,7 @@ use App\Models\Port;
 use App\Models\PortsVoiceVlan;
 use Illuminate\Support\Collection;
 
-trait PortsVoiceVlan
+trait CiscoPortsVoiceVlan
 {
     public function pollPortsVoiceVlan($os, $device): Collection
     {
