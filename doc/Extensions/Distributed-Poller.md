@@ -41,18 +41,17 @@ Distributed Polling uses **Redis** to coordinate polling nodes.
 Install and configure Redis on a shared server, then set the following environment variables in the `.env` file on **all nodes**:
 
 ```dotenv
-REDIS_HOST=127.0.0.1
+REDIS_HOST=<Redis Server IP>
 REDIS_PORT=6379
 REDIS_DB=0
 REDIS_TIMEOUT=60
 
 # If Redis authentication is enabled (recommended):
-REDIS_PASSWORD=PasswordGoesHere
+REDIS_PASSWORD=<Password>
 
 # If Redis ACLs are in use (recommended):
-REDIS_USERNAME=UsernameGoesHere
+REDIS_USERNAME=<Username>
 ```
-Only the shared server points at 127.0.0.1. Other pollers point at the shared server's general IP address.
 
 ### Sentinel
 
@@ -63,12 +62,12 @@ Sentinel provides high availability and automatic failover.
 Authentication can (and should) be enabled for both Sentinel and Redis instances.
 
 ```dotenv
-REDIS_SENTINEL=redis-001.example.org:26379,redis-002.example.org:26379,redis-003.example.org:26379
-REDIS_SENTINEL_SERVICE=mymaster
+REDIS_SENTINEL=<Server List> # Comma separated with host:port format eg: redis-001.example.org:26379,redis-002.example.org:26379
+REDIS_SENTINEL_SERVICE=<Sentinel Instance Name>
 
 # If Sentinel authentication is enabled (recommended):
-REDIS_SENTINEL_PASSWORD=SentinelPasswordGoesHere
-REDIS_SENTINEL_USERNAME=SentinelUsernameGoesHere
+REDIS_SENTINEL_PASSWORD=<Sentinel Password>
+REDIS_SENTINEL_USERNAME=<Sentinel Username>
 ```
 
 ### Redis Security
@@ -93,18 +92,18 @@ Each node requires valid connection settings in `.env`.
 This file is generated after running Composer and setting both `APP_KEY` and `NODE_ID`.
 
 !!! warning
-    `APP_KEY` must be **identical** across all nodes.
+    `APP_KEY` must be **identical** across all nodes. You can generate one with `lnms key:generate --show`
 
     `NODE_ID` must be **unique** per node.
 
 ```dotenv
-APP_KEY=   # Required - same on all nodes
-NODE_ID=   # Required - unique per node
+APP_KEY=<Generated App Key>   # Required - same on all nodes
+NODE_ID=<Unique Node ID>      # Required - unique per node
 
-DB_HOST=localhost
+DB_HOST=<DB Server IP>
 DB_DATABASE=librenms
-DB_USERNAME=librenms
-DB_PASSWORD=
+DB_USERNAME=<DB Username>
+DB_PASSWORD=<DB Password>
 ```
 
 ---
@@ -180,7 +179,8 @@ Stop when you are able to handle your work load.
 
 ## High Availability
 
-Coming soon.....
+Not all services LibreNMS relies on can support High Availability. You can find
+more details in the [High Availability](../Support/High-Availability.md) docs.
 
 ---
 
