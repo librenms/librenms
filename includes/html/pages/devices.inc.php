@@ -223,8 +223,9 @@ if ($format == 'graph') {
         }
         $where = substr($where, 0, strlen($where) - 3);
         $where .= ' )';
+
+        show_device_group($vars['group']);
     }
-    show_device_group($vars['group']);
 
     $query = 'SELECT * FROM `devices` LEFT JOIN `locations` ON `devices`.`location_id` = `locations`.`id` WHERE 1';
 
