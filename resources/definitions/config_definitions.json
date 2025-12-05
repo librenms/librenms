@@ -1451,7 +1451,7 @@
             "default": 0.05,
             "group": "poller",
             "section": "ping",
-            "order": 5,
+            "order": 4,
             "type": "float",
             "validate": {
                 "value": "numeric|between:0.000001,0.9"
@@ -2344,13 +2344,6 @@
             "section": "ping",
             "order": 3,
             "type": "text"
-        },
-        "fping_options.bytes": {
-            "default": 64,
-            "group": "poller",
-            "section": "ping",
-            "order": 4,
-            "type": "integer"
         },
         "front_page": {
             "default": "default",
@@ -4586,7 +4579,7 @@
             "default": true,
             "group": "poller",
             "section": "ping",
-            "order": 6,
+            "order": 5,
             "type": "boolean"
         },
         "ignore_bsd_os_drives": {
@@ -5305,6 +5298,16 @@
             "section": "binaries",
             "order": 4,
             "type": "executable"
+        },
+        "mtu_options.bytes": {
+            "default": null,
+            "group": "poller",
+            "section": "mtu",
+            "order": 1,
+            "type": "integer",
+            "validate": {
+                "value": "int|nullable|between:9,65535"
+            }
         },
         "mydomain": {
             "type": "text",

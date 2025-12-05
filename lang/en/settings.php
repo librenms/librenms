@@ -71,6 +71,7 @@ return [
             'influxdb' => ['name' => 'Datastore: InfluxDB'],
             'influxdbv2' => ['name' => 'Datastore: InfluxDBv2'],
             'kafka' => ['name' => 'Datastore: Kafka'],
+            'mtu' => ['name' => 'MTU Check'],
             'opentsdb' => ['name' => 'Datastore: OpenTSDB'],
             'ping' => ['name' => 'Ping'],
             'prometheus' => ['name' => 'Datastore: Prometheus'],
@@ -966,10 +967,6 @@ return [
             'description' => 'Path to fping6',
         ],
         'fping_options' => [
-            'bytes' => [
-                'description' => 'fping packet size',
-                'help' => 'Size of packets for fping in bytes',
-            ],
             'count' => [
                 'description' => 'fping count',
                 'help' => 'The number of pings to send when checking if a host is up or down via icmp',
@@ -1451,6 +1448,12 @@ return [
         ],
         'mtr' => [
             'description' => 'Path to mtr',
+        ],
+        'mtu_options' => [
+            'bytes' => [
+                'description' => 'MTU test packet size',
+                'help' => 'Size of packets for MTU test in bytes (blank to disable MTU tests)',
+            ],
         ],
         'mydomain' => [
             'description' => 'Primary Domain',

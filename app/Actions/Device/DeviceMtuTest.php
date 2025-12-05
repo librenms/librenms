@@ -12,7 +12,7 @@ class DeviceMtuTest
 {
     private readonly string $fping_bin;
     private readonly string|false $fping6_bin;
-    private readonly int $bytes;
+    private readonly int|null $bytes;
 
     public function __construct()
     {
@@ -20,7 +20,7 @@ class DeviceMtuTest
         $this->fping_bin = LibrenmsConfig::get('fping', 'fping');
         $fping6 = LibrenmsConfig::get('fping6', 'fping6');
         $this->fping6_bin = is_executable($fping6) ? $fping6 : false;
-        $this->bytes = LibrenmsConfig::get('fping_options.bytes', 64) - 8;
+        $this->bytes = LibrenmsConfig::get('mtu_options.bytes');
     }
 
     public function execute(Device $device): bool
@@ -28,6 +28,12 @@ class DeviceMtuTest
         if (! ConnectivityHelper::pingIsAllowed($device)) {
             return true;
         }
+
+        if ($this->bytes == null) {
+            return true;
+        }
+
+        $bytes = $this->bytes > 8 ? $this->bytes - 8 : $this->bytes;
 
         $cmd = match ($device->ipFamily()) {
             AddressFamily::IPv4 => $this->fping6_bin === false ? [$this->fping_bin, '-4'] : [$this->fping_bin],
@@ -38,7 +44,7 @@ class DeviceMtuTest
         $cmd = array_merge($cmd, [
             '-q',
             '-b',
-            $this->bytes,
+            $bytes,
             $device->pollerTarget(),
         ]);
 
