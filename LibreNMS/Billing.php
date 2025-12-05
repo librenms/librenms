@@ -249,7 +249,6 @@ class Billing
     {
         $histrow = BillHistory::query()
             ->select(['rate_95th', 'rate_average', 'bill_type', 'bill_datefrom', 'bill_dateto'])
-            ->withCasts(['bill_datefrom' => 'timestamp', 'bill_dateto' => 'timestamp'])
             ->where('bill_id', $bill_id)
             ->where('bill_hist_id', $bill_hist_id)
             ->first();
@@ -270,7 +269,6 @@ class Billing
 
     public static function getBitsGraphData($bill_id, $from, $to, $reducefactor): array
     {
-        dd('test');
         $i = '0';
         $iter = 0;
         $first = null;
@@ -299,6 +297,7 @@ class Billing
         }
 
         $bill_data = Bill::query()->where('bill_id', $bill_id)->first();
+        
         $data = BillData::query()
             ->select(['*'])
             ->withCasts(['timestamp' => 'timestamp'])
@@ -308,7 +307,7 @@ class Billing
             ->orderBy('timestamp', 'asc')
             ->get();
 
-        foreach ( as $row) {
+        foreach ($data as $row) {
             $timestamp = $row->timestamp;
             if (! $first) {
                 $first = $timestamp;
