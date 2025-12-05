@@ -77,11 +77,11 @@ if (count($drives)) {
            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $drive['storage_descr'], $overlib_content) . '</td>
            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</td>
            <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, \LibreNMS\Util\Html::percentageBar(400, 10, $percent, "$used / $total ($percent%)", $free, null, null, [
-                'left' => $background['left'],
-                'left_text' => null,
-                'right' => $background['right'],
-                'right_text' => null,
-            ]), $overlib_content) . '
+            'left' => $background['left'],
+            'left_text' => null,
+            'right' => $background['right'],
+            'right_text' => null,
+        ]), $overlib_content) . '
            </a></td>
          </tr>';
     }//end foreach
