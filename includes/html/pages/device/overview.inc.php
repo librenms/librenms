@@ -5,7 +5,7 @@ use LibreNMS\Interfaces\Plugins\Hooks\DeviceOverviewHook;
 $overview = 1;
 
 echo '
-<div class="container-fluid">
+<div class="container-fluid" style="padding: 0px;">
   <div class="row">
     <div class="col-md-12">
       &nbsp;
