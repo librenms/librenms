@@ -683,7 +683,7 @@ function describe_bgp_error_code($code, $subcode)
 }
 
 /**
- * take input string like "Some Name <user@example.com>" and return email
+ * take input string like "Some Name <user@example.com>" and return email a-link
  * 
  * @params string $input
  * 
