@@ -63,3 +63,7 @@
 .dropdown-menu > li > a {
   @apply tw:pl-6
 }
+
+#coordinates-text  {
+  @apply tw:underline;
+}
