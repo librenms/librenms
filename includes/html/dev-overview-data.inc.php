@@ -91,17 +91,17 @@ if ($device['sysObjectID']) {
 if ($device['sysContact']) {
     echo '<div class="row">
         <div class="col-sm-4">Contact</div>';
-    if (get_dev_attrib($device, 'override_sysContact_bool')) {
-        echo '
-        <div class="col-sm-8">' . Clean::html(get_dev_attrib($device, 'override_sysContact_string')) . '</div>
-      </div>
-      <div class="row">
-        <div class="col-sm-4">SNMP Contact</div>';
-    }
 
-    echo '
-        <div class="col-sm-8">' . Clean::html($device['sysContact']) . '</div>
-      </div>';
+    if (get_dev_attrib($device, 'override_sysContact_bool')) {
+        $overrideContact = get_dev_attrib($device, 'override_sysContact_string');
+        echo '<div class="col-sm-8">' . parseEmailFromEmailLikeString($overrideContact) . '</div>
+        </div>
+        <div class="row">
+            <div class="col-sm-4">SNMP Contact</div>';
+    } else {
+        echo '<div class="col-sm-8">' . parseEmailFromEmailLikeString($device['sysContact']) . '</div>
+        </div>';
+    }
 }
 
 if (! empty($device['inserted']) && preg_match('/^0/', (string) $device['inserted']) == 0) {
