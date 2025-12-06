@@ -15,8 +15,8 @@ use App\Models\StateTranslation;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Util\Time;
 use LibreNMS\Util\Clean;
+use LibreNMS\Util\Time;
 
 /**
  * Parse cli discovery or poller modules and set config for this run
@@ -684,31 +684,31 @@ function describe_bgp_error_code($code, $subcode)
 
 /**
  * take input string like "Some Name <user@example.com>" and return email a-link
- * 
+ *
  * @params string $input
- * 
+ *
  * @return string
  */
-function parseEmailFromEmailLikeString(string $input) {
+function parseEmailFromEmailLikeString(string $input)
+{
     // Extract email using regex
     if (preg_match('/[\\w.+-]+@[\\w.-]+\\.[A-Za-z]{2,}/', $input, $matches)) {
         $email = $matches[0];
         
         // Validate email
         if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $emailLink = '<a href="mailto:' . htmlspecialchars($email, ENT_QUOTES, 'UTF-8') . '">' 
-                       . htmlspecialchars($email, ENT_QUOTES, 'UTF-8') 
+            $emailLink = '<a href="mailto:' . htmlspecialchars($email, ENT_QUOTES, 'UTF-8') . '">'
+                       . htmlspecialchars($email, ENT_QUOTES, 'UTF-8')
                        . '</a>';
             
             // Replace email in original text with link
             return preg_replace(
-                '/(' . preg_quote($email, '/') . ')/', 
+                '/(' . preg_quote($email, '/') . ')/',
                 $emailLink, 
                 Clean::html($input)
             );
         }
     }
-    
     // No valid email found, return plain text
     return Clean::html($input);
 }
