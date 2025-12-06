@@ -91,17 +91,17 @@ if ($device['sysObjectID']) {
 if ($device['sysContact']) {
     echo '<div class="row">
         <div class="col-sm-4">Contact</div>';
-
     if (get_dev_attrib($device, 'override_sysContact_bool')) {
-        $overrideContact = get_dev_attrib($device, 'override_sysContact_string');
-        echo '<div class="col-sm-8">' . parseEmailFromEmailLikeString($overrideContact) . '</div>
-        </div>
-        <div class="row">
-            <div class="col-sm-4">SNMP Contact</div>';
-    } else {
-        echo '<div class="col-sm-8">' . parseEmailFromEmailLikeString($device['sysContact']) . '</div>
-        </div>';
+        echo '
+        <div class="col-sm-8">' . Clean::html(get_dev_attrib($device, 'override_sysContact_string')) . '</div>
+      </div>
+      <div class="row">
+        <div class="col-sm-4">SNMP Contact</div>';
     }
+
+    echo '
+        <div class="col-sm-8">' . Clean::html($device['sysContact']) . '</div>
+      </div>';
 }
 
 if (! empty($device['inserted']) && preg_match('/^0/', (string) $device['inserted']) == 0) {
@@ -147,13 +147,11 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
         <div class="col-sm-4">Lat / Lng</div>
         <div class="col-sm-8"><span id="coordinates-text">' . $location_coords . '</span><div class="pull-right">';
 
-    echo '<div class="btn-group" role="group" aria-label="Map actions">';
     echo '<button type="button" id="toggle-map-button" class="btn btn-primary btn-xs" data-toggle="collapse" data-target="#toggle-map"><i class="fa fa-map" style="color:white" aria-hidden="true"></i> <span>View</span></button>';
     if ($location_valid) {
         echo ' <a id="map-it-button" href="https://maps.google.com/?q=' . $location->lat . ',' . $location->lng . '" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</a>';
     }
-    echo '      </div>
-            </div>
+    echo '</div>
         </div>
     </div>
     <div id="toggle-map" class="row collapse"><div id="location-map"></div></div>
