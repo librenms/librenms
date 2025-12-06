@@ -1,5 +1,5 @@
 <div x-data="themeToggleComponentData()"
-    {{ $attributes->class("tw:flex tw:mx-5 tw:my-2 tw:rounded-md tw:overflow-hidden") }}
+    {{ $attributes->class("tw:flex tw:justify-between tw:my-2 tw:rounded-md tw:overflow-hidden") }}
 >
     <button
         class="tw:p-2 tw:focus:outline-none tw:flex-1 tw:hover:bg-gray-200 tw:dark:hover:bg-dark-gray-500"
