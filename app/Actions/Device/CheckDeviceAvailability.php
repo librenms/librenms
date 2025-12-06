@@ -12,6 +12,7 @@ class CheckDeviceAvailability
         private readonly SetDeviceAvailability $setDeviceAvailability,
         private readonly DeviceIsPingable $deviceIsPingable,
         private readonly DeviceIsSnmpable $deviceIsSnmpable,
+        private readonly DeviceMtuTest $deviceMtuTest,
     ) {
     }
 
@@ -22,6 +23,8 @@ class CheckDeviceAvailability
         if ($ping_response->success()) {
             $is_up_snmp = ! ConnectivityHelper::snmpIsAllowed($device) || $this->deviceIsSnmpable->execute($device);
             $this->setDeviceAvailability->execute($device, $is_up_snmp, AvailabilitySource::SNMP, $commit);
+
+            $device->mtu_status = $this->deviceMtuTest->execute($device);
         } else { // icmp down
             $this->setDeviceAvailability->execute($device, false, AvailabilitySource::ICMP, $commit);
         }
