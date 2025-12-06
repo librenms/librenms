@@ -1853,7 +1853,7 @@ label {
 
 .nav > li > a {
   padding-left: 10px;
-  padding-right: 5px;
+  margin-right: 5px;
 }
 
 /* devices layout modifications */
@@ -2128,6 +2128,7 @@ label {
 
 .icon-theme {
     color: black;
+    padding-right: 4px;
 }
 .multiselect,
 .multiselect__input,
