@@ -147,11 +147,13 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
         <div class="col-sm-4">Lat / Lng</div>
         <div class="col-sm-8"><span id="coordinates-text">' . $location_coords . '</span><div class="pull-right">';
 
+    echo '<div class="btn-group" role="group" aria-label="Map actions">';
     echo '<button type="button" id="toggle-map-button" class="btn btn-primary btn-xs" data-toggle="collapse" data-target="#toggle-map"><i class="fa fa-map" style="color:white" aria-hidden="true"></i> <span>View</span></button>';
     if ($location_valid) {
         echo ' <a id="map-it-button" href="https://maps.google.com/?q=' . $location->lat . ',' . $location->lng . '" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</a>';
     }
-    echo '</div>
+    echo '      </div>
+            </div>
         </div>
     </div>
     <div id="toggle-map" class="row collapse"><div id="location-map"></div></div>
