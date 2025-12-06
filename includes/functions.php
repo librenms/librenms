@@ -15,6 +15,7 @@ use App\Models\StateTranslation;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Util\Clean;
 use LibreNMS\Util\Time;
 
 /**
@@ -679,4 +680,35 @@ function describe_bgp_error_code($code, $subcode)
     }
 
     return $message;
+}
+
+/**
+ * take input string like "Some Name <user@example.com>" and return email
+ * 
+ * @params string $input
+ * 
+ * @return string
+ */
+function parseEmailFromEmailLikeString(string $input) {
+    // Extract email using regex
+    if (preg_match('/[\\w.+-]+@[\\w.-]+\\.[A-Za-z]{2,}/', $input, $matches)) {
+        $email = $matches[0];
+
+        // Validate email
+        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $emailLink = '<a href="mailto:' . htmlspecialchars($email, ENT_QUOTES, 'UTF-8') . '">' 
+                       . htmlspecialchars($email, ENT_QUOTES, 'UTF-8') 
+                       . '</a>';
+
+            // Replace email in original text with link
+            return preg_replace(
+                '/(' . preg_quote($email, '/') . ')/', 
+                $emailLink, 
+                Clean::html($input)
+            );
+        }
+    }
+
+    // No valid email found, return plain text
+    return Clean::html($input);
 }
