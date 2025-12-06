@@ -1703,7 +1703,7 @@ ports:
     - { Field: port_descr_type, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: port_descr_descr, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: port_descr_circuit, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: port_descr_speed, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: port_descr_speed, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: port_descr_notes, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: ifDescr, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: ifName, Type: varchar(255), 'Null': true, Extra: '' }
