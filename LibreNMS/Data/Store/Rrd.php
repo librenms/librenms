@@ -671,7 +671,7 @@ class Rrd extends BaseDatastore
     public function graph(array $options, ?array $env = null): string
     {
         // Use php-rrd if it is installed
-        if (function_exists('rrd_graph')) {
+        if (class_exists('\RRDGraph')) {
             return self::graphPhprrd($options, $env);
         }
 
