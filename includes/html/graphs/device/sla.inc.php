@@ -10,8 +10,7 @@ if ($sla['owner']) {
 
 $rrd_filename = Rrd::name($device['hostname'], ['sla', $sla['sla_nr']]);
 
-$rrd_options[] = '-l';
-$rrd_options[] = '0';
+$graph_params->scale_min = 0;
 
 $rrd_options[] = 'COMMENT:Round Trip Time   Cur      Min     Max\\n';
 $rrd_options[] = "DEF:rtt=$rrd_filename:rtt:AVERAGE";

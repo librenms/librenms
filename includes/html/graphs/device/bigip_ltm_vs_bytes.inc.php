@@ -26,9 +26,9 @@ if (isset($components[$vars['id']])) {
     $hash = $components[$vars['id']]['hash'];
 
     include 'includes/html/graphs/common.inc.php';
-    $rrd_options[] = '-l';
-    $rrd_options[] = '0';
-    $rrd_options[] = '-E';
+    $graph_params->scale_min = 0;
+    $graph_params->sloped_mode = true;
+
     $rrd_options[] = 'COMMENT:Bits           Now      Ave      Max\\n';
 
     $rrd_filename = Rrd::name($device['hostname'], ['f5-ltm-vs', $label, $hash]);

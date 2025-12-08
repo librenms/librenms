@@ -84,7 +84,7 @@ class PrinterSupplyController extends TableController
         $colors = Color::percentage(100 - $percent); // supply, not usage
         $right = $supply->supply_capacity == 100 ? '' : $supply->supply_capacity;
 
-        $bar = Html::percentageBar(400, 20, $percent, $supply->supply_current, $right, colors: $colors);
+        $bar = Html::percentageBar(400, 10, $percent, $supply->supply_current, $right, colors: $colors);
 
         return [
             'device_hostname' => $hostname,

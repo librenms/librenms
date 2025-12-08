@@ -7,9 +7,9 @@
 $rrd_filename = Rrd::name($device['hostname'], 'purestorage_bandwidth');
 
 if (Rrd::checkRrdExists($rrd_filename)) {
-    $rrd_options[] = "--title='Array Bandwidth'";
-    $rrd_options[] = "--vertical-label='bits/sec'";
-    $rrd_options[] = '--lower-limit=0';
+    $graph_params->title = 'Array Bandwidth';
+    $graph_params->vertical_label = 'bits/sec';
+    $graph_params->scale_min = 0;
 
     // Read bandwidth (converted from bytes to bits)
     $rrd_options[] = "DEF:readBytes=$rrd_filename:read:AVERAGE";

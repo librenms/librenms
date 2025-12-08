@@ -75,9 +75,9 @@ if ($mempools->isNotEmpty()) {
         $minigraph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
 
         $percentageBar = match ($mempool->mempool_class) {
-            'system' => Html::percentageBar(400, 20, $mempool->mempool_perc, "$used / $total ($mempool->mempool_perc%)", $free, $mempool->mempool_perc_warn, $available_used_all),
-            'virtual', 'swap' => Html::percentageBar(400, 20, $mempool->mempool_perc, "$used / $total ($mempool->mempool_perc%)", $free, $mempool->mempool_perc_warn),
-            default => Html::percentageBar(400, 20, $mempool->mempool_perc, "$used ($mempool->mempool_perc%)", '', $mempool->mempool_perc_warn),
+            'system' => Html::percentageBar(400, 10, $mempool->mempool_perc, "$used / $total ($mempool->mempool_perc%)", $free, $mempool->mempool_perc_warn, $available_used_all),
+            'virtual', 'swap' => Html::percentageBar(400, 10, $mempool->mempool_perc, "$used / $total ($mempool->mempool_perc%)", $free, $mempool->mempool_perc_warn),
+            default => Html::percentageBar(400, 10, $mempool->mempool_perc, "$used ($mempool->mempool_perc%)", '', $mempool->mempool_perc_warn),
         };
 
         echo '<tr>
