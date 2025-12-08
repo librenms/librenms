@@ -49,8 +49,8 @@ poller_modules:
     cisco-vpdn: true
     ipmi: false
     xdsl: true
-    port-security: false
-    port-ports-voice-vlan: false
+    port-security: true
+    port-ports-voice-vlan: true
 discovery_modules:
     cisco-cef: true
     slas: true
