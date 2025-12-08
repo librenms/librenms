@@ -476,11 +476,11 @@ class Billing
                 ->get();
 
             foreach ($bill_data as $data) {
-                array_push($ticklabels, date('Y-m-d', (int)$data->timestamp));
+                array_push($ticklabels, $data->timestamp->format('Y-m-d'));
                 array_push($in_data, $data->in_delta ?? 0);
                 array_push($out_data, $data->out_delta ?? 0);
                 array_push($tot_data, $data->delta ?? 0);
-                $average += $data->traf_total;
+                $average += $data->delta;
             }
 
             $ave_count = count($tot_data);
