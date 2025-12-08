@@ -101,18 +101,18 @@ if ($device['sysContact']) {
     if (is_array($emails) && count($emails) > 0) {
         $email = key($emails);
         if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $emailLink = '<a href="mailto:' . htmlspecialchars($email, ENT_QUOTES, 'UTF-8') . '">'
-                       . htmlspecialchars($email, ENT_QUOTES, 'UTF-8')
+            $emailLink = '<a href="mailto:' . htmlspecialchars((string) $email) . '">'
+                       . htmlspecialchars((string) $email)
                        . '</a>';
             $displayText = preg_replace(
-                '/(' . preg_quote($email, '/') . ')/',
+                '/(' . preg_quote((string) $email, '/') . ')/',
                 $emailLink,
                 Clean::html($contactText)
             );
         }
     }
     
-    $displayText = $displayText ?? Clean::html($contactText);
+    $displayText ??= Clean::html($contactText);
     
     if (get_dev_attrib($device, 'override_sysContact_bool')) {
         echo '<div class="col-sm-8">' . $displayText . '</div>
