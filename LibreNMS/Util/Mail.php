@@ -34,6 +34,7 @@ class Mail
 {
     /**
      * Parse string with emails. Return array with email (as key) and name (as value)
+     *
      * @return array<string, string>
      */
     public static function parseEmails(string $emails): array
