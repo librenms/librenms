@@ -298,7 +298,7 @@ class Billing
         }
 
         $bill_data = Bill::query()->where('bill_id', $bill_id)->first();
-        
+
         $data = BillData::query()
             ->withCasts(['timestamp' => 'timestamp'])
             ->where('bill_id', $bill_id)
@@ -435,13 +435,18 @@ class Billing
     public static function getBandwidthGraphData($bill_id, $bill_hist_id, $from, $to, $imgtype): ?array
     {
         if (is_numeric($bill_hist_id)) {
-            $histrow = BillHistory::query()->selectRaw('UNIX_TIMESTAMP(bill_datefrom) as `from`, UNIX_TIMESTAMP(bill_dateto) AS `to`, rate_95th, rate_average')->where('bill_id', $bill_id)->where('bill_hist_id', $bill_hist_id)->first();
+            $histrow = BillHistory::query()
+                ->select(['rate_95th', 'rate_average', 'bill_datefrom', 'bill_dateto'])
+                ->withCasts(['bill_datefrom' => 'timestamp', 'bill_dateto' => 'timestamp'])
+                ->where('bill_id', $bill_id)
+                ->where('bill_hist_id', $bill_hist_id)
+                ->first();
 
             if (is_null($histrow)) {
                 return null;
             }
-            $from = $histrow->from;
-            $to = $histrow->to;
+            $from = $histrow->bill_datefrom;
+            $to = $histrow->bill_dateto;
         } else {
             if (! is_numeric($from) || ! is_numeric($to)) {
                 throw new \Exception('Must supply from and to if bill_hist_id is not supplied');
@@ -459,7 +464,18 @@ class Billing
         $data = [];
         $average = 0;
         if ($imgtype == 'day') {
-            foreach (BillData::query()->selectRaw('DISTINCT UNIX_TIMESTAMP(timestamp) as timestamp, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out')->where('bill_id', $bill_id)->whereRaw('timestamp >= FROM_UNIXTIME( ? )', [$from])->whereRaw('timestamp <= FROM_UNIXTIME( ? )', [$to])->groupByRaw('DATE(timestamp)')->orderBy('timestamp', 'asc')->get() as $data) {
+            $bill_data = BillData::query()
+                ->select(['timestamp'])
+                ->selectRaw('SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out')
+                ->withCasts(['timestamp' => 'timestamp'])
+                ->where('bill_id', $bill_id)
+                ->whereRaw('timestamp >= FROM_UNIXTIME( ? )', [$from])
+                ->whereRaw('timestamp <= FROM_UNIXTIME( ? )', [$to])
+                ->groupByRaw('DATE(timestamp)')
+                ->orderBy('timestamp', 'asc')
+                ->get();
+
+            foreach ($bill_data as $data) {
                 array_push($ticklabels, date('Y-m-d', $data->timestamp));
                 array_push($in_data, $data->traf_in ?? 0);
                 array_push($out_data, $data->traf_out ?? 0);
@@ -478,7 +494,15 @@ class Billing
                 array_push($tot_data, 0);
             }
         } elseif ($imgtype == 'hour') {
-            foreach (BillData::query()->selectRaw('DISTINCT HOUR(timestamp) as hour, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out')->where('bill_id', $bill_id)->whereRaw('timestamp >= FROM_UNIXTIME( ? )', [$from])->whereRaw('timestamp <= FROM_UNIXTIME( ? )', [$to])->groupByRaw('HOUR(timestamp)')->orderByRaw('HOUR(timestamp) ASC')->get() as $data) {
+            $bill_data = BillData::query()
+                ->selectRaw('DISTINCT HOUR(timestamp) as hour, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out')
+                ->where('bill_id', $bill_id)
+                ->whereRaw('timestamp >= FROM_UNIXTIME( ? )', [$from])
+                ->whereRaw('timestamp <= FROM_UNIXTIME( ? )', [$to])
+                ->groupByRaw('HOUR(timestamp)')
+                ->orderByRaw('HOUR(timestamp) ASC')
+                ->get();
+            foreach ($bill_data as $data) {
                 array_push($ticklabels, sprintf('%02d', $data->hour) . ':00');
                 array_push($in_data, $data->traf_in ?? 0);
                 array_push($out_data, $data->traf_out ?? 0);
