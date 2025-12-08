@@ -92,15 +92,38 @@ if ($device['sysContact']) {
     echo '<div class="row">
         <div class="col-sm-4">Contact</div>';
 
+    $contactText = get_dev_attrib($device, 'override_sysContact_bool') 
+        ? get_dev_attrib($device, 'override_sysContact_string')
+        : $device['sysContact'];
+
+    $emails = \LibreNMS\Util\Mail::parseEmails($contactText);
+    
+    if (is_array($emails) && count($emails) > 0) {
+        $email = key($emails);
+        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $emailLink = '<a href="mailto:' . htmlspecialchars($email, ENT_QUOTES, 'UTF-8') . '">'
+                       . htmlspecialchars($email, ENT_QUOTES, 'UTF-8')
+                       . '</a>';
+            $displayText = preg_replace(
+                '/(' . preg_quote($email, '/') . ')/',
+                $emailLink,
+                Clean::html($contactText)
+            );
+        }
+    }
+    
+    $displayText = $displayText ?? Clean::html($contactText);
+    
     if (get_dev_attrib($device, 'override_sysContact_bool')) {
-        $overrideContact = get_dev_attrib($device, 'override_sysContact_string');
-        echo '<div class="col-sm-8">' . parseEmailFromEmailLikeString($overrideContact) . '</div>
-        </div>
-        <div class="row">
-            <div class="col-sm-4">SNMP Contact</div>';
+        echo '<div class="col-sm-8">' . $displayText . '</div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4">SNMP Contact</div>
+                <div class="col-sm-8">' . Clean::html($device['sysContact']) . '</div>
+            </div>';
     } else {
-        echo '<div class="col-sm-8">' . parseEmailFromEmailLikeString($device['sysContact']) . '</div>
-        </div>';
+        echo '<div class="col-sm-8">' . $displayText . '</div>
+            </div>';
     }
 }
 
