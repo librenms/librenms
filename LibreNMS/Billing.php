@@ -249,6 +249,7 @@ class Billing
     {
         $histrow = BillHistory::query()
             ->select(['rate_95th', 'rate_average', 'bill_type', 'bill_datefrom', 'bill_dateto'])
+            ->withCasts(['bill_datefrom' => 'timestamp', 'bill_dateto' => 'timestamp'])
             ->where('bill_id', $bill_id)
             ->where('bill_hist_id', $bill_hist_id)
             ->first();
@@ -299,11 +300,10 @@ class Billing
         $bill_data = Bill::query()->where('bill_id', $bill_id)->first();
         
         $data = BillData::query()
-            ->select(['*'])
             ->withCasts(['timestamp' => 'timestamp'])
             ->where('bill_id', $bill_id)
-            ->where('timestamp', '>=', $from)
-            ->where('timestamp', '<=', $to)
+            ->whereRaw('timestamp >= FROM_UNIXTIME( ? )', [$from])
+            ->whereRaw('timestamp <= FROM_UNIXTIME( ? )', [$to])
             ->orderBy('timestamp', 'asc')
             ->get();
 

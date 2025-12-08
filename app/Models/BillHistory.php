@@ -9,6 +9,7 @@ class BillHistory extends BillRelatedModel
     protected $table = 'bill_history';
     const CREATED_AT = null;
     const UPDATED_AT = 'updated';
+    protected $primaryKey = 'bill_hist_id';
 
     protected $fillable = [
         'bill_datefrom',
