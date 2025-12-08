@@ -466,7 +466,7 @@ class Billing
         if ($imgtype == 'day') {
             $bill_data = BillData::query()
                 ->select(['timestamp'])
-                ->selectRaw('SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out')
+                ->selectRaw('SUM(delta) as delta, SUM(in_delta) as in_delta, SUM(out_delta) as out_delta')
                 ->withCasts(['timestamp' => 'timestamp'])
                 ->where('bill_id', $bill_id)
                 ->whereRaw('timestamp >= FROM_UNIXTIME( ? )', [$from])
@@ -476,10 +476,10 @@ class Billing
                 ->get();
 
             foreach ($bill_data as $data) {
-                array_push($ticklabels, date('Y-m-d', $data->timestamp));
-                array_push($in_data, $data->traf_in ?? 0);
-                array_push($out_data, $data->traf_out ?? 0);
-                array_push($tot_data, $data->traf_total ?? 0);
+                array_push($ticklabels, date('Y-m-d', (int)$data->timestamp));
+                array_push($in_data, $data->in_delta ?? 0);
+                array_push($out_data, $data->out_delta ?? 0);
+                array_push($tot_data, $data->delta ?? 0);
                 $average += $data->traf_total;
             }
 
@@ -495,7 +495,7 @@ class Billing
             }
         } elseif ($imgtype == 'hour') {
             $bill_data = BillData::query()
-                ->selectRaw('DISTINCT HOUR(timestamp) as hour, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out')
+                ->selectRaw('DISTINCT HOUR(timestamp) as timestamp, SUM(delta) as delta, SUM(in_delta) as in_delta, SUM(out_delta) as out_delta')
                 ->where('bill_id', $bill_id)
                 ->whereRaw('timestamp >= FROM_UNIXTIME( ? )', [$from])
                 ->whereRaw('timestamp <= FROM_UNIXTIME( ? )', [$to])
@@ -503,11 +503,11 @@ class Billing
                 ->orderByRaw('HOUR(timestamp) ASC')
                 ->get();
             foreach ($bill_data as $data) {
-                array_push($ticklabels, sprintf('%02d', $data->hour) . ':00');
-                array_push($in_data, $data->traf_in ?? 0);
-                array_push($out_data, $data->traf_out ?? 0);
-                array_push($tot_data, $data->traf_total ?? 0);
-                $average += $data->traf_total;
+                array_push($ticklabels, sprintf('%02d', $data->timestamp) . ':00');
+                array_push($in_data, $data->in_delta ?? 0);
+                array_push($out_data, $data->out_delta ?? 0);
+                array_push($tot_data, $data->delta ?? 0);
+                $average += $data->delta;
             }
 
             $ave_count = count($tot_data);
