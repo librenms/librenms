@@ -3,7 +3,7 @@
 require 'includes/html/graphs/common.inc.php';
 
 $rrd_filename = Rrd::name($device['hostname'], 'gaia_logserver_lograte');
-$rrd_options[] = "--vertical-label='Logs per second'";
+$graph_params->vertical_label = 'Logs per second';
 
 $rrd_options[] = "DEF:lograte=$rrd_filename:LogReceiveRate:LAST";
 

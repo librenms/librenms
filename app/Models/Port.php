@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 use Permissions;
 
@@ -128,6 +129,29 @@ class Port extends DeviceRelatedModel
     public function getDescription(): string
     {
         return (string) $this->ifAlias;
+    }
+
+    /**
+     * Get port speeds, respecting parsed interface circuit speeds as bps
+     *
+     * @return array{int, int} [egress bps, ingress bps]
+     */
+    public function getSpeeds(): array
+    {
+        $egress = $ingress = (int) $this->ifSpeed;
+
+        if (! empty($this->port_descr_speed)) {
+            $speed_parts = explode('/', (string) $this->port_descr_speed, 2);
+            $parsed_egress = Number::toBytes($speed_parts[0]);
+            $parsed_ingress = isset($speed_parts[1]) ? Number::toBytes($speed_parts[1]) : $parsed_egress;
+
+            if ($parsed_egress > 0 && $parsed_ingress > 0) {
+                $egress = $parsed_egress;
+                $ingress = $parsed_ingress;
+            }
+        }
+
+        return [$egress, $ingress];
     }
 
     /**

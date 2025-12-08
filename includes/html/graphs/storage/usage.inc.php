@@ -7,7 +7,7 @@ require 'includes/html/graphs/common.inc.php';
 
 $previous = $graph_params->visible('previous');
 
-$rrd_options[] = '-b 1024';
+$graph_params->base = 1024;
 
 $iter = '1';
 

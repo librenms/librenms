@@ -3,13 +3,10 @@
 require 'includes/html/graphs/common.inc.php';
 
 $unit_text ??= '';
-$rrd_options[] = '-u';
-$rrd_options[] = '100';
-$rrd_options[] = '-l';
-$rrd_options[] = '0';
-$rrd_options[] = '-E';
-$rrd_options[] = '-b';
-$rrd_options[] = '1024';
+$graph_params->scale_min = 0;
+$graph_params->scale_max = 100;
+$graph_params->sloped_mode = true;
+$graph_params->base = 1024;
 
 $iter = '1';
 

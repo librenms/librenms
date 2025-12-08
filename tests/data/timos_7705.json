@@ -3531,7 +3531,7 @@
                     "port_descr_type": "mob",
                     "port_descr_descr": "DPAC-GU-LTE",
                     "port_descr_circuit": null,
-                    "port_descr_speed": "Tam-NOC-TOYCELL-GLTAM869-LTE-668",
+                    "port_descr_speed": "Tam-NOC-TOYCELL-GLTAM869-LTE-66869",
                     "port_descr_notes": null,
                     "ifDescr": "1/3/5, 10/100/Gig Ethernet SFP, \\Mob: DPAC-GU-LTE [Tam-NOC-TOYCELL-GLTAM869-LTE-66869]",
                     "ifName": "1/3/5",

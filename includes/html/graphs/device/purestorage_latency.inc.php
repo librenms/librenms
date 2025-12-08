@@ -7,9 +7,9 @@
 $rrd_filename = Rrd::name($device['hostname'], 'purestorage_latency');
 
 if (Rrd::checkRrdExists($rrd_filename)) {
-    $rrd_options[] = "--title='Array Latency'";
-    $rrd_options[] = "--vertical-label='Latency (ms)'";
-    $rrd_options[] = '--lower-limit=0';
+    $graph_params->title = 'Array Latency';
+    $graph_params->vertical_label = 'Latency (ms)';
+    $graph_params->scale_min = 0;
 
     // Read latency (convert from microseconds to milliseconds)
     $rrd_options[] = "DEF:readLatencyUS=$rrd_filename:read:AVERAGE";

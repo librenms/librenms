@@ -7,9 +7,9 @@
 $rrd_filename = Rrd::name($device['hostname'], 'purestorage_iops');
 
 if (Rrd::checkRrdExists($rrd_filename)) {
-    $rrd_options[] = "--title='Array IOPS'";
-    $rrd_options[] = "--vertical-label='Operations/sec'";
-    $rrd_options[] = '--lower-limit=0';
+    $graph_params->title = 'Array IOPS';
+    $graph_params->vertical_label = 'Operations/sec';
+    $graph_params->scale_min = 0;
 
     // Read IOPS
     $rrd_options[] = "DEF:readIOPS=$rrd_filename:read:AVERAGE";
