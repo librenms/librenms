@@ -195,55 +195,6 @@ function dbDelete($table, $where = null, $parameters = [])
 }//end dbDelete()
 
 /**
- * Delete orphaned entries from a table that no longer have a parent in parent_table
- * Format of parents array is as follows table.table_key_column<.target_key_column>
- *
- * @param  string  $target_table  The table to delete entries from
- * @param  array  $parents  an array of parent tables to check.
- * @return bool|int
- *
- * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent#deleting-models
- * @see https://laravel.com/docs/eloquent#deleting-models
- */
-function dbDeleteOrphans($target_table, $parents)
-{
-    if (empty($parents)) {
-        // don't delete all entries if parents is missing
-        return false;
-    }
-
-    $target_table = $target_table;
-    $sql = "DELETE T FROM `$target_table` T";
-    $where = [];
-
-    foreach ((array) $parents as $parent) {
-        $parent_parts = explode('.', (string) $parent);
-        if (count($parent_parts) == 2) {
-            [$parent_table, $parent_column] = $parent_parts;
-            $target_column = $parent_column;
-        } elseif (count($parent_parts) == 3) {
-            [$parent_table, $parent_column, $target_column] = $parent_parts;
-        } else {
-            // invalid input
-            return false;
-        }
-
-        $sql .= " LEFT JOIN `$parent_table` ON `$parent_table`.`$parent_column` = T.`$target_column`";
-        $where[] = " `$parent_table`.`$parent_column` IS NULL";
-    }
-
-    $query = "$sql WHERE" . implode(' AND', $where);
-
-    try {
-        $result = Eloquent::DB()->delete($query);
-    } catch (PDOException $pdoe) {
-        dbHandleException(new QueryException('dbFacile', $query, [], $pdoe));
-    }
-
-    return $result;
-}
-
-/**
  * Fetches all of the rows (associatively) from the last performed query.
  * Most other retrieval functions build off this
  *
