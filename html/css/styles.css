@@ -1853,7 +1853,7 @@ label {
 
 .nav > li > a {
   padding-left: 10px;
-  margin-right: 5px;
+  padding-right: 5px;
 }
 
 /* devices layout modifications */
