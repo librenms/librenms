@@ -255,21 +255,34 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
                 '.1.3.6.1.4.1.2281.10.5.1.1.3.' . $index,
                 'ceraos-tx',
                 $index,
-                $ifNames[$index] . ' TX Level',
+                $ifNames[$index] . ' TX',
                 $data['genEquipRfuStatusTxLevel']
             );
         }
 
-        $rx = snmpwalk_group($this->getDeviceArray(), 'genEquipRfuStatusRxLevel', 'MWRM-RADIO-MIB');
-        foreach ($rx as $index => $data) {
+        $main_rx = snmpwalk_group($this->getDeviceArray(), 'genEquipRfuStatusRxLevel', 'MWRM-RADIO-MIB');
+        foreach ($main_rx as $index => $data) {
             $sensors[] = new WirelessSensor(
                 'power',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.2281.10.5.1.1.2.' . $index,
-                'ceraos-rx',
+                'ceraos-main-rx',
                 $index,
-                $ifNames[$index] . ' RX Level',
+                $ifNames[$index] . ' RX Main',
                 $data['genEquipRfuStatusRxLevel']
+            );
+        }
+
+        $div_rx = snmpwalk_group($this->getDeviceArray(), 'genEquipRfuStatusRxLevelDiversity', 'MWRM-RADIO-MIB');
+        foreach ($div_rx as $index => $data) {
+            $sensors[] = new WirelessSensor(
+                'power',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.2281.10.5.1.1.10.' . $index,
+                'ceraos-diversity-rx',
+                $index,
+                $ifNames[$index] . ' RX Diversity',
+                $data['genEquipRfuStatusRxLevelDiversity']
             );
         }
 
