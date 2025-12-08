@@ -7,11 +7,8 @@ $name = 'voip-monitor';
 if (! empty($agent_data[$name])) {
     $rawdata = $agent_data[$name];
 } else {
-    $options = '-Oqv';
-    $mib = 'NET-SNMP-EXTEND-MIB';
-
     $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.7.118.111.105.112.109.111.110';
-    $rawdata = snmp_get($device, $oid, $options, $mib);
+    $rawdata = SnmpQuery::get($oid)->value();
 }
 
 // Format Data
