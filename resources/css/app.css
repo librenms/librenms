@@ -65,5 +65,5 @@
 }
 
 #coordinates-text  {
-  @apply tw:underline;
+  @apply tw:hover:underline tw:hover:cursor-pointer;
 }
