@@ -1790,7 +1790,7 @@ return [
                 'description' => 'Port Security',
             ],
             'ports-voice-vlan' => [
-                'description' => 'Port Security',
+                'description' => 'Voice VLAN',
             ],
         ],
         'polling.selected_ports' => [
