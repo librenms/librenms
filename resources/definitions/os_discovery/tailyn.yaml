@@ -2,6 +2,7 @@ modules:
     os:
         hardware: ENTITY-MIB::entPhysicalModelName.1
         version: IMP-HF528-MIB::iswSdpSwVersion.0
+        features: IMP-HF528-MIB::iswSdpProductModel.0
     processors:
         data:
             -
