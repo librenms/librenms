@@ -7,7 +7,7 @@ modules:
         data:
             -
                 oid: IMP-HF528-MIB::iswCPULoading
-                num_oid: '.1.3.6.1.4.1.5833.2017.3.15.1.0'
+                num_oid: '.1.3.6.1.4.1.5833.2017.3.15.1.{{ $index }}'
     sensors:
         additional_oids:
             data:
