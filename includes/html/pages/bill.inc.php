@@ -174,7 +174,7 @@ if (!Bill::where('bill_id', $bill_id)->exists()) {
             <?php echo Billing::formatBytes($total_data) ?> of <?php echo Billing::formatBytes($bill_data['bill_quota']) . ' (' . $percent . '%)' ?>
             - Average rate <?php echo Number::formatSi($rate_average, 2, 0, 'bps') ?>
         </td>
-        <td style="width: 210px;"><?php echo \LibreNMS\Util\Html::percentageBar(200, 10, $percent, null, $percent . '%', ['left' => $background['left'], 'right' => $background['right']]); ?></td>
+        <td style="width: 210px;"><?php echo \LibreNMS\Util\Html::percentageBar(200, 10, $percent, null, $percent . '%', null, null, ['left' => $background['left'], 'right' => $background['right']]); ?></td>
         </tr>
         <tr>
             <td colspan="2">
