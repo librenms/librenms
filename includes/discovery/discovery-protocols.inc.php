@@ -1,6 +1,7 @@
 <?php
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Link;
 use App\Models\Ospfv3Nbr;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\StringHelpers;
@@ -555,7 +556,7 @@ foreach (dbFetchRows($sql, [$device['device_id']]) as $test) {
 }
 
 // remove orphaned links
-$deleted = (int) dbDeleteOrphans('links', ['devices.device_id.local_device_id']);
+$deleted = Link::doesntHave('device')->delete();
 echo str_repeat('-', $deleted);
 d_echo(" $deleted orphaned links deleted\n");
 
