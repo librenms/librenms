@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('ports_voice_vlan', function (Blueprint $table) {
             $table->increments('ports_voice_vlan_id');
-            $table->integer('port_id')->unsigned()->default(0)->unique();
-            $table->integer('device_id')->unsigned()->default(0)->index();
+            $table->integer('port_id')->unsigned()->default(0);
+            $table->integer('device_id')->unsigned();
             $table->integer('voice_vlan')->unsigned()->default(0);
             $table->unique(['device_id', 'port_id', 'voice_vlan'], 'ports_voice_vlans_device_id_port_id_voice_vlan_unique');
             $table->index(['port_id'], 'ports_voice_vlans_port_id_index');
