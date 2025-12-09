@@ -165,14 +165,14 @@ class Rrd extends BaseDatastore
         $rrd_name = $meta['rrd_name'] ?? $measurement;
         $step = $meta['rrd_step'] ?? $this->step;
         if (! empty($meta['rrd_oldname'])) {
-            self::renameFile($device_model, $meta['rrd_oldname'], $rrd_name);
+            $this->renameFile($device_model, $meta['rrd_oldname'], $rrd_name);
         }
 
         if (isset($meta['rrd_proxmox_name'])) {
             $pmxvars = $meta['rrd_proxmox_name'];
-            $rrd = self::proxmoxName($pmxvars['pmxcluster'], $pmxvars['vmid'], $pmxvars['vmport']);
+            $rrd = $this->proxmoxName($pmxvars['pmxcluster'], $pmxvars['vmid'], $pmxvars['vmport']);
         } else {
-            $rrd = self::name($device_model->hostname, $rrd_name);
+            $rrd = $this->name($device_model->hostname, $rrd_name);
         }
 
         if (isset($meta['rrd_def'])) {
@@ -338,8 +338,8 @@ class Rrd extends BaseDatastore
      */
     public function renameFile(Device $device, $oldname, $newname): bool
     {
-        $oldrrd = self::name($device->hostname, $oldname);
-        $newrrd = self::name($device->hostname, $newname);
+        $oldrrd = $this->name($device->hostname, $oldname);
+        $newrrd = $this->name($device->hostname, $newname);
         if (is_file($oldrrd) && ! is_file($newrrd)) {
             if (rename($oldrrd, $newrrd)) {
                 Eventlog::log("Renamed $oldrrd to $newrrd", $device, 'poller', Severity::Ok);
@@ -402,7 +402,7 @@ class Rrd extends BaseDatastore
         $output = null;
 
         try {
-            $cmd = self::buildCommand($command, $filename, $options);
+            $cmd = $this->buildCommand($command, $filename, $options);
         } catch (FileExistsException) {
             Log::debug("RRD[%g$filename already exists%n]", ['color' => true]);
 
@@ -491,10 +491,10 @@ class Rrd extends BaseDatastore
             }
         }
 
-        if (self::useRrdCached($command)) {
+        if ($this->useRrdCached($command)) {
             // only relative paths if using rrdcached
             $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
-            $options = self::fixRrdCachedOptions($options);
+            $options = $this->fixRrdCachedOptions($options);
         }
 
         return [$command, $filename, ...$options];
@@ -667,8 +667,8 @@ class Rrd extends BaseDatastore
     private function graphPhprrd(array $options, ?array $env = null): string
     {
         $rrd = new \RRDGraph('-');
-        if (self::useRrdCached('graph')) {
-            $options = self::fixRrdCachedOptions($options);
+        if ($this->useRrdCached('graph')) {
+            $options = $this->fixRrdCachedOptions($options);
         }
         $rrd->setOptions($options);
         try {
@@ -693,10 +693,10 @@ class Rrd extends BaseDatastore
     {
         // Use php-rrd if it is installed
         if (class_exists('\RRDGraph')) {
-            return self::graphPhprrd($options, $env);
+            return $this->graphPhprrd($options, $env);
         }
 
-        return self::graphRrdtool($options, $env);
+        return $this->graphRrdtool($options, $env);
     }
 
     /**
