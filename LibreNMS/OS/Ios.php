@@ -35,9 +35,11 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Polling\PortSecurityPolling;
+use LibreNMS\Interfaces\Polling\PortsVoiceVlanPolling;
 use LibreNMS\OS\Shared\Cisco;
 use LibreNMS\OS\Traits\CiscoCellular;
 use LibreNMS\OS\Traits\CiscoPortSecurity;
+use LibreNMS\OS\Traits\CiscoPortsVoiceVlan;
 
 class Ios extends Cisco implements
     WirelessCellDiscovery,
@@ -47,10 +49,12 @@ class Ios extends Cisco implements
     WirelessRsrqDiscovery,
     WirelessRsrpDiscovery,
     WirelessSnrDiscovery,
-    PortSecurityPolling
+    PortSecurityPolling,
+    PortsVoiceVlanPolling
 {
     use CiscoCellular;
     use CiscoPortSecurity;
+    use CiscoPortsVoiceVlan;
 
     /**
      * @return WirelessSensor[] Sensors

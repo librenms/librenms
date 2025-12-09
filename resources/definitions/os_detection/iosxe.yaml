@@ -23,7 +23,8 @@ poller_modules:
     cisco-vpdn: true
     cisco-qfp: true
     xdsl: true
-    port-security: false
+    port-security: true
+    ports-voice-vlan: true
 discovery_modules:
     cisco-cef: true
     slas: true

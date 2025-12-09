@@ -601,4 +601,12 @@ class Port extends DeviceRelatedModel
     {
         return $this->hasOne(PortSecurity::class, 'port_id');
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\PortsVoiceVlan, $this>
+     */
+    public function portsVoiceVlan(): HasOne
+    {
+        return $this->hasOne(PortsVoiceVlan::class, 'port_id');
+    }
 }

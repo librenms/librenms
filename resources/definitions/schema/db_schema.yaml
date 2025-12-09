@@ -1940,6 +1940,16 @@ ports_vlans:
     PRIMARY: { Name: PRIMARY, Columns: [port_vlan_id], Unique: true, Type: BTREE }
     ports_vlans_device_id_port_id_vlan_unique: { Name: ports_vlans_device_id_port_id_vlan_unique, Columns: [device_id, port_id, vlan], Unique: true, Type: BTREE }
     ports_vlans_port_id_index: { Name: ports_vlans_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
+ports_voice_vlan:
+  Columns:
+    - { Field: ports_voice_vlan_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: voice_vlan, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [ports_voice_vlan_id], Unique: true, Type: BTREE }
+    ports_voice_vlans_device_id_port_id_voice_vlan_unique: { Name: ports_voice_vlans_device_id_port_id_voice_vlan_unique, Columns: [device_id, port_id, voice_vlan], Unique: true, Type: BTREE }
+    ports_voice_vlans_port_id_index: { Name: ports_voice_vlans_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
 port_groups:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

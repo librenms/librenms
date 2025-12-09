@@ -1789,6 +1789,9 @@ return [
             'port-security' => [
                 'description' => 'Port Security',
             ],
+            'ports-voice-vlan' => [
+                'description' => 'Voice VLAN',
+            ],
         ],
         'polling.selected_ports' => [
             'description' => 'Selected Port Polling',

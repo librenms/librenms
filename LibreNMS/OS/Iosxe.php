@@ -43,8 +43,10 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Polling\IsIsPolling;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\PortSecurityPolling;
+use LibreNMS\Interfaces\Polling\PortsVoiceVlanPolling;
 use LibreNMS\OS\Traits\CiscoCellular;
 use LibreNMS\OS\Traits\CiscoPortSecurity;
+use LibreNMS\OS\Traits\CiscoPortsVoiceVlan;
 use LibreNMS\Util\IP;
 use SnmpQuery;
 
@@ -58,11 +60,13 @@ class Iosxe extends Ciscowlc implements
     WirelessRsrqDiscovery,
     WirelessRsrpDiscovery,
     WirelessSnrDiscovery,
-    PortSecurityPolling
+    PortSecurityPolling,
+    PortsVoiceVlanPolling
 {
     use SyncsModels;
     use CiscoCellular;
     use CiscoPortSecurity;
+    use CiscoPortsVoiceVlan;
 
     /**
      * Array of shortened ISIS codes
