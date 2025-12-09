@@ -3,8 +3,6 @@
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use App\Models\Port;
-use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Number;
@@ -52,9 +50,9 @@ if (isset($options['h'])) {
 }
 
 $devices = $devices->withCount([
-            'ports',
-            'ports as inactive_count' => fn ($q) => $q->where('deleted', 1)->orWhere('ifAdminStatus', '!=', 'up')->orWhere('disabled', 1),
-        ]);
+    'ports',
+    'ports as inactive_count' => fn ($q) => $q->where('deleted', 1)->orWhere('ifAdminStatus', '!=', 'up')->orWhere('disabled', 1),
+]);
 
 $devices = $devices->get()->toArray();
 
