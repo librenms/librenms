@@ -34,12 +34,8 @@ $datastore = Datastore::init($options);
 echo "Starting service polling run:\n\n";
 $polled_services = 0;
 
-$query = Device::query()->select('devices.*', 'services.*', 'devices_attribs.attrib_value')
+$query = Device::query()->select('devices.*', 'services.*')
     ->join('services', 'devices.device_id', '=', 'services.device_id')
-    ->leftJoin('devices_attribs', function ($join): void {
-        $join->on('devices.device_id', '=', 'devices_attribs.device_id')
-             ->where('devices_attribs.attrib_type', '=', 'override_icmp_disable');
-    })
     ->where('devices.disabled', 0)
     ->orderBy('devices.device_id', 'DESC');
 
@@ -69,7 +65,7 @@ foreach ($services as $service) {
     // Run the polling function if service is enabled and the associated device is up, "Disable ICMP Test" option is not enabled,
     // or service hostname/ip is different from associated device
     if (! $service['service_disabled'] && ($service['status'] == 1 || ($service['status'] == 0 && $service['status_reason'] === 'snmp') ||
-        $service['attrib_value'] === 'true' || (! is_null($service['service_ip']) && $service['service_ip'] !== $service['hostname'] &&
+        $service->getAttrib('override_icmp_disable') === 'true' || (! is_null($service['service_ip']) && $service['service_ip'] !== $service['hostname'] &&
         $service['service_ip'] !== inet6_ntop($service['ip'])))) {
         poll_service($service);
         $polled_services++;

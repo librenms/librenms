@@ -38,7 +38,7 @@ if (isset($options['help'])) {
     exit(0);
 }
 
-$devices = Device::query()->where('status', 1)->where('disabled', 0)->orderBy('hostname', 'ASC');
+$devices = Device::query()->isActive()->orderBy('hostname', 'ASC');
 if (isset($options['h'])) {
     if (is_numeric($options['h'])) {
         $devices->where('device_id', $options['h']);
@@ -50,6 +50,11 @@ if (isset($options['h'])) {
         $devices->where('hostname', 'like', str_replace('*', '%', $options['h']));
     }
 }
+
+$devices = $devices->withCount([
+            'ports',
+            'ports as inactive_count' => fn ($q) => $q->where('deleted', 1)->orWhere('ifAdminStatus', '!=', 'up')->orWhere('disabled', 1),
+        ]);
 
 $devices = $devices->get()->toArray();
 
@@ -95,13 +100,7 @@ echo PHP_EOL;
 $inactive_sql = "`deleted` = 1 OR `ifAdminStatus` != 'up' OR `disabled` = 1";
 $set_count = 0;
 foreach ($devices as &$device) {
-    $count = Port::query()->where('device_id', $device['device_id'])->count();
-    $inactive = Port::query()->where('device_id', $device['device_id'])->where(function (Builder $query): void {
-        $query->where('deleted', 1)->orWhere('ifAdminStatus', '!=', 'up')->orWhere('disabled', 1);
-    })->count();
-
-    $device['port_count'] = $count;
-    $device['inactive_ratio'] = ($inactive == 0 ? 0 : ($inactive / $count));
+    $device['inactive_ratio'] = ($device['inactive_count'] == 0 ? 0 : ($device['inactive_count'] / $device['ports_count']));
     $device['diff_sec'] = $device['selective_time_sec'] - $device['full_time_sec'];
     $device['diff_perc'] = Number::calculatePercent($device['diff_sec'], $device['full_time_sec']);
 
