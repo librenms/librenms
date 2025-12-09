@@ -150,8 +150,17 @@ well as pre-fetched data. The index ($index) and the sub_indexes (in
 case the oid is indexed multiple times) are also available: if
 $index="1.20", then $subindex0="1" and $subindex1="20".
 
-To pre-fetch data, use `additional_oids`
-For example
+To fetch data not avaialble to your sensor you can use `additional_oids`.
+
+> [!IMPORTANT] 
+> `additional_oids` should only be used when a oid data is not fetched by your sensor due to its negative performance impact.
+
+ `additional_oids` can also be used within a class.
+ This is the preferred way if the `additional_oids` are only used inside the class.
+ See `additional_oids` in the `temperature` class below aswell as `additional_oids` on the `sensors` level.
+ 
+ Note that only one `additional_oids` statements should be used for the same oid and this is only an example showing both cases.
+
 ```
 sensors:
     additional_oids:
@@ -159,6 +168,27 @@ sensors:
             -
                 oid:
                     - Stulz-WIB8000-MIB::unitsettingName
+    temperature:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - Stulz-WIB8000-MIB::unitsettingName
+        data:
+            -
+                oid: unitTemperature
+                value: unitTemperature
+                num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.1.1.1.1170.{{ $index }}'
+                index: 'unitTemperature.{{ $index }}'
+                descr: 'Unit {{ Stulz-WIB8000-MIB::unitsettingName:0-1 }} temp'
+                divisor: 10
+            -
+                oid: unitSupplyAirTemperature
+                value: unitSupplyAirTemperature
+                num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.1.1.1.1193.{{ $index }}'
+                index: 'unitSupplyAirTemperature.{{ $index }}'
+                descr: 'Unit {{ Stulz-WIB8000-MIB::unitsettingName:0-1 }} supply temp'
+                divisor: 10
 ```
 
 If you want access a string in an index, `{{ $index_string }}` can be used,
