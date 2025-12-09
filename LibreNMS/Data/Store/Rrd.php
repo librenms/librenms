@@ -444,6 +444,29 @@ class Rrd extends BaseDatastore
     }
 
     /**
+     * Determine whether we need to use rrdcached
+     */
+    private function useRrdCached(string $command): bool
+    {
+        if ($this->rrdcached &&
+            ! ($command == 'create' && version_compare($this->version, '1.5.5', '<')) &&
+            ! ($command == 'tune' && version_compare($this->version, '1.5', '<'))
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Add rrdcached options to the options array
+     */
+    private function fixRrdCachedOptions(array $options = []): array
+    {
+        return ['--daemon', $this->rrdcached, ...str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $options)];
+    }
+
+    /**
      * Build a command array for rrdtool
      * Shortens the filename as needed
      * Determines if --daemon should be used
@@ -468,15 +491,10 @@ class Rrd extends BaseDatastore
             }
         }
 
-        if ($this->rrdcached &&
-            ! ($command == 'create' && version_compare($this->version, '1.5.5', '<')) &&
-            ! ($command == 'tune' && version_compare($this->version, '1.5', '<'))
-        ) {
+        if (self::useRrdCached($command)) {
             // only relative paths if using rrdcached
             $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
-            $options = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $options);
-
-            return [$command, $filename, '--daemon', $this->rrdcached, ...$options];
+            $options = self::fixRrdCachedOptions($options);
         }
 
         return [$command, $filename, ...$options];
@@ -649,6 +667,9 @@ class Rrd extends BaseDatastore
     private function graphPhprrd(array $options, ?array $env = null): string
     {
         $rrd = new \RRDGraph('-');
+        if (self::useRrdCached('graph')) {
+            $options = self::fixRrdCachedOptions($options);
+        }
         $rrd->setOptions($options);
         try {
             $data = $rrd->saveVerbose();
