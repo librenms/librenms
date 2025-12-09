@@ -18,10 +18,7 @@
                     </thead>
                 </table>
             </div>
-
-            @if(! $filter_device)
-                <input type="hidden" name="device" id="device" value="{{ $device->device_id }}">
-            @endif
+            <input type="hidden" name="device" id="device" value="{{ $device->device_id }}">
         </x-panel>
     </x-device.page>
 @endsection
@@ -65,14 +62,27 @@
             '</div>'
         );
 
-        init_select2("select#device", "device", {limit: 100}, "{{ $device->device_id }}");
-        init_select2("#eventtype", "eventlog", function(params) {
-            return {
-                field: "type",
-                device: $('#device').val(),
-                term: params.term,
-                page: params.page || 1
+        $('#eventtype').select2({
+            theme: 'bootstrap',
+            dropdownAutoWidth: true,
+            width: 'auto',
+            allowClear: true,
+            placeholder: 'All Types',
+            ajax: {
+                url: '{{ route('ajax.select.eventlog') }}',
+                delay: 200,
+                data: function (params) {
+                    return {
+                        field: 'type',
+                        device: $('#device').val(),
+                        term: params.term,
+                        page: params.page || 1
+                    };
+                }
             }
-        }, @json($eventtype));
+        });
+        @if(!empty($eventtype))
+            $('#eventtype').val({!! json_encode($eventtype) !!}).trigger('change');
+        @endif
     </script>
 @endsection

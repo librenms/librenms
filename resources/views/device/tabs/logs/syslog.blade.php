@@ -20,10 +20,7 @@
                     </thead>
                 </table>
             </div>
-
-            @if(! $filter_device)
-                <input type="hidden" name="device" id="device" value="{{ $device->device_id }}">
-            @endif
+            <input type="hidden" name="device" id="device" value="{{ $device->device_id }}">
         </x-panel>
     </x-device.page>
 @endsection
@@ -61,18 +58,22 @@
             '</div>' +
             '&nbsp;&nbsp;<div class="form-group">' +
             '<select name="program" id="program" class="form-control">' +
-                '<option value="">All Programs&nbsp;&nbsp;</option>' +
-            @if($program)
-                '<option value=\"' + @json($program) + '\">' + @json($program) + '</option>' +";
-            @endif
+                '<option value="">All Programs</option>' +
+                @if ($program)
+                    '<option value="' + @json($program) + '" selected>' +
+                        @json($program) +
+                    '</option>' +
+                @endif
             '</select>' +
             '</div>' +
             '&nbsp;&nbsp;<div class="form-group">' +
             '<select name="priority" id="priority" class="form-control">' +
                 '<option value="">All Priorities</option>' +
-            @if($priority)
-                '<option value=\"' + @json($priority) + '\">' + @json($priority) + '</option>' +";
-            @endif
+                @if ($priority)
+                    '<option value="' + @json($priority) + '" selected>' +
+                        @json($priority) +
+                    '</option>' +
+                @endif
             '</select>' +
             '</div>' +
             '&nbsp;&nbsp;<div class="form-group">' +
@@ -131,22 +132,49 @@
             $("#dtpickerto").data("DateTimePicker").maxDate('{{ $now }}');
         }
 
-        init_select2("select#device", "device", {limit: 100}, "{{ $device->device_id }}");
-        init_select2("#program", "syslog", function(params) {
-            return {
-                field: "program",
-                device: $('#device').val(),
-                term: params.term,
-                page: params.page || 1
+        $('#program').select2({
+            theme: 'bootstrap',
+            dropdownAutoWidth: true,
+            width: 'auto',
+            allowClear: true,
+            placeholder: 'All Programs',
+            ajax: {
+                url: '{{ route('ajax.select.syslog') }}',
+                delay: 200,
+                data: function (params) {
+                    return {
+                        field: 'program',
+                        device: $('#device').val(),
+                        term: params.term,
+                        page: params.page || 1
+                    };
+                }
             }
-        }, @json($program));
-        init_select2("#priority", "syslog", function(params) {
-            return {
-                field: "priority",
-                device: $('#device').val(),
-                term: params.term,
-                page: params.page || 1
+        });
+        @if(!empty($program))
+            $('#program').val({!! json_encode($program) !!}).trigger('change');
+        @endif
+        $('#priority').select2({
+            theme: 'bootstrap',
+            dropdownAutoWidth: true,
+            width: 'auto',
+            allowClear: true,
+            placeholder: 'All Priorities',
+            ajax: {
+                url: '{{ route('ajax.select.syslog') }}',
+                delay: 200,
+                data: function (params) {
+                    return {
+                        field: 'priority',
+                        device: $('#device').val(),
+                        term: params.term,
+                        page: params.page || 1
+                    };
+                }
             }
-        }, @json($priority));
+        });
+        @if(!empty($priority))
+            $('#priority').val({!! json_encode($priority) !!}).trigger('change');
+        @endif
     </script>
 @endsection
