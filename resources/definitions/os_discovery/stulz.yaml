@@ -1,7 +1,7 @@
 mib: Stulz-WIB8000-MIB
 modules:
     sensors:
-        pre-cache:
+         additional_oids:
             data:
                 -
                     oid:
