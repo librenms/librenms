@@ -18,8 +18,8 @@ return new class extends Migration
             $table->integer('port_id')->unsigned()->default(0)->unique();
             $table->integer('device_id')->unsigned()->default(0)->index();
             $table->integer('voice_vlan')->unsigned()->default(0);
-            $table->index(['device_id', 'port_id', 'voice_vlan'], 'ports_voice_vlans_device_id_port_id_voice_vlan_unique');
-            $table->index(['device_id', 'port_id', 'voice_vlan'], 'ports_voice_vlans_port_id_index');
+            $table->unique(['device_id', 'port_id', 'voice_vlan'], 'ports_voice_vlans_device_id_port_id_voice_vlan_unique');
+            $table->index(['port_id'], 'ports_voice_vlans_port_id_index');
         });
     }
 

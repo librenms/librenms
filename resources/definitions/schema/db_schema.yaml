@@ -1943,8 +1943,8 @@ ports_vlans:
 ports_voice_vlan:
   Columns:
     - { Field: ports_voice_vlan_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: voice_vlan, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [ports_voice_vlan_id], Unique: true, Type: BTREE }
