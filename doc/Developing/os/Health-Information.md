@@ -150,6 +150,17 @@ well as pre-fetched data. The index ($index) and the sub_indexes (in
 case the oid is indexed multiple times) are also available: if
 $index="1.20", then $subindex0="1" and $subindex1="20".
 
+To pre-fetch data, use `additional_oids`
+For example
+```
+sensors:
+    additional_oids:
+        data:
+            -
+                oid:
+                    - Stulz-WIB8000-MIB::unitsettingName
+```
+
 If you want access a string in an index, `{{ $index_string }}` can be used,
 optionally suffixed with a format string to specify how to extract the string.
 `{{ $index_string:nns }}` will skip two numeric indexes and return the string after.
