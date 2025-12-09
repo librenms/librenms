@@ -29,6 +29,7 @@ class CheckAlerts
     {
         if (LibrenmsConfig::get('alert.disable')) {
             Log::info('#### Alerting disabled ####');
+
             return;
         }
 
