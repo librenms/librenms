@@ -377,13 +377,13 @@ class Rrd extends BaseDatastore
      * Generates a path based on the hostname (or IP)
      *
      * @param  string  $host  Host name
+     * @param  string  $full_path  Whether to return the full path or just the directory name
      * @return string the name of the rrd directory for $host
      */
-    public function dirFromHost($host): string
+    public function dirFromHost($host, $full_path = false): string
     {
         $host = self::safeName(trim($host, '[]'));
-
-        return Str::finish($this->rrd_dir, '/') . $host;
+        return $full_path ? Str::finish($this->rrd_dir, '/') . $host : $host;
     }
 
     /**
@@ -494,16 +494,24 @@ class Rrd extends BaseDatastore
     public function getRrdFiles(string $hostname): array
     {
         $dir = $this->dirFromHost($hostname);
+        if (empty($dir)) {
+            $append = '';
+        } else {
+            $append = $dir . '/';
+        }
 
         if ($this->rrdcached) {
             $output = $this->command('list', $dir . '/', ['--recursive']);
             $files = explode("\n", trim($output[0] ?? ''));
             array_pop($files); // remove rrdcached status line
-            $prepend = str_replace($this->rrd_dir . '/', '', $dir) . '/';
 
-            return array_map(fn ($file) => $prepend . $file, $files);
+            return array_map(fn ($file) => $append . $file, $files);
         }
 
+        $dir = $this->dirFromHost($hostname, true);
+        if (! is_dir($dir)) {
+            return [];
+        }
         $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir));
         $rrdFiles = new \RegexIterator($iterator, '/\.rrd$/');
 
@@ -559,12 +567,11 @@ class Rrd extends BaseDatastore
     public function checkRrdExists($filename): bool
     {
         if ($this->rrdcached && version_compare($this->version, '1.5', '>=')) {
-            $check_output = implode('', $this->command('last', $filename));
-            $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
+            $check_output = implode('', $this->command('first', $filename));
 
             return ! (str_contains($check_output, $filename) && str_contains($check_output, 'No such file or directory'));
         } else {
-            return is_file($filename);
+            return is_file($this->rrd_dir . '/' . $filename);
         }
     }
 
