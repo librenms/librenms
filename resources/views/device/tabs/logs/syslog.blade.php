@@ -120,7 +120,7 @@
                 term: params.term,
                 page: params.page || 1
             }
-        }, @json($program ? ['id' => $program, 'text' => $program] : null),'All Programs');
+        }, @json($program),'All Programs');
         init_select2("#priority", "syslog", function(params) {
             return {
                 field: "priority",
@@ -128,6 +128,6 @@
                 term: params.term,
                 page: params.page || 1
             }
-        }, @json($priority ? ['id' => $priority, 'text' => $priority] : null),'All Priorities');
+        }, @json($priority),'All Priorities');
     </script>
 @endsection

@@ -59,6 +59,6 @@
                 term: params.term,
                 page: params.page || 1
             }
-        }, @json($eventtype ? ['id' => $eventtype, 'text' => $eventtype] : null),'All types');
+        }, @json($eventtype),'All types');
     </script>
 @endsection
