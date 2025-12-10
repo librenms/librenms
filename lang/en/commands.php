@@ -221,6 +221,23 @@ return [
         'error' => 'Error processing Mac OUI:',
         'vendor_update' => 'Adding OUI :oui for :vendor',
     ],
+    'maintenance:rrd-step' => [
+        'description' => 'Convert RRD files to match configured step and heartbeat',
+        'arguments' => [
+            'device' => 'Hostname, device id, or all',
+        ],
+        'options' => [
+            'confirm' => 'Confirm that you have backed up your rrd files.',
+        ],
+        'errors' => [
+            'invalid' => 'Invalid hostname or device id specified',
+        ],
+        'confirm_backup' => 'Before continuing, please confirm that you have backed up your rrd files.',
+        'mismatched_heartbeat' => ':file: Mismatched heartbeat. :ds != :hb',
+        'skipping' => 'Skipping :file, step is already :step.',
+        'converting' => 'Converting :file:',
+        'summary' => 'Converted: :converted  Failed: :failed  Skipped: :skipped',
+    ],
     'maintenance:cleanup-syslog' => [
         'delete' => 'Cleared syslog entries older than :days days (:count rows)',
     ],

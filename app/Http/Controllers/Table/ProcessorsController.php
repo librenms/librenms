@@ -59,7 +59,7 @@ class ProcessorsController extends TableController
         $hostname = Blade::render('<x-device-link :device="$device" />', ['device' => $processor->device]);
         $descr = $processor->processor_descr;
         $mini_graph = Url::graphPopup($graph_array);
-        $bar = Html::percentageBar(400, 20, $perc, $perc . '%', (100 - $perc) . '%', $processor->processor_perc_warn);
+        $bar = Html::percentageBar(400, 10, $perc, $perc . '%', (100 - $perc) . '%', $processor->processor_perc_warn);
         $usage = Url::graphPopup($graph_array, $bar);
 
         if (\Request::input('view') == 'graphs') {

@@ -255,15 +255,18 @@ class ConfigRepository
     /**
      * Forget a key and all it's descendants from persistent storage.
      * This will effectively set it back to default.
-     *
-     * @param  string  $key
-     * @return int|false
      */
-    public function erase($key): bool|int
+    public function erase(string $key): bool
     {
         $this->forget($key);
         try {
-            return Models\Config::withChildren($key)->delete();
+            $deleted = Models\Config::withChildren($key)->delete();
+
+            if ($deleted > 0) {
+                $this->invalidateCache();
+            }
+
+            return true;
         } catch (Exception) {
             return false;
         }

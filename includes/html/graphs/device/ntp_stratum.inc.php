@@ -21,9 +21,11 @@ $components = $component->getComponents($device['device_id'], $options);
 $components = $components[$device['device_id']];
 
 include 'includes/html/graphs/common.inc.php';
-$rrd_options .= ' -l 0 -u 16 -E ';
-$rrd_options .= " COMMENT:'Stratum               Now      Min      Max\\n'";
-$rrd_additions = '';
+$graph_params->scale_min = 0;
+$graph_params->scale_max = 16;
+$graph_params->sloped_mode = true;
+
+$rrd_options[] = 'COMMENT:Stratum               Now      Min      Max\\n';
 
 $count = 0;
 foreach ($components as $array) {
@@ -33,17 +35,11 @@ foreach ($components as $array) {
         // Grab a color from the array.
         $color = \App\Facades\LibrenmsConfig::get("graph_colours.mixed.$count", \App\Facades\LibrenmsConfig::get('graph_colours.oranges.' . ($count - 7)));
 
-        $rrd_additions .= ' DEF:DS' . $count . '=' . $rrd_filename . ':stratum:AVERAGE ';
-        $rrd_additions .= ' LINE1.25:DS' . $count . '#' . $color . ":'" . str_pad(substr((string) $array['peer'], 0, 15), 15) . "'" . $stack;
-        $rrd_additions .= ' GPRINT:DS' . $count . ':LAST:%5.0lf ';
-        $rrd_additions .= ' GPRINT:DS' . $count . ':MIN:%7.0lf ';
-        $rrd_additions .= ' GPRINT:DS' . $count . ':MAX:%7.0lf\\l ';
+        $rrd_options[] = 'DEF:DS' . $count . '=' . $rrd_filename . ':stratum:AVERAGE';
+        $rrd_options[] = 'LINE1.25:DS' . $count . '#' . $color . ':' . str_pad(substr((string) $array['peer'], 0, 15), 15) . $stack;
+        $rrd_options[] = 'GPRINT:DS' . $count . ':LAST:%5.0lf';
+        $rrd_options[] = 'GPRINT:DS' . $count . ':MIN:%7.0lf';
+        $rrd_options[] = 'GPRINT:DS' . $count . ':MAX:%7.0lf\\l';
         $count++;
     }
-}
-
-if ($rrd_additions == '') {
-    // We didn't add any data points.
-} else {
-    $rrd_options .= $rrd_additions;
 }

@@ -47,8 +47,10 @@ if (is_file($check_script)) {
 }
 
 include 'includes/html/graphs/common.inc.php';
-$rrd_options .= ' -l 0 -E ';
-$rrd_options .= " COMMENT:'                      Now     Avg      Max\\n'";
+$graph_params->scale_min = 0;
+$graph_params->sloped_mode = true;
+
+$rrd_options[] = 'COMMENT:                      Now     Avg      Max\\n';
 $rrd_additions = '';
 
 // Remove encoded characters
@@ -83,19 +85,13 @@ if ($services[$vars['service']]['service_ds'] != '') {
             $color_avg = \App\Facades\LibrenmsConfig::get("graph_colours.$tint.2");
             $color_max = \App\Facades\LibrenmsConfig::get("graph_colours.$tint.0");
 
-            $rrd_additions .= ' DEF:DS=' . $rrd_filename . ':' . $ds . ':AVERAGE ';
-            $rrd_additions .= ' DEF:DS_MAX=' . $rrd_filename . ':' . $ds . ':MAX ';
-            $rrd_additions .= ' AREA:DS_MAX#' . $color_max . ':';
-            $rrd_additions .= ' AREA:DS#' . $color_avg . ":'" . str_pad(substr(ucfirst((string) $ds) . ' (' . $label . ')', 0, 15), 15) . "' ";
-            $rrd_additions .= ' GPRINT:DS:LAST:%5.2lf%s ';
-            $rrd_additions .= ' GPRINT:DS:AVERAGE:%5.2lf%s ';
-            $rrd_additions .= ' GPRINT:DS_MAX:MAX:%5.2lf%s\\l ';
+            $rrd_options[] = 'DEF:DS=' . $rrd_filename . ':' . $ds . ':AVERAGE';
+            $rrd_options[] = 'DEF:DS_MAX=' . $rrd_filename . ':' . $ds . ':MAX';
+            $rrd_options[] = 'AREA:DS_MAX#' . $color_max . ':';
+            $rrd_options[] = 'AREA:DS#' . $color_avg . ':' . str_pad(substr(ucfirst((string) $ds) . ' (' . $label . ')', 0, 15), 15);
+            $rrd_options[] = 'GPRINT:DS:LAST:%5.2lf%s';
+            $rrd_options[] = 'GPRINT:DS:AVERAGE:%5.2lf%s';
+            $rrd_options[] = 'GPRINT:DS_MAX:MAX:%5.2lf%s\\l';
         }
     }
-}
-
-if ($rrd_additions == '') {
-    // We didn't add any data points.
-} else {
-    $rrd_options .= $rrd_additions;
 }
