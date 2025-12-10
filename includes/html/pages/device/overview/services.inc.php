@@ -26,7 +26,7 @@ if (ObjectCache::serviceCounts(['total'], $device['device_id'])['total'] > 0) {
                     <div class="panel-heading">
                         <a href="' . Url::deviceUrl($device['device_id'], ['tab' => 'services']) . '"><i class="fa fa-cogs fa-lg icon-theme" aria-hidden="true"></i> <strong>Services</strong></a>
                     </div>
-                    <div class="panel-body">
+                    <div class="panel-body btn-group" role="group" aria-label="Service filter">
                         <a class="btn btn-default" role="button" href="' . Url::deviceUrl($device['device_id'], ['tab' => 'services']) . '">Total: <span class="badge">' . $services['total'] . '</span></a>
                         <a class="btn btn-success" role="button" href="' . Url::deviceUrl($device['device_id'], ['tab' => 'services']) . '">Ok: <span class="badge">' . $services['ok'] . '</span></a>
                         <a class="btn btn-warning" role="button" href="' . Url::deviceUrl($device['device_id'], ['tab' => 'services']) . '">Warning: <span class="badge">' . $services['warning'] . '</span></a>
