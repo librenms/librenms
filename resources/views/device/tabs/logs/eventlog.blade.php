@@ -18,7 +18,6 @@
                     </thead>
                 </table>
             </div>
-            <input type="hidden" name="device" id="device" value="{{ $device->device_id }}">
         </x-panel>
     </x-device.page>
 @endsection
@@ -41,9 +40,7 @@
             '<div class="pull-left">' +
                 '<form method="GET" action="" class="form-inline" role="form" id="result_form">' +
                 '<div class="form-group">' +
-                    '<label><strong>Type&nbsp;&nbsp;</strong></label>' +
                     '<select name="eventtype" id="eventtype" class="form-control">' +
-                        '<option value="">All types</option>' +
                     '</select>' +
                 '</div>' +
                 '&nbsp;&nbsp;' +
@@ -55,7 +52,7 @@
         init_select2("#eventtype", "eventlog", function(params) {
             return {
                 field: "type",
-                device: $('#device').val(),
+                device: {{ $device->device_id }},
                 term: params.term,
                 page: params.page || 1
             }

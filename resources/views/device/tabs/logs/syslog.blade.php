@@ -20,7 +20,6 @@
                     </thead>
                 </table>
             </div>
-            <input type="hidden" name="device" id="device" value="{{ $device->device_id }}">
         </x-panel>
     </x-device.page>
 @endsection
@@ -48,13 +47,11 @@
                 '<form method="GET" action="" class="form-inline" role="form" id="result_form">' +
                 '<div class="form-group">' +
                     '<select name="program" id="program" class="form-control">' +
-                        '<option value="">All Programs</option>' +
                     '</select>' +
                 '</div>' +
                 '&nbsp;&nbsp;' +
                 '<div class="form-group">' +
                     '<select name="priority" id="priority" class="form-control">' +
-                        '<option value="">All Priorities</option>' +
                     '</select>' +
                 '</div>' +
                 '&nbsp;&nbsp;' +
@@ -116,7 +113,7 @@
         init_select2("#program", "syslog", function(params) {
             return {
                 field: "program",
-                device: $('#device').val(),
+                device: {{ $device->device_id }},
                 term: params.term,
                 page: params.page || 1
             }
@@ -124,7 +121,7 @@
         init_select2("#priority", "syslog", function(params) {
             return {
                 field: "priority",
-                device: $('#device').val(),
+                device: {{ $device->device_id }},
                 term: params.term,
                 page: params.page || 1
             }
