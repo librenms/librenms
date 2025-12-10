@@ -11,7 +11,6 @@
                     <tr>
                         <th data-column-id="datetime" data-order="desc">Timestamp</th>
                         <th data-column-id="type">Type</th>
-                        <th data-column-id="device_id">Hostname</th>
                         <th data-column-id="message">Message</th>
                         <th data-column-id="username">User</th>
                     </tr>

@@ -12,7 +12,6 @@
                         <th data-column-id="label"></th>
                         <th data-column-id="timestamp" data-order="desc">Timestamp</th>
                         <th data-column-id="level">Level</th>
-                        <th data-column-id="device_id">Hostname</th>
                         <th data-column-id="program">Program</th>
                         <th data-column-id="msg">Message</th>
                         <th data-column-id="priority">Priority</th>
