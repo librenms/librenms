@@ -187,6 +187,12 @@ Route::prefix('v0')->group(function (): void {
         Route::get('device/{hostname}', [App\Api\Controllers\LegacyApiController::class, 'get_port_security'])->name('get_port_security_by_hostname');
         Route::get('', [App\Api\Controllers\LegacyApiController::class, 'get_port_security'])->name('get_port_security');
     });
+
+    Route::prefix('port_voice_vlan')->group(function (): void {
+        Route::get('port/{portid}', [App\Api\Controllers\LegacyApiController::class, 'get_port_voice_vlan'])->name('get_port_voice_vlan_by_port');
+        Route::get('device/{hostname}', [App\Api\Controllers\LegacyApiController::class, 'get_port_voice_vlan'])->name('get_port_voice_vlan_by_hostname');
+        Route::get('', [App\Api\Controllers\LegacyApiController::class, 'get_port_voice_vlan'])->name('get_port_voice_vlan');
+    });
     // Route not found
     Route::any('/{path?}', [App\Api\Controllers\LegacyApiController::class, 'api_not_found'])->where('path', '.*');
 });

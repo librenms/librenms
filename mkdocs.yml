@@ -252,6 +252,7 @@ nav:
       - Port_Groups: API/Port_Groups.md
       - PortGroups: API/PortGroups.md
       - PortSecurity: API/PortSecurity.md
+      - PortVoiceVlan: API/PortVoiceVlan.md
       - Ports: API/Ports.md
       - Routing: API/Routing.md
       - Services: API/Services.md
