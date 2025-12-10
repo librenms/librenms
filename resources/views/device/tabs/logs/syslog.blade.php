@@ -45,48 +45,29 @@
 
         $('.actionBar').append(
             '<div class="pull-left">' +
-            '<form method="GET" action="" class="form-inline" role="form" id="result_form">' +
-            '<div class="form-group">' +
-            @if($filter_device)
-                '<select name="device" id="device" class="form-control">' +
-                '<option value="">All Devices&nbsp;&nbsp;</option>' +
-                @if($device)
-                    '<option value={{ $device->device_id }}>' + @json($device->displayName()) + '</option>' +
-                @endif
-                '</select>' +
-            @endif
-            '</div>' +
-            '&nbsp;&nbsp;<div class="form-group">' +
-            '<select name="program" id="program" class="form-control">' +
-                '<option value="">All Programs</option>' +
-                @if ($program)
-                    '<option value="' + @json($program) + '" selected>' +
-                        @json($program) +
-                    '</option>' +
-                @endif
-            '</select>' +
-            '</div>' +
-            '&nbsp;&nbsp;<div class="form-group">' +
-            '<select name="priority" id="priority" class="form-control">' +
-                '<option value="">All Priorities</option>' +
-                @if ($priority)
-                    '<option value="' + @json($priority) + '" selected>' +
-                        @json($priority) +
-                    '</option>' +
-                @endif
-            '</select>' +
-            '</div>' +
-            '&nbsp;&nbsp;<div class="form-group">' +
-            '<input name="from" type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="' + @json($from) + '" placeholder="From" data-date-format="YYYY-MM-DD HH:mm">' +
-            '</div>' +
-            '<div class="form-group">' +
-            '&nbsp;&nbsp;<input name="to" type="text" class="form-control" id="dtpickerto" maxlength="16" value="' + @json($to) + '" placeholder="To" data-date-format="YYYY-MM-DD HH:mm">' +
-            '</div>' +
-            '&nbsp;&nbsp;<button type="submit" class="btn btn-default">Filter</button>' +
-            '</form>' +
-            '</div>' +
-            '</div>' +
-            '</div>' +
+                '<form method="GET" action="" class="form-inline" role="form" id="result_form">' +
+                '<div class="form-group">' +
+                    '<select name="program" id="program" class="form-control">' +
+                        '<option value="">All Programs</option>' +
+                    '</select>' +
+                '</div>' +
+                '&nbsp;&nbsp;' +
+                '<div class="form-group">' +
+                    '<select name="priority" id="priority" class="form-control">' +
+                        '<option value="">All Priorities</option>' +
+                    '</select>' +
+                '</div>' +
+                '&nbsp;&nbsp;' +
+                '<div class="form-group">' +
+                    '<input name="from" type="text" class="form-control" id="dtpickerfrom" maxlength="16" value="' + @json($from) + '" placeholder="From" data-date-format="YYYY-MM-DD HH:mm">' +
+                '</div>' +
+                '&nbsp;&nbsp;' +
+                '<div class="form-group">' +
+                    '<input name="to" type="text" class="form-control" id="dtpickerto" maxlength="16" value="' + @json($to) + '" placeholder="To" data-date-format="YYYY-MM-DD HH:mm">' +
+                '</div>' +
+                '&nbsp;&nbsp;' +
+                '<button type="submit" class="btn btn-default">Filter</button>' +
+                '</form>' +
             '</div>'
         );
 
@@ -132,49 +113,21 @@
             $("#dtpickerto").data("DateTimePicker").maxDate('{{ $now }}');
         }
 
-        $('#program').select2({
-            theme: 'bootstrap',
-            dropdownAutoWidth: true,
-            width: 'auto',
-            allowClear: true,
-            placeholder: 'All Programs',
-            ajax: {
-                url: '{{ route('ajax.select.syslog') }}',
-                delay: 200,
-                data: function (params) {
-                    return {
-                        field: 'program',
-                        device: $('#device').val(),
-                        term: params.term,
-                        page: params.page || 1
-                    };
-                }
+        init_select2("#program", "syslog", function(params) {
+            return {
+                field: "program",
+                device: $('#device').val(),
+                term: params.term,
+                page: params.page || 1
             }
-        });
-        @if(!empty($program))
-            $('#program').val({!! json_encode($program) !!}).trigger('change');
-        @endif
-        $('#priority').select2({
-            theme: 'bootstrap',
-            dropdownAutoWidth: true,
-            width: 'auto',
-            allowClear: true,
-            placeholder: 'All Priorities',
-            ajax: {
-                url: '{{ route('ajax.select.syslog') }}',
-                delay: 200,
-                data: function (params) {
-                    return {
-                        field: 'priority',
-                        device: $('#device').val(),
-                        term: params.term,
-                        page: params.page || 1
-                    };
-                }
+        }, @json($program ? ['id' => $program, 'text' => $program] : null),'All Programs');
+        init_select2("#priority", "syslog", function(params) {
+            return {
+                field: "priority",
+                device: $('#device').val(),
+                term: params.term,
+                page: params.page || 1
             }
-        });
-        @if(!empty($priority))
-            $('#priority').val({!! json_encode($priority) !!}).trigger('change');
-        @endif
+        }, @json($priority ? ['id' => $priority, 'text' => $priority] : null),'All Priorities');
     </script>
 @endsection
