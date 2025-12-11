@@ -34,8 +34,6 @@ use Symfony\Component\Process\Process;
 
 class Fping
 {
-    private readonly string $fping_bin;
-    private readonly string|false $fping6_bin;
     private readonly int $count;
     private readonly int $timeout;
     private readonly int $interval;
@@ -45,9 +43,6 @@ class Fping
     public function __construct()
     {
         // prep fping parameters
-        $this->fping_bin = LibrenmsConfig::get('fping', 'fping');
-        $fping6 = LibrenmsConfig::get('fping6', 'fping6');
-        $this->fping6_bin = is_executable($fping6) ? $fping6 : false;
         $this->count = max(LibrenmsConfig::get('fping_options.count', 3), 1);
         $this->interval = max(LibrenmsConfig::get('fping_options.interval', 500), 20);
         $this->timeout = max(LibrenmsConfig::get('fping_options.timeout', 500), $this->interval);
@@ -64,13 +59,8 @@ class Fping
      */
     public function ping(string $host, AddressFamily $address_family = AddressFamily::IPv4): FpingResponse
     {
-        $cmd = match ($address_family) {
-            AddressFamily::IPv4 => $this->fping6_bin === false ? [$this->fping_bin, '-4'] : [$this->fping_bin],
-            AddressFamily::IPv6 => $this->fping6_bin === false ? [$this->fping_bin, '-6'] : [$this->fping6_bin],
-        };
-
         // build the command
-        $cmd = array_merge($cmd, [
+        $cmd = array_merge(LibrenmsConfig::fpingCommand($address_family), [
             '-e',
             '-q',
             '-c',
@@ -98,7 +88,7 @@ class Fping
     public function bulkPing(array $hosts, callable $callback): void
     {
         $process = app()->make(Process::class, ['command' => [
-            $this->fping_bin,
+            LibrenmsConfig::get('fping', 'fping'),
             '-f', '-',
             '-e',
             '-t', $this->timeout,
