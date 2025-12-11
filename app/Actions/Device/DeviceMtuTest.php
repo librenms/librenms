@@ -4,7 +4,6 @@ namespace App\Actions\Device;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Polling\ConnectivityHelper;
 use Log;
 use Symfony\Component\Process\Process;
