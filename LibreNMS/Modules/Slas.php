@@ -123,8 +123,14 @@ class Slas implements Module
     public function dump(Device $device, string $type): ?array
     {
         return [
-            'slas' => $device->slas()->orderBy('sla_nr')
+            'slas' => $device->slas()
+                ->orderByColumns($this->getSortColumns('slas'))
                 ->get()->map->makeHidden(['device_id', 'sla_id']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return ['sla_nr'];
     }
 }
