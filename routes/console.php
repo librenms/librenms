@@ -5,9 +5,12 @@ use App\Console\Commands\MaintenanceCleanupSyslog;
 use App\Console\Commands\MaintenanceFetchOuis;
 use App\Console\Commands\MaintenanceFetchRSS;
 use App\Jobs\PingCheck;
+use App\Models\Eventlog;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schedule;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Time;
 use Symfony\Component\Process\Process;
 
@@ -178,19 +181,23 @@ $maintenance_log_file = Config::get('log_dir') . '/maintenance.log';
 Schedule::command(MaintenanceFetchOuis::class)
     ->weeklyOn(0, Time::pseudoRandomBetween('01:00', '01:59'))
     ->onOneServer()
-    ->appendOutputTo($maintenance_log_file);
+    ->appendOutputTo($maintenance_log_file)
+    ->onFailure(fn () => Eventlog::log('The scheduled command maintenance:fetch-ouis failed to run. Check the maintenance.log for details.', null, 'maintenance', Severity::Error));
 
 Schedule::command(MaintenanceCleanupNetworks::class)
     ->weeklyOn(0, Time::pseudoRandomBetween('02:00', '02:59'))
     ->onOneServer()
-    ->appendOutputTo($maintenance_log_file);
+    ->appendOutputTo($maintenance_log_file)
+    ->onFailure(fn () => Eventlog::log('The scheduled command maintenance:cleanup-networks failed to run. Check the maintenance.log for details.', null, 'maintenance', Severity::Error));
 
 Schedule::command(MaintenanceFetchRSS::class)
     ->dailyAt(Time::pseudoRandomBetween('03:00', '03:59'))
     ->onOneServer()
-    ->appendOutputTo($maintenance_log_file);
+    ->appendOutputTo($maintenance_log_file)
+    ->onFailure(fn () => Eventlog::log('The scheduled command maintenance:fetch-rss failed to run. Check the maintenance.log for details.', null, 'maintenance', Severity::Error));
 
 Schedule::command(MaintenanceCleanupSyslog::class)
     ->dailyAt('03:30')
     ->onOneServer()
-    ->appendOutputTo($maintenance_log_file);
+    ->appendOutputTo($maintenance_log_file)
+    ->onFailure(fn () => Eventlog::log('The scheduled command maintenance:cleanup-syslog failed to run. Check the maintenance.log for details.', null, 'maintenance', Severity::Error));

@@ -21,9 +21,9 @@ $pallette = [
     16 => 'CE6FC7',
 ];
 
-$rrd_options[] = '-l';
-$rrd_options[] = '0';
-$rrd_options[] = '-E';
+$graph_params->scale_min = 0;
+$graph_params->sloped_mode = true;
+
 $rrd_options[] = 'COMMENT:Associated Stations    Cur     Min    Max\\n';
 $radioId = 1;
 foreach (glob(Rrd::name($device['hostname'], 'xirrus_users-', '*.rrd')) as $rrd) {

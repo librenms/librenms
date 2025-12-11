@@ -17,12 +17,10 @@ $sla_nr = Sla::where('sla_id', $vars['id'])->value('sla_nr');
 
 if ($sla_nr) {
     require 'includes/html/graphs/common.inc.php';
-    $rrd_options[] = '-l';
-    $rrd_options[] = '-100';
-    $rrd_options[] = '-u';
-    $rrd_options[] = '100';
-    $rrd_options[] = '-E';
-    $rrd_options[] = '-r';
+    $graph_params->scale_min = -100;
+    $graph_params->scale_max = 100;
+    $graph_params->sloped_mode = true;
+    $graph_params->scale_rigid = true;
     $rrd_filename_1 = Rrd::name($device['hostname'], ['sla', $sla_nr, 'jitter']);
     $rrd_filename_2 = Rrd::name($device['hostname'], ['sla', $sla_nr, 'NumPackets']);
 

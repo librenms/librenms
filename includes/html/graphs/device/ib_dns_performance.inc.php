@@ -3,8 +3,8 @@
 require 'includes/html/graphs/common.inc.php';
 
 $rrd_filename = Rrd::name($device['hostname'], 'ib_dns_performance');
-$rrd_options[] = "--vertical-label='Answer time in milliseconds'";
-$rrd_options[] = "--lower-limit='0'";
+$graph_params->vertical_label = 'Answer time in milliseconds';
+$graph_params->scale_min = 0;
 
 $stats = [
     'PerfAA' => '#74C366FF',

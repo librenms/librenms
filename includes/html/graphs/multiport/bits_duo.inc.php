@@ -2,10 +2,6 @@
 
 $legend = $graph_params->visible('legend');
 
-$rrd_options[] = \App\Facades\LibrenmsConfig::get('rrdgraph_def_text');
-$rrd_options[] = '-c';
-$rrd_options[] = 'FONT#' . ltrim(\App\Facades\LibrenmsConfig::get('rrdgraph_def_text_color'), '#');
-
 $i = 1;
 
 foreach (explode(',', (string) $vars['id']) as $ifid) {
