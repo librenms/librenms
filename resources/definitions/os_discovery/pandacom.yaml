@@ -1,0 +1,275 @@
+mib: PanDacom-MIB:SPEED-MULTILINE-MIB:SPEEDAMP-MIB:SPEEDSINGLELINE-XFP-MIB:SPEED-DUALLINE-FC:SPEED-MUX-200G-MIB:SPEEDCARRIER-MIB
+mib_dir: pandacom
+modules:
+    os:
+        serial: SPEEDCARRIER-MIB::nmCarrierSerialNumber.0
+        serial_replace: 
+            - [ '/unknown/' ]
+        hardware: SPEEDCARRIER-MIB::nmCarrierType.0
+        hardware_replace:
+            - ['/carrier5UHighPower/', 'Carrier 5U HighPower']
+            - ['/carrier5U/', 'Carrier 5U']
+            - ['/carrier45U/', 'Carrier 4.5U']
+            - ['/carrier1U/', 'Carrier 1U']
+            - ['/carrier4U/', 'Carrier 4U']
+        location: 'SPEEDCARRIER-MIB::nmAgentConfigSnmpSysLocation.0'
+
+    sensors:
+        state:
+            data:
+                -
+                    oid: nmAAlarmState
+                    value: nmAAlarmState
+                    num_oid: '.1.3.6.1.4.1.3652.3.1.1.7'
+                    descr: 'Agent'
+                    states:
+                        - { value: 0, descr: off, graph: 1, generic: 0 }
+                        - { value: 1, descr: on, graph: 1, generic: 3 }
+                    group: Alarms
+                -
+                    oid: nmFanState
+                    value: nmFanState
+                    num_oid: '.1.3.6.1.4.1.3652.3.2.1.5.0'
+                    descr: 'Fans'
+                    states:
+                        - { value: 0, descr: "not Available", graph: 1, generic: 3 }
+                        - { value: 3, descr: "Ok", graph: 1, generic: 0 }
+                        - { value: 4, descr: "Failed", graph: 1, generic: 2 }
+                        - { value: 5, descr: "not Installed", graph: 1, generic: 3 }
+
+                    group: Alarms
+                -
+                    oid: nmPSU1Status
+                    value: nmPSU1Status
+                    num_oid: '.1.3.6.1.4.1.3652.3.2.1.3.0'
+                    descr: 'PSU 1'
+                    states:
+                        - { value: 0, descr: not Installed, graph: 1, generic: 0 }
+                        - { value: 1, descr: Critical, graph: 1, generic: 2 }
+                        - { value: 2, descr: Warning, graph: 1, generic: 1 }
+                        - { value: 3, descr: Ok, graph: 1, generic: 0 }
+                    group: Alarms
+                -
+                    oid: nmPSU2Status
+                    value: nmPSU2Status
+                    num_oid: '.1.3.6.1.4.1.3652.3.2.1.4.0'
+                    descr: 'PSU 2'
+                    states:
+                        - { value: 0, descr: not Installed, graph: 1, generic: 0 }
+                        - { value: 1, descr: Critical, graph: 1, generic: 2 }
+                        - { value: 2, descr: Warning, graph: 1, generic: 1 }
+                        - { value: 3, descr: Ok, graph: 1, generic: 0 }
+                    group: Alarms
+                -
+                    oid: nmPSU3Status
+                    value: nmPSU3Status
+                    num_oid: '.1.3.6.1.4.1.3652.3.2.1.12.0'
+                    descr: 'PSU 3'
+                    states:
+                        - { value: 0, descr: not Installed, graph: 1, generic: 0 }
+                        - { value: 1, descr: Critical, graph: 1, generic: 2 }
+                        - { value: 2, descr: Warning, graph: 1, generic: 1 }
+                        - { value: 3, descr: Ok, graph: 1, generic: 0 }
+                    group: Alarms
+
+
+        dbm:
+            data:
+                -
+                    oid: SPEEDCARRIER-MIB::convSxLSFPDMIParamTable
+                    value: SPEEDCARRIER-MIB::convSxLSFPDMIRxLevel
+                    num_oid: '.1.3.6.1.4.1.3652.3.3.1.8.1.1.{{ $index }}'
+                    descr: 'Slot {{ SPEEDCARRIER-MIB::convSxLSFPDMISlot }} Port {{ SPEEDCARRIER-MIB::convSxLSFPDMIPort }} Rx Power'
+                    divisor: 100
+                    skip_values: 0
+                    low_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdAlarmLevel
+                    low_warn_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdWarningLevel
+                    high_limit: SPEEDCARRIER-MIB::convSxLSFPDMIRxHighAlarm
+                    index: 'rx-{{ $index }}'
+                    group: transceiver
+                -
+                    oid: SPEEDCARRIER-MIB::convSxLSFPDMIParamTable
+                    value: SPEEDCARRIER-MIB::convSxLSFPDMITxLevel
+                    num_oid: '.1.3.6.1.4.1.3652.3.3.1.8.1.1.{{ $index }}'
+                    descr: 'Slot {{ SPEEDCARRIER-MIB::convSxLSFPDMISlot }} Port {{ SPEEDCARRIER-MIB::convSxLSFPDMIPort }} Tx Power'
+                    divisor: 100
+                    skip_values: 0
+                    low_limit: SPEEDCARRIER-MIB::convSxLSFPDMITTxLowThresholdAlarmLevel
+                    low_warn_limit: SPEEDCARRIER-MIB::convSxLSFPDMITTxLowThresholdWarningLevel
+                    index: 'tx-{{ $index }}'
+                    group: transceiver
+
+                # speedDualline FC
+                -
+                    oid: SPEED-DUALLINE-FC::speedDuallineFCXCVMeassurementTable
+                    value: SPEED-DUALLINE-FC::speedDuallineFCPortXCVDMIRxLevel
+                    num_oid: '.1.3.6.1.4.1.3652.3.3.3.7.1.4.{{ $index }}'
+                    descr: 'Slot {{ SPEED-DUALLINE-FC::speedDuallineFCPortXCVDMISlot }} Port {{ SPEED-DUALLINE-FC::speedDuallineFCPortXCVDMIPort }} Rx Power'
+                    divisor: 100
+                    skip_values: 0
+                    # low_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdAlarmLevel
+                    # low_warn_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdWarningLevel
+                    # high_limit: SPEEDCARRIER-MIB::convSxLSFPDMIRxHighAlarm
+                    index: 'rx-{{ $index }}'
+                    group: transceiver
+                -
+                    oid: SPEED-DUALLINE-FC::speedDuallineFCXCVMeassurementTable
+                    value: SPEED-DUALLINE-FC::speedDuallineFCPortXCVDMITxLevel
+                    num_oid: '.1.3.6.1.4.1.3652.3.3.3.7.1.5.{{ $index }}'
+                    descr: 'Slot {{ SPEED-DUALLINE-FC::speedDuallineFCPortXCVDMISlot }} Port {{ SPEED-DUALLINE-FC::speedDuallineFCPortXCVDMIPort }} Tx Power'
+                    divisor: 100
+                    skip_values: 0
+                    # low_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdAlarmLevel
+                    # low_warn_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdWarningLevel
+                    # high_limit: SPEEDCARRIER-MIB::convSxLSFPDMIRxHighAlarm
+                    index: 'tx-{{ $index }}'
+                    group: transceiver
+
+
+
+                # speedMUX-200G
+                # Line Port
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMIRxLevel
+                    num_oid: '.1.3.6.1.4.1.3652.3.4.1.11.1.5.{{ $index }}'
+                    descr: 'Slot {{ SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMIMSlot }} Line Port {{ SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMIMPort }} Rx Power'
+                    divisor: 100
+                    skip_values: 0
+                    # low_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdAlarmLevel
+                    # low_warn_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdWarningLevel
+                    # high_limit: SPEEDCARRIER-MIB::convSxLSFPDMIRxHighAlarm
+                    index: 'rx-{{ $index }}'
+                    group: transceiver
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMITxLevel
+                    num_oid: '.1.3.6.1.4.1.3652.3.4.1.11.1.6.{{ $index }}'
+                    descr: 'Slot {{ SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMIMSlot }} Line Port {{ SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMIMPort }} Tx Power'
+                    divisor: 100
+                    skip_values: 0
+                    # low_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdAlarmLevel
+                    # low_warn_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdWarningLevel
+                    # high_limit: SPEEDCARRIER-MIB::convSxLSFPDMIRxHighAlarm
+                    index: 'tx-{{ $index }}'
+                    group: transceiver
+
+                # Client Ports
+                # Lane 1
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxLevelLane1
+                    num_oid: '.1.3.6.1.4.1.3652.3.4.1.10.1.4.{{ $index }}'
+                    descr: 'Slot {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMSlot }} Port {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMPort }} Lane 1 Rx Power'
+                    divisor: 100
+                    skip_values: 0
+                    # low_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdAlarmLevel
+                    # low_warn_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdWarningLevel
+                    # high_limit: SPEEDCARRIER-MIB::convSxLSFPDMIRxHighAlarm
+                    index: 'rx-{{ $index }}-lane-1'
+                    group: transceiver
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLevelLane1
+                    num_oid: '.1.3.6.1.4.1.3652.3.4.1.10.1.8.{{ $index }}'
+                    descr: 'Slot {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMSlot }} Port {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMPort }} Lane 1 Tx Power'
+                    divisor: 100
+                    skip_values: 0
+                    # low_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdAlarmLevel
+                    # low_warn_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdWarningLevel
+                    # high_limit: SPEEDCARRIER-MIB::convSxLSFPDMIRxHighAlarm
+                    index: 'tx-{{ $index }}-lane-1'
+                    group: transceiver
+
+                # Lane 2
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxLevelLane1
+                    num_oid: '.1.3.6.1.4.1.3652.3.4.1.10.1.5.{{ $index }}'
+                    descr: 'Slot {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMSlot }} Port {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMPort }} Lane 2 Rx Power'
+                    divisor: 100
+                    skip_values: 0
+                    # low_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdAlarmLevel
+                    # low_warn_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdWarningLevel
+                    # high_limit: SPEEDCARRIER-MIB::convSxLSFPDMIRxHighAlarm
+                    index: 'rx-{{ $index }}-lane-2'
+                    group: transceiver
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLevelLane1
+                    num_oid: '.1.3.6.1.4.1.3652.3.4.1.10.1.9.{{ $index }}'
+                    descr: 'Slot {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMSlot }} Port {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMPort }} Lane 2 Tx Power'
+                    divisor: 100
+                    skip_values: 0
+                    # low_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdAlarmLevel
+                    # low_warn_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdWarningLevel
+                    # high_limit: SPEEDCARRIER-MIB::convSxLSFPDMIRxHighAlarm
+                    index: 'tx-{{ $index }}-lane-2'
+                    group: transceiver
+
+                # Lane 3
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxLevelLane3
+                    num_oid: '.1.3.6.1.4.1.3652.3.4.1.10.1.6.{{ $index }}'
+                    descr: 'Slot {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMSlot }} Port {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMPort }} Lane 3 Rx Power'
+                    divisor: 100
+                    skip_values: 0
+                    # low_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdAlarmLevel
+                    # low_warn_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdWarningLevel
+                    # high_limit: SPEEDCARRIER-MIB::convSxLSFPDMIRxHighAlarm
+                    index: 'rx-{{ $index }}-lane-3'
+                    group: transceiver
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLevelLane3
+                    num_oid: '.1.3.6.1.4.1.3652.3.4.1.10.1.10.{{ $index }}'
+                    descr: 'Slot {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMSlot }} Port {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMPort }} Lane 3 Tx Power'
+                    divisor: 100
+                    skip_values: 0
+                    # low_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdAlarmLevel
+                    # low_warn_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdWarningLevel
+                    # high_limit: SPEEDCARRIER-MIB::convSxLSFPDMIRxHighAlarm
+                    index: 'tx-{{ $index }}-lane-3'
+                    group: transceiver
+
+                # Lane 4
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxLevelLane4
+                    num_oid: '.1.3.6.1.4.1.3652.3.4.1.10.1.7.{{ $index }}'
+                    descr: 'Slot {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMSlot }} Port {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMPort }} Lane 4 Rx Power'
+                    divisor: 100
+                    skip_values: 0
+                    # low_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdAlarmLevel
+                    # low_warn_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdWarningLevel
+                    # high_limit: SPEEDCARRIER-MIB::convSxLSFPDMIRxHighAlarm
+                    index: 'rx-{{ $index }}-lane-4'
+                    group: transceiver
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLevelLane4
+                    num_oid: '.1.3.6.1.4.1.3652.3.4.1.10.1.11.{{ $index }}'
+                    descr: 'Slot {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMSlot }} Port {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMPort }} Lane 4 Tx Power'
+                    divisor: 100
+                    skip_values: 0
+                    # low_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdAlarmLevel
+                    # low_warn_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdWarningLevel
+                    # high_limit: SPEEDCARRIER-MIB::convSxLSFPDMIRxHighAlarm
+                    index: 'tx-{{ $index }}-lane-4'
+                    group: transceiver
+
+
+
+
+
+        temperature:
+            data:
+                -
+                    oid: SPEEDCARRIER-MIB::convSxLSFPDMIParamTable
+                    value: SPEEDCARRIER-MIB::convSxLSFPDMITemp
+                    num_oid: '.1.3.6.1.4.1.3652.3.3.1.8.1.9.{{ $index }}'
+                    descr: 'Slot {{ SPEEDCARRIER-MIB::convSxLSFPDMISlot }} Port {{ SPEEDCARRIER-MIB::convSxLSFPDMIPort }} Temperature'
+                    skip_values: 0
+                    index: 'temperatur-{{ $index }}' 
+                    group: transceiver
