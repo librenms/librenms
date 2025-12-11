@@ -4,6 +4,15 @@ modules:
         serial: AC-SYSTEM-MIB::acSysIdSerialNumber.0
         version: AC-SYSTEM-MIB::acSysVersionSoftware.0
     sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - AcGateway::callerDisplayCallerDisplay
+                        - AcGateway::channelsStartingPhoneNum
+                        - AC-ANALOG-MIB::acAnalogFxsFxoType
+                        - AC-PSTN-MIB::acTrunkDialPlanName
+                        - DS1-MIB::dsx1CircuitIdentifier
         count:
             data:
                 -
