@@ -7,6 +7,7 @@ use App\Models\Device;
 use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Polling\ConnectivityHelper;
 use Log;
+use Symfony\Component\Process\Process;
 
 class DeviceMtuTest
 {
@@ -50,13 +51,10 @@ class DeviceMtuTest
 
         Log::debug('[MTU] ' . implode(' ', $cmd) . PHP_EOL);
 
-        $descriptorspec = [
-            0 => ['file', '/dev/null', 'r'],
-            1 => ['file', '/dev/null', 'w'],
-            2 => ['file', '/dev/null', 'w'],
-        ];
-        $fping = proc_open($cmd, $descriptorspec, $pipes);
+        $fping = new Process($cmd);
+        $fping->disableOutput();
+        $fping->run();
 
-        return proc_close($fping) == 0;
+        return $fping->isSuccessful();
     }
 }
