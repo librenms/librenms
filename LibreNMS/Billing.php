@@ -5,6 +5,7 @@ namespace LibreNMS;
 use App\Facades\LibrenmsConfig;
 use DateTime;
 use DateTimeZone;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Number;
 
@@ -125,49 +126,24 @@ class Billing
         return $return;
     }
 
-    private static function get95thagg($bill_id, $datefrom, $dateto): float
+    private static function get95thdata($bill_id, $datefrom, $dateto): array
     {
-        $mq_sql = 'SELECT count(delta) FROM bill_data WHERE bill_id = ?';
-        $mq_sql .= ' AND timestamp > ? AND timestamp <= ?';
-        $measurements = dbFetchCell($mq_sql, [$bill_id, $datefrom, $dateto]);
-        $measurement_95th = (round($measurements / 100 * 95) - 1);
+        $get95thdataCache = DB::table('bill_data')
+            ->selectRaw('(SUM(delta) / SUM(period) * 8) as rate')
+            ->selectRaw('(SUM(in_delta) / SUM(period) * 8) as in_rate')
+            ->selectRaw('(SUM(out_delta) / SUM(period) * 8) as out_rate')
+            ->selectRaw('FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(`timestamp`)) / 300) * 300 as bucket_start')
+            ->selectRaw('DATE_ADD(FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(`timestamp`)) / 300) * 300, INTERVAL 5 MINUTE) as bucket_end')
+            ->selectRaw('SUM(delta) as delta_sum')
+            ->where('bill_id', $bill_id)
+            ->whereBetween('timestamp', [$datefrom, $dateto])
+            ->groupByRaw('bill_id, bucket_start')
+            ->orderBy(column: 'rate')
+            ->get()->toArray();
 
-        $q_95_sql = 'SELECT (delta / period * 8) AS rate FROM bill_data  WHERE bill_id = ?';
-        $q_95_sql .= ' AND timestamp > ? AND timestamp <= ? ORDER BY rate ASC';
-        $a_95th = dbFetchColumn($q_95_sql, [$bill_id, $datefrom, $dateto]);
-        $m_95th = $a_95th[$measurement_95th];
+        $measurement_95th = (round(count($get95thdataCache) / 100 * 95) - 2);
 
-        return round($m_95th, 2);
-    }
-
-    private static function get95thIn($bill_id, $datefrom, $dateto): float
-    {
-        $mq_sql = 'SELECT count(delta) FROM bill_data WHERE bill_id = ?';
-        $mq_sql .= ' AND timestamp > ? AND timestamp <= ?';
-        $measurements = dbFetchCell($mq_sql, [$bill_id, $datefrom, $dateto]);
-        $measurement_95th = (round($measurements / 100 * 95) - 1);
-
-        $q_95_sql = 'SELECT (in_delta / period * 8) AS rate FROM bill_data  WHERE bill_id = ?';
-        $q_95_sql .= ' AND timestamp > ? AND timestamp <= ? ORDER BY rate ASC';
-        $a_95th = dbFetchColumn($q_95_sql, [$bill_id, $datefrom, $dateto]);
-        $m_95th = $a_95th[$measurement_95th] ?? 0;
-
-        return round($m_95th, 2);
-    }
-
-    private static function get95thout($bill_id, $datefrom, $dateto): float
-    {
-        $mq_sql = 'SELECT count(delta) FROM bill_data WHERE bill_id = ?';
-        $mq_sql .= ' AND timestamp > ? AND timestamp <= ?';
-        $measurements = dbFetchCell($mq_sql, [$bill_id, $datefrom, $dateto]);
-        $measurement_95th = (round($measurements / 100 * 95) - 1);
-
-        $q_95_sql = 'SELECT (out_delta / period * 8) AS rate FROM bill_data  WHERE bill_id = ?';
-        $q_95_sql .= ' AND timestamp > ? AND timestamp <= ? ORDER BY rate ASC';
-        $a_95th = dbFetchColumn($q_95_sql, [$bill_id, $datefrom, $dateto]);
-        $m_95th = $a_95th[$measurement_95th] ?? 0;
-
-        return round($m_95th, 2);
+        return (array) $get95thdataCache[$measurement_95th];
     }
 
     public static function getRates($bill_id, $datefrom, $dateto, $dir_95th): array
@@ -180,11 +156,12 @@ class Billing
         $mtot_out = $sum_data['outbound'];
         $ptot = $sum_data['period'];
 
-        $data['rate_95th_in'] = self::get95thIn($bill_id, $datefrom, $dateto);
-        $data['rate_95th_out'] = self::get95thout($bill_id, $datefrom, $dateto);
+        $rate_95th_data = self::get95thdata($bill_id, $datefrom, $dateto);
+        $data['rate_95th_in'] = $rate_95th_data['in_rate'];
+        $data['rate_95th_out'] = $rate_95th_data['out_rate'];
 
         if ($dir_95th == 'agg') {
-            $data['rate_95th'] = self::get95thagg($bill_id, $datefrom, $dateto);
+            $data['rate_95th'] = $rate_95th_data['rate'];
             $data['dir_95th'] = 'agg';
         } else {
             if ($data['rate_95th_out'] > $data['rate_95th_in']) {
