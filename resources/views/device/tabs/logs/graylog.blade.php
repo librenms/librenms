@@ -28,7 +28,7 @@
     <script>
         var graylog_grid = $("#graylog").bootgrid({
             ajax: true,
-            rowCount: [{{ $range }}, 25, 50, 100, 250, -1],
+            rowCount: [50, 100, 250, -1],
             formatters: {
                 "browserTime": function (column, row) {
                         let timezone = @json($timezone);
