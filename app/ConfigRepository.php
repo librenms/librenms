@@ -529,7 +529,7 @@ class ConfigRepository
     public function locateBinary($binary): mixed
     {
         if (! Str::contains($binary, '/')) {
-            $output = `whereis -b $binary`;
+            $output = shell_exec("whereis -b $binary");
             $list = trim(substr((string) $output, strpos((string) $output, ':') + 1));
             $targets = explode(' ', $list);
             foreach ($targets as $target) {
