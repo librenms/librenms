@@ -84,4 +84,23 @@ final class TimeUtilityTest extends TestCase
 
         $this->assertNull(Time::parseInput('not a date'));
     }
+
+    public function testRandomTimeBetween(): void
+    {
+        $start = time();
+        $end = time() + 3600;
+        $randomTime = Time::randomBetween($start, $end)->format('U');
+        $this->assertGreaterThanOrEqual($start, $randomTime);
+        $this->assertLessThanOrEqual($end, $randomTime);
+
+        // test with pesudo random
+        $randomTime = Time::pseudoRandomBetween($start, $end, 'U');
+        $this->assertGreaterThanOrEqual($start, $randomTime);
+        $this->assertLessThanOrEqual($end, $randomTime);
+
+        $this->assertEquals(
+            Time::pseudoRandomBetween($start, $end),
+            Time::pseudoRandomBetween($start, $end),
+        );
+    }
 }

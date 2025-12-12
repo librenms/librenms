@@ -11,6 +11,12 @@ modules:
         version: FORTINET-FORTIGATE-MIB::fgSysVersion.0
         serial: ENTITY-MIB::entPhysicalSerialNum.1
         hardware: ENTITY-MIB::entPhysicalModelName.1
+        hardware_replace:
+            - ['/FGR_/', 'FortiGate Rugged ']
+            - ['/FGT_VM64/', 'FortiGate VM']
+            - ['/FGT_/', 'FortiGate ']
+            - ['/FWF_/', 'FortiWiFi ']
+
     processors:
         data:
             -

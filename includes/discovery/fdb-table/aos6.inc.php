@@ -70,7 +70,7 @@ if (! empty($fdbPort_table)) {
                 continue;
             }
             $port_id = $portid_dict[$dot1dBasePort];
-            $vlan_id = isset($vlans_dict[$vlan]) ? $vlans_dict[$vlan] : 0;
+            $vlan_id = $vlans_dict[$vlan] ?? 0;
             $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
             Log::debug("vlan $vlan_id mac $mac_address port ($dot1dBasePort) $port_id\n");
         }

@@ -267,7 +267,7 @@ class CustomMapController extends Controller
             }
 
             $node_id_map = collect();
-            foreach ($nodes as $id => $node) {
+            foreach ($nodes as $node) {
                 $newnode = $node->replicate();
                 $newnode->custom_map_id = $newmap->custom_map_id;
                 $newnode->save();
@@ -349,7 +349,7 @@ class CustomMapController extends Controller
             if (! is_numeric($key)) {
                 // Delete keys that are not numeric
                 unset($ret[$key]);
-            } elseif (! preg_match('/^#[A-Fa-f0-0]{6}$/', $ret[$key])) {
+            } elseif (! preg_match('/^#[A-Fa-f0-0]{6}$/', (string) $ret[$key])) {
                 // Delete keys that are not a valid hex HTML colour
                 unset($ret[$key]);
             }

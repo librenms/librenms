@@ -106,29 +106,25 @@ trait BridgeMib
 
         // prep base port to port_id map if we have instances
         $baseIfIndex = $stpInstances->isEmpty() ? [] : $this->getCacheByIndex('BRIDGE-MIB::dot1dBasePortIfIndex');
-        $basePortIdMap = array_map(function ($ifIndex) {
-            return PortCache::getIdFromIfIndex($ifIndex, $this->getDevice());
-        }, $baseIfIndex);
+        $basePortIdMap = array_map(fn ($ifIndex) => PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()), $baseIfIndex);
 
         foreach ($stpInstances as $instance) {
             $vlan_ports = SnmpQuery::context("$instance->vlan", 'vlan-')
                 ->enumStrings()->walk('BRIDGE-MIB::dot1dStpPortTable')
-                ->mapTable(function ($data, $port) use ($instance, $basePortIdMap) {
-                    return new PortStp([
-                        'vlan' => $instance->vlan,
-                        'port_id' => $basePortIdMap[$port] ?? 0,
-                        'port_index' => $port,
-                        'priority' => $data['BRIDGE-MIB::dot1dStpPortPriority'] ?? 0,
-                        'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown',
-                        'enable' => $data['BRIDGE-MIB::dot1dStpPortEnable'] ?? 'unknown',
-                        'pathCost' => $data['BRIDGE-MIB::dot1dStpPortPathCost32'] ?? $data['BRIDGE-MIB::dot1dStpPortPathCost'] ?? 0,
-                        'designatedRoot' => Mac::parseBridge($data['BRIDGE-MIB::dot1dStpPortDesignatedRoot'] ?? '')->hex(),
-                        'designatedCost' => $data['BRIDGE-MIB::dot1dStpPortDesignatedCost'] ?? 0,
-                        'designatedBridge' => Mac::parseBridge($data['BRIDGE-MIB::dot1dStpPortDesignatedBridge'] ?? '')->hex(),
-                        'designatedPort' => $this->designatedPort($data['BRIDGE-MIB::dot1dStpPortDesignatedPort'] ?? ''),
-                        'forwardTransitions' => $data['BRIDGE-MIB::dot1dStpPortForwardTransitions'] ?? 0,
-                    ]);
-                })->filter(function (PortStp $port) {
+                ->mapTable(fn ($data, $port) => new PortStp([
+                    'vlan' => $instance->vlan,
+                    'port_id' => $basePortIdMap[$port] ?? 0,
+                    'port_index' => $port,
+                    'priority' => $data['BRIDGE-MIB::dot1dStpPortPriority'] ?? 0,
+                    'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown',
+                    'enable' => $data['BRIDGE-MIB::dot1dStpPortEnable'] ?? 'unknown',
+                    'pathCost' => $data['BRIDGE-MIB::dot1dStpPortPathCost32'] ?? $data['BRIDGE-MIB::dot1dStpPortPathCost'] ?? 0,
+                    'designatedRoot' => Mac::parseBridge($data['BRIDGE-MIB::dot1dStpPortDesignatedRoot'] ?? '')->hex(),
+                    'designatedCost' => $data['BRIDGE-MIB::dot1dStpPortDesignatedCost'] ?? 0,
+                    'designatedBridge' => Mac::parseBridge($data['BRIDGE-MIB::dot1dStpPortDesignatedBridge'] ?? '')->hex(),
+                    'designatedPort' => $this->designatedPort($data['BRIDGE-MIB::dot1dStpPortDesignatedPort'] ?? ''),
+                    'forwardTransitions' => $data['BRIDGE-MIB::dot1dStpPortForwardTransitions'] ?? 0,
+                ]))->filter(function (PortStp $port) {
                     if ($port->enable === 'disabled') {
                         d_echo("$port->port_index ($port->vlan) disabled skipping\n");
 

@@ -39,7 +39,7 @@ if (isset($_POST['editing'])) {
             $device->features = null;
             $device->hardware = $_POST['hardware'];
             $device->icon = null;
-            $device->os = $_POST['os'] ? strip_tags($_POST['os_id']) : 'ping';
+            $device->os = $_POST['os'] ? strip_tags((string) $_POST['os']) : 'ping';
             $device->snmp_disable = 1;
             $device->sysName = $_POST['sysName'] ?: null;
             $device->version = null;
@@ -133,7 +133,7 @@ if (isset($_POST['editing'])) {
         }
 
         if ($snmp_enabled && ($force_save !== true && ! $device_is_snmpable)) {
-            $update_failed_message[] = 'Could not connect to ' . htmlspecialchars($device->hostname) . ' with those SNMP settings.  To save anyway, turn on Force Save.';
+            $update_failed_message[] = 'Could not connect to ' . htmlspecialchars((string) $device->hostname) . ' with those SNMP settings.  To save anyway, turn on Force Save.';
             $update_message[] = 'SNMP settings reverted';
         }
 
@@ -209,8 +209,7 @@ echo "
     <div class='form-group'>
     <label for='os' class='col-sm-2 control-label'>OS (optional)</label>
     <div class='col-sm-4'>
-    <input id='os' class='form-control' name='os' value='" . htmlspecialchars(LibrenmsConfig::get("os.{$device->os}.text")) . "'/>
-    <input type='hidden' id='os_id' class='form-control' name='os_id' value='" . htmlspecialchars($device->os) . "'/>
+    <select id='os' class='form-control' name='os'></select>
     </div>
     </div>
     </div>
@@ -246,10 +245,10 @@ echo "      </select>
     <div class='col-sm-2'>
     </div>
     <div class='col-sm-1'>
-    <input type='number' id='timeout' name='timeout' class='form-control input-sm' value='" . htmlspecialchars($device->timeout ?: '') . "' placeholder='seconds' />
+    <input type='number' id='timeout' name='timeout' class='form-control input-sm' value='" . htmlspecialchars((string) $device->timeout ?: '') . "' placeholder='seconds' />
     </div>
     <div class='col-sm-1'>
-    <input type='number' id='retries' name='retries' class='form-control input-sm' value='" . htmlspecialchars($device->retries ?: '') . "' placeholder='retries' />
+    <input type='number' id='retries' name='retries' class='form-control input-sm' value='" . htmlspecialchars((string) $device->retries ?: '') . "' placeholder='retries' />
     </div>
     </div>
     <div class='form-group'>
@@ -290,7 +289,7 @@ echo "        </select>
     <div class='form-group'>
     <label for='community' class='col-sm-2 control-label'>SNMP Community</label>
     <div class='col-sm-4'>
-    <input id='community' class='form-control' name='community' value='********' onfocus='this.value=(this.value===\"********\" ? decodeURIComponent(\"" . rawurlencode($device->community) . "\") : this.value);'/>
+    <input id='community' class='form-control' name='community' value='********' onfocus='this.value=(this.value===\"********\" ? decodeURIComponent(\"" . rawurlencode((string) $device->community) . "\") : this.value);'/>
     </div>
     </div>
     </div>
@@ -325,7 +324,7 @@ echo "        </select>
     <div class='col-sm-4'>
     <select id='authalgo' name='authalgo' class='form-control'>";
 foreach (\LibreNMS\SNMPCapabilities::authAlgorithms() as $algo => $enabled) {
-    echo "<option value='$algo' " . (strcasecmp($device->authalgo,$algo) == 0 ? 'selected' : '') . ($enabled ? '' : ' disabled') . ">$algo</option>\n";
+    echo "<option value='$algo' " . (strcasecmp((string) $device->authalgo,(string) $algo) == 0 ? 'selected' : '') . ($enabled ? '' : ' disabled') . ">$algo</option>\n";
 }
 echo '</select>';
 
@@ -347,7 +346,7 @@ echo "
     <select id='cryptoalgo' name='cryptoalgo' class='form-control'>";
 
 foreach (\LibreNMS\SNMPCapabilities::cryptoAlgoritms() as $algo => $enabled) {
-    echo "<option value='$algo' " . (strcasecmp($device->cryptoalgo,$algo) == 0 ? 'selected' : '') . ($enabled ? '' : ' disabled') . ">$algo</option>\n";
+    echo "<option value='$algo' " . (strcasecmp((string) $device->cryptoalgo,(string) $algo) == 0 ? 'selected' : '') . ($enabled ? '' : ' disabled') . ">$algo</option>\n";
 }
 echo '</select>
     ';
@@ -378,7 +377,7 @@ if (LibrenmsConfig::get('distributed_poller') === true) {
             echo ' selected';
         }
 
-        echo '>' . htmlspecialchars($group['group_name']) . '</option>';
+        echo '>' . htmlspecialchars((string) $group['group_name']) . '</option>';
     }
 
     echo '
@@ -427,46 +426,8 @@ function disableSnmp(e) {
     }
 }
 
-var os_suggestions = new Bloodhound({
-    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('text'),
-    queryTokenizer: Bloodhound.tokenizers.whitespace,
-    remote: {
-        url: "ajax_ossuggest.php?term=%QUERY",
-        filter: function (output) {
-            return $.map(output, function (item) {
-                return {
-                    text: item.text,
-                    os: item.os,
-                };
-            });
-        },
-        wildcard: "%QUERY"
-    }
-});
-os_suggestions.initialize();
-$('#os').typeahead({
-        hint: true,
-        highlight: true,
-        minLength: 1,
-        classNames: {
-            menu: 'typeahead-left'
-        }
-    },
-    {
-        source: os_suggestions.ttAdapter(),
-        async: true,
-        displayKey: 'text',
-        valueKey: 'os',
-        templates: {
-            suggestion: Handlebars.compile('<p>&nbsp;{{text}}</p>')
-        },
-        limit: 20
-    });
-
-$("#os").on("typeahead:selected typeahead:autocompleted", function(e,datum) {
-    $("#os_id").val(datum.os);
-    $("#os").html('<mark>' + datum.text + '</mark>');
-});
+var current_os = <?php echo json_encode(['id' => $device->os, 'text' => LibrenmsConfig::get("os.{$device->os}.text")], JSON_HEX_QUOT|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS) ?>;
+init_select2('#os', 'os', {}, current_os, 'OS (optional)');
 
 $("[name='snmp']").bootstrapSwitch('offColor','danger');
 

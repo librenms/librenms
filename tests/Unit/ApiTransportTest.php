@@ -24,10 +24,8 @@ final class ApiTransportTest extends TestCase
         $this->assertTrue($result);
 
         LaravelHttp::assertSentCount(1);
-        LaravelHttp::assertSent(function (Request $request) {
-            return $request->method() == 'GET' &&
-                $request->url() == 'https://librenms.org?text=This%20is%20a%20multi-line%0Aalert.';
-        });
+        LaravelHttp::assertSent(fn (Request $request) => $request->method() == 'GET' &&
+            $request->url() == 'https://librenms.org?text=This%20is%20a%20multi-line%0Aalert.');
     }
 
     public function testPostMultilineVariables(): void
@@ -49,10 +47,8 @@ final class ApiTransportTest extends TestCase
         $this->assertTrue($result);
 
         LaravelHttp::assertSentCount(1);
-        LaravelHttp::assertSent(function (Request $request) {
-            return $request->method() == 'POST' &&
-                $request->url() == 'https://librenms.org?text=This%20is%20a%20post%20multi-line%0Aalert.' &&
-                $request->body() == "bodytext=This is a post multi-line\nalert.";
-        });
+        LaravelHttp::assertSent(fn (Request $request) => $request->method() == 'POST' &&
+            $request->url() == 'https://librenms.org?text=This%20is%20a%20post%20multi-line%0Aalert.' &&
+            $request->body() == "bodytext=This is a post multi-line\nalert.");
     }
 }

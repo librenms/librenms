@@ -136,7 +136,7 @@ class Number
             $base = $baseIndicator == 'i' ? 1024 : 1000;
             $exponent = ['k' => 1, 'K' => 1, 'M' => 2, 'G' => 3, 'T' => 4, 'P' => 5, 'E' => 6, 'Z' => 7, 'Y' => 8];
 
-            return self::cast($number) * pow($base, $exponent[$magnitude] ?? 0);
+            return self::cast($number) * $base ** ($exponent[$magnitude] ?? 0);
         }
 
         return NAN;
@@ -214,7 +214,7 @@ class Number
     public static function extract(mixed $string): float|int
     {
         if (! is_numeric($string)) {
-            preg_match('/-?\d*\.?\d+/', $string, $matches);
+            preg_match('/-?\d*\.?\d+/', (string) $string, $matches);
             if (! empty($matches[0])) {
                 $string = $matches[0];
             }

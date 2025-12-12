@@ -12,13 +12,13 @@ $oids = SnmpQuery::cache()->hideMib()->numericIndex()->walk('FCMGMT-MIB::connUni
 
 if (is_array($oids)) {
     foreach ($oids as $index => $entry) {
-        if (str_contains($entry['connUnitSensorMessage'], 'Status')) {
+        if (str_contains((string) $entry['connUnitSensorMessage'], 'Status')) {
             $states = [
                 ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'OK'],
                 ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'Not OK'],
             ];
 
-            $connUnitSensorMessage = explode(':', $entry['connUnitSensorMessage']);
+            $connUnitSensorMessage = explode(':', (string) $entry['connUnitSensorMessage']);
             $value = array_pop($connUnitSensorMessage) === ' OK' ? 1 : 2;
             $descr = implode(':', $connUnitSensorMessage);
 

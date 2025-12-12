@@ -46,14 +46,12 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery
         }
 
         return SnmpQuery::mibDir('nokia/aos7')->walk('ALCATEL-IND1-VLAN-MGR-MIB::vlanDescription')
-            ->mapTable(function ($vlans, $vlan_id) {
-                return new Vlan([
-                    'vlan_vlan' => $vlan_id,
-                    'vlan_name' => $vlans['ALCATEL-IND1-VLAN-MGR-MIB::vlanDescription'] ?? null,
-                    'vlan_domain' => 1,
-                    'vlan_type' => null,
-                ]);
-            });
+            ->mapTable(fn ($vlans, $vlan_id) => new Vlan([
+                'vlan_vlan' => $vlan_id,
+                'vlan_name' => $vlans['ALCATEL-IND1-VLAN-MGR-MIB::vlanDescription'] ?? null,
+                'vlan_domain' => 1,
+                'vlan_type' => null,
+            ]));
     }
 
     public function discoverVlanPorts(Collection $vlans): Collection

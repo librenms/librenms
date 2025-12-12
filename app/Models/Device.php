@@ -117,7 +117,7 @@ class Device extends BaseModel
 
     public function pollerTarget(): string
     {
-        return $this->overwrite_ip ?: $this->hostname ?: '';
+        return ($this->overwrite_ip ?: $this->hostname) ?: '';
     }
 
     public function ipFamily(): AddressFamily
@@ -145,9 +145,7 @@ class Device extends BaseModel
             if ($port) {
                 return $port->device;
             }
-        } catch (InvalidIpException $e) {
-            //
-        } catch (ModelNotFoundException $e) {
+        } catch (InvalidIpException|ModelNotFoundException) {
             //
         }
 
@@ -159,9 +157,7 @@ class Device extends BaseModel
             if ($port) {
                 return $port->device;
             }
-        } catch (InvalidIpException $e) {
-            //
-        } catch (ModelNotFoundException $e) {
+        } catch (InvalidIpException|ModelNotFoundException) {
             //
         }
 
@@ -446,9 +442,7 @@ class Device extends BaseModel
 
     public function setAttrib($name, $value)
     {
-        $attrib = $this->attribs->first(function ($item) use ($name) {
-            return $item->attrib_type === $name;
-        });
+        $attrib = $this->attribs->first(fn ($item) => $item->attrib_type === $name);
 
         if (! $attrib) {
             $attrib = new DeviceAttrib(['attrib_type' => $name]);
@@ -462,9 +456,7 @@ class Device extends BaseModel
 
     public function forgetAttrib($name)
     {
-        $attrib_index = $this->attribs->search(function ($attrib) use ($name) {
-            return $attrib->attrib_type === $name;
-        });
+        $attrib_index = $this->attribs->search(fn ($attrib) => $attrib->attrib_type === $name);
 
         if ($attrib_index !== false) {
             $deleted = (bool) $this->attribs->get($attrib_index)->delete();
@@ -702,6 +694,8 @@ class Device extends BaseModel
             return $query;
         } elseif ($deviceSpec == 'all') {
             return $query;
+        } elseif ($deviceSpec == 'new') {
+            return $query->whereNull('last_discovered');
         } elseif ($deviceSpec == 'even') {
             return $query->whereRaw('device_id % 2 = 0');
         } elseif ($deviceSpec == 'odd') {
@@ -1184,6 +1178,14 @@ class Device extends BaseModel
     public function services(): HasMany
     {
         return $this->hasMany(Service::class, 'device_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\DeviceStats, $this>
+     */
+    public function stats(): HasOne
+    {
+        return $this->hasOne(DeviceStats::class, 'device_id');
     }
 
     /**

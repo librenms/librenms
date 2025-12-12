@@ -2,43 +2,12 @@
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
+use App\Models\Service;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Enum\Severity;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Clean;
 use LibreNMS\Util\IP;
-
-function get_service_status($device = null)
-{
-    $sql_query = 'SELECT service_status, count(service_status) as count FROM services WHERE';
-    $sql_param = [];
-    $add = 0;
-
-    if (! is_null($device)) {
-        // Add a device filter to the SQL query.
-        $sql_query .= ' `device_id` = ?';
-        $sql_param[] = $device;
-        $add++;
-    }
-
-    if ($add == 0) {
-        // No filters, remove " WHERE" -6
-        $sql_query = substr($sql_query, 0, strlen($sql_query) - 6);
-    }
-    $sql_query .= ' GROUP BY service_status';
-
-    // $service is not null, get only what we want.
-    $result = dbFetchRows($sql_query, $sql_param);
-
-    // Set our defaults to 0
-    $service_count = [0 => 0, 1 => 0, 2 => 0];
-    // Rebuild the array in a more convenient method
-    foreach ($result as $v) {
-        $service_count[$v['service_status']] = $v['count'];
-    }
-
-    return $service_count;
-}
 
 function add_service($device, $type, $desc, $ip = '', $param = '', $ignore = 0, $disabled = 0, $template_id = '', $name = '')
 {
@@ -48,45 +17,25 @@ function add_service($device, $type, $desc, $ip = '', $param = '', $ignore = 0, 
         $ip = $device->pollerTarget();
     }
 
-    $insert = ['device_id' => $device->device_id, 'service_ip' => $ip, 'service_type' => $type, 'service_changed' => ['UNIX_TIMESTAMP(NOW())'], 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked', 'service_ds' => '{}', 'service_disabled' => $disabled, 'service_template_id' => $template_id, 'service_name' => $name];
+    $insert = ['device_id' => $device->device_id, 'service_ip' => $ip, 'service_type' => $type, 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked', 'service_ds' => '{}', 'service_disabled' => $disabled, 'service_template_id' => $template_id, 'service_name' => $name];
 
-    return dbInsert($insert, 'services');
+    return Service::create($insert);
 }
 
 function service_get($device = null, $service = null)
 {
-    $sql_query = 'SELECT `service_id`,`device_id`,`service_ip`,`service_type`,`service_desc`,`service_param`,`service_ignore`,`service_status`,`service_changed`,`service_message`,`service_disabled`,`service_ds`,`service_template_id`,`service_name` FROM `services` WHERE';
-    $sql_param = [];
-    $add = 0;
-
-    d_echo('SQL Query: ' . $sql_query);
     if (! is_null($service)) {
         // Add a service filter to the SQL query.
-        $sql_query .= ' `service_id` = ? AND';
-        $sql_param[] = $service;
-        $add++;
-    }
-    if (! is_null($device)) {
-        // Add a device filter to the SQL query.
-        $sql_query .= ' `device_id` = ? AND';
-        $sql_param[] = $device;
-        $add++;
-    }
-
-    if ($add == 0) {
-        // No filters, remove " WHERE" -6
-        $sql_query = substr($sql_query, 0, strlen($sql_query) - 6);
+        $services = Service::query()->where('service_id', $service)->get();
+    } elseif (! is_null($device)) {
+        $services = Service::query()->where('device_id', $device)->get();
     } else {
-        // We have filters, remove " AND" -4
-        $sql_query = substr($sql_query, 0, strlen($sql_query) - 4);
+        $services = Service::query()->get();
     }
-    d_echo('SQL Query: ' . $sql_query);
 
-    // $service is not null, get only what we want.
-    $services = dbFetchRows($sql_query, $sql_param);
     d_echo('Service Array: ' . print_r($services, true) . "\n");
 
-    return $services;
+    return $services->toArray();
 }
 
 function edit_service($update = [], $service = null)
@@ -95,7 +44,7 @@ function edit_service($update = [], $service = null)
         return false;
     }
 
-    return dbUpdate($update, 'services', '`service_id`=?', [$service]);
+    return Service::query()->where('service_id', $service)->update($update);
 }
 
 function delete_service($service = null)
@@ -104,12 +53,12 @@ function delete_service($service = null)
         return false;
     }
 
-    return dbDelete('services', '`service_id` =  ?', [$service]);
+    return Service::query()->where('service_id', $service)->delete();
 }
 
 function discover_service($device, $service)
 {
-    if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_type`= ? AND `device_id` = ?', [$service, $device['device_id']])) {
+    if (Service::query()->where('service_type', $service)->where('device_id', $device['device_id'])->doesntExist()) {
         add_service($device, $service, "$service Monitoring (Auto Discovered)", null, null, 0, 0, 0, "AUTO: $service");
         Eventlog::log('Autodiscovered service: type ' . $service, $device['device_id'], 'service', Severity::Info);
         echo '+';
@@ -128,7 +77,7 @@ function poll_service($service)
     $check_cmd = '';
 
     // if we have a script for this check, use it.
-    $check_script = LibrenmsConfig::get('install_dir') . '/includes/services/check_' . strtolower($service['service_type']) . '.inc.php';
+    $check_script = LibrenmsConfig::get('install_dir') . '/includes/services/check_' . strtolower((string) $service['service_type']) . '.inc.php';
     if (is_file($check_script)) {
         include $check_script;
     }
@@ -164,7 +113,7 @@ function poll_service($service)
         // rrd definition
         $rrd_def = new RrdDefinition();
         foreach ($perf as $k => $v) {
-            if (($v['uom'] == 'c') && ! preg_match('/[Uu]ptime/', $k)) {
+            if (($v['uom'] == 'c') && ! preg_match('/[Uu]ptime/', (string) $k)) {
                 // This is a counter, create the DS as such
                 $rrd_def->addDataset($k, 'COUNTER', 0);
             } else {
@@ -192,8 +141,8 @@ function poll_service($service)
 
         // TODO: Put the 3 lines below in a function getStatus(int) ?
         $status_text = [0 => 'OK', 1 => 'Warning', 3 => 'Unknown'];
-        $old_status_text = isset($status_text[$old_status]) ? $status_text[$old_status] : 'Critical';
-        $new_status_text = isset($status_text[$new_status]) ? $status_text[$new_status] : 'Critical';
+        $old_status_text = $status_text[$old_status] ?? 'Critical';
+        $new_status_text = $status_text[$new_status] ?? 'Critical';
 
         Eventlog::log(
             "Service {$service['service_name']} ({$service['service_type']})' changed status from $old_status_text to $new_status_text - {$service['service_desc']} - $msg",
@@ -228,7 +177,7 @@ function check_service($command)
     $valid_uom = ['us', 'ms', 'KB', 'MB', 'GB', 'TB', 'c', 's', '%', 'B'];
 
     // Make our command safe.
-    $parts = preg_split('~(?:\'[^\']*\'|"[^"]*")(*SKIP)(*F)|\h+~', trim($command));
+    $parts = preg_split('~(?:\'[^\']*\'|"[^"]*")(*SKIP)(*F)|\h+~', trim((string) $command));
     $safe_command = implode(' ', array_map(function ($part) {
         $trimmed = preg_replace('/^(\'(.*)\'|"(.*)")$/', '$2$3', $part);
 
@@ -281,8 +230,8 @@ function check_service($command)
             // http://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html
             $normalized_ds = preg_replace('/[^a-zA-Z0-9_]/', '', $ds);
             // if ds_name is longer than 19 characters, only use the first 19
-            if (strlen($normalized_ds) > 19) {
-                $normalized_ds = substr($normalized_ds, 0, 19);
+            if (strlen((string) $normalized_ds) > 19) {
+                $normalized_ds = substr((string) $normalized_ds, 0, 19);
                 d_echo($ds . ' exceeded 19 characters, renaming to ' . $normalized_ds . "\n");
             }
             if ($ds != $normalized_ds) {
@@ -292,7 +241,7 @@ function check_service($command)
                     $perf_unique = 0;
                     // Try to generate a unique name
                     for ($i = 0; $i < 10; $i++) {
-                        $tmp_ds_name = substr($normalized_ds, 0, 18) . $i;
+                        $tmp_ds_name = substr((string) $normalized_ds, 0, 18) . $i;
                         if (! isset($metrics[$tmp_ds_name])) {
                             d_echo($normalized_ds . " collides with an existing index\n");
                             $normalized_ds = $tmp_ds_name;
@@ -304,7 +253,7 @@ function check_service($command)
                         // Try harder to generate a unique name
                         for ($i = 0; $i < 10; $i++) {
                             for ($j = 0; $j < 10; $j++) {
-                                $tmp_ds_name = substr($normalized_ds, 0, 17) . $j . $i;
+                                $tmp_ds_name = substr((string) $normalized_ds, 0, 17) . $j . $i;
                                 if (! isset($perf[$tmp_ds_name])) {
                                     $normalized_ds = $tmp_ds_name;
                                     $perf_unique = 1;

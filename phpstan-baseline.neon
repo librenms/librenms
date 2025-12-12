@@ -11,11 +11,6 @@ parameters:
 			path: LibreNMS/Data/Store/Rrd.php
 
 		-
-			message: "#^Right side of && is always true\\.$#"
-			count: 1
-			path: LibreNMS/Data/Store/Rrd.php
-
-		-
 			message: "#^Parameter \\#1 \\$model of static method LibreNMS\\\\Model\\:\\:onCreate\\(\\) expects static\\(LibreNMS\\\\Device\\\\Processor\\), LibreNMS\\\\Device\\\\Processor given\\.$#"
 			count: 1
 			path: LibreNMS/Device/Processor.php
@@ -164,11 +159,6 @@ parameters:
 			message: "#^PHPDoc type array of property App\\\\Models\\\\UserPref\\:\\:\\$primaryKey is not covariant with PHPDoc type string of overridden property Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:\\$primaryKey\\.$#"
 			count: 1
 			path: app/Models/UserPref.php
-
-		-
-			message: "#^Variable \\$username on left side of \\?\\? is never defined\\.$#"
-			count: 1
-			path: app/Providers/LegacyUserProvider.php
 
 		-
 			message: "#^Parameter \\#1 \\$attr of method LibreNMS\\\\Authentication\\\\SSOAuthorizer\\:\\:authSSOGetAttr\\(\\) expects string, int given\\.$#"

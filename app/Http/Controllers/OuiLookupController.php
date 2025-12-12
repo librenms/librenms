@@ -17,7 +17,7 @@ class OuiLookupController extends Controller
         $query = $request->get('query');
 
         if ($query) {
-            $lines = preg_split('/\r\n|\n|\r/', $query, flags: PREG_SPLIT_NO_EMPTY);
+            $lines = preg_split('/\r\n|\n|\r/', (string) $query, flags: PREG_SPLIT_NO_EMPTY);
             foreach ($lines as $line) {
                 $mac = Mac::parsePartial($line);
 

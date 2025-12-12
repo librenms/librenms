@@ -33,7 +33,7 @@ class Mattermost extends Transport
     public function deliverAlert(array $alert_data): bool
     {
         $host = $this->config['mattermost-url'];
-        $mattermost_msg = strip_tags($alert_data['msg']);
+        $mattermost_msg = strip_tags((string) $alert_data['msg']);
         $color = self::getColorForState($alert_data['state']);
         $data = [
             'attachments' => [

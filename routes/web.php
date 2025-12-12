@@ -193,6 +193,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::put('alert-rule/{alert_rule}/toggle', [AlertRuleController::class, 'toggle'])->name('alert-rule.toggle');
         Route::get('alert-rule-from-template/{template_id}', [AlertRuleTemplateController::class, 'template'])->name('alert-rule-template');
         Route::get('alert-rule-from-rule/{alert_rule}', [AlertRuleTemplateController::class, 'rule'])->name('alert-rule-template.rule');
+        Route::get('alertlog/{alertLog}/details', Ajax\AlertDetailsController::class)->name('alertlog.details');
 
         Route::get('plugin/settings', App\Http\Controllers\PluginAdminController::class)->name('plugin.admin');
         Route::get('plugin/settings/{plugin:plugin_name}', PluginSettingsController::class)->name('plugin.settings');
@@ -200,7 +201,7 @@ Route::middleware(['auth'])->group(function (): void {
 
         Route::resource('port-groups', PortGroupController::class);
         Route::get('validate', [ValidateController::class, 'index'])->name('validate');
-        Route::get('validate/results', [ValidateController::class, 'runValidation'])->name('validate.results');
+        Route::get('validate/results/{group?}', [ValidateController::class, 'runValidation'])->name('validate.results');
         Route::post('validate/fix', [ValidateController::class, 'runFixer'])->name('validate.fix');
     });
 
@@ -273,8 +274,10 @@ Route::middleware(['auth'])->group(function (): void {
             Route::get('syslog', Select\SyslogController::class)->name('ajax.select.syslog');
             Route::get('location', Select\LocationController::class)->name('ajax.select.location');
             Route::get('munin', Select\MuninPluginController::class)->name('ajax.select.munin');
+            Route::get('os', Select\OsController::class)->name('ajax.select.os');
             Route::get('role', Select\RoleController::class)->name('ajax.select.role');
             Route::get('service', Select\ServiceController::class)->name('ajax.select.service');
+            Route::get('customoid', Select\CustomoidController::class)->name('ajax.select.customoid');
             Route::get('template', Select\ServiceTemplateController::class)->name('ajax.select.template');
             Route::get('poller-group', Select\PollerGroupController::class)->name('ajax.select.poller-group');
             Route::get('port', Select\PortController::class)->name('ajax.select.port');
@@ -294,7 +297,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('graylog', Table\GraylogController::class)->name('table.graylog');
             Route::post('inventory', Table\InventoryController::class)->name('table.inventory');
             Route::get('inventory/export', [Table\InventoryController::class, 'export']);
-            Route::post('location', Table\LocationController::class);
+            Route::post('location', Table\LocationController::class)->name('table.location');
             Route::post('mempools', Table\MempoolsController::class)->name('table.mempools');
             Route::get('mempools/export', [Table\MempoolsController::class, 'export']);
             Route::post('outages', Table\OutagesController::class)->name('table.outages');

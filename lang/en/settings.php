@@ -830,6 +830,9 @@ return [
             'description' => 'Memcached port',
             'help' => 'The port for the memcached server. Default is 11211',
         ],
+        'enable_ports_etherlike' => [
+            'description' => 'Enable etherlike graphs for ports',
+        ],
         'email_auto_tls' => [
             'description' => 'Auto TLS support',
             'help' => 'Tries to use TLS before falling back to un-encrypted',
@@ -1588,6 +1591,10 @@ return [
                 'description' => 'Minimum password length',
                 'help' => 'Passwords shorter than the given length will be rejected',
             ],
+            'uncompromised' => [
+                'description' => 'Require password to be uncompromised',
+                'help' => 'Checks password against HaveIBeenPwned database using k-anonymity',
+            ],
         ],
         'peeringdb' => [
             'enabled' => [
@@ -1795,6 +1802,10 @@ return [
             'description' => 'Port NAC entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
+        'ports_page_default' => [
+            'description' => 'Default ports tab',
+            'help' => 'Default tab to open when viewing ports on the device page',
+        ],
         'ports_purge' => [
             'description' => 'Purge ports deleted',
             'help' => 'Cleanup done by daily.sh',
@@ -1897,6 +1908,10 @@ return [
             'description' => 'RANCID Repository Type',
             'help' => 'Type of repository used by RANCID, used to display config diffs on device pages',
         ],
+        'rancid_repo_url' => [
+            'description' => 'RANCID Repository URL',
+            'help' => 'RANCID repository URL, used to point at GitWeb that visualizes a bare Git repository',
+        ],
         'rancid_ignorecomments' => [
             'description' => 'RANCID Ignore Comments',
             'help' => 'Ignore comments when comparing RANCID configs, used to display config diffs on device pages',
@@ -1986,7 +2001,7 @@ return [
                 'help' => 'Discovery task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_discovery_enabled is set to true.',
                 'options' => [
                     'legacy' => 'Legacy (Unrestricted)',
-                    'cron' => 'Cron (discovery.php)',
+                    'cron' => 'Cron (lnms device:discover)',
                     'dispatcher' => 'Dispatcher Service',
                 ],
             ],
@@ -2348,6 +2363,10 @@ return [
         'device_location_map_show_device_dependencies' => [
             'description' => 'Show devices dependecies on location map',
             'help' => 'Show links between devices on the location map based on parent dependencies',
+        ],
+        'device_stats_avg_factor' => [
+            'description' => 'Averaging factor',
+            'help' => 'We calculate a moving average using an exponential weighted moving average function.  This is the factor used by the function to control how much the current value affects the average.  Values closer to 1 will make the average change quicker.',
         ],
         'whois' => [
             'description' => 'Path to whois',

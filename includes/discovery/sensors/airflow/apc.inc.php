@@ -28,7 +28,7 @@ foreach ($pre_cache['cooling_unit_analog'] as $index => $data) {
     $descr = $data['coolingUnitStatusAnalogDescription'];
     $scale = $data['coolingUnitStatusAnalogScale'] ?? null;
     $value = $data['coolingUnitStatusAnalogValue'] ?? null;
-    if (preg_match('/Airflow/', $descr) && $data['coolingUnitStatusAnalogUnits'] == 'CFM' && $value >= 0) {
+    if (preg_match('/Airflow/', (string) $descr) && $data['coolingUnitStatusAnalogUnits'] == 'CFM' && $value >= 0) {
         discover_sensor(null, 'airflow', $device, $cur_oid, $cur_oid, 'apc', $descr, $scale, 1, null, null, null, null, $value);
     }
 }

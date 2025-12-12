@@ -70,7 +70,7 @@ $parms = $_SERVER['argv'];
 array_shift($parms);
 
 foreach ($parms as $parameter) {
-    @[$arg, $value] = @explode('=', $parameter);
+    @[$arg, $value] = @explode('=', (string) $parameter);
 
     switch ($arg) {
         case '--method':
@@ -292,8 +292,8 @@ $ds_name = [];
 */
 if (count($output)) {
     foreach ($output as $line) {
-        if (substr_count($line, '<v>')) {
-            $linearray = explode('<v>', $line);
+        if (substr_count((string) $line, '<v>')) {
+            $linearray = explode('<v>', (string) $line);
             /* discard the row */
             array_shift($linearray);
             $ds_num = 0;
@@ -337,23 +337,23 @@ if (count($output)) {
 
                 $ds_num++;
             }
-        } elseif (substr_count($line, '<rra>')) {
+        } elseif (substr_count((string) $line, '<rra>')) {
             $in_rra = true;
-        } elseif (substr_count($line, '<min>')) {
-            $ds_min[] = trim(str_replace('<min>', '', str_replace('</min>', '', trim($line))));
-        } elseif (substr_count($line, '<max>')) {
-            $ds_max[] = trim(str_replace('<max>', '', str_replace('</max>', '', trim($line))));
-        } elseif (substr_count($line, '<name>')) {
-            $ds_name[] = trim(str_replace('<name>', '', str_replace('</name>', '', trim($line))));
-        } elseif (substr_count($line, '<cf>')) {
-            $rra_cf[] = trim(str_replace('<cf>', '', str_replace('</cf>', '', trim($line))));
-        } elseif (substr_count($line, '<pdp_per_row>')) {
-            $rra_pdp[] = trim(str_replace('<pdp_per_row>', '', str_replace('</pdp_per_row>', '', trim($line))));
-        } elseif (substr_count($line, '</rra>')) {
+        } elseif (substr_count((string) $line, '<min>')) {
+            $ds_min[] = trim(str_replace('<min>', '', str_replace('</min>', '', trim((string) $line))));
+        } elseif (substr_count((string) $line, '<max>')) {
+            $ds_max[] = trim(str_replace('<max>', '', str_replace('</max>', '', trim((string) $line))));
+        } elseif (substr_count((string) $line, '<name>')) {
+            $ds_name[] = trim(str_replace('<name>', '', str_replace('</name>', '', trim((string) $line))));
+        } elseif (substr_count((string) $line, '<cf>')) {
+            $rra_cf[] = trim(str_replace('<cf>', '', str_replace('</cf>', '', trim((string) $line))));
+        } elseif (substr_count((string) $line, '<pdp_per_row>')) {
+            $rra_pdp[] = trim(str_replace('<pdp_per_row>', '', str_replace('</pdp_per_row>', '', trim((string) $line))));
+        } elseif (substr_count((string) $line, '</rra>')) {
             $in_rra = false;
             $rra_num++;
-        } elseif (substr_count($line, '<step>')) {
-            $step = trim(str_replace('<step>', '', str_replace('</step>', '', trim($line))));
+        } elseif (substr_count((string) $line, '<step>')) {
+            $step = trim(str_replace('<step>', '', str_replace('</step>', '', trim((string) $line))));
         }
     }
 }
@@ -453,10 +453,10 @@ function backupRRDFile($rrdfile)
         $backupdir = $tempdir;
     }
 
-    if (file_exists($backupdir . '/' . basename($rrdfile))) {
-        $newfile = basename($rrdfile) . '.' . $seed;
+    if (file_exists($backupdir . '/' . basename((string) $rrdfile))) {
+        $newfile = basename((string) $rrdfile) . '.' . $seed;
     } else {
-        $newfile = basename($rrdfile);
+        $newfile = basename((string) $rrdfile);
     }
 
     echo($html ? "<tr><td colspan='20' class='spikekill_note'>" : '') . "NOTE: Backing Up '$rrdfile' to '" . $backupdir . '/' . $newfile . "'" . ($html ? "</td></tr>\n" : "\n");
@@ -638,7 +638,7 @@ function outputStatistics($rra)
                             $ds_name[$dskey],
                             $rra_cf[$rra_key],
                             $ds['totalsamples'],
-                            isset($ds['numsamples']) ? $ds['numsamples'] : '0',
+                            $ds['numsamples'] ?? '0',
                             $ds['average'] != 'N/A' ? round($ds['average'], 2) : $ds['average'],
                             $ds['standard_deviation'] != 'N/A' ? round($ds['standard_deviation'], 2) : $ds['standard_deviation'],
                             isset($ds['max_value']) ? round($ds['max_value'], 2) : 'N/A',
@@ -692,7 +692,7 @@ function outputStatistics($rra)
                             $ds_name[$dskey],
                             $rra_cf[$rra_key],
                             $ds['totalsamples'],
-                            isset($ds['numsamples']) ? $ds['numsamples'] : '0',
+                            $ds['numsamples'] ?? '0',
                             $ds['average'] != 'N/A' ? round($ds['average'], 2) : $ds['average'],
                             $ds['standard_deviation'] != 'N/A' ? round($ds['standard_deviation'], 2) : $ds['standard_deviation'],
                             isset($ds['max_value']) ? round($ds['max_value'], 2) : 'N/A',
@@ -723,8 +723,8 @@ function updateXML(&$output, &$rra)
 
     if (count($output)) {
         foreach ($output as $line) {
-            if (substr_count($line, '<v>')) {
-                $linearray = explode('<v>', $line);
+            if (substr_count((string) $line, '<v>')) {
+                $linearray = explode('<v>', (string) $line);
                 /* discard the row */
                 array_shift($linearray);
 
@@ -773,11 +773,11 @@ function updateXML(&$output, &$rra)
 
                 $new_array[] = $out_row;
             } else {
-                if (substr_count($line, '</rra>')) {
+                if (substr_count((string) $line, '</rra>')) {
                     $ds_minmax = [];
                     $rra_num++;
                     $kills = 0;
-                } elseif (substr_count($line, '</database>')) {
+                } elseif (substr_count((string) $line, '</database>')) {
                     $ds_num++;
                     $kills = 0;
                 }
@@ -795,7 +795,7 @@ function removeComments(&$output)
     $new_array = [];
     if (count($output)) {
         foreach ($output as $line) {
-            $line = trim($line);
+            $line = trim((string) $line);
             if ($line == '') {
                 continue;
             } else {
@@ -865,10 +865,10 @@ function standard_deviation($samples)
     $sample_square = [];
 
     for ($current_sample = 0; $sample_count > $current_sample; $current_sample++) {
-        $sample_square[$current_sample] = pow($samples[$current_sample], 2);
+        $sample_square[$current_sample] = $samples[$current_sample] ** 2;
     }
 
-    return sqrt(array_sum($sample_square) / $sample_count - pow(array_sum($samples) / $sample_count, 2));
+    return sqrt(array_sum($sample_square) / $sample_count - (array_sum($samples) / $sample_count) ** 2);
 }
 
 /* display_help - displays the usage of the function */

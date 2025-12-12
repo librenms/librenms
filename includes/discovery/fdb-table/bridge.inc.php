@@ -71,7 +71,7 @@ if (! empty($fdbPort_table)) {
         // Look the dot1qVlanFdbId up to a real VLAN number; if undefined assume the
         // index *is* the VLAN number. Code in fdb-table.inc.php to map to the
         // device VLANs table should catch anything invalid.
-        $vlan = isset($vlan_fdb_dict[$vlanIndex]) ? $vlan_fdb_dict[$vlanIndex] : $vlanIndex;
+        $vlan = $vlan_fdb_dict[$vlanIndex] ?? $vlanIndex;
 
         foreach ($data[$data_oid] ?? [] as $mac => $dot1dBasePort) {
             if ($dot1dBasePort == 0) {
@@ -84,7 +84,7 @@ if (! empty($fdbPort_table)) {
                 continue;
             }
             $port_id = $portid_dict[$dot1dBasePort] ?? PortCache::getIdFromIfIndex($dot1dBasePort); // if vendor messed up, assume base port = ifIndex
-            $vlan_id = isset($vlans_dict[$vlan]) ? $vlans_dict[$vlan] : 0;
+            $vlan_id = $vlans_dict[$vlan] ?? 0;
             $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
             Log::debug("vlan $vlan mac $mac_address port ($dot1dBasePort) $port_id\n");
         }

@@ -140,6 +140,7 @@ return [
         ],
 
         'cache' => [
+            'scheme' => env('REDIS_SCHEME', 'tcp'),
             'url' => env('REDIS_URL'),
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'username' => env('REDIS_USERNAME'),
@@ -149,7 +150,7 @@ return [
         ],
 
         'sentinel_session' => [
-            ...explode(',', env('REDIS_SENTINEL_HOSTS', '')),
+            ...explode(',', (string) env('REDIS_SENTINEL_HOSTS', '')),
             'options' => [
                 'replication' => 'sentinel',
                 'service' => env('REDIS_SENTINEL_SERVICE', 'mymaster'),
@@ -161,7 +162,7 @@ return [
         ],
 
         'sentinel_cache' => [
-            ...explode(',', env('REDIS_SENTINEL_HOSTS', '')),
+            ...explode(',', (string) env('REDIS_SENTINEL_HOSTS', '')),
             'options' => [
                 'replication' => 'sentinel',
                 'service' => env('REDIS_SENTINEL_SERVICE', 'mymaster'),

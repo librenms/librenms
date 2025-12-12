@@ -6,6 +6,7 @@ use App\Actions\Device\CheckDeviceAvailability;
 use App\Events\DevicePolled;
 use App\Events\PollingDevice;
 use App\Facades\LibrenmsConfig;
+use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
 use App\Polling\Measure\MeasurementManager;
@@ -16,19 +17,21 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\OS;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Dns;
 use LibreNMS\Util\Module;
+use LibreNMS\Util\ModuleList;
 use Throwable;
 
 class PollDevice implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private ?\App\Models\Device $device = null;
+    private ?Device $device = null;
     private ?array $deviceArray = null;
     /**
      * @var OS|OS\Generic
@@ -37,11 +40,11 @@ class PollDevice implements ShouldQueue
 
     /**
      * @param  int  $device_id
-     * @param  array<string, bool|string[]>  $module_overrides
+     * @param  ModuleList  $moduleList
      */
     public function __construct(
         public int $device_id,
-        public array $module_overrides = [],
+        public ModuleList $moduleList,
     ) {
     }
 
@@ -51,6 +54,7 @@ class PollDevice implements ShouldQueue
     public function handle(): void
     {
         $this->initDevice();
+        $this->initRrdDirectory();
         PollingDevice::dispatch($this->device);
         $this->os = OS::make($this->deviceArray);
 
@@ -65,7 +69,7 @@ class PollDevice implements ShouldQueue
         $measurement->end();
 
         // if modules are not overridden, record performance
-        if (empty($this->modules)) {
+        if (! $this->moduleList->hasOverride()) {
             if ($this->device->status) {
                 $this->recordPerformance($measurement);
             }
@@ -118,8 +122,7 @@ class PollDevice implements ShouldQueue
 
         $datastore = app('Datastore');
 
-        foreach ($this->getModules() as $module => $status) {
-            $module_status = Module::pollingStatus($module, $this->device, $this->isModuleManuallyEnabled($module));
+        foreach ($this->moduleList->modulesWithStatus(ProcessType::poller, $this->device) as $module => $module_status) {
             $should_poll = false;
             $start_memory = memory_get_usage();
             $module_start = microtime(true);
@@ -132,8 +135,8 @@ class PollDevice implements ShouldQueue
                     Log::info("#### Load poller module $module ####\n");
                     Log::debug($module_status);
 
-                    if (is_array($status)) {
-                        LibrenmsConfig::set('poller_submodules.' . $module, $status);
+                    if ($module_status->hasSubModules()) {
+                        LibrenmsConfig::set('poller_submodules.' . $module, $module_status->submodules);
                     }
 
                     $instance->poll($this->os, $datastore);
@@ -152,42 +155,31 @@ class PollDevice implements ShouldQueue
             if ($should_poll) {
                 Log::info('');
                 app(MeasurementManager::class)->printChangedStats();
-                $this->saveModulePerformance($module, $module_start, $start_memory);
+                Module::savePerformance($module, ProcessType::poller, $module_start, $start_memory);
+                $this->os->enableGraph('poller_modules_perf');
                 Log::info("#### Unload poller module $module ####\n");
             }
         }
-    }
-
-    private function saveModulePerformance(string $module, float $start_time, int $start_memory): void
-    {
-        $module_time = microtime(true) - $start_time;
-        $module_mem = (memory_get_usage() - $start_memory);
-
-        Log::info(sprintf(">> Runtime for poller module '%s': %.4f seconds with %s bytes", $module, $module_time, $module_mem));
-
-        app('Datastore')->put($this->deviceArray, 'poller-perf', [
-            'module' => $module,
-            'rrd_def' => RrdDefinition::make()->addDataset('poller', 'GAUGE', 0),
-            'rrd_name' => ['poller-perf', $module],
-        ], [
-            'poller' => $module_time,
-        ]);
-        $this->os->enableGraph('poller_modules_perf');
     }
 
     private function initDevice(): void
     {
         \DeviceCache::setPrimary($this->device_id);
         $this->device = \DeviceCache::getPrimary();
-        $this->device->ip = $this->device->overwrite_ip ?: Dns::lookupIp($this->device) ?: $this->device->ip;
+        $this->device->ip = Dns::lookupIp($this->device) ?? $this->device->ip;
 
         $this->deviceArray = $this->device->toArray();
         if ($os_group = LibrenmsConfig::get("os.{$this->device->os}.group")) {
             $this->deviceArray['os_group'] = $os_group;
         }
 
-        $this->printDeviceInfo($os_group);
-        $this->initRrdDirectory();
+        Log::info(sprintf(<<<'EOH'
+Hostname:  %s %s
+ID:        %s
+OS:        %s
+IP:        %s
+
+EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->device_id, $this->device->os, $this->device->ip));
     }
 
     private function initRrdDirectory(): void
@@ -204,17 +196,6 @@ class PollDevice implements ShouldQueue
         }
     }
 
-    private function printDeviceInfo(?string $group): void
-    {
-        Log::info(sprintf(<<<'EOH'
-Hostname:  %s %s %s
-ID:        %s
-OS:        %s
-IP:        %s
-
-EOH, $this->device->hostname, $group ? "($group)" : '', $this->device->status ? '' : '%RDOWN%n', $this->device->device_id, $this->device->os, $this->device->ip), ['color' => true]);
-    }
-
     private function recordPerformance(Measurement $measurement): void
     {
         $measurement->manager()->record('device', $measurement);
@@ -227,35 +208,5 @@ EOH, $this->device->hostname, $group ? "($group)" : '', $this->device->status ? 
         ], [
             'poller' => $this->device->last_polled_timetaken,
         ]);
-
-        $this->os->enableGraph('poller_perf');
-    }
-
-    private function getModules(): array
-    {
-        $default_modules = LibrenmsConfig::get('poller_modules', []);
-
-        if (empty($this->module_overrides)) {
-            return $default_modules;
-        }
-
-        // ensure order of modules, preserve submodules
-        $ordered_modules = [];
-        foreach ($default_modules as $module => $enabled) {
-            if (isset($this->module_overrides[$module])) {
-                $ordered_modules[$module] = $this->module_overrides[$module];
-            }
-        }
-
-        return $ordered_modules;
-    }
-
-    private function isModuleManuallyEnabled(string $module): ?bool
-    {
-        if (empty($this->module_overrides)) {
-            return null;
-        }
-
-        return isset($this->module_overrides[$module]);
     }
 }

@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'errors' => [
+        'db_connect' => 'Failed to connect to database. Verify database service is running and connection settings.',
+        'db_auth' => 'Failed to connect to database. Verify credentials: :error',
+        'no_devices' => 'No devices found matching your given device specification',
+        'no_new_devices' => 'No new devices',
+    ],
     'config:clear' => [
         'description' => 'Clear config cache.  This will allow any changes that have been made since the last full config load to be reflected in the current config.',
     ],
@@ -112,6 +118,21 @@ return [
             'added' => 'Added device :hostname (:device_id)',
         ],
     ],
+    'device:discover' => [
+        'description' => 'Discover information about existing devices, defines what will be polled',
+        'arguments' => [
+            'device spec' => 'Device spec to discover: device_id, hostname, wildcard (*), odd, even, all',
+        ],
+        'options' => [
+            'module' => 'Specify module(s) to be run. submodules may be added with /.  Multiple values allowed.',
+        ],
+        'errors' => [
+            'none_up' => 'Device was down, unable to discover.|All devices were down, unable to discover.',
+            'none_actioned' => 'No devices were discovered.',
+        ],
+        'actioned' => 'Discovered :count devices in :time',
+        'starting' => 'Starting discovery:',
+    ],
     'device:ping' => [
         'description' => 'Ping device and record data for response',
         'arguments' => [
@@ -134,13 +155,11 @@ return [
             'no-data' => 'Do not update datastores (RRD, InfluxDB, etc)',
         ],
         'errors' => [
-            'db_connect' => 'Failed to connect to database. Verify database service is running and connection settings.',
-            'db_auth' => 'Failed to connect to database. Verify credentials: :error',
-            'no_devices' => 'No devices found matching your given device specification.',
             'none_up' => 'Device was down, unable to poll.|All devices were down, unable to poll.',
-            'none_polled' => 'No devices were polled.',
+            'none_actioned' => 'No devices were polled.',
         ],
-        'polled' => 'Polled :count devices in :time',
+        'actioned' => 'Polled :count devices in :time',
+        'starting' => 'Starting polling run:',
     ],
     'device:remove' => [
         'doesnt_exists' => 'No such device: :device',
@@ -201,6 +220,26 @@ return [
         'success' => 'Successfully updated OUI/Vendor mappings. :count modified OUI|Successfully updated. :count modified OUIs',
         'error' => 'Error processing Mac OUI:',
         'vendor_update' => 'Adding OUI :oui for :vendor',
+    ],
+    'maintenance:rrd-step' => [
+        'description' => 'Convert RRD files to match configured step and heartbeat',
+        'arguments' => [
+            'device' => 'Hostname, device id, or all',
+        ],
+        'options' => [
+            'confirm' => 'Confirm that you have backed up your rrd files.',
+        ],
+        'errors' => [
+            'invalid' => 'Invalid hostname or device id specified',
+        ],
+        'confirm_backup' => 'Before continuing, please confirm that you have backed up your rrd files.',
+        'mismatched_heartbeat' => ':file: Mismatched heartbeat. :ds != :hb',
+        'skipping' => 'Skipping :file, step is already :step.',
+        'converting' => 'Converting :file:',
+        'summary' => 'Converted: :converted  Failed: :failed  Skipped: :skipped',
+    ],
+    'maintenance:cleanup-syslog' => [
+        'delete' => 'Cleared syslog entries older than :days days (:count rows)',
     ],
     'plugin:disable' => [
         'description' => 'Disable all plugins with the given name',
@@ -300,7 +339,14 @@ return [
             'full-name' => 'Full name for the user',
             'role' => 'Set the user to the desired role :roles',
         ],
-        'password-request' => "Please enter the user's password",
+        'form' => [
+            'username' => 'Username',
+            'password' => 'Password',
+            'roles' => 'Select user role(s)',
+            'email' => 'Email (optional)',
+            'full-name' => 'Full name (optional)',
+            'descr' => 'Description (optional)',
+        ],
         'success' => 'Successfully added user: :username',
         'wrong-auth' => 'Warning! You will not be able to log in with this user because you are not using MySQL auth',
     ],

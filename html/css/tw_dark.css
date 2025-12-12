@@ -6,10 +6,6 @@
     color: #bfc0c0
 }
 
-.dark a {
-    background-color: transparent
-}
-
 .dark mark {
     color: #000
 }
@@ -441,7 +437,6 @@
 
 .dark .btn {
     color: #fff;
-    border-color: rgba(0, 0, 0, 0.6);
 }
 
 .dark .btn-default {
@@ -548,7 +543,7 @@
 .dark .nav .open > a:hover,
 .dark .nav .open > a:focus {
     background-color: #3e444c;
-    border-color: #fff
+    border-color: rgba(0, 0, 0, 0.6)
 }
 
 .dark .nav-tabs {
@@ -569,6 +564,7 @@
     color: #fff;
     background-color: #3e444c;
     border-color: #1c1e22;
+    border-bottom-color: rgba(0, 0, 0, 0.2);
 }
 
 @media (min-width: 768px) {
@@ -1103,18 +1099,6 @@
     border-left-color: #2e3338;
 }
 
-.dark .navbar .navbar-nav > li > a:hover {
-    border-left-color: transparent
-}
-
-.dark .navbar .nav .open > a {
-    border-color: transparent
-}
-
-.dark .navbar-nav > li.active > a {
-    border-left-color: transparent
-}
-
 .dark .table .success,
 .dark .table .warning,
 .dark .table .danger,
@@ -1197,12 +1181,6 @@
     background-color: #3a3f44;
     color: #fff;
     border-color: rgba(0, 0, 0, 0.6);
-}
-
-.dark .nav .open > a,
-.dark .nav .open > a:hover,
-.dark .nav .open > a:focus {
-    border-color: rgba(0, 0, 0, 0.6)
 }
 
 .dark .pagination > li.disabled > a,

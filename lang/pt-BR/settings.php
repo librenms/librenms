@@ -1711,7 +1711,7 @@ return [
                 'help' => 'Método de agendamento de tarefas de descoberta. O modo legado usará cron se a entrada do crontab existir e o serviço de dispatcher se a opção de configuração legada service_discovery_enabled estiver definida como verdadeiro.',
                 'options' => [
                     'legacy' => 'Legado (Irrestrito)',
-                    'cron' => 'Cron (discovery.php)',
+                    'cron' => 'Cron (lnms device:discover)',
                     'dispatcher' => 'Serviço de Dispatcher',
                 ],
             ],

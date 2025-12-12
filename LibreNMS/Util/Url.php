@@ -76,7 +76,7 @@ class Url
     public static function deviceLink($device, $text = '', $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
     {
         if (! $device instanceof Device || ! $device->hostname) {
-            return $escape_text ? htmlentities($text) : (string) $text;
+            return $escape_text ? htmlentities((string) $text) : (string) $text;
         }
 
         if (! $device->canAccess(Auth::user())) {
@@ -134,8 +134,8 @@ class Url
         $contents .= '</div><br />';
 
         foreach ((array) $graphs as $entry) {
-            $graph = isset($entry['graph']) ? $entry['graph'] : 'unknown';
-            $graphhead = isset($entry['text']) ? $entry['text'] : 'unknown';
+            $graph = $entry['graph'] ?? 'unknown';
+            $graphhead = $entry['text'] ?? 'unknown';
             $contents .= '<div class="overlib-box">';
             $contents .= '<span class="overlib-title">' . $graphhead . '</span><br />';
             $contents .= Url::minigraphImage($device, $start, $end, $graph);
@@ -351,7 +351,7 @@ class Url
         $url = empty($vars) ? '' : $prefix;
         foreach ($vars as $var => $value) {
             if ($value == '0' || $value != '' && ! Str::contains($var, 'opt') && ! is_numeric($var)) {
-                $url .= urlencode($var) . '=' . urlencode($value) . '/';
+                $url .= urlencode((string) $var) . '=' . urlencode((string) $value) . '/';
             }
         }
 
@@ -389,8 +389,8 @@ class Url
     public static function graphPopup($args, $content = null, $link = null)
     {
         // Take $args and print day,week,month,year graphs in overlib, hovered over graph
-        $original_from = isset($args['from']) ? $args['from'] : '';
-        $popup_title = isset($args['popup_title']) ? $args['popup_title'] : 'Graph';
+        $original_from = $args['from'] ?? '';
+        $popup_title = $args['popup_title'] ?? 'Graph';
         $now = CarbonImmutable::now();
 
         $graph = $content ?: self::graphTag($args);
@@ -595,9 +595,7 @@ class Url
      */
     public static function parseLegacyPath($path)
     {
-        $parts = array_filter(explode('/', $path), function ($part) {
-            return Str::contains($part, '=');
-        });
+        $parts = array_filter(explode('/', $path), fn ($part) => Str::contains($part, '='));
 
         $vars = [];
         foreach ($parts as $part) {
@@ -651,7 +649,7 @@ class Url
         if (strlen($base_url) > 1) {
             $segments = explode('/', trim(str_replace($base_url, '', $path), '/'));
         } else {
-            $segments = explode('/', trim($path, '/'));
+            $segments = explode('/', trim((string) $path, '/'));
         }
 
         // parse the path

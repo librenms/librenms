@@ -33,8 +33,8 @@ $lastmonth = dbFetchCell('SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 MONTH
 $yesterday = dbFetchCell('SELECT UNIX_TIMESTAMP(DATE_SUB(NOW(), INTERVAL 1 DAY))');
 $rightnow = date('U');
 
-$cur_days = date('d', (strtotime('now') - strtotime($datefrom)));
-$total_days = round((strtotime($dateto) - strtotime($datefrom)) / (60 * 60 * 24));
+$cur_days = date('d', (strtotime('now') - strtotime((string) $datefrom)));
+$total_days = round((strtotime((string) $dateto) - strtotime((string) $datefrom)) / (60 * 60 * 24));
 
 $total['data'] = Billing::formatBytes($bill_data['total_data']);
 if ($bill_data['bill_type'] == 'quota') {
@@ -84,7 +84,12 @@ function showPercent($per)
     $background = \LibreNMS\Util\Color::percentage($per, null);
     $right_background = $background['right'];
     $left_background = $background['left'];
-    $res = print_percentage_bar(200, 20, $per, null, 'ffffff', $left_background, $per . '%', 'ffffff', $right_background);
+    $res = \LibreNMS\Util\Html::percentageBar(200, 10, $per, null, $per . '%', null, null, [
+        'left' => $left_background,
+        'left_text' => null,
+        'right' => $right_background,
+        'right_text' => null,
+    ]);
 
     return $res;
 }//end showPercent()

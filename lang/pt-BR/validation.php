@@ -208,7 +208,7 @@ return [
             ],
             'CheckRrdcachedConnectivity' => [
                 'fail_socket' => ':socket não parece existir, teste de conectividade do rrdcached falhou',
-                'fail_port' => 'Não é possível conectar ao servidor rrdcached na porta :port',
+                'fail_port' => 'Não é possível conectar ao servidor rrdcached :server na porta :port',
                 'ok' => 'Conectado ao rrdcached',
             ],
             'CheckRrdDirPermissions' => [

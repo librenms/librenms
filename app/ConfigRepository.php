@@ -255,16 +255,19 @@ class ConfigRepository
     /**
      * Forget a key and all it's descendants from persistent storage.
      * This will effectively set it back to default.
-     *
-     * @param  string  $key
-     * @return int|false
      */
-    public function erase($key): bool|int
+    public function erase(string $key): bool
     {
         $this->forget($key);
         try {
-            return Models\Config::withChildren($key)->delete();
-        } catch (Exception $e) {
+            $deleted = Models\Config::withChildren($key)->delete();
+
+            if ($deleted > 0) {
+                $this->invalidateCache();
+            }
+
+            return true;
+        } catch (Exception) {
             return false;
         }
     }
@@ -333,7 +336,7 @@ class ConfigRepository
                 ->each(function ($item): void {
                     Arr::set($this->config, $item->config_name, $item->config_value);
                 });
-        } catch (QueryException $e) {
+        } catch (QueryException) {
             // possibly table config doesn't exist yet
         }
 
@@ -345,7 +348,7 @@ class ConfigRepository
     {
         try {
             $graph_types = GraphType::all()->toArray();
-        } catch (QueryException $e) {
+        } catch (QueryException) {
             // possibly table config doesn't exist yet
             $graph_types = [];
         }
@@ -354,7 +357,7 @@ class ConfigRepository
         foreach ($graph_types as $graph) {
             $g = [];
             foreach ($graph as $k => $v) {
-                if (str_starts_with($k, 'graph_')) {
+                if (str_starts_with((string) $k, 'graph_')) {
                     // remove leading 'graph_' from column name
                     $key = str_replace('graph_', '', $k);
                 } else {
@@ -473,7 +476,7 @@ class ConfigRepository
             isset($_SERVER['HTTPS']) ||
             (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
         ) {
-            $this->set('base_url', preg_replace('/^http:/', 'https:', $this->get('base_url', '')));
+            $this->set('base_url', preg_replace('/^http:/', 'https:', (string) $this->get('base_url', '')));
         }
         $this->set('base_url', Str::finish($this->get('base_url', ''), '/'));
 
@@ -493,7 +496,7 @@ class ConfigRepository
     {
         if (! $this->has($key)) {
             if (is_string($value)) {
-                $format_values = array_map([$this, 'get'], $format_values);
+                $format_values = array_map($this->get(...), $format_values);
                 $this->set($key, vsprintf($value, $format_values));
             } else {
                 $this->set($key, $value);
@@ -527,7 +530,7 @@ class ConfigRepository
     {
         if (! Str::contains($binary, '/')) {
             $output = `whereis -b $binary`;
-            $list = trim(substr($output, strpos($output, ':') + 1));
+            $list = trim(substr((string) $output, strpos((string) $output, ':') + 1));
             $targets = explode(' ', $list);
             foreach ($targets as $target) {
                 if (is_executable($target)) {

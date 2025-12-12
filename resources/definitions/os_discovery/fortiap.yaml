@@ -3,6 +3,10 @@ modules:
     os:
         version: FORTINET-FORTIAP-MIB::fapVersion.0
         serial: FORTINET-FORTIAP-MIB::fapSerialNum.0
+        hardware: FORTINET-FORTIAP-MIB::fapVersion.0
+        hardware_regex: '/(?<hardware>FP\d+[A-Z])/i'
+        hardware_replace:
+            -   ['/FP/', 'FortiAP ']
     mempools:
         data:
             -
@@ -19,7 +23,7 @@ modules:
             data:
                 -
                     oid: fapTemperature
-                    num_oid: '.1.3.6.1.4.1.12356.120.3.44.0'
+                    num_oid: '.1.3.6.1.4.1.12356.120.3.44.{{ $index }}'
                     index: fapTemperature
                     descr: Temperature
                     value: fapTemperature
@@ -27,7 +31,7 @@ modules:
             data:
                 -
                     oid: fapStationCount
-                    num_oid: '.1.3.6.1.4.1.12356.120.3.43.0'
+                    num_oid: '.1.3.6.1.4.1.12356.120.3.43.{{ $index }}'
                     index: fapStationCount
                     descr: 'Station Count'
                     value: fapStationCount
@@ -35,7 +39,7 @@ modules:
             data:
                 -
                     oid: fapPoeModeOper
-                    num_oid: '.1.3.6.1.4.1.12356.120.3.4.0'
+                    num_oid: '.1.3.6.1.4.1.12356.120.3.4.{{ $index }}'
                     index: fapPoeModeOper
                     descr: 'Operating PoE Mode'
                     value: fapPoeModeOper

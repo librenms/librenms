@@ -35,7 +35,7 @@ final class SyslogTest extends TestCase
     private function fillLine($line)
     {
         $entry = [];
-        [$entry['host'],$entry['facility'],$entry['priority'], $entry['level'], $entry['tag'], $entry['timestamp'], $entry['msg'], $entry['program']] = explode('||', trim($line));
+        [$entry['host'],$entry['facility'],$entry['priority'], $entry['level'], $entry['tag'], $entry['timestamp'], $entry['msg'], $entry['program']] = explode('||', trim((string) $line));
 
         return $entry;
     }

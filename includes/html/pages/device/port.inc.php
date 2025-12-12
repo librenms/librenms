@@ -63,12 +63,12 @@ echo view('device.tabs.ports.includes.port_row', [
 
 echo '</table></div>';
 
-$pos = strpos(strtolower($ifname), 'vlan');
+$pos = strpos(strtolower((string) $ifname), 'vlan');
 if ($pos !== false) {
     $broke = 'yes';
 }
 
-$pos = strpos(strtolower($ifname), 'loopback');
+$pos = strpos(strtolower((string) $ifname), 'loopback');
 
 if ($pos !== false) {
     $broke = 'yes';

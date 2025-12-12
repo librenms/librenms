@@ -23,6 +23,7 @@
         "ext-pdo": "*",
         "ext-session": "*",
         "ext-simplexml": "*",
+        "ext-sockets": "*",
         "ext-xml": "*",
         "ext-zlib": "*",
         "amenadiel/jpgraph": "^4",
@@ -65,6 +66,7 @@
         "fakerphp/faker": "^1.23",
         "friendsofphp/php-cs-fixer": "^3.66",
         "larastan/larastan": "^3.1",
+        "laravel/boost": "^1.8",
         "laravel/dusk": "^8.2.2",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
@@ -133,8 +135,7 @@
             "@php artisan vue-i18n:generate --multi-locales --format=umd",
             "@php artisan view:cache",
             "@php artisan optimize",
-            "@php artisan config:clear",
-            "@python-requirements"
+            "@php artisan config:clear"
         ],
         "pre-update-cmd": "LibreNMS\\ComposerHelper::preUpdate",
         "post-update-cmd": [
@@ -147,9 +148,6 @@
         "post-root-package-install": "LibreNMS\\ComposerHelper::postRootPackageInstall",
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
-        ],
-        "python-requirements": [
-            "scripts/dynamic_check_requirements.py || pip3 install --user -r requirements.txt || :"
         ]
     },
     "support": {

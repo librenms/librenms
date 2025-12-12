@@ -22,7 +22,7 @@ print_optionbar_start();
 
 echo "<span style='font-weight: bold;'>Wireless</span> &#187; ";
 
-if (! $vars['metric']) {
+if (empty($vars['metric'])) {
     $vars['metric'] = 'overview';
 }
 

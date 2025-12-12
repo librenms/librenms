@@ -10,7 +10,6 @@ $sections = [
     'mac' => 'MAC Address',
     'arp' => 'ARP Table',
     'fdb' => 'FDB Table',
-    'secureports' => 'Port Security',
 ];
 
 if (dbFetchCell('SELECT 1 from `packages` LIMIT 1')) {

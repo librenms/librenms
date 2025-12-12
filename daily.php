@@ -7,6 +7,7 @@
  */
 
 use App\Facades\LibrenmsConfig;
+use App\Models\AlertRule;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Database\Eloquent\Collection;
@@ -73,36 +74,6 @@ if ($options['f'] === 'rrd_purge') {
                 echo "Purged the following RRD files due to old age (over $rrd_purge days old):\n";
                 echo $purge;
             }
-        }
-        $lock->release();
-    }
-}
-
-if ($options['f'] === 'syslog') {
-    $lock = Cache::lock('syslog_purge', 86000);
-    if ($lock->get()) {
-        $syslog_purge = LibrenmsConfig::get('syslog_purge');
-
-        if (is_numeric($syslog_purge)) {
-            $rows = (int) dbFetchCell('SELECT MIN(seq) FROM syslog');
-            $initial_rows = $rows;
-            while (true) {
-                $limit = dbFetchCell('SELECT seq FROM syslog WHERE seq >= ? ORDER BY seq LIMIT 1000,1', [$rows]);
-                if (empty($limit)) {
-                    break;
-                }
-
-                // Deletes are done in blocks of 1000 to avoid a single very large operation.
-                if (dbDelete('syslog', 'seq >= ? AND seq < ? AND timestamp < DATE_SUB(NOW(), INTERVAL ? DAY)', [$rows, $limit, $syslog_purge]) > 0) {
-                    $rows = $limit;
-                } else {
-                    break;
-                }
-            }
-
-            dbDelete('syslog', 'seq >= ? AND timestamp < DATE_SUB(NOW(), INTERVAL ? DAY)', [$rows, $syslog_purge]);
-            $final_rows = $rows - $initial_rows;
-            echo "Syslog cleared for entries over $syslog_purge days (about $final_rows rows)\n";
         }
         $lock->release();
     }
@@ -218,14 +189,6 @@ if ($options['f'] === 'handle_notifiable') {
     }
 }
 
-if ($options['f'] === 'notifications') {
-    $lock = Cache::lock('notifications', 86000);
-    if ($lock->get()) {
-        Notifications::post();
-        $lock->release();
-    }
-}
-
 if ($options['f'] === 'bill_data') {
     // Deletes data older than XX months before the start of the last complete billing period
     $msg = "Deleting billing data more than %d month before the last completed billing cycle\n";
@@ -302,15 +265,11 @@ if ($options['f'] === 'refresh_alert_rules') {
     $lock = Cache::lock('refresh_alert_rules', 86000);
     if ($lock->get()) {
         echo 'Refreshing alert rules queries' . PHP_EOL;
-        $rules = dbFetchRows('SELECT `id`, `builder`, `extra` FROM `alert_rules`');
+        $rules = AlertRule::query()->select(['id', 'builder', 'extra'])->get();
         foreach ($rules as $rule) {
-            $rule_options = json_decode($rule['extra'], true);
-            if ($rule_options['options']['override_query'] !== 'on' && $rule_options['options']['override_query'] !== true) {
-                $data['query'] = QueryBuilderParser::fromJson($rule['builder'])->toSql();
-                if (! empty($data['query'])) {
-                    dbUpdate($data, 'alert_rules', 'id=?', [$rule['id']]);
-                    unset($data);
-                }
+            if (($rule->extra['options']['override_query'] ?? false) !== 'on' && ($rule->extra['options']['override_query'] ?? false) !== true) {
+                $rule->query = QueryBuilderParser::fromJson($rule->builder)->toSql();
+                $rule->save();
             }
         }
         $lock->release();

@@ -36,15 +36,13 @@ use Symfony\Component\Process\Process;
 class Version
 {
     /** @var string Update this on release */
-    public const VERSION = '25.10.0';
+    public const VERSION = '25.11.0';
 
     /** @var Git convenience instance */
     public $git;
-    private ConfigRepository $config;
 
-    public function __construct(ConfigRepository $config)
+    public function __construct(private readonly ConfigRepository $config)
     {
-        $this->config = $config;
         $this->git = Git::make();
     }
 
@@ -91,7 +89,7 @@ class Version
             case 'mysql':
                 $ret = Arr::first(DB::selectOne('select version()'));
 
-                return (str_contains($ret, 'MariaDB') ? 'MariaDB ' : 'MySQL ') . $ret;
+                return (str_contains((string) $ret, 'MariaDB') ? 'MariaDB ' : 'MySQL ') . $ret;
             case 'sqlite':
                 return 'SQLite ' . Arr::first(DB::selectOne('select sqlite_version()'));
             default:
@@ -116,7 +114,7 @@ class Version
             if (Eloquent::isConnected()) {
                 return Eloquent::DB()->table('migrations')->count();
             }
-        } catch (\Exception $e) {
+        } catch (\Exception) {
         }
 
         return 0;
@@ -133,7 +131,7 @@ class Version
 
         try {
             return Eloquent::DB()->table('migrations')->orderBy('id', 'desc')->value('migration');
-        } catch (\Exception $e) {
+        } catch (\Exception) {
             return 'No Schema';
         }
     }

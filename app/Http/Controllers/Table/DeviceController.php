@@ -161,7 +161,7 @@ class DeviceController extends TableController
             'extra' => $this->getLabel($device),
             'status' => $status,
             'maintenance' => $device->isUnderMaintenance(),
-            'icon' => '<img src="' . asset($device->icon) . '" title="' . pathinfo($device->icon, PATHINFO_FILENAME) . '">',
+            'icon' => '<img src="' . asset($device->icon) . '" title="' . pathinfo((string) $device->icon, PATHINFO_FILENAME) . '">',
             'hostname' => URL::modernDeviceLink($device, extra: $this->isDetailed() ? $device->name() : ''),
             'metrics' => $this->getMetrics($device),
             'hardware' => htmlspecialchars(Rewrite::ciscoHardware($device)),
@@ -222,7 +222,7 @@ class DeviceController extends TableController
     {
         $port_count = $device->ports_count;
         $sensor_count = $device->sensors_count;
-        $wireless_count = $device->wirelessSensors_count;
+        $wireless_count = $device->wireless_sensors_count;
 
         $metrics = [];
         if ($port_count) {
