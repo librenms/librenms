@@ -150,7 +150,7 @@ well as pre-fetched data. The index ($index) and the sub_indexes (in
 case the oid is indexed multiple times) are also available: if
 $index="1.20", then $subindex0="1" and $subindex1="20".
 
-To fetch data not avaialble to your sensor you can use `additional_oids`.
+To fetch data not available to your sensor you can use `additional_oids`.
 
 > [!CAUTION]
 > `additional_oids` should only be used when data is not fetched by your sensor.
