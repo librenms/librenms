@@ -32,6 +32,7 @@ theme:
     - content.tabs.link
     - content.action.edit
     - content.code.copy
+    - search.share
 site_dir: out
 site_url: https://docs.librenms.org
 markdown_extensions:
