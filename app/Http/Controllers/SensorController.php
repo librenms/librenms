@@ -35,6 +35,7 @@ class SensorController
     {
         $metric = str_replace('metric=', '', $metric);
         $view = str_replace('view=', '', $legacyview) ?: $request->get('view', 'detail');
+        $status = $request->get('status', 'all');
 
         $metrics = $this->getMetrics($request);
         $metric = $metric ?: array_key_first($metrics);
@@ -47,6 +48,30 @@ class SensorController
             'graphs' => ['text' => __('Graphs'), 'link' => $request->fullUrlWithQuery(['view' => 'graphs'])],
             'detail' => ['text' => __('No Graphs'), 'link' => $request->fullUrlWithoutQuery('view')],
         ];
+
+        $status_bar = [
+            'all' => [ 'text' => __('All'), 'link' => $request->fullUrlWithQuery(['status' => 'all'])],
+            'alert' => [ 'text' => __('Alert') , 'link' => $request->fullUrlWithQuery(['status' => 'alert'])],
+            'error' => [ 'text' => __('Error') , 'link' => $request->fullUrlWithQuery(['status' => 'error'])],
+            'warning' => [ 'text' => __('Warning') , 'link' => $request->fullUrlWithQuery(['status' => 'warning'])],
+        ];
+
+        if($metric == 'all') {
+            unset($status_bar['all']);
+            if($status == 'all') $status = 'alert';
+        }
+
+        if(in_array($metric, ['all', 'state'])) {
+            $status_bar['unknown'] = [ 'text' => __('Unknown') , 'link' => $request->fullUrlWithQuery(['status' => 'unknown'])];
+        }
+
+        if(in_array($metric ,['mempool', 'processor', 'storage'])) {
+            unset($status_bar['alert']);
+            unset($status_bar['error']);
+            unset($status_bar['unknown']);
+        }
+
+        if(!array_key_exists($status, $status_bar )) $status = array_key_first($status_bar);
 
         $title = 'Health :: ' . match ($metric) {
             'dbm' => 'dBm',
@@ -69,6 +94,8 @@ class SensorController
             'metric' => $metric,
             'views' => $views,
             'view' => $view,
+            'status_bar' => $status_bar,
+            'status' => $status,
         ]);
     }
 
@@ -78,6 +105,11 @@ class SensorController
     private function getMetrics(Request $request): array
     {
         $metrics = [
+            'all' => [
+                'text' => __('All'),
+                'link' => route('sensor.index', $request->all() + ['metric' => 'all']),
+                'icon' => 'fa-bell',
+            ],
             'mempool' => [
                 'text' => __('Memory'),
                 'link' => route('sensor.index', $request->all() + ['metric' => 'mempool']),

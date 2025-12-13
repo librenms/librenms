@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Enum\SensorState;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Url;
 
@@ -22,7 +23,8 @@ class SensorsController extends TableController
     {
         return [
             'view' => Rule::in(['detail', 'graphs']),
-            'class' => Rule::in(\LibreNMS\Enum\Sensor::values()),
+            'class' => Rule::in(array_merge(\LibreNMS\Enum\Sensor::values(), ['all'])),
+            'status' => 'nullable|string',
         ];
     }
 
@@ -50,17 +52,35 @@ class SensorsController extends TableController
     protected function baseQuery(Request $request): Builder
     {
         $class = $request->input('class');
+        $status = $request->input('status');
         $relations = [];
-        if ($class == 'state') {
+        if ($class == 'state' || $class == 'all') {
             $relations[] = 'translations';
         }
 
         return Sensor::query()
             ->hasAccess($request->user())
-            ->where('sensor_class', $class)
             ->when($request->get('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'sensors.device_id'))
+            ->when($class != 'all', fn($q) => $q->where('sensor_class', $class))
             ->with($relations)
-            ->withAggregate('device', 'hostname');
+            ->withAggregate('device', 'hostname')
+            ->when($status == 'unknown', fn($q) => (new Sensor)->scopeStateUnknown($q))
+            ->when($status == 'alert', fn($q) => $q->where('sensor_alert', 1))
+            ->when(in_array($status, ['alert', 'error']), function($q) {
+                $q->where(function ($q) {
+                    (new Sensor)->scopeIsCritical($q)
+                        ->orWhere( fn ($q) => (new Sensor)->scopeStateEq($q, SensorState::Error));
+                });
+            })
+            ->when($status == 'warning', function($q) {
+                $q->where(function ($q) {
+                    (new Sensor)->scopeStateEq($q, SensorState::Warning)
+                        ->orWhere(function ($q) {
+                            $q->whereNot(fn ($q) => (new Sensor)->scopeIsCritical($q));
+                            (new Sensor)->scopeIsWarning($q);
+                        });
+                });
+            });
     }
 
     /**
