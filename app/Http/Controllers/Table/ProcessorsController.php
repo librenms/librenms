@@ -15,6 +15,13 @@ class ProcessorsController extends TableController
 
     protected $default_sort = ['device_hostname' => 'asc', 'processor_descr' => 'asc'];
 
+    protected function rules(): array
+    {
+        return [
+            'status' => 'nullable|string',
+        ];
+    }
+
     protected function sortFields($request): array
     {
         return [
@@ -35,10 +42,19 @@ class ProcessorsController extends TableController
 
     protected function baseQuery(Request $request): Builder
     {
-        return Processor::query()
+        $status = $request->input('status');
+
+        $query = Processor::query()
             ->hasAccess($request->user())
             ->when($request->get('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'processors.device_id'))
             ->withAggregate('device', 'hostname');
+
+        switch($status) {
+            case "warning":
+                $query->whereRaw('processor_perc_warn > 0 AND processor_usage >= processor_perc_warn');
+        }
+
+        return $query;
     }
 
     /**

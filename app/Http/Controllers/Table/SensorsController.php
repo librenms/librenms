@@ -22,7 +22,8 @@ class SensorsController extends TableController
     {
         return [
             'view' => Rule::in(['detail', 'graphs']),
-            'class' => Rule::in(\LibreNMS\Enum\Sensor::values()),
+            'class' => Rule::in(array_merge(\LibreNMS\Enum\Sensor::values(), ['all'])),
+            'status' => 'nullable|string',
         ];
     }
 
@@ -50,17 +51,45 @@ class SensorsController extends TableController
     protected function baseQuery(Request $request): Builder
     {
         $class = $request->input('class');
+        $status = $request->input('status');
         $relations = [];
-        if ($class == 'state') {
+        if ($class == 'state' || $class == 'all') {
             $relations[] = 'translations';
         }
 
-        return Sensor::query()
+        $query = Sensor::query()
             ->hasAccess($request->user())
-            ->where('sensor_class', $class)
             ->when($request->get('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'sensors.device_id'))
             ->with($relations)
             ->withAggregate('device', 'hostname');
+
+        if($status != "") {
+            $query->leftJoin('sensors_to_state_indexes', 'sensors_to_state_indexes.sensor_id', '=', 'sensors.sensor_id')
+            ->leftJoin('state_translations', function ($j) {
+                $j->on( 'sensors_to_state_indexes.state_index_id', '=', 'state_translations.state_index_id')
+                ->on( 'sensors.sensor_current', '=', 'state_translations.state_value');
+            });
+        }
+
+        if($class != "all") {
+            $query->where('sensor_class', $class);
+        }
+
+        switch($status) {
+            case "unknown":
+                $query->whereRaw('state_translations.state_generic_value = 3)');
+                break;
+            case "alert":
+                $query->where('sensor_alert', 1);
+            case "error":
+                $query->whereRaw('(sensor_current < sensor_limit_low OR sensor_current > sensor_limit OR state_translations.state_generic_value = 2)');
+                break;
+            case "warning":
+                $query->whereRaw('((sensor_current > sensor_limit_low AND sensor_current < sensor_limit'
+                  . ' AND (sensor_current < sensor_limit_low_warn OR sensor_current > sensor_limit_warn)'
+                  . ' OR state_translations.state_generic_value = 1))');
+        }
+        return $query;
     }
 
     /**
