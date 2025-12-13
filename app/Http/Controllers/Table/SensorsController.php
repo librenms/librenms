@@ -69,33 +69,20 @@ class SensorsController extends TableController
             ->when($class != 'all', fn($q) => $q->where('sensor_class', $class))
             ->with($relations)
             ->withAggregate('device', 'hostname')
-            ->when($status == 'unknown', function($q) {
-                $q->whereHas('translations', function ($q) {
-                    $q->whereColumn( 'sensor_current', '=', 'state_value')
-                        ->where(function ($q) {
-                            $q->where('state_generic_value', '<', SensorState::Ok)
-                                ->orwhere('state_generic_value', '>', SensorState::Error);
-                        });
-                });
-            })
+            ->when($status == 'unknown', fn($q) => (new Sensor)->scopeStateUnknown($q))
             ->when($status == 'alert', fn($q) => $q->where('sensor_alert', 1))
             ->when(in_array($status, ['alert', 'error']), function($q) {
                 $q->where(function ($q) {
-                    $q->where('sensor_current', '<', 'sensor_limit_low')
-                        ->orWhereColumn('sensor_current', '>', 'sensor_limit')
-                        ->orWhereHas('translations', fn ($q) => has_state($q, SensorState::Error));
+                    (new Sensor)->scopeIsCritical($q)
+                        ->orWhere( fn ($q) => (new Sensor)->scopeStateEq($q, SensorState::Error));
                 });
-              })
+            })
             ->when($status == 'warning', function($q) {
                 $q->where(function ($q) {
-                    $q->WhereHas('translations', fn ($q) => has_state($q, SensorState::Warning))
+                    (new Sensor)->scopeStateEq($q, SensorState::Warning)
                         ->orWhere(function ($q) {
-                            $q->whereColumn('sensor_current', '>', 'sensor_limit_low')
-                                ->whereColumn('sensor_current', '<', 'sensor_limit')
-                                ->where(function ($q) {
-                                    $q->whereColumn('sensor_current', '<', 'sensor_limit_low_warn')
-                                        ->orWhereColumn('sensor_current', '>', 'sensor_limit_warn');
-                                });
+                            $q->whereNot(fn ($q) => (new Sensor)->scopeIsCritical($q));
+                            (new Sensor)->scopeIsWarning($q);
                         });
                 });
             });
