@@ -26,6 +26,7 @@
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Application;
+use App\Models\ApplicationMetric;
 use App\Models\Eventlog;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\Enum\Severity;
@@ -102,7 +103,7 @@ DeviceCache::getPrimary()->applications()->whereIn('app_type', $apps_to_remove)-
 });
 
 // clean application_metrics
-dbDeleteOrphans('application_metrics', ['applications.app_id']);
+ApplicationMetric::doesntHave('app')->delete();
 
 echo PHP_EOL;
 

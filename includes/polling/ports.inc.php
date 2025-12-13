@@ -745,21 +745,27 @@ foreach ($ports as $port) {
             ];
 
             $port_ifAlias = []; // for port descr parser mappings
-            include LibrenmsConfig::get('install_dir') . '/' . LibrenmsConfig::get('port_descr_parser');
+            $port_parser ??= include LibrenmsConfig::get('install_dir') . '/' . LibrenmsConfig::get('port_descr_parser');
+
+            // handle functional style parsers
+            if (is_callable($port_parser)) {
+                $port_ifAlias = app()->call($port_parser, [
+                    'ifAlias' => $this_port['ifAlias'] ?? '',
+                    'ifIndex' => $port['ifIndex'] ?? '',
+                    'ifName' => $this_port['ifName'] ?? '',
+                    'port_id' => $port['port_id'] ?? 0,
+                ]);
+            } else {
+                unset($port_parser);
+            }
 
             foreach ($port_attribs as $attrib) {
                 $attrib_key = 'port_descr_' . $attrib;
-                if (($port_ifAlias[$attrib] ?? null) != $port[$attrib_key]) {
-                    if (! isset($port_ifAlias[$attrib])) {
-                        $port_ifAlias[$attrib] = null;
-                        $log_port = 'NULL';
-                    } else {
-                        $log_port = $port_ifAlias[$attrib];
-                    }
+                $attrib_value = $port_ifAlias[$attrib] ?? null;
+                if ($attrib_value != $port[$attrib_key]) {
+                    $port['update'][$attrib_key] = $attrib_value;
 
-                    $port['update'][$attrib_key] = $port_ifAlias[$attrib];
-                    Eventlog::log($attrib . ': ' . $port[$attrib_key] . ' -> ' . $log_port, $device['device_id'], 'interface', Severity::Notice, $port['port_id']);
-                    unset($log_port);
+                    Eventlog::log($attrib . ': ' . $port[$attrib_key] . ' -> ' . ($attrib_value ?? 'NULL'), $device['device_id'], 'interface', Severity::Notice, $port['port_id']);
                 }
             }
         }//end if

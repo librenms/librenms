@@ -3,10 +3,14 @@
 use App\Console\Commands\MaintenanceCleanupNetworks;
 use App\Console\Commands\MaintenanceCleanupSyslog;
 use App\Console\Commands\MaintenanceFetchOuis;
+use App\Console\Commands\MaintenanceFetchRSS;
 use App\Jobs\PingCheck;
+use App\Models\Eventlog;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schedule;
+use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Time;
 use Symfony\Component\Process\Process;
 
@@ -42,34 +46,6 @@ Artisan::command('poller:ping
 ', function (): void {
     PingCheck::dispatch($this->argument('groups'));
 })->purpose(__('Check if devices are up or down via icmp'));
-
-Artisan::command('poller:discovery
-    {device spec : ' . __('Device spec to discover: device_id, hostname, wildcard, odd, even, all, new') . '}
-    {--o|os= : ' . __('Only devices with the specified operating system') . '}
-    {--t|type= : ' . __('Only devices with the specified type') . '}
-    {--m|modules= : ' . __('Specify single module to be run. Comma separate modules, submodules may be added with /') . '}
-', function (): void {
-    $command = [base_path('discovery.php'), '-h', $this->argument('device spec')];
-    if ($this->option('os')) {
-        $command[] = '-o';
-        $command[] = $this->option('os');
-    }
-    if ($this->option('type')) {
-        $command[] = '-t';
-        $command[] = $this->option('type');
-    }
-    if ($this->option('modules')) {
-        $command[] = '-m';
-        $command[] = $this->option('modules');
-    }
-    if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {
-        $command[] = '-d';
-        if ($verbosity >= 256) {
-            $command[] = '-v';
-        }
-    }
-    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
-})->purpose(__('Discover information about existing devices, defines what will be polled'));
 
 Artisan::command('poller:alerts', function (): void {
     $command = [base_path('alerts.php')];
@@ -205,14 +181,23 @@ $maintenance_log_file = Config::get('log_dir') . '/maintenance.log';
 Schedule::command(MaintenanceFetchOuis::class)
     ->weeklyOn(0, Time::pseudoRandomBetween('01:00', '01:59'))
     ->onOneServer()
-    ->appendOutputTo($maintenance_log_file);
+    ->appendOutputTo($maintenance_log_file)
+    ->onFailure(fn () => Eventlog::log('The scheduled command maintenance:fetch-ouis failed to run. Check the maintenance.log for details.', null, 'maintenance', Severity::Error));
 
 Schedule::command(MaintenanceCleanupNetworks::class)
     ->weeklyOn(0, Time::pseudoRandomBetween('02:00', '02:59'))
     ->onOneServer()
-    ->appendOutputTo($maintenance_log_file);
+    ->appendOutputTo($maintenance_log_file)
+    ->onFailure(fn () => Eventlog::log('The scheduled command maintenance:cleanup-networks failed to run. Check the maintenance.log for details.', null, 'maintenance', Severity::Error));
+
+Schedule::command(MaintenanceFetchRSS::class)
+    ->dailyAt(Time::pseudoRandomBetween('03:00', '03:59'))
+    ->onOneServer()
+    ->appendOutputTo($maintenance_log_file)
+    ->onFailure(fn () => Eventlog::log('The scheduled command maintenance:fetch-rss failed to run. Check the maintenance.log for details.', null, 'maintenance', Severity::Error));
 
 Schedule::command(MaintenanceCleanupSyslog::class)
     ->dailyAt('03:30')
     ->onOneServer()
-    ->appendOutputTo($maintenance_log_file);
+    ->appendOutputTo($maintenance_log_file)
+    ->onFailure(fn () => Eventlog::log('The scheduled command maintenance:cleanup-syslog failed to run. Check the maintenance.log for details.', null, 'maintenance', Severity::Error));

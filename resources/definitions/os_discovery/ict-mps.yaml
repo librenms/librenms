@@ -61,20 +61,20 @@ modules:
             data:
                 -
                     oid: probeTemperature.0
-                    num_oid: '.1.3.6.1.4.1.39145.13.12.0'
+                    num_oid: '.1.3.6.1.4.1.39145.13.12.{{ $index }}'
                     descr: 'Battery Probe'
                     value: probeTemperature
         charge:
             data:
                 -
                     oid: batterySoc.0
-                    num_oid: '.1.3.6.1.4.1.39145.13.13.0'
+                    num_oid: '.1.3.6.1.4.1.39145.13.13.{{ $index }}'
                     descr: 'Battery Charge'
                     value: batterySoc
         runtime:
             data:
                 -
                     oid: batteryRunTime.0
-                    num_oid: '.1.3.6.1.4.1.39145.13.15.0'
+                    num_oid: '.1.3.6.1.4.1.39145.13.15.{{ $index }}'
                     descr: 'Battery Run-time'
                     value: batteryRunTime
