@@ -91,25 +91,35 @@ acProductTrunkPack8410                      OBJECT IDENTIFIER       ::= { acKnow
 acProductTrunkPack8410IpMedia               OBJECT IDENTIFIER       ::= { acKnownProducts 64 }
 acProductMediant600                         OBJECT IDENTIFIER       ::= { acKnownProducts 65 }
 acProductTrunkPack12610                     OBJECT IDENTIFIER       ::= { acKnownProducts 66 }
-acProductMediant1000MSBG                    OBJECT IDENTIFIER       ::= { acKnownProducts 67 }
-acProductMediant600MSBG                     OBJECT IDENTIFIER       ::= { acKnownProducts 68 }
-acProductMediaPack500MSBR                   OBJECT IDENTIFIER       ::= { acKnownProducts 69 }
-acProductM4000                   			OBJECT IDENTIFIER       ::= { acKnownProducts 70 }
-acProductMediant1000ESBC                  	OBJECT IDENTIFIER       ::= { acKnownProducts 71 }
-acProductMediant800ESBC                		OBJECT IDENTIFIER       ::= { acKnownProducts 72 }
-acProductHosted                   			OBJECT IDENTIFIER       ::= { acKnownProducts 73 }
-acProductMediant850MSBG                   	OBJECT IDENTIFIER       ::= { acKnownProducts 74 }
-acProductMediant850ESBC                   	OBJECT IDENTIFIER       ::= { acKnownProducts 75 }
-acProductMediant500MSBR                		OBJECT IDENTIFIER       ::= { acKnownProducts 76 }
-acProductMediant500ESBC             		OBJECT IDENTIFIER       ::= { acKnownProducts 77 }
-acProductM2600                   			OBJECT IDENTIFIER       ::= { acKnownProducts 78 }
+acProductMediant1000MSBR                    OBJECT IDENTIFIER       ::= { acKnownProducts 67 }
+acProductMediant600MSBR                     OBJECT IDENTIFIER       ::= { acKnownProducts 68 }
+acProductMediant800MSBR                     OBJECT IDENTIFIER       ::= { acKnownProducts 69 }
+acProductM4000                              OBJECT IDENTIFIER       ::= { acKnownProducts 70 }
+acProductMediant1000ESBC                    OBJECT IDENTIFIER       ::= { acKnownProducts 71 }
+acProductMediant800ESBC                     OBJECT IDENTIFIER       ::= { acKnownProducts 72 }
+acProductHosted                             OBJECT IDENTIFIER       ::= { acKnownProducts 73 }
+acProductMediant850MSBR                     OBJECT IDENTIFIER       ::= { acKnownProducts 74 }
+acProductMediant850ESBC                     OBJECT IDENTIFIER       ::= { acKnownProducts 75 }
+acProductMediant500MSBR                     OBJECT IDENTIFIER       ::= { acKnownProducts 76 }
+acProductMediant500ESBC                     OBJECT IDENTIFIER       ::= { acKnownProducts 77 }
+acProductM2600                              OBJECT IDENTIFIER       ::= { acKnownProducts 78 }
 acProductMediantVeSBC                       OBJECT IDENTIFIER       ::= { acKnownProducts 79 }
 acProductMediantVeHSBC                      OBJECT IDENTIFIER       ::= { acKnownProducts 80 }
 acProductMediantSeSBC                       OBJECT IDENTIFIER       ::= { acKnownProducts 81 }
 acProductMediantSeHSBC                      OBJECT IDENTIFIER       ::= { acKnownProducts 82 }
 acProductMediant6000SBC                     OBJECT IDENTIFIER       ::= { acKnownProducts 83 }
-acProductMediant500LMSBG                    OBJECT IDENTIFIER       ::= { acKnownProducts 84 }
-acProductMediant500LESBC                    OBJECT IDENTIFIER       ::= { acKnownProducts 85 }
+acProductMediant500LMSBR              		OBJECT IDENTIFIER       ::= { acKnownProducts 84 }
+acProductMediant500LESBC					OBJECT IDENTIFIER       ::= { acKnownProducts 85 }
+acProductMediantPack1288					OBJECT IDENTIFIER       ::= { acKnownProducts 86 }
+acProductMediant500LI						OBJECT IDENTIFIER       ::= { acKnownProducts 89 }
+acProductMediant3100						OBJECT IDENTIFIER       ::= { acKnownProducts 90 }
+acProductMediaPack202B                      OBJECT IDENTIFIER       ::= { acKnownProducts 200 }
+acProductMediaPack202D                      OBJECT IDENTIFIER       ::= { acKnownProducts 201 }
+acProductMediaPack204B                      OBJECT IDENTIFIER       ::= { acKnownProducts 202 }
+acProductMediaPack204D                      OBJECT IDENTIFIER       ::= { acKnownProducts 203 }
+acProductMediaPack202R                      OBJECT IDENTIFIER       ::= { acKnownProducts 204 }
+acProductMediaPack204R                      OBJECT IDENTIFIER       ::= { acKnownProducts 205 }
+
 
 -- ************************************
 --  AudioCodes General  Known Types
@@ -129,7 +139,8 @@ acM500Chassis       OBJECT IDENTIFIER 	::= { acKnownChassis 8 }
 acM850Chassis       OBJECT IDENTIFIER 	::= { acKnownChassis 9 }
 acM2600Chassis      OBJECT IDENTIFIER 	::= { acKnownChassis 10 }
 acM500LChassis      OBJECT IDENTIFIER 	::= { acKnownChassis 11 }
-
+acMP1288Chassis     OBJECT IDENTIFIER 	::= { acKnownChassis 12 }
+acM3100Chassis      OBJECT IDENTIFIER 	::= { acKnownChassis 13 }
 
 --  AudioCodes known slots
 acKnownSlots OBJECT IDENTIFIER ::= { acKnownPhysicalTypes 3 }
@@ -353,7 +364,33 @@ acM2600PowerSupplyModule                OBJECT IDENTIFIER      	::= { acM2600Kno
 acM2600FanModule  		                OBJECT IDENTIFIER		::= { acM2600KnownTypes 6 }
 acM2600MPModule  		                OBJECT IDENTIFIER		::= { acM2600KnownTypes 7 }
 
+-- *****************************************
+--  AudioCodes MP1288 Known Types
+-- *****************************************
+acMP1288KnownTypes                       OBJECT IDENTIFIER 		::= { acKnownPhysicalTypes 29 }
 
+acMP1288CpuSlot                       	OBJECT IDENTIFIER      	::= { acMP1288KnownTypes 1 }
+acMP1288PowerSupplySlot 	            OBJECT IDENTIFIER      	::= { acMP1288KnownTypes 2 }
+acMP1288FanSlot  		                OBJECT IDENTIFIER		::= { acMP1288KnownTypes 3 }
+acMP1288IfsSlot  		                OBJECT IDENTIFIER		::= { acMP1288KnownTypes 4 }
+acMP1288CpuModule   	           		OBJECT IDENTIFIER      	::= { acMP1288KnownTypes 5 }
+acMP1288AnalogModule              	    OBJECT IDENTIFIER      	::= { acMP1288KnownTypes 6 }
+acMP1288PowerSupplyModule  		        OBJECT IDENTIFIER		::= { acMP1288KnownTypes 7 }
+acMP1288FanModule  		                OBJECT IDENTIFIER		::= { acMP1288KnownTypes 8 }
+
+-- *****************************************
+--  AudioCodes M3100 Known Types
+-- *****************************************
+acM3100KnownTypes                       OBJECT IDENTIFIER 		::= { acKnownPhysicalTypes 30 }
+
+acM3100CpuSlot                       	OBJECT IDENTIFIER      	::= { acM3100KnownTypes 1 }
+acM3100PowerSupplySlot					OBJECT IDENTIFIER      	::= { acM3100KnownTypes 2 }
+acM3100FanSlot  		                OBJECT IDENTIFIER		::= { acM3100KnownTypes 3 }
+acM3100IfsSlot  		                OBJECT IDENTIFIER		::= { acM3100KnownTypes 4 }
+acM3100CpuModule						OBJECT IDENTIFIER      	::= { acM3100KnownTypes 5 }
+acM3100IfsModule						OBJECT IDENTIFIER      	::= { acM3100KnownTypes 6 }
+acM3100PowerSupplyModule  		        OBJECT IDENTIFIER		::= { acM3100KnownTypes 7 }
+acM3100FanModule  		                OBJECT IDENTIFIER		::= { acM3100KnownTypes 8 }
 END
 
 
