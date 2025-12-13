@@ -65,7 +65,7 @@ class SensorsController extends TableController
 
         if($status != "") {
             $query->leftJoin('sensors_to_state_indexes', 'sensors_to_state_indexes.sensor_id', '=', 'sensors.sensor_id')
-            ->leftJoin('state_translations', function ($j) {
+            ->leftJoin('state_translations', function ($j): void {
                 $j->on( 'sensors_to_state_indexes.state_index_id', '=', 'state_translations.state_index_id')
                 ->on( 'sensors.sensor_current', '=', 'state_translations.state_value');
             });
