@@ -75,10 +75,10 @@ class MempoolsController extends TableController
             }
         }
 
-        switch($status) {
-            case "warning":
-                $query->whereRaw('mempool_perc_warn > 0 AND mempool_perc >= mempool_perc_warn');
-        }
+        $query->when($status == 'warning', function ($q) {
+            $q->where('mempool_perc_warn', '>', 0)
+                ->whereColumn('mempool_perc', '>=', 'mempool_perc_warn');
+        });
 
         return $query;
     }

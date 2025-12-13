@@ -44,17 +44,14 @@ class ProcessorsController extends TableController
     {
         $status = $request->input('status');
 
-        $query = Processor::query()
+        return Processor::query()
             ->hasAccess($request->user())
             ->when($request->get('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'processors.device_id'))
-            ->withAggregate('device', 'hostname');
-
-        switch($status) {
-            case "warning":
-                $query->whereRaw('processor_perc_warn > 0 AND processor_usage >= processor_perc_warn');
-        }
-
-        return $query;
+            ->withAggregate('device', 'hostname')
+            ->when($status == 'warning', function ($q) {
+                $q->where('processor_perc_warn', '>', 0)
+                    ->whereColumn('processor_usage', '>=', 'processor_perc_warn');
+            });
     }
 
     /**

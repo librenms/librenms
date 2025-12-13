@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Validation\Rule;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Enum\SensorState;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Url;
 
@@ -57,39 +58,47 @@ class SensorsController extends TableController
             $relations[] = 'translations';
         }
 
-        $query = Sensor::query()
+       function has_state($q, $state) {
+            $q->where('state_generic_value', $state)
+                ->whereColumn( 'sensor_current', '=', 'state_value');
+        }
+
+        return Sensor::query()
             ->hasAccess($request->user())
             ->when($request->get('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'sensors.device_id'))
+            ->when($class != 'all', fn($q) => $q->where('sensor_class', $class))
             ->with($relations)
-            ->withAggregate('device', 'hostname');
-
-        if($status != "") {
-            $query->leftJoin('sensors_to_state_indexes', 'sensors_to_state_indexes.sensor_id', '=', 'sensors.sensor_id')
-            ->leftJoin('state_translations', function ($j): void {
-                $j->on( 'sensors_to_state_indexes.state_index_id', '=', 'state_translations.state_index_id')
-                ->on( 'sensors.sensor_current', '=', 'state_translations.state_value');
+            ->withAggregate('device', 'hostname')
+            ->when($status == 'unknown', function($q) {
+                $q->whereHas('translations', function ($q) {
+                    $q->whereColumn( 'sensor_current', '=', 'state_value')
+                        ->where(function ($q) {
+                            $q->where('state_generic_value', '<', SensorState::Ok)
+                                ->orwhere('state_generic_value', '>', SensorState::Error);
+                        });
+                });
+            })
+            ->when($status == 'alert', fn($q) => $q->where('sensor_alert', 1))
+            ->when(in_array($status, ['alert', 'error']), function($q) {
+                $q->where(function ($q) {
+                    $q->where('sensor_current', '<', 'sensor_limit_low')
+                        ->orWhereColumn('sensor_current', '>', 'sensor_limit')
+                        ->orWhereHas('translations', fn ($q) => has_state($q, SensorState::Error));
+                });
+              })
+            ->when($status == 'warning', function($q) {
+                $q->where(function ($q) {
+                    $q->WhereHas('translations', fn ($q) => has_state($q, SensorState::Warning))
+                        ->orWhere(function ($q) {
+                            $q->whereColumn('sensor_current', '>', 'sensor_limit_low')
+                                ->whereColumn('sensor_current', '<', 'sensor_limit')
+                                ->where(function ($q) {
+                                    $q->whereColumn('sensor_current', '<', 'sensor_limit_low_warn')
+                                        ->orWhereColumn('sensor_current', '>', 'sensor_limit_warn');
+                                });
+                        });
+                });
             });
-        }
-
-        if($class != "all") {
-            $query->where('sensor_class', $class);
-        }
-
-        switch($status) {
-            case "unknown":
-                $query->whereRaw('state_translations.state_generic_value = 3)');
-                break;
-            case "alert":
-                $query->where('sensor_alert', 1);
-            case "error":
-                $query->whereRaw('(sensor_current < sensor_limit_low OR sensor_current > sensor_limit OR state_translations.state_generic_value = 2)');
-                break;
-            case "warning":
-                $query->whereRaw('((sensor_current > sensor_limit_low AND sensor_current < sensor_limit'
-                  . ' AND (sensor_current < sensor_limit_low_warn OR sensor_current > sensor_limit_warn)'
-                  . ' OR state_translations.state_generic_value = 1))');
-        }
-        return $query;
     }
 
     /**

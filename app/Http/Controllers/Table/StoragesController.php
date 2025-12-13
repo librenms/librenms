@@ -47,17 +47,14 @@ class StoragesController extends TableController
     {
         $status = $request->input('status');
 
-        $query =  Storage::query()
+        return Storage::query()
             ->hasAccess($request->user())
             ->when($request->get('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'storage.device_id'))
-            ->withAggregate('device', 'hostname');
-
-        switch($status) {
-            case "warning":
-                $query->whereRaw('storage_perc > 0 AND storage_perc >= storage_perc_warn');
-        }
-
-        return $query;
+            ->withAggregate('device', 'hostname')
+            ->when($status == 'warning', function ($q) {
+                $q->where('storage_perc', '>', 0)
+                    ->whereColumn('storage_perc', '>=', 'storage_perc_warn');
+            });
     }
 
     /**
