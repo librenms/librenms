@@ -77,7 +77,13 @@ class RrdProcess
             return str_contains($buffer, $waitFor);
         });
 
-        return rtrim($this->process->getOutput());
+        $output = $this->process->getOutput();
+
+        if ($waitFor === self::COMMAND_COMPLETE) {
+            $output = substr($output, 0, strrpos($output, $waitFor)); // remove OK line
+        }
+
+        return rtrim($output);
     }
 
     public function runAsync(string $command): void
