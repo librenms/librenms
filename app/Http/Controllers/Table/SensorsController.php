@@ -58,11 +58,6 @@ class SensorsController extends TableController
             $relations[] = 'translations';
         }
 
-       function has_state($q, $state) {
-            $q->where('state_generic_value', $state)
-                ->whereColumn( 'sensor_current', '=', 'state_value');
-        }
-
         return Sensor::query()
             ->hasAccess($request->user())
             ->when($request->get('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'sensors.device_id'))
