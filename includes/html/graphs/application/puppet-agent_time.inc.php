@@ -15,7 +15,6 @@ $array = [
     'config_retrieval',
     'convert_catalog',
     'fact_generation',
-    'node_retrieval',
     'plugin_sync',
     'schedule',
     'transaction_evaluation',

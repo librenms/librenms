@@ -99,7 +99,6 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('config_retrieval', 'GAUGE', 0)
     ->addDataset('convert_catalog', 'GAUGE', 0)
     ->addDataset('fact_generation', 'GAUGE', 0)
-    ->addDataset('node_retrieval', 'GAUGE', 0)
     ->addDataset('plugin_sync', 'GAUGE', 0)
     ->addDataset('schedule', 'GAUGE', 0)
     ->addDataset('transaction_evaluation', 'GAUGE', 0)
@@ -110,7 +109,6 @@ $fields = [
     'config_retrieval' => $puppet_time['config_retrieval'],
     'convert_catalog' => $puppet_time['convert_catalog'],
     'fact_generation' => $puppet_time['fact_generation'],
-    'node_retrieval' => $puppet_time['node_retrieval'],
     'plugin_sync' => $puppet_time['plugin_sync'],
     'schedule' => $puppet_time['schedule'],
     'transaction_evaluation' => $puppet_time['transaction_evaluation'],
