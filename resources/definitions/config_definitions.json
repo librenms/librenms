@@ -7028,6 +7028,67 @@
             "default": true,
             "type": "boolean"
         },
+        "sso.descr_attr":{
+            "default": null,
+            "type": "text"
+        },
+        "sso.email_attr":{
+            "default": null,
+            "type": "text"
+        },
+        "sso.group_attr":{
+            "default": null,
+            "type": "text"
+        },
+        "sso.group_delimiter":{
+            "default": null,
+            "type": "text"
+        },
+        "sso.group_filter":{
+            "default": null,
+            "type": "text"
+        },
+        "sso.group_filter":{
+            "default": [],
+            "type": "array"
+        },
+       "sso.group_strategy": {
+            "default": null,
+            "type": "select",
+            "options": {
+                "attribute": "attribute",
+                "map": "map",
+                "static": "static"
+            }
+        },
+        "sso.level_attr":{
+            "default": null,
+            "type": "text"
+        },
+        "sso.group_level_map":{
+            "default": null,
+            "type": "text"
+        },
+        "sso.mode":{
+            "default": "env",
+            "type": "select",
+            "options": {
+                "env": "env",
+                "header": "header"
+            }
+        },
+        "sso.realname_attr":{
+            "default": null,
+            "type": "text"
+        },
+        "sso.static_level":{
+            "default": null,
+            "type": "integer"
+        },
+        "sso.trusted_proxies":{
+            "default": [],
+            "type": "array"
+        },
         "sso.update_users": {
             "default": true,
             "type": "boolean"
