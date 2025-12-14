@@ -75,7 +75,7 @@ class MempoolsController extends TableController
             }
         }
 
-        $query->when($status == 'warning', function ($q) {
+        $query->when($status == 'warning', function ($q): void {
             $q->where('mempool_perc_warn', '>', 0)
                 ->whereColumn('mempool_perc', '>=', 'mempool_perc_warn');
         });

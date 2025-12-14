@@ -171,7 +171,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
      */
     public function scopeStateEq($query, $state)
     {
-        return $query->whereHas('translations', function ($q) use ($state) {
+        return $query->whereHas('translations', function ($q) use ($state): void {
             $q->where('state_generic_value', $state)
                 ->whereColumn( 'sensor_current', '=', 'state_value');
         });
@@ -183,7 +183,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
      */
     public function scopeStateUnknown($query)
     {
-        return $query->whereHas('translations', function ($q) {
+        return $query->whereHas('translations', function ($q): void {
             $q->whereColumn( 'sensor_current', '=', 'state_value')
                 ->where(function ($q) {
                     $q->where('state_generic_value', '<', SensorState::Ok)

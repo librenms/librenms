@@ -48,7 +48,7 @@ class ProcessorsController extends TableController
             ->hasAccess($request->user())
             ->when($request->get('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'processors.device_id'))
             ->withAggregate('device', 'hostname')
-            ->when($status == 'warning', function ($q) {
+            ->when($status == 'warning', function ($q): void {
                 $q->where('processor_perc_warn', '>', 0)
                     ->whereColumn('processor_usage', '>=', 'processor_perc_warn');
             });
