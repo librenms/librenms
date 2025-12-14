@@ -185,7 +185,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
     {
         return $query->whereHas('translations', function ($q): void {
             $q->whereColumn( 'sensor_current', '=', 'state_value')
-                ->where(function ($q) {
+                ->where(function ($q): void {
                     $q->where('state_generic_value', '<', SensorState::Ok)
                         ->orWhere('state_generic_value', '>', SensorState::Error);
                 });
