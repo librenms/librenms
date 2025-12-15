@@ -31,7 +31,6 @@ use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 use LibreNMS\Util\Url;
 
-
 class Alertmanager extends Transport
 {
     protected string $name = 'Alert Manager';
