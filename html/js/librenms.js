@@ -244,6 +244,11 @@ $(document).on('initialized.rs.jquery.bootgrid', function (e, b) {
     var grid = $(e.target);
     var tableId = grid.attr('id');
 
+    // Allow per-table opt-out via data-export="false"
+    if (grid.data('export') === false) {
+        return;
+    }
+
     if ($('#' + tableId + '-export-button').length === 0) {
         var ajaxUrl = grid.data('url');
         var params = grid.data('params');

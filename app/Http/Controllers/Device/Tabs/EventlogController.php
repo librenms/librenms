@@ -26,9 +26,11 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
 class EventlogController extends Controller
@@ -37,12 +39,33 @@ class EventlogController extends Controller
     {
         $request->validate([
             'eventtype' => 'nullable|string',
+            'device' => 'nullable|int',
+            'from' => 'nullable|string',
+            'to' => 'nullable|string',
         ]);
+        $eventlog_filter = [
+            'field' => 'type',
+            'device' => $device->device_id,
+        ];
 
+        $format = LibrenmsConfig::get('dateformat.byminute', 'Y-m-d H:i');
+        $now = Carbon::now();
+        $defaultFrom = (clone $now)->subDays(7);
+        $fromInput = $request->input('from');
+        $toInput = $request->input('to');
+
+        if (empty($fromInput) && empty($toInput)) {
+            $fromInput = $defaultFrom->format($format);
+            $toInput = $now->format($format);
+        }
         return view('device.tabs.logs.eventlog', [
-            'device' => $device,
-            'filter_device' => false,
+            'now' => $now->format($format),
+            'default_date' => $defaultFrom->format($format),
             'eventtype' => $request->input('eventtype', ''),
+            'from' => $fromInput,
+            'to' => $toInput,
+            'device' => $device,
+            'eventlog_filter' => $eventlog_filter,
         ]);
     }
 }
