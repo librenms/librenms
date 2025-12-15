@@ -8,10 +8,6 @@ class Panel extends Component
 {
     /**
      * Create a new component instance.
-     *
-     * @param  string  $title
-     * @param  string  $body_class
-     * @return void
      */
     public function __construct(
         /**
@@ -27,10 +23,8 @@ class Panel extends Component
 
     /**
      * Get the view / contents that represent the component.
-     *
-     * @return \Illuminate\View\View|string
      */
-    public function render()
+    public function render(): \Illuminate\View\View|string
     {
         return view('components.panel');
     }
