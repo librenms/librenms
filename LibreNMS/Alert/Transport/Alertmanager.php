@@ -78,7 +78,7 @@ class Alertmanager extends Transport
 
         $urls = array_values(array_filter(array_map('trim', explode(',', (string) $url))));
 
-        $client = Http::timeout(5);
+        $client = Http::client();
 
         if ($username !== '' && $password !== '') {
             $client = $client->withBasicAuth($username, $password);
