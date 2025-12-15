@@ -76,7 +76,7 @@ class Alertmanager extends Transport
             }
         }
 
-        $urls = array_values(array_filter(array_map('trim', explode(',', (string) $url))));
+        $urls = array_values(array_filter(array_map(trim(...), explode(',', (string) $url))));
 
         $client = Http::client();
 
@@ -84,12 +84,10 @@ class Alertmanager extends Transport
             $client = $client->withBasicAuth($username, $password);
         }
 
-        $responses = $client->pool(function (Pool $pool) use ($urls, $data): array {
-            return array_map(
-                static fn (string $baseUrl) => $pool->post(rtrim($baseUrl, '/') . '/api/v2/alerts', $data),
-                $urls
-            );
-        });
+        $responses = $client->pool(fn(Pool $pool): array => array_map(
+            static fn (string $baseUrl) => $pool->post(rtrim($baseUrl, '/') . '/api/v2/alerts', $data),
+            $urls
+        ));
 
         $firstSuccess = collect($responses)->first(static fn (Response $res): bool => $res->successful());
 
