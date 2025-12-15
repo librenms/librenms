@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Facades\LibrenmsConfig;
-use App\Http\Controllers\Controller;
-use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
@@ -41,6 +39,7 @@ class EventlogController extends Controller
             $fromInput = $defaultFrom->format($format);
             $toInput = $now->format($format);
         }
+
         return view('eventlog', [
             'device' => $device_selected,
             'filter' => [

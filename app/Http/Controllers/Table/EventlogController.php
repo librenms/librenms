@@ -166,6 +166,7 @@ class EventlogController extends TableController
             'User',
         ];
     }
+
     /**
      * Format a row for CSV export
      *

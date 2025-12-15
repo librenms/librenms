@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Facades\LibrenmsConfig;
-use App\Http\Controllers\Controller;
-use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
@@ -26,7 +24,7 @@ class GraylogController extends Controller
             ->select(['device_id', 'hostname', 'ip', 'sysName', 'display'])
             ->firstWhere('device_id', $request->input('device'));
 
-        $graylog_filter = ['field' => 'stream',];
+        $graylog_filter = ['field' => 'stream'];
         $device_selected = '';
         if ($device) {
             $device_selected = ['id' => $device->device_id, 'text' => $device->displayName()];

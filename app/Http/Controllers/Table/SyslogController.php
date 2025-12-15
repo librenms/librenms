@@ -140,6 +140,7 @@ class SyslogController extends TableController
             default => '',
         };
     }
+
     protected function getExportHeaders()
     {
         return [
@@ -150,6 +151,7 @@ class SyslogController extends TableController
             'Message',
         ];
     }
+
     /**
      * Format a row for CSV export
      *

@@ -28,8 +28,8 @@ namespace App\Http\Controllers\Table;
 
 use App\ApiClients\GraylogApi;
 use App\Facades\LibrenmsConfig;
-use Carbon\Carbon;
 use App\Models\Device;
+use Carbon\Carbon;
 use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
@@ -77,7 +77,6 @@ class GraylogController extends SimpleTableController
         $toInput = $request->get('to');
         $userTz = $this->timezone ? $this->timezone->getName() : (session('preferences.timezone') ?: config('app.timezone'));
 
-
         if ($range === 0 && $fromInput && $toInput) {
             $from = Carbon::createFromFormat('Y-m-d H:i', (string) $fromInput, $userTz);
             $to = Carbon::createFromFormat('Y-m-d H:i', (string) $toInput, $userTz);
@@ -97,7 +96,7 @@ class GraylogController extends SimpleTableController
         try {
             if ($from && $to) {
                 $fromUtc = $from->clone()->setTimezone('UTC')->format('Y-m-d\TH:i:s.v\Z');
-                $toUtc   = $to->clone()->setTimezone('UTC')->format('Y-m-d\TH:i:s.v\Z');
+                $toUtc = $to->clone()->setTimezone('UTC')->format('Y-m-d\TH:i:s.v\Z');
 
                 $data = $api->queryAbsolute(
                     $query,

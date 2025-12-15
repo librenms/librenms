@@ -58,6 +58,7 @@ class EventlogController extends Controller
             $fromInput = $defaultFrom->format($format);
             $toInput = $now->format($format);
         }
+
         return view('device.tabs.logs.eventlog', [
             'now' => $now->format($format),
             'default_date' => $defaultFrom->format($format),
