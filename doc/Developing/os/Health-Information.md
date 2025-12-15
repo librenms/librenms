@@ -152,7 +152,6 @@ $index="1.20", then $subindex0="1" and $subindex1="20".
 
 To fetch data not available to your sensor you can use `additional_oids`.
 
-> [!CAUTION]
 > `additional_oids` should only be used when data is not fetched by your sensor.
 
  `additional_oids` can also be used within a class.
