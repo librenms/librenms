@@ -75,11 +75,7 @@ class Alertmanager extends Transport
             }
         }
 
-        $urls = collect(explode(',', (string) $url))
-            ->map(fn (string $u) => trim($u))
-            ->filter()
-            ->values();
-
+        $urls = array_values(array_filter(array_map('trim', explode(',', (string) $url))));
         $client = Http::timeout(5);
 
         if ($username !== '' && $password !== '') {
@@ -87,14 +83,20 @@ class Alertmanager extends Transport
         }
 
         $responses = $client->pool(function (Pool $pool) use ($urls, $data) {
-            return $urls
-                ->map(fn (string $am) => rtrim($am, '/') . '/api/v2/alerts')
-                ->map(fn (string $postUrl) => $pool->post($postUrl, $data))
-                ->all();
+            $requests = [];
+
+            foreach ($urls as $am) {
+                $postUrl = rtrim($am, '/') . '/api/v2/alerts';
+                $requests[] = $pool->post($postUrl, $data);
+            }
+
+            return $requests;
         });
 
-        if (collect($responses)->contains(fn ($res) => $res?->successful())) {
-            return true;
+        foreach ($responses as $res) {
+            if ($res?->successful()) {
+                return true;
+            }
         }
         
         throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alertmanager_msg, $data);
