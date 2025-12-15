@@ -29,6 +29,7 @@ use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 use LibreNMS\Util\Url;
 
+
 class Alertmanager extends Transport
 {
     protected string $name = 'Alert Manager';
@@ -73,21 +74,28 @@ class Alertmanager extends Transport
             }
         }
 
-        $client = Http::client()->timeout(5);
+        $urls = collect(explode(',', (string) $url))
+            ->map(fn (string $u) => trim($u))
+            ->filter()
+            ->values();
 
-        if ($username != '' && $password != '') {
-            $client->withBasicAuth($username, $password);
+        $client = Http::timeout(5);
+
+        if ($username !== '' && $password !== '') {
+            $client = $client->withBasicAuth($username, $password);
         }
 
-        foreach (explode(',', (string) $url) as $am) {
-            $post_url = ($am . '/api/v2/alerts');
-            $res = $client->post($post_url, $data);
+        $responses = $client->pool(function (Pool $pool) use ($urls, $data) {
+            return $urls
+                ->map(fn (string $am) => rtrim($am, '/') . '/api/v2/alerts')
+                ->map(fn (string $postUrl) => $pool->post($postUrl, $data))
+                ->all();
+        });
 
-            if ($res->successful()) {
-                return true;
-            }
+        if (collect($responses)->contains(fn ($res) => $res?->successful())) {
+            return true;
         }
-
+        
         throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alertmanager_msg, $data);
     }
 
