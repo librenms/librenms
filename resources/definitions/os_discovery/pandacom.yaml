@@ -2,7 +2,7 @@ modules:
     os:
         serial: SPEEDCARRIER-MIB::nmCarrierSerialNumber.0
         serial_replace: 
-            - ['/unknown/', NULL]
+            - [ '/unknown/', '']
         hardware: SPEEDCARRIER-MIB::nmCarrierType.0
         hardware_replace:
             - ['/carrier5UHighPower/', 'Carrier 5U HighPower']
