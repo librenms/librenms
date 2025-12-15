@@ -28,6 +28,7 @@ use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 use LibreNMS\Util\Url;
+use Illuminate\Http\Client\Pool;
 
 
 class Alertmanager extends Transport
