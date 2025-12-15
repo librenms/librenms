@@ -596,7 +596,7 @@ if (! empty($peers)) {
                 $afi = $peer_afi['afi'];
                 $safi = $peer_afi['safi'];
                 d_echo("$afi $safi\n");
-                d_echo("inside foreach")
+                d_echo("inside foreach");
                 if ($device['os_group'] == 'cisco') {
                     $bgp_peer_ident = $peer_ip->toSnmpIndex();
 
