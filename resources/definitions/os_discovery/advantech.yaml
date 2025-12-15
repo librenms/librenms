@@ -7,10 +7,7 @@ modules:
             data:
                 -
                     oid:
-                        - ADVANTECH-EKI-PRONEER-MIB::sfpDMIInfoTable
                         - ADVANTECH-EKI-PRONEER-MIB::sfpDMIAlarmInfoTable
-                        - ADVANTECH-EKI-PRONEER-MIB::poePortStatusTable
-                        - ADVANTECH-EKI-PRONEER-MIB::poeActualPowerConsumption
                         - ADVANTECH-EKI-PRONEER-MIB::poeMaxPowerAvailable
         temperature:
             data:
@@ -19,7 +16,7 @@ modules:
                     value: ADVANTECH-EKI-PRONEER-MIB::sfpDMITemperature
                     num_oid: '.1.3.6.1.4.1.10297.202.7000.2.5.2.1.2.{{ $index }}'
                     descr: '{{ $ADVANTECH-EKI-PRONEER-MIB::sfpDMIPortIndex }} Temperature'
-                    index: 'sfpDMITemperature.{{ $index }}'
+                    index: 'sfp-temp-{{ $index }}'
                     low_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMITempLowAlarmValue
                     low_warn_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMITempLowWarnValue
                     warn_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMITempHighWarnValue
@@ -44,7 +41,7 @@ modules:
                     value: ADVANTECH-EKI-PRONEER-MIB::sfpDMIVoltage
                     num_oid: '.1.3.6.1.4.1.10297.202.7000.2.5.2.1.3.{{ $index }}'
                     descr: '{{ $ADVANTECH-EKI-PRONEER-MIB::sfpDMIPortIndex }} Voltage'
-                    index: 'sfpDMIVoltage.{{ $index }}'
+                    index: 'sfp-voltage-{{ $index }}'
                     low_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMIVoltageLowAlarmValue
                     low_warn_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMIVoltageLowWarnValue
                     warn_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMIVoltageHighWarnValue
@@ -64,7 +61,7 @@ modules:
                     value: ADVANTECH-EKI-PRONEER-MIB::sfpDMITxBias
                     num_oid: '.1.3.6.1.4.1.10297.202.7000.2.5.2.1.4.{{ $index }}'
                     descr: '{{ $ADVANTECH-EKI-PRONEER-MIB::sfpDMIPortIndex }} Tx Bias'
-                    index: 'sfpDMITxBias.{{ $index }}'
+                    index: 'sfp-current-{{ $index }}'
                     divisor: 1000
                     low_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMITxBasisLowAlarmValue
                     low_warn_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMITxBasisLowWarnValue
@@ -91,7 +88,7 @@ modules:
                     value: ADVANTECH-EKI-PRONEER-MIB::sfpDMITxPower
                     num_oid: '.1.3.6.1.4.1.10297.202.7000.2.5.2.1.5.{{ $index }}'
                     descr: '{{ $ADVANTECH-EKI-PRONEER-MIB::sfpDMIPortIndex }} Tx Power'
-                    index: 'sfpDMITxPower.{{ $index }}'
+                    index: 'sfp-tx-dbm-{{ $index }}'
                     low_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMITxPowerLowAlarmValue
                     low_warn_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMITxPowerLowWarnValue
                     warn_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMITxPowerHighWarnValue
@@ -101,7 +98,7 @@ modules:
                     value: ADVANTECH-EKI-PRONEER-MIB::sfpDMIRxPower
                     num_oid: '.1.3.6.1.4.1.10297.202.7000.2.5.2.1.6.{{ $index }}'
                     descr: '{{ $ADVANTECH-EKI-PRONEER-MIB::sfpDMIPortIndex }} Rx Power'
-                    index: 'sfpDMIRxPower.{{ $index }}'
+                    index: 'sfp-rx-dbm-{{ $index }}'
                     low_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMIRxPowerLowAlarmValue
                     low_warn_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMIRxPowerLowWarnValue
                     warn_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMIRxPowerHighWarnValue
