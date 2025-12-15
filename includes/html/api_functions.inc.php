@@ -1472,7 +1472,7 @@ function add_edit_rule(Illuminate\Http\Request $request)
         return api_error(400, 'Missing the alert builder rule');
     }
 
-    $name = $data['name'];
+    $name = strip_tags((string) $data['name']);
     if (empty($name)) {
         return api_error(400, 'Missing the alert rule name');
     }
@@ -1498,7 +1498,7 @@ function add_edit_rule(Illuminate\Http\Request $request)
     $interval = $data['interval'];
     $override_query = $data['override_query'];
     $adv_query = $data['adv_query'];
-    $notes = $data['notes'];
+    $notes = strip_tags((string) $data['notes']);
     $delay_sec = convert_delay($delay);
     $interval_sec = convert_delay($interval);
     if ($mute == 1) {
