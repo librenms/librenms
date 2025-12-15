@@ -23,13 +23,13 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use Illuminate\Http\Client\Pool;
+use Illuminate\Http\Client\Response;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 use LibreNMS\Util\Url;
-use Illuminate\Http\Client\Pool;
-use Illuminate\Http\Client\Response;
 
 
 class Alertmanager extends Transport
@@ -84,7 +84,7 @@ class Alertmanager extends Transport
             $client = $client->withBasicAuth($username, $password);
         }
 
-        $responses = $client->pool(fn(Pool $pool): array => array_map(
+        $responses = $client->pool(fn (Pool $pool): array => array_map(
             static fn (string $baseUrl) => $pool->post(rtrim($baseUrl, '/') . '/api/v2/alerts', $data),
             $urls
         ));
