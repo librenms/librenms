@@ -76,30 +76,42 @@ class Alertmanager extends Transport
         }
 
         $urls = array_values(array_filter(array_map('trim', explode(',', (string) $url))));
+
         $client = Http::timeout(5);
 
         if ($username !== '' && $password !== '') {
             $client = $client->withBasicAuth($username, $password);
         }
 
-        $responses = $client->pool(function (Pool $pool) use ($urls, $data) {
-            $requests = [];
-
-            foreach ($urls as $am) {
-                $postUrl = rtrim($am, '/') . '/api/v2/alerts';
-                $requests[] = $pool->post($postUrl, $data);
-            }
-
-            return $requests;
+        $responses = $client->pool(function (Pool $pool) use ($urls, $data): array {
+            return array_map(
+                static fn (string $baseUrl) => $pool->post(rtrim($baseUrl, '/') . '/api/v2/alerts', $data),
+                $urls
+            );
         });
 
-        foreach ($responses as $res) {
-            if ($res?->successful()) {
-                return true;
-            }
+        $firstSuccess = collect($responses)->first(static fn (Response $res): bool => $res->successful());
+
+        if ($firstSuccess !== null) {
+            return true;
         }
-        
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alertmanager_msg, $data);
+
+        $lastResponse = collect($responses)->last()
+            ?? throw new AlertTransportDeliveryException(
+                $alert_data,
+                0,
+                'No URLs provided',
+                $alertmanager_msg,
+                $data
+            );
+
+        throw new AlertTransportDeliveryException(
+            $alert_data,
+            $lastResponse->status(),
+            $lastResponse->body(),
+            $alertmanager_msg,
+            $data
+        );
     }
 
     public static function configTemplate(): array
