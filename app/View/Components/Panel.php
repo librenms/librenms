@@ -17,11 +17,11 @@ class Panel extends Component
         /**
          * The Panel title.
          */
-        public $title = null,
+        public ?string $title = '',
         /**
          * The Panel body class.
          */
-        public $body_class = null
+        public ?string $bodyClass = ''
     ) {
     }
 
