@@ -32,11 +32,17 @@ if (! Auth::user()->hasGlobalAdmin()) {
         }
 
         if ($action == 'deldevgroupperm') {
-            $user->deviceGroups()->detach($vars['device_group_id']);
+            $allow_dynamic = \App\Facades\LibrenmsConfig::get('permission.device_group.allow_dynamic');
+            if ($allow_dynamic) {
+                $user->deviceGroups()->detach($vars['device_group_id']);
+            }
         }
 
         if ($action == 'adddevgroupperm') {
-            $user->deviceGroups()->syncWithoutDetaching($vars['device_group_id']);
+            $allow_dynamic = \App\Facades\LibrenmsConfig::get('permission.device_group.allow_dynamic');
+            if ($allow_dynamic) {
+                $user->deviceGroups()->syncWithoutDetaching($vars['device_group_id']);
+            }
         }
 
         if ($action == 'delifperm') {
@@ -110,6 +116,15 @@ if (! Auth::user()->hasGlobalAdmin()) {
         // Display devices this users has access to
         echo '<h3>Device access via Device Group (beta)</h3>';
 
+        $allow_dynamic = \App\Facades\LibrenmsConfig::get('permission.device_group.allow_dynamic');
+
+        if (! $allow_dynamic) {
+            echo "<div class='alert alert-warning' role='alert'>
+                <i class='fa fa-lock' aria-hidden='true'></i> <strong>Read-only mode:</strong> Device group permissions are disabled.
+                Set <code>permission.device_group.allow_dynamic</code> to <code>true</code> in your configuration to enable this feature.
+              </div>";
+        }
+
         echo "<div class='panel panel-default panel-condensed'>
             <table class='table table-hover table-condensed table-striped'>
               <tr>
@@ -118,7 +133,13 @@ if (! Auth::user()->hasGlobalAdmin()) {
               </tr>";
 
         foreach ($user->deviceGroups as $device_group_perm) {
-            echo '<tr><td><strong>' . $device_group_perm->name . "</td><td> <a href='edituser/action=deldevgroupperm/user_id=" . $user->user_id . '/device_group_id=' . $device_group_perm->id . "'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a></strong></td></tr>";
+            echo '<tr><td><strong>' . $device_group_perm->name . '</strong></td><td>';
+            if ($allow_dynamic) {
+                echo "<a href='edituser/action=deldevgroupperm/user_id=" . $user->user_id . '/device_group_id=' . $device_group_perm->id . "'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a>";
+            } else {
+                echo '<i class="fa fa-lock text-muted" aria-hidden="true" title="Read-only: Enable permission.device_group.allow_dynamic to modify"></i>';
+            }
+            echo '</td></tr>';
         }
 
         echo '</table>
@@ -129,22 +150,19 @@ if (! Auth::user()->hasGlobalAdmin()) {
         }
 
         // Display device groups this user doesn't have access to
-        echo '<h4>Grant access to new Device Group</h4>';
-        $allow_dynamic = \App\Facades\LibrenmsConfig::get('permission.device_group.allow_dynamic');
-        if (! $allow_dynamic) {
-            echo '<i>Dynamic groups are disabled, set permission.device_group.allow_dynamic to enable.</i>';
+        if ($allow_dynamic) {
+            echo '<h4>Grant access to new Device Group</h4>';
+            echo "<form class='form-inline' role='form' method='post' action=''>
+                " . csrf_field() . "
+                <input type='hidden' value='" . $user_data['user_id'] . "' name='user_id'>
+                <input type='hidden' value='edituser' name='page'>
+                <input type='hidden' value='adddevgroupperm' name='action'>
+                <div class='form-group'>
+                  <label class='sr-only' for='device_group_id'>Device</label>
+                  <select name='device_group_id' id='device_group_id' class='form-control'></select>
+               </div>
+               <button type='submit' class='btn btn-default' name='Submit'>Add</button></form>";
         }
-
-        echo "<form class='form-inline' role='form' method='post' action=''>
-            " . csrf_field() . "
-            <input type='hidden' value='" . $user_data['user_id'] . "' name='user_id'>
-            <input type='hidden' value='edituser' name='page'>
-            <input type='hidden' value='adddevgroupperm' name='action'>
-            <div class='form-group'>
-              <label class='sr-only' for='device_group_id'>Device</label>
-              <select name='device_group_id' id='device_group_id' class='form-control'></select>
-           </div>
-           <button type='submit' class='btn btn-default' name='Submit'>Add</button></form>";
 
         echo "</div></div>
 
@@ -261,7 +279,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
                     device: window.port_device_id
                 };
             });
-          init_select2('#device_group_id', 'device-group', {" . ($allow_dynamic ? '' : '"type": "static"') . "}, null, 'Select Group');
+          " . ($allow_dynamic ? "init_select2('#device_group_id', 'device-group', {}, null, 'Select Group');" : '') . "
           init_select2('#bill_id', 'bill', {}, null, 'Select Bill');
         </script>
         </div>";
