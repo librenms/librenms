@@ -2233,7 +2233,7 @@ return [
         'snmpwalk' => [
             'description' => 'Path to snmpwalk',
         ],
-        'sso' =>[
+        'sso' => [
             'create_users' => [
                 'description' => 'Create Users',
                 'help' => 'If new users should be created upon login.',
