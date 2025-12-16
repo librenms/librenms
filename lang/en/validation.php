@@ -92,13 +92,21 @@ return [
             ],
             'CheckRrdcachedConnectivity' => [
                 'fail_socket' => ':socket does not appear to exist, rrdcached connectivity test failed',
-                'fail_port' => 'Cannot connect to rrdcached server on port :port',
+                'fail_port' => 'Cannot connect to rrdcached server :server on port :port',
                 'ok' => 'Connected to rrdcached',
             ],
             'CheckRrdDirPermissions' => [
                 'fail_root' => 'Your RRD directory is owned by root, please consider changing over to user a non-root user',
                 'fail_mode' => 'Your RRD directory is not set to 0775',
                 'ok' => 'rrd_dir is writable',
+            ],
+            'CheckRrdStep' => [
+                'fail' => 'Some RRD files have the incorrect step. :bad/:total',
+                'fail_bad_files' => 'Errors reading RRD files. :bad/:total',
+                'list_bad_step_title' => 'RRD files with incorrect step',
+                'list_bad_files_title' => 'Error running rrdinfo on files',
+                'list_bad_step_item' => ':file: step is :step, should be :target',
+                'ok' => 'All :total RRD files have the correct step.',
             ],
         ],
         'database' => [
