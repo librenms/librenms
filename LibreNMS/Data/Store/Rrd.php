@@ -248,8 +248,6 @@ class Rrd extends BaseDatastore
         throw new RrdException('Bad options passed to rrdtool_update');
     }
 
-    // rrdtool_update
-
     /**
      * Modify an rrd file's max value and trim the peaks as defined by rrdtool
      *
@@ -384,6 +382,69 @@ class Rrd extends BaseDatastore
         return Str::finish($this->rrd_dir, '/') . $host;
     }
 
+    private function usePhprrd(string $command): bool
+    {
+        if ($command == 'update' && function_exists('rrd_update')) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function ignoreCommand(string $command): bool
+    {
+        // do not write rrd files, but allow read-only commands
+        $ro_commands = ['graph', 'graphv', 'dump', 'fetch', 'first', 'last', 'lastupdate', 'info', 'xport'];
+        if ($this->disabled && ! in_array($command, $ro_commands)) {
+            if (! LibrenmsConfig::get('hide_rrd_disabled')) {
+                Log::debug('[%rRRD Disabled%n]', ['color' => true]);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private function phprrdCommand(string $command, string $filename, array $options = []): array
+    {
+        if ($this->ignoreCommand($command)) {
+            return [null, null];
+        }
+
+        Log::debug('PHPRRD[%g' . "$command $filename" . '%n]', ['color' => true]);
+        $stat = Measurement::start($this->coalesceStatisticType($command));
+
+        if ($command == 'update') {
+            if ($this->rrdcached) {
+                putenv('RRDCACHED_ADDRESS=' . $this->rrdcached);
+                $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
+            }
+
+            if (rrd_update($filename, $options)) {
+                $output = ["OK", null];
+            } else {
+                $output = [null, null];
+            }
+
+            if ($this->rrdcached) {
+                putenv('RRDCACHED_ADDRESS');
+            }
+        } else {
+            throw new \Exception("Command $command cannot be handled by phprrdCommand()");
+        }
+
+        if (Debug::isVerbose()) {
+            echo 'RRDtool Output: ';
+            echo $output[0];
+            echo $output[1];
+        }
+
+        $this->recordStatistic($stat->end());
+
+        return $output;
+    }
+
     /**
      * Generates and pipes a command to rrdtool
      *
@@ -398,6 +459,14 @@ class Rrd extends BaseDatastore
      */
     private function command(string $command, string $filename, array $options = []): array
     {
+        if ($this->ignoreCommand($command)) {
+            return [null, null];
+        }
+
+        if ($this->usePhprrd($command)) {
+            return $this->phprrdCommand($command, $filename, $options);
+        }
+
         $stat = Measurement::start($this->coalesceStatisticType($command));
         $output = null;
 
@@ -410,16 +479,6 @@ class Rrd extends BaseDatastore
         }
 
         Log::debug('RRD[%g' . implode(' ', $cmd) . '%n]', ['color' => true]);
-
-        // do not write rrd files, but allow read-only commands
-        $ro_commands = ['graph', 'graphv', 'dump', 'fetch', 'first', 'last', 'lastupdate', 'info', 'xport'];
-        if ($this->disabled && ! in_array($command, $ro_commands)) {
-            if (! LibrenmsConfig::get('hide_rrd_disabled')) {
-                Log::debug('[%rRRD Disabled%n]', ['color' => true]);
-            }
-
-            return [null, null];
-        }
 
         // send the command!
         if (in_array($command, ['last', 'list', 'lastupdate']) && $this->init(false)) {
