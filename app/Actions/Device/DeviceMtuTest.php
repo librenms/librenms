@@ -31,6 +31,8 @@ class DeviceMtuTest
 
         $cmd = array_merge(LibrenmsConfig::fpingCommand($device->ipFamily()), [
             '-q',
+            '-r',
+            '10',
             '-b',
             $bytes,
             $device->pollerTarget(),
