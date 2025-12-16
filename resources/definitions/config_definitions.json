@@ -7036,31 +7036,45 @@
         },
         "sso.create_users": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "auth",
+            "section": "sso"
         },
         "sso.descr_attr":{
             "default": null,
-            "type": "text"
+            "type": "text",
+            "group": "auth",
+            "section": "sso"
         },
         "sso.email_attr":{
             "default": null,
-            "type": "text"
+            "type": "text",
+            "group": "auth",
+            "section": "sso"
         },
         "sso.group_attr":{
             "default": null,
-            "type": "text"
+            "type": "text",
+            "group": "auth",
+            "section": "sso"
         },
         "sso.group_delimiter":{
             "default": null,
-            "type": "text"
+            "type": "text",
+            "group": "auth",
+            "section": "sso"
         },
         "sso.group_filter":{
             "default": null,
-            "type": "text"
+            "type": "text",
+            "group": "auth",
+            "section": "sso"
         },
         "sso.group_filter":{
             "default": [],
-            "type": "array"
+            "type": "array",
+            "group": "auth",
+            "section": "sso"
         },
        "sso.group_strategy": {
             "default": null,
@@ -7069,7 +7083,9 @@
                 "attribute": "attribute",
                 "map": "map",
                 "static": "static"
-            }
+            },
+            "group": "auth",
+            "section": "sso"
         },
         "sso.level_attr":{
             "default": null,
@@ -7077,7 +7093,9 @@
         },
         "sso.group_level_map":{
             "default": null,
-            "type": "text"
+            "type": "text",
+            "group": "auth",
+            "section": "sso"
         },
         "sso.mode":{
             "default": "env",
@@ -7085,7 +7103,9 @@
             "options": {
                 "env": "env",
                 "header": "header"
-            }
+            },
+            "group": "auth",
+            "section": "sso"
         },
         "sso.realname_attr":{
             "default": null,
@@ -7101,11 +7121,15 @@
         },
         "sso.update_users": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "auth",
+            "section": "sso"
         },
         "sso.user_attr": {
             "default": "REMOTE_USER",
-            "type": "text"
+            "type": "text",
+            "group": "auth",
+            "section": "sso"
         },
         "storage_perc_warn": {
             "default": 60,

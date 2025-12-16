@@ -34,6 +34,7 @@ return [
             'radius' => ['name' => 'Radius Settings'],
             'socialite' => ['name' => 'Socialite Settings'],
             'http' => ['name' => 'HTTP Auth Settings'],
+            'sso' => ['name' => 'Single Sign-on'],
         ],
         'authorization' => [
             'device-group' => ['name' => 'Device Group Settings'],
