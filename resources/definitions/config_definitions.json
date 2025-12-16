@@ -7117,7 +7117,11 @@
             "default": [],
             "type": "array",
             "group": "auth",
-            "section": "sso"
+            "section": "sso",
+            "validate": {
+                 "value": "array",
+                 "value.*": "string"
+             }
         },
         "sso.update_users": {
             "default": true,
