@@ -22,7 +22,7 @@
                 <td>{{ $poller['poller_name'] }}</td>
                 <td>{{ $poller['devices'] }}</td>
                 <td>{{ $poller['time_taken'] }} Seconds</td>
-                <td>{{ $poller['last_polled'] }}</td>
+                <td>{{ (new Carbon\Carbon($poller['last_polled']))->setTimezone($timezone) }}</td>
                 <td>@if( $poller['long_not_polled'] )<button type='button' class='btn btn-danger btn-sm' aria-label={{ __('Delete') }} data-toggle='modal' data-target='#confirm-delete' data-id='{{ $poller['id'] }}' data-pollertype='delete-poller' name='delete-poller'><i class='fa fa-trash' aria-hidden='true'></i></button>@endif</td>
             </tr>
             @endforeach
