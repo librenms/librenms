@@ -2,8 +2,6 @@ os: pandacom
 text: 'PanDacom'
 type: network
 icon: pandacom
-group: pandacom
-mib_dir: pandacom
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
