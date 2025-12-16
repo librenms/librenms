@@ -7071,10 +7071,19 @@
             "section": "sso"
         },
         "sso.group_level_map":{
-            "default": [],
-            "type": "array",
+            "default": {},
+            "type": "group-role-map",
             "group": "auth",
-            "section": "sso"
+            "section": "sso",
+            "options": {
+                "groupPlaceholder": "Group Name"
+            },
+            "validate": {
+                "value": "array",
+                "value.*": "array",
+                "value.*.roles": "array|required",
+                "value.*.roles.*": "string"
+            }
         },
        "sso.group_strategy": {
             "default": null,
