@@ -11,7 +11,7 @@
                     "hardware": "IE-3200-8T2S",
                     "features": null,
                     "location": "<private>",
-                    "os": "ios",
+                    "os": "iosxe",
                     "type": "network",
                     "serial": "FVH2849L0CA",
                     "icon": "cisco.svg"
