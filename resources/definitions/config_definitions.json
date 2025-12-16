@@ -7070,7 +7070,7 @@
             "group": "auth",
             "section": "sso"
         },
-        "sso.group_filter":{
+        "sso.group_level_map":{
             "default": [],
             "type": "array",
             "group": "auth",
@@ -7091,12 +7091,6 @@
             "default": null,
             "type": "text"
         },
-        "sso.group_level_map":{
-            "default": null,
-            "type": "text",
-            "group": "auth",
-            "section": "sso"
-        },
         "sso.mode":{
             "default": "env",
             "type": "select",
@@ -7109,15 +7103,21 @@
         },
         "sso.realname_attr":{
             "default": null,
-            "type": "text"
+            "type": "text",
+            "group": "auth",
+            "section": "sso"
         },
         "sso.static_level":{
             "default": null,
-            "type": "integer"
+            "type": "integer",
+            "group": "auth",
+            "section": "sso"
         },
         "sso.trusted_proxies":{
             "default": [],
-            "type": "array"
+            "type": "array",
+            "group": "auth",
+            "section": "sso"
         },
         "sso.update_users": {
             "default": true,
