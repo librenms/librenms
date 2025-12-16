@@ -14,7 +14,7 @@
                     "os": "pandacom",
                     "type": "network",
                     "serial": "",
-                    "icon": "generic.svg"
+                    "icon": "pandacom.png"
                 }
             ]
         },
