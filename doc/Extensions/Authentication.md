@@ -507,7 +507,7 @@ try and guess.
 
 To get up and running, all you need to do is configure the following values:
 
-```basg
+```bash
 lnms config:set auth_mechanism mysql
 lnms config:set sso.mode env
 lnms config:set sso.group_strategy static
