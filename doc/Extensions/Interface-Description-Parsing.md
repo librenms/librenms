@@ -35,7 +35,7 @@ descr Cust: Example Customer [10Mbit] (T1 Telco Y CCID129031) {EXAMP0001}
 
 Unix / Linux:
 
-This requires an additional script to be [setup](#setup)
+This requires an additional script to be [setup](#device-setup)
 
 ```text
 # eth3: Cust: Example Customer [10Mbit] (T1 Telco Y CCID129031) {EXAMP0001}

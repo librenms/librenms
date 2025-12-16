@@ -90,6 +90,7 @@ class ServiceConfig(DBConfig):
 
     redis_host = "localhost"
     redis_port = 6379
+    redis_scheme = "tcp"
     redis_db = 0
     redis_user = None
     redis_pass = None
@@ -220,6 +221,9 @@ class ServiceConfig(DBConfig):
         )
         self.redis_port = int(
             os.getenv("REDIS_PORT", config.get("redis_port", ServiceConfig.redis_port))
+        )
+        self.redis_scheme = os.getenv(
+            "REDIS_SCHEME", config.get("redis_scheme", ServiceConfig.redis_scheme)
         )
         self.redis_socket = os.getenv(
             "REDIS_SOCKET", config.get("redis_socket", ServiceConfig.redis_socket)
@@ -708,6 +712,7 @@ class Service:
                 sentinel=self.config.redis_sentinel,
                 sentinel_service=self.config.redis_sentinel_service,
                 socket_timeout=self.config.redis_timeout,
+                ssl=(self.config.redis_scheme == "tls"),
             )
         except ImportError:
             if self.config.distributed:

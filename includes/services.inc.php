@@ -2,43 +2,12 @@
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
+use App\Models\Service;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Enum\Severity;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Clean;
 use LibreNMS\Util\IP;
-
-function get_service_status($device = null)
-{
-    $sql_query = 'SELECT service_status, count(service_status) as count FROM services WHERE';
-    $sql_param = [];
-    $add = 0;
-
-    if (! is_null($device)) {
-        // Add a device filter to the SQL query.
-        $sql_query .= ' `device_id` = ?';
-        $sql_param[] = $device;
-        $add++;
-    }
-
-    if ($add == 0) {
-        // No filters, remove " WHERE" -6
-        $sql_query = substr($sql_query, 0, strlen($sql_query) - 6);
-    }
-    $sql_query .= ' GROUP BY service_status';
-
-    // $service is not null, get only what we want.
-    $result = dbFetchRows($sql_query, $sql_param);
-
-    // Set our defaults to 0
-    $service_count = [0 => 0, 1 => 0, 2 => 0];
-    // Rebuild the array in a more convenient method
-    foreach ($result as $v) {
-        $service_count[$v['service_status']] = $v['count'];
-    }
-
-    return $service_count;
-}
 
 function add_service($device, $type, $desc, $ip = '', $param = '', $ignore = 0, $disabled = 0, $template_id = '', $name = '')
 {
@@ -48,45 +17,25 @@ function add_service($device, $type, $desc, $ip = '', $param = '', $ignore = 0, 
         $ip = $device->pollerTarget();
     }
 
-    $insert = ['device_id' => $device->device_id, 'service_ip' => $ip, 'service_type' => $type, 'service_changed' => ['UNIX_TIMESTAMP(NOW())'], 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked', 'service_ds' => '{}', 'service_disabled' => $disabled, 'service_template_id' => $template_id, 'service_name' => $name];
+    $insert = ['device_id' => $device->device_id, 'service_ip' => $ip, 'service_type' => $type, 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked', 'service_ds' => '{}', 'service_disabled' => $disabled, 'service_template_id' => $template_id, 'service_name' => $name];
 
-    return dbInsert($insert, 'services');
+    return Service::create($insert);
 }
 
 function service_get($device = null, $service = null)
 {
-    $sql_query = 'SELECT `service_id`,`device_id`,`service_ip`,`service_type`,`service_desc`,`service_param`,`service_ignore`,`service_status`,`service_changed`,`service_message`,`service_disabled`,`service_ds`,`service_template_id`,`service_name` FROM `services` WHERE';
-    $sql_param = [];
-    $add = 0;
-
-    d_echo('SQL Query: ' . $sql_query);
     if (! is_null($service)) {
         // Add a service filter to the SQL query.
-        $sql_query .= ' `service_id` = ? AND';
-        $sql_param[] = $service;
-        $add++;
-    }
-    if (! is_null($device)) {
-        // Add a device filter to the SQL query.
-        $sql_query .= ' `device_id` = ? AND';
-        $sql_param[] = $device;
-        $add++;
-    }
-
-    if ($add == 0) {
-        // No filters, remove " WHERE" -6
-        $sql_query = substr($sql_query, 0, strlen($sql_query) - 6);
+        $services = Service::query()->where('service_id', $service)->get();
+    } elseif (! is_null($device)) {
+        $services = Service::query()->where('device_id', $device)->get();
     } else {
-        // We have filters, remove " AND" -4
-        $sql_query = substr($sql_query, 0, strlen($sql_query) - 4);
+        $services = Service::query()->get();
     }
-    d_echo('SQL Query: ' . $sql_query);
 
-    // $service is not null, get only what we want.
-    $services = dbFetchRows($sql_query, $sql_param);
     d_echo('Service Array: ' . print_r($services, true) . "\n");
 
-    return $services;
+    return $services->toArray();
 }
 
 function edit_service($update = [], $service = null)
@@ -95,7 +44,7 @@ function edit_service($update = [], $service = null)
         return false;
     }
 
-    return dbUpdate($update, 'services', '`service_id`=?', [$service]);
+    return Service::query()->where('service_id', $service)->update($update);
 }
 
 function delete_service($service = null)
@@ -104,12 +53,12 @@ function delete_service($service = null)
         return false;
     }
 
-    return dbDelete('services', '`service_id` =  ?', [$service]);
+    return Service::query()->where('service_id', $service)->delete();
 }
 
 function discover_service($device, $service)
 {
-    if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_type`= ? AND `device_id` = ?', [$service, $device['device_id']])) {
+    if (Service::query()->where('service_type', $service)->where('device_id', $device['device_id'])->doesntExist()) {
         add_service($device, $service, "$service Monitoring (Auto Discovered)", null, null, 0, 0, 0, "AUTO: $service");
         Eventlog::log('Autodiscovered service: type ' . $service, $device['device_id'], 'service', Severity::Info);
         echo '+';
