@@ -666,6 +666,13 @@ class Rrd extends BaseDatastore
      */
     private function graphPhprrd(array $options, ?array $env = null): string
     {
+        // Set environment if required
+        if ($env != null) {
+            foreach ($env as $k => $v) {
+                putenv("$k=$v");
+            }
+        }
+
         $rrd = new \RRDGraph('-');
         if ($this->useRrdCached('graph')) {
             $options = $this->fixRrdCachedOptions($options);
