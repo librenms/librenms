@@ -340,3 +340,140 @@ Output:
  "status": "ok"
 }
 ```
+
+## Alert templates
+
+### `get_alert_template`
+
+Get the alert template details.
+
+Route: `/api/v0/alert_templates/:id`
+
+
+
+Input:
+
+  - id: (Required) is the alert template id.
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/alert_templates/1
+```
+
+Output:
+
+```json
+{
+  "status": "ok",
+  "alert_templates": [
+    {
+      "id": 4,
+      "name": "Default Alert Template",
+      "template": "{{ $alert->title }}\nSeverity: {{ $alert->severity }}\n@if ($alert->state == 0)Time elapsed: {{ $alert->elapsed }} @endif\nTimestamp: {{ $alert->timestamp }}\nUnique-ID: {{ $alert->uid }}\nRule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif\n@if ($alert->faults) Faults:\n@foreach ($alert->faults as $key => $value)\n  #{{ $key }}: {{ $value['string'] }}\n@endforeach\n@endif\nAlert sent to:\n@foreach ($alert->contacts as $key => $value)\n  {{ $value }} <{{ $key }}>\n@endforeach",
+      "title": null,
+      "title_rec": null,
+      "alert_rules": []
+    },
+  ],
+  "count": 1
+}
+```
+
+### `list_alert_templates`
+
+List the alert templates.
+
+Route: `/api/v0/alert_templates`
+
+
+Input: None
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/alert_templates
+```
+
+Output:
+
+```json
+{
+  "status": "ok",
+  "alert_templates": [
+    {
+      "id": 4,
+      "name": "Default Alert Template",
+      "template": "{{ $alert->title }}\nSeverity: {{ $alert->severity }}\n@if ($alert->state == 0)Time elapsed: {{ $alert->elapsed }} @endif\nTimestamp: {{ $alert->timestamp }}\nUnique-ID: {{ $alert->uid }}\nRule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif\n@if ($alert->faults) Faults:\n@foreach ($alert->faults as $key => $value)\n  #{{ $key }}: {{ $value['string'] }}\n@endforeach\n@endif\nAlert sent to:\n@foreach ($alert->contacts as $key => $value)\n  {{ $value }} <{{ $key }}>\n@endforeach",
+      "title": null,
+      "title_rec": null,
+      "alert_rules": []
+    },
+  ],
+  "count": 1
+}
+```
+
+### `add_alert_template`
+
+Add a new alert template.
+
+Route: `/api/v0/alert_templates`
+
+Input (JSON):
+
+- name: (Required) Name for the new template
+- template: (Required) Template code used to generate the alert message
+- title: Title that is used when an alert is generated
+- title_rec: Title that is used when an alert has recovered
+- alert_rules: an array of rule_id's for which this template should apply (see also: [`list_alert_rules`](#list_alert_rules).)
+
+Example:
+
+```curl
+curl -X POST -d '{"name":"new alert template","template":"---","title":"CREATED ALERT","title_rec": "ALERT RECOVERED","alert_rules":[]}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/alert_templates
+```
+
+Output:
+- status: Status of the request. Can be: ok, warning, error
+- message: The output of this call. Error messages will be displayed here.
+- id: The id of the newly created alert template
+
+```json
+{
+  "status": "ok",
+  "message": "Alert template has been created and attached rules have been updated.",
+  "id": 2
+}
+```
+
+### `edit_rule`
+
+Edit an existing alert rule
+
+Route: `/api/v0/alert_templates`
+
+Input (JSON):
+
+- name: (Required) Name for the new template
+- template: (Required) Template code used to generate the alert message
+- template_id: (Required) template id that will be changed. If this is not present a new alert template will be created.
+- title: Title that is used when an alert is generated
+- title_rec: Title that is used when an alert has recovered
+- alert_rules: an array of rule_id's for which this template should apply (see also: [`list_alert_rules`](#list_alert_rules).)
+
+Example:
+
+```curl
+curl -X POST -d '{"name":"new alert template","template":"---","template_id":"2","title":"CREATED ALERT","title_rec": "ALERT RECOVERED","alert_rules":[]}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://foo.example/api/v0/alert_templates
+```
+
+Output:
+
+```json
+{
+  "status": "ok",
+  "message": "Alert template has been updated and attached rules have been updated.",
+  "id": 2
+}
+```
