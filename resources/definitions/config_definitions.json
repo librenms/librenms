@@ -7126,14 +7126,15 @@
             "default": null,
             "type": "text",
             "group": "auth",
-            "section": "sso"
+            "section": "sso",
+            "order": 10
         },
         "sso.static_level":{
             "default": null,
             "type": "integer",
             "group": "auth",
             "section": "sso",
-            "order": 10
+            "order": 11
         },
         "sso.trusted_proxies":{
             "default": [],
@@ -7144,21 +7145,21 @@
                  "value": "array",
                  "value.*": "string"
              },
-            "order": 11
+            "order": 12
         },
         "sso.update_users": {
             "default": true,
             "type": "boolean",
             "group": "auth",
             "section": "sso",
-            "order": 12
+            "order": 13
         },
         "sso.user_attr": {
             "default": "REMOTE_USER",
             "type": "text",
             "group": "auth",
             "section": "sso",
-            "order": 13
+            "order": 14
         },
         "storage_perc_warn": {
             "default": 60,
