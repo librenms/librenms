@@ -485,29 +485,26 @@ class Rrd extends BaseDatastore
     }
 
     /**
-     * Get array of all rrd files for a device via rrdached or localdisk.
-     * If $hostname is empty, it will list all rrd files
+     * Get array of all rrd files for a device,
+     * via rrdached or localdisk.
      *
      * @param  string  $hostname  hostname of the device
-     * @return string[] array of rrd files for this host relative to rrd_dir
+     * @return string[] array of rrd files for this host
      */
     public function getRrdFiles(string $hostname): array
     {
-        $dir = $this->dirFromHost($hostname);
-
         if ($this->rrdcached) {
-            $output = $this->command('list', $dir . '/', ['--recursive']);
+            $output = $this->command('list', '/' . self::safeName($hostname));
+
             $files = explode("\n", trim($output[0] ?? ''));
             array_pop($files); // remove rrdcached status line
-            $prepend = str_replace($this->rrd_dir . '/', '', $dir) . '/';
-
-            return array_map(fn ($file) => $prepend . $file, $files);
+        } else {
+            $files = glob($this->dirFromHost($hostname) . '/*.rrd') ?: [];
         }
 
-        $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir));
-        $rrdFiles = new \RegexIterator($iterator, '/\.rrd$/');
+        sort($files);
 
-        return array_map(fn (\SplFileInfo $file) => str_replace($this->rrd_dir . '/', '', $file), iterator_to_array($rrdFiles, false));
+        return $files;
     }
 
     /**
@@ -525,8 +522,6 @@ class Rrd extends BaseDatastore
         $separator = '-';
 
         $rrdfile_array = $this->getRrdFiles($device['hostname']);
-        sort($rrdfile_array);
-
         if ($category) {
             $pattern = sprintf('%s-%s-%s-%s', 'app', $app_name, $app_id, $category);
         } else {

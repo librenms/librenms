@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use App\Console\LnmsCommand;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
-use App\Facades\Rrd;
 use Exception;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\RRD\RrdProcess;
@@ -50,11 +49,9 @@ class MaintenanceRrdStep extends LnmsCommand
             return 0;
         }
 
-        $files = Rrd::getRrdFiles($hostname === 'all' ? '' : $hostname);
-
         [$converted, $skipped, $failed] = [0, 0, 0];
 
-        foreach ($files as $file) {
+        foreach ($this->listFiles($hostname, $rrdProcess) as $file) {
             $rrdFile = basename($file, '.rrd');
 
             [$step, $heartbeat] = $rrdFile === 'icmp-perf'
@@ -127,5 +124,29 @@ class MaintenanceRrdStep extends LnmsCommand
         $xmlContent = (string) preg_replace('#<minimal_heartbeat>\d+</minimal_heartbeat>#', "<minimal_heartbeat>$heartbeat</minimal_heartbeat>", $xmlContent);
 
         return $xmlContent;
+    }
+
+    /**
+     * @param  string  $hostname
+     * @param  RrdProcess  $rrdProcess
+     * @return string[]
+     * @throws RrdException
+     */
+    private function listFiles(string $hostname, RrdProcess $rrdProcess): array
+    {
+        $command= $hostname === 'all' ? ['list -r .', ''] : "list ./$hostname";
+        $output = rtrim($rrdProcess->run($command));
+
+        if (empty($output)) {
+            return [];
+        }
+
+        $files = explode("\n", $output);
+
+        if ($hostname === 'all') {
+            return $files;
+        }
+
+        return array_map(fn ($file) => "$hostname/$file", $files);
     }
 }
