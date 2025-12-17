@@ -390,9 +390,7 @@ class MtuQueueManager(TimedQueueManager):
         :param config: LibreNMS.ServiceConfig reference to the service config object
         :param lock_manager: the single instance of lock manager
         """
-        TimedQueueManager.__init__(
-            self, config, lock_manager, "mtu", True, True
-        )
+        TimedQueueManager.__init__(self, config, lock_manager, "mtu", True, True)
         self._db = LibreNMS.DB(self.config)
 
     def do_dispatch(self):
