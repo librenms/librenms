@@ -8,29 +8,23 @@ class Panel extends Component
 {
     /**
      * Create a new component instance.
-     *
-     * @param  string  $title
-     * @param  string  $body_class
-     * @return void
      */
     public function __construct(
         /**
          * The Panel title.
          */
-        public $title = null,
+        public ?string $title = '',
         /**
          * The Panel body class.
          */
-        public $body_class = null
+        public ?string $bodyClass = ''
     ) {
     }
 
     /**
      * Get the view / contents that represent the component.
-     *
-     * @return \Illuminate\View\View|string
      */
-    public function render()
+    public function render(): \Illuminate\View\View|string
     {
         return view('components.panel');
     }

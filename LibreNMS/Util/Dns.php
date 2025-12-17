@@ -79,7 +79,11 @@ class Dns implements Geocoder
             return [];
         }
 
-        return array_map(fn ($info) => socket_addrinfo_explain($info)['ai_addr']['sin_addr'], $result);
+        return array_map(function ($info) {
+            $explaned = socket_addrinfo_explain($info);
+
+            return $explaned['ai_addr']['sin6_addr'] ?? $explaned['ai_addr']['sin_addr'];
+        }, $result);
     }
 
     /**

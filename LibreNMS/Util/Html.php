@@ -145,14 +145,14 @@ class Html
             $colors = Color::percentage($percent, $warn ?: null);
         }
         $default = Color::percentage(0);
-        $left_text_color = $colors['left_text'] ? '#' . $colors['left_text'] : 'inherit';
-        $right_text_color = $colors['right_text'] ? '#' . $colors['right_text'] : 'inherit';
+        $left_text_color = empty($colors['left_text']) ? 'inherit' : '#' . $colors['left_text'];
+        $right_text_color = empty($colors['right_text']) ? 'inherit' : '#' . $colors['right_text'];
         $left_color = $colors['left'] ?? $default['left'];
         $right_color = $colors['right'] ?? $default['right'];
 
         $output = [];
         $output[] = '<div style="width:' . $width . 'px">';
-        $output[] = '<div class="progress" style="background-color:#eaeaea; height:' . $height . 'px; margin-bottom: 4px;">';
+        $output[] = '<div class="progress" style="background-color:#' . $right_color . '; height:' . $height . 'px; margin-bottom: 4px;">';
 
         $output[] = '<div class="progress-bar" role="progressbar" aria-valuenow="' . $percent . '" aria-valuemin="0" aria-valuemax="100" style="width:' . $percent . '%; background-color: #' . $left_color . '; height:' . $height . 'px;"></div>';
 
