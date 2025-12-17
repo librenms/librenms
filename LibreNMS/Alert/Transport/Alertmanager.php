@@ -23,6 +23,7 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Pool;
 use Illuminate\Http\Client\Response;
 use LibreNMS\Alert\Transport;
