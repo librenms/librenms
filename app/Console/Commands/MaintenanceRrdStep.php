@@ -130,11 +130,12 @@ class MaintenanceRrdStep extends LnmsCommand
      * @param  string  $hostname
      * @param  RrdProcess  $rrdProcess
      * @return string[]
+     *
      * @throws RrdException
      */
     private function listFiles(string $hostname, RrdProcess $rrdProcess): array
     {
-        $command= $hostname === 'all' ? ['list -r .', ''] : "list ./$hostname";
+        $command = $hostname === 'all' ? ['list -r .', ''] : "list ./$hostname";
         $output = rtrim($rrdProcess->run($command));
 
         if (empty($output)) {
