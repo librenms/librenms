@@ -27,7 +27,7 @@ class DeviceMtuTest
             return true;
         }
 
-        $bytes = $this->bytes > 8 ? $this->bytes - 8 : $this->bytes;
+        $bytes = $this->bytes > 28 ? $this->bytes - 28 : $this->bytes;
 
         $cmd = array_merge(LibrenmsConfig::fpingCommand($device->ipFamily()), [
             '-q',
