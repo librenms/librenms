@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use App\Console\LnmsCommand;
 use App\Jobs\MtuCheck;
 use Illuminate\Support\Arr;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
 class DeviceMtu extends LnmsCommand

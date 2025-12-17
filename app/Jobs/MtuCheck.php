@@ -36,7 +36,6 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Alert\AlertRules;
-use LibreNMS\Enum\AvailabilitySource;
 use Symfony\Component\Process\Process;
 
 class MtuCheck implements ShouldQueue
