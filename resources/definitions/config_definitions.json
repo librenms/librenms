@@ -7092,7 +7092,7 @@
             },
             "order": 6
         },
-       "sso.group_strategy": {
+        "sso.group_strategy": {
             "default": null,
             "type": "select",
             "options": {
@@ -7107,6 +7107,8 @@
         "sso.level_attr":{
             "default": null,
             "type": "text",
+            "group": "auth",
+            "section": "sso",
             "order": 8
         },
         "sso.mode":{

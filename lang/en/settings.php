@@ -2248,7 +2248,7 @@ return [
             ],
             'group_attr' => [
                 'description' => 'Group Attribute',
-                'help' => 'The attribute to use for either the group level if attribute or containing the groups information if using mapping.',
+                'help' => 'The attribute containing the groups information if using mapping.',
             ],
             'group_delimiter' => [
                 'description' => 'Group Delimiter',
@@ -2265,6 +2265,10 @@ return [
             'group_strategy' => [
                 'description' => 'Group Strategy',
                 'help' => 'How the group mapping should be done.',
+            ],
+            'level_attr' => [
+                'description' => 'Level Attribute',
+                'help' => 'The attribute to use if using the attribute group strategy.',
             ],
             'mode' => [
                 'description' => 'Mode',
