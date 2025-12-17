@@ -1,3 +1,3 @@
 modules:
     os:
-        sysDescr_regex: '/(?<version>IPBS2\[[^\]]+], Bootcode\[[^\]]+]), Hardware\[(?<hardware>[^\]]+)]/'
+        sysDescr_regex: '/(?<version>IPBS[2|3]\[[^\]]+], Bootcode\[[^\]]+]), Hardware\[(?<hardware>[^\]]+)]/'
