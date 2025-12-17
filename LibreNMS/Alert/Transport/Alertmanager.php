@@ -90,7 +90,16 @@ class Alertmanager extends Transport
         ));
 
         foreach ($responses as $res) {
-            if ($res instanceof ConnectionException || ! $res->successful()) {
+            if ($res instanceof ConnectionException) {
+                throw new AlertTransportDeliveryException(
+                    $alert_data,
+                    0,
+                    $res->getMessage(),
+                    $alertmanager_msg,
+                    $data
+                );
+            }
+            if (! $res->successful()) {    
                 throw new AlertTransportDeliveryException(
                     $alert_data,
                     $res->status(),
