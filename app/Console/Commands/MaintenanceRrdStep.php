@@ -15,10 +15,6 @@ class MaintenanceRrdStep extends LnmsCommand
 {
     protected $name = 'maintenance:rrd-step';
 
-    private int $systemStep;
-    private int $icmpStep;
-    private int $systemHeartbeat;
-
     public function __construct()
     {
         parent::__construct();
@@ -30,9 +26,9 @@ class MaintenanceRrdStep extends LnmsCommand
     {
         $this->configureOutputOptions();
 
-        $this->systemStep = (int) LibrenmsConfig::get('rrd.step', 300);
-        $this->icmpStep = (int) LibrenmsConfig::get('ping_rrd_step', $this->systemStep);
-        $this->systemHeartbeat = (int) LibrenmsConfig::get('rrd.heartbeat', $this->systemStep * 2);
+        $systemStep = (int) LibrenmsConfig::get('rrd.step', 300);
+        $icmpStep = (int) LibrenmsConfig::get('ping_rrd_step', $systemStep);
+        $systemHeartbeat = (int) LibrenmsConfig::get('rrd.heartbeat', $systemStep * 2);
 
         $hostname = (string) $this->argument('device');
         if ($hostname !== 'all') {
@@ -55,8 +51,8 @@ class MaintenanceRrdStep extends LnmsCommand
             $rrdFile = basename($file, '.rrd');
 
             [$step, $heartbeat] = $rrdFile === 'icmp-perf'
-                ? [$this->icmpStep, $this->icmpStep * 2]
-                : [$this->systemStep, $this->systemHeartbeat];
+                ? [$icmpStep, $icmpStep * 2]
+                : [$systemStep, $systemHeartbeat];
 
             try {
                 $this->checkRrdFile($rrdProcess, $file, $step, $heartbeat);
@@ -135,7 +131,9 @@ class MaintenanceRrdStep extends LnmsCommand
      */
     private function listFiles(string $hostname, RrdProcess $rrdProcess): array
     {
-        $command = $hostname === 'all' ? ['list -r .', ''] : "list ./$hostname";
+        $rrd_dir = LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd');
+
+        $command = $hostname === 'all' ? "list -r $rrd_dir" : "list $rrd_dir/$hostname";
         $output = rtrim($rrdProcess->run($command));
 
         if (empty($output)) {
