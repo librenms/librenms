@@ -88,28 +88,19 @@ class Alertmanager extends Transport
             $urls
         ));
 
-        $firstSuccess = collect($responses)->first(static fn ($res): bool => $res->successful());
-
-        if ($firstSuccess !== null) {
-            return true;
+        foreach ($responses as $res) {
+            if (! $res->successful()) {
+                throw new AlertTransportDeliveryException(
+                    $alert_data,
+                    $res->status(),
+                    $res->body(),
+                    $alertmanager_msg,
+                    $data
+                );
+            }
         }
 
-        $lastResponse = collect($responses)->last()
-            ?? throw new AlertTransportDeliveryException(
-                $alert_data,
-                0,
-                'No URLs provided',
-                $alertmanager_msg,
-                $data
-            );
-
-        throw new AlertTransportDeliveryException(
-            $alert_data,
-            $lastResponse->status(),
-            $lastResponse->body(),
-            $alertmanager_msg,
-            $data
-        );
+        return true;
     }
 
     public static function configTemplate(): array
