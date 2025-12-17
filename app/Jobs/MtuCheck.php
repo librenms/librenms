@@ -26,6 +26,8 @@
 
 namespace App\Jobs;
 
+use App\Action;
+use App\Actions\Alerts\RunAlertRulesAction;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Bus\Queueable;
@@ -35,7 +37,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Alert\AlertRules;
 use Symfony\Component\Process\Process;
 
 class MtuCheck implements ShouldQueue
@@ -169,18 +170,9 @@ class MtuCheck implements ShouldQueue
         if ($device->mtu_status != $result) {
             $device->mtu_status = $result;
             $device->save();
-            $this->runAlerts($device->device_id);
+            Action::execute(RunAlertRulesAction::class, $device);
         } else {
             Log::debug("$hostname status has not changed");
         }
-    }
-
-    /**
-     * run alerts for a device
-     */
-    private function runAlerts(int $device_id): void
-    {
-        $rules = new AlertRules;
-        $rules->runRules($device_id);
     }
 }
