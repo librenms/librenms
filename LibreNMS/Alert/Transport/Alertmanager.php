@@ -25,7 +25,6 @@ namespace LibreNMS\Alert\Transport;
 
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Pool;
-use Illuminate\Http\Client\Response;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
@@ -99,7 +98,7 @@ class Alertmanager extends Transport
                     $data
                 );
             }
-            if (! $res->successful()) {    
+            if (! $res->successful()) {
                 throw new AlertTransportDeliveryException(
                     $alert_data,
                     $res->status(),
