@@ -88,7 +88,7 @@ class Alertmanager extends Transport
             $urls
         ));
 
-        $firstSuccess = collect($responses)->first(static fn (Response $res): bool => $res->successful());
+        $firstSuccess = collect($responses)->first(static fn ($res): bool => $res->successful());
 
         if ($firstSuccess !== null) {
             return true;
