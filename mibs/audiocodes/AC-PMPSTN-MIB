@@ -13,6 +13,8 @@ AC-PM-PSTN-MIB DEFINITIONS ::= BEGIN
         IpAddress                                   FROM RFC1155-SMI
         Unsigned32,
 		Integer32,
+		Counter32,
+		Gauge32,
         enterprises                                 FROM SNMPv2-SMI
 		SnmpAdminString								FROM SNMP-FRAMEWORK-MIB
 		audioCodes,       
@@ -22,7 +24,7 @@ AC-PM-PSTN-MIB DEFINITIONS ::= BEGIN
 
        
 acPMPSTN  MODULE-IDENTITY       
-    LAST-UPDATED "200902050516Z"          --Thursday, February 05, 2009
+    LAST-UPDATED "202005251042Z"          --Monday, May 25 2020
     ORGANIZATION "AudioCodes Ltd"
     CONTACT-INFO
     "Postal: Support
@@ -50,6 +52,8 @@ Asked for is either not supported or currently not relevant
 (this is for when values asked for are for intervals not yet
 recorded."
 
+    REVISION "202102160955Z"          --Tuesday, February 16 2021
+	DESCRIPTION  "obsoleted acPMPSTN"
 
 
     ::= {acPerformance 10}  
@@ -67,7 +71,7 @@ recorded."
      acPMPSTNConfigurationPeriodLength OBJECT-TYPE
        SYNTAX Unsigned32 (0..894780)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Length of monitoring intervals for entire MIB. Time is in minutes.
 Access: Instant."
@@ -83,7 +87,7 @@ Access: Instant."
 
                   }
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Total-Counters Reset.  To reset the total counters, set the
 value of this object to resetTotalCounters(2).
@@ -98,7 +102,7 @@ Access: Instant."
      acPMTrunkUtilizationAttributesHighThreshold OBJECT-TYPE
        SYNTAX Unsigned32 (0..32)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "High threshold.
 Access: Instant."
@@ -109,7 +113,7 @@ Access: Instant."
      acPMTrunkUtilizationAttributesLowThreshold OBJECT-TYPE
        SYNTAX Unsigned32 (0..32)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Low threshold.
 Access: Instant."
@@ -123,7 +127,7 @@ Access: Instant."
      acPMPSTNChannelsAttributesInServiceHighThreshold OBJECT-TYPE
        SYNTAX Unsigned32 (0..32)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "High threshold.
 Access: Instant."
@@ -134,7 +138,7 @@ Access: Instant."
      acPMPSTNChannelsAttributesInServiceLowThreshold OBJECT-TYPE
        SYNTAX Unsigned32 (0..32)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Low threshold.
 Access: Instant."
@@ -145,7 +149,7 @@ Access: Instant."
      acPMPSTNChannelsAttributesOutOfServiceHighThreshold OBJECT-TYPE
        SYNTAX Unsigned32 (0..32)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "High threshold.
 Access: Instant."
@@ -156,7 +160,7 @@ Access: Instant."
      acPMPSTNChannelsAttributesOutOfServiceLowThreshold OBJECT-TYPE
        SYNTAX Unsigned32 (0..32)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Low threshold.
 Access: Instant."
@@ -167,7 +171,7 @@ Access: Instant."
      acPMPSTNChannelsAttributesInMaintenanceHighThreshold OBJECT-TYPE
        SYNTAX Unsigned32 (0..32)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "High threshold.
 Access: Instant."
@@ -178,7 +182,7 @@ Access: Instant."
      acPMPSTNChannelsAttributesInMaintenanceLowThreshold OBJECT-TYPE
        SYNTAX Unsigned32 (0..32)
        MAX-ACCESS read-write
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Low threshold.
 Access: Instant."
@@ -192,7 +196,7 @@ Access: Instant."
      acPMPSTNDataAcPMPSTNTimeFromStartOfInterval OBJECT-TYPE
        SYNTAX Unsigned32 (0..2147483647)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "The time in seconds since the start of the current interval.
 MIB specific."
@@ -206,7 +210,7 @@ MIB specific."
      acPMTrunkUtilizationTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcPMTrunkUtilizationEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Number of active channels per trunk (index: trunk number)."
        ::= {acPMPSTNData 21}
@@ -219,7 +223,7 @@ MIB specific."
      acPMTrunkUtilizationEntry OBJECT-TYPE
        SYNTAX AcPMTrunkUtilizationEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acPMTrunkUtilizationTrunkNum,acPMTrunkUtilizationInterval}
@@ -250,7 +254,7 @@ MIB specific."
      acPMTrunkUtilizationTrunkNum OBJECT-TYPE
        SYNTAX Unsigned32 (0..83)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Trunk number.
 0 is the first trunk."
@@ -261,7 +265,7 @@ MIB specific."
      acPMTrunkUtilizationInterval OBJECT-TYPE
        SYNTAX Unsigned32 (0..2)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Interval index.
 0 - current period (incomplete monitoring - mid period).
@@ -274,7 +278,7 @@ MIB specific."
      acPMTrunkUtilizationVal OBJECT-TYPE
        SYNTAX Gauge32
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Value of gauge or counter."
        ::= {acPMTrunkUtilizationEntry 3}
@@ -284,7 +288,7 @@ MIB specific."
      acPMTrunkUtilizationAverage OBJECT-TYPE
        SYNTAX Integer32 (-1..2147483647)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Average value within the period time."
        ::= {acPMTrunkUtilizationEntry 4}
@@ -294,7 +298,7 @@ MIB specific."
      acPMTrunkUtilizationMax OBJECT-TYPE
        SYNTAX Integer32 (-1..2147483647)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Maximum value within the period time."
        ::= {acPMTrunkUtilizationEntry 5}
@@ -304,7 +308,7 @@ MIB specific."
      acPMTrunkUtilizationMin OBJECT-TYPE
        SYNTAX Integer32 (-1..2147483647)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Minimum value within the period time."
        ::= {acPMTrunkUtilizationEntry 6}
@@ -314,7 +318,7 @@ MIB specific."
      acPMTrunkUtilizationVolume OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Activity volume."
        ::= {acPMTrunkUtilizationEntry 7}
@@ -324,7 +328,7 @@ MIB specific."
      acPMTrunkUtilizationTimeBelowLowThreshold OBJECT-TYPE
        SYNTAX Integer32 (-1..100)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Percent of interval time for which gauge is below what was determined
 as the low threshold."
@@ -335,7 +339,7 @@ as the low threshold."
      acPMTrunkUtilizationTimeBetweenThresholds OBJECT-TYPE
        SYNTAX Integer32 (-1..100)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Percent of interval time for which gauge is above what was determined
 as the high threshold."
@@ -346,7 +350,7 @@ as the high threshold."
      acPMTrunkUtilizationTimeAboveHighThreshold OBJECT-TYPE
        SYNTAX Integer32 (-1..100)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Percent of interval time for which gauge is between what were
 determined as the low and high thresholds."
@@ -357,7 +361,7 @@ determined as the low and high thresholds."
      acPMTrunkUtilizationFullDayAverage OBJECT-TYPE
        SYNTAX Integer32 (-1..2147483647)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "The average of full 24 hours."
        ::= {acPMTrunkUtilizationEntry 11}
@@ -367,7 +371,7 @@ determined as the low and high thresholds."
      acPMTrunkUtilizationTotal OBJECT-TYPE
        SYNTAX Integer32 (-1..2147483647)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Total since last reset."
        ::= {acPMTrunkUtilizationEntry 12}
@@ -380,7 +384,7 @@ determined as the low and high thresholds."
      acPMPSTNTrunkActivitySecondsTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcPMPSTNTrunkActivitySecondsEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Counts activity seconds on the trunk."
        ::= {acPMPSTNData 22}
@@ -393,7 +397,7 @@ determined as the low and high thresholds."
      acPMPSTNTrunkActivitySecondsEntry OBJECT-TYPE
        SYNTAX AcPMPSTNTrunkActivitySecondsEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acPMPSTNTrunkActivitySecondsTrunkNum,acPMPSTNTrunkActivitySecondsInterval}
@@ -417,7 +421,7 @@ determined as the low and high thresholds."
      acPMPSTNTrunkActivitySecondsTrunkNum OBJECT-TYPE
        SYNTAX Unsigned32 (0..83)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Trunk number.
 0 is the first trunk."
@@ -428,7 +432,7 @@ determined as the low and high thresholds."
      acPMPSTNTrunkActivitySecondsInterval OBJECT-TYPE
        SYNTAX Unsigned32 (0..2)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Interval index.
 0 - current period (incomplete monitoring - mid period).
@@ -441,7 +445,7 @@ determined as the low and high thresholds."
      acPMPSTNTrunkActivitySecondsVal OBJECT-TYPE
        SYNTAX Gauge32
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Value of gauge or counter."
        ::= {acPMPSTNTrunkActivitySecondsEntry 3}
@@ -451,7 +455,7 @@ determined as the low and high thresholds."
      acPMPSTNTrunkActivitySecondsTotal OBJECT-TYPE
        SYNTAX Integer32 (-1..2147483647)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Total since last reset."
        ::= {acPMPSTNTrunkActivitySecondsEntry 4}
@@ -461,7 +465,7 @@ determined as the low and high thresholds."
      acPMPSTNTrunkActivitySecondsVolume OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Activity volume."
        ::= {acPMPSTNTrunkActivitySecondsEntry 5}
@@ -477,7 +481,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsInServiceTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcPMPSTNNumOfChannelsInServiceEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Channels in service, per trunk."
        ::= {acPMPSTNChannels 1}
@@ -490,7 +494,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsInServiceEntry OBJECT-TYPE
        SYNTAX AcPMPSTNNumOfChannelsInServiceEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acPMPSTNNumOfChannelsInServiceTrunkNum,acPMPSTNNumOfChannelsInServiceInterval}
@@ -516,7 +520,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsInServiceTrunkNum OBJECT-TYPE
        SYNTAX Unsigned32 (0..83)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Trunk number.
 0 is the first trunk."
@@ -527,7 +531,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsInServiceInterval OBJECT-TYPE
        SYNTAX Unsigned32 (0..2)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Interval index.
 0 - current period (incomplete monitoring - mid period).
@@ -540,7 +544,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsInServiceVal OBJECT-TYPE
        SYNTAX Gauge32
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Value of gauge or counter."
        ::= {acPMPSTNNumOfChannelsInServiceEntry 3}
@@ -550,7 +554,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsInServiceAverage OBJECT-TYPE
        SYNTAX Integer32 (-1..2147483647)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Average value within the period time."
        ::= {acPMPSTNNumOfChannelsInServiceEntry 4}
@@ -560,7 +564,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsInServiceMax OBJECT-TYPE
        SYNTAX Integer32 (-1..2147483647)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Maximum value within the period time."
        ::= {acPMPSTNNumOfChannelsInServiceEntry 5}
@@ -570,7 +574,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsInServiceMin OBJECT-TYPE
        SYNTAX Integer32 (-1..2147483647)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Minimum value within the period time."
        ::= {acPMPSTNNumOfChannelsInServiceEntry 6}
@@ -580,7 +584,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsInServiceVolume OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Activity volume."
        ::= {acPMPSTNNumOfChannelsInServiceEntry 7}
@@ -593,7 +597,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsOutOfServiceTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcPMPSTNNumOfChannelsOutOfServiceEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Channels out of service, per trunk."
        ::= {acPMPSTNChannels 2}
@@ -606,7 +610,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsOutOfServiceEntry OBJECT-TYPE
        SYNTAX AcPMPSTNNumOfChannelsOutOfServiceEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acPMPSTNNumOfChannelsOutOfServiceTrunkNum,acPMPSTNNumOfChannelsOutOfServiceInterval}
@@ -632,7 +636,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsOutOfServiceTrunkNum OBJECT-TYPE
        SYNTAX Unsigned32 (0..83)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Trunk number.
 0 is the first trunk."
@@ -643,7 +647,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsOutOfServiceInterval OBJECT-TYPE
        SYNTAX Unsigned32 (0..2)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Interval index.
 0 - current period (incomplete monitoring - mid period).
@@ -656,7 +660,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsOutOfServiceVal OBJECT-TYPE
        SYNTAX Gauge32
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Value of gauge or counter."
        ::= {acPMPSTNNumOfChannelsOutOfServiceEntry 3}
@@ -666,7 +670,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsOutOfServiceAverage OBJECT-TYPE
        SYNTAX Integer32 (-1..2147483647)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Average value within the period time."
        ::= {acPMPSTNNumOfChannelsOutOfServiceEntry 4}
@@ -676,7 +680,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsOutOfServiceMax OBJECT-TYPE
        SYNTAX Integer32 (-1..2147483647)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Maximum value within the period time."
        ::= {acPMPSTNNumOfChannelsOutOfServiceEntry 5}
@@ -686,7 +690,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsOutOfServiceMin OBJECT-TYPE
        SYNTAX Integer32 (-1..2147483647)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Minimum value within the period time."
        ::= {acPMPSTNNumOfChannelsOutOfServiceEntry 6}
@@ -696,7 +700,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsOutOfServiceVolume OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Activity volume."
        ::= {acPMPSTNNumOfChannelsOutOfServiceEntry 7}
@@ -709,7 +713,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsInMaintenanceTable OBJECT-TYPE
        SYNTAX SEQUENCE OF AcPMPSTNNumOfChannelsInMaintenanceEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Channels in maintenance status (not in-service), per trunk."
        ::= {acPMPSTNChannels 3}
@@ -722,7 +726,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsInMaintenanceEntry OBJECT-TYPE
        SYNTAX AcPMPSTNNumOfChannelsInMaintenanceEntry
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            ""
        INDEX {acPMPSTNNumOfChannelsInMaintenanceTrunkNum,acPMPSTNNumOfChannelsInMaintenanceInterval}
@@ -748,7 +752,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsInMaintenanceTrunkNum OBJECT-TYPE
        SYNTAX Unsigned32 (0..83)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Trunk number.
 0 is the first trunk."
@@ -759,7 +763,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsInMaintenanceInterval OBJECT-TYPE
        SYNTAX Unsigned32 (0..2)
        MAX-ACCESS not-accessible
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Interval index.
 0 - current period (incomplete monitoring - mid period).
@@ -772,7 +776,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsInMaintenanceVal OBJECT-TYPE
        SYNTAX Gauge32
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Value of gauge or counter."
        ::= {acPMPSTNNumOfChannelsInMaintenanceEntry 3}
@@ -782,7 +786,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsInMaintenanceAverage OBJECT-TYPE
        SYNTAX Integer32 (-1..2147483647)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Average value within the period time."
        ::= {acPMPSTNNumOfChannelsInMaintenanceEntry 4}
@@ -792,7 +796,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsInMaintenanceMax OBJECT-TYPE
        SYNTAX Integer32 (-1..2147483647)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Maximum value within the period time."
        ::= {acPMPSTNNumOfChannelsInMaintenanceEntry 5}
@@ -802,7 +806,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsInMaintenanceMin OBJECT-TYPE
        SYNTAX Integer32 (-1..2147483647)
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Minimum value within the period time."
        ::= {acPMPSTNNumOfChannelsInMaintenanceEntry 6}
@@ -812,7 +816,7 @@ determined as the low and high thresholds."
      acPMPSTNNumOfChannelsInMaintenanceVolume OBJECT-TYPE
        SYNTAX Counter32
        MAX-ACCESS read-only
-       STATUS current
+       STATUS obsolete
        DESCRIPTION
            "Activity volume."
        ::= {acPMPSTNNumOfChannelsInMaintenanceEntry 7}
