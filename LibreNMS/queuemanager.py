@@ -382,6 +382,58 @@ class BillingQueueManager(TimedQueueManager):
                 log_file.write(output)
 
 
+class MtuQueueManager(TimedQueueManager):
+    def __init__(self, config, lock_manager):
+        """
+        A TimedQueueManager to manage dispatch and workers for MTU
+
+        :param config: LibreNMS.ServiceConfig reference to the service config object
+        :param lock_manager: the single instance of lock manager
+        """
+        TimedQueueManager.__init__(
+            self, config, lock_manager, "mtu", True, True
+        )
+        self._db = LibreNMS.DB(self.config)
+
+    def do_dispatch(self):
+        try:
+            groups = self._db.query("SELECT DISTINCT (`poller_group`) FROM `devices`")
+            for group in groups:
+                self.post_work("", group[0])
+        except pymysql.err.Error as e:
+            logger.critical("DB Exception ({})".format(e))
+
+    def do_work(self, context, group):
+        if self.lock(group, "group", timeout=self.config.mtu.frequency):
+            try:
+                logger.info("Running MTU test")
+
+                args = (
+                    ("device:mtu", "-vv", "-g", group)
+                    if self.config.debug
+                    else ("device:mtu", "-q", "-g", group)
+                )
+                exit_code, output = LibreNMS.call_script("lnms", args)
+
+                if self.config.log_output:
+                    with open(
+                        "{}/dispatch_group_{}_mtu.log".format(
+                            self.config.logdir, group
+                        ),
+                        "a",
+                    ) as log_file:
+                        log_file.write(output)
+
+                if exit_code != 0:
+                    logger.warning(
+                        "Running MTU check for group {} failed with error code {}: {}".format(
+                            group, exit_code, output
+                        )
+                    )
+            finally:
+                self.unlock(group, "group")
+
+
 class PingQueueManager(TimedQueueManager):
     def __init__(self, config, lock_manager):
         """

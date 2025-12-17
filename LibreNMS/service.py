@@ -81,6 +81,7 @@ class ServiceConfig(DBConfig):
     discovery = PollerConfig(16, 21600)
     billing = PollerConfig(2, 300, 60)
     ping = PollerConfig(1, 60)
+    mtu = PollerConfig(1, 60)
     down_retry = 60
     update_enabled = True
     update_frequency = 86400
@@ -196,6 +197,7 @@ class ServiceConfig(DBConfig):
             else config.get("schedule_type").get("ping", "legacy") == "dispatcher"
         )
         self.ping.frequency = config.get("ping_rrd_step", ServiceConfig.ping.frequency)
+        self.mtu.frequency = config.get("mtu_frequency", ServiceConfig.mtu.frequency)
         self.down_retry = config.get(
             "service_poller_down_retry", ServiceConfig.down_retry
         )
@@ -495,6 +497,7 @@ class Service:
             self.config, self._lm
         )
         self.queue_managers["ping"] = LibreNMS.PingQueueManager(self.config, self._lm)
+        self.queue_managers["mtu"] = LibreNMS.MtuQueueManager(self.config, self._lm)
 
         if self.config.update_enabled:
             self.daily_timer.start()
@@ -512,7 +515,7 @@ class Service:
             )
         )
         logger.info(
-            "Queue Workers: Discovery={} Poller={} Services={} Alerting={} Billing={} Ping={}".format(
+            "Queue Workers: Discovery={} Poller={} Services={} Alerting={} Billing={} Ping={} MTU={}".format(
                 self.config.discovery.workers
                 if self.config.discovery.enabled
                 else "disabled",
@@ -525,6 +528,7 @@ class Service:
                 "enabled" if self.config.alerting.enabled else "disabled",
                 "enabled" if self.config.billing.enabled else "disabled",
                 "enabled" if self.config.ping.enabled else "disabled",
+                "enabled",
             )
         )
 

@@ -17,6 +17,7 @@ from .queuemanager import (
     QueueManager,
     TimedQueueManager,
     BillingQueueManager,
+    MtuQueueManager,
     PingQueueManager,
     ServicesQueueManager,
     AlertQueueManager,

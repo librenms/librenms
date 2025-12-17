@@ -6765,6 +6765,14 @@
             "type": "integer",
             "units": "Seconds"
         },
+        "mtu_frequency": {
+            "default": 300,
+            "group": "poller",
+            "section": "dispatcherservice",
+            "order": 20,
+            "type": "integer",
+            "units": "Seconds"
+        },
         "ping_rrd_step": {
             "default": 300,
             "group": "poller",

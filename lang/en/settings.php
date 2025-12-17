@@ -1449,6 +1449,10 @@ return [
         'mtr' => [
             'description' => 'Path to mtr',
         ],
+        'mtu_frequency' => [
+            'description' => 'MTU Frequency',
+            'help' => 'How often to check MTU',
+        ],
         'mtu_options' => [
             'bytes' => [
                 'description' => 'MTU test packet size',
