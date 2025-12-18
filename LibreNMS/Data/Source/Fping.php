@@ -85,6 +85,32 @@ class Fping
         return $response;
     }
 
+    /**
+     * Run fping against a hostname/ip and check for success.
+     */
+    public function alive(string $host, AddressFamily $address_family = AddressFamily::IPv4): bool
+    {
+        // build the command
+        $cmd = array_merge(LibrenmsConfig::fpingCommand($address_family), [
+            '-r',
+            $this->count,
+            '-t',
+            $this->timeout,
+            '-O',
+            $this->tos,
+            $host,
+        ]);
+
+        $process = app()->make(Process::class, ['command' => $cmd]);
+        Log::debug('[FPING] ' . $process->getCommandLine() . PHP_EOL);
+        $process->disableOutput();
+        $process->run();
+
+        Log::debug('response: ' . ($process->isSuccessful() ? "success" : "fail"));
+
+        return $process->isSuccessful();
+    }
+
     public function bulkPing(array $hosts, callable $callback): void
     {
         $process = app()->make(Process::class, ['command' => [
