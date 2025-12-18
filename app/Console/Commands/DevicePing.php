@@ -24,6 +24,7 @@ class DevicePing extends LnmsCommand
     {
         parent::__construct();
         $this->addArgument('device spec', InputArgument::REQUIRED);
+        $this->addOption('force', 'f', InputOption::VALUE_NONE);
         $this->addOption('groups', 'g', InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED);
     }
 
@@ -37,6 +38,12 @@ class DevicePing extends LnmsCommand
         $spec = $this->argument('device spec');
 
         if ($spec == 'fast') {
+            // We do not need to run if ICMP tests are run during polling and the poll interval equals the ping interval
+            if (LibrenmsConfig::get('icmp_check') && LibrenmsConfig::get('service_poller_frequency') == LibrenmsConfig::get('ping_rrd_step') && ! $this->option('force')) {
+                $this->info('Not running bulk fping because icmp_check is enabled and service_poller_frequency = ping_rrd_step');
+                return 0;
+            }
+
             try {
                 $groups = Arr::wrap($this->option('groups'));
                 PingCheck::dispatchSync($groups);
