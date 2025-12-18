@@ -66,11 +66,14 @@ class MtuCheck implements ShouldQueue
 
         $remaining_devices = $this->fetchDevices();
 
+        [$offline_hostname_list, $remaining_devices] = $this->getOfflineHosts($remaining_devices);
+        Log::info('Ignoring ' . count($offline_hostname_list) . ' offline devices');
+
         $bytes = LibrenmsConfig::get('mtu_options.bytes');
         if ($bytes != null) {
             $fping_bytes = $bytes > 28 ? $bytes - 28 : $bytes;
 
-            [$ping_hostname_list, $remaining_devices] = $this->getPingHosts($this->fetchDevices());
+            [$ping_hostname_list, $remaining_devices] = $this->getPingHosts($remaining_devices);
             Log::info('Pinging ' . count($ping_hostname_list) . ' hosts');
             Log::debug('Pinging the following hosts: ' . implode(', ', $ping_hostname_list));
 
@@ -89,6 +92,17 @@ class MtuCheck implements ShouldQueue
     }
 
     /**
+     * Get an list of hostnames that are offline
+     */
+    private function getOfflineHosts(Collection $devices): array
+    {
+        // Select all devices with ping enabled
+        [$offline_devices, $other_devices] = $devices->partition(fn (Device $d) => $d->status == 0);
+
+        return [$offline_devices->map(fn (Device $d, string $hostname) => $hostname)->all(), $other_devices];
+    }
+
+    /**
      * Get an list of hostnames that we need to ping.  We don't care about order at the moment
      */
     private function getPingHosts(Collection $devices): array
@@ -96,7 +110,7 @@ class MtuCheck implements ShouldQueue
         // Select all devices with ping enabled
         [$ping_devices, $other_devices] = $devices->partition(fn (Device $d) => ! ($d->exists && $d->getAttrib('override_icmp_disable') === 'true'));
 
-        return [$ping_devices->map(fn (Device $d) => $d->overwrite_ip ?: $d->hostname)->all(), $other_devices];
+        return [$ping_devices->map(fn (Device $d, string $hostname) => $hostname)->all(), $other_devices];
     }
 
     /**
@@ -109,7 +123,7 @@ class MtuCheck implements ShouldQueue
         }
 
         // Only check devices that are enabled and online
-        $query = Device::where('disabled', 0)->where('status', 1);
+        $query = Device::where('disabled', 0);
 
         if ($this->groups) {
             $query->whereIntegerInRaw('poller_group', $this->groups);
