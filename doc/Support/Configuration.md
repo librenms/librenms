@@ -728,6 +728,23 @@ To disable the MTU test, set the packet size to null (the default).
 The MTU check does not ensure packets can traverse the network without being fragmented.  The test makes
 sure that 2 way communication can occure even if packets need to be fragmented at any poing along the way.
 
+If you have many devices that require fragmentation with the chosen MTU setting and start getting false
+positives, you may need to disable PMTU discovery.  The standard Linux ping can do this with the "-M dont"
+command argument, but fping does not support this.
+
+One option to resolve the false positive alerts is to disable PMTU discovery as follows:
+
+```bash
+echo 1 > /proc/sys/net/ipv4/ip_no_pmtu_disc
+```
+
+You will need to add the following line to `/etc/sysctl.conf` or `/etc/sysctl.d/librenms.conf` to keep the
+setting across reboots.
+
+```
+net.ipv4.ip_no_pmtu_disc = 1
+```
+
 ## Auto discovery settings
 
 Please refer to [Auto-Discovery](../Extensions/Auto-Discovery.md)
