@@ -1,6 +1,7 @@
 #!/usr/bin/env php
 <?php
 
+use App\Facades\LibrenmsConfig;
 use App\Jobs\PingCheck;
 use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Util\Debug;
@@ -22,7 +23,10 @@ END;
     exit;
 }
 
-$scheduler = \App\Facades\LibrenmsConfig::get('schedule_type.ping');
+Debug::set(isset($options['d']));
+Debug::setVerbose(isset($options['v']));
+
+$scheduler = LibrenmsConfig::get('schedule_type.ping');
 if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
     if (Debug::isEnabled()) {
         echo "Fast Pings are not enabled for cron scheduling.  Add the -f command argument if you want to force this command to run.\n";
@@ -30,8 +34,12 @@ if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
     exit(0);
 }
 
-Debug::set(isset($options['d']));
-Debug::setVerbose(isset($options['v']));
+if (! isset($options['f']) && LibrenmsConfig::get('icmp_check') && LibrenmsConfig::get('service_poller_frequency') == LibrenmsConfig::get('ping_rrd_step')) {
+    if (Debug::isEnabled()) {
+        echo "Fast Pings have the same frequency and polling, so we will let the poller do the work.  Add the -f command argument if you want to force this command to run.\n";
+    }
+    exit(0);
+}
 
 Datastore::init($options);
 
