@@ -157,6 +157,10 @@ require_once 'includes/html/modal/delete_service.inc.php';
                             $label = 'label-info';
                             $title = 'UNKNOWN';
                         }
+                        
+                        if ($service['service_changed'] == '0') {
+                            $service['service_changed'] = time();
+                        }
 
                         $service_iteration++;
 
