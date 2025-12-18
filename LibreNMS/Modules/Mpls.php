@@ -200,28 +200,44 @@ class Mpls implements Module
     public function dump(Device $device, string $type): ?array
     {
         return [
-            'mpls_lsps' => $device->mplsLsps()->orderBy('vrf_oid')->orderBy('lsp_oid')
+            'mpls_lsps' => $device->mplsLsps()
+                ->orderByColumns($this->getSortColumns('mpls_lsps'))
                 ->get()->map->makeHidden(['lsp_id', 'device_id']),
             'mpls_lsp_paths' => $device->mplsLspPaths()
                 ->leftJoin('mpls_lsps', 'mpls_lsp_paths.lsp_id', 'mpls_lsps.lsp_id')
                 ->select(['mpls_lsp_paths.*', 'mpls_lsps.vrf_oid', 'mpls_lsps.lsp_oid'])
-                ->orderBy('vrf_oid')->orderBy('lsp_oid')->orderBy('path_oid')
+                ->orderByColumns($this->getSortColumns('mpls_lsp_paths'))
                 ->get()->map->makeHidden(['lsp_path_id', 'device_id', 'lsp_id']),
-            'mpls_sdps' => $device->mplsSdps()->orderBy('sdp_oid')
+            'mpls_sdps' => $device->mplsSdps()
+                ->orderByColumns($this->getSortColumns('mpls_sdps'))
                 ->get()->map->makeHidden(['sdp_id', 'device_id']),
             'mpls_sdp_binds' => $device->mplsSdpBinds()
                 ->leftJoin('mpls_sdps', 'mpls_sdp_binds.sdp_id', 'mpls_sdps.sdp_id')
                 ->leftJoin('mpls_services', 'mpls_sdp_binds.svc_id', 'mpls_services.svc_id')
-                ->orderBy('mpls_sdps.sdp_oid')->orderBy('mpls_services.svc_oid')
+                ->orderByColumns($this->getSortColumns('mpls_sdp_binds'))
                 ->select(['mpls_sdp_binds.*', 'mpls_sdps.sdp_oid', 'mpls_services.svc_oid'])
                 ->get()->map->makeHidden(['bind_id', 'sdp_id', 'svc_id', 'device_id']),
-            'mpls_services' => $device->mplsServices()->orderBy('svc_oid')
+            'mpls_services' => $device->mplsServices()
+                ->orderByColumns($this->getSortColumns('mpls_services'))
                 ->get()->map->makeHidden(['svc_id', 'device_id']),
             'mpls_saps' => $device->mplsSaps()
                 ->leftJoin('mpls_services', 'mpls_saps.svc_id', 'mpls_services.svc_id')
-                ->orderBy('mpls_services.svc_oid')->orderBy('mpls_saps.sapPortId')->orderBy('mpls_saps.sapEncapValue')
+                ->orderByColumns($this->getSortColumns('mpls_saps'))
                 ->select(['mpls_saps.*', 'mpls_services.svc_oid'])
                 ->get()->map->makeHidden(['sap_id', 'svc_id', 'device_id']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return match ($table) {
+            'mpls_lsps' => ['vrf_oid', 'lsp_oid'],
+            'mpls_lsp_paths' => ['vrf_oid', 'lsp_oid', 'path_oid'],
+            'mpls_sdps' => ['sdp_oid'],
+            'mpls_sdp_binds' => ['sdp_oid', 'svc_oid'],
+            'mpls_services' => ['svc_oid'],
+            'mpls_saps' => ['svc_oid', 'sapPortId', 'sapEncapValue'],
+            default => [],
+        };
     }
 }

@@ -88,10 +88,16 @@ class Transceivers implements Module
         }
 
         return [
-            'transceivers' => $device->transceivers()->orderBy('index')
+            'transceivers' => $device->transceivers()
+                ->orderByColumns($this->getSortColumns('transceivers'))
                 ->leftJoin('ports', 'transceivers.port_id', 'ports.port_id')
                 ->select(['transceivers.*', 'ifIndex'])
                     ->get()->map->makeHidden(['id', 'created_at', 'updated_at', 'device_id', 'port_id']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return ['index'];
     }
 }

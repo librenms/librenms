@@ -209,8 +209,14 @@ class Isis implements Module
     public function dump(Device $device, string $type): ?array
     {
         return [
-            'isis_adjacencies' => $device->isisAdjacencies()->orderBy('index')
+            'isis_adjacencies' => $device->isisAdjacencies()
+                ->orderByColumns($this->getSortColumns('isis_adjacencies'))
                 ->get()->map->makeHidden(['id', 'device_id', 'port_id']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return ['index'];
     }
 }

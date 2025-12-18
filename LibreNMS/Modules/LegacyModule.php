@@ -192,6 +192,13 @@ class LegacyModule implements Module
         return $data;
     }
 
+    public function getSortColumns(string $table): array
+    {
+        $def = $this->moduleDumpDefinition();
+
+        return array_map(fn($r) => trim($r), explode(',', $def[$table]['order_by']));
+    }
+
     private function moduleDumpDefinition(): array
     {
         static $def;
