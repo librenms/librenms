@@ -31,11 +31,6 @@ class CheckDeviceAvailability
                 // Poller frequency matches ping frequency - fetch ping stats here
                 $ping_response = $this->deviceIsPingable->execute($device);
                 $ping_success = $ping_response->success();
-
-                // Do not keep stats if a device has pings disabled
-                if (! ConnectivityHelper::pingIsAllowed($device)) {
-                    $ping_response = null;
-                }
             } else {
                 // Pings are being done more frequently with an external process - just check for any successful ping
                 $ping_success = $this->fping->alive($device->pollerTarget(), $device->ipFamily());
