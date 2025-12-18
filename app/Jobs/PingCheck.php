@@ -121,7 +121,7 @@ class PingCheck implements ShouldQueue
         // just add any left over
         $ordered_device_list = $ordered_device_list->merge($pending_children);
 
-        return $ordered_device_list->map(fn (Device $device) => $device->overwrite_ip ?: $device->hostname)->all();
+        return $ordered_device_list->map(fn (Device $device) => $device->overwrite_ip ?: ($device->status == 1 ? $device->ip : $device->hostname))->all();
     }
 
     /**
@@ -134,7 +134,7 @@ class PingCheck implements ShouldQueue
         }
 
         $query = Device::canPing()
-            ->select(['devices.device_id', 'hostname', 'overwrite_ip', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken'])
+            ->select(['devices.device_id', 'ip', 'hostname', 'overwrite_ip', 'status', 'status_reason', 'last_ping', 'last_ping_timetaken'])
             ->with([
                 'parents' => function ($q): void {
                     $q->canPing()->select('devices.device_id');
@@ -149,7 +149,7 @@ class PingCheck implements ShouldQueue
             $query->whereIntegerInRaw('poller_group', $this->groups);
         }
 
-        $this->devices = $query->get()->keyBy(fn ($device) => $device->overwrite_ip ?: $device->hostname);
+        $this->devices = $query->get()->keyBy(fn (Device $device) => $device->overwrite_ip ?: ($device->status == 1 ? $device->ip : $device->hostname));
 
         return $this->devices;
     }
