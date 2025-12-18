@@ -24,8 +24,9 @@ class CheckDeviceAvailability
         $ping_response = null;
 
         if (ConnectivityHelper::pingIsAllowed($device)) {
-            // I think this does not cover installs where a separate ping process is not running.  I'm not sure how to test for this if we need to
-            // ConnectivityHelper::pingIsAllowed() already makes sure icmp_check is enabled
+            // This may fail if:
+            //  - Both the dispatcher service and ping crontab are disabled
+            //  - The service_poller_frequency or ping_rrd_step have been changed
             if (LibrenmsConfig::get('service_poller_frequency') == LibrenmsConfig::get('ping_rrd_step')) {
                 // Poller frequency matches ping frequency - fetch ping stats here
                 $ping_response = $this->deviceIsPingable->execute($device);
