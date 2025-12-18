@@ -106,7 +106,7 @@ class Fping
         $process->disableOutput();
         $process->run();
 
-        Log::debug('response: ' . ($process->isSuccessful() ? "success" : "fail"));
+        Log::debug('response: ' . ($process->isSuccessful() ? 'success' : 'fail'));
 
         return $process->isSuccessful();
     }
