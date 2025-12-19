@@ -70,9 +70,11 @@ class Core implements Module
             'sysDescr' => $snmpdata['.1.3.6.1.2.1.1.1.0'] ?? null,
         ]);
 
-        foreach ($device->getDirty() as $attribute => $value) {
-            Eventlog::log($value . ' -> ' . $device->$attribute, $device, 'system', Severity::Notice);
-            $os->getDeviceArray()[$attribute] = $value; // update device array
+        foreach (['sysObjectID', 'sysName', 'sysDescr'] as $attribute) {
+            if ($device->isDirty($attribute)) {
+                Eventlog::log($attribute . ': ' . $device->getOriginal($attribute) . ' -> ' . $device->$attribute, $device, 'system', Severity::Notice);
+                $os->getDeviceArray()[$attribute] = $device->$attribute; // update device array
+            }
         }
 
         // detect OS
