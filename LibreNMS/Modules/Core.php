@@ -29,6 +29,7 @@ namespace LibreNMS\Modules;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
+use App\Observers\DeviceObserver;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
@@ -72,7 +73,8 @@ class Core implements Module
 
         foreach (['sysObjectID', 'sysName', 'sysDescr'] as $attribute) {
             if ($device->isDirty($attribute)) {
-                Eventlog::log($attribute . ': ' . $device->getOriginal($attribute) . ' -> ' . $device->$attribute, $device, 'system', Severity::Notice);
+                $message = DeviceObserver::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute));
+                Eventlog::log($message, $device, 'system', Severity::Notice);
                 $os->getDeviceArray()[$attribute] = $device->$attribute; // update device array
             }
         }
