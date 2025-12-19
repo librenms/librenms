@@ -13,7 +13,7 @@ Location resolution happens as follows
 
 1. If `device['location']` contains `[lat, lng]` (note the square
    brackets), that is used
-1. If there is a location overide for the device in the WebUI and it
+1. If there is a location override for the device in the WebUI and it
    contains `[lat, lng]` (note the square brackets), that is used.
 1. Attempt to resolve lat, lng using `lnms config:set geoloc.engine`
 1. Properly formatted addresses in sysLocation or sysLocation
@@ -53,7 +53,7 @@ Example Settings:
 
 ### Device Overview World Map Settings
 
-If a device has a location with a valid latitude and logitude, the
+If a device has a location with a valid latitude and longitude, the
 device overview page will have a panel showing the device on a world
 map.  The following settings affect this map:
 
