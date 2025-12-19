@@ -1,0 +1,66 @@
+os: apc-cpdu
+text: 'APC cPDU'
+type: power
+icon: apc
+mib_dir: apc-cpdu
+over:
+    - { graph: device_current, text: Current }
+    - { graph: device_voltage, text: Voltage }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.318.1.1.32.1
+
+# turning these off reduces ops and time by half on discovery runs
+poller_modules:
+  # leave 'ports' alone -- perhaps devices might add something one day
+  applications: false
+  bgp-peers: false
+  cipsec-tunnels: false
+  cisco-cef: false
+  cisco-ipsec-flow-monitor: false
+  cisco-mac-accounting: false
+  cisco-otv: false
+  ipmi: false
+  loadbalancers: false
+  mef: false
+  mpls: false
+  ntp: false
+  ospf: false
+  ospfv3: false
+  printer-supplies: false
+  processors: false
+  services: false
+  slas: false
+  stp: false
+  ucd-diskio: false
+  ucd-mib: false
+  vlans: false
+  wireless: false
+  fdb-table: false
+  arp-table: false
+
+discovery_modules:
+  ports-stack: false
+  bgp-peers: false
+  cisco-cef: false
+  cisco-mac-accounting: false
+  cisco-otv: false
+  cisco-pw: false
+  cisco-vrf-lite: false
+  discovery-protocols: false
+  hr-device: false
+  mpls: false
+  ntp: false
+  printer-supplies: false
+  services: false
+  slas: false
+  stp: false
+  ucd-diskio: false
+  vlans: false
+  vminfo: false
+  wireless: false
+  fdb-table: false
+  arp-table: false
+  mempools: false
+  processors: false
+
