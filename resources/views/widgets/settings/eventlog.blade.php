@@ -30,6 +30,14 @@
         </select>
     </div>
     <div class="form-group">
+        <label for="message_filter-{{ $id }}" class="control-label">{{ __('Filer text') }}</label>
+        <input type="text" class="form-control" name="message_filter" id="message_filter-{{ $id }}" placeholder="{{ __('Prefilter Log Messages') }}" value="{{ $message_filter }}">
+    </div>
+    <div class="form-group">
+        <label for="age-{{ $id }}" class="control-label">{{ __('Max age') }}</label>
+        <input type="text" class="form-control" name="age" id="age-{{ $id }}" placeholder="{{ __('24h') }}" value="{{ $age }}">
+    </div>
+    <div class="form-group">
         <label for="hidenavigation-{{ $id }}" class="control-label">{{ __('Hide Navigation') }}</label>
         <input type="checkbox" class="form-control" name="hidenavigation" id="hidenavigation-{{ $id }}" value="{{ $hidenavigation }}" data-size="normal" @if($hidenavigation) checked @endif>
     </div>
