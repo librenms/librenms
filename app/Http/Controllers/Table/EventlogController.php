@@ -81,7 +81,7 @@ class EventlogController extends TableController
                 $query->where('message', 'like', '%' . $request->message . '%');
             })
             ->when($request->age, function ($query) use ($request): void {
-                $query->where('datetime', '>', Carbon::now()->subSeconds( (int) $request->age));
+                $query->where('datetime', '>', Carbon::now()->subSeconds((int) $request->age));
             });
     }
 
