@@ -23,7 +23,6 @@ class StoragesController extends TableController
         ];
     }
 
-
     protected function sortFields($request): array
     {
         return [

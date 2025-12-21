@@ -50,28 +50,32 @@ class SensorController
         ];
 
         $status_bar = [
-            'all' => [ 'text' => __('All'), 'link' => $request->fullUrlWithQuery(['status' => 'all'])],
-            'alert' => [ 'text' => __('Alert') , 'link' => $request->fullUrlWithQuery(['status' => 'alert'])],
-            'error' => [ 'text' => __('Error') , 'link' => $request->fullUrlWithQuery(['status' => 'error'])],
-            'warning' => [ 'text' => __('Warning') , 'link' => $request->fullUrlWithQuery(['status' => 'warning'])],
+            'all' => ['text' => __('All'), 'link' => $request->fullUrlWithQuery(['status' => 'all'])],
+            'alert' => ['text' => __('Alert'), 'link' => $request->fullUrlWithQuery(['status' => 'alert'])],
+            'error' => ['text' => __('Error'), 'link' => $request->fullUrlWithQuery(['status' => 'error'])],
+            'warning' => ['text' => __('Warning'), 'link' => $request->fullUrlWithQuery(['status' => 'warning'])],
         ];
 
-        if($metric == 'all') {
+        if ($metric == 'all') {
             unset($status_bar['all']);
-            if($status == 'all') $status = 'alert';
+            if ($status == 'all') {
+                $status = 'alert';
+            }
         }
 
-        if(in_array($metric, ['all', 'state'])) {
-            $status_bar['unknown'] = [ 'text' => __('Unknown') , 'link' => $request->fullUrlWithQuery(['status' => 'unknown'])];
+        if (in_array($metric, ['all', 'state'])) {
+            $status_bar['unknown'] = ['text' => __('Unknown'), 'link' => $request->fullUrlWithQuery(['status' => 'unknown'])];
         }
 
-        if(in_array($metric ,['mempool', 'processor', 'storage'])) {
+        if (in_array($metric, ['mempool', 'processor', 'storage'])) {
             unset($status_bar['alert']);
             unset($status_bar['error']);
             unset($status_bar['unknown']);
         }
 
-        if(!array_key_exists($status, $status_bar )) $status = array_key_first($status_bar);
+        if (! array_key_exists($status, $status_bar)) {
+            $status = array_key_first($status_bar);
+        }
 
         $title = 'Health :: ' . match ($metric) {
             'dbm' => 'dBm',

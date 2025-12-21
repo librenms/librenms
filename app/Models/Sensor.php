@@ -9,11 +9,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use LibreNMS\Enum\SensorState;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
-use LibreNMS\Enum\SensorState;
 
 class Sensor extends DeviceRelatedModel implements Keyable
 {
@@ -173,7 +173,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
     {
         return $query->whereHas('translations', function ($q) use ($state): void {
             $q->where('state_generic_value', $state)
-                ->whereColumn( 'sensor_current', '=', 'state_value');
+                ->whereColumn('sensor_current', '=', 'state_value');
         });
     }
 
@@ -184,7 +184,7 @@ class Sensor extends DeviceRelatedModel implements Keyable
     public function scopeStateUnknown($query)
     {
         return $query->whereHas('translations', function ($q): void {
-            $q->whereColumn( 'sensor_current', '=', 'state_value')
+            $q->whereColumn('sensor_current', '=', 'state_value')
                 ->where(function ($q): void {
                     $q->where('state_generic_value', '<', SensorState::Ok)
                         ->orWhere('state_generic_value', '>', SensorState::Error);

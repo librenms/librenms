@@ -64,7 +64,6 @@ class MempoolsController extends TableController
         if ($request->get('view') == 'graphs') {
             $query = Device::hasAccess($request->user())->has('mempools')->with('mempools');
         } else {
-
             $query = Mempool::hasAccess($request->user())
                 ->with(['device', 'device.location']);
 
