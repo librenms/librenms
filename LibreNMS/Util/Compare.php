@@ -53,47 +53,27 @@ class Compare
             }
         }
 
-        switch ($comparison) {
-            case '=':
-                return $a == $b;
-            case '!=':
-                return $a != $b;
-            case '==':
-                return $a === $b;
-            case '!==':
-                return $a !== $b;
-            case '>=':
-                return $a >= $b;
-            case '<=':
-                return $a <= $b;
-            case '>':
-                return $a > $b;
-            case '<':
-                return $a < $b;
-            case 'contains':
-                return Str::contains($a, $b);
-            case 'not_contains':
-                return ! Str::contains($a, $b);
-            case 'starts':
-                return Str::startsWith($a, $b);
-            case 'not_starts':
-                return ! Str::startsWith($a, $b);
-            case 'ends':
-                return Str::endsWith($a, $b);
-            case 'not_ends':
-                return ! Str::endsWith($a, $b);
-            case 'regex':
-                return Str::isMatch($b, $a);
-            case 'not_regex':
-                return ! Str::isMatch($b, $a);
-            case 'in_array':
-                return in_array($a, $b);
-            case 'not_in_array':
-                return ! in_array($a, $b);
-            case 'exists':
-                return isset($a) == $b;
-            default:
-                return false;
-        }
+        return match ($comparison) {
+            '=' => $a == $b,
+            '!=' => $a != $b,
+            '==' => $a === $b,
+            '!==' => $a !== $b,
+            '>=' => $a >= $b,
+            '<=' => $a <= $b,
+            '>' => $a > $b,
+            '<' => $a < $b,
+            'contains' => Str::contains($a, $b),
+            'not_contains' => ! Str::contains($a, $b),
+            'starts' => Str::startsWith($a, $b),
+            'not_starts' => ! Str::startsWith($a, $b),
+            'ends' => Str::endsWith($a, $b),
+            'not_ends' => ! Str::endsWith($a, $b),
+            'regex' => Str::isMatch($b, $a),
+            'not_regex' => ! Str::isMatch($b, $a),
+            'in_array' => in_array($a, $b),
+            'not_in_array' => ! in_array($a, $b),
+            'exists' => isset($a) == $b,
+            default => false,
+        };
     }
 }

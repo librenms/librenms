@@ -8,7 +8,7 @@ if ($phasecount > 1) {
     d_echo($oids);
     foreach ($oids as $index => $data) {
         $type = 'apcUPS';
-        $descr = 'Phase ' . substr($index, -1);
+        $descr = 'Phase ' . substr((string) $index, -1);
         $load_oid = '.1.3.6.1.4.1.318.1.1.1.9.3.3.1.10.' . $index;
         $divisor = 1;
         $load = $data['upsPhaseOutputPercentLoad'];

@@ -39,7 +39,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
 if (isset($_POST['device_id'])) {
     if (! is_numeric($_POST['device_id'])) {
         $status = 'error';
-        $message = 'Invalid device id ' . htmlspecialchars($_POST['device_id']);
+        $message = 'Invalid device id ' . htmlspecialchars((string) $_POST['device_id']);
     } else {
         $device = Device::find($_POST['device_id']);
 
@@ -55,7 +55,7 @@ if (isset($_POST['device_id'])) {
             }
             $status = 'ok';
             $message = 'Port state cleared successfully';
-        } catch (Exception $e) {
+        } catch (Exception) {
             $status = 'error';
             $message = 'Clearing port state failed: $e';
         }

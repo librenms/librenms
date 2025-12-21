@@ -5,7 +5,7 @@ modules:
         serial: DEVICE::deviceSerialNumber.0
         version: DEVICE::deviceFirmwareVersion.0
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

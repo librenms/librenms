@@ -1034,9 +1034,21 @@ return [
                 'description' => 'Nome de Usuário',
                 'help' => 'Nome de usuário para conectar ao InfluxDB, se necessário',
             ],
+            'batch_size' => [
+                'description' => 'Batch Size',
+                'help' => 'Number of metrics to send in a single batch, 0 means no batching',
+            ],
+            'measurements' => [
+                'description' => 'Measurements',
+                'help' => 'List of measurements to send to InfluxDB, leave empty to send all',
+            ],
             'verifySSL' => [
                 'description' => 'Verificar SSL',
                 'help' => 'Verificar se o certificado SSL é válido e confiável',
+            ],
+            'debug' => [
+                'description' => 'Debug',
+                'help' => 'To enable or disable verbose output to CLI',
             ],
         ],
         'influxdbv2' => [
@@ -1699,7 +1711,7 @@ return [
                 'help' => 'Método de agendamento de tarefas de descoberta. O modo legado usará cron se a entrada do crontab existir e o serviço de dispatcher se a opção de configuração legada service_discovery_enabled estiver definida como verdadeiro.',
                 'options' => [
                     'legacy' => 'Legado (Irrestrito)',
-                    'cron' => 'Cron (discovery.php)',
+                    'cron' => 'Cron (lnms device:discover)',
                     'dispatcher' => 'Serviço de Dispatcher',
                 ],
             ],

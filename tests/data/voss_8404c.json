@@ -14253,196 +14253,196 @@
                     "vlan_domain": 1,
                     "vlan_name": "Default",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 7,
                     "vlan_domain": 1,
                     "vlan_name": "TEST-Cameras",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 20,
                     "vlan_domain": 1,
                     "vlan_name": "TEST-Micros",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 25,
                     "vlan_domain": 1,
                     "vlan_name": "TEST-EMV",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 50,
                     "vlan_domain": 1,
                     "vlan_name": "TEST-VM-MGMT",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 51,
                     "vlan_domain": 1,
                     "vlan_name": "TEST-Storage",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 52,
                     "vlan_domain": 1,
                     "vlan_name": "Tegile-HA",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 70,
                     "vlan_domain": 1,
                     "vlan_name": "GTB-SonicWall",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 75,
                     "vlan_domain": 1,
                     "vlan_name": "TEST-Phones",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 90,
                     "vlan_domain": 1,
                     "vlan_name": "TEST-ATM",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 101,
                     "vlan_domain": 1,
                     "vlan_name": "TEST-Default",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 170,
                     "vlan_domain": 1,
                     "vlan_name": "WiFi-MGMT",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 171,
                     "vlan_domain": 1,
                     "vlan_name": "TEST-Low-WiFi",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 172,
                     "vlan_domain": 1,
                     "vlan_name": "TEST-Conf-WiFi",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 173,
                     "vlan_domain": 1,
                     "vlan_name": "TEST-Bus-WiFi",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 174,
                     "vlan_domain": 1,
                     "vlan_name": "TEST-Condo-WiFi",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 175,
                     "vlan_domain": 1,
                     "vlan_name": "TEST-Hotel-WiFi",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 176,
                     "vlan_domain": 1,
                     "vlan_name": "TEST-Tower-WiFi",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 177,
                     "vlan_domain": 1,
                     "vlan_name": "TEST-Pandora",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 180,
                     "vlan_domain": 1,
                     "vlan_name": "TEST-Pool-WiFi",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 210,
                     "vlan_domain": 1,
                     "vlan_name": "TEST-MGMT",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 240,
                     "vlan_domain": 1,
                     "vlan_name": "Pub_Untrust",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 256,
                     "vlan_domain": 1,
                     "vlan_name": "TEST-BuildingAuto",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 257,
                     "vlan_domain": 1,
                     "vlan_name": "TEST-TimeClocks",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1104,
                     "vlan_domain": 1,
                     "vlan_name": "Pubinet-TEST-WAN",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4044,
                     "vlan_domain": 1,
                     "vlan_name": "vIST",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4051,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN-4051",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4052,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN-4052",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

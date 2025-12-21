@@ -18,7 +18,7 @@ from datetime import datetime
 from platform import python_version
 from time import sleep
 from socket import gethostname
-from signal import signal, SIGTERM, SIGQUIT, SIGINT, SIGHUP, SIGCHLD
+from signal import signal, SIGTERM, SIGQUIT, SIGINT, SIGHUP, SIGCHLD, SIG_IGN
 from uuid import uuid1
 from os import utime
 
@@ -90,6 +90,7 @@ class ServiceConfig(DBConfig):
 
     redis_host = "localhost"
     redis_port = 6379
+    redis_scheme = "tcp"
     redis_db = 0
     redis_user = None
     redis_pass = None
@@ -220,6 +221,9 @@ class ServiceConfig(DBConfig):
         )
         self.redis_port = int(
             os.getenv("REDIS_PORT", config.get("redis_port", ServiceConfig.redis_port))
+        )
+        self.redis_scheme = os.getenv(
+            "REDIS_SCHEME", config.get("redis_scheme", ServiceConfig.redis_scheme)
         )
         self.redis_socket = os.getenv(
             "REDIS_SOCKET", config.get("redis_socket", ServiceConfig.redis_socket)
@@ -449,17 +453,13 @@ class Service:
         # Speed things up by only looking at direct zombie children
         for p in psutil.Process().children(recursive=False):
             try:
-                cmd = (
-                    p.cmdline()
-                )  # cmdline is uncached, so needs to go here to avoid NoSuchProcess
                 status = p.status()
 
                 if status == psutil.STATUS_ZOMBIE:
                     pid = p.pid
                     r = os.waitpid(p.pid, os.WNOHANG)
                     logger.warning(
-                        'Reaped long running job "%s" in state %s with PID %d - job returned %d',
-                        cmd,
+                        "Reaped long running job in state %s with PID %d - job returned %d",
                         status,
                         r[0],
                         r[1],
@@ -685,7 +685,7 @@ class Service:
 
         self._lm.unlock("schema-update", self.config.unique_name)
 
-        self.restart()
+        self.reload_flag = True
 
     def create_lock_manager(self):
         """
@@ -712,6 +712,7 @@ class Service:
                 sentinel=self.config.redis_sentinel,
                 sentinel_service=self.config.redis_sentinel_service,
                 socket_timeout=self.config.redis_timeout,
+                ssl=(self.config.redis_scheme == "tls"),
             )
         except ImportError:
             if self.config.distributed:
@@ -740,6 +741,9 @@ class Service:
         """
         Stop then recreate this entire process by re-calling the original script.
         Has the effect of reloading the python files from disk.
+
+        This should only ever be called from the main thread and never directly.
+        In all other cases, set `reload_flag` to `True`.
         """
         if sys.version_info < (3, 4, 0):
             logger.warning(
@@ -757,6 +761,8 @@ class Service:
             self._stop_managers()
         self._release_master()
 
+        # Set the SIGCHLD signal handler to ignore so remaining processes don't fail to report in and become zombies
+        signal(SIGCHLD, SIG_IGN)
         python = sys.executable
         sys.stdout.flush()
         os.execl(python, python, *sys.argv)
@@ -879,7 +885,7 @@ class Service:
             self._db.query(
                 "INSERT INTO poller_cluster(node_id, poller_name, poller_version, poller_groups, last_report, master) "
                 'values("{0}", "{1}", "{2}", "{3}", NOW(), {4}) '
-                'ON DUPLICATE KEY UPDATE poller_version="{2}", poller_groups="{3}", last_report=NOW(), master={4}; '.format(
+                'ON DUPLICATE KEY UPDATE poller_version="{2}", last_report=NOW(), master={4}; '.format(
                     self.config.node_id,
                     self.config.name,
                     "librenms-service",
@@ -946,7 +952,7 @@ class Service:
                 ),
                 exc_info=True,
             )
-            self.restart()
+            self.reload_flag = True
         else:
             logger.info("Log file updated {}s ago".format(int(logfile_mdiff)))
 

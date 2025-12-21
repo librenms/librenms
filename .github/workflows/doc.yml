@@ -8,6 +8,7 @@ on:
       - '.github/workflows/doc.yml'
       - 'doc/**'
       - 'mkdocs.yml'
+      - 'resources/definitions/os_detection/**'
   pull_request:
     branches:
       - 'master'
@@ -15,6 +16,7 @@ on:
       - '.github/workflows/doc.yml'
       - 'doc/**'
       - 'mkdocs.yml'
+      - 'resources/definitions/os_detection/**'
 
 permissions:
   contents: read # to fetch code (actions/checkout)
@@ -30,6 +32,7 @@ jobs:
           fetch-depth: 0
           sparse-checkout-cone-mode: false
           sparse-checkout: |
+            /resources/definitions/os_detection
             /doc
             /mkdocs.yml
       -
@@ -39,8 +42,9 @@ jobs:
       -
         name: Build docs
         run: |
-          docker run --rm -v "$(pwd):/docs" mkdocs build --strict
+          docker run --rm -v "$(pwd):/docs" mkdocs build --strict 2>&1 | tee output.log
           sudo chown -R $(id -u):$(id -g) ./out
+          echo "Problems found:" && (grep -F 'no such' output.log && exit 1 || echo "None, Good job :)")
       -
         name: Check GitHub Pages status
         uses: crazy-max/ghaction-github-status@v4

@@ -18,7 +18,7 @@ use PHPUnit\Framework\Attributes\Group;
  * Class LoginTest
  */
 #[Group('browser')]
-class LoginTest extends DuskTestCase
+final class LoginTest extends DuskTestCase
 {
     use DatabaseTruncation;
     protected array $connectionsToTruncate = ['testing', 'testing_persistent'];
@@ -34,7 +34,7 @@ class LoginTest extends DuskTestCase
      */
     public function testUserCanLogin(): void
     {
-        $this->browse(function (Browser $browser) {
+        $this->browse(function (Browser $browser): void {
             $password = 'some_password';
             $user = User::factory()->create([
                 'password' => Hash::make($password),
@@ -60,7 +60,7 @@ class LoginTest extends DuskTestCase
      */
     public function test2faLogin(): void
     {
-        $this->browse(function (Browser $browser) {
+        $this->browse(function (Browser $browser): void {
             $password = 'another_password';
             $user = User::factory()->create([
                 'password' => Hash::make($password),

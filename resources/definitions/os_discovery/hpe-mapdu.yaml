@@ -8,7 +8,7 @@ modules:
             hardware:
                 - CPQPOWER-MIB::deviceModel.0
     sensors:
-        pre_cached:
+        additional_oids:
             data:
                 -
                     oid:

@@ -15,6 +15,11 @@
     "notes": "Device may responds on ICMP but not on SNMP."
   },
   {
+    "builder": {"condition":"AND","rules":[{"id":"devices.mtu_status","field":"devices.mtu_status","type":"integer","input":"text","operator":"equal","value":"0"}],"valid":true},
+    "name": "Device MTU issues",
+    "notes": "Device is online but large packets are failing."
+  },
+  {
     "builder": {"condition":"AND","rules":[{"id":"devices.uptime","field":"devices.uptime","type":"string","input":"text","operator":"less","value":"300"},{"id":"macros.device","field":"macros.device","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
     "name": "Device rebooted",
     "extra": "{\"count\": 1}",
@@ -984,5 +989,25 @@
     "name": "ZFS: pool with errors present",
     "severity": "critical",
     "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"zfs"},{"id":"application_metrics.metric like \"pool_%_%_errors\"","field":"application_metrics.metric like \"pool_%_%_errors\"","type":null,"input":"text","operator":"equal","value":"1"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"0"}],"valid":true}
+  },
+  {
+    "name": "I2PD: application failed",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"applications.app_type","field":"applications.app_type","type":"string","input":"text","operator":"equal","value":"i2pd"},{"id":"applications.app_state","field":"applications.app_state","type":"string","input":"text","operator":"not_equal","value":"OK"}],"valid":true}
+  },
+  {
+    "name": "I2PD: network status degraded",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"net_status"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater","value":"1"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"less","value":"8"}],"valid":true}
+  },
+  {
+    "name": "I2PD: network status critical",
+    "severity": "critical",
+    "builder": {"condition":"AND","rules":[{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"net_status"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"greater_or_equal","value":"8"}],"valid":true}
+  },
+  {
+    "name": "I2PD: tunnels not establishing",
+    "severity": "warning",
+    "builder": {"condition":"AND","rules":[{"id":"application_metrics.metric","field":"application_metrics.metric","type":"string","input":"text","operator":"equal","value":"tunnels_successrate"},{"id":"application_metrics.value","field":"application_metrics.value","type":"string","input":"text","operator":"less_or_equal","value":"10"}],"valid":true}
   }
 ]

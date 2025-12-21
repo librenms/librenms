@@ -50,9 +50,9 @@ foreach ($protocolSegments as $protocolSegment) {
     // Loop through all BGP protocols
     foreach ($protocolBodys as $protocolBody) {
         // Deal with the BGP block
-        if (strpos($protocolBody, 'GP') === 0) {
+        if (str_starts_with($protocolBody, 'GP')) {
             foreach (explode("\n", 'B' . $protocolBody) as $protocolBodyLine) {
-                if (strpos($protocolBodyLine, ':') !== false) {
+                if (str_contains($protocolBodyLine, ':')) {
                     $lineParts = explode(':', $protocolBodyLine, 2);
                     $protocolData[str_replace(' ', '_', strtolower(trim($lineParts[0])))] = trim($lineParts[1]);
                 }
@@ -71,9 +71,9 @@ foreach ($protocolSegments as $protocolSegment) {
             $IpVersion = 6;
         }
 
-        if (strpos($protocolBody, 'hannel ipv' . $IpVersion) === 0) {
+        if (str_starts_with($protocolBody, 'hannel ipv' . $IpVersion)) {
             foreach (explode("\n", 'C' . $protocolBody) as $protocolBodyLine) {
-                if (strpos($protocolBodyLine, ':') !== false) {
+                if (str_contains($protocolBodyLine, ':')) {
                     $lineParts = explode(':', $protocolBodyLine, 2);
                     $protocolData[str_replace(' ', '_', strtolower(trim($lineParts[0])))] = trim($lineParts[1]);
                 }
@@ -148,8 +148,8 @@ foreach ($protocolsData as $protocol) {
     $bgpPeer->astext = \LibreNMS\Util\AutonomousSystem::get($protocol['neighbor_as'])->name();
     $bgpPeer->bgpPeerIdentifier = $protocol['neighbor_id'] ?: '0.0.0.0';
     $bgpPeer->bgpPeerRemoteAs = $protocol['neighbor_as'];
-    $bgpPeer->bgpPeerState = strtolower($protocol['bgp_state']);
-    $bgpPeer->bgpPeerAdminStatus = str_replace('up', 'start', strtolower($protocol['protocol_state']));
+    $bgpPeer->bgpPeerState = strtolower((string) $protocol['bgp_state']);
+    $bgpPeer->bgpPeerAdminStatus = str_replace('up', 'start', strtolower((string) $protocol['protocol_state']));
 
     if (isset($protocolData['last_error'])) {
         // Find the subcode if its there and set it

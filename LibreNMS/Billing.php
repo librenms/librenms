@@ -150,7 +150,7 @@ class Billing
         $q_95_sql = 'SELECT (in_delta / period * 8) AS rate FROM bill_data  WHERE bill_id = ?';
         $q_95_sql .= ' AND timestamp > ? AND timestamp <= ? ORDER BY rate ASC';
         $a_95th = dbFetchColumn($q_95_sql, [$bill_id, $datefrom, $dateto]);
-        $m_95th = $a_95th[$measurement_95th];
+        $m_95th = $a_95th[$measurement_95th] ?? 0;
 
         return round($m_95th, 2);
     }
@@ -165,7 +165,7 @@ class Billing
         $q_95_sql = 'SELECT (out_delta / period * 8) AS rate FROM bill_data  WHERE bill_id = ?';
         $q_95_sql .= ' AND timestamp > ? AND timestamp <= ? ORDER BY rate ASC';
         $a_95th = dbFetchColumn($q_95_sql, [$bill_id, $datefrom, $dateto]);
-        $m_95th = $a_95th[$measurement_95th];
+        $m_95th = $a_95th[$measurement_95th] ?? 0;
 
         return round($m_95th, 2);
     }
@@ -354,8 +354,8 @@ class Billing
         $allowed_val = null;
 
         foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY `bill_datefrom` DESC LIMIT 12', [$bill_id]) as $data) {
-            $datefrom = date('Y-m-d', strtotime($data['bill_datefrom']));
-            $dateto = date('Y-m-d', strtotime($data['bill_dateto']));
+            $datefrom = date('Y-m-d', strtotime((string) $data['bill_datefrom']));
+            $dateto = date('Y-m-d', strtotime((string) $data['bill_dateto']));
             $datelabel = $datefrom . ' - ' . $dateto;
 
             array_push($ticklabels, $datelabel);
@@ -423,9 +423,9 @@ class Billing
         if ($imgtype == 'day') {
             foreach (dbFetchRows('SELECT DISTINCT UNIX_TIMESTAMP(timestamp) as timestamp, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out FROM bill_data WHERE `bill_id` = ? AND `timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?) GROUP BY DATE(timestamp) ORDER BY timestamp ASC', [$bill_id, $from, $to]) as $data) {
                 array_push($ticklabels, date('Y-m-d', $data['timestamp']));
-                array_push($in_data, isset($data['traf_in']) ? $data['traf_in'] : 0);
-                array_push($out_data, isset($data['traf_out']) ? $data['traf_out'] : 0);
-                array_push($tot_data, isset($data['traf_total']) ? $data['traf_total'] : 0);
+                array_push($in_data, $data['traf_in'] ?? 0);
+                array_push($out_data, $data['traf_out'] ?? 0);
+                array_push($tot_data, $data['traf_total'] ?? 0);
                 $average += $data['traf_total'];
             }
 
@@ -442,9 +442,9 @@ class Billing
         } elseif ($imgtype == 'hour') {
             foreach (dbFetchRows('SELECT DISTINCT HOUR(timestamp) as hour, SUM(delta) as traf_total, SUM(in_delta) as traf_in, SUM(out_delta) as traf_out FROM bill_data WHERE `bill_id` = ? AND `timestamp` >= FROM_UNIXTIME(?) AND `timestamp` <= FROM_UNIXTIME(?) GROUP BY HOUR(timestamp) ORDER BY HOUR(timestamp) ASC', [$bill_id, $from, $to]) as $data) {
                 array_push($ticklabels, sprintf('%02d', $data['hour']) . ':00');
-                array_push($in_data, isset($data['traf_in']) ? $data['traf_in'] : 0);
-                array_push($out_data, isset($data['traf_out']) ? $data['traf_out'] : 0);
-                array_push($tot_data, isset($data['traf_total']) ? $data['traf_total'] : 0);
+                array_push($in_data, $data['traf_in'] ?? 0);
+                array_push($out_data, $data['traf_out'] ?? 0);
+                array_push($tot_data, $data['traf_total'] ?? 0);
                 $average += $data['traf_total'];
             }
 

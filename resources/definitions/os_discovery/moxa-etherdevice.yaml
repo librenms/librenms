@@ -53,7 +53,7 @@ modules:
             - MOXA-EDSP506E-MIB::serialNumber.0
             - MOXA-EDSG512E8POE-MIB::serialNumber
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

@@ -13,7 +13,7 @@ if (! $graph_type) {
 echo '<table cellspacing="0" cellpadding="5" border="0">';
 
 foreach (dbFetchRows('SELECT * FROM juniAtmVp WHERE port_id = ?', [$interface['port_id']]) as $vp) {
-    if (is_integer($row / 2)) {
+    if (is_int($row / 2)) {
         $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
     } else {
         $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
@@ -39,7 +39,7 @@ foreach (dbFetchRows('SELECT * FROM juniAtmVp WHERE port_id = ?', [$interface['p
     echo '<tr bgcolor="' . $row_colour . '"><td>';
 
     foreach ($periods as $period) {
-        $graph_array['from'] = $$period;
+        $graph_array['from'] = ${$period};
         $graph_array_zoom = $graph_array;
         $graph_array_zoom['height'] = '150';
         $graph_array_zoom['width'] = '400';

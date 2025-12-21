@@ -219,6 +219,7 @@ class QueueManager:
                 sentinel=self.config.redis_sentinel,
                 sentinel_service=self.config.redis_sentinel_service,
                 socket_timeout=self.config.redis_timeout,
+                ssl=(self.config.redis_scheme == "tls"),
             )
 
         except ImportError:
@@ -362,11 +363,11 @@ class BillingQueueManager(TimedQueueManager):
     def do_work(self, run_type, group):
         if run_type == "poll":
             logger.info("Polling billing")
-            args = ("-d", "-f") if self.config.debug else ("-f")
+            args = ("-d", "-f") if self.config.debug else ("-f",)
             exit_code, output = LibreNMS.call_script("poll-billing.php", args)
         else:  # run_type == 'calculate'
             logger.info("Calculating billing")
-            args = ("-d", "-f") if self.config.debug else ("-f")
+            args = ("-d", "-f") if self.config.debug else ("-f",)
             exit_code, output = LibreNMS.call_script("billing-calculate.php", args)
 
         if exit_code != 0:
@@ -407,8 +408,12 @@ class PingQueueManager(TimedQueueManager):
             try:
                 logger.info("Running fast ping")
 
-                args = ("-d", "-g", group) if self.config.debug else ("-g", group)
-                exit_code, output = LibreNMS.call_script("ping.php", args)
+                args = (
+                    ("device:ping", "fast", "-vv", "-g", group)
+                    if self.config.debug
+                    else ("device:ping", "fast", "-q", "-g", group)
+                )
+                exit_code, output = LibreNMS.call_script("lnms", args)
 
                 if self.config.log_output:
                     with open(

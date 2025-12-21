@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -11,9 +9,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('hrDevice', function (Blueprint $table) {
-            $table->string('hrDeviceType', 32)->default('')->change();
-        });
     }
 
     /**
@@ -21,8 +16,5 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('hrDevice', function (Blueprint $table) {
-            $table->text('hrDeviceType')->change();
-        });
     }
 };

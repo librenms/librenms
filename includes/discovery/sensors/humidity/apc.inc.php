@@ -6,7 +6,7 @@ $apc_env_data = snmpwalk_cache_oid($device, 'uioSensor', [], 'PowerNet-MIB', nul
 if ($apc_env_data) {
     // NMC2/NMC3/etc Universal Input Output
     foreach (array_keys($apc_env_data) as $index) {
-        $current = isset($apc_env_data[$index]['uioSensorStatusHumidity']) ? $apc_env_data[$index]['uioSensorStatusHumidity'] : 0;
+        $current = $apc_env_data[$index]['uioSensorStatusHumidity'] ?? 0;
         if ($current > 0) {
             // Humidity <= 0 -> Sensor not available
             $descr = $apc_env_data[$index]['uioSensorConfigSensorName'];
@@ -23,7 +23,7 @@ if ($apc_env_data) {
             // future appearing sub-index will remain untouched, so 1.2 will stay 1.2, 2.2 will stay 2.2, etc.
             // The reason that we remove the sub-index from the first entry is to preserve compatibility with sensors
             // created by prior versions using the legacy iemConfig and iemStatus tables.
-            $split_index = explode('.', $index);
+            $split_index = explode('.', (string) $index);
             if (count($split_index) == 2 && $split_index[1] == 1) {
                 $index = $split_index[0];
             }

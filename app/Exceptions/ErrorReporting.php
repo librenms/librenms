@@ -38,6 +38,8 @@ use Throwable;
 
 class ErrorReporting
 {
+    private const MAX_PROD_ERRORS = 4;
+    private int $errorCount = 0;
     private ?bool $reportingEnabled = null;
     protected array $upgradable = [
         \LibreNMS\Exceptions\FilePermissionsException::class,
@@ -54,18 +56,16 @@ class ErrorReporting
 
         $exceptions->dontReportDuplicates();
         $exceptions->throttle(fn (Throwable $e) => Limit::perMinute(LibrenmsConfig::get('reporting.throttle', 30)));
-        $exceptions->reportable([$this, 'reportable']);
-        $exceptions->report([$this, 'report']);
-        $exceptions->render([$this, 'render']);
+        $exceptions->reportable($this->reportable(...));
+        $exceptions->report($this->report(...));
+        $exceptions->render($this->render(...));
 
-        Flare::determineVersionUsing(function () {
-            return \LibreNMS\Util\Version::VERSION;
-        });
+        Flare::determineVersionUsing(fn () => \LibreNMS\Util\Version::VERSION);
     }
 
     public function reportable(Throwable $e): bool
     {
-        \Log::critical('%RException: ' . get_class($e) . ' ' . $e->getMessage() . '%n @ %G' . $e->getFile() . ':' . $e->getLine() . '%n' . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
+        \Log::critical('%RException: ' . $e::class . ' ' . $e->getMessage() . '%n @ %G' . $e->getFile() . ':' . $e->getLine() . '%n' . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
 
         return false; // false = block default log message
     }
@@ -159,7 +159,7 @@ class ErrorReporting
     {
         // throw exceptions and deprecations in testing and non-prod when APP_DEBUG is set.
         if ($environment == 'testing' || ($environment !== 'production' && config('app.debug'))) {
-            app()->booted(function () {
+            app()->booted(function (): void {
                 config([
                     'logging.deprecations.channel' => 'deprecations_channel',
                     'logging.deprecations.trace' => true,
@@ -172,14 +172,19 @@ class ErrorReporting
         // in production, don't halt execution on non-fatal errors
         set_error_handler(function ($severity, $message, $file, $line) {
             // If file is from a package, find the first non-vendor frame
-            if (str_contains($file, '/vendor/')) {
+            if (self::isUndesirableTracePath($file)) {
                 // add vendor file to message
                 $message .= ' from ' . strstr($file, 'vendor') . ':' . $line;
                 [$file, $line] = self::findFirstNonVendorFrame();
             }
 
             if ((error_reporting() & $severity) !== 0) { // this check primarily allows @ to suppress errors
-                error_log("\e[31mPHP Error($severity)\e[0m: $message in $file:$line");
+                if ($this->errorCount++ < self::MAX_PROD_ERRORS) {
+                    // limit reported errors so php-fpm headers don't get too large
+                    $max_errors = $this->errorCount == self::MAX_PROD_ERRORS ? ' (max reported errors reached)' : '';
+
+                    error_log("\e[31mPHP Error($severity)\e[0m: $message in $file:$line$max_errors");
+                }
             }
 
             // For notices and warnings, prevent conversion to exceptions
@@ -195,7 +200,7 @@ class ErrorReporting
     {
         foreach (debug_backtrace() as $trace) {
             // not vendor frames
-            if (isset($trace['file']) && str_contains($trace['file'], '/vendor/')) {
+            if (isset($trace['file']) && self::isUndesirableTracePath($trace['file'])) {
                 continue;
             }
             // not this class
@@ -207,5 +212,13 @@ class ErrorReporting
         }
 
         return ['', ''];
+    }
+
+    private static function isUndesirableTracePath(string $path): bool
+    {
+        return Str::contains($path, [
+            '/vendor/',
+            '/storage/framework/views/',
+        ]);
     }
 }

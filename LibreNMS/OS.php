@@ -41,6 +41,8 @@ use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\StorageDiscovery;
 use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
 use LibreNMS\Interfaces\Discovery\StpPortDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\Interfaces\Polling\Netstats\IcmpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpForwardNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpNetstatsPolling;
@@ -54,6 +56,7 @@ use LibreNMS\OS\Traits\BridgeMib;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\OS\Traits\HostResources;
 use LibreNMS\OS\Traits\NetstatsPolling;
+use LibreNMS\OS\Traits\QBridgeMib;
 use LibreNMS\OS\Traits\UcdResources;
 use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
@@ -75,7 +78,9 @@ class OS implements
     StpInstancePolling,
     StpPortPolling,
     TcpNetstatsPolling,
-    UdpNetstatsPolling
+    UdpNetstatsPolling,
+    VlanDiscovery,
+    VlanPortDiscovery
 {
     use HostResources {
         HostResources::discoverProcessors as discoverHrProcessors;
@@ -93,6 +98,7 @@ class OS implements
     use NetstatsPolling;
     use BridgeMib;
     use EntityMib;
+    use QBridgeMib;
 
     /**
      * @var float|null
@@ -165,9 +171,7 @@ class OS implements
         }
 
         // create missing graphs
-        $device->graphs()->saveMany($graphs->diff($device->graphs->pluck('graph'))->map(function ($graph) {
-            return new DeviceGraph(['graph' => $graph]);
-        }));
+        $device->graphs()->saveMany($graphs->diff($device->graphs->pluck('graph'))->map(fn ($graph) => new DeviceGraph(['graph' => $graph])));
     }
 
     public function preCache()
@@ -199,7 +203,7 @@ class OS implements
 
         if (! isset($this->cache['cache_oid'][$oid])) {
             $data = snmpwalk_cache_oid($this->getDeviceArray(), $oid, [], $mib, null, $snmpflags);
-            $this->cache['cache_oid'][$oid] = array_map('current', $data);
+            $this->cache['cache_oid'][$oid] = array_map(current(...), $data);
         }
 
         return $this->cache['cache_oid'][$oid];
@@ -287,7 +291,7 @@ class OS implements
         $name = $rf->getShortName();
         preg_match_all('/[A-Z][a-z]*/', $name, $segments);
 
-        return implode('-', array_map('strtolower', $segments[0]));
+        return implode('-', array_map(strtolower(...), $segments[0]));
     }
 
     /**
@@ -312,13 +316,15 @@ class OS implements
 
         $data = [];
         foreach ($oids as $id => $oid) {
-            if (isset($callback)) {
-                $channel = call_user_func($callback, $snmp_data[$oid]);
-            } else {
-                $channel = $snmp_data[$oid];
-            }
+            if (isset($snmp_data[$oid])) {
+                if (isset($callback)) {
+                    $channel = call_user_func($callback, $snmp_data[$oid]);
+                } else {
+                    $channel = $snmp_data[$oid];
+                }
 
-            $data[$id] = WirelessSensor::channelToFrequency($channel);
+                $data[$id] = WirelessSensor::channelToFrequency($channel);
+            }
         }
 
         return $data;
@@ -391,5 +397,31 @@ class OS implements
     public function hasYamlDiscovery(?string $module = null): bool
     {
         return $module ? isset($this->getDiscovery()['modules'][$module]) : ! empty($this->getDiscovery());
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function discoverVlans(): Collection
+    {
+        $vlans = $this->discoverIetfQBridgeMibVlans();
+        if ($vlans->isNotEmpty()) {
+            return $vlans;
+        }
+
+        return $this->discoverIeeeQBridgeMibVlans();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function discoverVlanPorts(Collection $vlans): Collection
+    {
+        $vlans = $this->discoverIetfQBridgeMibPorts();
+        if ($vlans->isNotEmpty()) {
+            return $vlans;
+        }
+
+        return $this->discoverIeeeQBridgeMibPorts();
     }
 }

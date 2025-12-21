@@ -2720,6 +2720,7 @@ ciscoC9300X12Y                       OBJECT IDENTIFIER ::= { ciscoProducts 3037 
 ciscoC9300X24Y                       OBJECT IDENTIFIER ::= { ciscoProducts 3038 } -- Catalyst 9300X Pacman 24 ports Catalyst 9300X switch 
 ciscoC9300X48HX                      OBJECT IDENTIFIER ::= { ciscoProducts 3039 } -- Catalyst 9300X 48 ports mGig with 90W POE Catalyst 9300X switch
 ciscoC9300X48TX                      OBJECT IDENTIFIER ::= { ciscoProducts 3040 } -- Catalyst 9300X 48 ports mGig 9300X switch
+ciscoFpr4245SM79                    OBJECT IDENTIFIER ::= { ciscoProducts 3041 } -- Cisco Secure Firewall 4245 Threat Defense Module 79
 ciscoISR1100X4G                     OBJECT IDENTIFIER ::= { ciscoProducts 3045 } -- Cisco ISR1100X-4G ( 4xGE, Flexible Core, 8G FLASH, 8G DRAM)
 ciscoISR1100X6G                     OBJECT IDENTIFIER ::= { ciscoProducts 3046 } -- Cisco ISR1100X-6G ( 4xGE, 2xSFP, Flexible Core, 8G FLASH, 8G DRAM)
 ciscoESS930010XE                    OBJECT IDENTIFIER ::= { ciscoProducts 3047 } -- Catalyst ESS9300 Embedded Series switch - 10p 10G, NE

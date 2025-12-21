@@ -34,84 +34,84 @@ use LibreNMS\RRD\RrdDefinition;
 // CISCO-IPSEC-FLOW-MONITOR-MIB::cipSecGlobalNoSaFails.0 = Counter32: 5 Failures
 // CISCO-IPSEC-FLOW-MONITOR-MIB::cipSecGlobalSysCapFails.0 = Counter32: 0 Failures
 if ($device['os_group'] == 'cisco') {
-    $data = snmpwalk_cache_oid($device, 'cipSecGlobalStats', null, 'CISCO-IPSEC-FLOW-MONITOR-MIB');
-    $data = $data[0];
+    if ($data = snmpwalk_cache_oid($device, 'cipSecGlobalStats', null, 'CISCO-IPSEC-FLOW-MONITOR-MIB')) {
+        $data = $data[0];
 
-    // Use HC Counters if they exist
-    if (is_numeric($data['cipSecGlobalHcInOctets'])) {
-        $data['cipSecGlobalInOctets'] = $data['cipSecGlobalHcInOctets'];
+        // Use HC Counters if they exist
+        if (is_numeric($data['cipSecGlobalHcInOctets'])) {
+            $data['cipSecGlobalInOctets'] = $data['cipSecGlobalHcInOctets'];
+        }
+
+        if (is_numeric($data['cipSecGlobalHcOutOctets'])) {
+            $data['cipSecGlobalOutOctets'] = $data['cipSecGlobalHcOutOctets'];
+        }
+
+        if (is_numeric($data['cipSecGlobalHcInDecompOctets'])) {
+            $data['cipSecGlobalInDecompOctets'] = $data['cipSecGlobalHcInDecompOctets'];
+        }
+
+        if (is_numeric($data['cipSecGlobalHcOutUncompOctets'])) {
+            $data['cipSecGlobalOutUncompOctets'] = $data['cipSecGlobalHcOutUncompOctets'];
+        }
+
+        if ($data['cipSecGlobalActiveTunnels']) {
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('Tunnels', 'GAUGE', 0)
+                ->addDataset('InOctets', 'COUNTER', 0, 100000000000)
+                ->addDataset('OutOctets', 'COUNTER', 0, 100000000000)
+                ->addDataset('InDecompOctets', 'COUNTER', 0, 100000000000)
+                ->addDataset('OutUncompOctets', 'COUNTER', 0, 100000000000)
+                ->addDataset('InPkts', 'COUNTER', 0, 100000000000)
+                ->addDataset('OutPkts', 'COUNTER', 0, 100000000000)
+                ->addDataset('InDrops', 'COUNTER', 0, 100000000000)
+                ->addDataset('InReplayDrops', 'COUNTER', 0, 100000000000)
+                ->addDataset('OutDrops', 'COUNTER', 0, 100000000000)
+                ->addDataset('InAuths', 'COUNTER', 0, 100000000000)
+                ->addDataset('OutAuths', 'COUNTER', 0, 100000000000)
+                ->addDataset('InAuthFails', 'COUNTER', 0, 100000000000)
+                ->addDataset('OutAuthFails', 'COUNTER', 0, 100000000000)
+                ->addDataset('InDencrypts', 'COUNTER', 0, 100000000000)
+                ->addDataset('OutEncrypts', 'COUNTER', 0, 100000000000)
+                ->addDataset('InDecryptFails', 'COUNTER', 0, 100000000000)
+                ->addDataset('OutEncryptFails', 'COUNTER', 0, 100000000000)
+                ->addDataset('ProtocolUseFails', 'COUNTER', 0, 100000000000)
+                ->addDataset('NoSaFails', 'COUNTER', 0, 100000000000)
+                ->addDataset('SysCapFails', 'COUNTER', 0, 100000000000);
+
+            $fields = [
+                'Tunnels' => $data['cipSecGlobalActiveTunnels'],
+                'InOctets' => $data['cipSecGlobalInOctets'],
+                'OutOctets' => $data['cipSecGlobalOutOctets'],
+                'InDecompOctets' => $data['cipSecGlobalInDecompOctets'],
+                'OutUncompOctets' => $data['cipSecGlobalOutUncompOctets'],
+                'InPkts' => $data['cipSecGlobalInPkts'],
+                'OutPkts' => $data['cipSecGlobalOutPkts'],
+                'InDrops' => $data['cipSecGlobalInDrops'],
+                'InReplayDrops' => $data['cipSecGlobalInReplayDrops'],
+                'OutDrops' => $data['cipSecGlobalOutDrops'],
+                'InAuths' => $data['cipSecGlobalInAuths'],
+                'OutAuths' => $data['cipSecGlobalOutAuths'],
+                'InAuthFails' => $data['cipSecGlobalInAuthFails'],
+                'OutAuthFails' => $data['cipSecGlobalOutAuthFails'],
+                'InDencrypts' => $data['cipSecGlobalInDecrypts'],
+                'OutEncrypts' => $data['cipSecGlobalOutEncrypts'],
+                'InDecryptFails' => $data['cipSecGlobalInDecryptFails'],
+                'OutEncryptFails' => $data['cipSecGlobalOutEncryptFails'],
+                'ProtocolUseFails' => $data['cipSecGlobalProtocolUseFails'],
+                'NoSaFails' => $data['cipSecGlobalNoSaFails'],
+                'SysCapFails' => $data['cipSecGlobalSysCapFails'],
+            ];
+
+            $tags = ['rrd_def' => $rrd_def];
+            app('Datastore')->put($device, 'cipsec_flow', $tags, $fields);
+
+            $os->enableGraph('cipsec_flow_tunnels');
+            $os->enableGraph('cipsec_flow_pkts');
+            $os->enableGraph('cipsec_flow_bits');
+            $os->enableGraph('cipsec_flow_stats');
+
+            echo ' cipsec_flow';
+        }//end if
     }
-
-    if (is_numeric($data['cipSecGlobalHcOutOctets'])) {
-        $data['cipSecGlobalOutOctets'] = $data['cipSecGlobalHcOutOctets'];
-    }
-
-    if (is_numeric($data['cipSecGlobalHcInDecompOctets'])) {
-        $data['cipSecGlobalInDecompOctets'] = $data['cipSecGlobalHcInDecompOctets'];
-    }
-
-    if (is_numeric($data['cipSecGlobalHcOutUncompOctets'])) {
-        $data['cipSecGlobalOutUncompOctets'] = $data['cipSecGlobalHcOutUncompOctets'];
-    }
-
-    if ($data['cipSecGlobalActiveTunnels']) {
-        $rrd_def = RrdDefinition::make()
-            ->addDataset('Tunnels', 'GAUGE', 0)
-            ->addDataset('InOctets', 'COUNTER', 0, 100000000000)
-            ->addDataset('OutOctets', 'COUNTER', 0, 100000000000)
-            ->addDataset('InDecompOctets', 'COUNTER', 0, 100000000000)
-            ->addDataset('OutUncompOctets', 'COUNTER', 0, 100000000000)
-            ->addDataset('InPkts', 'COUNTER', 0, 100000000000)
-            ->addDataset('OutPkts', 'COUNTER', 0, 100000000000)
-            ->addDataset('InDrops', 'COUNTER', 0, 100000000000)
-            ->addDataset('InReplayDrops', 'COUNTER', 0, 100000000000)
-            ->addDataset('OutDrops', 'COUNTER', 0, 100000000000)
-            ->addDataset('InAuths', 'COUNTER', 0, 100000000000)
-            ->addDataset('OutAuths', 'COUNTER', 0, 100000000000)
-            ->addDataset('InAuthFails', 'COUNTER', 0, 100000000000)
-            ->addDataset('OutAuthFails', 'COUNTER', 0, 100000000000)
-            ->addDataset('InDencrypts', 'COUNTER', 0, 100000000000)
-            ->addDataset('OutEncrypts', 'COUNTER', 0, 100000000000)
-            ->addDataset('InDecryptFails', 'COUNTER', 0, 100000000000)
-            ->addDataset('OutEncryptFails', 'COUNTER', 0, 100000000000)
-            ->addDataset('ProtocolUseFails', 'COUNTER', 0, 100000000000)
-            ->addDataset('NoSaFails', 'COUNTER', 0, 100000000000)
-            ->addDataset('SysCapFails', 'COUNTER', 0, 100000000000);
-
-        $fields = [
-            'Tunnels' => $data['cipSecGlobalActiveTunnels'],
-            'InOctets' => $data['cipSecGlobalInOctets'],
-            'OutOctets' => $data['cipSecGlobalOutOctets'],
-            'InDecompOctets' => $data['cipSecGlobalInDecompOctets'],
-            'OutUncompOctets' => $data['cipSecGlobalOutUncompOctets'],
-            'InPkts' => $data['cipSecGlobalInPkts'],
-            'OutPkts' => $data['cipSecGlobalOutPkts'],
-            'InDrops' => $data['cipSecGlobalInDrops'],
-            'InReplayDrops' => $data['cipSecGlobalInReplayDrops'],
-            'OutDrops' => $data['cipSecGlobalOutDrops'],
-            'InAuths' => $data['cipSecGlobalInAuths'],
-            'OutAuths' => $data['cipSecGlobalOutAuths'],
-            'InAuthFails' => $data['cipSecGlobalInAuthFails'],
-            'OutAuthFails' => $data['cipSecGlobalOutAuthFails'],
-            'InDencrypts' => $data['cipSecGlobalInDecrypts'],
-            'OutEncrypts' => $data['cipSecGlobalOutEncrypts'],
-            'InDecryptFails' => $data['cipSecGlobalInDecryptFails'],
-            'OutEncryptFails' => $data['cipSecGlobalOutEncryptFails'],
-            'ProtocolUseFails' => $data['cipSecGlobalProtocolUseFails'],
-            'NoSaFails' => $data['cipSecGlobalNoSaFails'],
-            'SysCapFails' => $data['cipSecGlobalSysCapFails'],
-        ];
-
-        $tags = ['rrd_def' => $rrd_def];
-        app('Datastore')->put($device, 'cipsec_flow', $tags, $fields);
-
-        $os->enableGraph('cipsec_flow_tunnels');
-        $os->enableGraph('cipsec_flow_pkts');
-        $os->enableGraph('cipsec_flow_bits');
-        $os->enableGraph('cipsec_flow_stats');
-
-        echo ' cipsec_flow';
-    }//end if
-
     unset($data, $rrd_def);
 }//end if

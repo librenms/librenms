@@ -1,0 +1,253 @@
+modules:
+  os:
+    hardware: ARHANGELSK-GLOBAL-REG::modelname.0
+    version: ARHANGELSK-GLOBAL-REG::controllerswversion.0
+
+  sensors:
+    voltage:
+      data:
+        - oid: ARHANGELSK-GLOBAL-REG::systemvoltage
+          num_oid: '.1.3.6.1.4.1.40865.1.6.{{ $index }}'
+          divisor: 1000
+          index: 'systemvoltage.{{ $index }}'
+          descr: 'System Voltage'
+
+        - oid: ARHANGELSK-GLOBAL-REG::acvoltage
+          num_oid: '.1.3.6.1.4.1.40865.1.8.{{ $index }}'
+          divisor: 1000
+          index: 'acvoltage.{{ $index }}'
+          descr: 'AC Input Voltage'
+
+        - oid: ARHANGELSK-GLOBAL-REG::rectoutputvoltage
+          num_oid: '.1.3.6.1.4.1.40865.1.6.{{ $index }}'
+          divisor: 1000
+          index: 'rectoutputvoltage.{{ $index }}'
+          descr: 'Rectifier Output Voltage'
+
+        - oid: ARHANGELSK-GLOBAL-REG::rectinputvoltage
+          num_oid: '.1.3.6.1.4.1.40865.1.8.{{ $index }}'
+          divisor: 1000
+          index: 'rectinputvoltage.{{ $index }}'
+          descr: 'Rectifier AC Input Voltage'
+
+    current:
+      data:
+        - oid: ARHANGELSK-GLOBAL-REG::systemcurrent
+          num_oid: '.1.3.6.1.4.1.40865.1.7.{{ $index }}'
+          divisor: 1000
+          index: 'systemcurrent.{{ $index }}'
+          descr: 'System Current'
+
+        - oid: ARHANGELSK-GLOBAL-REG::batterycurrent
+          num_oid: '.1.3.6.1.4.1.40865.1.11.{{ $index }}'
+          index: 'batterycurrent.{{ $index }}'
+          descr: 'Battery Current'
+
+        - oid: ARHANGELSK-GLOBAL-REG::rectoutputcurrent
+          num_oid: '.1.3.6.1.4.1.40865.1.17.{{ $index }}'
+          divisor: 1000
+          index: 'rectoutputcurrent.{{ $index }}'
+          descr: 'Rectifier Output Current'
+
+    state:
+      data:
+        - oid: ARHANGELSK-GLOBAL-REG::systemstatus
+          num_oid: '.1.3.6.1.4.1.40865.1.5.{{ $index }}'
+          descr: 'System Status'
+          index: 'systemstatus.{{ $index }}'
+          state_name: ARHANGELSK-GLOBAL-REG::systemstatus
+          states:
+            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
+            - { descr: normal,  graph: 1, value: 1,  generic: 0 }
+            - { descr: minor,   graph: 1, value: 2,  generic: 1 }
+            - { descr: major,   graph: 1, value: 3,  generic: 2 }
+
+        - oid: ARHANGELSK-GLOBAL-REG::batterymode
+          num_oid: '.1.3.6.1.4.1.40865.1.13.{{ $index }}'
+          descr: 'Battery State'
+          index: 'batterymode.{{ $index }}'
+          state_name: ARHANGELSK-GLOBAL-REG::batterymode
+          states:
+            - { descr: floatcharge,     graph: 1, value: 0,  generic: 0 }
+            - { descr: floatcharge,     graph: 1, value: 1,  generic: 0 }
+            - { descr: equalizecharge,  graph: 1, value: 2,  generic: 0 }
+
+        - oid: ARHANGELSK-GLOBAL-REG::rectopenstate
+          num_oid: '.1.3.6.1.4.1.40865.1.5.{{ $index }}'
+          descr: 'Rectifier Status'
+          index: 'rectopenstate.{{ $index }}'
+          state_name: ARHANGELSK-GLOBAL-REG::rectopenstate
+          states:
+            - { descr: power-on,  graph: 1, value: 1,  generic: 0 }
+            - { descr: shutdown,  graph: 1, value: 0,  generic: 2 }
+
+        - oid: ARHANGELSK-GLOBAL-REG::rectpluginnotok
+          num_oid: '.1.3.6.1.4.1.40865.1.21.{{ $index }}'
+          descr: 'Rectifier Plug-In OK'
+          index: 'rectpluginnotok.{{ $index }}'
+          state_name: ARHANGELSK-GLOBAL-REG::rectpluginnotok
+          states:
+            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
+            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+
+        - oid: ARHANGELSK-GLOBAL-REG::hvsdflag
+          num_oid: '.1.3.6.1.4.1.40865.1.22.{{ $index }}'
+          descr: 'High Voltage Shutdown - Output over voltage'
+          index: 'hvsdflag.{{ $index }}'
+          state_name: ARHANGELSK-GLOBAL-REG::hvsdflag
+          states:
+            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
+            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+
+        - oid: ARHANGELSK-GLOBAL-REG::outputundervol
+          num_oid: '.1.3.6.1.4.1.40865.1.23.{{ $index }}'
+          descr: 'Low Voltage Shutdown - Output under voltage'
+          state_name: ARHANGELSK-GLOBAL-REG::outputundervol
+          index: 'outputundervol.{{ $index }}'
+          states:
+            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
+            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+
+        - oid: ARHANGELSK-GLOBAL-REG::inputundervol
+          num_oid: '.1.3.6.1.4.1.40865.1.24.{{ $index }}'
+          descr: 'Low Voltage Shutdown - Input under voltage'
+          index: 'inputundervol.{{ $index }}'
+          state_name: ARHANGELSK-GLOBAL-REG::inputundervol
+          states:
+            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
+            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+
+        - oid: ARHANGELSK-GLOBAL-REG::fanisnotrotate
+          num_oid: '.1.3.6.1.4.1.40865.1.26.{{ $index }}'
+          descr: 'Fan Status'
+          index: 'fanisnotrotate.{{ $index }}'
+          state_name: ARHANGELSK-GLOBAL-REG::fanisnotrotate
+          states:
+            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
+            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+
+        - oid: ARHANGELSK-GLOBAL-REG::ambientovertemp
+          num_oid: '.1.3.6.1.4.1.40865.1.27.{{ $index }}'
+          descr: 'Ambient Temperature High'
+          index: 'ambientovertemp.{{ $index }}'
+          state_name: ARHANGELSK-GLOBAL-REG::ambientovertemp
+          states:
+            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
+            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+
+        - oid: ARHANGELSK-GLOBAL-REG::ambientundertemp
+          num_oid: '.1.3.6.1.4.1.40865.1.28.{{ $index }}'
+          descr: 'Ambient Temperature Low'
+          index: 'ambientundertemp.{{ $index }}'
+          state_name: ARHANGELSK-GLOBAL-REG::ambientundertemp
+          states:
+            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
+            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+
+        - oid: ARHANGELSK-GLOBAL-REG::pfcovertemp
+          num_oid: '.1.3.6.1.4.1.40865.1.29.{{ $index }}'
+          descr: 'PFC Over Temperature'
+          index: 'pfcovertemp.{{ $index }}'
+          state_name: ARHANGELSK-GLOBAL-REG::pfcovertemp
+          states:
+            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
+            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+
+        - oid: ARHANGELSK-GLOBAL-REG::pfceepromfault
+          num_oid: '.1.3.6.1.4.1.40865.1.36.{{ $index }}'
+          descr: 'PFC EEPROM Status'
+          index: 'pfceepromfault.{{ $index }}'
+          state_name: ARHANGELSK-GLOBAL-REG::pfceepromfault
+          states:
+            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
+            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+
+        - oid: ARHANGELSK-GLOBAL-REG::dcdcovertemp
+          num_oid: '.1.3.6.1.4.1.40865.1.30.{{ $index }}'
+          descr: 'DC-DC Over Temperature'
+          index: 'dcdcovertemp.{{ $index }}'
+          state_name: ARHANGELSK-GLOBAL-REG::dcdcovertemp
+          states:
+            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
+            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+
+        - oid: ARHANGELSK-GLOBAL-REG::dcdceepromfault
+          num_oid: '.1.3.6.1.4.1.40865.1.32.{{ $index }}'
+          descr: 'DC-DC EEPROM Status'
+          index: 'dcdceepromfault.{{ $index }}'
+          state_name: ARHANGELSK-GLOBAL-REG::dcdceepromfault
+          states:
+            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
+            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+
+        - oid: ARHANGELSK-GLOBAL-REG::powderatedbyacvol
+          num_oid: '.1.3.6.1.4.1.40865.1.33.{{ $index }}'
+          descr: 'Output power derate by AC voltage'
+          index: 'powderatedbyacvol.{{ $index }}'
+          state_name: ARHANGELSK-GLOBAL-REG::powderatedbyacvol
+          states:
+            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
+            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+
+        - oid: ARHANGELSK-GLOBAL-REG::powderatedbytemp
+          num_oid: '.1.3.6.1.4.1.40865.1.34.{{ $index }}'
+          descr: 'Output power derate by Temperature'
+          index: 'powderatedbytemp.{{ $index }}'
+          state_name: ARHANGELSK-GLOBAL-REG::powderatedbytemp
+          states:
+            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
+            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+
+        - oid: ARHANGELSK-GLOBAL-REG::currentsharenotok
+          num_oid: '.1.3.6.1.4.1.40865.1.35.{{ $index }}'
+          descr: 'Rectifier Current Share Imbalance'
+          index: 'currentsharenotok.{{ $index }}'
+          state_name: ARHANGELSK-GLOBAL-REG::currentsharenotok
+          states:
+            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
+            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+
+        - oid: ARHANGELSK-GLOBAL-REG::acstopflag
+          num_oid: '.1.3.6.1.4.1.40865.1.38.{{ $index }}'
+          descr: 'AC Input Status'
+          index: 'acstopflag.{{ $index }}'
+          state_name: ARHANGELSK-GLOBAL-REG::acstopflag
+          states:
+            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
+            - { descr: alarm,   graph: 1, value: 2,  generic: 2 }
+
+        - oid: ARHANGELSK-GLOBAL-REG::dcvoltagealarm
+          num_oid: '.1.3.6.1.4.1.40865.1.39.{{ $index }}'
+          descr: 'DC Output Status'
+          index: 'dcvoltagealarm.{{ $index }}'
+          state_name: ARHANGELSK-GLOBAL-REG::dcvoltagealarm
+          states:
+            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
+            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+
+        - oid: ARHANGELSK-GLOBAL-REG::battfusebreak
+          num_oid: '.1.3.6.1.4.1.40865.1.42.{{ $index }}'
+          descr: 'Battery Breaker Status'
+          index: 'battfusebreak.{{ $index }}'
+          state_name: ARHANGELSK-GLOBAL-REG::battfusebreak
+          states:
+            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
+            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+
+        - oid: ARHANGELSK-GLOBAL-REG::loadfusebreak
+          num_oid: '.1.3.6.1.4.1.40865.1.44.{{ $index }}'
+          descr: 'Load Breaker Status'
+          index: 'loadfusebreak.{{ $index }}'
+          state_name: ARHANGELSK-GLOBAL-REG::loadfusebreak
+          states:
+            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
+            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }
+
+        - oid: ARHANGELSK-GLOBAL-REG::batteryprotectflag
+          num_oid: '.1.3.6.1.4.1.40865.1.45.{{ $index }}'
+          descr: 'Battery Low Voltage Disconnect'
+          index: 'batteryprotectflag.{{ $index }}'
+          state_name: ARHANGELSK-GLOBAL-REG::batteryprotectflag
+          states:
+            - { descr: normal,  graph: 1, value: 0,  generic: 0 }
+            - { descr: alarm,   graph: 1, value: 1,  generic: 2 }

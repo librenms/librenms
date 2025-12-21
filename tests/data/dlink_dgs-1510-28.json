@@ -7238,42 +7238,42 @@
                     "vlan_domain": 1,
                     "vlan_name": "default",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 211,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0211",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 430,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0430",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 990,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0990",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 991,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0991",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2011,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN2011",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

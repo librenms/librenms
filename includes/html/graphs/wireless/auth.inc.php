@@ -9,7 +9,7 @@ if (is_numeric($vars['id'])) {
         $rrd_filename = Rrd::name($device['hostname'], ['wireless-sensor', $sensor['sensor_class'], $sensor['sensor_type'], $sensor['sensor_index']]);
 
         $title = generate_device_link($device);
-        $title .= ' :: Wireless Sensor :: ' . htmlentities($sensor['sensor_descr']);
+        $title .= ' :: Wireless Sensor :: ' . htmlentities((string) $sensor['sensor_descr']);
         $auth = true;
     }
 }

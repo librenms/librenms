@@ -1,7 +1,7 @@
 mib: JANITZA-MIB
 modules:
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

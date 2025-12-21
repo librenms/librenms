@@ -43,6 +43,7 @@ use App\Models\User;
 use App\Models\UserPref;
 use App\Models\Vminfo;
 use App\Models\WirelessSensor;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -82,7 +83,15 @@ class MenuComposer
         $vars['device_groups'] = DeviceGroup::hasAccess($user)->orderBy('name')->get(['device_groups.id', 'name', 'desc']);
         $vars['package_count'] = Package::hasAccess($user)->count();
 
-        $vars['device_types'] = Device::hasAccess($user)->select('type')->distinct()->where('type', '!=', '')->orderBy('type')->pluck('type');
+        $configDeviceTypes = Arr::keyBy(LibrenmsConfig::get('device_types'), 'type');
+        $vars['device_types'] = Device::hasAccess($user)
+            ->select('type')
+            ->distinct()
+            ->where('type', '!=', '')
+            ->orderBy('type')
+            ->pluck('type')
+            ->keyBy(fn ($type) => $type)
+            ->map(fn ($type) => $configDeviceTypes[$type]['icon'] ?? 'angle-double-right');
         $vars['no_devices_added'] = ! Device::hasAccess($user)->exists();
 
         $vars['locations'] = (LibrenmsConfig::get('show_locations') && LibrenmsConfig::get('show_locations_dropdown')) ?
@@ -94,7 +103,15 @@ class MenuComposer
         $vars['links'] = Link::exists();
         $vars['device_dependencies'] = \DB::table('device_relationships')->exists();
         $vars['device_group_dependencies'] = $vars['device_groups']->isNotEmpty() && \DB::table('device_group_device')->exists();
-        $vars['custommaps'] = CustomMap::select(['custom_map_id', 'name', 'menu_group'])->hasAccess($user)->orderBy('name')->get()->groupBy('menu_group')->sortKeys();
+
+        $vars['custommaps_groups'] = CustomMap::select(['custom_map_id', 'name', 'menu_group'])
+            ->hasAccess($user)->orderBy('name')->get()
+            ->groupBy('menu_group')->sortKeys();
+        $vars['custommaps'] = $vars['custommaps_groups']->pull('', new Collection);
+        if ($vars['custommaps']->count() >= 20) {
+            $vars['custommaps_groups']->prepend($vars['custommaps'], __('Custom Maps'));
+            $vars['custommaps'] = new Collection;
+        }
 
         // Service menu
         if (LibrenmsConfig::get('show_services')) {
@@ -269,7 +286,7 @@ class MenuComposer
 
         // User menu
         $vars['notification_count'] = Notification::isSticky()
-            ->orWhere(function ($query) use ($user) {
+            ->orWhere(function ($query) use ($user): void {
                 $query->isUnread($user);
             })->count();
 

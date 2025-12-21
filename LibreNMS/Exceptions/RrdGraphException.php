@@ -30,15 +30,6 @@ use LibreNMS\Util\Graph;
 
 class RrdGraphException extends RrdException
 {
-    /** @var string */
-    protected $image_output;
-    /** @var string|null */
-    private $short_text;
-    /** @var int|string|null */
-    private $width;
-    /** @var int|string|null */
-    private $height;
-
     /**
      * @param  string  $error
      * @param  string|null  $short_text
@@ -47,13 +38,9 @@ class RrdGraphException extends RrdException
      * @param  int  $exit_code
      * @param  string  $image_output
      */
-    public function __construct($error, $short_text = null, $width = null, $height = null, $exit_code = 0, $image_output = '')
+    public function __construct($error, private $short_text = null, private $width = null, private $height = null, $exit_code = 0, protected $image_output = '')
     {
         parent::__construct($error, $exit_code);
-        $this->short_text = $short_text;
-        $this->image_output = $image_output;
-        $this->width = $width;
-        $this->height = $height;
     }
 
     public function getImage(): string

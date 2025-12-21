@@ -38,10 +38,10 @@ class Matrix extends Transport
         $authtoken = $this->config['matrix-authtoken'];
         $message = $this->config['matrix-message'];
 
-        $txnid = rand(1111, 9999) . time();
+        $txnid = random_int(1111, 9999) . time();
 
-        $server = preg_replace('/\/$/', '', $server);
-        $host = $server . '/_matrix/client/r0/rooms/' . urlencode($room) . '/send/m.room.message/' . $txnid;
+        $server = preg_replace('/\/$/', '', (string) $server);
+        $host = $server . '/_matrix/client/r0/rooms/' . urlencode((string) $room) . '/send/m.room.message/' . $txnid;
 
         $message = SimpleTemplate::parse($message, $alert_data);
 

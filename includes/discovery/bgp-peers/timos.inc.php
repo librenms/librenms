@@ -30,7 +30,7 @@ use LibreNMS\Util\IP;
 if ($device['os'] == 'timos') {
     $bgpPeersCache = SnmpQuery::numericIndex()->walk('TIMETRA-BGP-MIB::tBgpPeerNgTable')->valuesByIndex();
     foreach ($bgpPeersCache as $key => $value) {
-        $oid = explode('.', $key);
+        $oid = explode('.', (string) $key);
         $vrfInstance = $oid[0];
         $address = implode('.', array_slice($oid, 3));
         if (strlen($address) > 15) {
@@ -95,7 +95,7 @@ if ($device['os'] == 'timos') {
     }
 
     // clean up peers
-    if (! is_null($seenPeerID)) {
+    if (isset($seenPeerID) && ! is_null($seenPeerID)) {
         $deleted = DeviceCache::getPrimary()->bgppeers()->whereNotIn('bgpPeer_id', $seenPeerID)->delete();
         echo str_repeat('-', $deleted);
     }

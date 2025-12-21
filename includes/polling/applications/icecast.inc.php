@@ -15,7 +15,7 @@ if (! empty($agent_data[$name])) {
     $rawdata = str_replace("<<<icecast>>>\n", '', $rawdata);
 }
 
-$lines = explode("\n", $rawdata);
+$lines = explode("\n", (string) $rawdata);
 
 $icecast = [];
 

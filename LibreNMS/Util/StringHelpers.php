@@ -20,7 +20,7 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2021 Tony Murray
+ * @copyright  2025 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
@@ -43,6 +43,7 @@ class StringHelpers
             'gpsd' => 'GPSD',
             'hv-monitor' => 'HV Monitor',
             'http_access_log_combined' => 'HTTP Access Log Combined',
+            'i2pd' => 'I2PD Router',
             'mojo_cape_submit' => 'Mojo CAPE Submit',
             'mailcow-postfix' => 'mailcow-dockerized postfix',
             'mysql' => 'MySQL',
@@ -73,7 +74,7 @@ class StringHelpers
             'zfs' => 'ZFS',
         ];
 
-        return isset($replacements[$string]) ? $replacements[$string] : ucwords(str_replace(['_', '-'], ' ', $string));
+        return $replacements[$string] ?? ucwords(str_replace(['_', '-'], ' ', $string));
     }
 
     /**
@@ -102,7 +103,7 @@ class StringHelpers
 
         $charset = config('app.charset');
 
-        if (($converted = @iconv($charset, 'UTF-8', $string)) !== false) {
+        if (($converted = @iconv((string) $charset, 'UTF-8', $string)) !== false) {
             return (string) $converted;
         }
 
@@ -206,5 +207,44 @@ class StringHelpers
         $pattern = '/^[[:xdigit:]]{2}(?:' . $escapedDelimiter . '[[:xdigit:]]{2})*$/';
 
         return (bool) preg_match($pattern, $string);
+    }
+
+    /**
+     * Convert hex string to an array of 1-based indices of the nonzero bits
+     * ie. '9a00' -> '100110100000' -> array(1, 4, 5, 7)
+     *
+     * @return int[]
+     */
+    public static function bitsToIndices(string $hex_data): array
+    {
+        $hex_data = str_replace([' ', "\n"], '', $hex_data);
+
+        // we need an even number of digits for hex2bin
+        if (strlen($hex_data) % 2 === 1) {
+            $hex_data = '0' . $hex_data;
+        }
+
+        if (! StringHelpers::isHex($hex_data)) {
+            // could be malformed
+            if (preg_match('/^(\d+)(,\d+)*$/', ltrim($hex_data, '0'), $matches)) {
+                return array_map(intval(...), explode(',', $matches[0]));
+            }
+
+            return [];
+        }
+
+        $value = hex2bin($hex_data);
+        $length = strlen($value);
+        $indices = [];
+        for ($i = 0; $i < $length; $i++) {
+            $byte = ord($value[$i]);
+            for ($j = 7; $j >= 0; $j--) {
+                if ($byte & (1 << $j)) {
+                    $indices[] = 8 * $i + 8 - $j;
+                }
+            }
+        }
+
+        return $indices;
     }
 }

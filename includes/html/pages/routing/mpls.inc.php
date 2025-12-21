@@ -129,7 +129,7 @@ if ($vars['view'] == 'lsp') {
     foreach ($query as $lsp) {
         $device = device_by_id_cache($lsp['device_id']);
 
-        if (! is_integer($i / 2)) {
+        if (! is_int($i / 2)) {
             $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
         } else {
             $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
@@ -216,7 +216,7 @@ if ($vars['view'] == 'paths') {
     $query = dbFetchRows($sql);
     foreach ($query as $path) {
         $device = device_by_id_cache($path['device_id']);
-        if (! is_integer($i / 2)) {
+        if (! is_int($i / 2)) {
             $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
         } else {
             $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');

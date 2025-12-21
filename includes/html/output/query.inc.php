@@ -56,8 +56,8 @@ switch ($type) {
                 $response = 'no match';
             }
 
-            $extra = json_decode($rule['extra'], true);
-            if ($extra['options']['override_query'] === 'on') {
+            $extra = json_decode((string) $rule['extra'], true);
+            if ($extra['options']['override_query'] === 'on' || $extra['options']['override_query'] === true) {
                 $qb = $extra['options']['override_query'];
             } else {
                 $qb = QueryBuilderParser::fromJson($rule['builder'] ?? []);

@@ -7,36 +7,24 @@ use Illuminate\View\Component;
 class Panel extends Component
 {
     /**
-     * The Panel title.
-     *
-     * @var string
-     */
-    public $title;
-
-    /**
-     * The Panel body class.
-     *
-     * @var string
-     */
-    public $body_class;
-
-    /**
      * Create a new component instance.
-     *
-     * @return void
      */
-    public function __construct($title = null, $bodyClass = null)
-    {
-        $this->title = $title;
-        $this->body_class = $bodyClass;
+    public function __construct(
+        /**
+         * The Panel title.
+         */
+        public ?string $title = '',
+        /**
+         * The Panel body class.
+         */
+        public ?string $bodyClass = ''
+    ) {
     }
 
     /**
      * Get the view / contents that represent the component.
-     *
-     * @return \Illuminate\View\View|string
      */
-    public function render()
+    public function render(): \Illuminate\View\View|string
     {
         return view('components.panel');
     }
