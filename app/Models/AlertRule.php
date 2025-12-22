@@ -60,7 +60,6 @@ class AlertRule extends BaseModel
         'query',
         'builder',
         'invert_map',
-        'ignore_offline_devices',
     ];
 
     protected $casts = [
