@@ -84,6 +84,7 @@ alert_rules:
     - { Field: proc, Type: varchar(80), 'Null': true, Extra: '' }
     - { Field: invert_map, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: notes, Type: text, 'Null': true, Extra: '' }
+    - { Field: ignore_offline_devices, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     alert_rules_name_unique: { Name: alert_rules_name_unique, Columns: [name], Unique: true, Type: BTREE }
