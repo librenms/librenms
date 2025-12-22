@@ -98,11 +98,9 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
         // handle string indexes
         if (Str::contains($oid, '"')) {
-            $oid = preg_replace_callback('/"([^"]+)"/', function ($matches) {
-                return Oid::encodeString($matches[1])->oid;
-            }, $oid);
+            $oid = preg_replace_callback('/"([^"]+)"/', fn ($matches) => Oid::encodeString($matches[1])->oid, $oid);
         }
-        $proc->processor_oid = '.' . ltrim($oid, '.');
+        $proc->processor_oid = '.' . ltrim((string) $oid, '.');
 
         $proc->processor_perc_warn = $warn_percent ?? LibrenmsConfig::get('processor_perc_warn', 75);
 
@@ -116,7 +114,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             $proc->processor_usage = static::processData($data, $proc->processor_precision);
         }
 
-        d_echo('Discovered ' . get_called_class() . ' ' . print_r($proc->toArray(), true));
+        d_echo('Discovered ' . static::class . ' ' . print_r($proc->toArray(), true));
 
         return $proc;
     }
@@ -129,8 +127,8 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             empty($data['type']) ? $os->getName() : $data['type'],
             $os->getDeviceId(),
             $data['num_oid'],
-            isset($data['index']) ? $data['index'] : $index,
-            empty($data['descr']) ? 'Processor' : trim($data['descr']),
+            $data['index'] ?? $index,
+            empty($data['descr']) ? 'Processor' : trim((string) $data['descr']),
             $precision,
             static::processData($data['value'], $precision),
             $data['warn_percent'] ?? null,
@@ -150,8 +148,8 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         }
 
         foreach ($processors as $processor) {
-            $processor->processor_descr = substr($processor->processor_descr, 0, 64);
-            $processor->processor_type = substr($processor->processor_type, 0, 16);
+            $processor->processor_descr = substr((string) $processor->processor_descr, 0, 64);
+            $processor->processor_type = substr((string) $processor->processor_type, 0, 16);
         }
 
         if (isset($processors) && is_array($processors)) {
@@ -163,7 +161,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             );
         }
 
-        dbDeleteOrphans(static::$table, ['devices.device_id']);
+        \App\Models\Processor::doesntHave('device')->delete();
 
         echo PHP_EOL;
     }
@@ -180,7 +178,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
         $rrd_def = RrdDefinition::make()->addDataset('usage', 'GAUGE', -273, 1000);
 
-        foreach ($processors as $index => $processor) {
+        foreach ($processors as $processor) {
             extract($processor); // extract db fields to variables
             /** @var int $processor_id */
             /** @var string $processor_type */
@@ -239,7 +237,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
     private static function processData($data, $precision)
     {
-        if (preg_match('/([0-9]{1,5}(\.[0-9]+)?)/', $data, $matches) !== 1) {
+        if (preg_match('/([0-9]{1,5}(\.[0-9]+)?)/', (string) $data, $matches) !== 1) {
             return null;
         }
         $value = (float) $matches[1];
@@ -248,7 +246,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             // idle value, subtract from 100
             $value = 100 - ($value / ($precision * -1));
         } elseif ($precision > 1) {
-            $value = $value / $precision;
+            $value /= $precision;
         }
 
         return $value;
@@ -264,7 +262,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             return [];
         }
 
-        return YamlDiscovery::discover($os, get_called_class(), $discovery);
+        return YamlDiscovery::discover($os, static::class, $discovery);
     }
 
     /**

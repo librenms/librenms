@@ -1,0 +1,100 @@
+os: purestorage
+text: 'Pure Storage'
+type: storage
+icon: purestorage
+mib_dir: purestorage
+processor_stacked: false
+
+over:
+    - { graph: device_purestorage_bandwidth, text: 'Array Bandwidth' }
+    - { graph: device_purestorage_iops, text: 'Array IOPS' }
+    - { graph: device_purestorage_latency, text: 'Array Latency' }
+
+poller_modules:
+    arp-table: false
+    bgp-peers: false
+    cisco-ace-loadbalancer: false
+    cisco-ace-serverfarms: false
+    cisco-cef: false
+    cisco-ipsec-flow-monitor: false
+    cisco-mac-accounting: false
+    cisco-otv: false
+    cisco-qfp: false
+    cisco-remote-access-monitor: false
+    cipsec-tunnels: false
+    entity-physical: true
+    entity-state: false
+    fdb-table: false
+    ipmi: false
+    isis: false
+    mef: false
+    mempools: false
+    mib: false
+    ntp: false
+    ospf: false
+    ospfv3: false
+    port-security: false
+    processors: false
+    route: false
+    slas: false
+    stp: false
+    storage: false
+    ucd-diskio: false
+    ucd-mib: false
+    vlans: false
+    wireless: false
+
+discovery_modules:
+    arp-table: false
+    bgp-peers: false
+    charge: false
+    cisco-cef: false
+    cisco-mac-accounting: false
+    cisco-otv: false
+    cisco-pw: false
+    cisco-qfp: false
+    cisco-vrf-lite: false
+    discovery-protocols: false
+    diskio: false
+    entity-physical: true
+    entity-state: false
+    fdb-table: false
+    hr-device: false
+    ipmi: false
+    ipv4-addresses: false
+    ipv6-address: false
+    ipv6-addresses: false
+    isis: false
+    junose-atm-vp: false
+    loadbalancers: false
+    mempools: false
+    mpls: false
+    ntp: false
+    ospf: false
+    ports: false
+    ports-stack: false
+    printer-supplies: false
+    sensors: false
+    services: false
+    slas: false
+    stp: false
+    storage: false
+    ucd-diskio: false
+    ucd-dsktable: false
+    ucd-mib: false
+    vlans: false
+    vminfo: false
+    vrf: false
+    wireless: false
+    xdsl: false
+
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.40482
+            - .1.3.6.1.4.1.40482.
+        sysDescr_regex:
+            - '/Pure.*Storage/i'
+            - '/FlashArray/i'
+            - '/Purity/i'
+

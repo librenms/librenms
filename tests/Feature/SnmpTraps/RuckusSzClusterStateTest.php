@@ -30,7 +30,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
 
-class RuckusSzClusterStateTest extends SnmpTrapTestCase
+final class RuckusSzClusterStateTest extends SnmpTrapTestCase
 {
     public function testClusterInMaintenance(): void
     {

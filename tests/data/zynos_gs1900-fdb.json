@@ -10083,7 +10083,7 @@
                     "vlan_domain": 1,
                     "vlan_name": "default",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -10482,14 +10482,6 @@
                 {
                     "vlan": 1,
                     "baseport": 50,
-                    "priority": 0,
-                    "state": "unknown",
-                    "cost": 0,
-                    "untagged": 1
-                },
-                {
-                    "vlan": 1,
-                    "baseport": 1003,
                     "priority": 0,
                     "state": "unknown",
                     "cost": 0,

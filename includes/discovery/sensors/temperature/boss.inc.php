@@ -8,7 +8,7 @@ if (empty($temps)) {
     return;
 }
 
-foreach (explode("\n", $temps) as $i => $t) {
+foreach (explode("\n", (string) $temps) as $i => $t) {
     $t = explode(' ', $t);
     $oid = $t[0];
     $val = $t[1];

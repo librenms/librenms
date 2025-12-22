@@ -12171,63 +12171,63 @@
                     "vlan_domain": 1,
                     "vlan_name": "system@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2,
                     "vlan_domain": 1,
                     "vlan_name": "guest@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 39,
                     "vlan_domain": 1,
                     "vlan_name": "mkr@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 40,
                     "vlan_domain": 1,
                     "vlan_name": "lpa@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 98,
                     "vlan_domain": 1,
                     "vlan_name": "mobile@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 99,
                     "vlan_domain": 1,
                     "vlan_name": "pos@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 100,
                     "vlan_domain": 1,
                     "vlan_name": "prn@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 200,
                     "vlan_domain": 1,
                     "vlan_name": "lan@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 255,
                     "vlan_domain": 1,
                     "vlan_name": "mgmn@02",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

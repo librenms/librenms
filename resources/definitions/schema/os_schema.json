@@ -212,6 +212,9 @@
                 },
                 "xdsl": {
                     "type": "boolean"
+                },
+                "port-security": {
+                    "type": "boolean"
                 }
             },
             "additionalProperties": false

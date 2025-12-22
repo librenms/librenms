@@ -22849,119 +22849,119 @@
                     "vlan_domain": 1,
                     "vlan_name": "default",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 304,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN-304",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 305,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN-305",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 306,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN-306",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 307,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN-307",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 308,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN-308",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 309,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN-309",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 311,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN-311",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 312,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN-312",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 315,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN-315",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1501,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN-1501",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1502,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN-1502",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1506,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN-1506",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1508,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN-1508",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 1600,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN-1600",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3022,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN-3022",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3023,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN-3023",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

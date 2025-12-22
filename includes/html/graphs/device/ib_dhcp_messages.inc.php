@@ -3,7 +3,7 @@
 require 'includes/html/graphs/common.inc.php';
 
 $rrd_filename = Rrd::name($device['hostname'], 'ib_dhcp_messages');
-$rrd_options .= " --vertical-label='Messages per minute'";
+$graph_params->vertical_label = 'Messages per minute';
 
 $stats = [
     'request' => '#FFAB00FF',
@@ -25,31 +25,31 @@ foreach ($stats as $stat => $color) {
     $rrd_list[$i]['ds'] = $stat;
 
     // Set up DEFs
-    $rrd_options .= ' DEF:' . $stat . '=' . $rrd_filename . ':' . $stat . ':AVERAGE ';
+    $rrd_options[] = 'DEF:' . $stat . '=' . $rrd_filename . ':' . $stat . ':AVERAGE';
 
     // Set up CDEFS to multiply with 60 to get per minute value
-    $rrd_options .= " 'CDEF:cdef" . $stat . '=' . $stat . ",60,*'";
+    $rrd_options[] = 'CDEF:cdef' . $stat . '=' . $stat . ',60,*';
 
     // Set up area graphing with stacking
     if ($i == '0') {
-        $rrd_options .= " 'AREA:cdef" . $stat . $color . ':' . ucfirst($stat) . "'";
+        $rrd_options[] = 'AREA:cdef' . $stat . $color . ':' . ucfirst($stat);
     } else {
-        $rrd_options .= " 'AREA:cdef" . $stat . $color . ':' . ucfirst($stat) . ":STACK'";
+        $rrd_options[] = 'AREA:cdef' . $stat . $color . ':' . ucfirst($stat) . ':STACK';
     }
 
     // Set up legend, with consistent indent
     $filler = 8 - strlen($stat);
     $current_pad = str_pad('', $filler, ' ', STR_PAD_LEFT);
-    $rrd_options .= " 'GPRINT:cdef" . $stat . ':LAST:' . $current_pad . "Current\:%8.0lf'";
-    $rrd_options .= " 'GPRINT:cdef" . $stat . ":AVERAGE:Average\:%8.0lf'";
-    $rrd_options .= " 'GPRINT:cdef" . $stat . ":MAX:Maximum\:%8.0lf\\n'";
+    $rrd_options[] = 'GPRINT:cdef' . $stat . ':LAST:' . $current_pad . "Current\:%8.0lf";
+    $rrd_options[] = 'GPRINT:cdef' . $stat . ":AVERAGE:Average\:%8.0lf";
+    $rrd_options[] = 'GPRINT:cdef' . $stat . ":MAX:Maximum\:%8.0lf\\n";
 }
 
 // Set up Total value
-$rrd_options .= " 'CDEF:cdeftotal=cdefrequest,cdefack,cdefdiscover,cdefoffer,cdefinform,cdefnack,cdefrelease,cdefdecline,cdefother,+,+,+,+,+,+,+,+'";
-$rrd_options .= " 'LINE1:cdeftotal#000000FF:Total'";
+$rrd_options[] = 'CDEF:cdeftotal=cdefrequest,cdefack,cdefdiscover,cdefoffer,cdefinform,cdefnack,cdefrelease,cdefdecline,cdefother,+,+,+,+,+,+,+,+';
+$rrd_options[] = 'LINE1:cdeftotal#000000FF:Total';
 $filler = 8 - strlen('Total');
 $current_pad = str_pad('', $filler, ' ', STR_PAD_LEFT);
-$rrd_options .= " 'GPRINT:cdeftotal:LAST:" . $current_pad . "Current\:%8.0lf'";
-$rrd_options .= " 'GPRINT:cdeftotal:AVERAGE:Average\:%8.0lf'";
-$rrd_options .= " 'GPRINT:cdeftotal:MAX:Maximum\:%8.0lf\\n'";
+$rrd_options[] = 'GPRINT:cdeftotal:LAST:' . $current_pad . "Current\:%8.0lf";
+$rrd_options[] = "GPRINT:cdeftotal:AVERAGE:Average\:%8.0lf";
+$rrd_options[] = "GPRINT:cdeftotal:MAX:Maximum\:%8.0lf\\n";

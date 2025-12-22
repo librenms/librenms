@@ -74,13 +74,11 @@ class Awplus extends OS implements OSDiscovery, TransceiverDiscovery
     public function discoverTransceivers(): Collection
     {
         return \SnmpQuery::enumStrings()->walk('AT-SYSINFO-MIB::atPortInfoTransceiverTable')
-            ->mapTable(function ($data, $ifIndex) {
-                return new Transceiver([
-                    'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
-                    'index' => $ifIndex,
-                    'type' => $data['AT-SYSINFO-MIB::atPortInfoTransceiverType'] ?? null,
-                    'entity_physical_index' => $ifIndex,
-                ]);
-            });
+            ->mapTable(fn ($data, $ifIndex) => new Transceiver([
+                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
+                'index' => $ifIndex,
+                'type' => $data['AT-SYSINFO-MIB::atPortInfoTransceiverType'] ?? null,
+                'entity_physical_index' => $ifIndex,
+            ]));
     }
 }

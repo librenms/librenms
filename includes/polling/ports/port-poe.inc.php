@@ -45,8 +45,8 @@ if ($device['os'] == 'vrp') {
     // Code for Cisco IOS and IOSXE, tested on 2960X
     if (isset($this_port['cpeExtPsePortPwrAllocated'])) {
         // if we have cpeExtPsePortPwrAllocated, we have the complete array so we can populate the RRD
-        $upd = "$polled:" . $port['cpeExtPsePortPwrAllocated'] . ':' . $port['cpeExtPsePortPwrAvailable'] . ':' .
-            $port['cpeExtPsePortPwrConsumption'] . ':' . $port['cpeExtPsePortMaxPwrDrawn'];
+        $upd = "$polled:" . $this_port['cpeExtPsePortPwrAllocated'] . ':' . $this_port['cpeExtPsePortPwrAvailable'] . ':' .
+            $this_port['cpeExtPsePortPwrConsumption'] . ':' . $this_port['cpeExtPsePortMaxPwrDrawn'];
         echo "$this_port[cpeExtPsePortPwrAllocated],$this_port[cpeExtPsePortPwrAvailable],$this_port[cpeExtPsePortPwrConsumption],$this_port[cpeExtPsePortMaxPwrDrawn]\n";
         $fields = [
             'PortPwrAllocated' => $this_port['cpeExtPsePortPwrAllocated'],

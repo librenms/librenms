@@ -26,7 +26,7 @@ namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use LibreNMS\Enum\Severity;
 
-class PoseidonAlarmTrapTest extends SnmpTrapTestCase
+final class PoseidonAlarmTrapTest extends SnmpTrapTestCase
 {
     /**
      * Test HWgroup Posiedon industrial environment monitoring trap handlers

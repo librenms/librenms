@@ -109,9 +109,7 @@ class DashboardController extends Controller
 
         // Split dashboards into user owned or shared
         $dashboards = $this->getAvailableDashboards($user);
-        [$user_dashboards, $shared_dashboards] = $dashboards->partition(function ($dashboard) use ($user) {
-            return $dashboard->user_id == $user->user_id;
-        });
+        [$user_dashboards, $shared_dashboards] = $dashboards->partition(fn ($dashboard) => $dashboard->user_id == $user->user_id);
 
         $data = $dashboard->widgets;
 
@@ -156,7 +154,7 @@ class DashboardController extends Controller
             'dashboard_name' => 'string|max:255',
         ]);
 
-        $name = trim(strip_tags($request->get('dashboard_name')));
+        $name = trim(strip_tags((string) $request->get('dashboard_name')));
         $dashboard = Dashboard::create([
             'user_id' => Auth::id(),
             'dashboard_name' => $name,
@@ -214,7 +212,7 @@ class DashboardController extends Controller
 
         if ($dashboard_copy->save()) {
             // copy widgets
-            $dashboard->widgets->each(function (UserWidget $widget) use ($dashboard_copy, $target_user_id) {
+            $dashboard->widgets->each(function (UserWidget $widget) use ($dashboard_copy, $target_user_id): void {
                 $dashboard_copy->widgets()->save($widget->replicate()->fill([
                     'user_id' => $target_user_id,
                 ]));

@@ -264,15 +264,9 @@ main () {
 
     # if not running as $LIBRENMS_USER (unless $LIBRENMS_USER = root), relaunch
     if [[ "$LIBRENMS_USER" != "root" ]]; then
-        # only try to su if we are root (or sudo)
-        if [[ "$EUID" -eq 0 ]]; then
-            echo "Re-running ${DAILY_SCRIPT} as ${LIBRENMS_USER} user"
-            sudo -u "$LIBRENMS_USER" "$DAILY_SCRIPT" "$@"
-            exit
-        fi
-
         if [[ "$EUID" -ne "$LIBRENMS_USER_ID" ]]; then
-            printf "\\033[0;93mWARNING\\033[0m: You should run this script as %s\\n" "${LIBRENMS_USER}"
+            printf "\\033[0;91mERROR\\033[0m: You must run this script as %s\\n" "${LIBRENMS_USER}"
+            exit 1
         fi
     fi
 
@@ -375,18 +369,14 @@ main () {
 
                 # List all tasks to do after pull in the order of execution
                 status_run 'Updating SQL-Schema' './lnms migrate --force --no-interaction --isolated'
-                status_run 'Updating submodules' "$DAILY_SCRIPT submodules"
                 status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
-                status_run 'Fetching notifications' "$DAILY_SCRIPT notifications"
                 status_run 'Caching PeeringDB data' "$DAILY_SCRIPT peeringdb"
             ;;
             cleanup)
                 # Cleanups
                 options=("refresh_alert_rules"
-                               "refresh_os_cache"
                                "refresh_device_groups"
                                "recalculate_device_dependencies"
-                               "syslog"
                                "eventlog"
                                "authlog"
                                "callback"
@@ -398,16 +388,6 @@ main () {
                                "ports_nac"
                                "route"
                                "ports_purge")
-                call_daily_php "${options[@]}"
-            ;;
-            submodules)
-                # Init+Update our submodules
-                git submodule --quiet init
-                git submodule --quiet update
-            ;;
-            notifications)
-                # Get notifications
-                options=("notifications")
                 call_daily_php "${options[@]}"
             ;;
             peeringdb)

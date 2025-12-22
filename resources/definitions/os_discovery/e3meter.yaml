@@ -3,7 +3,7 @@ modules:
     os:
         version: NETTRACK-E3METER-CTR-SNMP-MIB::e3ConcentratorFWVersion
     sensors:
-        pre-cache:
+        additional_oids:
             data:
                 -
                     oid:

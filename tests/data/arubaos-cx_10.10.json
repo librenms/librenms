@@ -4395,49 +4395,49 @@
                     "vlan_domain": 1,
                     "vlan_name": "DEFAULT_VLAN_1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 97,
                     "vlan_domain": 1,
                     "vlan_name": "lan_temp1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 98,
                     "vlan_domain": 1,
                     "vlan_name": "lan_temp2",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 99,
                     "vlan_domain": 1,
                     "vlan_name": "lan_legacy",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 100,
                     "vlan_domain": 1,
                     "vlan_name": "lan_mgmt",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 101,
                     "vlan_domain": 1,
                     "vlan_name": "lan_user",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 102,
                     "vlan_domain": 1,
                     "vlan_name": "lan_guest",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
@@ -5167,6 +5167,28 @@
                     "ifAlias": "LINK to Main Gateway (THgw01)",
                     "ifDescr": "1/1/14",
                     "ifName": "1/1/14"
+                }
+            ]
+        }
+    },
+    "hr-device": {
+        "discovery": {
+            "hrDevice": [
+                {
+                    "hrDeviceIndex": 196608,
+                    "hrDeviceDescr": "",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 48
+                },
+                {
+                    "hrDeviceIndex": 196609,
+                    "hrDeviceDescr": "",
+                    "hrDeviceType": "hrDeviceProcessor",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "running",
+                    "hrProcessorLoad": 48
                 }
             ]
         }

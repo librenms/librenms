@@ -13025,112 +13025,112 @@
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 10,
                     "vlan_domain": 1,
                     "vlan_name": "data_multicast:core",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 84,
                     "vlan_domain": 1,
                     "vlan_name": "mngt:asw",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 200,
                     "vlan_domain": 1,
                     "vlan_name": "data:firma",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 211,
                     "vlan_domain": 1,
                     "vlan_name": "data_multicast:clients",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 241,
                     "vlan_domain": 1,
                     "vlan_name": "data:wifi",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 254,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 254",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 311,
                     "vlan_domain": 1,
                     "vlan_name": "multicast:antik-stb",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 511,
                     "vlan_domain": 1,
                     "vlan_name": "data_multicast:clients(public)",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 545,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 545",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 546,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 546",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 547,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 547",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 548,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 548",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 549,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 549",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 550,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 550",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 999,
                     "vlan_domain": 1,
                     "vlan_name": "NATIVE",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

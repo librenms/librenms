@@ -8,7 +8,7 @@ modules:
         data:
             -
                 oid: atdCPUUtilizationAvg
-                num_oid: .1.3.6.1.4.1.8962.4.1.1.1.0
+                num_oid: '.1.3.6.1.4.1.8962.4.1.1.1.{{ $index }}'
     sensors:
         count:
             data:
@@ -38,41 +38,41 @@ modules:
                 -
                     oid: mcAfeeATDMIBObjects
                     value: atdHDDDataSpaceUtilization
-                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.4.0'
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.4.{{ $index }}'
                     descr: 'ATD Data Disk Space Utilization'
                     index: 'atdDataDiskSpaceUsed'
                 -
                     oid: atdHDDSystemSpaceUtilization
-                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.3.0'
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.3.{{ $index }}'
                     descr: 'ATD System Disk Space Utilization'
                     index: 'atdSystemDiskSpaceUsed'
 
                 -
                     oid: atdHDDVarSpaceUtilization
-                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.19.0'
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.19.{{ $index }}'
                     descr: 'ATD Var Disk Space Utilization'
                     index: 'atdVarDiskSpaceUsed'
         state:
            data:
                 -
                     oid: atdSystemHealth
-                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.9.0'
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.9.{{ $index }}'
                     descr: 'System Health'
                     state_name: atdSystemHealth
                     states:
                         - { value: 0, generic: 2, graph: 0, descr: 'Bad' }
-                        - { value: 1, generic: 0, graph: 0, descr: 'Good' } 
-                -                    
+                        - { value: 1, generic: 0, graph: 0, descr: 'Good' }
+                -
                     oid: atdBackupSchedulerStatus
-                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.10.0'
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.10.{{ $index }}'
                     descr: 'Backup Scheduler Status'
                     state_name: atdBackupSchedulerStatus
                     states:
                         - { value: 0, generic: 2, graph: 0, descr: 'Backup Scheduler Status Failed' }
-                        - { value: 1, generic: 0, graph: 0, descr: 'Backup Scheduler Status Ok' } 
+                        - { value: 1, generic: 0, graph: 0, descr: 'Backup Scheduler Status Ok' }
                 -
                     oid: atdLoadBalancerStatus
-                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.11.0'
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.11.{{ $index }}'
                     descr: 'ATD Load Balancer Status'
                     state_name: atdLoadBalancerStatus
                     states:
@@ -86,7 +86,7 @@ modules:
                         - { value: 7, generic: 3, graph: 0, descr: 'Invalid Status' }
                 -
                     oid: atdEmailConnectorStatus
-                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.12.0'
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.12.{{ $index }}'
                     descr: 'ATD Email Connetor Status'
                     state_name: atdEmailConnectorStatus
                     states:
@@ -96,7 +96,7 @@ modules:
                         - { value: 3, generic: 2, graph: 0, descr: 'Email Connector Overloaded' }
                 -
                     oid: atdEmailGatewayWaitTime
-                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.13.0'
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.13.{{ $index }}'
                     descr: 'Email Gateway Wait Time Threshold'
                     state_name: atdEmailGatewayWaitTime
                     states:
@@ -104,7 +104,7 @@ modules:
                         - { value: 1, generic: 2, graph: 0, descr: 'Email Gateway Threshold Wait Time Reached' }
                 -
                     oid: atdMalwareInterfaceStatus
-                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.14.0'
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.14.{{ $index }}'
                     descr: 'ATD Malware Interface Status'
                     state_name: atdMalwareInterfaceStatus
                     states:
@@ -112,7 +112,7 @@ modules:
                         - { value: 1, generic: 0, graph: 0, descr: Up }
                 -
                     oid: atdLicenseStatus
-                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.15.0'
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.15.{{ $index }}'
                     descr: 'ATD License Status'
                     state_name: atdLicenseStatus
                     states:
@@ -121,35 +121,35 @@ modules:
                         - { value: 3, generic: 2, graph: 0, descr: Expired }
                 -
                     oid: atdDXLChannelStatus
-                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.16.0'
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.16.{{ $index }}'
                     descr: 'ATD DXL Status'
                     state_name: atdDXLChannelStatus
                     states:
                         - { value: 0, generic: 2, graph: 0, descr: Down }
-                        - { value: 1, generic: 0, graph: 0, descr: Up } 
+                        - { value: 1, generic: 0, graph: 0, descr: Up }
                 -
                     oid: atdSensorStatus
-                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.17.0'
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.17.{{ $index }}'
                     descr: 'ATD Sensor Status'
                     state_name: atdSensorStatus
                     states:
                         - { value: 0, generic: 2, graph: 0, descr: Inactive }
-                        - { value: 1, generic: 0, graph: 0, descr: Active } 
+                        - { value: 1, generic: 0, graph: 0, descr: Active }
                         - { value: 2, generic: 3, graph: 0, descr: 'Not Connected' }
                 -
                     oid: atdTAXIIStatus
-                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.18.0'
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.18.{{ $index }}'
                     descr: 'ATD TAXII Status'
                     state_name: atdTAXIIStatus
                     states:
                         - { value: 0, generic: 2, graph: 0, descr: Down }
-                        - { value: 1, generic: 0, graph: 0, descr: Up } 
+                        - { value: 1, generic: 0, graph: 0, descr: Up }
                         - { value: 2, generic: 3, graph: 0, descr: Unknown }
                 -
                     oid: atdMalwareDNSStatus
-                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.18.0'
+                    num_oid: '.1.3.6.1.4.1.8962.4.1.1.18.{{ $index }}'
                     descr: 'ATD Malware DNS Status'
                     state_name: atdMalwareDNSStatus
                     states:
                         - { value: 0, generic: 2, graph: 0, descr: Bad }
-                        - { value: 1, generic: 0, graph: 0, descr: Good } 
+                        - { value: 1, generic: 0, graph: 0, descr: Good }

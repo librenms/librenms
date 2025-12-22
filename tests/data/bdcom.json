@@ -20841,21 +20841,21 @@
                     "vlan_domain": 1,
                     "vlan_name": "Default.",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2,
                     "vlan_domain": 1,
                     "vlan_name": "service_net.",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 101,
                     "vlan_domain": 1,
                     "vlan_name": "dhcp.",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

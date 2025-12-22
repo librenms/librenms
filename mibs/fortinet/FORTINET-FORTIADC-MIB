@@ -20,10 +20,12 @@ FORTINET-FORTIADC-MIB DEFINITIONS ::= BEGIN
 		ifIndex
 			FROM IF-MIB
 		FnBoolState, FnIndex, fortinet
-			FROM FORTINET-CORE-MIB;
+			FROM FORTINET-CORE-MIB
+		sysName, sysUpTime
+			FROM SNMPv2-MIB;
 
 fnFortiADCMib MODULE-IDENTITY
-	LAST-UPDATED "201401010000Z"
+	LAST-UPDATED "202303010000Z"
 	ORGANIZATION
 		"Fortinet Technologies, Inc."
 	CONTACT-INFO
@@ -32,7 +34,7 @@ fnFortiADCMib MODULE-IDENTITY
 		http://www.fortinet.com
 		"
 	DESCRIPTION
-		"Initial version of FORTINET-ADC-MIB."
+		"MIB module for FortiADC"
 	::= { fortinet 112 }
 
 	--
@@ -110,8 +112,10 @@ fnFortiADCMib MODULE-IDENTITY
 	fadc300D			OBJECT IDENTIFIER ::=	{fadcModel 301}
 	fadc300E			OBJECT IDENTIFIER ::=	{fadcModel 302}
 	fadc300F                        OBJECT IDENTIFIER ::=   {fadcModel 303}
+	fadc320F                        OBJECT IDENTIFIER ::=   {fadcModel 323}
 	fadc400D			OBJECT IDENTIFIER ::=	{fadcModel 401}
 	fadc400F                        OBJECT IDENTIFIER ::=   {fadcModel 403}
+	fadc420F                        OBJECT IDENTIFIER ::=   {fadcModel 423}
 	fadc700D			OBJECT IDENTIFIER ::=	{fadcModel 701}
 	fadc1500D			OBJECT IDENTIFIER ::=	{fadcModel 1501}
 	fadc2000D			OBJECT IDENTIFIER ::=	{fadcModel 2001}
@@ -281,7 +285,7 @@ fnFortiADCMib MODULE-IDENTITY
 		MAX-ACCESS  not-accessible
 		STATUS      current
 		DESCRIPTION
-			"A table of alerts infortion"
+			"A table of alerts information"
 		::= { fadcSysAlert 1 }
 
 	fadcSysAlertEntry OBJECT-TYPE
@@ -650,335 +654,359 @@ fnFortiADCMib MODULE-IDENTITY
 	--
 
 	fadcTrapCpuHighThreshold  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if CPU usage becomes too high."
 		::=  {  fadcTraps  101  }
 
 	fadcTrapMemLowThreshold  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if memory usage becomes too high."
 		::=  {  fadcTraps  102  }
 
 	fadcTrapLogDiskHighThreshold  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if Log disk usage becomes too high."
 		::=  {  fadcTraps  103  }
 
 	fadcTrapDosAttackStart  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if DOS attack start."
 		::=  {  fadcTraps  401  }
 
 	fadcTrapDosAttackStop  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if DOS attack stop."
 		::=  {  fadcTraps  402  }
 
 	fadcTrapFwConnectionLimit  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
-		DESCRIPTION   "Trap sent if FW connectionhas exceeded the allowed connections."
+		DESCRIPTION   "Trap sent if FW Connections exceeded the allowed connections."
 		::=  {  fadcTraps  403  }
 
 	fadcTrapFwSnatLimit  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if FW snat pool has exhausted."
 		::=  {  fadcTraps  404  }
 
 	fadcTrapRequestBlocked  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if the HTTP request was blocked."
 		::=  {  fadcTraps  405  }
 
 	fadcTrapXSSAttack  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if XSS attack detected by Signature."
 		::=  {  fadcTraps  406  }
 
 	fadcTrapSQLInjectionAttack  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if SQL Injection attack detected by Signature."
 		::=  {  fadcTraps  407  }
 
 	fadcTrapGenericAttack  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if Generic attack detected by Signature."
 		::=  {  fadcTraps  408  }
 
 	fadcTrapExploitsAttack  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if Know Exploits attack detected by Signature."
 		::=  {  fadcTraps  409  }
 
 	fadcTrapTrojansAttack  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if Trojans attack detected by Signature."
 		::=  {  fadcTraps  410  }
 
 	fadcTrapInfoDisclosureAttack  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if Information Disclosure attack detected by Signature."
 		::=  {  fadcTraps  411  }
 
 	fadcTrapURLPattenViolate  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if URL Patten violate detected."
 		::=  {  fadcTraps  412  }
 
 	fadcTrapProtocolConstraint  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if HTTP Protocol Constraint violate detected."
 		::=  {  fadcTraps  413  }
 
 	fadcTrapGeoViolateDetected  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if Geo violate detected."
 		::=  {  fadcTraps  414  }
 
-	fadcTrapReputaionViolateDetected  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+	fadcTrapReputationViolateDetected  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if IP Reputation violate detected."
 		::=  {  fadcTraps  415  }
 
 	fadcTrapBotDetected NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if Bot detected"
 		::=  {  fadcTraps  416  }
 
 	fadcTrapFwConnectionDeny NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if Connection denied by FW_Policy"
 		::=  {  fadcTraps  417  }
 
 	fadcTrapXmlDetected	NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if XML violate detected"
 		::=  {  fadcTraps  418  }
 
 	fadcTrapJsonDetected NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if JSON violate detected"
 		::=  {  fadcTraps  419  }
 
 	fadcTrapSoapDetected NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if SOAP violate detected"
 		::=  {  fadcTraps  420  }
 
 	fadcTrapDlpDetected NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if WAF DLP is detected from client IP on virtual server"
 		::=  {  fadcTraps  421  }
 
 	fadcTrapHtmlDetected NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if WAF Html validation is detected from client IP on virtual server"
 		::=  {  fadcTraps  422  }
 
 	fadcTrapWpdDetected NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if web page defacement detected"
 		::=  {  fadcTraps  423  }
 
 	fadcTrapCsrfDetected NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if CSRF is detected from client IP on virtual server"
 		::=  {  fadcTraps  424  }
 
 	fadcTrapDdosIpFragmentation NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
-		DESCRIPTION   "DDoS IP Fragmentation attack detecked"
+		DESCRIPTION   "DDoS IP Fragmentation attack detected"
 		::=  {  fadcTraps  425  }
 
 	fadcTrapDdosTcpSlowDataAttack NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
-		DESCRIPTION   "DDoS TCP slow data attack detecked"
+		DESCRIPTION   "DDoS TCP slow data attack detected"
 		::=  {  fadcTraps  426  }
 
 	fadcTrapDdosTcpAccessFlood NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
-		DESCRIPTION   "DDoS TCP access flood attack detecked"
+		DESCRIPTION   "DDoS TCP access flood attack detected"
 		::=  {  fadcTraps  427  }
 
 	fadcTrapDdosHttpConnectionFlood NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
-		DESCRIPTION   "DDoS HTTP connection flood attack detecked"
+		DESCRIPTION   "DDoS HTTP connection flood attack detected"
 		::=  {  fadcTraps  428  }
 
 	fadcTrapDdosHttpRequestFlood NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
-		DESCRIPTION   "DDoS HTTP request flood attack detecked"
+		DESCRIPTION   "DDoS HTTP request flood attack detected"
 		::=  {  fadcTraps  429  }
 
 	fadcTrapDdosHttpAccessLimit NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
-		DESCRIPTION   "DDoS HTTP access limit attack detecked"
+		DESCRIPTION   "DDoS HTTP access limit attack detected"
 		::=  {  fadcTraps  430  }
 
 	fadcTrapPeriodBlockIP NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Period Block IP"
 		::=  {  fadcTraps  431  }
 
+	fadcTrapCorsViolateDetected NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "CORS is detected from client IP on virtual server"
+		::=  {  fadcTraps  432  }
+
+	fadcTrapThresholdViolateDetected NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "WAF is detected from client IP on virtual server"
+		::=  {  fadcTraps  433  }
+
+	fadcTrapBiometricsBaseDetected NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "WAF is detected from client IP on virtual server"
+		::=  {  fadcTraps  434  }
+
+	fadcTrapSysUserLoginFailedAndBlocked NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial }
+		STATUS        current
+		DESCRIPTION   "Trap sent if user login fail and block IP"
+		::=  {  fadcTraps  435  }
+
 	fadcTrapCPUTempHigh  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial}
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if CPU temperature becomes too high."
 		::=  {  fadcTraps  501  }
 
 	fadcTrapCPUTempNormal  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial}
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if CPU temperature becomes normal."
 		::=  {  fadcTraps  502  }
 
 	fadcTrapDeviceTempHigh  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if device temperature becomes too high."
 		::=  {  fadcTraps  503  }
 
 	fadcTrapDeviceTempNormal  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if device temperature becomes normal."
 		::=  {  fadcTraps  504  }
 
 	fadcTrapPSUTempHigh  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if PSU temperature becomes too high."
 		::=  {  fadcTraps  505  }
 
 	fadcTrapPSUTempNormal  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if PSU temperature becomes normal."
 		::=  {  fadcTraps  506  }
 
 	fadcTrapPSUFanSlow  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if PSU fan speed becomes too slow."
 		::=  {  fadcTraps  507  }
 
 	fadcTrapDeviceFanSlow  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if device fan speed becomes too slow."
 		::=  {  fadcTraps  508  }
 
 	fadcTrapPSUFanBad  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if PSU fan becomes bad."
 		::=  {  fadcTraps  509  }
 
 	fadcTrapPSUFanGood	NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if PSU fan becomes good."
 		::=  {  fadcTraps  510  }
 
 	fadcTrapDeviceFanBad  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if device fan becomes bad."
 		::=  {  fadcTraps  511  }
 
 	fadcTrapDeviceFanGood  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if device fan becomes good."
 		::=  {  fadcTraps  512  }
 
 	fadcTrapVoltageHigh  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if voltage becomes too high."
 		::=  {  fadcTraps  513  }
 
 	fadcTrapPowerSupplyHigh  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if power supply voltage becomes too high."
 		::=  {  fadcTraps  514  }
 
 	fadcTrapPSUVoltageHigh  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if PSU voltage becomes too high."
 		::=  {  fadcTraps  515  }
 
 	fadcTrapVoltageLow  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if voltage becomes too low."
 		::=  {  fadcTraps  516  }
 
 	fadcTrapPowerSupplyLow  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if power supply voltage becomes too low."
 		::=  {  fadcTraps  517  }
 
 	fadcTrapPSUVoltageLow  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if PSU voltage becomes too low."
 		::=  {  fadcTraps  518  }
 
 	fadcTrapPSUFailure  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if PSU becomes failure."
 		::=  {  fadcTraps  519  }
 
 	fadcTrapARPConflict  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if getting ARP conflict."
 		::=  {  fadcTraps  520  }
 
 	fadcTrapExternalLinkChange  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if an external interface link status changes.
 			For a fixed port, this is an occurrence when network cables are 
-			connected or removed, and the network is reconfigured; for a pluggable 
+			connected or removed, and the network is reconfigured; for a plugable 
 			port (such as a SFP or XFP port), this happens when the pluggable unit 
 			is plugged in or unplugged, or when a cable is connected or removed 
 			from a plugged port. The possible values are UP, DOWN, DISABLED, 
@@ -986,7 +1014,7 @@ fnFortiADCMib MODULE-IDENTITY
 		::=  {  fadcTraps  521  }
 
 	fadcTrapLogDiskCloseThreshold  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if the disk partition free space is very limited,
 			which is less than a specified limit. By default, the limit is set to 
@@ -994,401 +1022,401 @@ fnFortiADCMib MODULE-IDENTITY
 		::=  {  fadcTraps  522  }
 
 	fadcTrapLogDiskLost  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if the log disk cannot mount."
 		::=  {  fadcTraps  523  }
 
 	fadcTrapSsdMwiNearThreshold  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if the SSD disk wear-out indicator is near its threshold."
 		::=  {  fadcTraps  524  }
 
 	fadcTrapSsdMwiReachedThreshold  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if the SSD disk wear-out indicator has reached its threshold."
 		::=  {  fadcTraps  525  }
 
 	fadcTrapHAPeerLost  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if it detect peers lost in HA mode."
 		::=  {  fadcTraps  526  }
 
 	fadcTrapHAMasterFailover  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if the HA-Master failover to HA-Slave in HA mode."
 		::=  {  fadcTraps  527  }
 
 	fadcTrapPortStatusChange  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if the device got monitor port status changing event 
 			include up/down in HA mode."
 		::=  {  fadcTraps  528  }
 
 	fadcTrapDiskStatusChange  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if the device got disk status changing event include
 			bad/fine in HA mode."
 		::=  {  fadcTraps  529  }
 
 	fadcTrapInetPortExhaustion  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if The device has run out of source ports and cannot 
 			open new communications channels with other machines."
 		::=  {  fadcTraps  530  }
 
 	fadcTrapCertExpire  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if One of the SSL certificates configured on the
 			device will expire soon."
 		::=  {  fadcTraps  531  }
 
 	fadcTrapLogicalInterfaceUp  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial, fadcIntfName }
+		OBJECTS       { sysUpTime, fadcSysSerial, fadcAlertPriority, sysName, fadcIntfName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if Logical interfaces (system interfaces) going UP."
 		::=  {  fadcTraps  532  }
 
 	fadcTrapLogicalInterfaceDown  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial, fadcIntfName }
+		OBJECTS       { sysUpTime, fadcSysSerial, fadcAlertPriority, sysName, fadcIntfName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if Logical interfaces (system interfaces) going DOWN."
 		::=  {  fadcTraps  533  }
 
 	fadcTrapLogicalInterfaceDisabled  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial, fadcIntfName }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName, fadcIntfName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if Logical interfaces (system interfaces) going DISABLED."
 		::=  {  fadcTraps  534  }
 
 	fadcTrapAlertTrigger NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial, fadcAlertName }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName, fadcAlertName }
 		STATUS        current
-		DESCRIPTION   "Trap sent if a system alert be trigged"
+		DESCRIPTION   "Trap sent if a system alert be triggered"
 		::=  {  fadcTraps  535  }
 
 	fadcTrapSysConnMemHigh NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION	"Trap sent if Connection memory usage over Threshold"
 		::=  {  fadcTraps  536  }
 
-	fadcTrapSysLincenseExpiryNotif NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+	fadcTrapSysLicenseExpiryNotif NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION	"Trap sent if License expired"
 		::=  {  fadcTraps  537  }
 
 	fadcTrapSysDeviceRebooted NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION	"Trap sent if System rebooted"
 		::=  {  fadcTraps  538  }
 
 	fadcTrapSysDeviceStarted NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION	"Trap sent if Device started"
 		::=  {  fadcTraps  539  }
 
-	fadcTrapSysUpgeadeComplete NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+	fadcTrapSysUpgradeComplete NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION	"Trap sent if System upgrade complete"
 		::=  {  fadcTraps  540  }
 
 	fadcTrapSysUserLogin NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION	"Trap sent if User login"
 		::=  {  fadcTraps  541  }
 
 	fadcTrapSysUserLogout NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION	"Trap sent if User logout"
 		::=  {  fadcTraps  542  }
 
 	fadcTrapSysDhcpIpAllocFailure NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION	"Trap sent if IP address allocation failure"
 		::=  {  fadcTraps  543  }
 
 	fadcTrapSysMetricsDbDiskFull NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION	"Trap sent if Metrics DB Disk full"
 		::=  {  fadcTraps  544  }
 
 	fadcTrapSysStatisticsDbDiskFull NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION	"Trap sent if Statistics DB Disk usage full"
 		::=  {  fadcTraps  545  }
 
 	fadcTrapSysLogFull NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION	"Trap sent if Log disk full"
 		::=  {  fadcTraps  546  }
 
 	fadcTrapSysFwBandwidthLimit NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION	"Trap sent if traffic dropped due to FW QoS"
 		::=  {  fadcTraps  547  }
 
 	fadcTrapConfigExecute NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION	"Trap sent if Config executed"
 		::=  {  fadcTraps  548  }
 
 	fadcTrapConfigCreate NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION	"Trap sent if Config create"
 		::=  {  fadcTraps  549  }
 
 	fadcTrapConfigDelete NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION	"Trap sent if Config delete"
 		::=  {  fadcTraps  550  }
 
 	fadcTrapConfigUpdate NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION	"Trap sent if Config update"
 		::=  {  fadcTraps  551  }
 
 	fadcTrapSysOcspResponseExpires NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION     "Trap sent if OCSP response expires"
 		::=  {  fadcTraps  552  }
 
 	fadcTrapSysSslCertificateRevoked NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION     "Trap sent if SSL certificate revoked"
 		::=  {  fadcTraps  553  }
 
 	fadcTrapSysCrlExpires NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION     "Trap sent if SYS CRL expires"
 		::=  {  fadcTraps  554  }
 
 	fadcTrapMemberConnRateStart  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a pool member has exceeded the allowed connection rate."
 		::=  {  fadcTraps  600  }
 
 	fadcTrapVSConnRateStart  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a virtual server has exceeded the allowed connection rate."
 		::=  {  fadcTraps  601  }
 
 	fadcTrapMemberConnLimitStart  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a pool member has exceeded the allowed connections."
 		::=  {  fadcTraps  602  }
 
 	fadcTrapVSConnLimitStart  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a virtual server has exceeded the allowed connections."
 		::=  {  fadcTraps  603  }
 
 	fadcTrapMemberConnRateStop  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a pool member has dropping the allowed connection rate."
 		::=  {  fadcTraps  604  }
 
 	fadcTrapVSConnRateStop  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a virtual server has dropping the allowed connection rate."
 		::=  {  fadcTraps  605  }
 
 	fadcTrapMemberConnLimitStop  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a pool member has dropping the allowed connections."
 		::=  {  fadcTraps  606  }
 
 	fadcTrapVSConnLimitStop  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a virtual server has dropping the allowed connections."
 		::=  {  fadcTraps  607  }
 
 	fadcTrapVSTransactionRateStart  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a virtual server has exceeded the allowed transaction rate."
 		::=  {  fadcTraps  608  }
 
 	fadcTrapVSTransactionRateStop  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a virtual server has dropping the allowed transaction rate."
 		::=  {  fadcTraps  609  }
 
 	fadcTrapMemberHCDown  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if A pool member has occurring health check down."
 		::=  {  fadcTraps  610  }
 
 	fadcTrapVSHealthChange  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a virtual server has occurring health status change."
 		::=  {  fadcTraps  611  }
 
 	fadcTrapMemberHCUp  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a pool member has occurring health check up."
 		::=  {  fadcTraps  612  }
 
 	fadcTrapVSAuthFail  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a virtual server has occurring authentication failure."
 		::=  {  fadcTraps  613  }
 
 	fadcTrapVSIPPoolLimit  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if VS ip pool has exhausted."
 		::=  {  fadcTraps  614  }
 
-	adcTrapGatewayHCDown  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+	fadcTrapGatewayHCDown  NOTIFICATION-TYPE
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a link group member has occurring health check down."
 		::=  {  fadcTraps  615  }
 
 	fadcTrapLinkGroupHCDown  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a link group has occurring health check down."
 		::=  {  fadcTraps  616  }
 
 	fadcTrapGatewayHCUp  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a link group member has occurring health check up."
 		::=  {  fadcTraps  617  }
 
 	fadcTrapLinkGroupHCUp  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a link group has occurring health check up."
 		::=  {  fadcTraps  618  }
 
 	fadcTrapGatewayInboundBandwidth  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a link group member has exceeded the 
 			allowed inbound bandwidth."
 		::=  {  fadcTraps  619  }
 
 	fadcTrapGatewayOutboundBandwidth  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a link group member has exceeded the 
 			allowed outbound bandwidth."
 		::=  {  fadcTraps  620  }
 
 	fadcTrapGatewayInboundSpillover  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a link group member has exceeded the 
 			allowed inbound Spillover."
 		::=  {  fadcTraps  621  }
 
 	fadcTrapGatewayOutboundSpillover  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a link group member has exceeded the 
 			allowed outbound Spillover."
 		::=  {  fadcTraps  622  }
 
 	fadcTrapGatewayTotalSpillover  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a link group member has exceeded the 
 			allowed total Spillover"
 		::=  {  fadcTraps  623  }
 
 	fadcTrapGlbServerNotAvail  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a Server is becoming unavailable in global 
 			traffic management module include SLB and generic."
 		::=  {  fadcTraps  624  }
 
 	fadcTrapGlbServerAvail  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a Server is becoming available in global 
 			traffic management module."
 		::=  {  fadcTraps  625  }
 
 	fadcTrapGlbVSNotAvail  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if A Virtual Server is becoming unavailable in global 
 			traffic management module."
 		::=  {  fadcTraps  626  }
 
 	fadcTrapGlbVSAvail  NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a Virtual Server is becoming available in global 
 			traffic management module."
 		::=  {  fadcTraps  627  }
 
 --	fadcTrapGlbPoolNotAvail  NOTIFICATION-TYPE
---		OBJECTS       { fadcSysSerial }
+--		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 --		STATUS        current
 --		DESCRIPTION   "Trap sent if a pool is becoming unavailable in global
 --			traffic management module."
 --		::=  {  fadcTraps  628  }
 
 --	fadcTrapGlbPoolAvail  NOTIFICATION-TYPE
---		OBJECTS       { fadcSysSerial }
+--		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 --		STATUS        current
 --		DESCRIPTION   "Trap sent if a pool is becoming available in global
 --			traffic management module."
 --		::=  {  fadcTraps  629  }
 
 --	fadcTrapUnsolicitedRepliesExceededThreshold  NOTIFICATION-TYPE
---		OBJECTS       { fadcSysSerial }
+--		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 --		STATUS        current
 --		DESCRIPTION   "Trap sent if The DNS cache object received unsolicited query
 --			replies exceeding a configured threshold."
 --		::=  {  fadcTraps  630  }
 
 --	fadcTrapGlbKeyGenerationRollover  NOTIFICATION-TYPE
---		OBJECTS       { fadcSysSerial }
+--		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 --		STATUS        current
 --		DESCRIPTION   "Trap sent if DNSSEC Key generation has rolled over."
 --		::=  {  fadcTraps  631  }
@@ -1400,181 +1428,181 @@ fnFortiADCMib MODULE-IDENTITY
 --		::=  {  fadcTraps  632  }
 
 	fadcTrapGlbGWNotAvail NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a Gateway is becoming unavailable in global traffic management module."
 		::=  {  fadcTraps  633  }
 
 	fadcTrapGlbGWAvail NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS        current
 		DESCRIPTION   "Trap sent if a Gateway is becoming available in global traffic management module."
 		::=  {  fadcTraps  634  }
 
 	fadcTrapSlbPoolDown NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if a Pool is down"
 		::=  {  fadcTraps  635  }
 
 	fadcTrapSlbPoolUp NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if a Pool is up"
 		::=  {  fadcTraps  636  }
 
 	fadcTrapSlbPoolHealthChange NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
-		DESCRIPTION     "Trap sent if a Pool health check is chnage"
+		DESCRIPTION     "Trap sent if a Pool health check is change"
 		::=  {  fadcTraps  637  }
 
 	fadcTrapSlbServerHealthChange NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
-		DESCRIPTION     "Trap sent if a Server health check is chnage"
+		DESCRIPTION     "Trap sent if a Server health check is change"
 		::=  {  fadcTraps  638  }
 
 	fadcTrapSlbServerEnabled NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if a Server enabled"
 		::=  {  fadcTraps  639  }
 
 	fadcTrapSlbServerDisabled NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if a Server disabled"
 		::=  {  fadcTraps  640  }
 
 	fadcTrapSlbServerMaintain NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if a Server maintain"
 		::=  {  fadcTraps  641  }
 
 	fadcTrapSlbVirtualServerDown NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if a Virtual server is down"
 		::=  {  fadcTraps  642  }
 
 	fadcTrapSlbVirtualServerUp NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if a Virtual server is up"
 		::=  {  fadcTraps  643  }
 
 	fadcTrapSlbVirtualServerEnabled NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if a Virtual server is enabled"
 		::=  {  fadcTraps  644  }
 
 	fadcTrapSlbVirtualServerDisabled NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if a Virtual server is disabled"
 		::=  {  fadcTraps  645  }
 
 	fadcTrapSlbVirtualServerMaintain NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if a Virtual server is maintain"
 		::=  {  fadcTraps  646  }
 
 	fadcTrapSlbFlowTblHigh NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if Flow table usage over Threshold"
 		::=  {  fadcTraps  647  }
 
 	fadcTrapSlbPersistTblHigh NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if Persistence table usage over Threshold"
 		::=  {  fadcTraps  648  }
 
 	fadcTrapSlbPktBuffHigh NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if Packet buffer usage over Threshold"
 		::=  {  fadcTraps  649  }
 
 	fadcTrapSlbSynCacheUsageHigh NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if SYN cache usage over Threshold"
 		::=  {  fadcTraps  650  }
 
 	fadcTrapSlbSynTblHigh NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if SYN table usage over Threshold"
 		::=  {  fadcTraps  651  }
 
 	fadcTrapSlbConnDropMaxFlowTbl NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if connection(s) dropped due to flow table limit"
 		::=  {  fadcTraps  652  }
 
 	fadcTrapSlbConnDropMaxPersistTbl NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if connection(s) dropped due to persistence table limit"
 		::=  {  fadcTraps  653  }
 
 	fadcTrapSlbConnDropMaxSysTbl NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if connection(s) dropped due to SYN table limit"
 		::=  {  fadcTraps  654  }
 
 	fadcTrapSlbConnDropNoConnMem NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if connection(s) dropped due to SYN table limit"
 		::=  {  fadcTraps  655  }
 
 	fadcTrapSlbConnDropNoPktBuff NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if connection(s) dropped due to low packet buffer"
 		::=  {  fadcTraps  656  }
 
 	fadcTrapSlbConnDropPoolLBFailure NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if pool load balancing decision(s) failed"
 		::=  {  fadcTraps  657  }
 
 	fadcTrapSlbPktDropNoPktBuff NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if packet(s) dropped due to low packet buffer"
 		::=  {  fadcTraps  658  }
 
 	fadcTrapSlbPktBuffAllocFail NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if packet buffer allocation failure(s)"
 		::=  {  fadcTraps  659  }
 
 	fadcTrapSlbCertExpire NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if SSL certificate expires in"
 		::=  {  fadcTraps  660  }
 
 	fadcTrapSlbCacheOBJAllocFail NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if HTTP cacheable objects dropped due to memory allocation failure"
 		::=  {  fadcTraps  661  }
 
 	fadcTrapLlbVSThroughputLimit NOTIFICATION-TYPE
-		OBJECTS       { fadcSysSerial }
+		OBJECTS       { fadcSysSerial, fadcAlertPriority, sysName }
 		STATUS      current
 		DESCRIPTION     "Trap sent if packet(s) dropped due to virtual service bandwidth limit"
 		::=  {  fadcTraps  662  }
@@ -1658,7 +1686,7 @@ fnFortiADCMib MODULE-IDENTITY
 		MAX-ACCESS  read-only
 		STATUS      current
 		DESCRIPTION
-			"New Connections persecond rate for the specified virtual server."
+			"New Connections per second rate for the specified virtual server."
 		::= { fadcVSEntry 5 }
 
 	fadcVSConcurrent OBJECT-TYPE
@@ -1682,7 +1710,7 @@ fnFortiADCMib MODULE-IDENTITY
 		MAX-ACCESS  read-only
 		STATUS      current
 		DESCRIPTION
-			"The virtual domian of the specified virtual server."
+			"The virtual domain of the specified virtual server."
 		::= { fadcVSEntry 8 }
 
 	--
@@ -2180,7 +2208,7 @@ fnFortiADCMib MODULE-IDENTITY
 	    MAX-ACCESS  read-only
 	    STATUS      current
 	    DESCRIPTION 
-	    	"The Devcice fan name."
+	    	"The Device fan name."
 	    ::= { fadcDeviceFanEntry 2 }
     
     	fadcDeviceFanSpeed	OBJECT-TYPE
@@ -2196,7 +2224,7 @@ fnFortiADCMib MODULE-IDENTITY
 	    MAX-ACCESS  read-only
 	    STATUS      current
 	    DESCRIPTION 
-	    	"The Devcice fan tray status. (0 for good, 1 for bad or removed)"
+	    	"The Device fan tray status. (0 for good, 1 for bad or removed)"
 	    ::= { fadcDeviceFanEntry 4 }
 
 	--
@@ -2226,12 +2254,12 @@ fnFortiADCMib MODULE-IDENTITY
 	    	"The count of Peer."
 	    ::= { fadcHA 3 }
 
-	fadcMoniterIntfCount	OBJECT-TYPE
+	fadcMonitorIntfCount	OBJECT-TYPE
 	    SYNTAX		Integer32
 	    MAX-ACCESS  read-only
 	    STATUS      current
 	    DESCRIPTION 
-	    	"The count of Moniter Interface"
+	    	"The count of Monitor Interface"
 	    ::= { fadcHA 4 }   
 
 	fadcDiskState	OBJECT-TYPE
@@ -2527,7 +2555,7 @@ fnFortiADCMib MODULE-IDENTITY
 		MAX-ACCESS  read-only
 		STATUS      current
 		DESCRIPTION
-			"The virtual domian of the specified real server(pool member)."
+			"The virtual domain of the specified real server(pool member)."
 		::= { fadcRSEntry 5 }
 
         fadcRSName OBJECT-TYPE
@@ -2551,7 +2579,7 @@ fnFortiADCMib MODULE-IDENTITY
 	-- fnFortiADCMib.fadcApplication.fadcVirtualServer
 	--
 	
-	fadcVirturalServerNumber OBJECT-TYPE
+	fadcVirtualServerNumber OBJECT-TYPE
 		SYNTAX      Integer32
 		MAX-ACCESS  read-only
 		STATUS      current
@@ -2559,8 +2587,8 @@ fnFortiADCMib MODULE-IDENTITY
 			"The number of virtual servers in fadcVirtualServer."
 		::= { fadcVS 1 }
 
-	fadcVirturalServerTable OBJECT-TYPE
-		SYNTAX      SEQUENCE OF FadcVirturalServerEntry
+	fadcVirtualServerTable OBJECT-TYPE
+		SYNTAX      SEQUENCE OF FadcVirtualServerEntry
 		MAX-ACCESS  not-accessible
 		STATUS      current
 		DESCRIPTION
@@ -2568,92 +2596,92 @@ fnFortiADCMib MODULE-IDENTITY
 			intended to be extended with platform specific information."
 		::= { fadcVS 2 }
 
-	fadcVirturalServerEntry OBJECT-TYPE
-		SYNTAX      FadcVirturalServerEntry
+	fadcVirtualServerEntry OBJECT-TYPE
+		SYNTAX      FadcVirtualServerEntry
 		MAX-ACCESS  not-accessible
 		STATUS      current
 		DESCRIPTION
 			"An entry containing information applicable to a particular virtual server."
-		INDEX       { fadcVirturalServerIndex }
-		::= { fadcVirturalServerTable 1 }
+		INDEX       { fadcVirtualServerIndex }
+		::= { fadcVirtualServerTable 1 }
 
-	FadcVirturalServerEntry ::= SEQUENCE {
-		fadcVirturalServerIndex				FnIndex,
-		fadcVirturalServerName				DisplayString,
-		fadcVirturalServerStatus			DisplayString,
-		fadcVirturalServerHealth			DisplayString,
-		fadcVirturalServerNewConnections	Integer32,
-		fadcVirturalServerConcurrent		Integer32,
-		fadcVirturalServerThroughputKbps	Integer32,
-		fadcVirturalServerVdom				DisplayString,
-		fadcVirturalServerWAF				Integer32
+	FadcVirtualServerEntry ::= SEQUENCE {
+		fadcVirtualServerIndex				FnIndex,
+		fadcVirtualServerName				DisplayString,
+		fadcVirtualServerStatus			DisplayString,
+		fadcVirtualServerHealth			DisplayString,
+		fadcVirtualServerNewConnections	Integer32,
+		fadcVirtualServerConcurrent		Integer32,
+		fadcVirtualServerThroughputKbps	Integer32,
+		fadcVirtualServerVdom				DisplayString,
+		fadcVirtualServerWAF				Integer32
 	}
 
-	fadcVirturalServerIndex OBJECT-TYPE
+	fadcVirtualServerIndex OBJECT-TYPE
 		SYNTAX      FnIndex
 		MAX-ACCESS  not-accessible
 		STATUS      current
 		DESCRIPTION
 			"An index uniquely defining a virtual server within the fadcVSTable."
-		::= { fadcVirturalServerEntry 1 }
+		::= { fadcVirtualServerEntry 1 }
 
-	fadcVirturalServerName OBJECT-TYPE
+	fadcVirtualServerName OBJECT-TYPE
 		SYNTAX      DisplayString
 		MAX-ACCESS  read-only
 		STATUS      current
 		DESCRIPTION
 			"The server name of the specified virtual server."
-		::= { fadcVirturalServerEntry 2 }
+		::= { fadcVirtualServerEntry 2 }
 
-	fadcVirturalServerStatus OBJECT-TYPE
+	fadcVirtualServerStatus OBJECT-TYPE
 		SYNTAX      DisplayString
 		MAX-ACCESS  read-only
 		STATUS      current
 		DESCRIPTION
 			"The configuration status of specified virtual server."
-		::= { fadcVirturalServerEntry 3 }
+		::= { fadcVirtualServerEntry 3 }
 
-	fadcVirturalServerHealth OBJECT-TYPE
+	fadcVirtualServerHealth OBJECT-TYPE
 		SYNTAX      DisplayString
 		MAX-ACCESS  read-only
 		STATUS      current
  		DESCRIPTION
 			"The health of specified virtual server."
-		::= { fadcVirturalServerEntry 4 }
+		::= { fadcVirtualServerEntry 4 }
 
-	fadcVirturalServerNewConnections OBJECT-TYPE
+	fadcVirtualServerNewConnections OBJECT-TYPE
 		SYNTAX      Integer32 (1..2147483647)
 		MAX-ACCESS  read-only
 		STATUS      current
 		DESCRIPTION
 			"New Connections persecond rate for the specified virtual server."
-		::= { fadcVirturalServerEntry 5 }
+		::= { fadcVirtualServerEntry 5 }
 
-	fadcVirturalServerConcurrent OBJECT-TYPE
+	fadcVirtualServerConcurrent OBJECT-TYPE
 		SYNTAX      Integer32 (1..2147483647)
 		MAX-ACCESS  read-only
 		STATUS      current
 		DESCRIPTION
 			"Concurrent connection rate for the specified virtual server."
-		::= { fadcVirturalServerEntry 6 }
+		::= { fadcVirtualServerEntry 6 }
 
-	fadcVirturalServerThroughputKbps OBJECT-TYPE
+	fadcVirtualServerThroughputKbps OBJECT-TYPE
 		SYNTAX      Integer32 (1..2147483647)
 		MAX-ACCESS  read-only
 		STATUS      current
 		DESCRIPTION
 			"Throughput bps rate for the specified virtual server."
-		::= { fadcVirturalServerEntry 7 }
+		::= { fadcVirtualServerEntry 7 }
 
-	fadcVirturalServerVdom OBJECT-TYPE
+	fadcVirtualServerVdom OBJECT-TYPE
 		SYNTAX      DisplayString
 		MAX-ACCESS  read-only
 		STATUS      current
 		DESCRIPTION
-			"The virtual domian of the specified virtual server."
-		::= { fadcVirturalServerEntry 8 }
+			"The virtual domain of the specified virtual server."
+		::= { fadcVirtualServerEntry 8 }
 
-	fadcVirturalServerWAF	OBJECT-TYPE
+	fadcVirtualServerWAF	OBJECT-TYPE
 		SYNTAX      Integer32 (1..2147483647)
 		MAX-ACCESS  read-only
 		STATUS      current
@@ -2662,7 +2690,7 @@ fnFortiADCMib MODULE-IDENTITY
 			blocked because it issued (at least one) violation(s) which is 
 			marked as blocking at the current active policy in Application 
 			Security Module.)"
-		::= { fadcVirturalServerEntry 9 }
+		::= { fadcVirtualServerEntry 9 }
 	
 	--
 	-- fnFortiADCMib.fadcApplication.fadcLinkLoadBalance.fadcGatewayTables
@@ -2745,7 +2773,7 @@ fnFortiADCMib MODULE-IDENTITY
 		MAX-ACCESS  read-only
 		STATUS      current
 		DESCRIPTION
-			"The virtual domian of the specified Gateway."
+			"The virtual domain of the specified Gateway."
 		::= { fadcGatewayEntry 6 }
 
 	--
@@ -2822,7 +2850,7 @@ fnFortiADCMib MODULE-IDENTITY
 		MAX-ACCESS  read-only
 		STATUS      current
 		DESCRIPTION
-			"The virtual domian of the specified Link Group."
+			"The virtual domain of the specified Link Group."
 		::= { fadcLinkGroupEntry 5 }
   	
   	--
@@ -2897,7 +2925,7 @@ fnFortiADCMib MODULE-IDENTITY
 		MAX-ACCESS  read-only
 		STATUS      current
 		DESCRIPTION
-			"The virtual domian of the specified GLB vs."
+			"The virtual domain of the specified GLB vs."
 		::= { fadcGLBVSEntry 5 }
 
 	--
@@ -2909,7 +2937,7 @@ fnFortiADCMib MODULE-IDENTITY
 		MAX-ACCESS  read-only
 		STATUS      current
 		DESCRIPTION
-			"Client-side connecyions per second"
+			"Client-side connections per second"
 		::= { fadcServerLoadBalance 1 }
 
 	fadcClientSideRPS OBJECT-TYPE
@@ -2925,7 +2953,7 @@ fnFortiADCMib MODULE-IDENTITY
 		MAX-ACCESS  read-only
 		STATUS      current
 		DESCRIPTION
-			"Client-side SSL-only connecyions per second"
+			"Client-side SSL-only connections per second"
 		::= { fadcServerLoadBalance 3 }
 
 	fadcClientSideSSLRPS OBJECT-TYPE
@@ -2941,7 +2969,7 @@ fnFortiADCMib MODULE-IDENTITY
 		MAX-ACCESS  read-only
 		STATUS      current
 		DESCRIPTION
-			"Client-side throughputingress and egress"
+			"Client-side throughput ingress and egress"
 		::= { fadcServerLoadBalance 5 }
 
 	fadcClientSideSSLThroughput OBJECT-TYPE
@@ -2972,27 +3000,27 @@ fnFortiADCMib MODULE-IDENTITY
 	-- fnFortiADCMib.fadcApplication.fadcServerLoadBalance.fadcClientSideSSLCacheUtilizationTables
 	--
 
-	fadcClientSSLCacheUtilizTables OBJECT IDENTIFIER
+	fadcClientSSLCacheUtilizeTables OBJECT IDENTIFIER
 		::= { fadcServerLoadBalance 20 }
 
-	fadcClientSSLCacheUtilizTable OBJECT-TYPE
-		SYNTAX      SEQUENCE OF FadcClientSSLCacheUtilizEntry
+	fadcClientSSLCacheUtilizeTable OBJECT-TYPE
+		SYNTAX      SEQUENCE OF FadcClientSSLCacheUtilizeEntry
 		MAX-ACCESS  not-accessible
 		STATUS      current
 		DESCRIPTION
 			"Client-side SSL cache utilization table"
-		::= { fadcClientSSLCacheUtilizTables 1 }
+		::= { fadcClientSSLCacheUtilizeTables 1 }
 
-	fadcClientSSLCacheUtilizEntry OBJECT-TYPE
-		SYNTAX      FadcClientSSLCacheUtilizEntry
+	fadcClientSSLCacheUtilizeEntry OBJECT-TYPE
+		SYNTAX      FadcClientSSLCacheUtilizeEntry
 		MAX-ACCESS  not-accessible
 		STATUS      current
 		DESCRIPTION
 			"An entry containing information applicable to a particular virtual server."
 		INDEX       { fadcSLBVSIndex }
-		::= { fadcClientSSLCacheUtilizTable 1 }
+		::= { fadcClientSSLCacheUtilizeTable 1 }
 
-	FadcClientSSLCacheUtilizEntry ::= SEQUENCE {
+	FadcClientSSLCacheUtilizeEntry ::= SEQUENCE {
 		fadcSLBVSIndex              FnIndex,
 		fadcSLBVSName               DisplayString,
 		fadcSLBTotalCacheItems             Integer32,
@@ -3012,7 +3040,7 @@ fnFortiADCMib MODULE-IDENTITY
 		STATUS      current
 		DESCRIPTION
 			"An index uniquely defining a virtual server within the fadcClientSSLCacheUtilizationTable."
-		::= { fadcClientSSLCacheUtilizEntry 1 }
+		::= { fadcClientSSLCacheUtilizeEntry 1 }
 
 	fadcSLBVSName OBJECT-TYPE
 		SYNTAX      DisplayString
@@ -3020,7 +3048,7 @@ fnFortiADCMib MODULE-IDENTITY
 		STATUS      current
 		DESCRIPTION
 			"The server name of the specified virtual server."
-		::= { fadcClientSSLCacheUtilizEntry 2 }
+		::= { fadcClientSSLCacheUtilizeEntry 2 }
 
 	fadcSLBTotalCacheItems OBJECT-TYPE
 		SYNTAX      Integer32 (1..2147483647)
@@ -3028,7 +3056,7 @@ fnFortiADCMib MODULE-IDENTITY
 		STATUS      current
 		DESCRIPTION
 			"The total cache items of specified virtual server."
-		::= { fadcClientSSLCacheUtilizEntry 3 }
+		::= { fadcClientSSLCacheUtilizeEntry 3 }
 
 	fadcSLBTotalCacheSize OBJECT-TYPE
 		SYNTAX      Integer32 (1..2147483647)
@@ -3036,7 +3064,7 @@ fnFortiADCMib MODULE-IDENTITY
 		STATUS      current
 		DESCRIPTION
 			"The total cache size of specified virtual server."
-		::= { fadcClientSSLCacheUtilizEntry 4 }
+		::= { fadcClientSSLCacheUtilizeEntry 4 }
 
 	fadcSLBCacheHitCount OBJECT-TYPE
 		SYNTAX      Integer32 (1..2147483647)
@@ -3044,7 +3072,7 @@ fnFortiADCMib MODULE-IDENTITY
 		STATUS      current
 		DESCRIPTION
 			"The cache hit count of specified virtual server."
-		::= { fadcClientSSLCacheUtilizEntry 5 }
+		::= { fadcClientSSLCacheUtilizeEntry 5 }
 
 	fadcSLBCacheHitBytes OBJECT-TYPE
 		SYNTAX      Integer32 (1..2147483647)
@@ -3052,7 +3080,7 @@ fnFortiADCMib MODULE-IDENTITY
 		STATUS      current
 		DESCRIPTION
 			"The cache hit bytes of specified virtual server."
-		::= { fadcClientSSLCacheUtilizEntry 6 }
+		::= { fadcClientSSLCacheUtilizeEntry 6 }
 
 	fadcSLBTotalCertCacheItems OBJECT-TYPE
 		SYNTAX      Integer32 (1..2147483647)
@@ -3060,7 +3088,7 @@ fnFortiADCMib MODULE-IDENTITY
 		STATUS      current
 		DESCRIPTION
 			"The total certificate cache items of specified virtual server."
-		::= { fadcClientSSLCacheUtilizEntry 7 }
+		::= { fadcClientSSLCacheUtilizeEntry 7 }
 
 	fadcSLBTotalCertCacheSize OBJECT-TYPE
 		SYNTAX      Integer32 (1..2147483647)
@@ -3068,7 +3096,7 @@ fnFortiADCMib MODULE-IDENTITY
 		STATUS      current
 		DESCRIPTION
 			"The total certificate cache size of specified virtual server."
-		::= { fadcClientSSLCacheUtilizEntry 8 }
+		::= { fadcClientSSLCacheUtilizeEntry 8 }
 
 	fadcSLBHitCertCacheCount OBJECT-TYPE
 		SYNTAX      Integer32 (1..2147483647)
@@ -3076,7 +3104,7 @@ fnFortiADCMib MODULE-IDENTITY
 		STATUS      current
 		DESCRIPTION
 			"The certificate cache hit count of specified virtual server."
-		::= { fadcClientSSLCacheUtilizEntry 9 }
+		::= { fadcClientSSLCacheUtilizeEntry 9 }
 
 	fadcSLBHitCertTotalCheck OBJECT-TYPE
 		SYNTAX      Integer32 (1..2147483647)
@@ -3084,7 +3112,7 @@ fnFortiADCMib MODULE-IDENTITY
 		STATUS      current
 		DESCRIPTION
 			"The certificate cache hit total check of specified virtual server."
-		::= { fadcClientSSLCacheUtilizEntry 10 }
+		::= { fadcClientSSLCacheUtilizeEntry 10 }
 
 	fadcSLBHitCertPercentage OBJECT-TYPE
 		SYNTAX      Integer32 (1..2147483647)
@@ -3092,7 +3120,7 @@ fnFortiADCMib MODULE-IDENTITY
 		STATUS      current
 		DESCRIPTION
 			"The certificate cache hit percentage of specified virtual server."
-		::= { fadcClientSSLCacheUtilizEntry 11 }
+		::= { fadcClientSSLCacheUtilizeEntry 11 }
 
 	--
 	-- fnFortiADCMib.fadcApplication.fadcGlobalLoadBalance.fadcGLBServerTables
@@ -3157,7 +3185,7 @@ fnFortiADCMib MODULE-IDENTITY
 		MAX-ACCESS  read-only
 		STATUS      current
 		DESCRIPTION
-			"The virtual domian of the specified GLB server."
+			"The virtual domain of the specified GLB server."
 		::= { fadcGLBServerEntry 4 }
 
 	--
@@ -3232,7 +3260,7 @@ fnFortiADCMib MODULE-IDENTITY
 		MAX-ACCESS  read-only
 		STATUS      current
 		DESCRIPTION
-			"The virtual domian of the specified GLB gateway."
+			"The virtual domain of the specified GLB gateway."
 		::= { fadcGLBGatewayEntry 5 }
 
 	--
@@ -3264,8 +3292,12 @@ fnFortiADCMib MODULE-IDENTITY
 					fadcTrapExploitsAttack, fadcTrapTrojansAttack,
 					fadcTrapInfoDisclosureAttack, fadcTrapURLPattenViolate,
 					fadcTrapProtocolConstraint, fadcTrapGeoViolateDetected,
-					fadcTrapReputaionViolateDetected, fadcTrapBotDetected, fadcTrapFwConnectionDeny,
+					fadcTrapReputationViolateDetected, fadcTrapBotDetected, fadcTrapFwConnectionDeny,
 					fadcTrapXmlDetected, fadcTrapJsonDetected, fadcTrapSoapDetected,
+					fadcTrapDlpDetected, fadcTrapHtmlDetected, fadcTrapWpdDetected, fadcTrapCsrfDetected,
+					fadcTrapDdosIpFragmentation, fadcTrapDdosTcpSlowDataAttack, fadcTrapDdosTcpAccessFlood,
+					fadcTrapDdosHttpConnectionFlood, fadcTrapDdosHttpRequestFlood, fadcTrapDdosHttpAccessLimit,
+					fadcTrapPeriodBlockIP, 
 					fadcTrapCPUTempHigh, fadcTrapCPUTempNormal, fadcTrapDeviceTempHigh,
 					fadcTrapDeviceTempNormal, fadcTrapPSUTempHigh, fadcTrapPSUTempNormal,
 					fadcTrapPSUFanSlow, fadcTrapDeviceFanSlow, fadcTrapPSUFanBad, fadcTrapPSUFanGood,
@@ -3276,8 +3308,8 @@ fnFortiADCMib MODULE-IDENTITY
 					fadcTrapHAPeerLost, fadcTrapHAMasterFailover, fadcTrapPortStatusChange, fadcTrapDiskStatusChange,
 					fadcTrapInetPortExhaustion, fadcTrapCertExpire, fadcTrapLogicalInterfaceUp,
 					fadcTrapLogicalInterfaceDown, fadcTrapLogicalInterfaceDisabled, fadcTrapAlertTrigger,
-					fadcTrapSysConnMemHigh, fadcTrapSysLincenseExpiryNotif, fadcTrapSysDeviceRebooted,
-					fadcTrapSysDeviceStarted, fadcTrapSysUpgeadeComplete, fadcTrapSysUserLogin,
+					fadcTrapSysConnMemHigh, fadcTrapSysLicenseExpiryNotif, fadcTrapSysDeviceRebooted,
+					fadcTrapSysDeviceStarted, fadcTrapSysUpgradeComplete, fadcTrapSysUserLogin,
 					fadcTrapSysUserLogout, fadcTrapSysDhcpIpAllocFailure, fadcTrapSysMetricsDbDiskFull,
 					fadcTrapSysStatisticsDbDiskFull, fadcTrapSysLogFull, fadcTrapSysFwBandwidthLimit,
 					fadcTrapConfigExecute, fadcTrapConfigCreate, fadcTrapConfigDelete, fadcTrapConfigUpdate,
@@ -3286,7 +3318,7 @@ fnFortiADCMib MODULE-IDENTITY
 					fadcTrapVSConnLimitStart, fadcTrapMemberConnRateStop, fadcTrapVSConnRateStop,
 					fadcTrapMemberConnLimitStop, fadcTrapVSConnLimitStop, fadcTrapVSTransactionRateStart,
 					fadcTrapVSTransactionRateStop, fadcTrapMemberHCDown, fadcTrapVSHealthChange, fadcTrapMemberHCUp,
-					fadcTrapVSAuthFail, fadcTrapVSIPPoolLimit, adcTrapGatewayHCDown,
+					fadcTrapVSAuthFail, fadcTrapVSIPPoolLimit, fadcTrapGatewayHCDown,
 					fadcTrapLinkGroupHCDown, fadcTrapGatewayHCUp, fadcTrapLinkGroupHCUp, fadcTrapGatewayInboundBandwidth,
 					fadcTrapGatewayOutboundBandwidth, fadcTrapGatewayInboundSpillover, fadcTrapGatewayOutboundSpillover,
 					fadcTrapGatewayTotalSpillover, fadcTrapGlbServerNotAvail, fadcTrapGlbServerAvail, fadcTrapGlbVSNotAvail,
@@ -3366,7 +3398,7 @@ fnFortiADCMib MODULE-IDENTITY
 					fadcPortLinkName, fadcPortLinkStatus,
 					fadcDeviceTempName, fadcDeviceTempValue,
 					fadcDeviceFanName, fadcDeviceFanSpeed, fadcDeviceFanStatus,
-					fadcHACurMode, fadcHACurState, fadcHAPeerCount,	fadcMoniterIntfCount,
+					fadcHACurMode, fadcHACurState, fadcHAPeerCount,	fadcMonitorIntfCount,
 					fadcDiskState, fadcHALastChangedTime, fadcHALastChangedReason,
 					fadcSyncType, fadcSyncSent, fadcSyncReceived,
 					fadcDuplicateNodeID, fadcVersionMismatch,
@@ -3386,12 +3418,12 @@ fnFortiADCMib MODULE-IDENTITY
 
 	fadcApplicationConformanceGroup OBJECT-GROUP
 		OBJECTS 	{ fadcPoolNumber, fadcRSNumber, fadcPoolName, fadcRSStatus,
-					fadcRSHealth, fadcRSVdom, fadcRSName,
-					fadcVirturalServerNumber, fadcVirturalServerName,
-					fadcVirturalServerStatus, fadcVirturalServerHealth,
-					fadcVirturalServerNewConnections, fadcVirturalServerConcurrent,
-					fadcVirturalServerThroughputKbps, fadcVirturalServerVdom,
-					fadcVirturalServerWAF,
+					fadcRSHealth, fadcRSVdom, fadcRSName, fadcRSObjStatus,
+					fadcVirtualServerNumber, fadcVirtualServerName,
+					fadcVirtualServerStatus, fadcVirtualServerHealth,
+					fadcVirtualServerNewConnections, fadcVirtualServerConcurrent,
+					fadcVirtualServerThroughputKbps, fadcVirtualServerVdom,
+					fadcVirtualServerWAF,
 					fadcGatewayName, fadcGatewayHCStatus, fadcGatewayInboundBandWidth,
 					fadcGatewayOutboundBandWidth, fadcGatewayVdom,
 					fadcLinkGroupName, fadcLinkGroupHCStatus, fadcLinkGroupMode, fadcLinkGroupVdom,

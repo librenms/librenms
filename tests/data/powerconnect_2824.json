@@ -5488,14 +5488,14 @@
                     "vlan_domain": 1,
                     "vlan_name": "Internal vlan",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 3,
                     "vlan_domain": 1,
                     "vlan_name": "extra",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ]
         }

@@ -1,7 +1,7 @@
 --**MOD+************************************************************************
 --* Module:    ARUBAWIRED-POWERSUPPLY-MIB :POWERSUPPLY MIB file
 --*
---* (c) Copyright 2020,2023 Hewlett Packard Enterprise Development LP
+--* (c) Copyright 2020,2023-2025 Hewlett Packard Enterprise Development LP
 --* All Rights Reserved.
 --*
 --* The contents of this software are proprietary and confidential
@@ -27,7 +27,7 @@ IMPORTS
         FROM ARUBAWIRED-CHASSIS-MIB;
 
 arubaWiredPowerSupply MODULE-IDENTITY
-    LAST-UPDATED "202305090000Z" -- May 9, 2023
+    LAST-UPDATED "202502260000Z" -- February 26, 2025
     ORGANIZATION "HPE/Aruba Networking Division"
     CONTACT-INFO "Hewlett Packard Company
                   8000 Foothills Blvd.
@@ -35,6 +35,12 @@ arubaWiredPowerSupply MODULE-IDENTITY
     DESCRIPTION
         "This MIB module describes management objects that manage Power
          Supply Units."
+
+    REVISION     "202502260000Z" -- February 26, 2025
+    DESCRIPTION  "Added additional states in arubaWiredPSUStateEnum"
+
+    REVISION     "202412160000Z" -- December 16, 2024
+    DESCRIPTION  "Added additional states in arubaWiredPSUStateEnum"
 
     REVISION     "202305090000Z" -- May 9, 2023
     DESCRIPTION  "Added states in arubaWiredPSUStateEnum."
@@ -198,20 +204,23 @@ arubaWiredPSUAirflowDirection OBJECT-TYPE
 
 arubaWiredPSUStateEnum OBJECT-TYPE
       SYNTAX      INTEGER {
-                          ok             (1),
-                          faultAbsent    (2),
-                          faultInput     (3),
-                          faultOutput    (4),
-                          faultPOE       (5),
-                          faultNoRecov   (6),
-                          alert          (7),
-                          unknown        (8),
-                          unsupported    (9),
-                          warning        (10),
-                          init           (11),
-                          empty          (12),
-                          faultAirflow   (13),
-                          faultRedundancy(14)
+                          ok              (1),
+                          faultAbsent     (2),
+                          faultInput      (3),
+                          faultOutput     (4),
+                          faultPOE        (5),
+                          faultNoRecov    (6),
+                          alert           (7),
+                          unknown         (8),
+                          unsupported     (9),
+                          warning         (10),
+                          init            (11),
+                          empty           (12),
+                          faultAirflow    (13),
+                          faultRedundancy (14),
+                          faultMixedInput (15),
+                          overvoltage     (16),
+                          undervoltage    (17)
                   }
       MAX-ACCESS  read-only
       STATUS      current

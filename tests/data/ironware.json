@@ -23431,28 +23431,28 @@
                     "vlan_domain": 1,
                     "vlan_name": "DEFAULT-VLAN",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 55,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 55",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 66,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 66",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4095,
                     "vlan_domain": 1,
                     "vlan_name": "CONTROL-VLAN",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

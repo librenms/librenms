@@ -2582,147 +2582,147 @@
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0001",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 95,
                     "vlan_domain": 1,
                     "vlan_name": "MONITORING",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 99,
                     "vlan_domain": 1,
                     "vlan_name": "MGMT",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 101,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0101",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 102,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0102",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 103,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0103",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 104,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0104",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 105,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0105",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 106,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0106",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 107,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0107",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 108,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0108",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 109,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0109",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 110,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0110",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 111,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0111",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 112,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0112",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 113,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0113",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 114,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0114",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 115,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0115",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 201,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN0201",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2001,
                     "vlan_domain": 1,
                     "vlan_name": "SERVICE",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4024,
                     "vlan_domain": 1,
                     "vlan_name": "IPTV",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ]
         }

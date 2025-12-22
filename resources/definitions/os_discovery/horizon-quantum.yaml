@@ -8,13 +8,15 @@ modules:
         temperature:
             data:
                 -
-                    oid: hzQtmIduTemperature.0
-                    num_oid: '.1.3.6.1.4.1.7262.2.4.1.1.8.0'
+                    oid: DRAGONWAVE-HORIZON-QUANTUM-MIB::hzQtmIduTemperature.0
+                    value: DRAGONWAVE-HORIZON-QUANTUM-MIB::hzQtmIduTemperature
+                    num_oid: '.1.3.6.1.4.1.7262.2.4.1.1.8.{{ $index }}'
                     divisor: 100
                     descr: 'IDU Temperature'
                 -
-                    oid: hzQtmRadioTemperature.1
-                    num_oid: '.1.3.6.1.4.1.7262.2.4.5.4.1.1.14.1'
+                    oid: DRAGONWAVE-HORIZON-QUANTUM-MIB::hzQtmRadioTemperature.1
+                    value: DRAGONWAVE-HORIZON-QUANTUM-MIB::hzQtmRadioTemperature
+                    num_oid: '.1.3.6.1.4.1.7262.2.4.5.4.1.1.14.{{ $index }}'
                     divisor: 10
                     descr: 'Radio Temperature'
         state:

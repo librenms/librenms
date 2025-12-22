@@ -1052,9 +1052,21 @@ return [
                 'description' => 'მომხმარებლის სახელი',
                 'help' => 'მომხმარებლის სახელი InfluxDB-სთან მისაერთებლად, თუ აუცილებელია',
             ],
+            'batch_size' => [
+                'description' => 'Batch Size',
+                'help' => 'Number of metrics to send in a single batch, 0 means no batching',
+            ],
+            'measurements' => [
+                'description' => 'Measurements',
+                'help' => 'List of measurements to send to InfluxDB, leave empty to send all',
+            ],
             'verifySSL' => [
                 'description' => 'SSL-ის გადამოწმება',
                 'help' => 'SSL სერტიფიკატების გადამოწმება მათ სანდოობაზე და სისწორეზე',
+            ],
+            'debug' => [
+                'description' => 'Debug',
+                'help' => 'To enable or disable verbose output to CLI',
             ],
         ],
         'influxdbv2' => [

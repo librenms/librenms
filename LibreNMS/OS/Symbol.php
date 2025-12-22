@@ -43,7 +43,7 @@ class Symbol extends OS implements WirelessClientsDiscovery
     {
         $device = $this->getDeviceArray();
 
-        if (Str::contains(strtolower($device['hardware']), 'ap')) {
+        if (Str::contains(strtolower((string) $device['hardware']), 'ap')) {
             $oid = '.1.3.6.1.4.1.388.11.2.4.2.100.10.1.18.1';
 
             return [

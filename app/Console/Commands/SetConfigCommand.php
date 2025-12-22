@@ -133,14 +133,14 @@ class SetConfigCommand extends LnmsCommand
      */
     private function juggleType(?string $value)
     {
-        $json = json_decode($value, true);
+        $json = json_decode((string) $value, true);
 
         return json_last_error() ? $value : $json;
     }
 
     private function findParentSetting(DynamicConfig $definition, $setting): ?string
     {
-        $parts = explode('.', $setting);
+        $parts = explode('.', (string) $setting);
         array_pop($parts); // looking for parent, not this setting
 
         while (! empty($parts)) {
@@ -159,7 +159,7 @@ class SetConfigCommand extends LnmsCommand
         if ($parent) {
             $data = LibrenmsConfig::get($parent);
 
-            if (preg_match("/^$parent\.?(?<sub>.+)\\.(?<index>\\d+)\$/", $setting, $matches)) {
+            if (preg_match("/^$parent\.?(?<sub>.+)\\.(?<index>\\d+)\$/", (string) $setting, $matches)) {
                 // nested inside the parent setting, update just the required part
                 $sub_data = Arr::get($data, $matches['sub']);
                 $this->forgetWithIndex($sub_data, $matches['index']);

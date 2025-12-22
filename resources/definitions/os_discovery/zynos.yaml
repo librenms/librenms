@@ -10,17 +10,14 @@ modules:
             -
                 oid: ZYXEL-GS4012F-MIB::sysMgmtCPUUsage
                 value: sysMgmtCPUUsage
-                snmp_flags: ['-OeQUs', '-Pu'] # workaround for underscores in mib
                 num_oid: '.1.3.6.1.4.1.890.1.5.8.20.12.7.{{ $index }}'
             -
                 oid: ZYXEL-GS2200-24-MIB::sysMgmtCPUUsage
                 value: sysMgmtCPUUsage
-                snmp_flags: ['-OeQUs', '-Pu'] # workaround for underscores in mib
                 num_oid: '.1.3.6.1.4.1.890.1.5.8.55.12.7.{{ $index }}'
             -
                 oid: ZYXEL-MGS3712-MIB::sysMgmtCPUUsage
                 value: sysMgmtCPUUsage
-                snmp_flags: ['-OeQUs', '-Pu'] # workaround for underscores in mib
                 num_oid: '.1.3.6.1.4.1.890.1.5.8.47.11.7.{{ $index }}'
             -
                 oid: sysMgmtCPU5SecUsage
@@ -31,7 +28,6 @@ modules:
                 -
                     oid: zyxelStackingSlotInfoTable
                     value: zyStackingSlotInfoRole
-                    snmp_flags: ['-OeQUs', '-Pu'] # workaround for underscores in mib
                     num_oid: '.1.3.6.1.4.1.890.1.15.3.97.2.1.1.5.{{ $index }}'
                     descr: 'Switch {{ $index }} Stacking Role'
                     group: Switch Role
@@ -50,7 +46,6 @@ modules:
                 -
                     oid: zyxelStackingSlotChannelInfoTable
                     value: zyStackingSlotChannelInfoNeighbor
-                    snmp_flags: ['-OeQUs', '-Pu'] # workaround for underscores in mib
                     num_oid: '.1.3.6.1.4.1.890.1.15.3.97.2.2.1.5.{{ $index }}'
                     descr: 'Switch {{ $subindex0 }} Port {{ $subindex1 }} Neighbor'
                     group: Stacking Neighbor
@@ -65,7 +60,6 @@ modules:
                 -
                     oid: zyStackingTopology
                     value: zyStackingTopology
-                    snmp_flags: ['-OeQUs', '-Pu'] # workaround for underscores in mib
                     num_oid: '.1.3.6.1.4.1.890.1.15.3.97.2.3.{{ $index }}'
                     descr: 'Stacking Topology'
                     group: Stacking Topology
@@ -91,7 +85,6 @@ modules:
                 -
                     oid: fanRpmTable
                     value: fanRpmCurValue
-                    snmp_flags: ['-OteQUs', '-Pu'] # workaround for underscores in mib
                     num_oid: '.1.3.6.1.4.1.890.1.5.8.47.8.1.1.2.{{ $index }}'
                     descr: 'Fan {{ $index }} ({{ $fanRpmDescr }})'
                     index: 'fanRpmCurValue.{{ $index }}'
@@ -110,7 +103,6 @@ modules:
                 -
                     oid: tempTable
                     value: tempCurValue
-                    snmp_flags: ['-OteQUsb', '-Pu'] # workaround for underscores in mib
                     num_oid: '.1.3.6.1.4.1.890.1.5.8.47.8.2.1.2.{{ $index }}'
                     descr: 'Temp {{ $index }} ({{ $tempDescr }})'
                     index: 'tempCurValue.{{ $index }}'
@@ -118,7 +110,6 @@ modules:
                 -
                     oid: transceiverDdmInfoTable
                     value: transceiverDdmInfoEntryCurrent
-                    snmp_flags: ['-OteQUsb', '-Pu'] # workaround for underscores in mib
                     num_oid: '.1.3.6.1.4.1.890.1.5.8.47.117.2.1.7.{{ $index }}'
                     descr: 'SFP ifIndex {{ $transceiverDdmInfoEntryPort }} {{ $transceiverDdmInfoEntryDescription }}'
                     index: 'transceiverDdmInfoEntryCurrent.{{ $index }}'
@@ -197,7 +188,6 @@ modules:
                 -
                     oid: voltageTable
                     value: voltageCurValue
-                    snmp_flags: ['-OteQUs', '-Pu'] # workaround for underscores in mib
                     num_oid: '.1.3.6.1.4.1.890.1.5.8.47.8.3.1.2.{{ $index }}'
                     divisor: 1000
                     descr: '{{ $voltageNominalValue }}mV ({{ $voltageDescr }})'
@@ -206,7 +196,6 @@ modules:
                 -
                     oid: transceiverDdmInfoTable
                     value: transceiverDdmInfoEntryCurrent
-                    snmp_flags: ['-OteQUsb', '-Pu'] # workaround for underscores in mib
                     num_oid: '.1.3.6.1.4.1.890.1.5.8.47.117.2.1.7.{{ $index }}'
                     descr: 'SFP ifIndex {{ $transceiverDdmInfoEntryPort }} {{ $transceiverDdmInfoEntryDescription }}'
                     index: 'transceiverDdmInfoEntryCurrent.{{ $index }}'
@@ -239,4 +228,4 @@ modules:
                     high_limit: pethMainPsePower
                     group: "PoE"
                     descr: "PoE Budget Consumed - ID {{ $index }}"
-                    
+

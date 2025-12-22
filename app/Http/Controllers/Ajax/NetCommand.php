@@ -70,7 +70,7 @@ class NetCommand extends Controller
 
         //stream output
         return (new StreamedResponse(
-            function () use ($proc, $request) {
+            function () use ($proc, $request): void {
                 // a bit dirty, bust browser initial cache
                 $ua = $request->header('User-Agent');
                 if (Str::contains($ua, ['Chrome', 'Trident'])) {
@@ -81,7 +81,7 @@ class NetCommand extends Controller
                 echo str_repeat($char, 4096);
                 echo PHP_EOL; // avoid first line mess ups due to line feed
 
-                $proc->run(function ($type, $buffer) {
+                $proc->run(function ($type, $buffer): void {
                     echo $buffer;
                     ob_flush();
                     flush();

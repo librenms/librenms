@@ -18341,140 +18341,140 @@
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 1",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2,
                     "vlan_domain": 1,
                     "vlan_name": "Server",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 11,
                     "vlan_domain": 1,
                     "vlan_name": "Data",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 127,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 127",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 148,
                     "vlan_domain": 1,
                     "vlan_name": "Aulas_Gandia",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 203,
                     "vlan_domain": 1,
                     "vlan_name": "AULAS-ADE",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 248,
                     "vlan_domain": 1,
                     "vlan_name": "WAN",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 249,
                     "vlan_domain": 1,
                     "vlan_name": "VPN",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 333,
                     "vlan_domain": 1,
                     "vlan_name": "PBX",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 360,
                     "vlan_domain": 1,
                     "vlan_name": "PBX-SIP_Provider",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 600,
                     "vlan_domain": 1,
                     "vlan_name": "FirewallDMZ",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 626,
                     "vlan_domain": 1,
                     "vlan_name": "APS_ADE7J",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 700,
                     "vlan_domain": 1,
                     "vlan_name": "WLAN-Office",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 750,
                     "vlan_domain": 1,
                     "vlan_name": "WLAN-Mobile",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 770,
                     "vlan_domain": 1,
                     "vlan_name": "WLAN-Guest",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 998,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 998",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 999,
                     "vlan_domain": 1,
                     "vlan_name": "Gestion",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2400,
                     "vlan_domain": 1,
                     "vlan_name": "No_Internet",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2500,
                     "vlan_domain": 1,
                     "vlan_name": "Examen_Poliformat",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 2600,
                     "vlan_domain": 1,
                     "vlan_name": "Examen",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [

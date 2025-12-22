@@ -30,7 +30,7 @@ use LibreNMS\Exceptions\InsufficientDataException;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\Number;
 
-class NumberTest extends TestCase
+final class NumberTest extends TestCase
 {
     public function testToBytes(): void
     {

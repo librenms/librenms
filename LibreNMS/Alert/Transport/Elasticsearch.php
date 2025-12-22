@@ -64,7 +64,7 @@ class Elasticsearch extends Transport
             'entity_descr' => $alert_data['sysDescr'],
         ];
 
-        foreach ($alert_data['faults'] as $k => $v) {
+        foreach ($alert_data['faults'] as $v) {
             $data['message'] = $v['string'];
             switch (true) {
                 case array_key_exists('port_id', $v):

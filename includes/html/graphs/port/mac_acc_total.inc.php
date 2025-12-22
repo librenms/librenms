@@ -47,7 +47,7 @@ $accs = dbFetchRows(
 
 $pluses = '';
 $iter = '0';
-$rrd_options .= " COMMENT:'                                     In\: Current     Maximum      Total      Out\: Current     Maximum     Total\\\\n'";
+$rrd_options[] = "COMMENT:                                     In\: Current     Maximum      Total      Out\: Current     Maximum     Total\\\\n";
 
 foreach ($accs as $acc) {
     $this_rrd = Rrd::name($acc['hostname'], ['cip', $acc['ifIndex'], $acc['mac']]);
@@ -90,31 +90,31 @@ foreach ($accs as $acc) {
 
         $colour = \App\Facades\LibrenmsConfig::get("graph_colours.$colours.$iter");
         $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($name, 36);
-        $rrd_options .= ' DEF:in' . $this_id . "=$this_rrd:" . $prefix . 'IN:AVERAGE ';
-        $rrd_options .= ' DEF:out' . $this_id . "temp=$this_rrd:" . $prefix . 'OUT:AVERAGE ';
-        $rrd_options .= ' CDEF:inB' . $this_id . '=in' . $this_id . ",$multiplier,* ";
-        $rrd_options .= ' CDEF:outB' . $this_id . 'temp=out' . $this_id . "temp,$multiplier,*";
-        $rrd_options .= ' CDEF:outB' . $this_id . '=outB' . $this_id . 'temp,-1,*';
-        $rrd_options .= ' CDEF:octets' . $this_id . '=inB' . $this_id . ',outB' . $this_id . 'temp,+';
-        $rrd_options .= ' VDEF:totin' . $this_id . '=inB' . $this_id . ',TOTAL';
-        $rrd_options .= ' VDEF:totout' . $this_id . '=outB' . $this_id . 'temp,TOTAL';
-        $rrd_options .= ' VDEF:tot' . $this_id . '=octets' . $this_id . ',TOTAL';
-        $rrd_options .= ' AREA:inB' . $this_id . '#' . $colour . ":'" . $descr . "':STACK";
+        $rrd_options[] = 'DEF:in' . $this_id . "=$this_rrd:" . $prefix . 'IN:AVERAGE';
+        $rrd_options[] = 'DEF:out' . $this_id . "temp=$this_rrd:" . $prefix . 'OUT:AVERAGE';
+        $rrd_options[] = 'CDEF:inB' . $this_id . '=in' . $this_id . ",$multiplier,*";
+        $rrd_options[] = 'CDEF:outB' . $this_id . 'temp=out' . $this_id . "temp,$multiplier,*";
+        $rrd_options[] = 'CDEF:outB' . $this_id . '=outB' . $this_id . 'temp,-1,*';
+        $rrd_options[] = 'CDEF:octets' . $this_id . '=inB' . $this_id . ',outB' . $this_id . 'temp,+';
+        $rrd_options[] = 'VDEF:totin' . $this_id . '=inB' . $this_id . ',TOTAL';
+        $rrd_options[] = 'VDEF:totout' . $this_id . '=outB' . $this_id . 'temp,TOTAL';
+        $rrd_options[] = 'VDEF:tot' . $this_id . '=octets' . $this_id . ',TOTAL';
+        $rrd_options[] = 'AREA:inB' . $this_id . '#' . $colour . ':' . $descr . ':STACK';
         if ($rrd_optionsb) {
             $stack = ':STACK';
         }
 
-        $rrd_optionsb .= ' AREA:outB' . $this_id . '#' . $colour . ":''$stack";
-        $rrd_options .= ' GPRINT:inB' . $this_id . ":LAST:%6.2lf%s$units";
-        $rrd_options .= ' GPRINT:inB' . $this_id . ":MAX:%6.2lf%s$units";
-        $rrd_options .= ' GPRINT:totin' . $this_id . ":%6.2lf%s$unit";
-        $rrd_options .= " COMMENT:'    '";
-        $rrd_options .= ' GPRINT:outB' . $this_id . "temp:LAST:%6.2lf%s$units";
-        $rrd_options .= ' GPRINT:outB' . $this_id . "temp:MAX:%6.2lf%s$units";
-        $rrd_options .= ' GPRINT:totout' . $this_id . ":%6.2lf%s$unit\\\\n";
+        $rrd_optionsb[] = 'AREA:outB' . $this_id . '#' . $colour . ":''$stack";
+        $rrd_options[] = 'GPRINT:inB' . $this_id . ":LAST:%6.2lf%s$units";
+        $rrd_options[] = 'GPRINT:inB' . $this_id . ":MAX:%6.2lf%s$units";
+        $rrd_options[] = 'GPRINT:totin' . $this_id . ":%6.2lf%s$unit";
+        $rrd_options[] = 'COMMENT:    ';
+        $rrd_options[] = 'GPRINT:outB' . $this_id . "temp:LAST:%6.2lf%s$units";
+        $rrd_options[] = 'GPRINT:outB' . $this_id . "temp:MAX:%6.2lf%s$units";
+        $rrd_options[] = 'GPRINT:totout' . $this_id . ":%6.2lf%s$unit\\\\n";
         $iter++;
     }//end if
 }//end foreach
 
-$rrd_options .= $rrd_optionsb;
-$rrd_options .= ' HRULE:0#999999';
+array_push($rrd_options, ...$rrd_optionsb);
+$rrd_options[] = 'HRULE:0#999999';

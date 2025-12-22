@@ -5,7 +5,7 @@ icon: alpha
 over:
     - { graph: device_current, text: Current }
     - { graph: device_voltage, text: Voltage }
-    - { graph: device_state, text: State }
+    - { graph: device_temperature, text: 'Battery Temperature' }
 mib_dir: alpha
 rfc1628_compat: true
 snmp_bulk: false

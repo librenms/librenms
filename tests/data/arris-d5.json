@@ -10570,77 +10570,77 @@
                     "vlan_domain": 1,
                     "vlan_name": "Vlan-20",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 21,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan-21",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 22,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan-22",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 23,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan-23",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 32,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan-32",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 33,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan-33",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4090,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan-4090",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4091,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan-4091",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4092,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan-4092",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4093,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan-4093",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 },
                 {
                     "vlan_vlan": 4094,
                     "vlan_domain": 1,
                     "vlan_name": "Vlan-4094",
                     "vlan_type": null,
-                    "vlan_mtu": null
+                    "vlan_state": 1
                 }
             ],
             "ports_vlans": [
