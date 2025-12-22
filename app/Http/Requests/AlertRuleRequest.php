@@ -61,6 +61,7 @@ class AlertRuleRequest extends FormRequest
 
             'mute' => ['sometimes', 'boolean'],
             'invert' => ['sometimes', 'boolean'],
+            'ignore_offline_devices' => ['sometimes', 'boolean'],
             'recovery' => ['sometimes', 'boolean'],
             'acknowledgement' => ['sometimes', 'boolean'],
             'invert_map' => ['sometimes', 'boolean'],
@@ -87,7 +88,7 @@ class AlertRuleRequest extends FormRequest
         ]);
 
         // Convert checkbox values ('on' string) to boolean
-        $this->merge(collect(['mute', 'invert', 'recovery', 'acknowledgement', 'invert_map', 'override_query'])
+        $this->merge(collect(['mute', 'invert', 'ignore_offline_devices', 'recovery', 'acknowledgement', 'invert_map', 'override_query'])
             ->mapWithKeys(fn ($field) => [$field => match ($this->input($field)) {
                 'on', '1', 1, true => true,
                 default => false

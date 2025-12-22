@@ -63,6 +63,8 @@ class AlertRules
 
             return false;
         }
+        //Cache whether device is offline or not
+        $device_is_offline = AlertUtil::isOffline($device_id);
         //Checks each rule.
         foreach (AlertUtil::getRules($device_id) as $rule) {
             Log::info('Rule %p#' . $rule['id'] . ' (' . $rule['name'] . '):%n ', ['color' => true]);
@@ -125,6 +127,8 @@ class AlertRules
                     $details['rule'] = $qry;
                     $details = gzcompress(json_encode($details), 9);
                     dbUpdate(['details' => $details], 'alert_log', 'id = ?', [$alert_log['id']]);
+                } elseif ($rule['ignore_offline_devices'] && $device_is_offline) {
+                    Log::info('Status: %yIGNORE (device offline)%n', ['color' => true]);
                 } else {
                     $extra = gzcompress(json_encode(['contacts' => AlertUtil::getContacts($qry), 'rule' => $qry]), 9);
                     if (dbInsert(['state' => AlertState::ACTIVE, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'details' => $extra], 'alert_log')) {

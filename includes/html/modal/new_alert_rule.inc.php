@@ -103,22 +103,26 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     </div>
                                 </div>
                                 <div class='form-group form-inline'>
-                                    <label for='mute' class='col-sm-3 col-md-2 control-label' title="Show alert status in the webui, but do not issue notifications.">Mute alerts </label>
-                                    <div class='col-sm-2' title="Show alert status in the webui, but do not issue notifications.">
+                                    <label for='mute' class='col-md-2 control-label' title="Show alert status in the webui, but do not issue notifications.">Mute alerts </label>
+                                    <div class='col-sm-1' title="Show alert status in the webui, but do not issue notifications.">
                                         <input type="checkbox" name="mute" id="mute">
                                     </div>
-                                    <label for='invert' class='col-sm-3 col-md-3 control-label' title="Alert when this rule doesn't match." style="vertical-align: top;">Invert rule match </label>
-                                    <div class='col-sm-2' title="Alert when this rule doesn't match.">
+                                    <label for='invert' class='col-md-3 control-label' title="Alert when this rule doesn't match." style="vertical-align: top;">Invert rule match </label>
+                                    <div class='col-sm-1' title="Alert when this rule doesn't match.">
                                         <input type='checkbox' name='invert' id='invert'>
+                                    </div>
+                                    <label for='invert' class='col-md-3 control-label' title="Ignore alert rule for device that are offline." style="vertical-align: top;">Ignore offline devices</label>
+                                    <div class='col-sm-1' title="Ignore alert rule for device that are offline.">
+                                        <input type='checkbox' name='ignore_offline_devices' id='ignore_offline_devices'>
                                     </div>
                                 </div>
                                 <div class="form-group form-inline">
-                                    <label for='recovery' class='col-sm-3 col-md-2 control-label' title="Issue recovery alerts.">Recovery alerts </label>
-                                    <div class='col-sm-2' title="Issue recovery alerts.">
+                                    <label for='recovery' class='col-md-2 control-label' title="Issue recovery alerts.">Recovery alerts </label>
+                                    <div class='col-sm-1' title="Issue recovery alerts.">
                                         <input type='checkbox' name='recovery' id='recovery'>
                                     </div>
-                                    <label for='acknowledgement' class='col-sm-3 col-md-3 control-label' title="Issue acknowledgement alerts." style="vertical-align: top;">Acknowledgement alerts </label>
-                                    <div class='col-sm-2' title="Issue acknowledgement alerts.">
+                                    <label for='acknowledgement' class='col-md-3 control-label' title="Issue acknowledgement alerts." style="vertical-align: top;">Acknowledgement alerts </label>
+                                    <div class='col-sm-1' title="Issue acknowledgement alerts.">
                                         <input type='checkbox' name='acknowledgement' id='acknowledgement'>
                                     </div>
                                 </div>
@@ -127,8 +131,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <div class="col-sm-7" style="width: 56%;">
                                         <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
                                     </div>
-                                    <div>
-                                        <label for='invert_map' class='col-md-1' style="width: 14.1333%;" text-align="left" title="If ON, alert rule check will run on all devices except the selected devices and groups.">All devices except in list </label>
+                                    <label for='invert_map' class='col-md-1' style="width: 14.1333%;" text-align="left" title="If ON, alert rule check will run on all devices except the selected devices and groups.">All devices except in list </label>
+                                    <div class='col-sm-1' title="If ON, alert rule check will run on all devices except the selected devices and groups.">
                                         <input type='checkbox' name='invert_map' id='invert_map'>
                                     </div>
                                 </div>
@@ -326,6 +330,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $severity.val($severity.find("option[selected]").val());
                 $("#mute").bootstrapSwitch('state', <?=$default_mute_alerts?>);
                 $("#invert").bootstrapSwitch('state', <?=$default_invert_rule_match?>);
+                $("#ignore_offline_devices").bootstrapSwitch('state', false);
                 $("#recovery").bootstrapSwitch('state', <?=$default_recovery_alerts?>);
                 $("#acknowledgement").bootstrapSwitch('state', <?=$default_acknowledgement_alerts?>);
                 $("#override_query").bootstrapSwitch('state', false);
@@ -408,6 +413,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 }
                 $("[name='mute']").bootstrapSwitch('state', extra.mute);
                 $("[name='invert']").bootstrapSwitch('state', extra.invert);
+                $("[name='ignore_offline_devices']").bootstrapSwitch('state', (rule.ignore_offline_devices == 1));
                 if (typeof extra.recovery == 'undefined') {
                     extra.recovery = '<?=$default_recovery_alerts?>';
                 }
