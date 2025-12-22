@@ -1932,7 +1932,7 @@
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.8691.602.8.6.2.3.1.2.1",
+                    "sensor_oid": ".1.3.6.1.4.1.8691.602.8.6.2.4.1.2.1",
                     "sensor_index": "deviceioStatRelayStatus.1",
                     "sensor_type": "deviceioStatRelayStatus",
                     "sensor_descr": "Relay 1 Status",
