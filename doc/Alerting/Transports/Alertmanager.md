@@ -28,8 +28,8 @@ prefix are always included, using their fixed string value when a match is not f
 Labels prefixed with "stc_" are considered static, 
 and will never be considered for value substitution.
 
-Multiple Alertmanager URLs (comma separated) are supported. Each
-URL will be tried and the search will stop at the first success.
+Multiple Alertmanager URLs (comma separated) are supported. All 
+will be tried. Alertmanager clustering is expected to deduplicate alerts.
 
 Basic HTTP authentication with a username and a password is supported.
 If you let those value blank, no authentication will be used.
