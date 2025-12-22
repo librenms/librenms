@@ -12,7 +12,7 @@ modules:
           value: pduOutletMeteredStatusCurrent
           num_oid: '.1.3.6.1.4.1.318.1.1.32.5.9.1.5.{{ $index }}'
           index: 'pduOutletMeteredStatusCurrent.{{ $index }}'
-          descr: 'Outlet {{ $pduOutletMeteredStatusNumber }} {{ $pduOutletMeteredStatusName }}'
+          descr: '{{ $pduOutletMeteredStatusNumber }} {{ $pduOutletMeteredStatusName }}'
           divisor: 100
           multiplier: 1
           group: 'Outlets'
@@ -38,7 +38,7 @@ modules:
           value: pduOutletMeteredStatusActivePower
           num_oid: '.1.3.6.1.4.1.318.1.1.32.5.9.1.6.{{ $index }}'
           index: 'pduOutletMeteredStatusActivePower.{{ $index }}'
-          descr: 'Outlet {{ $pduOutletMeteredStatusNumber }} {{ $pduOutletMeteredStatusName }}'
+          descr: '{{ $pduOutletMeteredStatusNumber }} {{ $pduOutletMeteredStatusName }}'
           group: 'Outlets'
           skip_values:
             - oid: pduOutletMeteredStatusNumber
@@ -61,7 +61,7 @@ modules:
           value: pduOutletMeteredStatusPowerFactor
           num_oid: '.1.3.6.1.4.1.318.1.1.32.5.9.1.7.{{ $index }}'
           index: 'pduOutletMeteredStatusPowerFactor.{{ $index }}'
-          descr: 'Outlet {{ $pduOutletMeteredStatusNumber }} {{ $pduOutletMeteredStatusName }}'
+          descr: '{{ $pduOutletMeteredStatusNumber }} {{ $pduOutletMeteredStatusName }}'
           divisor: 100
           multiplier: 1
           low_limit: -1
@@ -77,7 +77,7 @@ modules:
         - oid: pduUnitStatusTable
           value: pduUnitStatusLoadState
           num_oid: '.1.3.6.1.4.1.318.1.1.32.2.4.1.3.{{ $index }}'
-          descr: 'Load State {{ $pduUnitStatusName }}'
+          descr: 'Load {{ $pduUnitStatusName }}'
           index: 'pduUnitStatusLoadState.{{ $index }}'
           group: 'PDU'
           state_name: 'apdu-pdu-load-state'
@@ -91,7 +91,7 @@ modules:
           value: pduOutletMeteredStatusLoadState
           num_oid: '.1.3.6.1.4.1.318.1.1.32.5.9.1.4.{{ $index }}'
           index: 'pduOutletMeteredStatusLoadState.{{ $index }}'
-          descr: 'Load State {{ $pduOutletMeteredStatusNumber }} {{ $pduOutletMeteredStatusName }}'
+          descr: 'Load {{ $pduOutletMeteredStatusNumber }} {{ $pduOutletMeteredStatusName }}'
           state_name: apdu-pdu-outlet-load-state
           group: 'Outlets'
           skip_values:
