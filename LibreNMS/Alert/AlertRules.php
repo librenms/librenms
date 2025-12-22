@@ -64,7 +64,7 @@ class AlertRules
             return false;
         }
         //Cache whether device is offline or not
-        $device_is_offline = AlertUtil::isOffline($device_id);
+        $device_is_offline = AlertUtil::isOffline((int) $device_id);
         //Checks each rule.
         foreach (AlertUtil::getRules($device_id) as $rule) {
             Log::info('Rule %p#' . $rule['id'] . ' (' . $rule['name'] . '):%n ', ['color' => true]);
