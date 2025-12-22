@@ -413,7 +413,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 }
                 $("[name='mute']").bootstrapSwitch('state', extra.mute);
                 $("[name='invert']").bootstrapSwitch('state', extra.invert);
-                $("[name='ignore_offline_devices']").bootstrapSwitch('state', (rule.ignore_offline_devices == 1));
+                $("[name='ignore_offline_devices']").bootstrapSwitch('state', (extra.ignore_offline_devices == 1));
                 if (typeof extra.recovery == 'undefined') {
                     extra.recovery = '<?=$default_recovery_alerts?>';
                 }

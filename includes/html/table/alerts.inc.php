@@ -121,15 +121,16 @@ if ($rowCount != -1) {
 }
 
 if (session('preferences.timezone')) {
-    $sql = "SELECT `alerts`.*, IFNULL(CONVERT_TZ(`alerts`.`timestamp`, @@global.time_zone, ?),`alerts`.`timestamp`) AS timestamp_display, `devices`.`hostname`, `devices`.`sysName`, `devices`.`display`, `devices`.`os`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`name`, `alert_rules`.`severity`, `alert_rules`.`builder`, `alert_rules`.`ignore_offline_devices`, `devices`.`status` AS device_status $sql";
+    $sql = "SELECT `alerts`.*, IFNULL(CONVERT_TZ(`alerts`.`timestamp`, @@global.time_zone, ?),`alerts`.`timestamp`) AS timestamp_display, `devices`.`hostname`, `devices`.`sysName`, `devices`.`display`, `devices`.`os`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`name`, `alert_rules`.`severity`, `alert_rules`.`builder`, `alert_rules`.`extra`, `devices`.`status` AS device_status $sql";
     $param = array_merge([session('preferences.timezone')], $param);
 } else {
-    $sql = "SELECT `alerts`.*, `alerts`.`timestamp` AS timestamp_display, `devices`.`hostname`, `devices`.`sysName`, `devices`.`display`, `devices`.`os`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`name`, `alert_rules`.`severity`, `alert_rules`.`builder`, `alert_rules`.`ignore_offline_devices`, `devices`.`status` AS device_status  $sql";
+    $sql = "SELECT `alerts`.*, `alerts`.`timestamp` AS timestamp_display, `devices`.`hostname`, `devices`.`sysName`, `devices`.`display`, `devices`.`os`, `devices`.`hardware`, `locations`.`location`, `alert_rules`.`name`, `alert_rules`.`severity`, `alert_rules`.`builder`, `alert_rules`.`extra`, `devices`.`status` AS device_status  $sql";
 }
 
 $rulei = 0;
 foreach (dbFetchRows($sql, $param) as $alert) {
-    if ($alert['ignore_offline_devices'] == 1 && $alert['device_status'] == 0) {
+    $rule_extra = json_decode((string) $alert['extra'], true);
+    if ($rule_extra['ignore_offline_devices'] == 1 && $alert['device_status'] == 0) {
         continue;
     }
 

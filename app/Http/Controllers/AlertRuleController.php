@@ -61,7 +61,6 @@ class AlertRuleController extends Controller
             'severity' => $alertRule->severity,
             'adv_query' => $alertRule->query,
             'invert_map' => $alertRule->invert_map,
-            'ignore_offline_devices' => $alertRule->ignore_offline_devices,
         ]);
     }
 
@@ -174,7 +173,6 @@ class AlertRuleController extends Controller
             'proc',
             'notes',
             'invert_map',
-            'ignore_offline_devices',
         ]));
         $alertRule->disabled ??= false;
         $alertRule->builder = json_decode((string) $request->validated('builder_json', '[]'), true);
@@ -198,6 +196,7 @@ class AlertRuleController extends Controller
             'invert',
             'acknowledgement',
             'recovery',
+            'ignore_offline_devices',
         ]);
         $extra['count'] ??= '-1';
         $extra['options'] = ['override_query' => $overrideQuery];
