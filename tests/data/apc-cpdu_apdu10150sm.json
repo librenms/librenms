@@ -2030,7 +2030,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.2.4.1.4.1",
                     "sensor_index": "pduUnitStatusActivePower.1",
                     "sensor_type": "apc-cpdu",
-                    "sensor_descr": "Active Power pdu-under-test.hostname",
+                    "sensor_descr": "Active pdu-under-test.hostname",
                     "group": "PDU",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -2055,7 +2055,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.2.4.1.6.1",
                     "sensor_index": "pduUnitStatusPeakPower.1",
                     "sensor_type": "apc-cpdu",
-                    "sensor_descr": "Peak Power pdu-under-test.hostname",
+                    "sensor_descr": "Peak pdu-under-test.hostname",
                     "group": "PDU",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -3102,34 +3102,9 @@
                     "sensor_deleted": 0,
                     "sensor_class": "state",
                     "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.2.4.1.3.1",
-                    "sensor_index": "pduUnitStatusLoadState.1",
-                    "sensor_type": "apdu-pdu-load-state",
-                    "sensor_descr": "Load pdu-under-test.hostname",
-                    "group": "PDU",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 5,
-                    "sensor_limit": null,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-load-state"
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "state",
-                    "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.1",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.1",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 1 Test Name",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3146,7 +3121,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3154,7 +3129,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.10",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.10",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 10",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3171,7 +3146,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3179,7 +3154,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.11",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.11",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 11",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3196,7 +3171,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3204,7 +3179,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.12",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.12",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 12",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3221,7 +3196,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3229,7 +3204,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.13",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.13",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 13",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3246,7 +3221,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3254,7 +3229,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.14",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.14",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 14",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3271,7 +3246,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3279,7 +3254,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.15",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.15",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 15",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3296,7 +3271,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3304,7 +3279,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.16",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.16",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 16",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3321,7 +3296,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3329,7 +3304,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.17",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.17",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 17",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3346,7 +3321,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3354,7 +3329,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.18",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.18",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 18",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3371,7 +3346,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3379,7 +3354,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.19",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.19",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 19",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3396,7 +3371,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3404,7 +3379,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.2",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.2",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 2 OUTLET 2",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3421,7 +3396,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3429,7 +3404,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.20",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.20",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 20",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3446,7 +3421,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3454,7 +3429,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.21",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.21",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 21",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3471,7 +3446,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3479,7 +3454,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.22",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.22",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 22",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3496,7 +3471,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3504,7 +3479,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.23",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.23",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 23",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3521,7 +3496,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3529,7 +3504,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.24",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.24",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 24",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3546,7 +3521,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3554,7 +3529,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.25",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.25",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 25",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3571,7 +3546,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3579,7 +3554,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.26",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.26",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 26",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3596,7 +3571,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3604,7 +3579,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.27",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.27",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 27",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3621,7 +3596,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3629,7 +3604,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.28",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.28",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 28",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3646,7 +3621,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3654,7 +3629,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.29",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.29",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 29",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3671,7 +3646,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3679,7 +3654,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.3",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.3",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 3 OUTLET 3",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3696,7 +3671,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3704,7 +3679,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.30",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.30",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 30",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3721,7 +3696,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3729,7 +3704,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.31",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.31",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 31",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3746,7 +3721,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3754,7 +3729,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.32",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.32",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 32",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3771,7 +3746,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3779,7 +3754,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.33",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.33",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 33",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3796,7 +3771,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3804,7 +3779,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.34",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.34",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 34",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3821,7 +3796,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3829,7 +3804,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.35",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.35",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 35",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3846,7 +3821,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3854,7 +3829,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.36",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.36",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 36",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3871,7 +3846,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3879,7 +3854,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.37",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.37",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 37",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3896,7 +3871,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3904,7 +3879,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.38",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.38",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 38",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3921,7 +3896,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3929,7 +3904,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.39",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.39",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 39",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3946,7 +3921,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3954,7 +3929,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.4",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.4",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 4 OUTLET 4",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3971,7 +3946,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -3979,7 +3954,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.40",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.40",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 40",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -3996,7 +3971,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4004,7 +3979,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.5",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.5",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 5 OUTLET 5",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4021,7 +3996,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4029,7 +4004,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.6",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.6",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 6 OUTLET 6",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4046,7 +4021,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4054,7 +4029,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.7",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.7",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 7 OUTLET 7",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4071,7 +4046,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4079,7 +4054,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.8",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.8",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 8 OUTLET 8",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4096,7 +4071,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4104,7 +4079,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.9.1.4.1.9",
                     "sensor_index": "pduOutletMeteredStatusLoadState.1.9",
-                    "sensor_type": "apdu-pdu-outlet-load-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "sensor_descr": "Load 9 OUTLET 9",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4121,7 +4096,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-load-state"
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4129,7 +4104,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.1",
                     "sensor_index": "pduOutletSwitchedStatusState.1.1",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 1 Test Name",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4146,7 +4121,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4154,7 +4129,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.10",
                     "sensor_index": "pduOutletSwitchedStatusState.1.10",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 10",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4171,7 +4146,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4179,7 +4154,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.11",
                     "sensor_index": "pduOutletSwitchedStatusState.1.11",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 11",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4196,7 +4171,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4204,7 +4179,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.12",
                     "sensor_index": "pduOutletSwitchedStatusState.1.12",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 12",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4221,7 +4196,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4229,7 +4204,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.13",
                     "sensor_index": "pduOutletSwitchedStatusState.1.13",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 13",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4246,7 +4221,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4254,7 +4229,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.14",
                     "sensor_index": "pduOutletSwitchedStatusState.1.14",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 14",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4271,7 +4246,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4279,7 +4254,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.15",
                     "sensor_index": "pduOutletSwitchedStatusState.1.15",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 15",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4296,7 +4271,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4304,7 +4279,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.16",
                     "sensor_index": "pduOutletSwitchedStatusState.1.16",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 16",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4321,7 +4296,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4329,7 +4304,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.17",
                     "sensor_index": "pduOutletSwitchedStatusState.1.17",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 17",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4346,7 +4321,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4354,7 +4329,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.18",
                     "sensor_index": "pduOutletSwitchedStatusState.1.18",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 18",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4371,7 +4346,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4379,7 +4354,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.19",
                     "sensor_index": "pduOutletSwitchedStatusState.1.19",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 19",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4396,7 +4371,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4404,7 +4379,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.2",
                     "sensor_index": "pduOutletSwitchedStatusState.1.2",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 2 OUTLET 2",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4421,7 +4396,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4429,7 +4404,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.20",
                     "sensor_index": "pduOutletSwitchedStatusState.1.20",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 20",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4446,7 +4421,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4454,7 +4429,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.21",
                     "sensor_index": "pduOutletSwitchedStatusState.1.21",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 21",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4471,7 +4446,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4479,7 +4454,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.22",
                     "sensor_index": "pduOutletSwitchedStatusState.1.22",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 22",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4496,7 +4471,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4504,7 +4479,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.23",
                     "sensor_index": "pduOutletSwitchedStatusState.1.23",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 23",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4521,7 +4496,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4529,7 +4504,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.24",
                     "sensor_index": "pduOutletSwitchedStatusState.1.24",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 24",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4546,7 +4521,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4554,7 +4529,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.25",
                     "sensor_index": "pduOutletSwitchedStatusState.1.25",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 25",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4571,7 +4546,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4579,7 +4554,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.26",
                     "sensor_index": "pduOutletSwitchedStatusState.1.26",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 26",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4596,7 +4571,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4604,7 +4579,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.27",
                     "sensor_index": "pduOutletSwitchedStatusState.1.27",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 27",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4621,7 +4596,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4629,7 +4604,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.28",
                     "sensor_index": "pduOutletSwitchedStatusState.1.28",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 28",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4646,7 +4621,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4654,7 +4629,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.29",
                     "sensor_index": "pduOutletSwitchedStatusState.1.29",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 29",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4671,7 +4646,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4679,7 +4654,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.3",
                     "sensor_index": "pduOutletSwitchedStatusState.1.3",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 3 OUTLET 3",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4696,7 +4671,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4704,7 +4679,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.30",
                     "sensor_index": "pduOutletSwitchedStatusState.1.30",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 30",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4721,7 +4696,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4729,7 +4704,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.31",
                     "sensor_index": "pduOutletSwitchedStatusState.1.31",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 31",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4746,7 +4721,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4754,7 +4729,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.32",
                     "sensor_index": "pduOutletSwitchedStatusState.1.32",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 32",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4771,7 +4746,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4779,7 +4754,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.33",
                     "sensor_index": "pduOutletSwitchedStatusState.1.33",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 33",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4796,7 +4771,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4804,7 +4779,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.34",
                     "sensor_index": "pduOutletSwitchedStatusState.1.34",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 34",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4821,7 +4796,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4829,7 +4804,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.35",
                     "sensor_index": "pduOutletSwitchedStatusState.1.35",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 35",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4846,7 +4821,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4854,7 +4829,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.36",
                     "sensor_index": "pduOutletSwitchedStatusState.1.36",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 36",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4871,7 +4846,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4879,7 +4854,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.37",
                     "sensor_index": "pduOutletSwitchedStatusState.1.37",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 37",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4896,7 +4871,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4904,7 +4879,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.38",
                     "sensor_index": "pduOutletSwitchedStatusState.1.38",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 38",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4921,7 +4896,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4929,7 +4904,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.39",
                     "sensor_index": "pduOutletSwitchedStatusState.1.39",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 39",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4946,7 +4921,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4954,7 +4929,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.4",
                     "sensor_index": "pduOutletSwitchedStatusState.1.4",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 4 OUTLET 4",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4971,7 +4946,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -4979,7 +4954,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.40",
                     "sensor_index": "pduOutletSwitchedStatusState.1.40",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 40",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -4996,7 +4971,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5004,7 +4979,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.5",
                     "sensor_index": "pduOutletSwitchedStatusState.1.5",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 5 OUTLET 5",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -5021,7 +4996,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5029,7 +5004,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.6",
                     "sensor_index": "pduOutletSwitchedStatusState.1.6",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 6 OUTLET 6",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -5046,7 +5021,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5054,7 +5029,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.7",
                     "sensor_index": "pduOutletSwitchedStatusState.1.7",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 7 OUTLET 7",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -5071,7 +5046,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5079,7 +5054,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.8",
                     "sensor_index": "pduOutletSwitchedStatusState.1.8",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 8 OUTLET 8",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -5096,7 +5071,7 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
                 },
                 {
                     "sensor_deleted": 0,
@@ -5104,7 +5079,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.5.4.1.4.1.9",
                     "sensor_index": "pduOutletSwitchedStatusState.1.9",
-                    "sensor_type": "apdu-pdu-outlet-state",
+                    "sensor_type": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "sensor_descr": "Status 9 OUTLET 9",
                     "group": "Outlets",
                     "sensor_divisor": 1,
@@ -5121,92 +5096,117 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "rrd_type": "GAUGE",
-                    "state_name": "apdu-pdu-outlet-state"
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.318.1.1.32.2.4.1.3.1",
+                    "sensor_index": "pduUnitStatusLoadState.1",
+                    "sensor_type": "PowerNet-MIB::pduUnitStatusLoadState",
+                    "sensor_descr": "Load pdu-under-test.hostname",
+                    "group": "PDU",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 5,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "PowerNet-MIB::pduUnitStatusLoadState"
                 }
             ],
             "state_indexes": [
                 {
-                    "state_name": "apdu-pdu-load-state",
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "state_descr": "Upper Critical",
                     "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
-                    "state_name": "apdu-pdu-load-state",
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "state_descr": "Upper Warning",
                     "state_draw_graph": 0,
                     "state_value": 2,
                     "state_generic_value": 1
                 },
                 {
-                    "state_name": "apdu-pdu-load-state",
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "state_descr": "Lower Warning",
                     "state_draw_graph": 0,
                     "state_value": 3,
                     "state_generic_value": 1
                 },
                 {
-                    "state_name": "apdu-pdu-load-state",
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "state_descr": "Lower Critical",
                     "state_draw_graph": 0,
                     "state_value": 4,
                     "state_generic_value": 2
                 },
                 {
-                    "state_name": "apdu-pdu-load-state",
+                    "state_name": "PowerNet-MIB::pduOutletMeteredStatusLoadState",
                     "state_descr": "Normal",
                     "state_draw_graph": 0,
                     "state_value": 5,
                     "state_generic_value": 0
                 },
                 {
-                    "state_name": "apdu-pdu-outlet-load-state",
-                    "state_descr": "Upper Critical",
-                    "state_draw_graph": 0,
-                    "state_value": 1,
-                    "state_generic_value": 2
-                },
-                {
-                    "state_name": "apdu-pdu-outlet-load-state",
-                    "state_descr": "Upper Warning",
-                    "state_draw_graph": 0,
-                    "state_value": 2,
-                    "state_generic_value": 1
-                },
-                {
-                    "state_name": "apdu-pdu-outlet-load-state",
-                    "state_descr": "Lower Warning",
-                    "state_draw_graph": 0,
-                    "state_value": 3,
-                    "state_generic_value": 1
-                },
-                {
-                    "state_name": "apdu-pdu-outlet-load-state",
-                    "state_descr": "Lower Critical",
-                    "state_draw_graph": 0,
-                    "state_value": 4,
-                    "state_generic_value": 2
-                },
-                {
-                    "state_name": "apdu-pdu-outlet-load-state",
-                    "state_descr": "Normal",
-                    "state_draw_graph": 0,
-                    "state_value": 5,
-                    "state_generic_value": 0
-                },
-                {
-                    "state_name": "apdu-pdu-outlet-state",
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "state_descr": "off/unused",
                     "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
-                    "state_name": "apdu-pdu-outlet-state",
+                    "state_name": "PowerNet-MIB::pduOutletSwitchedStatusState",
                     "state_descr": "on",
                     "state_draw_graph": 0,
                     "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "PowerNet-MIB::pduUnitStatusLoadState",
+                    "state_descr": "Upper Critical",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "PowerNet-MIB::pduUnitStatusLoadState",
+                    "state_descr": "Upper Warning",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "PowerNet-MIB::pduUnitStatusLoadState",
+                    "state_descr": "Lower Warning",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "PowerNet-MIB::pduUnitStatusLoadState",
+                    "state_descr": "Lower Critical",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "PowerNet-MIB::pduUnitStatusLoadState",
+                    "state_descr": "Normal",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
                     "state_generic_value": 0
                 }
             ]
