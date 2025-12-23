@@ -182,7 +182,12 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             'TIMETRA-MPLS-MIB::vRtrMplsLspPathTable',
             'TIMETRA-MPLS-MIB::vRtrMplsLspPathLastChange',
         ])->mapTable(function ($value, $vrf_oid, $lsp_oid, $path_oid) use ($lsps) {
-            $lsp_id = $lsps->where('lsp_oid', $lsp_oid)->firstWhere('vrf_oid', $vrf_oid)->lsp_id;
+            $lsp = $lsps->where('lsp_oid', $lsp_oid)->firstWhere('vrf_oid', $vrf_oid);
+            $lsp_id = $lsp?->lsp_id;
+
+            if (! $lsp_id) {
+                return null;
+            }
 
             return new MplsLspPath([
                 'lsp_id' => $lsp_id,
@@ -203,7 +208,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'mplsLspPathTunnelARHopListIndex' => $value['vRtrMplsLspPathTunnelARHopListIndex'] ?? null,
                 'mplsLspPathTunnelCHopListIndex' => $value['vRtrMplsLspPathTunnelCRHopListIndex'] ?? null,
             ]);
-        });
+        })->filter();
     }
 
     /**
@@ -287,8 +292,13 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 return null;
             }
 
+            $svc = $svcs->firstWhere('svc_oid', $svcId);
+            if (! $svc) {
+                return null;
+            }
+
             return new MplsSap([
-                'svc_id' => $svcs->firstWhere('svc_oid', $svcId)->svc_id,
+                'svc_id' => $svc->svc_id,
                 'svc_oid' => $svcId,
                 'sapPortId' => $sapPortId,
                 'device_id' => $this->getDeviceId(),
@@ -319,9 +329,11 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         ])->mapTable(function ($value, $svcId) use ($sdps, $svcs) {
             $bind_id = str_replace(' ', '', $value['sdpBindId'] ?? '');
             $sdp_oid = hexdec(substr($bind_id, 0, 8));
-            $svc_oid = hexdec(substr($bind_id, 9, 16));
-            $sdp_id = $sdps->firstWhere('sdp_oid', $sdp_oid)->sdp_id;
-            $svc_id = $svcs->firstWhere('svc_oid', $svcId)->svc_id;
+            $svc_oid = hexdec(substr($bind_id, 8, 8));
+            $sdp = $sdps->firstWhere('sdp_oid', $sdp_oid);
+            $svc = $svcs->firstWhere('svc_oid', $svc_oid);
+            $sdp_id = $sdp?->sdp_id;
+            $svc_id = $svc?->svc_id;
 
             if ($sdp_id && $svc_id && $sdp_oid && $svc_oid) {
                 return new MplsSdpBind([
@@ -469,7 +481,12 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             'TIMETRA-MPLS-MIB::vRtrMplsLspPathLastChange',
             'TIMETRA-MPLS-MIB::vRtrMplsLspPathStatTable',
         ])->mapTable(function ($value, $vrf_oid, $lsp_oid, $path_oid) use ($lsps) {
-            $lsp_id = $lsps->where('lsp_oid', $lsp_oid)->firstWhere('vrf_oid', $vrf_oid)->lsp_id;
+            $lsp = $lsps->where('lsp_oid', $lsp_oid)->firstWhere('vrf_oid', $vrf_oid);
+            $lsp_id = $lsp?->lsp_id;
+
+            if (! $lsp_id) {
+                return null;
+            }
 
             return new MplsLspPath([
                 'lsp_id' => $lsp_id,
@@ -493,7 +510,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'mplsLspPathTunnelARHopListIndex' => $value['vRtrMplsLspPathTunnelARHopListIndex'] ?? null,
                 'mplsLspPathTunnelCHopListIndex' => $value['vRtrMplsLspPathTunnelCRHopListIndex'] ?? null,
             ]);
-        });
+        })->filter();
     }
 
     /**
@@ -580,7 +597,11 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 return null;
             }
 
-            $svc_id = $svcs->firstWhere('svc_oid', $svcId)->svc_id;
+            $svc = $svcs->firstWhere('svc_oid', $svcId);
+            if (! $svc) {
+                return null;
+            }
+            $svc_id = $svc->svc_id;
 
             // Any unused vlan on a port returns * in sapEncapValue but had OID .4095
             $specialQinQIdentifier = $this->nokiaEncap($sapEncapValue);
@@ -642,9 +663,11 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         ])->mapTable(function ($value, $svcId) use ($sdps, $svcs) {
             $bind_id = str_replace(' ', '', $value['sdpBindId'] ?? '');
             $sdp_oid = hexdec(substr($bind_id, 0, 8));
-            $svc_oid = hexdec(substr($bind_id, 9, 16));
-            $sdp_id = $sdps->firstWhere('sdp_oid', $sdp_oid)->sdp_id;
-            $svc_id = $svcs->firstWhere('svc_oid', $svcId)->svc_id;
+            $svc_oid = hexdec(substr($bind_id, 8, 8));
+            $sdp = $sdps->firstWhere('sdp_oid', $sdp_oid);
+            $svc = $svcs->firstWhere('svc_oid', $svc_oid);
+            $sdp_id = $sdp?->sdp_id;
+            $svc_id = $svc?->svc_id;
 
             if ($sdp_id && $svc_id && $sdp_oid && $svc_oid) {
                 return new MplsSdpBind([
