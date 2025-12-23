@@ -56,8 +56,13 @@ class Axos extends OS implements OSDiscovery, TransceiverDiscovery
                 return null;
             }
 
+            $portId = PortCache::getIdFromIfIndex((int) $ifIndex, $this->getDevice());
+            if ($portId === null) {
+                return null;
+            }
+
             return new Transceiver([
-                'port_id' => PortCache::getIdFromIfIndex((int) $ifIndex, $this->getDevice()),
+                'port_id' => $portId,
                 'index' => $ifIndex,
                 'entity_physical_index' => (int) $ifIndex,
                 'channels' => 1,
