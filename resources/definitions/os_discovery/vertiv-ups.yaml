@@ -1,0 +1,396 @@
+modules:
+    os:
+        hardware: VERTIV-ITA2-MIB::identModel.0
+        serial: VERTIV-ITA2-MIB::identIndex.0
+    sensors:
+        state:
+            data:
+                -
+                    oid: VERTIV-ITA2-MIB::upsOutputSource
+                    value: VERTIV-ITA2-MIB::upsOutputSource
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.1.2.{{ $index }}'
+                    descr: 'Output PWR Source {{ $index }}'
+                    index: 'upsOutputSource.{{ $index }}'
+                    state_name: upsOutputSource
+                    states:
+                        - { descr: 'No Output', graph: 1, value: 0, generic: 2 }
+                        - { descr: 'On Main', graph: 1, value: 1, generic: 1 }
+                        - { descr: 'On Battery', graph: 1, value: 2, generic: 1 }
+                        - { descr: 'On Bypass', graph: 1, value: 3, generic: 1 }
+                        - { descr: 'on Utility and Battery', graph: 1, value: 4, generic: 0 }
+
+        voltage:
+            data:
+                -
+                    oid: VERTIV-ITA2-MIB::inputPhaseVoltageA
+                    value: VERTIV-ITA2-MIB::inputPhaseVoltageA
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.2.1.{{ $index }}'
+                    descr: 'Input Phase Voltage A'
+                    index: 'inputPhaseVoltageA'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: VERTIV-ITA2-MIB::inputPhaseVoltageA
+                            op: '=='
+                            value: 0
+                -
+                    oid: VERTIV-ITA2-MIB::inputPhaseVoltageB
+                    value: VERTIV-ITA2-MIB::inputPhaseVoltageB
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.2.2.{{ $index }}'
+                    descr: 'Input Phase Voltage B'
+                    index: 'inputPhaseVoltageB'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: VERTIV-ITA2-MIB::inputPhaseVoltageB
+                            op: '=='
+                            value: 0
+                -
+                    oid: VERTIV-ITA2-MIB::inputPhaseVoltageC
+                    value: VERTIV-ITA2-MIB::inputPhaseVoltageC
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.2.3.{{ $index }}'
+                    descr: 'Input Phase Voltage C'
+                    index: 'inputPhaseVoltageC'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: VERTIV-ITA2-MIB::inputPhaseVoltageC
+                            op: '=='
+                            value: 0
+                -
+                    oid: VERTIV-ITA2-MIB::outputPhaseVoltageA
+                    value: VERTIV-ITA2-MIB::outputPhaseVoltageA
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.1.{{ $index }}'
+                    descr: 'Output Phase Voltage A'
+                    index: 'outputPhaseVoltageA'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: VERTIV-ITA2-MIB::inputPhaseVoltageA
+                            op: '=='
+                            value: 0
+                -
+                    oid: VERTIV-ITA2-MIB::outputPhaseVoltageB
+                    value: VERTIV-ITA2-MIB::outputPhaseVoltageB
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.2.{{ $index }}'
+                    descr: 'Output Phase Voltage B'
+                    index: 'outputPhaseVoltageB'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: VERTIV-ITA2-MIB::inputPhaseVoltageB
+                            op: '=='
+                            value: 0
+                -
+                    oid: VERTIV-ITA2-MIB::outputPhaseVoltageC
+                    value: VERTIV-ITA2-MIB::outputPhaseVoltageC
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.3.{{ $index }}'
+                    descr: 'Output Phase Voltage C'
+                    index: 'outputPhaseVoltageC'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: VERTIV-ITA2-MIB::inputPhaseVoltageC
+                            op: '=='
+                            value: 0
+                -
+                    oid: VERTIV-ITA2-MIB::bypassPhaseVoltageA
+                    value: VERTIV-ITA2-MIB::bypassPhaseVoltageA
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.4.1.{{ $index }}'
+                    descr: 'Bypass Phase Voltage A'
+                    index: 'bypassPhaseVoltageA'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: VERTIV-ITA2-MIB::inputPhaseVoltageA
+                            op: '=='
+                            value: 0
+                -
+                    oid: VERTIV-ITA2-MIB::bypassPhaseVoltageB
+                    value: VERTIV-ITA2-MIB::bypassPhaseVoltageB
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.4.2.{{ $index }}'
+                    descr: 'Bypass Phase Voltage B'
+                    index: 'bypassPhaseVoltageB'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: VERTIV-ITA2-MIB::inputPhaseVoltageB
+                            op: '=='
+                            value: 0
+                -
+                    oid: VERTIV-ITA2-MIB::bypassPhaseVoltageC
+                    value: VERTIV-ITA2-MIB::bypassPhaseVoltageC
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.4.3.{{ $index }}'
+                    descr: 'Bypass Phase Voltage C'
+                    index: 'bypassPhaseVoltageC'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: VERTIV-ITA2-MIB::inputPhaseVoltageC
+                            op: '=='
+                            value: 0
+                -
+                    oid: VERTIV-ITA2-MIB::positiveBatteryVoltage
+                    value: VERTIV-ITA2-MIB::positiveBatteryVoltage
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.4.2.{{ $index }}'
+                    descr: 'Positive Battery Voltage'
+                    index: 'positiveBatteryVoltage'
+                    divisor: 10
+                -
+                    oid: VERTIV-ITA2-MIB::negativeBatteryVoltage
+                    value: VERTIV-ITA2-MIB::negativeBatteryVoltage
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.4.3.{{ $index }}'
+                    descr: 'Negative Battery Voltage '
+                    index: 'negativeBatteryVoltage'
+                    divisor: 10
+        frequency:
+            data:
+                -
+                    oid: VERTIV-ITA2-MIB::inputFrequency
+                    value: VERTIV-ITA2-MIB::inputFrequency
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.2.4.{{ $index }}'
+                    descr: 'Input Frequency'
+                    index: 'inputFrequency'
+                    divisor: 100
+                -
+                    oid: VERTIV-ITA2-MIB::outputFrequency
+                    value: VERTIV-ITA2-MIB::outputFrequency
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.7.{{ $index }}'
+                    descr: 'Output Frequency'
+                    index: 'outputFrequency'
+                    divisor: 100
+                -
+                    oid: VERTIV-ITA2-MIB::bypassFrequency
+                    value: VERTIV-ITA2-MIB::bypassFrequency
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.4.4.{{ $index }}'
+                    descr: 'Bypass Frequency'
+                    index: 'bypassFrequency'
+                    divisor: 100
+        current:
+            data:
+                -
+                    oid: VERTIV-ITA2-MIB::inputPhaseCurrentA
+                    value: VERTIV-ITA2-MIB::inputPhaseCurrentA
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.2.5.{{ $index }}'
+                    descr: 'Input Phase Current A'
+                    index: 'inputPhaseCurrentA'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: VERTIV-ITA2-MIB::inputPhaseVoltageA
+                            op: '=='
+                            value: 0
+                -
+                    oid: VERTIV-ITA2-MIB::inputPhaseCurrentB
+                    value: VERTIV-ITA2-MIB::inputPhaseCurrentB
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.2.6.{{ $index }}'
+                    descr: 'Input Phase Current B'
+                    index: 'inputPhaseCurrentB'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: VERTIV-ITA2-MIB::inputPhaseVoltageB
+                            op: '=='
+                            value: 0
+                -
+                    oid: VERTIV-ITA2-MIB::inputPhaseCurrentC
+                    value: VERTIV-ITA2-MIB::inputPhaseCurrentC
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.2.7.{{ $index }}'
+                    descr: 'Input Phase Current C'
+                    index: 'inputPhaseCurrentC'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: VERTIV-ITA2-MIB::inputPhaseVoltageC
+                            op: '=='
+                            value: 0
+                -
+                    oid: VERTIV-ITA2-MIB::outputCurrentA
+                    value: VERTIV-ITA2-MIB::outputCurrentA
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.4.{{ $index }}'
+                    descr: 'Output Current A'
+                    index: 'outputCurrentA'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: VERTIV-ITA2-MIB::inputPhaseVoltageA
+                            op: '=='
+                            value: 0
+                -
+                    oid: VERTIV-ITA2-MIB::outputCurrentB
+                    value: VERTIV-ITA2-MIB::outputCurrentB
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.5.{{ $index }}'
+                    descr: 'Output Current B'
+                    index: 'outputCurrentB'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: VERTIV-ITA2-MIB::inputPhaseVoltageB
+                            op: '=='
+                            value: 0
+                -
+                    oid: VERTIV-ITA2-MIB::outputCurrentC
+                    value: VERTIV-ITA2-MIB::outputCurrentC
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.6.{{ $index }}'
+                    descr: 'Output Current C'
+                    index: 'outputCurrentC'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: VERTIV-ITA2-MIB::inputPhaseVoltageC
+                            op: '=='
+                            value: 0
+                -
+                    oid: VERTIV-ITA2-MIB::positiveBatteryChargingCurrent
+                    value: VERTIV-ITA2-MIB::positiveBatteryChargingCurrent
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.5.3.{{ $index }}'
+                    descr: 'Positive Battery Charging Current'
+                    index: 'positiveBatteryChargingCurrent'
+                    divisor: 100
+                -
+                    oid: VERTIV-ITA2-MIB::positiveBatteryDischargingCurrent
+                    value: VERTIV-ITA2-MIB::positiveBatteryDischargingCurrent
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.5.4.{{ $index }}'
+                    descr: 'Positive Battery Discharging Current'
+                    index: 'positiveBatteryDischargingCurrent'
+                    divisor: 100
+                -
+                    oid: VERTIV-ITA2-MIB::negativeBatteryChargingCurrent
+                    value: VERTIV-ITA2-MIB::negativeBatteryChargingCurrent
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.5.5.{{ $index }}'
+                    descr: 'Negative Battery Charging Current'
+                    index: 'negativeBatteryChargingCurrent'
+                    divisor: 100
+                -
+                    oid: VERTIV-ITA2-MIB::negativeBatteryDischargingCurrent
+                    value: VERTIV-ITA2-MIB::negativeBatteryDischargingCurrent
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.5.6.{{ $index }}'
+                    descr: 'Negative Battery Discharging Current'
+                    index: 'negativeBatteryDischargingCurrent'
+                    divisor: 100
+        power_consumed:
+            data:
+                -
+                    oid: VERTIV-ITA2-MIB::outputActivePowerA
+                    value: VERTIV-ITA2-MIB::outputActivePowerA
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.8.{{ $index }}'
+                    descr: 'Output Active Power A'
+                    index: 'outputActivePowerA'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: VERTIV-ITA2-MIB::inputPhaseVoltageA
+                            op: '=='
+                            value: 0
+                -
+                    oid: VERTIV-ITA2-MIB::outputActivePowerB
+                    value: VERTIV-ITA2-MIB::outputActivePowerB
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.9.{{ $index }}'
+                    descr: 'Output Active Power B'
+                    index: 'outputActivePowerB'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: VERTIV-ITA2-MIB::inputPhaseVoltageB
+                            op: '=='
+                            value: 0
+                -
+                    oid: VERTIV-ITA2-MIB::outputActivePowerC
+                    value: VERTIV-ITA2-MIB::outputActivePowerC
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.10.{{ $index }}'
+                    descr: 'Output Active Power C'
+                    index: 'outputActivePowerC'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: VERTIV-ITA2-MIB::inputPhaseVoltageC
+                            op: '=='
+                            value: 0
+        load:
+            data:
+                -
+                    oid: VERTIV-ITA2-MIB::outputLoadA
+                    value: VERTIV-ITA2-MIB::outputLoadA
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.14.{{ $index }}'
+                    descr: 'Output Load A'
+                    index: 'outputLoadA'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: VERTIV-ITA2-MIB::inputPhaseVoltageA
+                            op: '=='
+                            value: 0
+                -
+                    oid: VERTIV-ITA2-MIB::outputLoadB
+                    value: VERTIV-ITA2-MIB::outputLoadB
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.15.{{ $index }}'
+                    descr: 'Output Load B'
+                    index: 'outputLoadB'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: VERTIV-ITA2-MIB::inputPhaseVoltageB
+                            op: '=='
+                            value: 0
+                -
+                    oid: VERTIV-ITA2-MIB::outputLoadC
+                    value: VERTIV-ITA2-MIB::outputLoadC
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.16.{{ $index }}'
+                    descr: 'Output Load C'
+                    index: 'outputLoadC'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: VERTIV-ITA2-MIB::inputPhaseVoltageC
+                            op: '=='
+                            value: 0
+        runtime:
+            data:
+                -
+                    oid: VERTIV-ITA2-MIB::batteryRemainsTime
+                    value: VERTIV-ITA2-MIB::batteryRemainsTime
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.5.7.{{ $index }}'
+                    descr: 'Estimated Battery Runtime'
+                    index: 'batteryRemainsTime'
+        temperature:
+            data:
+                -
+                    oid: VERTIV-ITA2-MIB::batteryTemperature
+                    value: VERTIV-ITA2-MIB::batteryTemperature
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.5.8.{{ $index }}'
+                    descr: 'Battery Temperature'
+                    index: 'batteryTemperature'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: VERTIV-ITA2-MIB::batteryTemperature
+                            op: '=='
+                            value: 65535
+                -
+                    oid: VERTIV-ITA2-MIB::batteryEnvironmentTemperature
+                    value: VERTIV-ITA2-MIB::batteryEnvironmentTemperature
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.5.9.{{ $index }}'
+                    descr: 'Battery Environment Temperature'
+                    index: 'batteryEnvironmentTemperature'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: VERTIV-ITA2-MIB::batteryEnvironmentTemperature
+                            op: '=='
+                            value: 65535
+        charge:
+            data:
+                -
+                    oid: VERTIV-ITA2-MIB::batteryCapacity
+                    value: VERTIV-ITA2-MIB::batteryCapacity
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.5.10.{{ $index }}'
+                    descr: 'Battery Charge'
+                    index: 'batteryCapacity'
+        count:
+            data:
+                -
+                    oid: VERTIV-ITA2-MIB::batteryDischargeTimes
+                    value: VERTIV-ITA2-MIB::batteryDischargeTimes
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.5.11.{{ $index }}'
+                    descr: 'Battery Discharge Times'
+                    index: 'batteryDischargeTimes'
