@@ -10,9 +10,11 @@ modules:
                     oid: AxosOltPonPortEntry
                     value: axosOltPonPortTemperature
                     num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.4.2.1.4.{{ $index }}'
-                    descr: 'axosOltPonPortName'
+                    group: transceiver
+                    descr: '{{ $axosOltPonPortName }} Temperature'
                     index: 'axosOltPonPortTemperature.{{ $index }}'
                     divisor: 1000
+                    entPhysicalIndex: '{{ $index }}'
                     skip_values:
                         -
                             oid: axosOltPonPortStatus
@@ -24,9 +26,27 @@ modules:
                     oid: AxosOltPonPortEntry
                     value: axosOltPonPortVoltage
                     num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.4.2.1.8.{{ $index }}'
-                    descr: 'axosOltPonPortName'
+                    group: transceiver
+                    descr: '{{ $axosOltPonPortName }} Voltage'
                     index: 'axosOltPonPortVoltage.{{ $index }}'
                     divisor: 1000
+                    entPhysicalIndex: '{{ $index }}'
+                    skip_values:
+                        -
+                            oid: axosOltPonPortStatus
+                            op: '='
+                            value: 0
+        current:
+            data:
+                -
+                    oid: AxosOltPonPortEntry
+                    value: axosOltPonPortTxBias
+                    num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.4.2.1.5.{{ $index }}'
+                    group: transceiver
+                    descr: '{{ $axosOltPonPortName }} TX Bias'
+                    index: 'axosOltPonPortTxBias.{{ $index }}'
+                    divisor: 1000
+                    entPhysicalIndex: '{{ $index }}'
                     skip_values:
                         -
                             oid: axosOltPonPortStatus
@@ -35,6 +55,20 @@ modules:
 
         state:
             data:
+                -
+                    oid: AxosOltPonPortEntry
+                    value: axosOltPonPortStatus
+                    num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.4.2.1.3.{{ $index }}'
+                    descr: '{{ $axosOltPonPortName }} Status'
+                    index: axosOltPonPortStatus.{{ $index }}
+                    group: transceiver
+                    entPhysicalIndex: '{{ $index }}'
+                    state_name: axosOltPonPortStatus
+                    states:
+                        - { value: 0, generic: 3, graph: 0, descr: Invalid }
+                        - { value: 1, generic: 0, graph: 0, descr: Up }
+                        - { value: 2, generic: 1, graph: 0, descr: Down }
+
                 -
                     oid: axosCardTable
                     value: axosCardAdminStatus
@@ -55,9 +89,9 @@ modules:
                     index: axosOntOperStatus.{{ $index }}
                     state_name: axosOntOperStatus
                     states:
-                      - { value: 0, generic: 3, graph: 0, descr: Unknown }
-                      - { value: 1, generic: 0, graph: 0, descr: Enabled }
-                      - { value: 2, generic: 0, graph: 0, descr: Disabled }
+                        - { value: 0, generic: 3, graph: 0, descr: Unknown }
+                        - { value: 1, generic: 0, graph: 0, descr: Enabled }
+                        - { value: 2, generic: 0, graph: 0, descr: Disabled }
                 -
                     oid: axosOntTable
                     value: axosOntAdminStatus
@@ -66,9 +100,9 @@ modules:
                     index: axosOntAdminStatus.{{ $index }}
                     state_name: axosOntAdminStatus
                     states:
-                      - { value: 0, generic: 3, graph: 0, descr: Unknown }
-                      - { value: 1, generic: 0, graph: 0, descr: Enabled }
-                      - { value: 2, generic: 0, graph: 0, descr: Disabled }
+                        - { value: 0, generic: 3, graph: 0, descr: Unknown }
+                        - { value: 1, generic: 0, graph: 0, descr: Enabled }
+                        - { value: 2, generic: 0, graph: 0, descr: Disabled }
 
         dbm:
             data:
@@ -76,30 +110,32 @@ modules:
                     oid: AxosOltPonPortEntry
                     value: axosOltPonPortRxPower
                     num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.4.2.1.7.{{ $index }}'
+                    group: transceiver
                     descr: '{{ $axosOltPonPortName }} Rx Power'
                     index: 'axosOltPonPortRxPower.{{ $index }}'
-                    group: '{{ $axosOltPonPortName }}'
                     divisor: 10000
                     user_func: 'mw_to_dbm'
+                    entPhysicalIndex: '{{ $index }}'
                     skip_values:
                         -
                             oid: axosOltPonPortStatus
                             op: '='
-                            value: 2
+                            value: 0
                 -
                     oid: AxosOltPonPortEntry
                     value: axosOltPonPortTxPower
                     num_oid: '.1.3.6.1.4.1.6321.1.2.4.2.4.2.1.6.{{ $index }}'
+                    group: transceiver
                     descr: '{{ $axosOltPonPortName }} Tx Power'
                     index: 'axosOltPonPortTxPower.{{ $index }}'
-                    group: '{{ $axosOltPonPortName }}'
                     divisor: 10000
                     user_func: 'mw_to_dbm'
+                    entPhysicalIndex: '{{ $index }}'
                     skip_values:
                         -
                             oid: axosOltPonPortStatus
                             op: '='
-                            value: 2
+                            value: 0
 
                 -
                     oid: AxosOntTable
