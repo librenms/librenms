@@ -45,3 +45,84 @@ You can now select this group from the Devices -> All Devices link in
 the navigation at the top. You can also use map your device groups to
 an alert rule in the section `Match devices, groups and locations list`
 against any alert rule.
+
+## Device Group Permissions (Beta)
+
+Device groups can be used to grant users access to specific devices based on group membership. This feature is marked as beta and requires specific configuration to function properly.
+
+### Configuration
+
+To enable device group permissions, you must set the following configuration option:
+
+!!! setting "authorization"
+    ```bash
+    lnms config:set permission.device_group.allow_dynamic true
+    ```
+
+By default, this setting is `false`, which means:
+- Device group permissions are **disabled** and in **read-only mode**
+- Users with assigned device group permissions will see those assignments in the UI, but they will **not grant any actual access**
+- Administrators cannot add or remove device group permission assignments
+- The permissions query will **exclude all dynamic device groups** from access calculations
+
+### Important Notes
+
+⚠️ **Warning**: If `permission.device_group.allow_dynamic` is `false` (the default), device group permissions appear to be "invisible" or "disappear" from the user's effective permissions, even though the database records still exist. This is a common source of confusion.
+
+### How It Works
+
+When enabled (`permission.device_group.allow_dynamic = true`):
+- Users can be granted access to devices via device group assignments
+- Both **static** and **dynamic** device groups can be used for permissions
+- Admins can add/remove device group assignments on the user edit page
+- Permissions are cached for 24 hours for performance
+
+When disabled (default: `permission.device_group.allow_dynamic = false`):
+- The device group permissions section on the user edit page becomes **read-only**
+- A warning banner indicates the feature is disabled
+- Delete buttons are replaced with lock icons
+- The "Add" form is hidden
+- All modification attempts (add/delete) are blocked at the backend
+
+### Assigning Device Group Permissions
+
+1. Navigate to Settings → Manage Users → Edit User
+2. Scroll to the "Device access via Device Group (beta)" section
+3. Select a device group from the dropdown
+4. Click "Add" to grant access
+5. To revoke access, click the trash icon next to the group name
+
+### Static vs Dynamic Groups
+
+- **Static Groups**: Manually maintained list of devices
+- **Dynamic Groups**: Automatically updated based on rules (e.g., hostname patterns, location, etc.)
+
+When `permission.device_group.allow_dynamic = false`:
+- Only **static** device groups are considered for permissions
+- Dynamic group assignments exist in the database but are excluded from permission checks
+
+### Troubleshooting
+
+**Problem**: Device group permissions "disappear" or users lose access intermittently
+
+**Cause**: The `permission.device_group.allow_dynamic` setting is `false` (or was changed from `true` to `false`)
+
+**Solution**: Enable dynamic groups in your configuration:
+
+```bash
+lnms config:set permission.device_group.allow_dynamic true
+```
+
+**Alternative**: If you don't want to use dynamic groups, ensure all device groups assigned to users are **static** type groups.
+
+### Database Tables
+
+Device group permissions are stored in the following tables:
+- `devices_group_perms`: Links users to device groups
+- `device_group_device`: Links devices to device groups
+- `device_groups`: Stores device group definitions (including `type`: static or dynamic)
+
+### See Also
+
+- [Authentication Options](Authentication.md) - For user role management
+- [API: Device Groups](../API/DeviceGroups.md) - For programmatic access to device groups

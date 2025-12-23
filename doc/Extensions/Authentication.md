@@ -51,6 +51,16 @@ the same time.
 **Note** Oxidized configs can often contain sensitive data. Because of
 that only Administrator account type can see configs.
 
+### Device Permissions for Users
+
+Users with the **user** role can be granted access to devices in several ways:
+
+1. **Individual Device Permissions** - Assign specific devices manually
+2. **Port/Interface Permissions** - Grant access to specific interfaces
+3. **Device Group Permissions (Beta)** - Assign access via device groups
+
+For more information about device group permissions, see [Device Groups: Permissions](Device-Groups.md#device-group-permissions-beta).
+
 ## Note for SELinux users
 
 When using SELinux on the LibreNMS server, you need to allow Apache
