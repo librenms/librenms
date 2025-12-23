@@ -461,8 +461,12 @@ class Rrd extends BaseDatastore
     /**
      * Add rrdcached options to the options array
      */
-    private function fixRrdCachedOptions(array $options = []): array
+    private function fixRrdCachedOptions(array $options = [], ?string $command = null, ?string $filename = null): array
     {
+        if ($command != null && $filename != null) {
+            return [$command, str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename), '--daemon', $this->rrdcached, ...str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $options)];
+        }
+
         return ['--daemon', $this->rrdcached, ...str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $options)];
     }
 
@@ -492,9 +496,7 @@ class Rrd extends BaseDatastore
         }
 
         if ($this->useRrdCached($command)) {
-            // only relative paths if using rrdcached
-            $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
-            $options = $this->fixRrdCachedOptions($options);
+            return $this->fixRrdCachedOptions($options, $command, $filename);
         }
 
         return [$command, $filename, ...$options];
