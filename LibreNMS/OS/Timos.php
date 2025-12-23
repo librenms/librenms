@@ -955,8 +955,8 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscove
             'TIMETRA-PORT-MIB::tmnxPortTransceiverDiagCapable',
             'TIMETRA-PORT-MIB::tmnxPortTransceiverModelNumber',
         ])->mapTable(function ($data, $chassisIndex, $portId) {
-            // Skip ports that are administratively down (outOfService = 3)
-            if (($data['TIMETRA-PORT-MIB::tmnxPortAdminStatus'] ?? '') === 'outOfService') {
+            // Skip ports that are not inService (inService)
+            if (($data['TIMETRA-PORT-MIB::tmnxPortAdminStatus'] ?? '') !== 'inService') {
                 return null;
             }
 
