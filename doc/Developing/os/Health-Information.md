@@ -150,6 +150,48 @@ well as pre-fetched data. The index ($index) and the sub_indexes (in
 case the oid is indexed multiple times) are also available: if
 $index="1.20", then $subindex0="1" and $subindex1="20".
 
+To fetch data not available to your sensor you can use `additional_oids`.
+
+!!! note
+    `additional_oids` should only be used when data is not fetched by your sensor.
+
+ `additional_oids` can also be used within a class.
+ This is the preferred way if the `additional_oids` are only used inside the class.
+ See `additional_oids` in the `temperature` class below aswell as `additional_oids` on the `sensors` level.
+ 
+!!! note
+     Only one `additional_oids` statements should be used for the same oid and this is only an example showing both cases.
+
+```
+sensors:
+    additional_oids:
+        data:
+            -
+                oid:
+                    - Stulz-WIB8000-MIB::unitsettingName
+    temperature:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - Stulz-WIB8000-MIB::unitsettingName
+        data:
+            -
+                oid: unitTemperature
+                value: unitTemperature
+                num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.1.1.1.1170.{{ $index }}'
+                index: 'unitTemperature.{{ $index }}'
+                descr: 'Unit {{ Stulz-WIB8000-MIB::unitsettingName:0-1 }} temp'
+                divisor: 10
+            -
+                oid: unitSupplyAirTemperature
+                value: unitSupplyAirTemperature
+                num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.1.1.1.1193.{{ $index }}'
+                index: 'unitSupplyAirTemperature.{{ $index }}'
+                descr: 'Unit {{ Stulz-WIB8000-MIB::unitsettingName:0-1 }} supply temp'
+                divisor: 10
+```
+
 If you want access a string in an index, `{{ $index_string }}` can be used,
 optionally suffixed with a format string to specify how to extract the string.
 `{{ $index_string:nns }}` will skip two numeric indexes and return the string after.
@@ -428,12 +470,12 @@ names Ethernet 1-1-1-1, 1-1-1-2, etc, and they are indexed as oid.1.1.1.1, oid.1
 the mib.
 
 Next the program checks which table the port exists in and that the connector type is 'fiber'. There
-are other port tables in the full code that were ommitted from the example for brevity. Copper
+are other port tables in the full code that were omitted from the example for brevity. Copper
 media won't have optical readings, so if the media type isn't fiber we skip discovery for that port.
 
 The next two lines build the OIDs for getting the optical receive and transmit values using the
 `$index` for the port. Using the OIDs the program gets the current receive and transmit values
-($currentRx and $currentTx repectively) to verify the values are not 0. Not all SFPs collect digital
+($currentRx and $currentTx respectively) to verify the values are not 0. Not all SFPs collect digital
 optical monitoring (DOM) data, in the case of Adva the value of both transmit and receive will be
 0 if DOM is not available. While 0 is a valid value for optical power, its extremely unlikely that
 both will be 0 if DOM is present. If DOM is not available, then the program stops discovery for

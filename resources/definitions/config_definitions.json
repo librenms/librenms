@@ -4579,7 +4579,7 @@
             "default": true,
             "group": "poller",
             "section": "ping",
-            "order": 4,
+            "order": 5,
             "type": "boolean"
         },
         "ignore_bsd_os_drives": {
@@ -5298,6 +5298,16 @@
             "section": "binaries",
             "order": 4,
             "type": "executable"
+        },
+        "mtu_options.bytes": {
+            "default": null,
+            "group": "poller",
+            "section": "mtu",
+            "order": 1,
+            "type": "integer",
+            "validate": {
+                "value": "int|nullable|between:9,65535"
+            }
         },
         "mydomain": {
             "type": "text",

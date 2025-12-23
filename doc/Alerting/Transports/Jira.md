@@ -42,4 +42,4 @@ The config fields that need to set for webhooks are: Jira Open URL, Jira Close U
 | Jira Password | myjirapass |
 | Enable webhook | ON/OFF |
 | Webhook ID | alert_id |
-| Custom Fileds | {"components":[{"id":"00001"}], "source": "LibrenNMS"} |
+| Custom Fields | {"components":[{"id":"00001"}], "source": "LibrenNMS"} |

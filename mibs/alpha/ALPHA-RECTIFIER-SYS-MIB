@@ -16,7 +16,7 @@
       	 	FROM SNMPv2-CONF;  
                            
 	rectifierSystem MODULE-IDENTITY
-		LAST-UPDATED "201704060000Z"
+		LAST-UPDATED "201912120000Z"
 		ORGANIZATION "Alpha Technologies Ltd."
 		CONTACT-INFO
 		  	 "Alpha Technologies Ltd.
@@ -29,6 +29,14 @@
 		DESCRIPTION
 		  	"This MIB defines the notification block(s) available in system controllers."
 
+        REVISION    "201912120000Z"  -- Dec 12, 2019
+		DESCRIPTION
+			"
+			Added fields for statistic counters for various rectifier states.
+			Tested with SimpleWeb: http://www.simpleweb.org      
+			Passed highest level of compliance.  (level 6)
+			"
+			
 		REVISION    "201704060000Z"  -- April 4, 2017
 		DESCRIPTION
 			"
@@ -307,6 +315,110 @@
        DESCRIPTION
                "Estimated battery health percentage."
        ::= { rectifierSystem 32 }
+	   
+   rectNumberOfAcquiredRectifiers OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Number of Acquired Rectifiers."
+       ::= { rectifierSystem 33 }
+	   
+   rectNumberOfSourcingRectifiers OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Number of Sourcing Rectifiers."
+       ::= { rectifierSystem 34 }
+	
+   rectNumberOfFailedRectifiers OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Number of Failed Rectifiers."
+       ::= { rectifierSystem 35 }
+	
+   rectNumberOfMinorAlertRectifiers OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Number of Rectifiers with Minor Alerts."
+       ::= { rectifierSystem 36 }  
+
+   rectNumberOfCommsLostRectifiers OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Number of Rectifiers in Comms Lost."
+       ::= { rectifierSystem 37 } 
+
+   rectNumberOfCommsNormalRectifiers OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Number of Rectifiers in Comms Normal."
+       ::= { rectifierSystem 38 }  
+	   
+   rectNumberOfACFailedRectifiers OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Number of Rectifiers with AC Failed."
+       ::= { rectifierSystem 39 }  	
+
+   rectNumberOfRectifiersWithConfigError OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Number of Rectifiers with Configuration Error."
+       ::= { rectifierSystem 40} 
+
+   rectNumberOfRectifiersInPowerLimit OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Number of Rectifiers in Power Limit."
+       ::= { rectifierSystem 41} 	
+
+   rectNumberOfRectifiersInCurrentLimit OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Number of Rectifiers in Current Limit."
+       ::= { rectifierSystem 42} 
+
+   rectNumberOfFanFailRectifiers OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Number of Rectifiers with Fan Failed."
+       ::= { rectifierSystem 43} 
+
+   rectNumberOfRectifiersInBootloader OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Number of Rectifiers in Boot Loader."
+       ::= { rectifierSystem 44} 
+
+   rectMaxRectifierAmbientTemperature OBJECT-TYPE
+       SYNTAX      ScaledNumber
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "Maximum Rectifier Ambient Temperature."
+       ::= { rectifierSystem 45}    	   
                                       
                                       
 	-- Conformance                                      
@@ -360,8 +472,21 @@
 			rectSysEstimatedCapacityRemainingPower,
 			rectSysEstimatedSOCPercent,
 			rectSysEstimatedBatteryRuntime,
-			rectSysEstimatedBatteryHealthPercent
-		}
+			rectSysEstimatedBatteryHealthPercent,
+			rectNumberOfAcquiredRectifiers,
+            rectNumberOfSourcingRectifiers,
+            rectNumberOfFailedRectifiers,
+            rectNumberOfMinorAlertRectifiers,
+            rectNumberOfCommsLostRectifiers,
+			rectNumberOfCommsNormalRectifiers,
+            rectNumberOfACFailedRectifiers,
+            rectNumberOfRectifiersWithConfigError,
+            rectNumberOfRectifiersInPowerLimit,
+            rectNumberOfRectifiersInCurrentLimit,
+            rectNumberOfFanFailRectifiers,
+            rectNumberOfRectifiersInBootloader,
+            rectMaxRectifierAmbientTemperature
+ 		}
 		STATUS   current
 		DESCRIPTION
 		     "Alpha Rectifier System data list group."
