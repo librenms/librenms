@@ -23,7 +23,6 @@ $components = $components[$device['device_id']];
 include 'includes/html/graphs/common.inc.php';
 $graph_params->scale_min = 0;
 $graph_params->scale_max = 16;
-$graph_params->sloped_mode = true;
 
 $rrd_options[] = 'COMMENT:Stratum               Now      Min      Max\\n';
 
