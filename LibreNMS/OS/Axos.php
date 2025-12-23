@@ -26,13 +26,17 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\EntPhysical;
+use App\Models\Transceiver;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
-class Axos extends OS implements OSDiscovery
+class Axos extends OS implements OSDiscovery, TransceiverDiscovery
 {
     public function discoverOS(Device $device): void
     {
@@ -43,6 +47,32 @@ class Axos extends OS implements OSDiscovery
             $card_count[$card] = ($card_count[$card] ?? 0) + 1;
         }
         $device->features = implode(', ', array_map(fn ($card) => ($card_count[$card] > 1 ? $card_count[$card] . 'x ' : '') . $card, array_keys($card_count)));
+    }
+
+    public function discoverTransceivers(): Collection
+    {
+        return SnmpQuery::cache()->walk('Axos-Card-MIB::axosOltPonPortTable')->mapTable(function ($data, $ifIndex) {
+            if (($data['Axos-Card-MIB::axosOltPonPortStatus'] ?? 0) == 0) {
+                return null;
+            }
+
+            return new Transceiver([
+                'port_id' => PortCache::getIdFromIfIndex((int) $ifIndex, $this->getDevice()),
+                'index' => $ifIndex,
+                'entity_physical_index' => (int) $ifIndex,
+            ]);
+        })->filter();
+    }
+
+    public static function getIfIndex(int $chassis, int $slot, int $id, string $type): int
+    {
+        // doesn't work for stacked chassis, I don't have enough info to figure out how it works
+        $offset = match ($type) {
+            'gpon' => 20000,
+            default => 0,
+        };
+
+        return $offset + (10000 * $chassis) + ($slot * 100) + $id;
     }
 
     public function discoverEntityPhysical(): Collection
