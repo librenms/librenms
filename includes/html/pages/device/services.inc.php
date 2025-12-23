@@ -86,6 +86,10 @@ if (count($services) > '0') {
             $status_label = 'label-info';
         }
 
+        if ($service['service_changed'] == '0') {
+            $service['service_changed'] = time();
+        }
+
         echo '<tr id="row_' . $service['service_id'] . '">';
         echo '<td class="col-sm-2"><span class="alert-status ' . $status_label . '"><span class="device-services-page text-nowrap">' . htmlentities((string) $service['service_name']) . '</span></span></td>';
         echo '<td class="col-sm-1 text-muted">' . htmlentities((string) $service['service_type']) . '</td>';
