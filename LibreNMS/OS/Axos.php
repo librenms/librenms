@@ -56,23 +56,18 @@ class Axos extends OS implements OSDiscovery, TransceiverDiscovery
                 return null;
             }
 
+            $portId = PortCache::getIdFromIfIndex((int) $ifIndex, $this->getDevice());
+            if ($portId === null) {
+                return null;
+            }
+
             return new Transceiver([
-                'port_id' => PortCache::getIdFromIfIndex((int) $ifIndex, $this->getDevice()),
+                'port_id' => $portId,
                 'index' => $ifIndex,
                 'entity_physical_index' => (int) $ifIndex,
+                'channels' => 1,
             ]);
         })->filter();
-    }
-
-    public static function getIfIndex(int $chassis, int $slot, int $id, string $type): int
-    {
-        // doesn't work for stacked chassis, I don't have enough info to figure out how it works
-        $offset = match ($type) {
-            'gpon' => 20000,
-            default => 0,
-        };
-
-        return $offset + (10000 * $chassis) + ($slot * 100) + $id;
     }
 
     public function discoverEntityPhysical(): Collection
