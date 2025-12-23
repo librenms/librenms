@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Interfaces\Models\Keyable;
 
@@ -42,6 +43,15 @@ class MplsService extends DeviceRelatedModel implements Keyable
     }
 
     // ---- Define Relationships ----
+
+    /**
+     * @return BelongsTo<Vrf, $this>
+     */
+    public function vrf(): BelongsTo
+    {
+        return $this->belongsTo(Vrf::class, 'svcVRouterId', 'vrf_oid')
+            ->whereRaw('device_id = vrfs.device_id');
+    }
 
     /**
      * @return HasMany<MplsSdpBind, $this>
