@@ -21,7 +21,6 @@ $components = $components[$device['device_id']];
 
 include 'includes/html/graphs/common.inc.php';
 $graph_params->scale_min = 0;
-$graph_params->sloped_mode = true;
 
 $rrd_options[] = 'COMMENT:VLANs               Now     Min    Max\\n';
 $rrd_additions = '';
