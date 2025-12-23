@@ -319,9 +319,9 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         ])->mapTable(function ($value, $svcId) use ($sdps, $svcs) {
             $bind_id = str_replace(' ', '', $value['sdpBindId'] ?? '');
             $sdp_oid = hexdec(substr($bind_id, 0, 8));
-            $svc_oid = hexdec(substr($bind_id, 9, 16));
-            $sdp_id = $sdps->firstWhere('sdp_oid', $sdp_oid)->sdp_id;
-            $svc_id = $svcs->firstWhere('svc_oid', $svcId)->svc_id;
+            $svc_oid = hexdec(substr($bind_id, 8, 8));
+            $sdp_id = $sdps->firstWhere('sdp_oid', $sdp_oid)?->sdp_id;
+            $svc_id = $svcs->firstWhere('svc_oid', $svc_oid)?->svc_id;
 
             if ($sdp_id && $svc_id && $sdp_oid && $svc_oid) {
                 return new MplsSdpBind([
@@ -642,9 +642,9 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         ])->mapTable(function ($value, $svcId) use ($sdps, $svcs) {
             $bind_id = str_replace(' ', '', $value['sdpBindId'] ?? '');
             $sdp_oid = hexdec(substr($bind_id, 0, 8));
-            $svc_oid = hexdec(substr($bind_id, 9, 16));
-            $sdp_id = $sdps->firstWhere('sdp_oid', $sdp_oid)->sdp_id;
-            $svc_id = $svcs->firstWhere('svc_oid', $svcId)->svc_id;
+            $svc_oid = hexdec(substr($bind_id, 8, 8));
+            $sdp_id = $sdps->firstWhere('sdp_oid', $sdp_oid)?->sdp_id;
+            $svc_id = $svcs->firstWhere('svc_oid', $svc_oid)?->svc_id;
 
             if ($sdp_id && $svc_id && $sdp_oid && $svc_oid) {
                 return new MplsSdpBind([

@@ -1,6 +1,11 @@
 <?php
 
 use LibreNMS\Util\Number;
+use App\Models\MplsLsp;
+use App\Models\MplsLspPath;
+use App\Models\MplsSdp;
+use App\Models\MplsSdpBind;
+use App\Models\MplsService;
 
 print_optionbar_start();
 
@@ -87,10 +92,10 @@ echo '<span style="font-weight: bold; padding-left:2em;">Devices</span> &#187; '
 
 if ($vars['device-state'] == 'disabled') {
     echo "<span class='pagemenu-selected'>";
-    echo generate_link('Disabled', $vars, ['device-state' => null]);
+    echo generate_link('Hide Disabled', $vars, ['device-state' => null]);
     echo '</span>';
 } else {
-    echo generate_link('Disabled', $vars, ['device-state' => 'disabled']);
+    echo generate_link('Show Disabled', $vars, ['device-state' => 'disabled']);
 }
 
 print_optionbar_end();
@@ -115,17 +120,16 @@ if ($vars['view'] == 'lsp') {
         </tr>';
 
     $i = 0;
-    $sql = 'SELECT `l`.*, `v`.`vrf_name`';
-    $sql .= ' FROM `mpls_lsps` AS l, `vrfs` AS v  LEFT JOIN `devices` AS d ON `v`.`device_id` = `d`.`device_id`';
-    $sql .= ' WHERE `l`.`vrf_oid` = `v`.`vrf_oid`';
-    $sql .= ' AND `l`.`device_id` = `v`.`device_id`';
-    $sql .= ' AND (`d`.disabled = 0';
-    if ($vars['device-state'] == 'disabled') {
-        $sql .= ' OR `d`.disabled = 1';
-    }
-    $sql .= ')';
-    $sql .= ' ORDER BY `d`.hostname, `l`.`mplsLspName`';
-    $query = dbFetchRows($sql);
+    $query = App\Models\MplsLsp::query()
+        ->hasAccess(auth()->user())
+        ->hasAccess(auth()->user())
+        ->when($vars['device-state'] !== 'disabled', function($q) {
+                $q->whereHas('device', fn($query) => $query->where('disabled', 0));
+        })
+        ->get()
+        ->sortBy('device.hostname')
+        ->sortBy('mplsLspName');
+
     foreach ($query as $lsp) {
         $device = device_by_id_cache($lsp['device_id']);
 
@@ -204,16 +208,14 @@ if ($vars['view'] == 'paths') {
         </tr>';
 
     $i = 0;
-    $sql = 'SELECT `p`.*, `l`.`mplsLspName`';
-    $sql .= ' FROM `mpls_lsp_paths` AS `p`, `mpls_lsps` AS `l` LEFT JOIN `devices` AS d ON `l`.`device_id` = `d`.`device_id`';
-    $sql .= ' WHERE `p`.`lsp_id` = `l`.`lsp_id`';
-    $sql .= ' AND (`d`.disabled = 0';
-    if ($vars['device-state'] == 'disabled') {
-        $sql .= ' OR `d`.disabled = 1';
-    }
-    $sql .= ')';
-    $sql .= ' ORDER BY `d`.`hostname`, `p`.`device_id`, `l`.`mplsLspName`';
-    $query = dbFetchRows($sql);
+    $query = App\Models\MplsLspPath::with(['device', 'lsp'])
+        ->hasAccess(auth()->user())
+        ->when($vars['device-state'] !== 'disabled', function($q) {
+                $q->whereHas('device', fn($query) => $query->where('disabled', 0));
+        })
+        ->get()
+        ->sortBy('device.hostname')
+        ->sortBy('mplsLspName');
     foreach ($query as $path) {
         $device = device_by_id_cache($path['device_id']);
         if (! is_int($i / 2)) {
@@ -284,15 +286,15 @@ if ($vars['view'] == 'sdps') {
         </tr>';
 
     $i = 0;
-    $sql = 'SELECT `s`.* ';
-    $sql .= ' FROM `mpls_sdps` as s LEFT JOIN `devices` AS d ON `s`.`device_id` = `d`.`device_id`';
-    $sql .= ' WHERE (`d`.disabled = 0';
-    if ($vars['device-state'] == 'disabled') {
-        $sql .= ' OR `d`.disabled = 1';
-    }
-    $sql .= ')';
-    $sql .= ' ORDER BY d.`hostname`, s.`sdp_oid`';
-    $query = dbFetchRows($sql);
+    $query = App\Models\MplsSdp::with('device')
+        ->hasAccess(auth()->user())
+        ->when($vars['device-state'] !== 'disabled', function($q) {
+                $q->whereHas('device', fn($query) => $query->where('disabled', 0));
+        })
+        ->get()
+        ->sortBy('sdp_oid')
+        ->sortBy('device.hostname');
+
     foreach ($query as $sdp) {
         $device = device_by_id_cache($sdp['device_id']);
 
@@ -369,15 +371,15 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
         </tr>';
 
     $i = 0;
-    $sql = 'SELECT b.*, s.svc_oid AS svcId';
-    $sql .= ' FROM `mpls_sdp_binds` AS b LEFT JOIN `mpls_services` AS s ON `b`.`svc_id` = `s`.`svc_id`  LEFT JOIN `devices` AS d ON `s`.`device_id` = `d`.`device_id`';
-    $sql .= ' WHERE (`d`.disabled = 0';
-    if ($vars['device-state'] == 'disabled') {
-        $sql .= ' OR `d`.disabled = 1';
-    }
-    $sql .= ')';
-    $sql .= ' ORDER BY d.`hostname`, `sdp_oid`, `svc_oid`';
-    $query = dbFetchRows($sql);
+    $query = App\Models\MplsSdpBind::with(['service', 'service.device'])
+        ->hasAccess(auth()->user())
+        ->when($vars['device-state'] !== 'disabled', function($q) {
+                $q->whereHas('service.device', fn($query) => $query->where('disabled', 0));
+        })
+        ->get()
+        ->sortBy('sdp_oid')
+        ->sortBy('service.svc_oid')
+        ->sortBy('service.device.hostname');
     foreach ($query as $sdpbind) {
         $device = device_by_id_cache($sdpbind['device_id']);
 
@@ -401,8 +403,8 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
 
         echo "<tr bgcolor=$bg_colour>
             <td>" . generate_device_link($device, 0, ['tab' => 'routing', 'proto' => 'mpls', 'view' => 'sdpbinds']) . '</td>
-            <td>' . $sdpbind['svcId'] . '</td>
-            <td>' . $sdpbind['sdp_oid'] . ':' . $sdpbind['svc_oid'] . '</td>
+            <td>' . $sdpbind->service['svc_oid'] . '</td>
+            <td>' . $sdpbind['sdp_oid'] . ':' . $sdpbind->service['svc_oid'] . '</td>
             <td>' . $sdpbind['sdpBindType'] . '</td>
             <td>' . $sdpbind['sdpBindVcType'] . '</td>
             <td><span class="label label-' . $adminstate_status_color . '">' . $sdpbind['sdpBindAdminStatus'] . '</td>
@@ -449,16 +451,19 @@ vprn services are up when the service is administratively up however routing fun
         </tr>';
 
     $i = 0;
-    $sql = 'SELECT s.*, v.vrf_name ';
-    $sql .= ' FROM `mpls_services` AS s LEFT JOIN  `vrfs` AS v ON `s`.`svcVRouterId` = `v`.`vrf_oid` AND `s`.`device_id` = `v`.`device_id` LEFT JOIN `devices` AS d ON `s`.`device_id` = `d`.`device_id`';
-    $sql .= ' WHERE `s`.`device_id` = `d`.`device_id`';
-    $sql .= ' AND (`d`.disabled = 0';
-    if ($vars['device-state'] == 'disabled') {
-        $sql .= ' OR `d`.disabled = 1';
-    }
-    $sql .= ')';
-    $sql .= ' ORDER BY d.`hostname`, s.`svc_oid`';
-    $query = dbFetchRows($sql);
+    $query = App\Models\MplsService::with(['device', 'vrf'])
+        ->whereHas('device', function ($q) use ($vars) {
+            if ($vars['device-state'] !== 'disabled') {
+                $q->where('disabled', 0);
+            } else {
+                $q->where('disabled', 0)->orWhere('disabled', 1);
+            }
+        })
+        ->get()
+        ->sortBy('svc_oid')
+        ->sortBy(function($item) {
+            return $item->device->hostname ?? '';
+        });
     foreach ($query as $svc) {
         $device = device_by_id_cache($svc['device_id']);
 
@@ -501,7 +506,7 @@ vprn services are up when the service is administratively up however routing fun
             <td>' . $svc['svcNumSaps'] . '</td>
             <td>' . \LibreNMS\Util\Time::formatInterval($svc['svcLastMgmtChange']) . '</td>
             <td>' . \LibreNMS\Util\Time::formatInterval($svc['svcLastStatusChange']) . '</td>
-            <td>' . $svc['vrf_name'] . '</td>
+            <td>' . ($svc->vrf?->vrf_name ?? 'N/A') . '</td>
             <td>' . $svc['svcTlsMacLearning'] . '</td>
             <td>' . $svc['svcTlsFdbTableSize'] . '</td>
             <td><span class="label label-' . $fdb_status_color . '">' . $svc['svcTlsFdbNumEntries'] . '</td>
@@ -531,20 +536,26 @@ if ($vars['view'] == 'saps') {
         </tr>';
 
     $i = 0;
-    $sql = 'SELECT `s`.*';
-    $sql .= ' FROM `mpls_saps` as s LEFT JOIN `devices` AS d ON `s`.`device_id` = `d`.`device_id`';
-    $sql .= ' WHERE (`d`.disabled = 0';
-    if ($vars['device-state'] == 'disabled') {
-        $sql .= ' OR `d`.disabled = 1';
-    }
-    $sql .= ')';
-    $sql .= ' ORDER BY d.`hostname`, `svc_oid`, `sapPortId`, `sapEncapValue`';
-    $query = dbFetchRows($sql);
+    $query = App\Models\MplsSap::with('device')
+        ->hasAccess(auth()->user())
+        ->when($vars['device-state'] !== 'disabled', function($q) {
+                $q->whereHas('device', fn($query) => $query->where('disabled', 0));
+        })
+        ->get()
+        ->sortBy('svc_oid')
+        ->sortBy('sapPortId')
+        ->sortBy('sapEncapValue')
+        ->sortBy('device.hostname');
+    
     foreach ($query as $sap) {
-        $port = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifName` = ?', [$sap['device_id'], $sap['ifName']]);
+        //$port = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifName` = ?', [$sap->device['device_id'], $sap['ifName']]);
+        $port = \App\Models\Port::query()->with(['device' => function ($query) {
+                $query->select('device_id', 'hostname');
+            }])->where('device_id', $sap->device_id)->where('ifName', $sap->ifName)->first();
+        $port = $port ? $port->toArray() : null;
         $port = cleanPort($port);
 
-        $device = device_by_id_cache($sap['device_id']);
+        $device = device_by_id_cache($sap->device_id);
 
         if (! is_integer($i / 2)) {
             $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
@@ -555,26 +566,26 @@ if ($vars['view'] == 'saps') {
         $adminstate_status_color = $operstate_status_color = 'default';
         $failcode_status_color = 'warning';
 
-        if ($sap['sapAdminStatus'] == 'up') {
+        if ($sap->sapAdminStatus == 'up') {
             $adminstate_status_color = 'success';
         }
-        if ($sap['sapAdminStatus'] == 'up' && $sap['sapOperStatus'] == 'up') {
+        if ($sap->sapAdminStatus == 'up' && $sap->sapOperStatus == 'up') {
             $operstate_status_color = 'success';
-        } elseif ($sap['sapAdminStatus'] == 'up' && $sap['sapOperStatus'] == 'down') {
+        } elseif ($sap->sapAdminStatus == 'up' && $sap->sapOperStatus == 'down') {
             $operstate_status_color = 'danger';
         }
 
         echo "<tr bgcolor=$bg_colour>
             <td>" . generate_device_link($device, 0, ['tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps']) . '</td>
-            <td>' . generate_sap_url($sap, $sap['svc_oid']) . '</td>
+            <td>' . generate_sap_url($sap, $sap->svc_oid) . '</td>
             <td>' . generate_port_link($port) . '</td>
-            <td>' . $sap['sapEncapValue'] . '</td>
-            <td>' . $sap['sapType'] . '</td>
-            <td>' . $sap['sapDescription'] . '</td>
-            <td><span class="label label-' . $adminstate_status_color . '">' . $sap['sapAdminStatus'] . '</td>
-            <td><span class="label label-' . $operstate_status_color . '">' . $sap['sapOperStatus'] . '</td>
-            <td>' . \LibreNMS\Util\Time::formatInterval($sap['sapLastMgmtChange']) . '</td>
-            <td>' . \LibreNMS\Util\Time::formatInterval($sap['sapLastStatusChange']) . '</td>';
+            <td>' . $sap->sapEncapValue . '</td>
+            <td>' . $sap->sapType . '</td>
+            <td>' . $sap->sapDescription . '</td>
+            <td><span class="label label-' . $adminstate_status_color . '">' . $sap->sapAdminStatus . '</td>
+            <td><span class="label label-' . $operstate_status_color . '">' . $sap->sapOperStatus . '</td>
+            <td>' . \LibreNMS\Util\Time::formatInterval($sap->sapLastMgmtChange) . '</td>
+            <td>' . \LibreNMS\Util\Time::formatInterval($sap->sapLastStatusChange) . '</td>';
         echo '</tr>';
 
         $i++;
