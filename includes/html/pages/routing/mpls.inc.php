@@ -1,11 +1,6 @@
 <?php
 
 use LibreNMS\Util\Number;
-use App\Models\MplsLsp;
-use App\Models\MplsLspPath;
-use App\Models\MplsSdp;
-use App\Models\MplsSdpBind;
-use App\Models\MplsService;
 
 print_optionbar_start();
 
@@ -123,8 +118,8 @@ if ($vars['view'] == 'lsp') {
     $query = App\Models\MplsLsp::query()
         ->hasAccess(auth()->user())
         ->hasAccess(auth()->user())
-        ->when($vars['device-state'] !== 'disabled', function($q) {
-                $q->whereHas('device', fn($query) => $query->where('disabled', 0));
+        ->when($vars['device-state'] !== 'disabled', function ($q): void {
+            $q->whereHas('device', fn ($query) => $query->where('disabled', 0));
         })
         ->get()
         ->sortBy('device.hostname')
@@ -159,10 +154,12 @@ if ($vars['view'] == 'lsp') {
 
         $avail = Number::calculatePercent($lsp['mplsLspPrimaryTimeUp'], $lsp['mplsLspAge'], 5);
 
-        $host = @dbFetchRow('SELECT * FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$lsp['mplsLspToAddr']]);
         $destination = $lsp['mplsLspToAddr'];
-        if (is_array($host)) {
-            $destination = generate_device_link($host, 0, ['tab' => 'routing', 'proto' => 'mpls']);
+        $host = \App\Models\Ipv4Address::where('ipv4_address', $lsp['mplsLspToAddr'])
+            ->with('port.device')
+            ->first();
+        if ($host) {
+            $destination = generate_device_link($host->port->device, 0, ['tab' => 'routing', 'proto' => 'mpls']);
         }
 
         echo "<tr bgcolor=$bg_colour>
@@ -210,8 +207,8 @@ if ($vars['view'] == 'paths') {
     $i = 0;
     $query = App\Models\MplsLspPath::with(['device', 'lsp'])
         ->hasAccess(auth()->user())
-        ->when($vars['device-state'] !== 'disabled', function($q) {
-                $q->whereHas('device', fn($query) => $query->where('disabled', 0));
+        ->when($vars['device-state'] !== 'disabled', function ($q): void {
+            $q->whereHas('device', fn ($query) => $query->where('disabled', 0));
         })
         ->get()
         ->sortBy('device.hostname')
@@ -239,10 +236,12 @@ if ($vars['view'] == 'paths') {
             $operstate_status_color = 'danger';
         }
 
-        $host = @dbFetchRow('SELECT * FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$path['mplsLspPathFailNodeAddr']]);
         $destination = $path['mplsLspPathFailNodeAddr'];
-        if (is_array($host)) {
-            $destination = generate_device_link($host, 0, ['tab' => 'routing', 'proto' => 'mpls']);
+        $host = \App\Models\Ipv4Address::where('ipv4_address', $path['mplsLspPathFailNodeAddr'])
+            ->with('port.device')
+            ->first();
+        if ($host) {
+            $destination = generate_device_link($host->port->device, 0, ['tab' => 'routing', 'proto' => 'mpls']);
         }
         echo "<tr bgcolor=$bg_colour>
             <td>" . generate_device_link($device, 0, ['tab' => 'routing', 'proto' => 'mpls', 'view' => 'paths']) . '</td>
@@ -288,8 +287,8 @@ if ($vars['view'] == 'sdps') {
     $i = 0;
     $query = App\Models\MplsSdp::with('device')
         ->hasAccess(auth()->user())
-        ->when($vars['device-state'] !== 'disabled', function($q) {
-                $q->whereHas('device', fn($query) => $query->where('disabled', 0));
+        ->when($vars['device-state'] !== 'disabled', function ($q): void {
+            $q->whereHas('device', fn ($query) => $query->where('disabled', 0));
         })
         ->get()
         ->sortBy('sdp_oid')
@@ -298,7 +297,7 @@ if ($vars['view'] == 'sdps') {
     foreach ($query as $sdp) {
         $device = device_by_id_cache($sdp['device_id']);
 
-        if (! is_integer($i / 2)) {
+        if (! is_int($i / 2)) {
             $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
         } else {
             $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
@@ -316,10 +315,14 @@ if ($vars['view'] == 'sdps') {
             $operstate_status_color = 'danger';
         }
 
-        $host = @dbFetchRow('SELECT * FROM `ipv4_addresses` AS A, `ports` AS I, `devices` AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id AND D.disabled = 0', [$sdp['sdpFarEndInetAddress']]);
-        $destination = $sdp['sdpFarEndInetAddress'];
-        if (is_array($host)) {
-            $destination = generate_device_link($host, 0, ['tab' => 'routing', 'proto' => 'mpls']);
+        $host = \App\Models\Ipv4Address::where('ipv4_address', $sdp['sdpFarEndInetAddress'])
+            ->whereHas('port.device', fn ($q) => $q->where('disabled', 0))
+            ->with('port.device')
+            ->first();
+        if ($host) {
+            $destination = generate_device_link($host->port->device, 0, ['tab' => 'routing', 'proto' => 'mpls']);
+        } else {
+            $destination = $sdp['sdpFarEndInetAddress'];
         }
         echo "<tr bgcolor=$bg_colour>
             <td>" . generate_device_link($device, 0, ['tab' => 'routing', 'proto' => 'mpls', 'view' => 'sdps']) . '</td>
@@ -373,8 +376,8 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
     $i = 0;
     $query = App\Models\MplsSdpBind::with(['service', 'service.device'])
         ->hasAccess(auth()->user())
-        ->when($vars['device-state'] !== 'disabled', function($q) {
-                $q->whereHas('service.device', fn($query) => $query->where('disabled', 0));
+        ->when($vars['device-state'] !== 'disabled', function ($q): void {
+            $q->whereHas('service.device', fn ($query) => $query->where('disabled', 0));
         })
         ->get()
         ->sortBy('sdp_oid')
@@ -383,7 +386,7 @@ sapDown: The SAP associated with the service is down.">Oper State</a></th>
     foreach ($query as $sdpbind) {
         $device = device_by_id_cache($sdpbind['device_id']);
 
-        if (! is_integer($i / 2)) {
+        if (! is_int($i / 2)) {
             $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
         } else {
             $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
@@ -452,7 +455,7 @@ vprn services are up when the service is administratively up however routing fun
 
     $i = 0;
     $query = App\Models\MplsService::with(['device', 'vrf'])
-        ->whereHas('device', function ($q) use ($vars) {
+        ->whereHas('device', function ($q) use ($vars): void {
             if ($vars['device-state'] !== 'disabled') {
                 $q->where('disabled', 0);
             } else {
@@ -461,13 +464,11 @@ vprn services are up when the service is administratively up however routing fun
         })
         ->get()
         ->sortBy('svc_oid')
-        ->sortBy(function($item) {
-            return $item->device->hostname ?? '';
-        });
+        ->sortBy(fn ($item) => $item->device->hostname ?? '');
     foreach ($query as $svc) {
         $device = device_by_id_cache($svc['device_id']);
 
-        if (! is_integer($i / 2)) {
+        if (! is_int($i / 2)) {
             $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
         } else {
             $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
@@ -538,26 +539,26 @@ if ($vars['view'] == 'saps') {
     $i = 0;
     $query = App\Models\MplsSap::with('device')
         ->hasAccess(auth()->user())
-        ->when($vars['device-state'] !== 'disabled', function($q) {
-                $q->whereHas('device', fn($query) => $query->where('disabled', 0));
+        ->when($vars['device-state'] !== 'disabled', function ($q): void {
+            $q->whereHas('device', fn ($query) => $query->where('disabled', 0));
         })
         ->get()
         ->sortBy('svc_oid')
         ->sortBy('sapPortId')
         ->sortBy('sapEncapValue')
         ->sortBy('device.hostname');
-    
+
     foreach ($query as $sap) {
         //$port = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `ifName` = ?', [$sap->device['device_id'], $sap['ifName']]);
-        $port = \App\Models\Port::query()->with(['device' => function ($query) {
-                $query->select('device_id', 'hostname');
-            }])->where('device_id', $sap->device_id)->where('ifName', $sap->ifName)->first();
+        $port = \App\Models\Port::query()->with(['device' => function ($query): void {
+            $query->select('device_id', 'hostname');
+        }])->where('device_id', $sap->device_id)->where('ifName', $sap->ifName)->first();
         $port = $port ? $port->toArray() : null;
         $port = cleanPort($port);
 
         $device = device_by_id_cache($sap->device_id);
 
-        if (! is_integer($i / 2)) {
+        if (! is_int($i / 2)) {
             $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
         } else {
             $bg_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
