@@ -8,6 +8,8 @@ use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Oid;
 
+d_echo('TOP LEVEL debug');
+
 $peers = dbFetchRows('SELECT * FROM `bgpPeers` AS B LEFT JOIN `vrfs` AS V ON `B`.`vrf_id` = `V`.`vrf_id` WHERE `B`.`device_id` = ?', [$device['device_id']]);
 
 if (! empty($peers)) {
@@ -23,6 +25,7 @@ if (! empty($peers)) {
         'bgpPeerOutFsmEstablishedTime',
         'bgpPeerInUpdateElapsedTime',
     ];
+    d_echo("if not empty");
 
     $generic = false;
     $cumulus_vrf = false;
@@ -50,6 +53,7 @@ if (! empty($peers)) {
     } elseif ($device['os'] === 'dell-os10') {
         $peer_data_check = snmpwalk_cache_oid($device, 'os10bgp4V2PeerRemoteAs', [], 'DELLEMC-OS10-BGP4V2-MIB', 'dell'); // practically identical MIB as arista
     } elseif ($device['os'] === 'timos') {
+        d_echo("inside main timos"); //PASS
         $peer_data_check = SnmpQuery::enumStrings()->numericIndex()->abortOnFailure()->walk([
             'TIMETRA-BGP-MIB::tBgpPeerNgTable',
             'TIMETRA-BGP-MIB::tBgpPeerNgOperTable',
@@ -243,7 +247,9 @@ if (! empty($peers)) {
                     $peer_data['bgpPeerLastErrorSubCode'] = intval($error_data[1]);
                     unset($peer_data['bgpPeerLastError']);
                 } elseif ($device['os'] == 'timos') {
+                    d_echo("inside if timos");
                     if (! isset($bgpPeers)) {
+                        d_echo("inside if of timos");
                         $bgpPeers = [];
                         foreach ($peer_data_check as $key => $value) {
                             $oid = explode('.', (string) $key);
@@ -580,14 +586,17 @@ if (! empty($peers)) {
             }
         }
 
+        d_echo("outisde if");
         // --- Populate cbgp data ---
-        if ($device['os_group'] == 'vrp' || $device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os'] == 'aos7' || $device['os_group'] === 'arista' || $device['os'] == 'dell-os10' || $device['os'] == 'firebrick') {
+        if ($device['os_group'] == 'vrp' || $device['os_group'] == 'cisco' || $device['os'] == 'junos' || $device['os'] == 'aos7' || $device['os_group'] === 'arista' || $device['os'] == 'dell-os10' || $device['os'] == 'firebrick' || $device['os'] == 'timos') {
             // Poll each AFI/SAFI for this peer (using CISCO-BGP4-MIB or BGP4-V2-JUNIPER MIB)
+            d_echo("inside IF of device os");
             $peer_afis = dbFetchRows('SELECT * FROM bgpPeers_cbgp WHERE `device_id` = ? AND bgpPeerIdentifier = ?', [$device['device_id'], $peer['bgpPeerIdentifier']]);
             foreach ($peer_afis as $peer_afi) {
                 $afi = $peer_afi['afi'];
                 $safi = $peer_afi['safi'];
                 d_echo("$afi $safi\n");
+                d_echo("inside foreach");
                 if ($device['os_group'] == 'cisco') {
                     $bgp_peer_ident = $peer_ip->toSnmpIndex();
 
@@ -667,6 +676,7 @@ if (! empty($peers)) {
                 } //end if
 
                 if ($device['os'] == 'junos') {
+                    d_echo("inside junos");
                     $safis = [
                         'unicast' => 1,
                         'multicast' => 2,
@@ -699,6 +709,130 @@ if (! empty($peers)) {
                     $cbgpPeerSuppressedPrefixes = null;
                     $cbgpPeerWithdrawnPrefixes = null;
                 }//end if
+
+                d_echo("checking debug");
+
+                if ($device['os'] == 'timos') {
+                    // Nokia TiMOS SAFI mappings (per AFI)
+                    // AFI: 1 = IPv4, 2 = IPv6
+                    $safis = [
+                        1 => [ // IPv4
+                            'unicast' => 1,
+                            'multicast' => 2,
+                            'vpn' => 128,
+                        ],
+                        2 => [ // IPv6
+                            'unicast' => 1,
+                            'multicast' => 2,
+                            'vpn' => 128,
+                        ],
+                    ];
+
+                    // SNMP walk only once
+                    if (! isset($t_prefixes)) {
+                        $t_prefixes = SnmpQuery::walk([
+                            // IPv4 unicast
+                            '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.5',  // tBgpPeerNgOperReceivedPrefixes
+                            '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.6',  // tBgpPeerNgOperSentPrefixes
+
+                            // IPv4 multicast
+                            '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.37', // tBgpPeerNgOperMCastV4RecvPfxs
+                            '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.38', // tBgpPeerNgOperMCastV4SentPfxs
+
+                            // IPv4 VPN
+                            '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.13', // tBgpPeerNgOperVpnRecvPrefixes
+                            '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.14', // tBgpPeerNgOperVpnSentPrefixes
+
+                            // IPv6 unicast
+                            '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.27', // tBgpPeerNgOperV6ReceivedPrefixes
+                            '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.28', // tBgpPeerNgOperV6SentPrefixes
+
+                            // IPv6 multicast
+                            '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.95', // tBgpPeerNgOperMcastV6RecvPfxs
+                            '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.96', // tBgpPeerNgOperMcastV6SentPfxs
+
+                            // IPv6 VPN
+                            '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.40', // tBgpPeerNgOperVpnIpv6RecvPfxs
+                            '.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.41', // tBgpPeerNgOperVpnIpv6SentPfxs
+                        ])->table(3);
+                    }
+
+                    d_echo("DEBUG RAW TIMOS PREFIXES FULL:\n");
+                    d_echo(json_encode($t_prefixes, JSON_PRETTY_PRINT));
+
+                    if (! empty($t_prefixes)) {
+                        // TIMETRA path
+                        $afi = $peer_ip->isIpV6() ? 2 : 1; // 1 for IPv4, 2 for IPv6
+                        $peer_key = '1.' . ($afi == 1 ? 'ipv4' : 'ipv6') . '."' . $peer_ip->toString() . '"'; // Match TiMOS: 1.ipv4."ip" or 1.ipv6."ip"
+                        d_echo("EXPECTED PEER KEY: $peer_key\n");
+
+                        $timosPeerIndex = isset($t_prefixes[$peer_key]) ? $peer_key : null;
+
+                        if ($timosPeerIndex !== null && isset($safis[$afi][$safi])) {
+                            $current_peer_data = $t_prefixes[$timosPeerIndex][$afi][$safis[$afi][$safi]] ?? [];
+
+                            if ($afi == 1) { // IPv4
+                                if ($safi == 'unicast') {
+                                    $cbgpPeerAcceptedPrefixes = $current_peer_data['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.5'] ?? null;
+                                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.6'] ?? null;
+                                } elseif ($safi == 'multicast') {
+                                    $cbgpPeerAcceptedPrefixes = $current_peer_data['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.37'] ?? null;
+                                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.38'] ?? null;
+                                } elseif ($safi == 'vpn') {
+                                    $cbgpPeerAcceptedPrefixes = $current_peer_data['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.13'] ?? null;
+                                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.14'] ?? null;
+                                }
+                            } elseif ($afi == 2) { // IPv6
+                                if ($safi == 'unicast') {
+                                    $cbgpPeerAcceptedPrefixes = $current_peer_data['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.27'] ?? null;
+                                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.28'] ?? null;
+                                } elseif ($safi == 'multicast') {
+                                    $cbgpPeerAcceptedPrefixes = $current_peer_data['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.95'] ?? null;
+                                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.96'] ?? null;
+                                } elseif ($safi == 'vpn') {
+                                    $cbgpPeerAcceptedPrefixes = $current_peer_data['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.40'] ?? null;
+                                    $cbgpPeerAdvertisedPrefixes = $current_peer_data['.1.3.6.1.4.1.6527.3.1.2.14.4.8.1.41'] ?? null;
+                                }
+                            }
+
+                            // Unused/unsupported OIDs
+                            $cbgpPeerDeniedPrefixes = $cbgpPeerPrefixAdminLimit = $cbgpPeerPrefixThreshold =
+                            $cbgpPeerPrefixClearThreshold = $cbgpPeerSuppressedPrefixes = $cbgpPeerWithdrawnPrefixes = null;
+                        }
+                    } else {
+                        // Fallback: BGP4-MIB
+                        $bgp4_peers = SnmpQuery::walk([
+                            '.1.3.6.1.2.1.15.3.1.10', // bgpPeerInUpdates
+                            '.1.3.6.1.2.1.15.3.1.11', // bgpPeerOutUpdates
+                        ])->table(1);
+
+                        $peer_data = $bgp4_peers[$peer_ip->uncompressed()] ?? [];
+                        if (! empty($peer_data)) {
+                            $cbgpPeerAcceptedPrefixes = $peer_data['.1.3.6.1.2.1.15.3.1.10'] ?? null;
+                            $cbgpPeerAdvertisedPrefixes = $peer_data['.1.3.6.1.2.1.15.3.1.11'] ?? null;
+
+                            $cbgpPeerDeniedPrefixes = $cbgpPeerPrefixAdminLimit = $cbgpPeerPrefixThreshold =
+                            $cbgpPeerPrefixClearThreshold = $cbgpPeerSuppressedPrefixes = $cbgpPeerWithdrawnPrefixes = null;
+                        }
+                    }
+
+                    $cbgp_data = [
+                        'cbgpPeerAcceptedPrefixes' => $cbgpPeerAcceptedPrefixes,
+                        'cbgpPeerDeniedPrefixes' => $cbgpPeerDeniedPrefixes,
+                        'cbgpPeerPrefixAdminLimit' => $cbgpPeerPrefixAdminLimit,
+                        'cbgpPeerPrefixThreshold' => $cbgpPeerPrefixThreshold,
+                        'cbgpPeerPrefixClearThreshold' => $cbgpPeerPrefixClearThreshold,
+                        'cbgpPeerAdvertisedPrefixes' => $cbgpPeerAdvertisedPrefixes,
+                        'cbgpPeerSuppressedPrefixes' => $cbgpPeerSuppressedPrefixes,
+                        'cbgpPeerWithdrawnPrefixes' => $cbgpPeerWithdrawnPrefixes,
+                    ];
+
+                    // Debug log
+                    d_echo('TiMOS BGP peer data: ');
+                    d_echo($cbgp_data);
+                }
+
+                d_echo('checking debug');
 
                 if ($device['os_group'] === 'arista') {
                     $safis['multicast'] = 2;
@@ -858,7 +992,9 @@ if (! empty($peers)) {
                 app('Datastore')->put($device, 'cbgp', $tags, $fields);
             } //end foreach
         } //end if
-        echo "\n";
+        else{
+        d_echo("in else");
+        }
     } //end foreach
 } //end if
 
