@@ -1,0 +1,12 @@
+os: vertiv-ups
+text: 'Vertiv UPS'
+type: power
+icon: vertiv
+group: vertiv
+mib_dir: vertiv
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.13400.2.54
+over:
+    - { graph: device_voltage, text: 'Voltage' }
+    - { graph: device_current, text: 'Current' }
