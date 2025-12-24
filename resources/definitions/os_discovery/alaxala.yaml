@@ -1,0 +1,601 @@
+mib: AX-SMI-MIB:AX3630S:AX2430S:AX1230S:AX6300S:AX1240S:AX260A:AX2530S:AX3660S:AX4630S:AX7800S:AX7800R:AX2000R
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: ax3630sTemperatureStatusTable
+                    value: ax3630sTemperatureStatusValue
+                    index: 'ax3630sTemperatureStatusValue.{{ $index }}'
+                    descr: ax3630sTemperatureStatusDescr
+                -
+                    oid: ax3640sTemperatureStatusTable
+                    value: ax3640sTemperatureStatusValue
+                    index: 'ax3640sTemperatureStatusValue.{{ $index }}'
+                    descr: ax3640sTemperatureStatusDescr
+                -
+                    oid: ax3650sTemperatureStatusTable
+                    value: ax3650sTemperatureStatusValue
+                    index: 'ax3650sTemperatureStatusValue.{{ $index }}'
+                    descr: ax3650sTemperatureStatusDescr
+                -
+                    oid: ax3830sTemperatureStatusTable
+                    value: ax3830sTemperatureStatusValue
+                    index: 'ax3830sTemperatureStatusValue.{{ $index }}'
+                    descr: ax3830sTemperatureStatusDescr
+                -
+                    oid: ax2430sTemperatureStatusTable
+                    value: ax2430sTemperatureStatusValue
+                    index: 'ax2430sTemperatureStatusValue.{{ $index }}'
+                    descr: ax2430sTemperatureStatusDescr
+                -
+                    oid: ax1230sTemperatureStatusTable
+                    value: ax1230sTemperatureStatusValue
+                    index: 'ax1230sTemperatureStatusValue.{{ $index }}'
+                    descr: ax1230sTemperatureStatusDescr
+                -
+                    oid: ax6300sTemperatureStatusTable
+                    value: ax6300sTemperatureStatusValue
+                    index: 'ax6300sTemperatureStatusValue.{{ $index }}'
+                    descr: ax6300sTemperatureStatusDescr
+                -
+                    oid: ax6700sTemperatureStatusTable
+                    value: ax6700sTemperatureStatusValue
+                    index: 'ax6700sTemperatureStatusValue.{{ $index }}'
+                    descr: ax6700sTemperatureStatusDescr
+                -
+                    oid: ax6600sTemperatureStatusTable
+                    value: ax6600sTemperatureStatusValue
+                    index: 'ax6600sTemperatureStatusValue.{{ $index }}'
+                    descr: ax6600sTemperatureStatusDescr
+                -
+                    oid: ax1240sTemperatureStatusTable
+                    value: ax1240sTemperatureStatusValue
+                    index: 'ax1240sTemperatureStatusValue.{{ $index }}'
+                    descr: ax1240sTemperatureStatusDescr
+                -
+                    oid: ax1250sTemperatureStatusTable
+                    value: ax1250sTemperatureStatusValue
+                    index: 'ax1250sTemperatureStatusValue.{{ $index }}'
+                    descr: ax1250sTemperatureStatusDescr
+                -
+                    oid: ax2230sTemperatureStatusTable
+                    value: ax2230sTemperatureStatusValue
+                    index: 'ax2230sTemperatureStatusValue.{{ $index }}'
+                    descr: ax2230sTemperatureStatusDescr
+                -
+                    oid: ax2130sTemperatureStatusTable
+                    value: ax2130sTemperatureStatusValue
+                    index: 'ax2130sTemperatureStatusValue.{{ $index }}'
+                    descr: ax2130sTemperatureStatusDescr
+                -
+                    oid: ax260aTemperatureStatusTable
+                    value: ax260aTemperatureStatusValue
+                    index: 'ax260aTemperatureStatusValue.{{ $index }}'
+                    descr: ax260aTemperatureStatusDescr
+                -
+                    oid: ax2530sTemperatureStatusTable
+                    value: ax2530sTemperatureStatusValue
+                    index: 'ax2530sTemperatureStatusValue.{{ $index }}'
+                    descr: ax2530sTemperatureStatusDescr
+                -
+                    oid: ax3660sTemperatureStatusTable
+                    value: ax3660sTemperatureStatusValue
+                    index: 'ax3660sTemperatureStatusValue.{{ $index }}'
+                    descr: ax3660sTemperatureStatusDescr
+                -
+                    oid: ax4630sTemperatureStatusTable
+                    value: ax4630sTemperatureStatusValue
+                    index: 'ax4630sTemperatureStatusValue.{{ $index }}'
+                    descr: ax4630sTemperatureStatusDescr
+                -
+                    oid: ax7800sTemperatureStatusTable
+                    value: ax7800sTemperatureStatusValue
+                    index: 'ax7800sTemperatureStatusValue.{{ $index }}'
+                    descr: ax7800sTemperatureStatusDescr
+                -
+                    oid: ax5400sTemperatureStatusTable
+                    value: ax5400sTemperatureStatusValue
+                    index: 'ax5400sTemperatureStatusValue.{{ $index }}'
+                    descr: ax5400sTemperatureStatusDescr
+                -
+                    oid: ax7800rTemperatureStatusTable
+                    value: ax7800rTemperatureStatusValue
+                    index: 'ax7800rTemperatureStatusValue.{{ $index }}'
+                    descr: ax7800rTemperatureStatusDescr
+                -
+                    oid: ax7700rTemperatureStatusTable
+                    value: ax7700rTemperatureStatusValue
+                    index: 'ax7700rTemperatureStatusValue.{{ $index }}'
+                    descr: ax7700rTemperatureStatusDescr
+                -
+                    oid: ax2000rTemperatureStatusTable
+                    value: ax2000rTemperatureStatusValue
+                    index: 'ax2000rTemperatureStatusValue.{{ $index }}'
+                    descr: ax2000rTemperatureStatusDescr
+        state:
+            data:
+                -
+                    oid: ax3630sPowerUnitTable
+                    value: ax3630sPowerSupplyStatus
+                    index: 'ax3630sPowerSupplyStatus.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    state_name: alaxalaPowerSupplyStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: disconnected, graph: 0, value: -1, generic: 2 }
+                -
+                    oid: ax3630sFanTable
+                    value: ax3630sFanStatus
+                    index: 'ax3630sFanStatus.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    state_name: alaxalaFanStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: high-speed, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: stopping, graph: 0, value: 5, generic: 2 }
+                        - { descr: notconnect, graph: 0, value: 32, generic: 2 }
+                -
+                    oid: ax3640sPowerUnitTable
+                    value: ax3640sPowerSupplyStatus
+                    index: 'ax3640sPowerSupplyStatus.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    state_name: alaxalaPowerSupplyStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: disconnected, graph: 0, value: -1, generic: 2 }
+                -
+                    oid: ax3640sFanTable
+                    value: ax3640sFanStatus
+                    index: 'ax3640sFanStatus.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    state_name: alaxalaFanStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: high-speed, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: stopping, graph: 0, value: 5, generic: 2 }
+                        - { descr: notconnect, graph: 0, value: 32, generic: 2 }
+                -
+                    oid: ax3650sPowerUnitTable
+                    value: ax3650sPowerSupplyStatus
+                    index: 'ax3650sPowerSupplyStatus.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    state_name: alaxalaPowerSupplyStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: disconnected, graph: 0, value: -1, generic: 2 }
+                -
+                    oid: ax3650sFanTable
+                    value: ax3650sFanStatus
+                    index: 'ax3650sFanStatus.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    state_name: alaxalaFanStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: high-speed, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: stopping, graph: 0, value: 5, generic: 2 }
+                        - { descr: notconnect, graph: 0, value: 32, generic: 2 }
+                -
+                    oid: ax3830sPowerUnitTable
+                    value: ax3830sPowerSupplyStatus
+                    index: 'ax3830sPowerSupplyStatus.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    state_name: alaxalaPowerSupplyStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: disconnected, graph: 0, value: -1, generic: 2 }
+                -
+                    oid: ax3830sFanTable
+                    value: ax3830sFanStatus
+                    index: 'ax3830sFanStatus.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    state_name: alaxalaFanStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: high-speed, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: stopping, graph: 0, value: 5, generic: 2 }
+                        - { descr: notconnect, graph: 0, value: 32, generic: 2 }
+                -
+                    oid: ax2430sPowerUnitTable
+                    value: ax2430sPowerSupplyStatus
+                    index: 'ax2430sPowerSupplyStatus.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    state_name: alaxalaPowerSupplyStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: disconnected, graph: 0, value: -1, generic: 2 }
+                -
+                    oid: ax2430sFanTable
+                    value: ax2430sFanStatus
+                    index: 'ax2430sFanStatus.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    state_name: alaxalaFanStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: high-speed, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: stopping, graph: 0, value: 5, generic: 2 }
+                        - { descr: notconnect, graph: 0, value: 32, generic: 2 }
+                -
+                    oid: ax1230sPowerUnitTable
+                    value: ax1230sPowerSupplyStatus
+                    index: 'ax1230sPowerSupplyStatus.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    state_name: alaxalaPowerSupplyStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: disconnected, graph: 0, value: -1, generic: 2 }
+                -
+                    oid: ax1230sFanTable
+                    value: ax1230sFanStatus
+                    index: 'ax1230sFanStatus.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    state_name: alaxalaFanStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: high-speed, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: stopping, graph: 0, value: 5, generic: 2 }
+                        - { descr: notconnect, graph: 0, value: 32, generic: 2 }
+                -
+                    oid: ax6300sPowerUnitTable
+                    value: ax6300sPowerSupplyStatus
+                    index: 'ax6300sPowerSupplyStatus.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    state_name: alaxalaPowerSupplyStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: disconnected, graph: 0, value: -1, generic: 2 }
+                -
+                    oid: ax6300sFanTable
+                    value: ax6300sFanStatus
+                    index: 'ax6300sFanStatus.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    state_name: alaxalaFanStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: high-speed, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: stopping, graph: 0, value: 5, generic: 2 }
+                        - { descr: notconnect, graph: 0, value: 32, generic: 2 }
+                -
+                    oid: ax6700sPowerUnitTable
+                    value: ax6700sPowerSupplyStatus
+                    index: 'ax6700sPowerSupplyStatus.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    state_name: alaxalaPowerSupplyStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: disconnected, graph: 0, value: -1, generic: 2 }
+                -
+                    oid: ax6700sFanTable
+                    value: ax6700sFanStatus
+                    index: 'ax6700sFanStatus.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    state_name: alaxalaFanStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: high-speed, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: stopping, graph: 0, value: 5, generic: 2 }
+                        - { descr: notconnect, graph: 0, value: 32, generic: 2 }
+                -
+                    oid: ax6600sPowerUnitTable
+                    value: ax6600sPowerSupplyStatus
+                    index: 'ax6600sPowerSupplyStatus.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    state_name: alaxalaPowerSupplyStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: disconnected, graph: 0, value: -1, generic: 2 }
+                -
+                    oid: ax6600sFanTable
+                    value: ax6600sFanStatus
+                    index: 'ax6600sFanStatus.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    state_name: alaxalaFanStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: high-speed, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: stopping, graph: 0, value: 5, generic: 2 }
+                        - { descr: notconnect, graph: 0, value: 32, generic: 2 }
+                -
+                    oid: ax1240sPowerUnitTable
+                    value: ax1240sPowerSupplyStatus
+                    index: 'ax1240sPowerSupplyStatus.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    state_name: alaxalaPowerSupplyStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: disconnected, graph: 0, value: -1, generic: 2 }
+                -
+                    oid: ax1240sFanTable
+                    value: ax1240sFanStatus
+                    index: 'ax1240sFanStatus.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    state_name: alaxalaFanStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: high-speed, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: stopping, graph: 0, value: 5, generic: 2 }
+                        - { descr: notconnect, graph: 0, value: 32, generic: 2 }
+                -
+                    oid: ax1250sPowerUnitTable
+                    value: ax1250sPowerSupplyStatus
+                    index: 'ax1250sPowerSupplyStatus.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    state_name: alaxalaPowerSupplyStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: disconnected, graph: 0, value: -1, generic: 2 }
+                -
+                    oid: ax1250sFanTable
+                    value: ax1250sFanStatus
+                    index: 'ax1250sFanStatus.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    state_name: alaxalaFanStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: high-speed, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: stopping, graph: 0, value: 5, generic: 2 }
+                        - { descr: notconnect, graph: 0, value: 32, generic: 2 }
+                -
+                    oid: ax2230sPowerUnitTable
+                    value: ax2230sPowerSupplyStatus
+                    index: 'ax2230sPowerSupplyStatus.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    state_name: alaxalaPowerSupplyStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: disconnected, graph: 0, value: -1, generic: 2 }
+                -
+                    oid: ax2230sFanTable
+                    value: ax2230sFanStatus
+                    index: 'ax2230sFanStatus.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    state_name: alaxalaFanStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: high-speed, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: stopping, graph: 0, value: 5, generic: 2 }
+                        - { descr: notconnect, graph: 0, value: 32, generic: 2 }
+                -
+                    oid: ax2130sPowerUnitTable
+                    value: ax2130sPowerSupplyStatus
+                    index: 'ax2130sPowerSupplyStatus.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    state_name: alaxalaPowerSupplyStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: disconnected, graph: 0, value: -1, generic: 2 }
+                -
+                    oid: ax2130sFanTable
+                    value: ax2130sFanStatus
+                    index: 'ax2130sFanStatus.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    state_name: alaxalaFanStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: high-speed, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: stopping, graph: 0, value: 5, generic: 2 }
+                        - { descr: notconnect, graph: 0, value: 32, generic: 2 }
+                -
+                    oid: ax260aPowerUnitTable
+                    value: ax260aPowerSupplyStatus
+                    index: 'ax260aPowerSupplyStatus.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    state_name: alaxalaPowerSupplyStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: disconnected, graph: 0, value: -1, generic: 2 }
+                -
+                    oid: ax260aFanTable
+                    value: ax260aFanStatus
+                    index: 'ax260aFanStatus.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    state_name: alaxalaFanStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: high-speed, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: stopping, graph: 0, value: 5, generic: 2 }
+                        - { descr: notconnect, graph: 0, value: 32, generic: 2 }
+                -
+                    oid: ax2530sPowerUnitTable
+                    value: ax2530sPowerSupplyStatus
+                    index: 'ax2530sPowerSupplyStatus.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    state_name: alaxalaPowerSupplyStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: disconnected, graph: 0, value: -1, generic: 2 }
+                -
+                    oid: ax2530sFanTable
+                    value: ax2530sFanStatus
+                    index: 'ax2530sFanStatus.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    state_name: alaxalaFanStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: high-speed, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: stopping, graph: 0, value: 5, generic: 2 }
+                        - { descr: notconnect, graph: 0, value: 32, generic: 2 }
+                -
+                    oid: ax3660sPowerUnitTable
+                    value: ax3660sPowerSupplyStatus
+                    index: 'ax3660sPowerSupplyStatus.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    state_name: alaxalaPowerSupplyStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: disconnected, graph: 0, value: -1, generic: 2 }
+                -
+                    oid: ax3660sFanTable
+                    value: ax3660sFanStatus
+                    index: 'ax3660sFanStatus.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    state_name: alaxalaFanStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: high-speed, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: stopping, graph: 0, value: 5, generic: 2 }
+                        - { descr: notconnect, graph: 0, value: 32, generic: 2 }
+                -
+                    oid: ax4630sPowerUnitTable
+                    value: ax4630sPowerSupplyStatus
+                    index: 'ax4630sPowerSupplyStatus.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    state_name: alaxalaPowerSupplyStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: disconnected, graph: 0, value: -1, generic: 2 }
+                -
+                    oid: ax4630sFanTable
+                    value: ax4630sFanStatus
+                    index: 'ax4630sFanStatus.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    state_name: alaxalaFanStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: high-speed, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: stopping, graph: 0, value: 5, generic: 2 }
+                        - { descr: notconnect, graph: 0, value: 32, generic: 2 }
+                -
+                    oid: ax7800sPowerUnitTable
+                    value: ax7800sPowerSupplyStatus
+                    index: 'ax7800sPowerSupplyStatus.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    state_name: alaxalaPowerSupplyStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: disconnected, graph: 0, value: -1, generic: 2 }
+                -
+                    oid: ax7800sFanTable
+                    value: ax7800sFanStatus
+                    index: 'ax7800sFanStatus.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    state_name: alaxalaFanStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: high-speed, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: stopping, graph: 0, value: 5, generic: 2 }
+                        - { descr: notconnect, graph: 0, value: 32, generic: 2 }
+                -
+                    oid: ax5400sPowerUnitTable
+                    value: ax5400sPowerSupplyStatus
+                    index: 'ax5400sPowerSupplyStatus.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    state_name: alaxalaPowerSupplyStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: disconnected, graph: 0, value: -1, generic: 2 }
+                -
+                    oid: ax5400sFanTable
+                    value: ax5400sFanStatus
+                    index: 'ax5400sFanStatus.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    state_name: alaxalaFanStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: high-speed, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: stopping, graph: 0, value: 5, generic: 2 }
+                        - { descr: notconnect, graph: 0, value: 32, generic: 2 }
+                -
+                    oid: ax7800rPowerUnitTable
+                    value: ax7800rPowerSupplyStatus
+                    index: 'ax7800rPowerSupplyStatus.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    state_name: alaxalaPowerSupplyStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: disconnected, graph: 0, value: -1, generic: 2 }
+                -
+                    oid: ax7800rFanTable
+                    value: ax7800rFanStatus
+                    index: 'ax7800rFanStatus.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    state_name: alaxalaFanStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: high-speed, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: stopping, graph: 0, value: 5, generic: 2 }
+                        - { descr: notconnect, graph: 0, value: 32, generic: 2 }
+                -
+                    oid: ax7700rPowerUnitTable
+                    value: ax7700rPowerSupplyStatus
+                    index: 'ax7700rPowerSupplyStatus.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    state_name: alaxalaPowerSupplyStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: disconnected, graph: 0, value: -1, generic: 2 }
+                -
+                    oid: ax7700rFanTable
+                    value: ax7700rFanStatus
+                    index: 'ax7700rFanStatus.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    state_name: alaxalaFanStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: high-speed, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: stopping, graph: 0, value: 5, generic: 2 }
+                        - { descr: notconnect, graph: 0, value: 32, generic: 2 }
+                -
+                    oid: ax2000rPowerUnitTable
+                    value: ax2000rPowerSupplyStatus
+                    index: 'ax2000rPowerSupplyStatus.{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    state_name: alaxalaPowerSupplyStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: disconnected, graph: 0, value: -1, generic: 2 }
+                -
+                    oid: ax2000rFanTable
+                    value: ax2000rFanStatus
+                    index: 'ax2000rFanStatus.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    state_name: alaxalaFanStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 2, generic: 0 }
+                        - { descr: high-speed, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: stopping, graph: 0, value: 5, generic: 2 }
+                        - { descr: notconnect, graph: 0, value: 32, generic: 2 }
