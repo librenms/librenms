@@ -1,9 +1,65 @@
-mib: MOXA-SYSTEM-INFO-MIB:MOXA-SYSTEM-UTILIZATION-MIB:MOXA-PORT-MIB:MOXA-DEVICE-IO-MIB
 modules:
     os:
         hardware:
-            - MOXA-SYSTEM-INFO-MIB::siStatProductInfoModelName.0            
-        version:
-            - MOXA-SYSTEM-INFO-MIB::siStatProductInfoFirmwareVersion.0
-        serial:
-            - MOXA-SYSTEM-INFO-MIB::siStatProductInfoSerialNumber.0
+            - MOXA-SYSTEM-INFO-MIB::siStatProductInfoModelName.0
+            - MOXA-SYSTEM-INFO-MIB::siStatPowerModuleInfoModelName.1
+        hardware_template: '{{ MOXA-SYSTEM-INFO-MIB::siStatProductInfoModelName.0 }} ({{ MOXA-SYSTEM-INFO-MIB::siStatPowerModuleInfoModelName.1 }})'
+        version: MOXA-SYSTEM-INFO-MIB::siStatProductInfoFirmwareVersion.0
+        serial: MOXA-SYSTEM-INFO-MIB::siStatProductInfoSerialNumber.0
+    processors:
+        data:
+            -
+                oid: MOXA-SYSTEM-UTILIZATION-MIB::usStatCPUUtilization
+                num_oid: '.1.3.6.1.4.1.8691.602.1.3.2.1.{{ $index }}'
+    mempools:
+        data:
+            -
+                total: MOXA-SYSTEM-UTILIZATION-MIB::usStatMemorySize
+                percent_used: MOXA-SYSTEM-UTILIZATION-MIB::usStatMemoryUtilization
+    sensors:
+        power:
+            data:
+                -
+                    oid: MOXA-SYSTEM-UTILIZATION-MIB::usStatPowerConsumption
+                    value: MOXA-SYSTEM-UTILIZATION-MIB::usStatPowerConsumption
+                    num_oid: '.1.3.6.1.4.1.8691.602.1.3.2.4.{{ $index }}'
+                    descr: 'Power Consumption'
+                    index: 'usStatPowerConsumption.{{ $index }}'
+                    high_limit: 30
+                    low_limit: 0
+        state:
+            data:
+                -
+                    oid: MOXA-DEVICE-IO-MIB::deviceioStatSystemPowerTable
+                    value: MOXA-DEVICE-IO-MIB::deviceioStatSystemPowerStatus
+                    num_oid: '.1.3.6.1.4.1.8691.602.8.6.2.1.1.2.{{ $index }}'
+                    descr: 'PWR {{ $index }} Status'
+                    index: 'deviceioStatSystemPowerStatus.{{ $index }}'
+                    state_name: deviceioStatSystemPowerStatus
+                    states:
+                        - { descr: 'off', graph: 1, value: 0, generic: 1 }
+                        - { descr: 'on', graph: 1, value: 1, generic: 0 }
+                -
+                    oid: MOXA-DEVICE-IO-MIB::deviceioStatDiTable
+                    value: MOXA-DEVICE-IO-MIB::deviceioStatDiStatus
+                    num_oid: '.1.3.6.1.4.1.8691.602.8.6.2.3.1.2.{{ $index }}'
+                    descr: 'DI {{ $index }} Status'
+                    index: 'deviceioStatDiStatus.{{ $index }}'
+                    state_name: deviceioStatDiStatus
+                    states:
+                        - { descr: 'open', graph: 1, value: 0, generic: 0 }
+                        - { descr: 'short', graph: 1, value: 1, generic: 0 }
+                -
+                    oid: MOXA-DEVICE-IO-MIB::deviceioStatRelayTable
+                    value: MOXA-DEVICE-IO-MIB::deviceioStatRelayStatus
+                    num_oid: '.1.3.6.1.4.1.8691.602.8.6.2.4.1.2.{{ $index }}'
+                    descr: 'Relay {{ $index }} Status'
+                    index: 'deviceioStatRelayStatus.{{ $index }}'
+                    state_name: deviceioStatRelayStatus
+                    states:
+                        - { descr: 'open', graph: 1, value: 0, generic: 0 }
+                        - { descr: 'short', graph: 1, value: 1, generic: 0 }
+
+# <Future> MOXA-POE-BT-MIB::poeBtStatPortEntry  <- POE stats table
+# <Future> MOXA-FIBER-CHECK-MIB::fiberCheckConfigPortTable  <- Fiber Warn High/Low table
+# <Future> MOXA-FIBER-CHECK-MIB::fiberCheckStatPortTable  <- Fiber Stats table
