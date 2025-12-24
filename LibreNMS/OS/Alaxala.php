@@ -78,7 +78,7 @@ class Alaxala extends OS implements MempoolsDiscovery, ProcessorDiscovery
                 'version' => ['ax7700rSoftwareVersion.0'],
                 'serial' => ['ax7700rBcuSerialNumber.1', 'ax7700rNifSerialNumber.1'],
             ],
-            # axSwitch Series
+            // axSwitch Series
             '.1.3.6.1.4.1.21839.1.2.2' => [ // ax7800s AXS-MIB
                 'hardware' => ['ax7800sChassisType.0', 'ax7800sChassisType.1'],
                 'rom' => ['ax7800sBcuRmRomVersion.0', 'ax7800sBcuRmRomVersion.1'],
