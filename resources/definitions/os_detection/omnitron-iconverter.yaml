@@ -3,6 +3,8 @@ text: 'Omnitron iConverter'
 type: management
 icon: omnitron
 mib_dir: omnitron
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
 discovery:
     -
         sysObjectID:

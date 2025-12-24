@@ -1,16 +1,54 @@
-mib: ADTRAN-AOSCPU
+mib: ADTRAN-MIB
 modules:
+    os:
+        hardware: ADTRAN-MIB::adProdName.0
+        serial: ADTRAN-MIB::adProdSerialNumber.0
+        version: ADTRAN-MIB::adProdSwVersion.0
     mempools:
         data:
             -
-                total: ADTRAN-AOSCPU::adGenAOSMemPool
-                free: ADTRAN-AOSCPU::adGenAOSHeapFree
-    os:
-        hardware: ADTRAN-AOSUNIT::adAOSDeviceProductName.0
-        serial: ADTRAN-AOSUNIT::adAOSDeviceSerialNumber.0
-        version: ADTRAN-AOSUNIT::adAOSDeviceVersion.0
+                total: ADTRAN-GENPROCESSES-MIB::adGenProcessesMemStatHeapSize
+                used: ADTRAN-GENPROCESSES-MIB::adGenProcessesMemStatHeapUsed
     processors:
         data:
             -
-                oid: adGenAOSCurrentCpuUtil
-                num_oid: '.1.3.6.1.4.1.664.5.53.1.4.1.{{ $index }}'
+                oid: ADTRAN-GENPROCESSES-MIB::adGenProcessesCpuStatCurUtilization
+                num_oid: '.1.3.6.1.4.1.664.5.70.22.2.2.1.1.{{ $index }}'
+                precision: 100
+    sensors:
+        fanspeed:
+            data:
+            -
+                oid: ADTRAN-TA5000FAN-MIB::adTA5kFanStatusFan1Speed
+                num_oid: '.1.3.6.1.4.1.664.2.751.2.1.1.1.{{ $index }}'
+                index: 'adTA5kFanStatusFan1Speed.{{ $index }}'
+                descr: 'FAN 1'
+            -
+                oid: ADTRAN-TA5000FAN-MIB::adTA5kFanStatusFan2Speed
+                num_oid: '.1.3.6.1.4.1.664.2.751.2.1.1.2.{{ $index }}'
+                index: 'adTA5kFanStatusFan2Speed.{{ $index }}'
+                descr: 'FAN 2'
+            -
+                oid: ADTRAN-TA5000FAN-MIB::adTA5kFanStatusFan3Speed
+                num_oid: '.1.3.6.1.4.1.664.2.751.2.1.1.3.{{ $index }}'
+                index: 'adTA5kFanStatusFan3Speed.{{ $index }}'
+                descr: 'FAN 3'
+            -
+                oid: ADTRAN-TA5000FAN-MIB::adTA5kFanStatusFan4Speed
+                num_oid: '.1.3.6.1.4.1.664.2.751.2.1.1.4.{{ $index }}'
+                index: 'adTA5kFanStatusFan4Speed.{{ $index }}'
+                descr: 'FAN 4'
+        voltage:
+            data:
+            -
+                oid: ADTRAN-TA5000FAN-MIB::adTA5kFanStatusVoltageAux
+                num_oid: '.1.3.6.1.4.1.664.2.751.2.1.1.7.{{ $index }}'
+                descr: 'VOLTAGE'
+        temperature:
+            data:
+            -
+                oid: ADTRAN-TA5000FAN-MIB::adTA5kFanStatusTable
+                value: ADTRAN-TA5000FAN-MIB::adTA5kFanStatusTemp
+                num_oid: '.1.3.6.1.4.1.664.2.751.2.1.1.6.{{ $index }}'
+                descr: 'FAN TEMPERATURE'
+                user_func: fahrenheit_to_celsius
