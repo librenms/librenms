@@ -212,7 +212,7 @@ class Alaxala extends OS implements MempoolsDiscovery, ProcessorDiscovery
 
             if (empty($device->serial)) {
                 $device->serial = $this->firstSnmpValue($device, $oids['serial'], $mib)
-                    ?: snmp_get($this->getDeviceArray(), 'ENTITY-MIB::entPhysicalSerialNum.1', '-OQv', null, 'alaxala')
+                    ?: $this->entitySerial($device)
                     ?: null;
             }
 
@@ -631,6 +631,23 @@ class Alaxala extends OS implements MempoolsDiscovery, ProcessorDiscovery
         $result = $this->firstSnmpValueWithOid($device, $oids, $mib, $enumStrings);
 
         return $result['value'] ?? null;
+    }
+
+    private function entitySerial(Device $device): ?string
+    {
+        $response = SnmpQuery::device($device)
+            ->mibDir('alaxala')
+            ->mibs(['ENTITY-MIB'])
+            ->get('ENTITY-MIB::entPhysicalSerialNum.1');
+
+        if ($response->isValid()) {
+            $value = $response->value();
+            if ($value !== '') {
+                return $value;
+            }
+        }
+
+        return null;
     }
 
     private function firstSnmpValueWithOid(Device $device, array $oids, string $mib, bool $enumStrings = false): ?array
