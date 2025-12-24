@@ -1,0 +1,351 @@
+--
+-- All Rights Reserved, Copyright (c) 2013, ALAXALA Networks Corp.
+--
+-- AX-QUEUE-MIB.my : axQueue group MIB file.
+--
+
+AX-QUEUE-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, Counter64
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE,OBJECT-GROUP
+            FROM SNMPv2-CONF
+        axMib
+            FROM AX-SMI-MIB
+;
+
+axQueue MODULE-IDENTITY
+    LAST-UPDATED    "201310030000Z"
+    ORGANIZATION    "ALAXALA Networks Corp."
+    CONTACT-INFO    "ALAXALA Networks Corp."
+    DESCRIPTION
+        "The MIB module for queue information."
+
+    REVISION        "201310030000Z"
+    DESCRIPTION
+        "Updated header comment."
+    REVISION        "201306240000Z"
+    DESCRIPTION
+        "Initial release."
+    ::= { axMib 46 }
+
+--------------------------------------------------
+-- Object Identifiers
+--------------------------------------------------
+
+axPortQueue        OBJECT IDENTIFIER ::= {axQueue 71}
+axPortOutQueue     OBJECT IDENTIFIER ::= {axPortQueue 21}
+
+--------------------------------------------------
+-- Object Type definitions
+--------------------------------------------------
+
+axPortOutQueueStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxPortOutQueueStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A collection of Port Out queue status."
+    ::= {axPortOutQueue 11}
+
+axPortOutQueueStatusEntry OBJECT-TYPE
+    SYNTAX AxPortOutQueueStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing Port Out queue status."
+    INDEX {
+        axPortOutQueueStatusIfIndex
+    }
+    ::= {axPortOutQueueStatusTable 1}
+
+AxPortOutQueueStatusEntry ::= SEQUENCE {
+    axPortOutQueueStatusIfIndex         Integer32,
+    axPortOutQueueStatusMaxQueue        Integer32
+}
+
+axPortOutQueueStatusIfIndex OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Identified by a particular value of this index is same value of ifIndex.Its value ranges between 1 and the value of ifNumber."
+    ::= {axPortOutQueueStatusEntry 1}
+
+axPortOutQueueStatusMaxQueue OBJECT-TYPE
+    SYNTAX Integer32(1 | 2 | 4 | 8)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Max number of queues."
+    ::= {axPortOutQueueStatusEntry 11}
+
+axPortOutQueueStatusQTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxPortOutQueueStatusQEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A per-queue collection of Port Out queue status."
+    ::= {axPortOutQueue 51}
+
+axPortOutQueueStatusQEntry OBJECT-TYPE
+    SYNTAX AxPortOutQueueStatusQEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A per-queue entry containing Port Out queue status."
+    INDEX {
+        axPortOutQueueStatusQIfIndex,
+        axPortOutQueueStatusQQueIndex
+    }
+    ::= {axPortOutQueueStatusQTable 1}
+
+AxPortOutQueueStatusQEntry ::= SEQUENCE {
+    axPortOutQueueStatusQIfIndex        Integer32,
+    axPortOutQueueStatusQQueIndex       Integer32,
+    axPortOutQueueStatusQQlen           Integer32,
+    axPortOutQueueStatusQPeakQlen       Integer32,
+    axPortOutQueueStatusQLimitQlen      Integer32
+}
+
+axPortOutQueueStatusQIfIndex OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Identified by a particular value of this index is same value of ifIndex.Its value rangesbetween 1 and the value of ifNumber."
+    ::= {axPortOutQueueStatusQEntry 1}
+
+axPortOutQueueStatusQQueIndex OBJECT-TYPE
+    SYNTAX Integer32(1..8)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An index that uniquely identifies the particular queue.Its value ranges between 1 and the value of axPortOutQueueStatusMaxQueue."
+    ::= {axPortOutQueueStatusQEntry 2}
+
+axPortOutQueueStatusQQlen OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of in-use packet buffers in a queue."
+    ::= {axPortOutQueueStatusQEntry 11}
+
+axPortOutQueueStatusQPeakQlen OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Greatest number of in-use packet buffers in a
+queue."
+    ::= {axPortOutQueueStatusQEntry 12}
+
+axPortOutQueueStatusQLimitQlen OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Limit of the number of in-use packet buffers in a
+queue."
+    ::= {axPortOutQueueStatusQEntry 13}
+
+axPortOutQueueStatsQTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxPortOutQueueStatsQEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A per-queue collection of Port Out queue statistics."
+    ::= {axPortOutQueue 61}
+
+axPortOutQueueStatsQEntry OBJECT-TYPE
+    SYNTAX AxPortOutQueueStatsQEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A per-queue entry containing Port Out queue statistics."
+    INDEX {
+        axPortOutQueueStatsQIfIndex,
+        axPortOutQueueStatsQQueIndex
+    }
+    ::= {axPortOutQueueStatsQTable 1}
+
+AxPortOutQueueStatsQEntry ::= SEQUENCE {
+    axPortOutQueueStatsQIfIndex                     Integer32,
+    axPortOutQueueStatsQQueIndex                    Integer32,
+    axPortOutQueueStatsQDiscard1SendPackets         Counter64,
+    axPortOutQueueStatsQDiscard1DiscardPackets      Counter64,
+    axPortOutQueueStatsQDiscard2SendPackets         Counter64,
+    axPortOutQueueStatsQDiscard2DiscardPackets      Counter64,
+    axPortOutQueueStatsQDiscard3SendPackets         Counter64,
+    axPortOutQueueStatsQDiscard3DiscardPackets      Counter64,
+    axPortOutQueueStatsQDiscard4SendPackets         Counter64,
+    axPortOutQueueStatsQDiscard4DiscardPackets      Counter64,
+    axPortOutQueueStatsQTotalSendPackets            Counter64,
+    axPortOutQueueStatsQTotalDiscardPackets         Counter64,
+    axPortOutQueueStatsQTotalSendBytes              Counter64
+}
+
+axPortOutQueueStatsQIfIndex OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Identified by a particular value of this index is same value of ifIndex.Its value rangesbetween 1 and the value of ifNumber."
+    ::= {axPortOutQueueStatsQEntry 1}
+
+axPortOutQueueStatsQQueIndex OBJECT-TYPE
+    SYNTAX Integer32(1..8)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An index that uniquely identifies the particular queue.Its value ranges between 1 and the value of axPortOutQueueStatusMaxQueue."
+    ::= {axPortOutQueueStatsQEntry 2}
+
+axPortOutQueueStatsQDiscard1SendPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of send packets in the discard priority 1 of queue number."
+    ::= {axPortOutQueueStatsQEntry 11}
+
+axPortOutQueueStatsQDiscard1DiscardPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of discard packets in the discard priority 1 of queue number."
+    ::= {axPortOutQueueStatsQEntry 12}
+
+axPortOutQueueStatsQDiscard2SendPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of send packets in the discard priority 2 of queue number."
+    ::= {axPortOutQueueStatsQEntry 21}
+
+axPortOutQueueStatsQDiscard2DiscardPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of discard packets in the discard priority 2 of queue number."
+    ::= {axPortOutQueueStatsQEntry 22}
+
+axPortOutQueueStatsQDiscard3SendPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of send packets in the discard priority 3 of queue number."
+    ::= {axPortOutQueueStatsQEntry 31}
+
+axPortOutQueueStatsQDiscard3DiscardPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of discard packets in the discard priority 3 of queue number."
+    ::= {axPortOutQueueStatsQEntry 32}
+
+axPortOutQueueStatsQDiscard4SendPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of send packets in the discard priority 4 of queue number."
+    ::= {axPortOutQueueStatsQEntry 41}
+
+axPortOutQueueStatsQDiscard4DiscardPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of discard packets in the discard priority 4 of queue number."
+    ::= {axPortOutQueueStatsQEntry 42}
+
+axPortOutQueueStatsQTotalSendPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of the total send packets."
+    ::= {axPortOutQueueStatsQEntry 101}
+
+axPortOutQueueStatsQTotalDiscardPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of the total discard packets."
+    ::= {axPortOutQueueStatsQEntry 102}
+
+axPortOutQueueStatsQTotalSendBytes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of the total send bytes."
+    ::= {axPortOutQueueStatsQEntry 103}
+
+--------------------------------------------------
+-- Notification Type definitions
+--------------------------------------------------
+
+
+--------------------------------------------------
+-- Conformance Statements
+--------------------------------------------------
+
+--
+-- Confoemance identifier
+--
+
+axQueueConformance              OBJECT IDENTIFIER ::= { axQueue 1000 }
+axQueueCompliances              OBJECT IDENTIFIER ::= { axQueueConformance 1 }
+axQueueGroups                   OBJECT IDENTIFIER ::= { axQueueConformance 2 }
+
+--
+-- Compliance
+--
+
+axQueueCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "AX Queue Object"
+    MODULE      -- this module
+        MANDATORY-GROUPS{ axQueueGroup }
+    ::= { axQueueCompliances 1 }
+
+--
+-- Object Group
+--
+
+axQueueGroup OBJECT-GROUP
+    OBJECTS    {
+                    axPortOutQueueStatusMaxQueue,
+                    axPortOutQueueStatusQQlen,
+                    axPortOutQueueStatusQPeakQlen,
+                    axPortOutQueueStatusQLimitQlen,
+                    axPortOutQueueStatsQDiscard1SendPackets,
+                    axPortOutQueueStatsQDiscard1DiscardPackets,
+                    axPortOutQueueStatsQDiscard2SendPackets,
+                    axPortOutQueueStatsQDiscard2DiscardPackets,
+                    axPortOutQueueStatsQDiscard3SendPackets,
+                    axPortOutQueueStatsQDiscard3DiscardPackets,
+                    axPortOutQueueStatsQDiscard4SendPackets,
+                    axPortOutQueueStatsQDiscard4DiscardPackets,
+                    axPortOutQueueStatsQTotalSendPackets,
+                    axPortOutQueueStatsQTotalDiscardPackets,
+                    axPortOutQueueStatsQTotalSendBytes
+               }
+    STATUS current
+    DESCRIPTION
+                "The collection of notifications of axQueue."
+    ::= { axQueueGroups 1 }
+
+END

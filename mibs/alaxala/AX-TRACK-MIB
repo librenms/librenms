@@ -1,0 +1,293 @@
+--
+-- All Rights Reserved, Copyright (c) 2014, 2017, ALAXALA Networks Corp.
+--
+-- AX-TRACK-MIB.my axTrack group MIB file.
+--
+
+AX-TRACK-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+        Integer32, TimeTicks
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        InetAddressType,InetAddress
+            FROM INET-ADDRESS-MIB
+        InterfaceIndexOrZero
+            FROM IF-MIB 
+        axMib
+            FROM AX-SMI-MIB
+;
+
+axTrack MODULE-IDENTITY
+    LAST-UPDATED    "201701250001Z"
+    ORGANIZATION    "ALAXALA Networks Corp."
+    CONTACT-INFO    "ALAXALA Networks Corp."
+    DESCRIPTION
+        "The MIB module for track information."
+    REVISION        "201701250001Z"
+    DESCRIPTION
+        "+Modified axTrackOperation (added value:disable)
+         +Modified axTrackType (added value:icmp,interface,list)"
+    REVISION        "201403120001Z"
+    DESCRIPTION
+        "Initial release."
+::= { axMib 40 }
+
+--------------------------------------------------
+-- Object Identifiers
+--------------------------------------------------
+axTrackGeneralGroup OBJECT IDENTIFIER  ::= {axTrack 1}
+axTrackTraps        OBJECT IDENTIFIER  ::= {axTrack 2}
+
+--------------------------------------------------
+-- Object Type definitions
+--------------------------------------------------
+
+--
+--  axTrackGeneralGroup 
+--
+
+axTrackGeneralLastChange OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value of sysUpTime at the time this entry was last updated."
+    ::= { axTrackGeneralGroup 1 }
+
+--
+--  axTrackTable 
+--
+
+axTrackTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AxTrackEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table containing track information."
+    ::= {axTrack 3}
+
+axTrackEntry OBJECT-TYPE
+    SYNTAX AxTrackEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A particular route to a particular destination, under a particular policy."
+    INDEX { axTrackId }
+    ::= {axTrackTable 1}
+
+AxTrackEntry ::= SEQUENCE {
+    axTrackId            Integer32,
+    axTrackName          OCTET STRING,
+    axTrackState         INTEGER,
+    axTrackOperation     INTEGER,
+    axTrackType          INTEGER,
+    axTrackListType      INTEGER,
+    axTrackVrfIndex      Integer32,
+    axTrackAddressType   InetAddressType,
+    axTrackAddress       InetAddress,
+    axTrackIfIndex       InterfaceIndexOrZero
+}
+
+axTrackId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index value which identifies track"
+    ::= {axTrackEntry 1}
+
+axTrackName OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The name of track"
+    ::= {axTrackEntry 2}
+
+axTrackState OBJECT-TYPE
+    SYNTAX INTEGER {
+                      up(1),down(2)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The state of track"
+    ::= {axTrackEntry 3}
+
+axTrackOperation OBJECT-TYPE
+    SYNTAX INTEGER {
+                      active(1),
+                      delete(2),
+                      disable(3)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operation state of track"
+    ::= {axTrackEntry 4}
+
+axTrackType OBJECT-TYPE
+    SYNTAX INTEGER {
+                      bfd(1),
+                      icmp(2),
+                      interface(3),
+                      list(4)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type of track"
+    ::= {axTrackEntry 5}
+
+axTrackListType OBJECT-TYPE
+    SYNTAX INTEGER {
+                      other(0),and(1),or(2)
+               }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type of list track"
+    ::= {axTrackEntry 6}
+
+axTrackVrfIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index value which identifies VRF number."
+    ::= {axTrackEntry 7}
+
+axTrackAddressType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A value that represents a type of target address."
+    ::= {axTrackEntry 8}
+
+axTrackAddress OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object specifies the IP address which is being monitored with this Tracking."
+    ::= {axTrackEntry 9}
+
+axTrackIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndexOrZero
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object contains an interface index used to indicate the interface which this track.This value can be zero if there is no interface associated with this track."
+    ::= {axTrackEntry 10}
+
+--------------------------------------------------
+-- Notification Type definitions
+--------------------------------------------------
+
+--
+-- axTrackTraps
+--
+
+axTrackTrapsPrefix        OBJECT IDENTIFIER  ::= {axTrackTraps 0}
+
+axTrackStateUp NOTIFICATION-TYPE
+    OBJECTS     {
+                   axTrackId,
+                   axTrackName,
+                   axTrackState,
+                   axTrackOperation,
+                   axTrackType,
+                   axTrackListType,
+                   axTrackVrfIndex,
+                   axTrackAddressType,
+                   axTrackAddress,
+                   axTrackIfIndex
+                }
+
+    STATUS      current
+    DESCRIPTION
+        "The tracking changes down to up"
+    ::= { axTrackTrapsPrefix 1 }
+
+axTrackStateDown NOTIFICATION-TYPE
+    OBJECTS     {
+                   axTrackId,
+                   axTrackName,
+                   axTrackState,
+                   axTrackOperation,
+                   axTrackType,
+                   axTrackListType,
+                   axTrackVrfIndex,
+                   axTrackAddressType,
+                   axTrackAddress,
+                   axTrackIfIndex
+                }
+
+    STATUS      current
+    DESCRIPTION
+        "The tracking changes down to up"
+    ::= { axTrackTrapsPrefix 2 }
+--------------------------------------------------
+-- Conformance Statements
+--------------------------------------------------
+
+--
+-- Conformance identifier
+--
+
+axTrackConformance       OBJECT IDENTIFIER ::= { axTrack 1000 }
+axTrackCompliances       OBJECT IDENTIFIER ::= { axTrackConformance 1 }
+axTrackGroups            OBJECT IDENTIFIER ::= { axTrackConformance 2 }
+
+-- Compliance
+--
+
+axTrackCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "AX Track"
+    MODULE        -- this module
+        MANDATORY-GROUPS {  axTrackGroup,
+                            axTrackNotificationGroup }
+    ::= { axTrackCompliances 1 }
+
+--
+-- Object Group
+--
+
+axTrackGroup OBJECT-GROUP
+    OBJECTS     {
+                   axTrackGeneralLastChange,
+                   axTrackId ,
+                   axTrackName,
+                   axTrackState,
+                   axTrackOperation,
+                   axTrackType,
+                   axTrackListType,
+                   axTrackVrfIndex,
+                   axTrackAddressType,
+                   axTrackAddress,
+                   axTrackIfIndex
+                 }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects which are used to provide
+         axTrack group."
+    ::= { axTrackGroups 1 }
+
+--
+-- Notification Group
+--
+
+axTrackNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   { axTrackStateUp,
+                      axTrackStateDown }
+    STATUS          current
+    DESCRIPTION
+        "The set of notifications of axTrack."
+    ::= { axTrackGroups 10 }
+
+END

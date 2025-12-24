@@ -1,0 +1,230 @@
+--
+-- All Rights Reserved, Copyright (c) 2013, ALAXALA Networks Corp.
+--
+-- AX-LOGIN-MIB.my axLogin group MIB file.
+--
+
+AX-LOGIN-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE,OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        DisplayString
+            FROM SNMPv2-TC
+        axMib
+            FROM AX-SMI-MIB
+;
+
+axLogin MODULE-IDENTITY
+    LAST-UPDATED    "201302050000Z"
+    ORGANIZATION    "ALAXALA Networks Corp."
+    CONTACT-INFO    "ALAXALA Networks Corp."
+    DESCRIPTION
+        "The MIB module for login information."
+
+    REVISION        "201302050000Z"
+    DESCRIPTION
+        "Initial release."
+::= { axMib 52 }
+
+
+--------------------------------------------------
+-- Object Identifiers
+--------------------------------------------------
+
+axLoginTrap              OBJECT IDENTIFIER ::= { axLogin 10 }
+
+--------------------------------------------------
+-- Object Type definitions
+--------------------------------------------------
+
+--
+--  axLogin
+--
+
+axLoginName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Log in user name."
+    ::= {axLogin 1}
+
+axLoginTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Date, time and time zone of user log in."
+    ::= {axLogin 2}
+
+axLogoutTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Date, time and time zone of user log out."
+    ::= {axLogin 3}
+
+axLoginFailureTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Date, time and time zone of user log in failure."
+    ::= {axLogin 4}
+
+axLoginLocation OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Connection information of log in user.
+        The status will be 'console' or 'aux'.
+        If other, displays 'IPADDRESS(APLLICATION)'.
+        ex. '192.168.11.1(telnet)'"
+    ::= {axLogin 5}
+
+axLoginLine OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Terminal information of log in user.
+        The status will be 'console' or 'aux'.
+        If other, displays 'TERMINAL(APLLICATION)'.
+        ex. 'ttyp/1(telnet)'"
+    ::= {axLogin 6}
+
+axLogoutStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+                      error(1),
+                      success(2),
+                      timeout(3),
+                      disconnect(4),
+                      force(5)
+               }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Log out factor.
+        error(1)      : log out due to none of bellow
+        success(2)    : log out due to command
+        timeout(3)    : log out due to 'auto-logout'
+        disconnect(4) : log out due to line disconnection
+        force(5)      : log out due to other user's command"
+    ::= {axLogin 7}
+
+
+--------------------------------------------------
+-- Notification Type definitions
+--------------------------------------------------
+
+--
+-- axLogin
+--
+
+axLoginTrapPrefix       OBJECT IDENTIFIER ::= { axLoginTrap 0 }
+
+axLoginSuccessTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    axLoginName,
+                    axLoginTime,
+                    axLoginLocation,
+                    axLoginLine
+                }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates success of user log in."
+    ::= { axLoginTrapPrefix 1 }
+
+axLoginFailureTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    axLoginName,
+                    axLoginFailureTime,
+                    axLoginLocation,
+                    axLoginLine
+                }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates failure of user log in."
+    ::= { axLoginTrapPrefix 2 }
+
+axLogoutTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    axLoginName,
+                    axLoginTime,
+                    axLogoutTime,
+                    axLoginLocation,
+                    axLoginLine,
+                    axLogoutStatus
+                }
+    STATUS      current
+    DESCRIPTION
+        "This trap indicates success of following log out.
+        'logout' command, 'exit' command, 'quit' command."
+    ::= { axLoginTrapPrefix 3 }
+
+
+--------------------------------------------------
+-- Conformance Statements
+--------------------------------------------------
+
+--
+-- Conformance identifier
+--
+
+axLoginConformance       OBJECT IDENTIFIER ::= { axLogin 1000 }
+axLoginCompliances       OBJECT IDENTIFIER ::= { axLoginConformance 1 }
+axLoginGroups            OBJECT IDENTIFIER ::= { axLoginConformance 2 }
+
+--
+-- Compliance
+--
+
+axLoginCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "AX Login"
+    MODULE        -- this module
+        MANDATORY-GROUPS {  axLoginGroup,
+                            axLoginNotificationGroup }
+    ::= { axLoginCompliances 1 }
+
+--
+-- Object Group
+--
+
+axLoginGroup OBJECT-GROUP
+    OBJECTS     {
+                    axLoginName,
+                    axLoginTime,
+                    axLogoutTime,
+                    axLoginFailureTime,
+                    axLoginLocation,
+                    axLoginLine,
+                    axLogoutStatus
+                }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects which are used to provide
+         axLogin group."
+    ::= { axLoginGroups 1 }
+
+--
+-- Notification Group
+--
+
+axLoginNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                        axLoginSuccessTrap,
+                        axLoginFailureTrap,
+                        axLogoutTrap
+                    }
+    STATUS          current
+    DESCRIPTION
+        "The set of notifications of axLogin."
+    ::= { axLoginGroups 10 }
+
+END
