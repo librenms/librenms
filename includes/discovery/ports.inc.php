@@ -72,11 +72,6 @@ if ($device['os'] == 'moxa-etherdevice') {
     require base_path('includes/discovery/ports/moxa-etherdevice.inc.php');
 }
 
-//Moxa EDS 4000 - add port stats
-if ($device['os'] == 'moxa-eds-4000-series') {
-    require base_path('includes/discovery/ports/moxa-eds-4000-series.inc.php');
-}
-
 //Remove extra ports on Zhone slms devices
 if ($device['os'] == 'slms') {
     require base_path('includes/discovery/ports/slms.inc.php');
