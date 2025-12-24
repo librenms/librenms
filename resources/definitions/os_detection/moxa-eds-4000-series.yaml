@@ -2,9 +2,11 @@ os: moxa-eds-4000-series
 icon: moxa
 text: Moxa-EDS-4000-Series
 type: network
-over:
-    - { graph: device_power, text: 'Power Consumption' }
 mib_dir: moxa
+group: moxa
+snmp_bulk: false
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
 discovery:
     -
         sysObjectID:
