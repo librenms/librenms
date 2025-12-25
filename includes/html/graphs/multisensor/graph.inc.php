@@ -162,10 +162,6 @@ foreach ($sensors as $sensor) {
     $i++;
 }
 
-if ($i === 0) {
-    throw new RrdGraphException('No RRD files found for specified sensors');
-}
-
 // Add aggregate total line for stacked mode
 if ($stacked_mode && $i > 1) {
     $rrd_options[] = 'COMMENT:\l';
