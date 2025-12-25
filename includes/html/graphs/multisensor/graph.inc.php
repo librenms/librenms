@@ -61,7 +61,7 @@ if ($width > '1500') {
 
 // Build column header with proper alignment
 $col_w = 9 + strlen($unit_short);
-$header_descr = str_pad($sensors[0]->classDescr(), $descr_len);
+$header_descr = str_pad((string) $sensors[0]->classDescr(), $descr_len);
 $rrd_options[] = sprintf('COMMENT:%s', substr($header_descr, 0, $descr_len));
 $rrd_options[] = sprintf('COMMENT:%' . $col_w . 's', 'Current');
 $rrd_options[] = sprintf('COMMENT:%' . $col_w . 's', 'Minimum');
@@ -104,8 +104,8 @@ foreach ($sensors as $sensor) {
         $hostname = $device['display'];
     } else {
         $hostname = $device['shortname'] ?? $device['hostname'];
-        if (strpos($hostname, '.') !== false) {
-            $hostname = explode('.', $hostname)[0];
+        if (str_contains((string) $hostname, '.')) {
+            $hostname = explode('.', (string) $hostname)[0];
         }
     }
 
@@ -113,13 +113,13 @@ foreach ($sensors as $sensor) {
     $sensor_descr = $sensor->sensor_descr;
 
     // Calculate space for each part
-    $host_len = min(12, strlen($hostname));
+    $host_len = min(12, strlen((string) $hostname));
     $sensor_len = $descr_len - $host_len - 1; // -1 for separator
 
     // Build the description: "hostname:sensor_descr"
-    $short_host = substr($hostname, 0, $host_len);
-    $short_sensor = strlen($sensor_descr) > $sensor_len
-        ? substr($sensor_descr, 0, $sensor_len - 2) . '..'
+    $short_host = substr((string) $hostname, 0, $host_len);
+    $short_sensor = strlen((string) $sensor_descr) > $sensor_len
+        ? substr((string) $sensor_descr, 0, $sensor_len - 2) . '..'
         : $sensor_descr;
 
     $full_descr = $short_host . ':' . $short_sensor;

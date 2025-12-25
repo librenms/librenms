@@ -99,7 +99,7 @@ class SensorController extends SelectController
     public function formatItem($sensor)
     {
         /** @var Sensor $sensor */
-        $classDescr = ucfirst($sensor->sensor_class);
+        $classDescr = ucfirst((string) $sensor->sensor_class);
 
         return [
             'id' => $sensor->sensor_id,
