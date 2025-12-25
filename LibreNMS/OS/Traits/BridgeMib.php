@@ -22,6 +22,8 @@
  *
  * @copyright  2025 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
+ * @copyright  2025 Peca Nesovanovic
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
 namespace LibreNMS\OS\Traits;
@@ -236,5 +238,20 @@ trait BridgeMib
         $this->ifIndexToBridgePort ??= SnmpQuery::walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
 
         return (int) ($this->ifIndexToBridgePort[$bridgePort] ?? 0);
+    }
+
+    public function dot1dTpFdbAddress(): array
+    {
+        return SnmpQuery::numericIndex()->walk('BRIDGE-MIB::dot1dTpFdbAddress')->pluck();
+    }
+
+    public function dot1dTpFdbPort(): array
+    {
+        return SnmpQuery::numericIndex()->walk('BRIDGE-MIB::dot1dTpFdbPort')->pluck();
+    }
+
+    public function dot1dBasePort(): array
+    {
+        return SnmpQuery::walk('BRIDGE-MIB::dot1dBasePort')->pluck();
     }
 }

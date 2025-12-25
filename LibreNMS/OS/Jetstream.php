@@ -28,12 +28,14 @@ namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
 use App\Models\Ipv6Address;
+use App\Models\PortsFdb;
 use App\Models\PortVlan;
 use App\Models\Route;
 use App\Models\Vlan;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Interfaces\Discovery\FdbTableDiscovery;
 use LibreNMS\Interfaces\Discovery\Ipv6AddressDiscovery;
 use LibreNMS\Interfaces\Discovery\RouteDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanDiscovery;
@@ -42,7 +44,7 @@ use LibreNMS\OS;
 use LibreNMS\Util\IPv6;
 use SnmpQuery;
 
-class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, VlanDiscovery, VlanPortDiscovery
+class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, VlanDiscovery, VlanPortDiscovery, FdbTableDiscovery
 {
     public function discoverIpv6Addresses(): Collection
     {
@@ -206,5 +208,35 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Vlan
         }
 
         return $result;
+    }
+
+    public function discoverFdbTable(): Collection
+    {
+        $fdbt = new Collection;
+
+        $dot1qTpFdbPort = $this->dot1qTpFdbPort();
+
+        foreach ($dot1qTpFdbPort as $realVlan => $macData) {
+            foreach ($macData as $mac_address => $idx) {
+                $port_id = \App\Models\Port::findPortId([
+                    'gigabitEthernet 1/0/' . $idx,
+                    'gigabitEthernet 1/0/' . $idx . ' : copper',
+                    'gigabitEthernet 1/0/' . $idx . ' : fiber',
+                    'gigabitEthernet1/0/' . $idx,
+                ], $this->getDeviceId());
+
+                $fdbt->push(new PortsFdb([
+                    'port_id' => $port_id,
+                    'mac_address' => $mac_address,
+                    'vlan_id' => $realVlan,
+                ]));
+            }
+        }
+
+        if ($fdbt->isEmpty()) {
+            $fdbt = parent::discoverFdbTable();
+        }
+
+        return $fdbt;
     }
 }
