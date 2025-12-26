@@ -1035,17 +1035,98 @@
             "processors": [
                 {
                     "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.2021.11.11.0",
-                    "processor_index": "0",
-                    "processor_type": "ucd-old",
+                    "hrDeviceIndex": 196608,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196608",
+                    "processor_index": "196608",
+                    "processor_type": "hr",
                     "processor_usage": 15,
-                    "processor_descr": "CPU",
-                    "processor_precision": -1,
+                    "processor_descr": "Intel Celeron N3060 @ 1.60GHz",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 196609,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196609",
+                    "processor_index": "196609",
+                    "processor_type": "hr",
+                    "processor_usage": 13,
+                    "processor_descr": "Intel Celeron N3060 @ 1.60GHz",
+                    "processor_precision": 1,
                     "processor_perc_warn": 75
                 }
             ]
         },
         "poller": "matches discovery"
+    },
+    "hr-device": {
+        "discovery": {
+            "hrDevice": [
+                {
+                    "hrDeviceIndex": 196608,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Celeron(R) CPU  N3060  @ 1.60GHz",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": 15
+                },
+                {
+                    "hrDeviceIndex": 196609,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Celeron(R) CPU  N3060  @ 1.60GHz",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": 13
+                },
+                {
+                    "hrDeviceIndex": 262145,
+                    "hrDeviceDescr": "network interface lo",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 262150,
+                    "hrDeviceDescr": "network interface S1E1",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 262151,
+                    "hrDeviceDescr": "network interface S1E2",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 262152,
+                    "hrDeviceDescr": "network interface mgmt",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 262153,
+                    "hrDeviceDescr": "network interface ha",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 786432,
+                    "hrDeviceDescr": "Guessing that there's a floating point co-processor",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                }
+            ]
+        }
     }
 }

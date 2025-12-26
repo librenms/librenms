@@ -1,23 +1,5 @@
 mib: NET-SNMP-EXTEND-MIB
 modules:
-    processors:
-        data:
-            -
-                oid: nsExtendOutput1Line
-                value: nsExtendOutput1Line
-                index: cpu_usage
-                descr: 'CPU Usage'
-                skip_values:
-                    - { oid: index, op: '!=', value: '3.49.48.48' }
-    mempools:
-        data:
-            -
-                oid: nsExtendOutput1Line
-                percent_used: nsExtendOutput1Line
-                index: mem_usage
-                descr: 'Memory Usage'
-                skip_values:
-                    - { oid: index, op: '!=', value: '3.49.48.50' }
     sensors:
         temperature:
             data:
@@ -33,6 +15,20 @@ modules:
                 -
                     oid: nsExtendOutput1Line
                     value: nsExtendOutput1Line
+                    index: cpu_usage
+                    descr: 'CPU Usage'
+                    skip_values:
+                        - { oid: index, op: '!=', value: '3.49.48.48' }
+                -
+                    oid: nsExtendOutput1Line
+                    percent_used: nsExtendOutput1Line
+                    index: mem_usage
+                    descr: 'Memory Usage'
+                    skip_values:
+                        - { oid: index, op: '!=', value: '3.49.48.50' }
+                -
+                    oid: nsExtendOutput1Line
+                    value: nsExtendOutput1Line
                     index: disk_usage
                     descr: 'Disk Usage'
                     skip_values:
@@ -40,8 +36,8 @@ modules:
                 -
                     oid: nsExtendOutput1Line
                     value: nsExtendOutput1Line
-                    index: partition_usage_total
-                    descr: 'Partition Usage (Total)'
+                    index: disk_partition_usage_total
+                    descr: 'Disk Partition Usage (Total)'
                     skip_values:
                         - { oid: index, op: '!=', value: '3.49.48.54' }
         state:

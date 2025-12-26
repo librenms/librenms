@@ -1835,17 +1835,206 @@
             "processors": [
                 {
                     "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.2021.11.11.0",
-                    "processor_index": "0",
-                    "processor_type": "ucd-old",
+                    "hrDeviceIndex": 196608,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196608",
+                    "processor_index": "196608",
+                    "processor_type": "hr",
                     "processor_usage": 4,
-                    "processor_descr": "CPU",
-                    "processor_precision": -1,
+                    "processor_descr": "Intel Xeon E-2176G @ 3.70GHz",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 196609,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196609",
+                    "processor_index": "196609",
+                    "processor_type": "hr",
+                    "processor_usage": 5,
+                    "processor_descr": "Intel Xeon E-2176G @ 3.70GHz",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 196610,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196610",
+                    "processor_index": "196610",
+                    "processor_type": "hr",
+                    "processor_usage": 4,
+                    "processor_descr": "Intel Xeon E-2176G @ 3.70GHz",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 196611,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196611",
+                    "processor_index": "196611",
+                    "processor_type": "hr",
+                    "processor_usage": 4,
+                    "processor_descr": "Intel Xeon E-2176G @ 3.70GHz",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 196612,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196612",
+                    "processor_index": "196612",
+                    "processor_type": "hr",
+                    "processor_usage": 4,
+                    "processor_descr": "Intel Xeon E-2176G @ 3.70GHz",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 196613,
+                    "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196613",
+                    "processor_index": "196613",
+                    "processor_type": "hr",
+                    "processor_usage": 4,
+                    "processor_descr": "Intel Xeon E-2176G @ 3.70GHz",
+                    "processor_precision": 1,
                     "processor_perc_warn": 75
                 }
             ]
         },
         "poller": "matches discovery"
+    },
+    "hr-device": {
+        "discovery": {
+            "hrDevice": [
+                {
+                    "hrDeviceIndex": 196608,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) E-2176G CPU @ 3.70GHz",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": 4
+                },
+                {
+                    "hrDeviceIndex": 196609,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) E-2176G CPU @ 3.70GHz",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": 5
+                },
+                {
+                    "hrDeviceIndex": 196610,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) E-2176G CPU @ 3.70GHz",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": 4
+                },
+                {
+                    "hrDeviceIndex": 196611,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) E-2176G CPU @ 3.70GHz",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": 4
+                },
+                {
+                    "hrDeviceIndex": 196612,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) E-2176G CPU @ 3.70GHz",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": 4
+                },
+                {
+                    "hrDeviceIndex": 196613,
+                    "hrDeviceDescr": "GenuineIntel: Intel(R) Xeon(R) E-2176G CPU @ 3.70GHz",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": 4
+                },
+                {
+                    "hrDeviceIndex": 262145,
+                    "hrDeviceDescr": "network interface lo",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 262154,
+                    "hrDeviceDescr": "network interface S0E1",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 262155,
+                    "hrDeviceDescr": "network interface S0E2",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 262156,
+                    "hrDeviceDescr": "network interface S0E3",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 262157,
+                    "hrDeviceDescr": "network interface S0E4",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 262158,
+                    "hrDeviceDescr": "network interface mgmt",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 262159,
+                    "hrDeviceDescr": "network interface ha",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 262160,
+                    "hrDeviceDescr": "network interface none1",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 262161,
+                    "hrDeviceDescr": "network interface none2",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                },
+                {
+                    "hrDeviceIndex": 786432,
+                    "hrDeviceDescr": "Guessing that there's a floating point co-processor",
+                    "hrDeviceType": "",
+                    "hrDeviceErrors": 0,
+                    "hrDeviceStatus": "unknown",
+                    "hrProcessorLoad": null
+                }
+            ]
+        }
     }
 }
