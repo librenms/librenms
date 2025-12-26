@@ -266,6 +266,60 @@ if (($device['os'] == 'routeros') && version_compare($device['version'], '7.7', 
             }
         }
     }
+} elseif ($device['os'] == 'dell-os10') {
+    echo ' LLDP-MIB: ';
+
+    $lldp_array = SnmpQuery::hideMib()->walk('LLDP-MIB::lldpRemTable')->table(3);
+    $lldp_ports = SnmpQuery::hideMib()->walk('LLDP-MIB::lldpLocPortId')->table();
+
+    if (! empty($lldp_array) && isset($lldp_ports['lldpLocPortId'])) {
+        foreach ($lldp_array as $lldp_if_array) {
+            foreach ($lldp_if_array as $entry_key => $lldp_instance) {
+                $local_port_id = find_port_id(
+                    $lldp_ports['lldpLocPortId'][$entry_key] ?? null,
+                    $entry_key,
+                    $device['device_id']
+                );
+                $interface = get_port_by_id($local_port_id);
+
+                if (! is_array($interface) || empty($interface['port_id'])) {
+                    continue;
+                }
+
+                foreach ($lldp_instance as $lldp) {
+                    $remote_device_id = find_device_id($lldp['lldpRemSysName'] ?? null);
+
+                    if (! $remote_device_id &&
+                        LibrenmsConfig::get('autodiscovery.xdp') === true &&
+                        isset($lldp['lldpRemSysName']) &&
+                        ! can_skip_discovery($lldp['lldpRemSysName'], $lldp['lldpRemSysDesc'] ?? null)
+                    ) {
+                        $remote_device_id = discover_new_device($lldp['lldpRemSysName'], $device, 'LLDP', $interface);
+                    }
+
+                    if ($interface['port_id'] && ! empty($lldp['lldpRemSysName']) && ! empty($lldp['lldpRemPortId'])) {
+                        $remote_port_id = find_port_id(
+                            $lldp['lldpRemPortDesc'] ?? null,
+                            $lldp['lldpRemPortId'],
+                            $remote_device_id
+                        );
+
+                        discover_link(
+                            $interface['port_id'],
+                            'lldp',
+                            $remote_port_id,
+                            $lldp['lldpRemSysName'],
+                            $lldp['lldpRemPortId'],
+                            null,
+                            $lldp['lldpRemSysDesc'] ?? null,
+                            $device['device_id'],
+                            $remote_device_id
+                        );
+                    }
+                }
+            }
+        }
+    }
     echo PHP_EOL;
 } else {
     echo ' LLDP-MIB: ';
