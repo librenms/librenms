@@ -246,7 +246,7 @@ if (! empty($peers)) {
                     if (! isset($bgpPeers)) {
                         $bgpPeers = [];
                         // Walk standard BGP4-MIB for fallback when vendor MIB doesn't provide counters
-                        $bgp4updates = snmpwalk_cache_oid($device, 'bgpPeerEntry', [], 'BGP4-MIB', 'nokia', '-OQUbs');
+                        $bgp4updates = SnmpQuery::cache()->enumStrings()->walk('BGP4-MIB::bgpPeerEntry')->table();
                         foreach ($peer_data_check as $key => $value) {
                             $oid = explode('.', (string) $key);
                             // Only process standard BGP peer entries:
