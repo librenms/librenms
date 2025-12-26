@@ -266,17 +266,42 @@ if (! empty($peers)) {
                         }
                     }
                     $address = (string) $peer_ip;
-                    $establishedTime = $bgpPeers[$vrfOid][$address]['TIMETRA-BGP-MIB::tBgpPeerNgLastChanged'] / 100;
+                    $peerData = $bgpPeers[$vrfOid][$address] ?? [];
+
+                    // Use tBgpPeerFsmEstablishedTime if available (already in seconds),
+                    // otherwise fall back to tBgpPeerNgLastChanged (centiseconds)
+                    if (isset($peerData['TIMETRA-BGP-MIB::tBgpPeerFsmEstablishedTime'])) {
+                        $establishedTime = $peerData['TIMETRA-BGP-MIB::tBgpPeerFsmEstablishedTime'];
+                    } elseif (isset($peerData['TIMETRA-BGP-MIB::tBgpPeerNgLastChanged'])) {
+                        $establishedTime = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgLastChanged'] / 100;
+                    } else {
+                        $establishedTime = 0;
+                    }
 
                     $peer_data = [];
-                    $peer_data['bgpPeerState'] = $bgpPeers[$vrfOid][$address]['TIMETRA-BGP-MIB::tBgpPeerNgConnState'];
-                    if ($bgpPeers[$vrfOid][$address]['TIMETRA-BGP-MIB::tBgpPeerNgShutdown'] == '1') {
+                    $peer_data['bgpPeerState'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgConnState'] ?? null;
+                    if (($peerData['TIMETRA-BGP-MIB::tBgpPeerNgShutdown'] ?? '') == '1') {
                         $peer_data['bgpPeerAdminStatus'] = 'adminShutdown';
                     } else {
-                        $peer_data['bgpPeerAdminStatus'] = $bgpPeers[$vrfOid][$address]['TIMETRA-BGP-MIB::tBgpPeerNgOperLastEvent'];
+                        $peer_data['bgpPeerAdminStatus'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperLastEvent'] ?? null;
                     }
-                    $peer_data['bgpPeerInTotalMessages'] = $bgpPeers[$vrfOid][$address]['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsRcvd'] % (2 ** 32);  // That are actually only octets available,
-                    $peer_data['bgpPeerOutTotalMessages'] = $bgpPeers[$vrfOid][$address]['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsSent'] % (2 ** 32); // not messages
+
+                    // Use proper message counters if available, fall back to octet counters
+                    if (isset($peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperInTotalMessages'])) {
+                        $peer_data['bgpPeerInTotalMessages'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperInTotalMessages'];
+                    } else {
+                        $peer_data['bgpPeerInTotalMessages'] = ($peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsRcvd'] ?? 0) % (2 ** 32);
+                    }
+                    if (isset($peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperOutTotalMessages'])) {
+                        $peer_data['bgpPeerOutTotalMessages'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperOutTotalMessages'];
+                    } else {
+                        $peer_data['bgpPeerOutTotalMessages'] = ($peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsSent'] ?? 0) % (2 ** 32);
+                    }
+
+                    // Update counters - available in newer SROS releases
+                    $peer_data['bgpPeerInUpdates'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperInUpdates'] ?? null;
+                    $peer_data['bgpPeerOutUpdates'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperOutUpdates'] ?? null;
+
                     $peer_data['bgpPeerFsmEstablishedTime'] = $establishedTime;
                 } elseif ($device['os'] == 'firebrick') {
                     // ToDo, It seems that bgpPeer(In|Out)Updates and bgpPeerInUpdateElapsedTime are actually not available over SNMP
