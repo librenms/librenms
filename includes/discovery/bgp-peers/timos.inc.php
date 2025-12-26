@@ -31,11 +31,30 @@ if ($device['os'] == 'timos') {
     $bgpPeersCache = SnmpQuery::numericIndex()->walk('TIMETRA-BGP-MIB::tBgpPeerNgTable')->valuesByIndex();
     foreach ($bgpPeersCache as $key => $value) {
         $oid = explode('.', (string) $key);
-        $vrfInstance = $oid[0];
-        $address = implode('.', array_slice($oid, 3));
-        if (strlen($address) > 15) {
-            $address = IP::fromSnmpString($address)->compressed();
+        // OID structure: vrfInstance.afi.length.ip[N]
+        // - afi: Address Family Identifier (1=IPv4, 2=IPv6)
+        // - length: Number of octets in the IP address
+        // - ip[N]: The IP address as N decimal octets
+        // IPv4: 7 parts total = 3 prefix parts + 4 IP octets
+        // IPv6: 19 parts total = 3 prefix parts + 16 IP octets
+        $oidCount = count($oid);
+        $afi = isset($oid[1]) ? (int) $oid[1] : 0;
+        $addressOctets = array_slice($oid, 3);
+        $addressOctetCount = count($addressOctets);
+
+        // Validate OID structure using both AFI and address length for robustness
+        if ($oidCount == 7 && $afi == 1 && $addressOctetCount == 4) {
+            // IPv4 address (AFI=1)
+            $address = implode('.', $addressOctets);
+        } elseif ($oidCount == 19 && $afi == 2 && $addressOctetCount == 16) {
+            // IPv6 address (AFI=2) - convert from SNMP string format
+            $address = IP::fromSnmpString(implode('.', $addressOctets))->compressed();
+        } else {
+            // Skip malformed or extended OIDs
+            continue;
         }
+
+        $vrfInstance = $oid[0];
         $bgpPeers[$vrfInstance][$address] = $value;
     }
     unset($bgpPeersCache);
