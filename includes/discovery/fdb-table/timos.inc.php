@@ -12,7 +12,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -127,7 +127,7 @@ if (! empty($fdbTable)) {
     echo "TIMETRA-SERV-MIB: $sapCount SAP entries" . PHP_EOL;
 
     foreach ($fdbTable as $svcId => $macEntries) {
-        foreach ($macEntries as $entry) {
+        foreach ($macEntries as $macIndex => $entry) {
             // Only process entries with tlsFdbLocale = 'sap' (1)
             // sap(1), sdp(2), cpm(3), endpoint(4), vxlan(5), evpnMpls(6), blackhole(7)
             $locale = $entry['tlsFdbLocale'] ?? null;
