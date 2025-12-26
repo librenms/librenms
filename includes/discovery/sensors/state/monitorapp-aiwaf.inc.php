@@ -24,7 +24,7 @@ foreach (preg_split('/\s*,\s*/', trim((string) $raw)) as $entry) {
         continue;
     }
 
-    $key = strtolower(preg_replace('/[^A-Za-z0-9._-]+/', '_', $name));
+    $key = strtolower((string) preg_replace('/[^A-Za-z0-9._-]+/', '_', $name));
     if ($key === '') {
         continue;
     }
