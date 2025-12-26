@@ -56,7 +56,7 @@ use LibreNMS\Util\Mac;
  * Decode TmnxEncapVal to extract VLAN ID(s)
  *
  * @param  int|string  $encapVal  The encoded encapsulation value
- * @return array  Array with 'outer' and optionally 'inner' VLAN IDs
+ * @return array Array with 'outer' and optionally 'inner' VLAN IDs
  *
  * @see TIMETRA-TC-MIB::TmnxEncapVal
  */
@@ -86,7 +86,7 @@ function decodeNokiaEncapValue($encapVal): array
  * Format TmnxEncapVal for display (Nokia-friendly format)
  *
  * @param  int|string  $encapVal  The encoded encapsulation value
- * @return string  Formatted encap value (e.g., "500" or "100.200" for QinQ)
+ * @return string Formatted encap value (e.g., "500" or "100.200" for QinQ)
  */
 function formatNokiaEncapValue($encapVal): string
 {
