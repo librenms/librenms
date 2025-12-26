@@ -95,7 +95,7 @@ modules:
                 -
                     oid: nsExtendOutput1Line
                     value: nsExtendOutput1Line
-                    index: total_mbps
+                    index: total_bps
                     descr: 'Total Throughput'
                     multiplier: 1000000
                     skip_values:
@@ -103,7 +103,7 @@ modules:
                 -
                     oid: nsExtendOutput1Line
                     value: nsExtendOutput1Line
-                    index: http_mbps
+                    index: http_bps
                     descr: 'HTTP Throughput'
                     multiplier: 1000000
                     skip_values:
@@ -111,7 +111,7 @@ modules:
                 -
                     oid: nsExtendOutput1Line
                     value: nsExtendOutput1Line
-                    index: https_mbps
+                    index: https_bps
                     descr: 'HTTPS Throughput'
                     multiplier: 1000000
                     skip_values:

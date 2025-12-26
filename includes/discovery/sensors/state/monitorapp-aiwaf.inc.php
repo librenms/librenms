@@ -1,8 +1,9 @@
 <?php
 
 use LibreNMS\Util\Oid;
+use SnmpQuery;
 
-$raw = snmp_get($device, 'NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."103"', '-Oqv', 'NET-SNMP-EXTEND-MIB');
+$raw = SnmpQuery::get('NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."103"')->value();
 if ($raw === false || trim((string) $raw) === '') {
     return;
 }
