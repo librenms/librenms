@@ -247,9 +247,19 @@ if (! empty($peers)) {
                         $bgpPeers = [];
                         foreach ($peer_data_check as $key => $value) {
                             $oid = explode('.', (string) $key);
+                            // Only process standard BGP peer entries:
+                            // IPv4: 7 parts (vrfInstance.afi.length.ip[4])
+                            // IPv6: 19 parts (vrfInstance.afi.length.ip[16])
+                            // Higher-order OIDs (20+ parts) are skipped as they represent
+                            // extended functionality not standard BGP peer data
+                            $oidCount = count($oid);
+                            if ($oidCount != 7 && $oidCount != 19) {
+                                continue;
+                            }
                             $vrfInstance = $oid[0];
                             $address = implode('.', array_slice($oid, 3));
-                            if (strlen($address) > 15) {
+                            if ($oidCount == 19) {
+                                // IPv6 address - convert from SNMP string format
                                 $address = IP::fromSnmpString($address)->compressed();
                             }
                             $bgpPeers[$vrfInstance][$address] = $value;
