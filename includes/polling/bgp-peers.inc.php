@@ -245,6 +245,8 @@ if (! empty($peers)) {
                 } elseif ($device['os'] == 'timos') {
                     if (! isset($bgpPeers)) {
                         $bgpPeers = [];
+                        // Walk standard BGP4-MIB for fallback when vendor MIB doesn't provide counters
+                        $bgp4updates = snmpwalk_cache_oid($device, 'bgpPeerEntry', [], 'BGP4-MIB', 'nokia', '-OQUbs');
                         foreach ($peer_data_check as $key => $value) {
                             $oid = explode('.', (string) $key);
                             // Only process standard BGP peer entries:
@@ -269,11 +271,11 @@ if (! empty($peers)) {
                     $peerData = $bgpPeers[$vrfOid][$address] ?? [];
 
                     // Use tBgpPeerFsmEstablishedTime if available (already in seconds),
-                    // otherwise fall back to tBgpPeerNgLastChanged (centiseconds)
+                    // otherwise fall back to standard BGP4-MIB
                     if (isset($peerData['TIMETRA-BGP-MIB::tBgpPeerFsmEstablishedTime'])) {
                         $establishedTime = $peerData['TIMETRA-BGP-MIB::tBgpPeerFsmEstablishedTime'];
-                    } elseif (isset($peerData['TIMETRA-BGP-MIB::tBgpPeerNgLastChanged'])) {
-                        $establishedTime = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgLastChanged'] / 100;
+                    } elseif (isset($bgp4updates[$address]['bgpPeerFsmEstablishedTime'])) {
+                        $establishedTime = $bgp4updates[$address]['bgpPeerFsmEstablishedTime'];
                     } else {
                         $establishedTime = 0;
                     }
@@ -301,6 +303,20 @@ if (! empty($peers)) {
                     // Update counters - available in newer SROS releases
                     $peer_data['bgpPeerInUpdates'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperInUpdates'] ?? null;
                     $peer_data['bgpPeerOutUpdates'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperOutUpdates'] ?? null;
+
+                    // Fallback to standard BGP4-MIB for older SROS releases that don't provide these counters
+                    if (empty($peer_data['bgpPeerInUpdates']) && isset($bgp4updates[$address]['bgpPeerInUpdates'])) {
+                        $peer_data['bgpPeerInUpdates'] = $bgp4updates[$address]['bgpPeerInUpdates'];
+                    }
+                    if (empty($peer_data['bgpPeerOutUpdates']) && isset($bgp4updates[$address]['bgpPeerOutUpdates'])) {
+                        $peer_data['bgpPeerOutUpdates'] = $bgp4updates[$address]['bgpPeerOutUpdates'];
+                    }
+                    if (empty($peer_data['bgpPeerInTotalMessages']) && isset($bgp4updates[$address]['bgpPeerInTotalMessages'])) {
+                        $peer_data['bgpPeerInTotalMessages'] = $bgp4updates[$address]['bgpPeerInTotalMessages'];
+                    }
+                    if (empty($peer_data['bgpPeerOutTotalMessages']) && isset($bgp4updates[$address]['bgpPeerOutTotalMessages'])) {
+                        $peer_data['bgpPeerOutTotalMessages'] = $bgp4updates[$address]['bgpPeerOutTotalMessages'];
+                    }
 
                     $peer_data['bgpPeerFsmEstablishedTime'] = $establishedTime;
                 } elseif ($device['os'] == 'firebrick') {
