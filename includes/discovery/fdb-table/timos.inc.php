@@ -117,7 +117,7 @@ if (! empty($fdbTable)) {
     // Count SAP entries for progress indication
     $sapCount = 0;
     foreach ($fdbTable as $svcId => $macEntries) {
-        foreach ($macEntries as $macIndex => $entry) {
+        foreach ($macEntries as $entry) {
             $locale = $entry['tlsFdbLocale'] ?? null;
             if ($locale === 'sap' || $locale === '1' || $locale === 1) {
                 $sapCount++;
@@ -127,7 +127,7 @@ if (! empty($fdbTable)) {
     echo "TIMETRA-SERV-MIB: $sapCount SAP entries" . PHP_EOL;
 
     foreach ($fdbTable as $svcId => $macEntries) {
-        foreach ($macEntries as $macIndex => $entry) {
+        foreach ($macEntries as $entry) {
             // Only process entries with tlsFdbLocale = 'sap' (1)
             // sap(1), sdp(2), cpm(3), endpoint(4), vxlan(5), evpnMpls(6), blackhole(7)
             $locale = $entry['tlsFdbLocale'] ?? null;
