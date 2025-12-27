@@ -172,7 +172,7 @@ if (! empty($peers)) {
                         //if not available, we timeout each time, to be fixed when split
                         $bgpPeersCache = snmpwalk_cache_oid($device, 'hwBgpPeerEntry', [], 'HUAWEI-BGP-VPN-MIB', 'huawei');
                         $bgpPeersStats = snmpwalk_cache_oid($device, 'hwBgpPeerStatisticTable', [], 'HUAWEI-BGP-VPN-MIB', 'huawei', '-OQUbs');
-                        $bgp4updates = snmpwalk_cache_oid($device, 'bgpPeerEntry', [], 'BGP4-MIB', 'huawei', '-OQUbs');
+                        $bgp4Fallback = snmpwalk_cache_oid($device, 'bgpPeerEntry', [], 'BGP4-MIB', 'huawei', '-OQUbs');
                         foreach ($bgpPeersCache as $key => $value) {
                             $oid = explode('.', (string) $key, 5);
                             $vrfInstance = $oid[0];
@@ -217,26 +217,26 @@ if (! empty($peers)) {
                     }
                     d_echo("VPN : $vrfInstance for $address :\n");
                     d_echo($peer_data);
-                    if (empty($peer_data['bgpPeerInUpdates']) && isset($bgp4updates[$address]['bgpPeerInUpdates'])) {
-                        $peer_data['bgpPeerInUpdates'] = $bgp4updates[$address]['bgpPeerInUpdates'];
+                    if (empty($peer_data['bgpPeerInUpdates']) && isset($bgp4Fallback[$address]['bgpPeerInUpdates'])) {
+                        $peer_data['bgpPeerInUpdates'] = $bgp4Fallback[$address]['bgpPeerInUpdates'];
                     }
-                    if (empty($peer_data['bgpPeerOutUpdates']) && isset($bgp4updates[$address]['bgpPeerOutUpdates'])) {
-                        $peer_data['bgpPeerOutUpdates'] = $bgp4updates[$address]['bgpPeerOutUpdates'];
+                    if (empty($peer_data['bgpPeerOutUpdates']) && isset($bgp4Fallback[$address]['bgpPeerOutUpdates'])) {
+                        $peer_data['bgpPeerOutUpdates'] = $bgp4Fallback[$address]['bgpPeerOutUpdates'];
                     }
-                    if (empty($peer_data['bgpPeerInTotalMessages']) && isset($bgp4updates[$address]['bgpPeerInTotalMessages'])) {
-                        $peer_data['bgpPeerInTotalMessages'] = $bgp4updates[$address]['bgpPeerInTotalMessages'];
+                    if (empty($peer_data['bgpPeerInTotalMessages']) && isset($bgp4Fallback[$address]['bgpPeerInTotalMessages'])) {
+                        $peer_data['bgpPeerInTotalMessages'] = $bgp4Fallback[$address]['bgpPeerInTotalMessages'];
                     }
-                    if (empty($peer_data['bgpPeerOutTotalMessages']) && isset($bgp4updates[$address]['bgpPeerOutTotalMessages'])) {
-                        $peer_data['bgpPeerOutTotalMessages'] = $bgp4updates[$address]['bgpPeerOutTotalMessages'];
+                    if (empty($peer_data['bgpPeerOutTotalMessages']) && isset($bgp4Fallback[$address]['bgpPeerOutTotalMessages'])) {
+                        $peer_data['bgpPeerOutTotalMessages'] = $bgp4Fallback[$address]['bgpPeerOutTotalMessages'];
                     }
                     if (empty($peer_data['bgpPeerState'])) {
-                        $peer_data['bgpPeerState'] = $bgp4updates[$address]['bgpPeerState'];
+                        $peer_data['bgpPeerState'] = $bgp4Fallback[$address]['bgpPeerState'];
                     }
-                    if (empty($peer_data['bgpPeerAdminStatus']) && isset($bgp4updates[$address]['bgpPeerAdminStatus'])) {
-                        $peer_data['bgpPeerAdminStatus'] = $bgp4updates[$address]['bgpPeerAdminStatus'];
+                    if (empty($peer_data['bgpPeerAdminStatus']) && isset($bgp4Fallback[$address]['bgpPeerAdminStatus'])) {
+                        $peer_data['bgpPeerAdminStatus'] = $bgp4Fallback[$address]['bgpPeerAdminStatus'];
                     }
                     if (empty($peer_data['bgpPeerLastError'])) {
-                        $peer_data['bgpPeerLastError'] = $bgp4updates[$address]['bgpPeerLastError'];
+                        $peer_data['bgpPeerLastError'] = $bgp4Fallback[$address]['bgpPeerLastError'];
                     }
                     $error_data = explode(' ', (string) $peer_data['bgpPeerLastError']);
                     $peer_data['bgpPeerLastErrorCode'] = intval($error_data[0]);
@@ -245,28 +245,91 @@ if (! empty($peers)) {
                 } elseif ($device['os'] == 'timos') {
                     if (! isset($bgpPeers)) {
                         $bgpPeers = [];
+                        // Unconditionally walk standard BGP4-MIB once per device as a fallback source.
+                        // This data supplements vendor MIB data when specific counters are missing.
+                        // Performance note: this adds one SNMP walk per device regardless of whether
+                        // the fallback data is ultimately needed.
+                        $bgp4Fallback = SnmpQuery::cache()->enumStrings()->walk('BGP4-MIB::bgpPeerEntry')->table();
                         foreach ($peer_data_check as $key => $value) {
                             $oid = explode('.', (string) $key);
-                            $vrfInstance = $oid[0];
-                            $address = implode('.', array_slice($oid, 3));
-                            if (strlen($address) > 15) {
-                                $address = IP::fromSnmpString($address)->compressed();
+                            // OID structure: vrfInstance.afi.length.ip[N]
+                            // - afi: Address Family Identifier (1=IPv4, 2=IPv6)
+                            // - length: Number of octets in the IP address
+                            // - ip[N]: The IP address as N decimal octets
+                            // IPv4: 7 parts total = 3 prefix parts + 4 IP octets
+                            // IPv6: 19 parts total = 3 prefix parts + 16 IP octets
+                            $oidCount = count($oid);
+                            $afi = isset($oid[1]) ? (int) $oid[1] : 0;
+                            $addressOctets = array_slice($oid, 3);
+                            $addressOctetCount = count($addressOctets);
+
+                            // Validate OID structure using both AFI and address length for robustness
+                            if ($oidCount == 7 && $afi == 1 && $addressOctetCount == 4) {
+                                // IPv4 address (AFI=1)
+                                $address = implode('.', $addressOctets);
+                            } elseif ($oidCount == 19 && $afi == 2 && $addressOctetCount == 16) {
+                                // IPv6 address (AFI=2) - convert from SNMP string format
+                                $address = IP::fromSnmpString(implode('.', $addressOctets))->compressed();
+                            } else {
+                                // Skip malformed or extended OIDs
+                                continue;
                             }
+
+                            $vrfInstance = $oid[0];
                             $bgpPeers[$vrfInstance][$address] = $value;
                         }
                     }
                     $address = (string) $peer_ip;
-                    $establishedTime = $bgpPeers[$vrfOid][$address]['TIMETRA-BGP-MIB::tBgpPeerNgLastChanged'] / 100;
+                    $peerData = $bgpPeers[$vrfOid][$address] ?? [];
+
+                    // Use tBgpPeerFsmEstablishedTime if available (already in seconds),
+                    // otherwise fall back to standard BGP4-MIB
+                    if (isset($peerData['TIMETRA-BGP-MIB::tBgpPeerFsmEstablishedTime'])) {
+                        $establishedTime = $peerData['TIMETRA-BGP-MIB::tBgpPeerFsmEstablishedTime'];
+                    } elseif (isset($bgp4Fallback[$address]['bgpPeerFsmEstablishedTime'])) {
+                        $establishedTime = $bgp4Fallback[$address]['bgpPeerFsmEstablishedTime'];
+                    } else {
+                        $establishedTime = 0;
+                    }
 
                     $peer_data = [];
-                    $peer_data['bgpPeerState'] = $bgpPeers[$vrfOid][$address]['TIMETRA-BGP-MIB::tBgpPeerNgConnState'];
-                    if ($bgpPeers[$vrfOid][$address]['TIMETRA-BGP-MIB::tBgpPeerNgShutdown'] == '1') {
+                    $peer_data['bgpPeerState'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgConnState'] ?? null;
+                    if (($peerData['TIMETRA-BGP-MIB::tBgpPeerNgShutdown'] ?? '') == '1') {
                         $peer_data['bgpPeerAdminStatus'] = 'adminShutdown';
                     } else {
-                        $peer_data['bgpPeerAdminStatus'] = $bgpPeers[$vrfOid][$address]['TIMETRA-BGP-MIB::tBgpPeerNgOperLastEvent'];
+                        $peer_data['bgpPeerAdminStatus'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperLastEvent'] ?? null;
                     }
-                    $peer_data['bgpPeerInTotalMessages'] = $bgpPeers[$vrfOid][$address]['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsRcvd'] % (2 ** 32);  // That are actually only octets available,
-                    $peer_data['bgpPeerOutTotalMessages'] = $bgpPeers[$vrfOid][$address]['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsSent'] % (2 ** 32); // not messages
+
+                    // Use proper message counters if available, fall back to octet counters
+                    if (isset($peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperInTotalMessages'])) {
+                        $peer_data['bgpPeerInTotalMessages'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperInTotalMessages'];
+                    } else {
+                        $peer_data['bgpPeerInTotalMessages'] = ($peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsRcvd'] ?? 0) % (2 ** 32);
+                    }
+                    if (isset($peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperOutTotalMessages'])) {
+                        $peer_data['bgpPeerOutTotalMessages'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperOutTotalMessages'];
+                    } else {
+                        $peer_data['bgpPeerOutTotalMessages'] = ($peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperMsgOctetsSent'] ?? 0) % (2 ** 32);
+                    }
+
+                    // Update counters - available in newer SROS releases
+                    $peer_data['bgpPeerInUpdates'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperInUpdates'] ?? null;
+                    $peer_data['bgpPeerOutUpdates'] = $peerData['TIMETRA-BGP-MIB::tBgpPeerNgOperOutUpdates'] ?? null;
+
+                    // Fallback to standard BGP4-MIB for older SROS releases that don't provide these counters
+                    if (empty($peer_data['bgpPeerInUpdates']) && isset($bgp4Fallback[$address]['bgpPeerInUpdates'])) {
+                        $peer_data['bgpPeerInUpdates'] = $bgp4Fallback[$address]['bgpPeerInUpdates'];
+                    }
+                    if (empty($peer_data['bgpPeerOutUpdates']) && isset($bgp4Fallback[$address]['bgpPeerOutUpdates'])) {
+                        $peer_data['bgpPeerOutUpdates'] = $bgp4Fallback[$address]['bgpPeerOutUpdates'];
+                    }
+                    if (empty($peer_data['bgpPeerInTotalMessages']) && isset($bgp4Fallback[$address]['bgpPeerInTotalMessages'])) {
+                        $peer_data['bgpPeerInTotalMessages'] = $bgp4Fallback[$address]['bgpPeerInTotalMessages'];
+                    }
+                    if (empty($peer_data['bgpPeerOutTotalMessages']) && isset($bgp4Fallback[$address]['bgpPeerOutTotalMessages'])) {
+                        $peer_data['bgpPeerOutTotalMessages'] = $bgp4Fallback[$address]['bgpPeerOutTotalMessages'];
+                    }
+
                     $peer_data['bgpPeerFsmEstablishedTime'] = $establishedTime;
                 } elseif ($device['os'] == 'firebrick') {
                     // ToDo, It seems that bgpPeer(In|Out)Updates and bgpPeerInUpdateElapsedTime are actually not available over SNMP
