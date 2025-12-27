@@ -402,6 +402,18 @@ function list_devices(Illuminate\Http\Request $request)
         $devices[] = $device;
     }
 
+    //only return requested columns
+    if ($request->has('columns')) {
+        $cols = explode(',', $request->get('columns'));
+        foreach ($devices as &$device) {
+            foreach ($device as $key => $value) {
+                if (! in_array($key, $cols)) {
+                    unset($device[$key]);
+                }
+            }
+        }
+    }
+
     return api_success($devices, 'devices');
 }
 
