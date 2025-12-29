@@ -4,6 +4,45 @@ type: power
 icon: vertiv
 group: vertiv
 mib_dir: vertiv
+discovery_modules:
+    applications: false
+    bgp-peers: false
+    cisco-vrf-lite: false
+    discovery-protocols: false
+    fdb-table: false
+    hr-device: false
+    mempools: false
+    mpls: false
+    ntp: false
+    ospf: false
+    ports-stack: false
+    printer-supplies: false
+    processors: false
+    services: false
+    storage: false
+    stp: false
+    ucd-diskio: false
+    vlans: false
+    wireless: false
+poller_modules:
+    applications: false
+    bgp-peers: false
+    fdb-table: false
+    hr-mib: false
+    ipSystemStats: false
+    mempools: false
+    netstats: false
+    ntp: false
+    ospf: false
+    ospfv3: false
+    printer-supplies: false
+    processors: false
+    storage: false
+    stp: false
+    ucd-diskio: false
+    ucd-mib: false
+    wireless: false
+    ipmi: false
 discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.13400.2.54
