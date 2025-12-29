@@ -4,6 +4,8 @@ type: environment
 icon: hwg
 mib_dir: hwg
 snmp_bulk: false
+over:
+    - { graph: device_state, text: States }
 discovery_modules:
     applications: false
     arp-table: false
