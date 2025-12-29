@@ -8,7 +8,7 @@
                     "sysDescr": "SampleDscription",
                     "sysContact": "<private>",
                     "version": "v3.2 Build 2023_0719_1007",
-                    "hardware": "EDS-4012-4GC ()",
+                    "hardware": "EDS-4012-4GC",
                     "features": null,
                     "location": "<private>",
                     "os": "moxa-eds-4000-series",
@@ -2451,37 +2451,5 @@
                 }
             ]
         }
-    },
-    "sensors": {
-        "discovery": {
-            "sensors": [
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "power",
-                    "poller_type": "snmp",
-                    "sensor_oid": ".1.3.6.1.4.1.8691.602.1.3.2.4.0",
-                    "sensor_index": "usStatPowerConsumption.0",
-                    "sensor_type": "moxa-eds-4000-series",
-                    "sensor_descr": "Power Consumption",
-                    "group": null,
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 7,
-                    "sensor_limit": 30,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": 0,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "rrd_type": "GAUGE",
-                    "state_name": null
-                }
-            ]
-        },
-        "poller": "matches discovery"
     }
 }
