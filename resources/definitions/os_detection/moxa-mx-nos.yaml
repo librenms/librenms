@@ -1,6 +1,6 @@
-os: moxa-eds-4000-series
+os: moxa-mx-nos
 icon: moxa
-text: Moxa-EDS-4000-Series
+text: 'MX-NOS'
 type: network
 mib_dir: moxa
 group: moxa
