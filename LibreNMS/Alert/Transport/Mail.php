@@ -27,6 +27,7 @@ namespace LibreNMS\Alert\Transport;
 use App\Facades\LibrenmsConfig;
 use Exception;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
@@ -42,6 +43,11 @@ class Mail extends Transport
             'role' => AlertUtil::findContactsRoles([$this->config['role']]),
             default => $this->config['email'] ?? $alert_data['contacts'] ?? [], // contacts is only used by legacy synthetic transport
         };
+
+        if (count($emails) == 0 && $this->config['ignore-no-emails']) {
+            Log::info('No e-mail contacts found', ['color' => true]);
+            return true;
+        }
 
         $html = LibrenmsConfig::get('email_html');
 
@@ -108,6 +114,13 @@ class Mail extends Transport
                     'descr' => 'Include graph image data in the email.  Will be embedded if html5, otherwise attached. Template must use @signedGraphTag',
                     'type' => 'checkbox',
                     'default' => true,
+                ],
+                [
+                    'title' => 'OK if no contacts',
+                    'name' => 'ignore-no-emails',
+                    'descr' => 'Enabling this option will avoid generating event logs if this transport does not find any e-mail addresses to send to.  This may be useful if you have this transport as part of a group, and do not want to generate event logs for devices that do not find a contact for this transport (e.g. contact type is owner or syscontact).',
+                    'type' => 'checkbox',
+                    'default' => false,
                 ],
             ],
             'validation' => [
