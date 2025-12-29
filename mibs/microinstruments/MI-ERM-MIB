@@ -1,0 +1,75 @@
+MI-ERM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, enterprises, Integer32
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC;
+
+microInstruments MODULE-IDENTITY
+    LAST-UPDATED "202412290000Z"
+    ORGANIZATION "Micro Instruments"
+    CONTACT-INFO "www.microinstruments.co.za"
+    DESCRIPTION "MIB for Micro Instruments Environmental Room Monitor"
+    ::= { enterprises 45501 }
+
+miErm OBJECT IDENTIFIER ::= { microInstruments 1 }
+miErmSensors OBJECT IDENTIFIER ::= { miErm 3 }
+
+miErmDcVoltage OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "DC Voltage in Volts"
+    ::= { miErmSensors 1 }
+
+miErmAcVoltage OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Main AC Voltage in Volts"
+    ::= { miErmSensors 2 }
+
+miErmSoc OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "State of Charge in percent"
+    ::= { miErmSensors 3 }
+
+miErmWatts OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Power in Watts (negative = discharging)"
+    ::= { miErmSensors 4 }
+
+miErmHumidity OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ambient Humidity in percent"
+    ::= { miErmSensors 5 }
+
+miErmTemperature OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ambient Temperature in Celsius"
+    ::= { miErmSensors 6 }
+
+miErmWater OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Water sensor status (0=Normal, 1=Water Detected)"
+    ::= { miErmSensors 9 }
+
+miErmSmoke OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Smoke sensor status (0=Normal, 1=Smoke Detected)"
+    ::= { miErmSensors 10 }
+
+END
