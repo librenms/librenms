@@ -14,15 +14,14 @@ discovery_modules:
     discovery-protocols: false
     fdb-table: false
     hr-device: false
-    ipv4-addresses: false
-    ipv6-addresses: false
     mempools: false
     ntp: false
+    mpls: false
+    ospf: false
     ports-stack: false
     ports: false
     printer-supplies: false
     processors: false
-    route: false
     services: false
     storage: false
     stp: false
@@ -38,6 +37,7 @@ poller_modules:
     ipmi: false
     mempools: false
     netstats: false
+    fdb-table: false
     ntp: false
     ospf: false
     ospfv3: false
