@@ -16,7 +16,6 @@ discovery_modules:
     hr-device: false
     ipv4-addresses: false
     ipv6-addresses: false
-    ipv6-nd: false
     mempools: false
     ntp: false
     ports-stack: false
