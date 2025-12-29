@@ -263,7 +263,11 @@ SdpInfoEntry                     ::= SEQUENCE
     sdpFpeLspId                      Unsigned32,
     sdpWeightedEcmpEnabled           TruthValue,
     sdpOperTunnelFarEndInetAddrType  InetAddressType,
-    sdpOperTunnelFarEndInetAddr      InetAddress
+    sdpOperTunnelFarEndInetAddr      InetAddress,
+    sdpOperBandwidthHi               Unsigned32,
+    sdpAvailableBandwidthHi          Unsigned32,
+    sdpMaxBookableBandwidthHi        Unsigned32,
+    sdpBookedBandwidthHi             Unsigned32
 }
 
 sdpId                            OBJECT-TYPE
@@ -1188,6 +1192,50 @@ sdpOperTunnelFarEndInetAddr      OBJECT-TYPE
          sdpFarEndInetAddress."
     ::= { sdpInfoEntry 73 }
 
+sdpOperBandwidthHi               OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpOperBandwidthHi indicates the upper 32-bits of
+         Bandwidth in kilobits per seconds (Kbps) available for this SDP. Lower
+         32-bits are indicated using sdpOperBandwidth object."
+    ::= { sdpInfoEntry 74 }
+
+sdpAvailableBandwidthHi          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpAvailableBandwidthHi indicates the upper 32-bits of
+         Bandwidth that is still free for booking by the SDP bindings on the
+         SDP. Lower 32-bits are indicated using sdpAvailableBandwidthHi object."
+    ::= { sdpInfoEntry 75 }
+
+sdpMaxBookableBandwidthHi        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpMaxBookableBandwidthHi indicates the upper 32-bits of
+         max Bandwidth that the SDP has for booking by the SDP bindings. Lower
+         32-bits are indicated using sdpMaxBookableBandwidth object."
+    ::= { sdpInfoEntry 76 }
+
+sdpBookedBandwidthHi             OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "kilobps"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBookedBandwidthHi indicates the upper 32-bits of SDP
+         Bandwidth that has been booked by the SDP bindings. Lower 32-bits are
+         indicated using sdpBookedBandwidth object."
+    ::= { sdpInfoEntry 77 }
+
 sdpBindTable                     OBJECT-TYPE
     SYNTAX      SEQUENCE OF SdpBindEntry
     MAX-ACCESS  not-accessible
@@ -1565,7 +1613,8 @@ sdpBindOperFlags                 OBJECT-TYPE
         evpnP2mpConflict        (30),
         labelStackLimitExceeded (31),
         vccvBfdDown             (32),
-        stitchingSvcPwFault     (33)
+        stitchingSvcPwFault     (33),
+        outOfAnySecResource     (34)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -1618,7 +1667,7 @@ sdpBindOperFlags                 OBJECT-TYPE
                                      faults status from peer.
          evpnRouteConflict      (28)  - EVPN has route to.
          adminLocked            (29)  - SDP Bind is admin-locked.
-         evpnP2mpConfict        (30)  - Conflict with evpn p2mp.
+         evpnP2mpConflict       (30)  - Conflict with evpn p2mp.
          labelStackLimitExceeded(31)  - label stack overhead exceeding the
                                      egress IOM limitation.
          vccvBfdDown(32) - vccv-bfd down
@@ -2754,7 +2803,18 @@ SdpBindTlsEntry                  ::= SEQUENCE
     sdpBindTlsRestProtSrcMacOper     TruthValue,
     sdpBindTlsRestProtSrcMacOperAct  INTEGER,
     sdpBindTlsAutoLrnMacPrtExcList   TNamedItemOrEmpty,
-    sdpBindTlsLastMgmtChange         TimeStamp
+    sdpBindTlsLastMgmtChange         TimeStamp,
+    sdpBindTlsDataMtSourceAddrType   InetAddressType,
+    sdpBindTlsDataMtSourceAddress    InetAddress,
+    sdpBindTlsDataMtGroupAddrType    InetAddressType,
+    sdpBindTlsDataMtGroupAddress     InetAddress,
+    sdpBindTlsProtMacAddressReceived MacAddress,
+    sdpBindTlsProtMacAddrRecLastChgd TimeStamp,
+    sdpBindTlsPbbProtectedMacAddrRec MacAddress,
+    sdpBindTlsPbbProtMacAddRecLstChg TimeStamp,
+    sdpBindTlsTableHighUtilization   TruthValue,
+    sdpBindTlsNonBlockMvRateXMacAddr MacAddress,
+    sdpBndTlsNoBlckMvRtXMacAddLstChg TimeStamp
 }
 
 sdpBindTlsStpAdminStatus         OBJECT-TYPE
@@ -3167,8 +3227,8 @@ sdpBindTlsStpException           OBJECT-TYPE
         "The value of the object sdpBindTlsStpException indicates whether an
          STP exception condition is present on this Spoke Sdp.
          - none : no exception condition found.
-         - oneWayCommuniation : The neighbor RSTP peer on this link
-                                is not able to detect our presence.
+         - oneWayCommunication : The neighbor RSTP peer on this link
+                                 is not able to detect our presence.
          - downstreamLoopDetected :A loop is detected on this link."
     ::= { sdpBindTlsEntry 36 }
 
@@ -3473,6 +3533,105 @@ sdpBindTlsLastMgmtChange         OBJECT-TYPE
          zero value."
     ::= { sdpBindTlsEntry 59 }
 
+sdpBindTlsDataMtSourceAddrType   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBindTlsDataMtSourceAddrType indicates the address type
+         of sdpBindTlsDataMtSourceAddress."
+    ::= { sdpBindTlsEntry 60 }
+
+sdpBindTlsDataMtSourceAddress    OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBindTlsDataMtSourceAddress indicates the source
+         address of a Multicast Tunnel that the sdp-bind is associated with."
+    ::= { sdpBindTlsEntry 61 }
+
+sdpBindTlsDataMtGroupAddrType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBindTlsDataMtGroupAddrType indicates the address type
+         of sdpBindTlsDataMtGroupAddress."
+    ::= { sdpBindTlsEntry 62 }
+
+sdpBindTlsDataMtGroupAddress     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBindTlsDataMtGroupAddress indicates the group address
+         of a Multicast Tunnel that the sdp-bind is associated with."
+    ::= { sdpBindTlsEntry 63 }
+
+sdpBindTlsProtMacAddressReceived OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sdpBindTlsProtMacAddressReceived specifies the protected MAC
+         address detected."
+    ::= { sdpBindTlsEntry 64 }
+
+sdpBindTlsProtMacAddrRecLastChgd OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBindTlsProtMacAddrRecLastChgd indicates the timestamp
+            of last change to sdpBindTlsProtMacAddressReceived."
+    ::= { sdpBindTlsEntry 65 }
+
+sdpBindTlsPbbProtectedMacAddrRec OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sdpBindTlsPbbProtectedMacAddrRec specifies the PBB MAC address
+         received."
+    ::= { sdpBindTlsEntry 66 }
+
+sdpBindTlsPbbProtMacAddRecLstChg OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBindTlsPbbProtMacAddRecLstChg indicates the timestamp
+            of last change to sdpBindTlsPbbProtectedMacAddrRec."
+    ::= { sdpBindTlsEntry 67 }
+
+sdpBindTlsTableHighUtilization   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sdpBindTlsTableHighUtilization specifies whether the utilization
+         of the MFIB table is high or low."
+    ::= { sdpBindTlsEntry 68 }
+
+sdpBindTlsNonBlockMvRateXMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sdpBindTlsNonBlockMvRateXMacAddr specifies the non-blocking
+         exceeded MAC address received."
+    ::= { sdpBindTlsEntry 69 }
+
+sdpBndTlsNoBlckMvRtXMacAddLstChg OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBndTlsNoBlckMvRtXMacAddLstChg indicates the timestamp
+            of last change to sdpBindTlsNonBlockMvRateXMacAddr."
+    ::= { sdpBindTlsEntry 70 }
+
 sdpBindMeshTlsTable              OBJECT-TYPE
     SYNTAX      SEQUENCE OF SdpBindMeshTlsEntry
     MAX-ACCESS  not-accessible
@@ -3663,7 +3822,7 @@ sdpBindMeshTlsAutLrnMacPrtExcLs  OBJECT-TYPE
 sdpBindApipeTable                OBJECT-TYPE
     SYNTAX      SEQUENCE OF SdpBindApipeEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The sdpBindApipeTable has an entry for each apipe sdpBind configured
          on this system."
@@ -3672,7 +3831,7 @@ sdpBindApipeTable                OBJECT-TYPE
 sdpBindApipeEntry                OBJECT-TYPE
     SYNTAX      SdpBindApipeEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "Each row entry represents a particular sdpBind related to a particular
          Apipe service entry. Entries are created/deleted by the user."
@@ -3695,7 +3854,7 @@ SdpBindApipeEntry                ::= SEQUENCE
 sdpBindApipeAdminConcatCellCount OBJECT-TYPE
     SYNTAX      Integer32 (1..128)
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sdpBindApipeAdminConcatCellCount specifies
          the maximum number of ATM cells to accumulate
@@ -3711,7 +3870,7 @@ sdpBindApipeAdminConcatCellCount OBJECT-TYPE
 sdpBindApipeSigConcatCellCount   OBJECT-TYPE
     SYNTAX      Integer32 (0..128)
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sdpBindApipeSigConcatCellCount indicates the
          maximum number of concatenated ATM cells the remote peer
@@ -3723,7 +3882,7 @@ sdpBindApipeSigConcatCellCount   OBJECT-TYPE
 sdpBindApipeOperConcatCellCount  OBJECT-TYPE
     SYNTAX      Integer32 (1..128)
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sdpBindApipeOperConcatCellCount indicates the maximum
          number of concatenated ATM cells that will be sent on this SDP
@@ -3734,7 +3893,7 @@ sdpBindApipeConcatMaxDelay       OBJECT-TYPE
     SYNTAX      Integer32 (1..400)
     UNITS       "hundreds of microseconds"
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sdpBindApipeConcatMaxDelay object specifies
          the maximum amount of time to wait while
@@ -3751,7 +3910,7 @@ sdpBindApipeConcatMaxDelay       OBJECT-TYPE
 sdpBindApipeConcatCellClp        OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sdpBindApipeConcatCellClp specifies whether a CLP change
          should be used as an indication to complete the cell concatenation
@@ -3763,7 +3922,7 @@ sdpBindApipeConcatCellClp        OBJECT-TYPE
 sdpBindApipeConcatCellAal5Fr     OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of sdpBindApipeConcatCellAal5Fr specifies whether the AAL5
          EOP (end of packet) should be used as an indication to complete the
@@ -5038,7 +5197,8 @@ PwTemplateEntry                  ::= SEQUENCE
     pwTemplateEgressIpFilterName     TLNamedItemOrEmpty,
     pwTemplateEgressIpv6FilterName   TLNamedItemOrEmpty,
     pwTemplateEgressMacFilterName    TLNamedItemOrEmpty,
-    pwTemplateForceQinqVcFwding      INTEGER
+    pwTemplateForceQinqVcFwding      INTEGER,
+    pwTemplatePathMtu                Integer32
 }
 
 pwTemplateId                     OBJECT-TYPE
@@ -5920,6 +6080,19 @@ pwTemplateForceQinqVcFwding      OBJECT-TYPE
          The pwTemplateVcType should be either set to 'ether' or 'vlan'."
     DEFVAL      { none }
     ::= { pwTemplateEntry 77 }
+
+pwTemplatePathMtu                OBJECT-TYPE
+    SYNTAX      Integer32 (0 | 576..9782)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the desired largest service frame size (in
+         octets) that can be transmitted through this pw-template to the
+         far-end ESR, without requiring the packet to be fragmented. The
+         default value of zero indicates that the path MTU should be computed
+         dynamically from the corresponding MTU of the tunnel."
+    DEFVAL      { 0 }
+    ::= { pwTemplateEntry 78 }
 
 pwTemplateIgmpSnpgGrpSrcTblLC    OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -6919,8 +7092,8 @@ sdpAtBndBgp129Type2TaiiGlobalId  OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of sdpAtBndBgp129Type2TaiiGlobalId indicates the global
-         identifier of Taget Attachment Individual Identifier (TAII) portion of
-         the Generalized Id FEC element as used by this multi-segment
+         identifier of Target Attachment Individual Identifier (TAII) portion
+         of the Generalized Id FEC element as used by this multi-segment
          pseudo-wire provider-edge in this service."
     ::= { sdpAtBndBgp129Type2Entry 5 }
 
@@ -6930,7 +7103,7 @@ sdpAtBndBgp129Type2TaiiPrefix    OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of sdpAtBndBgp129Type2TaiiPrefix indicates the prefix to the
-         Taget Attachment Individual Identifier (TAII) portion of the
+         Target Attachment Individual Identifier (TAII) portion of the
          Generalized Id FEC element as used by this multi-segment pseudo-wire
          provider-edge in this service."
     ::= { sdpAtBndBgp129Type2Entry 6 }
@@ -6941,7 +7114,7 @@ sdpAtBndBgp129Type2TaiiAcId      OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of sdpAtBndBgp129Type2TaiiAcId indicates the attachment
-         circuit identifier part of Taget Attachment Individual Identifier
+         circuit identifier part of Target Attachment Individual Identifier
          (TAII) portion of the Generalized Id FEC element as used by this
          multi-segment pseudo-wire provider-edge in this service."
     ::= { sdpAtBndBgp129Type2Entry 7 }
@@ -7542,7 +7715,7 @@ sdpPwPortEntropyLabel            OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The sdpPwPortEntropyLabel specifies whether the use of the
-         entropy-lable is preferred or not."
+         entropy-label is preferred or not."
     DEFVAL      { false }
     ::= { sdpPwPortEntry 18 }
 
@@ -8652,8 +8825,8 @@ sdpBindPwAdminLockEntry          OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "Each entry represents an active SDP binding adminstrative lock
-         operation. The SDP binding is placed in adminstrative lock by row
+        "Each entry represents an active SDP binding administrative lock
+         operation. The SDP binding is placed in administrative lock by row
          creation and is removed by row destruction.
 
          Rows in table sdpBindPwAdminLockTable are created and destroyed by
@@ -9120,7 +9293,10 @@ SdpBindExtEntry                  ::= SEQUENCE
     sdpBindExtBfdFailAction          INTEGER,
     sdpBindExtBfdSessStatOperState   TmnxBfdSessOperState,
     sdpBindExtBfdWaitForUpTimer      Unsigned32,
-    sdpBindExtBfdUpTimeRemain        Integer32
+    sdpBindExtBfdUpTimeRemain        Integer32,
+    sdpBindExtAnySecEncGrp           TNamedItemOrEmpty,
+    sdpBindExtAnySecEncGrpId         Unsigned32,
+    sdpBindExtAnySecEgrVcIndex       Unsigned32
 }
 
 sdpBindExtEntropyLabel           OBJECT-TYPE
@@ -9182,6 +9358,34 @@ sdpBindExtBfdUpTimeRemain        OBJECT-TYPE
     DESCRIPTION
         "The value of sdpBindExtBfdUpTimeRemain indicates the remaining uptime."
     ::= { sdpBindExtEntry 6 }
+
+sdpBindExtAnySecEncGrp           OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The sdpBindExtAnySecEncGrp specifies the name of ANY-SEC encryption
+         group for this service."
+    DEFVAL      { "" }
+    ::= { sdpBindExtEntry 7 }
+
+sdpBindExtAnySecEncGrpId         OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sdpBindExtAnySecEncGrpId indicates the ANY-SEC encryption group
+         operational identifier for this service."
+    ::= { sdpBindExtEntry 8 }
+
+sdpBindExtAnySecEgrVcIndex       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sdpBindExtAnySecEgrVcIndex indicates the ANY-SEC encryption group
+         operational VC identifier for this service."
+    ::= { sdpBindExtEntry 9 }
 
 sdpSegRouteTeLspTableLastChgd    OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -10552,7 +10756,6 @@ tmnxSdp7750V15v0Compliance       MODULE-COMPLIANCE
             tmnxSdpBindTlsV6v0Group,
             tmnxSdpBindTlsV8v0Group,
             tmnxSdpBindMeshV6v0Group,
-            tmnxSdpApipeV6v0Group,
             tmnxSdpBindDhcpV6v0Group,
             tmnxSdpBindDhcpV11v0Group,
             tmnxSdpBindTlsL2ptV6v0Group,
@@ -10790,6 +10993,44 @@ tmnxSdpV21v0Compliance           MODULE-COMPLIANCE
         }
     ::= { tmnxSdpCompliances 34 }
 
+tmnxSdpV22v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of service SDPs on Nokia SROS
+         series systems release 22.0"
+    MODULE
+        MANDATORY-GROUPS {
+            sdpDataMtV22v0Group,
+            tmnxSdpBgpVplsV22v0Group,
+            tmnxSdpBgpVpwsV22v0Group,
+            tmnxSdpBwGroup,
+            tmnxSdpBwNotifyObjsGroup
+        }
+    ::= { tmnxSdpCompliances 35 }
+
+tmnxSdpV24v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of service SDPs on Nokia SROS
+         series systems release 24.0"
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxPwTemplateV24v0Group
+        }
+    ::= { tmnxSdpCompliances 36 }
+
+tmnxSdpV25v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of service SDPs on Nokia SROS
+         series systems release 25.0"
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxSdpBindAnySecGroup,
+            tmnxSdpBindTlsMacAddrV25v0Group
+        }
+    ::= { tmnxSdpCompliances 37 }
+
 tmnxSdpGroups                    OBJECT IDENTIFIER ::= { tmnxSdpConformance 2 }
 
 tmnxSdpV6v0Group                 OBJECT-GROUP
@@ -10981,7 +11222,7 @@ tmnxSdpApipeV6v0Group            OBJECT-GROUP
         sdpBindApipeConcatCellClp,
         sdpBindApipeConcatCellAal5Fr
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The  group  of objects supporting SDP APipe feature
          on Nokia SROS series systems."
@@ -11372,7 +11613,7 @@ tmnxSdpEvalPwTempV7v0Group       OBJECT-GROUP
     }
     STATUS      current
     DESCRIPTION
-        "The  group  of objects supporting evaluating pseudowite template
+        "The  group  of objects supporting evaluating pseudowire template
          on Nokia SROS series systems in release 7.0."
     ::= { tmnxSdpGroups 120 }
 
@@ -12960,6 +13201,116 @@ sdpPwPortSvcMtuV21v0Group        OBJECT-GROUP
          series systems release 21.0."
     ::= { tmnxSdpGroups 576 }
 
+sdpDataMtV22v0Group              OBJECT-GROUP
+    OBJECTS     {
+        sdpBindTlsDataMtSourceAddrType,
+        sdpBindTlsDataMtSourceAddress,
+        sdpBindTlsDataMtGroupAddrType,
+        sdpBindTlsDataMtGroupAddress
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the data multicast tunnel objects on
+         Nokia SROS series systems release 22.0."
+    ::= { tmnxSdpGroups 577 }
+
+tmnxSdpBgpVplsV22v0Group         OBJECT-GROUP
+    OBJECTS     {
+        svcL2BgpVplsRteSendFlowLabel,
+        svcL2BgpVplsRteReceiveFlowLabel
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting SDP specific BGP VPLS feature on Nokia
+         SROS series systems release 22.0."
+    ::= { tmnxSdpGroups 578 }
+
+tmnxSdpBgpVpwsV22v0Group         OBJECT-GROUP
+    OBJECTS     {
+        svcL2BgpVpwsRteSendFlowLabel,
+        svcL2BgpVpwsRteReceiveFlowLabel
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting SDP specific BGP VPLS feature on Nokia
+         SROS series systems release 22.0."
+    ::= { tmnxSdpGroups 579 }
+
+tmnxSdpApipeObsoleteGroup        OBJECT-GROUP
+    OBJECTS     {
+        sdpBindApipeAdminConcatCellCount,
+        sdpBindApipeSigConcatCellCount,
+        sdpBindApipeOperConcatCellCount,
+        sdpBindApipeConcatMaxDelay,
+        sdpBindApipeConcatCellClp,
+        sdpBindApipeConcatCellAal5Fr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The  group  of objects supporting SDP APipe feature
+         on Nokia SROS series systems."
+    ::= { tmnxSdpGroups 581 }
+
+tmnxPwTemplateV24v0Group         OBJECT-GROUP
+    OBJECTS     {
+        pwTemplatePathMtu
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting PW-Template feature on Nokia SROS
+         series systems release 24.0"
+    ::= { tmnxSdpGroups 582 }
+
+tmnxSdpBwGroup                   OBJECT-GROUP
+    OBJECTS     {
+        sdpOperBandwidthHi,
+        sdpAvailableBandwidthHi
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting larger SDP bandwidth objects in Nokia
+         SROS series systems"
+    ::= { tmnxSdpGroups 583 }
+
+tmnxSdpBwNotifyObjsGroup         OBJECT-GROUP
+    OBJECTS     {
+        sdpMaxBookableBandwidthHi,
+        sdpBookedBandwidthHi
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting larger SDP bandwidth objects in Nokia
+         SROS series systems"
+    ::= { tmnxSdpGroups 584 }
+
+tmnxSdpBindAnySecGroup           OBJECT-GROUP
+    OBJECTS     {
+        sdpBindExtAnySecEncGrp,
+        sdpBindExtAnySecEncGrpId,
+        sdpBindExtAnySecEgrVcIndex
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting ANY-SEC encryption group Nokia SROS
+         series systems"
+    ::= { tmnxSdpGroups 585 }
+
+tmnxSdpBindTlsMacAddrV25v0Group  OBJECT-GROUP
+    OBJECTS     {
+        sdpBindTlsProtMacAddressReceived,
+        sdpBindTlsProtMacAddrRecLastChgd,
+        sdpBindTlsPbbProtectedMacAddrRec,
+        sdpBindTlsPbbProtMacAddRecLstChg,
+        sdpBindTlsTableHighUtilization,
+        sdpBindTlsNonBlockMvRateXMacAddr,
+        sdpBndTlsNoBlckMvRtXMacAddLstChg
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting MAC address on-change support in Nokia
+         SROS series systems release 25.0."
+    ::= { tmnxSdpGroups 586 }
+
 sdpTrapsPrefix                   OBJECT IDENTIFIER ::= { tmnxServNotifications 4 }
 
 sdpTraps                         OBJECT IDENTIFIER ::= { sdpTrapsPrefix 0 }
@@ -13284,7 +13635,9 @@ sdpBandwidthOverbooked           NOTIFICATION-TYPE
     OBJECTS     {
         sdpId,
         sdpMaxBookableBandwidth,
-        sdpBookedBandwidth
+        sdpBookedBandwidth,
+        sdpMaxBookableBandwidthHi,
+        sdpBookedBandwidthHi
     }
     STATUS      current
     DESCRIPTION
@@ -14144,7 +14497,9 @@ SvcL2BgpVplsRteEntry             ::= SEQUENCE
     svcL2BgpVplsRteState             INTEGER,
     svcL2BgpVplsRteSeqDelivery       Unsigned32,
     svcL2BgpVplsRteDF                TruthValue,
-    svcL2BgpVplsRteStatus            INTEGER
+    svcL2BgpVplsRteStatus            INTEGER,
+    svcL2BgpVplsRteSendFlowLabel     Unsigned32,
+    svcL2BgpVplsRteReceiveFlowLabel  Unsigned32
 }
 
 svcL2BgpVplsRteVeId              OBJECT-TYPE
@@ -14296,6 +14651,24 @@ svcL2BgpVplsRteStatus            OBJECT-TYPE
         "The value of svcL2BgpVplsRteStatus indicates the status of the this
          BGP VPLS L2 Route."
     ::= { svcL2BgpVplsRteEntry 14 }
+
+svcL2BgpVplsRteSendFlowLabel     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcL2BgpVplsRteSendFlowLabel indicates the  T-bit
+         advertised for this route."
+    ::= { svcL2BgpVplsRteEntry 15 }
+
+svcL2BgpVplsRteReceiveFlowLabel  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcL2BgpVplsRteReceiveFlowLabel indicates the  R-bit
+         advertised for this route."
+    ::= { svcL2BgpVplsRteEntry 16 }
 
 svcVllBgpADPWTempBindTblLC       OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -14513,7 +14886,9 @@ SvcL2BgpVpwsRteEntry             ::= SEQUENCE
     svcL2BgpVpwsRteStatus            INTEGER,
     svcL2BgpVpwsRteCsv               Unsigned32,
     svcL2BgpVpwsRteTxStatus          INTEGER,
-    svcL2BgpVpwsRtePreference        Unsigned32
+    svcL2BgpVpwsRtePreference        Unsigned32,
+    svcL2BgpVpwsRteSendFlowLabel     Unsigned32,
+    svcL2BgpVpwsRteReceiveFlowLabel  Unsigned32
 }
 
 svcL2BgpVpwsRteVeId              OBJECT-TYPE
@@ -14686,5 +15061,23 @@ svcL2BgpVpwsRtePreference        OBJECT-TYPE
         "The value of svcL2BgpVpwsRtePreference indicates the preference value
          for this route."
     ::= { svcL2BgpVpwsRteEntry 16 }
+
+svcL2BgpVpwsRteSendFlowLabel     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcL2BgpVpwsRteSendFlowLabel indicates the  T-bit
+         advertised for this route."
+    ::= { svcL2BgpVpwsRteEntry 17 }
+
+svcL2BgpVpwsRteReceiveFlowLabel  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcL2BgpVpwsRteReceiveFlowLabel indicates the  R-bit
+         advertised for this route."
+    ::= { svcL2BgpVpwsRteEntry 18 }
 
 END

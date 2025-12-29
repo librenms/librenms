@@ -132,7 +132,7 @@
         init_select2('#graph_customoid-{{ $id }}', 'customoid', {limit: 100}, '{{ $graph_customoid ?: '' }}');
         init_select2('#graph_bill-{{ $id }}', 'bill', {limit: 100}, '{{ $graph_bill ?: '' }}');
         init_select2('#graph_custom-{{ $id }}', 'graph-aggregate', {}, false);
-        init_select2('#graph_ports-{{ $id }}', 'port', {limit: 100}, {{ $graph_port_ids }});
+        init_select2('#graph_ports-{{ $id }}', 'port', {limit: 100}, false);
 
         function switch_graph_type{{ $id }}(data) {
             $('.graph_select_extra-{{ $id }}').hide();
