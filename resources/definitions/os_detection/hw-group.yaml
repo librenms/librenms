@@ -1,9 +1,0 @@
-os: hw-group
-text: 'HW-Group'
-type: appliance
-icon: hw-group
-mib_dir: hw-group
-discovery:
-    -
-        sysObjectID:
-            - .1.3.6.1.4.1.21796.5.1
