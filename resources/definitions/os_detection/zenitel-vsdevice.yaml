@@ -1,5 +1,5 @@
-os: zenitel
-text: 'Zenitel'
+os: zenitel-vsdevice
+text: 'VS Device'
 type: appliance
 icon: zenitel
 mib_dir: zenitel
