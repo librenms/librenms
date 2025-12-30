@@ -79,7 +79,12 @@ class GraphController extends WidgetController
 
             return ($device ? $device->displayName() : 'Device') . ' / ' . $settings['graph_type'];
         } elseif ($type == 'aggregate') {
-            return 'Overall ' . $this->getGraphType(false) . ' Bits (' . $settings['graph_range'] . ')';
+            $aggregate_type = $this->getGraphType(false);
+            if ($aggregate_type == 'ports') {
+                return 'Overall ' . $this->getGraphType(false) . ' Bits (' . $settings['graph_range'] . ')';
+            } else {
+                return 'Overall ' . $this->getGraphType(false) . ' Aggregate (' . $settings['graph_range'] . ')';
+            }
         } elseif ($type == 'port') {
             if ($port = Port::find($settings['graph_port'])) {
                 return $port->device->displayName() . ' / ' . $port->getShortLabel() . ' / ' . $settings['graph_type'];
