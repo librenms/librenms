@@ -26,8 +26,8 @@ namespace LibreNMS\Alert\Transport;
 
 use App\Facades\LibrenmsConfig;
 use Exception;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
@@ -46,6 +46,7 @@ class Mail extends Transport
 
         if (count($emails) == 0 && $this->config['ignore-no-emails']) {
             Log::info('No e-mail contacts found', ['color' => true]);
+
             return true;
         }
 
