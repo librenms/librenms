@@ -1,0 +1,22 @@
+os: victron
+text: 'Victron Energy GX'
+type: power
+icon: victron
+group: victron
+mib_dir: victron
+over:
+    - { graph: device_current, text: Current }
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_power, text: Power }
+    - { graph: device_charge, text: Battery }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.41312
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1
+        snmpget:
+            oid: .1.3.6.1.4.1.41312.1.7.1.0
+            op: '!='
+            value: false

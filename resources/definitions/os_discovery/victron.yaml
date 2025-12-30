@@ -1,0 +1,257 @@
+mib: VICTRON-MIB
+modules:
+    sensors:
+        # AC Input/Output Frequency
+        frequency:
+            data:
+                -
+                    oid: acInL1Frequency
+                    num_oid: '.1.3.6.1.4.1.41312.1.1.2.{{ $index }}'
+                    descr: 'AC Input L1 Frequency'
+                    index: '0'
+                    divisor: 100
+                -
+                    oid: acOutL1Frequency
+                    num_oid: '.1.3.6.1.4.1.41312.1.2.1.{{ $index }}'
+                    descr: 'AC Output L1 Frequency'
+                    index: '0'
+                    divisor: 100
+
+        # AC Input/Output and Battery Current
+        current:
+            data:
+                -
+                    oid: acInL1Current
+                    num_oid: '.1.3.6.1.4.1.41312.1.1.3.{{ $index }}'
+                    descr: 'AC Input L1 Current'
+                    index: '0'
+                    divisor: 100
+                -
+                    oid: acOutL1Current
+                    num_oid: '.1.3.6.1.4.1.41312.1.2.2.{{ $index }}'
+                    descr: 'AC Output L1 Current'
+                    index: '0'
+                    divisor: 100
+                -
+                    oid: dcCurrent
+                    num_oid: '.1.3.6.1.4.1.41312.1.4.1.{{ $index }}'
+                    descr: 'Battery Current'
+                    index: '0'
+                    divisor: 100
+
+        # Voltage sensors
+        voltage:
+            data:
+                -
+                    oid: acInL1Voltage
+                    num_oid: '.1.3.6.1.4.1.41312.1.1.4.{{ $index }}'
+                    descr: 'AC Input L1 Voltage'
+                    index: '0'
+                    divisor: 100
+                -
+                    oid: acOutL1Voltage
+                    num_oid: '.1.3.6.1.4.1.41312.1.2.3.{{ $index }}'
+                    descr: 'AC Output L1 Voltage'
+                    index: '0'
+                    divisor: 100
+                -
+                    oid: dcVoltage
+                    num_oid: '.1.3.6.1.4.1.41312.1.4.5.{{ $index }}'
+                    descr: 'Battery Voltage'
+                    index: '0'
+                    divisor: 100
+                -
+                    oid: dcRippleVoltage
+                    num_oid: '.1.3.6.1.4.1.41312.1.4.3.{{ $index }}'
+                    descr: 'Battery Ripple Voltage'
+                    index: '0'
+                    divisor: 1000
+                -
+                    oid: pvVoltage
+                    num_oid: '.1.3.6.1.4.1.41312.1.6.5.{{ $index }}'
+                    descr: 'PV Tracker {{ $index }} Voltage'
+                    index: 'pvVoltage.{{ $index }}'
+                    divisor: 100
+
+        # Power sensors
+        power:
+            data:
+                -
+                    oid: acInL1Power
+                    num_oid: '.1.3.6.1.4.1.41312.1.1.5.{{ $index }}'
+                    descr: 'AC Input L1 Power'
+                    index: '0'
+                -
+                    oid: acOutL1Power
+                    num_oid: '.1.3.6.1.4.1.41312.1.2.4.{{ $index }}'
+                    descr: 'AC Output L1 Power'
+                    index: '0'
+                -
+                    oid: acOutL1NominalPower
+                    num_oid: '.1.3.6.1.4.1.41312.1.2.5.{{ $index }}'
+                    descr: 'Inverter Nominal Power'
+                    index: '0'
+                -
+                    oid: dcPower
+                    num_oid: '.1.3.6.1.4.1.41312.1.4.2.{{ $index }}'
+                    descr: 'Battery Power'
+                    index: '0'
+                -
+                    oid: systemYieldPower
+                    num_oid: '.1.3.6.1.4.1.41312.1.7.4.{{ $index }}'
+                    descr: 'Solar Yield Power'
+                    index: '0'
+                    divisor: 100
+                -
+                    oid: pvPower
+                    num_oid: '.1.3.6.1.4.1.41312.1.6.4.{{ $index }}'
+                    descr: 'PV Tracker {{ $index }} Power'
+                    index: 'pvPower.{{ $index }}'
+                    divisor: 100
+
+        # Battery Temperature
+        temperature:
+            data:
+                -
+                    oid: dcTemperature
+                    num_oid: '.1.3.6.1.4.1.41312.1.4.4.{{ $index }}'
+                    descr: 'Battery Temperature'
+                    index: '0'
+                    divisor: 10
+
+        # State of Charge
+        charge:
+            data:
+                -
+                    oid: systemSoc
+                    num_oid: '.1.3.6.1.4.1.41312.1.7.1.{{ $index }}'
+                    descr: 'State of Charge'
+                    index: '0'
+                    low_limit: 20
+                    low_warn_limit: 30
+
+        # Runtime (Time to empty)
+        runtime:
+            data:
+                -
+                    oid: systemTimeToGo
+                    num_oid: '.1.3.6.1.4.1.41312.1.7.3.{{ $index }}'
+                    descr: 'Time to Empty'
+                    index: '0'
+                    divisor: 60
+
+        # State sensors (System state and alarms)
+        state:
+            data:
+                # System State
+                -
+                    oid: systemState
+                    num_oid: '.1.3.6.1.4.1.41312.1.7.2.{{ $index }}'
+                    descr: 'System State'
+                    index: '0'
+                    state_name: victronSystemState
+                    states:
+                        - { value: 0, generic: 3, graph: 1, descr: 'Off' }
+                        - { value: 1, generic: 1, graph: 1, descr: 'Low Power' }
+                        - { value: 2, generic: 2, graph: 1, descr: 'Fault' }
+                        - { value: 3, generic: 0, graph: 1, descr: 'Bulk' }
+                        - { value: 4, generic: 0, graph: 1, descr: 'Absorption' }
+                        - { value: 5, generic: 0, graph: 1, descr: 'Float' }
+                        - { value: 6, generic: 0, graph: 1, descr: 'Storage' }
+                        - { value: 7, generic: 0, graph: 1, descr: 'Equalize' }
+                        - { value: 8, generic: 0, graph: 1, descr: 'Passthru' }
+                        - { value: 9, generic: 0, graph: 1, descr: 'Inverting' }
+                        - { value: 10, generic: 0, graph: 1, descr: 'Power Assist' }
+                        - { value: 11, generic: 0, graph: 1, descr: 'Power Supply' }
+                        - { value: 252, generic: 1, graph: 1, descr: 'Bulk Protection' }
+                # Alarms
+                -
+                    oid: alarmGridLost
+                    num_oid: '.1.3.6.1.4.1.41312.1.3.2.{{ $index }}'
+                    descr: 'Grid Lost'
+                    index: '0'
+                    state_name: victronAlarm
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 'OK' }
+                        - { value: 1, generic: 1, graph: 1, descr: 'Warning' }
+                        - { value: 2, generic: 2, graph: 1, descr: 'Alarm' }
+                -
+                    oid: alarmHighTemperature
+                    num_oid: '.1.3.6.1.4.1.41312.1.3.3.{{ $index }}'
+                    descr: 'High Temperature'
+                    index: '0'
+                    state_name: victronAlarm
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 'OK' }
+                        - { value: 1, generic: 1, graph: 1, descr: 'Warning' }
+                        - { value: 2, generic: 2, graph: 1, descr: 'Alarm' }
+                -
+                    oid: alarmHighVoltage
+                    num_oid: '.1.3.6.1.4.1.41312.1.3.4.{{ $index }}'
+                    descr: 'High Battery Voltage'
+                    index: '0'
+                    state_name: victronAlarm
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 'OK' }
+                        - { value: 1, generic: 1, graph: 1, descr: 'Warning' }
+                        - { value: 2, generic: 2, graph: 1, descr: 'Alarm' }
+                -
+                    oid: alarmHighVoltageAcOut
+                    num_oid: '.1.3.6.1.4.1.41312.1.3.5.{{ $index }}'
+                    descr: 'High AC Output Voltage'
+                    index: '0'
+                    state_name: victronAlarm
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 'OK' }
+                        - { value: 1, generic: 1, graph: 1, descr: 'Warning' }
+                        - { value: 2, generic: 2, graph: 1, descr: 'Alarm' }
+                -
+                    oid: alarmLowSoc
+                    num_oid: '.1.3.6.1.4.1.41312.1.3.6.{{ $index }}'
+                    descr: 'Low State of Charge'
+                    index: '0'
+                    state_name: victronAlarm
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 'OK' }
+                        - { value: 1, generic: 1, graph: 1, descr: 'Warning' }
+                        - { value: 2, generic: 2, graph: 1, descr: 'Alarm' }
+                -
+                    oid: alarmLowVoltage
+                    num_oid: '.1.3.6.1.4.1.41312.1.3.7.{{ $index }}'
+                    descr: 'Low Battery Voltage'
+                    index: '0'
+                    state_name: victronAlarm
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 'OK' }
+                        - { value: 1, generic: 1, graph: 1, descr: 'Warning' }
+                        - { value: 2, generic: 2, graph: 1, descr: 'Alarm' }
+                -
+                    oid: alarmLowVoltageAcOut
+                    num_oid: '.1.3.6.1.4.1.41312.1.3.8.{{ $index }}'
+                    descr: 'Low AC Output Voltage'
+                    index: '0'
+                    state_name: victronAlarm
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 'OK' }
+                        - { value: 1, generic: 1, graph: 1, descr: 'Warning' }
+                        - { value: 2, generic: 2, graph: 1, descr: 'Alarm' }
+                -
+                    oid: alarmOverload
+                    num_oid: '.1.3.6.1.4.1.41312.1.3.9.{{ $index }}'
+                    descr: 'Overload'
+                    index: '0'
+                    state_name: victronAlarm
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 'OK' }
+                        - { value: 1, generic: 1, graph: 1, descr: 'Warning' }
+                        - { value: 2, generic: 2, graph: 1, descr: 'Alarm' }
+                -
+                    oid: alarmShortCircuit
+                    num_oid: '.1.3.6.1.4.1.41312.1.3.12.{{ $index }}'
+                    descr: 'Short Circuit'
+                    index: '0'
+                    state_name: victronAlarm
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 'OK' }
+                        - { value: 1, generic: 1, graph: 1, descr: 'Warning' }
+                        - { value: 2, generic: 2, graph: 1, descr: 'Alarm' }
