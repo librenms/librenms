@@ -1,167 +1,166 @@
-mib: AX-SMI-MIB:AX3630S:AX2430S:AX1230S:AX6300S:AX1240S:AX260A:AX2530S:AX3660S:AX4630S:AX7800S:AX7800R:AX2000R
 modules:
     sensors:
         temperature:
             data:
                 -
-                    oid: ax3630sTemperatureStatusTable
-                    value: ax3630sTemperatureStatusValue
+                    oid: AX3630S::ax3630sTemperatureStatusTable
+                    value: AX3630S::ax3630sTemperatureStatusValue
                     num_oid: '.1.3.6.1.4.1.21839.2.2.7.2.1.3.1.3.{{ $index }}'
                     index: 'ax3630sTemperatureStatusValue.{{ $index }}'
-                    descr: ax3630sTemperatureStatusDescr
+                    descr: AX3630S::ax3630sTemperatureStatusDescr
                     group: 'Chassis'
                 -
-                    oid: ax3640sTemperatureStatusTable
-                    value: ax3640sTemperatureStatusValue
+                    oid: AX3630S::ax3640sTemperatureStatusTable
+                    value: AX3630S::ax3640sTemperatureStatusValue
                     num_oid: '.1.3.6.1.4.1.21839.2.2.11.2.1.3.1.3.{{ $index }}'
                     index: 'ax3640sTemperatureStatusValue.{{ $index }}'
-                    descr: ax3640sTemperatureStatusDescr
+                    descr: AX3630S::ax3640sTemperatureStatusDescr
                     group: 'Chassis'
                 -
-                    oid: ax3650sTemperatureStatusTable
-                    value: ax3650sTemperatureStatusValue
+                    oid: AX3630S::ax3650sTemperatureStatusTable
+                    value: AX3630S::ax3650sTemperatureStatusValue
                     num_oid: '.1.3.6.1.4.1.21839.2.2.15.2.1.3.1.3.{{ $index }}'
                     index: 'ax3650sTemperatureStatusValue.{{ $index }}'
-                    descr: ax3650sTemperatureStatusDescr
+                    descr: AX3630S::ax3650sTemperatureStatusDescr
                     group: 'Chassis'
                 -
-                    oid: ax3830sTemperatureStatusTable
-                    value: ax3830sTemperatureStatusValue
+                    oid: AX3630S::ax3830sTemperatureStatusTable
+                    value: AX3630S::ax3830sTemperatureStatusValue
                     num_oid: '.1.3.6.1.4.1.21839.2.2.17.2.1.3.1.3.{{ $index }}'
                     index: 'ax3830sTemperatureStatusValue.{{ $index }}'
-                    descr: ax3830sTemperatureStatusDescr
+                    descr: AX3630S::ax3830sTemperatureStatusDescr
                     group: 'Chassis'
                 -
-                    oid: ax2430sTemperatureStatusTable
-                    value: ax2430sTemperatureStatusValue
+                    oid: AX2430S::ax2430sTemperatureStatusTable
+                    value: AX2430S::ax2430sTemperatureStatusValue
                     num_oid: '.1.3.6.1.4.1.21839.2.2.6.2.1.3.1.3.{{ $index }}'
                     index: 'ax2430sTemperatureStatusValue.{{ $index }}'
-                    descr: ax2430sTemperatureStatusDescr
+                    descr: AX2430S::ax2430sTemperatureStatusDescr
                     group: 'Chassis'
                 -
-                    oid: ax1230sTemperatureStatusTable
-                    value: ax1230sTemperatureStatusValue
+                    oid: AX1230S::ax1230sTemperatureStatusTable
+                    value: AX1230S::ax1230sTemperatureStatusValue
                     num_oid: '.1.3.6.1.4.1.21839.2.2.10.2.1.3.1.3.{{ $index }}'
                     index: 'ax1230sTemperatureStatusValue.{{ $index }}'
-                    descr: ax1230sTemperatureStatusDescr
+                    descr: AX1230S::ax1230sTemperatureStatusDescr
                     group: 'Chassis'
                 -
-                    oid: ax6300sTemperatureStatusTable
-                    value: ax6300sTemperatureStatusValue
+                    oid: AX6300S::ax6300sTemperatureStatusTable
+                    value: AX6300S::ax6300sTemperatureStatusValue
                     num_oid: '.1.3.6.1.4.1.21839.2.2.8.2.2.2.1.3.{{ $index }}'
                     index: 'ax6300sTemperatureStatusValue.{{ $index }}'
-                    descr: ax6300sTemperatureStatusDescr
+                    descr: AX6300S::ax6300sTemperatureStatusDescr
                     group: 'Chassis'
                 -
-                    oid: ax6700sTemperatureStatusTable
-                    value: ax6700sTemperatureStatusValue
+                    oid: AX6300S::ax6700sTemperatureStatusTable
+                    value: AX6300S::ax6700sTemperatureStatusValue
                     num_oid: '.1.3.6.1.4.1.21839.2.2.9.2.2.2.1.3.{{ $index }}'
                     index: 'ax6700sTemperatureStatusValue.{{ $index }}'
-                    descr: ax6700sTemperatureStatusDescr
+                    descr: AX6300S::ax6700sTemperatureStatusDescr
                     group: 'Chassis'
                 -
-                    oid: ax6600sTemperatureStatusTable
-                    value: ax6600sTemperatureStatusValue
+                    oid: AX6300S::ax6600sTemperatureStatusTable
+                    value: AX6300S::ax6600sTemperatureStatusValue
                     num_oid: '.1.3.6.1.4.1.21839.2.2.12.2.2.2.1.3.{{ $index }}'
                     index: 'ax6600sTemperatureStatusValue.{{ $index }}'
-                    descr: ax6600sTemperatureStatusDescr
+                    descr: AX6300S::ax6600sTemperatureStatusDescr
                     group: 'Chassis'
                 -
-                    oid: ax1240sTemperatureStatusTable
-                    value: ax1240sTemperatureStatusValue
+                    oid: AX1240S::ax1240sTemperatureStatusTable
+                    value: AX1240S::ax1240sTemperatureStatusValue
                     num_oid: '.1.3.6.1.4.1.21839.2.2.13.2.1.3.1.3.{{ $index }}'
                     index: 'ax1240sTemperatureStatusValue.{{ $index }}'
-                    descr: ax1240sTemperatureStatusDescr
+                    descr: AX1240S::ax1240sTemperatureStatusDescr
                     group: 'Chassis'
                 -
-                    oid: ax1250sTemperatureStatusTable
-                    value: ax1250sTemperatureStatusValue
+                    oid: AX1240S::ax1250sTemperatureStatusTable
+                    value: AX1240S::ax1250sTemperatureStatusValue
                     num_oid: '.1.3.6.1.4.1.21839.2.2.14.2.1.3.1.3.{{ $index }}'
                     index: 'ax1250sTemperatureStatusValue.{{ $index }}'
-                    descr: ax1250sTemperatureStatusDescr
+                    descr: AX1240S::ax1250sTemperatureStatusDescr
                     group: 'Chassis'
                 -
-                    oid: ax2230sTemperatureStatusTable
-                    value: ax2230sTemperatureStatusValue
+                    oid: AX1240S::ax2230sTemperatureStatusTable
+                    value: AX1240S::ax2230sTemperatureStatusValue
                     num_oid: '.1.3.6.1.4.1.21839.2.2.18.2.1.3.1.3.{{ $index }}'
                     index: 'ax2230sTemperatureStatusValue.{{ $index }}'
-                    descr: ax2230sTemperatureStatusDescr
+                    descr: AX1240S::ax2230sTemperatureStatusDescr
                     group: 'Chassis'
                 -
-                    oid: ax2130sTemperatureStatusTable
-                    value: ax2130sTemperatureStatusValue
+                    oid: AX1240S::ax2130sTemperatureStatusTable
+                    value: AX1240S::ax2130sTemperatureStatusValue
                     num_oid: '.1.3.6.1.4.1.21839.2.2.25.2.1.3.1.3.{{ $index }}'
                     index: 'ax2130sTemperatureStatusValue.{{ $index }}'
-                    descr: ax2130sTemperatureStatusDescr
+                    descr: AX1240S::ax2130sTemperatureStatusDescr
                     group: 'Chassis'
                 -
-                    oid: ax260aTemperatureStatusTable
-                    value: ax260aTemperatureStatusValue
+                    oid: AX260A::ax260aTemperatureStatusTable
+                    value: AX260A::ax260aTemperatureStatusValue
                     num_oid: '.1.3.6.1.4.1.21839.2.2.23.2.1.3.1.3.{{ $index }}'
                     index: 'ax260aTemperatureStatusValue.{{ $index }}'
-                    descr: ax260aTemperatureStatusDescr
+                    descr: AX260A::ax260aTemperatureStatusDescr
                     group: 'Chassis'
                 -
-                    oid: ax2530sTemperatureStatusTable
-                    value: ax2530sTemperatureStatusValue
+                    oid: AX2530S::ax2530sTemperatureStatusTable
+                    value: AX2530S::ax2530sTemperatureStatusValue
                     num_oid: '.1.3.6.1.4.1.21839.2.2.16.2.1.3.1.3.{{ $index }}'
                     index: 'ax2530sTemperatureStatusValue.{{ $index }}'
-                    descr: ax2530sTemperatureStatusDescr
+                    descr: AX2530S::ax2530sTemperatureStatusDescr
                     group: 'Chassis'
                 -
-                    oid: ax3660sTemperatureStatusTable
-                    value: ax3660sTemperatureStatusValue
+                    oid: AX3660S::ax3660sTemperatureStatusTable
+                    value: AX3660S::ax3660sTemperatureStatusValue
                     num_oid: '.1.3.6.1.4.1.21839.2.2.24.2.1.3.1.3.{{ $index }}'
                     index: 'ax3660sTemperatureStatusValue.{{ $index }}'
-                    descr: ax3660sTemperatureStatusDescr
+                    descr: AX3660S::ax3660sTemperatureStatusDescr
                     group: 'Chassis'
                 -
-                    oid: ax4630sTemperatureStatusTable
-                    value: ax4630sTemperatureStatusValue
+                    oid: AX4630S::ax4630sTemperatureStatusTable
+                    value: AX4630S::ax4630sTemperatureStatusValue
                     num_oid: '.1.3.6.1.4.1.21839.2.2.20.2.1.3.1.3.{{ $index }}'
                     index: 'ax4630sTemperatureStatusValue.{{ $index }}'
-                    descr: ax4630sTemperatureStatusDescr
+                    descr: AX4630S::ax4630sTemperatureStatusDescr
                     group: 'Chassis'
                 -
-                    oid: ax7800sTemperatureStatusTable
-                    value: ax7800sTemperatureStatusValue
+                    oid: AX7800S::ax7800sTemperatureStatusTable
+                    value: AX7800S::ax7800sTemperatureStatusValue
                     num_oid: '.1.3.6.1.4.1.21839.2.2.2.2.2.3.1.3.{{ $index }}'
                     index: 'ax7800sTemperatureStatusValue.{{ $index }}'
-                    descr: ax7800sTemperatureStatusDescr
+                    descr: AX7800S::ax7800sTemperatureStatusDescr
                     group: 'Chassis'
                 -
-                    oid: ax5400sTemperatureStatusTable
-                    value: ax5400sTemperatureStatusValue
+                    oid: AX7800S::ax5400sTemperatureStatusTable
+                    value: AX7800S::ax5400sTemperatureStatusValue
                     num_oid: '.1.3.6.1.4.1.21839.2.2.3.2.2.3.1.3.{{ $index }}'
                     index: 'ax5400sTemperatureStatusValue.{{ $index }}'
-                    descr: ax5400sTemperatureStatusDescr
+                    descr: AX7800S::ax5400sTemperatureStatusDescr
                     group: 'Chassis'
                 -
-                    oid: ax7800rTemperatureStatusTable
-                    value: ax7800rTemperatureStatusValue
+                    oid: AX7800R::ax7800rTemperatureStatusTable
+                    value: AX7800R::ax7800rTemperatureStatusValue
                     num_oid: '.1.3.6.1.4.1.21839.2.1.2.2.2.3.1.3.{{ $index }}'
                     index: 'ax7800rTemperatureStatusValue.{{ $index }}'
-                    descr: ax7800rTemperatureStatusDescr
+                    descr: AX7800R::ax7800rTemperatureStatusDescr
                     group: 'Chassis'
                 -
-                    oid: ax7700rTemperatureStatusTable
-                    value: ax7700rTemperatureStatusValue
+                    oid: AX7800R::ax7700rTemperatureStatusTable
+                    value: AX7800R::ax7700rTemperatureStatusValue
                     num_oid: '.1.3.6.1.4.1.21839.2.1.5.2.2.3.1.3.{{ $index }}'
                     index: 'ax7700rTemperatureStatusValue.{{ $index }}'
-                    descr: ax7700rTemperatureStatusDescr
+                    descr: AX7800R::ax7700rTemperatureStatusDescr
                     group: 'Chassis'
                 -
-                    oid: ax2000rTemperatureStatusTable
-                    value: ax2000rTemperatureStatusValue
+                    oid: AX2000R::ax2000rTemperatureStatusTable
+                    value: AX2000R::ax2000rTemperatureStatusValue
                     num_oid: '.1.3.6.1.4.1.21839.2.1.4.2.2.3.1.3.{{ $index }}'
                     index: 'ax2000rTemperatureStatusValue.{{ $index }}'
-                    descr: ax2000rTemperatureStatusDescr
+                    descr: AX2000R::ax2000rTemperatureStatusDescr
                     group: 'Chassis'
         state:
             data:
                 -
-                    oid: ax3630sPowerUnitTable
-                    value: ax3630sPowerSupplyStatus
+                    oid: AX3630S::ax3630sPowerUnitTable
+                    value: AX3630S::ax3630sPowerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.7.2.1.4.1.3.{{ $index }}'
                     index: 'ax3630sPowerSupplyStatus.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
@@ -172,8 +171,8 @@ modules:
                         - { value: 4,  generic: 2, graph: 0, descr: fault }
                         - { value: -1, generic: 2, graph: 0, descr: disconnected }
                 -
-                    oid: ax3630sFanTable
-                    value: ax3630sFanStatus
+                    oid: AX3630S::ax3630sFanTable
+                    value: AX3630S::ax3630sFanStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.7.2.1.5.1.2.{{ $index }}'
                     index: 'ax3630sFanStatus.{{ $index }}'
                     descr: 'Fan {{ $index }}'
@@ -186,8 +185,8 @@ modules:
                         - { value: 5,  generic: 2, graph: 0, descr: stopping }
                         - { value: 32, generic: 2, graph: 0, descr: notconnect }
                 -
-                    oid: ax3640sPowerUnitTable
-                    value: ax3640sPowerSupplyStatus
+                    oid: AX3630S::ax3640sPowerUnitTable
+                    value: AX3630S::ax3640sPowerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.11.2.1.4.1.3.{{ $index }}'
                     index: 'ax3640sPowerSupplyStatus.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
@@ -198,8 +197,8 @@ modules:
                         - { value: 4,  generic: 2, graph: 0, descr: fault }
                         - { value: -1, generic: 2, graph: 0, descr: disconnected }
                 -
-                    oid: ax3640sFanTable
-                    value: ax3640sFanStatus
+                    oid: AX3630S::ax3640sFanTable
+                    value: AX3630S::ax3640sFanStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.11.2.1.5.1.2.{{ $index }}'
                     index: 'ax3640sFanStatus.{{ $index }}'
                     descr: 'Fan {{ $index }}'
@@ -212,8 +211,8 @@ modules:
                         - { value: 5,  generic: 2, graph: 0, descr: stopping }
                         - { value: 32, generic: 2, graph: 0, descr: notconnect }
                 -
-                    oid: ax3650sPowerUnitTable
-                    value: ax3650sPowerSupplyStatus
+                    oid: AX3630S::ax3650sPowerUnitTable
+                    value: AX3630S::ax3650sPowerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.15.2.1.4.1.3.{{ $index }}'
                     index: 'ax3650sPowerSupplyStatus.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
@@ -224,8 +223,8 @@ modules:
                         - { value: 4,  generic: 2, graph: 0, descr: fault }
                         - { value: -1, generic: 2, graph: 0, descr: disconnected }
                 -
-                    oid: ax3650sFanTable
-                    value: ax3650sFanStatus
+                    oid: AX3630S::ax3650sFanTable
+                    value: AX3630S::ax3650sFanStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.15.2.1.5.1.2.{{ $index }}'
                     index: 'ax3650sFanStatus.{{ $index }}'
                     descr: 'Fan {{ $index }}'
@@ -238,8 +237,8 @@ modules:
                         - { value: 5,  generic: 2, graph: 0, descr: stopping }
                         - { value: 32, generic: 2, graph: 0, descr: notconnect }
                 -
-                    oid: ax3830sPowerUnitTable
-                    value: ax3830sPowerSupplyStatus
+                    oid: AX3630S::ax3830sPowerUnitTable
+                    value: AX3630S::ax3830sPowerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.17.2.1.4.1.3.{{ $index }}'
                     index: 'ax3830sPowerSupplyStatus.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
@@ -250,8 +249,8 @@ modules:
                         - { value: 4,  generic: 2, graph: 0, descr: fault }
                         - { value: -1, generic: 2, graph: 0, descr: disconnected }
                 -
-                    oid: ax3830sFanTable
-                    value: ax3830sFanStatus
+                    oid: AX3630S::ax3830sFanTable
+                    value: AX3630S::ax3830sFanStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.17.2.1.5.1.2.{{ $index }}'
                     index: 'ax3830sFanStatus.{{ $index }}'
                     descr: 'Fan {{ $index }}'
@@ -264,8 +263,8 @@ modules:
                         - { value: 5,  generic: 2, graph: 0, descr: stopping }
                         - { value: 32, generic: 2, graph: 0, descr: notconnect }
                 -
-                    oid: ax2430sPowerUnitTable
-                    value: ax2430sPowerSupplyStatus
+                    oid: AX2430S::ax2430sPowerUnitTable
+                    value: AX2430S::ax2430sPowerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.6.2.1.4.1.3.{{ $index }}'
                     index: 'ax2430sPowerSupplyStatus.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
@@ -276,8 +275,8 @@ modules:
                         - { value: 4,  generic: 2, graph: 0, descr: fault }
                         - { value: -1, generic: 2, graph: 0, descr: disconnected }
                 -
-                    oid: ax2430sFanTable
-                    value: ax2430sFanStatus
+                    oid: AX2430S::ax2430sFanTable
+                    value: AX2430S::ax2430sFanStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.6.2.1.5.1.2.{{ $index }}'
                     index: 'ax2430sFanStatus.{{ $index }}'
                     descr: 'Fan {{ $index }}'
@@ -290,8 +289,8 @@ modules:
                         - { value: 5,  generic: 2, graph: 0, descr: stopping }
                         - { value: 32, generic: 2, graph: 0, descr: notconnect }
                 -
-                    oid: ax1230sPowerUnitTable
-                    value: ax1230sPowerSupplyStatus
+                    oid: AX1230S::ax1230sPowerUnitTable
+                    value: AX1230S::ax1230sPowerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.10.2.1.4.1.3.{{ $index }}'
                     index: 'ax1230sPowerSupplyStatus.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
@@ -302,8 +301,8 @@ modules:
                         - { value: 4,  generic: 2, graph: 0, descr: fault }
                         - { value: -1, generic: 2, graph: 0, descr: disconnected }
                 -
-                    oid: ax1230sFanTable
-                    value: ax1230sFanStatus
+                    oid: AX1230S::ax1230sFanTable
+                    value: AX1230S::ax1230sFanStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.10.2.1.5.1.2.{{ $index }}'
                     index: 'ax1230sFanStatus.{{ $index }}'
                     descr: 'Fan {{ $index }}'
@@ -316,8 +315,8 @@ modules:
                         - { value: 5,  generic: 2, graph: 0, descr: stopping }
                         - { value: 32, generic: 2, graph: 0, descr: notconnect }
                 -
-                    oid: ax6300sPowerUnitTable
-                    value: ax6300sPowerSupplyStatus
+                    oid: AX6300S::ax6300sPowerUnitTable
+                    value: AX6300S::ax6300sPowerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.8.2.1.3.1.3.{{ $index }}'
                     index: 'ax6300sPowerSupplyStatus.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
@@ -328,8 +327,8 @@ modules:
                         - { value: 4,  generic: 2, graph: 0, descr: fault }
                         - { value: -1, generic: 2, graph: 0, descr: disconnected }
                 -
-                    oid: ax6300sFanTable
-                    value: ax6300sFanStatus
+                    oid: AX6300S::ax6300sFanTable
+                    value: AX6300S::ax6300sFanStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.8.2.1.4.1.2.{{ $index }}'
                     index: 'ax6300sFanStatus.{{ $index }}'
                     descr: 'Fan {{ $index }}'
@@ -342,8 +341,8 @@ modules:
                         - { value: 5,  generic: 2, graph: 0, descr: stopping }
                         - { value: 32, generic: 2, graph: 0, descr: notconnect }
                 -
-                    oid: ax6700sPowerUnitTable
-                    value: ax6700sPowerSupplyStatus
+                    oid: AX6300S::ax6700sPowerUnitTable
+                    value: AX6300S::ax6700sPowerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.9.2.1.3.1.3.{{ $index }}'
                     index: 'ax6700sPowerSupplyStatus.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
@@ -354,8 +353,8 @@ modules:
                         - { value: 4,  generic: 2, graph: 0, descr: fault }
                         - { value: -1, generic: 2, graph: 0, descr: disconnected }
                 -
-                    oid: ax6700sFanTable
-                    value: ax6700sFanStatus
+                    oid: AX6300S::ax6700sFanTable
+                    value: AX6300S::ax6700sFanStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.9.2.1.4.1.2.{{ $index }}'
                     index: 'ax6700sFanStatus.{{ $index }}'
                     descr: 'Fan {{ $index }}'
@@ -368,8 +367,8 @@ modules:
                         - { value: 5,  generic: 2, graph: 0, descr: stopping }
                         - { value: 32, generic: 2, graph: 0, descr: notconnect }
                 -
-                    oid: ax6600sPowerUnitTable
-                    value: ax6600sPowerSupplyStatus
+                    oid: AX6300S::ax6600sPowerUnitTable
+                    value: AX6300S::ax6600sPowerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.12.2.1.3.1.3.{{ $index }}'
                     index: 'ax6600sPowerSupplyStatus.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
@@ -380,8 +379,8 @@ modules:
                         - { value: 4,  generic: 2, graph: 0, descr: fault }
                         - { value: -1, generic: 2, graph: 0, descr: disconnected }
                 -
-                    oid: ax6600sFanTable
-                    value: ax6600sFanStatus
+                    oid: AX6300S::ax6600sFanTable
+                    value: AX6300S::ax6600sFanStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.12.2.1.4.1.2.{{ $index }}'
                     index: 'ax6600sFanStatus.{{ $index }}'
                     descr: 'Fan {{ $index }}'
@@ -394,8 +393,8 @@ modules:
                         - { value: 5,  generic: 2, graph: 0, descr: stopping }
                         - { value: 32, generic: 2, graph: 0, descr: notconnect }
                 -
-                    oid: ax1240sPowerUnitTable
-                    value: ax1240sPowerSupplyStatus
+                    oid: AX1240S::ax1240sPowerUnitTable
+                    value: AX1240S::ax1240sPowerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.13.2.1.4.1.3.{{ $index }}'
                     index: 'ax1240sPowerSupplyStatus.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
@@ -406,8 +405,8 @@ modules:
                         - { value: 4,  generic: 2, graph: 0, descr: fault }
                         - { value: -1, generic: 2, graph: 0, descr: disconnected }
                 -
-                    oid: ax1240sFanTable
-                    value: ax1240sFanStatus
+                    oid: AX1240S::ax1240sFanTable
+                    value: AX1240S::ax1240sFanStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.13.2.1.5.1.2.{{ $index }}'
                     index: 'ax1240sFanStatus.{{ $index }}'
                     descr: 'Fan {{ $index }}'
@@ -420,8 +419,8 @@ modules:
                         - { value: 5,  generic: 2, graph: 0, descr: stopping }
                         - { value: 32, generic: 2, graph: 0, descr: notconnect }
                 -
-                    oid: ax1250sPowerUnitTable
-                    value: ax1250sPowerSupplyStatus
+                    oid: AX1240S::ax1250sPowerUnitTable
+                    value: AX1240S::ax1250sPowerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.14.2.1.4.1.3.{{ $index }}'
                     index: 'ax1250sPowerSupplyStatus.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
@@ -432,8 +431,8 @@ modules:
                         - { value: 4,  generic: 2, graph: 0, descr: fault }
                         - { value: -1, generic: 2, graph: 0, descr: disconnected }
                 -
-                    oid: ax1250sFanTable
-                    value: ax1250sFanStatus
+                    oid: AX1240S::ax1250sFanTable
+                    value: AX1240S::ax1250sFanStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.14.2.1.5.1.2.{{ $index }}'
                     index: 'ax1250sFanStatus.{{ $index }}'
                     descr: 'Fan {{ $index }}'
@@ -446,8 +445,8 @@ modules:
                         - { value: 5,  generic: 2, graph: 0, descr: stopping }
                         - { value: 32, generic: 2, graph: 0, descr: notconnect }
                 -
-                    oid: ax2230sPowerUnitTable
-                    value: ax2230sPowerSupplyStatus
+                    oid: AX1240S::ax2230sPowerUnitTable
+                    value: AX1240S::ax2230sPowerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.18.2.1.4.1.3.{{ $index }}'
                     index: 'ax2230sPowerSupplyStatus.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
@@ -458,8 +457,8 @@ modules:
                         - { value: 4,  generic: 2, graph: 0, descr: fault }
                         - { value: -1, generic: 2, graph: 0, descr: disconnected }
                 -
-                    oid: ax2230sFanTable
-                    value: ax2230sFanStatus
+                    oid: AX1240S::ax2230sFanTable
+                    value: AX1240S::ax2230sFanStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.18.2.1.5.1.2.{{ $index }}'
                     index: 'ax2230sFanStatus.{{ $index }}'
                     descr: 'Fan {{ $index }}'
@@ -472,8 +471,8 @@ modules:
                         - { value: 5,  generic: 2, graph: 0, descr: stopping }
                         - { value: 32, generic: 2, graph: 0, descr: notconnect }
                 -
-                    oid: ax2130sPowerUnitTable
-                    value: ax2130sPowerSupplyStatus
+                    oid: AX1240S::ax2130sPowerUnitTable
+                    value: AX1240S::ax2130sPowerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.25.2.1.4.1.3.{{ $index }}'
                     index: 'ax2130sPowerSupplyStatus.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
@@ -484,8 +483,8 @@ modules:
                         - { value: 4,  generic: 2, graph: 0, descr: fault }
                         - { value: -1, generic: 2, graph: 0, descr: disconnected }
                 -
-                    oid: ax2130sFanTable
-                    value: ax2130sFanStatus
+                    oid: AX1240S::ax2130sFanTable
+                    value: AX1240S::ax2130sFanStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.25.2.1.5.1.2.{{ $index }}'
                     index: 'ax2130sFanStatus.{{ $index }}'
                     descr: 'Fan {{ $index }}'
@@ -498,8 +497,8 @@ modules:
                         - { value: 5,  generic: 2, graph: 0, descr: stopping }
                         - { value: 32, generic: 2, graph: 0, descr: notconnect }
                 -
-                    oid: ax260aPowerUnitTable
-                    value: ax260aPowerSupplyStatus
+                    oid: AX260A::ax260aPowerUnitTable
+                    value: AX260A::ax260aPowerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.23.2.1.4.1.3.{{ $index }}'
                     index: 'ax260aPowerSupplyStatus.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
@@ -510,8 +509,8 @@ modules:
                         - { value: 4,  generic: 2, graph: 0, descr: fault }
                         - { value: -1, generic: 2, graph: 0, descr: disconnected }
                 -
-                    oid: ax260aFanTable
-                    value: ax260aFanStatus
+                    oid: AX260A::ax260aFanTable
+                    value: AX260A::ax260aFanStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.23.2.1.5.1.2.{{ $index }}'
                     index: 'ax260aFanStatus.{{ $index }}'
                     descr: 'Fan {{ $index }}'
@@ -524,8 +523,8 @@ modules:
                         - { value: 5,  generic: 2, graph: 0, descr: stopping }
                         - { value: 32, generic: 2, graph: 0, descr: notconnect }
                 -
-                    oid: ax2530sPowerUnitTable
-                    value: ax2530sPowerSupplyStatus
+                    oid: AX2530S::ax2530sPowerUnitTable
+                    value: AX2530S::ax2530sPowerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.16.2.1.4.1.3.{{ $index }}'
                     index: 'ax2530sPowerSupplyStatus.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
@@ -536,8 +535,8 @@ modules:
                         - { value: 4,  generic: 2, graph: 0, descr: fault }
                         - { value: -1, generic: 2, graph: 0, descr: disconnected }
                 -
-                    oid: ax2530sFanTable
-                    value: ax2530sFanStatus
+                    oid: AX2530S::ax2530sFanTable
+                    value: AX2530S::ax2530sFanStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.16.2.1.5.1.2.{{ $index }}'
                     index: 'ax2530sFanStatus.{{ $index }}'
                     descr: 'Fan {{ $index }}'
@@ -550,8 +549,8 @@ modules:
                         - { value: 5,  generic: 2, graph: 0, descr: stopping }
                         - { value: 32, generic: 2, graph: 0, descr: notconnect }
                 -
-                    oid: ax3660sPowerUnitTable
-                    value: ax3660sPowerSupplyStatus
+                    oid: AX3660S::ax3660sPowerUnitTable
+                    value: AX3660S::ax3660sPowerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.24.2.1.4.1.3.{{ $index }}'
                     index: 'ax3660sPowerSupplyStatus.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
@@ -562,8 +561,8 @@ modules:
                         - { value: 4,  generic: 2, graph: 0, descr: fault }
                         - { value: -1, generic: 2, graph: 0, descr: disconnected }
                 -
-                    oid: ax3660sFanTable
-                    value: ax3660sFanStatus
+                    oid: AX3660S::ax3660sFanTable
+                    value: AX3660S::ax3660sFanStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.24.2.1.5.1.2.{{ $index }}'
                     index: 'ax3660sFanStatus.{{ $index }}'
                     descr: 'Fan {{ $index }}'
@@ -576,8 +575,8 @@ modules:
                         - { value: 5,  generic: 2, graph: 0, descr: stopping }
                         - { value: 32, generic: 2, graph: 0, descr: notconnect }
                 -
-                    oid: ax4630sPowerUnitTable
-                    value: ax4630sPowerSupplyStatus
+                    oid: AX4630S::ax4630sPowerUnitTable
+                    value: AX4630S::ax4630sPowerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.20.2.1.4.1.3.{{ $index }}'
                     index: 'ax4630sPowerSupplyStatus.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
@@ -588,8 +587,8 @@ modules:
                         - { value: 4,  generic: 2, graph: 0, descr: fault }
                         - { value: -1, generic: 2, graph: 0, descr: disconnected }
                 -
-                    oid: ax4630sFanTable
-                    value: ax4630sFanStatus
+                    oid: AX4630S::ax4630sFanTable
+                    value: AX4630S::ax4630sFanStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.20.2.1.5.1.2.{{ $index }}'
                     index: 'ax4630sFanStatus.{{ $index }}'
                     descr: 'Fan {{ $index }}'
@@ -602,8 +601,8 @@ modules:
                         - { value: 5,  generic: 2, graph: 0, descr: stopping }
                         - { value: 32, generic: 2, graph: 0, descr: notconnect }
                 -
-                    oid: ax7800sPowerUnitTable
-                    value: ax7800sPowerSupplyStatus
+                    oid: AX7800S::ax7800sPowerUnitTable
+                    value: AX7800S::ax7800sPowerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.2.2.1.3.1.3.{{ $index }}'
                     index: 'ax7800sPowerSupplyStatus.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
@@ -614,8 +613,8 @@ modules:
                         - { value: 4,  generic: 2, graph: 0, descr: fault }
                         - { value: -1, generic: 2, graph: 0, descr: disconnected }
                 -
-                    oid: ax7800sFanTable
-                    value: ax7800sFanStatus
+                    oid: AX7800S::ax7800sFanTable
+                    value: AX7800S::ax7800sFanStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.2.2.1.4.1.2.{{ $index }}'
                     index: 'ax7800sFanStatus.{{ $index }}'
                     descr: 'Fan {{ $index }}'
@@ -628,8 +627,8 @@ modules:
                         - { value: 5,  generic: 2, graph: 0, descr: stopping }
                         - { value: 32, generic: 2, graph: 0, descr: notconnect }
                 -
-                    oid: ax5400sPowerUnitTable
-                    value: ax5400sPowerSupplyStatus
+                    oid: AX7800S::ax5400sPowerUnitTable
+                    value: AX7800S::ax5400sPowerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.3.2.1.3.1.3.{{ $index }}'
                     index: 'ax5400sPowerSupplyStatus.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
@@ -640,8 +639,8 @@ modules:
                         - { value: 4,  generic: 2, graph: 0, descr: fault }
                         - { value: -1, generic: 2, graph: 0, descr: disconnected }
                 -
-                    oid: ax5400sFanTable
-                    value: ax5400sFanStatus
+                    oid: AX7800S::ax5400sFanTable
+                    value: AX7800S::ax5400sFanStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.2.3.2.1.4.1.2.{{ $index }}'
                     index: 'ax5400sFanStatus.{{ $index }}'
                     descr: 'Fan {{ $index }}'
@@ -654,8 +653,8 @@ modules:
                         - { value: 5,  generic: 2, graph: 0, descr: stopping }
                         - { value: 32, generic: 2, graph: 0, descr: notconnect }
                 -
-                    oid: ax7800rPowerUnitTable
-                    value: ax7800rPowerSupplyStatus
+                    oid: AX7800R::ax7800rPowerUnitTable
+                    value: AX7800R::ax7800rPowerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.1.2.2.1.3.1.3.{{ $index }}'
                     index: 'ax7800rPowerSupplyStatus.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
@@ -666,8 +665,8 @@ modules:
                         - { value: 4,  generic: 2, graph: 0, descr: fault }
                         - { value: -1, generic: 2, graph: 0, descr: disconnected }
                 -
-                    oid: ax7800rFanTable
-                    value: ax7800rFanStatus
+                    oid: AX7800R::ax7800rFanTable
+                    value: AX7800R::ax7800rFanStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.1.2.2.1.4.1.2.{{ $index }}'
                     index: 'ax7800rFanStatus.{{ $index }}'
                     descr: 'Fan {{ $index }}'
@@ -680,8 +679,8 @@ modules:
                         - { value: 5,  generic: 2, graph: 0, descr: stopping }
                         - { value: 32, generic: 2, graph: 0, descr: notconnect }
                 -
-                    oid: ax7700rPowerUnitTable
-                    value: ax7700rPowerSupplyStatus
+                    oid: AX7800R::ax7700rPowerUnitTable
+                    value: AX7800R::ax7700rPowerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.1.5.2.1.3.1.3.{{ $index }}'
                     index: 'ax7700rPowerSupplyStatus.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
@@ -692,8 +691,8 @@ modules:
                         - { value: 4,  generic: 2, graph: 0, descr: fault }
                         - { value: -1, generic: 2, graph: 0, descr: disconnected }
                 -
-                    oid: ax7700rFanTable
-                    value: ax7700rFanStatus
+                    oid: AX7800R::ax7700rFanTable
+                    value: AX7800R::ax7700rFanStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.1.5.2.1.4.1.2.{{ $index }}'
                     index: 'ax7700rFanStatus.{{ $index }}'
                     descr: 'Fan {{ $index }}'
@@ -706,8 +705,8 @@ modules:
                         - { value: 5,  generic: 2, graph: 0, descr: stopping }
                         - { value: 32, generic: 2, graph: 0, descr: notconnect }
                 -
-                    oid: ax2000rPowerUnitTable
-                    value: ax2000rPowerSupplyStatus
+                    oid: AX2000R::ax2000rPowerUnitTable
+                    value: AX2000R::ax2000rPowerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.1.4.2.1.3.1.3.{{ $index }}'
                     index: 'ax2000rPowerSupplyStatus.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
@@ -718,8 +717,8 @@ modules:
                         - { value: 4,  generic: 2, graph: 0, descr: fault }
                         - { value: -1, generic: 2, graph: 0, descr: disconnected }
                 -
-                    oid: ax2000rFanTable
-                    value: ax2000rFanStatus
+                    oid: AX2000R::ax2000rFanTable
+                    value: AX2000R::ax2000rFanStatus
                     num_oid: '.1.3.6.1.4.1.21839.2.1.4.2.1.4.1.2.{{ $index }}'
                     index: 'ax2000rFanStatus.{{ $index }}'
                     descr: 'Fan {{ $index }}'
