@@ -54,3 +54,38 @@ modules:
                         - { descr: 'mQTT',         graph: 1, value: 9, generic: 0 }
                         - { descr: 'snmp',         graph: 1, value: 10, generic: 0 }
                         - { descr: 'localGPS',     graph: 1, value: 11, generic: 0 }
+                -
+                    oid: Perseus-MIB::varTable
+                    value: Perseus-MIB::varState
+                    num_oid: '.1.3.6.1.4.1.21796.5.1.3.1.3.{{ $index }}'
+                    descr: '{{ $Perseus-MIB::varName }} State'
+                    index: 'varState.{{ $index }}'
+                    group: 'Sensor - {{ $Perseus-MIB::varName }}'
+                    state_name: varState
+                    states:
+                        - { descr: 'unknown',      graph: 1, value: 0, generic: 3 }
+                        - { descr: 'ok',           graph: 1, value: 1, generic: 0 }
+                        - { descr: 'varInvalid',   graph: 1, value: 2, generic: 0 }
+                        - { descr: 'meterInvalid', graph: 1, value: 3, generic: 0 }
+                        - { descr: 'alarmLow',     graph: 1, value: 4, generic: 0 }
+                        - { descr: 'alarmHigh',    graph: 1, value: 5, generic: 0 }
+                        - { descr: 'inactive',     graph: 1, value: 6, generic: 0 }
+                -
+                    oid: Perseus-MIB::varTable
+                    value: Perseus-MIB::varEnable
+                    num_oid: '.1.3.6.1.4.1.21796.5.1.3.1.6.{{ $index }}'
+                    descr: '{{ $Perseus-MIB::varName }} Enabled'
+                    index: 'varEnable.{{ $index }}'
+                    group: 'Sensor - {{ $Perseus-MIB::varName }}'
+                    state_name: varEnable
+                    states:
+                        - { descr: 'disabled',      graph: 2, value: 0, generic: 1 }
+                        - { descr: 'enabled',       graph: 2, value: 1, generic: 0 }
+        count:
+            data:
+                -
+                    oid: Perseus-MIB::varTable
+                    value: Perseus-MIB::varValue
+                    num_oid: '.1.3.6.1.4.1.21796.5.1.3.1.4.{{ $index }}'
+                    descr: '{{ $Perseus-MIB::varName }} Value in {{ $Perseus-MIB::varUnit }}'
+                    index: 'varValue.{{ $index }}'
