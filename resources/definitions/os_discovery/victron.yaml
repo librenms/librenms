@@ -8,13 +8,13 @@ modules:
                     oid: acInL1Frequency
                     num_oid: '.1.3.6.1.4.1.41312.1.1.2.{{ $index }}'
                     descr: 'AC Input L1 Frequency'
-                    index: '0'
+                    index: 'acInL1Frequency.{{ $index }}'
                     divisor: 100
                 -
                     oid: acOutL1Frequency
                     num_oid: '.1.3.6.1.4.1.41312.1.2.1.{{ $index }}'
                     descr: 'AC Output L1 Frequency'
-                    index: '0'
+                    index: 'acOutL1Frequency.{{ $index }}'
                     divisor: 100
 
         # AC Input/Output and Battery Current
@@ -24,19 +24,19 @@ modules:
                     oid: acInL1Current
                     num_oid: '.1.3.6.1.4.1.41312.1.1.3.{{ $index }}'
                     descr: 'AC Input L1 Current'
-                    index: '0'
+                    index: 'acInL1Current.{{ $index }}'
                     divisor: 100
                 -
                     oid: acOutL1Current
                     num_oid: '.1.3.6.1.4.1.41312.1.2.2.{{ $index }}'
                     descr: 'AC Output L1 Current'
-                    index: '0'
+                    index: 'acOutL1Current.{{ $index }}'
                     divisor: 100
                 -
                     oid: dcCurrent
                     num_oid: '.1.3.6.1.4.1.41312.1.4.1.{{ $index }}'
                     descr: 'Battery Current'
-                    index: '0'
+                    index: 'dcCurrent.{{ $index }}'
                     divisor: 100
 
         # Voltage sensors
@@ -46,25 +46,25 @@ modules:
                     oid: acInL1Voltage
                     num_oid: '.1.3.6.1.4.1.41312.1.1.4.{{ $index }}'
                     descr: 'AC Input L1 Voltage'
-                    index: '0'
+                    index: 'acInL1Voltage.{{ $index }}'
                     divisor: 100
                 -
                     oid: acOutL1Voltage
                     num_oid: '.1.3.6.1.4.1.41312.1.2.3.{{ $index }}'
                     descr: 'AC Output L1 Voltage'
-                    index: '0'
+                    index: 'acOutL1Voltage.{{ $index }}'
                     divisor: 100
                 -
                     oid: dcVoltage
                     num_oid: '.1.3.6.1.4.1.41312.1.4.5.{{ $index }}'
                     descr: 'Battery Voltage'
-                    index: '0'
+                    index: 'dcVoltage.{{ $index }}'
                     divisor: 100
                 -
                     oid: dcRippleVoltage
                     num_oid: '.1.3.6.1.4.1.41312.1.4.3.{{ $index }}'
                     descr: 'Battery Ripple Voltage'
-                    index: '0'
+                    index: 'dcRippleVoltage.{{ $index }}'
                     divisor: 1000
                 -
                     oid: pvVoltage
@@ -80,27 +80,27 @@ modules:
                     oid: acInL1Power
                     num_oid: '.1.3.6.1.4.1.41312.1.1.5.{{ $index }}'
                     descr: 'AC Input L1 Power'
-                    index: '0'
+                    index: 'acInL1Power.{{ $index }}'
                 -
                     oid: acOutL1Power
                     num_oid: '.1.3.6.1.4.1.41312.1.2.4.{{ $index }}'
                     descr: 'AC Output L1 Power'
-                    index: '0'
+                    index: 'acOutL1Power.{{ $index }}'
                 -
                     oid: acOutL1NominalPower
                     num_oid: '.1.3.6.1.4.1.41312.1.2.5.{{ $index }}'
                     descr: 'Inverter Nominal Power'
-                    index: '0'
+                    index: 'acOutL1NominalPower.{{ $index }}'
                 -
                     oid: dcPower
                     num_oid: '.1.3.6.1.4.1.41312.1.4.2.{{ $index }}'
                     descr: 'Battery Power'
-                    index: '0'
+                    index: 'dcPower.{{ $index }}'
                 -
                     oid: systemYieldPower
                     num_oid: '.1.3.6.1.4.1.41312.1.7.4.{{ $index }}'
                     descr: 'Solar Yield Power'
-                    index: '0'
+                    index: 'systemYieldPower.{{ $index }}'
                     divisor: 100
                 -
                     oid: pvPower
@@ -116,7 +116,7 @@ modules:
                     oid: dcTemperature
                     num_oid: '.1.3.6.1.4.1.41312.1.4.4.{{ $index }}'
                     descr: 'Battery Temperature'
-                    index: '0'
+                    index: 'dcTemperature.{{ $index }}'
                     divisor: 10
 
         # State of Charge
@@ -126,7 +126,7 @@ modules:
                     oid: systemSoc
                     num_oid: '.1.3.6.1.4.1.41312.1.7.1.{{ $index }}'
                     descr: 'State of Charge'
-                    index: '0'
+                    index: 'systemSoc.{{ $index }}'
                     low_limit: 20
                     low_warn_limit: 30
 
@@ -137,7 +137,7 @@ modules:
                     oid: systemTimeToGo
                     num_oid: '.1.3.6.1.4.1.41312.1.7.3.{{ $index }}'
                     descr: 'Time to Empty'
-                    index: '0'
+                    index: 'systemTimeToGo.{{ $index }}'
                     divisor: 60
 
         # State sensors (System state and alarms)
@@ -148,7 +148,7 @@ modules:
                     oid: systemState
                     num_oid: '.1.3.6.1.4.1.41312.1.7.2.{{ $index }}'
                     descr: 'System State'
-                    index: '0'
+                    index: 'systemState.{{ $index }}'
                     state_name: victronSystemState
                     states:
                         - { value: 0, generic: 3, graph: 1, descr: 'Off' }
@@ -169,7 +169,7 @@ modules:
                     oid: alarmGridLost
                     num_oid: '.1.3.6.1.4.1.41312.1.3.2.{{ $index }}'
                     descr: 'Grid Lost'
-                    index: '0'
+                    index: 'alarmGridLost.{{ $index }}'
                     state_name: victronAlarm
                     states:
                         - { value: 0, generic: 0, graph: 1, descr: 'OK' }
@@ -179,7 +179,7 @@ modules:
                     oid: alarmHighTemperature
                     num_oid: '.1.3.6.1.4.1.41312.1.3.3.{{ $index }}'
                     descr: 'High Temperature'
-                    index: '0'
+                    index: 'alarmHighTemperature.{{ $index }}'
                     state_name: victronAlarm
                     states:
                         - { value: 0, generic: 0, graph: 1, descr: 'OK' }
@@ -189,7 +189,7 @@ modules:
                     oid: alarmHighVoltage
                     num_oid: '.1.3.6.1.4.1.41312.1.3.4.{{ $index }}'
                     descr: 'High Battery Voltage'
-                    index: '0'
+                    index: 'alarmHighVoltage.{{ $index }}'
                     state_name: victronAlarm
                     states:
                         - { value: 0, generic: 0, graph: 1, descr: 'OK' }
@@ -199,7 +199,7 @@ modules:
                     oid: alarmHighVoltageAcOut
                     num_oid: '.1.3.6.1.4.1.41312.1.3.5.{{ $index }}'
                     descr: 'High AC Output Voltage'
-                    index: '0'
+                    index: 'alarmHighVoltageAcOut.{{ $index }}'
                     state_name: victronAlarm
                     states:
                         - { value: 0, generic: 0, graph: 1, descr: 'OK' }
@@ -209,7 +209,7 @@ modules:
                     oid: alarmLowSoc
                     num_oid: '.1.3.6.1.4.1.41312.1.3.6.{{ $index }}'
                     descr: 'Low State of Charge'
-                    index: '0'
+                    index: 'alarmLowSoc.{{ $index }}'
                     state_name: victronAlarm
                     states:
                         - { value: 0, generic: 0, graph: 1, descr: 'OK' }
@@ -219,7 +219,7 @@ modules:
                     oid: alarmLowVoltage
                     num_oid: '.1.3.6.1.4.1.41312.1.3.7.{{ $index }}'
                     descr: 'Low Battery Voltage'
-                    index: '0'
+                    index: 'alarmLowVoltage.{{ $index }}'
                     state_name: victronAlarm
                     states:
                         - { value: 0, generic: 0, graph: 1, descr: 'OK' }
@@ -229,7 +229,7 @@ modules:
                     oid: alarmLowVoltageAcOut
                     num_oid: '.1.3.6.1.4.1.41312.1.3.8.{{ $index }}'
                     descr: 'Low AC Output Voltage'
-                    index: '0'
+                    index: 'alarmLowVoltageAcOut.{{ $index }}'
                     state_name: victronAlarm
                     states:
                         - { value: 0, generic: 0, graph: 1, descr: 'OK' }
@@ -239,7 +239,7 @@ modules:
                     oid: alarmOverload
                     num_oid: '.1.3.6.1.4.1.41312.1.3.9.{{ $index }}'
                     descr: 'Overload'
-                    index: '0'
+                    index: 'alarmOverload.{{ $index }}'
                     state_name: victronAlarm
                     states:
                         - { value: 0, generic: 0, graph: 1, descr: 'OK' }
@@ -249,7 +249,7 @@ modules:
                     oid: alarmShortCircuit
                     num_oid: '.1.3.6.1.4.1.41312.1.3.12.{{ $index }}'
                     descr: 'Short Circuit'
-                    index: '0'
+                    index: 'alarmShortCircuit.{{ $index }}'
                     state_name: victronAlarm
                     states:
                         - { value: 0, generic: 0, graph: 1, descr: 'OK' }
