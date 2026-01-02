@@ -197,7 +197,7 @@ Schedule::command(MaintenanceFetchRSS::class)
     ->onFailure(fn () => Eventlog::log('The scheduled command maintenance:fetch-rss failed to run. Check the maintenance.log for details.', null, 'maintenance', Severity::Error));
 
 Schedule::command(MaintenanceCleanupSyslog::class)
-    ->dailyAt('03:30')
+    ->hourly()
     ->onOneServer()
     ->withoutOverlapping()
     ->appendOutputTo($maintenance_log_file)
