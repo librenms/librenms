@@ -199,5 +199,6 @@ Schedule::command(MaintenanceFetchRSS::class)
 Schedule::command(MaintenanceCleanupSyslog::class)
     ->dailyAt('03:30')
     ->onOneServer()
+    ->withoutOverlapping()
     ->appendOutputTo($maintenance_log_file)
     ->onFailure(fn () => Eventlog::log('The scheduled command maintenance:cleanup-syslog failed to run. Check the maintenance.log for details.', null, 'maintenance', Severity::Error));
