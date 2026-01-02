@@ -243,7 +243,7 @@ modules:
                     descr: '{{ ifName:1 }} Lane {{ $subindex2 }}'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
-                    index: 'lane-temp-{{ $index }}'
+                    index: 'tmnxDDMLaneTemperature.{{ $index }}'
                     high_limit: tmnxDDMLaneTempHiAlarm
                     warn_limit: tmnxDDMLaneTempHiWarn
                     low_limit: tmnxDDMLaneTempLowAlarm
@@ -269,7 +269,7 @@ modules:
                     descr: '{{ ifName:1 }} Tx Bias'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
-                    index: 'tx-bias-{{ $index }}'
+                    index: 'tmnxDDMTxBiasCurrent.{{ $index }}'
                     divisor: 500000
                     high_limit: tmnxDDMTxBiasCurrentHiAlarm
                     warn_limit: tmnxDDMTxBiasCurrentHiWarning
@@ -292,7 +292,7 @@ modules:
                     descr: '{{ ifName:1 }} Lane {{ $subindex2 }} Tx Bias'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
-                    index: 'tx-bias-{{ $index }}'
+                    index: 'tmnxDDMLaneTxBiasCurrent.{{ $index }}'
                     divisor: 500000
                     high_limit: tmnxDDMLaneTxBiasCurrentHiAlarm
                     warn_limit: tmnxDDMLaneTxBiasCurrentHiWarning
@@ -317,7 +317,7 @@ modules:
                     descr: '{{ ifName:1 }} Rx'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
-                    index: 'rx-{{ $index }}'
+                    index: 'tmnxDDMRxOpticalPower.{{ $index }}'
                     divisor: 10
                     high_limit: tmnxDDMRxOpticalPowerHiAlarm
                     warn_limit: tmnxDDMRxOpticalPowerHiWarning
@@ -341,7 +341,7 @@ modules:
                     descr: '{{ ifName:1 }} Tx'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
-                    index: 'tx-{{ $index }}'
+                    index: 'tmnxDDMTxOutputPower.{{ $index }}'
                     divisor: 10
                     high_limit: tmnxDDMTxOutputPowerHiAlarm
                     warn_limit: tmnxDDMTxOutputPowerHiWarning
@@ -365,7 +365,7 @@ modules:
                     descr: '{{ ifName:1 }} Lane {{ $subindex2 }} Rx'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
-                    index: 'lane-rx-{{ $index }}'
+                    index: 'tmnxDDMLaneRxOpticalPower.{{ $index }}'
                     user_func: 'uw_to_dbm'
                     divisor: 10
                     group: 'transceiver'
@@ -385,7 +385,7 @@ modules:
                     descr: '{{ ifName:1 }} Lane {{ $subindex2 }} Tx'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
-                    index: 'lane-tx-{{ $index }}'
+                    index: 'tmnxDDMLaneTxOutputPower.{{ $index }}'
                     user_func: 'uw_to_dbm'
                     divisor: 10
                     group: 'transceiver'
@@ -405,7 +405,7 @@ modules:
                     descr: '{{ ifName:1 }} Rx'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
-                    index: 'coh-rx-{{ $index }}'
+                    index: 'tmnxCohOptPortRxPower.{{ $index }}'
                     divisor: 100
                     group: 'transceiver'
                 -
@@ -415,7 +415,7 @@ modules:
                     descr: '{{ ifName:1 }} Tx'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
-                    index: 'coh-tx-{{ $index }}'
+                    index: 'tmnxCohOptPortTxPower.{{ $index }}'
                     divisor: 100
                     group: 'transceiver'
         voltage:
@@ -427,7 +427,7 @@ modules:
                     descr: '{{ ifName:1 }}'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
-                    index: '{{ $index }}'
+                    index: 'tmnxDDMSupplyVoltage.{{ $index }}'
                     high_limit: tmnxDDMSupplyVoltageHiAlarm
                     warn_limit: tmnxDDMSupplyVoltageHiWarning
                     low_limit: tmnxDDMSupplyVoltageLowAlarm
@@ -446,7 +446,7 @@ modules:
                     warn_limit: 90
                     high_limit: 95
                     low_limit: 0
-                    index: '{{ $index }}'
+                    index: 'tmnxPhysChassisFanSpeedPercent.{{ $index }}'
         count:
             data:
                 -
