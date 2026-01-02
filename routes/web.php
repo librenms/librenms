@@ -127,7 +127,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('logs/graylog', Device\Tabs\GraylogController::class)->name('graylog');
         Route::get('logs/outages', Device\Tabs\OutagesController::class)->name('outages');
         Route::get('logs/syslog', Device\Tabs\SyslogController::class)->name('syslog');
-        Route::get('popup', \App\Http\Controllers\DevicePopupController::class)->name('popup');
+        Route::get('popup', App\Http\Controllers\DevicePopupController::class)->name('popup');
         Route::put('notes', [Device\Tabs\NotesController::class, 'update'])->name('notes.update');
         Route::put('module/{module}', [Device\Tabs\ModuleController::class, 'update'])->name('module.update');
         Route::delete('module/{module}', [Device\Tabs\ModuleController::class, 'delete'])->name('module.delete');
@@ -282,6 +282,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::get('poller-group', Select\PollerGroupController::class)->name('ajax.select.poller-group');
             Route::get('port', Select\PortController::class)->name('ajax.select.port');
             Route::get('port-field', Select\PortFieldController::class)->name('ajax.select.port-field');
+            Route::get('sensor', Select\SensorController::class)->name('ajax.select.sensor');
         });
 
         // jquery bootgrid data controllers
