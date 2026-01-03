@@ -632,7 +632,7 @@ class DiscoveryQueueManager(TimedQueueManager):
             if exit_code == 0:
                 self.unlock(device_id)
             else:
-                if exit_code == 5:
+                if exit_code == 6:
                     logger.info(
                         "Device {} is down, cannot discover, waiting {}s for retry".format(
                             device_id, self.config.down_retry
