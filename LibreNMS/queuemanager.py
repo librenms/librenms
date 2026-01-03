@@ -613,8 +613,12 @@ class DiscoveryQueueManager(TimedQueueManager):
         ):
             logger.info("Discovering device {}".format(device_id))
 
-            args = ("-d", "-h", device_id) if self.config.debug else ("-h", device_id)
-            exit_code, output = LibreNMS.call_script("discovery.php", args)
+            args = (
+                ("device:discover", device_id, "-vv")
+                if self.config.debug
+                else ("device:discover", device_id, "-q")
+            )
+            exit_code, output = LibreNMS.call_script("lnms", args)
 
             if self.config.log_output:
                 with open(
