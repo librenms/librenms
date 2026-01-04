@@ -18,7 +18,7 @@
  **/
 
 // *************************************************************
-// ***** Current Sensors for Nokia PSD
+// ***** Voltage Sensors for Nokia PSD
 // *************************************************************
 
 if (str_contains((string) $device['sysObjectID'], '.1.3.6.1.4.1.7483.1.3.1.12')) {
@@ -37,7 +37,7 @@ if (str_contains((string) $device['sysObjectID'], '.1.3.6.1.4.1.7483.1.3.1.12'))
                 'sensor_oid' => ".1.3.6.1.4.1.7483.2.2.7.3.1.4.1.2.$ifIndex.1",
                 'sensor_index' => "$ifIndex.1",
                 'sensor_type' => 'nokia-1830',
-                'sensor_descr' => 'Voltage',
+                'sensor_descr' => "$ifName Voltage",
                 'sensor_divisor' => $divisor,
                 'sensor_multiplier' => 1,
                 'sensor_current' => $ddmvalue['ddmVoltage']['tnPsdDdmDataValue'] / $divisor,
