@@ -49,7 +49,7 @@ modules:
                   num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.71.1.4.{{ $index }}"
                   index: "tnOtPortTemperature.{{ $index }}"
                   entPhysicalIndex: "{{ $index }}"
-                  entPhysicalIndex_measured: port
+                  entPhysicalIndex_measured: ports
         state:
             data:
                 - oid: tnOchXcItuTable
@@ -237,7 +237,7 @@ modules:
                   index: "tnOtPortRxPower.{{ $index }}"
                   group: transceiver
                   entPhysicalIndex: "{{ $index }}"
-                  entPhysicalIndex_measured: port
+                  entPhysicalIndex_measured: ports
                   divisor: 1000
                 - oid: tnOtPortInfoTable
                   value: tnOtPortTxPower
@@ -246,7 +246,7 @@ modules:
                   index: "tnOtPortTxPower.{{ $index }}"
                   group: transceiver
                   entPhysicalIndex: "{{ $index }}"
-                  entPhysicalIndex_measured: port
+                  entPhysicalIndex_measured: ports
                   divisor: 1000
 
         power:
@@ -278,7 +278,7 @@ modules:
                   index: "tnOtPortBias.{{ $index }}"
                   group: transceiver
                   entPhysicalIndex: "{{ $index }}"
-                  entPhysicalIndex_measured: port
+                  entPhysicalIndex_measured: ports
         voltage:
             data:
                 - oid: tnOtPortInfoTable
@@ -288,5 +288,5 @@ modules:
                   index: "tnOtPortSupplyVoltage.{{ $index }}"
                   group: transceiver
                   entPhysicalIndex: "{{ $index }}"
-                  entPhysicalIndex_measured: port
+                  entPhysicalIndex_measured: ports
                   divisor: 1000
