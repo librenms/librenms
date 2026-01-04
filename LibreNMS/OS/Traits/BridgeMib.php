@@ -109,6 +109,7 @@ trait BridgeMib
         $basePortIdMap = array_map(fn ($ifIndex) => PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()), $baseIfIndex);
 
         foreach ($stpInstances as $instance) {
+
             $vlan_ports = SnmpQuery::context("$instance->vlan", 'vlan-')
                 ->enumStrings()->walk('BRIDGE-MIB::dot1dStpPortTable')
                 ->mapTable(fn ($data, $port) => new PortStp([
@@ -199,7 +200,7 @@ trait BridgeMib
         return $stpPorts;
     }
 
-    private function designatedPort(string $dp): int
+    protected function designatedPort(string $dp): int
     {
         if (preg_match('/-(\d+)/', $dp, $matches)) {
             // Syntax with "priority" dash "portID" like so : 32768-54, both in decimal

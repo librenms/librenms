@@ -1,0 +1,488 @@
+SQL[[1;33mselect `migration` from `migrations` order by `id` desc limit 1 [0;33m[][0m 0.67ms] 
+  
+SQL[[1;33mselect count(*) as aggregate from `migrations` [0;33m[][0m 0.75ms] 
+  
+SQL[[1;33mselect version() [0;33m[][0m 0.68ms] 
+  
+===========================================
+Component | Version
+--------- | -------
+LibreNMS  | 26.1.0-dev.34+878b1fd07 (2025-12-29T01:53:40+01:00)
+DB Schema | 2025_12_05_205509_devices_add_mtu_status (362)
+PHP       | 8.3.6
+Python    | 3.12.3
+Database  | MariaDB 10.11.13-MariaDB-0ubuntu0.24.04.1
+RRDTool   | 1.7.2
+SNMP      | 5.9.4.pre2
+===========================================
+  
+LibreNMS config cache cleared and config reloaded.  
+Starting discovery:
+
+Override discovery modules: stp  
+SQL[[1;33mselect `device_id` from `devices` where `hostname` = ? [0;33m["10.0.0.201"][0m 0.8ms] 
+  
+SQL[[1;33mselect * from `devices` where `device_id` = ? limit 1 [0;33m[33][0m 1.49ms] 
+  
+SQL[[1;33mselect `config_name`, `config_value` from `config` [0;33m[][0m 0.83ms] 
+  
+SQL[[1;33mselect * from `graph_types` [0;33m[][0m 0.73ms] 
+  
+Hostname:  10.0.0.201  (cisco)
+ID:        33
+OS:        ios
+IP:        10.0.0.201
+  
+SQL[[1;33mselect * from `devices_attribs` where `devices_attribs`.`device_id` = ? and `devices_attribs`.`device_id` is not null [0;33m[33][0m 0.84ms] 
+  
+[FPING] '/usr/bin/fping' '-e' '-q' '-c' '3' '-p' '500' '-t' '500' '-O' '0' '10.0.0.201'
+  
+response: 10.0.0.201 : xmt/rcv/%loss = 3/3/0%, min/avg/max = 45.4/48.8/54.8  
+SNMP[[0;36m'/usr/bin/snmpget' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/cisco' '-m' 'SNMPv2-TC:SNMPv2-MIB:IF-MIB:IP-MIB:TCP-MIB:UDP-MIB:NET-SNMP-VACM-MIB' '-v2c' '-c' 'public' '-OQXUte' '-Pu' 'udp:10.0.0.201:161' 'SNMPv2-MIB::sysObjectID.0'[0m]  
+SNMPv2-MIB::sysObjectID.0 = SNMPv2-SMI::enterprises.9.1.2897
+  
+  
+SQL[[1;33mselect * from `device_outages` where `device_outages`.`device_id` = ? and `device_outages`.`device_id` is not null and `up_again` is null [0;33m[33][0m 0.82ms] 
+  
+SQL[[1;33mselect * from `device_stats` where `device_stats`.`device_id` = ? and `device_stats`.`device_id` is not null limit 1 [0;33m[33][0m 1.02ms] 
+  
+SQL[[1;33mupdate `device_stats` set `ping_last_timestamp` = ?, `ping_rtt_last` = ?, `ping_rtt_prev` = ?, `ping_rtt_avg` = ?, `ping_loss_avg` = ?, `device_stats`.`updated_at` = ? where `id` = ? [0;33m["2026-01-02 16:11:38",48.8,45.4,36.6890908591092,21.905002193275347,"2026-01-02 16:11:38",7][0m 1.62ms] 
+  
+SQL[[1;33mupdate `devices` set `last_ping` = ?, `last_ping_timetaken` = ? where `device_id` = ? [0;33m["2026-01-02 16:11:38",48.8,33][0m 1.29ms] 
+  
+RRD[[0;32mupdate /opt/librenms/rrd/10.0.0.201/icmp-perf.rrd N:48.8:3:3:45.4:54.8[0m]  
+RRDtool Output: Attempting to initialize OS: ios  
+OS initialized: LibreNMS\OS\Ios  
+#### Load discovery module core ####
+  
+Module enabled: Global + | OS   | Device   | Manual    
+SNMP[[0;36m'/usr/bin/snmpget' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/cisco' '-m' 'SNMPv2-TC:SNMPv2-MIB:IF-MIB:IP-MIB:TCP-MIB:UDP-MIB:NET-SNMP-VACM-MIB' '-v2c' '-c' 'public' '-OQXUte' '-Pu' '-On' 'udp:10.0.0.201:161' 'SNMPv2-MIB::sysObjectID.0' 'SNMPv2-MIB::sysDescr.0' 'SNMPv2-MIB::sysName.0'[0m]  
+.1.3.6.1.2.1.1.2.0 = .1.3.6.1.4.1.9.1.2897
+.1.3.6.1.2.1.1.1.0 = Cisco IOS Software, C1000 Software (C1000-UNIVERSALK9-M), Version 15.2(7)E4, RELEASE SOFTWARE (fc2)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2021 by Cisco Systems, Inc.
+Compiled Mon 08-Mar-21 09:07 by prod_rel_team
+.1.3.6.1.2.1.1.5.0 = sw-mgmt-BHS.hell.corp
+  
+  
+| Cisco IOS Software, C1000 Software (C1000-UNIVERSALK9-M), Version 15.2(7)E4, RELEASE SOFTWARE (fc2)
+Technical Support: http://www.cisco.com/techsupport
+Copyright (c) 1986-2021 by Cisco Systems, Inc.
+Compiled Mon 08-Mar-21 09:07 by prod_rel_team | .1.3.6.1.4.1.9.1.2897 | 
+  
+  
+>> [0;36mSNMP[0m: [2/0.22s] [1;33mMySQL[0m: [5/0.06s] [0;32mRRD[0m: [1/0.00s]  
+>> Runtime for discovery module 'core': 0.1005 seconds with 53512 bytes  
+#### Unload discovery module core ####
+  
+#### Load discovery module stp ####
+  
+Module enabled: Global + | OS   | Device   | Manual +  
+SQL[[1;33mselect * from `vlans` where `vlans`.`device_id` = ? and `vlans`.`device_id` is not null [0;33m[33][0m 2.06ms] 
+  
+SNMP[[0;36m'/usr/bin/snmpget' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/cisco' '-m' 'SNMPv2-TC:SNMPv2-MIB:IF-MIB:IP-MIB:TCP-MIB:UDP-MIB:NET-SNMP-VACM-MIB' '-v2c' '-c' 'public' '-OQXUt' '-Pu' '-Os' 'udp:10.0.0.201:161' 'CISCO-STP-EXTENSIONS-MIB::stpxSpanningTreeType.0'[0m]  
+stpxSpanningTreeType.0 = pvstPlus
+  
+  
+SNMP[[0;36m'/usr/bin/snmpget' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/cisco' '-m' 'SNMPv2-TC:SNMPv2-MIB:IF-MIB:IP-MIB:TCP-MIB:UDP-MIB:NET-SNMP-VACM-MIB' '-v2c' '-c' 'public' '-OQXUte' '-Pu' 'udp:10.0.0.201:161' 'BRIDGE-MIB::dot1dStpProtocolSpecification.0'[0m]  
+BRIDGE-MIB::dot1dStpProtocolSpecification.0 = No Such Instance currently exists at this OID
+  
+  
+SNMP[[0;36m'/usr/bin/snmpget' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/cisco' '-m' 'SNMPv2-TC:SNMPv2-MIB:IF-MIB:IP-MIB:TCP-MIB:UDP-MIB:NET-SNMP-VACM-MIB' '-v2c' '-c' 'public@100' '-OQXUte' '-Pu' 'udp:10.0.0.201:161' 'BRIDGE-MIB::dot1dStpProtocolSpecification.0'[0m]  
+BRIDGE-MIB::dot1dStpProtocolSpecification.0 = 3
+  
+  
+SNMP[[0;36m'/usr/bin/snmpget' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/cisco' '-m' 'SNMPv2-TC:SNMPv2-MIB:IF-MIB:IP-MIB:TCP-MIB:UDP-MIB:NET-SNMP-VACM-MIB' '-v2c' '-c' 'public@100' '-OQXUt' '-Pu' 'udp:10.0.0.201:161' 'BRIDGE-MIB::dot1dBaseBridgeAddress.0' 'BRIDGE-MIB::dot1dStpProtocolSpecification.0' 'BRIDGE-MIB::dot1dStpPriority.0' 'BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0' 'BRIDGE-MIB::dot1dStpTopChanges.0' 'BRIDGE-MIB::dot1dStpDesignatedRoot.0' 'BRIDGE-MIB::dot1dStpRootCost.0' 'BRIDGE-MIB::dot1dStpRootPort.0' 'BRIDGE-MIB::dot1dStpMaxAge.0' 'BRIDGE-MIB::dot1dStpHelloTime.0'[0m]  
+BRIDGE-MIB::dot1dBaseBridgeAddress.0 = 38:91:b7:af:1:80
+BRIDGE-MIB::dot1dStpProtocolSpecification.0 = ieee8021d
+BRIDGE-MIB::dot1dStpPriority.0 = 32868
+BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0 = 113647500
+BRIDGE-MIB::dot1dStpTopChanges.0 = 14
+BRIDGE-MIB::dot1dStpDesignatedRoot.0 = "00 64 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpRootCost.0 = 6
+BRIDGE-MIB::dot1dStpRootPort.0 = 52
+BRIDGE-MIB::dot1dStpMaxAge.0 = 2000
+BRIDGE-MIB::dot1dStpHelloTime.0 = 200
+  
+  
+SNMP[[0;36m'/usr/bin/snmpget' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/cisco' '-m' 'SNMPv2-TC:SNMPv2-MIB:IF-MIB:IP-MIB:TCP-MIB:UDP-MIB:NET-SNMP-VACM-MIB' '-v2c' '-c' 'public@100' '-OQXUt' '-Pu' 'udp:10.0.0.201:161' 'BRIDGE-MIB::dot1dStpHoldTime.0' 'BRIDGE-MIB::dot1dStpForwardDelay.0' 'BRIDGE-MIB::dot1dStpBridgeMaxAge.0' 'BRIDGE-MIB::dot1dStpBridgeHelloTime.0' 'BRIDGE-MIB::dot1dStpBridgeForwardDelay.0'[0m]  
+BRIDGE-MIB::dot1dStpHoldTime.0 = 100
+BRIDGE-MIB::dot1dStpForwardDelay.0 = 1500
+BRIDGE-MIB::dot1dStpBridgeMaxAge.0 = 2000
+BRIDGE-MIB::dot1dStpBridgeHelloTime.0 = 200
+BRIDGE-MIB::dot1dStpBridgeForwardDelay.0 = 1500
+  
+  
+VLAN: 100 Bridge: 38:91:b7:af:01:80 DR: 2c:5a:0f:51:da:b1  
+SNMP[[0;36m'/usr/bin/snmpget' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/cisco' '-m' 'SNMPv2-TC:SNMPv2-MIB:IF-MIB:IP-MIB:TCP-MIB:UDP-MIB:NET-SNMP-VACM-MIB' '-v2c' '-c' 'public@102' '-OQXUte' '-Pu' 'udp:10.0.0.201:161' 'BRIDGE-MIB::dot1dStpProtocolSpecification.0'[0m]  
+BRIDGE-MIB::dot1dStpProtocolSpecification.0 = 3
+  
+  
+SNMP[[0;36m'/usr/bin/snmpget' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/cisco' '-m' 'SNMPv2-TC:SNMPv2-MIB:IF-MIB:IP-MIB:TCP-MIB:UDP-MIB:NET-SNMP-VACM-MIB' '-v2c' '-c' 'public@102' '-OQXUt' '-Pu' 'udp:10.0.0.201:161' 'BRIDGE-MIB::dot1dBaseBridgeAddress.0' 'BRIDGE-MIB::dot1dStpProtocolSpecification.0' 'BRIDGE-MIB::dot1dStpPriority.0' 'BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0' 'BRIDGE-MIB::dot1dStpTopChanges.0' 'BRIDGE-MIB::dot1dStpDesignatedRoot.0' 'BRIDGE-MIB::dot1dStpRootCost.0' 'BRIDGE-MIB::dot1dStpRootPort.0' 'BRIDGE-MIB::dot1dStpMaxAge.0' 'BRIDGE-MIB::dot1dStpHelloTime.0'[0m]  
+BRIDGE-MIB::dot1dBaseBridgeAddress.0 = 38:91:b7:af:1:80
+BRIDGE-MIB::dot1dStpProtocolSpecification.0 = ieee8021d
+BRIDGE-MIB::dot1dStpPriority.0 = 32870
+BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0 = 131949500
+BRIDGE-MIB::dot1dStpTopChanges.0 = 1
+BRIDGE-MIB::dot1dStpDesignatedRoot.0 = "00 66 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpRootCost.0 = 4
+BRIDGE-MIB::dot1dStpRootPort.0 = 456
+BRIDGE-MIB::dot1dStpMaxAge.0 = 2000
+BRIDGE-MIB::dot1dStpHelloTime.0 = 200
+  
+  
+SNMP[[0;36m'/usr/bin/snmpget' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/cisco' '-m' 'SNMPv2-TC:SNMPv2-MIB:IF-MIB:IP-MIB:TCP-MIB:UDP-MIB:NET-SNMP-VACM-MIB' '-v2c' '-c' 'public@102' '-OQXUt' '-Pu' 'udp:10.0.0.201:161' 'BRIDGE-MIB::dot1dStpHoldTime.0' 'BRIDGE-MIB::dot1dStpForwardDelay.0' 'BRIDGE-MIB::dot1dStpBridgeMaxAge.0' 'BRIDGE-MIB::dot1dStpBridgeHelloTime.0' 'BRIDGE-MIB::dot1dStpBridgeForwardDelay.0'[0m]  
+BRIDGE-MIB::dot1dStpHoldTime.0 = 100
+BRIDGE-MIB::dot1dStpForwardDelay.0 = 1500
+BRIDGE-MIB::dot1dStpBridgeMaxAge.0 = 2000
+BRIDGE-MIB::dot1dStpBridgeHelloTime.0 = 200
+BRIDGE-MIB::dot1dStpBridgeForwardDelay.0 = 1500
+  
+  
+VLAN: 102 Bridge: 38:91:b7:af:01:80 DR: 2c:5a:0f:51:da:b1  
+SNMP[[0;36m'/usr/bin/snmpget' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/cisco' '-m' 'SNMPv2-TC:SNMPv2-MIB:IF-MIB:IP-MIB:TCP-MIB:UDP-MIB:NET-SNMP-VACM-MIB' '-v2c' '-c' 'public@1002' '-OQXUte' '-Pu' 'udp:10.0.0.201:161' 'BRIDGE-MIB::dot1dStpProtocolSpecification.0'[0m]  
+BRIDGE-MIB::dot1dStpProtocolSpecification.0 = No Such Instance currently exists at this OID
+  
+  
+SNMP[[0;36m'/usr/bin/snmpget' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/cisco' '-m' 'SNMPv2-TC:SNMPv2-MIB:IF-MIB:IP-MIB:TCP-MIB:UDP-MIB:NET-SNMP-VACM-MIB' '-v2c' '-c' 'public@1003' '-OQXUte' '-Pu' 'udp:10.0.0.201:161' 'BRIDGE-MIB::dot1dStpProtocolSpecification.0'[0m]  
+BRIDGE-MIB::dot1dStpProtocolSpecification.0 = No Such Instance currently exists at this OID
+  
+  
+SNMP[[0;36m'/usr/bin/snmpget' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/cisco' '-m' 'SNMPv2-TC:SNMPv2-MIB:IF-MIB:IP-MIB:TCP-MIB:UDP-MIB:NET-SNMP-VACM-MIB' '-v2c' '-c' 'public@1004' '-OQXUte' '-Pu' 'udp:10.0.0.201:161' 'BRIDGE-MIB::dot1dStpProtocolSpecification.0'[0m]  
+BRIDGE-MIB::dot1dStpProtocolSpecification.0 = No Such Instance currently exists at this OID
+  
+  
+SNMP[[0;36m'/usr/bin/snmpget' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/cisco' '-m' 'SNMPv2-TC:SNMPv2-MIB:IF-MIB:IP-MIB:TCP-MIB:UDP-MIB:NET-SNMP-VACM-MIB' '-v2c' '-c' 'public@1005' '-OQXUte' '-Pu' 'udp:10.0.0.201:161' 'BRIDGE-MIB::dot1dStpProtocolSpecification.0'[0m]  
+BRIDGE-MIB::dot1dStpProtocolSpecification.0 = No Such Instance currently exists at this OID
+  
+  
+Instances: SQL[[1;33mselect * from `stp` where `stp`.`device_id` = ? and `stp`.`device_id` is not null [0;33m[33][0m 1.24ms] 
+  
+SQL[[1;33mupdate `stp` set `timeSinceTopologyChange` = ? where `stp_id` = ? [0;33m["1136475",174][0m 1.15ms] 
+  
+Updated data:   array (
+  'timeSinceTopologyChange' => '1136475',
+)  
+SQL[[1;33mupdate `stp` set `timeSinceTopologyChange` = ? where `stp_id` = ? [0;33m["1319495",175][0m 1.27ms] 
+  
+Updated data:   array (
+  'timeSinceTopologyChange' => '1319495',
+)  
+
+SNMP['/usr/bin/snmpbulkwalk' '-v2c' '-c' 'public' '-OQUs' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/cisco' 'udp:10.0.0.201:161' 'BRIDGE-MIB::dot1dBasePortIfIndex'[0m]
+dot1dBasePortIfIndex.13 = 10113
+dot1dBasePortIfIndex.25 = 10125
+dot1dBasePortIfIndex.26 = 10126
+dot1dBasePortIfIndex.28 = 10128
+dot1dBasePortIfIndex.29 = 10129
+dot1dBasePortIfIndex.30 = 10130
+dot1dBasePortIfIndex.31 = 10131
+dot1dBasePortIfIndex.32 = 10132
+dot1dBasePortIfIndex.33 = 10133
+dot1dBasePortIfIndex.34 = 10134
+dot1dBasePortIfIndex.35 = 10135
+dot1dBasePortIfIndex.36 = 10136
+dot1dBasePortIfIndex.37 = 10137
+dot1dBasePortIfIndex.38 = 10138
+dot1dBasePortIfIndex.39 = 10139
+dot1dBasePortIfIndex.40 = 10140
+dot1dBasePortIfIndex.41 = 10141
+dot1dBasePortIfIndex.42 = 10142
+dot1dBasePortIfIndex.43 = 10143
+dot1dBasePortIfIndex.44 = 10144
+dot1dBasePortIfIndex.45 = 10145
+dot1dBasePortIfIndex.46 = 10146
+dot1dBasePortIfIndex.47 = 10147
+dot1dBasePortIfIndex.48 = 10148
+dot1dBasePortIfIndex.49 = 10149
+dot1dBasePortIfIndex.50 = 10150
+dot1dBasePortIfIndex.51 = 10151
+dot1dBasePortIfIndex.55 = 10203
+dot1dBasePortIfIndex.56 = 10204  
+  
+SQL[[1;33mselect `port_id`, `ifIndex` from `ports` where `device_id` = ? [0;33m[33][0m 0.9ms] 
+  
+SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/cisco' '-m' 'SNMPv2-TC:SNMPv2-MIB:IF-MIB:IP-MIB:TCP-MIB:UDP-MIB:NET-SNMP-VACM-MIB' '-v2c' '-c' 'public@100' '-OQXUt' '-Pu' 'udp:10.0.0.201:161' 'BRIDGE-MIB::dot1dStpPortTable'[0m]  
+BRIDGE-MIB::dot1dStpPort[1] = 1
+BRIDGE-MIB::dot1dStpPort[4] = 4
+BRIDGE-MIB::dot1dStpPort[8] = 8
+BRIDGE-MIB::dot1dStpPort[9] = 9
+BRIDGE-MIB::dot1dStpPort[10] = 10
+BRIDGE-MIB::dot1dStpPort[11] = 11
+BRIDGE-MIB::dot1dStpPort[16] = 16
+BRIDGE-MIB::dot1dStpPort[17] = 17
+BRIDGE-MIB::dot1dStpPort[19] = 19
+BRIDGE-MIB::dot1dStpPort[21] = 21
+BRIDGE-MIB::dot1dStpPort[23] = 23
+BRIDGE-MIB::dot1dStpPort[24] = 24
+BRIDGE-MIB::dot1dStpPort[27] = 27
+BRIDGE-MIB::dot1dStpPort[52] = 52
+BRIDGE-MIB::dot1dStpPortPriority[1] = 128
+BRIDGE-MIB::dot1dStpPortPriority[4] = 128
+BRIDGE-MIB::dot1dStpPortPriority[8] = 128
+BRIDGE-MIB::dot1dStpPortPriority[9] = 128
+BRIDGE-MIB::dot1dStpPortPriority[10] = 128
+BRIDGE-MIB::dot1dStpPortPriority[11] = 128
+BRIDGE-MIB::dot1dStpPortPriority[16] = 128
+BRIDGE-MIB::dot1dStpPortPriority[17] = 128
+BRIDGE-MIB::dot1dStpPortPriority[19] = 128
+BRIDGE-MIB::dot1dStpPortPriority[21] = 128
+BRIDGE-MIB::dot1dStpPortPriority[23] = 128
+BRIDGE-MIB::dot1dStpPortPriority[24] = 128
+BRIDGE-MIB::dot1dStpPortPriority[27] = 128
+BRIDGE-MIB::dot1dStpPortPriority[52] = 128
+BRIDGE-MIB::dot1dStpPortState[1] = forwarding
+BRIDGE-MIB::dot1dStpPortState[4] = forwarding
+BRIDGE-MIB::dot1dStpPortState[8] = forwarding
+BRIDGE-MIB::dot1dStpPortState[9] = forwarding
+BRIDGE-MIB::dot1dStpPortState[10] = forwarding
+BRIDGE-MIB::dot1dStpPortState[11] = forwarding
+BRIDGE-MIB::dot1dStpPortState[16] = forwarding
+BRIDGE-MIB::dot1dStpPortState[17] = forwarding
+BRIDGE-MIB::dot1dStpPortState[19] = forwarding
+BRIDGE-MIB::dot1dStpPortState[21] = forwarding
+BRIDGE-MIB::dot1dStpPortState[23] = forwarding
+BRIDGE-MIB::dot1dStpPortState[24] = forwarding
+BRIDGE-MIB::dot1dStpPortState[27] = forwarding
+BRIDGE-MIB::dot1dStpPortState[52] = forwarding
+BRIDGE-MIB::dot1dStpPortEnable[1] = enabled
+BRIDGE-MIB::dot1dStpPortEnable[4] = enabled
+BRIDGE-MIB::dot1dStpPortEnable[8] = enabled
+BRIDGE-MIB::dot1dStpPortEnable[9] = enabled
+BRIDGE-MIB::dot1dStpPortEnable[10] = enabled
+BRIDGE-MIB::dot1dStpPortEnable[11] = enabled
+BRIDGE-MIB::dot1dStpPortEnable[16] = enabled
+BRIDGE-MIB::dot1dStpPortEnable[17] = enabled
+BRIDGE-MIB::dot1dStpPortEnable[19] = enabled
+BRIDGE-MIB::dot1dStpPortEnable[21] = enabled
+BRIDGE-MIB::dot1dStpPortEnable[23] = enabled
+BRIDGE-MIB::dot1dStpPortEnable[24] = enabled
+BRIDGE-MIB::dot1dStpPortEnable[27] = enabled
+BRIDGE-MIB::dot1dStpPortEnable[52] = enabled
+BRIDGE-MIB::dot1dStpPortPathCost[1] = 4
+BRIDGE-MIB::dot1dStpPortPathCost[4] = 4
+BRIDGE-MIB::dot1dStpPortPathCost[8] = 4
+BRIDGE-MIB::dot1dStpPortPathCost[9] = 19
+BRIDGE-MIB::dot1dStpPortPathCost[10] = 19
+BRIDGE-MIB::dot1dStpPortPathCost[11] = 4
+BRIDGE-MIB::dot1dStpPortPathCost[16] = 4
+BRIDGE-MIB::dot1dStpPortPathCost[17] = 4
+BRIDGE-MIB::dot1dStpPortPathCost[19] = 4
+BRIDGE-MIB::dot1dStpPortPathCost[21] = 4
+BRIDGE-MIB::dot1dStpPortPathCost[23] = 19
+BRIDGE-MIB::dot1dStpPortPathCost[24] = 4
+BRIDGE-MIB::dot1dStpPortPathCost[27] = 4
+BRIDGE-MIB::dot1dStpPortPathCost[52] = 4
+BRIDGE-MIB::dot1dStpPortDesignatedRoot[1] = "00 64 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpPortDesignatedRoot[4] = "00 64 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpPortDesignatedRoot[8] = "00 64 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpPortDesignatedRoot[9] = "00 64 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpPortDesignatedRoot[10] = "00 64 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpPortDesignatedRoot[11] = "00 64 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpPortDesignatedRoot[16] = "00 64 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpPortDesignatedRoot[17] = "00 64 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpPortDesignatedRoot[19] = "00 64 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpPortDesignatedRoot[21] = "00 64 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpPortDesignatedRoot[23] = "00 64 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpPortDesignatedRoot[24] = "00 64 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpPortDesignatedRoot[27] = "00 64 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpPortDesignatedRoot[52] = "00 64 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpPortDesignatedCost[1] = 6
+BRIDGE-MIB::dot1dStpPortDesignatedCost[4] = 6
+BRIDGE-MIB::dot1dStpPortDesignatedCost[8] = 6
+BRIDGE-MIB::dot1dStpPortDesignatedCost[9] = 6
+BRIDGE-MIB::dot1dStpPortDesignatedCost[10] = 6
+BRIDGE-MIB::dot1dStpPortDesignatedCost[11] = 6
+BRIDGE-MIB::dot1dStpPortDesignatedCost[16] = 6
+BRIDGE-MIB::dot1dStpPortDesignatedCost[17] = 6
+BRIDGE-MIB::dot1dStpPortDesignatedCost[19] = 6
+BRIDGE-MIB::dot1dStpPortDesignatedCost[21] = 6
+BRIDGE-MIB::dot1dStpPortDesignatedCost[23] = 6
+BRIDGE-MIB::dot1dStpPortDesignatedCost[24] = 6
+BRIDGE-MIB::dot1dStpPortDesignatedCost[27] = 6
+BRIDGE-MIB::dot1dStpPortDesignatedCost[52] = 2
+BRIDGE-MIB::dot1dStpPortDesignatedBridge[1] = "80 64 38 91 B7 AF 01 80 "
+BRIDGE-MIB::dot1dStpPortDesignatedBridge[4] = "80 64 38 91 B7 AF 01 80 "
+BRIDGE-MIB::dot1dStpPortDesignatedBridge[8] = "80 64 38 91 B7 AF 01 80 "
+BRIDGE-MIB::dot1dStpPortDesignatedBridge[9] = "80 64 38 91 B7 AF 01 80 "
+BRIDGE-MIB::dot1dStpPortDesignatedBridge[10] = "80 64 38 91 B7 AF 01 80 "
+BRIDGE-MIB::dot1dStpPortDesignatedBridge[11] = "80 64 38 91 B7 AF 01 80 "
+BRIDGE-MIB::dot1dStpPortDesignatedBridge[16] = "80 64 38 91 B7 AF 01 80 "
+BRIDGE-MIB::dot1dStpPortDesignatedBridge[17] = "80 64 38 91 B7 AF 01 80 "
+BRIDGE-MIB::dot1dStpPortDesignatedBridge[19] = "80 64 38 91 B7 AF 01 80 "
+BRIDGE-MIB::dot1dStpPortDesignatedBridge[21] = "80 64 38 91 B7 AF 01 80 "
+BRIDGE-MIB::dot1dStpPortDesignatedBridge[23] = "80 64 38 91 B7 AF 01 80 "
+BRIDGE-MIB::dot1dStpPortDesignatedBridge[24] = "80 64 38 91 B7 AF 01 80 "
+BRIDGE-MIB::dot1dStpPortDesignatedBridge[27] = "80 64 38 91 B7 AF 01 80 "
+BRIDGE-MIB::dot1dStpPortDesignatedBridge[52] = "80 64 38 91 B7 B0 23 00 "
+BRIDGE-MIB::dot1dStpPortDesignatedPort[1] = "80 01 "
+BRIDGE-MIB::dot1dStpPortDesignatedPort[4] = "80 04 "
+BRIDGE-MIB::dot1dStpPortDesignatedPort[8] = "80 08 "
+BRIDGE-MIB::dot1dStpPortDesignatedPort[9] = "80 09 "
+BRIDGE-MIB::dot1dStpPortDesignatedPort[10] = "80 0A "
+BRIDGE-MIB::dot1dStpPortDesignatedPort[11] = "80 0B "
+BRIDGE-MIB::dot1dStpPortDesignatedPort[16] = "80 10 "
+BRIDGE-MIB::dot1dStpPortDesignatedPort[17] = "80 11 "
+BRIDGE-MIB::dot1dStpPortDesignatedPort[19] = "80 13 "
+BRIDGE-MIB::dot1dStpPortDesignatedPort[21] = "80 15 "
+BRIDGE-MIB::dot1dStpPortDesignatedPort[23] = "80 17 "
+BRIDGE-MIB::dot1dStpPortDesignatedPort[24] = "80 18 "
+BRIDGE-MIB::dot1dStpPortDesignatedPort[27] = "80 1B "
+BRIDGE-MIB::dot1dStpPortDesignatedPort[52] = "80 34 "
+BRIDGE-MIB::dot1dStpPortForwardTransitions[1] = 1
+BRIDGE-MIB::dot1dStpPortForwardTransitions[4] = 1
+BRIDGE-MIB::dot1dStpPortForwardTransitions[8] = 1
+BRIDGE-MIB::dot1dStpPortForwardTransitions[9] = 1
+BRIDGE-MIB::dot1dStpPortForwardTransitions[10] = 1
+BRIDGE-MIB::dot1dStpPortForwardTransitions[11] = 1
+BRIDGE-MIB::dot1dStpPortForwardTransitions[16] = 1
+BRIDGE-MIB::dot1dStpPortForwardTransitions[17] = 1
+BRIDGE-MIB::dot1dStpPortForwardTransitions[19] = 1
+BRIDGE-MIB::dot1dStpPortForwardTransitions[21] = 1
+BRIDGE-MIB::dot1dStpPortForwardTransitions[23] = 1
+BRIDGE-MIB::dot1dStpPortForwardTransitions[24] = 1
+BRIDGE-MIB::dot1dStpPortForwardTransitions[27] = 1
+BRIDGE-MIB::dot1dStpPortForwardTransitions[52] = 1
+  
+  
+1 (100) port not found skipping  
+4 (100) port not found skipping  
+8 (100) port not found skipping  
+9 (100) port not found skipping  
+10 (100) port not found skipping  
+11 (100) port not found skipping  
+16 (100) port not found skipping  
+17 (100) port not found skipping  
+19 (100) port not found skipping  
+21 (100) port not found skipping  
+23 (100) port not found skipping  
+24 (100) port not found skipping  
+27 (100) port not found skipping  
+52 (100) port not found skipping  
+SNMP[[0;36m'/usr/bin/snmpbulkwalk' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/cisco' '-m' 'SNMPv2-TC:SNMPv2-MIB:IF-MIB:IP-MIB:TCP-MIB:UDP-MIB:NET-SNMP-VACM-MIB' '-v2c' '-c' 'public@102' '-OQXUt' '-Pu' 'udp:10.0.0.201:161' 'BRIDGE-MIB::dot1dStpPortTable'[0m]  
+BRIDGE-MIB::dot1dStpPort[2] = 2
+BRIDGE-MIB::dot1dStpPort[3] = 3
+BRIDGE-MIB::dot1dStpPort[5] = 5
+BRIDGE-MIB::dot1dStpPort[6] = 6
+BRIDGE-MIB::dot1dStpPort[12] = 12
+BRIDGE-MIB::dot1dStpPort[14] = 14
+BRIDGE-MIB::dot1dStpPort[18] = 18
+BRIDGE-MIB::dot1dStpPort[20] = 20
+BRIDGE-MIB::dot1dStpPort[22] = 22
+BRIDGE-MIB::dot1dStpPort[456] = 456
+BRIDGE-MIB::dot1dStpPortPriority[2] = 128
+BRIDGE-MIB::dot1dStpPortPriority[3] = 128
+BRIDGE-MIB::dot1dStpPortPriority[5] = 128
+BRIDGE-MIB::dot1dStpPortPriority[6] = 128
+BRIDGE-MIB::dot1dStpPortPriority[12] = 128
+BRIDGE-MIB::dot1dStpPortPriority[14] = 128
+BRIDGE-MIB::dot1dStpPortPriority[18] = 128
+BRIDGE-MIB::dot1dStpPortPriority[20] = 128
+BRIDGE-MIB::dot1dStpPortPriority[22] = 128
+BRIDGE-MIB::dot1dStpPortPriority[456] = 128
+BRIDGE-MIB::dot1dStpPortState[2] = forwarding
+BRIDGE-MIB::dot1dStpPortState[3] = forwarding
+BRIDGE-MIB::dot1dStpPortState[5] = forwarding
+BRIDGE-MIB::dot1dStpPortState[6] = forwarding
+BRIDGE-MIB::dot1dStpPortState[12] = forwarding
+BRIDGE-MIB::dot1dStpPortState[14] = forwarding
+BRIDGE-MIB::dot1dStpPortState[18] = forwarding
+BRIDGE-MIB::dot1dStpPortState[20] = forwarding
+BRIDGE-MIB::dot1dStpPortState[22] = forwarding
+BRIDGE-MIB::dot1dStpPortState[456] = forwarding
+BRIDGE-MIB::dot1dStpPortEnable[2] = enabled
+BRIDGE-MIB::dot1dStpPortEnable[3] = enabled
+BRIDGE-MIB::dot1dStpPortEnable[5] = enabled
+BRIDGE-MIB::dot1dStpPortEnable[6] = enabled
+BRIDGE-MIB::dot1dStpPortEnable[12] = enabled
+BRIDGE-MIB::dot1dStpPortEnable[14] = enabled
+BRIDGE-MIB::dot1dStpPortEnable[18] = enabled
+BRIDGE-MIB::dot1dStpPortEnable[20] = enabled
+BRIDGE-MIB::dot1dStpPortEnable[22] = enabled
+BRIDGE-MIB::dot1dStpPortEnable[456] = enabled
+BRIDGE-MIB::dot1dStpPortPathCost[2] = 4
+BRIDGE-MIB::dot1dStpPortPathCost[3] = 4
+BRIDGE-MIB::dot1dStpPortPathCost[5] = 4
+BRIDGE-MIB::dot1dStpPortPathCost[6] = 4
+BRIDGE-MIB::dot1dStpPortPathCost[12] = 4
+BRIDGE-MIB::dot1dStpPortPathCost[14] = 4
+BRIDGE-MIB::dot1dStpPortPathCost[18] = 4
+BRIDGE-MIB::dot1dStpPortPathCost[20] = 4
+BRIDGE-MIB::dot1dStpPortPathCost[22] = 4
+BRIDGE-MIB::dot1dStpPortPathCost[456] = 2
+BRIDGE-MIB::dot1dStpPortDesignatedRoot[2] = "00 66 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpPortDesignatedRoot[3] = "00 66 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpPortDesignatedRoot[5] = "00 66 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpPortDesignatedRoot[6] = "00 66 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpPortDesignatedRoot[12] = "00 66 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpPortDesignatedRoot[14] = "00 66 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpPortDesignatedRoot[18] = "00 66 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpPortDesignatedRoot[20] = "00 66 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpPortDesignatedRoot[22] = "00 66 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpPortDesignatedRoot[456] = "00 66 2C 5A 0F 51 DA B1 "
+BRIDGE-MIB::dot1dStpPortDesignatedCost[2] = 4
+BRIDGE-MIB::dot1dStpPortDesignatedCost[3] = 4
+BRIDGE-MIB::dot1dStpPortDesignatedCost[5] = 4
+BRIDGE-MIB::dot1dStpPortDesignatedCost[6] = 4
+BRIDGE-MIB::dot1dStpPortDesignatedCost[12] = 4
+BRIDGE-MIB::dot1dStpPortDesignatedCost[14] = 4
+BRIDGE-MIB::dot1dStpPortDesignatedCost[18] = 4
+BRIDGE-MIB::dot1dStpPortDesignatedCost[20] = 4
+BRIDGE-MIB::dot1dStpPortDesignatedCost[22] = 4
+BRIDGE-MIB::dot1dStpPortDesignatedCost[456] = 2
+BRIDGE-MIB::dot1dStpPortDesignatedBridge[2] = "80 66 38 91 B7 AF 01 80 "
+BRIDGE-MIB::dot1dStpPortDesignatedBridge[3] = "80 66 38 91 B7 AF 01 80 "
+BRIDGE-MIB::dot1dStpPortDesignatedBridge[5] = "80 66 38 91 B7 AF 01 80 "
+BRIDGE-MIB::dot1dStpPortDesignatedBridge[6] = "80 66 38 91 B7 AF 01 80 "
+BRIDGE-MIB::dot1dStpPortDesignatedBridge[12] = "80 66 38 91 B7 AF 01 80 "
+BRIDGE-MIB::dot1dStpPortDesignatedBridge[14] = "80 66 38 91 B7 AF 01 80 "
+BRIDGE-MIB::dot1dStpPortDesignatedBridge[18] = "80 66 38 91 B7 AF 01 80 "
+BRIDGE-MIB::dot1dStpPortDesignatedBridge[20] = "80 66 38 91 B7 AF 01 80 "
+BRIDGE-MIB::dot1dStpPortDesignatedBridge[22] = "80 66 38 91 B7 AF 01 80 "
+BRIDGE-MIB::dot1dStpPortDesignatedBridge[456] = "10 66 70 DB 98 D9 8D 43 "
+BRIDGE-MIB::dot1dStpPortDesignatedPort[2] = "80 02 "
+BRIDGE-MIB::dot1dStpPortDesignatedPort[3] = "80 03 "
+BRIDGE-MIB::dot1dStpPortDesignatedPort[5] = "80 05 "
+BRIDGE-MIB::dot1dStpPortDesignatedPort[6] = "80 06 "
+BRIDGE-MIB::dot1dStpPortDesignatedPort[12] = "80 0C "
+BRIDGE-MIB::dot1dStpPortDesignatedPort[14] = "80 0E "
+BRIDGE-MIB::dot1dStpPortDesignatedPort[18] = "80 12 "
+BRIDGE-MIB::dot1dStpPortDesignatedPort[20] = "80 14 "
+BRIDGE-MIB::dot1dStpPortDesignatedPort[22] = "80 16 "
+BRIDGE-MIB::dot1dStpPortDesignatedPort[456] = "90 2F "
+BRIDGE-MIB::dot1dStpPortForwardTransitions[2] = 1
+BRIDGE-MIB::dot1dStpPortForwardTransitions[3] = 1
+BRIDGE-MIB::dot1dStpPortForwardTransitions[5] = 1
+BRIDGE-MIB::dot1dStpPortForwardTransitions[6] = 1
+BRIDGE-MIB::dot1dStpPortForwardTransitions[12] = 1
+BRIDGE-MIB::dot1dStpPortForwardTransitions[14] = 1
+BRIDGE-MIB::dot1dStpPortForwardTransitions[18] = 1
+BRIDGE-MIB::dot1dStpPortForwardTransitions[20] = 1
+BRIDGE-MIB::dot1dStpPortForwardTransitions[22] = 1
+BRIDGE-MIB::dot1dStpPortForwardTransitions[456] = 1
+  
+  
+2 (102) port not found skipping  
+3 (102) port not found skipping  
+5 (102) port not found skipping  
+6 (102) port not found skipping  
+12 (102) port not found skipping  
+14 (102) port not found skipping  
+18 (102) port not found skipping  
+20 (102) port not found skipping  
+22 (102) port not found skipping  
+456 (102) port not found skipping  
+Ports: SQL[[1;33mselect * from `ports_stp` where `ports_stp`.`device_id` = ? and `ports_stp`.`device_id` is not null [0;33m[33][0m 3.33ms] 
+  
+
+  
+>> [0;36mSNMP[0m: [15/2.32s] [1;33mMySQL[0m: [6/0.10s] [0;32mRRD[0m: [0/0.00s]  
+>> Runtime for discovery module 'stp': 2.4117 seconds with 410088 bytes  
+#### Unload discovery module stp ####
+  
+
+>>> Discovered 10.0.0.201 (33) in 3.761 seconds <<<  
+
+[0;36mSNMP[0m [17/2.54s]: Snmpget[14/1.19s] Snmpwalk[3/1.35s]  
+[1;33mSQL[0m [18/0.21s]: Select[14/0.16s] Update[4/0.05s]  
+[0;32mRRD[0m [1/0.00s]: Update[1/0.00s]  
