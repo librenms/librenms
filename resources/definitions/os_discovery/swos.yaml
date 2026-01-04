@@ -1,6 +1,6 @@
 modules:
     os:
-        sysDescr_regex: '/(?<hardware>.*)\sSwOS/'
+        sysDescr_regex: '/(?<hardware>.*)\sSwOS\s(?<version>.*)/'
         serial: MIKROTIK-MIB::mtxrSerialNumber.0
         version: MIKROTIK-MIB::mtxrFirmwareVersion.0
     sensors:
