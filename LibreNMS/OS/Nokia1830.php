@@ -330,7 +330,7 @@ class Nokia1830 extends OS implements EntityPhysicalDiscovery, TransceiverDiscov
 
             // Determine type based on port name - OSC ports typically use SFP
             $type = 'SFP';
-            if (str_contains(strtoupper($ifName), 'OSCSFP')) {
+            if (str_contains(strtoupper((string) $ifName), 'OSCSFP')) {
                 $type = 'SFP';  // OSC SFP ports
             }
 
@@ -454,7 +454,7 @@ class Nokia1830 extends OS implements EntityPhysicalDiscovery, TransceiverDiscov
 
             // Determine type from port name
             $type = 'SFP';
-            if (str_contains(strtoupper($ifName), 'NETWORK')) {
+            if (str_contains(strtoupper((string) $ifName), 'NETWORK')) {
                 $type = 'SFP+';  // Network ports typically use SFP+ or higher
             }
 
@@ -629,7 +629,7 @@ class Nokia1830 extends OS implements EntityPhysicalDiscovery, TransceiverDiscov
             $day = (int) $matches[3];
 
             // Assume 20xx for years 00-99
-            $year = $year + 2000;
+            $year += 2000;
 
             if ($month >= 1 && $month <= 12 && $day >= 1 && $day <= 31) {
                 return sprintf('%04d-%02d-%02d', $year, $month, $day);
