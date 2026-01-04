@@ -1,4 +1,5 @@
 <?php
+
 /**
  * nokia-1830.inc.php
  *
