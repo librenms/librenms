@@ -22,6 +22,7 @@ modules:
                       - tnIroadmPortInfoTable
                       - tnUserInterfacePanelTable
                       - tnAccessPortTable
+                      - tnOtPortInfoTable
         temperature:
             data:
                 - oid: tnCardTable
@@ -34,11 +35,21 @@ modules:
                   low_limit: tnCardLowTemperatureThresh.{{ $index }}
                 - oid: tnOscSfpPortConfigTable
                   value: tnOscSfpTemperature
-                  group: Transceivers
-                  descr: "{{ $ifName }}"
+                  group: transceiver
+                  descr: "Temperature"
                   num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.4.76.1.2.{{ $index }}"
                   index: "tnOscSfpTemperature.{{ $index }}"
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: ports
                   divisor: 100
+                - oid: tnOtPortInfoTable
+                  value: tnOtPortTemperature
+                  group: transceiver
+                  descr: "{{ $ifName }} Temperature"
+                  num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.71.1.4.{{ $index }}"
+                  index: "tnOtPortTemperature.{{ $index }}"
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: port
         state:
             data:
                 - oid: tnOchXcItuTable
@@ -145,13 +156,15 @@ modules:
                 - oid: tnAmplifierPortInfoTable
                   value: tnAmplifierPortPowerIn
                   num_oid: ".1.3.6.1.4.1.7483.2.2.3.7.5.2.1.2.{{ $index }}"
-                  descr: "{{ ifName }} Power In"
+                  group: 'Amplifier Power'
+                  descr: "{{ ifName }} Power Rx"
                   index: "tnAmplifierPortPowerIn.{{ $index }}"
                   divisor: 100
                 - oid: tnAmplifierPortInfoTable
                   value: tnAmplifierPortPowerOut
                   num_oid: ".1.3.6.1.4.1.7483.2.2.3.7.5.2.1.3.{{ $index }}"
-                  descr: "{{ $ifName }} Power Out"
+                  group: 'Amplifier Power'
+                  descr: "{{ $ifName }} Power Tx"
                   index: "tnAmplifierPortPowerOut.{{ $index }}"
                   divisor: 100
                 - oid: tnAmplifierPortInfoTable
@@ -159,49 +172,82 @@ modules:
                   num_oid: ".1.3.6.1.4.1.7483.2.2.3.7.5.2.1.10.{{ $index }}"
                   descr: "{{ $ifName }} OSC Tx In"
                   index: "tnAmplifierPortOSCTxPowerIn.{{ $index }}"
+                  group: transceiver
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: ports
                   divisor: 100
                 - oid: tnAmplifierPortInfoTable
                   value: tnAmplifierPortOSCTxPowerOut
                   num_oid: ".1.3.6.1.4.1.7483.2.2.3.7.5.2.1.11.{{ $index }}"
                   descr: "{{ $ifName }} OSC Tx Out"
                   index: "tnAmplifierPortOSCTxPowerOut.{{ $index }}"
-                  divisor: 100
-                - oid: tnAmplifierPortInfoTable
-                  value: tnAmplifierPortOSCTxPowerOut
-                  num_oid: ".1.3.6.1.4.1.7483.2.2.3.7.5.2.1.11.{{ $index }}"
-                  descr: "{{ $ifName }} OSC Tx Out"
-                  index: "tnAmplifierPortOSCTxPowerOut.{{ $index }}"
+                  group: transceiver
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: ports
                   divisor: 100
                 - oid: tnIroadmPortInfoTable
                   value: tnIroadmPortInfoOSCTxPowerIn
                   num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.308.1.19.{{ $index }}"
                   descr: "{{ $ifName }} OSC Tx In"
                   index: "tnIroadmPortInfoOSCTxPowerIn.{{ $index }}"
+                  group: transceiver
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: ports
                   divisor: 100
                 - oid: tnIroadmPortInfoTable
                   value: tnIroadmPortInfoOSCTxPowerOut
                   num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.308.1.20.{{ $index }}"
                   descr: "{{ $ifName }} OSC Tx Out"
                   index: "tnIroadmPortInfoOSCTxPowerOut.{{ $index }}"
+                  group: transceiver
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: ports
                   divisor: 100
                 - oid: tnIroadmPortInfoTable
                   value: tnIroadmPortInfoOSCRxPowerIn
                   num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.308.1.21.{{ $index }}"
                   descr: "{{ $ifName }} OSC Rx In"
                   index: "tnIroadmPortInfoOSCRxPowerIn.{{ $index }}"
+                  group: transceiver
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: ports
                   divisor: 100
                 - oid: tnIroadmPortInfoTable
                   value: tnIroadmPortInfoOSCSfpTxPowerOut
                   num_oid: ".1.3.6.1.4.1.7483.2.2.3.7.5.2.1.22.{{ $index }}"
                   descr: "{{ $ifName }} OSC SFP Tx Out"
                   index: "tnIroadmPortInfoOSCSfpTxPowerOut.{{ $index }}"
+                  group: transceiver
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: ports
                   divisor: 100
                 - oid: tnIroadmPortInfoTable
                   value: tnIroadmPortInfoOSCSfpRxPowerIn
                   num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.308.1.23.{{ $index }}"
                   descr: "{{ $ifName }} OSC SFP Rx In"
                   index: "tnIroadmPortInfoOSCSfpRxPowerIn.{{ $index }}"
+                  group: transceiver
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: ports
                   divisor: 100
+                - oid: tnOtPortInfoTable
+                  value: tnOtPortRxPower
+                  num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.71.1.1.{{ $index }}"
+                  descr: "{{ $ifName }} RX Power"
+                  index: "tnOtPortRxPower.{{ $index }}"
+                  group: transceiver
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: port
+                  divisor: 1000
+                - oid: tnOtPortInfoTable
+                  value: tnOtPortTxPower
+                  num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.71.1.2.{{ $index }}"
+                  descr: "{{ $ifName }} TX Power"
+                  index: "tnOtPortTxPower.{{ $index }}"
+                  group: transceiver
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: port
+                  divisor: 1000
 
         power:
             data:
@@ -224,4 +270,23 @@ modules:
                   num_oid: ".1.3.6.1.4.1.7483.2.2.3.1.2.1.2.1.39.{{ $index }}"
                   descr: "{{ $tnCardName }} - {{ $tnCardMnemonic }}"
                   index: "tnCardTable.{{ $index }}"
+                  divisor: 1000
+                - oid: tnOtPortInfoTable
+                  value: tnOtPortBias
+                  num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.71.1.3.{{ $index }}"
+                  descr: "{{ $ifName }} Tx Bias"
+                  index: "tnOtPortBias.{{ $index }}"
+                  group: transceiver
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: port
+        voltage:
+            data:
+                - oid: tnOtPortInfoTable
+                  value: tnOtPortSupplyVoltage
+                  num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.71.1.12.{{ $index }}"
+                  descr: "{{ $ifName }} Voltage"
+                  index: "tnOtPortSupplyVoltage.{{ $index }}"
+                  group: transceiver
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: port
                   divisor: 1000

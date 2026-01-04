@@ -31,7 +31,7 @@ if (str_contains((string) $device['sysObjectID'], '.1.3.6.1.4.1.7483.1.3.1.12'))
         $ifName = $ifIndexToName[$ifIndex] ?? $ifIndex;
         if (! empty($ddmvalue['ddmLaserBiasCurrent']['tnPsdDdmDataValue']) && $ifAdminStatus[$ifIndex] == 'up') {
             $divisor = 1000000;
-            $descr = "$ifName Tx Bias";
+            $descr = "Tx Bias Current";
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
                 'sensor_class' => 'current',
@@ -44,7 +44,7 @@ if (str_contains((string) $device['sysObjectID'], '.1.3.6.1.4.1.7483.1.3.1.12'))
                 'sensor_current' => $ddmvalue['ddmLaserBiasCurrent']['tnPsdDdmDataValue'] / $divisor,
                 'entPhysicalIndex' => $ifIndex,
                 'entPhysicalIndex_measured' => 'port',
-                'group' => 'Transceivers',
+                'group' => 'transceiver',
             ]));
         }
     }
