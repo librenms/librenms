@@ -12,7 +12,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -20,10 +20,8 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2019 Vitali Kari
- * @copyright  2019 Tony Murray
- * @author     Vitali Kari <vitali.kari@gmail.com>
- * @author     Tony Murray <murraytony@gmail.com>
+ * @copyright  2026 Nick Peelman
+ * @author     Nick Peelman <nick@peelman.us>
  */
 
 namespace LibreNMS\OS;
@@ -203,7 +201,7 @@ class Nokia1830 extends OS implements EntityPhysicalDiscovery, TransceiverDiscov
 
         return $inventory;
     }
-    
+
     /**
      * Discover transceivers for Nokia 1830 PSS/PSD devices using TROPIC MIBs
      *
@@ -475,7 +473,7 @@ class Nokia1830 extends OS implements EntityPhysicalDiscovery, TransceiverDiscov
     /**
      * Map PSD SFP physical identifier to transceiver type
      */
-    private function mapPsdTransceiverType(?string $physId): ?string
+    private function mapPsdTransceiverType(?string $physId): string
     {
         if (empty($physId)) {
             return 'SFP';
