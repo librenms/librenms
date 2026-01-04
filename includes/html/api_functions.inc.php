@@ -3616,7 +3616,7 @@ function list_poller_log(Illuminate\Http\Request $request)
     // Filter for unpolled devices if requested
     if ($request->get('unpolled')) {
         $overdue = (int) (LibrenmsConfig::get('rrd.step', 300) * 1.2);
-        $query->whereRaw("`devices`.`last_polled` <= DATE_ADD(NOW(), INTERVAL - ? SECOND)", [$overdue]);
+        $query->whereRaw('`devices`.`last_polled` <= DATE_ADD(NOW(), INTERVAL - ? SECOND)', [$overdue]);
     }
 
     $devices = $query
