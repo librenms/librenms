@@ -203,6 +203,7 @@ class Nokia1830 extends OS implements EntityPhysicalDiscovery, TransceiverDiscov
 
         return $inventory;
     }
+    
     /**
      * Discover transceivers for Nokia 1830 PSS/PSD devices using TROPIC MIBs
      *

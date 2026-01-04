@@ -31,14 +31,13 @@ if (str_contains((string) $device['sysObjectID'], '.1.3.6.1.4.1.7483.1.3.1.12'))
         $ifName = $ifIndexToName[$ifIndex] ?? $ifIndex;
         if (! empty($ddmvalue['ddmLaserBiasCurrent']['tnPsdDdmDataValue']) && $ifAdminStatus[$ifIndex] == 'up') {
             $divisor = 1000000;
-            $descr = "Tx Bias Current";
             app('sensor-discovery')->discover(new \App\Models\Sensor([
                 'poller_type' => 'snmp',
                 'sensor_class' => 'current',
                 'sensor_oid' => ".1.3.6.1.4.1.7483.2.2.7.3.1.4.1.2.$ifIndex.3",
                 'sensor_index' => "$ifIndex.3",
                 'sensor_type' => 'nokia-1830',
-                'sensor_descr' => $descr,
+                'sensor_descr' => 'Tx Bias Current',
                 'sensor_divisor' => $divisor,
                 'sensor_multiplier' => 1,
                 'sensor_current' => $ddmvalue['ddmLaserBiasCurrent']['tnPsdDdmDataValue'] / $divisor,
