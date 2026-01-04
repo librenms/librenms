@@ -6,8 +6,7 @@ $device = device_by_id_cache($id);
 
 $rrd_filename = Rrd::name($device['hostname'], 'mem');
 
-$rrd_options[] = '-b';
-$rrd_options[] = '1024';
+$graph_params->base = 1024;
 
 $rrd_options[] = "DEF:atotalswap=$rrd_filename:totalswap:AVERAGE";
 $rrd_options[] = "DEF:aavailswap=$rrd_filename:availswap:AVERAGE";

@@ -21,8 +21,8 @@ $components = $component->getComponents($device['device_id'], $options);
 $components = $components[$device['device_id']];
 
 include 'includes/html/graphs/common.inc.php';
-$rrd_options[] = '-E';
-$rrd_options[] = "--vertical-label='Seconds'";
+$graph_params->vertical_label = 'Seconds';
+
 $rrd_options[] = 'COMMENT:Offset (s)             Now      Min      Max\\n';
 $rrd_additions = '';
 

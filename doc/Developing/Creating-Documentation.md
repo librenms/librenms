@@ -89,7 +89,7 @@ pip install \
  mkdocs-minify-plugin \
  mkdocs-redirects
 ```
-If you encounter permissions issues, these might be reoslved by using the
+If you encounter permissions issues, these might be resolved by using the
 user option, with whatever user you are building as, e.g. `-u librenms`
 
 2. A configuration file for building LibreNMS docs is already included in the
