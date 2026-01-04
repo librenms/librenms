@@ -39,7 +39,9 @@ use App\Models\MplsSdpBind;
 use App\Models\MplsService;
 use App\Models\MplsTunnelArHop;
 use App\Models\MplsTunnelCHop;
+use App\Models\PortVlan;
 use App\Models\Transceiver;
+use App\Models\Vlan;
 use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Exceptions\InvalidIpException;
@@ -51,13 +53,15 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
+use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Polling\MplsPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 use SnmpQuery;
 
-class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscovery, WirelessPowerDiscovery, WirelessSnrDiscovery, WirelessRsrqDiscovery, WirelessRssiDiscovery, WirelessRsrpDiscovery, WirelessChannelDiscovery
+<<<<<<< HEAD
+class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscovery, VlanDiscovery, WirelessPowerDiscovery, WirelessSnrDiscovery, WirelessRsrqDiscovery, WirelessRssiDiscovery, WirelessRsrpDiscovery, WirelessChannelDiscovery
 {
     public function discoverOS(Device $device): void
     {
@@ -940,6 +944,131 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscove
         }
 
         return $inventory;
+    }
+
+    /**
+     * Discover VLANs on Nokia TiMOS devices
+     *
+     * Attempts to discover VLANs using Q-BRIDGE-MIB first, then falls back to
+     * extracting VLAN IDs from SAP encapsulation values in TIMETRA-SERV-MIB.
+     *
+     * @return Collection of Vlan objects
+     */
+    public function discoverVlans(): Collection
+    {
+        $vlans = new Collection;
+
+        // First, try to discover VLANs from Q-BRIDGE-MIB (standard VLAN bridge MIB)
+        $qbridgeVlans = SnmpQuery::hideMib()->enumStrings()->walk([
+            'Q-BRIDGE-MIB::dot1qVlanStaticName',
+            'Q-BRIDGE-MIB::dot1qVlanStaticStatus',
+        ])->mapTable(function ($data, $vlanIndex) {
+            $vlanNumber = (int) $vlanIndex;
+
+            // Skip reserved VLANs
+            if ($vlanNumber < 1 || $vlanNumber > 4094) {
+                return null;
+            }
+
+            return new Vlan([
+                'device_id' => $this->getDeviceId(),
+                'vlan_vlan' => $vlanNumber,
+                'vlan_name' => $data['Q-BRIDGE-MIB::dot1qVlanStaticName'] ?? "VLAN $vlanNumber",
+            ]);
+        })->filter();
+
+        if ($qbridgeVlans->isNotEmpty()) {
+            return $qbridgeVlans;
+        }
+
+        // Fallback: Extract VLANs from SAP encapsulation values
+        // Nokia TiMOS uses TIMETRA-SERV-MIB with encapsulated VLAN IDs in SAPs
+        $saps = SnmpQuery::hideMib()->walk([
+            'TIMETRA-SAP-MIB::sapBaseInfoTable',
+        ])->mapTable(function ($data, $svcId, $sapPortId, $sapEncapValue) {
+            $vlanNumber = $this->extractVlanFromEncapValue($sapEncapValue);
+
+            // Skip invalid VLAN values
+            if ($vlanNumber < 1 || $vlanNumber > 4094) {
+                return null;
+            }
+
+            return new Vlan([
+                'device_id' => $this->getDeviceId(),
+                'vlan_vlan' => $vlanNumber,
+                'vlan_name' => "VLAN $vlanNumber",
+            ]);
+        })->filter();
+
+        // Remove duplicates by VLAN number
+        return $saps->unique('vlan_vlan')->values();
+    }
+
+    /**
+     * Discover VLAN-Port associations on Nokia TiMOS devices
+     *
+     * Extracts port membership information from SAP encapsulation values.
+     * Each SAP indicates that its port is a member of its VLAN.
+     *
+     * @param  Collection  $vlans  Collection of discovered Vlan objects
+     * @return Collection of PortVlan objects
+     */
+    public function discoverVlanPorts($vlans): Collection
+    {
+        $portVlans = new Collection;
+
+        // Walk SAP entries to discover VLAN-Port associations
+        $saps = SnmpQuery::hideMib()->walk([
+            'TIMETRA-SAP-MIB::sapBaseInfoTable',
+        ])->mapTable(function ($data, $svcId, $sapPortId, $sapEncapValue) use ($vlans) {
+            $vlanNumber = $this->extractVlanFromEncapValue($sapEncapValue);
+
+            // Skip invalid VLAN values
+            if ($vlanNumber < 1 || $vlanNumber > 4094) {
+                return null;
+            }
+
+            // Find matching VLAN from discovered VLANs
+            $vlan = $vlans->firstWhere('vlan_vlan', $vlanNumber);
+            if (! $vlan) {
+                return null;
+            }
+
+            // Convert TmnxPortID (sapPortId) to port_id
+            $portId = PortCache::getIdFromIfIndex((int) $sapPortId, $this->getDevice());
+            if (! $portId) {
+                return null;
+            }
+
+            return new PortVlan([
+                'device_id' => $this->getDeviceId(),
+                'port_id' => $portId,
+                'vlan' => $vlanNumber,
+                'state' => 'tagged',  // SAPs are typically tagged VLAN memberships
+            ]);
+        })->filter();
+
+        // Remove duplicates by port_id and vlan
+        return $saps->unique(fn ($item) => $item->port_id . '-' . $item->vlan)->values();
+    }
+
+    /**
+     * Extract outer VLAN ID from TmnxEncapVal
+     *
+     * TmnxEncapVal uses:
+     * - Lower 12 bits for dot1q (simple VLAN)
+     * - Lower 16 bits for outer VLAN in QinQ
+     * - Upper 16 bits for inner VLAN in QinQ
+     *
+     * @param  int|string  $encapVal  The encoded encapsulation value
+     * @return int The VLAN ID (outer VLAN for QinQ)
+     */
+    private function extractVlanFromEncapValue($encapVal): int
+    {
+        $encapVal = (int) $encapVal;
+
+        // Extract lower 12 bits for VLAN ID
+        return $encapVal & 0x0FFF;
     }
 
     private function parseIpField(array $data, string $ngField): ?string

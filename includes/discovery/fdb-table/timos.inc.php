@@ -172,24 +172,9 @@ if (! empty($fdbTable)) {
                 continue;
             }
 
-            // Create VLAN if it doesn't exist in the database (similar to Cisco IOS approach)
-            if (! array_key_exists($vlanNumber, $vlans_dict)) {
-                $vlanName = 'VLAN ' . $vlanNumber;
-                // For QinQ, include inner VLAN in the name
-                if ($decodedEncap['inner'] !== null) {
-                    $vlanName = "VLAN $vlanNumber (QinQ inner: {$decodedEncap['inner']})";
-                }
-
-                $vlan = Vlan::create([
-                    'device_id' => $device['device_id'],
-                    'vlan_vlan' => $vlanNumber,
-                    'vlan_name' => $vlanName,
-                ]);
-                $vlans_dict[$vlanNumber] = $vlan->vlan_id;
-                Log::debug("Created VLAN $vlanNumber (id: {$vlan->vlan_id})\n");
-            }
-
-            $vlan_id = $vlans_dict[$vlanNumber];
+            // Use VLAN ID from vlans_dict if available, otherwise use VLAN number directly
+            // This allows FDB entries to be added even if VLAN discovery module is disabled
+            $vlan_id = $vlans_dict[$vlanNumber] ?? $vlanNumber;
 
             // Nokia SAP format: ServiceID:Port:EncapValue (formatted for display)
             $formattedEncap = formatNokiaEncapValue($encapValue);
