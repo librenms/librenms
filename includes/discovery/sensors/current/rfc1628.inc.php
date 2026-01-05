@@ -37,7 +37,7 @@ foreach ($output_current as $index => $data) {
     if (count($output_current) > 1) {
         $descr .= " Phase $index";
     }
-    $outputCurrentValue = $data['upsOutputCurrent'];
+    $outputCurrentValue = $data['upsOutputCurrent'] ?? null;
     if (is_array($outputCurrentValue)) {
         $outputCurrentValue = $outputCurrentValue[0];
         $oid .= '.0';
@@ -75,7 +75,7 @@ foreach ($input_current as $index => $data) {
     if (count($input_current) > 1) {
         $descr .= " Phase $index";
     }
-    $inputCurrentValue = $data['upsInputCurrent'];
+    $inputCurrentValue = $data['upsInputCurrent'] ?? null;
     if (is_array($inputCurrentValue)) {
         $inputCurrentValue = $inputCurrentValue[0];
         $oid .= '.0';
@@ -113,7 +113,7 @@ foreach ($bypass_current as $index => $data) {
     if (count($bypass_current) > 1) {
         $descr .= " Phase $index";
     }
-    $bypassCurrentValue = $data['upsBypassCurrent'];
+    $bypassCurrentValue = $data['upsBypassCurrent'] ?? null;
     if (is_array($bypassCurrentValue)) {
         $bypassCurrentValue = $bypassCurrentValue[0];
         $oid .= '.0';
