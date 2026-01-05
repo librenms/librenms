@@ -44,7 +44,7 @@ class Mail extends Transport
             default => $this->config['email'] ?? $alert_data['contacts'] ?? [], // contacts is only used by legacy synthetic transport
         };
 
-        if (count($emails) == 0 && $this->config['ignore-no-emails']) {
+        if (is_array($emails) && count($emails) == 0 && $this->config['ignore-no-emails']) {
             Log::info('No e-mail contacts found', ['color' => true]);
 
             return true;
