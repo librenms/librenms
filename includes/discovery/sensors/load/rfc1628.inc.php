@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Util\Number;
 
-
 echo 'RFC1628 ';
 
 $load_data = snmpwalk_group($device, 'upsOutputPercentLoad', 'UPS-MIB');
