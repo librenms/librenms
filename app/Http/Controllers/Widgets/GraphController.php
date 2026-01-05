@@ -33,6 +33,7 @@ use App\Models\Customoid;
 use App\Models\Device;
 use App\Models\MuninPlugin;
 use App\Models\Port;
+use App\Models\Sensor;
 use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -56,6 +57,8 @@ class GraphController extends WidgetController
         'graph_service' => null,
         'graph_customoid' => null,
         'graph_ports' => [],
+        'graph_sensors' => [],
+        'graph_stack' => 'no',
         'graph_custom' => [],
         'graph_manual' => null,
         'graph_bill' => null,
@@ -76,7 +79,12 @@ class GraphController extends WidgetController
 
             return ($device ? $device->displayName() : 'Device') . ' / ' . $settings['graph_type'];
         } elseif ($type == 'aggregate') {
-            return 'Overall ' . $this->getGraphType(false) . ' Bits (' . $settings['graph_range'] . ')';
+            $aggregate_type = $this->getGraphType(false);
+            if ($aggregate_type == 'ports') {
+                return 'Overall ' . $this->getGraphType(false) . ' Bits (' . $settings['graph_range'] . ')';
+            } else {
+                return 'Overall ' . $this->getGraphType(false) . ' Aggregate (' . $settings['graph_range'] . ')';
+            }
         } elseif ($type == 'port') {
             if ($port = Port::find($settings['graph_port'])) {
                 return $port->device->displayName() . ' / ' . $port->getShortLabel() . ' / ' . $settings['graph_type'];
@@ -165,6 +173,14 @@ class GraphController extends WidgetController
 
         $data['graph_port_ids'] = $data['graph_ports']->pluck('port_id')->toJson();
 
+        $data['graph_sensors'] = Sensor::whereIntegerInRaw('sensor_id', $data['graph_sensors'])
+            ->select('sensors.device_id', 'sensor_id', 'sensor_class', 'sensor_descr', 'sensor_type')
+            ->with(['device' => function ($query): void {
+                $query->select('device_id', 'hostname', 'sysName', 'display');
+            }])->get();
+
+        $data['graph_sensor_ids'] = $data['graph_sensors']->pluck('sensor_id')->toJson();
+
         $data['graph_text'] = ucwords($name);
 
         return view('widgets.settings.graph', $data);
@@ -212,8 +228,18 @@ class GraphController extends WidgetController
                 $aggregate_type = $settings['graph_custom'];
             }
 
-            if ($aggregate_type == 'ports') {
+            if ($aggregate_type == 'sensors') {
+                // Multi-sensor graph
+                $sensor_ids = array_filter($settings['graph_sensors']); // Filter empty values
+                $params[] = 'id=' . implode(',', $sensor_ids);
+                if (($settings['graph_stack'] ?? 'no') == 'yes') {
+                    $params[] = 'stack=1';
+                }
+                $settings['graph_type'] = 'multisensor_graph';
+            } elseif ($aggregate_type == 'ports') {
                 $port_ids = $settings['graph_ports'];
+                $params[] = 'id=' . implode(',', $port_ids);
+                $settings['graph_type'] = 'multiport_bits_separate';
             } else {
                 $port_types = collect((array) $aggregate_type)->map(function ($type) {
                     // check for config definitions
@@ -230,10 +256,9 @@ class GraphController extends WidgetController
                         $query->orWhere('port_descr_type', 'LIKE', $port_type);
                     }
                 })->pluck('port_id')->all();
+                $params[] = 'id=' . implode(',', $port_ids);
+                $settings['graph_type'] = 'multiport_bits_separate';
             }
-
-            $params[] = 'id=' . implode(',', $port_ids);
-            $settings['graph_type'] = 'multiport_bits_separate';
         } else {
             $params[] = 'id=' . $settings['graph_' . $type];
         }
@@ -257,7 +282,7 @@ class GraphController extends WidgetController
 
         $type = explode('_', (string) $graph_type, 2)[0];
 
-        if ($summarize && in_array($type, ['transit', 'peering', 'core', 'ports', 'custom'])) {
+        if ($summarize && in_array($type, ['transit', 'peering', 'core', 'ports', 'sensors', 'custom'])) {
             return 'aggregate';
         }
 
@@ -267,7 +292,7 @@ class GraphController extends WidgetController
     private function hasInvalidSettings()
     {
         $raw_type = $this->getGraphType(false);
-        if ($raw_type == 'custom' || $this->getGraphType() != 'aggregate') {
+        if (in_array($raw_type, ['custom', 'ports', 'sensors']) || $this->getGraphType() != 'aggregate') {
             return empty($this->getSettings()['graph_' . $raw_type]);
         }
 
@@ -298,6 +323,7 @@ class GraphController extends WidgetController
 
             $settings['graph_custom'] = (array) $settings['graph_custom'];
             $settings['graph_ports'] = (array) $settings['graph_ports'];
+            $settings['graph_sensors'] = array_filter((array) $settings['graph_sensors']);
 
             $this->settings = $settings;
         }
