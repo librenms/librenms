@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Util\Number;
 
 echo 'RFC1628 ';
@@ -21,7 +22,12 @@ foreach ($load_data as $index => $data) {
     if (count($load_data) > 1) {
         $descr .= " $index";
     }
-    $value = Number::cast($value);
+
+    if (! is_numeric($value)) {
+        Log::debug("skipped $descr: $value is not numeric");
+
+        continue;
+    }
 
     discover_sensor(
         null,
@@ -37,6 +43,6 @@ foreach ($load_data as $index => $data) {
         null,
         null,
         null,
-        $value / $divisor
+        Number::cast($value) / $divisor
     );
 }

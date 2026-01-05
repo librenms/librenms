@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Util\Number;
 
 echo 'RFC1628 ';
@@ -42,7 +43,12 @@ foreach ($output_volts as $index => $data) {
         $upsOutputVoltage_value = $data['upsOutputVoltage'][0];
         $volt_oid .= '.0';
     }
-    $upsOutputVoltage_value = Number::cast($upsOutputVoltage_value);
+
+    if (! is_numeric($upsOutputVoltage_value)) {
+        Log::debug("skipped $descr: $upsOutputVoltage_value is not numeric");
+
+        continue;
+    }
 
     discover_sensor(
         null,
@@ -58,7 +64,7 @@ foreach ($output_volts as $index => $data) {
         null,
         null,
         null,
-        $upsOutputVoltage_value / $divisor
+        Number::cast($upsOutputVoltage_value) / $divisor
     );
 }
 
@@ -77,7 +83,11 @@ foreach ($input_volts as $index => $data) {
         $upsInputVoltage_value = $data['upsInputVoltage'][0];
         $volt_oid .= '.0';
     }
-    $upsInputVoltage_value = Number::cast($upsInputVoltage_value);
+    if (! is_numeric($upsInputVoltage_value)) {
+        Log::debug("skipped $descr: $upsInputVoltage_value is not numeric");
+
+        continue;
+    }
 
     discover_sensor(
         null,
@@ -93,7 +103,7 @@ foreach ($input_volts as $index => $data) {
         null,
         null,
         null,
-        $upsInputVoltage_value / $divisor
+        Number::cast($upsInputVoltage_value) / $divisor
     );
 }
 
@@ -105,11 +115,17 @@ foreach ($bypass_volts as $index => $data) {
     if (count($bypass_volts) > 1) {
         $descr .= " Phase $index";
     }
-    if (is_array($data['upsBypassVoltage'])) {
-        $data['upsBypassVoltage'] = $data['upsBypassVoltage'][0];
+    $bypassVoltage = $data['upsBypassVoltage'];
+    if (is_array($bypassVoltage)) {
+        $bypassVoltage = $bypassVoltage[0];
         $volt_oid .= '.0';
     }
-    $data['upsBypassVoltage'] = Number::cast($data['upsBypassVoltage']);
+
+    if (! is_numeric($bypassVoltage)) {
+        Log::debug("skipped $descr: $bypassVoltage is not numeric");
+
+        continue;
+    }
 
     discover_sensor(
         null,
@@ -125,7 +141,7 @@ foreach ($bypass_volts as $index => $data) {
         null,
         null,
         null,
-        $data['upsBypassVoltage'] / $divisor
+        Number::cast($bypassVoltage) / $divisor
     );
 }
 
