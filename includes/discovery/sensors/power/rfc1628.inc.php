@@ -9,9 +9,14 @@ foreach ($output_power as $index => $data) {
     if (count($output_power) > 1) {
         $descr .= " Phase $index";
     }
-    if (is_array($data['upsOutputPower'])) {
-        $data['upsOutputPower'] = $data['upsOutputPower'][0];
+    $value = $data['upsOutputPower'] ?? null;
+    if (is_array($value)) {
+        $value = $value[0];
         $pwr_oid .= '.0';
+    }
+
+    if (! is_numeric($value)) {
+        continue;
     }
 
     discover_sensor(
@@ -28,7 +33,7 @@ foreach ($output_power as $index => $data) {
         null,
         null,
         null,
-        $data['upsOutputPower']
+        $value
     );
 }
 
