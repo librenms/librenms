@@ -13,7 +13,7 @@ foreach ($input_freq as $index => $data) {
     if (count($input_freq) > 1) {
         $descr .= " Phase $index";
     }
-    $inputFrequency = $data['upsInputFrequency'];
+    $inputFrequency = $data['upsInputFrequency'] ?? null;
     if (is_array($inputFrequency)) {
         $inputFrequency = $inputFrequency[0];
         $freq_oid .= '.0';
