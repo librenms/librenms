@@ -57,7 +57,7 @@
                     <td rowspan="{{ $poller->stats->count() }}" @if($poller->node_id == '') class="danger" @endif>{{ $poller->node_id }}</td>
                     <td rowspan="{{ $poller->stats->count() }}">{{ $poller->poller_version }}</td>
                     <td rowspan="{{ $poller->stats->count() }}">{{ $poller->poller_groups }}</td>
-                    <td rowspan="{{ $poller->stats->count() }}">{{ $poller->last_report }}</td>
+                    <td rowspan="{{ $poller->stats->count() }}">{{ (new Carbon\Carbon($poller->last_report))->setTimezone($timezone) }}</td>
                     <td rowspan="{{ $poller->stats->count() }}">{{ __($poller->master ? 'Yes' : 'No') }}</td>
                 @endif
                     <td>{{ $stat->poller_type }}</td>
