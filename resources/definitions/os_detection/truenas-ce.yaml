@@ -1,0 +1,27 @@
+os: truenas-ce
+type: storage
+text: TrueNAS Community Edition
+processor_stacked: true
+mib_dir: ixsystems
+over:
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_storage, text: 'Storage Usage' }
+poller_modules:
+    bgp-peers: false
+    mpls: false
+    ospf: false
+    stp: false
+    wireless: false
+discovery_modules:
+    bgp-peers: false
+    mpls: false
+    stp: false
+    wireless: false
+weight: 15
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.50536.3
+        sysDescr_regex:
+            - '/^TrueNAS-\d+\.\d+.*\.\s+Software:\s+Linux/i'
