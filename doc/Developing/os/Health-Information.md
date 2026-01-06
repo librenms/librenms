@@ -470,12 +470,12 @@ names Ethernet 1-1-1-1, 1-1-1-2, etc, and they are indexed as oid.1.1.1.1, oid.1
 the mib.
 
 Next the program checks which table the port exists in and that the connector type is 'fiber'. There
-are other port tables in the full code that were ommitted from the example for brevity. Copper
+are other port tables in the full code that were omitted from the example for brevity. Copper
 media won't have optical readings, so if the media type isn't fiber we skip discovery for that port.
 
 The next two lines build the OIDs for getting the optical receive and transmit values using the
 `$index` for the port. Using the OIDs the program gets the current receive and transmit values
-($currentRx and $currentTx repectively) to verify the values are not 0. Not all SFPs collect digital
+($currentRx and $currentTx respectively) to verify the values are not 0. Not all SFPs collect digital
 optical monitoring (DOM) data, in the case of Adva the value of both transmit and receive will be
 0 if DOM is not available. While 0 is a valid value for optical power, its extremely unlikely that
 both will be 0 if DOM is present. If DOM is not available, then the program stops discovery for

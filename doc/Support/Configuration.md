@@ -726,7 +726,7 @@ pings enabled and also requires the following configuration setting to enable th
 To disable the MTU test, set the packet size to null (the default).
 
 The MTU check does not ensure packets can traverse the network without being fragmented.  The test makes
-sure that 2 way communication can occure even if packets need to be fragmented at any poing along the way.
+sure that 2 way communication can occure even if packets need to be fragmented at any point along the way.
 
 ## Auto discovery settings
 

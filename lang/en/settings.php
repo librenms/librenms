@@ -34,6 +34,7 @@ return [
             'radius' => ['name' => 'Radius Settings'],
             'socialite' => ['name' => 'Socialite Settings'],
             'http' => ['name' => 'HTTP Auth Settings'],
+            'sso' => ['name' => 'Single Sign-on'],
         ],
         'authorization' => [
             'device-group' => ['name' => 'Device Group Settings'],
@@ -2231,6 +2232,68 @@ return [
         ],
         'snmpwalk' => [
             'description' => 'Path to snmpwalk',
+        ],
+        'sso' => [
+            'create_users' => [
+                'description' => 'Create Users',
+                'help' => 'If new users should be created upon login.',
+            ],
+            'descr_attr' => [
+                'description' => 'User Description Attribute',
+                'help' => 'The attribute containing a description of the user.',
+            ],
+            'email_attr' => [
+                'description' => 'Email Attribute',
+                'help' => 'The attribute containing the email address of the user.',
+            ],
+            'group_attr' => [
+                'description' => 'Group Attribute',
+                'help' => 'The attribute containing the groups information if using mapping.',
+            ],
+            'group_delimiter' => [
+                'description' => 'Group Delimiter',
+                'help' => 'The delimiter to use for group information if using the mapping group strategy.',
+            ],
+            'group_filter' => [
+                'description' => 'Group Filter Regexp',
+                'help' => 'Used for filtering group information if using mapping group strategy.',
+            ],
+            'group_level_map' => [
+                'description' => 'Group Level Map',
+                'help' => 'Group to role mapping.',
+            ],
+            'group_strategy' => [
+                'description' => 'Group Strategy',
+                'help' => 'How the group mapping should be done.',
+            ],
+            'level_attr' => [
+                'description' => 'Level Attribute',
+                'help' => 'The attribute to use if using the attribute group strategy.',
+            ],
+            'mode' => [
+                'description' => 'Mode',
+                'help' => 'If it should use the evironment variables or HTTP header.',
+            ],
+            'realname_attr' => [
+                'description' => 'Realname Attribute',
+                'help' => 'The attribute containing the realname of the user.',
+            ],
+            'static_level' => [
+                'description' => 'Static Level',
+                'help' => 'If static is in use, the role level value to use for every one with access.',
+            ],
+            'trusted_proxies' => [
+                'description' => 'Trusted Proxies',
+                'help' => 'A listed of trusted proxies.',
+            ],
+            'update_users' => [
+                'description' => 'Update Users',
+                'help' => 'If users should be updated upon login.',
+            ],
+            'user_attr' => [
+                'description' => 'User Attribute',
+                'help' => 'The attribute containing the username.',
+            ],
         ],
         'storage_perc_warn' => [
             'description' => 'Default Storage Percentage Warning',
