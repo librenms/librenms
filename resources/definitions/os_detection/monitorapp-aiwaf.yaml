@@ -1,7 +1,7 @@
 os: aios
 text: 'MONITORAPP AIWAF'
 type: appliance
-icon: aios-aiwaf
+icon: monitorapp-aiwaf
 group: monitorapp
 
 over:
