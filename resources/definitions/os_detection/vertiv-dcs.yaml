@@ -1,5 +1,5 @@
-os: vertiv-dsc
-text: 'DSC'
+os: vertiv-dcs
+text: 'DCS'
 type: power
 icon: vertiv
 mib_dir: vertiv
