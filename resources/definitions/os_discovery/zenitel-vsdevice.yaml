@@ -48,7 +48,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.26122.3.5.1.1.2.{{ $index }}'
                     descr: 'Power Type'
                     index: 'powerType.{{ $index }}'
-                    group: '{{ $VS-DEVICE-MIB::powerString }} {{ $index }}'
+                    group: '{{ VS-DEVICE-MIB::powerString }} {{ $index }}'
                     state_name: powerType
                     states:
                         - { descr: 'Unknown'  , graph: 1, value: 1, generic: 3 }
@@ -61,7 +61,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.26122.3.5.1.1.4.{{ $index }}'
                     descr: 'Power Monitoring'
                     index: 'powerMonitoring.{{ $index }}'
-                    group: '{{ $VS-DEVICE-MIB::powerString }} {{ $index }}'
+                    group: '{{ VS-DEVICE-MIB::powerString }} {{ $index }}'
                     state_name: powerMonitoring
                     states:
                         - { descr: 'Unknown'     , graph: 1, value: 1, generic: 3 }
@@ -73,7 +73,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.26122.3.5.1.1.5.{{ $index }}'
                     descr: 'Power Status'
                     index: 'powerStatus.{{ $index }}'
-                    group: '{{ $VS-DEVICE-MIB::powerString }} {{ $index }}'
+                    group: '{{ VS-DEVICE-MIB::powerString }} {{ $index }}'
                     state_name: powerStatus
                     states:
                         - { descr: 'Unknown'     , graph: 1, value: 1, generic: 3 }
@@ -83,7 +83,7 @@ modules:
                     oid: VS-DEVICE-MIB::ethMonitoringTable
                     value: VS-DEVICE-MIB::ethMonitoringState
                     num_oid: '.1.3.6.1.4.1.26122.3.11.1.1.3.{{ $index }}'
-                    descr: '{{ $VS-DEVICE-MIB::ethMonitoringString }}'
+                    descr: '{{ VS-DEVICE-MIB::ethMonitoringString }}'
                     index: 'ethMonitoringState.{{ $index }}'
                     group: 'Ethernet Monitoring'
                     state_name: ethMonitoringState
