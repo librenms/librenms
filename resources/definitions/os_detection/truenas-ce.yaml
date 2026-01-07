@@ -18,7 +18,6 @@ discovery_modules:
     mpls: false
     stp: false
     wireless: false
-weight: 15
 discovery:
     -
         sysObjectID:
