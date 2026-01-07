@@ -21,8 +21,8 @@ modules:
                   num_oid: ".1.3.6.1.4.1.7483.2.2.3.1.2.1.2.1.13.{{ $index }}"
                   descr: "Shelf {{ $subindex0 }} Slot {{ $subindex1 }} ({{ $tnCardMnemonic }})"
                   index: "tnCardTemperature.{{ $index }}"
-                  high_limit: tnCardHighTemperatureThresh.{{ $index }}
-                  low_limit: tnCardLowTemperatureThresh.{{ $index }}
+                  high_limit: tnCardHighTemperatureThresh
+                  low_limit: tnCardLowTemperatureThresh
                 - oid: TROPIC-OPTICALPORT-MIB::tnOscSfpPortConfigTable
                   value: tnOscSfpTemperature
                   group: transceiver
