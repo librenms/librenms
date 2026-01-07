@@ -1,7 +1,7 @@
-os: monitorapp-aiwaf
+os: aios
 text: 'MONITORAPP AIWAF'
 type: appliance
-icon: monitorapp-aiwaf
+icon: aios-aiwaf
 group: monitorapp
 
 over:
@@ -12,7 +12,6 @@ over:
 discovery:
     -
         sysDescr_regex:
-            - '/^Linux /'            # old version
             - '/^Linux .*#*-AIOS/'
         snmpwalk:
             oid: NET-SNMP-EXTEND-MIB::nsExtendCommand

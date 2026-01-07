@@ -1,7 +1,6 @@
 <?php
 
 use LibreNMS\Util\Oid;
-use SnmpQuery;
 
 $raw = SnmpQuery::get('NET-SNMP-EXTEND-MIB::nsExtendOutput1Line."103"')->value();
 if ($raw === false || trim((string) $raw) === '') {
@@ -39,7 +38,7 @@ if (empty($processes)) {
     return;
 }
 
-$state_name = 'monitorappAiWafStatus';
+$state_name = 'MonitorappAIWAF_Status';
 $states = [
     ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'OK'],
     ['value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'NOT OK'],
