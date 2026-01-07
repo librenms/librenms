@@ -177,15 +177,15 @@ sensors:
                         - Stulz-WIB8000-MIB::unitsettingName
         data:
             -
-                oid: unitTemperature
-                value: unitTemperature
+                oid: Stulz-WIB8000-MIB::unitTemperature
+                value: Stulz-WIB8000-MIB::unitTemperature
                 num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.1.1.1.1170.{{ $index }}'
                 index: 'unitTemperature.{{ $index }}'
                 descr: 'Unit {{ Stulz-WIB8000-MIB::unitsettingName:0-1 }} temp'
                 divisor: 10
             -
-                oid: unitSupplyAirTemperature
-                value: unitSupplyAirTemperature
+                oid: Stulz-WIB8000-MIB::unitSupplyAirTemperature
+                value: Stulz-WIB8000-MIB::unitSupplyAirTemperature
                 num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.1.1.1.1193.{{ $index }}'
                 index: 'unitSupplyAirTemperature.{{ $index }}'
                 descr: 'Unit {{ Stulz-WIB8000-MIB::unitsettingName:0-1 }} supply temp'
@@ -233,15 +233,15 @@ mix sensor types in a single table.
 ```yaml
                     skip_values:
                     -
-                      oid: sensUnit
+                      oid: STE2-MIB::sensUnit
                       op: '!='
                       value: 4
                     -
-                      oid: sensConfig.0
+                      oid: STE2-MIB::sensConfig.0
                       op: '!='
                       value: 1
                     -
-                      device: hardware
+                      device: STE2-MIB::hardware
                       op: 'contains'
                       value: 'rev2'
 ```
@@ -257,7 +257,7 @@ Example:
 ```yaml
                     skip_values:
                     -
-                      oid: sensorName
+                      oid: MIB-NAME::sensorName
                       op: 'not_in_array'
                       value: ['sensor1', 'sensor2']
 ```
@@ -265,22 +265,27 @@ Example:
 ```yaml
                     skip_values:
                     -
-                      oid: sensorOptionalOID
+                      oid: MIB-NAME::sensorOptionalOID
                       op: 'exists'
                       value: false
 ```
 
 ```yaml
         temperature:
+            additional_oids:
+                data:
+                    -
+                        oid:
+                            - ENTITY-MIB::entPhysicalName
             data:
                 -
-                    oid: hwOpticalModuleInfoTable
-                    value: hwEntityOpticalTemperature
-                    descr: '{{ $entPhysicalName }}'
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTemperature
+                    descr: '{{ ENTITY-MIB::entPhysicalName }}'
                     index: '{{ $index }}'
                     skip_values:
                         -
-                            oid: hwEntityOpticalMode
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalMode
                             op: '='
                             value: '1'
 ```
