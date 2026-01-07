@@ -1,0 +1,30 @@
+os: cisco-ucs-fi
+text: 'Cisco UCS Fabric Interconnect'
+type: network
+icon: cisco
+group: cisco
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.9.12.3.1.3.847     # UCS 6120
+            - .1.3.6.1.4.1.9.12.3.1.3.1062    # UCS 6248UP 48-Port
+            - .1.3.6.1.4.1.9.12.3.1.3.1063    # UCS 6296UP 96-Port
+            - .1.3.6.1.4.1.9.12.3.1.3.1488    # UCS 6332 32-Port
+            - .1.3.6.1.4.1.9.12.3.1.3.1662    # UCS 6332-16UP
+            - .1.3.6.1.4.1.9.12.3.1.3.        # Prefix match for other UCS FI models
+        sysDescr_regex:
+            - '/Cisco NX-OS\(tm\) ucs/'
+            - '/ucs-6\d{3}-/'
+mib_dir: cisco
+discovery_modules:
+    vlans: true
+    entity-physical: true
+    device-api: false
+modules:
+    health: true
+poller_modules:
+    device-api: false

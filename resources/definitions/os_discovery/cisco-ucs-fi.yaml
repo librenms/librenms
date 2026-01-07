@@ -1,0 +1,5 @@
+# Cisco UCS Fabric Interconnect Discovery Definitions
+# Uses standard MIBs only - no Cisco legacy subtrees or UCSM-specific MIBs
+# Sensors are handled by entity-sensor module via ENTITY-SENSOR-MIB
+# No custom discovery modules needed - use standard LibreNMS discovery
+mib: ENTITY-MIB:ENTITY-SENSOR-MIB:IF-MIB:CISCO-VTP-MIB:CISCO-FLASH-MIB:CISCO-PROCESS-MIB:CISCO-ENHANCED-MEMPOOL-MIB
