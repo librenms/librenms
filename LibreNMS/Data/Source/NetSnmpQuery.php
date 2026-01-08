@@ -45,36 +45,32 @@ class NetSnmpQuery implements SnmpQueryInterface
 {
     private const DEFAULT_FLAGS = '-OQXUte';
 
-    /**
-     * @var array
-     */
-    private $cleanup = [
-        'command' => [
-            [
-                '/-c\' \'[\S]+\'/',
-                '/-u\' \'[\S]+\'/',
-                '/-U\' \'[\S]+\'/',
-                '/-A\' \'[\S]+\'/',
-                '/-X\' \'[\S]+\'/',
-                '/-P\' \'[\S]+\'/',
-                '/-H\' \'[\S]+\'/',
-                '/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/',
-            ], [
-                '-c\' \'COMMUNITY\'',
-                '-u\' \'USER\'',
-                '-U\' \'USER\'',
-                '-A\' \'PASSWORD\'',
-                '-X\' \'PASSWORD\'',
-                '-P\' \'PASSWORD\'',
-                '-H\' \'HOSTNAME\'',
-                '\1:HOSTNAME:\3',
-            ],
-        ],
-        'output' => [
-            '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/',
-            '*',
-        ],
+    /** @var string[] */
+    private array $commandCleanupPatterns = [
+        '/-c\' \'[\S]+\'/',
+        '/-u\' \'[\S]+\'/',
+        '/-U\' \'[\S]+\'/',
+        '/-A\' \'[\S]+\'/',
+        '/-X\' \'[\S]+\'/',
+        '/-P\' \'[\S]+\'/',
+        '/-H\' \'[\S]+\'/',
+        '/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/',
     ];
+
+    /** @var string[] */
+    private array $commandReplacementPatterns = [
+        '-c\' \'COMMUNITY\'',
+        '-u\' \'USER\'',
+        '-U\' \'USER\'',
+        '-A\' \'PASSWORD\'',
+        '-X\' \'PASSWORD\'',
+        '-P\' \'PASSWORD\'',
+        '-H\' \'HOSTNAME\'',
+        '\1:HOSTNAME:\3',
+    ];
+
+    private string $output_regex = '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/';
+    private string $output_replacement = '*';
 
     /**
      * @var string[]
@@ -526,7 +522,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     private function logCommand(string $command): void
     {
         if (Debug::isEnabled() && ! Debug::isVerbose()) {
-            $debug_command = preg_replace($this->cleanup['command'][0], (string) $this->cleanup['command'][1], $command);
+            $debug_command = preg_replace($this->commandCleanupPatterns, $this->commandReplacementPatterns, $command);
             Log::debug('SNMP[%c' . $debug_command . '%n]', ['color' => true]);
         } elseif (Debug::isVerbose()) {
             Log::debug('SNMP[%c' . $command . '%n]', ['color' => true]);
@@ -536,7 +532,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     private function logOutput(string $output, string $error): void
     {
         if (Debug::isEnabled() && ! Debug::isVerbose()) {
-            Log::debug(preg_replace($this->cleanup['output'][0], (string) $this->cleanup['output'][1], $output));
+            Log::debug(preg_replace($this->output_regex, $this->output_replacement, $output));
         } elseif (Debug::isVerbose()) {
             Log::debug($output);
         }
