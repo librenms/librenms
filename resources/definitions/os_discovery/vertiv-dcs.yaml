@@ -814,7 +814,7 @@ modules:
                     divisor: 10
                     skip_values:
                     -
-                      oid: DCS-MIB::
+                      oid: DCS-MIB::upsIta2com16PhaseAInputCurrent
                       op: '=='
                       value: -9999
                 -
@@ -1012,7 +1012,7 @@ modules:
                     -
                       oid: DCS-MIB::acOu59Exhausttemperature
                       op: '=='
-                      value: 9999
+                      value: -9999
                 -
                     oid: DCS-MIB::upsIta2comTable
                     value: DCS-MIB::upsIta2com67Ambienttemp
