@@ -35,7 +35,7 @@ descr Cust: Example Customer [10Mbit] (T1 Telco Y CCID129031) {EXAMP0001}
 
 Unix / Linux:
 
-This requires an additional script to be [setup](#setup)
+This requires an additional script to be [setup](#device-setup)
 
 ```text
 # eth3: Cust: Example Customer [10Mbit] (T1 Telco Y CCID129031) {EXAMP0001}
@@ -117,7 +117,7 @@ to support the parsing of interface information.
   to the Server and make it executable `chmod +x /path/to/ifAlias`
 - Add to `snmpd.conf` something like:
     ``pass .1.3.6.1.2.1.31.1.1.1.18 /path/to/ifAlias``
-- Add aliasses with
+- Add aliases with
   - `iproute2` package like:
     ``ip link set eth0.427 alias 'Cust: CustomerA'``
   - in `/etc/network/interfaces` or `/etc/network/interfaces.d/*` with a comment like:

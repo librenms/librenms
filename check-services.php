@@ -14,6 +14,7 @@
  */
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Device;
 use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Debug;
@@ -33,19 +34,19 @@ $datastore = Datastore::init($options);
 echo "Starting service polling run:\n\n";
 $polled_services = 0;
 
-$where = '';
-$params = [];
+$query = Device::query()->select('devices.*', 'services.*')
+    ->join('services', 'devices.device_id', '=', 'services.device_id')
+    ->where('devices.disabled', 0)
+    ->orderBy('devices.device_id', 'DESC');
+
 if (isset($options['h'])) {
     if (is_numeric($options['h'])) {
-        $where = 'AND `S`.`device_id` = ?';
-        $params[] = (int) $options['h'];
+        $query->where('services.device_id', $options['h']);
     } else {
         if (preg_match('/\*/', $options['h'])) {
-            $where = "AND `hostname` LIKE '?'";
-            $params[] = str_replace('*', '%', $options['h']);
+            $query->where('devices.hostname', 'like', str_replace('*', '%', $options['h']));
         } else {
-            $where = "AND `hostname` = '?'";
-            $params[] = $options['h'];
+            $query->where('devices.hostname', $options['h']);
         }
     }
 } else {
@@ -58,16 +59,13 @@ if (isset($options['h'])) {
     }
 }
 
-$sql = 'SELECT D.*,S.*,attrib_value  FROM `devices` AS D'
-       . ' INNER JOIN `services` AS S ON S.device_id = D.device_id AND D.disabled = 0 ' . $where
-       . ' LEFT JOIN `devices_attribs` as A ON D.device_id = A.device_id AND A.attrib_type = "override_icmp_disable"'
-       . ' ORDER by D.device_id DESC;';
+$services = $query->get();
 
-foreach (dbFetchRows($sql, $params) as $service) {
+foreach ($services as $service) {
     // Run the polling function if service is enabled and the associated device is up, "Disable ICMP Test" option is not enabled,
     // or service hostname/ip is different from associated device
     if (! $service['service_disabled'] && ($service['status'] == 1 || ($service['status'] == 0 && $service['status_reason'] === 'snmp') ||
-        $service['attrib_value'] === 'true' || (! is_null($service['service_ip']) && $service['service_ip'] !== $service['hostname'] &&
+        $service->getAttrib('override_icmp_disable') === 'true' || (! is_null($service['service_ip']) && $service['service_ip'] !== $service['hostname'] &&
         $service['service_ip'] !== inet6_ntop($service['ip'])))) {
         poll_service($service);
         $polled_services++;
