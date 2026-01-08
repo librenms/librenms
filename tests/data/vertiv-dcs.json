@@ -13,7 +13,7 @@
                     "location": "GOLF CLUB",
                     "os": "vertiv-dcs",
                     "type": "power",
-                    "serial": "10",
+                    "serial": null,
                     "icon": "vertiv.svg"
                 }
             ]
