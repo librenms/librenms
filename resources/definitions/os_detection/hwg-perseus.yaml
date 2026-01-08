@@ -6,6 +6,7 @@ mib_dir: hwg
 snmp_bulk: false
 over:
     - { graph: device_state, text: States }
+    - { graph: device_count, text: 'Count' }
 discovery:
     -
         sysObjectID:
