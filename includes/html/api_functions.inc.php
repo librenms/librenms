@@ -3650,6 +3650,7 @@ function list_poller_log(Illuminate\Http\Request $request)
     }
 
     return api_success($result, 'log');
+}
 function get_port_voice_vlan(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname') ?? null;
