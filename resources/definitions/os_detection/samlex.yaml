@@ -11,3 +11,7 @@ over:
 discovery:
     -
         sysObjectID: .1.3.6.1.4.1.49075
+
+discovery_modules:
+    discovery-protocols: false
+    fdb-table: false
