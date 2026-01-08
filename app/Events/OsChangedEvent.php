@@ -13,5 +13,6 @@ class OsChangedEvent
 
     public function __construct(
         public readonly Device $device,
-    ) {}
+    ) {
+    }
 }
