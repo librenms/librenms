@@ -14,7 +14,7 @@ modules:
                     state_name: upsOutputSource
                     states:
                         - { descr: 'No Output'             , graph: 1, value: 0, generic: 2 }
-                        - { descr: 'On Main'               , graph: 1, value: 1, generic: 1 }
+                        - { descr: 'On Main'               , graph: 1, value: 1, generic: 0 }
                         - { descr: 'On Battery'            , graph: 1, value: 2, generic: 1 }
                         - { descr: 'On Bypass'             , graph: 1, value: 3, generic: 1 }
                         - { descr: 'on Utility and Battery', graph: 1, value: 4, generic: 0 }
@@ -35,7 +35,7 @@ modules:
                     oid: VERTIV-ITA2-MIB::inputPhaseVoltageA
                     value: VERTIV-ITA2-MIB::inputPhaseVoltageA
                     num_oid: '.1.3.6.1.4.1.13400.2.54.2.2.1.{{ $index }}'
-                    descr: 'Input Phase Voltage A'
+                    descr: 'Input Phase A Voltage'
                     index: 'inputPhaseVoltageA.{{ $index }}'
                     divisor: 10
                     skip_values:
@@ -47,7 +47,7 @@ modules:
                     oid: VERTIV-ITA2-MIB::inputPhaseVoltageB
                     value: VERTIV-ITA2-MIB::inputPhaseVoltageB
                     num_oid: '.1.3.6.1.4.1.13400.2.54.2.2.2.{{ $index }}'
-                    descr: 'Input Phase Voltage B'
+                    descr: 'Input Phase B Voltage'
                     index: 'inputPhaseVoltageB.{{ $index }}'
                     divisor: 10
                     skip_values:
@@ -59,7 +59,7 @@ modules:
                     oid: VERTIV-ITA2-MIB::inputPhaseVoltageC
                     value: VERTIV-ITA2-MIB::inputPhaseVoltageC
                     num_oid: '.1.3.6.1.4.1.13400.2.54.2.2.3.{{ $index }}'
-                    descr: 'Input Phase Voltage C'
+                    descr: 'Input Phase C Voltage'
                     index: 'inputPhaseVoltageC.{{ $index }}'
                     divisor: 10
                     skip_values:
@@ -71,7 +71,7 @@ modules:
                     oid: VERTIV-ITA2-MIB::outputPhaseVoltageA
                     value: VERTIV-ITA2-MIB::outputPhaseVoltageA
                     num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.1.{{ $index }}'
-                    descr: 'Output Phase Voltage A'
+                    descr: 'Output Phase A Voltage'
                     index: 'outputPhaseVoltageA.{{ $index }}'
                     divisor: 10
                     skip_values:
@@ -83,7 +83,7 @@ modules:
                     oid: VERTIV-ITA2-MIB::outputPhaseVoltageB
                     value: VERTIV-ITA2-MIB::outputPhaseVoltageB
                     num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.2.{{ $index }}'
-                    descr: 'Output Phase Voltage B'
+                    descr: 'Output Phase B Voltage'
                     index: 'outputPhaseVoltageB.{{ $index }}'
                     divisor: 10
                     skip_values:
@@ -95,7 +95,7 @@ modules:
                     oid: VERTIV-ITA2-MIB::outputPhaseVoltageC
                     value: VERTIV-ITA2-MIB::outputPhaseVoltageC
                     num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.3.{{ $index }}'
-                    descr: 'Output Phase Voltage C'
+                    descr: 'Output Phase C Voltage'
                     index: 'outputPhaseVoltageC.{{ $index }}'
                     divisor: 10
                     skip_values:
@@ -107,7 +107,7 @@ modules:
                     oid: VERTIV-ITA2-MIB::bypassPhaseVoltageA
                     value: VERTIV-ITA2-MIB::bypassPhaseVoltageA
                     num_oid: '.1.3.6.1.4.1.13400.2.54.2.4.1.{{ $index }}'
-                    descr: 'Bypass Phase Voltage A'
+                    descr: 'Bypass Phase A Voltage'
                     index: 'bypassPhaseVoltageA.{{ $index }}'
                     divisor: 10
                     skip_values:
@@ -119,7 +119,7 @@ modules:
                     oid: VERTIV-ITA2-MIB::bypassPhaseVoltageB
                     value: VERTIV-ITA2-MIB::bypassPhaseVoltageB
                     num_oid: '.1.3.6.1.4.1.13400.2.54.2.4.2.{{ $index }}'
-                    descr: 'Bypass Phase Voltage B'
+                    descr: 'Bypass Phase B Voltage'
                     index: 'bypassPhaseVoltageB.{{ $index }}'
                     divisor: 10
                     skip_values:
@@ -131,7 +131,7 @@ modules:
                     oid: VERTIV-ITA2-MIB::bypassPhaseVoltageC
                     value: VERTIV-ITA2-MIB::bypassPhaseVoltageC
                     num_oid: '.1.3.6.1.4.1.13400.2.54.2.4.3.{{ $index }}'
-                    descr: 'Bypass Phase Voltage C'
+                    descr: 'Bypass Phase C Voltage'
                     index: 'bypassPhaseVoltageC.{{ $index }}'
                     divisor: 10
                     skip_values:
@@ -142,14 +142,14 @@ modules:
                 -
                     oid: VERTIV-ITA2-MIB::positiveBatteryVoltage
                     value: VERTIV-ITA2-MIB::positiveBatteryVoltage
-                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.4.2.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.5.1.{{ $index }}'
                     descr: 'Positive Battery Voltage'
                     index: 'positiveBatteryVoltage.{{ $index }}'
                     divisor: 10
                 -
                     oid: VERTIV-ITA2-MIB::negativeBatteryVoltage
                     value: VERTIV-ITA2-MIB::negativeBatteryVoltage
-                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.4.3.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.13400.2.54.2.5.2.{{ $index }}'
                     descr: 'Negative Battery Voltage '
                     index: 'negativeBatteryVoltage.{{ $index }}'
                     divisor: 10
@@ -182,7 +182,7 @@ modules:
                     oid: VERTIV-ITA2-MIB::inputPhaseCurrentA
                     value: VERTIV-ITA2-MIB::inputPhaseCurrentA
                     num_oid: '.1.3.6.1.4.1.13400.2.54.2.2.5.{{ $index }}'
-                    descr: 'Input Phase Current A'
+                    descr: 'Input Phase A Current'
                     index: 'inputPhaseCurrentA.{{ $index }}'
                     divisor: 10
                     skip_values:
@@ -194,7 +194,7 @@ modules:
                     oid: VERTIV-ITA2-MIB::inputPhaseCurrentB
                     value: VERTIV-ITA2-MIB::inputPhaseCurrentB
                     num_oid: '.1.3.6.1.4.1.13400.2.54.2.2.6.{{ $index }}'
-                    descr: 'Input Phase Current B'
+                    descr: 'Input Phase B Current'
                     index: 'inputPhaseCurrentB.{{ $index }}'
                     divisor: 10
                     skip_values:
@@ -206,7 +206,7 @@ modules:
                     oid: VERTIV-ITA2-MIB::inputPhaseCurrentC
                     value: VERTIV-ITA2-MIB::inputPhaseCurrentC
                     num_oid: '.1.3.6.1.4.1.13400.2.54.2.2.7.{{ $index }}'
-                    descr: 'Input Phase Current C'
+                    descr: 'Input Phase C Current'
                     index: 'inputPhaseCurrentC.{{ $index }}'
                     divisor: 10
                     skip_values:
@@ -218,7 +218,7 @@ modules:
                     oid: VERTIV-ITA2-MIB::outputCurrentA
                     value: VERTIV-ITA2-MIB::outputCurrentA
                     num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.4.{{ $index }}'
-                    descr: 'Output Current A'
+                    descr: 'Output Phase A Current'
                     index: 'outputCurrentA.{{ $index }}'
                     divisor: 10
                     skip_values:
@@ -230,7 +230,7 @@ modules:
                     oid: VERTIV-ITA2-MIB::outputCurrentB
                     value: VERTIV-ITA2-MIB::outputCurrentB
                     num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.5.{{ $index }}'
-                    descr: 'Output Current B'
+                    descr: 'Output Phase B Current'
                     index: 'outputCurrentB.{{ $index }}'
                     divisor: 10
                     skip_values:
@@ -242,7 +242,7 @@ modules:
                     oid: VERTIV-ITA2-MIB::outputCurrentC
                     value: VERTIV-ITA2-MIB::outputCurrentC
                     num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.6.{{ $index }}'
-                    descr: 'Output Current C'
+                    descr: 'Output Phase C Current'
                     index: 'outputCurrentC.{{ $index }}'
                     divisor: 10
                     skip_values:
@@ -284,7 +284,7 @@ modules:
                     oid: VERTIV-ITA2-MIB::outputActivePowerA
                     value: VERTIV-ITA2-MIB::outputActivePowerA
                     num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.8.{{ $index }}'
-                    descr: 'Output Active Power A'
+                    descr: 'Output Active Power Phase A'
                     index: 'outputActivePowerA.{{ $index }}'
                     divisor: 100
                     skip_values:
@@ -296,7 +296,7 @@ modules:
                     oid: VERTIV-ITA2-MIB::outputActivePowerB
                     value: VERTIV-ITA2-MIB::outputActivePowerB
                     num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.9.{{ $index }}'
-                    descr: 'Output Active Power B'
+                    descr: 'Output Active Power Phase B'
                     index: 'outputActivePowerB.{{ $index }}'
                     divisor: 100
                     skip_values:
@@ -308,7 +308,7 @@ modules:
                     oid: VERTIV-ITA2-MIB::outputActivePowerC
                     value: VERTIV-ITA2-MIB::outputActivePowerC
                     num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.10.{{ $index }}'
-                    descr: 'Output Active Power C'
+                    descr: 'Output Active Power Phase C'
                     index: 'outputActivePowerC.{{ $index }}'
                     divisor: 100
                     skip_values:
@@ -322,7 +322,7 @@ modules:
                     oid: VERTIV-ITA2-MIB::outputLoadA
                     value: VERTIV-ITA2-MIB::outputLoadA
                     num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.14.{{ $index }}'
-                    descr: 'Output Load A'
+                    descr: 'Output Load Phase A'
                     index: 'outputLoadA.{{ $index }}'
                     divisor: 10
                     skip_values:
@@ -334,7 +334,7 @@ modules:
                     oid: VERTIV-ITA2-MIB::outputLoadB
                     value: VERTIV-ITA2-MIB::outputLoadB
                     num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.15.{{ $index }}'
-                    descr: 'Output Load B'
+                    descr: 'Output Load Phase B'
                     index: 'outputLoadB.{{ $index }}'
                     divisor: 10
                     skip_values:
@@ -346,7 +346,7 @@ modules:
                     oid: VERTIV-ITA2-MIB::outputLoadC
                     value: VERTIV-ITA2-MIB::outputLoadC
                     num_oid: '.1.3.6.1.4.1.13400.2.54.2.3.16.{{ $index }}'
-                    descr: 'Output Load C'
+                    descr: 'Output Load Phase C'
                     index: 'outputLoadC.{{ $index }}'
                     divisor: 10
                     skip_values:
@@ -396,6 +396,9 @@ modules:
                     num_oid: '.1.3.6.1.4.1.13400.2.54.2.5.10.{{ $index }}'
                     descr: 'Battery Charge'
                     index: 'batteryCapacity.{{ $index }}'
+                    low_limit: 20
+                    low_warn_limit: 40 
+                    high_limit: 105
         count:
             data:
                 -
