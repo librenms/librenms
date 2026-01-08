@@ -940,7 +940,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscove
 
     public function discoverTransceivers(): Collection
     {
-        return SnmpQuery::cache()->enumStrings()->walk([
+        return SnmpQuery::enumStrings()->walk([
             'TIMETRA-PORT-MIB::tmnxPortAdminStatus',
             'TIMETRA-PORT-MIB::tmnxPortSFPEquipped',
             'TIMETRA-PORT-MIB::tmnxPortSFPConnectorCode',
