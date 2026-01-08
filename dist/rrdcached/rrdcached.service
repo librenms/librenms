@@ -17,7 +17,7 @@ ExecStart=/usr/bin/rrdcached \
     -l unix:/run/rrdcached.sock \ # Listen on UNIX socket \
     -t 4    \ # Use 4 threads \
     -F      \ # Force daemon mode \
-    -b /opt/librenms/rrd/ \ # Base directory for RRD files 
+    -b /ilstu/librenms/rrd/ \ # Base directory for RRD files 
 Restart=always
 RestartSec=10
 

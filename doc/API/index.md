@@ -74,6 +74,7 @@ Output from the API currently is via two output types:
 - [Port_Groups](Port_Groups.md)
 - [PortGroups](PortGroups.md)
 - [PortSecurity](PortSecurity.md)
+- [PortVoiceVlan](PortVoiceVlan.md)
 - [Alerts](Alerts.md)
 - [Routing](Routing.md)
 - [Switching](Switching.md)
