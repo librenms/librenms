@@ -40,7 +40,8 @@ trait BridgeMib
 
     public function discoverStpInstances(?string $vlan = null): Collection
     {
-        $protocol = SnmpQuery::get('BRIDGE-MIB::dot1dStpProtocolSpecification.0')->value();
+        $context = $vlan === null ? '' : (string) $vlan; // numeric context (@100), empty when no vlan
+        $protocol = SnmpQuery::context($context)->get('BRIDGE-MIB::dot1dStpProtocolSpecification.0')->value();
         // 1 = unknown (mstp?), 3 = ieee8021d
 
         if ($protocol != 1 && $protocol != 3) {
@@ -50,7 +51,7 @@ trait BridgeMib
         $timeFactor = $this->stpTimeFactor ?? 0.01;
 
         // fetch STP config and store it
-        $stp = SnmpQuery::context("$vlan", 'vlan-')->enumStrings()->get([
+        $stp = SnmpQuery::context($context)->enumStrings()->get([
             'BRIDGE-MIB::dot1dBaseBridgeAddress.0',
             'BRIDGE-MIB::dot1dStpProtocolSpecification.0',
             'BRIDGE-MIB::dot1dStpPriority.0',
@@ -100,17 +101,25 @@ trait BridgeMib
         return (new Collection())->push($instance);
     }
 
-    public function discoverStpPorts(Collection $stpInstances): Collection
+    public function discoverStpPorts(Collection $stpInstances, ?string $vlan = null): Collection
     {
         $ports = new Collection;
 
+        // If VLAN parameter is provided, create a temporary instance for context (ensures context is used for port queries)
+        if ($vlan !== null) {
+            $stpInstances = collect([new Stp(['vlan' => $vlan])]);
+        }
+
         // prep base port to port_id map if we have instances
-        $baseIfIndex = $stpInstances->isEmpty() ? [] : $this->getCacheByIndex('BRIDGE-MIB::dot1dBasePortIfIndex');
+        // Must use context for VLAN-specific queries (Cisco requires context for proper port mapping)
+        $baseIfIndex = $stpInstances->isEmpty() ? [] : SnmpQuery::context($vlan === null ? '' : $vlan)
+            ->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->pluck();
         $basePortIdMap = array_map(fn ($ifIndex) => PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()), $baseIfIndex);
 
         foreach ($stpInstances as $instance) {
-
-            $vlan_ports = SnmpQuery::context("$instance->vlan", 'vlan-')
+            // Use numeric context only (no 'vlan-' prefix) for consistency with protocol check (line 43)
+            $context = $instance->vlan === null ? '' : (string) $instance->vlan;
+            $vlan_ports = SnmpQuery::context($context)
                 ->enumStrings()->walk('BRIDGE-MIB::dot1dStpPortTable')
                 ->mapTable(fn ($data, $port) => new PortStp([
                     'vlan' => $instance->vlan,
@@ -200,7 +209,7 @@ trait BridgeMib
         return $stpPorts;
     }
 
-    protected function designatedPort(string $dp): int
+    private function designatedPort(string $dp): int
     {
         if (preg_match('/-(\d+)/', $dp, $matches)) {
             // Syntax with "priority" dash "portID" like so : 32768-54, both in decimal

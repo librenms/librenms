@@ -56,15 +56,15 @@ class StpController implements DeviceTab
     public function data(Device $device, Request $request): array
     {
         $stpInstances = $device->stpInstances;
-        
+
         // Get first available VLAN from instances (or default to 1 if no instances)
-        $firstVlan = $stpInstances->first()?->vlan ?? 1;
+        $firstVlan = $stpInstances->first()->vlan ?? 1;
         if (empty($firstVlan)) {
             $firstVlan = 1;
         }
-        
+
         $active_vlan = Url::parseOptions('vlan', $firstVlan);
-        
+
         $vlanOptions = $stpInstances->pluck('vlan')->mapWithKeys(function ($vlan) use ($device) {
             if (empty($vlan)) {
                 $vlan = 1;

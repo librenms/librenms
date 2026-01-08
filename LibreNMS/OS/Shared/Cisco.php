@@ -671,120 +671,46 @@ class Cisco extends OS implements
 
         //get Cisco stpxSpanningTreeType
         $stpxSpanningTreeType = SnmpQuery::enumStrings()->hideMib()->get('CISCO-STP-EXTENSIONS-MIB::stpxSpanningTreeType.0')->value();
-        $timeFactor = $this->stpTimeFactor ?? 0.01;
 
         // attempt to discover context based vlan instances
         foreach ($vlans->isEmpty() ? [null] : $vlans as $vlan) {
             $vlan = (empty($vlan->vlan_vlan) || $vlan->vlan_vlan == '1') ? null : (string) $vlan->vlan_vlan;
-            
-            // Check protocol with VLAN context (required for IOS)
-            $protocol = SnmpQuery::context("$vlan", 'vlan-')->get('BRIDGE-MIB::dot1dStpProtocolSpecification.0')->value();
-            if ($protocol != 1 && $protocol != 3) {
-                continue;
+            $instance = parent::discoverStpInstances($vlan);
+            if (isset($instance[0]) && $instance[0]->protocolSpecification == 'unknown') {
+                $instance[0]->protocolSpecification = $stpxSpanningTreeType;
             }
-            
-            // Fetch STP config with VLAN context
-            $stp = SnmpQuery::context("$vlan", 'vlan-')->enumStrings()->get([
-                'BRIDGE-MIB::dot1dBaseBridgeAddress.0',
-                'BRIDGE-MIB::dot1dStpProtocolSpecification.0',
-                'BRIDGE-MIB::dot1dStpPriority.0',
-                'BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0',
-                'BRIDGE-MIB::dot1dStpTopChanges.0',
-                'BRIDGE-MIB::dot1dStpDesignatedRoot.0',
-                'BRIDGE-MIB::dot1dStpRootCost.0',
-                'BRIDGE-MIB::dot1dStpRootPort.0',
-                'BRIDGE-MIB::dot1dStpMaxAge.0',
-                'BRIDGE-MIB::dot1dStpHelloTime.0',
-                'BRIDGE-MIB::dot1dStpHoldTime.0',
-                'BRIDGE-MIB::dot1dStpForwardDelay.0',
-                'BRIDGE-MIB::dot1dStpBridgeMaxAge.0',
-                'BRIDGE-MIB::dot1dStpBridgeHelloTime.0',
-                'BRIDGE-MIB::dot1dStpBridgeForwardDelay.0',
-            ])->values();
-
-            if (empty($stp)) {
-                continue;
-            }
-
-            $bridge = \LibreNMS\Util\Mac::parseBridge($stp['BRIDGE-MIB::dot1dBaseBridgeAddress.0'] ?? '');
-            $bridgeMac = $bridge->hex();
-            $drBridge = \LibreNMS\Util\Mac::parseBridge($stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0'] ?? '');
-            \Log::info(sprintf('VLAN: %s Bridge: %s DR: %s', $vlan ?: 1, $bridge->readable(), $drBridge->readable()));
-
-            $instance = new \App\Models\Stp([
-                'vlan' => $vlan,
-                'rootBridge' => $bridgeMac == $drBridge->hex() ? 1 : 0,
-                'bridgeAddress' => $bridgeMac,
-                'protocolSpecification' => $stpxSpanningTreeType ?: ($stp['BRIDGE-MIB::dot1dStpProtocolSpecification.0'] ?? 'unknown'),
-                'priority' => $stp['BRIDGE-MIB::dot1dStpPriority.0'] ?? 0,
-                'timeSinceTopologyChange' => substr($stp['BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0'] ?? '', 0, -2) ?: 0,
-                'topChanges' => $stp['BRIDGE-MIB::dot1dStpTopChanges.0'] ?? 0,
-                'designatedRoot' => $drBridge->hex(),
-                'rootCost' => $stp['BRIDGE-MIB::dot1dStpRootCost.0'] ?? 0,
-                'rootPort' => $stp['BRIDGE-MIB::dot1dStpRootPort.0'] ?? 0,
-                'maxAge' => ($stp['BRIDGE-MIB::dot1dStpMaxAge.0'] ?? 0) * $timeFactor,
-                'helloTime' => ($stp['BRIDGE-MIB::dot1dStpHelloTime.0'] ?? 0) * $timeFactor,
-                'holdTime' => ($stp['BRIDGE-MIB::dot1dStpHoldTime.0'] ?? 0) * $timeFactor,
-                'forwardDelay' => ($stp['BRIDGE-MIB::dot1dStpForwardDelay.0'] ?? 0) * $timeFactor,
-                'bridgeMaxAge' => ($stp['BRIDGE-MIB::dot1dStpBridgeMaxAge.0'] ?? 0) * $timeFactor,
-                'bridgeHelloTime' => ($stp['BRIDGE-MIB::dot1dStpBridgeHelloTime.0'] ?? 0) * $timeFactor,
-                'bridgeForwardDelay' => ($stp['BRIDGE-MIB::dot1dStpBridgeForwardDelay.0'] ?? 0) * $timeFactor,
-            ]);
-            
-            $instances->push($instance);
+            $instances = $instances->merge($instance);
         }
 
         return $instances;
     }
 
-    public function discoverStpPorts(Collection $stpInstances): Collection
+    /**
+     * Discover STP ports per VLAN context on Cisco devices.
+     * Iterates through each VLAN and discovers ports with proper SNMP context.
+     * This ensures each VLAN's port table is queried with the correct numeric context.
+     *
+     * @param Collection $stpInstances Collection of discovered STP instances
+     * @param string|null $vlan Optional VLAN number (unused, for interface compatibility)
+     * @return Collection Collection of discovered STP ports
+     */
+    public function discoverStpPorts(Collection $stpInstances, ?string $vlan = null): Collection
     {
+        // If VLAN parameter is provided, delegate to parent (for direct calls)
+        if ($vlan !== null) {
+            return parent::discoverStpPorts($stpInstances, $vlan);
+        }
+
         $ports = new Collection;
+        $vlans = $this->getDevice()->vlans;
 
-        foreach ($stpInstances as $instance) {
-            // Query base port to ifIndex mapping with VLAN context (required for IOS)
-            $basePortIdMap = SnmpQuery::context("$instance->vlan", 'vlan-')
-                ->walk('BRIDGE-MIB::dot1dBasePortIfIndex')
-                ->mapTable(function ($data, $bridgePort) {
-                    $ifIndex = $data['BRIDGE-MIB::dot1dBasePortIfIndex'] ?? null;
-                    return PortCache::getIdFromIfIndex($ifIndex, $this->getDevice());
-                })->toArray();
-
-            $vlan_ports = SnmpQuery::context("$instance->vlan", 'vlan-')
-                ->enumStrings()->walk('BRIDGE-MIB::dot1dStpPortTable')
-                ->mapTable(fn ($data, $port) => new \App\Models\PortStp([
-                    'vlan' => $instance->vlan,
-                    'port_id' => $basePortIdMap[$port] ?? 0,
-                    'port_index' => $port,
-                    'priority' => $data['BRIDGE-MIB::dot1dStpPortPriority'] ?? 0,
-                    'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown',
-                    'enable' => $data['BRIDGE-MIB::dot1dStpPortEnable'] ?? 'unknown',
-                    'pathCost' => $data['BRIDGE-MIB::dot1dStpPortPathCost32'] ?? $data['BRIDGE-MIB::dot1dStpPortPathCost'] ?? 0,
-                    'designatedRoot' => \LibreNMS\Util\Mac::parseBridge($data['BRIDGE-MIB::dot1dStpPortDesignatedRoot'] ?? '')->hex(),
-                    'designatedCost' => $data['BRIDGE-MIB::dot1dStpPortDesignatedCost'] ?? 0,
-                    'designatedBridge' => \LibreNMS\Util\Mac::parseBridge($data['BRIDGE-MIB::dot1dStpPortDesignatedBridge'] ?? '')->hex(),
-                    'designatedPort' => $this->designatedPort($data['BRIDGE-MIB::dot1dStpPortDesignatedPort'] ?? ''),
-                    'forwardTransitions' => $data['BRIDGE-MIB::dot1dStpPortForwardTransitions'] ?? 0,
-                ]))->filter(function (\App\Models\PortStp $port) {
-                    if ($port->enable === 'disabled') {
-                        d_echo("$port->port_index ($port->vlan) disabled skipping\n");
-                        return false;
-                    }
-
-                    if ($port->state === 'disabled') {
-                        d_echo("$port->port_index ($port->vlan) state disabled skipping\n");
-                        return false;
-                    }
-
-                    if (! $port->port_id) {
-                        d_echo("$port->port_index ($port->vlan) port not found skipping\n");
-                        return false;
-                    }
-
-                    d_echo("Discovered STP port $port->port_index ($port->vlan): $port->port_id");
-                    return true;
-                });
-
+        // Iterate through each VLAN and discover ports
+        foreach ($vlans as $vlan_obj) {
+            // Always pass VLAN number as string for proper context handling
+            // VLAN 1 uses empty context '', data VLANs use numeric context (e.g., '100')
+            $vlan_num = empty($vlan_obj->vlan_vlan) ? '' : (string) $vlan_obj->vlan_vlan;
+            // Use numeric context directly (no 'vlan-' prefix for SNMPv2c)
+            $vlan_ports = parent::discoverStpPorts(new Collection, $vlan_num);
             $ports = $ports->merge($vlan_ports);
         }
 
