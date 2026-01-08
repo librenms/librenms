@@ -153,6 +153,11 @@ modules:
                     descr: 'Negative Battery Voltage '
                     index: 'negativeBatteryVoltage.{{ $index }}'
                     divisor: 10
+                    skip_values:
+                        -
+                            oid: VERTIV-ITA2-MIB::negativeBatteryVoltage
+                            op: '=='
+                            value: 0
         frequency:
             data:
                 -
