@@ -227,6 +227,7 @@ modules:
                     low_limit: tmnxDDMTempLowAlarm
                     low_warn_limit: tmnxDDMTempLowWarning
                     divisor: 256
+                    group: 'transceiver'
                 -
                     oid: aluMwRadioInfoTable
                     value: aluMwRadioTemperature
@@ -235,6 +236,29 @@ modules:
                     index: 'aluMwRadioPortID.{{ $index }}'
                     high_limit: '50'
                     low_limit: '-20'
+                -
+                    oid: tmnxDDMLaneTable
+                    value: tmnxDDMLaneTemperature
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.66.1.2.{{ $index }}'
+                    descr: '{{ ifName:1 }} Lane {{ $subindex2 }}'
+                    entPhysicalIndex: '{{ $subindex1 }}'
+                    entPhysicalIndex_measured: ports
+                    index: 'tmnxDDMLaneTemperature.{{ $index }}'
+                    high_limit: tmnxDDMLaneTempHiAlarm
+                    warn_limit: tmnxDDMLaneTempHiWarn
+                    low_limit: tmnxDDMLaneTempLowAlarm
+                    low_warn_limit: tmnxDDMLaneTempLowWarn
+                    divisor: 256
+                    group: 'transceiver'
+                    skip_values:
+                        -
+                            oid: tmnxDDMLaneTemperature
+                            op: '='
+                            value: 0
+                        -
+                            oid: tmnxPortAdminStatus
+                            op: '='
+                            value: 3
 
         current:
             data:
@@ -245,12 +269,13 @@ modules:
                     descr: '{{ ifName:1 }} Tx Bias'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
-                    index: 'tx-bias-{{ $index }}'
+                    index: 'tmnxDDMTxBiasCurrent.{{ $index }}'
                     divisor: 500000
                     high_limit: tmnxDDMTxBiasCurrentHiAlarm
                     warn_limit: tmnxDDMTxBiasCurrentHiWarning
                     low_limit: tmnxDDMTxBiasCurrentLowAlarm
                     low_warn_limit: tmnxDDMTxBiasCurrentLowWarning
+                    group: 'transceiver'
                     skip_values:
                         -
                             oid: tmnxDDMRxOpticalPower
@@ -267,13 +292,13 @@ modules:
                     descr: '{{ ifName:1 }} Lane {{ $subindex2 }} Tx Bias'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
-                    index: 'tx-bias-{{ $index }}'
+                    index: 'tmnxDDMLaneTxBiasCurrent.{{ $index }}'
                     divisor: 500000
                     high_limit: tmnxDDMLaneTxBiasCurrentHiAlarm
                     warn_limit: tmnxDDMLaneTxBiasCurrentHiWarning
                     low_limit: tmnxDDMLaneTxBiasCurrentLowAlarm
                     low_warn_limit: tmnxDDMLaneTxBiasCurrentLowWarning
-                    group: '{{ ifName:1 }}'
+                    group: 'transceiver'
                     skip_values:
                         -
                             oid: tmnxDDMLaneTxBiasCurrent
@@ -292,14 +317,14 @@ modules:
                     descr: '{{ ifName:1 }} Rx'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
-                    index: 'rx-{{ $index }}'
+                    index: 'tmnxDDMRxOpticalPower.{{ $index }}'
                     divisor: 10
                     high_limit: tmnxDDMRxOpticalPowerHiAlarm
                     warn_limit: tmnxDDMRxOpticalPowerHiWarning
                     low_limit: tmnxDDMRxOpticalPowerLowAlarm
                     low_warn_limit: tmnxDDMRxOpticalPowerLowWarning
                     user_func: 'uw_to_dbm'
-                    group: '{{ ifName:1 }}'
+                    group: 'transceiver'
                     skip_values:
                         -
                             oid: tmnxPortAdminStatus
@@ -316,14 +341,14 @@ modules:
                     descr: '{{ ifName:1 }} Tx'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
-                    index: 'tx-{{ $index }}'
+                    index: 'tmnxDDMTxOutputPower.{{ $index }}'
                     divisor: 10
                     high_limit: tmnxDDMTxOutputPowerHiAlarm
                     warn_limit: tmnxDDMTxOutputPowerHiWarning
                     low_limit: tmnxDDMTxOutputPowerLowAlarm
                     low_warn_limit: tmnxDDMTxOutputPowerLowWarning
                     user_func: 'uw_to_dbm'
-                    group: '{{ ifName:1 }}'
+                    group: 'transceiver'
                     skip_values:
                         -
                             oid: tmnxPortAdminStatus
@@ -340,10 +365,10 @@ modules:
                     descr: '{{ ifName:1 }} Lane {{ $subindex2 }} Rx'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
-                    index: 'lane-rx-{{ $index }}'
+                    index: 'tmnxDDMLaneRxOpticalPower.{{ $index }}'
                     user_func: 'uw_to_dbm'
                     divisor: 10
-                    group: '{{ ifName:1 }}'
+                    group: 'transceiver'
                     high_limit: tmnxDDMLaneRxOpticalPwrHiAlarm
                     warn_limit: tmnxDDMLaneRxOpticalPwrHiWarn
                     low_limit: tmnxDDMLaneRxOpticalPwrLowAlarm
@@ -360,10 +385,10 @@ modules:
                     descr: '{{ ifName:1 }} Lane {{ $subindex2 }} Tx'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
-                    index: 'lane-tx-{{ $index }}'
+                    index: 'tmnxDDMLaneTxOutputPower.{{ $index }}'
                     user_func: 'uw_to_dbm'
                     divisor: 10
-                    group: '{{ ifName:1 }}'
+                    group: 'transceiver'
                     high_limit: tmnxDDMLaneTxOutputPowerHiAlarm
                     warn_limit: tmnxDDMLaneTxOutputPowerHiWarn
                     low_limit: tmnxDDMLaneTxOutputPowerLowAlarm
@@ -373,6 +398,26 @@ modules:
                             oid: tmnxPortAdminStatus
                             op: '='
                             value: 3
+                -
+                    oid: tmnxCohOptPortStatsTable
+                    value: tmnxCohOptPortRxPower
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.12.8.1.26.{{ $index }}'
+                    descr: '{{ ifName:1 }} Rx'
+                    entPhysicalIndex: '{{ $subindex1 }}'
+                    entPhysicalIndex_measured: ports
+                    index: 'tmnxCohOptPortRxPower.{{ $index }}'
+                    divisor: 100
+                    group: 'transceiver'
+                -
+                    oid: tmnxCohOptPortStatsTable
+                    value: tmnxCohOptPortTxPower
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.12.8.1.30.{{ $index }}'
+                    descr: '{{ ifName:1 }} Tx'
+                    entPhysicalIndex: '{{ $subindex1 }}'
+                    entPhysicalIndex_measured: ports
+                    index: 'tmnxCohOptPortTxPower.{{ $index }}'
+                    divisor: 100
+                    group: 'transceiver'
         voltage:
             data:
                 -
@@ -382,12 +427,13 @@ modules:
                     descr: '{{ ifName:1 }}'
                     entPhysicalIndex: '{{ $subindex1 }}'
                     entPhysicalIndex_measured: ports
-                    index: '{{ $index }}'
+                    index: 'tmnxDDMSupplyVoltage.{{ $index }}'
                     high_limit: tmnxDDMSupplyVoltageHiAlarm
                     warn_limit: tmnxDDMSupplyVoltageHiWarning
                     low_limit: tmnxDDMSupplyVoltageLowAlarm
                     low_warn_limit: tmnxDDMSupplyVoltageLowWarning
                     divisor: 10000
+                    group: 'transceiver'
 
         percent:
             data:
@@ -400,7 +446,7 @@ modules:
                     warn_limit: 90
                     high_limit: 95
                     low_limit: 0
-                    index: '{{ $index }}'
+                    index: 'tmnxPhysChassisFanSpeedPercent.{{ $index }}'
         count:
             data:
                 -
@@ -431,6 +477,53 @@ modules:
                     descr: 'Total hosts on this system'
                     index: 'tmnxSubMgmtSystSTotal.{{ $index }}'
                     group: 'Subscribers'
+                - 
+                    oid: tFPResTable
+                    value: tFPResEgrUserQueueAlloc
+                    index: 'tFPResEgrUserQueueAlloc.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.46.1.105.{{ $index }}'
+                    group: 'Resource Usage'
+                    descr: 'Card {{ $subindex1 }} Egress User Queues'
+                - 
+                    oid: tFPResTable
+                    value: tFPResSapIngQosPolAlloc
+                    index: 'tFPResSapIngQosPolAlloc.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.46.1.2.{{ $index }}'
+                    group: 'Resource Usage'
+                    descr: 'Card {{ $subindex1 }} Ingress QoS Policies'
+                - 
+                    oid: tFPResTable
+                    value: tFPResIngQueueAlloc
+                    index: 'tFPResIngQueueAlloc.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.46.1.8.{{ $index }}'
+                    group: 'Resource Usage'
+                    descr: 'Card {{ $subindex1 }} Ingress Queues'
+                - 
+                    oid: tFPResTable
+                    value: tFPResMacFdbRecAlloc
+                    index: 'tFPResMacFdbRecAlloc.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.46.1.70.{{ $index }}'
+                    group: 'Resource Usage'
+                    descr: 'Card {{ $subindex1 }} FDB Records'
+                - 
+                    oid: tFPResTable
+                    value: tFPResSapInstanceAlloc
+                    index: 'tFPResSapInstanceAlloc.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.46.1.90.{{ $index }}'
+                    group: 'Resource Usage'
+                    descr: 'Card {{ $subindex1 }} SAP Instances'
+                - 
+                    oid: tFPResTable
+                    value: tFPResPortForwardingIdAlloc
+                    index: 'tFPResPortForwardingIdAlloc.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.3.46.1.185.{{ $index }}'
+                    group: 'Resource Usage'
+                    descr: 'Card {{ $subindex1 }} Port Forwarding IDs'
+                    skip_values:
+                    -
+                        oid: tFPResPortForwardingIdTotal
+                        op: '='
+                        value: 0
                 -
                     oid: tmnxCellPortFrequencyBand
                     num_oid: '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.4.{{ $index }}'
@@ -488,6 +581,38 @@ modules:
                     descr:  'Interface {{ ifName:1 }}'
                     group: 'Rx Optical Signal-to-Noise Ratio'
                     index: 'tmnxCohOptPortRxOSNR.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: tmnxCohOptPortOperTable
+                    value: tmnxCohOptPortRxSNRXPolar
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.73.1.7.{{ $index }}'
+                    descr: '{{ ifName:1 }} X-Polarization'
+                    group: 'Rx Signal-to-Noise Ratio'
+                    index: 'tmnxCohOptPortRxSNRXPolar.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: tmnxCohOptPortOperTable
+                    value: tmnxCohOptPortRxSNRYPolar
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.73.1.8.{{ $index }}'
+                    descr: '{{ ifName:1 }} Y-Polarization'
+                    group: 'Rx Signal-to-Noise Ratio'
+                    index: 'tmnxCohOptPortRxSNRYPolar.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: tmnxCohOptPortOperTable
+                    value: tmnxCohOptPortRxOSNRXPolar
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.73.1.10.{{ $index }}'
+                    descr: '{{ ifName:1 }} X-Polarization'
+                    group: 'Rx Optical Signal-to-Noise Ratio'
+                    index: 'tmnxCohOptPortRxOSNRXPolar.{{ $index }}'
+                    divisor: 10
+                -
+                    oid: tmnxCohOptPortOperTable
+                    value: tmnxCohOptPortRxOSNRYPolar
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.2.4.73.1.11.{{ $index }}'
+                    descr: '{{ ifName:1 }} Y-Polarization'
+                    group: 'Rx Optical Signal-to-Noise Ratio'
+                    index: 'tmnxCohOptPortRxOSNRYPolar.{{ $index }}'
                     divisor: 10
         chromatic_dispersion:
             data:

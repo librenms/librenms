@@ -43,7 +43,7 @@ function create_bill($bill_name, $bill_type, $bill_cdr, $bill_day)
         'bill_name' => $bill_name,
         'bill_type' => $bill_type,
         'bill_cdr' => $bill_cdr,
-        'bill_day' => '1',
+        'bill_day' => $bill_day,
     ];
     $create_bill = dbInsert($insert, 'bills');
     echo 'Created bill ID ' . $create_bill . "\n";
@@ -125,8 +125,16 @@ function print_help(): never
  * t - type - bill type
  * q - quota - bill quota
  **/
-$options = getopt('b:s:h:i:f:np:t:q:');
+$options = getopt('b:s:h:i:fnp:t:q:');
 
+// Defaults to avoid undefined variables
+$host_glob = '';
+$nameType = '';
+$create_bill = false;
+$bill_type = '';
+$bill_cdr = '';
+
+// Parse options
 if (! empty($options['s'])) {
     $host_glob = str_replace('*', '%', $options['s']);
     $nameType = 'sysName';
@@ -145,19 +153,29 @@ if (! empty($options['q'])) {
     $bill_cdr = $options['q'];
 }
 
-$bill_name = str_replace('*', '%', $options['b']);
-$intf_glob = str_replace('*', '%', $options['i']);
+$bill_name = ! empty($options['b']) ? str_replace('*', '%', $options['b']) : '';
 
 // Exit if no bill
 if (empty($bill_name)) {
     echo "Please set -b (bill name)\n";
     print_help();
 }
+
+// Create bill path: do NOT touch -i/-s/-h requirements
 if ($create_bill) {
+    if (empty($bill_type) || empty($bill_cdr)) {
+        echo "For bill creation (-n), you must set both -t (type) and -q (quota)\n";
+        print_help();
+    }
+
     create_bill($bill_name, $bill_type, $bill_cdr, '1');
-    exit(1);
+    exit(0);
 }
-// Exit if missing hostname or sysName (or both set
+
+// From here on, we are updating bills (needs -i and either -s or -h)
+$intf_glob = ! empty($options['i']) ? str_replace('*', '%', $options['i']) : '';
+
+// Exit if missing hostname or sysName (or both set)
 if (empty($options['s']) && empty($options['h'])) {
     echo "Please set -s (sysName) or -h (hosthame)\n";
     print_help();
@@ -165,7 +183,8 @@ if (empty($options['s']) && empty($options['h'])) {
     echo "Please set either -s or -h, not both\n";
     print_help();
 }
-// Exit if missing hostname or sysName
+
+// Exit if missing interface glob
 if (empty($options['i'])) {
     echo "Please set -i (interface glob)\n";
     print_help();
@@ -180,11 +199,8 @@ if ($intf_glob == 'all') {
 if ($host_glob == 'all') {
     $host_glob = '%';
 }
-if (isset($options['f'])) {
-    $flush = true;
-} else {
-    $flush = false;
-}
+
+$flush = array_key_exists('f', $options);
 
 $id = list_bills($bill_name);
 

@@ -1,4 +1,3 @@
-mib: ADVANTECH-EKI-PRONEER-MIB
 modules:
     os:
         hardware: ADVANTECH-COMMON-MIB::sysModuleID.0
@@ -8,78 +7,121 @@ modules:
             data:
                 -
                     oid:
-                        - sfpPortIndex
-                        - sfpDMITempLowAlarmValue
-                        - sfpDMITempLowWarnValue
-                        - sfpDMITempHighWarnValue
-                        - sfpDMITempHighAlarmValue
-                        - sfpDMIVoltageLowAlarmValue
-                        - sfpDMIVoltageLowWarnValue
-                        - sfpDMIVoltageHighWarnValue
-                        - sfpDMIVoltageHighAlarmValue
-                        - sfpDMITxBasisLowAlarmValue
-                        - sfpDMITxBasisLowWarnValue
-                        - sfpDMITxBasisHighWarnValue
-                        - sfpDMITxBasisHighAlarmValue
-                        - sfpDMITxPowerLowAlarmValue
-                        - sfpDMITxPowerLowWarnValue
-                        - sfpDMITxPowerHighWarnValue
-                        - sfpDMITxPowerHighAlarmValue
-                        - sfpDMIRxPowerLowAlarmValue
-                        - sfpDMIRxPowerLowWarnValue
-                        - sfpDMIRxPowerHighWarnValue
-                        - sfpDMIRxPowerHighAlarmValue
+                        - ADVANTECH-EKI-PRONEER-MIB::sfpDMIAlarmInfoTable
+                        - ADVANTECH-EKI-PRONEER-MIB::poeMaxPowerAvailable
         temperature:
             data:
                 -
-                    oid: sfpDMITemperature
+                    oid: ADVANTECH-EKI-PRONEER-MIB::sfpDMIInfoTable
+                    value: ADVANTECH-EKI-PRONEER-MIB::sfpDMITemperature
                     num_oid: '.1.3.6.1.4.1.10297.202.7000.2.5.2.1.2.{{ $index }}'
-                    descr: '{{ $sfpPortIndex }} Temperature'
+                    descr: '{{ ADVANTECH-EKI-PRONEER-MIB::sfpDMIPortIndex }} Temperature'
                     index: 'sfp-temp-{{ $index }}'
-                    low_limit: sfpDMITempLowAlarmValue
-                    low_warn_limit: sfpDMITempLowWarnValue
-                    warn_limit: sfpDMITempHighWarnValue
-                    high_limit: sfpDMITempHighAlarmValue
+                    low_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMITempLowAlarmValue
+                    low_warn_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMITempLowWarnValue
+                    warn_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMITempHighWarnValue
+                    high_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMITempHighAlarmValue
+                -
+                    oid: ADVANTECH-EKI-PRONEER-MIB::poePortStatusTable
+                    value: ADVANTECH-EKI-PRONEER-MIB::poePortTemp
+                    num_oid: '.1.3.6.1.4.1.10297.202.7000.7.3.3.1.5.{{ $index }}'
+                    descr: 'GE{{ ADVANTECH-EKI-PRONEER-MIB::poePortStatusIndex }} POE Temperature'
+                    index: 'poePortTemp.{{ $index }}'
+                    low_limit: -10
+                    high_limit: 60
+                    skip_values:
+                        -
+                            oid: ADVANTECH-EKI-PRONEER-MIB::poePortVoltage
+                            op: '=='
+                            value: "N/A"
         voltage:
             data:
                 -
-                    oid: sfpDMIVoltage
+                    oid: ADVANTECH-EKI-PRONEER-MIB::sfpDMIInfoTable
+                    value: ADVANTECH-EKI-PRONEER-MIB::sfpDMIVoltage
                     num_oid: '.1.3.6.1.4.1.10297.202.7000.2.5.2.1.3.{{ $index }}'
-                    descr: '{{ $sfpPortIndex }} Voltage'
+                    descr: '{{ ADVANTECH-EKI-PRONEER-MIB::sfpDMIPortIndex }} Voltage'
                     index: 'sfp-voltage-{{ $index }}'
-                    low_limit: sfpDMIVoltageLowAlarmValue
-                    low_warn_limit: sfpDMIVoltageLowWarnValue
-                    warn_limit: sfpDMIVoltageHighWarnValue
-                    high_limit: sfpDMIVoltageHighAlarmValue
+                    low_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMIVoltageLowAlarmValue
+                    low_warn_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMIVoltageLowWarnValue
+                    warn_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMIVoltageHighWarnValue
+                    high_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMIVoltageHighAlarmValue
+                -
+                    oid: ADVANTECH-EKI-PRONEER-MIB::poePortStatusTable
+                    value: ADVANTECH-EKI-PRONEER-MIB::poePortVoltage
+                    num_oid: '.1.3.6.1.4.1.10297.202.7000.7.3.3.1.3.{{ $index }}'
+                    descr: 'GE{{ ADVANTECH-EKI-PRONEER-MIB::poePortStatusIndex }} POE Voltage'
+                    index: 'poePortVoltage.{{ $index }}'
+                    low_limit: 44
+                    high_limit: 57
         current:
             data:
                 -
-                    oid: sfpDMITxBias
+                    oid: ADVANTECH-EKI-PRONEER-MIB::sfpDMIInfoTable
+                    value: ADVANTECH-EKI-PRONEER-MIB::sfpDMITxBias
                     num_oid: '.1.3.6.1.4.1.10297.202.7000.2.5.2.1.4.{{ $index }}'
-                    descr: '{{ $sfpPortIndex }} Tx Bias'
+                    descr: '{{ ADVANTECH-EKI-PRONEER-MIB::sfpDMIPortIndex }} Tx Bias'
                     index: 'sfp-current-{{ $index }}'
                     divisor: 1000
-                    low_limit: sfpDMITxBasisLowAlarmValue
-                    low_warn_limit: sfpDMITxBasisLowWarnValue
-                    warn_limit: sfpDMITxBasisHighWarnValue
-                    high_limit: sfpDMITxBasisHighAlarmValue
+                    low_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMITxBasisLowAlarmValue
+                    low_warn_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMITxBasisLowWarnValue
+                    warn_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMITxBasisHighWarnValue
+                    high_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMITxBasisHighAlarmValue
+                -
+                    oid: ADVANTECH-EKI-PRONEER-MIB::poePortStatusTable
+                    value: ADVANTECH-EKI-PRONEER-MIB::poePortCurrent
+                    num_oid: '.1.3.6.1.4.1.10297.202.7000.7.3.3.1.2.{{ $index }}'
+                    descr: 'GE{{ ADVANTECH-EKI-PRONEER-MIB::poePortStatusIndex }} POE'
+                    index: 'poePortCurrent.{{ $index }}'
+                    divisor: 1000
+                    high_limit: .5
+                    low_limit: 0
+                    skip_values:
+                        -
+                            oid: ADVANTECH-EKI-PRONEER-MIB::poePortVoltage
+                            op: '=='
+                            value: "N/A"
         dbm:
             data:
                 -
-                    oid: sfpDMITxPower
+                    oid: ADVANTECH-EKI-PRONEER-MIB::sfpDMIInfoTable
+                    value: ADVANTECH-EKI-PRONEER-MIB::sfpDMITxPower
                     num_oid: '.1.3.6.1.4.1.10297.202.7000.2.5.2.1.5.{{ $index }}'
-                    descr: '{{ $sfpPortIndex }} Tx Power'
+                    descr: '{{ ADVANTECH-EKI-PRONEER-MIB::sfpDMIPortIndex }} Tx Power'
                     index: 'sfp-tx-dbm-{{ $index }}'
-                    low_limit: sfpDMITxPowerLowAlarmValue
-                    low_warn_limit: sfpDMITxPowerLowWarnValue
-                    warn_limit: sfpDMITxPowerHighWarnValue
-                    high_limit: sfpDMITxPowerHighAlarmValue
+                    low_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMITxPowerLowAlarmValue
+                    low_warn_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMITxPowerLowWarnValue
+                    warn_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMITxPowerHighWarnValue
+                    high_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMITxPowerHighAlarmValue
                 -
-                    oid: sfpDMIRxPower
+                    oid: ADVANTECH-EKI-PRONEER-MIB::sfpDMIInfoTable
+                    value: ADVANTECH-EKI-PRONEER-MIB::sfpDMIRxPower
                     num_oid: '.1.3.6.1.4.1.10297.202.7000.2.5.2.1.6.{{ $index }}'
-                    descr: '{{ $sfpPortIndex }} Rx Power'
+                    descr: '{{ ADVANTECH-EKI-PRONEER-MIB::sfpDMIPortIndex }} Rx Power'
                     index: 'sfp-rx-dbm-{{ $index }}'
-                    low_limit: sfpDMIRxPowerLowAlarmValue
-                    low_warn_limit: sfpDMIRxPowerLowWarnValue
-                    warn_limit: sfpDMIRxPowerHighWarnValue
-                    high_limit: sfpDMIRxPowerHighAlarmValue
+                    low_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMIRxPowerLowAlarmValue
+                    low_warn_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMIRxPowerLowWarnValue
+                    warn_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMIRxPowerHighWarnValue
+                    high_limit: ADVANTECH-EKI-PRONEER-MIB::sfpDMIRxPowerHighAlarmValue
+        power:
+            data:
+                -
+                    oid: ADVANTECH-EKI-PRONEER-MIB::poePortStatusTable
+                    value: ADVANTECH-EKI-PRONEER-MIB::poePortPower
+                    num_oid: '.1.3.6.1.4.1.10297.202.7000.7.3.3.1.4.{{ $index }}'
+                    descr: 'GE{{ ADVANTECH-EKI-PRONEER-MIB::poePortStatusIndex }} POE'
+                    index: 'poePortPower.{{ $index }}'
+                    high_limit: 30
+                    low_limit: 0
+                    skip_values:
+                        -
+                            oid: ADVANTECH-EKI-PRONEER-MIB::poePortVoltage
+                            op: '=='
+                            value: "N/A"
+                -
+                    oid: ADVANTECH-EKI-PRONEER-MIB::poeActualPowerConsumption
+                    value: ADVANTECH-EKI-PRONEER-MIB::poeActualPowerConsumption
+                    num_oid: '.1.3.6.1.4.1.10297.202.7000.7.3.1.3.{{ $index }}'
+                    descr: 'Total POE Power Consumption'
+                    index: 'poeActualPowerConsumption.{{ $index }}'
+                    high_limit: ADVANTECH-EKI-PRONEER-MIB::poeMaxPowerAvailable

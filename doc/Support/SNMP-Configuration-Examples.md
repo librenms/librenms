@@ -217,7 +217,7 @@ CLI SNMP v2 Configuration
 set [ find default=yes ] read-access=no
 add addresses=<ALLOWED-SRC-IPs/NETMASK> name=<COMMUNITY>
 /snmp
-set contact="<NAME>" enabled=yes engine-id=<ENGINE ID> location="<LOCALTION>"
+set contact="<NAME>" enabled=yes engine-id=<ENGINE ID> location="<LOCATION>"
 ```
 
 !!! note
@@ -236,12 +236,12 @@ CLI SNMP v3 Configuration for *authPriv*
 /snmp community
 add name="<COMMUNITY>" addresses="<ALLOWED-SRC-IPs/NETMASK>"
 set "<COMMUNITY>" authentication-password="<AUTH_PASS>" authentication-protocol=MD5
-set "<COMMUNITY>" encryption-password="<ENCRYP_PASS>" encryption-protocol=AES
+set "<COMMUNITY>" encryption-password="<ENCRYPT_PASS>" encryption-protocol=AES
 set "<COMMUNITY>" read-access=yes write-access=no security=private
 #Disable public SNMP
 set public read-access=no write-access=no security=private
 /snmp
-set contact="<NAME>" enabled=yes engine-id="<ENGINE ID>" location="<LOCALTION>"
+set contact="<NAME>" enabled=yes engine-id="<ENGINE ID>" location="<LOCATION>"
 ```
 
 !!! note

@@ -48,6 +48,7 @@ class AvailabilityMapController extends WidgetController
             'tile_size' => 12,
             'color_only_select' => 0,
             'show_disabled_and_ignored' => 0,
+            'show_totals' => 1,
             'mode_select' => 0,
             'order_by' => LibrenmsConfig::get('webui.availability_map_sort_status') ? 'status' : 'display-name',
             'device_group' => null,

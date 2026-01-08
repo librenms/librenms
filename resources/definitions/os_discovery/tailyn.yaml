@@ -1,0 +1,109 @@
+modules:
+    os:
+        hardware: ENTITY-MIB::entPhysicalModelName.1
+        version: IMP-HF528-MIB::iswSdpSwVersion.0
+        features: IMP-HF528-MIB::iswSdpProductModel.0
+    processors:
+        data:
+            -
+                oid: IMP-HF528-MIB::iswCPULoading
+                num_oid: '.1.3.6.1.4.1.5833.2017.3.15.1.{{ $index }}'
+    sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - IMP-HF528-MIB::iswUpShiftThreshold
+                        - IMP-HF528-MIB::iswDownShiftThreshold
+        temperature:
+            data:
+                -
+                    oid: IMP-HF528-MIB::iswDDMITable
+                    value: IMP-HF528-MIB::iswDDMIA2CurrentTemperature
+                    num_oid: '.1.3.6.1.4.1.5833.2017.4.12.2.1.9.{{ $index }}'
+                    descr: 'GE-{{ $index }} Temperature'
+                    index: 'iswDDMIA2CurrentTemperature.{{ $index }}'
+                    low_limit: IMP-HF528-MIB::iswDDMIA2TemperatureLowAlarmThreshold
+                    low_warn_limit: IMP-HF528-MIB::iswDDMIA2TemperatureLowWarnThreshold
+                    warn_limit: IMP-HF528-MIB::iswDDMIA2TemperatureHighWarnThreshold
+                    high_limit: IMP-HF528-MIB::iswDDMIA2TemperatureHighAlarmThreshold
+                    skip_values:
+                        -
+                            oid: IMP-HF528-MIB::iswDDMISfpDetected
+                            op: '=='
+                            value: 2
+                -
+                    oid: IMP-HF528-MIB::iswCurrentCpuTemperature
+                    value: IMP-HF528-MIB::iswCurrentCpuTemperature
+                    num_oid: '.1.3.6.1.4.1.5833.2017.4.11.1.{{ $index }}'
+                    descr: 'Processor {{ $index }} Temperature'
+                    index: 'iswCurrentCpuTemperature.{{ $index }}'
+                    low_limit: IMP-HF528-MIB::iswDownShiftThreshold
+                    high_limit: IMP-HF528-MIB::iswUpShiftThreshold
+        voltage:
+            data:
+                -
+                    oid: IMP-HF528-MIB::iswDDMITable
+                    value: IMP-HF528-MIB::iswDDMIA2CurrentVoltage
+                    num_oid: '.1.3.6.1.4.1.5833.2017.4.12.2.1.14.{{ $index }}'
+                    descr: 'GE-{{ $index }} Voltage'
+                    index: 'iswDDMIA2CurrentVoltage.{{ $index }}'
+                    low_limit: IMP-HF528-MIB::iswDDMIA2VoltageLowAlarmThreshold
+                    low_warn_limit: IMP-HF528-MIB::iswDDMIA2VoltageLowWarnThreshold
+                    warn_limit: IMP-HF528-MIB::iswDDMIA2VoltageHighWarnThreshold
+                    high_limit: IMP-HF528-MIB::iswDDMIA2VoltageHighAlarmThreshold
+                    skip_values:
+                        -
+                            oid: IMP-HF528-MIB::iswDDMISfpDetected
+                            op: '=='
+                            value: 2
+        current:
+            data:
+                -
+                    oid: IMP-HF528-MIB::iswDDMITable
+                    value: IMP-HF528-MIB::iswDDMIA2CurrentTxBias
+                    num_oid: '.1.3.6.1.4.1.5833.2017.4.12.2.1.19.{{ $index }}'
+                    descr: 'GE-{{ $index }} Tx Bias'
+                    divisor: 1000
+                    index: 'iswDDMIA2CurrentTxBias.{{ $index }}'
+                    low_limit: IMP-HF528-MIB::iswDDMIA2TxBiasLowAlarmThreshold
+                    low_warn_limit: IMP-HF528-MIB::iswDDMIA2TxBiasLowWarnThreshold
+                    warn_limit: IMP-HF528-MIB::iswDDMIA2TxBiasHighWarnThreshold
+                    high_limit: IMP-HF528-MIB::iswDDMIA2TxBiasHighAlarmThreshold
+                    skip_values:
+                        -
+                            oid: IMP-HF528-MIB::iswDDMISfpDetected
+                            op: '=='
+                            value: 2
+        dbm:
+            data:
+                -
+                    oid: IMP-HF528-MIB::iswDDMITable
+                    value: IMP-HF528-MIB::iswDDMIA2CurrentTxPower
+                    num_oid: '.1.3.6.1.4.1.5833.2017.4.12.2.1.24.{{ $index }}'
+                    descr: 'GE-{{ $index }} Tx Power'
+                    index: 'iswDDMIA2CurrentTxPower.{{ $index }}'
+                    low_limit: IMP-HF528-MIB::iswDDMIA2TxPowerLowAlarmThreshold
+                    low_warn_limit: IMP-HF528-MIB::iswDDMIA2TxPowerLowWarnThreshold
+                    high_limit: IMP-HF528-MIB::iswDDMIA2TxPowerHighAlarmThreshold
+                    warn_limit: IMP-HF528-MIB::iswDDMIA2TxPowerHighWarnThreshold
+                    skip_values:
+                        -
+                            oid: IMP-HF528-MIB::iswDDMISfpDetected
+                            op: '=='
+                            value: 2
+                -
+                    oid: IMP-HF528-MIB::iswDDMITable
+                    value: IMP-HF528-MIB::iswDDMIA2CurrentRxPower
+                    num_oid: '.1.3.6.1.4.1.5833.2017.4.12.2.1.29.{{ $index }}'
+                    descr: 'GE-{{ $index }} Rx Power'
+                    index: 'iswDDMIA2CurrentRxPower.{{ $index }}'
+                    low_limit: IMP-HF528-MIB::iswDDMIA2RxPowerLowAlarmThreshold
+                    low_warn_limit: IMP-HF528-MIB::iswDDMIA2RxPowerLowWarnThreshold
+                    high_limit: IMP-HF528-MIB::iswDDMIA2RxPowerHighAlarmThreshold
+                    warn_limit: IMP-HF528-MIB::iswDDMIA2RxPowerHighWarnThreshold
+                    skip_values:
+                        -
+                            oid: IMP-HF528-MIB::iswDDMISfpDetected
+                            op: '=='
+                            value: 2
