@@ -11,7 +11,7 @@
                     "hardware": "AP6",
                     "features": null,
                     "location": "<private>",
-                    "os": "altalabs",
+                    "os": "altalabs-ap",
                     "type": "wireless",
                     "serial": null,
                     "icon": "altalabs.svg"
