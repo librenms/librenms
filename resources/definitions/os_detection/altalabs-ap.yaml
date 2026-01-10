@@ -1,6 +1,6 @@
-os: altalabs
-text: Alta Labs
-type: network
+os: altalabs-ap
+text: Alta Labs AP
+type: wireless
 over:
     - { graph: device_bits, text: Traffic }
 discovery:
@@ -8,5 +8,4 @@ discovery:
         sysObjectID:
             - .1.3.6.1.4.1.8072.3.2.10
         sysDescr_regex:
-            - '/^Alta Route/'
-            - '/^Alta S/'
+            - '/^Alta AP/'
