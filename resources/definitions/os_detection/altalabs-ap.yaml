@@ -1,5 +1,6 @@
 os: altalabs-ap
 text: Alta Labs AP
+icon: altalabs
 type: wireless
 over:
     - { graph: device_bits, text: Traffic }
