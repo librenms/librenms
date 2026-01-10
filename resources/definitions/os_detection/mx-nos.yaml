@@ -1,4 +1,4 @@
-os: moxa-mx-nos
+os: mx-nos
 icon: moxa
 text: 'MX-NOS'
 type: network
