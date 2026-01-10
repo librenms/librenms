@@ -24,8 +24,6 @@ class MaintenanceRrdStep extends LnmsCommand
 
     public function handle(RrdProcess $rrdProcess): int
     {
-        $this->configureOutputOptions();
-
         $systemStep = (int) LibrenmsConfig::get('rrd.step', 300);
         $icmpStep = (int) LibrenmsConfig::get('ping_rrd_step', $systemStep);
         $systemHeartbeat = (int) LibrenmsConfig::get('rrd.heartbeat', $systemStep * 2);
