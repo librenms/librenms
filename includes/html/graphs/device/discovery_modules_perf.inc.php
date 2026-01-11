@@ -3,10 +3,9 @@
 use App\Facades\LibrenmsConfig;
 
 /*
- * LibreNMS per-module poller performance
+ * LibreNMS per-module discovery performance
  *
- * Copyright (c) 2016 Mike Rostermund <mike@kollegienet.dk>
- * Copyright (c) 2016 Paul D. Gear <paul@librenms.org>
+ * Copyright (c) 2024 LibreNMS Contributors
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -22,18 +21,18 @@ $scale_min = '0';
 $device = DeviceCache::get($device['device_id']);
 
 $attribs = $device->getAttribs();
-$modules = LibrenmsConfig::get('poller_modules');
+$modules = LibrenmsConfig::get('discovery_modules');
 ksort($modules);
 
 require 'includes/html/graphs/common.inc.php';
 
 foreach ($modules as $module => $module_status) {
-    $rrd_filename = Rrd::name($device->hostname, ['poller-perf', $module]);
-    $device_module_status = $attribs['poll_' . $module] ?? null;
+    $rrd_filename = Rrd::name($device->hostname, ['discovery-perf', $module]);
+    $device_module_status = $attribs['discover_' . $module] ?? null;
     if ($device_module_status || ($module_status && $device_module_status === null) ||
-        (LibrenmsConfig::getOsSetting($device->os, 'poller_modules.' . $module) && $device_module_status === null)) {
+        (LibrenmsConfig::getOsSetting($device->os, 'discovery_modules.' . $module) && $device_module_status === null)) {
         if (Rrd::checkRrdExists($rrd_filename)) {
-            $ds['ds'] = 'poller';
+            $ds['ds'] = 'discovery';
             $ds['descr'] = $module;
             $ds['filename'] = $rrd_filename;
             $rrd_list[] = $ds;

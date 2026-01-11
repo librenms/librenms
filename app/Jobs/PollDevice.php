@@ -17,6 +17,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\OS;
@@ -76,6 +77,13 @@ class PollDevice implements ShouldQueue
 
             if (ConnectivityHelper::pingIsAllowed($this->device)) {
                 $this->os->enableGraph('ping_perf');
+            }
+
+            // Preserve discovery graphs that were enabled during discovery
+            foreach ($this->device->graphs as $graph) {
+                if (Str::startsWith($graph->graph, 'discovery_')) {
+                    $this->os->enableGraph($graph->graph);
+                }
             }
 
             $this->os->persistGraphs($this->device->status); // save graphs but don't delete any if device is down

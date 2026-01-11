@@ -11,9 +11,11 @@
     <tr>
         <th data-column-id="hostname">{{ __('Hostname') }}</th>
         <th data-column-id="last_polled">{{ __('Last Polled') }}</th>
+        <th data-column-id="last_polled_timetaken" data-order="desc">{{ __('Poll Duration') }}</th>
+        <th data-column-id="last_discovered">{{ __('Last Discovered') }}</th>
+        <th data-column-id="last_discovered_timetaken">{{ __('Discovery Duration') }}</th>
         <th data-column-id="poller_group">{{ __('Poller Group') }}</th>
         <th data-column-id="location">{{ __('Location') }}</th>
-        <th data-column-id="last_polled_timetaken" data-order="desc">{{ __('Polling Duration') }} ({{ __('Seconds') }})</th>
     </tr>
     </thead>
 </table>
@@ -42,6 +44,9 @@
             };
         },
         url: "ajax_table.php"
+    }).on("loaded.rs.jquery.bootgrid", function() {
+        $('th[data-column-id="last_polled_timetaken"] .text').attr('title', '{{ __('Polling Duration in Seconds') }}');
+        $('th[data-column-id="last_discovered_timetaken"] .text').attr('title', '{{ __('Discovery Duration in Seconds') }}');
     });
 
 </script>

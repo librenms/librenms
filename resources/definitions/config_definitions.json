@@ -3752,6 +3752,22 @@
             },
             "type": "graph"
         },
+        "graph_types.device.discovery_modules_perf": {
+            "default": {
+                "section": "poller",
+                "order": 1,
+                "descr": "Discovery Modules Performance"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.discovery_perf": {
+            "default": {
+                "section": "poller",
+                "order": 1,
+                "descr": "Discovery Time"
+            },
+            "type": "graph"
+        },
         "graph_types.device.processor": {
             "default": {
                 "section": "system",

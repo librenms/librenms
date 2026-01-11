@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\OS;
+use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Dns;
 use LibreNMS\Util\Module;
 use LibreNMS\Util\ModuleList;
@@ -32,6 +33,7 @@ class DiscoverDevice implements ShouldQueue
 
     private array $deviceArray;
     private ?Device $device = null;
+    private OS|OS\Generic|null $os = null;
 
     public function __construct(
         public int $device_id,
@@ -63,6 +65,12 @@ class DiscoverDevice implements ShouldQueue
             $this->device->hostname,
             $this->device->device_id,
             $measurement->getDuration()));
+
+        // Record performance if not overriding modules
+        if (! $this->moduleList->hasOverride()) {
+            $this->recordPerformance($measurement);
+            $this->os->persistGraphs(false); // only add discovery graphs, don't remove existing ones
+        }
 
         $this->device->last_discovered = Carbon::now();
         $this->device->last_discovered_timetaken = $measurement->getDuration();
@@ -103,7 +111,7 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
         app(CheckDeviceAvailability::class)->execute($this->device, true);
         $this->deviceArray['status'] = $this->device->status;
         $this->deviceArray['status_reason'] = $this->device->status_reason;
-        $os = OS::make($this->deviceArray);
+        $this->os = OS::make($this->deviceArray);
 
         foreach ($this->moduleList->modulesWithStatus(ProcessType::discovery, $this->device) as $module => $module_status) {
             $should_discover = false;
@@ -112,7 +120,7 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
 
             try {
                 $instance = Module::fromName($module);
-                $should_discover = $instance->shouldDiscover($os, $module_status);
+                $should_discover = $instance->shouldDiscover($this->os, $module_status);
 
                 if ($should_discover) {
                     Log::info("#### Load discovery module $module ####\n");
@@ -122,11 +130,11 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
                         LibrenmsConfig::set('discovery_submodules.' . $module, $module_status->submodules);
                     }
 
-                    $instance->discover($os);
+                    $instance->discover($this->os);
 
                     // check for changed OS
                     if ($module == 'core') {
-                        $os = $this->checkForOsChange($os);
+                        $this->os = $this->checkForOsChange($this->os);
                         $this->device->save(); // save deferred core changes
                     }
                 }
@@ -145,9 +153,22 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
                 Log::info('');
                 app(MeasurementManager::class)->printChangedStats();
                 Module::savePerformance($module, ProcessType::discovery, $module_start, $start_memory);
+                $this->os->enableGraph('discovery_modules_perf');
                 Log::info("#### Unload discovery module $module ####\n");
             }
         }
+    }
+
+    private function recordPerformance(Measurement $measurement): void
+    {
+        $measurement->manager()->record('device', $measurement);
+
+        app('Datastore')->put($this->deviceArray, 'discovery-perf', [
+            'rrd_def' => RrdDefinition::make()->addDataset('discovery', 'GAUGE', 0),
+            'module' => 'ALL',
+        ], [
+            'discovery' => $measurement->getDuration(),
+        ]);
     }
 
     private function checkForOsChange(OS $os): OS

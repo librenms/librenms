@@ -56,8 +56,8 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT D.device_id, L.location as `location`, D.hostname AS `hostname`, D.sysName, IFNULL(CONVERT_TZ(D.last_polled, @@global.time_zone, ?),D.last_polled) AS `last_polled`, `group_name`, D.last_polled_timetaken AS `last_polled_timetaken` $sql";
-array_unshift($param, session('preferences.timezone'));
+$sql = "SELECT D.device_id, L.location as `location`, D.hostname AS `hostname`, D.sysName, IFNULL(CONVERT_TZ(D.last_polled, @@global.time_zone, ?),D.last_polled) AS `last_polled`, `group_name`, D.last_polled_timetaken AS `last_polled_timetaken`, IFNULL(CONVERT_TZ(D.last_discovered, @@global.time_zone, ?),D.last_discovered) AS `last_discovered`, D.last_discovered_timetaken AS `last_discovered_timetaken` $sql";
+array_unshift($param, session('preferences.timezone'), session('preferences.timezone'));
 
 foreach (dbFetchRows($sql, $param) as $device) {
     if (empty($device['group_name'])) {
@@ -69,6 +69,8 @@ foreach (dbFetchRows($sql, $param) as $device) {
         'poller_group' => $device['group_name'],
         'location' => $device['location'],
         'last_polled_timetaken' => round($device['last_polled_timetaken'], 2),
+        'last_discovered' => $device['last_discovered'],
+        'last_discovered_timetaken' => $device['last_discovered_timetaken'] ? round($device['last_discovered_timetaken'], 2) : null,
     ];
 }
 

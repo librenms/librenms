@@ -21,11 +21,13 @@ use App\Models\Port;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\OS;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\Module;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\UserFuncHelper;
 
@@ -151,6 +153,10 @@ function discover_device(&$device, $force_module = false)
 
     $discovery_modules = ['core' => true] + LibrenmsConfig::get('discovery_modules', []);
 
+    // Create OS instance for graph registration
+    $os = OS::make($device);
+    $discovered_modules = false;
+
     /** @var \App\Polling\Measure\MeasurementManager $measurements */
     $measurements = app(\App\Polling\Measure\MeasurementManager::class);
     $measurements->checkpoint(); // don't count previous stats
@@ -184,9 +190,11 @@ function discover_device(&$device, $force_module = false)
             }
 
             $module_time = microtime(true) - $module_start;
-            $module_time = substr($module_time, 0, 5);
             $module_mem = (memory_get_usage() - $start_memory);
             printf("\n>> Runtime for discovery module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
+            Module::savePerformance($module, ProcessType::discovery, $module_start, $start_memory);
+            $os->enableGraph('discovery_modules_perf');
+            $discovered_modules = true;
             $measurements->printChangedStats();
             echo "#### Unload disco module $module ####\n\n";
         } elseif ($device_module_status == '0') {
@@ -196,6 +204,11 @@ function discover_device(&$device, $force_module = false)
         } else {
             echo "Module [ $module ] disabled globally.\n\n";
         }
+    }
+
+    // Persist discovery graph if any modules were discovered
+    if ($discovered_modules) {
+        $os->persistGraphs(false); // only add discovery graph, don't remove existing ones
     }
 
     return true;

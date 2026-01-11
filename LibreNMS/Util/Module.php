@@ -68,16 +68,16 @@ class Module
 
         Log::info(sprintf(">> Runtime for %s module '%s': %.4f seconds with %s bytes", $type->name, $module, $module_time, $module_mem));
 
-        if ($type == ProcessType::discovery) {
-            return; // do not record for now as there is currently no rrd during discovery
-        }
+        // Determine RRD naming based on process type
+        $rrdPrefix = $type == ProcessType::discovery ? 'discovery-perf' : 'poller-perf';
+        $datasetName = $type == ProcessType::discovery ? 'discovery' : 'poller';
 
-        app('Datastore')->put(DeviceCache::getPrimary()->toArray(), 'poller-perf', [
+        app('Datastore')->put(DeviceCache::getPrimary()->toArray(), $rrdPrefix, [
             'module' => $module,
-            'rrd_def' => RrdDefinition::make()->addDataset('poller', 'GAUGE', 0),
-            'rrd_name' => ['poller-perf', $module],
+            'rrd_def' => RrdDefinition::make()->addDataset($datasetName, 'GAUGE', 0),
+            'rrd_name' => [$rrdPrefix, $module],
         ], [
-            'poller' => $module_time,
+            $datasetName => $module_time,
         ]);
     }
 }
