@@ -1,4 +1,3 @@
-mib: 'IF-MIB:NMS-SYS-MIB:NMS-OPTICAL-MIB'
 modules:
     os:
         hardware:
@@ -11,57 +10,62 @@ modules:
         additional_oids:
             data:
                 - oid:
-                        - ifName
+                        - IF-MIB::ifName
         temperature:
             data:
                 -   
-                    oid: temperatureTable
-                    value: temperatureValue
+                    oid: NMS-SYS-MIB::temperatureTable
+                    value: NMS-SYS-MIB::temperatureValue
                     num_oid: '.1.3.6.1.4.1.56166.1.2.4.1.2.{{ $index }}'
+                    index: 'temperatureValue.{{ $index }}'
                     descr: 'Temperature {{ $index }}'
                 - 
-                    oid: opticalModuleInfoTable
-                    value: opticalTemperature
+                    oid: NMS-OPTICAL-MIB::opticalModuleInfoTable
+                    value: NMS-OPTICAL-MIB::opticalTemperature
                     num_oid: '.1.3.6.1.4.1.56166.1.8.2.1.10.{{ $index }}'
-                    descr: '{{ $ifName }} Transceiver Temperature'
-                    low_limit: opticalTempLoAlarm
-                    low_warn_limit: opticalTempLoWarn
-                    high_limit: opticalTempHiAlarm
-                    warn_limit: opticalTempHiWarn
+                    descr: '{{ IF-MIB::ifName }} Transceiver Temperature'
+                    low_limit: NMS-OPTICAL-MIB::opticalTempLoAlarm
+                    low_warn_limit: NMS-OPTICAL-MIB::opticalTempLoWarn
+                    high_limit: NMS-OPTICAL-MIB::opticalTempHiAlarm
+                    warn_limit: NMS-OPTICAL-MIB::opticalTempHiWarn
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
-                    index: 'opticalTemperature-{{ $index }}'
+                    index: 'opticalTemperature.{{ $index }}'
                     group: transceiver
                     skip_values:
                         - 
-                            oid: opticalSupportDDM
+                            oid: NMS-OPTICAL-MIB::opticalSupportDDM
                             op: '!='
                             value: '1'
         state:
             data:
                 - 
-                    oid: powerTable
-                    value: powerState
+                    oid: NMS-SYS-MIB::powerTable
+                    value: NMS-SYS-MIB::powerState
                     num_oid: '.1.3.6.1.4.1.56166.1.2.3.1.3.{{ $index }}'
+                    index: 'powerState.{{ $index }}'
                     descr: 'Power {{ $index }} state'
+                    state_name: 'NMS-SYS-MIB::powerState'
                     states:
                         - { descr: 'on', graph: 1, value: 1, generic: 0 }
                         - { descr: 'off', graph: 2, value: 2, generic: 2 }
                 -   
-                    oid: fanStatusTable
-                    value: fanStatus
+                    oid: NMS-SYS-MIB::fanStatusTable
+                    value: NMS-SYS-MIB::fanStatus
                     num_oid: '.1.3.6.1.4.1.56166.1.2.5.1.3.{{ $index }}'
+                    index: 'fanStatus.{{ $index }}'
                     descr: 'Fan {{ $index }} status'
                     state_name: 'NMS-SYS-MIB::fanStatus'
                     states:
                         - { descr: normal, graph: 1, value: 1, generic: 0 }
                         - { descr: failure, graph: 0, value: 2, generic: 2 }
                 - 
-                    oid: fanStatusTable
-                    value: fanSpeedStatus
+                    oid: NMS-SYS-MIB::fanStatusTable
+                    value: NMS-SYS-MIB::fanSpeedStatus
                     num_oid: '.1.3.6.1.4.1.56166.1.2.5.1.2.{{ $index }}'
                     descr: 'Fan {{ $index }} speed'
-                    state_name: fanSpeedStatus
+                    index: 'fanSpeedStatus.{{ $index }}'
+                    state_name: 'NMS-SYS-MIB::fanSpeedStatus'
                     states:
                         - { descr: unknown, graph: 0, value: 0, generic: 2 }
                         - { descr: low, graph: 1, value: 1, generic: 0 }
@@ -70,79 +74,79 @@ modules:
         dbm:
             data:
                 - 
-                    oid: opticalModuleInfoTable
-                    value: opticalRxPower
+                    oid: NMS-OPTICAL-MIB::opticalModuleInfoTable
+                    value: NMS-OPTICAL-MIB::opticalRxPower
                     num_oid: '.1.3.6.1.4.1.56166.1.8.2.1.13.{{ $index }}'
-                    descr: '{{ $ifName }} Transceiver Receive Power'
+                    descr: '{{ IF-MIB::ifName }} Transceiver Receive Power'
                     divisor: 100
-                    low_limit: opticalRxLoAlarm
-                    low_warn_limit: opticalRxLoWarn
-                    high_limit: opticalRxHiAlarm
-                    warn_limit: opticalRxHiWarn
+                    low_limit: NMS-OPTICAL-MIB::opticalRxLoAlarm
+                    low_warn_limit: NMS-OPTICAL-MIB::opticalRxLoWarn
+                    high_limit: NMS-OPTICAL-MIB::opticalRxHiAlarm
+                    warn_limit: NMS-OPTICAL-MIB::opticalRxHiWarn
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
-                    index: 'opticalRxPower-{{ $index }}'
+                    index: 'opticalRxPower.{{ $index }}'
                     group: transceiver
                     skip_values:
                         - 
-                            oid: opticalSupportDDM
+                            oid: NMS-OPTICAL-MIB::opticalSupportDDM
                             op: '!='
                             value: '1'
                 - 
-                    oid: opticalModuleInfoTable
-                    value: opticalTxPower
+                    oid: NMS-OPTICAL-MIB::opticalModuleInfoTable
+                    value: NMS-OPTICAL-MIB::opticalTxPower
                     num_oid: '.1.3.6.1.4.1.56166.1.8.2.1.14.{{ $index }}'
-                    descr: '{{ $ifName }} Transceiver Transmit Power'
+                    descr: '{{ IF-MIB::ifName }} Transceiver Transmit Power'
                     divisor: 100
-                    low_limit: opticalTxLoAlarm
-                    low_warn_limit: opticalTxLoWarn
-                    high_limit: opticalTxHiAlarm
-                    warn_limit: opticalTxHiWarn
+                    low_limit: NMS-OPTICAL-MIB::opticalTxLoAlarm
+                    low_warn_limit: NMS-OPTICAL-MIB::opticalTxLoWarn
+                    high_limit: NMS-OPTICAL-MIB::opticalTxHiAlarm
+                    warn_limit: NMS-OPTICAL-MIB::opticalTxHiWarn
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
-                    index: 'opticalTxPower-{{ $index }}'
+                    index: 'opticalTxPower.{{ $index }}'
                     group: transceiver
                     skip_values:
                         - 
-                            oid: opticalSupportDDM
+                            oid: NMS-OPTICAL-MIB::opticalSupportDDM
                             op: '!='
                             value: '1'
         current:
             data:
                 - 
-                    oid: opticalModuleInfoTable
-                    value: opticalBiasCurrent
+                    oid: NMS-OPTICAL-MIB::opticalModuleInfoTable
+                    value: NMS-OPTICAL-MIB::opticalBiasCurrent
                     num_oid: '.1.3.6.1.4.1.56166.1.8.2.1.12.{{ $index }}'
-                    descr: '{{ $ifName }} Transceiver Bias Current'
+                    descr: '{{ IF-MIB::ifName }} Transceiver Bias Current'
                     divisor: 100000
-                    low_limit: opticalBiasLoAlarm
-                    low_warn_limit: opticalBiasLoWarn
-                    high_limit: opticalBiasHiAlarm
-                    warn_limit: opticalBiasHiWarn
+                    low_limit: NMS-OPTICAL-MIB::opticalBiasLoAlarm
+                    low_warn_limit: NMS-OPTICAL-MIB::opticalBiasLoWarn
+                    high_limit: NMS-OPTICAL-MIB::opticalBiasHiAlarm
+                    warn_limit: NMS-OPTICAL-MIB::opticalBiasHiWarn
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
-                    index: 'opticalBiasCurrent-{{ $index }}'
+                    index: 'opticalBiasCurrent.{{ $index }}'
                     group: transceiver
                     skip_values:
                         - 
-                            oid: opticalSupportDDM
+                            oid: NMS-OPTICAL-MIB::opticalSupportDDM
                             op: '!='
                             value: '1'
         voltage:
             data:
                 -
-                    oid: opticalModuleInfoTable
-                    value: opticalVoltage
+                    oid: NMS-OPTICAL-MIB::opticalModuleInfoTable
+                    value: NMS-OPTICAL-MIB::opticalVoltage
                     num_oid: '.1.3.6.1.4.1.56166.1.8.2.1.11.{{ $index }}'
-                    descr: '{{ $ifName }} Transceiver Voltage'
+                    descr: '{{ IF-MIB::ifName }} Transceiver Voltage'
                     divisor: 100
-                    low_limit: opticalVoltLoAlarm
-                    low_warn_limit: opticalVoltLoWarn
-                    high_limit: opticalVoltHiAlarm
-                    warn_limit: opticalVoltHiWarn
+                    low_limit: NMS-OPTICAL-MIB::opticalVoltLoAlarm
+                    low_warn_limit: NMS-OPTICAL-MIB::opticalVoltLoWarn
+                    high_limit: NMS-OPTICAL-MIB::opticalVoltHiAlarm
+                    warn_limit: NMS-OPTICAL-MIB::opticalVoltHiWarn
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
-                    index: 'opticalVoltage-{{ $index }}'
+                    index: 'opticalVoltage.{{ $index }}'
                     group: transceiver
                     skip_values:
                         - 
