@@ -93,13 +93,13 @@ modules:
                     oid: MOXA-POE-BT-MIB::poeBtStatPortTable
                     value: MOXA-POE-BT-MIB::poeBtStatVoltage
                     num_oid: '.1.3.6.1.4.1.8691.608.2.2.1.6.1.5.{{ $index }}'
-                    descr: 'POE Port-{{ $index }} Voltage'
+                    descr: 'Port-{{ $index }} POE Voltage'
                     index: 'poeBtStatVoltage.{{ $index }}'
                 -
                     oid: MOXA-FIBER-CHECK-MIB::fiberCheckStatPortTable
                     value: MOXA-FIBER-CHECK-MIB::fiberCheckStatVoltage
                     num_oid: '.1.3.6.1.4.1.8691.603.5.3.2.1.1.1.7.{{ $index }}'
-                    descr: 'Fiber Port-{{ $index }} Voltage'
+                    descr: 'Port-{{ $index }} {{ MOXA-FIBER-CHECK-MIB::fiberCheckStatModelName }} Voltage'
                     index: 'fiberCheckStatVoltage.{{ $index }}'
         current:
             data:
@@ -107,7 +107,7 @@ modules:
                     oid: MOXA-POE-BT-MIB::poeBtStatPortTable
                     value: MOXA-POE-BT-MIB::poeBtStatCurrent
                     num_oid: '.1.3.6.1.4.1.8691.608.2.2.1.6.1.4.{{ $index }}'
-                    descr: 'POE Port-{{ $index }} Current'
+                    descr: 'Port-{{ $index }} POE Current'
                     index: 'poeBtStatCurrent.{{ $index }}'
         temperature:
             data:
@@ -115,7 +115,7 @@ modules:
                     oid: MOXA-FIBER-CHECK-MIB::fiberCheckStatPortTable
                     value: MOXA-FIBER-CHECK-MIB::fiberCheckStatTemperatureC
                     num_oid: '.1.3.6.1.4.1.8691.603.5.3.2.1.1.1.5.{{ $index }}'
-                    descr: 'Fiber Port-{{ $index }} Temperature'
+                    descr: 'Port-{{ $index }} {{ MOXA-FIBER-CHECK-MIB::fiberCheckStatModelName }} Temperature'
                     index: 'fiberCheckStatTemperatureC.{{ $index }}'
                     high_limit: MOXA-FIBER-CHECK-MIB::fiberCheckStatTemperatureLimitC
         dbm:
@@ -124,16 +124,16 @@ modules:
                     oid: MOXA-FIBER-CHECK-MIB::fiberCheckStatPortTable
                     value: MOXA-FIBER-CHECK-MIB::fiberCheckStatTxPower
                     num_oid: '.1.3.6.1.4.1.8691.603.5.3.2.1.1.1.8.{{ $index }}'
-                    descr: 'Fiber Port-{{ $index }} TX Power'
+                    descr: 'Port-{{ $index }} {{ MOXA-FIBER-CHECK-MIB::fiberCheckStatModelName }} TX Power'
                     index: 'fiberCheckStatTxPower.{{ $index }}'
-                    #high_limit: MOXA-FIBER-CHECK-MIB::fiberCheckStatTxPowerLimit
+                    #high_limit: MOXA-FIBER-CHECK-MIB::fiberCheckStatTxPowerLimit #returns [-##.##, ##.##]
                 -
                     oid: MOXA-FIBER-CHECK-MIB::fiberCheckStatPortTable
                     value: MOXA-FIBER-CHECK-MIB::fiberCheckStatRxPower
                     num_oid: '.1.3.6.1.4.1.8691.603.5.3.2.1.1.1.9.{{ $index }}'
-                    descr: 'Fiber Port-{{ $index }} RX Power'
+                    descr: 'Port-{{ $index }} {{ MOXA-FIBER-CHECK-MIB::fiberCheckStatModelName }} RX Power'
                     index: 'fiberCheckStatRxPower.{{ $index }}'
-                    #high_limit: MOXA-FIBER-CHECK-MIB::fiberCheckStatRxPowerLimit
+                    #high_limit: MOXA-FIBER-CHECK-MIB::fiberCheckStatRxPowerLimit #returns [-##.##, ##.##]
 
 
 # <Future> MOXA-POE-BT-MIB::poeBtStatPortTable  <- POE stats table
