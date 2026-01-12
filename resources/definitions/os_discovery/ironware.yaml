@@ -105,7 +105,7 @@ modules:
                     index: 'snAgentPoeUnitPowerCapacityTotal.{{ $index }}'
                     group: 'Unit PoE'
                     divisor: 1000
-                    descr: 'Unit {{ $index }} Consumed Power'
+                    descr: 'Unit {{ $index }} Total Power'
                 -
                     oid: FOUNDRY-POE-MIB::snAgentPoeUnitTable
                     value: FOUNDRY-POE-MIB::snAgentPoeUnitPowerCapacityFree

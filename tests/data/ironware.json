@@ -24072,7 +24072,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.1991.1.1.2.14.4.1.1.2.1",
                     "sensor_index": "snAgentPoeUnitPowerCapacityTotal.1",
                     "sensor_type": "ironware",
-                    "sensor_descr": "Unit 1 Consumed Power",
+                    "sensor_descr": "Unit 1 Total Power",
                     "group": "Unit PoE",
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,

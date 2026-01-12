@@ -4,11 +4,11 @@ use App\Console\Commands\MaintenanceCleanupNetworks;
 use App\Console\Commands\MaintenanceCleanupSyslog;
 use App\Console\Commands\MaintenanceFetchOuis;
 use App\Console\Commands\MaintenanceFetchRSS;
+use App\Facades\LibrenmsConfig;
 use App\Jobs\PingCheck;
 use App\Models\Eventlog;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schedule;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Util\Time;
@@ -123,7 +123,7 @@ Artisan::command('scan
     /** @var Illuminate\Console\Command $this */
     $command = [base_path('snmp-scan.py')];
 
-    if (empty($this->argument('network')) && ! \App\Facades\LibrenmsConfig::has('nets')) {
+    if (empty($this->argument('network')) && ! LibrenmsConfig::has('nets')) {
         $this->error(__('Network is required if \'nets\' is not set in the config'));
 
         return 1;
@@ -174,10 +174,11 @@ Artisan::command('scan
 // mark schedule working
 Schedule::call(function (): void {
     Cache::put('scheduler_working', now(), now()->addMinutes(6));
-})->everyFiveMinutes();
+})->name('schedule operational check')->everyFiveMinutes();
 
 // schedule maintenance, should be after all others
-$maintenance_log_file = Config::get('log_dir') . '/maintenance.log';
+$maintenance_log_file = LibrenmsConfig::get('log_dir') . '/maintenance.log';
+
 Schedule::command(MaintenanceFetchOuis::class)
     ->weeklyOn(0, Time::pseudoRandomBetween('01:00', '01:59'))
     ->onOneServer()
