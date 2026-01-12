@@ -28,6 +28,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class Ipv6Address extends PortRelatedModel implements Keyable
@@ -45,11 +46,19 @@ class Ipv6Address extends PortRelatedModel implements Keyable
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Ipv6Network, $this>
+     * @return BelongsTo<Ipv6Network, $this>
      */
     public function network(): BelongsTo
     {
         return $this->belongsTo(Ipv6Network::class, 'ipv6_network_id', 'ipv6_network_id');
+    }
+
+    /**
+     * @return HasOneThrough<Device, Port, $this>
+     */
+    public function device(): HasOneThrough
+    {
+        return $this->hasOneThrough(Device::class, Port::class, 'port_id', 'device_id', 'port_id', 'device_id');
     }
 
     public function getCompositeKey(): string

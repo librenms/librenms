@@ -105,9 +105,6 @@ if ($rowCount != -1) {
 $sql = "SELECT *,`I`.`ifDescr` AS `interface` $sql";
 
 foreach (dbFetchRows($sql, $param) as $interface) {
-    $speed = \LibreNMS\Util\Number::formatSi($interface['ifSpeed'], 2, 0, 'bps');
-    $type = \LibreNMS\Util\Rewrite::normalizeIfType($interface['ifType']);
-
     if ($search_type == 'ipv6') {
         $address = (string) IP::parse($interface['ipv6_address'], true) . '/' . $interface['ipv6_prefixlen'];
     } elseif ($search_type == 'mac') {
@@ -118,17 +115,11 @@ foreach (dbFetchRows($sql, $param) as $interface) {
         $address = (string) IP::parse($interface['ipv4_address'], true) . '/' . $interface['ipv4_prefixlen'];
     }
 
-    if (isset($interface['in_errors'], $interface['out_errors']) && ($interface['in_errors'] > 0 || $interface['out_errors'] > 0)) {
-        $error_img = generate_port_link($interface, "<i class='fa fa-flag fa-lg' style='color:red' aria-hidden='true'></i>", 'errors');
-    } else {
-        $error_img = '';
-    }
-
     if (port_permitted($interface['port_id'])) {
         $interface = cleanPort($interface, $interface);
         $row = [
             'hostname' => generate_device_link($interface),
-            'interface' => generate_port_link($interface) . ' ' . $error_img,
+            'interface' => generate_port_link($interface),
             'address' => $address,
             'description' => $interface['ifAlias'],
         ];
