@@ -524,9 +524,12 @@ class Rrd extends BaseDatastore
     {
         try {
             $command = $this->buildCommand('graph', '-', $options);
-            $this->init(300);
 
-            return $this->rrd->run('"' . implode('" "', $command) . "\"\nquit");
+            $this->init(300);
+            $image = $this->rrd->run('"' . implode('" "', $command));
+            $this->rrd->stop();
+
+            return $image;
         } catch (RrdException $e) {
             throw new RrdGraphException($e->getMessage(), 'Error');
         }
