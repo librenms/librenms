@@ -30,33 +30,23 @@ use Illuminate\Http\Request;
 use LibreNMS\Util\IP;
 
 /**
- * @extends SearchController<Ipv6Address>
+ * @extends AddressSearchController<Ipv6Address>
  */
-class Ipv6SearchController extends SearchController
+class Ipv6AddressSearchController extends AddressSearchController
 {
     protected string $addressField = 'ipv6_compressed';
+    protected string $additionalSearchField = 'ipv6_address';
+    protected string $cidrField = 'ipv6_prefixlen';
 
     /**
      * @inheritDoc
      */
     protected function baseQuery(Request $request)
     {
-        $query = Ipv6Address::query()->hasAccess($request->user())->with(['port', 'device']);
-
-        $address = $request->get('address');
-        if ($address) {
-            if (str_contains($request->get('address'), '/')) {
-                [$address, $cidr] = explode('/', $address, 2);
-                $query->where('ipv6_prefixlen', $cidr);
-            }
-
-            $query->where(fn($q) => $q->where('ipv6_address', 'LIKE', "%$address%")->orWhere('ipv6_compressed', 'LIKE', "%$address%"));
-        }
-
-
-        $this->applyBaseSearchQuery($query, $request);
-
-        return $query;
+        return $this->applyBaseSearchQuery(
+            Ipv6Address::query()->hasAccess($request->user())->with(['port', 'device']),
+            $request
+        );
     }
 
     /**

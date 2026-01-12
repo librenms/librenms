@@ -30,20 +30,23 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use LibreNMS\Util\IP;
 use LibreNMS\Util\Url;
 
 /**
  * @template TModel of Model
  */
-abstract class SearchController extends TableController
+abstract class AddressSearchController extends TableController
 {
     protected string $addressField = ''; // set for sort
+    protected string $additionalSearchField = '';
+    protected string $cidrField = ''; // set for display
 
     protected function sortFields($request)
     {
         return [
             'hostname' => 'device_hostname',
-            'port' => 'port_ifDescr',
+            'port' => 'port_ifName',
             'description' => 'port_ifAlias',
             'address' => $this->addressField,
         ];
@@ -64,68 +67,35 @@ abstract class SearchController extends TableController
      */
     public function formatItem($model): array
     {
-        /** @var Port $port */
-        $port = $model instanceof Port ? $model : $model->port;
-        $descr = $port->getLabel() == $port->ifAlias ? '' : $port->ifAlias;
+        /** @var ?Port $port */
+        $port = $model?->port;
 
-        $fields = [
+        return [
             'hostname' => Url::modernDeviceLink($port?->device),
             'interface' => Url::portLink($port),
-            'address' => $this->getAddress($model),
-            'description' => $descr,
+            'address' => IP::parse($model->{$this->addressField}, true)->compressed() . '/' . $model->{$this->cidrField},
+            'description' => $port->getLabel() == $port->ifAlias ? '' : $port->ifAlias,
         ];
-
-        $oui = $this->getOui($model);
-        if ($oui !== null) {
-            $fields['mac_oui'] = $oui;
-        }
-
-        return $fields;
-    }
-
-    /**
-     * @param  TModel  $model
-     * @return string
-     */
-    abstract protected function getAddress($model): string;
-
-    /**
-     * @param  TModel  $model
-     * @return ?string
-     */
-    protected function getOui($model): ?string
-    {
-        return null;
     }
 
     protected function applyBaseSearchQuery(Builder $builder, Request $request): Builder
     {
-        $tableIsPorts = $builder->getModel()->getTable() == 'ports';
+        return $builder
+            ->when($request->get('address'), function ($q, $address) {
+                if (str_contains($address, '/')) {
+                    [$address, $cidr] = explode('/', $address, 2);
+                }
 
-        if ($tableIsPorts) {
-            $builder->when($request->get('device_id'), fn($q, $device_id) => $q->where('device_id', $device_id));
-            $builder->when($request->get('interface'), fn($q, $interface) => $q->where('ifDescr', 'LIKE', $interface));
-        } else {
-            $builder->when($request->get('device_id'), fn($q, $device_id) => $q->whereHas('port', fn ($q) => $q->where('device_id', $device_id)));
-            $builder->when($request->get('interface'), fn($q, $interface) => $q->whereHas('port', fn ($q) => $q->where('ifDescr', 'LIKE', $interface)));
-        }
+                $q->where(fn($q) => $q->where($this->addressField, 'LIKE', "%$address%")->when($this->additionalSearchField, fn($q, $f) => $q->orWhere($f, 'LIKE', "%$address%")));
 
-        if ($request->has('sort.hostname')) {
-            $builder->withAggregate('device','hostname');
-        }
-
-        if ($request->has('sort.interface')) {
-            if (! $tableIsPorts) {
-                $builder->withAggregate('port','ifDescr');
-            }
-        }
-
-        if ($request->has('sort.description')) {
-            if (! $tableIsPorts) {
-                $builder->withAggregate('port','ifAlias');
-            }
-        }
-
-        return $builder;
+                if (isset($cidr)) {
+                    $q->where($this->cidrField, $cidr);
+                }
+            })
+            ->when($request->get('device_id'), fn($q, $id) => $q->whereHas('port', fn($pq) => $pq->where('device_id', $id)))
+            ->when($request->get('interface'), fn($q, $i) => $q->whereHas('port', fn($pq) => $pq->where('ifDescr', 'LIKE', $i)))
+            ->when($request->has('sort.hostname'), fn($q) => $q->withAggregate('device', 'hostname'))
+            ->when($request->has('sort.interface'), fn($q) => $q->withAggregate('port', 'ifName'))
+            ->when($request->has('sort.description'), fn($q) => $q->withAggregate('port', 'ifAlias'));
     }
 }

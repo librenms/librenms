@@ -27,41 +27,23 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\Ipv4Address;
 use Illuminate\Http\Request;
-use LibreNMS\Util\IP;
 
 /**
- * @extends SearchController<Ipv4Address>
+ * @extends AddressSearchController<Ipv4Address>
  */
-class Ipv4SearchController extends SearchController
+class Ipv4AddressSearchController extends AddressSearchController
 {
     protected string $addressField = 'ipv4_address';
+    protected string $cidrField = 'ipv4_prefixlen';
 
     /**
      * @inheritDoc
      */
     protected function baseQuery(Request $request)
     {
-        $query = Ipv4Address::query()->hasAccess($request->user())->with(['port', 'port.device']);
-
-        $address = $request->get('address');
-        if ($address) {
-            if (str_contains($request->get('address'), '/')) {
-                [$address, $cidr] = explode('/', $address, 2);
-                $query->where('ipv4_prefixlen', $cidr);
-            }
-            $query->where('ipv4_address', 'LIKE', "%$address%");
-        }
-
-        $this->applyBaseSearchQuery($query, $request);
-
-        return $query;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function getAddress($model): string
-    {
-        return (string) IP::parse($model->ipv4_address, true) . '/' . $model->ipv4_prefixlen;
+        return $this->applyBaseSearchQuery(
+            Ipv4Address::query()->hasAccess($request->user())->with(['port', 'port.device']),
+            $request
+        );
     }
 }

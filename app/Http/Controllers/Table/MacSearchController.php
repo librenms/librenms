@@ -28,39 +28,44 @@ namespace App\Http\Controllers\Table;
 use App\Models\Port;
 use Illuminate\Http\Request;
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\Url;
 
-/**
- * @extends SearchController<Port>
- */
-class MacSearchController extends SearchController
+class MacSearchController extends TableController
 {
-    protected string $addressField = 'ifPhysAddress';
+    protected function sortFields($request)
+    {
+        return [
+            'hostname' => 'device_hostname',
+            'interface' => 'ifDescr',
+            'description' => 'ifAlias',
+            'address' => 'ifPhysAddress',
+        ];
+    }
 
-    /**
-     * @inheritDoc
-     */
     protected function baseQuery(Request $request)
     {
-        $query = Port::query()->hasAccess($request->user())->with('device');
-
-        $this->applyBaseSearchQuery($query, $request);
-
-        return $query;
+        return Port::query()
+            ->hasAccess($request->user())
+            ->with('device')
+            ->when($request->get('device_id'), fn($q, $id) => $q->where('device_id', $id))
+            ->when($request->get('interface'), fn($q, $i) => $q->where('ifDescr', 'LIKE', $i))
+            ->when($request->get('address'), function ($q, $mac) {
+                $cleanMac = str_replace([':', ' ', '-', '.', '0x'], '', $mac);
+                return $q->where('ifPhysAddress', 'LIKE', "%$cleanMac%");
+            })
+            ->when($request->has('sort.hostname'), fn($q) => $q->withAggregate('device', 'hostname'));
     }
 
-    /**
-     * @inheritDoc
-     */
-    protected function getAddress($model): string
+    public function formatItem($port): array
     {
-        return Mac::parse($model->ifPhysAddress)->readable();
-    }
+        $mac = Mac::parse($port->ifPhysAddress);
 
-    /**
-     * @inheritDoc
-     */
-    protected function getOui($model): ?string
-    {
-        return Mac::parse($model->ifPhysAddress)->vendor();
+        return [
+            'hostname' => Url::modernDeviceLink($port->device),
+            'interface' => Url::portLink($port),
+            'address' => $mac->readable(),
+            'description' => $port->getLabel() == $port->ifAlias ? '' : $port->ifAlias,
+            'mac_oui' => $mac->vendor(),
+        ];
     }
 }
