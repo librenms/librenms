@@ -90,7 +90,7 @@ class CiscoUcsFi extends BaseCisco
 		    // 3) sysDescr fallback for UCS-FI pattern
 		    if (empty($device->hardware) || stripos((string) $device->hardware, 'ciscoModules') !== false) {
 		        $sysDescr = \SnmpQuery::get('SNMPv2-MIB::sysDescr.0')->value();
-		        if (is_string($sysDescr) && preg_match('/(UCS-FI-[0-9A-Za-z\-]+)/', $sysDescr, $m)) {
+		        if (preg_match('/(UCS-FI-[0-9A-Za-z\-]+)/', $sysDescr, $m)) {
 		            $device->hardware = $this->sanitizeString($m[1]);
 		        }
 		    }
