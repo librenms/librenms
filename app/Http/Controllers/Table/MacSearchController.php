@@ -27,11 +27,21 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\Port;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\Url;
 
 class MacSearchController extends TableController
 {
+    protected function rules()
+    {
+        return [
+            'address' => ['nullable', 'string'],
+            'device_id' => ['nullable', 'integer'],
+            'interface' => ['nullable', Rule::in('Vlan%', 'Loopback%')],
+        ];
+    }
+
     protected function sortFields($request)
     {
         return [

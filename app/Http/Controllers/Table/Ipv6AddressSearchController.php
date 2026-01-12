@@ -50,7 +50,7 @@ class Ipv6AddressSearchController extends AddressSearchController
     protected function baseQuery(Request $request)
     {
         return $this->applyBaseSearchQuery(
-            Ipv6Address::query()->hasAccess($request->user())->with(['port', 'device']),
+            Ipv6Address::query()->hasAccess($request->user())->with(['port', 'port.device']),
             $request
         );
     }

@@ -72,7 +72,7 @@ abstract class AddressSearchController extends TableController
     public function formatItem($model): array
     {
         /** @var ?Port $port */
-        $port = $model?->port;
+        $port = $model->port;
 
         return [
             'hostname' => Url::modernDeviceLink($port?->device),
