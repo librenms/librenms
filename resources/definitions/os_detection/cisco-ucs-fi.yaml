@@ -7,6 +7,7 @@ over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_storage, text: 'Storage Usage' }
 discovery:
     -
         sysObjectID:
@@ -15,16 +16,30 @@ discovery:
             - .1.3.6.1.4.1.9.12.3.1.3.1063    # UCS 6296UP 96-Port
             - .1.3.6.1.4.1.9.12.3.1.3.1488    # UCS 6332 32-Port
             - .1.3.6.1.4.1.9.12.3.1.3.1662    # UCS 6332-16UP
-            - .1.3.6.1.4.1.9.12.3.1.3.        # Prefix match for other UCS FI models
+
         sysDescr_regex:
             - '/Cisco NX-OS\(tm\) ucs/'
             - '/ucs-6\d{3}-/'
+            - '/^\.1\.3\.6\.1\.4\.1\.9\.12\.3\.1\.3\.\d+$/'
 mib_dir: cisco
 discovery_modules:
     vlans: true
     entity-physical: true
-    device-api: false
+    discovery-protocols: true
 modules:
-    health: true
+  health: true
+  processors: true
+  mempools: true
+  vlans: true
+
 poller_modules:
-    device-api: false
+
+processors:
+  data:
+    - cisco                  # CISCO-PROCESS-MIB (cpmCPUTotal*)
+
+mempools:
+  data:
+    - cisco-enhanced        # CISCO-ENHANCED-MEMPOOL-MIB (cempMemPool*)
+    - cisco-memory          # CISCO-MEMORY-POOL-MIB (ciscoMemoryPool*)
+    - hr-mib                # HOST-RESOURCES-MIB fallback

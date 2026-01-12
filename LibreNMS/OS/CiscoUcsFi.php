@@ -1,45 +1,23 @@
 <?php
-/**
- * CiscoUcsFi.php
- *
- * Cisco UCS Fabric Interconnect
- * Uses standard LibreNMS discovery for:
- * - Interfaces (IF-MIB, ifXTable)
- * - Hardware inventory (ENTITY-MIB)
- * - Sensors (ENTITY-SENSOR-MIB)
- * - VLANs (CISCO-VTP-MIB via custom discovery module)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- *
- * @link       https://www.librenms.org
- *
- * @copyright  2026
- * @author     LibreNMS Contributors
- */
 
 namespace LibreNMS\OS;
 
+use App\Models\Device;
 use Illuminate\Support\Collection;
-use LibreNMS\Interfaces\Discovery\OSDiscovery;
-use LibreNMS\Interfaces\Discovery\VlanDiscovery;
-use LibreNMS\OS\Shared\Cisco;
+use LibreNMS\OS\Shared\Cisco as BaseCisco;
 
-class CiscoUcsFi extends Cisco implements OSDiscovery, VlanDiscovery
+/**
+ * Cisco UCS Fabric Interconnect OS
+ *
+ * Discovery priorities:
+ *  - Interfaces: IF-MIB/ifXTable (handled by core)
+ *  - Hardware/serial: ENTITY-MIB
+ *  - Sensors: ENTITY-SENSOR-MIB (handled by core + Cisco includes)
+ *  - VLANs: handled by core Modules\Vlans (Q-BRIDGE first, Cisco fallbacks)
+ */
+class CiscoUcsFi extends BaseCisco
 {
-    /**
-     * Map sysObjectID to UCS Fabric Interconnect model names
-     */
+    /** Known sysObjectID => Friendly model overrides (optional) */
     private const MODEL_MAP = [
         '.1.3.6.1.4.1.9.12.3.1.3.1062' => 'Cisco UCS 6248UP 48-Port Fabric Interconnect',
         '.1.3.6.1.4.1.9.12.3.1.3.1063' => 'Cisco UCS 6296UP 96-Port Fabric Interconnect',
@@ -48,61 +26,220 @@ class CiscoUcsFi extends Cisco implements OSDiscovery, VlanDiscovery
     ];
 
     /**
-     * Discover OS-specific information
-     * UCS FI runs NX-OS but is not a typical NX-OS device
-     * Avoid Cisco legacy subtrees and UCSM-specific MIBs
+     * Discover OS specifics for UCS FI.
+     * Avoid hard-coding entPhysicalIndex; pick the root chassis from ENTITY-MIB.
      */
-    public function discoverOS(\App\Models\Device $device): void
+		public function discoverOS(\App\Models\Device $device): void
+		{
+		    // Let parent Cisco discovery try first (serial, version, etc.)
+		    parent::discoverOS($device);
+
+		    // 0) If parent set a specific hardware already, keep it
+		    if (!empty($device->hardware) && stripos($device->hardware, 'ciscoModules') === false) {
+		        return;
+		    }
+
+		    // 1) UCS MIB product name (preferred): cucsNetworkElement productName (col 11)
+		    try {
+		        $rows = @snmpwalk_cache_oid($device->toArray(), '.1.3.6.1.4.1.9.9.719.1.32.1.1.11', [], null, null) ?: [];
+		        foreach ($rows as $row) {
+		            $val = null;
+		            if (is_array($row)) { foreach ($row as $vv) { $val = is_string($vv) ? $vv : null; break; } }
+		            elseif (is_string($row)) { $val = $row; }
+		            if ($val) {
+		                $device->hardware = $this->sanitizeString($val);   // e.g., UCS-FI-6332-16UP
+		                break;
+		            }
+		        }
+		    } catch (\Throwable $e) {
+		        \Log::debug('UCS FI: model (cucsNetworkElement col 11) read failed: ' . $e->getMessage());
+		    }
+
+		    if (!empty($device->hardware) && stripos($device->hardware, 'ciscoModules') === false) {
+		        // Optional: serial from col 17
+		        try {
+		            $sr = @snmpwalk_cache_oid($device->toArray(), '.1.3.6.1.4.1.9.9.719.1.32.1.1.17', [], null, null) ?: [];
+		            foreach ($sr as $row) {
+		                $val = null;
+		                if (is_array($row)) { foreach ($row as $vv) { $val = is_string($vv) ? $vv : null; break; } }
+		                elseif (is_string($row)) { $val = $row; }
+		                if ($val) { $device->serial = $this->sanitizeString($val); break; }
+		            }
+		        } catch (\Throwable $e) {
+		            \Log::debug('UCS FI: serial (cucsNetworkElement col 17) read failed: ' . $e->getMessage());
+		        }
+		        return;
+		    }
+
+		    // 2) ENTITY-MIB fallback: root chassis (no hard-coded entPhysicalIndex)
+		    $entity = @snmpwalk_cache_multi_oid($device->toArray(), 'entPhysicalTable', [], 'ENTITY-MIB');
+		    if (!empty($entity)) {
+		        $rootIdx = null;
+		        foreach ($entity as $idx => $row) {
+		            $contained = $row['entPhysicalContainedIn'] ?? null;
+		            $class     = strtolower($row['entPhysicalClass'] ?? '');
+		            if ($contained === '0' && ($class === 'chassis' || $class === 'stack' || $class === 'module' || $class === 'unknown')) {
+		                $rootIdx = $idx; break;
+		            }
+		        }
+		        if ($rootIdx === null) {
+		            foreach ($entity as $idx => $row) {
+		                if (($row['entPhysicalContainedIn'] ?? null) === '0') { $rootIdx = $idx; break; }
+		            }
+		        }
+		        if ($rootIdx !== null) {
+		            $m = $entity[$rootIdx]['entPhysicalModelName'] ?? '';
+		            if (!$m) { $m = $entity[$rootIdx]['entPhysicalName'] ?? ''; }
+		            if (!$m) { $m = $entity[$rootIdx]['entPhysicalDescr'] ?? ''; }
+		            if ($m) { $device->hardware = $this->sanitizeString($m); }
+		        }
+		    }
+
+		    // 3) sysDescr fallback for UCS-FI pattern
+		    if (empty($device->hardware) || stripos($device->hardware, 'ciscoModules') !== false) {
+		        $sysDescr = @snmp_get($device->toArray(), 'sysDescr.0', '-Oqv', 'SNMPv2-MIB');
+		        if (is_string($sysDescr) && preg_match('/(UCS-FI-[0-9A-Za-z\-]+)/', $sysDescr, $m)) {
+		            $device->hardware = $this->sanitizeString($m[1]);
+		        }
+		    }
+		}
+		/**
+		 * Keep UI-safe strings: ensure UTF-8, strip any 4-byte codepoints (if DB/renderer cant handle them),
+		 * and drop invalid sequences.
+		 */
+		private function sanitizeString(?string $s): ?string
+		{
+		    if ($s === null || $s === '') {
+		        return $s;
+		    }
+
+		    // Ensure valid UTF-8
+		    if (!mb_check_encoding($s, 'UTF-8')) {
+		        $s = mb_convert_encoding($s, 'UTF-8', 'auto');
+		    }
+
+		    // Strip 4-byte UTF-8 sequences (U+10000..U+10FFFF) to match non-utf8mb4 DBs safely
+		    $s = preg_replace('/[\xF0-\xF7][\x80-\xBF]{3}/', '', $s);
+
+		    // Drop any remaining invalid sequences
+		    $s = @iconv('UTF-8', 'UTF-8//IGNORE', $s);
+
+		    return $s;
+		}
+    /**
+     * Discover transceivers on UCS FI.
+     * UCS FI may use different ENTITY-MIB structures or vendor types than standard Cisco devices.
+     */
+    public function discoverTransceivers(): Collection
     {
-        // Use parent (Cisco) discovery for version/hardware/serial
-        parent::discoverOS($device);
+        // Try parent Cisco discovery first
+        $transceivers = parent::discoverTransceivers();
 
-        // Get hardware model name from ENTITY-MIB entPhysicalModelName
-        // UCS FI chassis typically has entPhysicalIndex 10
-        $modelName = snmp_get($this->getDeviceArray(), 'ENTITY-MIB::entPhysicalModelName.10', '-Oqv');
-
-        if (!empty($modelName) && $modelName !== '""') {
-            // Use the actual model name from ENTITY-MIB (e.g., "UCS-FI-6332-16UP")
-            $device->hardware = trim($modelName, '"');
-        } elseif (empty($device->hardware)) {
-            // Fallback to MODEL_MAP if ENTITY-MIB doesn't provide model name
-            if (isset(self::MODEL_MAP[$device->sysObjectID])) {
-                $device->hardware = self::MODEL_MAP[$device->sysObjectID];
-            }
+        if ($transceivers->isNotEmpty()) {
+            return $transceivers;
         }
 
-        // UCS FI specific notes:
-        // - Uses ENTITY-MIB for hardware inventory (handled by entity-physical module)
-        // - Uses ENTITY-SENSOR-MIB for sensors (handled by entity-sensor module)
-        // - Uses CISCO-VTP-MIB for VLAN discovery (inherited from Cisco parent)
-        // - Uses IF-MIB/ifXTable for interface stats (standard LibreNMS)
-        // - May use CISCO-FLASH-MIB for filesystem stats (optional)
+        // UCS FI specific: Look for port entities that may contain transceivers
+        // UCS FI might report transceivers with different vendor types or as port entities
+        $additionalContainers = [
+            'cevPortTenGigBaseEthernet',
+            'cevPortFortyGigBaseEthernet',
+            'cevPortHundredGigBaseEthernet',
+            'cevModuleUcs6100Fabric',
+            'cevModuleUcsFabricInterconnect',
+            'cevContainerUCSFI',
+        ];
+
+        // Get entity physical data
+        $snmpData = \SnmpQuery::cache()->hideMib()->mibs(['CISCO-ENTITY-VENDORTYPE-OID-MIB'])->walk('ENTITY-MIB::entPhysicalTable')->table(1);
+        if (empty($snmpData)) {
+            return new Collection;
+        }
+
+        $snmpData = collect(\SnmpQuery::hideMib()->mibs(['IF-MIB'])->walk('ENTITY-MIB::entAliasMappingIdentifier')->table(1, $snmpData));
+
+        // Look for entities with class 'port' that might be transceiver cages/ports
+        $portEntities = $snmpData->filter(function ($ent) use ($additionalContainers) {
+            $class = strtolower($ent['entPhysicalClass'] ?? '');
+            $vendorType = $ent['entPhysicalVendorType'] ?? '';
+
+            // Check if it's a port class or has a UCS-specific vendor type
+            return $class === 'port' || in_array($vendorType, $additionalContainers);
+        });
+
+        if ($portEntities->isEmpty()) {
+            return new Collection;
+        }
+
+        // For each port entity, look for child modules/transceivers
+        $transceiverData = $snmpData->filter(function ($ent) use ($portEntities) {
+            $containedIn = $ent['entPhysicalContainedIn'] ?? null;
+            $class = strtolower($ent['entPhysicalClass'] ?? '');
+
+            // Look for module class entities contained within port entities
+            return $class === 'module' && $portEntities->has($containedIn);
+        });
+
+        // Also check direct port entities if they look like transceivers
+        $directPorts = $portEntities->filter(function ($ent) {
+            $descr = strtolower($ent['entPhysicalDescr'] ?? '');
+            // Check if description suggests it's a transceiver
+            return str_contains($descr, 'sfp') ||
+                   str_contains($descr, 'xfp') ||
+                   str_contains($descr, 'qsfp') ||
+                   str_contains($descr, 'gbic') ||
+                   str_contains($descr, 'transceiver');
+        });
+
+        $allTransceivers = $transceiverData->merge($directPorts);
+
+        return $allTransceivers->map(function ($ent, $index) use ($snmpData, $portEntities) {
+            $ent['entPhysicalIndex'] = $index;
+
+            // Determine ifIndex
+            $ifIndex = null;
+            if (isset($ent['entAliasMappingIdentifier'][0])) {
+                $ifIndex = preg_replace('/^.*ifIndex[.[](\d+).*$/', '$1', (string) $ent['entAliasMappingIdentifier'][0]);
+            } else {
+                // Try parent port's ifIndex
+                $parentIdx = $ent['entPhysicalContainedIn'] ?? null;
+                if ($parentIdx && isset($portEntities[$parentIdx]['entAliasMappingIdentifier'][0])) {
+                    $ifIndex = preg_replace('/^.*ifIndex[.[](\d+).*$/', '$1', (string) $portEntities[$parentIdx]['entAliasMappingIdentifier'][0]);
+                }
+            }
+
+            return new \App\Models\Transceiver([
+                'port_id' => (int) \App\Facades\PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
+                'index' => $index,
+                'type' => $ent['entPhysicalDescr'] ?? null,
+                'vendor' => $ent['entPhysicalMfgName'] ?? null,
+                'revision' => $ent['entPhysicalHardwareRev'] ?? null,
+                'model' => $ent['entPhysicalModelName'] ?? null,
+                'serial' => $ent['entPhysicalSerialNum'] ?? null,
+                'entity_physical_index' => $index,
+            ]);
+        })->filter(function ($trans) {
+            // Only include if we found a valid port_id
+            return $trans->port_id > 0;
+        });
     }
 
     /**
-     * Discover VLANs using CISCO-VTP-MIB
-     * Some UCS FI firmware versions (particularly 6332-16UP) have a bug where VLAN IDs
-     * are byte-swapped in the SNMP index (e.g., 16777216 instead of 1)
-     *
-     * Note: VLAN-to-port membership is NOT reliably available via SNMP on UCS FI
-     * We only discover VLAN inventory, not port assignments
-     *
-     * @return Collection<\App\Models\Vlan>
+     * Defer VLAN discovery to the core (Q-BRIDGE first, then Cisco fallbacks).
+     * Apply UCS FI specific normalizations (byte-swap correction, UCSM hint).
      */
     public function discoverVlans(): Collection
     {
         $vlans = parent::discoverVlans();
 
-        // Check if in UCS Manager mode (only VLAN 1 with byte-swapped index indicates UCSM mode)
-        if ($vlans->count() == 1 && $vlans->first()->vlan_vlan >= 16777216) {
-            \Log::warning("UCS Fabric Interconnect appears to be in UCS Manager mode. VLANs are managed by UCS Manager and not exposed via SNMP on the fabric interconnect. Only VLAN 1 will be discovered. To discover all VLANs, monitor the UCS Manager instead or use SSH-based discovery.");
+        // UCS Manager mode hint: only VLAN 1 exposed (and sometimes byte-swapped index)
+        if ($vlans->count() === 1 && ($vlans->first()->vlan_vlan ?? 0) >= 16777216) {
+            \Log::warning('UCS Fabric Interconnect appears to expose only VLAN 1 (likely UCSM mode)');
         }
 
-        // Fix byte-swapped VLAN IDs (firmware bug on some UCS FI models)
-        // 16777216 (0x01000000) should be 1, etc.
+        // Fix byte-swapped VLAN IDs seen on some FI firmwares (e.g., 0x01000000 should be 1)
         return $vlans->map(function ($vlan) {
-            if ($vlan->vlan_vlan >= 16777216) {
-                // Extract actual VLAN ID from byte-swapped value (big-endian to little-endian)
+            if (isset($vlan->vlan_vlan) && $vlan->vlan_vlan >= 16777216) {
                 $actualVlanId = ($vlan->vlan_vlan >> 24) & 0xFF;
                 \Log::debug("UCS FI: Correcting byte-swapped VLAN ID {$vlan->vlan_vlan} to {$actualVlanId}");
                 $vlan->vlan_vlan = $actualVlanId;
