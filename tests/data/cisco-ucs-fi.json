@@ -16585,7 +16585,6 @@
                     "mempool_class": "system",
                     "mempool_precision": 1024,
                     "mempool_descr": "Processor 1 Memory",
-                    "discovered_via": "snmp",
                     "mempool_perc": 22,
                     "mempool_perc_oid": null,
                     "mempool_used": 3660091392,
