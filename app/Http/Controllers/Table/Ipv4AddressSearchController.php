@@ -27,14 +27,20 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\Ipv4Address;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 /**
  * @extends AddressSearchController<Ipv4Address>
  */
 class Ipv4AddressSearchController extends AddressSearchController
 {
-    protected string $addressField = 'ipv4_address';
-    protected string $cidrField = 'ipv4_prefixlen';
+
+    public function __construct()
+    {
+        $this->sortField = DB::raw('INET_ATON(ipv4_address)');
+        $this->searchField = 'ipv4_address';
+        $this->cidrField = 'ipv4_prefixlen';
+    }
 
     /**
      * @inheritDoc

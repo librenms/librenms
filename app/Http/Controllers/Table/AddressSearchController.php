@@ -26,9 +26,11 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Port;
+use Illuminate\Contracts\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Url;
@@ -38,7 +40,9 @@ use LibreNMS\Util\Url;
  */
 abstract class AddressSearchController extends TableController
 {
-    protected string $addressField = ''; // set for sort
+    /** @var string|Expression (string or DB::raw) */
+    protected mixed $sortField = ''; // set for sort
+    protected string $searchField = '';
     protected string $additionalSearchField = '';
     protected string $cidrField = ''; // set for display
 
@@ -46,9 +50,9 @@ abstract class AddressSearchController extends TableController
     {
         return [
             'hostname' => 'device_hostname',
-            'port' => 'port_ifName',
-            'description' => 'port_ifAlias',
-            'address' => $this->addressField,
+            'port' => 'port_ifname',
+            'description' => 'port_ifalias',
+            'address' => $this->sortField,
         ];
     }
 
@@ -73,7 +77,7 @@ abstract class AddressSearchController extends TableController
         return [
             'hostname' => Url::modernDeviceLink($port?->device),
             'interface' => Url::portLink($port),
-            'address' => IP::parse($model->{$this->addressField}, true)->compressed() . '/' . $model->{$this->cidrField},
+            'address' => IP::parse($model->{$this->searchField}, true)->compressed() . '/' . $model->{$this->cidrField},
             'description' => $port->getLabel() == $port->ifAlias ? '' : $port->ifAlias,
         ];
     }
@@ -86,7 +90,7 @@ abstract class AddressSearchController extends TableController
                     [$address, $cidr] = explode('/', $address, 2);
                 }
 
-                $q->where(fn($q) => $q->where($this->addressField, 'LIKE', "%$address%")->when($this->additionalSearchField, fn($q, $f) => $q->orWhere($f, 'LIKE', "%$address%")));
+                $q->where(fn($q) => $q->where($this->searchField, 'LIKE', "%$address%")->when($this->additionalSearchField, fn($q, $f) => $q->orWhere($f, 'LIKE', "%$address%")));
 
                 if (isset($cidr)) {
                     $q->where($this->cidrField, $cidr);

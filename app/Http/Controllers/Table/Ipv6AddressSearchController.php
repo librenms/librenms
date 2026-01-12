@@ -27,6 +27,7 @@ namespace App\Http\Controllers\Table;
 
 use App\Models\Ipv6Address;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\IP;
 
 /**
@@ -34,9 +35,14 @@ use LibreNMS\Util\IP;
  */
 class Ipv6AddressSearchController extends AddressSearchController
 {
-    protected string $addressField = 'ipv6_compressed';
-    protected string $additionalSearchField = 'ipv6_address';
-    protected string $cidrField = 'ipv6_prefixlen';
+
+    public function __construct()
+    {
+        $this->sortField = DB::raw('INET6_ATON(ipv6_address)');
+        $this->searchField = 'ipv6_address';
+        $this->additionalSearchField = 'ipv6_compressed';
+        $this->cidrField = 'ipv6_prefixlen';
+    }
 
     /**
      * @inheritDoc
