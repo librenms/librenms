@@ -10,13 +10,11 @@
  * the source code distribution for details.
  */
 
-use App\Facades\LibrenmsConfig;
-
 if ($device['os'] == 'f5') {
-    if (file_exists(LibrenmsConfig::get('install_dir') . 'includes/discovery/loadbalancers/f5-ltm.inc.php')) {
-        include LibrenmsConfig::get('install_dir') . 'includes/discovery/loadbalancers/f5-ltm.inc.php';
+    if (file_exists(base_path('includes/discovery/loadbalancers/f5-ltm.inc.php'))) {
+        include base_path('includes/discovery/loadbalancers/f5-ltm.inc.php');
     }
-    if (file_exists(LibrenmsConfig::get('install_dir') . 'includes/discovery/loadbalancers/f5-gtm.inc.php')) {
-        include LibrenmsConfig::get('install_dir') . 'includes/discovery/loadbalancers/f5-gtm.inc.php';
+    if (file_exists(base_path('includes/discovery/loadbalancers/f5-gtm.inc.php'))) {
+        include base_path('includes/discovery/loadbalancers/f5-gtm.inc.php');
     }
 }
