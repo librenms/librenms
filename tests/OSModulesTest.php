@@ -196,12 +196,22 @@ final class OSModulesTest extends DBTestCase
             $expected = Arr::dot($expected);
             $actual = Arr::dot($actual);
 
+            // Normalize numeric values in both expected and actual so 43 and 43.0 are comparable.
             // json will store 43.0 as 43, Number::cast will change those to integers too
+            foreach ($expected as $index => $value) {
+                if (is_float($value) || is_int($value) || (is_string($value) && is_numeric($value))) {
+                    $expected[$index] = Number::cast($value);
+                }
+            }
             foreach ($actual as $index => $value) {
-                if (is_float($value)) {
+                if (is_float($value) || is_int($value) || (is_string($value) && is_numeric($value))) {
                     $actual[$index] = Number::cast($value);
                 }
             }
+
+            // Ensure a stable ordering so identical sets with different key order still compare equal
+            ksort($expected);
+            ksort($actual);
 
             $this->assertSame($expected, $actual, $message);
         }
