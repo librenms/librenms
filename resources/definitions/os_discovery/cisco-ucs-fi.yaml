@@ -1,5 +1,36 @@
-# Cisco UCS Fabric Interconnect Discovery Definitions
-# Uses standard MIBs only - no Cisco legacy subtrees or UCSM-specific MIBs
-# Sensors are handled by entity-sensor module via ENTITY-SENSOR-MIB
-# No custom discovery modules needed - use standard LibreNMS discovery
-mib: ENTITY-MIB:ENTITY-SENSOR-MIB:IF-MIB:CISCO-VTP-MIB:CISCO-FLASH-MIB:CISCO-PROCESS-MIB:CISCO-ENHANCED-MEMPOOL-MIB
+mib: CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB:CISCO-ENTITY-FRU-CONTROL-MIB
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: cucsEquipmentPsuOperState
+                    value: cucsEquipmentPsuOperState
+                    num_oid: .1.3.6.1.4.1.9.9.719.1.15.56.1.7.{{ $index }}
+                    descr: 'UCS PSU {{ $index }}'
+                    index: '{{ $index }}'
+                    states:
+                        - { value: 1, descr: operable, graph: 1, generic: 0 }
+                        - { value: 2, descr: inoperable, graph: 1, generic: 2 }
+                        - { value: 3, descr: degraded, graph: 1, generic: 1 }
+                        - { value: 4, descr: poweredOff, graph: 1, generic: 1 }
+                        - { value: 5, descr: powerProblem, graph: 1, generic: 2 }
+                        - { value: 6, descr: removed, graph: 1, generic: 1 }
+                        - { value: 7, descr: voltageProblem, graph: 1, generic: 2 }
+                        - { value: 8, descr: thermalProblem, graph: 1, generic: 2 }
+                -
+                    oid: cefcModuleOperStatus
+                    value: cefcModuleOperStatus
+                    num_oid: .1.3.6.1.4.1.9.9.117.1.2.1.1.2.{{ $index }}
+                    descr: 'Module {{ $index }}'
+                    index: '{{ $index }}'
+                    states:
+                        - { value: 1, descr: ok, graph: 1, generic: 0 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: okButDiagFailed, graph: 1, generic: 1 }
+                        - { value: 4, descr: boot, graph: 1, generic: 1 }
+                        - { value: 5, descr: selfTest, graph: 1, generic: 1 }
+                        - { value: 6, descr: failed, graph: 1, generic: 2 }
+                        - { value: 7, descr: missing, graph: 1, generic: 1 }
+                        - { value: 8, descr: mismatchWithParent, graph: 1, generic: 2 }
+                        - { value: 9, descr: mismatchConfig, graph: 1, generic: 2 }
