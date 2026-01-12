@@ -4,6 +4,7 @@ namespace LibreNMS\RRD;
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\RrdException;
+use LibreNMS\Exceptions\RrdNotFoundException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\InputStream;
 use Symfony\Component\Process\Process;
@@ -29,6 +30,10 @@ class RrdProcess
 
         if ($this->rrdcached) {
             $this->env['RRDCACHED_ADDRESS'] = $this->rrdcached;
+        }
+
+        if (session('preferences.timezone')) {
+            $this->env['TZ'] = session('preferences.timezone');
         }
     }
 
@@ -71,7 +76,11 @@ class RrdProcess
 
             if (str_contains($buffer, 'ERROR: ')) {
                 preg_match('/ERROR: (.*)/', $buffer, $matches);
-                throw new RrdException($matches[1]);
+                $error = $matches[1];
+                if (str_contains($error, 'No such file')) {
+                    throw new RrdNotFoundException($error);
+                }
+                throw new RrdException($error);
             }
 
             return str_contains($buffer, $waitFor);
