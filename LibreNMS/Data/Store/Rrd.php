@@ -58,7 +58,6 @@ class Rrd extends BaseDatastore
     /** @var int */
     private $step;
 
-
     public function __construct()
     {
         parent::__construct();
@@ -168,8 +167,8 @@ class Rrd extends BaseDatastore
      * Updates an rrd database at $filename using $options
      * Where $options is an array, each entry which is not a number is replaced with "U"
      *
-     * @param string $filename
-     * @param array $data
+     * @param  string  $filename
+     * @param  array  $data
      *
      * @throws RrdException
      * @throws Exception
@@ -178,7 +177,7 @@ class Rrd extends BaseDatastore
      */
     public function update(string $filename, array $data): void
     {
-        $data = 'N:' . implode(':', array_map(fn($v) => is_numeric($v) ? $v : 'U', $data));
+        $data = 'N:' . implode(':', array_map(fn ($v) => is_numeric($v) ? $v : 'U', $data));
 
         $this->command('update', $filename, [$data]);
     }
@@ -526,6 +525,7 @@ class Rrd extends BaseDatastore
         try {
             $command = $this->buildCommand('graph', '-', $options);
             $this->init(300);
+
             return $this->rrd->run('"' . implode('" "', $command) . "\"\nquit");
         } catch (RrdException $e) {
             throw new RrdGraphException($e->getMessage(), 'Error');

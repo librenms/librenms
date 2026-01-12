@@ -2,4 +2,6 @@
 
 namespace LibreNMS\Exceptions;
 
-class RrdNotFoundException extends RrdException {}
+class RrdNotFoundException extends RrdException
+{
+}
