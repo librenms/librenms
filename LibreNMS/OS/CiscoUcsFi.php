@@ -74,6 +74,7 @@ class CiscoUcsFi extends BaseCisco
             } catch (\Throwable $e) {
                 \Log::debug('UCS FI: serial (cucsNetworkElement col 17) read failed: ' . $e->getMessage());
             }
+
             return;
         }
 
@@ -143,6 +144,7 @@ class CiscoUcsFi extends BaseCisco
 
         return $s;
     }
+
     /**
      * Discover transceivers on UCS FI.
      * UCS FI may use different ENTITY-MIB structures or vendor types than standard Cisco devices.
