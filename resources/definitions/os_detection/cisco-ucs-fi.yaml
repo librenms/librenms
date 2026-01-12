@@ -15,26 +15,11 @@ discovery:
             - .1.3.6.1.4.1.9.12.3.1.3.1063    # UCS 6296UP 96-Port
             - .1.3.6.1.4.1.9.12.3.1.3.1488    # UCS 6332 32-Port
             - .1.3.6.1.4.1.9.12.3.1.3.1662    # UCS 6332-16UP
-
+    -
         sysDescr_regex:
-            - '/ucs-6[23]\d{2}-.*-k9-system/'   # UCS-6xxx FI specific software pattern
+            - '/ucs-6\d{3}-.*-k9-system/'   # UCS-6xxx FI specific software pattern
 mib_dir: cisco
 discovery_modules:
     vlans: true
     entity-physical: true
     discovery-protocols: true
-modules:
-  health: true
-  processors: true
-  mempools: true
-  vlans: true
-
-processors:
-  data:
-    - cisco                  # CISCO-PROCESS-MIB (cpmCPUTotal*)
-
-mempools:
-  data:
-    - cisco-enhanced        # CISCO-ENHANCED-MEMPOOL-MIB (cempMemPool*)
-    - cisco-memory          # CISCO-MEMORY-POOL-MIB (ciscoMemoryPool*)
-    - hr-mib                # HOST-RESOURCES-MIB fallback
