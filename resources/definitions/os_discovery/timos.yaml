@@ -325,8 +325,8 @@ modules:
                     state_name: tmnxNatIsaMemberSessionUsageHi
                     group: 'NAT ISA Status'
                     states:
-                        - { value: 1, generic: 0, graph: 0, descr: 'false' }
-                        - { value: 2, generic: 1, graph: 0, descr: 'true' }
+                        - { value: 1, generic: 1, graph: 0, descr: 'true' }
+                        - { value: 2, generic: 0, graph: 0, descr: 'false' }
         temperature:
             data:
                 -
