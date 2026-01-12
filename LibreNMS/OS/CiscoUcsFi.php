@@ -33,7 +33,7 @@ class CiscoUcsFi extends BaseCisco
 
 		    // 1) UCS MIB product name (preferred): cucsNetworkElement productName (col 11)
 		    try {
-		        $rows = @snmpwalk_cache_oid($device->toArray(), '.1.3.6.1.4.1.9.9.719.1.32.1.1.11', [], null, null) ?: [];
+		        $rows = \SnmpQuery::numeric()->walk('.1.3.6.1.4.1.9.9.719.1.32.1.1.11')->table(1) ?: [];
 		        foreach ($rows as $row) {
 		            $val = null;
 		            if (is_array($row)) { foreach ($row as $vv) { $val = is_string($vv) ? $vv : null; break; } }
@@ -50,7 +50,7 @@ class CiscoUcsFi extends BaseCisco
 		    if (!empty($device->hardware) && stripos((string) $device->hardware, 'ciscoModules') === false) {
 		        // Optional: serial from col 17
 		        try {
-		            $sr = @snmpwalk_cache_oid($device->toArray(), '.1.3.6.1.4.1.9.9.719.1.32.1.1.17', [], null, null) ?: [];
+		            $sr = \SnmpQuery::numeric()->walk('.1.3.6.1.4.1.9.9.719.1.32.1.1.17')->table(1) ?: [];
 		            foreach ($sr as $row) {
 		                $val = null;
 		                if (is_array($row)) { foreach ($row as $vv) { $val = is_string($vv) ? $vv : null; break; } }
@@ -64,7 +64,7 @@ class CiscoUcsFi extends BaseCisco
 		    }
 
 		    // 2) ENTITY-MIB fallback: root chassis (no hard-coded entPhysicalIndex)
-		    $entity = @snmpwalk_cache_multi_oid($device->toArray(), 'entPhysicalTable', [], 'ENTITY-MIB');
+		    $entity = \SnmpQuery::walk('ENTITY-MIB::entPhysicalTable')->table();
 		    if (!empty($entity)) {
 		        $rootIdx = null;
 		        foreach ($entity as $idx => $row) {
@@ -89,7 +89,7 @@ class CiscoUcsFi extends BaseCisco
 
 		    // 3) sysDescr fallback for UCS-FI pattern
 		    if (empty($device->hardware) || stripos((string) $device->hardware, 'ciscoModules') !== false) {
-		        $sysDescr = @snmp_get($device->toArray(), 'sysDescr.0', '-Oqv', 'SNMPv2-MIB');
+		        $sysDescr = \SnmpQuery::get('SNMPv2-MIB::sysDescr.0')->value();
 		        if (is_string($sysDescr) && preg_match('/(UCS-FI-[0-9A-Za-z\-]+)/', $sysDescr, $m)) {
 		            $device->hardware = $this->sanitizeString($m[1]);
 		        }

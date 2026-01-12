@@ -8,8 +8,8 @@ if ($device['os'] !== 'cisco-ucs-fi') {
     return;
 }
 
-$psu_dn   = snmpwalk_cache_oid($device, '1.3.6.1.4.1.9.9.719.1.15.56.1.2', [], null, null);
-$psu_stat = snmpwalk_cache_oid($device, '1.3.6.1.4.1.9.9.719.1.15.56.1.7', [], null, null);
+$psu_dn   = \SnmpQuery::numeric()->walk('1.3.6.1.4.1.9.9.719.1.15.56.1.2')->table(1);
+$psu_stat = \SnmpQuery::numeric()->walk('1.3.6.1.4.1.9.9.719.1.15.56.1.7')->table(1);
 
 if (!is_array($psu_dn) || !is_array($psu_stat)) {
     return;

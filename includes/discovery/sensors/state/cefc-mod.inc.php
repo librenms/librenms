@@ -8,8 +8,8 @@ if ($device['os'] !== 'cisco-ucs-fi') {
     return;
 }
 
-$descrs = snmpwalk_cache_oid($device, 'entPhysicalDescr', [], 'ENTITY-MIB');
-$opers  = snmpwalk_cache_oid($device, '1.3.6.1.4.1.9.9.117.1.2.1.1.2', [], null, null);
+$descrs = \SnmpQuery::walk('ENTITY-MIB::entPhysicalDescr')->table(1);
+$opers  = \SnmpQuery::numeric()->walk('1.3.6.1.4.1.9.9.117.1.2.1.1.2')->table(1);
 
 if (!is_array($opers) || empty($opers)) {
     return;
