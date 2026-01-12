@@ -1,4 +1,5 @@
 <?php
+
 // Discover PSU state sensors on UCS FI using CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB
 // Table: cucsEquipmentPsuTable
 // DN:      1.3.6.1.4.1.9.9.719.1.15.56.1.2  (cucsEquipmentPsuDn)         -> "sys/switch-A/psu-1"
@@ -8,10 +9,10 @@ if ($device['os'] !== 'cisco-ucs-fi') {
     return;
 }
 
-$psu_dn   = \SnmpQuery::numeric()->walk('1.3.6.1.4.1.9.9.719.1.15.56.1.2')->table(1);
+$psu_dn = \SnmpQuery::numeric()->walk('1.3.6.1.4.1.9.9.719.1.15.56.1.2')->table(1);
 $psu_stat = \SnmpQuery::numeric()->walk('1.3.6.1.4.1.9.9.719.1.15.56.1.7')->table(1);
 
-if (!is_array($psu_dn) || !is_array($psu_stat)) {
+if (! is_array($psu_dn) || ! is_array($psu_stat)) {
     return;
 }
 
@@ -32,12 +33,12 @@ create_state_index($state_name, $states);
 
 foreach ($psu_stat as $index => $row) {
     $value = $row[array_key_first($row)] ?? null;
-    if (!is_numeric($value)) {
+    if (! is_numeric($value)) {
         continue;
     }
 
     $dnRow = $psu_dn[$index] ?? null;
-    $dn    = is_array($dnRow) ? reset($dnRow) : (is_string($dnRow) ? $dnRow : null);
+    $dn = is_array($dnRow) ? reset($dnRow) : (is_string($dnRow) ? $dnRow : null);
     $descr = $dn ?: "UCS PSU $index"; // e.g., "sys/switch-A/psu-1"
 
     // Sensortype "state" with our named state index
