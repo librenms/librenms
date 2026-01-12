@@ -17,15 +17,14 @@ if (!is_array($psu_dn) || !is_array($psu_stat)) {
 
 $state_name = 'cucsEquipmentPsuOperState';
 $states = [
-    // value => [descr, generic_severity]
-    1 => ['operable',       0], // OK
-    2 => ['inoperable',     2], // CRIT
-    3 => ['degraded',       1], // WARN
-    4 => ['poweredOff',     1], // WARN
-    5 => ['powerProblem',   2], // CRIT
-    6 => ['removed',        1], // WARN (often notPresent)
-    7 => ['voltageProblem', 2], // CRIT
-    8 => ['thermalProblem', 2], // CRIT
+    ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'operable'],       // OK
+    ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'inoperable'],     // CRIT
+    ['value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'degraded'],       // WARN
+    ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'poweredOff'],     // WARN
+    ['value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'powerProblem'],   // CRIT
+    ['value' => 6, 'generic' => 1, 'graph' => 0, 'descr' => 'removed'],        // WARN (often notPresent)
+    ['value' => 7, 'generic' => 2, 'graph' => 0, 'descr' => 'voltageProblem'], // CRIT
+    ['value' => 8, 'generic' => 2, 'graph' => 0, 'descr' => 'thermalProblem'], // CRIT
 ];
 
 // register state mapping (creates/updates state translation once)
@@ -58,13 +57,4 @@ foreach ($psu_stat as $index => $row) {
         null,
         $value
     );
-
-    // Tie the sensor to our state translation
-    // (LibreNMS helper: maps sensor_id -> state index & values)
-    $sensor_id = dbFetchCell('SELECT `sensor_id` FROM `sensors` WHERE `sensor_class`=? AND `sensor_index`=? AND `device_id`=?', ['state', $index, $device['device_id']]);
-    if ($sensor_id) {
-        foreach ($states as $k => $s) {
-            set_state_index($sensor_id, $state_name, $k, $s[0], $s[1]);
-        }
-    }
 }

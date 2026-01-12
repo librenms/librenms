@@ -27,7 +27,7 @@ class CiscoUcsFi extends BaseCisco
 		    parent::discoverOS($device);
 
 		    // 0) If parent set a specific hardware already, keep it
-		    if (!empty($device->hardware) && stripos($device->hardware, 'ciscoModules') === false) {
+		    if (!empty($device->hardware) && stripos((string) $device->hardware, 'ciscoModules') === false) {
 		        return;
 		    }
 
@@ -47,7 +47,7 @@ class CiscoUcsFi extends BaseCisco
 		        \Log::debug('UCS FI: model (cucsNetworkElement col 11) read failed: ' . $e->getMessage());
 		    }
 
-		    if (!empty($device->hardware) && stripos($device->hardware, 'ciscoModules') === false) {
+		    if (!empty($device->hardware) && stripos((string) $device->hardware, 'ciscoModules') === false) {
 		        // Optional: serial from col 17
 		        try {
 		            $sr = @snmpwalk_cache_oid($device->toArray(), '.1.3.6.1.4.1.9.9.719.1.32.1.1.17', [], null, null) ?: [];
@@ -88,7 +88,7 @@ class CiscoUcsFi extends BaseCisco
 		    }
 
 		    // 3) sysDescr fallback for UCS-FI pattern
-		    if (empty($device->hardware) || stripos($device->hardware, 'ciscoModules') !== false) {
+		    if (empty($device->hardware) || stripos((string) $device->hardware, 'ciscoModules') !== false) {
 		        $sysDescr = @snmp_get($device->toArray(), 'sysDescr.0', '-Oqv', 'SNMPv2-MIB');
 		        if (is_string($sysDescr) && preg_match('/(UCS-FI-[0-9A-Za-z\-]+)/', $sysDescr, $m)) {
 		            $device->hardware = $this->sanitizeString($m[1]);
@@ -114,7 +114,7 @@ class CiscoUcsFi extends BaseCisco
 		    $s = preg_replace('/[\xF0-\xF7][\x80-\xBF]{3}/', '', $s);
 
 		    // Drop any remaining invalid sequences
-		    $s = @iconv('UTF-8', 'UTF-8//IGNORE', $s);
+		    $s = @iconv('UTF-8', 'UTF-8//IGNORE', (string) $s);
 
 		    return $s;
 		}
@@ -210,10 +210,9 @@ class CiscoUcsFi extends BaseCisco
                 'serial' => $ent['entPhysicalSerialNum'] ?? null,
                 'entity_physical_index' => $index,
             ]);
-        })->filter(function ($trans) {
+        })->filter(fn($trans) =>
             // Only include if we found a valid port_id
-            return $trans->port_id > 0;
-        });
+            $trans->port_id > 0);
     }
 
     /**

@@ -17,15 +17,15 @@ if (!is_array($opers) || empty($opers)) {
 
 $state_name = 'cefcModuleOperStatus';
 $states = [
-    1 => ['ok',                  0],
-    2 => ['unknown',             3],
-    3 => ['okButDiagFailed',     1],
-    4 => ['boot',                1],
-    5 => ['selfTest',            1],
-    6 => ['failed',              2],
-    7 => ['missing',             1],
-    8 => ['mismatchWithParent',  2],
-    9 => ['mismatchConfig',      2],
+    ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'ok'],
+    ['value' => 2, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+    ['value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'okButDiagFailed'],
+    ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'boot'],
+    ['value' => 5, 'generic' => 1, 'graph' => 0, 'descr' => 'selfTest'],
+    ['value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'failed'],
+    ['value' => 7, 'generic' => 1, 'graph' => 0, 'descr' => 'missing'],
+    ['value' => 8, 'generic' => 2, 'graph' => 0, 'descr' => 'mismatchWithParent'],
+    ['value' => 9, 'generic' => 2, 'graph' => 0, 'descr' => 'mismatchConfig'],
 ];
 create_state_index($state_name, $states);
 
@@ -52,11 +52,4 @@ foreach ($opers as $idx => $row) {
         null,
         $value
     );
-
-    $sensor_id = dbFetchCell('SELECT `sensor_id` FROM `sensors` WHERE `sensor_class`=? AND `sensor_index`=? AND `device_id`=?', ['state', $idx, $device['device_id']]);
-    if ($sensor_id) {
-        foreach ($states as $k => $s) {
-            set_state_index($sensor_id, $state_name, $k, $s[0], $s[1]);
-        }
-    }
 }
