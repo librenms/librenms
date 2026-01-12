@@ -252,7 +252,7 @@ class Ipv6Addresses implements Module
                     try {
                         // broken output, parse from raw index
                         if ($prefixLen === 'IP-MIB::ipAddressPrefixOrigin') {
-                            if (preg_match('/^\.(?<ip>.+)\.(?<prefix_len>\d{1,3})$/', $prefix, $prefix_match)) {
+                            if (preg_match('/^\.(?<ip>.+)\.(?<prefix_len>\d{1,3})$/', (string) $prefix, $prefix_match)) {
                                 $prefix = $prefix_match['ip'];
                                 $prefixLen = (int) $prefix_match['prefix_len'];
                             }
