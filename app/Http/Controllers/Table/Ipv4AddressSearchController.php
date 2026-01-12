@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Ipv4SearchController.php
  *
@@ -34,7 +35,6 @@ use Illuminate\Support\Facades\DB;
  */
 class Ipv4AddressSearchController extends AddressSearchController
 {
-
     public function __construct()
     {
         $this->sortField = DB::raw('INET_ATON(ipv4_address)');

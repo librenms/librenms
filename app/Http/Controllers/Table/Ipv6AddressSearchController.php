@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Ipv6SearchController.php
  *
@@ -35,7 +36,6 @@ use LibreNMS\Util\IP;
  */
 class Ipv6AddressSearchController extends AddressSearchController
 {
-
     public function __construct()
     {
         $this->sortField = DB::raw('INET6_ATON(ipv6_address)');

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * SearchController.php
  *
@@ -90,16 +91,16 @@ abstract class AddressSearchController extends TableController
                     [$address, $cidr] = explode('/', $address, 2);
                 }
 
-                $q->where(fn($q) => $q->where($this->searchField, 'LIKE', "%$address%")->when($this->additionalSearchField, fn($q, $f) => $q->orWhere($f, 'LIKE', "%$address%")));
+                $q->where(fn ($q) => $q->where($this->searchField, 'LIKE', "%$address%")->when($this->additionalSearchField, fn ($q, $f) => $q->orWhere($f, 'LIKE', "%$address%")));
 
                 if (isset($cidr)) {
                     $q->where($this->cidrField, $cidr);
                 }
             })
-            ->when($request->get('device_id'), fn($q, $id) => $q->whereHas('port', fn($pq) => $pq->where('device_id', $id)))
-            ->when($request->get('interface'), fn($q, $i) => $q->whereHas('port', fn($pq) => $pq->where('ifDescr', 'LIKE', $i)))
-            ->when($request->has('sort.hostname'), fn($q) => $q->withAggregate('device', 'hostname'))
-            ->when($request->has('sort.interface'), fn($q) => $q->withAggregate('port', 'ifName'))
-            ->when($request->has('sort.description'), fn($q) => $q->withAggregate('port', 'ifAlias'));
+            ->when($request->get('device_id'), fn ($q, $id) => $q->whereHas('port', fn ($pq) => $pq->where('device_id', $id)))
+            ->when($request->get('interface'), fn ($q, $i) => $q->whereHas('port', fn ($pq) => $pq->where('ifDescr', 'LIKE', $i)))
+            ->when($request->has('sort.hostname'), fn ($q) => $q->withAggregate('device', 'hostname'))
+            ->when($request->has('sort.interface'), fn ($q) => $q->withAggregate('port', 'ifName'))
+            ->when($request->has('sort.description'), fn ($q) => $q->withAggregate('port', 'ifAlias'));
     }
 }
