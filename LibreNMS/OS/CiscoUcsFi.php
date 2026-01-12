@@ -17,14 +17,6 @@ use LibreNMS\OS\Shared\Cisco as BaseCisco;
  */
 class CiscoUcsFi extends BaseCisco
 {
-    /** Known sysObjectID => Friendly model overrides (optional) */
-    private const MODEL_MAP = [
-        '.1.3.6.1.4.1.9.12.3.1.3.1062' => 'Cisco UCS 6248UP 48-Port Fabric Interconnect',
-        '.1.3.6.1.4.1.9.12.3.1.3.1063' => 'Cisco UCS 6296UP 96-Port Fabric Interconnect',
-        '.1.3.6.1.4.1.9.12.3.1.3.1488' => 'Cisco UCS 6332 32-Port Fabric Interconnect',
-        '.1.3.6.1.4.1.9.12.3.1.3.1662' => 'Cisco UCS 6332-16UP Fabric Interconnect',
-    ];
-
     /**
      * Discover OS specifics for UCS FI.
      * Avoid hard-coding entPhysicalIndex; pick the root chassis from ENTITY-MIB.
@@ -193,7 +185,7 @@ class CiscoUcsFi extends BaseCisco
 
         $allTransceivers = $transceiverData->merge($directPorts);
 
-        return $allTransceivers->map(function ($ent, $index) use ($snmpData, $portEntities) {
+        return $allTransceivers->map(function ($ent, $index) use ($portEntities) {
             $ent['entPhysicalIndex'] = $index;
 
             // Determine ifIndex
