@@ -251,7 +251,7 @@ class Ipv6Addresses implements Module
                 foreach (array_keys($prefixData) as $prefixLen) {
                     try {
                         if ($ip->inNetwork($this->parseIp($prefix)->getNetwork($prefixLen))) {
-                            return $prefixLen;
+                            return (int) $prefixLen;
                         }
                     } catch (InvalidIpException) {
                         // ignore failures and return 0 if no matches found
