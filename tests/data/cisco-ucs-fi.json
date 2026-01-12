@@ -24,7 +24,6 @@
         "discovery": {
             "ports": [
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -127,7 +126,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -230,7 +228,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -333,7 +330,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -436,7 +432,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -539,7 +534,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -642,7 +636,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -745,7 +738,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -848,7 +840,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -951,7 +942,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -1054,7 +1044,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -1157,7 +1146,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -1260,7 +1248,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -1363,7 +1350,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -1466,7 +1452,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -1569,7 +1554,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -1672,7 +1656,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -1775,7 +1758,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -1878,7 +1860,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -1981,7 +1962,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -2084,7 +2064,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -2187,7 +2166,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -2290,7 +2268,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -2393,7 +2370,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -2496,7 +2472,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -2599,7 +2574,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -2702,7 +2676,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -2805,7 +2778,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -2908,7 +2880,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -3011,7 +2982,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -3114,7 +3084,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -3217,7 +3186,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -3320,7 +3288,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -3423,7 +3390,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -3526,7 +3492,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -3629,7 +3594,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -3732,7 +3696,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -3835,7 +3798,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -3938,7 +3900,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -4041,7 +4002,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -4144,7 +4104,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -4247,7 +4206,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -4350,7 +4308,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -4453,7 +4410,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -4556,7 +4512,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -4659,7 +4614,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -4762,7 +4716,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -4865,7 +4818,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -4968,7 +4920,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -5071,7 +5022,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -5174,7 +5124,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -5277,7 +5226,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -5380,7 +5328,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -5483,7 +5430,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -5586,7 +5532,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -5689,7 +5634,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -5792,7 +5736,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -5895,7 +5838,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -5998,7 +5940,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -6101,7 +6042,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -6204,7 +6144,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -6307,7 +6246,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -6410,7 +6348,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -6513,7 +6450,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -6616,7 +6552,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -6719,7 +6654,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -6822,7 +6756,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -6925,7 +6858,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -7028,7 +6960,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -7131,7 +7062,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -7234,7 +7164,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -7337,7 +7266,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -7440,7 +7368,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -7543,7 +7470,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -7646,7 +7572,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -7753,7 +7678,6 @@
         "poller": {
             "ports": [
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -7856,7 +7780,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -7959,7 +7882,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": "u",
                     "port_descr_descr": "Uplink",
                     "port_descr_circuit": null,
@@ -8062,7 +7984,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": "s",
                     "port_descr_descr": "Server",
                     "port_descr_circuit": null,
@@ -8165,7 +8086,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": "s",
                     "port_descr_descr": "Server",
                     "port_descr_circuit": null,
@@ -8268,7 +8188,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": "s",
                     "port_descr_descr": "Server",
                     "port_descr_circuit": null,
@@ -8371,7 +8290,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": "s",
                     "port_descr_descr": "Server",
                     "port_descr_circuit": null,
@@ -8474,7 +8392,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": "s",
                     "port_descr_descr": "Server",
                     "port_descr_circuit": null,
@@ -8577,7 +8494,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": "s",
                     "port_descr_descr": "Server",
                     "port_descr_circuit": null,
@@ -8680,7 +8596,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": "s",
                     "port_descr_descr": "Server, Port-channel 1302",
                     "port_descr_circuit": null,
@@ -8783,7 +8698,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": "s",
                     "port_descr_descr": "Server, Port-channel 1306",
                     "port_descr_circuit": null,
@@ -8886,7 +8800,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": "s",
                     "port_descr_descr": "Server, Port-channel 1308",
                     "port_descr_circuit": null,
@@ -8989,7 +8902,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -9092,7 +9004,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -9195,7 +9106,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -9298,7 +9208,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -9401,7 +9310,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -9504,7 +9412,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -9607,7 +9514,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -9710,7 +9616,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -9813,7 +9718,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -9916,7 +9820,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -10019,7 +9922,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -10122,7 +10024,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -10225,7 +10126,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -10328,7 +10228,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": "s",
                     "port_descr_descr": "Server, Port-channel 1305",
                     "port_descr_circuit": null,
@@ -10431,7 +10330,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": "s",
                     "port_descr_descr": "Server, Port-channel 1322",
                     "port_descr_circuit": null,
@@ -10534,7 +10432,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": "s",
                     "port_descr_descr": "Server, Port-channel 1325",
                     "port_descr_circuit": null,
@@ -10637,7 +10534,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -10740,7 +10636,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -10843,7 +10738,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -10946,7 +10840,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -11049,7 +10942,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -11152,7 +11044,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -11255,7 +11146,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -11358,7 +11248,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -11461,7 +11350,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -11564,7 +11452,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -11667,7 +11554,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -11770,7 +11656,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": "u",
                     "port_descr_descr": "Uplink",
                     "port_descr_circuit": null,
@@ -11873,7 +11758,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": "u",
                     "port_descr_descr": "Uplink",
                     "port_descr_circuit": null,
@@ -11976,7 +11860,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -12079,7 +11962,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -12182,7 +12064,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -12285,7 +12166,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -12388,7 +12268,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -12491,7 +12370,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -12594,7 +12472,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -12697,7 +12574,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -12800,7 +12676,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -12903,7 +12778,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -13006,7 +12880,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -13109,7 +12982,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -13212,7 +13084,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -13315,7 +13186,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -13418,7 +13288,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -13521,7 +13390,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -13624,7 +13492,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -13727,7 +13594,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -13830,7 +13696,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -13933,7 +13798,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -14036,7 +13900,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -14139,7 +14002,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -14242,7 +14104,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -14345,7 +14206,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -14448,7 +14308,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -14551,7 +14410,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -14654,7 +14512,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -14757,7 +14614,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -14860,7 +14716,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -14963,7 +14818,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -15066,7 +14920,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -15169,7 +15022,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -15272,7 +15124,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
@@ -15375,7 +15226,6 @@
                     "ifInUnknownProtos_rate": null
                 },
                 {
-                    "discovered_via": "snmp",
                     "port_descr_type": null,
                     "port_descr_descr": null,
                     "port_descr_circuit": null,
