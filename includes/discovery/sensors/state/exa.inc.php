@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\StateTranslation;
+use LibreNMS\Enum\Severity;
+
 $ponTable = SnmpQuery::cache()->walk('E7-Calix-MIB::e7OltPonPortTable')->table(3);
 
 foreach ($ponTable as $e7OltPonPortShelf => $ponShelf) {
@@ -23,13 +26,11 @@ foreach ($ponTable as $e7OltPonPortShelf => $ponShelf) {
                     'entPhysicalIndex' => $ifIndex,
                     'entPhysicalIndex_measured' => 'port',
                     'group' => $name,
-                ]));
-                // FIXME
-//                    ->withStateTranslations('E7-Calix-MIB::e7OltPonPortStatus', [
-//                    ['value' => 0, 'generic' => 3, 'graph' => 1, 'descr' => 'invalid'],
-//                    ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'linkUp'],
-//                    ['value' => 2, 'generic' => 2, 'graph' => 1, 'descr' => 'linkDown'],
-//                ]);
+                ]))->withStateTranslations('E7-Calix-MIB::e7OltPonPortStatus', [
+                    StateTranslation::define('invalid', 0, Severity::Unknown),
+                    StateTranslation::define('linkUp', 1, Severity::Ok),
+                    StateTranslation::define('linkDown', 2, Severity::Error),
+                ]);
             }
         }
     }
