@@ -59,7 +59,7 @@ class DiscoverDevice implements ShouldQueue
             $this->device->device_id,
             $measurement->getDuration()));
 
-        Log::channel('single')->alert(sprintf('INFO: device:discover %s (%s) discovered in %0.3fs',
+        Log::channel('log_file')->alert(sprintf('INFO: device:discover %s (%s) discovered in %0.3fs',
             $this->device->hostname,
             $this->device->device_id,
             $measurement->getDuration()));
