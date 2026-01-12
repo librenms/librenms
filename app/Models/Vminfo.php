@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Config;
+use App\Facades\LibrenmsConfig;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -55,8 +55,8 @@ class Vminfo extends DeviceRelatedModel implements Keyable
     {
         $where = [$device->hostname];
 
-        if (Config::get('mydomain')) {
-            $where[] = $device->hostname . '.' . Config::get('mydomain');
+        if (LibrenmsConfig::get('mydomain')) {
+            $where[] = $device->hostname . '.' . LibrenmsConfig::get('mydomain');
         }
 
         return $query->whereIn('vmwVmDisplayName', $where);
