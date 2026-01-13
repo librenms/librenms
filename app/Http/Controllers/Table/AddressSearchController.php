@@ -33,6 +33,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Url;
 
@@ -67,12 +68,12 @@ abstract class AddressSearchController extends TableController
     }
 
     /**
-     * @param  TModel  $model
+     * @param  TModel&object{port: Port|null}  $model
      * @return string[]
+     * @throws InvalidIpException
      */
     public function formatItem($model): array
     {
-        /** @var ?Port $port */
         $port = $model->port;
 
         return [
@@ -97,10 +98,10 @@ abstract class AddressSearchController extends TableController
                     $q->where($this->cidrField, $cidr);
                 }
             })
-            ->when($request->get('device_id'), fn($q, $id) => $q->whereHas('port', fn($pq) => $pq->where('device_id', $id)))
-            ->when($request->get('interface'), fn($q, $i) => $q->whereHas('port', fn($pq) => $pq->where('ifDescr', 'LIKE', $i)))
-            ->when($request->has('sort.hostname'), fn($q) => $q->withAggregate('device', 'hostname'))
-            ->when($request->has('sort.interface'), fn($q) => $q->withAggregate('port', 'ifName'))
+            ->when($request->get('device_id'), fn ($q, $id) => $q->whereHas('port', fn ($pq) => $pq->where('device_id', $id)))
+            ->when($request->get('interface'), fn ($q, $i) => $q->whereHas('port', fn ($pq) => $pq->where('ifDescr', 'LIKE', $i)))
+            ->when($request->has('sort.hostname'), fn ($q) => $q->withAggregate('device', 'hostname'))
+            ->when($request->has('sort.interface'), fn ($q) => $q->withAggregate('port', 'ifName'))
             ->when($request->has('sort.description'), function ($q) use ($builder): void {
                 $q->select($builder->getModel()->getTable() . '.*')->selectSub(function ($sub) use ($builder): void {
                     $sub->selectRaw('IF(ifAlias = ifName || ifAlias = ifDescr, "", ifAlias)')
