@@ -70,6 +70,7 @@ abstract class AddressSearchController extends TableController
     /**
      * @param  TModel&object{port: Port|null}  $model
      * @return string[]
+     *
      * @throws InvalidIpException
      */
     public function formatItem($model): array
@@ -110,6 +111,5 @@ abstract class AddressSearchController extends TableController
                         ->limit(1);
                 }, 'port_description');
             });
-
     }
 }
