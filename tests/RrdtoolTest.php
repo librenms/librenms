@@ -68,7 +68,7 @@ final class RrdtoolTest extends TestCase
         $this->assertEquals(['create', '/opt/librenms/rrd/f', 'o'], $cmd);
 
         $cmd = $this->buildCommandProxy('tune', 'f', ['o']);
-        $this->assertEquals(['tune', 'f', 'o'], $cmd);
+        $this->assertEquals(['tune', '/opt/librenms/rrd/f', 'o'], $cmd);
 
         $cmd = $this->buildCommandProxy('update', 'f', ['o']);
         $this->assertEquals(['update', 'f', '--daemon', 'server:42217', 'o'], $cmd);
