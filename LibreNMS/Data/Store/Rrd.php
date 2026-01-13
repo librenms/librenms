@@ -415,8 +415,8 @@ class Rrd extends BaseDatastore
 
         return array_reduce(
             $filenames,
-            function(array $new, string $item) use ($globtest, $prepend) {
-                if(fnmatch($globtest, $item, FNM_PATHNAME)) {
+            function (array $new, string $item) use ($globtest, $prepend) {
+                if (fnmatch($globtest, $item, FNM_PATHNAME)) {
                     $new[] = $prepend . $item;
                 }
 
