@@ -65,7 +65,7 @@ If using SELinux, the following is needed.
 2. Make a file (`snmp_nfs.te`) with the following contents
 
 ```bash
-module local_snmp 1.0;
+module snmp_nfs 1.0;
 
 require {
     type snmpd_t;
