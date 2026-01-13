@@ -51,8 +51,8 @@ abstract class AddressSearchController extends TableController
     {
         return [
             'hostname' => 'device_hostname',
-            'port' => 'port_ifname',
-            'description' => 'port_ifalias',
+            'interface' => 'port_ifname',
+            'description' => 'port_description',
             'address' => $this->sortField,
         ];
     }
@@ -97,10 +97,18 @@ abstract class AddressSearchController extends TableController
                     $q->where($this->cidrField, $cidr);
                 }
             })
-            ->when($request->get('device_id'), fn ($q, $id) => $q->whereHas('port', fn ($pq) => $pq->where('device_id', $id)))
-            ->when($request->get('interface'), fn ($q, $i) => $q->whereHas('port', fn ($pq) => $pq->where('ifDescr', 'LIKE', $i)))
-            ->when($request->has('sort.hostname'), fn ($q) => $q->withAggregate('device', 'hostname'))
-            ->when($request->has('sort.interface'), fn ($q) => $q->withAggregate('port', 'ifName'))
-            ->when($request->has('sort.description'), fn ($q) => $q->withAggregate('port', 'ifAlias'));
+            ->when($request->get('device_id'), fn($q, $id) => $q->whereHas('port', fn($pq) => $pq->where('device_id', $id)))
+            ->when($request->get('interface'), fn($q, $i) => $q->whereHas('port', fn($pq) => $pq->where('ifDescr', 'LIKE', $i)))
+            ->when($request->has('sort.hostname'), fn($q) => $q->withAggregate('device', 'hostname'))
+            ->when($request->has('sort.interface'), fn($q) => $q->withAggregate('port', 'ifName'))
+            ->when($request->has('sort.description'), function ($q) use ($builder) {
+                $q->select($builder->getModel()->getTable() . '.*')->selectSub(function ($sub) use ($builder) {
+                    $sub->selectRaw('IF(ifAlias = ifName || ifAlias = ifDescr, "", ifAlias)')
+                        ->from('ports')
+                        ->whereColumn('ports.port_id', $builder->qualifyColumn('port_id'))
+                        ->limit(1);
+                }, 'port_description');
+            });
+
     }
 }
