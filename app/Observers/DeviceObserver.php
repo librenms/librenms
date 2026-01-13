@@ -62,8 +62,8 @@ class DeviceObserver
             $new_name = $device->hostname;
 
             $old_name = $device->getOriginal('hostname');
-            $new_rrd_dir = Rrd::dirFromHost($new_name);
-            $old_rrd_dir = Rrd::dirFromHost($old_name);
+            $new_rrd_dir = Rrd::dirFromHost($new_name, true);
+            $old_rrd_dir = Rrd::dirFromHost($old_name, true);
 
             if (is_dir($new_rrd_dir)) {
                 $device->hostname = $old_name;
@@ -90,7 +90,7 @@ class DeviceObserver
     public function deleted(Device $device): void
     {
         // delete rrd files
-        $host_dir = Rrd::dirFromHost($device->hostname);
+        $host_dir = Rrd::dirFromHost($device->hostname, true);
         try {
             $result = File::deleteDirectory($host_dir);
 
