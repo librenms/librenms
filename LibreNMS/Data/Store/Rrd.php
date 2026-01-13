@@ -365,6 +365,7 @@ class Rrd extends BaseDatastore
      *
      * @param  string  $host  Host name
      * @param  array|string  $extra  Components of RRD filename - will be separated with "-", or a pre-formed rrdname
+     * @param  bool  $forceabsolute  Do we always want an absolute filename
      * @return string the name of the rrd file for $host's $extra component
      */
     public function partname($host, $extra, $forceabsolute = false): string
@@ -379,7 +380,7 @@ class Rrd extends BaseDatastore
      *
      * @param  string  $host  Host name
      * @param  array|string  $extra  Components of RRD filename - will be separated with "-", or a pre-formed rrdname
-     * @param  string  $extension  File extension (default is .rrd)
+     * @param  bool  $forceabsolute  Do we always want an absolute filename
      * @return string the name of the rrd file for $host's $extra component
      */
     public function name($host, $extra, $forceabsolute = false): string
@@ -391,7 +392,7 @@ class Rrd extends BaseDatastore
      * Generates a path based on the hostname (or IP)
      *
      * @param  string  $host  Host name
-     * @param  bool  $forceabsolute  Do we always want an absolute filename
+     * @param  bool  $forceabsolute  Do we always want an absolute directory name
      * @return string the name of the rrd directory for $host
      */
     public function dirFromHost($host, $forceabsolute = false): string

@@ -64,24 +64,24 @@ final class RrdtoolTest extends TestCase
         LibrenmsConfig::set('rrdtool_version', '1.4');
         LibrenmsConfig::set('rrd_dir', '/opt/librenms/rrd');
 
-        $cmd = $this->buildCommandProxy('create', '/opt/librenms/rrd/f', ['o']);
+        $cmd = $this->buildCommandProxy('create', 'f', ['o']);
         $this->assertEquals(['create', '/opt/librenms/rrd/f', 'o'], $cmd);
 
-        $cmd = $this->buildCommandProxy('tune', '/opt/librenms/rrd/f', ['o']);
+        $cmd = $this->buildCommandProxy('tune', 'f', ['o']);
         $this->assertEquals(['tune', '/opt/librenms/rrd/f', 'o'], $cmd);
 
-        $cmd = $this->buildCommandProxy('update', '/opt/librenms/rrd/f', ['o']);
+        $cmd = $this->buildCommandProxy('update', 'f', ['o']);
         $this->assertEquals(['update', 'f', '--daemon', 'server:42217', 'o'], $cmd);
 
         LibrenmsConfig::set('rrdtool_version', '1.6');
 
-        $cmd = $this->buildCommandProxy('create', '/opt/librenms/rrd/f', ['o']);
+        $cmd = $this->buildCommandProxy('create', 'f', ['o']);
         $this->assertEquals(['create', 'f', '--daemon', 'server:42217', 'o', '-O'], $cmd);
 
-        $cmd = $this->buildCommandProxy('tune', '/opt/librenms/rrd/f', ['o']);
+        $cmd = $this->buildCommandProxy('tune', 'f', ['o']);
         $this->assertEquals(['tune', 'f', '--daemon', 'server:42217', 'o'], $cmd);
 
-        $cmd = $this->buildCommandProxy('update', '/opt/librenms/rrd/f', ['o']);
+        $cmd = $this->buildCommandProxy('update', 'f', ['o']);
         $this->assertEquals(['update', 'f', '--daemon', 'server:42217', 'o'], $cmd);
     }
 
