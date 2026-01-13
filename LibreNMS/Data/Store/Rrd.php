@@ -309,10 +309,14 @@ class Rrd extends BaseDatastore
      */
     public function proxmoxName($pmxcluster, $vmid, $vmport): string
     {
-        $pmxcdir = implode('/', [$this->rrd_dir, 'proxmox', self::safeName($pmxcluster)]);
-        // this is not needed for remote rrdcached
-        if (! is_dir($pmxcdir)) {
-            mkdir($pmxcdir, 0775, true);
+        if ($this->rrdcached) {
+            $pmxcdir = implode('/', ['proxmox', self::safeName($pmxcluster)]);
+        } else {
+            $pmxcdir = implode('/', [$this->rrd_dir, 'proxmox', self::safeName($pmxcluster)]);
+            // this is not needed for remote rrdcached
+            if (! is_dir($pmxcdir)) {
+                mkdir($pmxcdir, 0775, true);
+            }
         }
 
         return implode('/', [$pmxcdir, self::safeName($vmid . '_netif_' . $vmport . '.rrd')]);
@@ -340,8 +344,8 @@ class Rrd extends BaseDatastore
      */
     public function renameFile(Device $device, $oldname, $newname): bool
     {
-        $oldrrd = self::name($device->hostname, $oldname);
-        $newrrd = self::name($device->hostname, $newname);
+        $oldrrd = self::name($device->hostname, $oldname, true);
+        $newrrd = self::name($device->hostname, $newname, true);
         if (is_file($oldrrd) && ! is_file($newrrd)) {
             if (rename($oldrrd, $newrrd)) {
                 Eventlog::log("Renamed $oldrrd to $newrrd", $device, 'poller', Severity::Ok);
@@ -359,6 +363,20 @@ class Rrd extends BaseDatastore
     }
 
     /**
+     * Generates a partial filename based on the hostname (or IP) and some extra items
+     *
+     * @param  string  $host  Host name
+     * @param  array|string  $extra  Components of RRD filename - will be separated with "-", or a pre-formed rrdname
+     * @return string the name of the rrd file for $host's $extra component
+     */
+    public function partname($host, $extra, $forceabsolute = false): string
+    {
+        $partname = self::safeName(is_array($extra) ? implode('-', $extra) : $extra);
+
+        return implode('/', [$this->dirFromHost($host, $forceabsolute), $partname]);
+    }
+
+    /**
      * Generates a filename based on the hostname (or IP) and some extra items
      *
      * @param  string  $host  Host name
@@ -366,22 +384,25 @@ class Rrd extends BaseDatastore
      * @param  string  $extension  File extension (default is .rrd)
      * @return string the name of the rrd file for $host's $extra component
      */
-    public function name($host, $extra, $extension = '.rrd'): string
+    public function name($host, $extra, $forceabsolute = false): string
     {
-        $filename = self::safeName(is_array($extra) ? implode('-', $extra) : $extra);
-
-        return implode('/', [$this->dirFromHost($host), $filename . $extension]);
+        return $this->partname($host, $extra, $forceabsolute) . '.rrd';
     }
 
     /**
      * Generates a path based on the hostname (or IP)
      *
      * @param  string  $host  Host name
+     * @param  bool  $forceabsolute  Do we always want an absolute filename
      * @return string the name of the rrd directory for $host
      */
-    public function dirFromHost($host): string
+    public function dirFromHost($host, $forceabsolute = false): string
     {
         $host = self::safeName(trim($host, '[]'));
+
+        if ($this->rrdcached && !$forceabsolute) {
+            return $host;
+        }
 
         return Str::finish($this->rrd_dir, '/') . $host;
     }
@@ -470,15 +491,16 @@ class Rrd extends BaseDatastore
             }
         }
 
-        if ($this->rrdcached &&
-            ! ($command == 'create' && version_compare($this->version, '1.5.5', '<')) &&
-            ! ($command == 'tune' && version_compare($this->version, '1.5', '<'))
-        ) {
-            // only relative paths if using rrdcached
-            $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
-            $options = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $options);
-
-            return [$command, $filename, '--daemon', $this->rrdcached, ...$options];
+        if ($this->rrdcached) {
+            // Check for commands not supported by rrdcached
+            if (($command == 'create' && version_compare($this->version, '1.5.5', '<')) ||
+                ($command == 'tune' && version_compare($this->version, '1.5', '<'))
+            ) {
+                // Convert filename to absolute path
+                $filename = Str::finish($this->rrd_dir, '/') . $filename;
+            } else {
+                return [$command, $filename, '--daemon', $this->rrdcached, ...$options];
+            }
         }
 
         return [$command, $filename, ...$options];
@@ -555,7 +577,6 @@ class Rrd extends BaseDatastore
     {
         if ($this->rrdcached && version_compare($this->version, '1.5', '>=')) {
             $check_output = implode('', $this->command('last', $filename));
-            $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
 
             return ! (str_contains($check_output, $filename) && str_contains($check_output, 'No such file or directory'));
         } else {
@@ -577,7 +598,7 @@ class Rrd extends BaseDatastore
             return;
         }
 
-        foreach (glob($this->name($hostname, $prefix, '*.rrd')) as $rrd) {
+        foreach (glob($this->partname($hostname, $prefix, true) . '*.rrd') as $rrd) {
             unlink($rrd);
         }
     }
