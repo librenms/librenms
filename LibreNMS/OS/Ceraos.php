@@ -37,6 +37,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessXpiDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFrequencyDiscovery, WirelessErrorsDiscovery, WirelessMseDiscovery, WirelessPowerDiscovery, WirelessRateDiscovery
 {
@@ -74,7 +75,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
         $sensors = [];
         $divisor = 100;
 
-        $xpi = snmpwalk_group($this->getDeviceArray(), 'genEquipRadioStatusXPI', 'MWRM-RADIO-MIB');
+        $xpi = SnmpQuery::walk('MWRM-RADIO-MIB::genEquipRadioStatusXPI')->valuesByIndex();
         foreach ($xpi as $index => $data) {
             $sensors[] = new WirelessSensor(
                 'xpi',
@@ -83,7 +84,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
                 'ceraos',
                 $index,
                 $ifNames[$index],
-                $data['genEquipRadioStatusXPI'] / $divisor,
+                $data['MWRM-RADIO-MIB::genEquipRadioStatusXPI'] / $divisor,
                 1,
                 $divisor
             );
@@ -96,7 +97,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
     {
         $sensors = [];
         // MWRM-RADIO-MIB::genEquipRfuCfgTxFreq
-        $tx = snmpwalk_group($this->getDeviceArray(), 'genEquipRfuCfgTxFreq', 'MWRM-RADIO-MIB');
+        $tx = SnmpQuery::walk('MWRM-RADIO-MIB::genEquipRfuCfgTxFreq')->valuesByIndex();
         $TxRadio = 0;
         foreach ($tx as $index => $data) {
             $TxRadio++;
@@ -113,7 +114,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
             );
         }
         // MWRM-RADIO-MIB::genEquipRfuCfgRxFreq
-        $rx = snmpwalk_group($this->getDeviceArray(), 'genEquipRfuCfgRxFreq', 'MWRM-RADIO-MIB');
+        $rx = SnmpQuery::walk('MWRM-RADIO-MIB::genEquipRfuCfgRxFreq')->valuesByIndex();
         $RxRadio = 0;
         foreach ($rx as $index => $data) {
             $RxRadio++;
@@ -145,7 +146,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
 
         $sensors = [];
 
-        $tx = snmpwalk_group($this->getDeviceArray(), 'genEquipRadioMRMCCurrTxBitrate', 'MWRM-RADIO-MIB');
+        $tx = SnmpQuery::walk('MWRM-RADIO-MIB::genEquipRadioMRMCCurrTxBitrate')->valuesByIndex();
         foreach ($tx as $index => $data) {
             $sensors[] = new WirelessSensor(
                 'rate',
@@ -154,12 +155,12 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
                 'ceraos-tx',
                 $index,
                 $ifNames[$index] . ' TX Bitrate',
-                $data['genEquipRadioMRMCCurrTxBitrate'],
+                $data['MWRM-RADIO-MIB::genEquipRadioMRMCCurrTxBitrate'],
                 1000
             );
         }
 
-        $rx = snmpwalk_group($this->getDeviceArray(), 'genEquipRadioMRMCCurrRxBitrate', 'MWRM-RADIO-MIB');
+        $rx = SnmpQuery::walk('MWRM-RADIO-MIB::genEquipRadioMRMCCurrRxBitrate')->valuesByIndex();
         foreach ($rx as $index => $data) {
             $sensors[] = new WirelessSensor(
                 'rate',
@@ -168,7 +169,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
                 'ceraos-rx',
                 $index,
                 $ifNames[$index] . ' RX Bitrate',
-                $data['genEquipRadioMRMCCurrRxBitrate'],
+                $data['MWRM-RADIO-MIB::genEquipRadioMRMCCurrRxBitrate'],
                 1000
             );
         }
@@ -188,7 +189,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
 
         $sensors = [];
 
-        $mse = snmpwalk_group($this->getDeviceArray(), 'genEquipRadioStatusDefectedBlocks', 'MWRM-RADIO-MIB');
+        $mse = SnmpQuery::walk('MWRM-RADIO-MIB::genEquipRadioStatusDefectedBlocks')->valuesByIndex();
         foreach ($mse as $index => $data) {
             $sensors[] = new WirelessSensor(
                 'errors',
@@ -197,7 +198,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
                 'ceraos',
                 $index,
                 $ifNames[$index] . ' Defected Blocks',
-                $data['genEquipRadioStatusDefectedBlocks']
+                $data['MWRM-RADIO-MIB::genEquipRadioStatusDefectedBlocks']
             );
         }
 
@@ -217,7 +218,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
         $sensors = [];
         $divisor = 100;
 
-        $mse = snmpwalk_group($this->getDeviceArray(), 'genEquipRadioStatusMSE', 'MWRM-RADIO-MIB');
+        $mse = SnmpQuery::walk('MWRM-RADIO-MIB::genEquipRadioStatusMSE')->valuesByIndex();
         foreach ($mse as $index => $data) {
             $sensors[] = new WirelessSensor(
                 'mse',
@@ -226,7 +227,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
                 'ceraos',
                 $index,
                 $ifNames[$index],
-                $data['genEquipRadioStatusMSE'] / $divisor,
+                $data['MWRM-RADIO-MIB::genEquipRadioStatusMSE'] / $divisor,
                 1,
                 $divisor
             );
@@ -247,7 +248,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
 
         $sensors = [];
 
-        $tx = snmpwalk_group($this->getDeviceArray(), 'genEquipRfuStatusTxLevel', 'MWRM-RADIO-MIB');
+        $tx = SnmpQuery::walk('MWRM-RADIO-MIB::genEquipRfuStatusTxLevel')->valuesByIndex();
         foreach ($tx as $index => $data) {
             $sensors[] = new WirelessSensor(
                 'power',
@@ -256,11 +257,11 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
                 'ceraos-tx',
                 $index,
                 $ifNames[$index] . ' TX',
-                $data['genEquipRfuStatusTxLevel']
+                $data['MWRM-RADIO-MIB::genEquipRfuStatusTxLevel']
             );
         }
 
-        $main_rx = snmpwalk_group($this->getDeviceArray(), 'genEquipRfuStatusRxLevel', 'MWRM-RADIO-MIB');
+        $main_rx = SnmpQuery::walk('MWRM-RADIO-MIB::genEquipRfuStatusRxLevel')->valuesByIndex();
         foreach ($main_rx as $index => $data) {
             $sensors[] = new WirelessSensor(
                 'power',
@@ -269,7 +270,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
                 'ceraos-main-rx',
                 $index,
                 $ifNames[$index] . ' RX Main',
-                $data['genEquipRfuStatusRxLevel']
+                $data['MWRM-RADIO-MIB::genEquipRfuStatusRxLevel']
             );
         }
 
