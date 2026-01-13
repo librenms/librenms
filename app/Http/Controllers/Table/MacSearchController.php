@@ -68,15 +68,19 @@ class MacSearchController extends TableController
             ->when($request->has('sort.hostname'), fn ($q) => $q->withAggregate('device', 'hostname'));
     }
 
-    public function formatItem($port): array
+    /**
+     * @param  Port  $model
+     * @return array
+     */
+    public function formatItem($model): array
     {
-        $mac = Mac::parse($port->ifPhysAddress);
+        $mac = Mac::parse($model->ifPhysAddress);
 
         return [
-            'hostname' => Url::modernDeviceLink($port->device),
-            'interface' => Url::portLink($port),
+            'hostname' => Url::modernDeviceLink($model->device),
+            'interface' => Url::portLink($model),
             'address' => $mac->readable(),
-            'description' => $port->getLabel() == $port->ifAlias ? '' : $port->ifAlias,
+            'description' => $model->getLabel() == $model->ifAlias ? '' : $model->ifAlias,
             'mac_oui' => $mac->vendor(),
         ];
     }

@@ -86,7 +86,7 @@ abstract class AddressSearchController extends TableController
     protected function applyBaseSearchQuery(Builder $builder, Request $request): Builder
     {
         return $builder
-            ->when($request->get('address'), function ($q, $address) {
+            ->when($request->get('address'), function ($q, $address): void {
                 if (str_contains($address, '/')) {
                     [$address, $cidr] = explode('/', $address, 2);
                 }
@@ -101,8 +101,8 @@ abstract class AddressSearchController extends TableController
             ->when($request->get('interface'), fn($q, $i) => $q->whereHas('port', fn($pq) => $pq->where('ifDescr', 'LIKE', $i)))
             ->when($request->has('sort.hostname'), fn($q) => $q->withAggregate('device', 'hostname'))
             ->when($request->has('sort.interface'), fn($q) => $q->withAggregate('port', 'ifName'))
-            ->when($request->has('sort.description'), function ($q) use ($builder) {
-                $q->select($builder->getModel()->getTable() . '.*')->selectSub(function ($sub) use ($builder) {
+            ->when($request->has('sort.description'), function ($q) use ($builder): void {
+                $q->select($builder->getModel()->getTable() . '.*')->selectSub(function ($sub) use ($builder): void {
                     $sub->selectRaw('IF(ifAlias = ifName || ifAlias = ifDescr, "", ifAlias)')
                         ->from('ports')
                         ->whereColumn('ports.port_id', $builder->qualifyColumn('port_id'))
