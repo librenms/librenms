@@ -400,7 +400,7 @@ class Rrd extends BaseDatastore
     {
         $host = self::safeName(trim($host, '[]'));
 
-        if ($this->rrdcached && !$forceabsolute) {
+        if ($this->rrdcached && ! $forceabsolute) {
             return $host;
         }
 
