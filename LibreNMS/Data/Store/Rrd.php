@@ -391,6 +391,42 @@ class Rrd extends BaseDatastore
     }
 
     /**
+     * Generates an array of filenames based on the hostname (or IP), some extra items and a glob match
+     *
+     * @param  string  $host  Host name
+     * @param  array|string  $extra  Components of RRD filename - will be separated with "-", or a pre-formed rrdname
+     * @param  string  $globmatch  Glob match string
+     * @param  bool  $forceabsolute  Do we always want an absolute filename
+     * @return string[] array of rrd files for this host
+     */
+    public function globnames($host, $extra, $globmatch, $forceabsolute = false): array
+    {
+        $filenames = $this->getRrdFiles($host);
+
+        if ($this->rrdcached) {
+            // getRrdFiles only returns filenames for rrdcached - glob match on filename and prepend directory
+            $globtest = self::safeName(is_array($extra) ? implode('-', $extra) : $extra) . $globmatch;
+            $prepend = $this->dirFromHost($host, $forceabsolute) . '/';
+        } else {
+            // getRrdFiles only returns absolute filenames - glob match on path and no prepend
+            $globtest = $this->partname($host, $extra, true) . $globmatch;
+            $prepend = '';
+        }
+
+        return array_reduce(
+            $filenames,
+            function(array $new, string $item) use ($globtest, $prepend) {
+                if(fnmatch($globtest, $item, FNM_PATHNAME)) {
+                    $new[] = $prepend . $item;
+                }
+
+                return $new;
+            },
+            []
+        );
+    }
+
+    /**
      * Generates a path based on the hostname (or IP)
      *
      * @param  string  $host  Host name
