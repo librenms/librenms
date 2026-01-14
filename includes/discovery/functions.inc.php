@@ -618,7 +618,7 @@ function sensors($types, $os, $pre_cache = [])
             include $os_file;
         }
         if (LibrenmsConfig::getOsSetting($device['os'], 'rfc1628_compat', false)) {
-            $ups_file = base_path("includes/discovery/$sensor_class/rfc1628.inc.php");
+            $ups_file = base_path("includes/discovery/sensors/$sensor_class/rfc1628.inc.php");
             if (is_file($ups_file)) {
                 include $ups_file;
             }
