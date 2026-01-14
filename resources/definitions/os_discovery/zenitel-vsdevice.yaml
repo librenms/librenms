@@ -1,0 +1,251 @@
+modules:
+    os:
+        hardware:
+          - VS-DEVICE-MIB::infoModelType.0
+          - VS-DEVICE-MIB::infoModelNumber.0
+        hardware_template: '{{ VS-DEVICE-MIB::infoModelType.0 }} ({{ VS-DEVICE-MIB::infoModelNumber.0 }})'
+        version: VS-DEVICE-MIB::infoKernelVersion.0
+        features: VS-DEVICE-MIB::infoPackageVersion.0
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: VS-DEVICE-MIB::tempTable
+                    value: VS-DEVICE-MIB::tempCurrentValue
+                    num_oid: '.1.3.6.1.4.1.26122.3.2.2.1.4.{{ $index }}'
+                    descr: '{{VS-DEVICE-MIB::tempSensorName}} {{ $index }}'
+                    index: 'tempCurrentValue.{{ $index }}'
+        fanspeed:
+            data:
+                -
+                    oid: VS-DEVICE-MIB::fanTable
+                    value: VS-DEVICE-MIB::fanValue
+                    num_oid: '.1.3.6.1.4.1.26122.3.3.2.1.3.{{ $index }}'
+                    descr: '{{VS-DEVICE-MIB::fanString}} {{ $index }}'
+                    index: 'fanValue.{{ $index }}'
+        voltage:
+            data:
+                -
+                    oid: VS-DEVICE-MIB::voltageTable
+                    value: VS-DEVICE-MIB::voltageValue
+                    num_oid: '.1.3.6.1.4.1.26122.3.4.2.1.3.{{ $index }}'
+                    descr: '{{VS-DEVICE-MIB::voltageString}} {{ $index }}'
+                    index: 'voltageValue.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: VS-DEVICE-MIB::infoDisablement
+                    value: VS-DEVICE-MIB::infoDisablement
+                    num_oid: '.1.3.6.1.4.1.26122.3.1.7.{{ $index }}'
+                    descr: 'Device Status'
+                    index: 'infoDisablement.{{ $index }}'
+                    states:
+                        - { descr: 'Offline', graph: 1, value: 1, generic: 3 }
+                        - { descr: 'Online' , graph: 1, value: 2, generic: 0 }
+                -
+                    oid: VS-DEVICE-MIB::powerTable
+                    value: VS-DEVICE-MIB::powerType
+                    num_oid: '.1.3.6.1.4.1.26122.3.5.1.1.2.{{ $index }}'
+                    descr: 'Power Type'
+                    index: 'powerType.{{ $index }}'
+                    group: '{{ VS-DEVICE-MIB::powerString }} {{ $index }}'
+                    state_name: powerType
+                    states:
+                        - { descr: 'Unknown'  , graph: 1, value: 1, generic: 3 }
+                        - { descr: 'ACPower'  , graph: 1, value: 2, generic: 0 }
+                        - { descr: 'DCPower'  , graph: 1, value: 3, generic: 0 }
+                        - { descr: 'POEPower' , graph: 1, value: 4, generic: 0 }
+                -
+                    oid: VS-DEVICE-MIB::powerTable
+                    value: VS-DEVICE-MIB::powerMonitoring
+                    num_oid: '.1.3.6.1.4.1.26122.3.5.1.1.4.{{ $index }}'
+                    descr: 'Power Monitoring'
+                    index: 'powerMonitoring.{{ $index }}'
+                    group: '{{ VS-DEVICE-MIB::powerString }} {{ $index }}'
+                    state_name: powerMonitoring
+                    states:
+                        - { descr: 'Unknown'     , graph: 1, value: 1, generic: 3 }
+                        - { descr: 'NotMonitored', graph: 1, value: 2, generic: 0 }
+                        - { descr: 'Monitored'   , graph: 1, value: 3, generic: 0 }
+                -
+                    oid: VS-DEVICE-MIB::powerTable
+                    value: VS-DEVICE-MIB::powerStatus
+                    num_oid: '.1.3.6.1.4.1.26122.3.5.1.1.5.{{ $index }}'
+                    descr: 'Power Status'
+                    index: 'powerStatus.{{ $index }}'
+                    group: '{{ VS-DEVICE-MIB::powerString }} {{ $index }}'
+                    state_name: powerStatus
+                    states:
+                        - { descr: 'Unknown'     , graph: 1, value: 1, generic: 3 }
+                        - { descr: 'NotConnected', graph: 1, value: 2, generic: 0 }
+                        - { descr: 'Connected'   , graph: 1, value: 3, generic: 0 }
+                -
+                    oid: VS-DEVICE-MIB::ethMonitoringTable
+                    value: VS-DEVICE-MIB::ethMonitoringState
+                    num_oid: '.1.3.6.1.4.1.26122.3.11.1.1.3.{{ $index }}'
+                    descr: '{{ VS-DEVICE-MIB::ethMonitoringString }}'
+                    index: 'ethMonitoringState.{{ $index }}'
+                    group: 'Ethernet Monitoring'
+                    state_name: ethMonitoringState
+                    states:
+                        - { descr: 'Unknown',      graph: 1, value: 1, generic: 3 }
+                        - { descr: 'NotMonitored', graph: 1, value: 2, generic: 0 }
+                        - { descr: 'Monitored',    graph: 1, value: 3, generic: 0 }
+                -
+                    oid: VS-DEVICE-MIB::lineInTable
+                    value: VS-DEVICE-MIB::lineInStatus
+                    num_oid: '.1.3.6.1.4.1.26122.3.6.1.1.5.{{ $index }}'
+                    descr: 'LineIn Status'
+                    index: 'lineInStatus.{{ $index }}'
+                    group: '{{ VS-DEVICE-MIB::lineInString }} {{ $index }}'
+                    state_name: lineInStatus
+                    states:
+                        - { descr: 'Unknown',                graph: 1, value: 1, generic: 3 }
+                        - { descr: 'lineInOk',               graph: 1, value: 2, generic: 0 }
+                        - { descr: 'lineInFail',             graph: 1, value: 3, generic: 2 }
+                        - { descr: 'microphoneUnknown',      graph: 1, value: 4, generic: 3 }
+                        - { descr: 'microphoneConnected',    graph: 1, value: 5, generic: 0 }
+                        - { descr: 'microphoneDisconnected', graph: 1, value: 6, generic: 1 }
+                        - { descr: 'microphoneShorted',      graph: 1, value: 7, generic: 2 }
+                -
+                    oid: VS-DEVICE-MIB::lineInTable
+                    value: VS-DEVICE-MIB::lineInMonitoringState
+                    num_oid: '.1.3.6.1.4.1.26122.3.6.1.1.2.{{ $index }}'
+                    descr: 'Monitoring State'
+                    index: 'lineInMonitoringState.{{ $index }}'
+                    group: '{{ VS-DEVICE-MIB::lineInString }} {{ $index }}'
+                    state_name: lineInMonitoringState
+                    states:
+                        - { descr: 'Unknown',                graph: 1, value: 1, generic: 3 }
+                        - { descr: 'lineInOk',               graph: 1, value: 2, generic: 0 }
+                        - { descr: 'lineInFail',             graph: 1, value: 3, generic: 2 }
+                        - { descr: 'microphoneUnknown',      graph: 1, value: 4, generic: 3 }
+                        - { descr: 'microphoneConnected',    graph: 1, value: 5, generic: 0 }
+                        - { descr: 'microphoneDisconnected', graph: 1, value: 6, generic: 1 }
+                        - { descr: 'microphoneShorted',      graph: 1, value: 7, generic: 2 }                        
+                -
+                    oid: VS-DEVICE-MIB::ampChannelTable
+                    value: VS-DEVICE-MIB::ampChannelStatus
+                    num_oid: '.1.3.6.1.4.1.26122.3.7.3.1.3.{{ $index }}'
+                    descr: 'Amp Status'
+                    index: 'ampChannelStatus.{{ $index }}'
+                    group: '{{ VS-DEVICE-MIB::ampChannelString }} {{ $index }}'
+                    state_name: ampChannelStatus
+                    states:
+                        - { descr: 'unknown',                    graph: 1, value: 1, generic: 3 }
+                        - { descr: 'notOperative',               graph: 1, value: 2, generic: 0 }
+                        - { descr: 'channelOk',                  graph: 1, value: 3, generic: 2 }
+                        - { descr: 'channelFail',                graph: 1, value: 4, generic: 3 }
+                        - { descr: 'channelShutdown',            graph: 1, value: 5, generic: 0 }
+                        - { descr: 'channelGracefulDegradation', graph: 1, value: 6, generic: 1 }
+                -
+                    oid: VS-DEVICE-MIB::ampChannelTable
+                    value: VS-DEVICE-MIB::ampChannelMonitorStatus
+                    num_oid: '.1.3.6.1.4.1.26122.3.7.3.1.4.{{ $index }}'
+                    descr: 'Monitor Status'
+                    index: 'ampChannelMonitorStatus.{{ $index }}'
+                    group: '{{ VS-DEVICE-MIB::ampChannelString }} {{ $index }}'
+                    state_name: ampChannelMonitorStatus
+                    states:
+                        - { descr: 'unknown',                           graph: 1, value: 1, generic: 3 }
+                        - { descr: 'channelOk',                         graph: 1, value: 2, generic: 0 }
+                        - { descr: 'channelShorted',                    graph: 1, value: 3, generic: 2 }
+                        - { descr: 'channelOpen',                       graph: 1, value: 4, generic: 2 }
+                        - { descr: 'channelLoadChange',                 graph: 1, value: 5, generic: 0 }
+                        - { descr: 'channelGroundFault',                graph: 1, value: 6, generic: 2 }
+                        - { descr: 'channelRefreshing',                 graph: 1, value: 7, generic: 0 }
+                        - { descr: 'channelShutdown',                   graph: 1, value: 8, generic: 2 }
+                        - { descr: 'channelVoltageLow',                 graph: 1, value: 9, generic: 1 }
+                        - { descr: 'channelIndecisive',                 graph: 1, value: 10, generic: 1 }
+                        - { descr: 'channelInterrupted',                graph: 1, value: 11, generic: 2 }
+                        - { descr: 'channelTimeoutFail',                graph: 1, value: 12, generic: 1 }                        
+                        - { descr: 'channelMonitoringReceiveError',     graph: 1, value: 13, generic: 1 }
+                        - { descr: 'channelMonitoringSuspended',        graph: 1, value: 14, generic: 1 }
+                        - { descr: 'channelLineFault',                  graph: 1, value: 15, generic: 3 }
+                -
+                    oid: VS-DEVICE-MIB::controlInputTable
+                    value: VS-DEVICE-MIB::controlInputStatus
+                    num_oid: '.1.3.6.1.4.1.26122.3.9.2.1.3.{{ $index }}'
+                    descr: 'Input Status'
+                    index: 'controlInputStatus.{{ $index }}'
+                    group: 'Control Input {{ $index }}'
+                    state_name: controlInputStatus
+                    states:
+                        - { descr: 'unknown',       graph: 1, value: 1, generic: 3 }
+                        - { descr: 'open',          graph: 1, value: 2, generic: 0 }
+                        - { descr: 'closed',        graph: 1, value: 3, generic: 0 }
+                        - { descr: 'failShorted',   graph: 1, value: 4, generic: 0 }
+                        - { descr: 'failOpen',      graph: 1, value: 5, generic: 0 }
+                -
+                    oid: VS-DEVICE-MIB::controlInputTable
+                    value: VS-DEVICE-MIB::controlInputMonitored
+                    num_oid: '.1.3.6.1.4.1.26122.3.9.2.1.4.{{ $index }}'
+                    descr: 'Input Monitored'
+                    index: 'controlInputMonitored.{{ $index }}'
+                    group: 'Control Input {{ $index }}'
+                    state_name: controlInputMonitored
+                    states:
+                        - { descr: 'notMonitored' ,  graph: 1, value: 1, generic: 3 }
+                        - { descr: 'monitored'    ,  graph: 1, value: 2, generic: 0 }
+                -
+                    oid: VS-DEVICE-MIB::controlOutputTable
+                    value: VS-DEVICE-MIB::controlOutputStatus
+                    num_oid: '.1.3.6.1.4.1.26122.3.10.2.1.3.{{ $index }}'
+                    descr: 'Output {{ $index }}'
+                    index: 'controlOutputStatus.{{ $index }}'
+                    group: 'Output Status'
+                    state_name: controlOutputStatus
+                    states:
+                        - { descr: 'unknown'      ,  graph: 1, value: 1, generic: 3 }
+                        - { descr: 'notActive'    ,  graph: 1, value: 2, generic: 0 }
+                        - { descr: 'active'       ,  graph: 1, value: 3, generic: 0 }
+                        - { descr: 'failNotActive',  graph: 1, value: 4, generic: 0 }
+                        - { descr: 'failActive'   ,  graph: 1, value: 5, generic: 0 }
+                -
+                    oid: VS-DEVICE-MIB::relayTable
+                    value: VS-DEVICE-MIB::relayState
+                    num_oid: '.1.3.6.1.4.1.26122.3.12.1.1.5.{{ $index }}'
+                    descr: 'State'
+                    index: 'relayState.{{ $index }}'
+                    group: '{{ VS-DEVICE-MIB::relayString }}'
+                    state_name: relayState
+                    states:
+                        - { descr: 'unknown'   ,  graph: 1, value: 1, generic: 3 }
+                        - { descr: 'notActive' ,  graph: 1, value: 2, generic: 0 }
+                        - { descr: 'active'    ,  graph: 1, value: 3, generic: 0 }
+                -
+                    oid: VS-DEVICE-MIB::relayTable
+                    value: VS-DEVICE-MIB::relayIdleMode
+                    num_oid: '.1.3.6.1.4.1.26122.3.12.1.1.3.{{ $index }}'
+                    descr: 'Idle Mode'
+                    index: 'relayIdleMode.{{ $index }}'
+                    group: '{{ VS-DEVICE-MIB::relayString }}'
+                    state_name: relayIdleMode
+                    states:
+                        - { descr: 'unknown'        ,  graph: 1, value: 1, generic: 3 }
+                        - { descr: 'normallyClosed' ,  graph: 1, value: 2, generic: 0 }
+                        - { descr: 'normallyOpen'   ,  graph: 1, value: 3, generic: 0 }
+                -
+                    oid: VS-DEVICE-MIB::letChannel1Table
+                    value: VS-DEVICE-MIB::letChannel1OperativeStatus
+                    num_oid: '.1.3.6.1.4.1.26122.3.8.1.2.1.3.{{ $index }}'
+                    descr: 'LetChannel 1 Status {{ $index }}'
+                    index: 'letChannel1OperativeStatus.{{ $index }}'
+                    state_name: letChannel1OperativeStatus
+                    states:
+                        - { descr: 'unknown'    ,  graph: 1, value: 1, generic: 3 }
+                        - { descr: 'notEnabled' ,  graph: 1, value: 2, generic: 1 }
+                        - { descr: 'failed'     ,  graph: 1, value: 3, generic: 2 }
+                        - { descr: 'ok'         ,  graph: 1, value: 4, generic: 0 }
+                -
+                    oid: VS-DEVICE-MIB::letChannel2Table
+                    value: VS-DEVICE-MIB::letChannel2OperativeStatus
+                    num_oid: '.1.3.6.1.4.1.26122.3.8.2.2.1.3.{{ $index }}'
+                    descr: 'LetChannel 2 Status {{ $index }}'
+                    index: 'letChannel2OperativeStatus.{{ $index }}'
+                    state_name: letChannel2OperativeStatus
+                    states:
+                        - { descr: 'unknown'    ,  graph: 1, value: 1, generic: 3 }
+                        - { descr: 'notEnabled' ,  graph: 1, value: 2, generic: 1 }
+                        - { descr: 'failed'     ,  graph: 1, value: 3, generic: 2 }
+                        - { descr: 'ok'         ,  graph: 1, value: 4, generic: 0 }

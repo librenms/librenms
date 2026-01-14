@@ -43,6 +43,8 @@ class EventlogController extends TableController
             'eventtype' => 'nullable|string',
             'to' => 'nullable|date',
             'from' => 'nullable|date',
+            'age' => 'nullable|int',
+            'message' => 'nullable|string',
         ];
     }
 
@@ -82,6 +84,11 @@ class EventlogController extends TableController
             })
             ->when($request->to, function ($query, $to): void {
                 $query->where('datetime', '<=', $to);
+            ->when($request->message, function ($query) use ($request): void {
+                $query->where('message', 'like', '%' . $request->message . '%');
+            })
+            ->when($request->age, function ($query) use ($request): void {
+                $query->where('datetime', '>', Carbon::now()->subSeconds((int) $request->age));
             });
     }
 

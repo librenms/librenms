@@ -1,0 +1,440 @@
+modules:
+    os:
+        serial: SPEEDCARRIER-MIB::nmCarrierSerialNumber.0
+        serial_replace: 
+            - [ '/unknown/', '']
+        hardware: SPEEDCARRIER-MIB::nmCarrierType.0
+        hardware_replace:
+            - ['/carrier5UHighPower/', 'Carrier 5U HighPower']
+            - ['/carrier5U/', 'Carrier 5U']
+            - ['/carrier45U/', 'Carrier 4.5U']
+            - ['/carrier1U/', 'Carrier 1U']
+            - ['/carrier4U/', 'Carrier 4U']
+        location: SPEEDCARRIER-MIB::nmAgentConfigSnmpSysLocation.0
+
+    sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - SPEED-MUX-200G-MIB::speedMux200gLinePortXCVThresholdTable
+                        - SPEED-MUX-200G-MIB::speedMux200gClientPortXCVThresholdTable
+                        - SPEED-MULTILINE-MIB::speedMultilinePortXCVThresholdTable
+
+        state:
+            data:
+                -
+                    oid: SPEEDCARRIER-MIB::nmAAlarmState
+                    value: SPEEDCARRIER-MIB::nmAAlarmState
+                    num_oid: .1.3.6.1.4.1.3652.3.1.1.7.{{ $index }}
+                    descr: 'Agent'
+                    states:
+                        - { value: 0, descr: off, graph: 1, generic: 0 }
+                        - { value: 1, descr: on, graph: 1, generic: 3 }
+                    index: nmAAlarmState.{{ $index }}
+                    group: Alarms
+                -
+                    oid: SPEEDCARRIER-MIB::nmFanState
+                    value: SPEEDCARRIER-MIB::nmFanState
+                    num_oid: .1.3.6.1.4.1.3652.3.2.1.5.{{ $index }}
+                    descr: 'Fans'
+                    states:
+                        - { value: 0, descr: "not Available", graph: 1, generic: 3 }
+                        - { value: 3, descr: "Ok", graph: 1, generic: 0 }
+                        - { value: 4, descr: "Failed", graph: 1, generic: 2 }
+                        - { value: 5, descr: "not Installed", graph: 1, generic: 3 }
+                    index: nmFanState.{{ $index }}
+                    group: Alarms
+                -
+                    oid: SPEEDCARRIER-MIB::nmPSU1Status
+                    value: SPEEDCARRIER-MIB::nmPSU1Status
+                    num_oid: .1.3.6.1.4.1.3652.3.2.1.3.{{ $index }}
+                    descr: 'PSU 1'
+                    states:
+                        - { value: 0, descr: not Installed, graph: 1, generic: 0 }
+                        - { value: 1, descr: Critical, graph: 1, generic: 2 }
+                        - { value: 2, descr: Warning, graph: 1, generic: 1 }
+                        - { value: 3, descr: Ok, graph: 1, generic: 0 }
+                    index: nmPSU1Status.{{ $index }}
+                    group: Alarms
+                -
+                    oid: SPEEDCARRIER-MIB::nmPSU2Status
+                    value: SPEEDCARRIER-MIB::nmPSU2Status
+                    num_oid: .1.3.6.1.4.1.3652.3.2.1.4.{{ $index }}
+                    descr: 'PSU 2'
+                    states:
+                        - { value: 0, descr: not Installed, graph: 1, generic: 0 }
+                        - { value: 1, descr: Critical, graph: 1, generic: 2 }
+                        - { value: 2, descr: Warning, graph: 1, generic: 1 }
+                        - { value: 3, descr: Ok, graph: 1, generic: 0 }
+                    index: nmPSU2Status.{{ $index }}
+                    group: Alarms
+                -
+                    oid: SPEEDCARRIER-MIB::nmPSU3Status
+                    value: SPEEDCARRIER-MIB::nmPSU3Status
+                    num_oid: .1.3.6.1.4.1.3652.3.2.1.12.{{ $index }}
+                    descr: 'PSU 3'
+                    states:
+                        - { value: 0, descr: not Installed, graph: 1, generic: 0 }
+                        - { value: 1, descr: Critical, graph: 1, generic: 2 }
+                        - { value: 2, descr: Warning, graph: 1, generic: 1 }
+                        - { value: 3, descr: Ok, graph: 1, generic: 0 }
+                        - { value: 255, descr: not Available, graph: 1, generic: 0 }
+                    index: nmPSU3Status.{{ $index }}
+                    group: Alarms
+
+        dbm:
+            data:
+                -
+                    oid: SPEEDCARRIER-MIB::convSxLSFPDMIParamTable
+                    value: SPEEDCARRIER-MIB::convSxLSFPDMIRxLevel
+                    num_oid: .1.3.6.1.4.1.3652.3.3.1.8.1.1.{{ $index }}
+                    descr: Slot {{ SPEEDCARRIER-MIB::convSxLSFPDMISlot }} Port {{ SPEEDCARRIER-MIB::convSxLSFPDMIPort }} Rx Power
+                    divisor: 100
+                    skip_values: 0
+                    low_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdAlarmLevel
+                    low_warn_limit: SPEEDCARRIER-MIB::convSxLSFPDMITRxLowThresholdWarningLevel
+                    high_limit: SPEEDCARRIER-MIB::convSxLSFPDMIRxHighAlarm
+                    index: convSxLSFPDMIRxLevel.{{ $index }}
+                    group: transceiver
+                -
+                    oid: SPEEDCARRIER-MIB::convSxLSFPDMIParamTable
+                    value: SPEEDCARRIER-MIB::convSxLSFPDMITxLevel
+                    num_oid: .1.3.6.1.4.1.3652.3.3.1.8.1.1.{{ $index }}
+                    descr: Slot {{ SPEEDCARRIER-MIB::convSxLSFPDMISlot }} Port {{ SPEEDCARRIER-MIB::convSxLSFPDMIPort }} Tx Power
+                    divisor: 100
+                    skip_values: 0
+                    low_limit: SPEEDCARRIER-MIB::convSxLSFPDMITTxLowThresholdAlarmLevel
+                    low_warn_limit: SPEEDCARRIER-MIB::convSxLSFPDMITTxLowThresholdWarningLevel
+                    index: convSxLSFPDMITxLevel.{{ $index }}
+                    group: transceiver
+
+                # speedDualline FC
+                -
+                    oid: SPEED-DUALLINE-FC::speedDuallineFCXCVMeassurementTable
+                    value: SPEED-DUALLINE-FC::speedDuallineFCPortXCVDMIRxLevel
+                    num_oid: .1.3.6.1.4.1.3652.3.3.3.7.1.4.{{ $index }}
+                    descr: Slot {{ SPEED-DUALLINE-FC::speedDuallineFCPortXCVDMISlot }} Port {{ SPEED-DUALLINE-FC::speedDuallineFCPortXCVDMIPort }} Rx Power
+                    divisor: 100
+                    skip_values: 0
+                    index: speedDuallineFCPortXCVDMIRxLevel.{{ $index }}
+                    group: transceiver
+                -
+                    oid: SPEED-DUALLINE-FC::speedDuallineFCXCVMeassurementTable
+                    value: SPEED-DUALLINE-FC::speedDuallineFCPortXCVDMITxLevel
+                    num_oid: .1.3.6.1.4.1.3652.3.3.3.7.1.5.{{ $index }}
+                    descr: Slot {{ SPEED-DUALLINE-FC::speedDuallineFCPortXCVDMISlot }} Port {{ SPEED-DUALLINE-FC::speedDuallineFCPortXCVDMIPort }} Tx Power
+                    divisor: 100
+                    skip_values: 0
+                    index: speedDuallineFCPortXCVDMITxLevel.{{ $index }}
+                    group: transceiver
+
+                # speedMUX-200G
+                # Line Ports
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMIRxLevel
+                    num_oid: .1.3.6.1.4.1.3652.3.4.1.11.1.5.{{ $index }}
+                    descr: Slot {{ SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMIMSlot }} Line Port {{ SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMIMPort }} Rx Power
+                    divisor: 100
+                    skip_values: 0
+                    low_limit: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMIRxLowAlarmThreshold
+                    low_warn_limit: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMIRxLowWarningThreshold
+                    high_limit: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMIRxHighAlarmThreshold
+                    warn_limit: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMIRxHighWarningThreshold
+                    index: speedMux200gLinePortXCVDMIRxLevel.{{ $index }}
+                    group: transceiver
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMITxLevel
+                    num_oid: .1.3.6.1.4.1.3652.3.4.1.11.1.6.{{ $index }}
+                    descr: Slot {{ SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMIMSlot }} Line Port {{ SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMIMPort }} Tx Power
+                    divisor: 100
+                    skip_values: 0
+                    low_limit: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMITxLowAlarmThreshold
+                    low_warn_limit: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMITxLowWarningThreshold
+                    index: speedMux200gLinePortXCVDMITxLevel.{{ $index }}
+                    group: transceiver
+
+                # Client Ports
+                # Lane 1
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxLevelLane1
+                    num_oid: .1.3.6.1.4.1.3652.3.4.1.10.1.4.{{ $index }}
+                    descr: Slot {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMSlot }} Port {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMPort }} Lane 1 Rx Power
+                    divisor: 100
+                    skip_values: 0
+                    low_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxLowAlarmThreshold
+                    low_warn_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxLowWarningThreshold
+                    high_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxHighAlarmThreshold
+                    warn_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxHighWarningThreshold
+                    index: speedMux200gClientPortXCVDMIRxLevelLane1.{{ $index }}
+                    group: transceiver
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLevelLane1
+                    num_oid: .1.3.6.1.4.1.3652.3.4.1.10.1.8.{{ $index }}
+                    descr: Slot {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMSlot }} Port {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMPort }} Lane 1 Tx Power
+                    divisor: 100
+                    skip_values: 0
+                    low_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLowAlarmThreshold
+                    low_warn_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLowWarningThreshold
+                    index: speedMux200gClientPortXCVDMITxLevelLane1.{{ $index }}
+                    group: transceiver
+
+                # Lane 2
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxLevelLane2
+                    num_oid: .1.3.6.1.4.1.3652.3.4.1.10.1.5.{{ $index }}
+                    descr: Slot {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMSlot }} Port {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMPort }} Lane 2 Rx Power
+                    divisor: 100
+                    skip_values: 0
+                    low_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxLowAlarmThreshold
+                    low_warn_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxLowWarningThreshold
+                    high_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxHighAlarmThreshold
+                    warn_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxHighWarningThreshold
+                    index: speedMux200gClientPortXCVDMIRxLevelLane2.{{ $index }}
+                    group: transceiver
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLevelLane2
+                    num_oid: .1.3.6.1.4.1.3652.3.4.1.10.1.9.{{ $index }}
+                    descr: Slot {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMSlot }} Port {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMPort }} Lane 2 Tx Power
+                    divisor: 100
+                    skip_values: 0
+                    low_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLowAlarmThreshold
+                    low_warn_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLowWarningThreshold
+                    index: speedMux200gClientPortXCVDMITxLevelLane2.{{ $index }}
+                    group: transceiver
+
+                # Lane 3
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxLevelLane3
+                    num_oid: .1.3.6.1.4.1.3652.3.4.1.10.1.6.{{ $index }}
+                    descr: Slot {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMSlot }} Port {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMPort }} Lane 3 Rx Power
+                    divisor: 100
+                    skip_values: 0
+                    low_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxLowAlarmThreshold
+                    low_warn_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxLowWarningThreshold
+                    high_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxHighAlarmThreshold
+                    warn_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxHighWarningThreshold
+                    index: speedMux200gClientPortXCVDMIRxLevelLane3.{{ $index }}
+                    group: transceiver
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLevelLane3
+                    num_oid: .1.3.6.1.4.1.3652.3.4.1.10.1.10.{{ $index }}
+                    descr: Slot {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMSlot }} Port {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMPort }} Lane 3 Tx Power
+                    divisor: 100
+                    skip_values: 0
+                    low_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLowAlarmThreshold
+                    low_warn_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLowWarningThreshold
+                    index: speedMux200gClientPortXCVDMITxLevelLane3.{{ $index }}
+                    group: transceiver
+
+                # Lane 4
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxLevelLane4
+                    num_oid: .1.3.6.1.4.1.3652.3.4.1.10.1.7.{{ $index }}
+                    descr: Slot {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMSlot }} Port {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMPort }} Lane 4 Rx Power
+                    divisor: 100
+                    skip_values: 0
+                    low_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxLowAlarmThreshold
+                    low_warn_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxLowWarningThreshold
+                    high_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxHighAlarmThreshold
+                    warn_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIRxHighWarningThreshold
+                    index: speedMux200gClientPortXCVDMIRxLevelLane4.{{ $index }}
+                    group: transceiver
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLevelLane4
+                    num_oid: .1.3.6.1.4.1.3652.3.4.1.10.1.11.{{ $index }}
+                    descr: Slot {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMSlot }} Port {{ SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIMPort }} Lane 4 Tx Power
+                    divisor: 100
+                    skip_values: 0
+                    low_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLowAlarmThreshold
+                    low_warn_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxLowWarningThreshold
+                    index: speedMux200gClientPortXCVDMITxLevelLane4.{{ $index }}
+                    group: transceiver
+
+        temperature:
+            data:
+
+                -
+                    oid: SPEEDCARRIER-MIB::convSxLSFPDMIParamTable
+                    value: SPEEDCARRIER-MIB::convSxLSFPDMITemp
+                    num_oid: .1.3.6.1.4.1.3652.3.3.1.8.1.9.{{ $index }}
+                    descr: Slot {{ SPEEDCARRIER-MIB::convSxLSFPDMISlot }} Port {{ SPEEDCARRIER-MIB::convSxLSFPDMIPort }} Temperature
+                    skip_values: 0
+                    index: convSxLSFPDMITemp.{{ $index }}
+                    group: transceiver
+
+
+                # Speed Multiline
+                # Slot Temperature
+                -
+                    oid: SPEED-MULTILINE-MIB::speedMultilineMOverviewTable
+                    value: SPEED-MULTILINE-MIB::speedMultilineMTemperature
+                    num_oid: .1.3.6.1.4.1.3652.3.3.6.1.1.7.{{ $index }}
+                    descr: Slot {{ SPEED-MULTILINE-MIB::speedMultilineMSlot }} Temperature
+                    skip_values: 0
+                    high_limit: SPEED-MULTILINE-MIB::speedMultilineMTempAlarmLevel
+                    warn_limit: SPEED-MULTILINE-MIB::speedMultilineMTempWarningLevel
+                    index: speedMultilineMTemperature.{{ $index }}
+                    group: Chassis
+
+                # Ports
+                -
+                    oid: SPEED-MULTILINE-MIB::speedMultilinePortXCVValueTable
+                    value: SPEED-MULTILINE-MIB::speedMultilinePortXCVDMITemp
+                    num_oid: .1.3.6.1.4.1.3652.3.3.6.4.1.7.{{ $index }}
+                    descr: Slot {{ SPEED-MULTILINE-MIB::speedMultilinePortXCVDMISlot }} Port {{ SPEED-MULTILINE-MIB::speedMultilinePortXCVDMIPort }} Temperature
+                    skip_values: 0
+                    high_limit: SPEED-MULTILINE-MIB::speedMultilinePortXCVTempHighAlarmLevel
+                    warn_limit: SPEED-MULTILINE-MIB::speedMultilinePortXCVTempHighWarningLevel
+                    index: speedMultilinePortXCVDMITemp.{{ $index }}
+                    group: transceiver
+
+                # speedDualline FC
+                # Slot Temperature
+                -
+                    oid: SPEED-DUALLINE-FC::speedDuallineFCMOverviewTable
+                    value: SPEED-DUALLINE-FC::speedDuallineFCMTemperature
+                    num_oid: .1.3.6.1.4.1.3652.3.3.3.1.1.7.{{ $index }}
+                    descr: Slot {{ SPEED-DUALLINE-FC::speedDuallineFCSlot }} Temperature
+                    skip_values: 0
+                    index: speedDuallineFCMTemperature.{{ $index }}
+                    group: Chassis
+
+                # Ports
+                -
+                    oid: SPEED-DUALLINE-FC::speedDuallineFCXCVMeassurementTable
+                    value: SPEED-DUALLINE-FC::speedDuallineFCPortXCVDMITemp
+                    num_oid: .1.3.6.1.4.1.3652.3.3.3.7.1.7.{{ $index }}
+                    descr: Slot {{ SPEED-DUALLINE-FC::speedDuallineFCPortXCVDMISlot }} Port {{ SPEED-DUALLINE-FC::speedDuallineFCPortXCVDMIPort }} Temperature
+                    skip_values: 0
+                    index: speedDuallineFCPortXCVDMITemp.{{ $index }}
+                    group: transceiver
+
+                # speedMUX-200G
+                # Slot Temperature
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gMOverviewTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gMTemperature
+                    num_oid: .1.3.6.1.4.1.3652.3.4.1.1.1.7.{{ $index }}
+                    descr: Slot {{ SPEED-MUX-200G-MIB::speedMux200gMSlot }} Temperature
+                    skip_values: 0
+                    index: speedMux200gMTemperature.{{ $index }}
+                    group: Chassis
+
+                # Line Ports
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVInfoTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMITemp
+                    num_oid: .1.3.6.1.4.1.3652.3.4.1.7.1.19.{{ $index }}
+                    descr: Slot {{ SPEED-MUX-200G-MIB::speedMux200gLineXCVInfoSlot }} Line Port {{ SPEED-MUX-200G-MIB::speedMux200gLineXCVInfoPort }} Temperature
+                    skip_values: 0
+                    high_limit: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMITempAlarmThreshold
+                    warn_limit: SPEED-MUX-200G-MIB::speedMux200gLPortXCVDMITempWarningThreshold
+                    index: speedMux200gLinePortXCVDMITemp.{{ $index }}
+                    group: transceiver
+
+                # Client Ports
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVInfoTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITemp
+                    num_oid: .1.3.6.1.4.1.3652.3.4.1.6.1.16.{{ $index }}
+                    descr: Slot {{ SPEED-MUX-200G-MIB::speedMux200gClientXCVInfoSlot }} Client Port {{ SPEED-MUX-200G-MIB::speedMux200gClientXCVInfoPort }} Temperature
+                    skip_values: 0
+                    high_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITempAlarmThreshold
+                    warn_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITempWarningThreshold
+                    index: speedMux200gClientPortXCVDMITemp.{{ $index }}
+                    group: transceiver
+
+
+        current:
+            data:
+                # speedMultiline
+                # Line Ports
+                -
+                    oid: SPEED-MULTILINE-MIB::speedMultilinePortXCVValueTable
+                    value: SPEED-MULTILINE-MIB::speedMultilinePortXCVDMITxBias
+                    num_oid: .1.3.6.1.4.1.3652.3.3.6.4.1.6.{{ $index }}
+                    descr: Slot {{ SPEED-MULTILINE-MIB::speedMultilinePortXCVDMISlot }} Line Port {{ SPEED-MULTILINE-MIB::speedMultilinePortXCVDMIPort }} Tx Current
+                    skip_values: 0
+                    divisor: 100000
+                    low_limit: SPEED-MULTILINE-MIB::speedMultilinePortXCVTxBiasLowAlarmLevel
+                    high_limit: SPEED-MULTILINE-MIB::speedMultilinePortXCVTxBiasHighAlarmLevel
+                    index: speedMultilinePortXCVDMITxBias.{{ $index }}
+                    group: transceiver
+
+                # speedMUX-200G
+                # Line Ports
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMITxBias
+                    num_oid: .1.3.6.1.4.1.3652.3.4.1.11.1.7.{{ $index }}
+                    descr: Slot {{ SPEED-MUX-200G-MIB::speedMux200gLineXCVInfoSlot }} Line Port {{ SPEED-MUX-200G-MIB::speedMux200gLineXCVInfoPort }} Tx Current
+                    skip_values: 0
+                    divisor: 100000
+                    low_limit: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMIBiasLowAlarmThreshold
+                    high_limit: SPEED-MUX-200G-MIB::speedMux200gLinePortXCVDMIBiasHighAlarmThreshold
+                    index: speedMux200gLinePortXCVDMITxBias.{{ $index }}
+                    group: transceiver
+
+                # Client Ports
+                # Lane 1
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxBiasLane1
+                    num_oid: .1.3.6.1.4.1.3652.3.4.1.10.1.12.{{ $index }}
+                    descr: Slot {{ SPEED-MUX-200G-MIB::speedMux200gClientXCVInfoSlot }} Client Port {{ SPEED-MUX-200G-MIB::speedMux200gClientXCVInfoPort }} Lane 1 Tx Current
+                    skip_values: 0
+                    divisor: 100000
+                    low_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIBiasLowAlarmThreshold
+                    high_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIBiasHighAlarmThreshold
+                    index: speedMux200gClientPortXCVDMITxBiasLane1.{{ $index }} 
+                    group: transceiver
+
+                # Lane 2
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxBiasLane2
+                    num_oid: .1.3.6.1.4.1.3652.3.4.1.10.1.13.{{ $index }}
+                    descr: Slot {{ SPEED-MUX-200G-MIB::speedMux200gClientXCVInfoSlot }} Client Port {{ SPEED-MUX-200G-MIB::speedMux200gClientXCVInfoPort }} Lane 2 Tx Current
+                    skip_values: 0
+                    divisor: 100000
+                    low_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIBiasLowAlarmThreshold
+                    high_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIBiasHighAlarmThreshold
+                    index: speedMux200gClientPortXCVDMITxBiasLane2.{{ $index }}
+                    group: transceiver
+
+                # Lane 3
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxBiasLane3
+                    num_oid: .1.3.6.1.4.1.3652.3.4.1.10.1.14.{{ $index }}
+                    descr: Slot {{ SPEED-MUX-200G-MIB::speedMux200gClientXCVInfoSlot }} Client Port {{ SPEED-MUX-200G-MIB::speedMux200gClientXCVInfoPort }} Lane 3 Tx Current
+                    skip_values: 0
+                    divisor: 100000
+                    low_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIBiasLowAlarmThreshold
+                    high_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIBiasHighAlarmThreshold
+                    index: speedMux200gClientPortXCVDMITxBiasLane3.{{ $index }} 
+                    group: transceiver
+
+                # Lane 4
+                -
+                    oid: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVValueTable
+                    value: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMITxBiasLane4
+                    num_oid: .1.3.6.1.4.1.3652.3.4.1.10.1.15.{{ $index }}
+                    descr: Slot {{ SPEED-MUX-200G-MIB::speedMux200gClientXCVInfoSlot }} Client Port {{ SPEED-MUX-200G-MIB::speedMux200gClientXCVInfoPort }} Lane 4 Tx Current
+                    skip_values: 0
+                    divisor: 100000
+                    low_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIBiasLowAlarmThreshold
+                    high_limit: SPEED-MUX-200G-MIB::speedMux200gClientPortXCVDMIBiasHighAlarmThreshold
+                    index: speedMux200gClientPortXCVDMITxBiasLane4.{{ $index }}
+                    group: transceiver

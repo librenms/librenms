@@ -35,31 +35,25 @@ class Mail
     /**
      * Parse string with emails. Return array with email (as key) and name (as value)
      *
-     * @param  string  $emails
-     * @return array|false
+     * @return array<string, string>
      */
-    public static function parseEmails($emails)
+    public static function parseEmails(string $emails): array
     {
         $result = [];
         $regex = '/^[\"\']?([^\"\']+)[\"\']?\s{0,}<([^@]+@[^>]+)>$/';
-        if (is_string($emails)) {
-            $emails = preg_split('/[,;]\s{0,}/', $emails);
-            foreach ($emails as $email) {
-                if (preg_match($regex, $email, $out, PREG_OFFSET_CAPTURE)) {
-                    $result[$out[2][0]] = $out[1][0];
-                } else {
-                    if (strpos($email, '@')) {
-                        $from_name = LibrenmsConfig::get('email_user');
-                        $result[$email] = $from_name;
-                    }
-                }
+
+        $emails = preg_split('/[,;]\s{0,}/', $emails);
+        foreach ($emails as $email) {
+            if (preg_match($regex, $email, $out, PREG_OFFSET_CAPTURE)) {
+                $email = $out[2][0];
             }
 
-            return $result;
+            if (filter_var($email, FILTER_VALIDATE_EMAIL) !== false) {
+                $result[$email] = $out[1][0] ?? LibrenmsConfig::get('email_user');
+            }
         }
 
-        // Return FALSE if input not string
-        return false;
+        return $result;
     }
 
     /**
@@ -82,7 +76,7 @@ class Mail
             $mail = new PHPMailer(true);
             $mail->Hostname = php_uname('n');
 
-            foreach (self::parseEmails(LibrenmsConfig::get('email_from')) as $from => $from_name) {
+            foreach (self::parseEmails((string) LibrenmsConfig::get('email_from')) as $from => $from_name) {
                 $mail->setFrom($from, $from_name);
             }
 

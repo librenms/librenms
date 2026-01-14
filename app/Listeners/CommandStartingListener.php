@@ -28,6 +28,9 @@ namespace App\Listeners;
 
 use App\Exceptions\RunningAsIncorrectUserException;
 use Illuminate\Console\Events\CommandStarting;
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Util\Debug;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class CommandStartingListener
 {
@@ -39,6 +42,33 @@ class CommandStartingListener
      * @throws RunningAsIncorrectUserException
      */
     public function handle(CommandStarting $event): void
+    {
+        $this->configureOutput($event);
+        $this->checkRunningUser($event);
+    }
+
+    private function configureOutput(CommandStarting $event): void
+    {
+        $verbosity = $event->output->getVerbosity();
+
+        if ($verbosity === OutputInterface::VERBOSITY_QUIET) {
+            Log::setDefaultDriver('stack'); // this omits stdout
+            Debug::setCliQuietOutput();
+
+            return;
+        }
+
+        Log::setDefaultDriver('console');
+
+        if ($verbosity >= OutputInterface::VERBOSITY_VERY_VERBOSE) {
+            Debug::set();
+            if ($verbosity >= OutputInterface::VERBOSITY_DEBUG) {
+                Debug::setVerbose();
+            }
+        }
+    }
+
+    private function checkRunningUser(CommandStarting $event): void
     {
         // Check that we don't run this as the wrong user and break the install
         if (in_array($event->command, $this->skip_user_check)) {

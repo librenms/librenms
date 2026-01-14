@@ -1,0 +1,282 @@
+ALPHACOM-MIB DEFINITIONS ::= BEGIN
+ 
+ IMPORTS
+     enterprises, MODULE-IDENTITY, OBJECT-TYPE, Counter32, 
+     Integer32, Unsigned32, NOTIFICATION-TYPE FROM SNMPv2-SMI
+     DisplayString                            FROM SNMPv2-TC;
+
+     
+ stentofon MODULE-IDENTITY
+     LAST-UPDATED "201111301600Z"
+     ORGANIZATION "Zenitel Norway ASA"
+     CONTACT-INFO
+             "   
+                 
+                 email: alphasupport@zenitel.com"
+     DESCRIPTION
+             "MIB for AlphaCom Information."
+ 
+     REVISION      "201111301600Z"
+     DESCRIPTION
+             "Revision 3
+               Added missing imports giving MIB validation errors.
+               Removed some unused import definitions
+              Revision 2
+               Updated with Zenitel enterprise OID and snmptrap definition for 
+               AlphaCom syslog to snmptraps log facilities"
+     ::= { enterprises 26122 }
+ 
+ alphacom OBJECT IDENTIFIER ::= { stentofon 1 }
+ amc 			OBJECT IDENTIFIER ::= { alphacom 1 }
+ rtp 			OBJECT IDENTIFIER ::= { alphacom 2 }
+ alarmObjects         OBJECT IDENTIFIER ::= { alphacom 10 }
+ alarmNotifications   OBJECT IDENTIFIER ::= { alphacom 11 }
+ 
+ 
+ 
+ -- ----------------------------------------------------------------------
+ --  AMC (Alphacom Module Controller) Status on the Main AlphaCom daemon
+ -- ----------------------------------------------------------------------
+ nodeState OBJECT-TYPE
+     SYNTAX      Integer32 (0..1)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The AMC Node state.
+             0 - Disabled
+             1 - Enabled."
+     ::= { amc 1 }
+ 
+ -- Not yet implemented
+ -- nodeUsage OBJECT-TYPE
+ --    SYNTAX      Integer32 (0..2)
+ --    MAX-ACCESS  read-only
+ --    STATUS      current
+ --    DESCRIPTION
+ --            "The AMC Node usage.
+ --            0 - Idle
+ --            1 - Active
+ --            2 - Busy."
+ --    ::= { amc 2 }
+ 
+ 
+ -- ----------------------------------------------------------------------
+ --  Audio statisics table
+ -- ----------------------------------------------------------------------
+ rtpStatisticsTable OBJECT-TYPE
+     SYNTAX        SEQUENCE OF RtpStatisticsEntry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+                "Table with RTP Statistics
+                 One entry for each link from this node"
+     ::= { rtp 1 }
+  
+ rtpStatisticsEntry OBJECT-TYPE
+     SYNTAX        RtpStatisticsEntry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+                "RTP Statistics Entry"
+     INDEX      { rtpStatIndex }
+     ::= { rtpStatisticsTable 1 }
+ 
+ RtpStatisticsEntry ::= SEQUENCE {
+     rtpStatIndex       Unsigned32,
+     rtpFromNode        Unsigned32,
+     rtpToNode          Unsigned32,
+     rtpConnectons      Counter32,
+     rtpStreamTime      Counter32,
+     rtpTxPackets       Counter32,
+     rtpRxLate          Counter32,
+     rtpRxLost          Counter32,
+     rtpRxPackets       Counter32,
+     rtpJitter          Unsigned32,
+     rtpDelay           Unsigned32
+     }
+ 
+ rtpStatIndex OBJECT-TYPE
+     SYNTAX        Unsigned32
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION   "The unique RTP Connection Index"
+     ::= { rtpStatisticsEntry 1 }
+ 
+ rtpFromNode OBJECT-TYPE
+     SYNTAX        Unsigned32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION   "The From AMC Node for RTP Connection"
+     ::= { rtpStatisticsEntry 2 }
+ 
+ rtpToNode OBJECT-TYPE
+     SYNTAX        Unsigned32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION   "The To AMC Node for RTP Connection"
+     ::= { rtpStatisticsEntry 3 }
+ 
+ rtpStreamTime OBJECT-TYPE
+     SYNTAX        Counter32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION   "The audio stream time in seconds for the rtp link"
+     ::= { rtpStatisticsEntry 4 }
+ 
+ rtpConnectons OBJECT-TYPE
+     SYNTAX        Counter32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION   "The Number of Connections on the rtp link"
+     ::= { rtpStatisticsEntry 5 }
+ 
+ rtpTxPackets OBJECT-TYPE
+     SYNTAX        Counter32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION   "The Number of Received packets on the rtp link"
+     ::= { rtpStatisticsEntry 6 }
+ 
+ rtpRxPackets OBJECT-TYPE
+     SYNTAX        Counter32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION   "The Number of Transmitted packets on the rtp link"
+     ::= { rtpStatisticsEntry 7 }
+ 
+ rtpRxLate OBJECT-TYPE
+     SYNTAX        Counter32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION   "The Number of Late received packets on the rtp link"
+     ::= { rtpStatisticsEntry 8 }
+ 
+ rtpRxLost OBJECT-TYPE
+     SYNTAX        Counter32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION   "The Number of Lost received packets on the rtp link"
+     ::= { rtpStatisticsEntry 9 }
+ 
+ rtpJitter OBJECT-TYPE
+     SYNTAX        Unsigned32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION   "Average RTP jitter in ms"
+     ::= { rtpStatisticsEntry 10 }
+ 
+ rtpDelay OBJECT-TYPE
+     SYNTAX        Unsigned32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION   "Average RTP delay in ms"
+     ::= { rtpStatisticsEntry 11 }
+ 
+ -- ----------------------------------------------------------------------
+ --  Alarm objects
+ -- ----------------------------------------------------------------------
+ 
+ managedObjectClass OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..255))
+         MAX-ACCESS    accessible-for-notify
+         STATUS        current
+         DESCRIPTION
+                 "This object identifies the class of network to which the
+                 subject alarm is related, e.g. STENTOFON IP substation"
+         ::= { alarmObjects 1 }
+ 
+ managedObjectInstance OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE (0..255))
+         MAX-ACCESS  accessible-for-notify
+         STATUS      current
+         DESCRIPTION
+                 "This object identifies the instance (of a class) of network resource to 
+                  which the subject alarm is related, e.g. ipstation-26.stentofon.com or 10.12.4.26"
+         ::= { alarmObjects 2 }
+ 
+ severity OBJECT-TYPE
+    SYNTAX     INTEGER { indeterminate(0), critical(1), major(2), minor(3), warning(4), info(5), cleared(6) }
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+       "The severity of the alarm according to X.733."
+ ::= { alarmObjects 3 }
+ 
+ timestamp OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..255))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+       "The timestamp of the alarm as a string: 'yyyy.MM.dd-HH.mm.ss'"
+ ::= { alarmObjects 4 }
+ 
+ description OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+       "Specific problem description."
+ ::= { alarmObjects 5 }
+ 
+ -- ----------------------------------------------------------------------
+ --  Alarms / Traps
+ -- ----------------------------------------------------------------------
+ 
+ logEvent NOTIFICATION-TYPE
+    OBJECTS    
+    {
+        managedObjectClass,
+        managedObjectInstance,
+        severity,
+        timestamp,
+        description
+    }
+    STATUS     current
+    DESCRIPTION
+       "This trap is a wrapper for an syslog log event with a uncpecified facilty."
+ ::= { alarmNotifications 1000 }
+ 
+ debugLogEvent NOTIFICATION-TYPE
+    OBJECTS    
+    {
+        managedObjectClass,
+        managedObjectInstance,
+        severity,
+        timestamp,
+        description
+    }
+    STATUS     current
+    DESCRIPTION
+       "This trap is a wrapper for an syslog log event with facilty local0 (Debug Log)."
+ ::= { alarmNotifications 1001 }
+ 
+ systemLogEvent NOTIFICATION-TYPE
+    OBJECTS    
+    {
+        managedObjectClass,
+        managedObjectInstance,
+        severity,
+        timestamp,
+        description
+    }
+    STATUS     current
+    DESCRIPTION
+       "This trap is a wrapper for an syslog log event with facilty local0 (System Log)."
+ ::= { alarmNotifications 1002 }
+ 
+ callLogEvent NOTIFICATION-TYPE
+    OBJECTS    
+    {
+        managedObjectClass,
+        managedObjectInstance,
+        severity,
+        timestamp,
+        description
+    }
+    STATUS     current
+    DESCRIPTION
+       "This trap is a wrapper for an syslog log event with facilty local0 (Call statisics Log)."
+ ::= { alarmNotifications 1003 }
+ 
+ 
+ END

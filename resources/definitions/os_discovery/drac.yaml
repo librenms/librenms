@@ -491,4 +491,24 @@ modules:
                             oid: amperageProbeType
                             op: '!='
                             value: 26
-
+        percent:
+            data:
+                -
+                    oid: IDRAC-MIB-SMIv2::physicalDiskTable
+                    value: IDRAC-MIB-SMIv2::physicalDiskProgress
+                    num_oid: '.1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.51.{{ $index }}'
+                    descr: '{{ IDRAC-MIB-SMIv2::physicalDiskName }} Operation Progress'
+                    index: 'physicalDiskProgress.{{ $index }}'
+                    group: 'Storage'
+                -
+                    oid: IDRAC-MIB-SMIv2::physicalDiskTable
+                    value: IDRAC-MIB-SMIv2::physicalDiskRemainingRatedWriteEndurance
+                    num_oid: '.1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.49.{{ $index }}'
+                    descr: '{{ IDRAC-MIB-SMIv2::physicalDiskName }} Remaining Rated Write Endurance'
+                    index: 'physicalDiskRemainingRatedWriteEndurance.{{ $index }}'
+                    group: 'Storage'
+                    skip_values:
+                        -
+                            oid: IDRAC-MIB-SMIv2::physicalDiskRemainingRatedWriteEndurance
+                            op: '='
+                            value: 255
