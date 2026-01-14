@@ -84,6 +84,7 @@ class EventlogController extends TableController
             })
             ->when($request->to, function ($query, $to): void {
                 $query->where('datetime', '<=', $to);
+            })
             ->when($request->message, function ($query) use ($request): void {
                 $query->where('message', 'like', '%' . $request->message . '%');
             })
