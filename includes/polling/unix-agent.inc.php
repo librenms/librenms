@@ -190,11 +190,12 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
     // Use agent DMI data if available
     if (isset($agent_data['dmi'])) {
         // Parse DMI string into associative array
-        $dmi = array_column(array_map(fn($l) => explode('=', $l, 2), explode("\n", trim($agent_data['dmi']))), 1, 0);
-        $getDmiValue = function($system_key, $baseboard_key, $generic_value) use ($dmi) {
+        $dmi = array_column(array_map(fn ($l) => explode('=', $l, 2), explode("\n", trim($agent_data['dmi']))), 1, 0);
+        $getDmiValue = function ($system_key, $baseboard_key, $generic_value) use ($dmi) {
             if (isset($dmi[$system_key]) && $dmi[$system_key] !== $generic_value) {
                 return $dmi[$system_key];
             }
+
             return $dmi[$baseboard_key] ?? '';
         };
 
