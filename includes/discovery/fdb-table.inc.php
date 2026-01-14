@@ -18,15 +18,15 @@ foreach ($sql_result as $entry) {
 
 $insert = []; // populate $insert with database entries
 if (file_exists(LibrenmsConfig::get('install_dir') . "/includes/discovery/fdb-table/{$device['os']}.inc.php")) {
-    require LibrenmsConfig::get('install_dir') . "/includes/discovery/fdb-table/{$device['os']}.inc.php";
+    require base_path("includes/discovery/fdb-table/{$device['os']}.inc.php");
 } elseif ($device['os'] == 'ios' || $device['os'] == 'iosxe' || $device['os'] == 'nxos') {
     //ios,iosxe,nxos are all Cisco
-    include LibrenmsConfig::get('install_dir') . '/includes/discovery/fdb-table/ios.inc.php';
+    include base_path('includes/discovery/fdb-table/ios.inc.php');
 }
 
 if (empty($insert)) {
     // Check generic Q-BRIDGE-MIB and BRIDGE-MIB
-    include LibrenmsConfig::get('install_dir') . '/includes/discovery/fdb-table/bridge.inc.php';
+    include base_path('includes/discovery/fdb-table/bridge.inc.php');
 }
 
 if (! empty($insert)) {

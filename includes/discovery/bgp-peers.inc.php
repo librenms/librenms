@@ -8,7 +8,7 @@ use LibreNMS\Util\IP;
 // Load OS specific file
 //
 if (file_exists(LibrenmsConfig::get('install_dir') . "/includes/discovery/bgp-peers/{$device['os']}.inc.php")) {
-    include LibrenmsConfig::get('install_dir') . "/includes/discovery/bgp-peers/{$device['os']}.inc.php";
+    include base_path("includes/discovery/bgp-peers/{$device['os']}.inc.php");
 }
 
 if (empty($bgpLocalAs)) {
