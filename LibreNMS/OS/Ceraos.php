@@ -60,7 +60,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
 
         $ifDescr = SnmpQuery::walk('IF-MIB::ifDescr')->valuesByIndex();
         $num_radios = 0;
-        foreach ($ifDescr as $idx => $cols) {
+        foreach ($ifDescr as $cols) {
             if (($cols['IF-MIB::ifDescr'] ?? null) === 'Radio') {
                 $num_radios++;
             }
