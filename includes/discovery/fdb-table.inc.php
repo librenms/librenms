@@ -1,7 +1,6 @@
 <?php
 
 // Build a dictionary of vlans in database
-use App\Facades\LibrenmsConfig;
 
 $vlans_dict = [];
 foreach (dbFetchRows('SELECT `vlan_id`, `vlan_vlan` from `vlans` WHERE `device_id` = ?', [$device['device_id']]) as $vlan_entry) {
@@ -17,7 +16,7 @@ foreach ($sql_result as $entry) {
 }
 
 $insert = []; // populate $insert with database entries
-if (file_exists(LibrenmsConfig::get('install_dir') . "/includes/discovery/fdb-table/{$device['os']}.inc.php")) {
+if (file_exists(base_path("includes/discovery/fdb-table/{$device['os']}.inc.php"))) {
     require base_path("includes/discovery/fdb-table/{$device['os']}.inc.php");
 } elseif ($device['os'] == 'ios' || $device['os'] == 'iosxe' || $device['os'] == 'nxos') {
     //ios,iosxe,nxos are all Cisco

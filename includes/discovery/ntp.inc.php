@@ -26,9 +26,7 @@
  * )
  */
 
-use App\Facades\LibrenmsConfig;
-
-if (isset($device['os_group']) && file_exists(LibrenmsConfig::get('install_dir') . "/includes/discovery/ntp/{$device['os_group']}.inc.php")) {
+if (isset($device['os_group']) && file_exists(base_path("includes/discovery/ntp/{$device['os_group']}.inc.php"))) {
     include base_path("includes/discovery/ntp/{$device['os_group']}.inc.php");
 }
 
