@@ -4,10 +4,9 @@ require 'includes/html/graphs/common.inc.php';
 
 $rrd_filename = Rrd::name($device['hostname'], ['app', 'ceph', $app->app_id, 'df', $vars['pool']]);
 
-$rrd_options[] = '-l';
-$rrd_options[] = '0';
-$rrd_options[] = '-b';
-$rrd_options[] = '1024';
+$graph_params->scale_min = 0;
+$graph_params->base = 1024;
+
 $rrd_options[] = 'COMMENT:Bytes         Min         Cur        Max\\n';
 
 $usedc = 'CC0000';

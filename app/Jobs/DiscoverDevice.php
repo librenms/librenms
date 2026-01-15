@@ -10,6 +10,7 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
 use App\Polling\Measure\MeasurementManager;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -58,10 +59,14 @@ class DiscoverDevice implements ShouldQueue
             $this->device->device_id,
             $measurement->getDuration()));
 
-        Log::channel('single')->alert(sprintf('INFO: device:discover %s (%s) discovered in %0.3fs',
+        Log::channel('log_file')->alert(sprintf('INFO: device:discover %s (%s) discovered in %0.3fs',
             $this->device->hostname,
             $this->device->device_id,
             $measurement->getDuration()));
+
+        $this->device->last_discovered = Carbon::now();
+        $this->device->last_discovered_timetaken = $measurement->getDuration();
+        $this->device->save();
 
         DeviceDiscovered::dispatch($this->device);
     }

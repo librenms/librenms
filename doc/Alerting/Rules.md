@@ -124,6 +124,7 @@ Alert when:
   softwareLoopback: `macros.port_usage_perc >= 80 AND
   port.port_descr_type != "client" AND ports.ifType != "softwareLoopback"`
 - Alert when mac address is located on your network `ipv4_mac.mac_address = "2c233a756912"`
+- Device MTU test fails: `devices.mtu_status != 1`
 
 ## Alert Rules Collection
 

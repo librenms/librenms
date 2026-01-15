@@ -30,6 +30,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
+use Exception;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Enum\Severity;
@@ -37,6 +38,7 @@ use LibreNMS\Exceptions\FileExistsException;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Proc;
+use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Rewrite;
 use Log;
@@ -124,7 +126,7 @@ class Rrd extends BaseDatastore
             }
 
             return $this->isSyncRunning() && ($dual_process ? $this->isAsyncRunning() : true);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to start RRD datastore: ' . $e->getMessage());
 
             return false;
@@ -394,7 +396,7 @@ class Rrd extends BaseDatastore
      * @param  array  $options  rrdtool command options
      * @return array the output of stdout and stderr in an array
      *
-     * @throws \Exception thrown when the rrdtool process(s) cannot be started
+     * @throws Exception thrown when the rrdtool process(s) cannot be started
      */
     private function command(string $command, string $filename, array $options = []): array
     {
@@ -486,27 +488,23 @@ class Rrd extends BaseDatastore
      * Get array of all rrd files for a device,
      * via rrdached or localdisk.
      *
-     * @param  array  $device  device for which we get the rrd's
-     * @return array array of rrd files for this host
+     * @param  string  $hostname  hostname of the device
+     * @return string[] array of rrd files for this host
      */
-    public function getRrdFiles($device)
+    public function getRrdFiles(string $hostname): array
     {
         if ($this->rrdcached) {
-            $filename = sprintf('/%s', self::safeName($device['hostname']));
-            $rrd_files = $this->command('list', $filename);
-            // Command output is an array, create new array with each filename as a item in array.
-            $rrd_files_array = explode("\n", trim((string) $rrd_files[0]));
-            // Remove status line from response
-            array_pop($rrd_files_array);
+            $output = $this->command('list', '/' . self::safeName($hostname));
+
+            $files = explode("\n", trim($output[0] ?? ''));
+            array_pop($files); // remove rrdcached status line
         } else {
-            $rrddir = $this->dirFromHost($device['hostname']);
-            $pattern = sprintf('%s/*.rrd', $rrddir);
-            $rrd_files_array = glob($pattern);
+            $files = glob($this->dirFromHost($hostname) . '/*.rrd') ?: [];
         }
 
-        sort($rrd_files_array);
+        sort($files);
 
-        return $rrd_files_array;
+        return $files;
     }
 
     /**
@@ -523,7 +521,7 @@ class Rrd extends BaseDatastore
         $entries = [];
         $separator = '-';
 
-        $rrdfile_array = $this->getRrdFiles($device);
+        $rrdfile_array = $this->getRrdFiles($device['hostname']);
         if ($category) {
             $pattern = sprintf('%s-%s-%s-%s', 'app', $app_name, $app_id, $category);
         } else {
@@ -696,11 +694,19 @@ class Rrd extends BaseDatastore
      */
     public static function version(): ?string
     {
-        $proc = new Process([LibrenmsConfig::get('rrdtool', 'rrdtool'), '--version']);
-        $proc->run();
-        $parts = explode(' ', $proc->getOutput(), 3);
+        try {
+            $rrd = app(RrdProcess::class, ['timeout' => 10]);
+            $output = $rrd->run('--version');
+            $parts = explode(' ', $output, 3);
 
-        return $proc->isSuccessful() && isset($parts[1]) ? str_replace('1.7.01.7.0', '1.7.0', $parts[1]) : null;
+            if (isset($parts[1])) {
+                return str_replace('1.7.01.7.0', '1.7.0', $parts[1]);
+            }
+        } catch (Exception) {
+            //
+        }
+
+        return null;
     }
 
     /**

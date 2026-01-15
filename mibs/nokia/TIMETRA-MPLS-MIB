@@ -37,6 +37,7 @@ IMPORTS
     TmnxCBFClasses, TmnxEnabledDisabled,
     TmnxMplsLabel, TmnxMplsLabelOrZero,
     TmnxMplsLspBandwidth,
+    TmnxMplsLspBandwidthOrNone,
     TmnxMplsTpGlobalID, TmnxMplsTpNodeID,
     TmnxNhgDownReason, TmnxOperState,
     TmnxRsvpDSTEClassType, TmnxTimeInterval,
@@ -226,7 +227,24 @@ TmnxMplsLspFailCode              ::= TEXTUAL-CONVENTION
         mplsV6Down                 (61),
         lspAdminDown               (62),
         pathAdminDown              (63),
-        templateAdminDown          (64)
+        templateAdminDown          (64),
+        pceAssocConflict           (65),
+        pathRetried                (66),
+        clearCommand               (67),
+        nonActiveSecondary         (68),
+        autoBandwidthAdjustment    (69),
+        pathDegraded               (71),
+        lspSelfPingTimeout         (72),
+        rsvpError                  (73),
+        p2mpInstanceAdminDown      (74),
+        bfdDown                    (75),
+        rsvpNeighborDown           (76),
+        resvTimeout                (77),
+        resvTear                   (78),
+        frrPathDown                (79),
+        lspInitRetryTimeout        (80),
+        iomProgrammingFailure      (81),
+        delayMetricLimitExceeded   (82)
     }
 
 TmnxMplsLabelOwner               ::= TEXTUAL-CONVENTION
@@ -309,13 +327,14 @@ TmnxMplsLspAutoBWLastAdjCause    ::= TEXTUAL-CONVENTION
         "TmnxMplsLspAutoBWLastAdjCause is an enumerated integer that specifies
          cause of auto-bandwidth last adjustment."
     SYNTAX      INTEGER {
-        none             (0),
-        manual           (1),
-        normal           (2),
-        overflow         (3),
-        vllCAC           (4),
-        underflow        (5),
-        activePathChange (6)
+        none                     (0),
+        manual                   (1),
+        normal                   (2),
+        overflow                 (3),
+        vllCAC                   (4),
+        underflow                (5),
+        activePathChange         (6),
+        lspContainerOptimization (7)
     }
 
 TmnxMplsLspBgpRSVPLSPTunState    ::= TEXTUAL-CONVENTION
@@ -345,6 +364,23 @@ TmnxMplsLspAddrType              ::= TEXTUAL-CONVENTION
         ipv4    (1),
         nodeId  (2),
         ipv6    (3)
+    }
+
+TmnxMplsResourceOwner            ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxMplsResourceOwner is an enumerated integer that specifies the
+         owners for MPLS resources."
+    SYNTAX      INTEGER {
+        rsvp          (1),
+        ldp           (2),
+        bgp           (3),
+        mplsTp        (4),
+        staticSvc     (5),
+        srMpls        (6),
+        bier          (7),
+        treeSid       (8),
+        reservedBlock (9)
     }
 
 tmnxMplsObjs                     OBJECT IDENTIFIER ::= { tmnxSRObjs 6 }
@@ -452,7 +488,8 @@ VRtrMplsLspEntry                 ::= SEQUENCE
     vRtrMplsLspBfdEnable             TruthValue,
     vRtrMplsLspBfdPingIntvl          Unsigned32,
     vRtrMplsLspNgFromAddr            InetAddress,
-    vRtrMplsLspNgToAddr              InetAddress
+    vRtrMplsLspNgToAddr              InetAddress,
+    vRtrMplsLspIgpScSrOverSrTe       TruthValue
 }
 
 vRtrMplsLspIndex                 OBJECT-TYPE
@@ -570,7 +607,8 @@ vRtrMplsLspType                  OBJECT-TYPE
         meshP2pSrTe     (11),
         oneHopP2pSrTe   (12),
         pceInitP2pSrTe  (13),
-        onDemandP2pSrTe (15)
+        onDemandP2pSrTe (15),
+        memberP2p       (16)
     }
     MAX-ACCESS  read-create
     STATUS      current
@@ -599,10 +637,10 @@ vRtrMplsLspType                  OBJECT-TYPE
          using One-Hop LSP Template values configured in the associated row
          entry of vRtrMplsLspTemplateTable.
 
-         When the value of vRtrMplsLspType is set to 'segmentRouting', it
-         specifies that the LSP is used for segment routing and vRtrMplsLspType
-         can only be set to 'segmentRouting' when the value of vRtrMplsLspIndex
-         is greater than 65535.
+         When the value of vRtrMplsLspType is set to 'srTe', it specifies that
+         the LSP is used for segment routing and vRtrMplsLspType can only be
+         set to 'srTe' when the value of vRtrMplsLspIndex is greater than
+         65535.
 
          A 'wrongValue' error is returned if an attempt is made to set an
          object in the row entry where the value of vRtrMplsLspType is
@@ -631,7 +669,11 @@ vRtrMplsLspType                  OBJECT-TYPE
          that the LSP is a point-to-point created dynamically on receiving a
          on-demand request from network policies, using onDemandP2pSrTe LSP
          Template values configured in the associated row entry of
-         vRtrMplsLspTemplateTable."
+         vRtrMplsLspTemplateTable.
+
+         When value of the vRtrMplsLspType is 'memberP2p', it specifies that
+         the LSP is a point-to-point LSP which dynamically created by the
+         system and is a member of a Container LSP."
     DEFVAL      { dynamic }
     ::= { vRtrMplsLspEntry 9 }
 
@@ -1691,7 +1733,7 @@ vRtrMplsLspNgFromAddr            OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The value of vRtrMplsLspNgFromAddr specifices the source address of
+        "The value of vRtrMplsLspNgFromAddr specifies the source address of
          this LSP."
     ::= { vRtrMplsLspEntry 77 }
 
@@ -1700,9 +1742,31 @@ vRtrMplsLspNgToAddr              OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The value of vRtrMplsLspNgToAddr specifices the destination address of
+        "The value of vRtrMplsLspNgToAddr specifies the destination address of
          this LSP."
     ::= { vRtrMplsLspEntry 78 }
+
+vRtrMplsLspIgpScSrOverSrTe       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspIgpScSrOverSrTe specifies whether the SR-TE
+         LSP can be used as an SRv4/SRv6 IGP shortcut.
+
+         The object vRtrMplsLspIgpScSrOverSrTe is applicable to SR-TE LSPs.
+
+         When vRtrMplsLspIgpScSrOverSrTe is set to  'true', the SR-TE LSP can used as
+         an SRv4/SRv6 IGP shortcut.
+
+         When vRtrMplsLspIgpScSrOverSrTe is set to 'false', the SR-TE LSP
+         cannot be used as an SRv4/SRv6 shortcut.
+
+         An 'inconsistentValue' error is returned if an attempt is made to set
+         this object to a non-default value when the value of the object
+         vRtrMplsLspIgpShortcut is not set to 'true'."
+    DEFVAL      { false }
+    ::= { vRtrMplsLspEntry 79 }
 
 vRtrMplsLspStatTable             OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrMplsLspStatEntry
@@ -1913,11 +1977,13 @@ vRtrMplsLspSelfPingOamNoRsc      OBJECT-TYPE
 vRtrMplsLspPathTableSpinlock     OBJECT-TYPE
     SYNTAX      TestAndIncr
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "voluntary serialization control for vRtrMplsLspPathTable. Primarily
          used by SNMP manager to coordinate changes to
-         vRtrMplsLspPathInheritance."
+         vRtrMplsLspPathInheritance.
+
+         Obsoleted in 23.3."
     DEFVAL      { 0 }
     ::= { tmnxMplsObjs 3 }
 
@@ -2035,7 +2101,11 @@ VRtrMplsLspPathEntry             ::= SEQUENCE
     vRtrMplsLspPathLastMBBFailCode   TmnxMplsLspFailCode,
     vRtrMplsLspPathDegraded          TruthValue,
     vRtrMplsLspPathDegradedReason    BITS,
-    vRtrMplsLspPathReturnPathLabel   Unsigned32
+    vRtrMplsLspPathReturnPathLabel   Unsigned32,
+    vRtrMplsLspPathBfdSrcAddrType    InetAddressType,
+    vRtrMplsLspPathBfdSrcAddr        InetAddress,
+    vRtrMplsLspPathDelayMetricLimit  Unsigned32,
+    vRtrMplsLspPathLspIdentifier     Unsigned32
 }
 
 vRtrMplsLspPathRowStatus         OBJECT-TYPE
@@ -3034,7 +3104,7 @@ vRtrMplsLspPathBfdUpWaitTimer    OBJECT-TYPE
     ::= { vRtrMplsLspPathEntry 73 }
 
 vRtrMplsLspPathBfdUpWaitTmLeft   OBJECT-TYPE
-    SYNTAX      Unsigned32 (1..60)
+    SYNTAX      Unsigned32 (0..60)
     UNITS       "seconds"
     MAX-ACCESS  read-only
     STATUS      current
@@ -3068,7 +3138,7 @@ vRtrMplsLspPathBfdStartFailRsn   OBJECT-TYPE
     ::= { vRtrMplsLspPathEntry 76 }
 
 vRtrMplsLspPathBfdOperUpWaitTmr  OBJECT-TYPE
-    SYNTAX      Unsigned32 (1..60)
+    SYNTAX      Unsigned32 (0..60)
     UNITS       "seconds"
     MAX-ACCESS  read-only
     STATUS      current
@@ -3138,14 +3208,14 @@ vRtrMplsLspPathDegradedReason    OBJECT-TYPE
 
          If 'frrInUse' bit is set, LSP path is degraded because fast-reroute is
          in use. If 'softPreempted' bit is set, LSP path is degraded because it
-         has been soft preempted. If 'bfd-down' bit is set, LSP path is
-         degraded because BFD session is down for this LSP path. If
-         'manual-switch' bit is set, LSP path is manually degraded because a
-         manual switch was triggered for the LSP."
+         has been soft preempted. If 'bfdDown' bit is set, LSP path is degraded
+         because BFD session is down for this LSP path. If 'manual-switch' bit
+         is set, LSP path is manually degraded because a manual switch was
+         triggered for the LSP."
     ::= { vRtrMplsLspPathEntry 81 }
 
 vRtrMplsLspPathReturnPathLabel   OBJECT-TYPE
-    SYNTAX      Unsigned32 (32..1048512 | 4294967295)
+    SYNTAX      Unsigned32 (32..1048575 | 4294967295)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -3153,6 +3223,61 @@ vRtrMplsLspPathReturnPathLabel   OBJECT-TYPE
          label for the LSP Path."
     DEFVAL      { 4294967295 }
     ::= { vRtrMplsLspPathEntry 82 }
+
+vRtrMplsLspPathBfdSrcAddrType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathBfdSrcAddrType specifies the address type
+         of vRtrMplsLspPathBfdSrcAddr."
+    DEFVAL      { unknown }
+    ::= { vRtrMplsLspPathEntry 83 }
+
+vRtrMplsLspPathBfdSrcAddr        OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsLspPathBfdSrcAddr specifies the source address of BFD
+         packets when BFD is enabled on this LSP path.
+
+         The address type of vRtrMplsLspPathBfdSrcAddr is specified by
+         vRtrMplsLspPathBfdSrcAddrType.
+
+         When vRtrMplsLspPathBfdSrcAddr has not been explicitly set, the sender
+         address of the LSP will be used as source address of BFD packets."
+    DEFVAL      { ''H }
+    ::= { vRtrMplsLspPathEntry 84 }
+
+vRtrMplsLspPathDelayMetricLimit  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..16777215)
+    UNITS       "microseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathDelayMetricLimit specifies the delay
+         metric limit when vRtrMplsLspExtMetricType is set to 'delay'.
+
+         When the value of vRtrMplsLspPathDelayMetricLimit is set to default
+         value and vRtrMplsLspExtMetricType is set to 'delay', there is no
+         limit on the end-to-end path delay.
+
+         When the value of vRtrMplsLspPathDelayMetricLimit is set to
+         non-default value and vRtrMplsLspExtMetricType is set to 'delay', only
+         paths that have end-to-end delay less than the configured limit will
+         be considered."
+    DEFVAL      { 0 }
+    ::= { vRtrMplsLspPathEntry 85 }
+
+vRtrMplsLspPathLspIdentifier     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This value of vRtrMplsLspPathLspIdentifier indicates the LSP
+         identifier that is signaled for this LSP path entry."
+    ::= { vRtrMplsLspPathEntry 86 }
 
 vRtrMplsLspPathStatTable         OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrMplsLspPathStatEntry
@@ -3433,7 +3558,14 @@ VRtrMplsGeneralEntry             ::= SEQUENCE
     vRtrMplsGenRsvpPccOperState      TmnxOperState,
     vRtrMplsGenRsvpPceOperState      TmnxOperState,
     vRtrMplsGenSrTePccOperState      TmnxOperState,
-    vRtrMplsGenSrTePceOperState      TmnxOperState
+    vRtrMplsGenSrTePceOperState      TmnxOperState,
+    vRtrMplsGenStrictEroNhopDirRes   TruthValue,
+    vRtrMplsGenRsvpResigOnIgpEvt     TruthValue,
+    vRtrMplsGenSrTeResigOnIgpOvl     TruthValue,
+    vRtrMplsGenLspBsidBlkName        TLNamedItemOrEmpty,
+    vRtrMplsGenLspHistory            TruthValue,
+    vRtrMplsGenLspHistAdminState     TmnxAdminState,
+    vRtrMplsGenP2mpTtlPropagate      TruthValue
 }
 
 vRtrMplsGeneralLastChange        OBJECT-TYPE
@@ -4164,8 +4296,8 @@ vRtrMplsGenMaxBypassPlrAssoc     OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The value of vRtrMplsGenMaxBypassPlrAssoc specifies the maxiumum
-         bypass PLR assocations."
+        "The value of vRtrMplsGenMaxBypassPlrAssoc specifies the maximum bypass
+         PLR associations."
     DEFVAL      { 16 }
     ::= { vRtrMplsGeneralEntry 51 }
 
@@ -4390,6 +4522,87 @@ vRtrMplsGenSrTePceOperState      OBJECT-TYPE
          operationally down."
     ::= { vRtrMplsGeneralEntry 66 }
 
+vRtrMplsGenStrictEroNhopDirRes   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGenStrictEroNhopDirRes specifies whether the
+         route to a strict next-hop in ERO of RSVP LSPs must be resolved using
+         only direct routes."
+    DEFVAL      { false }
+    ::= { vRtrMplsGeneralEntry 67 }
+
+vRtrMplsGenRsvpResigOnIgpEvt     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGenRsvpResigOnIgpEvt specifies whether or not
+         RSVP-TE LSPs will be resignaled when IGP event is received."
+    DEFVAL      { false }
+    ::= { vRtrMplsGeneralEntry 68 }
+
+vRtrMplsGenSrTeResigOnIgpOvl     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGenSrTeResigOnIgpOvl specifies whether or not
+         SR-TE LSPs will be resignaled when IGP overload is received."
+    DEFVAL      { false }
+    ::= { vRtrMplsGeneralEntry 69 }
+
+vRtrMplsGenLspBsidBlkName        OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGenLspBsidBlkName specifies the name identifying
+         the reserved label block for LSP binding SID."
+    DEFVAL      { "" }
+    ::= { vRtrMplsGeneralEntry 71 }
+
+vRtrMplsGenLspHistory            OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGenLspHistory specifies whether or not LSP
+         history is enabled."
+    DEFVAL      { false }
+    ::= { vRtrMplsGeneralEntry 72 }
+
+vRtrMplsGenLspHistAdminState     OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGenLspHistAdminState specifies whether or not LSP
+         history is being recorded.
+
+         When the value of vRtrMplsGenLspHistAdminState is set to 'inService',
+         LSP history will be recorded.
+
+         When the value of vRtrMplsGenLspHistAdminState is set to
+         'outOfService',  LSP history will stop being recorded and previously
+         recorded history  will remain intact.
+
+         This variable is not valid if LSP history is disabled i.e. when
+         vRtrMplsGenLspHistory is set to 'false'."
+    DEFVAL      { inService }
+    ::= { vRtrMplsGeneralEntry 73 }
+
+vRtrMplsGenP2mpTtlPropagate      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGenP2mpTtlPropagate specifies whether or not to
+         enable  TTL propagation for RSVP P2MP LSPs."
+    DEFVAL      { true }
+    ::= { vRtrMplsGeneralEntry 74 }
+
 vRtrMplsGeneralStatTable         OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrMplsGeneralStatEntry
     MAX-ACCESS  not-accessible
@@ -4452,7 +4665,8 @@ VRtrMplsGeneralStatEntry         ::= SEQUENCE
     vRtrMplsGenPceInitSrTeIpv6LspUp  Gauge32,
     vRtrMplsGenOnDemandSrTeLspOrig   Gauge32,
     vRtrMplsGenOnDemandSrTeIpv4LspUp Gauge32,
-    vRtrMplsGenOnDemandSrTeIpv6LspUp Gauge32
+    vRtrMplsGenOnDemandSrTeIpv6LspUp Gauge32,
+    vRtrMplsGenMemberP2pLspUp        Gauge32
 }
 
 vRtrMplsGeneralStaticLspOriginate OBJECT-TYPE
@@ -4830,6 +5044,16 @@ vRtrMplsGenOnDemandSrTeIpv6LspUp OBJECT-TYPE
          IPv6 LSPs of  vRtrMplsLspType 'onDemandP2pSrTe' that are operationally
          up in this virtual router."
     ::= { vRtrMplsGeneralStatEntry 40 }
+
+vRtrMplsGenMemberP2pLspUp        OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGenMemberP2pLspUp indicates the number of LSPs of
+          vRtrMplsLspType 'memberP2p' that are operationally up in this virtual
+         router."
+    ::= { vRtrMplsGeneralStatEntry 41 }
 
 vRtrMplsIfTable                  OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrMplsIfEntry
@@ -5945,6 +6169,40 @@ vRtrMplsLspPathManDegState       OBJECT-TYPE
          vRtrMplsLspPathDegraded is 'false', the LSP path is not manually
          degraded."
     ::= { tmnxMplsNotificationObjects 25 }
+
+tmnxNotifyMplsResourceType       OBJECT-TYPE
+    SYNTAX      INTEGER {
+        nhlfe  (1),
+        ltn    (2),
+        labels (3)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNotifyMplsResourceType indicates the MPLS resource."
+    ::= { tmnxMplsNotificationObjects 26 }
+
+tmnxNotifyMplsResourceUsagePct   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxNotifyMplsResourceUsagePct indicates the utilization
+         percentage at the moment the notification using this object was
+         raised."
+    ::= { tmnxMplsNotificationObjects 27 }
+
+vRtrMplsLspContCompNominalLsps   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "During LSP container optimization, if the computed value for number of
+         nominal LSPs exceeds the min or max member LSP limits configured for
+         the LSP container, the value of vRtrMplsLspContNumNominalLsps
+         specifies the computed value for number of nominal LSPs before being
+         adjusted to fall within the min and max member LSP limits."
+    ::= { tmnxMplsNotificationObjects 28 }
 
 vRtrMplsLabelRangeTable          OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrMplsLabelRangeEntry
@@ -9246,7 +9504,8 @@ VRtrMplsLspTemplateEntry         ::= SEQUENCE
     vRtrMplsLspTempBfdUpWaitTimer    Unsigned32,
     vRtrMplsLspTempSelfPing          INTEGER,
     vRtrMplsLspTempAddrFamily        INTEGER,
-    vRtrMplsLspTemplateEgrStatsMode  INTEGER
+    vRtrMplsLspTemplateEgrStatsMode  INTEGER,
+    vRtrMplsLspTempIgpScSrOverSrTe   TruthValue
 }
 
 vRtrMplsLspTemplateName          OBJECT-TYPE
@@ -9296,7 +9555,8 @@ vRtrMplsLspTemplateType          OBJECT-TYPE
         onehopP2PSrTe   (4),
         meshP2PSrTe     (5),
         pceInitP2PSrTe  (6),
-        onDemandP2pSrTe (8)
+        onDemandP2pSrTe (8),
+        memberP2p       (9)
     }
     MAX-ACCESS  read-create
     STATUS      current
@@ -9311,7 +9571,8 @@ vRtrMplsLspTemplateType          OBJECT-TYPE
          'onehopP2PSrTe (4)'- auto creation of one-Hop P2P SrTe LSPs.
          'meshP2PSrTe (5)'  - auto creation of mesh P2P SrTe LSPs.
          'pceInitP2PSrTe (6)'- auto creation of PCE-Initiated P2P SR-Te LSPs.
-         'onDemandP2pSrTe (8)'    - auto creation of On-demand P2P SR-TE LSPs."
+         'onDemandP2pSrTe (8)'    - auto creation of On-demand P2P SR-TE LSPs.
+         'memberP2p (9)'    - auto creation of P2P RSVP LSPs which are members of a Container LSP."
     DEFVAL      { unknown }
     ::= { vRtrMplsLspTemplateEntry 5 }
 
@@ -10013,7 +10274,7 @@ vRtrMplsLspTempBfdPingIntvl      OBJECT-TYPE
          for periodic LSP ping for BFD bootstrapping.
 
          The object vRtrMplsLspTempBfdPingIntvl is applicable to LSP templates
-         with  vRtrMplsLspTemplateType set to 'oneHopP2P' or 'meshP2P'.
+         with  vRtrMplsLspTemplateType set to 'onehopP2P' or 'meshP2P'.
 
          When the value of vRtrMplsLspTempBfdPingIntvl is set to '0', it
          disables LSP pings for BFD bootstrapping."
@@ -10078,7 +10339,7 @@ vRtrMplsLspTempMaxSrLabels       OBJECT-TYPE
         "The value of vRtrMplsLspTempMaxSrLabels specifies maximum segment
          routing label stack size for this LSP template.
 
-          The default IXR platform is 3 and maximum value supported is 5."
+          The default IXR platform is 3 and maximum value supported is 10."
     DEFVAL      { 6 }
     ::= { vRtrMplsLspTemplateEntry 55 }
 
@@ -10170,8 +10431,9 @@ vRtrMplsLspTempPathCompMeth      OBJECT-TYPE
 
 vRtrMplsLspTempMetricType        OBJECT-TYPE
     SYNTAX      INTEGER {
-        igp (1),
-        te  (2)
+        igp   (1),
+        te    (2),
+        delay (3)
     }
     MAX-ACCESS  read-create
     STATUS      current
@@ -10183,6 +10445,9 @@ vRtrMplsLspTempMetricType        OBJECT-TYPE
 
          If the value of vRtrMplsLspTempMetricType is 'te', the metric used is
          TE.
+
+         If the value of vRtrMplsLspTempMetricType is 'delay', the metric used
+         is DELAY.
 
          The default value for vRtrMplsLspTempMetricType is 'igp'."
     DEFVAL      { igp }
@@ -10236,8 +10501,8 @@ vRtrMplsLspTempBfdUpWaitTimer    OBJECT-TYPE
          vRtrMplsLspTempBfdFailureAction  is set to 'failoverOrDown'.
 
          The timer object is applicable for LSP templates with
-         vRtrMplsLspTemplateType set to 'oneHopP2PSrTe', 'meshP2PSrTe' or
-         pceInitP2PSrte'.
+         vRtrMplsLspTemplateType set to 'onehopP2PSrTe', 'meshP2PSrTe' or
+         pceInitP2PSrTe'.
 
          The timer is started when BFD is first enabled on a path or BFD
          transitions from up to down. When this timer expires and if BFD has
@@ -10304,6 +10569,28 @@ vRtrMplsLspTemplateEgrStatsMode  OBJECT-TYPE
          collected stats will be aggregated."
     DEFVAL      { per-fc }
     ::= { vRtrMplsLspTemplateEntry 68 }
+
+vRtrMplsLspTempIgpScSrOverSrTe   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspTempIgpScSrOverSrTe specifies whether the
+         SR-TE LSP can be used as an SRv4/SRv6 IGP shortcut.
+
+         The object vRtrMplsLspTempIgpScSrOverSrTe is applicable to SR-TE LSPs.
+
+         When vRtrMplsLspTempIgpScSrOverSrTe is set to  'true', the SR-TE LSP can used as
+         an SRv4/SRv6 IGP shortcut.
+
+         When vRtrMplsLspTempIgpScSrOverSrTe is set to 'false', the SR-TE LSP
+         cannot be used as an SRv4/SRv6 shortcut.
+
+         An 'inconsistentValue' error is returned if an attempt is made to set
+         this object to a non-default value when the value of the object
+         vRtrMplsLspTemplateIgpShortcut is not set to 'true'."
+    DEFVAL      { false }
+    ::= { vRtrMplsLspTemplateEntry 69 }
 
 vRtrMplsLspAutoBWTableLastChg    OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -10872,7 +11159,7 @@ vRtrMplsLspAutoBWUseLastAdjBW    OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of vRtrMplsLspAutoBWUseLastAdjBW specifies whether use of
-         last adjusted bandwidth is enabled or diabled.
+         last adjusted bandwidth is enabled or disabled.
 
          When the value is 'true' the use of last adjusted bandwidth is
          enabled, and LSP paths will be signalled with the last adjusted
@@ -10957,7 +11244,8 @@ VRtrMplsLspPathOperEntry         ::= SEQUENCE
     vRtrMplsLspPathOperLocalSrProt   INTEGER,
     vRtrMplsLspPathOperLabelStackRed INTEGER,
     vRtrMplsLspPathNgFNAddrType      InetAddressType,
-    vRtrMplsLspPathNgFNAddr          InetAddress
+    vRtrMplsLspPathNgFNAddr          InetAddress,
+    vRtrMplsLspPathOperDelayMetricLm Unsigned32
 }
 
 vRtrMplsLspPathOperSetupPriority OBJECT-TYPE
@@ -11048,7 +11336,7 @@ vRtrMplsLspPathOperRecordLabel   OBJECT-TYPE
     ::= { vRtrMplsLspPathOperEntry 4 }
 
 vRtrMplsLspPathOperHopLimit      OBJECT-TYPE
-    SYNTAX      Unsigned32 (2..255)
+    SYNTAX      Unsigned32 (0 | 2..255)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -11306,7 +11594,8 @@ vRtrMplsLspPathOperMetricType    OBJECT-TYPE
     SYNTAX      INTEGER {
         notApplicable (0),
         igp           (1),
-        te            (2)
+        te            (2),
+        delay         (3)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -11369,6 +11658,16 @@ vRtrMplsLspPathNgFNAddr          OBJECT-TYPE
         "The value of vRtrMplsLspPathNgFNAddr indicates the IP address of the
          node in the LSP path at which the LSP path failed."
     ::= { vRtrMplsLspPathOperEntry 22 }
+
+vRtrMplsLspPathOperDelayMetricLm OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..16777215)
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathOperDelayMetricLm indicates the  delay
+         metric limit used for the currently operational LSP path."
+    ::= { vRtrMplsLspPathOperEntry 23 }
 
 vRtrMplsLabelObjs                OBJECT IDENTIFIER ::= { tmnxMplsObjs 45 }
 
@@ -12259,7 +12558,12 @@ VRtrMplsLspExtEntry              ::= SEQUENCE
     vRtrMplsLspExtOverrideTunElc     TruthValue,
     vRtrMplsLspExtPrefTransFrr       TruthValue,
     vRtrMplsLspExtBfdReturnPathLabel Unsigned32,
-    vRtrMplsLspExtSoftPreemption     TruthValue
+    vRtrMplsLspExtSoftPreemption     TruthValue,
+    vRtrMplsLspExtBsid               TmnxMplsLabelOrZero,
+    vRtrMplsLspExtBfdSrcAddrType     InetAddressType,
+    vRtrMplsLspExtBfdSrcAddr         InetAddress,
+    vRtrMplsLspExtLspContainer       TNamedItemOrEmpty,
+    vRtrMplsLspExtLspContMemberId    Unsigned32
 }
 
 vRtrMplsLspExtPceCompute         OBJECT-TYPE
@@ -12323,7 +12627,7 @@ vRtrMplsLspExtMaxSrLabels        OBJECT-TYPE
         "The value of vRtrMplsLspExtMaxSrLabels specifies maximum segment
          routing label stack size for this LSP.
 
-         The default IXR platform is 3 and maximum value supported is 5."
+         The default IXR platform is 3 and maximum value supported is 10."
     DEFVAL      { 6 }
     ::= { vRtrMplsLspExtEntry 5 }
 
@@ -12476,8 +12780,9 @@ vRtrMplsLspExtPathCompMeth       OBJECT-TYPE
 
 vRtrMplsLspExtMetricType         OBJECT-TYPE
     SYNTAX      INTEGER {
-        igp (1),
-        te  (2)
+        igp   (1),
+        te    (2),
+        delay (3)
     }
     MAX-ACCESS  read-create
     STATUS      current
@@ -12489,6 +12794,9 @@ vRtrMplsLspExtMetricType         OBJECT-TYPE
 
          If the value of vRtrMplsLspExtMetricType is 'te', the metric used is
          TE.
+
+         If the value of vRtrMplsLspExtMetricType is 'delay', the metric used
+         is DELAY.
 
          The default value for vRtrMplsLspExtPceReport is 'igp'."
     DEFVAL      { igp }
@@ -12650,7 +12958,7 @@ vRtrMplsLspExtPrefTransFrr       OBJECT-TYPE
     ::= { vRtrMplsLspExtEntry 24 }
 
 vRtrMplsLspExtBfdReturnPathLabel OBJECT-TYPE
-    SYNTAX      Unsigned32 (32..1048512 | 4294967295)
+    SYNTAX      Unsigned32 (32..1048575 | 4294967295)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -12668,6 +12976,68 @@ vRtrMplsLspExtSoftPreemption     OBJECT-TYPE
          preemption is enabled or disabled for P2MP RSVP LSPs."
     DEFVAL      { false }
     ::= { vRtrMplsLspExtEntry 26 }
+
+vRtrMplsLspExtBsid               OBJECT-TYPE
+    SYNTAX      TmnxMplsLabelOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspExtBsid specifies the binding SID (segment ID)
+         value used for the SR-TE LSP."
+    DEFVAL      { 0 }
+    ::= { vRtrMplsLspExtEntry 27 }
+
+vRtrMplsLspExtBfdSrcAddrType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspExtBfdSrcAddrType specifies the address type
+         of vRtrMplsLspExtBfdSrcAddr."
+    DEFVAL      { unknown }
+    ::= { vRtrMplsLspExtEntry 28 }
+
+vRtrMplsLspExtBfdSrcAddr         OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsLspExtBfdSrcAddr specifies the source address of BFD
+         packets when BFD is enabled on this LSP.
+
+         The address type of vRtrMplsLspExtBfdSrcAddr is specified by
+         vRtrMplsLspExtBfdSrcAddrType.
+
+         When vRtrMplsLspExtBfdSrcAddr has not been explicitly set, the sender
+         address of the LSP will be used as source address of BFD packets."
+    DEFVAL      { ''H }
+    ::= { vRtrMplsLspExtEntry 29 }
+
+vRtrMplsLspExtLspContainer       OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When the value of vRtrMplsLspType is 'memberP2p', the value of
+         vRtrMplsLspExtLspContainer identifies the LSP container that this  LSP
+         is a member of.
+
+         For all other LSP types, the value of vRtrMplsLspExtLspContainer is an
+         empty string."
+    ::= { vRtrMplsLspExtEntry 30 }
+
+vRtrMplsLspExtLspContMemberId    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..64)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When the value of vRtrMplsLspType is 'memberP2p', the value of
+         vRtrMplsLspExtLspContMemberId indicates the member ID of this LSP
+         within the LSP container specified by vRtrMplsLspExtLspContainer.
+
+         For all other LSP types, the value of vRtrMplsLspExtLspContMemberId is
+         0."
+    ::= { vRtrMplsLspExtEntry 31 }
 
 vRtrMplsLspPathProfTblLstChg     OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -14963,7 +15333,7 @@ vRtrMplsPceInitGenEntry          OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "Each entry represents paramters for PCE initiated LSPs on  the system.
+        "Each entry represents parameters for PCE initiated LSPs on the system.
 
          Entries can be created and deleted via SNMP SET operations."
     INDEX       { vRtrID }
@@ -15344,7 +15714,12 @@ VRtrMplsLspTemplateExtEntry      ::= SEQUENCE
     vRtrMplsLspTempExtOverrideTunElc TruthValue,
     vRtrMplsLspTempExtPrefTransFrr   TruthValue,
     vRtrMplsLspTempExtReturnPathLbl  Unsigned32,
-    vRtrMplsLspTempExtSoftPreemption TruthValue
+    vRtrMplsLspTempExtSoftPreemption TruthValue,
+    vRtrMplsLspTempExtBsidEnable     TruthValue,
+    vRtrMplsLspTempExtBfdSrcAddrType InetAddressType,
+    vRtrMplsLspTempExtBfdSrcAddr     InetAddress,
+    vRtrMplsLspTempExtDelayMetricLim Unsigned32,
+    vRtrMplsLspTempExtLspContRefCnt  Gauge32
 }
 
 vRtrMplsLspTempExtFallbkPathComp OBJECT-TYPE
@@ -15407,7 +15782,7 @@ vRtrMplsLspTempExtPrefTransFrr   OBJECT-TYPE
     ::= { vRtrMplsLspTemplateExtEntry 4 }
 
 vRtrMplsLspTempExtReturnPathLbl  OBJECT-TYPE
-    SYNTAX      Unsigned32 (32..1048512 | 4294967295)
+    SYNTAX      Unsigned32 (32..1048575 | 4294967295)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -15425,6 +15800,162 @@ vRtrMplsLspTempExtSoftPreemption OBJECT-TYPE
          preemption is enabled or disabled for P2MP RSVP LSP templates."
     DEFVAL      { false }
     ::= { vRtrMplsLspTemplateExtEntry 6 }
+
+vRtrMplsLspTempExtBsidEnable     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspTempExtBsidEnable specifies whether binding
+         SID (segment ID) is used for the SR-TE LSP Template."
+    DEFVAL      { false }
+    ::= { vRtrMplsLspTemplateExtEntry 7 }
+
+vRtrMplsLspTempExtBfdSrcAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspTempExtBfdSrcAddrType specifies the address
+         type of vRtrMplsLspTempExtBfdSrcAddr."
+    DEFVAL      { unknown }
+    ::= { vRtrMplsLspTemplateExtEntry 8 }
+
+vRtrMplsLspTempExtBfdSrcAddr     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsLspTempExtBfdSrcAddr specifies the source address of BFD
+         packets when BFD is enabled on this LSP template.
+
+         The address type of vRtrMplsLspTempExtBfdSrcAddr is specified by
+         vRtrMplsLspTempExtBfdSrcAddrType.
+
+         When vRtrMplsLspTempExtBfdSrcAddr has not been explicitly set,  for
+         BFD on LSPs using this template, sender address of the LSP will be
+         used as source address of BFD packets."
+    DEFVAL      { ''H }
+    ::= { vRtrMplsLspTemplateExtEntry 9 }
+
+vRtrMplsLspTempExtDelayMetricLim OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..16777215)
+    UNITS       "microseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspTempExtDelayMetricLim specifies the delay
+         metric limit when vRtrMplsLspTempMetricType is set to 'delay'.
+
+         When the value of vRtrMplsLspTempExtDelayMetricLim is set to default
+         value and vRtrMplsLspTempMetricType is set to 'delay', there is no
+         limit on the end-to-end path delay.
+
+         When the value of vRtrMplsLspTempExtDelayMetricLim is set to
+         non-default value and vRtrMplsLspTempMetricType is set to 'delay',
+         only paths that have end-to-end delay less than the configured limit
+         will be considered."
+    DEFVAL      { 0 }
+    ::= { vRtrMplsLspTemplateExtEntry 10 }
+
+vRtrMplsLspTempExtLspContRefCnt  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspTempExtLspContRefCnt indicates the number of
+         LSP containers referencing this LSP template.
+
+         The object is applicable to LSP templates with vRtrMplsLspTemplateType
+         set to 'memberP2p'."
+    ::= { vRtrMplsLspTemplateExtEntry 11 }
+
+vRtrMplsLspPceAssocTableLastChg  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPceAssocTableLastChg indicates the sysUpTime
+         at the time of the last modification of an entry in the
+         vRtrMplsLspPceAssocTable."
+    ::= { tmnxMplsObjs 93 }
+
+vRtrMplsLspPceAssocTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsLspPceAssocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsLspPceAssocTable has an entry for each Labeled Switch Path
+         (LSP) configured for a virtual router in the system."
+    ::= { tmnxMplsObjs 94 }
+
+vRtrMplsLspPceAssocEntry         OBJECT-TYPE
+    SYNTAX      VRtrMplsLspPceAssocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a Labeled Switch Path (LSP) configured
+         for a virtual router in the system.  Entries can be created and
+         deleted via SNMP SET operations.  Setting RowStatus to 'active'
+         requires vRtrMplsLspPceAssocType and  vRtrMplsLspPceAssocName to
+         have been assigned valid values."
+    INDEX       {
+        vRtrID,
+        vRtrMplsLspIndex,
+        vRtrMplsLspPceAssocType,
+        vRtrMplsLspPceAssocName
+    }
+    ::= { vRtrMplsLspPceAssocTable 1 }
+
+VRtrMplsLspPceAssocEntry         ::= SEQUENCE
+{
+    vRtrMplsLspPceAssocType          INTEGER,
+    vRtrMplsLspPceAssocName          TNamedItem,
+    vRtrMplsLspPceAssocRowStatus     RowStatus,
+    vRtrMplsLspPceAssocLastChange    TimeStamp
+}
+
+vRtrMplsLspPceAssocType          OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none      (0),
+        diversity (1),
+        policy    (2)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPceAssocType specifies the type of association
+         used by the the specified LSP."
+    DEFVAL      { none }
+    ::= { vRtrMplsLspPceAssocEntry 1 }
+
+vRtrMplsLspPceAssocName          OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPceAssocName specifies the name of the pce
+         association name."
+    ::= { vRtrMplsLspPceAssocEntry 2 }
+
+vRtrMplsLspPceAssocRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The row status used for creation, deletion, or control
+         of vRtrMplsLspPceAssocTable entries.  Before the row can be
+         placed into the 'active' state vRtrMplsLspName must
+         have been assigned a valid value."
+    ::= { vRtrMplsLspPceAssocEntry 3 }
+
+vRtrMplsLspPceAssocLastChange    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime when this row was last modified."
+    ::= { vRtrMplsLspPceAssocEntry 4 }
 
 vRtrMplsLspTempPathProTblLastChg OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -15506,6 +16037,686 @@ vRtrMplsLspTempPathProfGroupId   OBJECT-TYPE
          used by the path profile for the specified LSP Template."
     DEFVAL      { 0 }
     ::= { vRtrMplsLspTempPathProfEntry 4 }
+
+vRtrMplsLspTempPceAssocTblLstChg OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspTempPceAssocTblLstChg indicates the sysUpTime
+         at the time of the last modification of an entry in the
+         vRtrMplsLspTempPceAssocTable."
+    ::= { tmnxMplsObjs 97 }
+
+vRtrMplsLspTempPceAssocTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsLspTempPceAssocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsLspTempPceAssocTable has an entry for each Labeled Switch
+         Path (LSP) Template configured for a virtual router in the system."
+    ::= { tmnxMplsObjs 98 }
+
+vRtrMplsLspTempPceAssocEntry     OBJECT-TYPE
+    SYNTAX      VRtrMplsLspTempPceAssocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a Labeled Switch Path (LSP) Template configured
+         for a virtual router in the system.  Entries can be created and
+         deleted via SNMP SET operations.  Setting RowStatus to 'active'
+         requires vRtrMplsLspTempPceAssocType and  vRtrMplsLspTempPceAssocName to
+         have been assigned valid values."
+    INDEX       {
+        vRtrID,
+        vRtrMplsLspTemplateName,
+        vRtrMplsLspTempPceAssocType,
+        vRtrMplsLspTempPceAssocName
+    }
+    ::= { vRtrMplsLspTempPceAssocTable 1 }
+
+VRtrMplsLspTempPceAssocEntry     ::= SEQUENCE
+{
+    vRtrMplsLspTempPceAssocType      INTEGER,
+    vRtrMplsLspTempPceAssocName      TNamedItem,
+    vRtrMplsLspTempPceAssocRowStatus RowStatus,
+    vRtrMplsLspTempPceAssocLstChg    TimeStamp
+}
+
+vRtrMplsLspTempPceAssocType      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none      (0),
+        diversity (1),
+        policy    (2)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspTempPceAssocType specifies the type of
+         association used by the the specified LSP Template."
+    DEFVAL      { none }
+    ::= { vRtrMplsLspTempPceAssocEntry 1 }
+
+vRtrMplsLspTempPceAssocName      OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspTempPceAssocName specifies the name of the pce
+         association name."
+    ::= { vRtrMplsLspTempPceAssocEntry 2 }
+
+vRtrMplsLspTempPceAssocRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The row status used for creation, deletion, or control
+         of vRtrMplsLspTempPceAssocTable entries.  Before the row can be
+         placed into the 'active' state vRtrMplsLspTemplateName must
+         have been assigned a valid value."
+    ::= { vRtrMplsLspTempPceAssocEntry 3 }
+
+vRtrMplsLspTempPceAssocLstChg    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime when this row was last modified."
+    ::= { vRtrMplsLspTempPceAssocEntry 4 }
+
+tmnxMplsResourceTable            OBJECT IDENTIFIER ::= { tmnxMplsObjs 99 }
+
+tmnxMplsResourceEntry            OBJECT IDENTIFIER ::= { tmnxMplsResourceTable 1 }
+
+tmnxMplsResourceNhlfeTotal       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxMplsResourceNhlfeTotal indicates the total
+         number of NHLFE resources on the system."
+    ::= { tmnxMplsResourceEntry 1 }
+
+tmnxMplsResourceNhlfeAlloc       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxMplsResourceNhlfeAlloc indicates the
+         number of NHLFE resources currently allocated on the system."
+    ::= { tmnxMplsResourceEntry 2 }
+
+tmnxMplsResourceNhlfeFree        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxMplsResourceNhlfeFree indicates the number
+         of NHLFE resources currently free on the system."
+    ::= { tmnxMplsResourceEntry 3 }
+
+tmnxMplsResourceLtnTotal         OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxMplsResourceLtnTotal indicates the total
+         number of LTN resources on the system."
+    ::= { tmnxMplsResourceEntry 4 }
+
+tmnxMplsResourceLtnAlloc         OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxMplsResourceLtnAlloc indicates the number
+         of LTN resources currently allocated on the system."
+    ::= { tmnxMplsResourceEntry 5 }
+
+tmnxMplsResourceLtnFree          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxMplsResourceLtnFree indicates the number
+         of LTN resources currently free on the system."
+    ::= { tmnxMplsResourceEntry 6 }
+
+tmnxMplsResourceLabelTotal       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxMplsResourceLabelTotal indicates the total
+         number of label resources on the system."
+    ::= { tmnxMplsResourceEntry 7 }
+
+tmnxMplsResourceLabelAlloc       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxMplsResourceLabelAlloc indicates the
+         number of labels resources currently allocated on the system."
+    ::= { tmnxMplsResourceEntry 8 }
+
+tmnxMplsResourceLabelFree        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxMplsResourceLabelFree indicates the number
+         of label resources currently free on the system."
+    ::= { tmnxMplsResourceEntry 9 }
+
+tmnxMplsResourceOwnerTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxMplsResourceOwnerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxMplsResourceOwnerTable contains information about MPLS
+         resource utilization by various resource owners specific to the Nokia
+         SR systems."
+    ::= { tmnxMplsObjs 100 }
+
+tmnxMplsResourceOwnerEntry       OBJECT-TYPE
+    SYNTAX      TmnxMplsResourceOwnerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row in the tmnxMplsResourceOwnerEntry contains information about
+         utilization of MPLS resources by a resource owner as specified by the
+         index.
+
+         Rows in this table are created automatically by the system and cannot
+         be created or destroyed by SNMP Set requests."
+    INDEX       { tmnxMplsResourceOwner }
+    ::= { tmnxMplsResourceOwnerTable 1 }
+
+TmnxMplsResourceOwnerEntry       ::= SEQUENCE
+{
+    tmnxMplsResourceOwner            TmnxMplsResourceOwner,
+    tmnxMplsResOwnerNhlfeAlloc       Unsigned32,
+    tmnxMplsResOwnerLtnAlloc         Unsigned32,
+    tmnxMplsResOwnerLabelAlloc       Unsigned32
+}
+
+tmnxMplsResourceOwner            OBJECT-TYPE
+    SYNTAX      TmnxMplsResourceOwner
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxMplsResourceOwner identifies an
+         application that owns the resources."
+    ::= { tmnxMplsResourceOwnerEntry 1 }
+
+tmnxMplsResOwnerNhlfeAlloc       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxMplsResOwnerNhlfeAlloc indicates the
+         number of NHLFE resources currently allocated by the resource owner
+         specified by tmnxMplsResourceOwner."
+    ::= { tmnxMplsResourceOwnerEntry 2 }
+
+tmnxMplsResOwnerLtnAlloc         OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxMplsResOwnerLtnAlloc indicates the number
+         of LTN resources currently allocated by the resource owner specified
+         by tmnxMplsResourceOwner."
+    ::= { tmnxMplsResourceOwnerEntry 3 }
+
+tmnxMplsResOwnerLabelAlloc       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxMplsResOwnerLabelAlloc indicates the
+         number of label resources currently allocated by the resource owner
+         specified by tmnxMplsResourceOwner."
+    ::= { tmnxMplsResourceOwnerEntry 4 }
+
+vRtrMplsLspContainerTblLstChg    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContainerTblLstChg indicates the sysUpTime at
+         the time of the last modification of an entry in the
+         vRtrMplsLspContainerTable."
+    ::= { tmnxMplsObjs 101 }
+
+vRtrMplsLspContainerTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsLspContainerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsLspContainerTable has an entry for each LSP container
+         configured for a virtual router in the system."
+    ::= { tmnxMplsObjs 102 }
+
+vRtrMplsLspContainerEntry        OBJECT-TYPE
+    SYNTAX      VRtrMplsLspContainerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a LSP container configured
+         for a virtual router in the system.  Entries can be created and
+         deleted via SNMP SET operations."
+    INDEX       {
+        vRtrID,
+        vRtrMplsLspContainerName
+    }
+    ::= { vRtrMplsLspContainerTable 1 }
+
+VRtrMplsLspContainerEntry        ::= SEQUENCE
+{
+    vRtrMplsLspContainerName         TNamedItem,
+    vRtrMplsLspContainerRowStatus    RowStatus,
+    vRtrMplsLspContainerLastChgd     TimeStamp,
+    vRtrMplsLspContainerAdminState   TmnxAdminState,
+    vRtrMplsLspContLspTemplateName   TNamedItemOrEmpty,
+    vRtrMplsLspContMinMemberLsps     Unsigned32,
+    vRtrMplsLspContMaxMemberLsps     Unsigned32,
+    vRtrMplsLspContainerToAddrType   InetAddressType,
+    vRtrMplsLspContainerToAddr       InetAddress,
+    vRtrMplsLspContainerSuffix       DisplayString,
+    vRtrMplsLspContOptMinAvgRate     TmnxMplsLspBandwidth,
+    vRtrMplsLspContOptMaxAvgRate     TmnxMplsLspBandwidth,
+    vRtrMplsLspContOptOptimizeTimer  Unsigned32,
+    vRtrMplsLspContOptAdHoc          TruthValue,
+    vRtrMplsLspContainerOperState    TmnxOperState,
+    vRtrMplsLspContOperDownReason    INTEGER,
+    vRtrMplsLspContNumMemberLsps     Gauge32,
+    vRtrMplsLspContNumMemberLspsUp   Gauge32,
+    vRtrMplsLspContNumNominalLsps    Gauge32,
+    vRtrMplsLspContNominalBw         TmnxMplsLspBandwidth,
+    vRtrMplsLspContOptTimeRemaining  Unsigned32,
+    vRtrMplsLspContAdHocOptPending   TruthValue,
+    vRtrMplsLspContLastOpt           TimeStamp,
+    vRtrMplsLspContLastOptStatus     INTEGER,
+    vRtrMplsLspContLastOptReason     INTEGER,
+    vRtrMplsLspContAdHocOptEvent     INTEGER,
+    vRtrMplsLspContInitMemberLsps    Unsigned32,
+    vRtrMplsLspContInitMemLspBw      TmnxMplsLspBandwidthOrNone
+}
+
+vRtrMplsLspContainerName         OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContainerName specifies the name of the LSP
+         container."
+    ::= { vRtrMplsLspContainerEntry 1 }
+
+vRtrMplsLspContainerRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The row status used for creation and deletion of entries in the
+         vRtrMplsLspContainerTable."
+    ::= { vRtrMplsLspContainerEntry 2 }
+
+vRtrMplsLspContainerLastChgd     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysUpTime when this row was last modified."
+    ::= { vRtrMplsLspContainerEntry 3 }
+
+vRtrMplsLspContainerAdminState   OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContainerAdminState specifies the
+         administrative state for this LSP container."
+    DEFVAL      { outOfService }
+    ::= { vRtrMplsLspContainerEntry 4 }
+
+vRtrMplsLspContLspTemplateName   OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object vRtrMplsLspContLspTemplateName specifies the
+         LSP Template which is used as a guideline to create and signal member
+         LSPs in this LSP container."
+    DEFVAL      { ''H }
+    ::= { vRtrMplsLspContainerEntry 5 }
+
+vRtrMplsLspContMinMemberLsps     OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..64)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContMinMemberLsps specifies minimum number of
+         member LSPs in this LSP container."
+    DEFVAL      { 1 }
+    ::= { vRtrMplsLspContainerEntry 6 }
+
+vRtrMplsLspContMaxMemberLsps     OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..64)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContMaxMemberLsps specifies maximum number of
+         member LSPs in this LSP container."
+    DEFVAL      { 64 }
+    ::= { vRtrMplsLspContainerEntry 7 }
+
+vRtrMplsLspContainerToAddrType   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContainerToAddrType specifies the IP address
+         type of vRtrMplsLspContainerToAddr."
+    DEFVAL      { unknown }
+    ::= { vRtrMplsLspContainerEntry 8 }
+
+vRtrMplsLspContainerToAddr       OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsLspContainerToAddr specifies the destination address of
+         member LSPs this LSP container.
+
+         The address type of vRtrMplsLspContainerToAddr is specified by
+         vRtrMplsLspContainerToAddrType."
+    DEFVAL      { ''H }
+    ::= { vRtrMplsLspContainerEntry 9 }
+
+vRtrMplsLspContainerSuffix       OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0|1..24))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContainerSuffix specifies the suffix used in
+         the naming of member LSPs in this LSP container."
+    DEFVAL      { "" }
+    ::= { vRtrMplsLspContainerEntry 10 }
+
+vRtrMplsLspContOptMinAvgRate     OBJECT-TYPE
+    SYNTAX      TmnxMplsLspBandwidth
+    UNITS       "megabps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContOptMinAvgRate specifies the minimum
+         allowed average traffic rate per member LSP in this LSP container.
+
+         If the average traffic rate over all member LSPs of the container goes
+         below this value, the system will try to decrease the number of member
+         LSPs on the next optimization."
+    DEFVAL      { 0 }
+    ::= { vRtrMplsLspContainerEntry 11 }
+
+vRtrMplsLspContOptMaxAvgRate     OBJECT-TYPE
+    SYNTAX      TmnxMplsLspBandwidth
+    UNITS       "megabps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContOptMaxAvgRate specifies the maximum
+         allowed average traffic rate per member LSP in this LSP container.
+
+         If the average traffic rate over all member LSPs of the container goes
+         above this value, the system will try to increase the number of member
+         LSPs on the next optimization."
+    DEFVAL      { 6400000 }
+    ::= { vRtrMplsLspContainerEntry 12 }
+
+vRtrMplsLspContOptOptimizeTimer  OBJECT-TYPE
+    SYNTAX      Unsigned32 (15..44640)
+    UNITS       "minutes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContOptOptimizeTimer specifies the time
+         interval, in minutes, for the optimize timer which controls timer
+         based optimization of the LSP container."
+    DEFVAL      { 2880 }
+    ::= { vRtrMplsLspContainerEntry 13 }
+
+vRtrMplsLspContOptAdHoc          OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContOptAdHoc specifies whether ad-hoc
+         optimization is enabled or disabled for the LSP container."
+    DEFVAL      { false }
+    ::= { vRtrMplsLspContainerEntry 14 }
+
+vRtrMplsLspContainerOperState    OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContainerOperState indicates the  current
+         operating state of the LSP container."
+    ::= { vRtrMplsLspContainerEntry 15 }
+
+vRtrMplsLspContOperDownReason    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable        (0),
+        adminDown            (1),
+        lspNameConflict      (2),
+        noResourcesAvailable (3),
+        noLspOperational     (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContOperDownReason indicates the reason due to
+         which this LSP container is operationally down."
+    ::= { vRtrMplsLspContainerEntry 16 }
+
+vRtrMplsLspContNumMemberLsps     OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContNumMemberLsps indicates number of  member
+         LSPs in this LSP container."
+    ::= { vRtrMplsLspContainerEntry 17 }
+
+vRtrMplsLspContNumMemberLspsUp   OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContNumMemberLspsUp indicates number of
+         member LSPs in this LSP container that are operationally up."
+    ::= { vRtrMplsLspContainerEntry 18 }
+
+vRtrMplsLspContNumNominalLsps    OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContNumNominalLsps indicates nominal number of
+         member LSPs in this LSP container."
+    ::= { vRtrMplsLspContainerEntry 19 }
+
+vRtrMplsLspContNominalBw         OBJECT-TYPE
+    SYNTAX      TmnxMplsLspBandwidth
+    UNITS       "megabps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContNominalBw indicates the nominal bandwidth
+         computed for each member LSP in this LSP container."
+    ::= { vRtrMplsLspContainerEntry 20 }
+
+vRtrMplsLspContOptTimeRemaining  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContOptTimeRemaining indicates the time
+         remaining, in seconds, till the optimization timer expires and
+         optimization is started for this LSP container."
+    ::= { vRtrMplsLspContainerEntry 21 }
+
+vRtrMplsLspContAdHocOptPending   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContAdHocOptPending indicates whether ad-hoc
+         optimization is pending for the LSP container."
+    ::= { vRtrMplsLspContainerEntry 22 }
+
+vRtrMplsLspContLastOpt           OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContLastOpt indicates the sysUpTime when the
+         LSP container was last optimized."
+    ::= { vRtrMplsLspContainerEntry 23 }
+
+vRtrMplsLspContLastOptStatus     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable (0),
+        completed     (1),
+        failed        (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContLastOptStatus indicates the status  of the
+         last optimization of this LSP container."
+    ::= { vRtrMplsLspContainerEntry 24 }
+
+vRtrMplsLspContLastOptReason     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable       (0),
+        timerBased          (1),
+        adHoc               (2),
+        configParamModified (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContLastOptReason indicates the reason  for
+         the last optimization of this LSP container."
+    ::= { vRtrMplsLspContainerEntry 25 }
+
+vRtrMplsLspContAdHocOptEvent     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable        (0),
+        lspAutoBwFailed      (1),
+        lspFailedToEstablish (2),
+        lspAutoBwSkipped     (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContAdHocOptEvent indicates the event  that
+         triggered ad-hoc optimization for this LSP container."
+    ::= { vRtrMplsLspContainerEntry 26 }
+
+vRtrMplsLspContInitMemberLsps    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..64)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContInitMemberLsps specifies the initial
+         number of member LSPs used when the LSP container is administratively
+         up.
+
+         When the value of vRtrMplsLspContInitMemberLsps is set to the default
+         value, then the value of vRtrMplsLspContMinMemberLsps is used."
+    DEFVAL      { 0 }
+    ::= { vRtrMplsLspContainerEntry 27 }
+
+vRtrMplsLspContInitMemLspBw      OBJECT-TYPE
+    SYNTAX      TmnxMplsLspBandwidthOrNone
+    UNITS       "megabps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContInitMemLspBw specifies the initial
+         bandwidth of member LSPs used when the LSP container is
+         administratively up.
+
+         When the value of vRtrMplsLspContInitMemLspBw set to the default
+         value, then the value of vRtrMplsLspTempAutoBWMinBW is used."
+    DEFVAL      { -1 }
+    ::= { vRtrMplsLspContainerEntry 28 }
+
+vRtrMplsLspContMemberLspTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrMplsLspContMemberLspEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrMplsLspContMemberLspTable has an entry for each member LSP in
+         an LSP container in a virtual router in the system."
+    ::= { tmnxMplsObjs 103 }
+
+vRtrMplsLspContMemberLspEntry    OBJECT-TYPE
+    SYNTAX      VRtrMplsLspContMemberLspEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a member LSP in an LSP container in a
+         virtual router in the system."
+    INDEX       {
+        vRtrID,
+        vRtrMplsLspContainerName,
+        vRtrMplsLspExtLspContMemberId
+    }
+    ::= { vRtrMplsLspContMemberLspTable 1 }
+
+VRtrMplsLspContMemberLspEntry    ::= SEQUENCE
+{
+    vRtrMplsLspContMemberLspIndex    TmnxVRtrMplsLspID,
+    vRtrMplsLspContMemLspOperBw      TmnxMplsLspBandwidth,
+    vRtrMplsLspContMemLspSamAvgBw    TmnxMplsLspBandwidth
+}
+
+vRtrMplsLspContMemberLspIndex    OBJECT-TYPE
+    SYNTAX      TmnxVRtrMplsLspID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContMemberLspIndex indicates the
+         vRtrMplsLspIndex of the member LSP specified by the values of
+         vRtrMplsLspContainerName and vRtrMplsLspExtLspContMemberId."
+    ::= { vRtrMplsLspContMemberLspEntry 1 }
+
+vRtrMplsLspContMemLspOperBw      OBJECT-TYPE
+    SYNTAX      TmnxMplsLspBandwidth
+    UNITS       "megabps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContMemLspOperBw indicates the operational
+         bandwidth of this member LSP in the LSP container."
+    ::= { vRtrMplsLspContMemberLspEntry 2 }
+
+vRtrMplsLspContMemLspSamAvgBw    OBJECT-TYPE
+    SYNTAX      TmnxMplsLspBandwidth
+    UNITS       "megabps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspContMemLspSamAvgBw indicates the sampled
+         average bandwidth for this member LSP in the LSP container."
+    ::= { vRtrMplsLspContMemberLspEntry 3 }
 
 tmnxMplsConformance              OBJECT IDENTIFIER ::= { tmnxSRConfs 6 }
 
@@ -16262,6 +17473,7 @@ tmnxMplsV21v0Compliance          MODULE-COMPLIANCE
             tmnxMplsPccPceOperStateV21Group,
             tmnxMplsLspTempExtV21Group,
             tmnxMplsLspStatsModeV21Group,
+            tmnxMplsLspPceAssocGroup,
             tmnxMplsLspOvrTunnelElcGroup,
             tmnxMplsLspTransportFrrGroup,
             tmnxMplsLspTempPathProfGroup
@@ -16278,9 +17490,56 @@ tmnxMplsV22v0Compliance          MODULE-COMPLIANCE
             tmnxMplsLspExtBfdGroup,
             tmnxMplsLspRateCountersGroup,
             tmnxP2mpMplsLspSoftPreemptGroup,
-            tmnxMplsNotifyV22v0Group
+            tmnxMplsNotifyV22v0Group,
+            tmnxMplsStrictEroNextHopResGroup,
+            tmnxMplsLspTempPceAssocGroup,
+            tmnxMplsAdHocRouteOptGroup,
+            tmnxMplsBsidRsvdLblBlkGroup,
+            tmnxMplsLspHistoryGroup,
+            tmnxMplsIgpScOverSrTeGroup,
+            tmnxMplsP2mpTtlPropagateGroup
         }
     ::= { tmnxMplsCompliances 20 }
+
+tmnxMplsV23v0Compliance          MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of extended MPLS on Nokia SROS
+         series systems 23.0 Release."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxMplsIgpScOverSrTeGroup,
+            tmnxMplsResourcesGroup,
+            tmnxMplsResNotifyObjsGroup,
+            tmnxMplsResNotificationsGroup
+        }
+    ::= { tmnxMplsCompliances 21 }
+
+tmnxMplsV24v0Compliance          MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of extended MPLS on Nokia SROS
+         series systems 24.0 Release."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxMplsBfdSrcAddrGroup,
+            tmnxMplsSrteDelayMetricGroup,
+            tmnxMplsV24GenGroup
+        }
+    ::= { tmnxMplsCompliances 22 }
+
+tmnxMplsV25v0Compliance          MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of extended MPLS on Nokia SROS
+         series systems 25.0 Release."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxMplsLspContainerGroup,
+            tmnxMplsLspContNotifyObjsGroup,
+            tmnxMplsLCNotificationGroup
+        }
+    ::= { tmnxMplsCompliances 23 }
 
 tmnxMplsGroups                   OBJECT IDENTIFIER ::= { tmnxMplsConformance 2 }
 
@@ -19074,6 +20333,18 @@ tmnxMplsLspStatsModeV21Group     OBJECT-GROUP
          SROS series systems 21.0 Release."
     ::= { tmnxMplsGroups 131 }
 
+tmnxMplsLspPceAssocGroup         OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspPceAssocTableLastChg,
+        vRtrMplsLspPceAssocRowStatus,
+        vRtrMplsLspPceAssocLastChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of MPLS LSP on Nokia SROS
+         series systems."
+    ::= { tmnxMplsGroups 132 }
+
 tmnxMplsLspOvrTunnelElcGroup     OBJECT-GROUP
     OBJECTS     {
         vRtrMplsLspExtOverrideTunElc,
@@ -19147,13 +20418,248 @@ tmnxP2mpMplsLspSoftPreemptGroup  OBJECT-GROUP
 
 tmnxMplsNotifyV22v0Group         NOTIFICATION-GROUP
     NOTIFICATIONS {
-        vRtrMplsS2lSubLspPreempted
+        vRtrMplsS2lSubLspPreempted,
+        vRtrMplsNodeInIgpOverloadIpv6
     }
     STATUS      current
     DESCRIPTION
         "The group of notifications supporting MPLS  on Nokia SROS series
          systems 22.0 Release."
     ::= { tmnxMplsGroups 139 }
+
+tmnxMplsStrictEroNextHopResGroup OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsGenStrictEroNhopDirRes
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of strict ERO  next hop
+         resolution in MPLS in Nokia SROS series systems."
+    ::= { tmnxMplsGroups 140 }
+
+tmnxMplsLspTempPceAssocGroup     OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspTempPceAssocTblLstChg,
+        vRtrMplsLspTempPceAssocRowStatus,
+        vRtrMplsLspTempPceAssocLstChg
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of MPLS LSP templates on
+         Nokia SROS series systems."
+    ::= { tmnxMplsGroups 141 }
+
+tmnxMplsAdHocRouteOptGroup       OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsGenRsvpResigOnIgpEvt,
+        vRtrMplsGenSrTeResigOnIgpOvl
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of MPLS Ad Hoc route
+         optimization of LSPs on Nokia SROS series systems."
+    ::= { tmnxMplsGroups 142 }
+
+tmnxMplsBsidRsvdLblBlkGroup      OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspExtBsid,
+        vRtrMplsLspTempExtBsidEnable,
+        vRtrMplsGenLspBsidBlkName
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of MPLS BSID reserved label
+         block on Nokia SROS series systems."
+    ::= { tmnxMplsGroups 143 }
+
+tmnxMplsLspHistoryGroup          OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsGenLspHistory,
+        vRtrMplsGenLspHistAdminState
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of MPLS BSID reserved label
+         block on Nokia SROS series systems."
+    ::= { tmnxMplsGroups 144 }
+
+tmnxMplsV23v0ObsoleteGroup       OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspPathTableSpinlock
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of obsolete objects which are no longer supported in MPLS
+         23.3.R1 release onwards on Nokia SROS series systems."
+    ::= { tmnxMplsGroups 145 }
+
+tmnxMplsIgpScOverSrTeGroup       OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspIgpScSrOverSrTe,
+        vRtrMplsLspTempIgpScSrOverSrTe
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of MPLS BSID reserved label
+         block on Nokia SROS series systems."
+    ::= { tmnxMplsGroups 146 }
+
+tmnxMplsP2mpTtlPropagateGroup    OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsGenP2mpTtlPropagate
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of MPLS BSID reserved label
+         block on Nokia SROS series systems."
+    ::= { tmnxMplsGroups 147 }
+
+tmnxMplsResourcesGroup           OBJECT-GROUP
+    OBJECTS     {
+        tmnxMplsResourceNhlfeTotal,
+        tmnxMplsResourceNhlfeAlloc,
+        tmnxMplsResourceNhlfeFree,
+        tmnxMplsResourceLtnTotal,
+        tmnxMplsResourceLtnAlloc,
+        tmnxMplsResourceLtnFree,
+        tmnxMplsResourceLabelTotal,
+        tmnxMplsResourceLabelAlloc,
+        tmnxMplsResourceLabelFree,
+        tmnxMplsResOwnerNhlfeAlloc,
+        tmnxMplsResOwnerLtnAlloc,
+        tmnxMplsResOwnerLabelAlloc
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of MPLS resources on Nokia
+         SROS series systems."
+    ::= { tmnxMplsGroups 148 }
+
+tmnxMplsResNotifyObjsGroup       OBJECT-GROUP
+    OBJECTS     {
+        tmnxNotifyMplsResourceType,
+        tmnxNotifyMplsResourceUsagePct
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notification objects supporting management of MPLS
+         resources on Nokia SROS series systems."
+    ::= { tmnxMplsGroups 149 }
+
+tmnxMplsResNotificationsGroup    NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxMplsResourceHighUsage,
+        tmnxMplsResourceExhausted,
+        tmnxMplsResourceRecovered
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting management of MPLS resources on
+         Nokia SROS series systems."
+    ::= { tmnxMplsGroups 150 }
+
+tmnxMplsBfdSrcAddrGroup          OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspExtBfdSrcAddrType,
+        vRtrMplsLspExtBfdSrcAddr,
+        vRtrMplsLspTempExtBfdSrcAddrType,
+        vRtrMplsLspTempExtBfdSrcAddr,
+        vRtrMplsLspPathBfdSrcAddrType,
+        vRtrMplsLspPathBfdSrcAddr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of MPLS SRTE BFD source
+         address on Nokia SROS series systems."
+    ::= { tmnxMplsGroups 151 }
+
+tmnxMplsSrteDelayMetricGroup     OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspPathDelayMetricLimit,
+        vRtrMplsLspTempExtDelayMetricLim,
+        vRtrMplsLspPathOperDelayMetricLm
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of MPLS SRTE delay metric
+         on Nokia SROS series systems."
+    ::= { tmnxMplsGroups 152 }
+
+tmnxMplsV24GenGroup              OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspPathLspIdentifier
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of MPLS
+         on Nokia SROS series systems 24.0 Release."
+    ::= { tmnxMplsGroups 153 }
+
+tmnxMplsLspContainerGroup        OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspContainerTblLstChg,
+        vRtrMplsLspContainerRowStatus,
+        vRtrMplsLspContainerLastChgd,
+        vRtrMplsLspContLspTemplateName,
+        vRtrMplsLspContMinMemberLsps,
+        vRtrMplsLspContMaxMemberLsps,
+        vRtrMplsLspContainerToAddrType,
+        vRtrMplsLspContainerToAddr,
+        vRtrMplsLspContainerAdminState,
+        vRtrMplsLspContainerSuffix,
+        vRtrMplsLspTempExtLspContRefCnt,
+        vRtrMplsGenMemberP2pLspUp,
+        vRtrMplsLspContOptMinAvgRate,
+        vRtrMplsLspContOptMaxAvgRate,
+        vRtrMplsLspContOptOptimizeTimer,
+        vRtrMplsLspContOptAdHoc,
+        vRtrMplsLspExtLspContainer,
+        vRtrMplsLspExtLspContMemberId,
+        vRtrMplsLspContMemberLspIndex,
+        vRtrMplsLspContainerOperState,
+        vRtrMplsLspContOperDownReason,
+        vRtrMplsLspContNumMemberLsps,
+        vRtrMplsLspContNumMemberLspsUp,
+        vRtrMplsLspContNumNominalLsps,
+        vRtrMplsLspContNominalBw,
+        vRtrMplsLspContOptTimeRemaining,
+        vRtrMplsLspContAdHocOptPending,
+        vRtrMplsLspContLastOpt,
+        vRtrMplsLspContLastOptStatus,
+        vRtrMplsLspContLastOptReason,
+        vRtrMplsLspContAdHocOptEvent,
+        vRtrMplsLspContMemLspOperBw,
+        vRtrMplsLspContMemLspSamAvgBw,
+        vRtrMplsLspContInitMemberLsps,
+        vRtrMplsLspContInitMemLspBw
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of MPLS LSP containers on
+         Nokia SROS series systems."
+    ::= { tmnxMplsGroups 154 }
+
+tmnxMplsLspContNotifyObjsGroup   OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspContCompNominalLsps
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notification objects supporting management of MPLS LSP
+         containers on Nokia SROS series systems."
+    ::= { tmnxMplsGroups 155 }
+
+tmnxMplsLCNotificationGroup      NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        vRtrMplsLspContOptStarted,
+        vRtrMplsLspContMaxLspsExceeded,
+        vRtrMplsLspContMinLspsExceeded
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting management of MPLS LSP
+         Containers Nokia SROS series systems."
+    ::= { tmnxMplsGroups 156 }
 
 tmnxMplsNotifyPrefix             OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 6 }
 
@@ -19647,5 +21153,127 @@ vRtrMplsS2lSubLspPreempted       NOTIFICATION-TYPE
 
          [RECOVERY] There is no recovery required for this notification."
     ::= { tmnxMplsNotifications 30 }
+
+vRtrMplsNodeInIgpOverloadIpv6    NOTIFICATION-TYPE
+    OBJECTS     {
+        vRtrMplsGenRetryOnIgpOverload,
+        vRtrMplsIgpOverloadRtrAddrType,
+        vRtrMplsIgpOverloadRtrAddr,
+        vRtrMplsIgpOverloadIgpType
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The vRtrMplsNodeInIgpOverloadIpv6 notification is generated
+         when MPLS gets a notification that a node is in IGP overload state.
+
+         [EFFECT] The LSPs with IPv6 addresses transiting through nodes  that
+         are in IGP overload state are teardown.
+
+         [RECOVERY] There is no recovery required for this notification."
+    ::= { tmnxMplsNotifications 31 }
+
+tmnxMplsResourceHighUsage        NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxNotifyMplsResourceType,
+        tmnxNotifyMplsResourceUsagePct
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxMplsResourceHighUsage notification is generated when
+         the usage of the resource specified by tmnxNotifyMplsResourceType has
+         reached or exceeded the warning threshold specified by
+         tmnxNotifyMplsResourceUsagePct.
+
+         [EFFECT] The specified resource has reached or exceeded the warning
+         threshold.
+
+         [RECOVERY] There is no recovery required for this notification."
+    ::= { tmnxMplsNotifications 32 }
+
+tmnxMplsResourceExhausted        NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxNotifyMplsResourceType
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxMplsResourceExhausted notification is generated when
+         the usage of the resource specified by tmnxNotifyMplsResourceType has
+         reached the maximum limit.
+
+         [EFFECT] The utilization of the specified resource has reached its
+         limit.
+
+         [RECOVERY] Intervention may be required to recover resources."
+    ::= { tmnxMplsNotifications 33 }
+
+tmnxMplsResourceRecovered        NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxNotifyMplsResourceType,
+        tmnxNotifyMplsResourceUsagePct
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxMplsResourceRecovered notification is generated when
+         the usage of the resource specified by tmnxNotifyMplsResourceType
+         drops below the warning threshold specified by
+         tmnxNotifyMplsResourceUsagePct. This trap is generated only if the
+         tmnxMplsResourceHighUsage notification or the
+         tmnxMplsResourceExhausted notification had been generated earlier.
+
+         [EFFECT] The utilization of the specified resource has dropped below
+         the warning threshold.
+
+         [RECOVERY] There is no recovery required for this notification."
+    ::= { tmnxMplsNotifications 34 }
+
+vRtrMplsLspContOptStarted        NOTIFICATION-TYPE
+    OBJECTS     {
+        vRtrMplsLspContLastOptReason
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The vRtrMplsLspContOptStarted notification is generated when
+         an optimization starts for the LSP container.
+
+         [EFFECT] The LSP container will be optimized.
+
+         [RECOVERY] There is no recovery required for this notification."
+    ::= { tmnxMplsNotifications 35 }
+
+vRtrMplsLspContMaxLspsExceeded   NOTIFICATION-TYPE
+    OBJECTS     {
+        vRtrMplsLspContMaxMemberLsps,
+        vRtrMplsLspContCompNominalLsps
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The vRtrMplsLspContMaxLspsExceeded notification is generated
+         when LSP container is optimized and the computed value for number of
+         nominal LSPs is more than the maximum number of member LSPs configured
+         for the LSP container.
+
+         [EFFECT] The number of nominal member LSPs will be adjusted down to
+         the maximum number of member LSPs configured for the LSP container.
+
+         [RECOVERY] There is no recovery required for this notification."
+    ::= { tmnxMplsNotifications 36 }
+
+vRtrMplsLspContMinLspsExceeded   NOTIFICATION-TYPE
+    OBJECTS     {
+        vRtrMplsLspContMinMemberLsps,
+        vRtrMplsLspContCompNominalLsps
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The vRtrMplsLspContMinLspsExceeded notification is generated
+         when LSP container is optimized and the computed value for number of
+         nominal LSPs is less than the minimum number of member LSPs configured
+         for the LSP container.
+
+         [EFFECT] The number of nominal member LSPs will be adjusted up to the
+         minimum number of member LSPs configured for the LSP container.
+
+         [RECOVERY] There is no recovery required for this notification."
+    ::= { tmnxMplsNotifications 37 }
 
 END

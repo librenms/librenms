@@ -713,6 +713,21 @@ cryptopass  Privacy (Encryption) Passphrase
 cryptoalgo  AES | AES-192 | AES-256 | AES-256-C | DES
 ```
 
+## MTU Settings
+
+LibreNMS can optionally test for MTU issues.  The current implementation only works for devices with
+pings enabled and also requires the following configuration setting to enable the MTU check:
+
+!!! setting "poller/mtu"
+    ```bash
+    lnms config:set mtu_options.bytes 1500
+    ```
+
+To disable the MTU test, set the packet size to null (the default).
+
+The MTU check does not ensure packets can traverse the network without being fragmented.  The test makes
+sure that 2 way communication can occure even if packets need to be fragmented at any point along the way.
+
 ## Auto discovery settings
 
 Please refer to [Auto-Discovery](../Extensions/Auto-Discovery.md)

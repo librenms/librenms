@@ -221,8 +221,32 @@ return [
         'error' => 'Error processing Mac OUI:',
         'vendor_update' => 'Adding OUI :oui for :vendor',
     ],
+    'maintenance:rrd-step' => [
+        'description' => 'Convert RRD files to match configured step and heartbeat',
+        'arguments' => [
+            'device' => 'Hostname, device id, or all',
+        ],
+        'options' => [
+            'confirm' => 'Confirm that you have backed up your rrd files.',
+        ],
+        'errors' => [
+            'invalid' => 'Invalid hostname or device id specified',
+        ],
+        'confirm_backup' => 'Before continuing, please confirm that you have backed up your rrd files.',
+        'mismatched_heartbeat' => ':file: Mismatched heartbeat. :ds != :hb',
+        'skipping' => 'Skipping :file, step is already :step.',
+        'converting' => 'Converting :file:',
+        'summary' => 'Converted: :converted  Failed: :failed  Skipped: :skipped',
+    ],
     'maintenance:cleanup-syslog' => [
+        'description' => 'Cleanup syslog entries older than a specified number of days',
+        'arguments' => [
+            'days' => 'Number of days to keep syslog entries (default: syslog_purge configured value)',
+        ],
+        'bad_days_input' => 'Days must be numeric',
+        'bad_days_setting' => 'Syslog cleanup disabled due to invalid syslog_purge setting',
         'delete' => 'Cleared syslog entries older than :days days (:count rows)',
+        'disabled' => 'Syslog cleanup disabled, days <= 0',
     ],
     'plugin:disable' => [
         'description' => 'Disable all plugins with the given name',

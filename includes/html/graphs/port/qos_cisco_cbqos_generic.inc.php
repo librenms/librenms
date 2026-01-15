@@ -13,9 +13,8 @@
  */
 
 include 'includes/html/graphs/common.inc.php';
-$rrd_options[] = '-l';
-$rrd_options[] = '0';
-$rrd_options[] = '-E';
+$graph_params->scale_min = 0;
+
 $rrd_options[] = 'COMMENT:Class-Map              Now      Avg      Max\\n';
 $rrd_additions = '';
 

@@ -63,7 +63,7 @@ Set throttle-time (in seconds):
 
 `./lnms config:set twofactor_lock 300`
 
-## User Administation
+## User Administration
 
 If Two-Factor is enabled, the Settings -> Manage Users grid will show a '2FA' column 
 containing a green tick for users with active 2FA.

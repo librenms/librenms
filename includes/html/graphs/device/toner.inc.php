@@ -2,9 +2,7 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_options[] = '-l';
-$rrd_options[] = '0';
-$rrd_options[] = '-E';
+$graph_params->scale_min = 0;
 
 $iter = '1';
 $rrd_options[] = 'COMMENT:Toner level            Cur     Min      Max\\n';

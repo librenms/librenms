@@ -3,8 +3,8 @@
 require 'includes/html/graphs/common.inc.php';
 
 $rrd_filename = Rrd::name($device['hostname'], 'ib_dns_request_return_codes');
-$rrd_options[] = "--vertical-label='Requests per second'";
-$rrd_options[] = "--lower-limit='0'";
+$graph_params->vertical_label = 'Requests per second';
+$graph_params->scale_min = 0;
 
 $stats = [
     'success' => '#74C366FF',

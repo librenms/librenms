@@ -55,8 +55,6 @@ class DeviceDiscover extends LnmsCommand
 
     public function handle(MeasurementManager $measurements): int
     {
-        $this->configureOutputOptions();
-
         try {
             $this->handleDebug();
 

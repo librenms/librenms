@@ -31,9 +31,8 @@ foreach ($components as $k => $v) {
 $components = $keep;
 
 include 'includes/html/graphs/common.inc.php';
-$rrd_options[] = '-l';
-$rrd_options[] = '0';
-$rrd_options[] = '-E';
+$graph_params->scale_min = 0;
+
 $rrd_options[] = 'COMMENT:LTM Pool Members                               Now      Avg      Max\\n';
 $colours = array_merge(\App\Facades\LibrenmsConfig::get('graph_colours.mixed'), \App\Facades\LibrenmsConfig::get('graph_colours.manycolours'), \App\Facades\LibrenmsConfig::get('graph_colours.manycolours'));
 $count = 0;

@@ -647,6 +647,7 @@ devices:
     - { Field: max_depth, Type: int, 'Null': false, Extra: '', Default: '0' }
     - { Field: disable_notify, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: ignore_status, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: mtu_status, Type: tinyint, 'Null': false, Extra: '', Default: '1' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [device_id], Unique: true, Type: BTREE }
     devices_hostname_sysname_display_index: { Name: devices_hostname_sysname_display_index, Columns: [hostname, sysName, display], Unique: false, Type: BTREE }
@@ -1703,7 +1704,7 @@ ports:
     - { Field: port_descr_type, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: port_descr_descr, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: port_descr_circuit, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: port_descr_speed, Type: varchar(32), 'Null': true, Extra: '' }
+    - { Field: port_descr_speed, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: port_descr_notes, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: ifDescr, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: ifName, Type: varchar(255), 'Null': true, Extra: '' }
