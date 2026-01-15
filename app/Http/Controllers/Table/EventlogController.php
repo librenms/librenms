@@ -30,8 +30,8 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use Illuminate\Support\Facades\Blade;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Util\Url;
 use LibreNMS\Util\Time;
+use LibreNMS\Util\Url;
 
 class EventlogController extends TableController
 {
