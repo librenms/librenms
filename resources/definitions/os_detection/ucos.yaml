@@ -1,5 +1,5 @@
 os: ucos
-text: 'Cisco Unified Communications Manager'
+text: 'Cisco Unified OS (VOS)'
 type: collaboration
 icon: cisco
 over:

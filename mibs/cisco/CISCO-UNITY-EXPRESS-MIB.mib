@@ -1,0 +1,1361 @@
+-- **********************************************************************
+-- CISCO-UNITY-EXPRESS-MIB.my
+--   
+-- October 2004, Chandresh Patel
+-- May 2004, Steve Herrick
+--   
+-- Copyright (c) 2004-2007 by Cisco Systems Inc.
+-- All rights reserved.
+-- *********************************************************************
+
+CISCO-UNITY-EXPRESS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Unsigned32,
+    Counter32,
+    Gauge32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    TruthValue,
+    DateAndTime
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    InetAddressType,
+    InetAddress,
+    InetPortNumber
+        FROM INET-ADDRESS-MIB
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+ciscoUnityExpressMIB MODULE-IDENTITY
+    LAST-UPDATED    "200509020000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems
+            Customer Service
+
+            Postal: 170 W. Tasman Drive
+            San Jose, CA 95134
+            USA
+
+            Phone:  +1 800 553-NETS
+            Email:  cs-cue@cisco.com"
+    DESCRIPTION
+        "The MIB Module for the management of the Cisco Unity
+        Express (CUE) service.  CUE is a voicemail service that
+        runs in a Cisco router.  CUE accepts connections from
+        Cisco Call Manager Express (CCME), or from Cisco Call
+        Manager (CCM).
+
+        *** ABBREVIATIONS, ACRONYMS, AND SYMBOLS ***
+
+        JTAPI -  Java Telephony Application Programming Interface
+
+        AVT   -  Administration Via Telephone
+
+        MWI   -  Message Waiting Indicator
+
+        AA    -  Auto Attendent
+
+        SIP   -  Session Initiation Protocol  
+
+        AIM   -  Advanced Integration Module
+
+        NM    - Network Module"
+    REVISION        "200701080000Z"
+    DESCRIPTION
+        "Deprecated cueHardwareModuleType."
+    REVISION        "200509020000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+          ::= { ciscoMgmt 420 }
+
+
+ciscoUnityExpressMIBNotifs  OBJECT IDENTIFIER
+    ::= { ciscoUnityExpressMIB 0 }
+
+ciscoUnityExpressMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoUnityExpressMIB 1 }
+
+ciscoUnityExpressMIBConform  OBJECT IDENTIFIER
+    ::= { ciscoUnityExpressMIB 2 }
+
+cueSystem  OBJECT IDENTIFIER
+    ::= { ciscoUnityExpressMIBObjects 1 }
+
+cueSystemControl  OBJECT IDENTIFIER
+    ::= { cueSystem 1 }
+
+
+cueShutdownRequest OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Shutdown all applications and halt the system." 
+    ::= { cueSystemControl 1 }
+cueSystemScalars  OBJECT IDENTIFIER
+    ::= { cueSystem 2 }
+
+
+cueAVTNumber OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..15))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Administration Via Telephone (AVT) pilot number. AVT plays
+        your personalized greeting when you are away and takes
+        the message." 
+    ::= { cueSystemScalars 1 }
+
+cueVoicemailNumber OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..15))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Voicemail pilot number.  This is used to play back your
+        messages." 
+    ::= { cueSystemScalars 2 }
+
+cueAANumber OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..15))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Auto Attendant (AA) pilot number. AA is the generic
+        voicemail entrance to the company.  (If you know your
+        party's extension...)" 
+    ::= { cueSystemScalars 3 }
+
+cueHardwareModuleType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        aim(1),
+                        nm(2),
+                        other(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "Type of hardware module running this Cisco Unity Express
+        (CUE) software.
+
+        'aim' - Advanced Integration Module (AIM). 
+
+        'nm'  - Network Module (NM).
+
+        'other'  - This information is provided by the SNMPv2-MIB
+        sysObjectID." 
+    ::= { cueSystemScalars 4 }
+
+cueCallControlAgentType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        ccm(1),
+                        ccme(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Type of call control agent delivering calls to
+        this voicemail application. 
+
+        'ccm'  - Cisco Call Manager. 
+
+        'ccme' - Cisco Call Manager Express." 
+    ::= { cueSystemScalars 5 }
+cueSIPInfo  OBJECT IDENTIFIER
+    ::= { cueSystem 3 }
+
+
+cueSIPGatewayName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..128))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Session Initiation Protocol (SIP) gateway hostname." 
+    ::= { cueSIPInfo 1 }
+
+cueSIPGatewayIPType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Session Initiation Protocol (SIP) gateway IP address type." 
+    ::= { cueSIPInfo 2 }
+
+cueSIPGatewayIP OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Session Initiation Protocol (SIP) gateway IP address.
+        The type of internet address is indicated by the value of 
+        cueSIPGatewayIPType." 
+    ::= { cueSIPInfo 3 }
+
+cueSIPPort OBJECT-TYPE
+    SYNTAX          InetPortNumber
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Session Initiation Protocol (SIP) port number." 
+    ::= { cueSIPInfo 4 }
+cueJTAPIInfo  OBJECT IDENTIFIER
+    ::= { cueSystem 4 }
+
+
+cueJTAPIServerTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CueJTAPIServerEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "List of JTAPI Servers."
+    ::= { cueJTAPIInfo 1 }
+
+cueJTAPIServerEntry OBJECT-TYPE
+    SYNTAX          CueJTAPIServerEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry containing information about a JTAPI Server."
+    INDEX           { cueJTAPIServerIndex } 
+    ::= { cueJTAPIServerTable 1 }
+
+CueJTAPIServerEntry ::= SEQUENCE {
+        cueJTAPIServerIndex  Unsigned32,
+        cueJTAPIServerName   SnmpAdminString,
+        cueJTAPIServerIPType InetAddressType,
+        cueJTAPIServerIP     InetAddress
+}
+
+cueJTAPIServerIndex OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..4294967295 )
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An arbitrary integer, a unique value for each JTAPI Server." 
+    ::= { cueJTAPIServerEntry 1 }
+
+cueJTAPIServerName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..128))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Java Telephony Application Programming Interface (JTAPI)
+        session server hostname." 
+    ::= { cueJTAPIServerEntry 2 }
+
+cueJTAPIServerIPType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Java Telephony Application Programming Interface (JTAPI)
+        session server IP address type." 
+    ::= { cueJTAPIServerEntry 3 }
+
+cueJTAPIServerIP OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Java Telephony Application Programming Interface (JTAPI)
+        session server IP address.  The type of internet address 
+        is indicated by the value of cueJTAPIServerIPType." 
+    ::= { cueJTAPIServerEntry 4 }
+ 
+
+
+cueJTAPISubsystemState OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        initializing(2),
+                        inService(3),
+                        outOfService(4),
+                        shuttingDown(5),
+                        shutDown(6),
+                        partialService(7)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Java Telephony Application Programming Interface (JTAPI)
+        subsystem functional state. 
+
+        'unknown'        - Unknown. 
+
+        'initializing'   - Initializing.
+
+        'inService'      - In service.
+
+        'outOfService'   - Out of service.
+
+        'shuttingDown'   - Shutting down.
+
+        'shutDown'       - Shut down.
+
+        'partialService' - Partial service." 
+    ::= { cueJTAPIInfo 2 }
+
+cueJTAPIUsername OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..63))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Java Telephony Application Programming Interface (JTAPI)
+        session user name." 
+    ::= { cueJTAPIInfo 3 }
+
+cueJTAPISoftwareVersion OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..63))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Java Telephony Application Programming Interface (JTAPI)
+        software version string." 
+    ::= { cueJTAPIInfo 4 }
+
+cueJTAPIPortsRegistered OBJECT-TYPE
+    SYNTAX          Gauge32 (0..1023 )
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Current number of Java Telephony Application Programming
+        Interface (JTAPI) ports registered." 
+    ::= { cueJTAPIInfo 5 }
+cueSystemDefaults  OBJECT IDENTIFIER
+    ::= { cueSystem 5 }
+
+
+cueDefaultMailboxSize OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..65535 )
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Default mailbox size in seconds.  New mailboxes will
+        have this default size." 
+    ::= { cueSystemDefaults 1 }
+
+cueDefaultGreetingSize OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..65535 )
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Default greeting length in seconds.  New mailboxes will
+        have this default maximum greeting length." 
+    ::= { cueSystemDefaults 2 }
+
+cueDefaultMessageSizeMax OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..65535 )
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Default maximum message length in seconds.  New mailboxes
+        will have this default maximum single message length." 
+    ::= { cueSystemDefaults 3 }
+
+cueDefaultMessageExpiryTime OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..65535 )
+    UNITS           "days"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Default message age before deletion in days.  New
+        mailboxes will have this default age limit." 
+    ::= { cueSystemDefaults 4 }
+-- Usage
+cueUsage  OBJECT IDENTIFIER
+    ::= { ciscoUnityExpressMIBObjects 2 }
+
+cueUsageScalars  OBJECT IDENTIFIER
+    ::= { cueUsage 1 }
+
+
+cueLicensedPortsMax OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..1023 )
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Maximum number of call processing ports.  This is limited
+        by the type of license purchased." 
+    ::= { cueUsageScalars 1 }
+
+cueActiveCalls OBJECT-TYPE
+    SYNTAX          Gauge32 (0..1023 )
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of calls in progress.  The number of active
+        calls is limited by cueLicensedPortsMax." 
+    ::= { cueUsageScalars 2 }
+
+cuePersonalMailboxes OBJECT-TYPE
+    SYNTAX          Gauge32 (0..65535 )
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Current number of personal mailboxes.  A personal mailbox
+        holds a user's voicemail messages." 
+    ::= { cueUsageScalars 3 }
+
+cueGeneralDeliveryMailboxes OBJECT-TYPE
+    SYNTAX          Gauge32 (0..65535 )
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Current number of general delivery mailboxes.  A general
+        delivery mailbox is used to distribute a message to a list of
+        users. Examples would be department or company wide messages
+        via voicemail." 
+    ::= { cueUsageScalars 4 }
+
+cueOrphanedMailboxes OBJECT-TYPE
+    SYNTAX          Gauge32 (0..65535 )
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Current number of mailboxes not associated with an owner.  This
+        may occur if the user is deleted, but the mailbox is not.
+        The mailbox will continue to take up its defined
+        cueAllocatedCapacity on the storage media." 
+    ::= { cueUsageScalars 5 }
+
+cueCapacityOfVoicemail OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..2147483647 )
+    UNITS           "minutes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Licensed maximum capacity of voicemail in minutes.  It is
+        the ceiling for the sum of all user's mailboxes." 
+    ::= { cueUsageScalars 6 }
+
+cueAllocatedCapacity OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..2147483647 )
+    UNITS           "minutes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Allocated capacity of voicemail in minutes.  This is the
+        sum of each user's defined mailbox size, regardless of
+        whether they are full or empty.  The cueAllocatedCapacity
+        cannot exceed the licensed cueCapacityOfVoicemail." 
+    ::= { cueUsageScalars 7 }
+
+cueTotalTimeUsed OBJECT-TYPE
+    SYNTAX          Gauge32 (0..2147483647 )
+    UNITS           "minutes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Total time used in minutes for greetings and messages in
+        all mailboxes.  This cannot exceed the cueAllocatedCapacity.
+        If all mailboxes are full, cueTotalTimeUsed will equal
+        cueAllocatedCapacity." 
+    ::= { cueUsageScalars 8 }
+
+cuePercentTimeUsed OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100 )
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Percentage of total time used for greetings and
+        messages in all mailboxes relative to the licensed
+        cueCapacityOfVoicemail." 
+    ::= { cueUsageScalars 9 }
+
+cueMessageTimeUsed OBJECT-TYPE
+    SYNTAX          Gauge32 (0..2147483647 )
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Message time used in seconds.  This is the total of all
+        messages stored in all mailboxes." 
+    ::= { cueUsageScalars 10 }
+
+cueMessageCount OBJECT-TYPE
+    SYNTAX          Gauge32 (0..65535 )
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Total number of messages stored in all mailboxes." 
+    ::= { cueUsageScalars 11 }
+
+cueAverageMessageLength OBJECT-TYPE
+    SYNTAX          Gauge32 (0..65535 )
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Average message length in seconds of all messages stored
+        in all mailboxes." 
+    ::= { cueUsageScalars 12 }
+
+cueGreetingTimeUsed OBJECT-TYPE
+    SYNTAX          Gauge32 (0..2147483647 )
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Greeting time used in seconds for all greetings in all
+        mailboxes." 
+    ::= { cueUsageScalars 13 }
+
+cueGreetingCount OBJECT-TYPE
+    SYNTAX          Gauge32 (0..65535 )
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of greetings in all mailboxes." 
+    ::= { cueUsageScalars 14 }
+
+cueAverageGreetingLength OBJECT-TYPE
+    SYNTAX          Gauge32 (0..65535 )
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Average greeting length in seconds." 
+    ::= { cueUsageScalars 15 }
+
+cueMessagesLeft OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of messages left in all mailboxes since
+        the last boot." 
+    ::= { cueUsageScalars 16 }
+
+cueMessagesRetrieved OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of messages retrieved from all mailboxes since
+        the last boot." 
+    ::= { cueUsageScalars 17 }
+
+cueMessagesDeleted OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of messages deleted from all mailboxes since
+        the last boot." 
+    ::= { cueUsageScalars 18 }
+
+cueLicensedMailboxesMax OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..2147483647 )
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Licensed maximum number of mailboxes.  Enhanced
+        licenses may be purchased to increase this limit." 
+    ::= { cueUsageScalars 19 }
+
+cueMailboxesAbove90PercentFull OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..2147483647 )
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of mailboxes that are at least 90 percent
+        full.  This is an indication of general use." 
+    ::= { cueUsageScalars 20 }
+-- Mailbox Table
+
+cueMboxTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CueMboxEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A list of mailbox entries."
+    ::= { cueUsage 2 }
+
+cueMboxEntry OBJECT-TYPE
+    SYNTAX          CueMboxEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry containing information about a particular
+        mailbox."
+    INDEX           { cueMboxIndex } 
+    ::= { cueMboxTable 1 }
+
+CueMboxEntry ::= SEQUENCE {
+        cueMboxIndex                 Unsigned32,
+        cueMboxOwner                 SnmpAdminString,
+        cueMboxPrimaryExtension      SnmpAdminString,
+        cueMboxType                  INTEGER ,
+        cueMboxDescription           SnmpAdminString,
+        cueMboxSize                  Gauge32,
+        cueMboxTimeUsed              Gauge32,
+        cueMboxPercentTimeUsed       Gauge32,
+        cueMboxNumberOfMessages      Gauge32,
+        cueMboxNumberOfNewMessages   Gauge32,
+        cueMboxNumberOfSavedMessages Gauge32,
+        cueMboxMessageSizeMax        Unsigned32,
+        cueMboxMessageExpiryTime     Unsigned32,
+        cueMboxPlayTutorial          TruthValue,
+        cueMboxGreetingType          INTEGER ,
+        cueMboxEnabled               TruthValue,
+        cueMboxBusy                  TruthValue,
+        cueMboxMWIState              TruthValue
+}
+
+cueMboxIndex OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..4294967295 )
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A unique value, greater than zero, for each mailbox." 
+    ::= { cueMboxEntry 1 }
+
+cueMboxOwner OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..63))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The user name of the mailbox owner." 
+    ::= { cueMboxEntry 2 }
+
+cueMboxPrimaryExtension OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..15))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The phone extension number of the mailbox owner." 
+    ::= { cueMboxEntry 3 }
+
+cueMboxType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        personal(1),
+                        generalDelivery(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The type of mailbox.  A personal mailbox stores messages
+        for a user.  A general delivery mailbox distributes
+        broadcast messages to a list of users.
+        'personal'        - Personal mailbox of the owner.
+        'generalDelivery' - Assigned to a group for delivery." 
+    ::= { cueMboxEntry 4 }
+
+cueMboxDescription OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "A textual string containing information about the mailbox." 
+    ::= { cueMboxEntry 5 }
+
+cueMboxSize OBJECT-TYPE
+    SYNTAX          Gauge32 (0..65535 )
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Total number of seconds allocated for greetings and
+        messages." 
+    ::= { cueMboxEntry 6 }
+
+cueMboxTimeUsed OBJECT-TYPE
+    SYNTAX          Gauge32 (0..65535 )
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Time used for greetings and messages in seconds for this
+        mailbox.  cueMboxTimeUsed cannot exceed cueMboxSize." 
+    ::= { cueMboxEntry 7 }
+
+cueMboxPercentTimeUsed OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100 )
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Percentage of cueMboxSize taken by greetings and
+        messages in this mailbox." 
+    ::= { cueMboxEntry 8 }
+
+cueMboxNumberOfMessages OBJECT-TYPE
+    SYNTAX          Gauge32 (0..65535 )
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Number of messages in the mailbox." 
+    ::= { cueMboxEntry 9 }
+
+cueMboxNumberOfNewMessages OBJECT-TYPE
+    SYNTAX          Gauge32 (0..65535 )
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Number of new messages in the mailbox." 
+    ::= { cueMboxEntry 10 }
+
+cueMboxNumberOfSavedMessages OBJECT-TYPE
+    SYNTAX          Gauge32 (0..65535 )
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Number of saved messages in the mailbox." 
+    ::= { cueMboxEntry 11 }
+
+cueMboxMessageSizeMax OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..65535 )
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Maximum number of seconds for a single message." 
+    ::= { cueMboxEntry 12 }
+
+cueMboxMessageExpiryTime OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..65535 )
+    UNITS           "days"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Message expiration time in days before a message is
+        deleted from the mailbox." 
+    ::= { cueMboxEntry 13 }
+
+cueMboxPlayTutorial OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates if the tutorial will be played at the next
+        message retrieval.
+
+        'true'  - The tutorial will be played at the next 
+                     message retrieval.
+
+        'false' - The tutorial will not be played at the 
+                     next message retrieval." 
+    ::= { cueMboxEntry 14 }
+
+cueMboxGreetingType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        standard(1),
+                        alternate(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The type of greeting played to the caller.  A standard
+        greeting uses only the owner's recorded name.  A custom
+        greeting allows the user to record the full message played
+        to callers.
+        'standard'   - System greeting with owner's recorded name.
+        'alternate'  - Owner custom greeting." 
+    ::= { cueMboxEntry 15 }
+
+cueMboxEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Indicates if the mailbox is enabled for use." 
+    ::= { cueMboxEntry 16 }
+
+cueMboxBusy OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Indicates if the mailbox currently in use." 
+    ::= { cueMboxEntry 17 }
+
+cueMboxMWIState OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates if the message waiting indicator (MWI) light
+        on the user's phone is activated." 
+    ::= { cueMboxEntry 18 }
+ 
+
+-- Security
+cueSecurity  OBJECT IDENTIFIER
+    ::= { ciscoUnityExpressMIBObjects 3 }
+
+cueLoginInfo  OBJECT IDENTIFIER
+    ::= { cueSecurity 1 }
+
+
+cueLoginAttempts OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Total number of login attempts from the GUI.
+        This includes both success and failure." 
+    ::= { cueLoginInfo 1 }
+
+cueLoginUsernameFailures OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of GUI logins rejected for unknown username." 
+    ::= { cueLoginInfo 2 }
+
+cueLoginPasswordFailures OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of GUI logins rejected for incorrect password." 
+    ::= { cueLoginInfo 3 }
+cuePINInfo  OBJECT IDENTIFIER
+    ::= { cueSecurity 2 }
+
+
+cuePINAttempts OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Total number of voicemail PIN password attempts while
+        trying to access a mailbox.  This includes successes 
+        and failures." 
+    ::= { cuePINInfo 1 }
+
+cuePINResets OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of PIN resets, overriding a current voicemail PIN
+        password." 
+    ::= { cuePINInfo 2 }
+
+cuePINUidFailures OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of failed voicemail PIN attempts due to a bad
+        User ID (uid) while trying to access a mailbox." 
+    ::= { cuePINInfo 3 }
+
+cuePINPasswordFailures OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of failed voicemail PIN attempts due to a bad
+        password while trying to access a mailbox." 
+    ::= { cuePINInfo 4 }
+-- Notification Configuration
+cueNotif  OBJECT IDENTIFIER
+    ::= { ciscoUnityExpressMIBObjects 4 }
+
+cueNotifConfig  OBJECT IDENTIFIER
+    ::= { cueNotif 1 }
+
+
+cueNotifEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Indicates if notifications should be generated.
+
+        'true'  - Notifications will be sent to targets 
+                  registered via the CUE CLI.
+
+        'false' - Notifications will not be sent.
+
+        Default value for this object is true because frequency of the
+        notification generation is not very high.
+        The following notifications are controlled by this object.
+        - ciscoUnityExpressApplAlert
+        - ciscoUnityExpressStorageAlert
+        - ciscoUnityExpressSecurityAlert
+        - ciscoUnityExpressCallMgrAlert
+        - ciscoUnityExpressRescExhausted
+        - ciscoUnityExpressBackupAlert
+        - ciscoUnityExpressNTPAlert"
+    DEFVAL          { true } 
+    ::= { cueNotifConfig 1 }
+-- Notification Related Objects
+cueNotifInfo  OBJECT IDENTIFIER
+    ::= { cueNotif 2 }
+
+
+cueNotifSeverity OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        error(1),
+                        warning(2),
+                        informational(3)
+                    }
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "The classification on the event severity.
+        'error'          - Significant problem.
+        'warning'        - Not immediately significant.
+        'informational'  - Information only." 
+    ::= { cueNotifInfo 1 }
+
+cueNotifDate OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "The date and time the notification occurred at the source." 
+    ::= { cueNotifInfo 2 }
+
+cueNotifDescription OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION     "Description of the notification." 
+    ::= { cueNotifInfo 3 }
+
+cueNotifDetail OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION     "Detail information on error encountered." 
+    ::= { cueNotifInfo 4 }
+-- Security Notification Objects
+cueNotifSecurity  OBJECT IDENTIFIER
+    ::= { cueNotif 3 }
+
+
+cueLoginUsernameThresh OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..65535 )
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Notification threshold for failed login attempts due to bad
+        user name.  A notification is sent if this threshold is 
+        exceeded within a 5 minute period." 
+    ::= { cueNotifSecurity 1 }
+
+cueLoginPasswordThresh OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..65535 )
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Notification threshold for failed login attempts due to bad
+        password.  A notification is sent if this threshold is 
+        exceeded within a 5 minute period." 
+    ::= { cueNotifSecurity 2 }
+
+cuePINUidThresh OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..65535 )
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Notification threshold for failed PIN authentication attempts
+        due to bad user id number.  A notification is sent if this 
+        threshold is exceeded within a 5 minute period." 
+    ::= { cueNotifSecurity 3 }
+
+cuePINPasswordThresh OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..65535 )
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Notification threshold for failed PIN authentication attempts
+        due to bad password.  A notification is sent if this threshold
+        is exceeded within a 5 minute period." 
+    ::= { cueNotifSecurity 4 }
+
+cuePINResetThresh OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..65535 )
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Notification threshold for PIN password resets.
+        A notification is sent if this threshold is exceeded 
+        within a 5 minute period." 
+    ::= { cueNotifSecurity 5 }
+-- Backup and Restore
+cueBackupRestore  OBJECT IDENTIFIER
+    ::= { ciscoUnityExpressMIBObjects 5 }
+
+-- Backup and Restore History Table
+
+cueBRHistoryTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CueBRHistoryEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A list of voicemail backup restore entries."
+    ::= { cueBackupRestore 1 }
+
+cueBRHistoryEntry OBJECT-TYPE
+    SYNTAX          CueBRHistoryEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry containing information about a past
+        voicemail backup or restore operation."
+    INDEX           { cueBRHistoryIndex } 
+    ::= { cueBRHistoryTable 1 }
+
+CueBRHistoryEntry ::= SEQUENCE {
+        cueBRHistoryIndex     Unsigned32,
+        cueBRHistoryOperation INTEGER ,
+        cueBRHistoryDate      DateAndTime,
+        cueBRHistoryResult    INTEGER 
+}
+
+cueBRHistoryIndex OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..4294967295 )
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A unique value, greater than zero, for each entry." 
+    ::= { cueBRHistoryEntry 1 }
+
+cueBRHistoryOperation OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        backup(1),
+                        restore(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The type of operation.
+
+        'backup'  - Backup of voicemail information.
+
+        'restore' - Restore of voicemail information." 
+    ::= { cueBRHistoryEntry 2 }
+
+cueBRHistoryDate OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Date and time of the operation." 
+    ::= { cueBRHistoryEntry 3 }
+
+cueBRHistoryResult OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        success(1),
+                        failure(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Backup or Restore operation result.
+
+        'success' - The operation was a success.
+
+        'failure' - The operation was a failure." 
+    ::= { cueBRHistoryEntry 4 }
+ 
+
+-- Notifications
+
+
+ciscoUnityExpressApplAlert NOTIFICATION-TYPE
+    OBJECTS         {
+                        cueNotifSeverity,
+                        cueNotifDate,
+                        cueNotifDescription,
+                        cueNotifDetail
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Notification related to applications running on Cisco Unity
+        Express. This notification is sent when application state is
+        changed for example changed from running to down or vice versa."
+   ::= { ciscoUnityExpressMIBNotifs 1 }
+
+
+ciscoUnityExpressStorageAlert NOTIFICATION-TYPE
+    OBJECTS         {
+                        cueNotifSeverity,
+                        cueNotifDate,
+                        cueNotifDescription,
+                        cueNotifDetail
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Notification when storage device degradation is excessive."
+   ::= { ciscoUnityExpressMIBNotifs 2 }
+
+
+ciscoUnityExpressSecurityAlert NOTIFICATION-TYPE
+    OBJECTS         {
+                        cueNotifSeverity,
+                        cueNotifDate,
+                        cueNotifDescription,
+                        cueNotifDetail
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Notification when a possible security issue is detected."
+   ::= { ciscoUnityExpressMIBNotifs 3 }
+
+
+ciscoUnityExpressCallMgrAlert NOTIFICATION-TYPE
+    OBJECTS         {
+                        cueNotifSeverity,
+                        cueNotifDate,
+                        cueNotifDescription,
+                        cueNotifDetail
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Notification when the connection to the call manager
+        is lost."
+   ::= { ciscoUnityExpressMIBNotifs 4 }
+
+
+ciscoUnityExpressRescExhausted NOTIFICATION-TYPE
+    OBJECTS         {
+                        cueNotifSeverity,
+                        cueNotifDate,
+                        cueNotifDescription,
+                        cueNotifDetail
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Notification indicates that the CUE has run out of a certain
+        specified type of resource. For example, when all JTAPI or SIP
+        ports are in used, new incoming call can not be made, at that 
+        time this notification will be generated."
+   ::= { ciscoUnityExpressMIBNotifs 5 }
+
+
+ciscoUnityExpressBackupAlert NOTIFICATION-TYPE
+    OBJECTS         {
+                        cueNotifSeverity,
+                        cueNotifDate,
+                        cueNotifDescription,
+                        cueNotifDetail
+                    }
+    STATUS          current
+    DESCRIPTION     "Notification of a voicemail backup failure."
+   ::= { ciscoUnityExpressMIBNotifs 6 }
+
+
+ciscoUnityExpressNTPAlert NOTIFICATION-TYPE
+    OBJECTS         {
+                        cueNotifSeverity,
+                        cueNotifDate,
+                        cueNotifDescription,
+                        cueNotifDetail
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Notification of a Network Time Protocol (NTP) error."
+   ::= { ciscoUnityExpressMIBNotifs 7 }
+-- Conformance
+ciscoUnityExpressMIBCompliances  OBJECT IDENTIFIER
+    ::= { ciscoUnityExpressMIBConform 1 }
+
+ciscoUnityExpressMIBGroups  OBJECT IDENTIFIER
+    ::= { ciscoUnityExpressMIBConform 2 }
+
+
+-- Compliance
+ciscoUnityExpressMIBCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        the Cisco Unity Express MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        cueSystemGroup,
+                        cueUsageGroup,
+                        cueSecurityGroup,
+                        cueNotifGroup,
+                        ciscoUnityExpressMIBNotificationsGroup,
+                        cueBackupRestoreGroup
+                    }
+    ::= { ciscoUnityExpressMIBCompliances 1 }
+
+ciscoUnityExpressMIBComplianceRev1 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        the Cisco Unity Express MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        cueSystemGroupRev1,
+                        cueUsageGroup,
+                        cueSecurityGroup,
+                        cueNotifGroup,
+                        ciscoUnityExpressMIBNotificationsGroup,
+                        cueBackupRestoreGroup
+                    }
+    ::= { ciscoUnityExpressMIBCompliances 2 }
+
+-- Units of conformance
+cueSystemGroup OBJECT-GROUP
+    OBJECTS         {
+                        cueShutdownRequest,
+                        cueAVTNumber,
+                        cueVoicemailNumber,
+                        cueAANumber,
+                        cueHardwareModuleType,
+                        cueCallControlAgentType,
+                        cueSIPGatewayName,
+                        cueSIPGatewayIPType,
+                        cueSIPGatewayIP,
+                        cueSIPPort,
+                        cueJTAPIServerName,
+                        cueJTAPIServerIPType,
+                        cueJTAPIServerIP,
+                        cueJTAPISubsystemState,
+                        cueJTAPIUsername,
+                        cueJTAPISoftwareVersion,
+                        cueJTAPIPortsRegistered,
+                        cueDefaultMailboxSize,
+                        cueDefaultGreetingSize,
+                        cueDefaultMessageSizeMax,
+                        cueDefaultMessageExpiryTime
+                    }
+    STATUS          deprecated
+    DESCRIPTION
+        "General system parameters. It comprises of everything under
+        cueSystem object."
+    ::= { ciscoUnityExpressMIBGroups 1 }
+
+cueUsageGroup OBJECT-GROUP
+    OBJECTS         {
+                        cueLicensedPortsMax,
+                        cueActiveCalls,
+                        cuePersonalMailboxes,
+                        cueGeneralDeliveryMailboxes,
+                        cueOrphanedMailboxes,
+                        cueCapacityOfVoicemail,
+                        cueAllocatedCapacity,
+                        cueTotalTimeUsed,
+                        cuePercentTimeUsed,
+                        cueMessageTimeUsed,
+                        cueMessageCount,
+                        cueAverageMessageLength,
+                        cueGreetingTimeUsed,
+                        cueGreetingCount,
+                        cueAverageGreetingLength,
+                        cueMboxOwner,
+                        cueMboxPrimaryExtension,
+                        cueMboxType,
+                        cueMboxDescription,
+                        cueMboxSize,
+                        cueMboxTimeUsed,
+                        cueMboxPercentTimeUsed,
+                        cueMboxNumberOfMessages,
+                        cueMboxNumberOfNewMessages,
+                        cueMboxNumberOfSavedMessages,
+                        cueMboxMessageSizeMax,
+                        cueMboxMessageExpiryTime,
+                        cueMboxPlayTutorial,
+                        cueMboxGreetingType,
+                        cueMboxEnabled,
+                        cueMboxBusy,
+                        cueMboxMWIState,
+                        cueMessagesLeft,
+                        cueMessagesRetrieved,
+                        cueMessagesDeleted,
+                        cueLicensedMailboxesMax,
+                        cueMailboxesAbove90PercentFull
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Voicemail usage parameters. It comprises of everything under
+        cueUsage object."
+    ::= { ciscoUnityExpressMIBGroups 2 }
+
+cueSecurityGroup OBJECT-GROUP
+    OBJECTS         {
+                        cueLoginAttempts,
+                        cueLoginUsernameFailures,
+                        cueLoginPasswordFailures,
+                        cuePINAttempts,
+                        cuePINResets,
+                        cuePINUidFailures,
+                        cuePINPasswordFailures
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Security information. It comprises of everything under
+        cueSecurity object."
+    ::= { ciscoUnityExpressMIBGroups 3 }
+
+cueNotifGroup OBJECT-GROUP
+    OBJECTS         {
+                        cueNotifEnable,
+                        cueNotifSeverity,
+                        cueNotifDate,
+                        cueNotifDescription,
+                        cueNotifDetail,
+                        cueLoginUsernameThresh,
+                        cueLoginPasswordThresh,
+                        cuePINUidThresh,
+                        cuePINPasswordThresh,
+                        cuePINResetThresh
+                    }
+    STATUS          current
+    DESCRIPTION
+        "Notification parameters. It comprises of everything under
+        cueNotif object."
+    ::= { ciscoUnityExpressMIBGroups 4 }
+
+ciscoUnityExpressMIBNotificationsGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    {
+                        ciscoUnityExpressApplAlert,
+                        ciscoUnityExpressStorageAlert,
+                        ciscoUnityExpressSecurityAlert,
+                        ciscoUnityExpressCallMgrAlert,
+                        ciscoUnityExpressRescExhausted,
+                        ciscoUnityExpressBackupAlert,
+                        ciscoUnityExpressNTPAlert
+                    }
+    STATUS          current
+    DESCRIPTION     "A collection of traps."
+    ::= { ciscoUnityExpressMIBGroups 5 }
+
+cueBackupRestoreGroup OBJECT-GROUP
+    OBJECTS         {
+                        cueBRHistoryOperation,
+                        cueBRHistoryDate,
+                        cueBRHistoryResult
+                    }
+    STATUS          current
+    DESCRIPTION     "Voicemail backup and restore parameters."
+    ::= { ciscoUnityExpressMIBGroups 6 }
+
+cueSystemGroupRev1 OBJECT-GROUP
+    OBJECTS         {
+                        cueShutdownRequest,
+                        cueAVTNumber,
+                        cueVoicemailNumber,
+                        cueAANumber,
+                        cueCallControlAgentType,
+                        cueSIPGatewayName,
+                        cueSIPGatewayIPType,
+                        cueSIPGatewayIP,
+                        cueSIPPort,
+                        cueJTAPIServerName,
+                        cueJTAPIServerIPType,
+                        cueJTAPIServerIP,
+                        cueJTAPISubsystemState,
+                        cueJTAPIUsername,
+                        cueJTAPISoftwareVersion,
+                        cueJTAPIPortsRegistered,
+                        cueDefaultMailboxSize,
+                        cueDefaultGreetingSize,
+                        cueDefaultMessageSizeMax,
+                        cueDefaultMessageExpiryTime
+                    }
+    STATUS          current
+    DESCRIPTION
+        "General system parameters. It comprises of everything under
+        cueSystem object."
+    ::= { ciscoUnityExpressMIBGroups 7 }
+
+END
+
+
+

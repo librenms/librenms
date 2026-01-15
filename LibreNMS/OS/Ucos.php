@@ -29,21 +29,72 @@ namespace LibreNMS\OS;
 use App\Models\Device;
 use Illuminate\Support\Str;
 
+/**
+ * Cisco Unified Communications OS (formerly Cisco VOS)
+ *
+ * Covers:
+ * - Cisco Unified Communications Manager (CUCM/Call Manager)
+ * - Cisco Unity Connection (CUC)
+ * - Cisco Unified Contact Center Express (UCCX)
+ * - Cisco Emergency Responder (CER)
+ * - Cisco Unified Presence/IM&Presence
+ *
+ * OS-level metrics (CPU, Memory, Storage) are discovered via:
+ * - HOST-RESOURCES-MIB (hrProcessorLoad, hrStorage*)
+ * - Standard LibreNMS processors/mempools/storage modules
+ *
+ * Application metrics are discovered via:
+ * - CISCO-CCM-MIB for CUCM (phones, gateways, devices, etc.)
+ * - Additional application-specific MIBs as available
+ */
 class Ucos extends \LibreNMS\OS
 {
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
 
+        // Detect the primary application/role based on installed packages
         $applist = snmp_walk($this->getDeviceArray(), 'SYSAPPL-MIB::sysApplInstallPkgProductName', '-OQv');
-        if (Str::contains($applist, 'Cisco Unified CCX Database')) {
-            $device->features = 'UCCX';
-        } elseif (Str::contains($applist, 'Cisco CallManager')) {
+
+        // First check sysDescr for product name (newer versions may include it)
+        $sysDescr = $device->sysDescr ?? '';
+
+        if (Str::contains($sysDescr, 'Communications Manager')) {
+            $device->hardware = 'CUCM';
             $device->features = 'CUCM';
-        } elseif (Str::contains($applist, 'Cisco Emergency Responder')) {
-            $device->features = 'CER';
-        } elseif (Str::contains($applist, 'Connection System Agent')) {
+        } elseif (Str::contains($sysDescr, 'Unity Connection')) {
+            $device->hardware = 'Unity Connection';
             $device->features = 'CUC';
+        } elseif (Str::contains($sysDescr, 'IM and Presence')) {
+            $device->hardware = 'IM&P';
+            $device->features = 'CUP';
+        } elseif (Str::contains($sysDescr, 'Contact Center Express')) {
+            $device->hardware = 'UCCX';
+            $device->features = 'UCCX';
+        } elseif (Str::contains($sysDescr, 'Emergency Responder')) {
+            $device->hardware = 'CER';
+            $device->features = 'CER';
+        } elseif (Str::contains($sysDescr, 'Unity Express')) {
+            $device->hardware = 'Unity Express';
+            $device->features = 'CUC';
+        }
+        // Fallback to SYSAPPL-MIB detection for older versions with generic sysDescr
+        elseif (Str::contains($applist, 'Cisco Unified CCX Database')) {
+            $device->hardware = 'UCCX';
+            $device->features = 'UCCX';  // Contact Center Express
+        } elseif (Str::contains($applist, 'Cisco CallManager')) {
+            $device->hardware = 'CUCM';
+            $device->features = 'CUCM';  // Communications Manager (Call Manager)
+        } elseif (Str::contains($applist, 'Cisco Emergency Responder')) {
+            $device->hardware = 'CER';
+            $device->features = 'CER';   // Emergency Responder
+        } elseif (Str::contains($applist, 'Connection System Agent')) {
+            $device->hardware = 'Unity Connection';
+            $device->features = 'CUC';   // Unity Connection (Voice Mail)
+        } elseif (Str::contains($applist, 'Cisco XCP')) {
+            // XCP (eXtensible Communication Platform) indicates Presence/IM&Presence
+            $device->hardware = 'IM&P';
+            $device->features = 'CUP';   // Unified Presence / IM&Presence
         }
     }
 }

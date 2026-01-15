@@ -25,56 +25,35 @@ class CiscoUcsFi extends BaseCisco
         // Let parent Cisco discovery try first (serial, version, etc.)
         parent::discoverOS($device);
 
-        // 0) If parent set a specific hardware already, keep it
-        if (! empty($device->hardware) && stripos((string) $device->hardware, 'ciscoModules') === false) {
-            return;
-        }
+       $hardwareReady = ! empty($device->hardware) && stripos((string) $device->hardware, 'ciscoModules') === false;
 
-        // 1) UCS MIB product name (preferred): cucsNetworkElement productName (col 11)
+        // 1) UCS MIB product name/serial (preferred): cucsNetworkElement productName (col 11), serial (col 17)
         try {
-            $rows = \SnmpQuery::numeric()->walk('.1.3.6.1.4.1.9.9.719.1.32.1.1.11')->table(1) ?: [];
-            foreach ($rows as $row) {
-                $val = null;
-                if (is_array($row)) {
-                    foreach ($row as $vv) {
-                        $val = is_string($vv) ? $vv : null;
-                        break;
-                    }
-                } elseif (is_string($row)) {
-                    $val = $row;
+            // Walk individual column OIDs as table() doesn't parse numeric walks correctly for this MIB
+            $productNames = \SnmpQuery::numeric()->walk('.1.3.6.1.4.1.9.9.719.1.32.1.1.11')->values();
+            $serials = \SnmpQuery::numeric()->walk('.1.3.6.1.4.1.9.9.719.1.32.1.1.17')->values();
+
+            // Try product name first
+            if (! empty($productNames)) {
+                $productName = reset($productNames);  // Get first value
+                if (is_string($productName) && $productName !== '') {
+                    $device->hardware = $this->sanitizeString($productName);   // e.g., UCS-FI-6332-16UP
+                    $hardwareReady = true;
                 }
-                if ($val) {
-                    $device->hardware = $this->sanitizeString($val);   // e.g., UCS-FI-6332-16UP
-                    break;
+            }
+
+            // Try serial number
+            if (! empty($serials)) {
+                $serial = reset($serials);  // Get first value
+                if (is_string($serial) && $serial !== '') {
+                    $device->serial = $this->sanitizeString($serial);
                 }
             }
         } catch (\Throwable $e) {
-            \Log::debug('UCS FI: model (cucsNetworkElement col 11) read failed: ' . $e->getMessage());
+            \Log::debug('UCS FI: model/serial (cucsNetworkElement) read failed: ' . $e->getMessage());
         }
 
-        if (! empty($device->hardware) && stripos((string) $device->hardware, 'ciscoModules') === false) {
-            // Optional: serial from col 17
-            try {
-                $sr = \SnmpQuery::numeric()->walk('.1.3.6.1.4.1.9.9.719.1.32.1.1.17')->table(1) ?: [];
-                foreach ($sr as $row) {
-                    $val = null;
-                    if (is_array($row)) {
-                        foreach ($row as $vv) {
-                            $val = is_string($vv) ? $vv : null;
-                            break;
-                        }
-                    } elseif (is_string($row)) {
-                        $val = $row;
-                    }
-                    if ($val) {
-                        $device->serial = $this->sanitizeString($val);
-                        break;
-                    }
-                }
-            } catch (\Throwable $e) {
-                \Log::debug('UCS FI: serial (cucsNetworkElement col 17) read failed: ' . $e->getMessage());
-            }
-
+        if ($hardwareReady) {
             return;
         }
 
@@ -122,7 +101,7 @@ class CiscoUcsFi extends BaseCisco
     }
 
     /**
-     * Keep UI-safe strings: ensure UTF-8, strip any 4-byte codepoints (if DB/renderer cant handle them),
+     * Keep UI-safe strings: ensure UTF-8, strip any 4-byte codepoints (if DB/renderer can't handle them),
      * and drop invalid sequences.
      */
     private function sanitizeString(?string $s): ?string

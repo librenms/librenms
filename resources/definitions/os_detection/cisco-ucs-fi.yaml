@@ -1,5 +1,5 @@
 os: cisco-ucs-fi
-text: 'Cisco UCS Fabric Interconnect'
+text: 'UCS Fabric Interconnect'
 type: network
 icon: cisco
 group: cisco
