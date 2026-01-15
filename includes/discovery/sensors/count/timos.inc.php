@@ -30,7 +30,7 @@ $resrcData = SnmpQuery::hideMib()->walk([
     'TIMETRA-NAT-MIB::tmnxNatIsaMemberResrcVal',
 ])->table(3);
 
-// OID base: 1.3.6.1.4.1.6527.3.1.2.65.1.3.6.1
+// OID base: 1.3.6.1.4.1.6527.3.1.2.65.1.1.3.6.1
 // .2 = tmnxNatIsaMemberResrcName
 // .4 = tmnxNatIsaMemberResrcVal
 
@@ -128,6 +128,7 @@ foreach ($vappStatsData as $oid => $value) {
 
     // First part is the string length of the policy name
     $nameLength = (int) array_shift($indexParts);
+    // After the name, we expect 3 more parts: idx1, idx2, stat_type_enum
     if ($nameLength < 1 || $nameLength > count($indexParts) - 3) {
         continue;
     }
