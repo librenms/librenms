@@ -24,7 +24,7 @@ $icon = '<span class="alert-status ' . $severity_colour . '"></span>';
 
 echo '<tr>';
 echo '<td>' . $icon . '</td>';
-echo '<td>' . $entry['humandate'] . '</td>';
+echo '<td>' . \LibreNMS\Util\Time::serverToUser($entry['datetime']) . '</td>';
 
 echo '<td style="white-space: nowrap;max-width: 100px;overflow: hidden;text-overflow: ellipsis;">';
 

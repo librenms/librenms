@@ -203,4 +203,52 @@ class Time
 
         return $time->format($format);
     }
+
+    /**
+     * Returns current user time
+     */
+    public static function userNow(): Carbon
+    {
+        return Carbon::now(session('preferences.timezone'));
+    }
+
+    /**
+     * Returns user time from unix timestamp
+     */
+    public static function userFromTimestamp(int $timestamp): Carbon
+    {
+        return Carbon::createFromTimestamp($timestamp, session('preferences.timezone'));
+    }
+
+    /**
+     * Convert a time string in user timezone to server time
+     */
+    public static function userToServer(string $time): Carbon
+    {
+        return Carbon::parse($time, session('preferences.timezone'));
+    }
+
+    /**
+     * Returns current server time
+     */
+    public static function serverNow(): Carbon
+    {
+        return Carbon::now();
+    }
+
+    /**
+     * Returns server time from unix timestamp
+     */
+    public static function serverFromTimestamp(int $timestamp): Carbon
+    {
+        return Carbon::createFromTimestamp($timestamp);
+    }
+
+    /**
+     * Convert a time string in server timezone to user time
+     */
+    public static function serverToUser(string $time): Carbon
+    {
+        return Carbon::parse($time)->setTimezone(session('preferences.timezone'));
+    }
 }

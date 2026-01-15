@@ -28,7 +28,6 @@ namespace App\Http\Controllers\Table;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\DeviceOutage;
-use Carbon\Carbon;
 use Carbon\CarbonInterval;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -66,8 +65,8 @@ class OutagesController extends TableController
      */
     public function baseQuery(Request $request): Builder
     {
-        $from_ts = Time::parseInput($request->from);
-        $to_ts = Time::parseInput($request->to);
+        $from_ts = $request->from ? Time::userToServer($request->from)->timestamp : null;
+        $to_ts = $request->to ? Time::userToServer($request->to)->timestamp : null;
 
         return DeviceOutage::hasAccess($request->user())
             ->with('device')
@@ -138,8 +137,8 @@ class OutagesController extends TableController
 
     private function asDuration(DeviceOutage $outage): CarbonInterval
     {
-        $start = Carbon::createFromTimestamp($outage->going_down);
-        $end = $outage->up_again ? Carbon::createFromTimestamp($outage->up_again) : Carbon::now();
+        $start = Time::serverFromTimestamp($outage->going_down);
+        $end = $outage->up_again ? Time::serverFromTimestamp($outage->up_again) : Time::serverNow();
 
         return $end->diffAsCarbonInterval($start);
     }
@@ -151,8 +150,7 @@ class OutagesController extends TableController
         }
 
         // Convert epoch to local time
-        return Carbon::createFromTimestamp($timestamp, session('preferences.timezone'))
-            ->format(LibrenmsConfig::get('dateformat.compact'));
+        return Time::userFromTimestamp($timestamp)->format(LibrenmsConfig::get('dateformat.compact'));
     }
 
     private function statusLabel(DeviceOutage $outage): string
@@ -193,8 +191,8 @@ class OutagesController extends TableController
     {
         return [
             $outage->device ? $outage->device->displayName() : '',
-            Carbon::createFromTimestamp($outage->going_down)->toISOString(),
-            $outage->up_again ? Carbon::createFromTimestamp($outage->up_again)->toISOString() : '-',
+            Time::serverFromTimestamp($outage->going_down)->toISOString(),
+            $outage->up_again ? Time::userFromTimestamp($outage->up_again)->toISOString() : '-',
             $this->asDuration($outage)->format('%H:%I:%S'),
         ];
     }

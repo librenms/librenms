@@ -37,7 +37,6 @@ $refresh = request()->input('refresh', 30);
                                 id="date_range" name="date_range"
                                 start="{{ $from }}"
                                 end="{{ $to }}"
-                                output-format="timestamp"
                                 class="form-control tw:min-w-64"
                                 x-on:date-range-changed="refreshOutagesGrid"
                             ></x-date-range-picker>
@@ -96,8 +95,8 @@ $refresh = request()->input('refresh', 30);
             return {
                 device: document.getElementById('device').value,
                 status: document.getElementById('status').value,
-                to: range.end?.toISOString(),
-                from: range.start?.toISOString(),
+                to: range.end,
+                from: range.start,
             };
         },
     }).on("loaded.rs.jquery.bootgrid", function() {
