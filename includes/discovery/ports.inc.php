@@ -59,7 +59,7 @@ if ($device['os'] == 'zynos') {
 
 // Get correct eth0 port status for AirFiber 5XHD devices
 if ($device['os'] == 'airos-af-ltu') {
-    require 'ports/airos-af-ltu.inc.php';
+    require base_path('includes/discovery/ports/airos-af-ltu.inc.php');
 }
 
 //Teleste Luminato ifOperStatus
