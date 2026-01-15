@@ -18,7 +18,7 @@ Currently supported OSes are as below.
 === "CentOS/RedHat"
 
     ```bash
-    yum install perl-JSON perl-File-Slurp perl-MIME-Base64
+    yum install perl-IO-Compress perl-JSON perl-File-Slurp perl-MIME-Base64
     ```
 
 === "FreeBSD"
