@@ -116,7 +116,7 @@ $allowedVappStats = [
 
 foreach ($vappStatsData as $oid => $value) {
     // Extract the numeric index from the OID
-    if (! preg_match('/tmnxNatVappPlcyStatsVal\.(.+)$/', $oid, $matches)) {
+    if (! preg_match('/tmnxNatVappPlcyStatsVal\.(.+)$/', (string) $oid, $matches)) {
         continue;
     }
 
@@ -134,7 +134,7 @@ foreach ($vappStatsData as $oid => $value) {
 
     // Next $nameLength parts are ASCII codes for the policy name
     $nameAscii = array_splice($indexParts, 0, $nameLength);
-    $policyName = implode('', array_map('chr', $nameAscii));
+    $policyName = implode('', array_map(chr(...), $nameAscii));
 
     // Remaining parts: idx1, idx2, stat_type_enum
     if (count($indexParts) < 3) {

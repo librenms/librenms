@@ -31,7 +31,7 @@ $blockUsageData = SnmpQuery::numericIndex()->hideMib()->walk('TIMETRA-NAT-MIB::t
 
 foreach ($blockUsageData as $oid => $value) {
     // Extract the numeric index from the OID
-    if (! preg_match('/tmnxNatPlLsnMemberBlockUsage\.(.+)$/', $oid, $matches)) {
+    if (! preg_match('/tmnxNatPlLsnMemberBlockUsage\.(.+)$/', (string) $oid, $matches)) {
         continue;
     }
 
@@ -49,7 +49,7 @@ foreach ($blockUsageData as $oid => $value) {
 
     // Next $nameLength parts are ASCII codes for the pool name
     $nameAscii = array_splice($indexParts, 0, $nameLength);
-    $poolName = implode('', array_map('chr', $nameAscii));
+    $poolName = implode('', array_map(chr(...), $nameAscii));
 
     $descr = "$poolName Block Usage";
 
