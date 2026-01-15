@@ -11,11 +11,11 @@ class VlansController extends Controller
     public function index(Request $request): View
     {
         return view('vlans.index', [
-            'vlanIds' => Vlan::distinct()
+            'vlans' => Vlan::distinct()
                 ->hasAccess($request->user())
                 ->where('vlan_vlan', '>', 0)
                 ->orderBy('vlan_vlan')
-                ->pluck('vlan_vlan'),
+                ->get(['vlan_vlan', 'vlan_name']),
         ]);
     }
 }

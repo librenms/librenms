@@ -8,8 +8,8 @@
             <x-slot name="heading">
                 <h2 class="panel-title">{{ __('VLAN') }}
                 <select id="vlan-select">
-                    @foreach($vlanIds as $vlanId)
-                        <option>{{ $vlanId }}</option>
+                    @foreach($vlans as $vlan)
+                        <option value="{{ $vlan->vlan_vlan }}">{{ $vlan->vlan_vlan }} - {{ $vlan->vlan_name ?: 'N/A' }}</option>
                     @endforeach
                 </select>
                 </h2>
@@ -50,7 +50,7 @@
 
 @push('scripts')
     <script>
-        var vlan_id = {{ (int) $vlanIds->first() }};
+        var vlan_id = {{ (int) $vlans->first()->vlan_vlan }};
         var grid = $("#vlan-ports").bootgrid({
             ajax: true,
             post: function () {
