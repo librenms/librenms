@@ -60,40 +60,29 @@ class Ucos extends \LibreNMS\OS
         $sysDescr = $device->sysDescr ?? '';
 
         if (Str::contains($sysDescr, 'Communications Manager')) {
-            $device->hardware = 'CUCM';
             $device->features = 'CUCM';
         } elseif (Str::contains($sysDescr, 'Unity Connection')) {
-            $device->hardware = 'Unity Connection';
             $device->features = 'CUC';
         } elseif (Str::contains($sysDescr, 'IM and Presence')) {
-            $device->hardware = 'IM&P';
             $device->features = 'CUP';
         } elseif (Str::contains($sysDescr, 'Contact Center Express')) {
-            $device->hardware = 'UCCX';
             $device->features = 'UCCX';
         } elseif (Str::contains($sysDescr, 'Emergency Responder')) {
-            $device->hardware = 'CER';
             $device->features = 'CER';
         } elseif (Str::contains($sysDescr, 'Unity Express')) {
-            $device->hardware = 'Unity Express';
             $device->features = 'CUC';
         }
         // Fallback to SYSAPPL-MIB detection for older versions with generic sysDescr
         elseif (Str::contains($applist, 'Cisco Unified CCX Database')) {
-            $device->hardware = 'UCCX';
             $device->features = 'UCCX';  // Contact Center Express
         } elseif (Str::contains($applist, 'Cisco CallManager')) {
-            $device->hardware = 'CUCM';
             $device->features = 'CUCM';  // Communications Manager (Call Manager)
         } elseif (Str::contains($applist, 'Cisco Emergency Responder')) {
-            $device->hardware = 'CER';
             $device->features = 'CER';   // Emergency Responder
         } elseif (Str::contains($applist, 'Connection System Agent')) {
-            $device->hardware = 'Unity Connection';
             $device->features = 'CUC';   // Unity Connection (Voice Mail)
         } elseif (Str::contains($applist, 'Cisco XCP')) {
             // XCP (eXtensible Communication Platform) indicates Presence/IM&Presence
-            $device->hardware = 'IM&P';
             $device->features = 'CUP';   // Unified Presence / IM&Presence
         }
     }

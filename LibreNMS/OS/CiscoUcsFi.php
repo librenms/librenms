@@ -25,7 +25,7 @@ class CiscoUcsFi extends BaseCisco
         // Let parent Cisco discovery try first (serial, version, etc.)
         parent::discoverOS($device);
 
-       $hardwareReady = ! empty($device->hardware) && stripos((string) $device->hardware, 'ciscoModules') === false;
+        $hardwareReady = ! empty($device->hardware) && stripos((string) $device->hardware, 'ciscoModules') === false;
 
         // 1) UCS MIB product name/serial (preferred): cucsNetworkElement productName (col 11), serial (col 17)
         try {
