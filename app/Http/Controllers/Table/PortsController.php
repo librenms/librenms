@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Url;
 
 class PortsController extends TableController
 {
@@ -138,7 +139,7 @@ class PortsController extends TableController
 
         return [
             'status' => $status,
-            'device' => Blade::render('<x-device-link :device="$device" />', ['device' => $port->device]),
+            'device' => Url::modernDeviceLink($port->device),
             'port' => Blade::render('<x-port-link :port="$port"/>', ['port' => $port]),
             'secondsIfLastChange' => ceil($port->device?->uptime - ($port->ifLastChange / 100)),
             'ifConnectorPresent' => ($port->ifConnectorPresent == 'true') ? 'yes' : 'no',
@@ -201,7 +202,7 @@ class PortsController extends TableController
 
         return [
             'device_id' => $port->device_id,
-            'hostname' => $port->device->displayName(),
+            'hostname' => $port->device?->displayName(),
             'port' => $port->ifName ?: $port->ifDescr,
             'ifindex' => $port->ifIndex,
             'status' => $status,

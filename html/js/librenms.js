@@ -264,7 +264,8 @@ $(document).on('initialized.rs.jquery.bootgrid', function (e, b) {
                     '<i class="fa fa-download"></i> <span class="caret"></span>' +
                     '</button>' +
                     '<ul class="dropdown-menu">' +
-                    '<li><a href="' + exportUrl + '" class="export-link" data-grid-id="' + tableId + '"><i class="fa fa-file-text-o"></i> Export to CSV</a></li>' +
+                    '<li><a href="' + exportUrl + '" class="export-link" data-grid-id="' + tableId + '" data-export-type="visible"><i class="fa-solid fa-fw fa-file-csv"></i> Export page</a></li>' +
+                    '<li><a href="' + exportUrl + '" class="export-link" data-grid-id="' + tableId + '" data-export-type="all"><i class="fa-solid fa-fw fa-file-csv"></i> Export all results</a></li>' +
                     '</ul>' +
                     '</div>'
                 );
@@ -277,6 +278,7 @@ $(document).on('initialized.rs.jquery.bootgrid', function (e, b) {
                     e.preventDefault();
 
                     var gridId = $(this).data('grid-id');
+                    var exportType = $(this).data('export-type');
                     var grid = $('#' + gridId);
                     var currentUrl = $(this).attr('href');
                     var urlParams = [];
@@ -286,11 +288,13 @@ $(document).on('initialized.rs.jquery.bootgrid', function (e, b) {
                         urlParams.push('searchPhrase=' + encodeURIComponent(searchPhrase));
                     }
 
-                    // pagination and row count
-                    var currentPage = grid.bootgrid('getCurrentPage');
-                    var rowCount = grid.bootgrid('getRowCount');
-                    urlParams.push('current=' + currentPage);
-                    urlParams.push('rowCount=' + rowCount);
+                    // Only include pagination for visible records export
+                    if (exportType === 'visible') {
+                        var currentPage = grid.bootgrid('getCurrentPage');
+                        var rowCount = grid.bootgrid('getRowCount');
+                        urlParams.push('current=' + currentPage);
+                        urlParams.push('rowCount=' + rowCount);
+                    }
 
                     // get all filters from the header
                     var headerContainer = $('.' + gridId + '-headers-table-menu');
