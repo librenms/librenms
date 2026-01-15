@@ -1,7 +1,7 @@
 @props([
     'start' => '',
     'end' => '',
-    'outputFormat' => '', // iso, timestamp, or format string
+    'timezone' => '',
     'presets' => true,
     'placeholder' => 'Select date range...',
     'class' => 'tw:w-full tw:px-3 tw:py-2 tw:border tw:border-gray-300 tw:rounded-md'
@@ -13,7 +13,7 @@
      data-start="{{ $start }}"
      data-end="{{ $end }}"
      data-presets=" {{ is_array($presets) ? implode(',', $presets) : (string) $presets }}"
-     data-output-format="{{ $outputFormat }}"
+     data-timezone="{{ $timezone }}"
      data-placeholder="{{ $placeholder }}">
     <div
         x-text="displayText"
@@ -51,15 +51,15 @@
             <div class="tw:flex-1">
                 <label class="tw:block tw:text-xs tw:text-gray-600 tw:dark:text-gray-400 tw:mb-1">From</label>
                 <div class="tw:flex tw:flex-wrap tw:gap-1 tw:dark:text-dark-gray-400">
-                    <input type="date" x-model="startDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
-                    <input type="time" x-model="startTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
+                    <input type="date" x-model="fieldStartDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
+                    <input type="time" x-model="fieldStartTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
                 </div>
             </div>
             <div class="tw:flex-1">
                 <label class="tw:block tw:text-xs tw:text-gray-600 tw:dark:text-gray-400 tw:mb-1">To</label>
                 <div class="tw:flex tw:flex-wrap tw:gap-1 tw:dark:text-dark-gray-400">
-                    <input type="date" x-model="endDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
-                    <input type="time" x-model="endTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
+                    <input type="date" x-model="fieldEndDate" class="tw:flex-1 tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
+                    <input type="time" x-model="fieldEndTime" class="tw:min-w-fit tw:px-2 tw:py-1 tw:border tw:border-gray-300 tw:dark:border-gray-600 tw:rounded tw:bg-white">
                 </div>
             </div>
         </div>
@@ -77,14 +77,14 @@
     document.addEventListener('alpine:init', () => {
         Alpine.data('dateRangePicker', () => ({
             open: false,
-            startDate: '',
-            endDate: '',
-            startTime: '',
-            endTime: '',
+            fieldStartDate: '',
+            fieldEndDate: '',
+            fieldStartTime: '',
+            fieldEndTime: '',
+            timeZone: '',
             placeholder: 'Select date range...',
             relativeStartSeconds: null,
             relativeEndSeconds: null,
-            outputFormat: '',
             presets: [
                 '6h',
                 '24h',
@@ -98,53 +98,51 @@
             ],
 
             // Computed properties
-            get start() {
+            get startDate() {
                 if (this.relativeStartSeconds !== null) {
                     return new Date(Date.now() - (this.relativeStartSeconds * 1000));
                 }
 
-                if (this.startDate) {
-                    return new Date(`${this.startDate} ${this.startTime}`);
+                if (this.fieldStartDate) {
+                    return new Date(`${this.fieldStartDate} ${this.fieldStartTime}`);
                 }
 
                 return null;
             },
 
-            get end() {
-                if (this.relativeStartSeconds !== null || !this.endDate) {
+            get endDate() {
+                if (this.relativeStartSeconds !== null || !this.fieldEndDate) {
                     return null
                 }
 
                 // if no end time, we want to include the entire day
-                if (!this.endTime) {
-                    return new Date(new Date(this.endDate).getTime() + 86400000);
+                if (!this.fieldEndTime) {
+                    return new Date(new Date(this.fieldEndDate).getTime() + 86400000);
                 }
 
-                return new Date(`${this.endDate} ${this.endTime}`);
+                return new Date(`${this.fieldEndDate} ${this.fieldEndTime}`);
             },
 
             get outStartString() {
-                if (this.relativeStartSeconds !== null) {
-                    return this.toShortOffset(this.relativeStartSeconds)
+                if (thisStartDate = this.startDate) {
+                    // Add the timezone offset back to the date so we still get the entered date when toJSON() converts it to UTC
+                    return new Date(thisStartDate.getTime() - (thisStartDate.getTimezoneOffset() * 60000)).toJSON().split('.')[0];
                 }
 
-                return this.formatDate(this.start, this.startTime, this.outputFormat);
+                return '';
             },
 
             get outEndString() {
-                if (this.relativeEndSeconds !== null) {
-                    return this.toShortOffset(this.relativeEndSeconds)
+                if (thisEndDate = this.endDate) {
+                    // Add the timezone offset back to the date so we still get the entered date when toJSON() converts it to UTC
+                    return new Date(thisEndDate.getTime() - (thisEndDate.getTimezoneOffset() * 60000)).toJSON().split('.')[0];
                 }
 
-                if (this.relativeStartSeconds !== null) {
-                    return '';
-                }
-
-                return this.formatDate(this.end, this.endTime, this.outputFormat);
+                return '';
             },
 
             get hasValue() {
-                return !!(this.start || this.end);
+                return !!(this.startDate || this.endDate);
             },
 
             get displayText() {
@@ -155,14 +153,14 @@
                     }
                 }
 
-                const startString = this.formatDate(this.start, this.startTime);
-                const endString = this.formatDate(this.end, this.endTime);
+                const startString = this.formatDate(this.startDate, this.fieldStartTime);
+                const endString = this.formatDate(this.endDate, this.fieldEndTime);
 
                 if (startString && endString) {
                     return `${startString} to ${endString}`;
                 } else if (startString) {
                     return `From ${startString}`;
-                } else if (this.endString) {
+                } else if (endString) {
                     return `Until ${endString}`;
                 }
 
@@ -180,7 +178,7 @@
                 };
 
                 if (this.$el.dataset.placeholder) this.placeholder = this.$el.dataset.placeholder;
-                if (this.$el.dataset.outputFormat) this.outputFormat = this.$el.dataset.outputFormat;
+                this.timeZone = this.$el.dataset.timezone;
 
                 this.setRange(this.$el.dataset.start, this.$el.dataset.end);
             },
@@ -210,11 +208,11 @@
                 }
 
                 if (start !== null) {
-                    [this.startDate, this.startTime, this.relativeStartSeconds] = this.parseDateTime(start);
+                    [this.fieldStartDate, this.fieldStartTime, this.relativeStartSeconds] = this.parseDateTime(start);
                 }
 
                 if (end !== null) {
-                    [this.endDate, this.endTime, this.relativeEndSeconds] = this.parseDateTime(end);
+                    [this.fieldEndDate, this.fieldEndTime, this.relativeEndSeconds] = this.parseDateTime(end);
                 }
 
                 this.closeDropdown();
@@ -222,10 +220,10 @@
             },
 
             clearRange() {
-                this.startDate = '';
-                this.endDate = '';
-                this.startTime = '';
-                this.endTime = '';
+                this.fieldStartDate = '';
+                this.fieldEndDate = '';
+                this.fieldStartTime = '';
+                this.fieldEndTime = '';
                 this.relativeStartSeconds = null;
                 this.relativeEndSeconds = null;
                 this.closeDropdown();
@@ -234,8 +232,8 @@
 
             getRange() {
                 return {
-                    start: this.start,
-                    end: this.end,
+                    start: this.outStartString,
+                    end: this.outEndString,
                     relativeStartSeconds: this.relativeStartSeconds,
                     relativeEndSeconds: this.relativeEndSeconds,
                 };
@@ -243,7 +241,7 @@
 
             parseDateTime(dateInput) {
                 // Returns [date, time, relativeSeconds]
-                if (typeof dateInput !== 'string') {
+                if (typeof dateInput !== 'string' || ! dateInput) {
                     return ['', '', null];
                 }
 
@@ -260,25 +258,36 @@
                 let d;
                 let includeTime = false;
 
-                // Check for Unix timestamp
-                if (/^\d{10,}$/.test(input)) {
-                    const timestamp = parseInt(input);
+                dateoptions = {};
+                timeoptions = { hour: '2-digit', minute: '2-digit' };
+
+                const timestamp = Number(input);
+                if (isNaN(timestamp)) {
+                    // Non-numeric input is assumed to be a date in the correct timezone
+                    d = new Date(input);
+                    includeTime = /\d{1,2}:\d{2}/.test(input);
+                } else {
+                    // Pure numeric input is assumed to be a timestamp
+
+                    // Convert to the correct timezone
+                    if (this.timeZone) {
+                        dateoptions.timeZone = this.timeZone;
+                        timeoptions.timeZone = this.timeZone;
+                    }
+
                     // If less than 13 digits, it's in seconds, otherwise milliseconds
                     d = new Date(input.length < 13 ? timestamp * 1000 : timestamp);
                     // For Unix timestamps, include time unless it's midnight
                     includeTime = !(d.getHours() === 0 && d.getMinutes() === 0 && d.getSeconds() === 0);
-                } else {
-                    d = new Date(input);
-                    includeTime = /\d{1,2}:\d{2}/.test(input);
                 }
 
                 if (isNaN(d.getTime())) {
+                    console.log('Invalid date time input detected');
                     return ['', '', null];
                 }
 
-                // output the correct formats for the input fields
-                const date = d.toLocaleDateString('en-CA');
-                const time = includeTime ? d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '';
+                const date = d.toLocaleDateString('en-CA', dateoptions);
+                const time = includeTime ? d.toLocaleTimeString('en-GB', timeoptions) : '';
                 return [date, time, null];
             },
 
@@ -345,20 +354,12 @@
             // Check if a preset is selected based on seconds value
             isPresetSelected(preset) {
                 const sec = this.parseRelativeOffset(preset);
-                return this.relativeStartSeconds !== null && sec !== null && sec === this.relativeStartSeconds && !this.endDate && !this.endTime;
+                return this.relativeStartSeconds !== null && sec !== null && sec === this.relativeStartSeconds && !this.fieldEndDate && !this.fieldEndTime;
             },
 
-            formatDate(fullDate, time, format = 'local') {
+            formatDate(fullDate, time) {
                 if (!fullDate) {
                     return '';
-                }
-
-                if (format === 'iso') {
-                    return fullDate.toISOString();
-                }
-
-                if (format === 'timestamp') {
-                    return Math.floor(fullDate.getTime() / 1000).toString();
                 }
 
                 let options = {

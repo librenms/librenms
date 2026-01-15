@@ -84,12 +84,7 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-if (session('preferences.timezone')) {
-    $sql = "SELECT E.id AS alert_log_id, E.details AS alert_log_details, R.severity, D.device_id,name AS alert,rule_id,state,time_logged,DATE_FORMAT(IFNULL(CONVERT_TZ(time_logged, @@global.time_zone, ?),time_logged), '" . \App\Facades\LibrenmsConfig::get('dateformat.mysql.compact') . "') as humandate,details $sql";
-    $param = array_merge([session('preferences.timezone')], $param);
-} else {
-    $sql = "SELECT E.id AS alert_log_id, E.details AS alert_log_details, R.severity, D.device_id,name AS alert,rule_id,state,time_logged,DATE_FORMAT(time_logged, '" . \App\Facades\LibrenmsConfig::get('dateformat.mysql.compact') . "') as humandate,details $sql";
-}
+$sql = "SELECT E.id AS alert_log_id, E.details AS alert_log_details, R.severity, D.device_id,name AS alert,rule_id,state,time_logged,details $sql";
 
 $rulei = 0;
 foreach (dbFetchRows($sql, $param) as $alertlog) {
@@ -130,7 +125,7 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
 
     $response[] = [
         'id' => $rulei++,
-        'time_logged' => $alertlog['humandate'],
+        'time_logged' => \LibreNMS\Util\Time::serverToUser($alertlog['time_logged'])->format(LibrenmsConfig::get('dateformat.compact')),
         'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . $rulei . '" data-parent="#alerts"></a>',
         'verbose_details' => "<button type='button' class='btn btn-alert-details verbose-alert-details' style='display:none' aria-label='Details' id='alert-details' data-alert_log_id='{$alert_log_id}'><i class='fa-solid fa-circle-info'></i></button>",
         'hostname' => '<div class="incident">' . generate_device_link($dev) . '<div id="incident' . $rulei . '" class="collapse">' . $fault_detail . '</div></div>',
