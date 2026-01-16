@@ -4,11 +4,11 @@ modules:
         #location: 
         #version: 
     sensors:
-        #additional_oids:
-        #    data:
-        #        -
-        #            oid:
-        #              - CONTEG-DATABUS-MIB::sdbDevIdTable
+        additional_oids:
+            data:
+                -
+                    oid:
+                      - CONTEG-DATABUS-MIB::sdbDevOutName
         power_consumed:
             data:
                 -
@@ -45,7 +45,7 @@ modules:
                     oid: CONTEG-DATABUS-MIB::sdbDevOutMtTable
                     value: CONTEG-DATABUS-MIB::sdbDevOutMtActualCurrent
                     num_oid: '.1.3.6.1.4.1.28402.12.1.1.2.7.2.1.5.{{ $index }}'
-                    descr: 'PDU {{ $subindex0 }} Port {{ $subindex1 }} Current'
+                    descr: 'PDU {{ $subindex0 }} Port {{ $subindex1 }} ({{ CONTEG-DATABUS-MIB::sdbDevOutName }}) Current'
                     index: 'sdbDevOutMtActualCurrent.{{ $index }}'
                     divisor: 100
                     skip_values:
@@ -75,7 +75,7 @@ modules:
                     oid: CONTEG-DATABUS-MIB::sdbDevOutMtTable
                     value: CONTEG-DATABUS-MIB::sdbDevOutMtPowerWatt
                     num_oid: '.1.3.6.1.4.1.28402.12.1.1.2.7.2.1.11.{{ $index }}'
-                    descr: 'PDU {{ $subindex0 }} Port {{ $subindex1 }} Wattage'
+                    descr: 'PDU {{ $subindex0 }} Port {{ $subindex1 }} ({{ CONTEG-DATABUS-MIB::sdbDevOutName }}) Wattage'
                     index: 'sdbDevOutMtActualCurrent.{{ $index }}'
                     divisor: 100
                     skip_values:
