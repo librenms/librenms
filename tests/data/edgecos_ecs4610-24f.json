@@ -18358,5 +18358,988 @@
                 }
             ]
         }
+    },
+    "ports-stack": {
+        "discovery": {
+            "ports_stack": [
+                {
+                    "high_ifIndex": 1,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1,
+                    "low_ifIndex": 1199,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1,
+                    "low_ifIndex": 1251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 1,
+                    "low_ifIndex": 2503,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2,
+                    "low_ifIndex": 1199,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2,
+                    "low_ifIndex": 1251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2,
+                    "low_ifIndex": 2528,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 2,
+                    "low_ifIndex": 2529,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 3,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 3,
+                    "low_ifIndex": 1199,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 3,
+                    "low_ifIndex": 1251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 3,
+                    "low_ifIndex": 2510,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 1199,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 1251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 4,
+                    "low_ifIndex": 2506,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 5,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 5,
+                    "low_ifIndex": 1199,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 5,
+                    "low_ifIndex": 1251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 5,
+                    "low_ifIndex": 2530,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 6,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 6,
+                    "low_ifIndex": 1199,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 6,
+                    "low_ifIndex": 1251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 7,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 7,
+                    "low_ifIndex": 1199,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 7,
+                    "low_ifIndex": 1251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 7,
+                    "low_ifIndex": 2512,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 8,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 8,
+                    "low_ifIndex": 1199,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 8,
+                    "low_ifIndex": 1251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 8,
+                    "low_ifIndex": 2514,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 1199,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 1251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 9,
+                    "low_ifIndex": 2516,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 1199,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 1251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 10,
+                    "low_ifIndex": 2534,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 11,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 11,
+                    "low_ifIndex": 1199,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 11,
+                    "low_ifIndex": 1251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 11,
+                    "low_ifIndex": 2518,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 12,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 12,
+                    "low_ifIndex": 1199,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 12,
+                    "low_ifIndex": 1251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 12,
+                    "low_ifIndex": 2520,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 13,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 13,
+                    "low_ifIndex": 1199,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 13,
+                    "low_ifIndex": 1251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 13,
+                    "low_ifIndex": 2522,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 14,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 14,
+                    "low_ifIndex": 1199,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 14,
+                    "low_ifIndex": 1251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 14,
+                    "low_ifIndex": 2548,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 14,
+                    "low_ifIndex": 2549,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 14,
+                    "low_ifIndex": 2550,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 15,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 15,
+                    "low_ifIndex": 1199,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 15,
+                    "low_ifIndex": 1251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 15,
+                    "low_ifIndex": 2551,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 15,
+                    "low_ifIndex": 2552,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 16,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 16,
+                    "low_ifIndex": 1199,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 16,
+                    "low_ifIndex": 1251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 16,
+                    "low_ifIndex": 2524,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 17,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 17,
+                    "low_ifIndex": 1199,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 17,
+                    "low_ifIndex": 1251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 17,
+                    "low_ifIndex": 2524,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 17,
+                    "low_ifIndex": 2526,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 18,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 18,
+                    "low_ifIndex": 1199,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 18,
+                    "low_ifIndex": 1251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 18,
+                    "low_ifIndex": 2537,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 19,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 19,
+                    "low_ifIndex": 1199,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 19,
+                    "low_ifIndex": 1251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 19,
+                    "low_ifIndex": 2540,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 20,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 20,
+                    "low_ifIndex": 1199,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 20,
+                    "low_ifIndex": 1251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 20,
+                    "low_ifIndex": 2532,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 20,
+                    "low_ifIndex": 2546,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 21,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 21,
+                    "low_ifIndex": 1199,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 21,
+                    "low_ifIndex": 1251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 21,
+                    "low_ifIndex": 2544,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 22,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 22,
+                    "low_ifIndex": 1199,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 22,
+                    "low_ifIndex": 1251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 23,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 23,
+                    "low_ifIndex": 1199,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 23,
+                    "low_ifIndex": 1251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 1001,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 1199,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 1251,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2503,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2504,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2505,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2506,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2507,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2508,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2509,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2510,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2511,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2512,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2513,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2514,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2515,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2516,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2517,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2518,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2519,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2520,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2521,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2522,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2523,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2524,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2525,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2526,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2527,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2528,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2529,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2530,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2531,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2532,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2533,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2534,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2535,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2536,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2537,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2538,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2539,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2540,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2541,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2542,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2543,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2544,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2545,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2546,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2547,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2548,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2549,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2550,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2551,
+                    "ifStackStatus": "active"
+                },
+                {
+                    "high_ifIndex": 24,
+                    "low_ifIndex": 2552,
+                    "ifStackStatus": "active"
+                }
+            ]
+        }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "cementnikiv12-1-1",
+                    "remote_port": "70 72 CF 8A C5 2C (7072cf8ac52c)",
+                    "remote_platform": null,
+                    "remote_version": "ECS3510-28T",
+                    "ifAlias": "cementnikiv12-1-1",
+                    "ifDescr": "Ethernet Port on unit 1, port 1",
+                    "ifName": "Port1"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "cementnikiv12a-3-1",
+                    "remote_port": "70 72 CF 49 07 15 (7072cf490715)",
+                    "remote_platform": null,
+                    "remote_version": "Edge-Core FE L2 Switch ES3528M",
+                    "ifAlias": "cementnikiv12-3-1",
+                    "ifDescr": "Ethernet Port on unit 1, port 18",
+                    "ifName": "Port18"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "core2.kv-molodigna-44-2",
+                    "remote_port": "CC 37 AB F6 D1 11 (cc37abf6d111)",
+                    "remote_platform": null,
+                    "remote_version": "ECS4120-28F",
+                    "ifAlias": "core2-kvasilov44-2-1",
+                    "ifDescr": "Ethernet Port on unit 1, port 24",
+                    "ifName": "Port24"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "fesnivalna2-2-1",
+                    "remote_port": "70 72 CF B0 94 0C (7072cfb0940c)",
+                    "remote_platform": null,
+                    "remote_version": "ECS3510-28T",
+                    "ifAlias": "festivalna2-2-1",
+                    "ifDescr": "Ethernet Port on unit 1, port 19",
+                    "ifName": "Port19"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "kotlarevskogo2-4-1",
+                    "remote_port": "70 72 CF 15 A2 D0 (7072cf15a2d0)",
+                    "remote_platform": null,
+                    "remote_version": "Edge-Core FE L2 Switch ES3528M",
+                    "ifAlias": "kotlarevskogo2-3-1",
+                    "ifDescr": "Ethernet Port on unit 1, port 21",
+                    "ifName": "Port21"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "zavodska1-2-1",
+                    "remote_port": "70 72 CF B8 E4 B9 (7072cfb8e4b9)",
+                    "remote_platform": null,
+                    "remote_version": "ECS3510-28T",
+                    "ifAlias": "zavodska1-2-1",
+                    "ifDescr": "Ethernet Port on unit 1, port 2",
+                    "ifName": "Port2"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "zavodska10-2-1",
+                    "remote_port": "70 72 CF B9 61 8F (7072cfb9618f)",
+                    "remote_platform": null,
+                    "remote_version": "ECS3510-28T",
+                    "ifAlias": "zavodska10-2-1",
+                    "ifDescr": "Ethernet Port on unit 1, port 11",
+                    "ifName": "Port11"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "zavodska12-2-1",
+                    "remote_port": "70 72 CF 16 38 9F (7072cf16389f)",
+                    "remote_platform": null,
+                    "remote_version": "Edge-Core FE L2 Switch ES3528M",
+                    "ifAlias": "zavodska12-2-1",
+                    "ifDescr": "Ethernet Port on unit 1, port 12",
+                    "ifName": "Port12"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "zd-zavodska-14-2-1",
+                    "remote_port": "70 72 CF 66 3E 13 (7072cf663e13)",
+                    "remote_platform": null,
+                    "remote_version": "Edge-Core FE L2 Switch ES3528M",
+                    "ifAlias": "zavodska14-2-1",
+                    "ifDescr": "Ethernet Port on unit 1, port 13",
+                    "ifName": "Port13"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "zavodska14a-1-1",
+                    "remote_port": "70 72 CF 41 CD C7 (7072cf41cdc7)",
+                    "remote_platform": null,
+                    "remote_version": "ES3510MA",
+                    "ifAlias": "zavodska14a-1-1",
+                    "ifDescr": "Ethernet Port on unit 1, port 14",
+                    "ifName": "Port14"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "zavodska14a-4-1",
+                    "remote_port": "CC 37 AB 4B 5D 32 (cc37ab4b5d32)",
+                    "remote_platform": null,
+                    "remote_version": "ES3510MAv2",
+                    "ifAlias": "zavodska14a-4-1",
+                    "ifDescr": "Ethernet Port on unit 1, port 15",
+                    "ifName": "Port15"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "zavodska18a-2-1",
+                    "remote_port": "70 72 CF 66 E2 D9 (7072cf66e2d9)",
+                    "remote_platform": null,
+                    "remote_version": "Edge-Core FE L2 Switch ES3528M",
+                    "ifAlias": "zavodska18a-2-1",
+                    "ifDescr": "Ethernet Port on unit 1, port 16",
+                    "ifName": "Port16"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "zavodska18a-5-1",
+                    "remote_port": "70 72 CF 5D 37 43 (7072cf5d3743)",
+                    "remote_platform": null,
+                    "remote_version": "Edge-Core FE L2 Switch ES3528M",
+                    "ifAlias": "zavodska18a-5-1",
+                    "ifDescr": "Ethernet Port on unit 1, port 17",
+                    "ifName": "Port17"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "zavodska2-2-1",
+                    "remote_port": "00 12 CF F0 08 A0 (0012cff008a0)",
+                    "remote_platform": null,
+                    "remote_version": "Edge-Core FE L2 Switch ES3528M",
+                    "ifAlias": "zavodska2-2-1",
+                    "ifDescr": "Ethernet Port on unit 1, port 3",
+                    "ifName": "Port3"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "zavodska2a-2-1",
+                    "remote_port": "70 72 CF A7 8F 43 (7072cfa78f43)",
+                    "remote_platform": null,
+                    "remote_version": "Edge-Core FE L2 Switch ES3528M",
+                    "ifAlias": "zavodska2a-2-1",
+                    "ifDescr": "Ethernet Port on unit 1, port 4",
+                    "ifName": "Port4"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "zavodska3-2-1",
+                    "remote_port": "70 72 CF 14 E9 EE (7072cf14e9ee)",
+                    "remote_platform": null,
+                    "remote_version": "Edge-Core FE L2 Switch ES3528M",
+                    "ifAlias": "zavodska3-2-1",
+                    "ifDescr": "Ethernet Port on unit 1, port 5",
+                    "ifName": "Port5"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "zavodska3-4-1",
+                    "remote_port": "00 E0 0C 00 01 16 (00e00c000116)",
+                    "remote_platform": null,
+                    "remote_version": "ECS3510-28T",
+                    "ifAlias": "zavodska3-4-1",
+                    "ifDescr": "Ethernet Port on unit 1, port 20",
+                    "ifName": "Port20"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "zavodska4-2-1",
+                    "remote_port": "70 72 CF 57 7E DD (7072cf577edd)",
+                    "remote_platform": null,
+                    "remote_version": "ECS3510-28T",
+                    "ifAlias": "zavodska4-2-1",
+                    "ifDescr": "Ethernet Port on unit 1, port 7",
+                    "ifName": "Port7"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "zavodska6-2-1",
+                    "remote_port": "70 72 CF 8A D3 55 (7072cf8ad355)",
+                    "remote_platform": null,
+                    "remote_version": "ECS3510-28T",
+                    "ifAlias": "zavodska6-2-1",
+                    "ifDescr": "Ethernet Port on unit 1, port 8",
+                    "ifName": "Port8"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "zavodska8-2-1",
+                    "remote_port": "70 72 CF 15 34 76 (7072cf153476)",
+                    "remote_platform": null,
+                    "remote_version": "Edge-Core FE L2 Switch ES3528M",
+                    "ifAlias": "zavodska8-2-1",
+                    "ifDescr": "Ethernet Port on unit 1, port 9",
+                    "ifName": "Port9"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "zavodska9-2-1",
+                    "remote_port": "70 72 CF 13 85 98 (7072cf138598)",
+                    "remote_platform": null,
+                    "remote_version": "Edge-Core FE L2 Switch ES3528M",
+                    "ifAlias": "zavodska9-2-1",
+                    "ifDescr": "Ethernet Port on unit 1, port 10",
+                    "ifName": "Port10"
+                }
+            ]
+        }
     }
 }
