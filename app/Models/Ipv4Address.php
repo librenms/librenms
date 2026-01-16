@@ -57,6 +57,7 @@ class Ipv4Address extends PortRelatedModel implements Keyable
     /**
      * This is not a standard relationship it is a shortcut to generate an aggregate for sorting.
      * Use port.device nested relationship to access device.
+     *
      * @return HasOneThrough<Device, Port, $this>
      */
     public function deviceViaPort(): HasOneThrough
