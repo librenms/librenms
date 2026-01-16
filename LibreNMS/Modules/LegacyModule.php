@@ -40,12 +40,12 @@ use Symfony\Component\Yaml\Yaml;
 
 class LegacyModule implements Module
 {
-    /** @var array */
-    private $module_deps = [
+    private array $module_deps = [
         'arp-table' => ['ports'],
         'bgp-peers' => ['ports', 'vrf', 'ipv4-addresses', 'ipv6-addresses'],
         'cisco-mac-accounting' => ['ports'],
         'fdb-table' => ['ports', 'vlans'],
+        'transceivers' => ['ports'],
         'vlans' => ['ports'],
         'vrf' => ['ports'],
     ];

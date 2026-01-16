@@ -1055,20 +1055,6 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscove
                 default => null,
             };
 
-            // Parse manufacture date if available (DateAndTime OCTET STRING format)
-            // DateAndTime is an 8 or 11 byte OCTET STRING:
-            // Bytes 1-2: Year (big endian), Byte 3: Month, Byte 4: Day
-            $date = null;
-            $rawDate = $data['TIMETRA-PORT-MIB::tmnxPortSFPVendorManufactureDate'] ?? null;
-            if ($rawDate && strlen($rawDate) >= 4) {
-                $bytes = unpack('nyear/Cmonth/Cday', $rawDate);
-                if ($bytes && $bytes['year'] >= 1970 && $bytes['year'] <= 2100
-                    && $bytes['month'] >= 1 && $bytes['month'] <= 12
-                    && $bytes['day'] >= 1 && $bytes['day'] <= 31) {
-                    $date = sprintf('%04d-%02d-%02d', $bytes['year'], $bytes['month'], $bytes['day']);
-                }
-            }
-
             return new Transceiver([
                 'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
                 'index' => "$chassisIndex.$portId",
@@ -1078,7 +1064,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, TransceiverDiscove
                 'oui' => $data['TIMETRA-PORT-MIB::tmnxPortSFPVendorOUI'] ?? null,
                 'model' => $data['TIMETRA-PORT-MIB::tmnxPortTransceiverModelNumber'] ?? $data['TIMETRA-PORT-MIB::tmnxPortSFPVendorPartNum'] ?? null,
                 'serial' => $data['TIMETRA-PORT-MIB::tmnxPortSFPVendorSerialNum'] ?? null,
-                'date' => $date,
+                'date' => $data['TIMETRA-PORT-MIB::tmnxPortSFPVendorManufactureDate'] ?? null,
                 'ddm' => $ddm,
                 'connector' => $connector,
                 'wavelength' => $wavelength > 0 ? $wavelength : null,

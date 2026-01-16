@@ -256,10 +256,6 @@ class Nokia1830 extends OS implements EntityPhysicalDiscovery, TransceiverDiscov
                 }
             }
 
-            // Parse manufacture date if available
-            // tnSfpPortDate is a SnmpAdminString with date info
-            $date = $this->parseDate($data['TROPIC-OPTICALPORT-MIB::tnSfpPortDate'] ?? null);
-
             return new Transceiver([
                 'port_id' => $portId,
                 'index' => (string) $ifIndex,
@@ -269,7 +265,7 @@ class Nokia1830 extends OS implements EntityPhysicalDiscovery, TransceiverDiscov
                 'model' => $this->cleanString($data['TROPIC-OPTICALPORT-MIB::tnSfpPortUnitPartNum'] ?? null),
                 'serial' => $serial ?: null,
                 'revision' => $this->cleanString($data['TROPIC-OPTICALPORT-MIB::tnSfpPortFirmwareVersion'] ?? null),
-                'date' => $date,
+                'date' => $data['TROPIC-OPTICALPORT-MIB::tnSfpPortDate'] ?? null,
                 'wavelength' => $wavelength > 0 ? $wavelength : null,
             ]);
         })->filter();
@@ -402,9 +398,6 @@ class Nokia1830 extends OS implements EntityPhysicalDiscovery, TransceiverDiscov
             $model = $this->cleanString($data['TROPIC-PSD-MIB::tnPsdSfpInfoNokiaPartNumber'] ?? null)
                 ?: $this->cleanString($data['TROPIC-PSD-MIB::tnPsdSfpInfoPartNumber'] ?? null);
 
-            // Parse date
-            $date = $this->parseDate($data['TROPIC-PSD-MIB::tnPsdSfpInfoVendorDate'] ?? null);
-
             return new Transceiver([
                 'port_id' => $portId,
                 'index' => (string) $ifIndex,
@@ -413,7 +406,7 @@ class Nokia1830 extends OS implements EntityPhysicalDiscovery, TransceiverDiscov
                 'vendor' => $vendor,
                 'model' => $model,
                 'serial' => $serial,
-                'date' => $date,
+                'date' => $data['TROPIC-PSD-MIB::tnPsdSfpInfoVendorDate'] ?? null,
                 'wavelength' => $wavelength,
             ]);
         })->filter();
@@ -607,52 +600,6 @@ class Nokia1830 extends OS implements EntityPhysicalDiscovery, TransceiverDiscov
 
         // Return module type as-is if no match found
         return $moduleType ?: $acronymCode;
-    }
-
-    /**
-     * Parse date string from tnSfpPortDate
-     */
-    private function parseDate(?string $dateStr): ?string
-    {
-        if (empty($dateStr)) {
-            return null;
-        }
-
-        // Try to parse various date formats
-        // Common formats: YYMMDD, YYYY-MM-DD, etc.
-        $dateStr = trim($dateStr);
-
-        // Try YYMMDD format (6 digits)
-        if (preg_match('/^(\d{2})(\d{2})(\d{2})$/', $dateStr, $matches)) {
-            $year = (int) $matches[1];
-            $month = (int) $matches[2];
-            $day = (int) $matches[3];
-
-            // Assume 20xx for years 00-99
-            $year += 2000;
-
-            if ($month >= 1 && $month <= 12 && $day >= 1 && $day <= 31) {
-                return sprintf('%04d-%02d-%02d', $year, $month, $day);
-            }
-        }
-
-        // Try YYYYMMDD format (8 digits)
-        if (preg_match('/^(\d{4})(\d{2})(\d{2})$/', $dateStr, $matches)) {
-            $year = (int) $matches[1];
-            $month = (int) $matches[2];
-            $day = (int) $matches[3];
-
-            if ($year >= 1970 && $year <= 2100 && $month >= 1 && $month <= 12 && $day >= 1 && $day <= 31) {
-                return sprintf('%04d-%02d-%02d', $year, $month, $day);
-            }
-        }
-
-        // Try ISO format YYYY-MM-DD
-        if (preg_match('/^(\d{4})-(\d{2})-(\d{2})/', $dateStr, $matches)) {
-            return $matches[0];
-        }
-
-        return null;
     }
 
     /**
