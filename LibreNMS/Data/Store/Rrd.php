@@ -428,6 +428,11 @@ class Rrd extends BaseDatastore
         if (in_array($command, ['last', 'list', 'lastupdate']) && $this->init(false)) {
             // send this to our synchronous process so output is guaranteed
             $output = $this->sync_process->sendCommand(implode(' ', $cmd));
+            while (! strrpos($output[0], 'OK u:')) {
+                $moreoutput = $this->getOutput();
+                $output[0] .= $moreoutput[0];
+                $output[1] .= $moreoutput[1];
+            }
         } elseif ($this->init()) {
             // don't care about the return of other commands, so send them to the faster async process
             $output = $this->async_process->sendCommand(implode(' ', $cmd));
