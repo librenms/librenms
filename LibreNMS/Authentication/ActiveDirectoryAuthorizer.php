@@ -77,7 +77,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         );
 
         if ($search === false) {
-            throw new AuthenticationException("LDAP search failed: " . ldap_error($connection));
+            throw new AuthenticationException('LDAP search failed: ' . ldap_error($connection));
         }
 
         $result = ldap_get_entries($connection, $search);
