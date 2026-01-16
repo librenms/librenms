@@ -146,13 +146,13 @@ foreach ($protocolsData as $protocol) {
     $bgpPeer = BgpPeer::firstOrNew([
         'device_id' => $device['device_id'],
         'bgpPeerRemoteAs' => $protocol['neighbor_as'],
-        'bgpLocalAddr' => $protocol['source_address'] ?: '0.0.0.0',
+        'bgpLocalAddr' => $protocol['source_address'] ?? '0.0.0.0',
         'bgpPeerRemoteAddr' => $protocol['neighbor_address'],
     ]);
 
     $bgpPeer->device_id = $device['device_id'];
     $bgpPeer->astext = \LibreNMS\Util\AutonomousSystem::get($protocol['neighbor_as'])->name();
-    $bgpPeer->bgpPeerIdentifier = $protocol['neighbor_id'] ?: '0.0.0.0';
+    $bgpPeer->bgpPeerIdentifier = $protocol['neighbor_id'] ?? '0.0.0.0';
     $bgpPeer->bgpPeerRemoteAs = $protocol['neighbor_as'];
     $bgpPeer->bgpPeerState = strtolower((string) $protocol['bgp_state']);
     $bgpPeer->bgpPeerAdminStatus = str_replace('up', 'start', strtolower((string) $protocol['protocol_state']));
@@ -168,12 +168,12 @@ foreach ($protocolsData as $protocol) {
             }
         }
 
-        $bgpPeer->bgpPeerLastErrorText = $protocol['neighbor_id'] ?: '0.0.0.0';
+        $bgpPeer->bgpPeerLastErrorText = $protocol['neighbor_id'] ?? '0.0.0.0';
     }
 
-    $bgpPeer->bgpLocalAddr = $protocol['source_address'] ?: '0.0.0.0';
+    $bgpPeer->bgpLocalAddr = $protocol['source_address'] ?? '0.0.0.0';
     $bgpPeer->bgpPeerRemoteAddr = $protocol['neighbor_address'];
-    $bgpPeer->bgpPeerDescr = $protocol['description'] ?: $protocol['name'];
+    $bgpPeer->bgpPeerDescr = $protocol['description'] ?? $protocol['name'];
     $bgpPeer->bgpPeerInUpdates = intval($protocol['route_change_stats']['import_updates']['accepted'] ?? 0);
     $bgpPeer->bgpPeerOutUpdates = intval($protocol['route_change_stats']['export_updates']['accepted'] ?? 0);
     $bgpPeer->bgpPeerInTotalMessages = intval($protocol['route_change_stats']['import_updates']['received'] ?? 0);
