@@ -428,7 +428,7 @@ class Rrd extends BaseDatastore
         if (in_array($command, ['last', 'list', 'lastupdate']) && $this->init(false)) {
             // send this to our synchronous process so output is guaranteed
             $output = $this->sync_process->sendCommand(implode(' ', $cmd));
-            while (! strrpos($output[0], 'OK u:')) {
+            while (! strrpos((string) $output[0], 'OK u:')) {
                 $moreoutput = $this->sync_process->getOutput();
 
                 // Error if we get no output before we reach the end of command
@@ -576,7 +576,7 @@ class Rrd extends BaseDatastore
 
             // Check and fill cache for this host if needed
             if (! isset($this->rrd_file_cache[$hostpart])) {
-                $this->rrd_file_cache[$hostpart] = array_fill_keys(explode("\n", trim(($this->command('list', '/' . $hostpart, ['--recursive']))[0] ?? '')), true);
+                $this->rrd_file_cache[$hostpart] = array_fill_keys(explode("\n", trim($this->command('list', '/' . $hostpart, ['--recursive'])[0] ?? '')), true);
             }
 
             return isset($this->rrd_file_cache[$hostpart][$filepart]);
