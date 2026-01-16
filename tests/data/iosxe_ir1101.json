@@ -571,7 +571,7 @@
                     "model": "GLC-LH-SMD",
                     "revision": "V01",
                     "serial": "F798YLY",
-                    "date": null,
+                    "date": "0-0-0,0:0:0.0",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,

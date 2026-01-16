@@ -3748,7 +3748,7 @@
                     "model": "GLC-LH-SMD",
                     "revision": "V01",
                     "serial": "FNS17522EL8",
-                    "date": null,
+                    "date": "0-0-0,0:0:0.0",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
