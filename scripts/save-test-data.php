@@ -145,8 +145,7 @@ try {
         echo PHP_EOL;
 
         LibrenmsConfig::invalidateAndReload();
-        $resolved_modules = isset($parts[2]) ? new ModuleList($parts[2]) : ModuleList::fromUserOverrides($modules);
-        $tester = new ModuleTestHelper($resolved_modules, $target_os, $target_variant);
+        $tester = new ModuleTestHelper(new ModuleList($parts[2] ?? []), $target_os, $target_variant);
         if (! $no_save && ! empty($output_file)) {
             $tester->setJsonSavePath($output_file);
         }
