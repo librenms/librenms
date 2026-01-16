@@ -184,8 +184,8 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
 
     private function initRrdDirectory(): void
     {
-        $host_rrd = \Rrd::name($this->device->hostname, '', true);
-        if (LibrenmsConfig::get('rrd.enable', true) && ! is_dir($host_rrd)) {
+        $host_rrd = \Rrd::dirFromHost($this->device->hostname, true);
+        if (LibrenmsConfig::get('rrdcached', false) && LibrenmsConfig::get('rrd.enable', true) && ! is_dir($host_rrd)) {
             try {
                 mkdir($host_rrd);
                 Log::info("Created directory : $host_rrd");
