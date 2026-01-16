@@ -54,9 +54,11 @@ class Ipv6Address extends PortRelatedModel implements Keyable
     }
 
     /**
+     * This is not a standard relationship it is a shortcut to generate an aggregate for sorting.
+     * Use port.device nested relationship to access device.
      * @return HasOneThrough<Device, Port, $this>
      */
-    public function device(): HasOneThrough
+    public function deviceViaPort(): HasOneThrough
     {
         return $this->hasOneThrough(Device::class, Port::class, 'port_id', 'device_id', 'port_id', 'device_id');
     }

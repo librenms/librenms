@@ -51,7 +51,7 @@ abstract class AddressSearchController extends TableController
     protected function sortFields($request)
     {
         return [
-            'hostname' => 'device_hostname',
+            'hostname' => 'device_via_port_hostname',
             'interface' => 'port_ifname',
             'description' => 'port_description',
             'address' => $this->sortField,
@@ -101,7 +101,7 @@ abstract class AddressSearchController extends TableController
             })
             ->when($request->get('device_id'), fn ($q, $id) => $q->whereHas('port', fn ($pq) => $pq->where('device_id', $id)))
             ->when($request->get('interface'), fn ($q, $i) => $q->whereHas('port', fn ($pq) => $pq->where('ifDescr', 'LIKE', $i)))
-            ->when($request->has('sort.hostname'), fn ($q) => $q->withAggregate('device', 'hostname'))
+            ->when($request->has('sort.hostname'), fn ($q) => $q->withAggregate('deviceViaPort', 'hostname'))
             ->when($request->has('sort.interface'), fn ($q) => $q->withAggregate('port', 'ifName'))
             ->when($request->has('sort.description'), function ($q) use ($builder): void {
                 $q->select($builder->getModel()->getTable() . '.*')->selectSub(function ($sub) use ($builder): void {
