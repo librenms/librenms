@@ -399,17 +399,17 @@ class Rrd extends BaseDatastore
      * @param  bool  $forceabsolute  Do we always want an absolute filename
      * @return string[] array of rrd files for this host
      */
-    public function globnames($host, $extra, $globmatch, $forceabsolute = false): array
+    public function globnames($host, $extra, $globmatch): array
     {
         $filenames = $this->getRrdFiles($host);
 
         if ($this->rrdcached) {
             // getRrdFiles only returns filenames for rrdcached - glob match on filename and prepend directory
             $globtest = self::safeName(is_array($extra) ? implode('-', $extra) : $extra) . $globmatch;
-            $prepend = $this->dirFromHost($host, $forceabsolute) . '/';
+            $prepend = $this->dirFromHost($host) . '/';
         } else {
             // getRrdFiles only returns absolute filenames - glob match on path and no prepend
-            $globtest = $this->partname($host, $extra, true) . $globmatch;
+            $globtest = $this->partname($host, $extra) . $globmatch;
             $prepend = '';
         }
 
