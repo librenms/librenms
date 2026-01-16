@@ -563,6 +563,11 @@ class Rrd extends BaseDatastore
             $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
             [$hostpart, $filepart] = explode('/', $filename, 2);
 
+            // Error if no hostname was found
+            if (! $hostpart) {
+                throw new RrdException('Bad filename passed to checkRrdExists: ' . $filename);
+            }
+
             // Check and fill cache for this host if needed
             if (! isset($this->rrd_file_cache[$hostpart])) {
                 $this->rrd_file_cache[$hostpart] = array_fill_keys(explode("\n", trim(($this->command('list', '/' . $hostpart, ['--recursive']))[0] ?? '')), true);
