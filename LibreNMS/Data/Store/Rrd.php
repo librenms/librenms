@@ -344,8 +344,8 @@ class Rrd extends BaseDatastore
      */
     public function renameFile(Device $device, $oldname, $newname): bool
     {
-        $oldrrd = self::name($device->hostname, $oldname, true);
-        $newrrd = self::name($device->hostname, $newname, true);
+        $oldrrd = self::_name($device->hostname, $oldname, true);
+        $newrrd = self::_name($device->hostname, $newname, true);
         if (is_file($oldrrd) && ! is_file($newrrd)) {
             if (rename($oldrrd, $newrrd)) {
                 Eventlog::log("Renamed $oldrrd to $newrrd", $device, 'poller', Severity::Ok);
@@ -385,9 +385,21 @@ class Rrd extends BaseDatastore
      * @param  bool  $forceabsolute  Do we always want an absolute filename
      * @return string the name of the rrd file for $host's $extra component
      */
-    public function name($host, $extra, $forceabsolute = false): string
+    private function _name($host, $extra, $forceabsolute = false): string
     {
         return $this->partname($host, $extra, $forceabsolute) . '.rrd';
+    }
+
+    /**
+     * Public interface to the _name() function - doesn't allow forcing absolute paths
+     *
+     * @param  string  $host  Host name
+     * @param  array|string  $extra  Components of RRD filename - will be separated with "-", or a pre-formed rrdname
+     * @return string the name of the rrd file for $host's $extra component
+     */
+    public function name($host, $extra): string
+    {
+        return $this->_name($host, $extra);
     }
 
     /**
