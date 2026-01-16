@@ -26,6 +26,8 @@
 
 namespace LibreNMS\Util;
 
+use Illuminate\Support\Facades\Log;
+
 class Debug
 {
     /** @var bool */
@@ -90,6 +92,9 @@ class Debug
     {
         if (Laravel::isBooted()) {
             config(['logging.channels.stdout.level' => 'debug']);
+            // Clear cached logger instances so they pick up the new level
+            Log::forgetChannel('console');
+            Log::forgetChannel('stdout');
         } else {
             putenv('STDOUT_LOG_LEVEL=debug');
         }
@@ -99,6 +104,9 @@ class Debug
     {
         if (Laravel::isBooted()) {
             config(['logging.channels.stdout.level' => 'info']);
+            // Clear cached logger instances so they pick up the new level
+            Log::forgetChannel('console');
+            Log::forgetChannel('stdout');
         } else {
             putenv('STDOUT_LOG_LEVEL=info');
         }
@@ -108,6 +116,9 @@ class Debug
     {
         if (Laravel::isBooted()) {
             config(['logging.channels.stdout.level' => 'emergency']);
+            // Clear cached logger instances so they pick up the new level
+            Log::forgetChannel('console');
+            Log::forgetChannel('stdout');
         } else {
             putenv('STDOUT_LOG_LEVEL=emergency');
         }
