@@ -138,7 +138,7 @@ $bgpPeerIds = [];
 
 foreach ($protocolsData as $protocol) {
     // Skip peers that don't have neighbor_address (incomplete BGP handshakes/errors)
-    if (!isset($protocol['neighbor_address']) || !isset($protocol['neighbor_as'])) {
+    if (! isset($protocol['neighbor_address']) || ! isset($protocol['neighbor_as'])) {
         echo PHP_EOL . $name . ': Skipped peer ' . $protocol['name'] . ' (incomplete BGP data)';
         continue;
     }
