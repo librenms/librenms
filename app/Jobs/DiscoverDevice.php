@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Actions\Device\CheckDeviceAvailability;
 use App\Events\DeviceDiscovered;
 use App\Events\DiscoveringDevice;
+use App\Events\OsChangedEvent;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
@@ -17,6 +18,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\Severity;
@@ -104,6 +106,9 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
         $this->deviceArray['status'] = $this->device->status;
         $this->deviceArray['status_reason'] = $this->device->status_reason;
         $os = OS::make($this->deviceArray);
+        Event::listen(OsChangedEvent::class, function () use (&$os): void {
+            $os = $this->handleOsChange($os);
+        });
 
         foreach ($this->moduleList->modulesWithStatus(ProcessType::discovery, $this->device) as $module => $module_status) {
             $should_discover = false;
@@ -123,12 +128,6 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
                     }
 
                     $instance->discover($os);
-
-                    // check for changed OS
-                    if ($module == 'core') {
-                        $os = $this->checkForOsChange($os);
-                        $this->device->save(); // save deferred core changes
-                    }
                 }
             } catch (Throwable $e) {
                 // Re-throw exception if we're in running tests
@@ -150,25 +149,21 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
         }
     }
 
-    private function checkForOsChange(OS $os): OS
+    private function handleOsChange(OS $os): OS
     {
-        if ($this->device->isDirty('os')) {
-            Eventlog::log('Device OS changed: ' . $this->device->getOriginal('os') . ' -> ' . $this->device->os, $this->device, 'system', Severity::Notice);
-            $this->deviceArray['os'] = $this->device->os;
-            $this->deviceArray['os_group'] = LibrenmsConfig::get("os.{$this->device->os}.group");
-            $os = OS::make($this->deviceArray);
+        Eventlog::log('Device OS changed: ' . $this->device->getOriginal('os') . ' -> ' . $this->device->os, $this->device, 'system', Severity::Notice);
+        $this->deviceArray['os'] = $this->device->os;
+        $this->deviceArray['os_group'] = LibrenmsConfig::getOsSetting($this->device->os, 'group');
+        $os = OS::make($this->deviceArray);
 
-            Log::info('OS Changed ');
-            Log::notice('OS: ' . LibrenmsConfig::getOsSetting($this->device->os, 'text') . " ({$this->device->os})\n");
-        }
-
-        // Set type to a predefined type for the OS if it's not already set
-        $loaded_os_type = LibrenmsConfig::get("os.{$this->device->os}.type");
-        if (! $this->device->getAttrib('override_device_type') && $loaded_os_type != $this->device->type) {
-            $this->device->type = $loaded_os_type;
-            Log::debug("Device type changed to $loaded_os_type!");
-        }
+        Log::info('OS Changed ');
+        Log::notice('OS: ' . LibrenmsConfig::getOsSetting($this->device->os, 'text') . " ({$this->device->os})\n");
 
         return $os;
+    }
+
+    public function __destruct()
+    {
+        $this->device?->save(); // make sure device changes are saved
     }
 }

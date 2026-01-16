@@ -5,7 +5,6 @@
  * requires snmp extend agent script from librenms-agent
  */
 
-use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
 
 $sensor_oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.1';
@@ -59,4 +58,4 @@ if (preg_match('/(Linux).+(ntc)/', (string) $device['sysDescr'])) {
     }
 }
 
-include LibrenmsConfig::get('install_dir') . '/includes/discovery/sensors/temperature/supermicro.inc.php';
+include base_path('includes/discovery/sensors/temperature/supermicro.inc.php');

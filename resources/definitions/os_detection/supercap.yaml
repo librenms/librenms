@@ -1,0 +1,15 @@
+os: supercap
+text: 'SuperCap Energy'
+type: power
+icon: supercap
+mib_dir: supercap
+over:
+    - { graph: device_bits, text: Traffic }
+discovery:
+    -
+        sysObjectID_regex:
+            - '/^$/'
+        snmpget:
+            oid: SUPERCAPBATTERY-MIB::BMS01-AmbientTemperature
+            op: '>='
+            value: '0'

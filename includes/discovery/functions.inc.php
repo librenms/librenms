@@ -14,6 +14,7 @@
 
 use App\Actions\Device\CheckDeviceAvailability;
 use App\Actions\Device\ValidateDeviceAndCreate;
+use App\Events\OsChangedEvent;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
@@ -154,6 +155,13 @@ function discover_device(&$device, $force_module = false)
     /** @var \App\Polling\Measure\MeasurementManager $measurements */
     $measurements = app(\App\Polling\Measure\MeasurementManager::class);
     $measurements->checkpoint(); // don't count previous stats
+    Event::listen(OsChangedEvent::class, function ($event) use (&$device): void {
+        $device['os'] = $event->device->os;
+        $device['os_group'] = LibrenmsConfig::getOsSetting($event->device->os, 'group');
+
+        Log::info('OS Changed ');
+        Log::notice('OS: ' . LibrenmsConfig::getOsSetting($event->device->os, 'text') . " ({$event->device->os})\n");
+    });
 
     foreach ($discovery_modules as $module => $module_status) {
         $os_module_status = LibrenmsConfig::getOsSetting($device['os'], "discovery_modules.$module");
@@ -171,7 +179,7 @@ function discover_device(&$device, $force_module = false)
             echo "\n#### Load disco module $module ####\n";
 
             try {
-                include "includes/discovery/$module.inc.php";
+                include base_path("includes/discovery/$module.inc.php");
             } catch (Throwable $e) {
                 // Re-throw exception if we're in running tests
                 if (defined('PHPUNIT_RUNNING')) {
@@ -609,17 +617,18 @@ function sensors($types, $os, $pre_cache = [])
     $device = &$os->getDeviceArray();
     foreach ((array) $types as $sensor_class) {
         echo ucfirst((string) $sensor_class) . ': ';
-        $dir = LibrenmsConfig::get('install_dir') . '/includes/discovery/sensors/' . $sensor_class . '/';
 
-        if (isset($device['os_group']) && is_file($dir . $device['os_group'] . '.inc.php')) {
-            include $dir . $device['os_group'] . '.inc.php';
+        if (isset($device['os_group']) && is_file(base_path("includes/discovery/sensors/$sensor_class/{$device['os_group']}.inc.php"))) {
+            include base_path("includes/discovery/sensors/$sensor_class/{$device['os_group']}.inc.php");
         }
-        if (is_file($dir . $device['os'] . '.inc.php')) {
-            include $dir . $device['os'] . '.inc.php';
+        $os_file = base_path("includes/discovery/sensors/$sensor_class/{$device['os']}.inc.php");
+        if (is_file($os_file)) {
+            include $os_file;
         }
         if (LibrenmsConfig::getOsSetting($device['os'], 'rfc1628_compat', false)) {
-            if (is_file($dir . '/rfc1628.inc.php')) {
-                include $dir . '/rfc1628.inc.php';
+            $ups_file = base_path("includes/discovery/sensors/$sensor_class/rfc1628.inc.php");
+            if (is_file($ups_file)) {
+                include $ups_file;
             }
         }
         discovery_process($os, $sensor_class, $pre_cache);

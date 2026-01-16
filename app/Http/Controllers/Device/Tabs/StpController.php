@@ -55,7 +55,7 @@ class StpController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        $stpInstances = $device->stpInstances;
+        $stpInstances = $device->stpInstances->sortBy('vlan');
         // Get first available VLAN from instances (or default to 1 if no instances)
         $active_vlan = Url::parseOptions('vlan') ?? $stpInstances->first()->vlan ?? 1;
 
