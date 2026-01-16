@@ -275,7 +275,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
             );
         }
 
-        $div_rx = snmpwalk_group($this->getDeviceArray(), 'genEquipRfuStatusRxLevelDiversity', 'MWRM-RADIO-MIB');
+        $div_rx = SnmpQuery::walk('MWRM-RADIO-MIB::genEquipRfuStatusRxLevelDiversity')->valuesByIndex();
         foreach ($div_rx as $index => $data) {
             $sensors[] = new WirelessSensor(
                 'power',
@@ -284,7 +284,7 @@ class Ceraos extends OS implements OSDiscovery, WirelessXpiDiscovery, WirelessFr
                 'ceraos-diversity-rx',
                 $index,
                 $ifNames[$index] . ' RX Diversity',
-                $data['genEquipRfuStatusRxLevelDiversity']
+                $data['MWRM-RADIO-MIB::genEquipRfuStatusRxLevelDiversity']
             );
         }
 
