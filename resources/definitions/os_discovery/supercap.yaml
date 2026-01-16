@@ -1348,6 +1348,7 @@ modules:
                     descr: 'BMS 01 Health Status (%)'
                     index: 'BMS01-HealthStatus'
                     group: 'BMS 01'
+                    divisor: 100
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS01-AmbientTemperature
@@ -1360,6 +1361,7 @@ modules:
                     descr: 'BMS 02 Health Status (%)'
                     index: 'BMS02-HealthStatus'
                     group: 'BMS 02'
+                    divisor: 100
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS02-AmbientTemperature
@@ -1372,6 +1374,7 @@ modules:
                     descr: 'BMS 03 Health Status (%)'
                     index: 'BMS03-HealthStatus'
                     group: 'BMS 03'
+                    divisor: 100
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS03-AmbientTemperature
@@ -1384,6 +1387,7 @@ modules:
                     descr: 'BMS 04 Health Status (%)'
                     index: 'BMS04-HealthStatus'
                     group: 'BMS 04'
+                    divisor: 100
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS04-AmbientTemperature
@@ -1396,6 +1400,7 @@ modules:
                     descr: 'BMS 05 Health Status (%)'
                     index: 'BMS05-HealthStatus'
                     group: 'BMS 05'
+                    divisor: 100
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS05-AmbientTemperature
@@ -1408,6 +1413,7 @@ modules:
                     descr: 'BMS 06 Health Status (%)'
                     index: 'BMS06-HealthStatus'
                     group: 'BMS 06'
+                    divisor: 100
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS06-AmbientTemperature
@@ -1420,6 +1426,7 @@ modules:
                     descr: 'BMS 07 Health Status (%)'
                     index: 'BMS07-HealthStatus'
                     group: 'BMS 07'
+                    divisor: 100
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS07-AmbientTemperature
@@ -1432,6 +1439,7 @@ modules:
                     descr: 'BMS 08 Health Status (%)'
                     index: 'BMS08-HealthStatus'
                     group: 'BMS 08'
+                    divisor: 100
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS08-AmbientTemperature
@@ -1444,6 +1452,7 @@ modules:
                     descr: 'BMS 09 Health Status (%)'
                     index: 'BMS09-HealthStatus'
                     group: 'BMS 09'
+                    divisor: 100
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS09-AmbientTemperature
@@ -1456,6 +1465,7 @@ modules:
                     descr: 'BMS 10 Health Status (%)'
                     index: 'BMS10-HealthStatus'
                     group: 'BMS 10'
+                    divisor: 100
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS10-AmbientTemperature
@@ -1468,6 +1478,7 @@ modules:
                     descr: 'BMS 11 Health Status (%)'
                     index: 'BMS11-HealthStatus'
                     group: 'BMS 11'
+                    divisor: 100
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS11-AmbientTemperature
@@ -1480,6 +1491,7 @@ modules:
                     descr: 'BMS 12 Health Status (%)'
                     index: 'BMS12-HealthStatus'
                     group: 'BMS 12'
+                    divisor: 100
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS12-AmbientTemperature
@@ -1492,6 +1504,7 @@ modules:
                     descr: 'BMS 13 Health Status (%)'
                     index: 'BMS13-HealthStatus'
                     group: 'BMS 13'
+                    divisor: 100
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS13-AmbientTemperature
@@ -1504,6 +1517,7 @@ modules:
                     descr: 'BMS 14 Health Status (%)'
                     index: 'BMS14-HealthStatus'
                     group: 'BMS 14'
+                    divisor: 100
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS14-AmbientTemperature
@@ -1516,6 +1530,7 @@ modules:
                     descr: 'BMS 15 Health Status (%)'
                     index: 'BMS15-HealthStatus'
                     group: 'BMS 15'
+                    divisor: 100
                     skip_values:
                         -
                             oid: SUPERCAPBATTERY-MIB::BMS15-AmbientTemperature
