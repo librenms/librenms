@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Modules;
 
+use App\Events\OsChangedEvent;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
@@ -81,6 +82,16 @@ class Core implements Module
 
         // detect OS
         $device->os = self::detectOS($device, false);
+
+        // Set type to a predefined type for the OS if it's not user set (still could be overridden later by os discovery)
+        if (! $device->getAttrib('override_device_type')) {
+            $device->type = LibrenmsConfig::getOsSetting($device->os, 'type');
+            $os->getDeviceArray()['type'] = $device->type;
+        }
+
+        if ($device->isDirty('os')) {
+            OsChangedEvent::dispatch($device);
+        }
     }
 
     public function shouldPoll(OS $os, ModuleStatus $status): bool
