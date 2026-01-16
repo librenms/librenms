@@ -55,7 +55,7 @@ class EditDeviceController
             ]);
         }
 
-        [$rrd_size, $rrd_num] = $this->getFolderSize(Rrd::dirFromHost($device->hostname));
+        [$rrd_size, $rrd_num] = $this->getFolderSize(Rrd::dirFromHost($device->hostname, true));
 
         $alertSchedules = $device->alertSchedules()->isActive()->get();
         $isUnderMaintenance = $alertSchedules->isNotEmpty();
