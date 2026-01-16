@@ -788,6 +788,7 @@ entPhysical:
     - { Field: entPhysicalContainedIn, Type: int, 'Null': false, Extra: '', Default: '0' }
     - { Field: entPhysicalParentRelPos, Type: int, 'Null': false, Extra: '', Default: '-1' }
     - { Field: entPhysicalMfgName, Type: text, 'Null': true, Extra: '' }
+    - { Field: entPhysicalMfgDate, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: ifIndex, Type: 'int unsigned', 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [entPhysical_id], Unique: true, Type: BTREE }
