@@ -14365,6 +14365,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14384,7 +14385,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 5003
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10004,
@@ -14403,7 +14405,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "PRECISION",
-                    "ifIndex": 5002
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10009,
@@ -14422,7 +14425,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10017
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10010,
@@ -14441,7 +14445,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10021
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10011,
@@ -14460,7 +14465,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10025
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10012,
@@ -14479,7 +14485,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10029
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10013,
@@ -14498,7 +14505,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10033
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10014,
@@ -14517,7 +14525,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10037
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10021,
@@ -14536,7 +14545,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 5020
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10022,
@@ -14555,7 +14565,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 22,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 5021
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10023,
@@ -14574,7 +14585,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 5022
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10024,
@@ -14593,7 +14605,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 24,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 5023
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 }
             ]
         },

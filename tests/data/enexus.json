@@ -5754,6 +5754,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "Eltek",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5773,6 +5774,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Eltek",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5792,6 +5794,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Eltek",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5811,6 +5814,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Eltek",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5830,6 +5834,7 @@
                     "entPhysicalContainedIn": 100,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Eltek",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5849,6 +5854,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Eltek",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5868,6 +5874,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 100,
                     "entPhysicalMfgName": "Eltek",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5887,6 +5894,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Eltek",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5906,6 +5914,7 @@
                     "entPhysicalContainedIn": 10,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Eltek",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

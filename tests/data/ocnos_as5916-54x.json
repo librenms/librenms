@@ -26250,6 +26250,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Accton",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -26269,6 +26270,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "3Y POWER",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -26288,6 +26290,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -26307,7 +26310,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "Fiberstore",
-                    "ifIndex": 10034
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10015,
@@ -26326,7 +26330,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10092
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10021,
@@ -26345,7 +26350,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "IBM-Amphenol",
-                    "ifIndex": 10017
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10023,
@@ -26364,7 +26370,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "IBM-Amphenol",
-                    "ifIndex": 10025
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10024,
@@ -26383,7 +26390,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 24,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10029
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10026,
@@ -26402,7 +26410,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 26,
                     "entPhysicalMfgName": "Molex Inc.",
-                    "ifIndex": 10122
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10030,
@@ -26421,7 +26430,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 30,
                     "entPhysicalMfgName": "Amphenol",
-                    "ifIndex": 10005
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10031,
@@ -26440,7 +26450,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 31,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10009
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10032,
@@ -26459,7 +26470,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 32,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10013
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 }
             ]
         },
