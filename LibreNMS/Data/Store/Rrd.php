@@ -430,6 +430,12 @@ class Rrd extends BaseDatastore
             $output = $this->sync_process->sendCommand(implode(' ', $cmd));
             while (! strrpos($output[0], 'OK u:')) {
                 $moreoutput = $this->sync_process->getOutput();
+
+                // Error if we get no output before we reach the end of command
+                if (! $moreoutput[0] && ! $moreoutput[1]) {
+                    throw new RrdException('End of command output not found for command: ' . implode(' ', $cmd));
+                }
+
                 $output[0] .= $moreoutput[0];
                 $output[1] .= $moreoutput[1];
             }
