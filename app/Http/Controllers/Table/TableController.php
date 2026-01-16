@@ -84,7 +84,6 @@ abstract class TableController extends PaginatedAjaxController
      */
     protected function formatResponse($paginator)
     {
-//        dd(array_map(fn ($i) => $i->toArray(), $paginator->items()));
         return response()->json([
             'current' => $paginator->currentPage(),
             'rowCount' => $paginator->count(),

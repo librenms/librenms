@@ -29,7 +29,6 @@ namespace App\Http\Controllers\Table;
 use App\Models\Ipv6Address;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use LibreNMS\Util\IP;
 
 /**
  * @extends AddressSearchController<Ipv6Address>
@@ -53,13 +52,5 @@ class Ipv6AddressSearchController extends AddressSearchController
             Ipv6Address::query()->hasAccess($request->user())->with(['port', 'port.device']),
             $request
         );
-    }
-
-    /**
-     * @inheritDoc
-     */
-    protected function getAddress($model): string
-    {
-        return (string) IP::parse($model->ipv6_address, true) . '/' . $model->ipv6_prefixlen;
     }
 }
