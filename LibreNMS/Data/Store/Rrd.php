@@ -408,7 +408,6 @@ class Rrd extends BaseDatastore
      * @param  string  $host  Host name
      * @param  array|string  $extra  Components of RRD filename - will be separated with "-", or a pre-formed rrdname
      * @param  string  $globmatch  Glob match string
-     * @param  bool  $forceabsolute  Do we always want an absolute filename
      * @return string[] array of rrd files for this host
      */
     public function globnames($host, $extra, $globmatch): array
