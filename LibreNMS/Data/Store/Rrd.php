@@ -370,7 +370,7 @@ class Rrd extends BaseDatastore
      * @param  bool  $forceabsolute  Do we always want an absolute filename
      * @return string the name of the rrd file for $host's $extra component
      */
-    public function partname($host, $extra, $forceabsolute = false): string
+    private function partname($host, $extra, $forceabsolute = false): string
     {
         $partname = self::safeName(is_array($extra) ? implode('-', $extra) : $extra);
 
