@@ -31,6 +31,7 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
 use Exception;
+use File;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Enum\Severity;
@@ -42,7 +43,9 @@ use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Rewrite;
 use Log;
+use SplFileInfo;
 use Symfony\Component\Process\Process;
+use Throwable;
 
 class Rrd extends BaseDatastore
 {
@@ -342,8 +345,8 @@ class Rrd extends BaseDatastore
      */
     public function renameFile(Device $device, $oldname, $newname): bool
     {
-        $oldrrd = self::name($device->hostname, $oldname, true);
-        $newrrd = self::name($device->hostname, $newname, true);
+        $oldrrd = self::_name($device->hostname, $oldname, true);
+        $newrrd = self::_name($device->hostname, $newname, true);
         if (is_file($oldrrd) && ! is_file($newrrd)) {
             if (rename($oldrrd, $newrrd)) {
                 Eventlog::log("Renamed $oldrrd to $newrrd", $device, 'poller', Severity::Ok);
@@ -368,7 +371,7 @@ class Rrd extends BaseDatastore
      * @param  bool  $forceabsolute  Do we always want an absolute filename
      * @return string the name of the rrd file for $host's $extra component
      */
-    public function partname($host, $extra, $forceabsolute = false): string
+    private function partname($host, $extra, $forceabsolute = false): string
     {
         $partname = self::safeName(is_array($extra) ? implode('-', $extra) : $extra);
 
@@ -383,9 +386,21 @@ class Rrd extends BaseDatastore
      * @param  bool  $forceabsolute  Do we always want an absolute filename
      * @return string the name of the rrd file for $host's $extra component
      */
-    public function name($host, $extra, $forceabsolute = false): string
+    private function _name($host, $extra, $forceabsolute = false): string
     {
         return $this->partname($host, $extra, $forceabsolute) . '.rrd';
+    }
+
+    /**
+     * Public interface to the _name() function - doesn't allow forcing absolute paths
+     *
+     * @param  string  $host  Host name
+     * @param  array|string  $extra  Components of RRD filename - will be separated with "-", or a pre-formed rrdname
+     * @return string the name of the rrd file for $host's $extra component
+     */
+    public function name($host, $extra): string
+    {
+        return $this->_name($host, $extra);
     }
 
     /**
@@ -394,20 +409,19 @@ class Rrd extends BaseDatastore
      * @param  string  $host  Host name
      * @param  array|string  $extra  Components of RRD filename - will be separated with "-", or a pre-formed rrdname
      * @param  string  $globmatch  Glob match string
-     * @param  bool  $forceabsolute  Do we always want an absolute filename
      * @return string[] array of rrd files for this host
      */
-    public function globnames($host, $extra, $globmatch, $forceabsolute = false): array
+    public function globnames($host, $extra, $globmatch): array
     {
         $filenames = $this->getRrdFiles($host);
 
         if ($this->rrdcached) {
             // getRrdFiles only returns filenames for rrdcached - glob match on filename and prepend directory
             $globtest = self::safeName(is_array($extra) ? implode('-', $extra) : $extra) . $globmatch;
-            $prepend = $this->dirFromHost($host, $forceabsolute) . '/';
+            $prepend = $this->dirFromHost($host) . '/';
         } else {
             // getRrdFiles only returns absolute filenames - glob match on path and no prepend
-            $globtest = $this->partname($host, $extra, true) . $globmatch;
+            $globtest = $this->partname($host, $extra) . $globmatch;
             $prepend = '';
         }
 
@@ -431,7 +445,7 @@ class Rrd extends BaseDatastore
      * @param  bool  $forceabsolute  Do we always want an absolute directory name
      * @return string the name of the rrd directory for $host
      */
-    public function dirFromHost($host, $forceabsolute = false): string
+    private function dirFromHost($host, $forceabsolute = false): string
     {
         $host = self::safeName(trim($host, '[]'));
 
@@ -774,5 +788,76 @@ class Rrd extends BaseDatastore
     private function coalesceStatisticType($type): string
     {
         return ($type == 'update' || $type == 'create') ? $type : 'other';
+    }
+
+    /**
+     * Initialise storage for a device
+     */
+    public function initStorage(Device $device): void
+    {
+        $device_dir = $this->dirFromHost($device->hostname, true);
+
+        if (LibrenmsConfig::get('rrdcached', false) && LibrenmsConfig::get('rrd.enable', true) && ! is_dir($device_dir)) {
+            mkdir($device_dir);
+            Log::info("Created directory : $device_dir");
+        }
+    }
+
+    /**
+     * Rename storage for a device
+     */
+    public function renameDevice(string $oldName, string $newName): bool
+    {
+        $new_rrd_dir = $this->dirFromHost($newName, true);
+
+        if (is_dir($new_rrd_dir)) {
+            throw new RrdException("Renaming of $oldName failed due to existing RRD folder for $newName");
+        }
+
+        if (! is_dir($new_rrd_dir) && rename($this->dirFromHost($oldName, true), $new_rrd_dir) === true) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Delete a device
+     */
+    public function deleteDevice(string $hostname): void
+    {
+        // delete rrd files
+        $host_dir = $this->dirFromHost($hostname, true);
+        if (! File::deleteDirectory($host_dir)) {
+            throw new RrdException("Could not delete RRD files for: $hostname");
+        }
+    }
+
+    /**
+     * Get storage stats for a device
+     */
+    public function getStorageSize(Device $device): array
+    {
+        $directory = $this->dirFromHost($device->hostname, true);
+
+        if (! File::isDirectory($directory) || ! File::isReadable($directory)) {
+            return [0, 0];
+        }
+
+        try {
+            $files = collect(File::allFiles($directory));
+
+            $size = $files->sum(function (SplFileInfo $file): int {
+                try {
+                    return $file->getSize();
+                } catch (Throwable) {
+                    return 0;
+                }
+            });
+
+            return [$size, $files->count()];
+        } catch (Throwable) {
+            return [0, 0];
+        }
     }
 }
