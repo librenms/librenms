@@ -59,7 +59,8 @@ class Os implements Module
         $this->sysContact($os);
 
         // null out values in case they aren't filled.
-        $os->getDevice()->fill([
+        $device = $os->getDevice();
+        $device->fill([
             'hardware' => null,
             'version' => null,
             'features' => null,
@@ -67,7 +68,13 @@ class Os implements Module
             'icon' => null,
         ]);
 
-        $os->discoverOS($os->getDevice());
+        $os->discoverOS($device);
+
+        // reset type if user overrode it
+        if ($device->getAttrib('override_device_type') && $device->isDirty('type')) {
+            $device->type = $device->getOriginal('type');
+        }
+
         $this->handleChanges($os);
     }
 
