@@ -135,8 +135,7 @@ echo "\n";
 
 try {
     $no_save = isset($options['n']) || isset($options['no-save']);
-    foreach ($os_list as $parts) {
-        [$target_os, $target_variant] = $parts;
+    foreach ($os_list as [$target_os, $target_variant, $resolved_modules]) {
         echo "OS: $target_os\n";
         echo "Module: $modules_input\n";
         if ($target_variant) {
@@ -145,7 +144,7 @@ try {
         echo PHP_EOL;
 
         LibrenmsConfig::invalidateAndReload();
-        $tester = new ModuleTestHelper(ModuleList::fromUserOverrides($modules), $target_os, $target_variant);
+        $tester = new ModuleTestHelper(new ModuleList($resolved_modules), $target_os, $target_variant);
         if (! $no_save && ! empty($output_file)) {
             $tester->setJsonSavePath($output_file);
         }
