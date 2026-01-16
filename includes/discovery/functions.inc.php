@@ -13,7 +13,6 @@
  */
 
 use App\Actions\Device\ValidateDeviceAndCreate;
-use App\Events\OsChangedEvent;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
