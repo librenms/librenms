@@ -429,7 +429,7 @@ class Rrd extends BaseDatastore
             // send this to our synchronous process so output is guaranteed
             $output = $this->sync_process->sendCommand(implode(' ', $cmd));
             while (! strrpos($output[0], 'OK u:')) {
-                $moreoutput = $this->getOutput();
+                $moreoutput = $this->sync_process->getOutput();
                 $output[0] .= $moreoutput[0];
                 $output[1] .= $moreoutput[1];
             }
