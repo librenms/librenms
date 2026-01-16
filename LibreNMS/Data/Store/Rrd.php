@@ -58,6 +58,7 @@ class Rrd extends BaseDatastore
     private $version;
     /** @var string */
     private $rrdcached;
+    private $rrd_file_cache = [];
 
     private array $rra;
     /** @var int */
@@ -553,11 +554,16 @@ class Rrd extends BaseDatastore
      */
     public function checkRrdExists($filename): bool
     {
-        if ($this->rrdcached && version_compare($this->version, '1.5', '>=')) {
-            $check_output = implode('', $this->command('last', $filename));
+        if ($this->rrdcached) {
             $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
+            [$hostpart, $filepart] = explode('/', $filename, 2);
 
-            return ! (str_contains($check_output, $filename) && str_contains($check_output, 'No such file or directory'));
+            // Check and fill cache for this host if needed
+            if (! isset($this->rrd_file_cache[$hostpart])) {
+                $this->rrd_file_cache[$hostpart] = array_fill_keys(explode("\n", trim(($this->command('list', '/' . $hostpart, ['--recursive']))[0] ?? '')), true);
+            }
+
+            return isset($this->rrd_file_cache[$hostpart][$filepart]);
         } else {
             return is_file($filename);
         }
