@@ -322,6 +322,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Nokia",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -341,6 +342,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

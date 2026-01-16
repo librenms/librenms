@@ -8016,8 +8016,8 @@
                     "entPhysicalHardwareRev": "A1",
                     "entPhysicalFirmwareRev": "1.50.021",
                     "entPhysicalSoftwareRev": "1.50.021",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "true",
                     "entPhysicalModelName": "DGS-1510-28",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8025,6 +8025,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "D-Link Corporation",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8035,8 +8036,8 @@
                     "entPhysicalHardwareRev": "A1",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "BaseModule",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8044,6 +8045,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "D-Link Corporation",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8054,8 +8056,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "true",
                     "entPhysicalModelName": "Internal Power",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8063,6 +8065,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8073,8 +8076,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "true",
                     "entPhysicalModelName": "External Power",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8082,6 +8085,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8092,8 +8096,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "true",
                     "entPhysicalModelName": "Fan",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8101,6 +8105,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8111,8 +8116,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Copper Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8120,6 +8125,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8130,8 +8136,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Copper Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8139,6 +8145,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8149,8 +8156,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Copper Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8158,6 +8165,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8168,8 +8176,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Copper Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8177,6 +8185,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8187,8 +8196,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Copper Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8196,6 +8205,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8206,8 +8216,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Copper Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8215,6 +8225,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8225,8 +8236,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Copper Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8234,6 +8245,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8244,8 +8256,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Copper Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8253,6 +8265,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8263,8 +8276,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Copper Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8272,6 +8285,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8282,8 +8296,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Copper Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8291,6 +8305,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8301,8 +8316,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Copper Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8310,6 +8325,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8320,8 +8336,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Copper Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8329,6 +8345,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8339,8 +8356,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Copper Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8348,6 +8365,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8358,8 +8376,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Copper Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8367,6 +8385,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8377,8 +8396,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Copper Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8386,6 +8405,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8396,8 +8416,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Copper Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8405,6 +8425,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 16,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8415,8 +8436,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Copper Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8424,6 +8445,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 17,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8434,8 +8456,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Copper Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8443,6 +8465,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 18,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8453,8 +8476,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Copper Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8462,6 +8485,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 19,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8472,8 +8496,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Copper Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8481,6 +8505,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 20,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8491,8 +8516,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Copper Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8500,6 +8525,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8510,8 +8536,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Copper Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8519,6 +8545,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 22,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8529,8 +8556,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Copper Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8538,6 +8565,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8548,8 +8576,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Copper Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8557,6 +8585,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 24,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8567,8 +8596,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Fiber Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8576,6 +8605,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 25,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8586,8 +8616,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Fiber Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8595,6 +8625,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 26,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8605,8 +8636,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Fiber Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8614,6 +8645,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8624,8 +8656,8 @@
                     "entPhysicalHardwareRev": "",
                     "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "",
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": "false",
                     "entPhysicalModelName": "Fiber Port",
                     "entPhysicalVendorType": "zeroDotZero",
@@ -8633,6 +8665,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 28,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

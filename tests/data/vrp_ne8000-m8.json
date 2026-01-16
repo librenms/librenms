@@ -13435,6 +13435,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Huawei",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13454,6 +13455,7 @@
                     "entPhysicalContainedIn": 17432577,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "Huawei",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13473,6 +13475,7 @@
                     "entPhysicalContainedIn": 17235969,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "PRECISION",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13492,6 +13495,7 @@
                     "entPhysicalContainedIn": 17235969,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "OEM",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13511,6 +13515,7 @@
                     "entPhysicalContainedIn": 17235969,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13530,6 +13535,7 @@
                     "entPhysicalContainedIn": 17235969,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "OEM",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13549,6 +13555,7 @@
                     "entPhysicalContainedIn": 17235969,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13568,6 +13575,7 @@
                     "entPhysicalContainedIn": 17235969,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13587,6 +13595,7 @@
                     "entPhysicalContainedIn": 17235969,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13606,6 +13615,7 @@
                     "entPhysicalContainedIn": 17235969,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13625,6 +13635,7 @@
                     "entPhysicalContainedIn": 17235969,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "OEM",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13644,6 +13655,7 @@
                     "entPhysicalContainedIn": 17235969,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "OEM",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13663,6 +13675,7 @@
                     "entPhysicalContainedIn": 17432577,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Huawei",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13682,6 +13695,7 @@
                     "entPhysicalContainedIn": 17301505,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "OEM",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 16
                 },
                 {
@@ -13701,6 +13715,7 @@
                     "entPhysicalContainedIn": 17301505,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "OEM",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 17
                 },
                 {
@@ -13720,6 +13735,7 @@
                     "entPhysicalContainedIn": 17301505,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 18
                 },
                 {
@@ -13739,6 +13755,7 @@
                     "entPhysicalContainedIn": 17301505,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 19
                 },
                 {
@@ -13758,6 +13775,7 @@
                     "entPhysicalContainedIn": 17301505,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 20
                 },
                 {
@@ -13777,6 +13795,7 @@
                     "entPhysicalContainedIn": 17301505,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 21
                 },
                 {
@@ -13796,6 +13815,7 @@
                     "entPhysicalContainedIn": 17301505,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 22
                 },
                 {
@@ -13815,6 +13835,7 @@
                     "entPhysicalContainedIn": 17301505,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "OEM",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 23
                 },
                 {
@@ -13834,6 +13855,7 @@
                     "entPhysicalContainedIn": 17301505,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 24
                 },
                 {
@@ -13853,6 +13875,7 @@
                     "entPhysicalContainedIn": 17301505,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "OEM",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 25
                 },
                 {
@@ -13872,6 +13895,7 @@
                     "entPhysicalContainedIn": 16777216,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13891,6 +13915,7 @@
                     "entPhysicalContainedIn": 16777216,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13910,6 +13935,7 @@
                     "entPhysicalContainedIn": 17432576,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Huawei",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13929,6 +13955,7 @@
                     "entPhysicalContainedIn": 17432577,
                     "entPhysicalParentRelPos": 61,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13948,6 +13975,7 @@
                     "entPhysicalContainedIn": 17432832,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -13967,6 +13995,7 @@
                     "entPhysicalContainedIn": 17432577,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 4
                 },
                 {
@@ -13986,6 +14015,7 @@
                     "entPhysicalContainedIn": 16777216,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14005,6 +14035,7 @@
                     "entPhysicalContainedIn": 17498112,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Huawei",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14024,6 +14055,7 @@
                     "entPhysicalContainedIn": 16777216,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14043,6 +14075,7 @@
                     "entPhysicalContainedIn": 17563648,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Huawei",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14062,6 +14095,7 @@
                     "entPhysicalContainedIn": 16777216,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14081,6 +14115,7 @@
                     "entPhysicalContainedIn": 17629184,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Huawei",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14100,6 +14135,7 @@
                     "entPhysicalContainedIn": 16777216,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14119,6 +14155,7 @@
                     "entPhysicalContainedIn": 16777216,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14138,6 +14175,7 @@
                     "entPhysicalContainedIn": 17760256,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14157,6 +14195,7 @@
                     "entPhysicalContainedIn": 17432577,
                     "entPhysicalParentRelPos": 78,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14176,6 +14215,7 @@
                     "entPhysicalContainedIn": 17432577,
                     "entPhysicalParentRelPos": 79,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

@@ -2115,6 +2115,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -2124,7 +2125,7 @@
                     "entPhysicalName": "24:de:c6:c3:50:a4 10.4.1.27 Cluster Member",
                     "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": "6.4.4.8-4.2.4.12",
+                    "entPhysicalSoftwareRev": null,
                     "entPhysicalAlias": null,
                     "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": null,
@@ -2134,6 +2135,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -2143,7 +2145,7 @@
                     "entPhysicalName": "24:de:c6:c3:52:da 10.4.1.26 Cluster Master",
                     "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": "6.4.4.8-4.2.4.12",
+                    "entPhysicalSoftwareRev": null,
                     "entPhysicalAlias": null,
                     "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": null,
@@ -2153,6 +2155,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

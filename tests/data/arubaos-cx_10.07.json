@@ -12612,6 +12612,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12631,6 +12632,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12650,6 +12652,7 @@
                     "entPhysicalContainedIn": 110001,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12669,6 +12672,7 @@
                     "entPhysicalContainedIn": 115001,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12688,6 +12692,7 @@
                     "entPhysicalContainedIn": 115002,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12707,6 +12712,7 @@
                     "entPhysicalContainedIn": 115003,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12726,6 +12732,7 @@
                     "entPhysicalContainedIn": 113001,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12745,6 +12752,7 @@
                     "entPhysicalContainedIn": 101001,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12764,6 +12772,7 @@
                     "entPhysicalContainedIn": 101001,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12783,6 +12792,7 @@
                     "entPhysicalContainedIn": 101001,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12802,6 +12812,7 @@
                     "entPhysicalContainedIn": 101001,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12821,6 +12832,7 @@
                     "entPhysicalContainedIn": 101001,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12840,6 +12852,7 @@
                     "entPhysicalContainedIn": 101001,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": null
                 },
                 {
@@ -12859,6 +12872,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 1
                 },
                 {
@@ -12878,6 +12892,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 2
                 },
                 {
@@ -12897,6 +12912,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 3
                 },
                 {
@@ -12916,6 +12932,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 4
                 },
                 {
@@ -12935,6 +12952,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 5
                 },
                 {
@@ -12954,6 +12972,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 6
                 },
                 {
@@ -12973,6 +12992,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 7
                 },
                 {
@@ -12992,6 +13012,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 8
                 },
                 {
@@ -13011,6 +13032,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 9
                 },
                 {
@@ -13030,6 +13052,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 10
                 },
                 {
@@ -13049,6 +13072,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 11
                 },
                 {
@@ -13068,6 +13092,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 12
                 },
                 {
@@ -13087,6 +13112,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 13
                 },
                 {
@@ -13106,6 +13132,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 14
                 },
                 {
@@ -13125,6 +13152,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 15
                 },
                 {
@@ -13144,6 +13172,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 16,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 16
                 },
                 {
@@ -13163,6 +13192,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 17,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 17
                 },
                 {
@@ -13182,6 +13212,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 18,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 18
                 },
                 {
@@ -13201,6 +13232,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 19,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 19
                 },
                 {
@@ -13220,6 +13252,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 20,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 20
                 },
                 {
@@ -13239,6 +13272,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 21
                 },
                 {
@@ -13258,6 +13292,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 22,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 22
                 },
                 {
@@ -13277,6 +13312,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 23
                 },
                 {
@@ -13296,6 +13332,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 24,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 24
                 },
                 {
@@ -13315,6 +13352,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 25,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 25
                 },
                 {
@@ -13334,6 +13372,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 26,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 26
                 },
                 {
@@ -13353,6 +13392,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 27
                 },
                 {
@@ -13372,6 +13412,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 28,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 28
                 },
                 {
@@ -13391,6 +13432,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 29,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 29
                 },
                 {
@@ -13410,6 +13452,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 30,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 30
                 },
                 {
@@ -13429,6 +13472,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 31,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 31
                 },
                 {
@@ -13448,6 +13492,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 32,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 32
                 },
                 {
@@ -13467,6 +13512,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 33,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 33
                 },
                 {
@@ -13486,6 +13532,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 34,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 34
                 },
                 {
@@ -13505,6 +13552,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 35,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 35
                 },
                 {
@@ -13524,6 +13572,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 36,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 36
                 },
                 {
@@ -13543,6 +13592,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 37,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 37
                 },
                 {
@@ -13562,6 +13612,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 38,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 38
                 },
                 {
@@ -13581,6 +13632,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 39,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 39
                 },
                 {
@@ -13600,6 +13652,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 40,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 40
                 },
                 {
@@ -13619,6 +13672,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 41,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 41
                 },
                 {
@@ -13638,6 +13692,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 42,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 42
                 },
                 {
@@ -13657,6 +13712,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 43,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 43
                 },
                 {
@@ -13676,6 +13732,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 44,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 44
                 },
                 {
@@ -13695,6 +13752,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 45,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 45
                 },
                 {
@@ -13714,6 +13772,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 46,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 46
                 },
                 {
@@ -13733,6 +13792,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 47,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 47
                 },
                 {
@@ -13752,6 +13812,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 48,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 48
                 },
                 {
@@ -13771,6 +13832,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 49,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 49
                 },
                 {
@@ -13790,6 +13852,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 50,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 50
                 },
                 {
@@ -13809,6 +13872,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 51,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 51
                 },
                 {
@@ -13828,6 +13892,7 @@
                     "entPhysicalContainedIn": 112001,
                     "entPhysicalParentRelPos": 52,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": "",
                     "ifIndex": 52
                 }
             ]

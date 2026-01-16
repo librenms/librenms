@@ -5059,6 +5059,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5068,7 +5069,7 @@
                     "entPhysicalName": "ECA-Ultimo-L11-AP06 192.168.126.30 Cluster Member",
                     "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": "8.4.0.0-8.4.0.0",
+                    "entPhysicalSoftwareRev": null,
                     "entPhysicalAlias": null,
                     "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": null,
@@ -5078,6 +5079,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5087,7 +5089,7 @@
                     "entPhysicalName": "ECA-Ultimo-L11-AP14 192.168.126.25 Cluster Member",
                     "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": "8.4.0.0-8.4.0.0",
+                    "entPhysicalSoftwareRev": null,
                     "entPhysicalAlias": null,
                     "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": null,
@@ -5097,6 +5099,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -5106,7 +5109,7 @@
                     "entPhysicalName": "instant-ap-src-1 10.128.0.11 Cluster Master",
                     "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": "8.4.0.0-8.4.0.0",
+                    "entPhysicalSoftwareRev": null,
                     "entPhysicalAlias": null,
                     "entPhysicalAssetID": null,
                     "entPhysicalIsFRU": null,
@@ -5116,6 +5119,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Aruba",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]

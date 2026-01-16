@@ -541,6 +541,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "MP-118 FXS",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -560,6 +561,7 @@
                     "entPhysicalContainedIn": 67112960,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -579,6 +581,7 @@
                     "entPhysicalContainedIn": 67379200,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -598,6 +601,7 @@
                     "entPhysicalContainedIn": 67383297,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 1141129473
                 },
                 {
@@ -617,6 +621,7 @@
                     "entPhysicalContainedIn": 67383297,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 1141129474
                 },
                 {
@@ -636,6 +641,7 @@
                     "entPhysicalContainedIn": 67383297,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 1141129475
                 },
                 {
@@ -655,6 +661,7 @@
                     "entPhysicalContainedIn": 67383297,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 1141129476
                 },
                 {
@@ -674,6 +681,7 @@
                     "entPhysicalContainedIn": 67383297,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 1141129477
                 },
                 {
@@ -693,6 +701,7 @@
                     "entPhysicalContainedIn": 67383297,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 1141129478
                 },
                 {
@@ -712,6 +721,7 @@
                     "entPhysicalContainedIn": 67383297,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 1141129479
                 },
                 {
@@ -731,6 +741,7 @@
                     "entPhysicalContainedIn": 67383297,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 1141129480
                 },
                 {
@@ -750,6 +761,7 @@
                     "entPhysicalContainedIn": 67383297,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": 1141129985
                 }
             ]
