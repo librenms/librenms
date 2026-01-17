@@ -16,6 +16,10 @@ class VlanPortsController extends TableController
             'ifName',
             'ifDescr',
             'ifAlias',
+            // allow searching by device fields shown in the table
+            'devices.hostname',
+            'devices.display',
+            'devices.sysName',
         ];
     }
 
@@ -40,6 +44,8 @@ class VlanPortsController extends TableController
         return Port::with(['device', 'device.location'])
             ->hasAccess($request->user())
             ->leftJoin('ports_vlans', 'ports.port_id', 'ports_vlans.port_id')
+            // join devices to enable searching by device columns
+            ->leftJoin('devices', 'ports.device_id', 'devices.device_id')
             ->where(function ($query): void {
                 $query->where(fn ($q) => $q->where('ifVlan', $this->vlanId)->whereNull('ports_vlans.vlan'))
                     ->orWhere('ports_vlans.vlan', $this->vlanId);
@@ -68,7 +74,7 @@ class VlanPortsController extends TableController
     {
         return [
             'device' => Url::deviceLink($model->device),
-            'port' => Url::portLink($model, $model->getFullLabel()),
+            'port' => sprintf('<a href="%s">%s</a>', Url::generate(['page' => 'ports', 'device_id' => $model->device_id]), $model->getFullLabel()),
             // left joined columns
             'untagged' => $model['untagged'],
             'state' => $model['state'],
