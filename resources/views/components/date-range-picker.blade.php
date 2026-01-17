@@ -1,6 +1,7 @@
 @props([
     'start' => '',
     'end' => '',
+    'outputFormat' => '', // iso, timestamp, or format string
     'timezone' => '',
     'presets' => true,
     'placeholder' => 'Select date range...',
@@ -13,6 +14,7 @@
      data-start="{{ $start }}"
      data-end="{{ $end }}"
      data-presets=" {{ is_array($presets) ? implode(',', $presets) : (string) $presets }}"
+     data-output-format="{{ $outputFormat }}"
      data-timezone="{{ $timezone }}"
      data-placeholder="{{ $placeholder }}">
     <div
@@ -86,6 +88,7 @@
             placeholder: 'Select date range...',
             relativeStartSeconds: null,
             relativeEndSeconds: null,
+            outputFormat: '',
             presets: [
                 '6h',
                 '24h',
@@ -129,21 +132,23 @@
             },
 
             get outStartString() {
-                if (this.startDate) {
-                    // TODO: allow different time formats
-                    return this.startDate.toJSON();
+                if (this.relativeStartSeconds !== null) {
+                    return this.toShortOffset(this.relativeStartSeconds)
                 }
 
-                return '';
+                return this.formatDate(this.startDate, this.outputFormat);
             },
 
             get outEndString() {
-                if (this.endDate) {
-                    // TODO: allow different time formats
-                    return this.endDate.toJSON();
+                if (this.relativeEndSeconds !== null) {
+                    return this.toShortOffset(this.relativeEndSeconds)
                 }
 
-                return '';
+                if (this.relativeStartSeconds !== null) {
+                    return '';
+                }
+
+                return this.formatDate(this.endDate, this.outputFormat);
             },
 
             get hasValue() {
@@ -158,8 +163,8 @@
                     }
                 }
 
-                const startString = this.formatDate(this.startDate, this.fieldStartTime);
-                const endString = this.formatDate(this.endDate, this.fieldEndTime);
+                const startString = this.formatDate(this.startDate, 'local');
+                const endString = this.formatDate(this.endDate, 'local');
 
                 if (startString && endString) {
                     return `${startString} to ${endString}`;
@@ -183,6 +188,7 @@
                 };
 
                 if (this.$el.dataset.placeholder) this.placeholder = this.$el.dataset.placeholder;
+                if (this.$el.dataset.outputFormat) this.outputFormat = this.$el.dataset.outputFormat;
                 this.timeZone = this.$el.dataset.timezone;
 
                 this.setRange(this.$el.dataset.start, this.$el.dataset.end);
@@ -353,15 +359,27 @@
                 return this.relativeStartSeconds !== null && sec !== null && sec === this.relativeStartSeconds && !this.fieldEndDate && !this.fieldEndTime;
             },
 
-            formatDate(fullDate, time) {
+            formatDate(fullDate, outputFormat) {
                 if (!fullDate) {
                     return '';
                 }
 
-                let thisFormat = 'YYYY-MM-DD';
+                if (outputFormat === 'iso') {
+                    return b.toISOString();
+                }
 
-                if (time) {
-                    thisFormat += ' HH:mm'
+                if (outputFormat === 'timestamp') {
+                    return fullDate.unix().toString();
+                }
+
+                if (outputFormat != 'local') {
+                    // Output format should be specified as something like 'YYYY-MM-DD'
+                    return fullDate.format(outputFormat);
+                }
+
+                let thisFormat = 'LL';
+                if (fullDate.hours() > 0 || fullDate.minutes() > 0) {
+                    thisFormat += ' LT';
                 }
 
                 return fullDate.format(thisFormat);
