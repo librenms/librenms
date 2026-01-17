@@ -65,8 +65,8 @@ class OutagesController extends TableController
      */
     public function baseQuery(Request $request): Builder
     {
-        $from_ts = $request->from ? Time::userToServer($request->from)->timestamp : null;
-        $to_ts = $request->to ? Time::userToServer($request->to)->timestamp : null;
+        $from_ts = Time::parseInput($request->from);
+        $to_ts = Time::parseInput($request->to);
 
         return DeviceOutage::hasAccess($request->user())
             ->with('device')
@@ -191,7 +191,7 @@ class OutagesController extends TableController
     {
         return [
             $outage->device ? $outage->device->displayName() : '',
-            Time::serverFromTimestamp($outage->going_down)->toISOString(),
+            Time::userFromTimestamp($outage->going_down)->toISOString(),
             $outage->up_again ? Time::userFromTimestamp($outage->up_again)->toISOString() : '-',
             $this->asDuration($outage)->format('%H:%I:%S'),
         ];
