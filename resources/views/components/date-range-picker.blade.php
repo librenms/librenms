@@ -73,6 +73,7 @@
 </div>
 
 @pushOnce('scripts')
+<script src="{{ asset('js/RrdGraphJS/moment-timezone-with-data.js') }}"></script>
 <script>
     document.addEventListener('alpine:init', () => {
         Alpine.data('dateRangePicker', () => ({
@@ -100,11 +101,15 @@
             // Computed properties
             get startDate() {
                 if (this.relativeStartSeconds !== null) {
-                    return new Date(Date.now() - (this.relativeStartSeconds * 1000));
+                    return moment.tz(moment.tz(this.timeZone) - (this.relativeStartSeconds * 1000), this.timeZone);
+                }
+
+                if (this.fieldStartDate && this.fieldStartTime) {
+                    return moment.tz(`${this.fieldStartDate} ${this.fieldStartTime}`, this.timeZone);
                 }
 
                 if (this.fieldStartDate) {
-                    return new Date(`${this.fieldStartDate} ${this.fieldStartTime}`);
+                    return moment.tz(`${this.fieldStartDate} 00:00`, this.timeZone);
                 }
 
                 return null;
@@ -117,25 +122,25 @@
 
                 // if no end time, we want to include the entire day
                 if (!this.fieldEndTime) {
-                    return new Date(new Date(this.fieldEndDate).getTime() + 86400000);
+                    return moment.tz(moment.tz(`${this.fieldEndDate} 00:00`, this.timeZone) + 86400000, this.timeZone);
                 }
 
-                return new Date(`${this.fieldEndDate} ${this.fieldEndTime}`);
+                return moment.tz(`${this.fieldEndDate} ${this.fieldEndTime}`, this.timeZone);
             },
 
             get outStartString() {
-                if (thisStartDate = this.startDate) {
-                    // Add the timezone offset back to the date so we still get the entered date when toJSON() converts it to UTC
-                    return new Date(thisStartDate.getTime() - (thisStartDate.getTimezoneOffset() * 60000)).toJSON().split('.')[0];
+                if (this.startDate) {
+                    // TODO: allow different time formats
+                    return this.startDate.toJSON();
                 }
 
                 return '';
             },
 
             get outEndString() {
-                if (thisEndDate = this.endDate) {
-                    // Add the timezone offset back to the date so we still get the entered date when toJSON() converts it to UTC
-                    return new Date(thisEndDate.getTime() - (thisEndDate.getTimezoneOffset() * 60000)).toJSON().split('.')[0];
+                if (this.endDate) {
+                    // TODO: allow different time formats
+                    return this.endDate.toJSON();
                 }
 
                 return '';
@@ -258,36 +263,27 @@
                 let d;
                 let includeTime = false;
 
-                dateoptions = {};
-                timeoptions = { hour: '2-digit', minute: '2-digit' };
-
                 const timestamp = Number(input);
                 if (isNaN(timestamp)) {
                     // Non-numeric input is assumed to be a date in the correct timezone
-                    d = new Date(input);
+                    d = moment.tz(input, this.timeZone);
                     includeTime = /\d{1,2}:\d{2}/.test(input);
                 } else {
                     // Pure numeric input is assumed to be a timestamp
 
-                    // Convert to the correct timezone
-                    if (this.timeZone) {
-                        dateoptions.timeZone = this.timeZone;
-                        timeoptions.timeZone = this.timeZone;
-                    }
-
                     // If less than 13 digits, it's in seconds, otherwise milliseconds
-                    d = new Date(input.length < 13 ? timestamp * 1000 : timestamp);
+                    d = moment.tz(input.length < 13 ? timestamp * 1000 : timestamp, this.timeZone);
                     // For Unix timestamps, include time unless it's midnight
-                    includeTime = !(d.getHours() === 0 && d.getMinutes() === 0 && d.getSeconds() === 0);
+                    includeTime = !(d.hours() === 0 && d.minutes() === 0 && d.seconds() === 0);
                 }
 
-                if (isNaN(d.getTime())) {
+                if (! d.isValid()) {
                     console.log('Invalid date time input detected');
                     return ['', '', null];
                 }
 
-                const date = d.toLocaleDateString('en-CA', dateoptions);
-                const time = includeTime ? d.toLocaleTimeString('en-GB', timeoptions) : '';
+                const date = d.format('YYYY-MM-DD');
+                const time = includeTime ? d.format('HH:mm') : '';
                 return [date, time, null];
             },
 
@@ -362,18 +358,13 @@
                     return '';
                 }
 
-                let options = {
-                    month: 'numeric',
-                    day: 'numeric',
-                    year: 'numeric',
-                };
+                let thisFormat = 'YYYY-MM-DD';
 
                 if (time) {
-                    options['hour'] = 'numeric';
-                    options['minute'] = 'numeric';
+                    thisFormat += ' HH:mm'
                 }
 
-                return fullDate.toLocaleDateString(undefined, options);
+                return fullDate.format(thisFormat);
             },
 
             emitChange() {
