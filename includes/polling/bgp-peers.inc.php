@@ -259,9 +259,9 @@ if (! empty($peers)) {
                     $peerData = $bgpPeers[$vrfOid][$address] ?? null;
 
                     if ($peerData === null) {
-                        foreach ($bgpPeers as $candidateVrf => $candidatePeers) {
+                        // VRF OID from database didn't match, search all VRFs for this peer
+                        foreach ($bgpPeers as $candidatePeers) {
                             if (isset($candidatePeers[$address])) {
-                                $vrfOid = $candidateVrf;
                                 $peerData = $candidatePeers[$address];
                                 break;
                             }
@@ -269,7 +269,7 @@ if (! empty($peers)) {
                     }
 
                     if ($peerData === null) {
-                        Log::debug("Missing TIMETRA data for peer $address");
+                        Log::warning("Missing TIMETRA data for peer $address - peer may have configuration/data mismatch");
                         continue;
                     }
                     $establishedTime = $peerData['TIMETRA-BGP-MIB::tBgpPeerFsmEstablishedTime'] ?? null;
@@ -278,7 +278,7 @@ if (! empty($peers)) {
                         static $bgp4Peers;
 
                         if (! isset($bgp4Peers)) {
-                            $bgp4Peers = SnmpQuery::enumStrings()->numericIndex()->abortOnFailure()->walk('BGP4-MIB::bgpPeerTable')->valuesByIndex();
+                            $bgp4Peers = SnmpQuery::enumStrings()->numericIndex()->walk('BGP4-MIB::bgpPeerTable')->valuesByIndex();
                         }
 
                         $establishedTime = $bgp4Peers[$address]['BGP4-MIB::bgpPeerFsmEstablishedTime'] ?? 0;
