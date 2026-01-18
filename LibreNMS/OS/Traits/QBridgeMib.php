@@ -29,6 +29,7 @@
 namespace LibreNMS\OS\Traits;
 
 use App\Facades\PortCache;
+use App\Models\PortsFdb;
 use App\Models\PortVlan;
 use App\Models\Vlan;
 use Illuminate\Support\Collection;
@@ -155,5 +156,58 @@ trait QBridgeMib
         }
 
         return $ports;
+    }
+
+    private function discoverQBridgeFdb(): Collection
+    {
+        $fdbt = new Collection;
+
+        $dot1qTpFdbPort = $this->dot1qTpFdbPort();
+
+        $dot1qVlanFdbId = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanFdbId')->table();
+        $dot1qVlanFdbId = $tmp = $dot1qVlanFdbId['Q-BRIDGE-MIB::dot1qVlanFdbId'] ?? [];
+        if (! empty($tmp)) {
+            if (! empty(array_shift($tmp))) {
+                $dot1qVlanFdbId = array_shift($dot1qVlanFdbId);
+            }
+            $dot1qVlanFdbId = array_flip($dot1qVlanFdbId);
+        }
+
+        foreach ($dot1qTpFdbPort as $vlanIdx => $macData) {
+            foreach ($macData as $mac_address => $portIdx) {
+                if (is_array($portIdx)) {
+                    foreach ($portIdx as $idx) { //multiple port for one mac ???
+                        $ifIndex = $this->ifIndexFromBridgePort($idx);
+                        $port_id = PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0;
+                        $fdbt->push(new PortsFdb([
+                            'port_id' => $port_id,
+                            'mac_address' => $mac_address,
+                            'vlan_id' => $dot1qVlanFdbId[$vlanIdx] ?? $vlanIdx,
+                        ]));
+                    }
+                } else {
+                    $ifIndex = $this->ifIndexFromBridgePort($portIdx);
+                    $port_id = PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0;
+                    $fdbt->push(new PortsFdb([
+                        'port_id' => $port_id,
+                        'mac_address' => $mac_address,
+                        'vlan_id' => $dot1qVlanFdbId[$vlanIdx] ?? $vlanIdx,
+                    ]));
+                }
+            }
+        }
+
+        return $fdbt;
+    }
+
+    public function dot1qTpFdbPort(): array
+    {
+        $dot1qTpFdbPort = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qTpFdbPort')->table();
+        $dot1qTpFdbPort = $dot1qTpFdbPort['Q-BRIDGE-MIB::dot1qTpFdbPort'] ?? [];
+        if (empty($dot1qTpFdbPort)) {
+            $dot1qTpFdbPort[0] = $this->dot1dTpFdbPort();
+        }
+
+        return $dot1qTpFdbPort;
     }
 }

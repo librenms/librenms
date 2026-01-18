@@ -63,6 +63,24 @@ class Port extends DeviceRelatedModel
 
     // ---- Helper Functions ----
 
+    public static function findPortId($findMe = [], $device_id = null): int
+    {
+        $findMe = (is_array($findMe)) ? $findMe : [0 => $findMe];
+        $portId = 0;
+        foreach ($findMe as $search) {
+            if (! empty($device_id)) {
+                $portId = (empty($portId)) ? \App\Facades\PortCache::getIdFromIfDescr($search, $device_id) : $portId;
+                $portId = (empty($portId)) ? \App\Facades\PortCache::getIdFromIfName($search, $device_id) : $portId;
+                $portId = (empty($portId)) ? \App\Facades\PortCache::getIdFromIfAlias($search, $device_id) : $portId;
+                $portId = (empty($portId)) ? \App\Facades\PortCache::getIdFromIfPhysAddress($search, $device_id) : $portId;
+            } else {
+                $portId = (empty($portId)) ? Port::where('ifPhysAddress', $search)->value('port_id') ?? 0 : $portId;
+            }
+        }
+
+        return intval($portId);
+    }
+
     /**
      * Returns a human readable label for this port
      *
@@ -503,6 +521,14 @@ class Port extends DeviceRelatedModel
     public function pagpParent(): BelongsTo
     {
         return $this->belongsTo(Port::class, 'pagpGroupIfIndex', 'ifIndex');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PortsFdb, $this>
+     */
+    public function portsFdb(): HasMany
+    {
+        return $this->hasMany(PortsFdb::class, 'port_id');
     }
 
     /**

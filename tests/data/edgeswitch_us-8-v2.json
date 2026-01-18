@@ -5683,5 +5683,1651 @@
                 }
             ]
         }
+    },
+    "fdb-table": {
+        "discovery": {
+            "ports_fdb": [
+                {
+                    "mac_address": "000c6c0afd6d",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "001628089fcb",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "001e658fe114",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "002b67ade079",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "002b67ade575",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "002b67ade5af",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "00c3f48bf2e3",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "00c3f48bf2ea",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "00c3f48bf2eb",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "00c3f48bf2ec",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "00c3f48bf2ee",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "00c3f48c1335",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "00c3f48c1338",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "00c3f48c133a",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "00e0990cbd4f",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "080027357e9d",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "08d23e67aacf",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "08d23e67aae3",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "08d23e67c037",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "08d23e686271",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "08d23e689d5e",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "08d23e695e51",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "08d23e69abb8",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "08d23e69abc2",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "08d23e69b4eb",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "08d23e69b5ae",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "08d23e69d29b",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "08d23e69d2b9",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "08d23e69d7c3",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "08d23e69d872",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "08d23e69f78a",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "08d23e6a13a5",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "08d23e6a21a6",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "08d23e6a307e",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "08d23e6d3b66",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "08d23e6e0ece",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "08d23e6e68ec",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "08d23e6e691e",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "08d23e6f35c4",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "10d07a0f6ebf",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "10d07a1012b1",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "10d07a102c8d",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "14b31f17f418",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "14b31f17f41e",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "14b31f17f420",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "14b31f17f429",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "14b31f17f536",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "14b31f17f578",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "14b31f17f57d",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "14b31f180622",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "14b31f180644",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "14b31f18067a",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "14b31f1808d9",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "14b31f1808df",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "14b31f1808e4",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "14b31f1808f2",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "14b31f1808fa",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "14b31f180909",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "14feb5fe5f7b",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "180373bfc116",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "180373bfcafd",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "180373bfcec5",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "180373bfcf8c",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "180373bfd178",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "180373bfd36c",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "180373c0d25c",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "180373c0f29b",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "180373c0f2a9",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "180373c0f6ac",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "180373c10c91",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "180373c10cca",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "180373c10d52",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "180373c10eef",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "183eef5cfdb0",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "183eef6a410a",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "183eef70e5b0",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "247703faa728",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "24fce5f6fe0c",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "2cf05d452da7",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "2cf05d45b3e2",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "2cf05d45bae6",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "2cf05d51058f",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "2cf05d5105a0",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "2cf05d5107ce",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "2cf05d5107cf",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "2cf05d510c61",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "2cf05d510ee0",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "2cf05d510efa",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "2cf05dbe8e35",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "2cf05dbe8e41",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "2cf05dbe8e43",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "2cf05dbe8e46",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "2cf05dbe8e47",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "2cf05dbe8e49",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "2cf05dbe8e4c",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "2cf05dbe8e4d",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "2cf05dbe8e4e",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "2cf05dbe8e50",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "2cf05dbe8e72",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "302432f3da5e",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "30f77269b0ac",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "3417ebc233a7",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "3417ebc23abe",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "3417ebc23de2",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "3417ebc24589",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "3417ebc24629",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "3417ebde6922",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "3464a9364b33",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "3464a9364bd5",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "34e6d727cd2c",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "34f64bf2fc33",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "34f64bf2fc47",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "34f64bf2fc56",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "34f64bf2fc5b",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "34f64bf2fc6f",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "34f64bf2fc92",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "34f64bf2fd55",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "34f64bf2fd78",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "34f64bf2fd82",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "34f64bf2fe81",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "34f64bf2fe90",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "34f64bf31966",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "34f64bf319bb",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "34f64bf31f1a",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "380025476463",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "3cf011629e4a",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "4023431762cf",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "44c65d91f50c",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "4851b7c137bb",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "4851b7da3432",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "4851b7da3464",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "4851b7da3473",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "4851b7daa66f",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "4c52621b358b",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "5413795c2ae3",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "5413795c2ae5",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "5413797dc5f1",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "5413797dca49",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "5413797e1ae1",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "543ad6c658a4",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "54bd797599bc",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "54ee751f66a6",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "5cc1d73b6bdd",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "5cc1d73b6be4",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "5cc1d73b6bf2",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "5cc1d73b6bf7",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "5cc1d73b6bf8",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "5cc1d73b6bfb",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "5cc1d73b6bfc",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "606720074c20",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "64006a01e4c6",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "64006a01e697",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "6479f0810998",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "6479f0827ec7",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "6479f084bb15",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "681729e38e79",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "70b5e86005a6",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "70b5e8605c1d",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3ded7cf0a",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3ded8ad0c",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3deda8c3d",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3dedb8572",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3dedc2f08",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3dede1444",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3dedeb058",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3dedebf03",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3dedf5bcc",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3dedf71cc",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3dedfe4fc",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3dee0746a",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3dee12e31",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3dee153f2",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3dee1c7b4",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3dee317f2",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3dee3a1a5",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3dee5a77d",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3dee5d4be",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3dee5dcfb",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3dee63447",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3dee7ccc4",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3dee7fe8e",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3dee85107",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3dee9b4c2",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3dee9e06c",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3deea7d4f",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3deeaa6d0",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3deeb2eda",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3deeb4405",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3deecd8a7",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "78e3deed1e7d",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "7c507907b872",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "8086f26da632",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "80c75578eec9",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "842b2b96fb7d",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "8c04ba57858c",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "902e1c2bc177",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "a41f725d17c2",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "a41f725d729a",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "a41f725d7bce",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "a41f725d7f66",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "a41f725d8073",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "a41f725d807a",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "a41f725df7c1",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "a41f725e3854",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "a41f725e3855",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "a41f725e3dd2",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "a41f725e3dd4",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "a41f725e3edc",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "a4307aa12e0d",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "a4307aa12e0e",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "a4307aa12e0f",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "a4307aa12e10",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "a4307aa12e11",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "a4307aa12e14",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "a4307aa12e15",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "a4307aa12e16",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "a4bb6d7e7b4e",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "a660a59470be",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "ac7ba1418e1c",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "ac7ba1418f7a",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "ac7ba1418f7f",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "aced5c416040",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "aced5c4ce069",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "aced5c4ce082",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "aced5c4ce12c",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "aced5c4ce131",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "aced5c5021ca",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "acfdce33add8",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "acfdce33ae00",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "acfdce33ae1e",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "acfdce33ae37",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "acfdcee73d08",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "b010413e27d1",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "b010413e2a6c",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "b010413e2a9a",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "b0359fbffc61",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "b04f13d73b74",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "b04f13d744bc",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "b0c090afb1ab",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "b0c090afb93b",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "b0c090afb945",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "b0c090afbaab",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "b0c090afbab7",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "b0c090afbab9",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "b0c090afbacf",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "b0c090afbad3",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "b0c090afcec9",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "b0c090aff3b7",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "b0c090aff3e7",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "b881987508b9",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "b8ca3a932510",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "b8ca3a939ea0",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "b8ca3a94d1ad",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "b8ca3a94d34d",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "b8ca3a94d3cc",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "ccd2815bf523",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "ccd28162012f",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "ccd281688f0c",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "d49dc05f135d",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "d89ef315b6c3",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "e454e880cf30",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "e4b97a70cb42",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "e82aea5379fb",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "e82aea539c97",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "e82aea55c7f1",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "e82aea65d538",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "e82aeab9e57e",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "e82aeab9e7c2",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "ecb1d772eee4",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "f40669cdd601",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "f40669d01461",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "f48e388eb9ee",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "f48e388f1ca8",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "f8b156a835ce",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "f8b156ad3a7a",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "f8b156d2a234",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "fc77744e012e",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "fc77744ea598",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "fc77744eb76d",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "fc77744fa4a2",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "fc7774515fdb",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "fc77745364f2",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "fc7774536920",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "fc77745369f2",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "fc7774536d17",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "fc7774545bfa",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "fc77745469fb",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "fc7774546ece",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "fc7774549a70",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "fc777454d990",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "fc777454d9a4",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "fc777454d9c2",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "fc777454d9c7",
+                    "ifIndex": 1,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "84ef18fa6a63",
+                    "ifIndex": 1,
+                    "vlan_vlan": 5
+                },
+                {
+                    "mac_address": "94e6f747efe1",
+                    "ifIndex": 1,
+                    "vlan_vlan": 5
+                },
+                {
+                    "mac_address": "9c8c6e555a0a",
+                    "ifIndex": 1,
+                    "vlan_vlan": 5
+                },
+                {
+                    "mac_address": "a4db30bd4b5e",
+                    "ifIndex": 1,
+                    "vlan_vlan": 5
+                },
+                {
+                    "mac_address": "c048e677e566",
+                    "ifIndex": 1,
+                    "vlan_vlan": 5
+                },
+                {
+                    "mac_address": "00e04c36025c",
+                    "ifIndex": 1,
+                    "vlan_vlan": 6
+                },
+                {
+                    "mac_address": "08d23ef2e9e6",
+                    "ifIndex": 1,
+                    "vlan_vlan": 8
+                },
+                {
+                    "mac_address": "244bfe3dc772",
+                    "ifIndex": 1,
+                    "vlan_vlan": 8
+                },
+                {
+                    "mac_address": "3292e749e6c6",
+                    "ifIndex": 1,
+                    "vlan_vlan": 8
+                },
+                {
+                    "mac_address": "48e7da8f4421",
+                    "ifIndex": 1,
+                    "vlan_vlan": 8
+                },
+                {
+                    "mac_address": "48e7daf6440f",
+                    "ifIndex": 1,
+                    "vlan_vlan": 8
+                },
+                {
+                    "mac_address": "70c94e79608f",
+                    "ifIndex": 1,
+                    "vlan_vlan": 8
+                },
+                {
+                    "mac_address": "803049713f03",
+                    "ifIndex": 1,
+                    "vlan_vlan": 8
+                },
+                {
+                    "mac_address": "88e9fe63e33d",
+                    "ifIndex": 1,
+                    "vlan_vlan": 8
+                },
+                {
+                    "mac_address": "9c2976c21f19",
+                    "ifIndex": 1,
+                    "vlan_vlan": 8
+                },
+                {
+                    "mac_address": "a864f15ef3da",
+                    "ifIndex": 1,
+                    "vlan_vlan": 8
+                },
+                {
+                    "mac_address": "cec204fe39c2",
+                    "ifIndex": 1,
+                    "vlan_vlan": 8
+                },
+                {
+                    "mac_address": "d83bbf990066",
+                    "ifIndex": 1,
+                    "vlan_vlan": 8
+                },
+                {
+                    "mac_address": "e8d0fc93b621",
+                    "ifIndex": 1,
+                    "vlan_vlan": 8
+                },
+                {
+                    "mac_address": "f06e0bdf568d",
+                    "ifIndex": 1,
+                    "vlan_vlan": 8
+                },
+                {
+                    "mac_address": "f8b54d54979b",
+                    "ifIndex": 1,
+                    "vlan_vlan": 8
+                },
+                {
+                    "mac_address": "001c4218d741",
+                    "ifIndex": 1,
+                    "vlan_vlan": 10
+                },
+                {
+                    "mac_address": "2016d8409eb4",
+                    "ifIndex": 1,
+                    "vlan_vlan": 10
+                },
+                {
+                    "mac_address": "46487e741ef8",
+                    "ifIndex": 1,
+                    "vlan_vlan": 10
+                },
+                {
+                    "mac_address": "68140166d1e5",
+                    "ifIndex": 1,
+                    "vlan_vlan": 10
+                },
+                {
+                    "mac_address": "68ecc59d1584",
+                    "ifIndex": 1,
+                    "vlan_vlan": 10
+                },
+                {
+                    "mac_address": "70bc1072e44a",
+                    "ifIndex": 1,
+                    "vlan_vlan": 10
+                },
+                {
+                    "mac_address": "84c5a6930c4c",
+                    "ifIndex": 1,
+                    "vlan_vlan": 10
+                },
+                {
+                    "mac_address": "c49deda64283",
+                    "ifIndex": 1,
+                    "vlan_vlan": 10
+                },
+                {
+                    "mac_address": "d43b04ea6eb0",
+                    "ifIndex": 1,
+                    "vlan_vlan": 10
+                },
+                {
+                    "mac_address": "dcf5059b2f23",
+                    "ifIndex": 1,
+                    "vlan_vlan": 10
+                },
+                {
+                    "mac_address": "f0189859b61b",
+                    "ifIndex": 1,
+                    "vlan_vlan": 10
+                },
+                {
+                    "mac_address": "8c79f5a1e708",
+                    "ifIndex": 2,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "ccd281879fa7",
+                    "ifIndex": 3,
+                    "vlan_vlan": 2
+                },
+                {
+                    "mac_address": "10d07a0fc035",
+                    "ifIndex": 65,
+                    "vlan_vlan": 2
+                }
+            ]
+        }
     }
 }

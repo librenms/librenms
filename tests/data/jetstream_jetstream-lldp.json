@@ -6714,5 +6714,31 @@
                 }
             ]
         }
+    },
+    "fdb-table": {
+        "discovery": {
+            "ports_fdb": [
+                {
+                    "mac_address": "0000484f24f7",
+                    "ifIndex": 49154,
+                    "vlan_vlan": 100
+                },
+                {
+                    "mac_address": "e4e7495dd089",
+                    "ifIndex": 49180,
+                    "vlan_vlan": 100
+                },
+                {
+                    "mac_address": "f430b9290de2",
+                    "ifIndex": 49180,
+                    "vlan_vlan": 100
+                },
+                {
+                    "mac_address": "8030e02e1a0d",
+                    "ifIndex": 49180,
+                    "vlan_vlan": 254
+                }
+            ]
+        }
     }
 }

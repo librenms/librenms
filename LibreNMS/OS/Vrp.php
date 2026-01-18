@@ -33,6 +33,7 @@ use App\Models\AccessPoint;
 use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\Mempool;
+use App\Models\PortsFdb;
 use App\Models\PortsNac;
 use App\Models\PortVlan;
 use App\Models\Sla;
@@ -48,6 +49,7 @@ use LibreNMS\DB\SyncsModels;
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Discovery\FdbTableDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -80,7 +82,8 @@ class Vrp extends OS implements
     TransceiverDiscovery,
     OSDiscovery,
     VlanDiscovery,
-    VlanPortDiscovery
+    VlanPortDiscovery,
+    FdbTableDiscovery
 {
     use SyncsModels;
     use EntityMib {EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical; }
@@ -91,7 +94,7 @@ class Vrp extends OS implements
         $inventory = $this->discoverBaseEntityPhysical();
 
         // add additional data from Huawei MIBs
-        $extra = \SnmpQuery::walk([
+        $extra = SnmpQuery::walk([
             'HUAWEI-ENTITY-EXTENT-MIB::hwEntityBoardType',
             'HUAWEI-ENTITY-EXTENT-MIB::hwEntityBomEnDesc',
         ])->table(1);
@@ -117,7 +120,7 @@ class Vrp extends OS implements
         $entityToIfIndex = $this->getIfIndexEntPhysicalMap();
 
         // Walk through the MIB table for transceiver information
-        return \SnmpQuery::walk('HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable')->mapTable(function ($data, $entIndex) use ($entityToIfIndex) {
+        return SnmpQuery::walk('HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable')->mapTable(function ($data, $entIndex) use ($entityToIfIndex) {
             // Skip inactive transceivers
             if (isset($data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType']) && $data['HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalType'] === 'inactive') {
                 return null;
@@ -786,5 +789,64 @@ class Vrp extends OS implements
         }
 
         return $ports;
+    }
+
+    public function discoverFdbTable(): Collection
+    {
+        $fdbt = new Collection;
+
+        $fdbPort_table = SnmpQuery::walk('HUAWEI-L2MAM-MIB::hwDynFdbPort')->table();
+
+        if (! empty($fdbPort_table)) {
+            Log::info('HUAWEI-L2MAM-MIB:');
+            foreach ($fdbPort_table['HUAWEI-L2MAM-MIB::hwDynFdbPort'] as $hwDynFdbMac => $macData) {
+                foreach ($macData as $hwDynFdbVlanId => $basePort) {
+                    $ifIndex = reset($basePort); // $baseport can be ['' => '119'] or ['0' => '119']
+                    if (! empty($ifIndex)) {
+                        $fdbt->push(new PortsFdb([
+                            'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()),
+                            'mac_address' => $hwDynFdbMac,
+                            'vlan_id' => $hwDynFdbVlanId,
+                        ]));
+                    }
+                }
+            }
+        }
+
+        if ($fdbt->isEmpty()) {
+            $fdbt = parent::discoverFdbTable();
+        }
+
+        return $fdbt;
+
+        /*
+        * todo
+        * $hwCfgMacAddrQueryIfIndex = SnmpQuery::hideMib()->walk('HUAWEI-L2MAM-MIB::hwCfgMacAddrQueryIfIndex')->table(10);
+        * Static (sticky) mac addresses are not stored in the same table.
+        * if (! empty($hwCfgMacAddrQueryIfIndex)) {
+        * echo 'HUAWEI-L2MAM-MIB (static):' . PHP_EOL;
+        * foreach ($hwCfgMacAddrQueryIfIndex as $vlan => $data) {
+        *    if (! empty($data[0][0][0])) {
+        *        foreach ($data[0][0][0] as $mac => $data_next) {
+        *            if (! empty($data_next['showall'][0][0][0][0]['hwCfgMacAddrQueryIfIndex'])) {
+        *                $basePort = $data_next['showall'][0][0][0][0]['hwCfgMacAddrQueryIfIndex'];
+        *                $ifIndex = reset($basePort);
+        *                if (! $ifIndex) {
+        *                    continue;
+        *                }
+        *                $port_id = PortCache::getIdFromIfIndex($ifIndex, $device['device_id']);
+        *                $mac_address = Mac::parse($mac)->hex();
+        *                if (strlen($mac_address) != 12) {
+        *                    Log::debug("MAC address padding failed for $mac\n");
+        *                    continue;
+        *                }
+        *                $vlan_id = isset($vlans_dict[$vlan]) ? $vlans_dict[$vlan] : 0;
+        *                $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
+        *                Log::debug("vlan $vlan mac $mac_address port ($ifIndex) $port_id\n");
+        *            }
+        *        }
+        *    }
+        *}
+        */
     }
 }

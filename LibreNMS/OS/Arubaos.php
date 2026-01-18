@@ -22,12 +22,18 @@
  *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\Device;
+use App\Models\PortsFdb;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\FdbTableDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
@@ -41,6 +47,7 @@ use LibreNMS\Util\Number;
 use SnmpQuery;
 
 class Arubaos extends OS implements
+    FdbTableDiscovery,
     OSDiscovery,
     WirelessApCountDiscovery,
     WirelessClientsDiscovery,
@@ -216,5 +223,40 @@ class Arubaos extends OS implements
     public function pollWirelessFrequency(array $sensors)
     {
         return $this->pollWirelessChannelAsFrequency($sensors, [$this, 'decodeChannel']);
+    }
+
+    public function discoverFdbTable(): Collection
+    {
+        $fdbt = new Collection;
+
+        $dot1qTpFdbPort = $this->dot1qTpFdbPort();
+
+        $dot1dBasePortIfIndex = SnmpQuery::walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table();
+        $dot1dBasePortIfIndex = $dot1dBasePortIfIndex['BRIDGE-MIB::dot1dBasePortIfIndex'] ?? [];
+
+        foreach ($dot1qTpFdbPort as $vlanIdx => $macData) {
+            Log::info('FdbTable -> get Context: ' . $vlanIdx);
+            $tmpOids = SnmpQuery::context($vlanIdx, 'vlan-')->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table();
+            if (! empty($tmpOids)) {
+                $tmpOids = array_shift($tmpOids);
+                $dot1dBasePortIfIndex += $tmpOids;
+            }
+
+            foreach ($macData as $mac_address => $portIdx) {
+                $ifIndex = $dot1dBasePortIfIndex[$portIdx] ?? 0;
+                $port_id = PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0;
+                $fdbt->push(new PortsFdb([
+                    'port_id' => $port_id,
+                    'mac_address' => $mac_address,
+                    'vlan_id' => $vlanIdx,
+                ]));
+            }
+        }
+
+        if ($fdbt->isEmpty()) {
+            $fdbt = parent::discoverFdbTable();
+        }
+
+        return $fdbt;
     }
 }
