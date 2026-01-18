@@ -58,7 +58,7 @@ class VlanDevicesController extends TableController
     {
         return [
             'device' => Url::deviceLink($model),
-            'ports_count' => (int) $model->ports_count,
+            'ports_count' => $model->ports_count,
             // left joined fields
             'domain' => $model['vlan_domain'],
             'name' => $model['vlan_name'],
