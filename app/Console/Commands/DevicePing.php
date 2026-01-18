@@ -48,7 +48,7 @@ class DevicePing extends LnmsCommand
 
             try {
                 $groups = Arr::wrap($this->option('groups'));
-                PingCheck::dispatchSync(($this->option('force') ? 'force' : 'dispatcher'), $groups);
+                PingCheck::dispatchSync($this->option('force') ? 'force' : 'dispatcher', $groups);
 
                 return 0;
             } catch (\Throwable $e) {

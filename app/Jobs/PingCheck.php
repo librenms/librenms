@@ -78,6 +78,7 @@ class PingCheck implements ShouldQueue
     {
         if (! Fping::wantStats($this->source)) {
             Log::info("Ping stats are disabled for $this->source. Change the config option schedule_type.ping to set the correct source fast ping stats, or add -f to any command to run manually.");
+
             return;
         }
 

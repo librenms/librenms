@@ -1,7 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-use App\Facades\LibrenmsConfig;
 use App\Jobs\PingCheck;
 use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Store\Datastore;
@@ -42,4 +41,4 @@ if (isset($options['g'])) {
     $groups = [];
 }
 
-PingCheck::dispatchSync((isset($options['f']) ? 'force' : 'cron'), $groups);
+PingCheck::dispatchSync(isset($options['f']) ? 'force' : 'cron', $groups);
