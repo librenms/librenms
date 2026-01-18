@@ -1272,10 +1272,6 @@ return [
             'description' => 'Poller Workers',
             'help' => 'Amount of poller workers to spawn. Sets the default value for all nodes.',
         ],
-        'service_poller_frequency' => [
-            'description' => 'Poller Frequency (Warning!)',
-            'help' => 'How often to poll devices. Sets the default value for all nodes. Warning! Changing this without fixing rrd files will break graphs. See docs for more info.',
-        ],
         'service_poller_down_retry' => [
             'description' => 'Device Down Retry',
             'help' => 'If a device is down when polling is attempted. This is the amount of time to wait before retrying. Sets the default value for all nodes.',

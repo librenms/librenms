@@ -6693,14 +6693,6 @@
             "type": "integer",
             "units": "Workers"
         },
-        "service_poller_frequency": {
-            "default": 300,
-            "group": "poller",
-            "section": "dispatcherservice",
-            "order": 7,
-            "type": "integer",
-            "units": "Seconds"
-        },
         "service_poller_down_retry": {
             "default": 60,
             "group": "poller",

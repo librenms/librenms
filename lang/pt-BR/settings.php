@@ -1752,10 +1752,6 @@ return [
             'description' => 'Workers de Coleta de Dados',
             'help' => 'Quantidade de workers de coleta de dados a serem gerados. Valor padrão para todos os nós.',
         ],
-        'service_poller_frequency' => [
-            'description' => 'Frequência de Coleta de Dados (Aviso!)',
-            'help' => 'Com que frequência coletar dados dos dispositivos. Valor padrão para todos os nós. Aviso! Alterar isso sem corrigir os arquivos rrd corromperá os gráficos. Veja a documentação para mais informações.',
-        ],
         'service_poller_down_retry' => [
             'description' => 'Repetir Dispositivo Inativo',
             'help' => 'Se um dispositivo estiver inativo quando a coleta de dados for feita, este é o tempo de espera antes de tentar novamente. Valor padrão para todos os nós.',
