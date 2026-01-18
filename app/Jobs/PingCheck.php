@@ -62,7 +62,7 @@ class PingCheck implements ShouldQueue
      *
      * @param  array  $groups  List of distributed poller groups to check
      */
-    public function __construct(private array $groups = [])
+    public function __construct(private string $source, private array $groups = [])
     {
         $this->deferred = new Collection;
         $this->waiting_on = new Collection;
@@ -76,6 +76,11 @@ class PingCheck implements ShouldQueue
      */
     public function handle(): void
     {
+        if (! Fping::wantStats($this->source)) {
+            Log::info("Ping stats are disabled for $this->source. Change the config option schedule_type.ping to set the correct source fast ping stats, or add -f to any command to run manually.");
+            return;
+        }
+
         $ping_start = microtime(true);
 
         $ordered_hostname_list = $this->orderHostnames($this->fetchDevices());
