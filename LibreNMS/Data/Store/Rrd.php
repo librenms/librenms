@@ -374,7 +374,7 @@ class Rrd extends BaseDatastore
     {
         $partname = self::safeName(is_array($extra) ? implode('-', $extra) : $extra);
 
-        return implode('/', [$this->dirFromHost($host, $forceabsolute), $partname]);
+        return implode('/', [$this->_dirFromHost($host, $forceabsolute), $partname]);
     }
 
     /**
@@ -417,7 +417,7 @@ class Rrd extends BaseDatastore
         if ($this->rrdcached) {
             // getRrdFiles only returns filenames for rrdcached - glob match on filename and prepend directory
             $globtest = self::safeName(is_array($extra) ? implode('-', $extra) : $extra) . $globmatch;
-            $prepend = $this->dirFromHost($host) . '/';
+            $prepend = $this->_dirFromHost($host) . '/';
         } else {
             // getRrdFiles only returns absolute filenames - glob match on path and no prepend
             $globtest = $this->partname($host, $extra) . $globmatch;
@@ -438,13 +438,24 @@ class Rrd extends BaseDatastore
     }
 
     /**
+     * Generates an absolute path based on the hostname (or IP)
+     *
+     * @param  string  $host  Host name
+     * @return string the name of the rrd directory for $host
+     */
+    public function dirFromHost($host): string
+    {
+        return $this->_dirFromHost($host, true);
+    }
+
+    /**
      * Generates a path based on the hostname (or IP)
      *
      * @param  string  $host  Host name
      * @param  bool  $forceabsolute  Do we always want an absolute directory name
      * @return string the name of the rrd directory for $host
      */
-    public function dirFromHost($host, $forceabsolute = false): string
+    private function _dirFromHost($host, $forceabsolute = false): string
     {
         $host = self::safeName(trim($host, '[]'));
 
