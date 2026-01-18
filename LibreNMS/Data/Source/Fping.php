@@ -177,6 +177,7 @@ class Fping
             'disabled' => $source == 'poller',
             'cron' => $source == 'cron',
             'dispatcher' => $source == 'dispatcher',
+            default => throw new UnhandledMatchError(LibrenmsConfig::get('schedule_type.ping', 'legacy')),
         };
     }
 
@@ -197,6 +198,7 @@ class Fping
             'disabled' => $source == 'poller',
             'cron' => $source == 'cron',
             'dispatcher' => $source == 'dispatcher',
+            default => throw new UnhandledMatchError(LibrenmsConfig::get('schedule_type.ping', 'legacy')),
         };
     }
 }
