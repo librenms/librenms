@@ -2,7 +2,6 @@
 
 namespace App\Actions\Device;
 
-use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use LibreNMS\Data\Source\Fping;
 use LibreNMS\Enum\AvailabilitySource;
