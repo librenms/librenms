@@ -8,6 +8,7 @@ use App\Facades\LibrenmsConfig;
 use App\Jobs\PingCheck;
 use App\Models\Device;
 use Illuminate\Support\Arr;
+use LibreNMS\Data\Source\Fping;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -38,16 +39,16 @@ class DevicePing extends LnmsCommand
         $spec = $this->argument('device spec');
 
         if ($spec == 'fast') {
-            // We do not need to run if ICMP tests are run during polling and the poll interval equals the ping interval
-            if (LibrenmsConfig::get('icmp_check') && LibrenmsConfig::get('service_poller_frequency') == LibrenmsConfig::get('ping_rrd_step') && ! $this->option('force')) {
-                $this->info('Not running bulk fping because icmp_check is enabled and service_poller_frequency = ping_rrd_step');
+            // Check if we want to run pings through the dispatcher
+            if (! $this->option('force') && ! Fping::runPing('dispatcher')) {
+                $this->info('Fast Pings are not enabled for dispatcher scheduling. Add -f to the command to run manually, or make sure the icmp_check option is set to true and the schedule_type.ping option is set to dispatcher to allow dispatcher scheduling');
 
                 return 0;
             }
 
             try {
                 $groups = Arr::wrap($this->option('groups'));
-                PingCheck::dispatchSync($groups);
+                PingCheck::dispatchSync(($this->option('force') ? 'force' : 'dispatcher'), $groups);
 
                 return 0;
             } catch (\Throwable $e) {

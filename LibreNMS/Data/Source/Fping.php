@@ -160,4 +160,43 @@ class Fping
             }
         });
     }
+
+    /**
+     * Check if we want a given scheduler to run pings
+     */
+    public static function runPing(string $source): bool
+    {
+        // Don't run any pings if icmp checks are disabled
+        if (! LibrenmsConfig::get('icmp_check')) {
+            return false;
+        }
+
+        return match(LibrenmsConfig::get('schedule_type.ping', 'legacy')) {
+            // For legacy config, always run pings
+            'legacy' => true,
+            'disabled' => $source == 'poller',
+            'cron' => $source == 'cron',
+            'dispatcher' => $source == 'dispatcher',
+        };
+    }
+
+    /**
+     * Check if we want a given scheduler to generate stats
+     */
+    public static function wantStats(string $source): bool
+    {
+        // Always run if the force option has been given to a command
+        if ($source === 'force') {
+            return true;
+        }
+
+        return match(LibrenmsConfig::get('schedule_type.ping', 'legacy')) {
+            // For legacy config, if the normal and ping rrd steps are the same use the poller, else use cron/dispatcher
+            'legacy' => (LibrenmsConfig::get('rrd.step') == LibrenmsConfig::get('ping_rrd_step') ? $source == 'poller' : $source != 'poller'),
+            // If the fast ping process has been disabled, get stats from the poller
+            'disabled' => $source == 'poller',
+            'cron' => $source == 'cron',
+            'dispatcher' => $source == 'dispatcher',
+        };
+    }
 }
