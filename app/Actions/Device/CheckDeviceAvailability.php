@@ -24,15 +24,12 @@ class CheckDeviceAvailability
         $ping_response = null;
 
         if (ConnectivityHelper::pingIsAllowed($device)) {
-            // This may fail if:
-            //  - Both the dispatcher service and ping crontab are disabled
-            //  - The service_poller_frequency or ping_rrd_step have been changed
-            if (LibrenmsConfig::get('service_poller_frequency') == LibrenmsConfig::get('ping_rrd_step')) {
-                // Poller frequency matches ping frequency - fetch ping stats here
+            if (Fping::wantStats('poller')) {
+                // We want stats from the poller - do a full ping test with stats
                 $ping_response = $this->deviceIsPingable->execute($device);
                 $ping_success = $ping_response->success();
             } else {
-                // Pings are being done more frequently with an external process - just check for any successful ping
+                // Pings are configure to gather stats through another process - do a quick alive test
                 $ping_success = $this->fping->alive($device->pollerTarget(), $device->ipFamily());
             }
         } else {

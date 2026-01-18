@@ -3,6 +3,7 @@
 
 use App\Facades\LibrenmsConfig;
 use App\Jobs\PingCheck;
+use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Util\Debug;
 
@@ -26,17 +27,9 @@ END;
 Debug::set(isset($options['d']));
 Debug::setVerbose(isset($options['v']));
 
-$scheduler = LibrenmsConfig::get('schedule_type.ping');
-if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
+if (! isset($options['f']) && ! Fping::runPing('cron')) {
     if (Debug::isEnabled()) {
-        echo "Fast Pings are not enabled for cron scheduling.  Add the -f command argument if you want to force this command to run.\n";
-    }
-    exit(0);
-}
-
-if (! isset($options['f']) && LibrenmsConfig::get('icmp_check') && LibrenmsConfig::get('service_poller_frequency') == LibrenmsConfig::get('ping_rrd_step')) {
-    if (Debug::isEnabled()) {
-        echo "Fast Pings have the same frequency and polling, so we will let the poller do the work.  Add the -f command argument if you want to force this command to run.\n";
+        echo "Fast Pings are not enabled for cron scheduling.  Add -f to the command to run manually, or make sure the icmp_check option is set to true and the schedule_type.ping option is set to cron to allow crontab scheduling.\n";
     }
     exit(0);
 }
@@ -49,4 +42,4 @@ if (isset($options['g'])) {
     $groups = [];
 }
 
-PingCheck::dispatchSync($groups);
+PingCheck::dispatchSync((isset($options['f']) ? 'force' : 'cron'), $groups);
