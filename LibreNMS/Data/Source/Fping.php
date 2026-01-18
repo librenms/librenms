@@ -171,7 +171,7 @@ class Fping
             return false;
         }
 
-        return match(LibrenmsConfig::get('schedule_type.ping', 'legacy')) {
+        return match (LibrenmsConfig::get('schedule_type.ping', 'legacy')) {
             // For legacy config, always run pings
             'legacy' => true,
             'disabled' => $source == 'poller',
@@ -190,7 +190,7 @@ class Fping
             return true;
         }
 
-        return match(LibrenmsConfig::get('schedule_type.ping', 'legacy')) {
+        return match (LibrenmsConfig::get('schedule_type.ping', 'legacy')) {
             // For legacy config, if the normal and ping rrd steps are the same use the poller, else use cron/dispatcher
             'legacy' => (LibrenmsConfig::get('rrd.step') == LibrenmsConfig::get('ping_rrd_step') ? $source == 'poller' : $source != 'poller'),
             // If the fast ping process has been disabled, get stats from the poller
