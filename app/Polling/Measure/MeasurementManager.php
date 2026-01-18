@@ -32,6 +32,7 @@ use Log;
 
 class MeasurementManager
 {
+    const FPING_COLOR = "\e[0;35m";
     const SNMP_COLOR = "\e[0;36m";
     const DB_COLOR = "\e[1;33m";
     const DATASTORE_COLOR = "\e[0;32m";
@@ -48,6 +49,7 @@ class MeasurementManager
             self::$categories = new Collection;
             self::$categories->put('snmp', new MeasurementCollection());
             self::$categories->put('db', new MeasurementCollection());
+            self::$categories->put('fping', new MeasurementCollection());
         }
     }
 
@@ -108,10 +110,19 @@ class MeasurementManager
     }
 
     /**
+     * Record a measurement for fping
+     */
+    public function recordFping(Measurement $measurement): void
+    {
+        $this->record('fping', $measurement);
+    }
+
+    /**
      * Print global stat arrays
      */
     public function printStats(): void
     {
+        $this->printSummary('FPING', $this->getCategory('fping'), self::FPING_COLOR);
         $this->printSummary('SNMP', $this->getCategory('snmp'), self::SNMP_COLOR);
         $this->printSummary('SQL', $this->getCategory('db'), self::DB_COLOR);
 
