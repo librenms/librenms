@@ -27,6 +27,7 @@
 namespace LibreNMS\Data\Source;
 
 use App\Facades\LibrenmsConfig;
+use App\Polling\Measure\Measurement;
 use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Exceptions\FpingUnparsableLine;
 use Log;
@@ -59,6 +60,8 @@ class Fping
      */
     public function ping(string $host, AddressFamily $address_family = AddressFamily::IPv4): FpingResponse
     {
+        $measure = Measurement::start('ping');
+
         // build the command
         $cmd = array_merge(LibrenmsConfig::fpingCommand($address_family), [
             '-e',
@@ -79,6 +82,7 @@ class Fping
         $process->run();
 
         $response = FpingResponse::parseLine($process->getErrorOutput(), $process->getExitCode());
+        $measure->manager()->recordFping($measure->end());
 
         Log::debug("response: $response");
 
@@ -90,6 +94,8 @@ class Fping
      */
     public function alive(string $host, AddressFamily $address_family = AddressFamily::IPv4): bool
     {
+        $measure = Measurement::start('alive');
+
         // build the command
         $cmd = array_merge(LibrenmsConfig::fpingCommand($address_family), [
             '-r',
@@ -98,6 +104,8 @@ class Fping
             $this->timeout,
             '-O',
             $this->tos,
+            '-B',
+            '1.0',
             $host,
         ]);
 
@@ -105,6 +113,7 @@ class Fping
         Log::debug('[FPING] ' . $process->getCommandLine() . PHP_EOL);
         $process->disableOutput();
         $process->run();
+        $measure->manager()->recordFping($measure->end());
 
         Log::debug('response: ' . ($process->isSuccessful() ? 'success' : 'fail'));
 
