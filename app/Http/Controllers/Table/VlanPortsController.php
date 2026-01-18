@@ -74,7 +74,7 @@ class VlanPortsController extends TableController
     {
         return [
             'device' => Url::deviceLink($model->device),
-            'port' => sprintf('<a href="%s">%s</a>', Url::generate(['page' => 'ports', 'device_id' => $model->device_id]), $model->getFullLabel()),
+            'port' => Url::portLink($model, $model->getFullLabel()),
             // left joined columns
             'untagged' => $model['untagged'],
             'state' => $model['state'],
