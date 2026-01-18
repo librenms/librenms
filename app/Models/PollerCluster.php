@@ -112,12 +112,12 @@ class PollerCluster extends Model
 
         $scheduleType = \App\Facades\LibrenmsConfig::get('schedule_type');
 
-        $pollerGloballyEnabled = $scheduleType['poller'] == 'legacy' ? \App\Facades\LibrenmsConfig::get('service_poller_enabled', true) : $scheduleType['poller'] == 'dispatcher';
-        $discoveryGloballyEnabled = $scheduleType['discovery'] == 'legacy' ? \App\Facades\LibrenmsConfig::get('service_discovery_enabled', true) : $scheduleType['discovery'] == 'dispatcher';
-        $servicesGloballyEnabled = $scheduleType['services'] == 'legacy' ? \App\Facades\LibrenmsConfig::get('service_services_enabled', true) : $scheduleType['services'] == 'dispatcher';
-        $alertGloballyEnabled = $scheduleType['alerting'] == 'legacy' ? \App\Facades\LibrenmsConfig::get('service_alerting_enabled', true) : $scheduleType['alerting'] == 'dispatcher';
-        $billingGloballyEnabled = $scheduleType['billing'] == 'legacy' ? \App\Facades\LibrenmsConfig::get('service_billing_enabled', true) : $scheduleType['billing'] == 'dispatcher';
-        $pingGloballyEnabled = $scheduleType['ping'] == 'legacy' ? \App\Facades\LibrenmsConfig::get('service_ping_enabled', true) : $scheduleType['ping'] == 'dispatcher';
+        $pollerGloballyEnabled = $scheduleType['poller'] == 'legacy' ? true : $scheduleType['poller'] == 'dispatcher';
+        $discoveryGloballyEnabled = $scheduleType['discovery'] == 'legacy' ? true : $scheduleType['discovery'] == 'dispatcher';
+        $servicesGloballyEnabled = $scheduleType['services'] == 'legacy' ? true : $scheduleType['services'] == 'dispatcher';
+        $alertGloballyEnabled = $scheduleType['alerting'] == 'legacy' ? true : $scheduleType['alerting'] == 'dispatcher';
+        $billingGloballyEnabled = $scheduleType['billing'] == 'legacy' ? true : $scheduleType['billing'] == 'dispatcher';
+        $pingGloballyEnabled = $scheduleType['ping'] == 'legacy' ? false : $scheduleType['ping'] == 'dispatcher';
 
         return [
             [
