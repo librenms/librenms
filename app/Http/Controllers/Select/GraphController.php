@@ -69,6 +69,7 @@ class GraphController extends Controller
             'core' => 'Core',
             'custom' => 'Custom',
             'ports' => 'Manual Ports',
+            'sensors' => 'Manual Sensors',
         ]), 'aggregators', $search);
         if ($aggregators->isNotEmpty()) {
             $data[] = [

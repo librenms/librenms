@@ -288,7 +288,7 @@ if ($format == 'graph') {
 
     $features_selected = isset($vars['features']) ? json_encode(['id' => $vars['features'], 'text' => $vars['features']]) : '""';
     $hardware_selected = isset($vars['hardware']) ? json_encode(['id' => $vars['hardware'], 'text' => $vars['hardware']]) : '""';
-    $os_selected = isset($vars['os']) ? json_encode(['id' => $vars['os'], 'text' => $vars['hardware']]) : '""';
+    $os_selected = isset($vars['os']) ? json_encode(['id' => $vars['os'], 'text' => $vars['os']]) : '""';
     $type_selected = isset($vars['type']) ? json_encode(['id' => $vars['type'], 'text' => ucfirst($vars['type'])]) : '""';
     $version_selected = isset($vars['version']) ? json_encode(['id' => $vars['version'], 'text' => $vars['version']]) : '""';
 

@@ -43,8 +43,6 @@ class DevicePoll extends LnmsCommand
             return $this->dispatchWork();
         }
 
-        $this->configureOutputOptions();
-
         if ($this->option('no-data')) {
             LibrenmsConfig::set('rrd.enable', false);
             LibrenmsConfig::set('influxdb.enable', false);

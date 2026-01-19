@@ -20,7 +20,7 @@ STORMSHIELD-IF-MIB DEFINITIONS ::= BEGIN
          E-mail: support@stormshield.eu
          http://www.stormshield.eu"
       DESCRIPTION   "stormshield Interface MIBS"
-      REVISION      "201702200000Z"
+      REVISION      "201904250000Z"
       DESCRIPTION   "Initial"
       ::= { stormshieldMIB 4 }
 
@@ -49,9 +49,9 @@ STORMSHIELD-IF-MIB DEFINITIONS ::= BEGIN
       snsifMask                   DisplayString,
       snsifType                   DisplayString,
       snsifColor                  Integer32,
-      snsifMacThroughput          Integer32,
-      snsifCurThroughput          Integer32,
-      snsifMaxThroughput          Integer32,
+      snsifMacThroughput          Counter64,
+      snsifCurThroughput          Counter64,
+      snsifMaxThroughput          Counter64,
       snsifPktAccepted            Counter64,
       snsifPktBlocked             Counter64,
       snsifPktFragmented          Counter64,
@@ -79,16 +79,17 @@ STORMSHIELD-IF-MIB DEFINITIONS ::= BEGIN
       snsifInIcmpBytes            Counter64,
       snsifOutIcmpBytes           Counter64,
       snsifProtected              Integer32,
-      snsifDrvName                DisplayString
+      snsifDrvName                DisplayString,
+      snsifComment                DisplayString
    }
 
    snsifIndex OBJECT-TYPE
-   SYNTAX INTEGER (1..65535)
+   SYNTAX INTEGER (0..65535)
    MAX-ACCESS read-only
    STATUS current
    DESCRIPTION
       "A unique value for the table. Its value
-      ranges between 1 and 65535 and may not be contigous.
+      ranges between 0 and 65535 and may not be contigous.
       the index has no other meaning but a pure index"
    ::= { snsifEntry 1 }
 
@@ -141,7 +142,7 @@ STORMSHIELD-IF-MIB DEFINITIONS ::= BEGIN
       ::= { snsifEntry 7 }
 
    snsifMacThroughput OBJECT-TYPE
-      SYNTAX Integer32
+      SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
       DESCRIPTION
@@ -149,7 +150,7 @@ STORMSHIELD-IF-MIB DEFINITIONS ::= BEGIN
       ::= { snsifEntry 8 }
 
    snsifCurThroughput OBJECT-TYPE
-      SYNTAX Integer32
+      SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
       DESCRIPTION
@@ -157,7 +158,7 @@ STORMSHIELD-IF-MIB DEFINITIONS ::= BEGIN
       ::= { snsifEntry 9 }
 
    snsifMaxThroughput OBJECT-TYPE
-      SYNTAX Integer32
+      SYNTAX Counter64
       MAX-ACCESS read-only
       STATUS current
       DESCRIPTION
@@ -387,5 +388,13 @@ STORMSHIELD-IF-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION
          "Driver interface name"
       ::= { snsifEntry 38 }
+
+   snsifComment OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Interface comment"
+      ::= { snsifEntry 39 }
 
 END

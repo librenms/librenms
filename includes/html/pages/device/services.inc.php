@@ -92,7 +92,7 @@ if (count($services) > '0') {
         echo '<td class="col-sm-1 text-muted">' . nl2br(htmlentities((string) $service['service_ip'])) . '</td>';
         echo '<td class="col-sm-4">' . nl2br(htmlentities(trim((string) $service['service_message']))) . '</td>';
         echo '<td class="col-sm-2 text-muted">' . htmlentities((string) $service['service_desc']) . '</td>';
-        echo '<td class="col-sm-1 text-muted">' . \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) . '</td>';
+        echo '<td class="col-sm-1 text-muted">' . ($service['service_changed'] ? \LibreNMS\Util\Time::formatInterval(time() - $service['service_changed']) : 'Waiting for first service check') . '</td>';
         echo '<td class="col-sm-1">';
         if (Auth::user()->hasGlobalAdmin()) {
             echo '<div class="pull-right">';

@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Util\Number;
 
 echo 'RFC1628 ';
@@ -12,11 +13,17 @@ foreach ($input_freq as $index => $data) {
     if (count($input_freq) > 1) {
         $descr .= " Phase $index";
     }
-    if (is_array($data['upsInputFrequency'])) {
-        $data['upsInputFrequency'] = $data['upsInputFrequency'][0];
+    $inputFrequency = $data['upsInputFrequency'] ?? null;
+    if (is_array($inputFrequency)) {
+        $inputFrequency = $inputFrequency[0];
         $freq_oid .= '.0';
     }
-    $data['upsInputFrequency'] = Number::cast($data['upsInputFrequency']);
+
+    if (! is_numeric($inputFrequency)) {
+        Log::debug("skipped $descr: $inputFrequency is not numeric");
+
+        continue;
+    }
 
     discover_sensor(
         null,
@@ -32,7 +39,7 @@ foreach ($input_freq as $index => $data) {
         null,
         null,
         null,
-        $data['upsInputFrequency'] / $divisor
+        Number::cast($inputFrequency) / $divisor
     );
 }
 

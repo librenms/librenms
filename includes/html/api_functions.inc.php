@@ -31,6 +31,8 @@ use App\Models\MplsService;
 use App\Models\OspfPort;
 use App\Models\Ospfv3Nbr;
 use App\Models\Ospfv3Port;
+use App\Models\Poller;
+use App\Models\PollerCluster;
 use App\Models\PollerGroup;
 use App\Models\Port;
 use App\Models\PortGroup;
@@ -3585,4 +3587,66 @@ function server_info()
     return api_success([
         $versions,
     ], 'system');
+}
+
+/**
+ * List all pollers
+ */
+function list_pollers()
+{
+    $pollers = PollerCluster::with('stats')->get();
+
+    if ($pollers->isEmpty()) {
+        $pollers = Poller::get();
+    }
+
+    return api_success($pollers, 'pollers');
+}
+
+/**
+ * List poller log - devices with polling information
+ */
+function list_poller_log(Illuminate\Http\Request $request)
+{
+    $user = Auth::user();
+
+    $query = Device::hasAccess($user)
+        ->isActive();
+
+    // Filter for unpolled devices if requested
+    if ($request->get('unpolled')) {
+        $overdue = (int) (LibrenmsConfig::get('rrd.step', 300) * 1.2);
+        $query->whereRaw('`devices`.`last_polled` <= DATE_ADD(NOW(), INTERVAL - ? SECOND)', [$overdue]);
+    }
+
+    $devices = $query
+        ->leftJoin('poller_groups', 'devices.poller_group', '=', 'poller_groups.id')
+        ->select([
+            'devices.device_id',
+            'devices.hostname',
+            'devices.sysName',
+            'devices.display',
+            'devices.last_polled',
+            'devices.last_polled_timetaken',
+            'poller_groups.group_name',
+            'devices.poller_group',
+        ])
+        ->orderBy('devices.last_polled_timetaken', 'desc')
+        ->get();
+
+    $result = [];
+    foreach ($devices as $device) {
+        $group_name = $device->group_name ?: 'General';
+
+        $result[] = [
+            'hostname' => $device->hostname,
+            'display_name' => $device->display,
+            'last_polled' => $device->last_polled,
+            'last_polled_timetaken' => round($device->last_polled_timetaken, 2),
+            'poller_group' => $group_name,
+            'poller_group_id' => $device->poller_group,
+        ];
+    }
+
+    return api_success($result, 'log');
 }

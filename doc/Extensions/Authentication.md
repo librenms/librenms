@@ -507,11 +507,11 @@ try and guess.
 
 To get up and running, all you need to do is configure the following values:
 
-```php
-$config['auth_mechanism']        = "sso";
-$config['sso']['mode']           = "env";
-$config['sso']['group_strategy'] = "static";
-$config['sso']['static_level']   = 10;
+```bash
+lnms config:set auth_mechanism mysql
+lnms config:set sso.mode env
+lnms config:set sso.group_strategy static
+lnms config:set sso.static_level 10
 ```
 
 This, along with the defaults, sets up a basic Single Sign-on setup that:
@@ -542,8 +542,8 @@ being strongly recommended. This advice applies to the IDP too.
 The mechanism includes very basic protection, in the form of an IP
 whitelist with should contain the source addresses of your proxies:
 
-```php
-$config['sso']['trusted_proxies'] = ['127.0.0.1/8', '::1/128', '192.0.2.0', '2001:DB8::'];
+```bash
+lnms config:set sso.trusted_proxies '["127.0.0.1/8", "::1/128", "192.0.2.0", "2001:DB8::"]'
 ```
 
 This configuration item should contain an array with a list of IP
@@ -557,8 +557,8 @@ supply environment variables or headers.
 If for some reason your relying party doesn't store the username in
 ___REMOTE\_USER___, you can override this choice.
 
-```php
-$config['sso']['user_attr'] = 'HTTP_UID';
+```bash
+lnms config:set sso.trusted_proxies HTTP_UID
 ```
 
 Note that the user lookup is a little special - normally headers are
@@ -571,9 +571,9 @@ yourself.
 
 These are enabled by default:
 
-```php
-$config['sso']['create_users'] = true;
-$config['sso']['update_users'] = true;
+```bash
+lnms config:set sso.create_users true
+lnms config:set sso.update_users true
 ```
 
 If these are not enabled, user logins will be (somewhat silently)
@@ -587,10 +587,10 @@ the users true identity has been negotiated with the IDP, the username
 If the attributes are being populated, you can instruct the mechanism
 to add additional information to the user's database entry:
 
-```php
-$config['sso']['email_attr']    = "mail";
-$config['sso']['realname_attr'] = "displayName";
-$config['sso']['descr_attr']    = "unscoped-affiliation
+```bash
+lnms config:set sso.email_attr mail
+lnms config:set sso.realname_attr displayName
+lnms config:set sso.descr_attr unscoped-affiliation
 ```
 
 #### Group Strategies
@@ -609,9 +609,9 @@ control, this is probably suitable.
 
 ##### Attribute
 
-```php
-$config['sso']['group_strategy'] = "attribute";
-$config['sso']['level_attr']     = "entitlement";
+```bash
+lnms config:set sso.group_strategy attribute
+lnms config:set sso.level_attr entitlement
 ```
 
 If your Relying Party is capable of calculating the necessary
@@ -625,11 +625,11 @@ the value.
 
 This is the most flexible (and complex) way of assigning privileges.
 
-```php
-$config['sso']['group_strategy']  = "map";
-$config['sso']['group_attr']      = "member";
-$config['sso']['group_level_map'] = ['librenms-admins' => 10, 'librenms-readers' => 1, 'librenms-billingcontacts' => 5];
-$config['sso']['group_delimiter'] = ';';
+```bash
+lnms config:set sso.group_strategy map
+lnms config:set sso.group_attr member
+lnms config:set sso.group_level_map '{"librenms-admins": 10, "librenms-readers": 1, "librenms-billingcontacts": 5}'
+lnms config:set sso.group_delimiter ';'
 ```
 
 This mechanism expects to find a delimited list of groups within the
@@ -651,8 +651,8 @@ may create pseudo arrays).
 
 There is an optional value for sites with large numbers of groups:
 
-```php
-$config['sso']['group_filter']  = "/librenms-(.*)/i";
+```bash
+lnms config:set sso.group_filter "/librenms-(.*)/i"
 ```
 
 This filter causes the mechanism to only consider groups matching a regular expression.
@@ -665,12 +665,12 @@ Sign-On - that responsibility falls to the Relying Party.
 If your Relying Party has a magic URL that needs to be called to end a
 session, you can configure LibreNMS to direct the user to it:
 
-```php
+```bash
 # Example for Shibboleth
-$config['auth_logout_handler'] = '/Shibboleth.sso/Logout';
+lnms config:set sso.auth_logout_handler '/Shibboleth.sso/Logout'
 
 # Example for oauth2-proxy
-$config['auth_logout_handler'] = '/oauth2/sign_out';
+lnms config:set sso.auth_logout_handler '/oauth2/sign_out'
 ```
 
 This option functions independently of the Single Sign-on mechanism.
@@ -682,16 +682,16 @@ party, injecting environment variables, with the IDP supplying a list
 of groups.
 
 ```php
-$config['auth_mechanism'] = 'sso';
-$config['auth_logout_handler'] = '/Shibboleth.sso/Logout';
-$config['sso']['mode'] = 'env';
-$config['sso']['create_users'] = true;
-$config['sso']['update_users'] = true;
-$config['sso']['realname_attr'] = 'displayName';
-$config['sso']['email_attr'] = 'mail';
-$config['sso']['group_strategy'] = 'map';
-$config['sso']['group_attr'] = 'member';
-$config['sso']['group_filter'] = '/(librenms-.*)/i';
-$config['sso']['group_delimiter'] = ';';
-$config['sso']['group_level_map'] = ['librenms-demo' => 11, 'librenms-globaladmin' => 10, 'librenms-globalread' => 5, 'librenms-lowpriv'=> 1];
+lnms config:set auth_mechanism sso
+lnms config:set sso.auth_logout_handler '/Shibboleth.sso/Logout'
+lnms config:set sso.mode env
+lnms config:set sso.create_users true
+lnms config:set sso.update_users true
+lnms config:set sso.realname_attr displayName
+lnms config:set sso.email_attr mail
+lnms config:set sso.group_strategy map
+lnms config:set sso.group_attr member
+lnms config:set sso.group_filter '/(librenms-.*)/i'
+lnms config:set sso.group_delimiter ';'
+lnms config:set sso.group_level_map '{"librenms-admins": 10, "librenms-readers": 1, "librenms-billingcontacts": 5}'
 ```

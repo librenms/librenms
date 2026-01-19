@@ -1,0 +1,1852 @@
+VS-DEVICE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises, MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32, NOTIFICATION-TYPE, Counter32, Unsigned32
+		FROM SNMPv2-SMI
+	DisplayString
+		FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+		FROM SNMPv2-CONF;
+
+stentofon MODULE-IDENTITY
+	LAST-UPDATED				"201806190000Z"
+	ORGANIZATION				"Zenitel Norway AS"
+	CONTACT-INFO
+							"	Zenitel Norway AS
+								phone: +47 40002500
+								email: info@zenitel.com"
+	DESCRIPTION					"This MIB module defines objects for Vingtor-Stentofon Exigo and Turbine family derived data."
+	REVISION					"201806190000Z"
+	DESCRIPTION					"Fourth revision."
+	::= { enterprises 26122 }
+
+ipstation 						OBJECT IDENTIFIER ::= { stentofon 2 }
+	general						OBJECT IDENTIFIER ::= { ipstation 1 }
+	registration				OBJECT IDENTIFIER ::= { ipstation 2 }
+	call						OBJECT IDENTIFIER ::= { ipstation 3 }
+	alarmObjects				OBJECT IDENTIFIER ::= { ipstation 4 }
+	alarmNotifications			OBJECT IDENTIFIER ::= { ipstation 5 }
+	faultNotifications			OBJECT IDENTIFIER ::= { ipstation 8 }
+vsDevice 						OBJECT IDENTIFIER ::= { stentofon 3 }
+	info						OBJECT IDENTIFIER ::= { vsDevice 1 }
+	temp						OBJECT IDENTIFIER ::= { vsDevice 2 }
+	fan							OBJECT IDENTIFIER ::= { vsDevice 3 }
+	voltage						OBJECT IDENTIFIER ::= { vsDevice 4 }
+	power						OBJECT IDENTIFIER ::= { vsDevice 5 }
+	lineIn						OBJECT IDENTIFIER ::= { vsDevice 6 }
+	ampChannel					OBJECT IDENTIFIER ::= { vsDevice 7 }
+	letStatus					OBJECT IDENTIFIER ::= { vsDevice 8 }
+		letChannel1				OBJECT IDENTIFIER ::= { letStatus 1 }
+		letChannel2				OBJECT IDENTIFIER ::= { letStatus 2 }
+	controlInput				OBJECT IDENTIFIER ::= { vsDevice 9 }
+	controlOutput				OBJECT IDENTIFIER ::= { vsDevice 10 }
+	eth							OBJECT IDENTIFIER ::= { vsDevice 11 }
+	relay						OBJECT IDENTIFIER ::= { vsDevice 12 }
+stentofonMIBConformance			OBJECT IDENTIFIER ::= { stentofon 4 }
+	stentofonMIBCompliances		OBJECT IDENTIFIER ::= { stentofonMIBConformance 1 }
+	stentofonMIBGroups			OBJECT IDENTIFIER ::= { stentofonMIBConformance 2 }
+
+-- ----------------------------------------------------------------------
+--  Compliance and Groups
+-- ----------------------------------------------------------------------
+stentofonCompliance MODULE-COMPLIANCE
+	STATUS						current
+	DESCRIPTION					"The compliance statement for entities which implement the Stentofon MIB."
+	MODULE -- this module
+		MANDATORY-GROUPS 
+		{ 
+			alarmObjectsGroup,
+			sipNotificationsGroup,
+			faultNotificationsGroup,
+			deviceInfoGroup,
+			sipGeneralGroup
+		}
+	GROUP sipRegistrationGroup
+	DESCRIPTION					"This group is optional."
+	GROUP sipCallGroup
+	DESCRIPTION					"This group is optional."
+	GROUP deviceStatusGroup
+	DESCRIPTION					"This group is optional."
+	GROUP audioInputsGroup
+	DESCRIPTION					"This group is optional."
+	GROUP controlIOGroup
+	DESCRIPTION					"This group is optional."
+	GROUP ethernetGroup
+	DESCRIPTION					"This group is optional."
+	GROUP amplifierGroup
+	DESCRIPTION					"This group is optional."
+	GROUP letsGroup
+	DESCRIPTION					"This group is optional."
+	::= { stentofonMIBCompliances 1 }
+
+sipRegistrationGroup OBJECT-GROUP
+	OBJECTS {
+		serverType,
+		serverAddress,
+		isRegistered,
+		lastRegistration
+		}
+	STATUS						current
+	DESCRIPTION					"A collection of registration related objects, available only when device is in SIP/Pulse mode"
+	::= { stentofonMIBGroups 1 }
+
+sipCallGroup OBJECT-GROUP
+	OBJECTS {
+		callState,
+		callRemoteId,
+		incomingCallAttempts,
+		incomingCallsSuccess,
+		incomingCallsFailed,
+		outgoingCallAttempts,
+		outgoingCallsSuccess,
+		outgoingCallsFailed
+		}
+	STATUS						current
+	DESCRIPTION					"A collection of call state related objects, available only when device is in SIP/Pulse mode"
+	::= { stentofonMIBGroups 2 }
+
+sipGeneralGroup OBJECT-GROUP
+	OBJECTS {
+		softwareVersion,
+		buttonHangingStatus,
+		buttonHangingCounter,
+		soundTestLastResult,
+		soundTestFailedCounter,
+		soundTestErrorCounter,
+		soundTestSuccessCounter
+		}
+	STATUS						current
+	DESCRIPTION					"A collection of general device info objects available only when device is in SIP/Pulse mode"
+	::= { stentofonMIBGroups 3 }
+
+alarmObjectsGroup OBJECT-GROUP
+	OBJECTS {
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"A collection of objects included in all notifications"
+	::= { stentofonMIBGroups 4 }
+
+sipNotificationsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		ipsStarted,
+		ipsShutdown,
+		sipRegistered,
+		sipUnregistered,
+		sipRegisterFailed,
+		callConnect,
+		callConnectFailed,
+		callDisconnect,
+		callAbnormalDisconnect,
+		soundTestSuccess,
+		soundTestFailed,
+		soundTestError,
+		buttonHanging,
+		buttonPressed,
+		buttonReleased,
+		relayActivated,
+		relayDeactivated,
+		dakPressed,
+		dakReleased
+	}
+	STATUS						current
+	DESCRIPTION					"A collection of notifications available only when device is in SIP/Pulse mode"
+	::= { stentofonMIBGroups 5 }
+
+faultNotificationsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS
+	{
+		coolingFanFault,
+		missingAmpModule,
+		psuVoltageFault,
+		lineVoltageFault,
+		letFault,
+		ampShutdown,
+		slmFault,
+		fuseBroken,
+		ampDisabled,
+		lineInFault,
+		rcoFault,
+		rciFault,
+		dcPowerFault,
+		acPowerFault,
+		ethPortDisconnected,
+		micFault,
+		missingEmbdr,
+		swFault,
+		tempFault,
+		customFault
+	}
+	STATUS						current
+	DESCRIPTION					"A collection of fault monitoring related notifications, availability based on device type"
+	::= { stentofonMIBGroups 6 }
+
+deviceInfoGroup OBJECT-GROUP
+	OBJECTS {
+		infoPackageVersion,
+		infoModelType,
+		infoModelNumber,
+		infoAmplifierType,
+		infoKernelVersion,
+		infoDeviceTreeVersion,
+		infoDisablement
+	}
+	STATUS						current
+	DESCRIPTION					"A collection of device info objects, some fields not available on all device types"
+	::= { stentofonMIBGroups 7 }
+
+deviceStatusGroup OBJECT-GROUP
+	OBJECTS
+	{
+		tempTableCount,
+		tempSensorName,
+		tempCurrentString,
+		tempCurrentValue,
+		tempPeakString,
+		tempPeakValue,
+		tempAverageString,
+		tempAverageValue,
+		fanTableCount,
+		fanString,
+		fanValue,
+		voltageTableCount,
+		voltageString,
+		voltageValue,
+		powerType,
+		powerString,
+		powerMonitoring,
+		powerStatus
+	}
+	STATUS						current
+	DESCRIPTION					"A collection of device temperature, fan speed, internal voltages and power status objects, available on amplifier devices"
+	::= { stentofonMIBGroups 8 }
+
+audioInputsGroup OBJECT-GROUP
+	OBJECTS
+	{
+		lineInMonitoringState,
+		lineInType,
+		lineInString,
+		lineInStatus
+	}
+	STATUS						current
+	DESCRIPTION					"A collection of audio inputs device objects, available only on devices with microphone or line in monitoring"
+	::= { stentofonMIBGroups 9 }
+
+controlIOGroup OBJECT-GROUP
+	OBJECTS 
+	{
+		controlInputCount,
+		controlInputString,
+		controlInputStatus,
+		controlInputMonitored,
+		controlOutputCount,
+		controlOutputString,
+		controlOutputStatus,
+		relayString,
+		relayIdleMode,
+		relayDelay,
+		relayState
+	}
+	STATUS						current
+	DESCRIPTION					"A collection of control input and control output (CIO) device objects, available only on devices with CIO monitoring"
+	::= { stentofonMIBGroups 10 }
+
+ethernetGroup OBJECT-GROUP
+	OBJECTS {
+		ethMonitoringString,
+		ethMonitoringState
+	}
+	STATUS						current
+	DESCRIPTION					"A collection of Ethernet switch monitoring objects, available on devices with Ethernet switch"
+	::= { stentofonMIBGroups 11 }
+
+amplifierGroup OBJECT-GROUP
+	OBJECTS
+	{
+		ampChannelCount,
+		ampType,
+		ampChannelString,
+		ampChannelStatus,
+		ampChannelMonitorStatus
+	}
+	STATUS						current
+	DESCRIPTION					"A collection of amplifier info objects"
+	::= { stentofonMIBGroups 12 }
+
+letsGroup OBJECT-GROUP
+	OBJECTS
+	{
+		letChannel1Count,
+		letChannel1Description,
+		letChannel1OperativeStatus,
+		letChannel1SoftwareVersion,
+		letChannel1HardwareVersion,
+		letChannel1Voltage,
+		letChannel2Count,
+		letChannel2Description,
+		letChannel2OperativeStatus,
+		letChannel2SoftwareVersion,
+		letChannel2HardwareVersion,
+		letChannel2Voltage
+	}
+	STATUS						current
+	DESCRIPTION					"A collection of line end transponder (LET) objects, available only on devices that support LET connections"
+	::= { stentofonMIBGroups 13 }
+
+-- ----------------------------------------------------------------------
+--  SIP Registration Table
+-- ----------------------------------------------------------------------
+registrationTable OBJECT-TYPE
+	SYNTAX						SEQUENCE OF RegistrationEntry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"Table of SIP registrations."
+	::= { registration 1 }
+ 
+registrationEntry OBJECT-TYPE
+	SYNTAX						RegistrationEntry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"SIP registration Entry"
+	INDEX						{ regIndex }
+	::= { registrationTable 1 }
+
+-- ----------------------------------------------------------------------
+--  SIP Registration Row
+-- ----------------------------------------------------------------------
+RegistrationEntry ::= SEQUENCE
+{
+	regIndex					Unsigned32,
+	serverType					INTEGER,
+	serverAddress				DisplayString,
+	isRegistered				INTEGER,
+	lastRegistration			DisplayString
+}
+
+-- ----------------------------------------------------------------------
+--  SIP Registration Columns
+-- ----------------------------------------------------------------------
+regIndex OBJECT-TYPE
+	SYNTAX						Unsigned32
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"The SIP registration table index"
+	::= { registrationEntry 1 }
+
+serverType OBJECT-TYPE
+	SYNTAX						INTEGER { primary(0), backup(1), backup2(2) }
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"Priority of the SIP server"
+	::= { registrationEntry 2 }
+
+serverAddress OBJECT-TYPE
+	SYNTAX						DisplayString (SIZE (0..255))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The address of the SIP server"
+	::= { registrationEntry 3 }
+
+isRegistered OBJECT-TYPE
+	SYNTAX						INTEGER { notregistered(0), registered(1) }
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"SIP registration state of the device towards this SIP server"
+	::= { registrationEntry 4 }
+
+lastRegistration OBJECT-TYPE
+	SYNTAX						DisplayString (SIZE (0..255))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The time of the last successful registration with this SIP server"
+	::= { registrationEntry 5 }
+
+-- ----------------------------------------------------------------------
+--  Call data
+-- ----------------------------------------------------------------------
+callState OBJECT-TYPE
+	SYNTAX						INTEGER { idle(0), inprogress(1), incoming(2), outgoing(3), incancel(4) }
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"Call state of the device."
+	::= { call 1 }
+
+callRemoteId OBJECT-TYPE
+	SYNTAX						DisplayString (SIZE (0..255))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The SIP-id of the remote party (empty unless device is in a call)"
+	::= { call 2 }
+
+incomingCallAttempts OBJECT-TYPE
+	SYNTAX						Counter32
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The number of incoming call attempts since reboot"
+	::= { call 3 }
+
+incomingCallsSuccess OBJECT-TYPE
+	SYNTAX						Counter32
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The number of successful incoming calls since reboot"
+	::= { call 4 }
+
+incomingCallsFailed OBJECT-TYPE
+	SYNTAX						Counter32
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The number of incoming calls that has failed since reboot (unanswered calls are not considered failed)"
+	::= { call 5 }
+
+outgoingCallAttempts OBJECT-TYPE
+	SYNTAX						Counter32
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The number of outgoing call attempts since reboot"
+	::= { call 6 }
+
+outgoingCallsSuccess OBJECT-TYPE
+	SYNTAX						Counter32
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The number of successful outgoing calls since reboot"
+	::= { call 7 }
+
+outgoingCallsFailed OBJECT-TYPE
+	SYNTAX						Counter32
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The number of outgoing calls that failed since reboot (unanswered calls are not considered failed)"
+	::= { call 8 }
+
+-- ----------------------------------------------------------------------
+-- General data
+-- ----------------------------------------------------------------------
+softwareVersion OBJECT-TYPE
+	SYNTAX						DisplayString (SIZE (0..255))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The software version"
+	::= { general 1 }
+
+buttonHangingStatus OBJECT-TYPE
+	SYNTAX						Integer32
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"Status of the inputs and DAK buttons, the returned number is bitmap where each bit represents hanging status of one input or DAK button in ascending order"
+	::= { general 2 }
+
+buttonHangingCounter OBJECT-TYPE
+	SYNTAX						Counter32
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The number of input or buttons hanging since reboot"
+	::= { general 3 }
+
+soundTestLastResult OBJECT-TYPE
+	SYNTAX						INTEGER { unused(0), error(1), failed(2), success(3) }
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"Last status of the sound test"
+	::= { general 4 }
+
+soundTestFailedCounter OBJECT-TYPE
+	SYNTAX						Counter32
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The number of sound tests that failed since reboot"
+	::= { general 5 }
+
+soundTestErrorCounter OBJECT-TYPE
+	SYNTAX						Counter32
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The number of attempts to automatically set the sound pressure level since reboot"
+	::= { general 6 }
+
+soundTestSuccessCounter OBJECT-TYPE
+	SYNTAX						Counter32
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The number of sound tests that were successfull since reboot"
+	::= { general 7 }
+
+-- ----------------------------------------------------------------------
+--  Alarm objects
+-- ----------------------------------------------------------------------
+managedObjectClass OBJECT-TYPE
+	SYNTAX						DisplayString (SIZE (0..255))
+	MAX-ACCESS					accessible-for-notify
+	STATUS						current
+	DESCRIPTION					"This object identifies the class of network to which the
+								subject alarm is related, e.g. STENTOFON IP substation"
+	::= { alarmObjects 1 }
+
+managedObjectInstance OBJECT-TYPE
+	SYNTAX						DisplayString (SIZE (0..255))
+	MAX-ACCESS					accessible-for-notify
+	STATUS						current
+	DESCRIPTION					"This object identifies the instance (of a class) of network resource to 
+								which the subject alarm is related, e.g. ipstation-26.stentofon.com or 10.12.4.26"
+	::= { alarmObjects 2 }
+
+severity OBJECT-TYPE
+	SYNTAX						INTEGER { indeterminate(0), critical(1), major(2), minor(3), warning(4), info(5), cleared(6) }
+	MAX-ACCESS					accessible-for-notify
+	STATUS						current
+	DESCRIPTION					"The severity of the alarm according to X.733."
+	::= { alarmObjects 3 }
+
+time OBJECT-TYPE
+	SYNTAX						DisplayString (SIZE(0..255))
+	MAX-ACCESS					accessible-for-notify
+	STATUS						current
+	DESCRIPTION					"The time of the alarm as a string: 'yyyy.MM.dd-HH.mm.ss'"
+	::= { alarmObjects 4 }
+
+description OBJECT-TYPE
+	SYNTAX						DisplayString (SIZE(0..255))
+	MAX-ACCESS					accessible-for-notify
+	STATUS						current
+	DESCRIPTION					"Specific problem description."
+	::= { alarmObjects 5 }
+
+-- ----------------------------------------------------------------------
+--  SIP Mode Notifications
+-- ----------------------------------------------------------------------
+ipsStarted NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that the device has started."
+	::= { alarmNotifications 1 }
+
+ipsShutdown NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that the device is being shutdown/restarted."
+	::= { alarmNotifications 2 }
+
+sipRegistered NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that device has successfully registered with a SIP server."
+	::= { alarmNotifications 3 }
+
+sipUnregistered NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that device has successfully unregistered with a SIP server."
+	::= { alarmNotifications 4 }
+
+sipRegisterFailed NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that device failed to register with a SIP server."
+	::= { alarmNotifications 5 }
+
+callConnect NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that a call has connected successfully"
+	::= { alarmNotifications 6 }
+
+callConnectFailed NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that a call has failed to connect"
+	::= { alarmNotifications 7 }
+
+callDisconnect NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that a call has disconnected (normally)"
+	::= { alarmNotifications 8 }
+
+callAbnormalDisconnect NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that a call has disconnected abnormally"
+	::= { alarmNotifications 9 }
+
+soundTestSuccess NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that the sound test was sucssessful"
+	::= { alarmNotifications 10 }
+
+soundTestFailed NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that the sound test failed"
+	::= { alarmNotifications 11 }
+
+soundTestError NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that automatically setting sound pressure level failed"
+	::= { alarmNotifications 12 }
+
+buttonHanging NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that the button was pushed for more than 10 seconds without being released"
+	::= { alarmNotifications 13 }
+
+buttonPressed NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that the input button was pressed"
+	::= { alarmNotifications 14 }
+
+buttonReleased NOTIFICATION-TYPE
+	OBJECTS	 
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that the input button was released"
+	::= { alarmNotifications 15 }
+
+relayActivated NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that the relay was activated"
+	::= { alarmNotifications 16 }
+
+relayDeactivated NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that the relay was deactivated"
+	::= { alarmNotifications 17 }
+
+dakPressed NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that the DAK was pressed"
+	::= { alarmNotifications 18 }
+
+dakReleased NOTIFICATION-TYPE
+	OBJECTS	 
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that the DAK was released"
+	::= { alarmNotifications 19 }
+
+-- ----------------------------------------------------------------------
+--  Fault notifications
+-- ----------------------------------------------------------------------
+coolingFanFault NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that there is a cooling fan fault. Notification description will provide RPM and fan details."
+	::= { faultNotifications 1 }
+
+missingAmpModule NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that amplifier module is missing."
+	::= { faultNotifications 2 }
+
+psuVoltageFault NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that power supply voltage is not within operational range. Notification description will provide more information about voltage values."
+	::= { faultNotifications 3 }
+
+lineVoltageFault NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that selected speaker line voltage is not applied."
+	::= { faultNotifications 4 }
+
+letFault NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that Line End Transponder (LET) has failed. Notification description will provide LET channel and number."
+	::= { faultNotifications 5 }
+
+ampShutdown NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that amplifier audio channel is shut down. Notification description will provide details about affected channel."
+	::= { faultNotifications 6 }
+
+slmFault NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that Speaker Line Monitoring (SLM) related fault has occurred. Notification description will provide fault details and affected channel."
+	::= { faultNotifications 7 }
+
+fuseBroken NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that fuse is broken. Notification description will provide information about affected fuse."
+	::= { faultNotifications 8 }
+
+ampDisabled NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that amplifier audio channel is disabled. Notification description will provide details about affected channel."
+	::= { faultNotifications 9 }
+
+lineInFault NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that line in is disconnected."
+	::= { faultNotifications 10 }
+
+rcoFault NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that control output is not set or cleared. Notification description will provide more info about affected output and fault details."
+	::= { faultNotifications 11 }
+
+rciFault NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that control input is shorted or not connected. Notification description will provide more info about affected input and fault details."
+	::= { faultNotifications 12 }
+
+dcPowerFault NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that DC power is disconnected."
+	::= { faultNotifications 13 }
+
+acPowerFault NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that AC power is disconnected."
+	::= { faultNotifications 14 }
+
+ethPortDisconnected NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that Ethernet port is disconnected. Notification description will provide more info about affected port number."
+	::= { faultNotifications 15 }
+
+micFault NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that microphone is not connected or shorted. Notification description will provide fault details."
+	::= { faultNotifications 16 }
+
+missingEmbdr NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that panel station is missing expansion modules."
+	::= { faultNotifications 17 }
+
+swFault NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that software daemon has stopped working. Notification description will provide more info about affected daemon."
+	::= { faultNotifications 18 }
+
+tempFault NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that the high temperature is detected. Notification description will provide more info about value and affected sensor."
+	::= { faultNotifications 19 }
+
+customFault NOTIFICATION-TYPE
+	OBJECTS
+	{
+		managedObjectClass,
+		managedObjectInstance,
+		severity,
+		time,
+		description
+	}
+	STATUS						current
+	DESCRIPTION					"This notification signifies that custom defined fault has occurred. Notification description will provide fault information."
+	::= { faultNotifications 20 }
+
+-- -----------------------------------------------------------------
+-- Device Info
+-- -----------------------------------------------------------------
+infoPackageVersion OBJECT-TYPE
+	SYNTAX						DisplayString(SIZE(128))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The device Package Version."
+	::= { info 1 }
+
+infoModelType OBJECT-TYPE
+	SYNTAX						DisplayString(SIZE(128))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The device Model Type."
+	::= { info 2 }
+
+infoModelNumber OBJECT-TYPE
+	SYNTAX						Integer32 (0..9999)
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The device Model Number."
+	::= { info 3 }
+
+infoAmplifierType OBJECT-TYPE
+	SYNTAX						DisplayString(SIZE(128))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The device Amplifier Type (only for amplifier devices)."
+	::= { info 4 }
+
+infoKernelVersion OBJECT-TYPE
+	SYNTAX						DisplayString(SIZE(128))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The device Linux Kernel Version."
+	::= { info 5 }
+
+infoDeviceTreeVersion OBJECT-TYPE
+	SYNTAX						DisplayString(SIZE(128))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The device Device Tree Version."
+	::= { info 6 }
+
+infoDisablement OBJECT-TYPE
+	SYNTAX						INTEGER { offline(1), online(2) }
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The device Disablement status."
+	::= { info 7 }
+
+-- --------------------------------------------------------------
+-- Temperature sensors
+-- --------------------------------------------------------------
+tempTableCount OBJECT-TYPE
+	SYNTAX						Integer32 (0..5)
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"Number of Temperature entries in tempTable"
+	::= { temp 1 }
+
+tempTable OBJECT-TYPE
+	SYNTAX						SEQUENCE OF TempEntry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"Table of temperature sensors and their values."
+	::= { temp 2 }
+
+tempEntry OBJECT-TYPE
+	SYNTAX						TempEntry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"An entry containing a device and its statistics."
+	INDEX						{ tempIndex }
+	::= { tempTable 1 }
+
+TempEntry ::= SEQUENCE
+{
+	tempIndex					Integer32,
+	tempSensorName				DisplayString,
+	tempCurrentString			DisplayString,
+	tempCurrentValue			Gauge32,
+	tempPeakString				DisplayString,
+	tempPeakValue				Gauge32,
+	tempAverageString			DisplayString,
+	tempAverageValue			Gauge32
+}
+
+tempIndex OBJECT-TYPE
+	SYNTAX						Integer32 (1..5)
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"Reference index for each temperature item"
+	::= { tempEntry 1 }
+
+tempSensorName OBJECT-TYPE
+	SYNTAX						DisplayString(SIZE(128))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The name of the temperature sensor we are reading."
+	::= { tempEntry 2 }
+
+tempCurrentString OBJECT-TYPE
+	SYNTAX						DisplayString(SIZE(128))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The current temperature."
+	::= { tempEntry 3 }
+
+tempCurrentValue OBJECT-TYPE
+	SYNTAX						Gauge32
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The current temperature of this sensor in the device."
+	::= { tempEntry 4 }
+
+tempPeakString OBJECT-TYPE
+	SYNTAX						DisplayString(SIZE(128))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The peak temperature."
+	::= { tempEntry 5 }
+
+tempPeakValue OBJECT-TYPE
+	SYNTAX						Gauge32
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The peak temperature of this sensor in the device."
+	::= { tempEntry 6 }
+	
+tempAverageString OBJECT-TYPE
+	SYNTAX						DisplayString(SIZE(128))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The average temperature."
+	::= { tempEntry 7 }
+
+tempAverageValue OBJECT-TYPE
+	SYNTAX						Gauge32
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The average temperature of this sensor in the device."
+	::= { tempEntry 8 }
+
+-- --------------------------------------------------------------------------------
+-- Fan Table
+-- --------------------------------------------------------------------------------
+fanTableCount OBJECT-TYPE
+	SYNTAX						Integer32 (0..2)
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"Number of Fan entries in fanTable."
+	::= { fan 1 }
+
+fanTable OBJECT-TYPE
+	SYNTAX						SEQUENCE OF FanEntry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"Table of fans and their RPM status."
+	::= { fan 2 }
+
+fanEntry OBJECT-TYPE
+	SYNTAX						FanEntry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"An entry containing a device and its statistics."
+	INDEX						{ fanIndex }
+	::= { fanTable 1 }
+
+FanEntry ::= SEQUENCE
+{
+	fanIndex					Integer32,
+	fanString					DisplayString,
+	fanValue					Gauge32
+}
+
+fanIndex OBJECT-TYPE
+	SYNTAX						Integer32 (1..2)
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"Reference index for each observed device."
+	::= { fanEntry 1 }
+
+fanString OBJECT-TYPE
+	SYNTAX						DisplayString(SIZE(128))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The name of the fan sensor we are reading."
+	::= { fanEntry 2 }
+
+fanValue OBJECT-TYPE
+	SYNTAX						Gauge32
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The rotation speed of the fan in RPM."
+	::= { fanEntry 3 }
+
+-- --------------------------------------------------------------------------------
+-- Voltage Table
+-- --------------------------------------------------------------------------------
+voltageTableCount OBJECT-TYPE
+	SYNTAX						Integer32 (0..20)
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"Number of Voltage entries in voltageTable."
+	::= { voltage 1 }
+
+voltageTable OBJECT-TYPE
+	SYNTAX						SEQUENCE OF VoltageEntry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"Table of Voltage sensors and their values."
+	::= { voltage 2 }
+
+voltageEntry OBJECT-TYPE
+	SYNTAX						VoltageEntry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"An entry containing a device and its Voltage statistics."
+	INDEX	 					{ voltageIndex }
+	::= { voltageTable 1 }
+
+VoltageEntry ::= SEQUENCE
+{
+	voltageIndex				Integer32,
+	voltageString				DisplayString,
+	voltageValue				Gauge32
+}
+
+voltageIndex OBJECT-TYPE
+	SYNTAX						Integer32 (1..20)
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"Reference index for each observed device."
+	::= { voltageEntry 1 }
+
+voltageString OBJECT-TYPE
+	SYNTAX						DisplayString(SIZE(128))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The name of the device we are reading."
+	::= { voltageEntry 2 }
+
+voltageValue OBJECT-TYPE
+	SYNTAX						Gauge32
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The voltage in mV."
+	::= { voltageEntry 3 }
+
+-- --------------------------------------------------------------------------------
+-- Power status
+-- --------------------------------------------------------------------------------
+powerTable OBJECT-TYPE
+	SYNTAX						SEQUENCE OF PowerEntry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"Table of Power sources and their status."
+	::= { power 1 }
+
+powerEntry OBJECT-TYPE
+	SYNTAX						PowerEntry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"An entry containing Power source status."
+	INDEX	 					{ powerIndex }
+	::= { powerTable 1 }
+
+PowerEntry ::= SEQUENCE
+{
+	powerIndex					Integer32,
+	powerType 					INTEGER,
+	powerString					DisplayString,
+	powerMonitoring				INTEGER,
+	powerStatus					INTEGER
+}
+
+powerIndex OBJECT-TYPE
+	SYNTAX						Integer32 (1..2)
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"Reference index for each observed Power source."
+	::= { powerEntry 1 }
+
+powerType OBJECT-TYPE
+	SYNTAX						INTEGER { unknown(1), acPower(2), dcPower(3), poePower(4) }
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The type of the Power source we are reading."
+	::= { powerEntry 2 }
+
+powerString OBJECT-TYPE
+	SYNTAX						DisplayString(SIZE(128))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The name of the Power source we are reading."
+	::= { powerEntry 3 }
+
+powerMonitoring OBJECT-TYPE	
+	SYNTAX 						INTEGER { unknown(1), notMonitored(2), monitored(3) }
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The Monitoring state of the Power source."
+	::= {powerEntry 4 }
+
+powerStatus OBJECT-TYPE
+	SYNTAX						INTEGER { unknown(1), notConnected(2), connected(3) }
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The Power source status."
+	::= { powerEntry 5 }
+
+-- --------------------------------------------------------------------------------
+--Line in & Microphonestatus
+-- --------------------------------------------------------------------------------
+lineInTable OBJECT-TYPE
+	SYNTAX						SEQUENCE OF LineInEntry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"Table of Line In & Microphone and their status."
+	::= { lineIn 1 }
+
+lineInEntry OBJECT-TYPE
+	SYNTAX						LineInEntry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"An entry containing a device and its voltage statistics."
+	INDEX	 					{ lineInIndex }
+	::= { lineInTable 1 }
+
+LineInEntry ::= SEQUENCE
+{
+	lineInIndex					Integer32,
+	lineInMonitoringState		INTEGER,
+	lineInType					INTEGER,
+	lineInString 				DisplayString,
+	lineInStatus				INTEGER
+}
+
+lineInIndex OBJECT-TYPE
+	SYNTAX						Integer32 (1..2)
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"Reference index for each Line In."
+	::= { lineInEntry 1 }
+
+lineInMonitoringState OBJECT-TYPE
+	SYNTAX						INTEGER { unknown(1), notMonitored(2), monitored(3) }
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The monitoring state of the Line In or Microphone."
+	::= {lineInEntry 2 }
+
+-- Line 1, Line 2, Microphone Extern 
+lineInType OBJECT-TYPE
+	SYNTAX						INTEGER { unknown(1), lineIn1(2), lineIn2(3), microphoneExtern(4), microphoneIntern(5) }
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The type of the Line In we are reading, either Line In or Microphone."
+	::= { lineInEntry 3 }
+
+lineInString OBJECT-TYPE
+	SYNTAX						DisplayString(SIZE(128))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The name of the Line In or Microphone we are reading."
+	::= { lineInEntry 4 }
+
+lineInStatus OBJECT-TYPE
+	SYNTAX						INTEGER { unknown(1), lineInOk(2), lineInFail(3), microphoneUnknown(4), microphoneConnected(5), microphoneDisconnected(6), microphoneShorted(7) }
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The Line In or Microphone status"
+	::= { lineInEntry 5 }
+
+-- --------------------------------------------------------------------------------
+--Amp Channels & Class D Amp status
+-- --------------------------------------------------------------------------------
+ampChannelCount OBJECT-TYPE
+	SYNTAX						Integer32 (0..2)
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The total number of Amplifier channels."
+	::= { ampChannel 1 }
+
+ampType	OBJECT-TYPE
+	SYNTAX						INTEGER { unknown(1), turbine(2), ena2200(3), ena2400(4), ena2060(5), ena2100(6) }
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"Type of Amplifier."
+	::= { ampChannel 2 }
+
+ampChannelTable OBJECT-TYPE
+	SYNTAX						SEQUENCE OF AmpChannelEntry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"Table of Amplifier channels."
+	::= { ampChannel 3 }
+
+ampChannelEntry OBJECT-TYPE
+	SYNTAX						AmpChannelEntry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"An entry containing a Amplifier channel."
+	INDEX	 					{ ampChannelIndex }
+	::= { ampChannelTable 1 }
+
+AmpChannelEntry ::= SEQUENCE
+{
+	ampChannelIndex				Integer32,
+	ampChannelString			DisplayString,
+	ampChannelStatus			INTEGER,
+	ampChannelMonitorStatus		INTEGER
+}
+
+ampChannelIndex OBJECT-TYPE
+	SYNTAX						Integer32 (1..2)
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"Index into Amplifier channel table."
+	::= { ampChannelEntry 1 }
+
+ampChannelString OBJECT-TYPE
+	SYNTAX						DisplayString(SIZE(128))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The name of the Amplifier channel."
+	::= { ampChannelEntry 2 }
+
+ampChannelStatus OBJECT-TYPE
+	SYNTAX						INTEGER { unknown(1), notOperative(2), channelOk(3), channelFail(4), channelShutdown(5), channelGracefulDegradation(6) }
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The Amplifier Channel status."
+	::= { ampChannelEntry 3 }
+
+ampChannelMonitorStatus OBJECT-TYPE
+	SYNTAX						INTEGER { unknown(1), channelOk(2), channelShorted(3), channelOpen(4), channelLoadChange(5), channelGroundFault(6), channelRefreshing(7), channelShutdown(8), channelVoltageLow(9), channelIndecisive(10), channelInterrupted(11), channelTimeoutFail(12), channelMonitoringReceiveError(13), channelMonitoringSuspended(14), channelLineFault(15) }
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The Amplifier Channel status."
+	::= { ampChannelEntry 4 }
+-- --------------------------------------------------------------------------------
+--LET Channel 1 
+-- --------------------------------------------------------------------------------
+letChannel1Count OBJECT-TYPE
+	SYNTAX						Integer32 (0..10)
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The total number of configuration enabled LETs in channel 1."
+	::= { letChannel1 1 }
+
+letChannel1Table OBJECT-TYPE
+	SYNTAX						SEQUENCE OF LetChannel1Entry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"Table of LETs and their status."
+	::= { letChannel1 2 }
+
+letChannel1Entry OBJECT-TYPE
+	SYNTAX						LetChannel1Entry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"An entry containing a LET and status."
+	INDEX	 					{ letChannel1Index }
+	::= { letChannel1Table 1 }
+
+LetChannel1Entry ::= SEQUENCE 
+{
+	letChannel1Index			Integer32,
+	letChannel1Description		DisplayString,
+	letChannel1OperativeStatus	INTEGER,
+	letChannel1SoftwareVersion	DisplayString,
+	letChannel1HardwareVersion	DisplayString,
+	letChannel1Voltage			Gauge32
+}
+
+letChannel1Index OBJECT-TYPE
+	SYNTAX						Integer32 (1..10)
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"The index into this selection of LET data."
+	::= { letChannel1Entry 1 }
+
+letChannel1Description OBJECT-TYPE
+	SYNTAX						DisplayString(SIZE(128))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"Descriptive text about the LET we are reading."
+	::= { letChannel1Entry 2 }
+
+letChannel1OperativeStatus OBJECT-TYPE
+	SYNTAX						INTEGER { unknown(1), notEnabled(2), failed(3), ok(4) }
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The LET status."
+	::= { letChannel1Entry 3 }
+
+letChannel1SoftwareVersion OBJECT-TYPE
+	SYNTAX						DisplayString(SIZE(20))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"Software Version of the LET."
+	::= { letChannel1Entry 4 }
+
+letChannel1HardwareVersion OBJECT-TYPE
+	SYNTAX						DisplayString(SIZE(20))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"Hardware Version of the LET."
+	::= { letChannel1Entry 5 }
+
+letChannel1Voltage OBJECT-TYPE
+	SYNTAX						Gauge32 (0..39999)
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"Voltage in mV at LET."
+	::= { letChannel1Entry 6 }
+
+-- --------------------------------------------------------------------------------
+--LET Channel 2
+-- --------------------------------------------------------------------------------
+letChannel2Count OBJECT-TYPE
+	SYNTAX						Integer32 (0..10)
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The total number of configuration enabled LETs in channel 2."
+	::= { letChannel2 1 }
+
+letChannel2Table OBJECT-TYPE
+	SYNTAX						SEQUENCE OF LetChannel2Entry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"Table of LETs and their status."
+	::= { letChannel2 2 }
+
+letChannel2Entry OBJECT-TYPE
+	SYNTAX						LetChannel2Entry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"An entry containing a LET and status."
+	INDEX	 					{ letChannel2Index }
+	::= { letChannel2Table 1 }
+
+LetChannel2Entry ::= SEQUENCE
+{
+	letChannel2Index			Integer32,
+	letChannel2Description		DisplayString,
+	letChannel2OperativeStatus	INTEGER,
+	letChannel2SoftwareVersion 	DisplayString,
+	letChannel2HardwareVersion	DisplayString,
+	letChannel2Voltage			Gauge32
+}
+
+letChannel2Index OBJECT-TYPE
+	SYNTAX						Integer32 (1..10)
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"The index into this selection of LET data."
+	::= { letChannel2Entry 1 }
+
+letChannel2Description OBJECT-TYPE
+	SYNTAX						DisplayString(SIZE(128))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"Descriptive text about the LET we are reading."
+	::= { letChannel2Entry 2 }
+
+letChannel2OperativeStatus OBJECT-TYPE
+	SYNTAX						INTEGER { unknown(1), notEnabled(2), failed(3), ok(4) }
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The LET status."
+	::= { letChannel2Entry 3 }
+
+letChannel2SoftwareVersion OBJECT-TYPE
+	SYNTAX						DisplayString(SIZE(20))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"Software Version of the LET."
+	::= { letChannel2Entry 4 }
+
+letChannel2HardwareVersion OBJECT-TYPE
+	SYNTAX						DisplayString(SIZE(20))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"Hardware Version of the LET."
+	::= { letChannel2Entry 5 }
+
+letChannel2Voltage OBJECT-TYPE
+	SYNTAX						Gauge32 (0..39999)
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"Voltage in mV at LET."
+	::= { letChannel2Entry 6 }
+
+-- --------------------------------------------------------------------------------
+-- Control Inputs Table
+-- --------------------------------------------------------------------------------
+controlInputCount OBJECT-TYPE
+	SYNTAX						Integer32 (1..6)
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"Number of Control Input entries in controlInputTable."
+	::= { controlInput 1 }
+
+controlInputTable OBJECT-TYPE
+	SYNTAX						SEQUENCE OF ControlInputEntry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"Table of Control Input sensors and their values."
+	::= { controlInput 2 }
+
+controlInputEntry OBJECT-TYPE
+	SYNTAX						ControlInputEntry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"An entry containing a Control Input and its status."
+	INDEX	 					{ controlInputIndex }
+	::= { controlInputTable 1 }
+
+ControlInputEntry ::= SEQUENCE
+{
+	controlInputIndex			Integer32,
+	controlInputString			DisplayString,
+	controlInputStatus			INTEGER,
+	controlInputMonitored		INTEGER
+}
+
+controlInputIndex OBJECT-TYPE
+	SYNTAX						Integer32 (1..6)
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"Reference index for each Control Input."
+	::= { controlInputEntry 1 }
+
+controlInputString OBJECT-TYPE
+	SYNTAX						DisplayString(SIZE(128))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The name of the Control Input."
+	::= { controlInputEntry 2 }
+
+controlInputStatus OBJECT-TYPE
+	SYNTAX						INTEGER { unknown(1), open(2), closed(3), failShorted(4), failOpen(5) }
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The Control Input status."
+	::= { controlInputEntry 3 }
+
+controlInputMonitored OBJECT-TYPE
+	SYNTAX						INTEGER{ notMonitored(1), monitored(2) }
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The Control Input Monitored status."
+	::= { controlInputEntry 4 }
+
+-- --------------------------------------------------------------------------------
+-- Control Outputs Table
+-- --------------------------------------------------------------------------------
+controlOutputCount OBJECT-TYPE
+	SYNTAX						Integer32 (1..6)
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"Number of Control Output entries in controlOutputTable."
+	::= { controlOutput 1 }
+
+controlOutputTable OBJECT-TYPE
+	SYNTAX						SEQUENCE OF ControlOutputEntry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"Table of Control Output sensors and their values."
+	::= { controlOutput 2 }
+
+controlOutputEntry OBJECT-TYPE
+	SYNTAX						ControlOutputEntry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"An entry containing a Control Output and its status."
+	INDEX	 					{ controlOutputIndex }
+	::= { controlOutputTable 1 }
+
+ControlOutputEntry ::= SEQUENCE
+{
+	controlOutputIndex			Integer32,
+	controlOutputString			DisplayString,
+	controlOutputStatus			INTEGER
+}
+
+controlOutputIndex OBJECT-TYPE
+	SYNTAX						Integer32 (1..6)
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"Reference index for each Control Output."
+	::= { controlOutputEntry 1 }
+
+controlOutputString OBJECT-TYPE
+	SYNTAX						DisplayString(SIZE(128))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The name of the Control Output."
+	::= { controlOutputEntry 2 }
+
+controlOutputStatus OBJECT-TYPE
+	SYNTAX						INTEGER { unknown(1), notActive(2), active(3), failNotActive(4), failActive(5) }
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The Control Output status."
+	::= { controlOutputEntry 3 }
+
+-- -----------------------------------------------------------------
+-- ethMonitoring Table
+-- -----------------------------------------------------------------
+ethMonitoringTable OBJECT-TYPE
+	SYNTAX						SEQUENCE OF EthMonitoringEntry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"Table of Eth Switch Monitoring state."
+	::= { eth 1 }
+
+ethMonitoringEntry OBJECT-TYPE
+	SYNTAX						EthMonitoringEntry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"An entry containing an Eth Switch and its Monitoring state."
+	INDEX						{ ethMonitoringIndex }
+	::= { ethMonitoringTable 1 }
+
+EthMonitoringEntry ::= SEQUENCE
+{
+	ethMonitoringIndex			Integer32,
+	ethMonitoringString 		DisplayString,
+	ethMonitoringState			INTEGER
+}
+
+ethMonitoringIndex OBJECT-TYPE
+	SYNTAX						Integer32 (1..2)
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"Reference index for each Eth Switch Monitored."
+	::= { ethMonitoringEntry 1 }
+
+ethMonitoringString OBJECT-TYPE
+	SYNTAX						DisplayString(SIZE(128))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The name of the monitored Eth Switch."
+	::= { ethMonitoringEntry 2 }
+
+ethMonitoringState OBJECT-TYPE
+	SYNTAX						INTEGER { unknown(1), notMonitored(2), monitored(3) }
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The Eth Switch Monitoring state."
+	::= { ethMonitoringEntry 3 }
+
+-- --------------------------------------------------------------------
+-- Relay Table
+-- --------------------------------------------------------------------
+relayTable OBJECT-TYPE
+	SYNTAX						SEQUENCE OF RelayEntry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"Table of Relay state."
+	::= { relay 1 }
+
+relayEntry OBJECT-TYPE
+	SYNTAX						RelayEntry
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"An entry containing a Relay and its state."
+	INDEX						{ relayIndex }
+	::= { relayTable 1 }
+
+RelayEntry ::= SEQUENCE
+{
+	relayIndex					Integer32,
+	relayString 				DisplayString,
+	relayIdleMode				INTEGER,
+	relayDelay					Integer32,
+	relayState					INTEGER
+}
+
+relayIndex OBJECT-TYPE
+	SYNTAX						Integer32 (1..4)
+	MAX-ACCESS					not-accessible
+	STATUS						current
+	DESCRIPTION					"Reference index for each Relay monitored."
+	::= { relayEntry 1 }
+
+relayString OBJECT-TYPE
+	SYNTAX						DisplayString(SIZE(128))
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"The name of the monitored Relay."
+	::= { relayEntry 2 }
+
+relayIdleMode OBJECT-TYPE
+	SYNTAX						INTEGER { unknown(1), normallyClosed(2), normallyOpen(3) }
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"Relay idle mode state."
+	::= { relayEntry 3 }
+
+relayDelay OBJECT-TYPE
+	SYNTAX						Integer32 (0..30)
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"Delay time (sec) before activation."
+	::= { relayEntry 4 }
+
+relayState OBJECT-TYPE
+	SYNTAX						INTEGER { unknown(1), notActive(2), active(3) }
+	MAX-ACCESS					read-only
+	STATUS						current
+	DESCRIPTION					"Relay state."
+	::= { relayEntry 5 }
+
+END

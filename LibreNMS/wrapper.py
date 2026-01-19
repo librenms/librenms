@@ -93,8 +93,8 @@ wrappers = {
         "total_exec_time": 300,
     },
     "discovery": {
-        "executable": "discovery.php",
-        "option": "-h",
+        "executable": "lnms",
+        "option": "device:discover",
         "table_name": "devices",
         "memc_touch_time": 30,
         "stepping": 300,

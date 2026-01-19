@@ -408,6 +408,15 @@ if (LibrenmsConfig::get('enable_ports_poe')) {
                 $port_stats[$if_id] = array_merge($port_stats[$if_id], $p_stats);
             }
         }
+    } elseif ($device['os'] == 'ironware') {
+        $fetched_data_string .= 'snAgentPoePortTable ';
+        $port_stats_poe = SnmpQuery::hideMib()->walk('FOUNDRY-POE-MIB::snAgentPoePortTable')->table(1);
+
+        foreach ($port_stats_poe as $p_index => $p_stats) {
+            if (is_array($port_stats[$p_index])) {
+                $port_stats[$p_index] = array_merge($port_stats[$p_index], $p_stats);
+            }
+        }
     }
 }
 

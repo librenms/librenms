@@ -24,8 +24,6 @@ class MaintenanceRrdStep extends LnmsCommand
 
     public function handle(RrdProcess $rrdProcess): int
     {
-        $this->configureOutputOptions();
-
         $systemStep = (int) LibrenmsConfig::get('rrd.step', 300);
         $icmpStep = (int) LibrenmsConfig::get('ping_rrd_step', $systemStep);
         $systemHeartbeat = (int) LibrenmsConfig::get('rrd.heartbeat', $systemStep * 2);
@@ -131,7 +129,9 @@ class MaintenanceRrdStep extends LnmsCommand
      */
     private function listFiles(string $hostname, RrdProcess $rrdProcess): array
     {
-        $rrd_dir = LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd');
+        $rrd_dir = LibrenmsConfig::get('rrdcached')
+            ? '/'
+            : LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd');
 
         $command = $hostname === 'all' ? "list -r $rrd_dir" : "list $rrd_dir/$hostname";
         $output = rtrim($rrdProcess->run($command));

@@ -147,6 +147,12 @@ modules:
                     descr: 'Inverter Power'
                     index: 'power.{{ $index }}'
                     divisor: 10
+                -
+                    oid: gridpower
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.1.9.{{ $index }}'
+                    descr: 'Grid Power'
+                    index: 'gridpower.{{ $index }}'
+                    divisor: 10
         frequency:
             data:
                 -
@@ -209,3 +215,10 @@ modules:
                     descr: 'Grid Input Volts'
                     index: 'gridvout.{{ $index }}'
                     divisor: 10
+        percent:
+            data:
+                -
+                    oid: olProtection
+                    num_oid: '.1.3.6.1.4.1.49075.1.3.3.6.{{ $index }}'
+                    descr: 'Overload Protection'
+                    index: 'olProtection.{{ $index }}'

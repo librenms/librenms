@@ -7036,15 +7036,130 @@
         },
         "sso.create_users": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "auth",
+            "section": "sso",
+            "order": 0
+        },
+        "sso.descr_attr":{
+            "default": null,
+            "type": "text",
+            "group": "auth",
+            "section": "sso",
+            "order": 1
+        },
+        "sso.email_attr":{
+            "default": null,
+            "type": "text",
+            "group": "auth",
+            "section": "sso",
+            "order": 2
+        },
+        "sso.group_attr":{
+            "default": null,
+            "type": "text",
+            "group": "auth",
+            "section": "sso",
+            "order": 3
+        },
+        "sso.group_delimiter":{
+            "default": null,
+            "type": "text",
+            "group": "auth",
+            "section": "sso",
+            "order": 4
+        },
+        "sso.group_filter":{
+            "default": null,
+            "type": "text",
+            "group": "auth",
+            "section": "sso",
+            "order": 5
+        },
+        "sso.group_level_map":{
+            "default": {},
+            "type": "group-role-map",
+            "group": "auth",
+            "section": "sso",
+            "options": {
+                "groupPlaceholder": "Group Name"
+            },
+            "validate": {
+                "value": "array",
+                "value.*": "array",
+                "value.*.roles": "array|required",
+                "value.*.roles.*": "string"
+            },
+            "order": 6
+        },
+        "sso.group_strategy": {
+            "default": null,
+            "type": "select",
+            "options": {
+                "attribute": "attribute",
+                "map": "map",
+                "static": "static"
+            },
+            "group": "auth",
+            "section": "sso",
+            "order": 7
+        },
+        "sso.level_attr":{
+            "default": null,
+            "type": "text",
+            "group": "auth",
+            "section": "sso",
+            "order": 8
+        },
+        "sso.mode":{
+            "default": "env",
+            "type": "select",
+            "options": {
+                "env": "env",
+                "header": "header"
+            },
+            "group": "auth",
+            "section": "sso",
+            "order": 9
+        },
+        "sso.realname_attr":{
+            "default": null,
+            "type": "text",
+            "group": "auth",
+            "section": "sso",
+            "order": 10
+        },
+        "sso.static_level":{
+            "default": null,
+            "type": "integer",
+            "group": "auth",
+            "section": "sso",
+            "order": 11
+        },
+        "sso.trusted_proxies":{
+            "default": [],
+            "type": "array",
+            "group": "auth",
+            "section": "sso",
+            "validate": {
+                 "value": "array",
+                 "value.*": "string"
+             },
+            "order": 12
         },
         "sso.update_users": {
             "default": true,
-            "type": "boolean"
+            "type": "boolean",
+            "group": "auth",
+            "section": "sso",
+            "order": 13
         },
         "sso.user_attr": {
             "default": "REMOTE_USER",
-            "type": "text"
+            "type": "text",
+            "group": "auth",
+            "section": "sso",
+            "order": 14
         },
         "storage_perc_warn": {
             "default": 60,

@@ -59,7 +59,7 @@ if ($device['os'] == 'zynos') {
 
 // Get correct eth0 port status for AirFiber 5XHD devices
 if ($device['os'] == 'airos-af-ltu') {
-    require 'ports/airos-af-ltu.inc.php';
+    require base_path('includes/discovery/ports/airos-af-ltu.inc.php');
 }
 
 //Teleste Luminato ifOperStatus
@@ -85,6 +85,11 @@ if ($device['os'] == 'cnmatrix') {
 //Get Tachyon ports
 if ($device['os'] == 'tachyon') {
     require base_path('includes/discovery/ports/tachyon.inc.php');
+}
+
+// Nokia 1830 PSS/PSD - ensure ifDescr is set from ifName
+if ($device['os'] == 'nokia-1830') {
+    require base_path('includes/discovery/ports/nokia-1830.inc.php');
 }
 
 // End Building SNMP Cache Array

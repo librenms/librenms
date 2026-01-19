@@ -7,6 +7,9 @@
  *
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
+
+use App\Facades\LibrenmsConfig;
+
 ini_set('allow_url_fopen', 0);
 
 $init_modules = ['web', 'auth'];
@@ -26,7 +29,7 @@ if (is_numeric($_GET['bill_hist_id'])) {
     $urlargs['to'] = $_GET['to'];
 }
 
-$url = Config::get('base_url') . 'graph.php?';
+$url = LibrenmsConfig::get('base_url') . 'graph.php?';
 $i = 0;
 foreach ($urlargs as $name => $value) {
     if ($i++ > 0) {

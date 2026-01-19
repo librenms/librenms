@@ -1,0 +1,234 @@
+STORMSHIELD-HEALTH-MONITOR-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32  FROM SNMPv2-SMI
+      DisplayString                            FROM RFC1213-MIB
+      stormshieldMIB                           FROM STORMSHIELD-SMI-MIB;
+
+   snsHealthMonitor MODULE-IDENTITY
+      LAST-UPDATED  "202105060000Z"
+      ORGANIZATION  "Stormshield"
+      CONTACT-INFO
+         "Customer Support
+
+         22 rue du Gouverneur General Eboue
+         92130 Issy-les-Moulineaux
+         FRANCE
+
+         Tel: +33 (0)9 69 32 96 29
+         E-mail: support@stormshield.eu
+         http://www.stormshield.eu"
+      DESCRIPTION   "Stormshield Health Monitor"
+      REVISION      "202105060000Z"
+      DESCRIPTION   "Initial"
+      ::= { stormshieldMIB 16 }
+
+   snsGlobalHealth OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Stormshield Firewall current global health status"
+      ::= { snsHealthMonitor 1 }
+
+   snsFirewallHealthTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF SnsFirewallHealthEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Stormshield Firewall Health informations"
+      ::= { snsHealthMonitor 2 }
+
+   snsFirewallHealthEntry OBJECT-TYPE
+      SYNTAX SnsFirewallHealthEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Each entry in the snsFirewallHealthTable hold a health information."
+      INDEX { snsFirewallIndex }
+      ::= { snsFirewallHealthTable 1 }
+
+   SnsFirewallHealthEntry ::= SEQUENCE {
+         snsFirewallIndex      Integer32,
+         snsSerialHealth       DisplayString,
+         snsHaModeHealth       DisplayString,
+         snsHaLinkHealth       DisplayString,
+         snsPowerSupplyHealth  DisplayString,
+         snsFanHealth          DisplayString,
+         snsCpuHealth          DisplayString,
+         snsMemHealth          DisplayString,
+         snsDiskHealth         DisplayString,
+         snsRaidHealth         DisplayString,
+         snsCertHealth         DisplayString,
+         snsCRLHealth          DisplayString,
+         snsTPMHealth          DisplayString,
+         snsPasswdHealth       DisplayString,
+         snsCpuTempHealth      DisplayString,
+         snsRouterHealth       DisplayString,
+         snsNTPHealth          DisplayString
+      }
+
+   snsFirewallIndex OBJECT-TYPE
+      SYNTAX Integer32 (0..255)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION "Index of each firewall"
+      ::= { snsFirewallHealthEntry 1 }
+
+   snsSerialHealth OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Stormshield Firewall serial"
+      ::= { snsFirewallHealthEntry 2 }
+
+   snsHaModeHealth OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+      "Stormshield Firewall HA mode current status
+      - 'None' if HA is not active
+      - 'Active' if the firewall is the active one
+      - 'Passive' if the firewall is the passive one"
+      ::= { snsFirewallHealthEntry 3 }
+
+   snsHaLinkHealth OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Stormshield Firewall HA link current health status
+      - 'Good' if the HA link works correctly
+      - 'Minor' if the HA link does not work correctly (may be down)
+      - 'Major' if the HA link does not work (down)"
+      ::= { snsFirewallHealthEntry 4 }
+
+   snsPowerSupplyHealth OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+      "Stormshield Firewall power supply current health status
+      - 'Good' if the power supply works correctly
+      - 'Minor' if the power supply does not work correctly
+      - 'Major' if the power supply does not work correctly and have raised an alarm"
+      ::= { snsFirewallHealthEntry 5 }
+
+   snsFanHealth OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+      "Stormshield Firewall fans current health status
+      - 'Good' if the fans works correctly
+      - 'Minor' if the fans does not work correctly
+      - 'Major' if the fans does not work correctly and have raised an alarm"
+      ::= { snsFirewallHealthEntry 6 }
+
+   snsCpuHealth OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+      "Stormshield Firewall CPU current health status
+      - 'Good' if CPU load <= 90%
+      - 'Minor' if CPU load > 90% during a time lower than 5 minutes
+      - 'Major' if CPU load > 90% during a time higher than 5 minutes"
+      ::= { snsFirewallHealthEntry 7 }
+
+   snsMemHealth OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+      "Stormshield Firewall memory current health status
+      - 'Good' if memory load <= 80%
+      - 'Minor' if memory load > 80% during a time lower than 15 minutes
+      - 'Major' if memory load > 80% during a time higher than 15 minutes"
+      ::= { snsFirewallHealthEntry 8 }
+
+   snsDiskHealth OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+      "Stormshield Firewall disk current health status
+      - 'Good' if the disks works correctly
+      - 'Minor' if the disks does not work correctly
+      - 'Major' if the disks does not work correctly and have raised an alarm"
+      ::= { snsFirewallHealthEntry 9 }
+
+   snsRaidHealth OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+      "Stormshield Firewall raid current health status
+      - 'Good' if the raid works in optimal mode
+      - 'Minor' if the raid does not work in optimal mode
+      - 'Major' if the raid does not work in optimal mode and have raised an alarm"
+      ::= { snsFirewallHealthEntry 10 }
+
+   snsCertHealth OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Stormshield Firewall certificates current health status"
+      ::= { snsFirewallHealthEntry 11 }
+
+   snsCRLHealth OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Stormshield Firewall CRLs current health status"
+      ::= { snsFirewallHealthEntry 12 }
+
+   snsTPMHealth OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Stormshield Firewall TPM current health status"
+      ::= { snsFirewallHealthEntry 13 }
+
+   snsPasswdHealth OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+      "Stormshield Firewall Admin Password current health status
+      - 'Good' if the admin password last changed date is newer than a year
+      - 'Minor' if the admin password last changed date is older than a year
+      - 'Major' if the admin password is the default password"
+      ::= { snsFirewallHealthEntry 14 }
+
+   snsCpuTempHealth OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+      "Stormshield Firewall CPU temperature current health status
+      - 'Good' if CPU temperature is at least 20°C below max temperature
+      - 'Minor' if CPU temperature is 20°C, or less, below max temperature
+      - 'Major' if CPU temperature is 5°C below max temperature"
+      ::= { snsFirewallHealthEntry 15 }
+
+   snsRouterHealth OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+      "Stormshield Firewall Global router health status
+      - 'Good' if all gateways of all routers are UP
+      - 'Minor' if one gateway is DEGRADED
+      - 'Major' if at least one router has no GATEWAY UP or if it is impossible to determine the status"
+      ::= { snsFirewallHealthEntry 16 }
+
+   snsNTPHealth OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+      "Stormshield Firewall NTP current health status
+      - 'N/A' if NTP is not active or if firewall is passive in High Availability
+      - 'Good' if all NTP servers are PEER or CANDIDATES
+      - 'Minor' if at least one NTP server is DISCARDED
+      - 'Major' if no one NTP server is PEER or if NTP is DOWN and is required"
+      ::= { snsFirewallHealthEntry 17 }
+END

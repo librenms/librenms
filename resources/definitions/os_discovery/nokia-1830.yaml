@@ -1,4 +1,4 @@
-mib: TROPIC-SYSTEM-MIB:TROPIC-GLOBAL-REG:TROPIC-SOFTWARE-MIB:TROPIC-TC:TROPIC-CARD-MIB:TROPIC-CONTROLCARD-MIB:TROPIC-ALARMPANEL-MIB:TROPIC-FAN-MIB:TROPIC-OPTICALPORT-MIB:TROPIC-ACCESSPORT-MIB:TROPIC-AMPLIFIER-MIB:TROPIC-OCH-MIB:TROPIC-PSD-MIB
+mib: TROPIC-SYSTEM-MIB:TROPIC-GLOBAL-REG:TROPIC-SOFTWARE-MIB:TROPIC-TC:TROPIC-CARD-MIB:TROPIC-CONTROLCARD-MIB:TROPIC-ALARMPANEL-MIB:TROPIC-FAN-MIB:TROPIC-OPTICALPORT-MIB:TROPIC-ACCESSPORT-MIB:TROPIC-AMPLIFIER-MIB:TROPIC-OCH-MIB:TROPIC-PSD-MIB:IF-MIB
 modules:
     os:
         hardware:
@@ -13,50 +13,51 @@ modules:
         version:
             - TROPIC-SOFTWARE-MIB::tnSwNodeCommittedRelease.0
     sensors:
-        additional_oids:
-            data:
-                - oid:
-                      - ifName
-                      - tnCardTable
-                      - tnAmplifierPortInfoTable
-                      - tnIroadmPortInfoTable
-                      - tnUserInterfacePanelTable
-                      - tnAccessPortTable
         temperature:
             data:
-                - oid: tnCardTable
-                  value: tnCardTemperature
+                - oid: TROPIC-CARD-MIB::tnCardTable
+                  value: TROPIC-CARD-MIB::tnCardTemperature
                   group: Cards
                   num_oid: ".1.3.6.1.4.1.7483.2.2.3.1.2.1.2.1.13.{{ $index }}"
-                  descr: "Shelf {{ $subindex0 }} Slot {{ $subindex1 }} ({{ $tnCardMnemonic }})"
+                  descr: "Shelf {{ $subindex0 }} Slot {{ $subindex1 }} ({{ TROPIC-CARD-MIB::tnCardMnemonic }})"
                   index: "tnCardTemperature.{{ $index }}"
-                  high_limit: tnCardHighTemperatureThresh.{{ $index }}
-                  low_limit: tnCardLowTemperatureThresh.{{ $index }}
-                - oid: tnOscSfpPortConfigTable
-                  value: tnOscSfpTemperature
-                  group: Transceivers
-                  descr: "{{ $ifName }}"
+                  high_limit: TROPIC-CARD-MIB::tnCardHighTemperatureThresh
+                  low_limit: TROPIC-CARD-MIB::tnCardLowTemperatureThresh
+                - oid: TROPIC-OPTICALPORT-MIB::tnOscSfpPortConfigTable
+                  value: TROPIC-OPTICALPORT-MIB::tnOscSfpTemperature
+                  group: transceiver
+                  descr: "{{ IF-MIB::ifName }} Temperature"
                   num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.4.76.1.2.{{ $index }}"
                   index: "tnOscSfpTemperature.{{ $index }}"
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: ports
                   divisor: 100
+                - oid: TROPIC-OPTICALPORT-MIB::tnOtPortInfoTable
+                  value: TROPIC-OPTICALPORT-MIB::tnOtPortTemperature
+                  group: transceiver
+                  descr: "{{ IF-MIB::ifName }} Temperature"
+                  num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.71.1.4.{{ $index }}"
+                  index: "tnOtPortTemperature.{{ $index }}"
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: ports
         state:
             data:
-                - oid: tnOchXcItuTable
-                  value: tnOchXcItuOperState
+                - oid: TROPIC-OCH-MIB::tnOchXcItuTable
+                  value: TROPIC-OCH-MIB::tnOchXcItuOperState
                   group: Optical Trails (OCH)
                   num_oid: ".1.3.6.1.4.1.7483.2.2.4.5.2.1.3.1.14.{{ $index }}"
-                  descr: "{{ $tnOchXcItuName }}"
+                  descr: "{{ TROPIC-OCH-MIB::tnOchXcItuName }}"
                   index: "tnOchXcItuOperState.{{ $index }}"
                   state_name: TropicOchXcOperStateType
                   states:
                       - { value: 1, generic: 0, graph: 0, descr: up }
                       - { value: 2, generic: 2, graph: 0, descr: down }
                       - { value: 3, generic: 3, graph: 0, descr: unknown }
-                - oid: tnCardTable
-                  value: tnCardStatusLEDColor
+                - oid: TROPIC-CARD-MIB::tnCardTable
+                  value: TROPIC-CARD-MIB::tnCardStatusLEDColor
                   group: Cards
                   num_oid: ".1.3.6.1.4.1.7483.2.2.3.1.2.1.2.1.17.{{ $index }}"
-                  descr: "Shelf {{ $subindex0 }} Slot {{ $subindex1 }} ({{ $tnCardMnemonic }})"
+                  descr: "Shelf {{ $subindex0 }} Slot {{ $subindex1 }} ({{ TROPIC-CARD-MIB::tnCardMnemonic }})"
                   index: "tnCardTable.{{ $index }}"
                   state_name: tnCardStatusLEDColor
                   states:
@@ -66,9 +67,9 @@ modules:
                       - { value: 4, generic: 0, graph: 0, descr: green }
                       - { value: 5, generic: 1, graph: 0, descr: orange }
                       - { value: 6, generic: 3, graph: 0, descr: blue }
-                - oid: tnControlCardTable
+                - oid: TROPIC-CONTROLCARD-MIB::tnControlCardTable
                   group: Controllers
-                  value: tnControlCardActivityState
+                  value: TROPIC-CONTROLCARD-MIB::tnControlCardActivityState
                   num_oid: ".1.3.6.1.4.1.7483.2.2.3.3.2.2.1.1.{{ $index }}"
                   descr: "Shelf {{ $subindex0 }} (Slot {{ $subindex1 }})"
                   index: "tnControlCardActivityState.{{ $index }}"
@@ -78,8 +79,8 @@ modules:
                       - { value: 2, generic: 0, graph: 0, descr: active }
                       - { value: 3, generic: 0, graph: 0, descr: inactive }
                       - { value: 4, generic: 1, graph: 0, descr: unequipped }
-                - oid: tnFanUnitTable
-                  value: tnFanUnitStatusLEDColor
+                - oid: TROPIC-FAN-MIB::tnFanUnitTable
+                  value: TROPIC-FAN-MIB::tnFanUnitStatusLEDColor
                   group: Fans
                   num_oid: ".1.3.6.1.4.1.7483.2.2.5.1.2.1.2.1.11.{{ $index }}"
                   descr: "Shelf {{ $subindex0 }} - Fan (Slot {{ $subindex1 }})"
@@ -142,86 +143,140 @@ modules:
                       - { value: 6, generic: 3, graph: 0, descr: blue }
         dbm:
             data:
-                - oid: tnAmplifierPortInfoTable
-                  value: tnAmplifierPortPowerIn
+                - oid: TROPIC-AMPLIFIER-MIB::tnAmplifierPortInfoTable
+                  value: TROPIC-AMPLIFIER-MIB::tnAmplifierPortPowerIn
                   num_oid: ".1.3.6.1.4.1.7483.2.2.3.7.5.2.1.2.{{ $index }}"
-                  descr: "{{ ifName }} Power In"
+                  group: 'Amplifier Power'
+                  descr: "{{ IF-MIB::ifName }} Power Rx"
                   index: "tnAmplifierPortPowerIn.{{ $index }}"
                   divisor: 100
-                - oid: tnAmplifierPortInfoTable
-                  value: tnAmplifierPortPowerOut
+                - oid: TROPIC-AMPLIFIER-MIB::tnAmplifierPortInfoTable
+                  value: TROPIC-AMPLIFIER-MIB::tnAmplifierPortPowerOut
                   num_oid: ".1.3.6.1.4.1.7483.2.2.3.7.5.2.1.3.{{ $index }}"
-                  descr: "{{ $ifName }} Power Out"
+                  group: 'Amplifier Power'
+                  descr: "{{ IF-MIB::ifName }} Power Tx"
                   index: "tnAmplifierPortPowerOut.{{ $index }}"
                   divisor: 100
-                - oid: tnAmplifierPortInfoTable
-                  value: tnAmplifierPortOSCTxPowerIn
+                - oid: TROPIC-AMPLIFIER-MIB::tnAmplifierPortInfoTable
+                  value: TROPIC-AMPLIFIER-MIB::tnAmplifierPortOSCTxPowerIn
                   num_oid: ".1.3.6.1.4.1.7483.2.2.3.7.5.2.1.10.{{ $index }}"
-                  descr: "{{ $ifName }} OSC Tx In"
+                  descr: "{{ IF-MIB::ifName }} OSC Tx In"
                   index: "tnAmplifierPortOSCTxPowerIn.{{ $index }}"
+                  group: transceiver
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: ports
                   divisor: 100
-                - oid: tnAmplifierPortInfoTable
-                  value: tnAmplifierPortOSCTxPowerOut
+                - oid: TROPIC-AMPLIFIER-MIB::tnAmplifierPortInfoTable
+                  value: TROPIC-AMPLIFIER-MIB::tnAmplifierPortOSCTxPowerOut
                   num_oid: ".1.3.6.1.4.1.7483.2.2.3.7.5.2.1.11.{{ $index }}"
-                  descr: "{{ $ifName }} OSC Tx Out"
+                  descr: "{{ IF-MIB::ifName }} OSC Tx Out"
                   index: "tnAmplifierPortOSCTxPowerOut.{{ $index }}"
+                  group: transceiver
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: ports
                   divisor: 100
-                - oid: tnAmplifierPortInfoTable
-                  value: tnAmplifierPortOSCTxPowerOut
-                  num_oid: ".1.3.6.1.4.1.7483.2.2.3.7.5.2.1.11.{{ $index }}"
-                  descr: "{{ $ifName }} OSC Tx Out"
-                  index: "tnAmplifierPortOSCTxPowerOut.{{ $index }}"
-                  divisor: 100
-                - oid: tnIroadmPortInfoTable
-                  value: tnIroadmPortInfoOSCTxPowerIn
+                - oid: TROPIC-OPTICALPORT-MIB::tnIroadmPortInfoTable
+                  value: TROPIC-OPTICALPORT-MIB::tnIroadmPortInfoOSCTxPowerIn
                   num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.308.1.19.{{ $index }}"
-                  descr: "{{ $ifName }} OSC Tx In"
+                  descr: "{{ IF-MIB::ifName }} OSC Tx In"
                   index: "tnIroadmPortInfoOSCTxPowerIn.{{ $index }}"
+                  group: transceiver
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: ports
                   divisor: 100
-                - oid: tnIroadmPortInfoTable
-                  value: tnIroadmPortInfoOSCTxPowerOut
+                - oid: TROPIC-OPTICALPORT-MIB::tnIroadmPortInfoTable
+                  value: TROPIC-OPTICALPORT-MIB::tnIroadmPortInfoOSCTxPowerOut
                   num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.308.1.20.{{ $index }}"
-                  descr: "{{ $ifName }} OSC Tx Out"
+                  descr: "{{ IF-MIB::ifName }} OSC Tx Out"
                   index: "tnIroadmPortInfoOSCTxPowerOut.{{ $index }}"
+                  group: transceiver
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: ports
                   divisor: 100
-                - oid: tnIroadmPortInfoTable
-                  value: tnIroadmPortInfoOSCRxPowerIn
+                - oid: TROPIC-OPTICALPORT-MIB::tnIroadmPortInfoTable
+                  value: TROPIC-OPTICALPORT-MIB::tnIroadmPortInfoOSCRxPowerIn
                   num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.308.1.21.{{ $index }}"
-                  descr: "{{ $ifName }} OSC Rx In"
+                  descr: "{{ IF-MIB::ifName }} OSC Rx In"
                   index: "tnIroadmPortInfoOSCRxPowerIn.{{ $index }}"
+                  group: transceiver
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: ports
                   divisor: 100
-                - oid: tnIroadmPortInfoTable
-                  value: tnIroadmPortInfoOSCSfpTxPowerOut
+                - oid: TROPIC-OPTICALPORT-MIB::tnIroadmPortInfoTable
+                  value: TROPIC-OPTICALPORT-MIB::tnIroadmPortInfoOSCSfpTxPowerOut
                   num_oid: ".1.3.6.1.4.1.7483.2.2.3.7.5.2.1.22.{{ $index }}"
-                  descr: "{{ $ifName }} OSC SFP Tx Out"
+                  descr: "{{ IF-MIB::ifName }} OSC SFP Tx Out"
                   index: "tnIroadmPortInfoOSCSfpTxPowerOut.{{ $index }}"
+                  group: transceiver
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: ports
                   divisor: 100
-                - oid: tnIroadmPortInfoTable
-                  value: tnIroadmPortInfoOSCSfpRxPowerIn
+                - oid: TROPIC-OPTICALPORT-MIB::tnIroadmPortInfoTable
+                  value: TROPIC-OPTICALPORT-MIB::tnIroadmPortInfoOSCSfpRxPowerIn
                   num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.308.1.23.{{ $index }}"
-                  descr: "{{ $ifName }} OSC SFP Rx In"
+                  descr: "{{ IF-MIB::ifName }} OSC SFP Rx In"
                   index: "tnIroadmPortInfoOSCSfpRxPowerIn.{{ $index }}"
+                  group: transceiver
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: ports
                   divisor: 100
+                - oid: TROPIC-OPTICALPORT-MIB::tnOtPortInfoTable
+                  value: TROPIC-OPTICALPORT-MIB::tnOtPortRxPower
+                  num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.71.1.1.{{ $index }}"
+                  descr: "{{ IF-MIB::ifName }} RX Power"
+                  index: "tnOtPortRxPower.{{ $index }}"
+                  group: transceiver
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: ports
+                  divisor: 1000
+                - oid: TROPIC-OPTICALPORT-MIB::tnOtPortInfoTable
+                  value: TROPIC-OPTICALPORT-MIB::tnOtPortTxPower
+                  num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.71.1.2.{{ $index }}"
+                  descr: "{{ IF-MIB::ifName }} TX Power"
+                  index: "tnOtPortTxPower.{{ $index }}"
+                  group: transceiver
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: ports
+                  divisor: 1000
 
         power:
             data:
-                - oid: tnCardTable
-                  value: tnCardPower
+                - oid: TROPIC-CARD-MIB::tnCardTable
+                  value: TROPIC-CARD-MIB::tnCardPower
                   num_oid: ".1.3.6.1.4.1.7483.2.2.3.1.2.1.2.1.38.{{ $index }}"
-                  descr: "{{ $tnCardName }} - {{ $tnCardMnemonic }}"
+                  descr: "{{ TROPIC-CARD-MIB::tnCardName }} - {{ TROPIC-CARD-MIB::tnCardMnemonic }}"
                   index: "tnCardTable.{{ $index }}"
                   divisor: 1000
-                - oid: tnPsdShelfEntry
-                  value: tnPsdShelfRealTimePower
+                - oid: TROPIC-PSD-MIB::tnPsdShelfEntry
+                  value: TROPIC-PSD-MIB::tnPsdShelfRealTimePower
                   num_oid: ".1.3.6.1.4.1.7483.2.2.7.2.1.1.1.8.{{ $index }}"
-                  descr: "{{ $tnPsdShelfName }} - {{ $tnPsdShelfType }}"
+                  descr: "{{ TROPIC-PSD-MIB::tnPsdShelfName }} - {{ TROPIC-PSD-MIB::tnPsdShelfDescr }}"
                   index: "tnCardTable.{{ $index }}"
                   divisor: 10
         current:
             data:
-                - oid: tnCardTable
-                  value: tnCardCurrent
+                - oid: TROPIC-CARD-MIB::tnCardTable
+                  value: TROPIC-CARD-MIB::tnCardCurrent
                   num_oid: ".1.3.6.1.4.1.7483.2.2.3.1.2.1.2.1.39.{{ $index }}"
-                  descr: "{{ $tnCardName }} - {{ $tnCardMnemonic }}"
+                  descr: "{{ TROPIC-CARD-MIB::tnCardName }} - {{ TROPIC-CARD-MIB::tnCardMnemonic }}"
                   index: "tnCardTable.{{ $index }}"
+                  divisor: 1000
+                - oid: TROPIC-OPTICALPORT-MIB::tnOtPortInfoTable
+                  value: TROPIC-OPTICALPORT-MIB::tnOtPortBias
+                  num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.71.1.3.{{ $index }}"
+                  descr: "{{ IF-MIB::ifName }} Tx Bias"
+                  index: "tnOtPortBias.{{ $index }}"
+                  group: transceiver
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: ports
+        voltage:
+            data:
+                - oid: TROPIC-OPTICALPORT-MIB::tnOtPortInfoTable
+                  value: TROPIC-OPTICALPORT-MIB::tnOtPortSupplyVoltage
+                  num_oid: ".1.3.6.1.4.1.7483.2.2.4.3.5.71.1.12.{{ $index }}"
+                  descr: "{{ IF-MIB::ifName }} Voltage"
+                  index: "tnOtPortSupplyVoltage.{{ $index }}"
+                  group: transceiver
+                  entPhysicalIndex: "{{ $index }}"
+                  entPhysicalIndex_measured: ports
                   divisor: 1000
