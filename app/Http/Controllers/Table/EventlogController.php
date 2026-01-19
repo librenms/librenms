@@ -81,7 +81,7 @@ class EventlogController extends TableController
                 $query->where('message', 'like', '%' . $request->message . '%');
             })
             ->when($request->age, function ($query) use ($request): void {
-                $query->where('datetime', '>', Time::serverNow()->subSeconds((int) $request->age));
+                $query->where('datetime', '>', Time::toDb(Time::now())->subSeconds((int) $request->age));
             });
     }
 
@@ -127,7 +127,7 @@ class EventlogController extends TableController
         $output = "<span class='alert-status ";
         $output .= $this->severityLabel($eventlog->severity);
         $output .= " eventlog-status'></span>";
-        $output .= Time::serverToUser($eventlog->datetime)->format(LibrenmsConfig::get('dateformat.compact'));
+        $output .= Time::toUser(Time::fromDb($eventlog->datetime))->format(LibrenmsConfig::get('dateformat.compact'));
 
         return $output;
     }
