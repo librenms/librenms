@@ -129,6 +129,7 @@ class Billing
     {
         $sum_data = dbFetchRows('SELECT (SUM(delta) / SUM(period) * 8) as rate, FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(`timestamp`) / 300) * 300) AS bucket_start,   DATE_ADD(FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(`timestamp`) / 300) * 300), INTERVAL 5 MINUTE) AS bucket_end,SUM(delta) as delta_sum FROM bill_data WHERE bill_id = ? AND timestamp > ? AND timestamp <= ? GROUP BY bill_id, bucket_start ORDER BY rate ASC', [$bill_id, $datefrom, $dateto]);
         $measurement_95th = (round(count($sum_data) / 100 * 95) - 2);
+
         return round($sum_data[$measurement_95th]['rate'], 2);
     }
 
@@ -136,6 +137,7 @@ class Billing
     {
         $sum_data = dbFetchRows('SELECT (SUM(in_delta) / SUM(period) * 8) as rate, FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(`timestamp`) / 300) * 300) AS bucket_start,   DATE_ADD(FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(`timestamp`) / 300) * 300), INTERVAL 5 MINUTE) AS bucket_end,SUM(in_delta) as delta_sum FROM bill_data WHERE bill_id = ? AND timestamp > ? AND timestamp <= ? GROUP BY bill_id, bucket_start ORDER BY rate ASC', [$bill_id, $datefrom, $dateto]);
         $measurement_95th = (round(count($sum_data) / 100 * 95) - 2);
+
         return round($sum_data[$measurement_95th]['rate'], 2);
     }
 
@@ -143,6 +145,7 @@ class Billing
     {
         $sum_data = dbFetchRows('SELECT (SUM(out_delta) / SUM(period) * 8) as rate, FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(`timestamp`) / 300) * 300) AS bucket_start,   DATE_ADD(FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(`timestamp`) / 300) * 300), INTERVAL 5 MINUTE) AS bucket_end,SUM(out_delta) as delta_sum FROM bill_data WHERE bill_id = ? AND timestamp > ? AND timestamp <= ? GROUP BY bill_id, bucket_start ORDER BY rate ASC', [$bill_id, $datefrom, $dateto]);
         $measurement_95th = (round(count($sum_data) / 100 * 95) - 2);
+
         return round($sum_data[$measurement_95th]['rate'], 2);
     }
 
