@@ -1,14 +1,12 @@
-os: sitemonitor
-text: 'Packetflux SiteMonitor'
+os: sitemonitor3
+text: 'Packetflux SiteMonitor Base 3'
 type: appliance
 icon: packetflux
 over:
     - { graph: device_poller_perf, text: 'Poller time' }
 snmp_bulk: false
-mib_dir: packetflux
+mib_dir: sitemonitor3
 discovery:
     -
         sysObjectID:
-            - .1.3.6.1.4.1.32050
-        sysObjectID_except:
             - .1.3.6.1.4.1.32050.1.4
