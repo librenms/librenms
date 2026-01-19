@@ -137,8 +137,8 @@ class OutagesController extends TableController
 
     private function asDuration(DeviceOutage $outage): CarbonInterval
     {
-        $start = Time::serverFromTimestamp($outage->going_down);
-        $end = $outage->up_again ? Time::serverFromTimestamp($outage->up_again) : Time::serverNow();
+        $start = Time::fromTimestamp($outage->going_down);
+        $end = $outage->up_again ? Time::fromTimestamp($outage->up_again) : Time::now();
 
         return $end->diffAsCarbonInterval($start);
     }
@@ -150,7 +150,7 @@ class OutagesController extends TableController
         }
 
         // Convert epoch to local time
-        return Time::userFromTimestamp($timestamp)->format(LibrenmsConfig::get('dateformat.compact'));
+        return Time::toUser(Time::fromTimestamp($timestamp))->format(LibrenmsConfig::get('dateformat.compact'));
     }
 
     private function statusLabel(DeviceOutage $outage): string
@@ -191,8 +191,8 @@ class OutagesController extends TableController
     {
         return [
             $outage->device ? $outage->device->displayName() : '',
-            Time::userFromTimestamp($outage->going_down)->toISOString(),
-            $outage->up_again ? Time::userFromTimestamp($outage->up_again)->toISOString() : '-',
+            Time::toIso(Time::fromTimestamp($outage->going_down)),
+            $outage->up_again ? Time::toIso(Time::fromTimestamp($outage->up_again)) : '-',
             $this->asDuration($outage)->format('%H:%I:%S'),
         ];
     }

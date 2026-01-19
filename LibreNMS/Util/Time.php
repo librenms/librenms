@@ -205,33 +205,9 @@ class Time
     }
 
     /**
-     * Returns current user time
+     * Returns current time
      */
-    public static function userNow(): Carbon
-    {
-        return Carbon::now(session('preferences.timezone'));
-    }
-
-    /**
-     * Returns user time from unix timestamp
-     */
-    public static function userFromTimestamp(int $timestamp): Carbon
-    {
-        return Carbon::createFromTimestamp($timestamp, session('preferences.timezone'));
-    }
-
-    /**
-     * Convert a time string in user timezone to server time
-     */
-    public static function userToServer(string $time): Carbon
-    {
-        return Carbon::parse($time, session('preferences.timezone'));
-    }
-
-    /**
-     * Returns current server time
-     */
-    public static function serverNow(): Carbon
+    public static function now(): Carbon
     {
         return Carbon::now();
     }
@@ -239,16 +215,58 @@ class Time
     /**
      * Returns server time from unix timestamp
      */
-    public static function serverFromTimestamp(int $timestamp): Carbon
+    public static function fromTimestamp(int $timestamp): Carbon
     {
         return Carbon::createFromTimestamp($timestamp);
     }
 
     /**
-     * Convert a time string in server timezone to user time
+     * Return unix timestamp
      */
-    public static function serverToUser(string $time): Carbon
+    public static function toTimestamp(Carbon $input): int
     {
-        return Carbon::parse($time)->setTimezone(session('preferences.timezone'));
+        return $input->unix();
+    }
+
+    /**
+     * Convert a time string from the DB to server time
+     * DB time is the same as local time, so we just parse the time
+     */
+    public static function fromDb(string $time): Carbon
+    {
+        return Carbon::parse($time);
+    }
+
+    /**
+     * Converts from PHP to the DB timezone
+     * DB time is the same as server time, so this does nothing
+     */
+    public static function toDb(Carbon $input): Carbon
+    {
+        return $input;
+    }
+
+    /**
+     * Convert a time string from an ISO string to server time
+     */
+    public static function fromIso(string $time): Carbon
+    {
+        return Carbon::parse($time)->setTimezone(date_default_timezone_get());
+    }
+
+    /**
+     * Return IOS date string
+     */
+    public static function toIso(Carbon $input): string
+    {
+        return $input->toISOString();
+    }
+
+    /**
+     * Converts from PHP to the user timezone
+     */
+    public static function toUser(Carbon $input): Carbon
+    {
+        return $input->setTimezone(session('preferences.timezone'));
     }
 }

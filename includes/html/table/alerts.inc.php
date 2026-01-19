@@ -14,6 +14,8 @@
  * @author     LibreNMS Contributors
 */
 
+use LibreNMS\Util\Time;
+
 $where = ' `devices`.`disabled` = 0';
 $param = [];
 $alert_states = [
@@ -198,7 +200,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         'verbose_details' => "<button type='button' class='btn btn-alert-details command-alert-details' aria-label='Details' id='alert-details' data-alert_log_id='{$alert_log_id}'><i class='fa-solid fa-circle-info'></i></button>",
         'hostname' => $hostname,
         'location' => generate_link(htmlspecialchars($alert['location'] ?? 'N/A'), ['page' => 'devices', 'location' => $alert['location'] ?? '']),
-        'timestamp' => ($alert['timestamp'] ? \LibreNMS\Util\Time::serverToUser($alert['timestamp'])->format(LibrenmsConfig::get('dateformat.compact')) : 'N/A'),
+        'timestamp' => ($alert['timestamp'] ? Time::toUser(Time::fromDb($alert['timestamp']))->format(LibrenmsConfig::get('dateformat.compact')) : 'N/A'),
         'severity' => $severity_ico,
         'state' => $alert['state'],
         'alert_id' => $alert['id'],
