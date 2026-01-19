@@ -40,7 +40,7 @@ if (Auth::user()->hasGlobalAdmin()) {
     $admin_verbose_details = '<th data-column-id="verbose_details" data-sortable="false">Details</th>';
 }
 
-$device_id ??= (int) ($vars['device'] ?? 0);
+$device_id = (int) (request()->get('device_id') ?: ($vars['device'] ?? 0));
 
 $common_output[] = '<div class="panel panel-default panel-condensed">
                 <div class="panel-heading">
@@ -81,8 +81,7 @@ $common_output[] = '
         templates: {
             header: \'<div id="{{ctx.id}}" class="{{css.header}}"><div class="row"> \
                 <div class="col-sm-8 actionBar"><span class="pull-left"> \
-                <form method="post" action="" class="form-inline" role="form" id="alertlog-filter-form"> \
-                ' . csrf_field() . ' \
+                <form method="get" action="" class="form-inline" role="form" id="alertlog-filter-form"> \
             <input type=hidden name="hostname" id="hostname"> \
 ';
 
@@ -96,15 +95,16 @@ if (isset($vars['fromdevice']) && ! $vars['fromdevice']) {
 $common_output[] = '<div class="form-group"> \
                <select name="state" id="state" class="form-control input-sm"> \\';
 foreach ($alert_states as $text => $value) {
-    $selected = $value == ($_POST['state'] ?? '') ? ' selected' : '';
+    $selected = $value == (request()->get('state', '')) ? ' selected' : '';
     $common_output[] = "<option value=\"" . htmlspecialchars((string) $value) . "\"$selected>$text</option> \\";
 }
                $common_output[] = '</select> \
                </div> \
                <div class="form-group"> \
                <select name="severity[]" id="severity" class="form-control input-sm" multiple> \\';
+$current_severity = request()->get('severity', []);
 foreach ($alert_severities as $text => $value) {
-    $selected = in_array($value, $_POST['severity'] ?? []) == $value ? ' selected' : '';
+    $selected = in_array($value, (array) $current_severity) ? ' selected' : '';
     $common_output[] = "<option value=\"$value\"$selected>$text</option> \\";
 }
 $common_output[] = '</select> \
@@ -123,10 +123,10 @@ $common_output[] = '</select> \
     }).on("loaded.rs.jquery.bootgrid", function () {
 
         var results = $("div.infos").text().split(" ");
-        low = results[1] - 1;
-        high = results[3];
-        max = high - low;
-        search = $(\'.search-field\').val();
+        var low = results[1] - 1;
+        var high = results[3];
+        var max = high - low;
+        var search = $(\'.search-field\').val();
 
         grid.find(".incident-toggle").each(function () {
             $(this).parent().addClass(\'incident-toggle-td\');
@@ -176,6 +176,12 @@ $common_output[] = '</select> \
 
     $("#alertlog-filter-form").on("submit", function (e) {
         e.preventDefault();
+        var formData = $(this).serializeArray().filter(function(item) {
+            return item.value !== "";
+        });
+        var queryString = $.param(formData);
+        var newUrl = window.location.origin + window.location.pathname + (queryString ? "?" + queryString : "");
+        window.history.pushState({path: newUrl}, "", newUrl);
         grid.bootgrid("reload");
     });
 </script>
