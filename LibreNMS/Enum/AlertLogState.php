@@ -14,7 +14,7 @@ enum AlertLogState: int
 
     public function isActive(): bool
     {
-        return match($this) {
+        return match ($this) {
             self::Active, self::Worse, self::Better, self::Changed => true,
             default => false,
         };
@@ -22,7 +22,7 @@ enum AlertLogState: int
 
     public function asSeverity(): Severity
     {
-        return match($this) {
+        return match ($this) {
             self::Clear, self::Recovered => Severity::Ok,
             self::Active => Severity::Error,
             self::Acknowledged => Severity::Info,

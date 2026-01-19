@@ -57,7 +57,7 @@ $device_selected = json_encode($device->exists ? ['id' => $device->device_id, 't
 
 $common_output[] = '
 <div class="table-responsive">
-    <table id="alertlog" class="table table-hover table-condensed table-striped" data-url="' .  route('table.alertlog') . '">
+    <table id="alertlog" class="table table-hover table-condensed table-striped" data-url="' . route('table.alertlog') . '">
         <thead>
         <tr>
             <th data-column-id="status">State</th>
@@ -96,9 +96,9 @@ $common_output[] = '<div class="form-group"> \
                <select name="state" id="state" class="form-control input-sm"> \\';
 foreach ($alert_states as $text => $value) {
     $selected = $value == (request()->get('state', '')) ? ' selected' : '';
-    $common_output[] = "<option value=\"" . htmlspecialchars((string) $value) . "\"$selected>$text</option> \\";
+    $common_output[] = '<option value="' . htmlspecialchars((string) $value) . "\"$selected>$text</option> \\";
 }
-               $common_output[] = '</select> \
+$common_output[] = '</select> \
                </div> \
                <div class="form-group"> \
                <select name="severity[]" id="severity" class="form-control input-sm" multiple> \\';

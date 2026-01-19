@@ -15,7 +15,8 @@ class AlertLogController extends TableController
 
     public function __construct(
         private readonly AlertLogDetailFormatter $formatter
-    ) {}
+    ) {
+    }
 
     protected function rules()
     {
@@ -43,7 +44,7 @@ class AlertLogController extends TableController
         return [
             'device' => ['hostname', 'sysname'],
             'rule' => ['name'],
-//            'time_logged', // how would this be useful? removed
+            //            'time_logged', // how would this be useful? removed
         ];
     }
 

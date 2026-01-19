@@ -76,7 +76,6 @@ class AlertLogDetailFormatter
         }
 
         return $fault_detail . '<br>';
-
     }
 
     private function fallbackFormatting(array $detail): string
@@ -138,7 +137,6 @@ class AlertLogDetailFormatter
         return $output;
     }
 
-
     private function formatAccessPoint(array $detail): ?string
     {
         if (empty($detail['accesspoint_id'])) {
@@ -172,7 +170,6 @@ class AlertLogDetailFormatter
         $description = $sensor->sensor_class == 'state'
             ? "State: $value (numerical $sensor->sensor_current)"
             : "Value: $value ($sensor->sensor_class)";
-
 
         $thresholds = [];
         if ($sensor->sensor_limit_low) {
