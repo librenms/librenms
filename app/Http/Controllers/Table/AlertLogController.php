@@ -24,7 +24,7 @@ class AlertLogController extends TableController
             'severity' => 'array|nullable',
             'severity.*' => 'integer',
             'device_id' => 'integer|nullable',
-
+            'state' => 'integer|nullable',
         ];
     }
 
