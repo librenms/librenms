@@ -372,6 +372,11 @@ class Url
         return LaravelUrl::signedRoute('graph', $args);
     }
 
+    public static function graphPageUrl(string $type, array $args = []): string
+    {
+        return url('graphs', ['type' => $type, ...$args]);
+    }
+
     /**
      * @param  array  $args
      * @return string

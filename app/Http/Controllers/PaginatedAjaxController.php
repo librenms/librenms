@@ -128,8 +128,8 @@ abstract class PaginatedAjaxController extends Controller
             $query->where(function (Builder $query) use ($fields, $search): void {
                 foreach ($fields as $index => $field) {
                     if (! is_numeric($index)) {
-                        $query->orWhereHas($index, function ($query) use ($field, $search) {
-                            $query->where(function ($query) use ($field, $search) {
+                        $query->orWhereHas($index, function ($query) use ($field, $search): void {
+                            $query->where(function ($query) use ($field, $search): void {
                                 foreach ($field as $relatedField) {
                                     $query->orWhere($relatedField, 'like', '%' . $search . '%');
                                 }
