@@ -126,24 +126,25 @@ class Billing
         return $return;
     }
 
-    private static function get95thdata($bill_id, $datefrom, $dateto): array
+    private static function get95thagg($bill_id, $datefrom, $dateto): float
     {
-        $get95thdataCache = DB::table('bill_data')
-            ->selectRaw('(SUM(delta) / SUM(period) * 8) as rate')
-            ->selectRaw('(SUM(in_delta) / SUM(period) * 8) as in_rate')
-            ->selectRaw('(SUM(out_delta) / SUM(period) * 8) as out_rate')
-            ->selectRaw('FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(`timestamp`)) / 300) * 300 as bucket_start')
-            ->selectRaw('DATE_ADD(FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(`timestamp`)) / 300) * 300, INTERVAL 5 MINUTE) as bucket_end')
-            ->selectRaw('SUM(delta) as delta_sum')
-            ->where('bill_id', $bill_id)
-            ->whereBetween('timestamp', [$datefrom, $dateto])
-            ->groupByRaw('bill_id, bucket_start')
-            ->orderBy(column: 'rate')
-            ->get()->toArray();
+        $sum_data = dbFetchRows("SELECT (SUM(delta) / SUM(period) * 8) as rate, FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(`timestamp`) / 300) * 300) AS bucket_start,   DATE_ADD(FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(`timestamp`) / 300) * 300), INTERVAL 5 MINUTE) AS bucket_end,SUM(delta) as delta_sum FROM bill_data WHERE bill_id = ? AND timestamp > ? AND timestamp <= ? GROUP BY bill_id, bucket_start ORDER BY rate ASC", [$bill_id, $datefrom, $dateto]);
+        $measurement_95th = (round(count($sum_data) / 100 * 95) - 2);
+        return round($sum_data[$measurement_95th]['rate'], 2);
+    }
 
-        $measurement_95th = (round(count($get95thdataCache) / 100 * 95) - 2);
+    private static function get95thIn($bill_id, $datefrom, $dateto): float
+    {
+        $sum_data = dbFetchRows("SELECT (SUM(in_delta) / SUM(period) * 8) as rate, FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(`timestamp`) / 300) * 300) AS bucket_start,   DATE_ADD(FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(`timestamp`) / 300) * 300), INTERVAL 5 MINUTE) AS bucket_end,SUM(in_delta) as delta_sum FROM bill_data WHERE bill_id = ? AND timestamp > ? AND timestamp <= ? GROUP BY bill_id, bucket_start ORDER BY rate ASC", [$bill_id, $datefrom, $dateto]);
+        $measurement_95th = (round(count($sum_data) / 100 * 95) - 2);
+        return round($sum_data[$measurement_95th]['rate'], 2);
+    }
 
-        return (array) $get95thdataCache[$measurement_95th];
+    private static function get95thout($bill_id, $datefrom, $dateto): float
+    {
+        $sum_data = dbFetchRows("SELECT (SUM(out_delta) / SUM(period) * 8) as rate, FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(`timestamp`) / 300) * 300) AS bucket_start,   DATE_ADD(FROM_UNIXTIME(FLOOR(UNIX_TIMESTAMP(`timestamp`) / 300) * 300), INTERVAL 5 MINUTE) AS bucket_end,SUM(out_delta) as delta_sum FROM bill_data WHERE bill_id = ? AND timestamp > ? AND timestamp <= ? GROUP BY bill_id, bucket_start ORDER BY rate ASC", [$bill_id, $datefrom, $dateto]);
+        $measurement_95th = (round(count($sum_data) / 100 * 95) - 2);
+        return round($sum_data[$measurement_95th]['rate'], 2);
     }
 
     public static function getRates($bill_id, $datefrom, $dateto, $dir_95th): array
@@ -156,12 +157,11 @@ class Billing
         $mtot_out = $sum_data['outbound'];
         $ptot = $sum_data['period'];
 
-        $rate_95th_data = self::get95thdata($bill_id, $datefrom, $dateto);
-        $data['rate_95th_in'] = $rate_95th_data['in_rate'];
-        $data['rate_95th_out'] = $rate_95th_data['out_rate'];
+        $data['rate_95th_in'] = self::get95thIn($bill_id, $datefrom, $dateto);
+        $data['rate_95th_out'] = self::get95thout($bill_id, $datefrom, $dateto);
 
         if ($dir_95th == 'agg') {
-            $data['rate_95th'] = $rate_95th_data['rate'];
+            $data['rate_95th'] = self::get95thagg($bill_id, $datefrom, $dateto);
             $data['dir_95th'] = 'agg';
         } else {
             if ($data['rate_95th_out'] > $data['rate_95th_in']) {
