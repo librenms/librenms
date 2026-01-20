@@ -2,8 +2,7 @@
 
 namespace App\Http\Formatters;
 
-use App\Facades\DeviceCache;
-use App\Facades\PortCache;
+use App\Models\Port;
 use App\Models\Sensor;
 use App\Models\StateTranslation;
 use Illuminate\Support\Str;
@@ -106,7 +105,7 @@ class AlertLogDetailFormatter
             return null;
         }
 
-        $port = PortCache::get($detail['port_id']);
+        $port = new Port($detail);
 
         return $this->lines([
             $this->line('Port', Url::portLink($port), escape: false),
@@ -182,9 +181,9 @@ class AlertLogDetailFormatter
         }
 
         $service_url = Url::deviceUrl($device_id, ['tab' => 'services', 'view' => 'detail']);
-        $service_host = empty($detail['service_ip'])
-            ? DeviceCache::get($device_id)->displayName()
-            : $detail['service_ip'];
+        $service_host = ! empty($detail['service_ip'])
+            ? $detail['service_ip']
+            : ($detail['hostname'] ?? 'Unknown');
 
         return $this->lines([
             $this->linkLine('Service', $service_url, $service_name),
