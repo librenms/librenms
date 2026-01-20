@@ -135,7 +135,7 @@ modules:
                     oid: ADVANTECH-EKI-PRONEER-MIB::xRingProInfoTable
                     value: ADVANTECH-EKI-PRONEER-MIB::xRingProInfoPort1FwdState
                     num_oid: '.1.3.6.1.4.1.10297.202.7000.3.14.4.1.5.{{ $index }}'
-                    descr: '{{ ADVANTECH-EKI-PRONEER-MIB::xRingProInfoPort1 }} RingID-{{ ADVANTECH-EKI-PRONEER-MIB::xRingProInfoRingID }} - {{ ADVANTECH-EKI-PRONEER-MIB::xRingProInfoOperState }}'
+                    descr: 'X-Ring Pro RingID-{{ ADVANTECH-EKI-PRONEER-MIB::xRingProInfoRingID }} Port-{{ ADVANTECH-EKI-PRONEER-MIB::xRingProInfoPort1 }} - {{ ADVANTECH-EKI-PRONEER-MIB::xRingProInfoOperState }}'
                     index: 'xRingProInfoPort1FwdState.{{ $index }}'
                     state_name: xRingProInfoPort1FwdState
                     states:
@@ -146,7 +146,7 @@ modules:
                     oid: ADVANTECH-EKI-PRONEER-MIB::xRingProInfoTable
                     value: ADVANTECH-EKI-PRONEER-MIB::xRingProInfoPort2FwdState
                     num_oid: '.1.3.6.1.4.1.10297.202.7000.3.14.4.1.5.{{ $index }}'
-                    descr: '{{ ADVANTECH-EKI-PRONEER-MIB::xRingProInfoPort2 }} RingID-{{ ADVANTECH-EKI-PRONEER-MIB::xRingProInfoRingID }} - {{ ADVANTECH-EKI-PRONEER-MIB::xRingProInfoOperState }}'
+                    descr: 'X-Ring Pro RingID-{{ ADVANTECH-EKI-PRONEER-MIB::xRingProInfoRingID }} Port-{{ ADVANTECH-EKI-PRONEER-MIB::xRingProInfoPort2 }} - {{ ADVANTECH-EKI-PRONEER-MIB::xRingProInfoOperState }}'
                     index: 'xRingProInfoPort2FwdState.{{ $index }}'
                     state_name: xRingProInfoPort2FwdState
                     states:
