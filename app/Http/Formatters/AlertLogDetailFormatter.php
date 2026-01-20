@@ -14,42 +14,30 @@ class AlertLogDetailFormatter
 {
     public function format(array $alert_details): string
     {
-        $details = $alert_details;
-        $max_row_length = 0;
         $all_fault_detail = '';
 
         // Check if we have a diff (alert status changed, worse and better)
-        if (isset($details['diff'])) {
+        if (isset($alert_details['diff'])) {
             // Add a "title" for the modifications
             $all_fault_detail .= '<b>Modifications:</b><br>';
 
             // Check if we have added
-            if (isset($details['diff']['added'])) {
-                foreach (array_values($details['diff']['added'] ?? []) as $oa => $tmp_alerts_added) {
-                    $fault_detail = $this->formatDetails($oa, $tmp_alerts_added, 'Added');
-                    $max_row_length = strlen(strip_tags((string) $fault_detail)) > $max_row_length ? strlen(strip_tags((string) $fault_detail)) : $max_row_length;
-                    $all_fault_detail .= $fault_detail;
-                }//end foreach
+            foreach (array_values($alert_details['diff']['added'] ?? []) as $index => $tmp_alerts_added) {
+                $all_fault_detail .= $this->formatDetails($index, $tmp_alerts_added, 'Added');
             }
 
             // Check if we have resolved
-            if (isset($details['diff']['resolved'])) {
-                foreach (array_values($details['diff']['resolved'] ?? []) as $or => $tmp_alerts_resolved) {
-                    $fault_detail = $this->formatDetails($or, $tmp_alerts_resolved, 'Resolved');
-                    $max_row_length = strlen(strip_tags((string) $fault_detail)) > $max_row_length ? strlen(strip_tags((string) $fault_detail)) : $max_row_length;
-                    $all_fault_detail .= $fault_detail;
-                }//end foreach
+            foreach (array_values($alert_details['diff']['resolved'] ?? []) as $index => $tmp_alerts_resolved) {
+                $all_fault_detail .= $this->formatDetails($index, $tmp_alerts_resolved, 'Resolved');
             }
 
             // Add a "title" for the complete list
             $all_fault_detail .= '<br><b>All current items:</b><br>';
         }
 
-        foreach ($details['rule'] ?? [] as $o => $tmp_alerts_rule) {
-            $fault_detail = $this->formatDetails($o, $tmp_alerts_rule);
-            $max_row_length = strlen(strip_tags((string) $fault_detail)) > $max_row_length ? strlen(strip_tags((string) $fault_detail)) : $max_row_length;
-            $all_fault_detail .= $fault_detail;
-        }//end foreach
+        foreach ($alert_details['rule'] ?? [] as $index => $tmp_alerts_rule) {
+            $all_fault_detail .= $this->formatDetails($index, $tmp_alerts_rule);
+        }
 
         return $all_fault_detail;
     }
@@ -69,11 +57,9 @@ class AlertLogDetailFormatter
 
         $fault_detail = $type_info ? $type_info . ' ' : '';
         $fault_detail .= '#' . ($row + 1) . ': ';
-        $fault_detail .= implode('; ', $items);
-
-        if (empty($items)) {
-            $fault_detail .= $this->fallbackFormatting($alert_detail);
-        }
+        $fault_detail .= empty($items)
+            ? $this->fallbackFormatting($alert_detail)
+            : implode('<br>', $items);
 
         return $fault_detail . '<br>';
     }
@@ -97,10 +83,10 @@ class AlertLogDetailFormatter
                 continue;
             }
 
-            $lines[] = e($k) . ' => ' . e($v);
+            $lines[] = $this->line($k, $v);
         }
 
-        return implode('<br>', $lines);
+        return $this->lines($lines);
     }
 
     private function formatBill(array $detail): ?string
@@ -109,11 +95,9 @@ class AlertLogDetailFormatter
             return null;
         }
 
-        $bill_id = $detail['bill_id'];
-        $bill_name = $detail['bill_name'] ?? '';
-        $bill_url = Url::generate(['page' => 'bill', 'bill_id' => $bill_id]);
+        $bill_url = Url::generate(['page' => 'bill', 'bill_id' => $detail['bill_id']]);
 
-        return $this->simpleLink($bill_url, $bill_name);
+        return $this->linkLine('Bill', $bill_url, $detail['bill_name'] ?? 'Bill');
     }
 
     private function formatPort(array $detail): ?string
@@ -122,19 +106,17 @@ class AlertLogDetailFormatter
             return null;
         }
 
-        $output = '';
-
-        if (! empty($detail['isisISAdjState'])) {
-            $output .= 'Adjacent: ' . e($detail['isisISAdjIPAddrAddress'] ?? '') . ', Interface: ';
-        }
-
         $port = PortCache::get($detail['port_id']);
-        $output .= Url::portLink($port);
-        if ($port->ifAlias && $port->ifAlias != $port->ifDescr) {
-            $output .= '; ' . e($port->ifAlias);
-        }
 
-        return $output;
+        return $this->lines([
+            $this->line('Port', Url::portLink($port), escape: false),
+            ($port->ifAlias && $port->ifAlias != $port->ifDescr)
+                ? $this->line('Alias', $port->ifAlias)
+                : null,
+            !empty($detail['isisISAdjState'])
+                ? $this->line('Adjacent', $detail['isisISAdjIPAddrAddress'] ?? 'Unknown')
+                : null,
+        ]);
     }
 
     private function formatAccessPoint(array $detail): ?string
@@ -143,12 +125,12 @@ class AlertLogDetailFormatter
             return null;
         }
 
-        $device_id = $detail['device_id'] ?? 0;
-        $ap_id = $detail['accesspoint_id'];
-        $ap_name = $detail['name'] ?? ''; // could be wrong
-        $ap_url = Url::deviceUrl($device_id, ['tab' => 'accesspoints', 'ap' => $ap_id]);
+        $ap_url = Url::deviceUrl(
+            $detail['device_id'] ?? 0,
+            ['tab' => 'accesspoints', 'ap' => $detail['accesspoint_id']]
+        );
 
-        return $this->simpleLink($ap_url, $ap_name);
+        return $this->linkLine('Access Point', $ap_url, $detail['name'] ?? 'Access Point');
     }
 
     private function formatSensor(array $detail): ?string
@@ -157,35 +139,33 @@ class AlertLogDetailFormatter
             return null;
         }
 
-        $sensor = new Sensor($detail); // should work
+        $sensor = new Sensor($detail);
         $sensor->sensor_id = $detail['sensor_id'];
 
-        // pre-load translation for formatValue if it exists
+        // Pre-load translation for formatValue if it exists
         if (isset($detail['state_descr'])) {
             $translation = new StateTranslation($detail);
             $sensor->setRelation('translations', collect([$translation]));
         }
 
         $value = $sensor->formatValue();
-        $description = $sensor->sensor_class == 'state'
-            ? "State: $value (numerical $sensor->sensor_current)"
-            : "Value: $value ($sensor->sensor_class)";
+        $value_line = $sensor->sensor_class == 'state'
+            ? $this->line('State', $value . ' (numerical: ' . $sensor->sensor_current . ')')
+            : $this->line('Value', $value . ' (' . $sensor->sensor_class . ')');
 
-        $thresholds = [];
-        if ($sensor->sensor_limit_low) {
-            $thresholds[] = 'low: ' . $sensor->sensor_limit_low;
-        }
-        if ($sensor->sensor_limit_low_warn) {
-            $thresholds[] = 'low_warn: ' . $sensor->sensor_limit_low_warn;
-        }
-        if ($sensor->sensor_limit_warn) {
-            $thresholds[] = 'high_warn: ' . $sensor->sensor_limit_warn;
-        }
-        if ($sensor->sensor_limit) {
-            $thresholds[] = 'high: ' . $sensor->sensor_limit;
-        }
+        // Build thresholds
+        $thresholds = $this->inlineList([
+            $sensor->sensor_limit_low ? 'Low: ' . e($sensor->sensor_limit_low) : null,
+            $sensor->sensor_limit_low_warn ? 'Low Warn: ' . e($sensor->sensor_limit_low_warn) : null,
+            $sensor->sensor_limit_warn ? 'High Warn: ' . e($sensor->sensor_limit_warn) : null,
+            $sensor->sensor_limit ? 'High: ' . e($sensor->sensor_limit) : null,
+        ]);
 
-        return Url::sensorLink($sensor) . '<br>' . e($description) . '<br>' . e(implode(', ', $thresholds));
+        return $this->lines([
+            $this->line('Sensor', Url::sensorLink($sensor), escape: false),
+            $value_line,
+            $thresholds ? $this->line('Thresholds', $thresholds, escape: false) : null,
+        ]);
     }
 
     private function formatService(array $detail): ?string
@@ -195,25 +175,24 @@ class AlertLogDetailFormatter
         }
 
         $device_id = $detail['device_id'] ?? 0;
-        $service_name = $detail['service_name'] ?? '';
+        $service_name = $detail['service_name'] ?? 'Service';
+
         if (isset($detail['service_type'])) {
-            $service_name .= " ({$detail['service_type']})";
+            $service_name .= ' (' . e($detail['service_type']) . ')';
         }
+
         $service_url = Url::deviceUrl($device_id, ['tab' => 'services', 'view' => 'detail']);
-        $service_link = $this->simpleLink($service_url, $service_name);
-        $service_host = empty($detail['service_ip']) ? DeviceCache::get($device_id)->displayName() : $detail['service_ip'];
+        $service_host = empty($detail['service_ip'])
+            ? DeviceCache::get($device_id)->displayName()
+            : $detail['service_ip'];
 
-        $description = 'Service: ' . $service_link . '<br>Service Host: ' . e($service_host) . '<br>';
-
-        if (! empty($detail['service_desc'])) {
-            $description .= 'Description: ' . e($detail['service_desc']) . '<br>';
-        }
-
-        if (! empty($detail['service_param'])) {
-            $description .= 'Param: ' . e($detail['service_param']) . '<br>';
-        }
-
-        return $description . 'Msg: ' . e($detail['service_message'] ?? '');
+        return $this->lines([
+            $this->linkLine('Service', $service_url, $service_name),
+            $this->line('Host', $service_host),
+            $this->line('Description', $detail['service_desc'] ?? null),
+            $this->line('Param', $detail['service_param'] ?? null),
+            $this->line('Message', $detail['service_message'] ?? null),
+        ]);
     }
 
     private function formatBgpPeer(array $detail): ?string
@@ -223,23 +202,13 @@ class AlertLogDetailFormatter
         }
 
         $bgp_url = Url::deviceUrl($detail['device_id'] ?? 0, ['tab' => 'routing', 'proto' => 'bgp']);
-        $bgp_peer_id = $detail['bgpPeerIdentifier'] ?? '';
 
-        $description = $this->simpleLink($bgp_url, $bgp_peer_id);
-
-        if (! empty($detail['bgpPeerDescr'])) {
-            $description .= ', Desc ' . e($detail['bgpPeerDescr'] ?? '');
-        }
-
-        if (! empty($detail['bgpPeerRemoteAs'])) {
-            $description .= ', AS' . e($detail['bgpPeerRemoteAs']);
-        }
-
-        if (! empty($detail['bgpPeerState'])) {
-            $description .= ', State ' . e($detail['bgpPeerState']);
-        }
-
-        return $description;
+        return $this->lines([
+            $this->linkLine('BGP Peer', $bgp_url, $detail['bgpPeerIdentifier'] ?? 'BGP Peer'),
+            $this->line('Description', $detail['bgpPeerDescr'] ?? null),
+            $this->line('Remote AS', $detail['bgpPeerRemoteAs'] ?? null),
+            $this->line('State', $detail['bgpPeerState'] ?? null),
+        ]);
     }
 
     private function formatMempool(array $detail): ?string
@@ -249,14 +218,18 @@ class AlertLogDetailFormatter
         }
 
         $mempool_url = Url::graphPageUrl('mempool_usage', ['id' => $detail['mempool_id']]);
-        $mempool_perc = Number::normalizePercent($detail['mempool_perc'] ?? '');
-        $mempool_free = Number::formatSi($detail['mempool_free'] ?? '');
-        $mempool_total = Number::formatSi($detail['mempool_total'] ?? '');
 
-        $description = 'Memory Pool: ' . $this->simpleLink($mempool_url, $detail['mempool_descr'] ?? 'link');
-        $description .= '<br> Usage ' . e($mempool_perc) . '%, Free' . e($mempool_free) . ', Size ' . e($mempool_total);
+        // Build usage statistics inline
+        $usage = $this->inlineList([
+            isset($detail['mempool_perc']) ? 'Usage: ' . e(Number::normalizePercent($detail['mempool_perc'])) : null,
+            isset($detail['mempool_free']) ? 'Free: ' . e(Number::formatSi($detail['mempool_free'])) : null,
+            isset($detail['mempool_total']) ? 'Total: ' . e(Number::formatSi($detail['mempool_total'])) : null,
+        ]);
 
-        return $description;
+        return $this->lines([
+            $this->linkLine('Memory Pool', $mempool_url, $detail['mempool_descr'] ?? 'Memory Pool'),
+            $usage,
+        ]);
     }
 
     private function formatApplication(array $detail): ?string
@@ -265,24 +238,57 @@ class AlertLogDetailFormatter
             return null;
         }
 
-        $app_type = $detail['app_type'] ?? 'app';
+        $app_type = $detail['app_type'] ?? 'Application';
         $app_url = Url::deviceUrl($detail['device_id'] ?? 0, ['tab' => 'apps', 'app' => $app_type]);
 
-        $description = $this->simpleLink($app_url, $app_type);
-        if (! empty($detail['app_status'])) {
-            $description .= ' => ' . e($detail['app_status']);
-        }
-
-        // FIXME is this correct?
-        if (! empty($detail['metric'])) {
-            $description .= ' : ' . e($detail['metric']) . ' => ' . e($detail['value']);
-        }
-
-        return $description;
+        return $this->lines([
+            $this->linkLine('Application', $app_url, $app_type),
+            $this->line('Status', $detail['app_status'] ?? null),
+            !empty($detail['metric'])
+                ? $this->line('Metric', e($detail['metric']) . ' = ' . e($detail['value'] ?? 'N/A'), escape: false)
+                : null,
+        ]);
     }
 
-    private function simpleLink(string $url, string $text): string
+    // ========================================
+    // Helper Methods for Consistent Formatting
+    // ========================================
+
+    /**
+     * Format a labeled line with optional value
+     */
+    private function line(string $label, mixed $value, bool $escape = true): ?string
     {
-        return '<a href="' . e($url) . '">' . e($text) . '</a>';
+        if (empty($value) && $value !== '0' && $value !== 0) {
+            return null;
+        }
+
+        $formatted_value = $escape ? e($value) : $value;
+        return $label . ': ' . $formatted_value;
+    }
+
+    /**
+     * Format a labeled link line
+     */
+    private function linkLine(string $label, string $url, string $text): string
+    {
+        return $label . ': <a href="' . e($url) . '">' . e($text) . '</a>';
+    }
+
+    /**
+     * Join non-null values with comma separator
+     */
+    private function inlineList(array $items): ?string
+    {
+        $filtered = array_filter($items, fn($item) => $item !== null && $item !== '');
+        return empty($filtered) ? null : implode(', ', $filtered);
+    }
+
+    /**
+     * Join non-null lines with <br> separator
+     */
+    private function lines(array $lines): string
+    {
+        return implode('<br>', array_filter($lines, fn($line) => $line !== null && $line !== ''));
     }
 }
