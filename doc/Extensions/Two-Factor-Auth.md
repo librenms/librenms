@@ -113,3 +113,16 @@ Usage:
 - Create a Timerbased key as described above
 - Click Add (+) and scan provided QR or click on 'NO QR CODE?' and enter naming details and the Secret
 - On next login, enter the passcode that the App provides
+
+### Enpass Authenticator
+
+Enpass Authenticator is confirmed to work with Timebased One-Time Passwords (TOTP).
+
+Installation guide for LastPass Authenticator can be found [here](https://support.enpass.io/app/item/generating_one_time_code_in_enpass.htm)).
+
+Usage:
+
+- In the Item Details view, tap Edit at the top-right corner.
+- Navigate to the Additional Details section, you will find the One-time code field.
+- In the One-time code field, enter the secret key provided by the site or app, or tap the QR-code icon to scan in the key.
+- Tap Save to save your changes.
