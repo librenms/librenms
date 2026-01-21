@@ -16,6 +16,13 @@ class StoragesController extends TableController
 
     protected $default_sort = ['device_hostname' => 'asc', 'storage_descr' => 'asc'];
 
+    protected function rules(): array
+    {
+        return [
+            'status' => 'nullable|string',
+        ];
+    }
+
     protected function sortFields($request): array
     {
         return [
@@ -37,10 +44,16 @@ class StoragesController extends TableController
 
     protected function baseQuery(Request $request): Builder
     {
+        $status = $request->input('status');
+
         return Storage::query()
             ->hasAccess($request->user())
             ->when($request->get('searchPhrase'), fn ($q) => $q->leftJoin('devices', 'devices.device_id', '=', 'storage.device_id'))
-            ->withAggregate('device', 'hostname');
+            ->withAggregate('device', 'hostname')
+            ->when($status == 'warning', function ($q): void {
+                $q->where('storage_perc', '>', 0)
+                    ->whereColumn('storage_perc', '>=', 'storage_perc_warn');
+            });
     }
 
     /**
