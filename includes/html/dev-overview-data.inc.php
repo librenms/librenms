@@ -143,18 +143,18 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
         <div class="col-sm-4">Location</div>
         <div class="col-sm-8">' . Clean::html($location->display(), []) . '</div>
     </div>
-    <div class="row" id="coordinates-row" data-toggle="collapse" data-target="#toggle-map">
+    <div class="row" id="coordinates-row" data-toggle="collapse" data-target="#toggleInput-map">
         <div class="col-sm-4">Lat / Lng</div>
         <div class="col-sm-8"><span id="coordinates-text">' . $location_coords . '</span><div class="pull-right">';
 
-    echo '<button type="button" id="toggle-map-button" class="btn btn-primary btn-xs" data-toggle="collapse" data-target="#toggle-map"><i class="fa fa-map" style="color:white" aria-hidden="true"></i> <span>View</span></button>';
+    echo '<button type="button" id="toggleInput-map-button" class="btn btn-primary btn-xs" data-toggle="collapse" data-target="#toggleInput-map"><i class="fa fa-map" style="color:white" aria-hidden="true"></i> <span>View</span></button>';
     if ($location_valid) {
         echo ' <a id="map-it-button" href="https://maps.google.com/?q=' . $location->lat . ',' . $location->lng . '" target="_blank" class="btn btn-success btn-xs" role="button"><i class="fa fa-map-marker" style="color:white" aria-hidden="true"></i> Map</a>';
     }
     echo '</div>
         </div>
     </div>
-    <div id="toggle-map" class="row collapse"><div id="location-map"></div></div>
+    <div id="toggleInput-map" class="row collapse"><div id="location-map"></div></div>
     <script>
         var device_map, device_marker_cluster;
 
@@ -181,7 +181,7 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
             return new L.Control.Fullscreen(opts);
         }
 
-        $("#toggle-map").on("shown.bs.collapse", function () {
+        $("#toggleInput-map").on("shown.bs.collapse", function () {
              var device_marker, device_location;
              if (device_map == null) {
                 device_location = new L.LatLng(' . (float) $location->lat . ', ' . (float) $location->lng . ');
@@ -293,14 +293,14 @@ if ($device['location_id'] && $location = Location::find($device['location_id'])
     }
     echo '
         }
-            $("#toggle-map-button").find(".fa").removeClass("fa-map").addClass("fa-map-o");
-            $("#toggle-map-button span").text("Hide")
+            $("#toggleInput-map-button").find(".fa").removeClass("fa-map").addClass("fa-map-o");
+            $("#toggleInput-map-button span").text("Hide")
         }).on("hidden.bs.collapse", function () {
-            $("#toggle-map-button").find(".fa").removeClass("fa-map-o").addClass("fa-map");
-            $("#toggle-map-button span").text("View")
+            $("#toggleInput-map-button").find(".fa").removeClass("fa-map-o").addClass("fa-map");
+            $("#toggleInput-map-button span").text("View")
         });';
     if (LibrenmsConfig::get('device_location_map_open')) {
-        echo '$("#toggle-map").collapse("show");';
+        echo '$("#toggleInput-map").collapse("show");';
     }
     echo '</script>
     ';

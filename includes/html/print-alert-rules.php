@@ -73,10 +73,7 @@ if (isset($_POST['create-default'])) {
     unset($qb);
 }
 
-require_once 'includes/html/modal/new_alert_rule.inc.php';
 require_once 'includes/html/modal/delete_alert_rule.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
-require_once 'includes/html/modal/alert_rule_collection.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
-require_once 'includes/html/modal/alert_rule_list.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
 
 require_once 'includes/html/modal/edit_transport_group.inc.php';
 require_once 'includes/html/modal/edit_alert_transport.inc.php';
@@ -92,9 +89,9 @@ if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
 echo '<div class="table-responsive">';
 echo '<div class="col pull-left">';
 $device_id = $device['device_id'] ?? 0;
-echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-device_id="' .$device_id. '">Create new alert rule</button>';
+echo '<a class="btn btn-primary btn-sm" href="/alert-rules/create?device_id=' . $device_id . '">Create new alert rule</a>';
 echo '<i> - OR - </i>';
-echo '<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal" data-device_id="' .$device_id. '">Create rule from collection</button>';
+echo '<a class="btn btn-primary btn-sm" href="/alert-rules/create?open=collection&device_id=' . $device_id . '">Create rule from collection</a>';
 echo '</div>';
 
 echo '<div class="col pull-right">';
@@ -413,7 +410,7 @@ foreach ($rule_list as $rule) {
 
     echo '<td>';
     echo "<div class='btn-group btn-group-sm' role='group'>";
-    echo "<button type='button' class='btn btn-primary' data-toggle='modal' data-placement='left' data-target='#create-alert' data-rule_id='" . $rule['id'] . "' name='edit-alert-rule' title='Edit alert rule' data-content='" . htmlentities((string) $rule['name']) . "' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
+    echo "<a class='btn btn-primary' href='" . route('alert-rule.edit', $rule['id']) . "' title='Edit alert rule' data-content='" . htmlentities((string) $rule['name']) . "' data-container='body'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></a> ";
     echo "<button type='button' class='btn btn-danger' aria-label='Delete' data-placement='left' data-toggle='modal' data-target='#confirm-delete' data-alert_id='" . $rule['id'] . "' data-alert_name='" . htmlentities((string) $rule['name']) . "' name='delete-alert-rule' title='Delete alert rule' data-content='" . htmlentities((string) $rule['name']) . "' data-container='body'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
     echo '</td>';
 
@@ -477,7 +474,7 @@ $('input[name="alert-rule"]').on('switchChange.bootstrapSwitch',  function(event
     var orig_class = $(this).data("orig_class");
     $.ajax({
         type: 'PUT',
-        url: '<?php echo route('alert-rule.toggle', ':rule_id'); ?>'.replace(':rule_id', alert_id),
+        url: '<?php echo route('alert-rule.toggleInput', ':rule_id'); ?>'.replace(':rule_id', alert_id),
         data: {state: state},
         dataType: "json",
         success: function (msg) {

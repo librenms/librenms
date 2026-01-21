@@ -30,8 +30,8 @@
             },
             url: "ajax_table.php"
         }).on("loaded.rs.jquery.bootgrid", function () {
-            grid.find(".incident-toggle").each(function () {
-                $(this).parent().addClass('incident-toggle-td');
+            grid.find(".incident-toggleInput").each(function () {
+                $(this).parent().addClass('incident-toggleInput-td');
             }).on("click", function (e) {
                 var target = $(this).data("target");
                 $(target).collapse('toggle');
@@ -40,13 +40,13 @@
             grid.find(".incident").each(function () {
                 $(this).parent().addClass('col-lg-4 col-md-4 col-sm-4 col-xs-4');
                 $(this).parent().parent().on("mouseenter", function () {
-                    $(this).find(".incident-toggle").fadeIn(200);
+                    $(this).find(".incident-toggleInput").fadeIn(200);
                 }).on("mouseleave", function () {
-                    $(this).find(".incident-toggle").fadeOut(200);
-                }).on("click", "td:not(.incident-toggle-td)", function () {
-                    var target = $(this).parent().find(".incident-toggle").data("target");
-                    if ($(this).parent().find(".incident-toggle").hasClass('fa-plus')) {
-                        $(this).parent().find(".incident-toggle").toggleClass('fa-plus fa-minus');
+                    $(this).find(".incident-toggleInput").fadeOut(200);
+                }).on("click", "td:not(.incident-toggleInput-td)", function () {
+                    var target = $(this).parent().find(".incident-toggleInput").data("target");
+                    if ($(this).parent().find(".incident-toggleInput").hasClass('fa-plus')) {
+                        $(this).parent().find(".incident-toggleInput").toggleClass('fa-plus fa-minus');
                         $(target).collapse('toggle');
                     }
                 });

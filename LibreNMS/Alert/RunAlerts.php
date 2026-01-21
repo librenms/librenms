@@ -643,6 +643,7 @@ class RunAlerts
                 $transport_title = "Transport {$item['transport_type']}";
                 $obj['transport'] = $item['transport_type'];
                 $obj['transport_name'] = $item['transport_name'];
+                $obj['transport_id'] = $item['transport_id'] ?? null;
                 $obj['alert'] = new AlertData($obj);
                 $obj['title'] = $type->getTitle($obj);
                 $obj['alert']['title'] = $obj['title'];
