@@ -62,4 +62,6 @@
      */
 
      'config_cache_ttl' => env('CONFIG_CACHE_TTL', 300),
+     
+     'rrdcached' => env('RRDCACHED', ''),
  ];

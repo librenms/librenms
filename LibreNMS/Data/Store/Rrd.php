@@ -83,7 +83,7 @@ class Rrd extends BaseDatastore
 
     protected function loadConfig(): void
     {
-        $this->rrdcached = LibrenmsConfig::get('rrdcached', false);
+        $this->rrdcached = LibrenmsConfig::get('rrdcached', '');
         $this->rrd_dir = LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd');
         $this->step = LibrenmsConfig::get('rrd.step', 300);
         $this->rra = preg_split('/s+/', trim(LibrenmsConfig::get(

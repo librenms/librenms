@@ -23,7 +23,7 @@ class RrdProcess
     public function __construct(private readonly LoggerInterface $logger, private readonly int $timeout = 300)
     {
         $this->rrdtool_exec = LibrenmsConfig::get('rrdtool', 'rrdtool');
-        $this->rrdcached = (string) LibrenmsConfig::get('rrdcached', '');
+        $this->rrdcached = (string) config('librenms.rrdcached', '');
         $this->rrd_dir = LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd');
         $this->input = new InputStream();
 

@@ -37,7 +37,7 @@ class CheckRrdcached implements \LibreNMS\Interfaces\Validation
      */
     public function validate(): ValidationResult
     {
-        if (! LibrenmsConfig::get('rrdcached')) {
+        if (! config('librenms.rrdcached')) {
             return ValidationResult::fail(trans('validation.validations.distributedpoller.CheckRrdcached.fail'), 'lnms config:set rrdcached <rrdcached server ip:port>');
         }
 

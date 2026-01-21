@@ -129,7 +129,7 @@ class MaintenanceRrdStep extends LnmsCommand
      */
     private function listFiles(string $hostname, RrdProcess $rrdProcess): array
     {
-        $rrd_dir = LibrenmsConfig::get('rrdcached')
+        $rrd_dir = config('librenms.rrdcached')
             ? '/'
             : LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd');
 

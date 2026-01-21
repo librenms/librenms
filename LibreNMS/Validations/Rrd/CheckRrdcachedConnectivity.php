@@ -37,7 +37,7 @@ class CheckRrdcachedConnectivity implements Validation
      */
     public function validate(): ValidationResult
     {
-        $parts = explode(':', LibrenmsConfig::get('rrdcached'), 2);
+        $parts = explode(':', (string) config('librenms.rrdcached'), 2);
         $host = $parts[0];
         $port = $parts[1] ?? '';
 
@@ -63,6 +63,6 @@ class CheckRrdcachedConnectivity implements Validation
      */
     public function enabled(): bool
     {
-        return (bool) LibrenmsConfig::get('rrdcached');
+        return (bool) config('librenms.rrdcached');
     }
 }
