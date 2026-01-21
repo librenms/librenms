@@ -31,10 +31,14 @@ return [
             'engine' => null,
             'sslmode' => env('DB_SSLMODE', 'disabled'),
             'options' => extension_loaded('pdo_mysql') ? [
+                // @phpstan-ignore class.notFound, greaterOrEqual.alwaysFalse
                 (PHP_VERSION_ID >= 80500 ? Pdo\Mysql::ATTR_SSL_VERIFY_SERVER_CERT : PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT) => env('MYSQL_ATTR_SSL_VERIFY_SERVER_CERT', false),
             ] + array_filter([
+                // @phpstan-ignore class.notFound, greaterOrEqual.alwaysFalse
                 (PHP_VERSION_ID >= 80500 ? Pdo\Mysql::ATTR_SSL_CA : PDO::MYSQL_ATTR_SSL_CA) => env('MYSQL_ATTR_SSL_CA'),
+                // @phpstan-ignore class.notFound, greaterOrEqual.alwaysFalse
                 (PHP_VERSION_ID >= 80500 ? Pdo\Mysql::ATTR_SSL_CERT : PDO::MYSQL_ATTR_SSL_CERT) => env('MYSQL_ATTR_SSL_CERT'),
+                // @phpstan-ignore class.notFound, greaterOrEqual.alwaysFalse
                 (PHP_VERSION_ID >= 80500 ? Pdo\Mysql::ATTR_SSL_KEY : PDO::MYSQL_ATTR_SSL_KEY) => env('MYSQL_ATTR_SSL_KEY'),
             ]) : [],
         ],
