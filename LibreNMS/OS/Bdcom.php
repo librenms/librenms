@@ -3,11 +3,7 @@
 /**
  * Bdcom.php
  *
-<<<<<<< HEAD
- * -Description-
-=======
  * BDCOM OS
->>>>>>> 83baccc139da2dea6a95f8353fbc0b5ac4f54186
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

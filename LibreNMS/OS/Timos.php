@@ -72,7 +72,6 @@ class Timos extends OS implements
     WirelessRssiDiscovery,
     WirelessRsrpDiscovery,
     WirelessChannelDiscovery
-
 {
     public function discoverOS(Device $device): void
     {
