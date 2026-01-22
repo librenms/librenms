@@ -117,7 +117,7 @@ class PollerCluster extends Model
         $servicesGloballyEnabled = $scheduleType['services'] == 'legacy' ? true : $scheduleType['services'] == 'dispatcher';
         $alertGloballyEnabled = $scheduleType['alerting'] == 'legacy' ? true : $scheduleType['alerting'] == 'dispatcher';
         $billingGloballyEnabled = $scheduleType['billing'] == 'legacy' ? true : $scheduleType['billing'] == 'dispatcher';
-        $pingGloballyEnabled = $scheduleType['ping'] == 'legacy' ? false : $scheduleType['ping'] == 'dispatcher';
+        $pingGloballyEnabled = $scheduleType['ping'] == 'legacy' ? true : $scheduleType['ping'] == 'dispatcher';
 
         return [
             [
