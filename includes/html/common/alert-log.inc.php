@@ -166,8 +166,6 @@ $common_output[] = '<div class="form-group"> \
         max = high - low;
         search = $(\'.search-field\').val();
 
-        $(".pdf-export").html("<a href=\'pdf.php?report=alert-log&device_id=' . htmlspecialchars($device_id) . '&string=" + search + "&results=" + max + "&start=" + low + "\'><i class=\'fa fa-file-pdf-o fa-lg icon-theme\' aria-hidden=\'true\'></i> Export to PDF</a>");
-
         grid.find(".incident-toggle").each(function () {
             $(this).parent().addClass(\'incident-toggle-td\');
         }).on("click", function (e) {
