@@ -49,7 +49,7 @@ class ApplicationController extends SelectController
             $query->select('device_id', 'hostname', 'sysName', 'display');
         }]);
 
-        if ($type = $request->get('type')) {
+        if ($type = $request->input('type')) {
             $query->where('app_type', $type);
         }
 

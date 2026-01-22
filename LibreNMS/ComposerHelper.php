@@ -134,8 +134,6 @@ class ComposerHelper
         ];
 
         if (file_exists('config.php')) {
-            /** @phpstan-ignore ignore.unmatched */
-            /** @phpstan-ignore include.fileNotFound */
             @include 'config.php';
         }
 
