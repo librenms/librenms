@@ -18,7 +18,7 @@ COMMON-TC-4RF DEFINITIONS ::= BEGIN
 IMPORTS
 
     -- Standard imports
-    MODULE-IDENTITY, OBJECT-IDENTITY
+    MODULE-IDENTITY, OBJECT-IDENTITY,
     Integer32, Unsigned32, Counter32
         FROM SNMPv2-SMI
     TEXTUAL-CONVENTION, DisplayString, DateAndTime

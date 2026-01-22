@@ -44,21 +44,21 @@ class NetCommand extends Controller
 
         ini_set('allow_url_fopen', '0');
 
-        switch ($request->get('cmd')) {
+        switch ($request->input('cmd')) {
             case 'whois':
-                $cmd = [LibrenmsConfig::get('whois', 'whois'), $request->get('query')];
+                $cmd = [LibrenmsConfig::get('whois', 'whois'), $request->input('query')];
                 break;
             case 'ping':
-                $cmd = [LibrenmsConfig::get('ping', 'ping'), '-c', '5', $request->get('query')];
+                $cmd = [LibrenmsConfig::get('ping', 'ping'), '-c', '5', $request->input('query')];
                 break;
             case 'tracert':
-                $cmd = [LibrenmsConfig::get('mtr', 'mtr'), '-r', '-c', '5', $request->get('query')];
+                $cmd = [LibrenmsConfig::get('mtr', 'mtr'), '-r', '-c', '5', $request->input('query')];
                 break;
             case 'nmap':
                 if (! $request->user()->isAdmin()) {
                     return response('Insufficient privileges');
                 } else {
-                    $cmd = [LibrenmsConfig::get('nmap', 'nmap'), $request->get('query')];
+                    $cmd = [LibrenmsConfig::get('nmap', 'nmap'), $request->input('query')];
                 }
                 break;
             default:

@@ -17,33 +17,27 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
 
 
     alcatelIND1OSPFMIB MODULE-IDENTITY
-        LAST-UPDATED  "200704030000Z"
-        ORGANIZATION  "Alcatel-Lucent"
+        LAST-UPDATED  "201910070000Z"
+        ORGANIZATION  "ALE USA Inc"
         CONTACT-INFO
             "Please consult with Customer Service to ensure the most appropriate
              version of this document is used with the products in question:
 
-                        Alcatel-Lucent, Enterprise Solutions Division
-                       (Formerly Alcatel Internetworking, Incorporated)
+                            Alcatel-Lucent Enterprise,
                                26801 West Agoura Road
                             Agoura Hills, CA  91301-5122
                               United States Of America
 
-            Telephone:               North America  +1 800 995 2696
-                                     Latin America  +1 877 919 9526
-                                     Europe         +31 23 556 0100
-                                     Asia           +65 394 7933
-                                     All Other      +1 818 878 4507
-
-            Electronic Mail:         support@ind.alcatel.com
-            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+            Telephone:               +1 800 995 2696 
+ 				                 
+            Electronic Mail:         ebg_global_supportcenter@al-enterprise.com
+            World Wide Web:          https://www.al-enterprise.com" 
 
         DESCRIPTION
             "This module describes an authoritative enterprise-specific Simple
              Network Management Protocol (SNMP) Management Information Base (MIB):
 
-                 For the Birds Of Prey Product Line
+                 For the OmniSwitch Product Line
                  Configuration Of Global OSPF Configuration Parameters.
 
              The right to make changes in specification and other information
@@ -57,12 +51,13 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
 
-                         Copyright (C) 1995-2007 Alcatel-Lucent
-                             ALL RIGHTS RESERVED WORLDWIDE"
+                         Copyright (C) ALE USA Inc. 2014-2019
+			 Copyright (C) 1995-2013 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
 
-        REVISION      "200704030000Z"
+        REVISION      "201910070000Z"
         DESCRIPTION
-            "The latest version of this MIB Module."
+            "Updated the latest contact and Copyright information for ALE USA Inc."
 
         ::= { routingIND1Ospf 1 }
 
@@ -275,7 +270,7 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
                          enable(1),  -- redistribute subnets
                         disable(2)   -- redistribute only network
                     }
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS      deprecated
         DESCRIPTION
             "Enable/disable the reditribution of subnet routes.
@@ -291,7 +286,7 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
                         type1(1),  -- comparable cost
                         type2(2)   -- non-comparable cost
                     }
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS      deprecated
         DESCRIPTION
             "Type of metric to be used for redistribution. This object has been deprecated. 
@@ -302,7 +297,7 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
 
     alaOspfRedistProtoMetric OBJECT-TYPE
         SYNTAX      INTEGER ( 0 .. 65535 )
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS      deprecated
         DESCRIPTION
             "Default metric to be used for redistributing routes
@@ -314,7 +309,7 @@ ALCATEL-IND1-OSPF-MIB DEFINITIONS ::= BEGIN
 
     alaOspfRedistProtoStatus OBJECT-TYPE
         SYNTAX      RowStatus
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS      deprecated
         DESCRIPTION
             "Row status of this entry. This object has been deprecated. Use the 
@@ -1138,7 +1133,7 @@ alaOspfDebugHelper OBJECT-TYPE
 
     alaOspfRedistRouteMetric OBJECT-TYPE
         SYNTAX      INTEGER ( 0 .. 65535 )
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS      deprecated
         DESCRIPTION
            "The metric to be used for the redistributed route. This object has been deprecated. 
@@ -1154,7 +1149,7 @@ alaOspfDebugHelper OBJECT-TYPE
                          redistributeAsAggregate(2),
                          redistributeExactMatch(3)
                     }
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS      deprecated
         DESCRIPTION
            "Specifies how routes matching this entry are to be redistributed
@@ -1169,7 +1164,7 @@ alaOspfDebugHelper OBJECT-TYPE
 
     alaOspfRedistRouteTagMatch OBJECT-TYPE
         SYNTAX      INTEGER ( 0 .. 2147483647 )
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS      deprecated
         DESCRIPTION
            "Redistribute the route only when the route tag matches with this
@@ -1185,7 +1180,7 @@ alaOspfDebugHelper OBJECT-TYPE
                              redistribute(1),
                         doNotRedistribute(2)
                     }
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS      deprecated
         DESCRIPTION
             "Specifies whether the redistribution of routes in this range
@@ -1197,7 +1192,7 @@ alaOspfDebugHelper OBJECT-TYPE
 
     alaOspfRedistRouteStatus OBJECT-TYPE
         SYNTAX      RowStatus
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS      deprecated
         DESCRIPTION
             "The row status variable, used according to
@@ -1277,7 +1272,7 @@ alaOspfDebugHelper OBJECT-TYPE
 
     alaOspfIfMd5Key OBJECT-TYPE
         SYNTAX      OCTET STRING ( SIZE( 0 .. 16 ) )
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION
            "The MD5 message digest key."
@@ -1287,7 +1282,7 @@ alaOspfDebugHelper OBJECT-TYPE
 
     alaOspfIfMd5KeyStartAccept OBJECT-TYPE
         SYNTAX      TimeTicks
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION
            "The time that OSPF router will start accepting packets
@@ -1298,7 +1293,7 @@ alaOspfDebugHelper OBJECT-TYPE
 
     alaOspfIfMd5KeyStopAccept OBJECT-TYPE
         SYNTAX      TimeTicks
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION
            "The time that OSPF router will stop accepting packets
@@ -1309,7 +1304,7 @@ alaOspfDebugHelper OBJECT-TYPE
 
     alaOspfIfMd5KeyStartGenerate OBJECT-TYPE
         SYNTAX      TimeTicks
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION
            "The time that OSPF router will start using this key for
@@ -1320,7 +1315,7 @@ alaOspfDebugHelper OBJECT-TYPE
 
     alaOspfIfMd5KeyStopGenerate OBJECT-TYPE
         SYNTAX      TimeTicks
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION
            "The time that OSPF router will stop using this key for
@@ -1331,7 +1326,7 @@ alaOspfDebugHelper OBJECT-TYPE
 
     alaOspfIfMd5RowStatus  OBJECT-TYPE
         SYNTAX      RowStatus
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION
             "Row status of this entry."
@@ -1341,7 +1336,7 @@ alaOspfDebugHelper OBJECT-TYPE
 
     alaOspfIfMd5EncryptKey OBJECT-TYPE
         SYNTAX		AlaAuthenticationEncryptKey
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION
            "The MD5 message digest Encrypted key."
@@ -1384,8 +1379,8 @@ alaOspfDebugHelper OBJECT-TYPE
 			alaOspfIfOperStatus     INTEGER,
 			alaOspfIfIntfName       DisplayString,
     		alaOspfIf2WayNbrs 		Counter32,
-			alaOspfIfBfdStatus 		INTEGER,
-			alaOspfIfBfdDrsOnly		INTEGER	
+		alaOspfIfBfdStatus 		INTEGER,
+		alaOspfIfBfdDrsOnly		INTEGER
 		}
 
 	alaOspfIfEncryptKey OBJECT-TYPE
@@ -1509,7 +1504,6 @@ alaOspfDebugHelper OBJECT-TYPE
 		DESCRIPTION
 			"Enables/Disables OSPF for a BFD interface"
 		::= { alaOspfIfAugEntry 14}
-
 	alaOspfIfBfdDrsOnly OBJECT-TYPE
 		SYNTAX		INTEGER
 		{
@@ -2471,7 +2465,7 @@ alaOspfDebugHelper OBJECT-TYPE
        ::= { alaOspfAreaInterfaceEntry 1 }
 
     alaOspfAddressLessIf OBJECT-TYPE
-        SYNTAX   Integer32
+        SYNTAX   Integer32(0..2147483647)
         MAX-ACCESS   read-only
         STATUS   obsolete
         DESCRIPTION
@@ -2558,7 +2552,7 @@ alaOspfDebugHelper OBJECT-TYPE
         DEFVAL  { 1 }
        ::= { alaProtocolOspf 41 }
 
-	 alaOspfBfdStatus      OBJECT-TYPE
+    alaOspfBfdStatus      OBJECT-TYPE
 		SYNTAX      INTEGER
     	{
                  enable(1),
@@ -2570,7 +2564,6 @@ alaOspfDebugHelper OBJECT-TYPE
 		"Enables or disables bfd  for OSPF protocol"
 		DEFVAL      { disable }
 		::= { alaProtocolOspf 42}
-
     alaOspfBfdAllInterfaceStatus  OBJECT-TYPE
 		SYNTAX      INTEGER
         {
@@ -2583,10 +2576,18 @@ alaOspfDebugHelper OBJECT-TYPE
 	    "Enables or disables bfd for all OSPF interfaces"
 		DEFVAL      { disable }
 		::= { alaProtocolOspf 43}
-
-
-
-
+    alaOspfOpaqueTransitCapability  OBJECT-TYPE
+		SYNTAX      INTEGER
+		{
+			 enable(1),
+			 disable(2)
+		}
+		MAX-ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+		"Enables or disables opaque LSA accept and retransmit capability for OSPF"
+		DEFVAL      { enable }
+		::= { alaProtocolOspf 44}
 
 --
 -- Compliance Statements
@@ -2608,7 +2609,13 @@ alaOspfDebugHelper OBJECT-TYPE
                 alaOspfBdrRouterGroup,
                 alaOspfRedistRouteGroup,
                 alaOspfIfMd5Group,
-				alaOspfGeneralGroup
+		alaOspfGeneralGroup,
+		alaOspfAreaInterfaceGroup,
+		alaOspfAreaAggregateAugGroup,
+		alaOspfAreaAugGroup,
+		alaOspfExtLsdbAugGroup,
+		alaOspfIfAugGroup,
+		alaOspfNbrAugEntryGroup
             }
 
         ::= { alcatelIND1OSPFMIBCompliances 1 }
@@ -2627,9 +2634,13 @@ alaOspfDebugHelper OBJECT-TYPE
             alaOspfTimerSpfHold,
             alaOspfRouteNumber,
             alaOspfMTUCheck,
-	    alaOspfBfdStatus,
-	    alaOspfBfdAllInterfaceStatus
-	     
+            alaOspfBfdStatus,
+            alaOspfBfdAllInterfaceStatus,
+            alaOspfAsBdrRtr,
+            alaOspfDefaultOriginate,
+            alaOspfDefaultOriginateMetric,
+            alaOspfDefaultOriginateMetricType,
+            alaOspfOpaqueTransitCapability
         }
         STATUS  current
         DESCRIPTION
@@ -2680,7 +2691,9 @@ alaOspfDebugHelper OBJECT-TYPE
             alaOspfDebugSetup,
             alaOspfDebugTime,
             alaOspfDebugTm,
-            alaOspfDebugAll
+            alaOspfDebugAll,
+            alaOspfDebugHelper,
+            alaOspfDebugRestart
         }
         STATUS  current
         DESCRIPTION
@@ -2758,7 +2771,8 @@ alaOspfDebugHelper OBJECT-TYPE
             alaOspfIfMd5KeyStopAccept,
             alaOspfIfMd5KeyStartGenerate,
             alaOspfIfMd5KeyStopGenerate,
-            alaOspfIfMd5RowStatus
+            alaOspfIfMd5RowStatus,
+            alaOspfIfMd5EncryptKey
         }
         STATUS  current
         DESCRIPTION
@@ -2783,5 +2797,153 @@ alaOspfDebugHelper OBJECT-TYPE
         DESCRIPTION
             "Collection of objects for management of Interface MD5 configuration."
         ::= { alcatelIND1OSPFMIBGroups 9 }
+ 
+         alaOspfAreaInterfaceGroup  OBJECT-GROUP
+        OBJECTS
+        {
+    		alaOspfAddressLessIf,
+    		alaOspfIfIpAddress,
+    		alaOspfArea2WayNbrs,
+    		alaOspfAreaActiveVlinks ,
+    		alaOspfAreaAttachedIntfs	
+		}
+        STATUS  current
+        DESCRIPTION
+            "all interfaces attached to a specific area."
+        ::= { alcatelIND1OSPFMIBGroups 7 }
+        alaOspfAreaAggregateAugGroup  OBJECT-GROUP
+        OBJECTS
+        {
+    		alaOspfAreaAggregateMetric   		 	
+		}
+        STATUS  current
+        DESCRIPTION
+            "Additions to the area aggregate table."
+        ::= { alcatelIND1OSPFMIBGroups 10 }
+        alaOspfAreaAugGroup  OBJECT-GROUP
+        OBJECTS
+        {
+    		alaOspfAreaExchNbrs,
+    		alaOspfAreaFullNbrs,
+    		alaOspfAreaIncrSpfRuns,
+    		alaOspfAreaInitNbrs ,
+    		alaOspfAreaLastSpfRun,
+    		alaOspfAreaNssaElectedTranslatorRouterId,
+    		alaOspfAreaNssaImportSetPbit,
+    		alaOspfAreaNssaTranslatorRole ,
+    		alaOspfAreaNssaTranslatorStabilityInterval,
+    		alaOspfAreaNssaTranslatorState,
+    		alaOspfAreaNumIntfs,
+    		alaOspfAreaOperStatus
+    		   	
+		}
+        STATUS  current
+        DESCRIPTION
+            "Area table additions."
+        ::= { alcatelIND1OSPFMIBGroups 11 }
+        alaOspfExtLsdbAugGroup  OBJECT-GROUP
+        OBJECTS
+        {
+    		alaOspfExtLsdbFwdAddr,	
+    		alaOspfExtLsdbLength,
+    		alaOspfExtLsdbMask ,
+    		alaOspfExtLsdbMetric,
+    		alaOspfExtLsdbMetricType,
+    		alaOspfExtLsdbProto,
+    		alaOspfExtLsdbRouteTag
+		}
+        STATUS  current
+        DESCRIPTION
+            "External Link state database additions."
+        ::= { alcatelIND1OSPFMIBGroups 12 }
+        alaOspfIfAugGroup  OBJECT-GROUP
+        OBJECTS
+        {
+    		alaOspfIf2WayNbrs,
+    		alaOspfIfBdrRouterid,
+    		alaOspfIfFullNbrs,
+    		alaOspfIfBfdDrsOnly,
+    		alaOspfIfBfdStatus,
+    		alaOspfIfDrRouterid,
+    		alaOspfIfEncryptKey,
+    		alaOspfIfExchNbrs,
+    		alaOspfIfInitNbrs,
+    		alaOspfIfIntfName ,
+    		alaOspfIfIpMask ,
+    		alaOspfIfLinkType ,
+			alaOspfIfMTU,
+			alaOspfIfOperStatus ,
+			alaOspfIfVlanId     		
+		}
+        STATUS  current
+        DESCRIPTION
+            ""
+        ::= { alcatelIND1OSPFMIBGroups 13 }
+        alaOspfNbrAugEntryGroup  OBJECT-GROUP
+        OBJECTS
+        {
+    		alaOspfNbrAreaId,
+    		alaOspfNbrBdrAddress,
+    		alaOspfNbrDrAddress ,
+    		alaOspfNbrLastHello,
+    		alaOspfNbrMd5SeqNo,
+    		alaOspfNbrMode ,
+    		alaOspfNbrPendingLSack,
+    		alaOspfNbrPendingLSreq ,
+    		alaOspfNbrPendingLSupd ,
+    		alaOspfNbrRestartHelperAge ,
+    		alaOspfNbrRestartHelperExitReason ,
+    		alaOspfNbrRestartHelperStatus,
+    		alaOspfNbrType
+    		
+		}
+        STATUS  current
+        DESCRIPTION
+            ""
+        ::= { alcatelIND1OSPFMIBGroups 14 }
+        alaProtocolOspfGroup OBJECT-GROUP
+        OBJECTS
+        {
+        	alaOspfOpaqueLsaSupport,
+    		alaOspfRFC1583Compatibility,
+    		alaOspfRedistProtoRouteTag,
+    		alaOspfReferenceBandwidth,
+    		alaOspfRestartAge,
+    		alaOspfRestartExitReason,
+    		alaOspfRestartHelperStatus,
+    		alaOspfRestartHelperStrictLSAChecking,
+    		alaOspfRestartHelperSupport,
+    		alaOspfRestartInitiate,
+    		alaOspfRestartInterval,
+    		alaOspfRestartStatus,
+    		alaOspfRestartSupport,
+    		alaOspfTrafficEngineeringSupport,
+    		alaOspfVirtIfEncryptKey ,
+    		alaOspfVirtIfOperStatus,
+    		alaOspfVirtNbrBdrAddr
+        }
+        STATUS  current
+        DESCRIPTION
+            ""
+        ::= { alcatelIND1OSPFMIBGroups 15 }
+        alaOspfVirtNbrAugGroup  OBJECT-GROUP
+        OBJECTS
+        {
+        	alaOspfVirtNbrDrAddr,
+        	alaOspfVirtNbrLastHello,
+        	alaOspfVirtNbrMd5SeqNo,
+        	alaOspfVirtNbrMode,
+        	alaOspfVirtNbrPendingLSack,
+        	alaOspfVirtNbrPendingLSreq,
+        	alaOspfVirtNbrPendingLSupd,
+        	alaOspfVirtNbrRestartHelperAge,
+        	alaOspfVirtNbrRestartHelperExitReason,
+        	alaOspfVirtNbrRestartHelperStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            ""
+        ::= { alcatelIND1OSPFMIBGroups 16 }
+
 END
 

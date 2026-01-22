@@ -1,42 +1,39 @@
 ALCATEL-IND1-IPV6-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-	MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Unsigned32, Counter32
+	MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Unsigned32, Counter32, NOTIFICATION-TYPE
 		FROM SNMPv2-SMI
 	TEXTUAL-CONVENTION, PhysAddress, RowStatus, DisplayString, TimeStamp, TruthValue, DateAndTime
 		FROM SNMPv2-TC
-        MODULE-COMPLIANCE, OBJECT-GROUP
+        MODULE-COMPLIANCE, OBJECT-GROUP,NOTIFICATION-GROUP
 		FROM SNMPv2-CONF
         Ipv6Address, Ipv6IfIndexOrZero
 	        FROM IPV6-TC
 	softentIND1Ipv6
 		FROM ALCATEL-IND1-BASE
+    InterfaceIndex
+        FROM IF-MIB
 	ipv6IfIndex, ipv6RouteEntry
 	        FROM IPV6-MIB;
 
 
 alcatelIND1IPv6MIB MODULE-IDENTITY
-    LAST-UPDATED "200807240000Z" 
-    ORGANIZATION "Alcatel-Lucent"
+    LAST-UPDATED "201910070000Z" 
+    ORGANIZATION "ALE USA Inc"
     CONTACT-INFO
         "Please consult with Customer Service to ensure the most appropriate
          version of this document is used with the products in question:
          
-                    Alcatel-Lucent, Enterprise Solutions Division
-                   (Formerly Alcatel Internetworking, Incorporated)
+                    	Alcatel-Lucent Enterprise,           
                            26801 West Agoura Road
                         Agoura Hills, CA  91301-5122
                           United States Of America
         
-        Telephone:               North America  +1 800 995 2696
-                                 Latin America  +1 877 919 9526
-                                 Europe         +31 23 556 0100
-                                 Asia           +65 394 7933
-                                 All Other      +1 818 878 4507
+        Telephone:              +1 800 995 2696 
+				  
+        Electronic Mail:        ebg_global_supportcenter@al-enterprise.com 
+        World Wide Web:         https://www.al-enterprise.com"
         
-        Electronic Mail:         support@ind.alcatel.com
-        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
 
     DESCRIPTION
         "This module describes an authoritative enterprise-specific Simple
@@ -55,12 +52,13 @@ alcatelIND1IPv6MIB MODULE-IDENTITY
          non-exclusive license to use this specification in connection with
          management of the products for which it is intended to be used.
          
-                     Copyright (C) 1995-2008 Alcatel-Lucent
-                         ALL RIGHTS RESERVED WORLDWIDE"
+                 
+			Copyright (C) ALE USA Inc. 2014-2019
+  			ALL RIGHTS RESERVED WORLDWIDE"
 
-    REVISION      "200807240000Z"
+    REVISION       "201910070000Z"
     DESCRIPTION
-        "The latest version of this MIB Module."
+        "Updated the latest contact and Copyright information for ALE USA Inc."
 
     ::= { softentIND1Ipv6 1 }
 
@@ -139,6 +137,14 @@ alaIPv6GlobalID  OBJECT-TYPE
       global ID be created based on the algorithm from the RFC."
     ::= { alaIPv6Config 6 }
 
+alaIPv6ClearRafCounters OBJECT-TYPE
+    SYNTAX	INTEGER { clear(1) }
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Reset all IPv6 Raf counters."
+    ::= { alaIPv6Config 7 }
+
 --
 -- Alcatel IPv6 Interface Table
 --
@@ -193,7 +199,8 @@ AlaIPv6InterfaceEntry ::= SEQUENCE {
     alaIPv6InterfaceClockSkew	                Unsigned32,
     alaIPv6InterfaceRetransTimer                Unsigned32,
     alaIPv6InterfaceDADTransmits                Unsigned32,
-    alaIPv6InterfaceAdvHopLimit                 Unsigned32
+    alaIPv6InterfaceAdvHopLimit                 Unsigned32,
+    alaIPv6InterfaceDADEnable			TruthValue
 }
 
 alaIPv6InterfaceRowStatus OBJECT-TYPE
@@ -448,6 +455,15 @@ alaIPv6InterfaceAdvHopLimit OBJECT-TYPE
     DEFVAL { 64 }
     ::= { alaIPv6InterfaceEntry 21 }
 
+alaIPv6InterfaceDADEnable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+    "The TRUE/FALSE value determines whether DAD
+    has to be performed or not."
+    DEFVAL  { true }
+    ::= { alaIPv6InterfaceEntry 22 }
 
 --
 -- Alcatel IPv6 Tunnel Configuration
@@ -1328,11 +1344,8 @@ alaIPv6RouteFlagsECMP OBJECT-TYPE
 	"True if the ECMP (E) flag is set on the route."
     ::= { alaIPv6RouteFlagsEntry 7 }
 
-
---
 -- Alcatel IPv6 Local Unicast Address Table
 --
-
 alaIPv6LocalUnicastTable OBJECT-TYPE
     SYNTAX    	SEQUENCE OF AlaIPv6LocalUnicastEntry
     MAX-ACCESS 	not-accessible
@@ -1341,19 +1354,17 @@ alaIPv6LocalUnicastTable OBJECT-TYPE
       "Table allowing the creation and removal of local IPv6
       unicast addresses (RFC 4193) on an interface."
     ::= { alcatelIND1IPv6MIBObjects 13 }
-
 alaIPv6LocalUnicastEntry OBJECT-TYPE
     SYNTAX     	AlaIPv6LocalUnicastEntry
     MAX-ACCESS 	not-accessible
     STATUS     	current
     DESCRIPTION
       "An local unicast IPv6 address entry."
-    INDEX   	{ ipv6IfIndex, 
+    INDEX   	{ ipv6IfIndex,
 		  alaIPv6LocalUnicastGlobalID,
-                  alaIPv6LocalUnicastSubnetID, 
+                  alaIPv6LocalUnicastSubnetID,
                   alaIPv6LocalUnicastInterfaceID }
     ::= { alaIPv6LocalUnicastTable 1 }
-
 AlaIPv6LocalUnicastEntry ::= SEQUENCE {
     alaIPv6LocalUnicastGlobalID     OCTET STRING,
     alaIPv6LocalUnicastSubnetID     OCTET STRING,
@@ -1362,7 +1373,6 @@ AlaIPv6LocalUnicastEntry ::= SEQUENCE {
     alaIPv6LocalUnicastEUI64        TruthValue,
     alaIPv6LocalUnicastRowStatus    RowStatus
 }
-
 alaIPv6LocalUnicastGlobalID OBJECT-TYPE
     SYNTAX	OCTET STRING (SIZE(5))
     MAX-ACCESS	not-accessible
@@ -1372,7 +1382,6 @@ alaIPv6LocalUnicastGlobalID OBJECT-TYPE
       the value as all zero when adding a new addres to use the
       alaIPv6GlobalID value."
     ::= { alaIPv6LocalUnicastEntry 1 }
-
 alaIPv6LocalUnicastSubnetID OBJECT-TYPE
     SYNTAX	OCTET STRING (SIZE(2))
     MAX-ACCESS	not-accessible
@@ -1380,27 +1389,24 @@ alaIPv6LocalUnicastSubnetID OBJECT-TYPE
     DESCRIPTION
       "The subnet ID portion of the local IPv6 unicast address."
     ::= { alaIPv6LocalUnicastEntry 2 }
-
 alaIPv6LocalUnicastInterfaceID OBJECT-TYPE
     SYNTAX	OCTET STRING (SIZE(8))
     MAX-ACCESS	not-accessible
     STATUS	current
     DESCRIPTION
-      "The interface identifier portion of the local IPv6 unicast 
+      "The interface identifier portion of the local IPv6 unicast
       address.  When alaIPv6LocalUnicastEUI64 is true(1) the value
       of this object should be all zero."
     ::= { alaIPv6LocalUnicastEntry 3 }
-
 alaIPv6LocalUnicastPrefixLength OBJECT-TYPE
     SYNTAX	Unsigned32 (64..128)
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION
-      "The number of bits that are significant in the IPv6 
+      "The number of bits that are significant in the IPv6
       address prefix."
     DEFVAL { 64 }
     ::= { alaIPv6LocalUnicastEntry 4 }
-
 alaIPv6LocalUnicastEUI64 OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-create
@@ -1410,17 +1416,177 @@ alaIPv6LocalUnicastEUI64 OBJECT-TYPE
       automatically generated EUI-64 value."
     DEFVAL { false }
     ::= { alaIPv6LocalUnicastEntry 5 }
-
 alaIPv6LocalUnicastRowStatus OBJECT-TYPE
     SYNTAX	RowStatus
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION
-      "Used to control the addition and removal of local IPv6 
+      "Used to control the addition and removal of local IPv6
       unicast addresses."
     ::= { alaIPv6LocalUnicastEntry 6 }
 
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
+--  IPV6 RAF VLAN TABLE 
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+alaIpv6RafVlanTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF  AlaIpv6RafVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A table that contains the IPV6 RAF Vlans"
+        ::= { alcatelIND1IPv6MIBObjects 14 }
+        
+alaIpv6RafVlanEntry  OBJECT-TYPE
+        SYNTAX  AlaIpv6RafVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The list of VLANs for which RAF is enabled"
+        INDEX   { alaIpv6RafVlan }
+        ::= { alaIpv6RafVlanTable 1 }
+        
+AlaIpv6RafVlanEntry ::=   SEQUENCE 
+        {
+            alaIpv6RafVlan		Unsigned32,
+            alaIpv6RafVlanRowStatus	RowStatus,
+            alaIpv6RafVlanActiveStatus TruthValue
+        }
+
+alaIpv6RafVlan  OBJECT-TYPE
+        SYNTAX Unsigned32 (1..4094)
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The VLAN ID for which RAF is enabled."
+        ::= { alaIpv6RafVlanEntry 1 }
+
+alaIpv6RafVlanRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "The status of this table entry. The supported value for set are 
+        createAndGo (4) and destroy(6), to add or remove a binding"
+        ::= { alaIpv6RafVlanEntry 2 }
+
+alaIpv6RafVlanActiveStatus OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The TRUE/FALSE value to specify the status of RA-Filter."
+    DEFVAL  { false }
+    ::= { alaIpv6RafVlanEntry 3 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--  IPV6 RAF PORT TABLE 
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+alaIpv6RafPortTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF  AlaIpv6RafPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A table that contains the IPV6 RAF ports ports for a vlan"
+        ::= { alcatelIND1IPv6MIBObjects 15 }
+        
+alaIpv6RafPortEntry  OBJECT-TYPE
+        SYNTAX  AlaIpv6RafPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The list of ports of VLAN for which RAF is enabled"
+        INDEX   { alaIpv6RafPortVlan, alaIpv6RafPortIfIndex }
+        ::= { alaIpv6RafPortTable 1 }
+        
+AlaIpv6RafPortEntry ::=   SEQUENCE 
+        {
+            alaIpv6RafPortVlan		Unsigned32,
+			alaIpv6RafPortIfIndex	InterfaceIndex,
+            alaIpv6RafPortRowStatus	RowStatus,
+            alaIpv6RafPortActiveStatus TruthValue
+        }
+
+alaIpv6RafPortVlan  OBJECT-TYPE
+        SYNTAX Unsigned32 (1..4094)
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The VLAN ID for which RAF is enabled."
+        ::= { alaIpv6RafPortEntry 1 }
+
+alaIpv6RafPortIfIndex  OBJECT-TYPE
+        SYNTAX InterfaceIndex 
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The IfIndex of this UNI Port."
+        ::= { alaIpv6RafPortEntry 2 }
+
+alaIpv6RafPortRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "The status of this table entry. The supported value for set are 
+        createAndGo (4) and destroy(6), to add or remove a trusted port from vlan"
+        ::= { alaIpv6RafPortEntry 3 }
+
+alaIpv6RafPortActiveStatus OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+    "The TRUE/FALSE value to specify the status of RA-Filter Port."
+    DEFVAL  { false }
+    ::= { alaIpv6RafPortEntry 4 }
+ -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  
+ --  IPV6 RAF COUNTER STATISTICS TABLE 
+ 
+ -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+alaIpv6RafCounterStatsTable OBJECT-TYPE
+          SYNTAX  SEQUENCE OF  AlaIpv6RafCounterStatsEntry
+          MAX-ACCESS  not-accessible
+          STATUS  current
+          DESCRIPTION
+          "A table that contains the IPV6 RAF Counter statistics"
+          ::= { alcatelIND1IPv6MIBObjects 16 }
+          
+alaIpv6RafCounterStatsEntry  OBJECT-TYPE
+         SYNTAX AlaIpv6RafCounterStatsEntry 
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The list of NI's for which RAF counter statistics is displayed"
+         INDEX   { alaIpv6RafNi }
+         ::= { alaIpv6RafCounterStatsTable 1 }
+           
+   AlaIpv6RafCounterStatsEntry ::=   SEQUENCE 
+           {
+                        alaIpv6RafNi		INTEGER,
+			   alaIpv6RafUntrustedPktCnt Unsigned32
+           }
+   
+alaIpv6RafNi  OBJECT-TYPE
+         SYNTAX INTEGER (1..8)
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The NI for which RAF is enabled and is UP."
+         ::= { alaIpv6RafCounterStatsEntry 1 }
+   
+alaIpv6RafUntrustedPktCnt  OBJECT-TYPE
+         SYNTAX Unsigned32 (0..4000000000)
+         MAX-ACCESS  read-only
+         STATUS  current
+         DESCRIPTION
+         "The Untrusted packets count for Ra-filter enabled NI's."
+         ::= { alaIpv6RafCounterStatsEntry 2 }
+   
 --
 -- conformance information
 --
@@ -1444,8 +1610,13 @@ alaIPv6Compliance MODULE-COMPLIANCE
 		       alaIPv6InterfaceEUI64AddressGroup,
 		       alaIPv6InterfacePrefixGroup,
 		       alaIPv6PMTUGroup,
-		       alaIPv6RouteFlagsGroup,
-		       alaIPv6LocalUnicastGroup
+                       alaIPv6RouteFlagsGroup,
+		       alaIPv6LocalUnicastGroup,
+		       alaIPv6HostGroup,
+			   alaIpv6RafVlanGroup,
+			   alaIpv6RafPortGroup,
+                        alaIpv6RafCounterStatsGroup,
+		       alcatelIND1IPv6TrapsGroup
 		    }
     ::= { alcatelIND1IPv6MIBCompliances 1 }
 
@@ -1472,7 +1643,8 @@ alaIPv6ConfigGroup OBJECT-GROUP
 		  alaIPv6ClearPMTUTable,
 		  alaIPv6PMTUMinLifetime,
 		  alaIPv6NeighborStaleLifetime,
-		  alaIPv6GlobalID
+                  alaIPv6GlobalID,
+                alaIPv6ClearRafCounters
 		}
     STATUS     current
     DESCRIPTION
@@ -1621,7 +1793,7 @@ alaIPv6RouteFlagsGroup OBJECT-GROUP
     ::= { alcatelIND1IPv6MIBGroups 10 }
 
 alaIPv6LocalUnicastGroup OBJECT-GROUP
-    OBJECTS  	{ 
+    OBJECTS  	{
 		  -- alaIPv6LocalUnicastGlobalID,
 		  -- alaIPv6LocalUnicastSubnetID,
     		  -- alaIPv6LocalUnicastInterfaceID,
@@ -1631,11 +1803,68 @@ alaIPv6LocalUnicastGroup OBJECT-GROUP
 		}
     STATUS     current
     DESCRIPTION
-	"A collection of objects to support management of 
+	"A collection of objects to support management of
 	local IPv6 unicast addresses (RFC 4193)."
     ::= { alcatelIND1IPv6MIBGroups 11 }
 
+alaIPv6HostGroup OBJECT-GROUP
+    OBJECTS  	
+    {
+		alaIPv6HostRowStatus	  
+	}
+    STATUS     current
+    DESCRIPTION
+	"A entry maps a host name to an IPv6 address."
+    ::= { alcatelIND1IPv6MIBGroups 12 }
+    
+        
+    alcatelIND1IPv6TrapsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS  	
+    {
+		ndpMaxLimitReached	  
+		 
+	}
+    STATUS     current
+    DESCRIPTION
+	"This notification is generated when hardware table has reached supported
+             Maximum entries."
+    ::= { alcatelIND1IPv6MIBGroups 13 }
 
+alaIpv6RafVlanGroup OBJECT-GROUP
+    OBJECTS  	{
+		  -- alaIpv6RafVlan,
+    		  alaIpv6RafVlanRowStatus,
+              alaIpv6RafVlanActiveStatus 		    
+		}
+    STATUS     current
+    DESCRIPTION
+	"A collection of objects to support management of
+	IPv6 RAF"
+    ::= { alcatelIND1IPv6MIBGroups 14 }
+
+alaIpv6RafPortGroup OBJECT-GROUP
+    OBJECTS  	{
+		  -- alaIpv6RafPortVlan,
+		  -- alaIpv6RafPortIfIndex,
+    		  alaIpv6RafPortRowStatus,
+              alaIpv6RafPortActiveStatus
+		}
+    STATUS     current
+    DESCRIPTION
+	"A collection of objects to support management of
+	local IPv6 unicast addresses (RFC 4193)."
+    ::= { alcatelIND1IPv6MIBGroups 15 }
+
+alaIpv6RafCounterStatsGroup OBJECT-GROUP
+       OBJECTS     {
+    		        -- alaIpv6RafNi,
+        		 alaIpv6RafUntrustedPktCnt    		    
+    		      }
+       STATUS     current
+       DESCRIPTION
+  	    "A collection of objects to support management of
+   	     IPv6 RAF"
+       ::= { alcatelIND1IPv6MIBGroups 16 }
 --
 -- Traps in case if Maximum hardware table entries is reached
 --

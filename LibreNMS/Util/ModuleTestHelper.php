@@ -467,7 +467,7 @@ class ModuleTestHelper
         }
 
         // put data in the proper order for snmpsim
-        uksort($results, [$this, 'compareOid']);
+        uksort($results, $this->compareOid(...));
 
         $output = implode(PHP_EOL, $results) . PHP_EOL;
 

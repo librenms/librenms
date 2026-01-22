@@ -5,7 +5,7 @@ ALCATEL-IND1-ETHERNET-OAM-MIB DEFINITIONS ::= BEGIN
 		OBJECT-IDENTITY, Integer32,
 		Unsigned32
 						FROM SNMPv2-SMI
-		MacAddress
+		MacAddress,TruthValue
 		
 						FROM SNMPv2-TC 
 		OBJECT-GROUP,MODULE-COMPLIANCE
@@ -22,34 +22,28 @@ ALCATEL-IND1-ETHERNET-OAM-MIB DEFINITIONS ::= BEGIN
 
 
 	alcatelIND1EoamMIB MODULE-IDENTITY
-		LAST-UPDATED "200909080000Z"     -- 09/08/2009 00:00GMT
-		ORGANIZATION "Alcatel - Architects Of An Internet World"
+		LAST-UPDATED "201910070000Z"     
+		ORGANIZATION "ALE USA Inc"
 		CONTACT-INFO
             "Please consult with Customer Service to insure the most appropriate
              version of this document is used with the products in question:
 
-                        Alcatel Internetworking, Incorporated
-                       (Division 1, Formerly XYLAN Corporation)
-                               26801 West Agoura Road
-                            Agoura Hills, CA  91301-5122
-                              United States Of America
+                         	Alcatel-Lucent Enterprise,                    
+                                 26801 West Agoura Road
+                               Agoura Hills, CA  91301-5122
+                                United States Of America
 
-            Telephone:               North America  +1 800 995 2696
-                                     Latin America  +1 877 919 9526
-                                     Europe         +31 23 556 0100
-                                     Asia           +65 394 7933
-                                     All Other      +1 818 878 4507
+            Telephone:               +1 800 995 2696 				    
 
-            Electronic Mail:         support@ind.alcatel.com
-            World Wide Web:          http://www.ind.alcatel.com
-            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
-
+            Electronic Mail:         ebg_global_supportcenter@al-enterprise.com
+            World Wide Web:          https://www.al-enterprise.com"
+          
 		DESCRIPTION
 			"This module describes an authoritative enterprise-
 		specific Simple Network Management Protocol (SNMP) Management 
 		Information Base (MIB):
 
-                 For the Birds Of Prey Product Line
+                 For the OmniSwitch Product Line
                  Ethernet OAM for the Connectivity Fault Management.
 				 
 
@@ -64,18 +58,14 @@ ALCATEL-IND1-ETHERNET-OAM-MIB DEFINITIONS ::= BEGIN
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
 
-               Copyright (C) 1995-2002 Alcatel Internetworking, Incorporated
-                             ALL RIGHTS RESERVED WORLDWIDE"
+               
+		Copyright (C) ALE USA Inc. 2014-2019
+ 		Copyright (C) 1995-2013 Alcatel-Lucent
+                ALL RIGHTS RESERVED WORLDWIDE"
 
-		REVISION      "200909080000Z"
-        DESCRIPTION
-            	"Conectivity Fault Management module for managing IEEE 802.1ag. 
-            	This CFM MIB extends standard draft 802.1ag 8.1.
-		
-
-		The set of objects defined in this MIB, do not duplicate, 
-		nor conflict with any MIB object definitions defined in 
-		the 802.1ag 7.0 draft MIB."
+		REVISION      "201910070000Z"
+                DESCRIPTION
+            	    "Updated the latest contact and Copyright information for ALE USA Inc."
 		::= { softentIND1EthernetOam 1}
 
 -- --------------------------------------------------------------
@@ -184,7 +174,10 @@ AlaCfmMepEntry ::=
                 alaCfmMepOWDTPriority       Unsigned32,
                 alaCfmMepTWDTMacAddress     MacAddress,
                 alaCfmMepTWDTRMepIdentifier Dot1agCfmMepId,
-                alaCfmMepTWDTPriority       Unsigned32
+                alaCfmMepTWDTPriority       Unsigned32,
+                alaCfmMepRFPEnabled         TruthValue,
+                alaCfmMepPortStatusTlv      TruthValue,
+                alaCfmMepIfStatusTlv        TruthValue
      }
 
 alaCfmMepClearStats	OBJECT-TYPE
@@ -192,7 +185,7 @@ alaCfmMepClearStats	OBJECT-TYPE
 				default(0),
 				reset(1)
 	}
-	MAX-ACCESS	read-write
+	MAX-ACCESS	read-create
    STATUS      current
    DESCRIPTION
 		"Reset all statistics parameters corresponding to this MEP.
@@ -202,7 +195,7 @@ alaCfmMepClearStats	OBJECT-TYPE
 
 alaCfmMepOWDTMacAddress   OBJECT-TYPE
     SYNTAX     MacAddress
-    MAX-ACCESS read-write
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
         "Specifies the MAC address used as a target for the 
@@ -219,7 +212,7 @@ alaCfmMepOWDTMacAddress   OBJECT-TYPE
 
 alaCfmMepOWDTRMepIdentifier       OBJECT-TYPE
     SYNTAX     Dot1agCfmMepId
-    MAX-ACCESS read-write 
+    MAX-ACCESS read-create 
     STATUS     current
     DESCRIPTION
        "Specifies the Mep-Id assigned to the Remote MEP."
@@ -227,7 +220,7 @@ alaCfmMepOWDTRMepIdentifier       OBJECT-TYPE
 
 alaCfmMepOWDTPriority     OBJECT-TYPE
     SYNTAX     Unsigned32 (0..7)
-    MAX-ACCESS read-write
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
         "Specifies the priority used in the generated test frame 
@@ -237,7 +230,7 @@ alaCfmMepOWDTPriority     OBJECT-TYPE
 
 alaCfmMepTWDTMacAddress   OBJECT-TYPE
     SYNTAX     MacAddress
-    MAX-ACCESS read-write
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
         "Specifies the MAC address used as a target for the 
@@ -254,7 +247,7 @@ alaCfmMepTWDTMacAddress   OBJECT-TYPE
 
 alaCfmMepTWDTRMepIdentifier       OBJECT-TYPE
     SYNTAX     Dot1agCfmMepId
-    MAX-ACCESS read-write 
+    MAX-ACCESS read-create 
     STATUS     current
     DESCRIPTION
        "Specifies the Mep-Id assigned to the Remote MEP."
@@ -262,13 +255,39 @@ alaCfmMepTWDTRMepIdentifier       OBJECT-TYPE
 
 alaCfmMepTWDTPriority     OBJECT-TYPE
     SYNTAX     Unsigned32 (0..7)
-    MAX-ACCESS read-write
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
         "Specifies the priority used in the generated test 
              frame for the Two-Way-Delay test."
     DEFVAL { 7 }
     ::= { alaCfmMepEntry 7 }
+
+alaCfmMepRFPEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "If set to true, Remote Fault Propagation will be enabled
+        on the MEP."
+    DEFVAL { false }
+    ::= { alaCfmMepEntry 8}
+alaCfmMepPortStatusTlv OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "If set to true, Port Status Tlv will be configured in CCM."
+    DEFVAL { true }
+    ::= { alaCfmMepEntry 9}
+alaCfmMepIfStatusTlv OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "If set to true, Interface Status Tlv will be configured in CCM."
+    DEFVAL { true }
+    ::= { alaCfmMepEntry 10}
 
 --
 -- MEP Delay Result Table
@@ -359,7 +378,7 @@ alaCfmDelayResultVariation   OBJECT-TYPE
          in microseconds, from the two most recent time delay measurements"
     ::= { alaCfmDelayResultEntry 5 }
 
- 
+
 -- --------------------------------------------------------------
 -- IEEE 802.1ag MIB - Conformance Information
 -- --------------------------------------------------------------
@@ -390,7 +409,8 @@ alaCfmMepGroup OBJECT-GROUP
         alaCfmMepOWDTPriority,
         alaCfmMepTWDTMacAddress,
         alaCfmMepTWDTRMepIdentifier,
-        alaCfmMepTWDTPriority
+        alaCfmMepTWDTPriority,
+        alaCfmMepRFPEnabled
   }
    STATUS      current
    DESCRIPTION
@@ -420,7 +440,7 @@ alaCfmCompliance MODULE-COMPLIANCE
       MANDATORY-GROUPS {
          alaCfmBaseGroup,
          alaCfmMepGroup,
-	alaCfmDelayResultGroup
+	     alaCfmDelayResultGroup
       }
    ::= { alaCfmCompliances 1 }
 -- --------------------------------------------------------------
