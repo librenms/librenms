@@ -52,7 +52,7 @@ $arguments = [
 ];
 
 if (isset($options['m'])) {
-    $arguments['--modules'] = $options['m'];
+    $arguments['--modules'] = [$options['m']];
 }
 
 if (isset($options['q'])) {
