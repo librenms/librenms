@@ -13,27 +13,21 @@ IMPORTS
 
 alcatelIND1RouterDiscoveryProtocolMIB MODULE-IDENTITY
 
-    LAST-UPDATED  "200704030000Z"
-    ORGANIZATION  "Alcatel-Lucent"
+    LAST-UPDATED  "201910070000Z"
+    ORGANIZATION  "ALE USA Inc"
     CONTACT-INFO
         "Please consult with Customer Service to ensure the most appropriate
          version of this document is used with the products in question:
 
-                    Alcatel-Lucent, Enterprise Solutions Division
-                   (Formerly Alcatel Internetworking, Incorporated)
+                        Alcatel-Lucent Enterprise,
                            26801 West Agoura Road
                         Agoura Hills, CA  91301-5122
                           United States Of America
 
-        Telephone:               North America  +1 800 995 2696
-                                 Latin America  +1 877 919 9526
-                                 Europe         +31 23 556 0100
-                                 Asia           +65 394 7933
-                                 All Other      +1 818 878 4507
-
-        Electronic Mail:         support@ind.alcatel.com
-        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+        Telephone:               +1 800 995 2696 
+ 				               
+        Electronic Mail:         ebg_global_supportcenter@al-enterprise.com
+        World Wide Web:          https://www.al-enterprise.com"  
 
     DESCRIPTION
         "This module describes an authoritative enterprise-specific Simple
@@ -54,12 +48,13 @@ r
          non-exclusive license to use this specification in connection with
          management of the products for which it is intended to be used.
 
-                     Copyright (C) 1995-2003 Alcatel-Lucent
-                         ALL RIGHTS RESERVED WORLDWIDE"
+                     Copyright (C) ALE USA Inc. 2014-2019
+		     Copyright (C) 1995-2013 Alcatel-Lucent
+                     ALL RIGHTS RESERVED WORLDWIDE"
 
-    REVISION      "200704030000Z"
+    REVISION      "201910070000Z"
     DESCRIPTION
-        "The latest version of this MIB Module."
+        "Updated the latest contact and Copyright information for ALE USA Inc."
 
     ::= { routingIND1RDP 1 }
 
@@ -136,7 +131,7 @@ alaRDPIfStatus       OBJECT-TYPE
  
  alaRDPIfAdvtAddress    OBJECT-TYPE
     SYNTAX      IpAddress
-    MAX-ACCESS  read-write
+    MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
                 "Default advertisement Address is 224.0.0.1"
@@ -144,7 +139,7 @@ alaRDPIfStatus       OBJECT-TYPE
 
  alaRDPIfMaxAdvtInterval       OBJECT-TYPE
     SYNTAX     Unsigned32
-    MAX-ACCESS read-write
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
 		"Maximum advertisement interval is in seconds"
@@ -153,7 +148,7 @@ alaRDPIfStatus       OBJECT-TYPE
    
 alaRDPIfMinAdvtInterval       OBJECT-TYPE
     SYNTAX     Unsigned32
-    MAX-ACCESS read-write
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
 		"Minimum advertisement interval in seconds: 0.75 * alaRDPIfMaxAdvtInterval"
@@ -161,7 +156,7 @@ alaRDPIfMinAdvtInterval       OBJECT-TYPE
 
 alaRDPIfAdvLifeTime       OBJECT-TYPE
     SYNTAX     Unsigned32
-    MAX-ACCESS read-write
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
 		"Advertisement Lifetime in seconds: 3 * alaRDPIfMaxAdvtInterval"
@@ -169,7 +164,7 @@ alaRDPIfAdvLifeTime       OBJECT-TYPE
         
 alaRDPIfPrefLevel       OBJECT-TYPE
     SYNTAX     Integer32
-    MAX-ACCESS read-write
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
 		"Preference level for each IP address advertised on the interface: 0"
@@ -178,7 +173,7 @@ alaRDPIfPrefLevel       OBJECT-TYPE
 
 alaRDPIfRowStatus OBJECT-TYPE
     SYNTAX        RowStatus
-    MAX-ACCESS    read-write
+    MAX-ACCESS    read-create
     STATUS        current
     DESCRIPTION
           "The status of this table entry."

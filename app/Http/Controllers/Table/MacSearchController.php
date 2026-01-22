@@ -58,9 +58,9 @@ class MacSearchController extends TableController
         return Port::query()
             ->hasAccess($request->user())
             ->with('device')
-            ->when($request->get('device_id'), fn ($q, $id) => $q->where('device_id', $id))
-            ->when($request->get('interface'), fn ($q, $i) => $q->where('ifDescr', 'LIKE', $i))
-            ->when($request->get('address'), function ($q, $mac) {
+            ->when($request->input('device_id'), fn ($q, $id) => $q->where('device_id', $id))
+            ->when($request->input('interface'), fn ($q, $i) => $q->where('ifDescr', 'LIKE', $i))
+            ->when($request->input('address'), function ($q, $mac) {
                 $cleanMac = str_replace([':', ' ', '-', '.', '0x'], '', $mac);
 
                 return $q->where('ifPhysAddress', 'LIKE', "%$cleanMac%");

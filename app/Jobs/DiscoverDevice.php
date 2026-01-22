@@ -164,6 +164,6 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
 
     public function __destruct()
     {
-        $this->device->save(); // make sure device changes are saved
+        $this->device?->save(); // make sure device changes are saved
     }
 }

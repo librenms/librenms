@@ -145,7 +145,7 @@ abstract class PaginatedAjaxController extends Controller
     {
         foreach ($fields as $target => $field) {
             $callable = is_callable($field);
-            $value = $request->get($callable ? $target : $field);
+            $value = $request->input($callable ? $target : $field);
 
             // unfiltered field
             if ($value === null) {
@@ -177,7 +177,7 @@ abstract class PaginatedAjaxController extends Controller
     {
         $columns = $this->sortFields($request);
 
-        $sort = $request->get('sort', $this->default_sort);
+        $sort = $request->input('sort', $this->default_sort);
 
         foreach ($sort as $column => $direction) {
             if (isset($columns[$column]) || in_array($column, $columns)) {

@@ -70,18 +70,18 @@ class SensorController extends SelectController
             }])
             ->select(['sensors.device_id', 'sensor_id', 'sensor_class', 'sensor_descr', 'sensor_type']);
 
-        if ($request->get('term')) {
+        if ($request->input('term')) {
             // join with devices for searches
             $query->leftJoin('devices', 'devices.device_id', 'sensors.device_id');
         }
 
         // Filter by device if specified
-        if ($device_id = $request->get('device')) {
+        if ($device_id = $request->input('device')) {
             $query->where('sensors.device_id', $device_id);
         }
 
         // Filter by sensor class if specified (for intelligent filtering)
-        if ($sensor_class = $request->get('sensor_class')) {
+        if ($sensor_class = $request->input('sensor_class')) {
             $query->where('sensor_class', $sensor_class);
         }
 

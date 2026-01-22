@@ -381,12 +381,12 @@ cef_switching:
     - { Field: afi, Type: varchar(4), 'Null': false, Extra: '' }
     - { Field: cef_index, Type: int, 'Null': false, Extra: '' }
     - { Field: cef_path, Type: varchar(16), 'Null': false, Extra: '' }
-    - { Field: drop, Type: int, 'Null': false, Extra: '' }
-    - { Field: punt, Type: int, 'Null': false, Extra: '' }
-    - { Field: punt2host, Type: int, 'Null': false, Extra: '' }
-    - { Field: drop_prev, Type: int, 'Null': false, Extra: '' }
-    - { Field: punt_prev, Type: int, 'Null': false, Extra: '' }
-    - { Field: punt2host_prev, Type: int, 'Null': false, Extra: '' }
+    - { Field: drop, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: punt, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: punt2host, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: drop_prev, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: punt_prev, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: punt2host_prev, Type: bigint, 'Null': false, Extra: '' }
     - { Field: updated, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: updated_prev, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:

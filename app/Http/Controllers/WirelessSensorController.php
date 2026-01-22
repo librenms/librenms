@@ -11,7 +11,7 @@ class WirelessSensorController
     public function index(Request $request, string $metric = '', string $legacyview = ''): View
     {
         $metric = str_replace('metric=', '', $metric);
-        $view = str_replace('view=', '', $legacyview) ?: $request->get('view', 'detail');
+        $view = str_replace('view=', '', $legacyview) ?: $request->input('view', 'detail');
         $metrics = $this->getMetrics($request);
         $metric = $metric ?: array_key_first($metrics);
 
