@@ -31,14 +31,12 @@ Datastore::init();
 
 $scheduler = LibrenmsConfig::get('schedule_type.billing');
 if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
-    if (Debug::isEnabled()) {
-        echo "Billing is not enabled for cron scheduling. Add the -f command argument if you want to force this command to run.\n";
-    }
+    Log::debug("Billing is not enabled for cron scheduling. Add the -f command argument if you want to force this command to run.");
     exit(0);
 }
 
 $poller_start = microtime(true);
-echo "Starting Polling Session ... \n\n";
+Log::info("Starting Bill Polling Session ... \n");
 
 $query = \LibreNMS\DB\Eloquent::DB()->table('bills');
 
@@ -47,7 +45,7 @@ if (isset($options['b'])) {
 }
 
 foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
-    echo 'Bill : ' . $bill->bill_name . "\n";
+    Log::info('Bill : ' . $bill->bill_name);
     $bill_id = $bill->bill_id;
 
     if (LibrenmsConfig::get('distributed_poller') && LibrenmsConfig::get('distributed_billing')) {
@@ -65,7 +63,7 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
         $host = $port_data['hostname'];
         $port = $port_data['port'];
 
-        echo "  Polling {$port_data['ifName']} ({$port_data['ifDescr']}) on {$port_data['hostname']}\n";
+        Log::info("  Polling {$port_data['ifName']} ({$port_data['ifDescr']}) on {$port_data['hostname']}");
 
         $port_data['in_measurement'] = Billing::getValue($port_data['hostname'], $port_data['port'], $port_data['ifIndex'], 'In');
         $port_data['out_measurement'] = Billing::getValue($port_data['hostname'], $port_data['port'], $port_data['ifIndex'], 'Out');
@@ -99,17 +97,13 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
             $port_data['out_delta'] = '0';
         }
         //////////////////////////////////CountersValidation$DB-Update
-        echo "\nDB SNMP counters received.\n";
-        echo ' in_measurement: ',$port_data['in_measurement'],' out_measurement: ',$port_data['out_measurement'],"\n";
-        echo ' The data types are --> in_measurement:' . gettype($port_data['in_measurement']) . ' and out_measurement: ' . gettype($port_data['out_measurement']) . "\n";
         //For debugging
-        logfile("\n****$now: " . $bill->bill_name . "\nDB SNMP counters received.");
-        logfile('in_measurement: ' . $port_data['in_measurement'] . '  out_measurement: ' . $port_data['out_measurement'] . "\nThe data types are. in_measurement:" . gettype($port_data['in_measurement']) . ' and out_measurement: ' . gettype($port_data['out_measurement']));
-        logfile('IN_delta: ' . $port_data['in_delta'] . ' OUT_delta: ' . $port_data['out_delta'] . "\nLast_IN_delta: " . ($port_data['last_in_delta'] ?? '') . ' last_OUT_delta: ' . ($port_data['last_out_delta'] ?? ''));
+        Log::debug("****$now: " . $bill->bill_name . " Billing DB SNMP counters received.");
+        Log::debug('in_measurement: ' . $port_data['in_measurement'] . '  out_measurement: ' . $port_data['out_measurement'] . "\nThe data types are. in_measurement:" . gettype($port_data['in_measurement']) . ' and out_measurement: ' . gettype($port_data['out_measurement']));
+        Log::debug('IN_delta: ' . $port_data['in_delta'] . ' OUT_delta: ' . $port_data['out_delta'] . "\nLast_IN_delta: " . ($port_data['last_in_delta'] ?? '') . ' last_OUT_delta: ' . ($port_data['last_out_delta'] ?? ''));
 
         if (is_numeric($port_data['in_measurement']) && is_numeric($port_data['out_measurement'])) {
-            echo "Nice, valid counters 'in/out_measurement', lets use them\n";
-            logfile("Nice, valid counters 'in/out_measurement', lets use them");
+            Log::debug("Nice, valid counters 'in/out_measurement', lets use them");
             // NOTE: casting to string for mysqli bug (fixed by mysqlnd)
             $fields = ['timestamp' => $now, 'in_counter' => (string) set_numeric($port_data['in_measurement']), 'out_counter' => (string) set_numeric($port_data['out_measurement']), 'in_delta' => (string) set_numeric($port_data['in_delta']), 'out_delta' => (string) set_numeric($port_data['out_delta'])];
             if (dbUpdate($fields, 'bill_port_counters', "`port_id`='" . $port_id . "' AND `bill_id`='$bill_id'") == 0) {
@@ -118,8 +112,7 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
                 dbInsert($fields, 'bill_port_counters');
             }
         } else {
-            echo "WATCH out! - Wrong counters. Table 'bill_port_counters' not updated\n";
-            logfile("WATCH out! - Wrong counters. Table 'bill_port_counters' not updated");
+            Log::error("WATCH out! - Wrong counters. Table 'bill_port_counters' not updated");
         }
         ////////////////////////////////EndCountersValidation&DB-Update
         $delta = ($delta + $port_data['in_delta'] + $port_data['out_delta']);
@@ -149,7 +142,7 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
     }
 
     if (! empty($period) && $period < '0') {
-        logfile("BILLING: negative period! id:$bill_id period:$period delta:$delta in_delta:$in_delta out_delta:$out_delta");
+        Log::debug("BILLING: negative period! id:$bill_id period:$period delta:$delta in_delta:$in_delta out_delta:$out_delta");
     } else {
         // NOTE: casting to string for mysqli bug (fixed by mysqlnd)
         if (LibrenmsConfig::get('distributed_poller') && LibrenmsConfig::get('distributed_billing')) {
@@ -169,8 +162,8 @@ $poller_run = ($poller_end - $poller_start);
 $poller_time = substr($poller_run, 0, 5);
 
 if ($poller_time > 300) {
-    logfile("BILLING: polling took longer than 5 minutes ($poller_time seconds)!");
+    Log::warning("BILLING: polling took longer than 5 minutes ($poller_time seconds)!");
 }
-echo "\nCompleted in $poller_time sec\n";
+Log::info("Completed in $poller_time sec");
 
 app('Datastore')->terminate();
