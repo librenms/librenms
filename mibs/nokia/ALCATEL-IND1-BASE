@@ -2,33 +2,29 @@ ALCATEL-IND1-BASE DEFINITIONS ::= BEGIN
 
 
 IMPORTS
-	MODULE-IDENTITY, OBJECT-IDENTITY, enterprises
+        MODULE-IDENTITY, OBJECT-IDENTITY, enterprises
 FROM
-	SNMPv2-SMI;
+        SNMPv2-SMI;
 
 
 alcatelIND1BaseMIB MODULE-IDENTITY
-
-    LAST-UPDATED  "201910070000Z"
-    ORGANIZATION  "ALE USA Inc"
+    LAST-UPDATED "201911270000Z"
+    ORGANIZATION "ALE USA Inc."
     CONTACT-INFO
-        "Please consult with Customer Service to ensure the most appropriate
-         version of this document is used with the products in question:
+     "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
 
-				 Alcatel-Lucent Enterprise,
-				  26801 West Agoura Road
-				 Agoura Hills, CA  91301-5122
-				  United States Of America
-			
+                      ALE USA Inc. Enterprise
+                        26801 West Agoura Road
+                     Agoura Hills, CA  91301-5122
+                       United States Of America
 
-	Telephone:        +1 800 995 2696 
+     Telephone:          +1 800 995 2696
 
-        Electronic Mail:  ebg_global_supportcenter@al-enterprise.com 
-	World Wide Web:   https://www.al-enterprise.com"
-       
+     Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+     World Wide Web:     https://www.al-enterprise.com"
 
-    
-	DESCRIPTION
+    DESCRIPTION
         "This module describes an authoritative enterprise-specific Simple
          Network Management Protocol (SNMP) Management Information Base (MIB):
 
@@ -46,23 +42,29 @@ alcatelIND1BaseMIB MODULE-IDENTITY
          non-exclusive license to use this specification in connection with
          management of the products for which it is intended to be used.
 
-                   
-			Copyright (C) ALE USA Inc. 2014-2019 
-			Copyright (C) 1995-2013 Alcatel-Lucent
-			 ALL RIGHTS RESERVED WORLDWIDE"
+                   Copyright (C) ALE USA Inc. 2014-2019
+                   Copyright (C) 1995-2013 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
 
-    REVISION      "201910070000Z"
+    REVISION      "201911270000Z"
     DESCRIPTION
         "Updated the latest contact and Copyright information for ALE USA Inc."
 
-    ::= { alcatel 800 }
+    REVISION      "201005130000Z"
+    DESCRIPTION
+        "Fixed all MIBs to use MIB Module OID.0 as Notifications root."
+
+    REVISION      "201003010008Z"
+    DESCRIPTION
+        "The latest version of this MIB Module."
+    ::= { alcatel 801 }
 
 
 
 alcatel OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
-        "Alcatel-Lucent Corporate Private Enterprise Number."
+        "ALE USA Inc. Corporate Private Enterprise Number."
     ::= { enterprises 6486 }
 
 
@@ -70,7 +72,7 @@ alcatel OBJECT-IDENTITY
 alcatelIND1Management OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
-	    "Internetworking Division 1 Management Branch."
+            "Internetworking Division 1 Management Branch."
     ::= { alcatelIND1BaseMIB 1 }
 
 
@@ -139,159 +141,12 @@ notificationIND1Entities OBJECT-IDENTITY
 
 
 notificationIND1Traps OBJECT-IDENTITY
-    STATUS current
+    STATUS deprecated
     DESCRIPTION
-        "Branch For Notification/Trap Definitions."
+        "Branch For Notification/Trap Definitions. DO NOT CREATE any
+		child nodes. Each MIB should define Traps based on it's own OID."
     ::= { managementIND1Notifications 2 }
 
-
-aipAMAPTraps  OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-        "Branch For Alcatel-Lucent Enterprise/Xylan Mapping Adjaceny Protocol Notification/Trap Definitions."
-    ::= { notificationIND1Traps 1 }
-
-aipGMAPTraps  OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-        "Branch For Group Mobility Advertising Protocol Notification/Trap Definitions."
-    ::= { notificationIND1Traps 2 }
-
-
-policyManagerTraps OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-        "Branch For Policy Manager Notification/Trap Definitions."
-    ::= { notificationIND1Traps 3 }
-
-
-chassisTraps OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-        "Branch For Chassis Notification/Trap Definitions."
-    ::= { notificationIND1Traps 4 }
-
-
-healthMonTraps OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-        "Branch For Chassis Notification/Trap Definitions."
-    ::= { notificationIND1Traps 5 }
-
-
-cmmEsmDrvTraps OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-        "Branch For CMM Ethernet Driver Notification/Trap Definitions."
-    ::= { notificationIND1Traps 6 }
-
-spanningTreeTraps OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-        "Branch For CMM Spanning Tree Notification/Trap Definitions."
-    ::= { notificationIND1Traps 7 }
-
-portMirroringMonitoringTraps OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-	"Branch for Port mirroring and monitoring Notification/Trap Definitions."
-    ::= { notificationIND1Traps 8 }
-
-sourceLearningTraps OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-	"Branch for Source Learning Notification/Trap Definitioins."
-    ::= { notificationIND1Traps 9 }
-
-slbTraps OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-	"Branch for Server Load Balancing Notification/Trap Definitions."
-    ::= { notificationIND1Traps 10 }
-
-switchMgtTraps OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-	"Branch for Switch Management Notification/Trap Definitions."
-    ::= { notificationIND1Traps 11 }
-
-trapMgrTraps OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-	"Branch for Trap Manager Notification Definitions."
-    ::= { notificationIND1Traps 12 }
-
-groupmobilityTraps OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-        "Branch for Group Mobility Notification/Trap Definitions."
-    ::= { notificationIND1Traps 13 }
-
-lnkaggTraps OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-	"Branch for Link Aggregation  Notification/Trap Definitions."
-    ::= { notificationIND1Traps 14 }
-
-trafficEventTraps OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-	"OID branch for network traffic event Trap/Notification Definitions."
-    ::= { notificationIND1Traps 15 }
-
-atmTraps OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-        "Branch for ATM Notification/Trap Definitions."
-    ::= { notificationIND1Traps 16 }
-
-pethTraps OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-        "Branch for power over ethernet Notification/Trap Definitions."
-    ::= { notificationIND1Traps 17 }
-
-wccpTraps OBJECT-IDENTITY
-   STATUS current
-   DESCRIPTION
-		  "Branch for Web Cache Coordination Protocol Notification/Trap Definitions."
-  ::= { notificationIND1Traps 18 }
-
-alaNMSTraps OBJECT-IDENTITY
-   STATUS current
-   DESCRIPTION
-		  "Branch for Network Management Software Notification/Trap Definitions."
-  ::= { notificationIND1Traps 19 }
-
-alaNetSecTraps OBJECT-IDENTITY
-   STATUS current
-   DESCRIPTION
-		  "Branch for Network Security Notification/Trap Definitions."
-  ::= { notificationIND1Traps 20 }
-
-alaAaaTraps OBJECT-IDENTITY
-   STATUS current
-   DESCRIPTION
-		  "Branch for AAA Notification/Trap Definitions."
-  ::= { notificationIND1Traps 21 }
-
-alaLbdTraps OBJECT-IDENTITY
-   STATUS current
-   DESCRIPTION
-                  "Branch for Loop Back Detection Notification/Trap Definitions."
-  ::= { notificationIND1Traps 22 }
-
-alaDhcpClientTraps OBJECT-IDENTITY
-   STATUS current
-   DESCRIPTION
-                  "Branch for DHCP Client Notification/Trap Definitions."
-  ::= { notificationIND1Traps 23 }
-
-alaLLDPTraps OBJECT-IDENTITY
-   STATUS current 
-   DESCRIPTION
-          "Branch for ALA LLDP Notification/Trap Definitions."
-  ::= { notificationIND1Traps 24 }
 
 hardentIND1Physical OBJECT-IDENTITY
     STATUS current
@@ -441,13 +296,13 @@ softentIND1Ipms OBJECT-IDENTITY
 softentIND1PortMirroringMonitoring OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
-	" Branch for Port Mirroring and Monitoring information."
+        " Branch for Port Mirroring and Monitoring information."
     ::= { softwareIND1Entities 19 }
 
 softentIND1Slb OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
-	" Branch for Server Load Balancing information."
+        " Branch for Server Load Balancing information."
     ::= { softwareIND1Entities 20 }
 
 softentIND1Dot1Q OBJECT-IDENTITY
@@ -623,7 +478,6 @@ softentIND1Dot3Oam OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Branch for 802.3ah proprietary information."
-
     ::= { softwareIND1Entities 52 }
 
 softentIND1MplsFrr OBJECT-IDENTITY
@@ -638,23 +492,17 @@ softentIND1LicenseManager OBJECT-IDENTITY
         "Branch for License Manager proprietary information."
     ::= { softwareIND1Entities 54 }
 
+softentIND1MultiChassisManager OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for Multi-Chassis Manager proprietary information."
+    ::= { softwareIND1Entities 55 }
+
 softentIND1Saa OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
-	"Branch for Service Assurance Agent proprietary information."
-    ::= { softwareIND1Entities 55} 
-
-softentIND1Lbd OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-        "Branch for Loop Back Detection information."
+        "Branch for Service Assurance Agent proprietary information."
     ::= { softwareIND1Entities 56 }
-
-softentIND1Mvrp OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-        "Branch for MVRP information."
-    ::= { softwareIND1Entities 57 }
 
 softentIND1LldpMed OBJECT-IDENTITY
     STATUS current
@@ -663,82 +511,264 @@ softentIND1LldpMed OBJECT-IDENTITY
     ::= { softwareIND1Entities 58 }
 
 softentIND1DhcpSrv OBJECT-IDENTITY
+
     STATUS current
     DESCRIPTION
         "Branch for DHCP Server information."
     ::= { softwareIND1Entities 59 }
 
-softentIND1LLDP OBJECT-IDENTITY
+softentIND1CapMan OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
-	 "Branch for LLDP proprietary information."
+        "Branch for Capability Manager proprietary information."
     ::= { softwareIND1Entities 60 }
 
-softentIND1DHL OBJECT-IDENTITY
+softentIND1Vfc OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
-        "Branch for Dual Home Link (DHL) proprietary information."
-    ::= { softwareIND1Entities 63 }
+        "Branch for Virtual Flow Control Manager proprietary information."
+    ::= { softwareIND1Entities 61 }
 
-softentIND1PPPoEIA OBJECT-IDENTITY
+softentIND1Mvrp OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
-	 "Branch for PPPoE Intermediate Agent proprietary information."
-   ::= { softwareIND1Entities 64 }
-
-softentIND1TestOam OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-        "Branch for Test-oam proprietary information."
-    ::= { softwareIND1Entities 65 }
-
-softentIND1Kerberos OBJECT-IDENTITY
-     STATUS current
-     DESCRIPTION
-        "Branch for Kerberos proprietary information."
-     ::= { softwareIND1Entities 66 }
-
-softentIND1SIPSnooping	OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-        "Branch for SIP Snooping proprietary information."
-    ::= { softwareIND1Entities 67 }
+        "Branch for MVRP proprietary information."
+    ::= { softwareIND1Entities 62 }
 
 softentIND1Da OBJECT-IDENTITY
-     STATUS current
-     DESCRIPTION
-        "Branch for vNP proprietary information."
-     ::= { softwareIND1Entities 68 }
-
-softentIND1MultiChassisManager OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
-        "Branch for Multi-Chassis Manager proprietary information."
+        "Branch for DA (Device Authentication) proprietary information."
+    ::= { softwareIND1Entities 63 }
+
+softentIND1HAVlan OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for HA Vlan  proprietary information."
+    ::= { softwareIND1Entities 64 }
+
+ softentIND1DHL OBJECT-IDENTITY
+     STATUS current
+     DESCRIPTION
+         "Branch for Dual Home Link (DHL) proprietary information."
+     ::= { softwareIND1Entities 65 }
+
+softentIND1PwrMon OBJECT-IDENTITY
+    STATUS current
+     DESCRIPTION
+        "Branch for Power Monitoring and Management proprietary information."
+     ::= { softwareIND1Entities 66 }
+
+softentIND1EnergyAware OBJECT-IDENTITY
+     STATUS current
+     DESCRIPTION
+         "Branch for Power Monitoring and Management proprietary information."
+     ::= { softwareIND1Entities 67 }
+
+softentIND1PowerQuality OBJECT-IDENTITY
+     STATUS current
+     DESCRIPTION
+         "Branch for Power Monitoring and Management proprietary information."
+     ::= { softwareIND1Entities 68 }
+
+softentIND1VirtualChassisManager OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for Virtual-Chassis Manager proprietary information."
     ::= { softwareIND1Entities 69 }
+
+softentIND1EvbMib OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for Edge Virtual Bridging."
+    ::= { softwareIND1Entities 70 }
+
+softentIND1QcnMib OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for Qcn."
+    ::= { softwareIND1Entities 71 }
+
+softentIND1Dcbx OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for DCBX proprietary information."
+    ::= { softwareIND1Entities 72 }
+
+softentIND1AppFingerPrintMIB OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for Application Finger Print proprietary information."
+    ::= { softwareIND1Entities 73 }
+
+softentIND1Fips OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for FIP Snooping information."
+    ::= { softwareIND1Entities 74 }
+
+softentIND1AutoFabric OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for Dynamic Autofabric."
+    ::= { softwareIND1Entities 75 }
+
+softentIND1SIPSnooping OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for SIP SNOOPING."
+    ::= { softwareIND1Entities 76 }
 
 softentIND1OpenflowMIB OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
-        "Branch for OPENFLOW proprietary information."
-    ::= { softwareIND1Entities 70 }
+        "Branch for Openflow information."
+    ::= { softwareIND1Entities 77 }
 
-softentIND1TWAMP OBJECT-IDENTITY
+softentIND1DPI OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+         "Branch for DPI."
+   ::= { softwareIND1Entities 78 }
+
+
+softentIND1MsgSrvMIB OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
-        "Branch for Two Way Active Measurement Protocol proprietary information."
-    ::= { softwareIND1Entities 71 } 
+        "Branch for Message Service information."
+    ::= { softwareIND1Entities 79 }
 
-softentIND1CldAgnt OBJECT-IDENTITY
+softentIND1ActiveLeaseSrvMIB OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
-        "Branch for Cloud Agent."
-    ::= { softwareIND1Entities 72 }
+        "Branch for Message Service information."
+    ::= { softwareIND1Entities 80 }
 
-softentIND1RAD OBJECT-IDENTITY
+softentIND1AppMon OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
-	"Branch for RADIUS information."
-    ::= { softwareIND1Entities 73 }
+        "Branch for App Monitoring information."
+    ::= { softwareIND1Entities 81 }
+
+softentIND1Lbd OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for Loop Back Detection information."
+    ::= { softwareIND1Entities 82 }
+
+softentIND1AutoConfig OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch for Auto Config information."
+    ::= { softwareIND1Entities 83 }
+
+softentIND1VMSnooping OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+         "Branch for VM Snooping."
+   ::= { softwareIND1Entities 84 }
+
+softentIND1PPPoEIA OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+         "Branch for VM Snooping."
+   ::= { softwareIND1Entities 85 }
+
+softentIND1EventScripting OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+         "Branch for Event Scripting."
+   ::= { softwareIND1Entities 86 }
+
+softentIND1LldpTrust OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+         "Branch for LLDP Trust."
+   ::= { softwareIND1Entities 87 }
+
+softentIND1TCAM OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+         "Branch for TCAM-Manager."
+   ::= { softwareIND1Entities 88 }
+
+softentIND1PrivateVlan OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+         "Branch for Private-Vlan."
+   ::= { softwareIND1Entities 89 }
+
+softentIND1KeyManagement OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+         "Branch for Security."
+   ::= { softwareIND1Entities 90 }
+
+softentIND1ZeroConf OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Zero-Configuration."
+    ::= { softwareIND1Entities 91 }
+
+softentIND1Secy OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For MAC security."
+    ::= { softwareIND1Entities 92 }
+
+softentIND1AlarmMgr OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Alarm management."
+    ::= { softwareIND1Entities 93 }
+
+softentIND1Dp OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Device profile."
+    ::= { softwareIND1Entities 94 }
+    
+softentIND1Mqtt OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For MQTT."
+    ::= { softwareIND1Entities 95 }
+
+softentIND1TestOam OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Test OAM."
+    ::= { softwareIND1Entities 96 }
+
+softentIND1MRP OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For MRP."
+    ::= { softwareIND1Entities 97 }
+
+softentIND1PackageMgr OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Package Manager."
+    ::= { softwareIND1Entities 98 }
+
+softentIND1Naas OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For NAAS."
+    ::= { softwareIND1Entities 99 }
+
+softentIND1Ldp OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For LDP."
+    ::= { softwareIND1Entities 100 }
+
+softentIND1Mpls OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For MPLS."
+    ::= { softwareIND1Entities 101 }
 
 routingIND1Tm OBJECT-IDENTITY
     STATUS current
@@ -746,6 +776,23 @@ routingIND1Tm OBJECT-IDENTITY
         "Branch For DRC Task Manager Information."
     ::= { softentIND1Routing 1 }
 
+softentIND1SiteLicenseServer OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+       "Branch For site license server."
+   ::= { softwareIND1Entities 102 }
+
+softentIND1SiteLicenseClient OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+       "Branch For site license client."
+   ::= { softwareIND1Entities 103 }
+
+softentIND1Profinet OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION
+       "Branch For site license client."
+   ::= { softwareIND1Entities 104 }
 
 routingIND1Iprm OBJECT-IDENTITY
     STATUS current
@@ -814,10 +861,10 @@ routingIND1RDP OBJECT-IDENTITY
     ::= { softentIND1Routing 11 }
 
 routingIND1Ripng OBJECT-IDENTITY
-	STATUS current
-	DESCRIPTION
-		"Branch For RIPng."
-	::= { softentIND1Routing 12 }
+        STATUS current
+        DESCRIPTION
+                "Branch For RIPng."
+        ::= { softentIND1Routing 12 }
 
 routingIND1Ospf3 OBJECT-IDENTITY
   STATUS current
@@ -836,20 +883,25 @@ routingIND1Vrf OBJECT-IDENTITY
     DESCRIPTION
         "Branch For Virtual Router support."
     ::= { softentIND1Routing 15 }
-routingIND1GlobalRouteTableMIB OBJECT-IDENTITY
-   STATUS current
-   DESCRIPTION
-       "Branch For Global Route Table support."
-   ::= { softentIND1Routing 16 }
+
+routingIND1GlobalRouteTable OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Global Route Table support."
+    ::= { softentIND1Routing 16 }
+
+routingIND1IsisSpb OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For Isis/Spb."
+    ::= { softentIND1Routing 17 }
+	
 
 serventIND1Aqe OBJECT-IDENTITY
-	STATUS current
-	DESCRIPTION
-		"Branch For AQE."
-	::= { softwareIND1Services 1 }
-
+        STATUS current
+        DESCRIPTION
+                "Branch For AQE."
+        ::= { softwareIND1Services 1 }
 
 END
-
-
 
