@@ -258,10 +258,10 @@ class MapDataController extends Controller
             // If we have a device ID, we want to show if we are the soure or target of a link
             $linkQuery->where(function ($q) use ($device_id, $remote_port_attr): void {
                 $q->whereHas($remote_port_attr, function ($q) use ($device_id): void {
-                    $q->where('device_id', $device_id);
+                    $q->where($q->qualifyColumn('device_id'), $device_id);
                 })
                     ->orWhereHas('device', function ($q) use ($device_id): void {
-                        $q->where('device_id', $device_id);
+                        $q->where($q->qualifyColumn('device_id'), $device_id);
                     });
             });
         }

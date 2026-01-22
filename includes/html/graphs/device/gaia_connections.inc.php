@@ -3,7 +3,7 @@
 require 'includes/html/graphs/common.inc.php';
 
 $rrd_filename = Rrd::name($device['hostname'], 'gaia_connections');
-$rrd_options[] = "--vertical-label='Connections'";
+$graph_params->vertical_label = 'Connections';
 
 $rrd_options[] = "DEF:connections=$rrd_filename:NumConn:LAST";
 

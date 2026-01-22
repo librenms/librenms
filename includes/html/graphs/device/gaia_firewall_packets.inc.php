@@ -3,8 +3,8 @@
 require 'includes/html/graphs/common.inc.php';
 
 $rrd_filename = Rrd::name($device['hostname'], 'gaia_firewall_packets');
-$rrd_options[] = "--vertical-label='Packets per second'";
-$rrd_options[] = "--lower-limit='0'";
+$graph_params->vertical_label = 'Packets per second';
+$graph_params->scale_min = 0;
 
 $stats = [
     'accepted' => '#74C366FF',

@@ -8,7 +8,7 @@
                 <th data-column-id="hostname" data-order="asc">Device</th>
                 <th data-column-id="interface">Interface</th>
                 <th data-column-id="address" data-formatter="tooltip">Address</th>
-                <th data-column-id="description" data-sortable="false" data-formatter="tooltip">Description</th>
+                <th data-column-id="description" data-formatter="tooltip">Description</th>
             </tr>
         </thead>
     </table>
@@ -87,14 +87,12 @@ if ($interface == 'Vlan%') {
     post: function ()
     {
         return {
-            id: "address-search",
-            search_type: "ipv4",
-            device_id: '<?php echo $device_id ?: 'null'; ?>',
+            device_id: '<?php echo $device_id ?: ''; ?>',
             interface: '<?php echo htmlspecialchars((string) $interface); ?>',
             address: '<?php echo htmlspecialchars((string) $address); ?>'
         };
     },
-    url: "ajax_table.php",
+    url: "<?php echo route('search.ipv4'); ?>",
     formatters: {
         "tooltip": function (column, row) {
                 var value = row[column.id];

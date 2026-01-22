@@ -53,6 +53,9 @@ class DeviceObserver
         if ($device->isDirty('location_id')) {
             Eventlog::log(self::attributeChangedMessage('location', (string) $device->location, null), $device, 'system', Severity::Notice);
         }
+        if ($device->isDirty('type')) {
+            Log::debug("Device type changed to $device->type!");
+        }
     }
 
     public function updating(Device $device): void
@@ -237,7 +240,7 @@ class DeviceObserver
         }
     }
 
-    public static function attributeChangedMessage($attribute, $value, $previous)
+    public static function attributeChangedMessage($attribute, $value, $previous): string
     {
         return trans("device.attributes.$attribute") . ': '
             . (($previous && $previous != $value) ? "$previous -> " : '')

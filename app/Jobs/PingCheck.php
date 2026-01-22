@@ -26,6 +26,8 @@
 
 namespace App\Jobs;
 
+use App\Action;
+use App\Actions\Alerts\RunAlertRulesAction;
 use App\Actions\Device\SetDeviceAvailability;
 use App\Models\Device;
 use Illuminate\Bus\Queueable;
@@ -35,7 +37,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Alert\AlertRules;
 use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Source\FpingResponse;
 use LibreNMS\Enum\AvailabilitySource;
@@ -191,7 +192,7 @@ class PingCheck implements ShouldQueue
             Log::debug("Device $device->hostname changed status to $type, running alerts");
 
             if (count($waiting_on) === 0) {
-                $this->runAlerts($device->device_id);
+                Action::execute(RunAlertRulesAction::class, $device);
             } else {
                 Log::debug('Alerts Deferred');
 
@@ -240,7 +241,7 @@ class PingCheck implements ShouldQueue
                     if ($alert_child) {
                         Log::debug("Deferred device $child_id triggered by $device_id");
 
-                        $this->runAlerts($child_id);
+                        Action::execute(RunAlertRulesAction::class, $this->devices->get($child_id));
                         $this->deferred->pull($child_id);
                     }
                 }
@@ -248,14 +249,5 @@ class PingCheck implements ShouldQueue
         }
 
         $this->waiting_on->pull($device_id);
-    }
-
-    /**
-     * run alerts for a device
-     */
-    private function runAlerts(int $device_id): void
-    {
-        $rules = new AlertRules;
-        $rules->runRules($device_id);
     }
 }

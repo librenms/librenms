@@ -131,7 +131,7 @@
             $("#dtpickerto").data("DateTimePicker").maxDate('{{ $now }}');
         }
 
-        init_select2("select#device", "device", {limit: 100}, "{{ $device->device_id }}");
+        init_select2("select#device", "device", {limit: 100}, "{{ $device->device_id }}", 'All Devices');
         init_select2("#program", "syslog", function(params) {
             return {
                 field: "program",
@@ -139,7 +139,7 @@
                 term: params.term,
                 page: params.page || 1
             }
-        }, @json($program));
+        }, @json($program), 'All Programs');
         init_select2("#priority", "syslog", function(params) {
             return {
                 field: "priority",
@@ -147,6 +147,6 @@
                 term: params.term,
                 page: params.page || 1
             }
-        }, @json($priority));
+        }, @json($priority), 'All Priorities');
     </script>
 @endsection

@@ -28,16 +28,11 @@ if (session('applied_site_style') != 'dark') {
 
 $rrd_filename = Rrd::name($device['hostname'], 'icmp-perf');
 
-$rrd_options[] = '-X';
-$rrd_options[] = '0';
-$rrd_options[] = '--left-axis-format';
-$rrd_options[] = '%4.0lfms';
-$rrd_options[] = '--vertical-label';
-$rrd_options[] = 'Latency';
-$rrd_options[] = '--right-axis';
-$rrd_options[] = '1:0';
-$rrd_options[] = '--right-axis-label';
-$rrd_options[] = 'Loss %';
+$graph_params->units_exponent = 0;
+$graph_params->left_axis_format = '%4.0lfms';
+$graph_params->vertical_label = 'Latency';
+$graph_params->right_axis = '1:0';
+$graph_params->right_axis_label = 'Loss %';
 
 $rrd_options[] = 'DEF:ping=' . $rrd_filename . ':avg:AVERAGE';
 $rrd_options[] = 'DEF:min=' . $rrd_filename . ':min:MIN';

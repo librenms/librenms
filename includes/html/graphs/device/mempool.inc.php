@@ -4,9 +4,7 @@ use App\Models\Mempool;
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_options[] = '-E';
-$rrd_options[] = '-b';
-$rrd_options[] = '1024';
+$graph_params->base = 1024;
 
 // order mempools properly
 $mempool_classes = [
@@ -39,8 +37,7 @@ foreach ($mempools as $index => $mempool) {
 
 if (! $swap_present) {
     // swap is negative axis
-    $rrd_options[] = '-l';
-    $rrd_options[] = '0';
+    $graph_params->scale_min = 0;
 }
 
 $colors = \App\Facades\LibrenmsConfig::get('graph_colours.varied');

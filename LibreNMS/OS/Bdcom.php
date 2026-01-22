@@ -3,7 +3,11 @@
 /**
  * Bdcom.php
  *
+<<<<<<< HEAD
  * -Description-
+=======
+ * BDCOM OS
+>>>>>>> 83baccc139da2dea6a95f8353fbc0b5ac4f54186
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +24,9 @@
  *
  * @link       https://www.librenms.org
  *
+ * @copyright  2025 Frederik Kriewitz
  * @copyright  2025 Peca Nesovanovic
+ * @author     Frederik Kriewitz <frederik@kriewitz.eu>
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
@@ -28,14 +34,46 @@ namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
 use App\Models\Link;
+use App\Models\Transceiver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Interfaces\Discovery\LinkDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
 use SnmpQuery;
 
-class Bdcom extends OS implements LinkDiscovery
+class Bdcom extends OS implements TransceiverDiscovery, LinkDiscovery
 {
+    public function discoverTransceivers(): Collection
+    {
+        return SnmpQuery::cache()->walk('NMS-IF-MIB::ifSfpParameterTable')->mapTable(function ($data, $index) {
+            $ifIndex = $data['NMS-IF-MIB::ifSfpIndex'];
+            if ($data['NMS-IF-MIB::sfpPresentStatus'] != 1) {
+                return null;
+            }
+
+            $types = [
+                1 => 'SFP',
+                2 => 'DAC',
+                3 => null,
+            ];
+
+            $type = $types[$data['NMS-IF-MIB::type']] ?? 'unknown type ' . $data['NMS-IF-MIB::type'];
+
+            return new Transceiver([
+                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
+                'index' => $ifIndex,
+                'entity_physical_index' => $ifIndex,
+                'type' => $type,
+                'vendor' => $data['NMS-IF-MIB::vendname'] ?? null,
+                'model' => $data['NMS-IF-MIB::vendorPN'] ?? null,
+                'serial' => $data['NMS-IF-MIB::sfpSeqNum'] ?? null,
+                'distance' => $data['NMS-IF-MIB::transDist'] ?? null,
+                'wavelength' => $data['NMS-IF-MIB::waveLen'] ?? null,
+            ]);
+        })->filter();
+    }
+
     public function discoverLinks(): Collection
     {
         $links = new Collection;

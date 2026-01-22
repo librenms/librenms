@@ -19,7 +19,6 @@ use LibreNMS\Util\Number;
 
 require 'includes/html/graphs/common.inc.php';
 
-$stacked = generate_stacked_graphs(! empty($port['ifSpeed']) && ($vars['port_speed_zoom'] ?? LibrenmsConfig::get('graphs.port_speed_zoom')));
 $inverse ??= false;
 $multiplier ??= false;
 $format ??= '';
@@ -31,10 +30,17 @@ $rrd_filename_in ??= $rrd_filename ?? '';
 if ($inverse) {
     $in = 'out';
     $out = 'in';
+    if ($port) {
+        [$ingress_speed, $egress_speed] = PortCache::get($port['port_id'])->getSpeeds();
+    }
 } else {
     $in = 'in';
     $out = 'out';
+    if ($port) {
+        [$egress_speed, $ingress_speed] = PortCache::get($port['port_id'])->getSpeeds();
+    }
 }
+$stacked = generate_stacked_graphs(($egress_speed || $ingress_speed) && ($vars['port_speed_zoom'] ?? LibrenmsConfig::get('graphs.port_speed_zoom')));
 
 if ($multiplier) {
     $rrd_options[] = 'DEF:p' . $out . 'octets=' . $rrd_filename_out . ':' . $ds_out . ':AVERAGE';
@@ -167,9 +173,12 @@ $rrd_options[] = 'GPRINT:totout:Out %6.' . $float_precision . 'lf%sB)\\l';
 $rrd_options[] = 'LINE1:percentile_in#aa0000';
 $rrd_options[] = 'LINE1:dpercentile_out#aa0000';
 
-if (! empty($port['ifSpeed'])) {
-    $speed_line_type = ($vars['port_speed_zoom'] ?? LibrenmsConfig::get('graphs.port_speed_zoom')) ? 'LINE2' : 'HRULE';
-    $rrd_options[] = "$speed_line_type:{$port['ifSpeed']}#000000:Port Speed " . Number::formatSi($port['ifSpeed'], 2, 0, 'bps') . '\\n';
+$speed_line_type = ($vars['port_speed_zoom'] ?? LibrenmsConfig::get('graphs.port_speed_zoom')) ? 'LINE2' : 'HRULE';
+if ($egress_speed && $ingress_speed && $ingress_speed != $egress_speed) {
+    $rrd_options[] = "$speed_line_type:$ingress_speed#000000:In Port Speed " . Number::formatSi($ingress_speed, 2, 0, 'bps') . '\\n';
+    $rrd_options[] = "$speed_line_type:-$egress_speed#000000:Out Port Speed " . Number::formatSi($egress_speed, 2, 0, 'bps') . '\\n';
+} elseif ($egress_speed) {
+    $rrd_options[] = "$speed_line_type:$egress_speed#000000:Port Speed " . Number::formatSi($egress_speed, 2, 0, 'bps') . '\\n';
 }
 
 // Linear prediction of trend
