@@ -225,7 +225,7 @@ class Url
             $text = $label;
         }
 
-        $content = '<div class=list-large>' . addslashes(htmlentities($sensor->device->displayName() . ' - ' . $label)) . '</div>';
+        $content = '<div class=list-large>' . addslashes(htmlentities($sensor->device?->displayName() . ' - ' . $label)) . '</div>';
 
         $content .= "<div style=\'width: 850px\'>";
         $graph_array = [
