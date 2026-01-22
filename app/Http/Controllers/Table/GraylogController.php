@@ -86,7 +86,7 @@ class GraylogController extends SimpleTableController
             $messages = $data['messages'] ?? [];
 
             return $this->formatResponse(
-                array_map([$this, 'formatMessage'], $messages),
+                array_map($this->formatMessage(...), $messages),
                 $page,
                 count($messages),
                 $data['total_results'] ?? 0,
