@@ -112,7 +112,7 @@ class AlertLogDetailFormatter
             ($port->ifAlias && $port->ifAlias != $port->ifDescr)
                 ? $this->line('Alias', $port->ifAlias)
                 : null,
-            !empty($detail['isisISAdjState'])
+            ! empty($detail['isisISAdjState'])
                 ? $this->line('Adjacent', $detail['isisISAdjIPAddrAddress'] ?? 'Unknown')
                 : null,
         ]);
@@ -243,7 +243,7 @@ class AlertLogDetailFormatter
         return $this->lines([
             $this->linkLine('Application', $app_url, $app_type),
             $this->line('Status', $detail['app_status'] ?? null),
-            !empty($detail['metric'])
+            ! empty($detail['metric'])
                 ? $this->line('Metric', e($detail['metric']) . ' = ' . e($detail['value'] ?? 'N/A'), escape: false)
                 : null,
         ]);
@@ -263,6 +263,7 @@ class AlertLogDetailFormatter
         }
 
         $formatted_value = $escape ? e($value) : $value;
+
         return $label . ': ' . $formatted_value;
     }
 
@@ -279,7 +280,8 @@ class AlertLogDetailFormatter
      */
     private function inlineList(array $items): ?string
     {
-        $filtered = array_filter($items, fn($item) => $item !== null && $item !== '');
+        $filtered = array_filter($items, fn ($item) => $item !== null && $item !== '');
+
         return empty($filtered) ? null : implode(', ', $filtered);
     }
 
@@ -288,6 +290,6 @@ class AlertLogDetailFormatter
      */
     private function lines(array $lines): string
     {
-        return implode('<br>', array_filter($lines, fn($line) => $line !== null && $line !== ''));
+        return implode('<br>', array_filter($lines, fn ($line) => $line !== null && $line !== ''));
     }
 }

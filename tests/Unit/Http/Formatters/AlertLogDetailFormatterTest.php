@@ -19,8 +19,8 @@ class AlertLogDetailFormatterTest extends TestCase
     {
         $details = [
             'rule' => [
-                ['message' => 'Test alert', 'value' => 10]
-            ]
+                ['message' => 'Test alert', 'value' => 10],
+            ],
         ];
 
         $output = $this->formatter->format($details);
@@ -35,15 +35,15 @@ class AlertLogDetailFormatterTest extends TestCase
         $details = [
             'diff' => [
                 'added' => [
-                    ['message' => 'New item']
+                    ['message' => 'New item'],
                 ],
                 'resolved' => [
-                    ['message' => 'Fixed item']
-                ]
+                    ['message' => 'Fixed item'],
+                ],
             ],
             'rule' => [
-                ['message' => 'Still alert']
-            ]
+                ['message' => 'Still alert'],
+            ],
         ];
 
         $output = $this->formatter->format($details);
@@ -61,9 +61,9 @@ class AlertLogDetailFormatterTest extends TestCase
             'rule' => [
                 [
                     'bill_id' => 123,
-                    'bill_name' => 'Test Bill'
-                ]
-            ]
+                    'bill_name' => 'Test Bill',
+                ],
+            ],
         ];
 
         $output = $this->formatter->format($details);
@@ -82,8 +82,8 @@ class AlertLogDetailFormatterTest extends TestCase
                     'device_id' => 1,
                     'ifDescr' => 'eth0',
                     'ifAlias' => 'WAN Interface',
-                ]
-            ]
+                ],
+            ],
         ];
 
         $output = $this->formatter->format($details);
@@ -104,9 +104,9 @@ class AlertLogDetailFormatterTest extends TestCase
                     'sensor_current' => 35,
                     'sensor_limit' => 40,
                     'sensor_limit_warn' => 38,
-                    'sensor_descr' => 'CPU Temp'
-                ]
-            ]
+                    'sensor_descr' => 'CPU Temp',
+                ],
+            ],
         ];
 
         $output = $this->formatter->format($details);
@@ -128,9 +128,9 @@ class AlertLogDetailFormatterTest extends TestCase
                     'sensor_current' => 2,
                     'state_descr' => 'Critical',
                     'state_value' => 2, // Used by StateTranslation if constructor receives it
-                    'sensor_descr' => 'Power State'
-                ]
-            ]
+                    'sensor_descr' => 'Power State',
+                ],
+            ],
         ];
 
         $output = $this->formatter->format($details);
@@ -147,9 +147,9 @@ class AlertLogDetailFormatterTest extends TestCase
                 [
                     'accesspoint_id' => 101,
                     'device_id' => 1,
-                    'name' => 'AP-01'
-                ]
-            ]
+                    'name' => 'AP-01',
+                ],
+            ],
         ];
 
         $output = $this->formatter->format($details);
@@ -170,9 +170,9 @@ class AlertLogDetailFormatterTest extends TestCase
                     'service_type' => 'http',
                     'service_ip' => '1.2.3.4',
                     'service_desc' => 'Web Service',
-                    'service_message' => 'Connection refused'
-                ]
-            ]
+                    'service_message' => 'Connection refused',
+                ],
+            ],
         ];
 
         $output = $this->formatter->format($details);
@@ -195,9 +195,9 @@ class AlertLogDetailFormatterTest extends TestCase
                     'bgpPeerIdentifier' => '10.0.0.1',
                     'bgpPeerDescr' => 'ISP-A',
                     'bgpPeerRemoteAs' => 65001,
-                    'bgpPeerState' => 'idle'
-                ]
-            ]
+                    'bgpPeerState' => 'idle',
+                ],
+            ],
         ];
 
         $output = $this->formatter->format($details);
@@ -219,9 +219,9 @@ class AlertLogDetailFormatterTest extends TestCase
                     'mempool_descr' => 'System RAM',
                     'mempool_perc' => 85.5,
                     'mempool_free' => 1024 * 1024 * 100, // 100MB
-                    'mempool_total' => 1024 * 1024 * 1024 // 1GB
-                ]
-            ]
+                    'mempool_total' => 1024 * 1024 * 1024, // 1GB
+                ],
+            ],
         ];
 
         $output = $this->formatter->format($details);
@@ -244,9 +244,9 @@ class AlertLogDetailFormatterTest extends TestCase
                     'app_type' => 'nginx',
                     'app_status' => 'up',
                     'metric' => 'requests',
-                    'value' => 5000
-                ]
-            ]
+                    'value' => 5000,
+                ],
+            ],
         ];
 
         $output = $this->formatter->format($details);
@@ -267,9 +267,9 @@ class AlertLogDetailFormatterTest extends TestCase
                     'device_id' => 1, // should be skipped
                     'some_id' => 123, // should be skipped (contains id)
                     'description' => 'test', // should be skipped (contains desc)
-                    'another_val' => 'present'
-                ]
-            ]
+                    'another_val' => 'present',
+                ],
+            ],
         ];
 
         $output = $this->formatter->format($details);
