@@ -71,7 +71,7 @@ class AlertLogController extends TableController
             ->with(['device', 'rule'])
             ->hasAccess($request->user());
 
-        $sort = $request->get('sort');
+        $sort = $request->input('sort');
         if (isset($sort['severity']) || isset($sort['alert_rule'])) {
             $query->leftJoin('alert_rules', 'alert_log.rule_id', '=', 'alert_rules.id');
         }

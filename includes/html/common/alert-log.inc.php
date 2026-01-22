@@ -40,7 +40,7 @@ if (Auth::user()->hasGlobalAdmin()) {
     $admin_verbose_details = '<th data-column-id="verbose_details" data-sortable="false">Details</th>';
 }
 
-$device_id = (int) (request()->get('device_id') ?: ($vars['device'] ?? 0));
+$device_id = (int) (request()->input('device_id') ?: ($vars['device'] ?? 0));
 
 $common_output[] = '<div class="panel panel-default panel-condensed">
                 <div class="panel-heading">
@@ -95,14 +95,14 @@ if (isset($vars['fromdevice']) && ! $vars['fromdevice']) {
 $common_output[] = '<div class="form-group"> \
                <select name="state" id="state" class="form-control input-sm"> \\';
 foreach ($alert_states as $text => $value) {
-    $selected = $value == (request()->get('state', '')) ? ' selected' : '';
+    $selected = $value == (request()->input('state', '')) ? ' selected' : '';
     $common_output[] = '<option value="' . htmlspecialchars((string) $value) . "\"$selected>$text</option> \\";
 }
 $common_output[] = '</select> \
                </div> \
                <div class="form-group"> \
                <select name="severity[]" id="severity" class="form-control input-sm" multiple> \\';
-$current_severity = request()->get('severity', []);
+$current_severity = request()->input('severity', []);
 foreach ($alert_severities as $text => $value) {
     $selected = in_array($value, (array) $current_severity) ? ' selected' : '';
     $common_output[] = "<option value=\"$value\"$selected>$text</option> \\";
