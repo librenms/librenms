@@ -5,7 +5,7 @@ icon: packetflux
 over:
     - { graph: device_poller_perf, text: 'Poller time' }
 snmp_bulk: false
-mib_dir: sitemonitor3
+mib_dir: packetflux
 discovery:
     -
         sysObjectID:
