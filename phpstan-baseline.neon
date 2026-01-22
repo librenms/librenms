@@ -1,16 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Property LibreNMS\\\\Data\\\\Store\\\\Rrd\\:\\:\\$async_process \\(LibreNMS\\\\Proc\\) in isset\\(\\) is not nullable\\.$#"
-			count: 1
-			path: LibreNMS/Data/Store/Rrd.php
-
-		-
-			message: "#^Property LibreNMS\\\\Data\\\\Store\\\\Rrd\\:\\:\\$sync_process \\(LibreNMS\\\\Proc\\) in isset\\(\\) is not nullable\\.$#"
-			count: 1
-			path: LibreNMS/Data/Store/Rrd.php
-
-		-
 			message: "#^Parameter \\#1 \\$model of static method LibreNMS\\\\Model\\:\\:onCreate\\(\\) expects static\\(LibreNMS\\\\Device\\\\Processor\\), LibreNMS\\\\Device\\\\Processor given\\.$#"
 			count: 1
 			path: LibreNMS/Device/Processor.php
