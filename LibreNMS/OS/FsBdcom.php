@@ -20,49 +20,13 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2025 Peca Nesovanovic
- * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
+ * @copyright  2026 Frederik Kriewitz
+ * @author     Frederik Kriewitz <frederik@kriewitz.eu>
  */
 
 namespace LibreNMS\OS;
 
-use App\Facades\PortCache;
-use App\Models\Link;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
-use LibreNMS\Interfaces\Discovery\LinkDiscovery;
-use LibreNMS\OS;
-use SnmpQuery;
-
-class FsBdcom extends OS implements LinkDiscovery
+class FsBdcom extends Bdcom
 {
-    public function discoverLinks(): Collection
-    {
-        $links = new Collection;
-
-        Log::info('NMS-LLDP-MIB:');
-        $lldp_array = SnmpQuery::hideMib()->walk('NMS-LLDP-MIB::lldpRemoteSystemsData')->table(2);
-        foreach ($lldp_array as $lldp_array_inner) {
-            foreach ($lldp_array_inner as $lldp) {
-                $interface = PortCache::getByIfIndex($lldp['lldpRemLocalPortNum'] ?? 0, $this->getDeviceId());
-                $remote_device_id = find_device_id($lldp['lldpRemSysName'] ?? 0);
-                if (isset($interface['port_id']) && $lldp['lldpRemSysName'] && $lldp['lldpRemPortId']) {
-                    $remote_port_id = find_port_id($lldp['lldpRemPortDesc'], $lldp['lldpRemPortId'], $remote_device_id);
-                    $links->push(new Link([
-                        'local_port_id' => $interface['port_id'],
-                        'remote_hostname' => $lldp['lldpRemSysName'],
-                        'remote_device_id' => $remote_device_id,
-                        'remote_port_id' => $remote_port_id,
-                        'active' => 1,
-                        'protocol' => 'lldp',
-                        'remote_port' => $lldp['lldpRemPortId'] ?? '',
-                        'remote_platform' => null,
-                        'remote_version' => $lldp['lldpRemSysDesc'] ?? '',
-                    ]));
-                }
-            }
-        }
-
-        return $links->filter();
-    }
+    // No changes needed, inherits everything from Bdcom (OEM)
 }
