@@ -15,33 +15,27 @@ ALCATEL-IND1-RIPNG-MIB DEFINITIONS ::= BEGIN
 
 
     alcatelIND1RIPNGMIB MODULE-IDENTITY
-        LAST-UPDATED "200704030000Z"
-        ORGANIZATION "Alcatel-Lucent"
+        LAST-UPDATED "201910070000Z"
+        ORGANIZATION "ALE USA Inc"
         CONTACT-INFO
                 " Please consult with Customer Service to ensure the most appropriate
                   version of this document is used with the products in question:
 
-                            Alcatel-Lucent, Enterprise Solutions Division
-                           (Formerly Alcatel Internetworking, Incorporated)
+                                Alcatel-Lucent Enterprise,
                                    26801 West Agoura Road
                                 Agoura Hills, CA  91301-5122
                                   United States Of America
 
-                Telephone:               North America  +1 800 995 2696
-                                         Latin America  +1 877 919 9526
-                                         Europe         +31 23 556 0100
-                                         Asia           +65 394 7933
-                                         All Other      +1 818 878 4507
-
-                Electronic Mail:         support@ind.alcatel.com
-                World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-                File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+                Telephone:               +1 800 995 2696 
+ 				               
+                Electronic Mail:         ebg_global_supportcenter@al-enterprise.com
+                World Wide Web:          https://www.al-enterprise.com" 
 
         DESCRIPTION
                 "This module describes an authoritative enterprise-specific Simple
                  Network Management Protocol (SNMP) Management Information Base (MIB):
 
-                     For the Birds Of Prey Product Line
+                     For the OmniSwitch Product Line
                      Configuration Of Global RIPNG Configuration Parameters.
 
                  The right to make changes in specification and other information
@@ -55,12 +49,13 @@ ALCATEL-IND1-RIPNG-MIB DEFINITIONS ::= BEGIN
                  non-exclusive license to use this specification in connection with
                  management of the products for which it is intended to be used.
 
-                             Copyright (C) 1995-2007 Alcatel-Lucent
-                                 ALL RIGHTS RESERVED WORLDWIDE"
+                             Copyright (C) ALE USA Inc. 2014-2019
+			     Copyright (C) 1995-2013 Alcatel-Lucent
+                             ALL RIGHTS RESERVED WORLDWIDE"
 
-        REVISION         "200704030000Z"
+        REVISION         "201910070000Z"
         DESCRIPTION
-            "The latest version of this MIB Module."
+            "Updated the latest contact and Copyright information for ALE USA Inc."
 
         ::= { routingIND1Ripng 1 }
 
@@ -190,7 +185,7 @@ alaProtocolRipng        OBJECT IDENTIFIER ::= { alcatelIND1RIPNGMIBObjects 1 }
                 DESCRIPTION
                         "Controls whether trigged updates contain entire RIB
                         or just changes."
-                DEFVAL { 2 }
+                DEFVAL { onlyupdated }
         ::= { alaProtocolRipng 8 }
 
         alaRipngJitter OBJECT-TYPE
@@ -449,7 +444,7 @@ AlaRipngInterfaceEntry ::=
 
         alaRipngInterfaceStatus OBJECT-TYPE
                 SYNTAX  RowStatus
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                         "Create/delete RIPng interfaces."
@@ -457,7 +452,7 @@ AlaRipngInterfaceEntry ::=
         ::= { alaRipngInterfaceEntry 1 }
 
         alaRipngInterfaceIndex OBJECT-TYPE
-                SYNTAX  Integer32
+                SYNTAX  Integer32 (0..2147483647)
                 MAX-ACCESS not-accessible
                 STATUS current
                 DESCRIPTION
@@ -466,7 +461,7 @@ AlaRipngInterfaceEntry ::=
 
         alaRipngInterfaceMetric OBJECT-TYPE
                 SYNTAX  Integer32 (1 .. 15)
-                MAX-ACCESS read-write
+                MAX-ACCESS read-create
                 STATUS current
                 DESCRIPTION
                         "Metric used on this interface."
@@ -478,11 +473,11 @@ AlaRipngInterfaceEntry ::=
                         enabled (1),
                         disabled (2)
                 }
-                MAX-ACCESS read-write
+                MAX-ACCESS read-create
                 STATUS current
                 DESCRIPTION
                         "Controls whether or not to recv updates on this intf."
-                DEFVAL { 1 }
+                DEFVAL { enabled }
         ::= { alaRipngInterfaceEntry 4 }
 
         alaRipngInterfaceSendStatus OBJECT-TYPE
@@ -490,11 +485,11 @@ AlaRipngInterfaceEntry ::=
                         enabled (1),
                         disabled (2)
                 }
-                MAX-ACCESS read-write
+                MAX-ACCESS read-create
                 STATUS current
                 DESCRIPTION
                         "Controls whether or not to send updates on this intf."
-                DEFVAL { 1 }
+                DEFVAL { enabled }
         ::= { alaRipngInterfaceEntry 5 }
 
         alaRipngInterfaceHorizon OBJECT-TYPE
@@ -503,11 +498,11 @@ AlaRipngInterfaceEntry ::=
                         onlysplit (2),
                         poison (3)
                 }
-                MAX-ACCESS read-write
+                MAX-ACCESS read-create
                 STATUS current
                 DESCRIPTION
                         "Controls use of split horizon on this interface."
-                DEFVAL { 1 }
+                DEFVAL { none }
         ::= { alaRipngInterfaceEntry 6 }
 
         alaRipngInterfacePacketsSent OBJECT-TYPE
@@ -544,7 +539,7 @@ AlaRipngInterfaceEntry ::=
 
         alaRipngInterfaceJitter OBJECT-TYPE
                 SYNTAX  Integer32 (0 .. 60)
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  deprecated
                 DESCRIPTION
                         "Deprecated in favour of alaRipngJitter"
@@ -584,7 +579,7 @@ AlaRipngNexthopFilterEntry ::=
 
         alaRipngNexthopFilterStatus OBJECT-TYPE
                 SYNTAX  RowStatus
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  deprecated
                 DESCRIPTION
                         "Create/delete RIPng Nexthop Filter."
@@ -637,7 +632,7 @@ AlaRipngSummarizationEntry ::=
 
         alaRipngSummarizationStatus OBJECT-TYPE
                 SYNTAX  RowStatus
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  deprecated
                 DESCRIPTION
                         "Create/delete RIPng Summarization Filter."
@@ -682,7 +677,7 @@ AlaRipngSummarizationEntry ::=
                         include (1),
                         donotinclude (2)
                 }
-                MAX-ACCESS read-write
+                MAX-ACCESS read-create
                 STATUS deprecated
                 DESCRIPTION
                         "Include subnets?"
@@ -725,7 +720,7 @@ AlaRipngRouteFilterEntry ::=
 
         alaRipngRouteFilterStatus OBJECT-TYPE
                 SYNTAX  RowStatus
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  deprecated
                 DESCRIPTION
                         "Create/delete RIPng route Filter."
@@ -764,7 +759,7 @@ AlaRipngRouteFilterEntry ::=
                         include (1),
                         donotinclude (2)
                 }
-                MAX-ACCESS read-write
+                MAX-ACCESS read-create
                 STATUS deprecated
                 DESCRIPTION
                         "Include subnets?"
@@ -854,7 +849,7 @@ AlaRipngPeerEntry ::=
         ::= { alaRipngPeerEntry 6 }
 
         alaRipngPeerIndex OBJECT-TYPE
-                SYNTAX  Integer32
+                SYNTAX  Integer32 (0..2147483647)
                 MAX-ACCESS not-accessible
                 STATUS current
                 DESCRIPTION
@@ -1035,7 +1030,9 @@ alaRipngGlobalGroup OBJECT-GROUP
                 alaRipngGarbageTimer,
                 alaRipngRouteCount,
                 alaRipngGlobalRouteTag,
-                alaRipngTriggeredSends
+                alaRipngTriggeredSends,
+                alaRipngJitter,
+                alaRipngPort
         }
         STATUS current
         DESCRIPTION
@@ -1139,12 +1136,24 @@ alaRipngRouteGroup OBJECT-GROUP
                 alaRipngRouteMetric,
                 alaRipngRouteStatus,
                 alaRipngRouteFlags,
-                alaRipngRouteIndex
+                alaRipngRouteIndex,
+                alaRipngDebugNexthopFilter,
+                alaRipngDebugRouteFilter,
+                alaRipngDebugSummary
         }
         STATUS current
         DESCRIPTION
                 "Collection of Miscellaneous objects for management of RIP."
 ::= { alcatelIND1RIPNGMIBGroups 8 }
+
+alaRipngNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+                ripngRouteMaxLimitReached
+        }
+        STATUS current
+        DESCRIPTION
+                "Collection of Notification objects for management of RIPng."
+::= { alcatelIND1RIPNGMIBGroups 9 }
 
 --
 -- Traps

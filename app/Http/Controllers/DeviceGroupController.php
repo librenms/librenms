@@ -124,7 +124,7 @@ class DeviceGroupController extends Controller
         $devices_updated = false;
         if ($deviceGroup->type == 'static') {
             // sync device_ids from input
-            $updated = $deviceGroup->devices()->sync($request->get('devices', []));
+            $updated = $deviceGroup->devices()->sync($request->input('devices', []));
             // check for attached/detached/updated
             $devices_updated = array_sum(array_map(count(...), $updated)) > 0;
         } else {

@@ -2,13 +2,13 @@
 
 namespace App\Observers;
 
-use App;
 use App\ApiClients\Oxidized;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\Eventlog;
 use File;
+use Illuminate\Support\Facades\App;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\HostRenameException;
 use Log;

@@ -5,40 +5,36 @@ IMPORTS
 	OBJECT-TYPE,
 	OBJECT-IDENTITY,
 	MODULE-IDENTITY,
+
 	IpAddress		FROM SNMPv2-SMI
-	TEXTUAL-CONVENTION 	FROM SNMPv2-TC
+	TEXTUAL-CONVENTION,DisplayString 	FROM SNMPv2-TC
         OBJECT-GROUP,
 	MODULE-COMPLIANCE       FROM SNMPv2-CONF
 	softentIND1SnmpAgt	FROM ALCATEL-IND1-BASE;
 
 
 alcatelIND1SNMPAgentMIB  MODULE-IDENTITY
-	LAST-UPDATED  "200704030000Z"
-	ORGANIZATION "Alcatel-Lucent"
+	LAST-UPDATED  "201910070000Z"
+	ORGANIZATION  "ALE USA Inc"
 	CONTACT-INFO
 	    "Please consult with Customer Service to ensure the most appropriate
 	     version of this document is used with the products in question:
  
-			Alcatel-Lucent, Enterprise Solutions Division
-		       (Formerly Alcatel Internetworking, Incorporated)
+			    Alcatel-Lucent Enterprise,		      
 			       26801 West Agoura Road
 			    Agoura Hills, CA  91301-5122
 			      United States Of America
 	
-	    Telephone:               North America  +1 800 995 2696
-				     Latin America  +1 877 919 9526
-				     Europe         +31 23 556 0100
-				     Asia           +65 394 7933
-				     All Other      +1 818 878 4507
-	
-	    Electronic Mail:         support@ind.alcatel.com
-	    World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-	    File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+	    Telephone:               +1 800 995 2696 
+ 				                	
+	    Electronic Mail:         ebg_global_supportcenter@al-enterprise.com
+	    World Wide Web:          https://www.al-enterprise.com"
+
 	DESCRIPTION
 	    "This module describes an authoritative enterprise-specific Simple
              Network Management Protocol (SNMP) Management Information Base (MIB):
          
-                 For the Birds Of Prey Product Line
+                 For the OmniSwitch Product Line
                  SNMP Agent Subsystem.
          
              The right to make changes in specification and other information
@@ -52,12 +48,13 @@ alcatelIND1SNMPAgentMIB  MODULE-IDENTITY
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
          
-                         Copyright (C) 1995-2007 Alcatel-Lucent
-                             ALL RIGHTS RESERVED WORLDWIDE"
+                         Copyright (C) ALE USA Inc. 2014-2019
+			 Copyright (C) 1995-2013 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
 
-	REVISION      "200704030000Z"
+	REVISION      "201910070000Z"
         DESCRIPTION
-            "Addressing discrepancies with Alcatel Standard."
+            "Updated the latest contact and Copyright information for ALE USA Inc."
 	::= { softentIND1SnmpAgt 1 }
 
     alcatelIND1SNMPAgentMIBObjects OBJECT-IDENTITY
@@ -163,25 +160,21 @@ snmpAgtCommunityMode OBJECT-TYPE
              ipInterface (3)
        }
        MAX-ACCESS read-write
-       STATUS        obsolete 
+       STATUS        current
        DESCRIPTION
               "The SNMP Agent Configuration
               1 -- Default(Loopback0 or closest IP)
               2 -- No Loopback0
-              3 -- Interface IP Specified by User
-	      This object has been obsoleted. Use the alaIpManagedIntfEntry objects
-	      in AlcatelIND1Ip.mib"
+              3 -- Interface IP Specified by User"
        DEFVAL        { default }
        ::= {  alcatelIND1SNMPAgentMIBObjects 4 }
  
       snmpAgtSourceIp  OBJECT-TYPE
 	SYNTAX     IpAddress
         MAX-ACCESS read-write
-        STATUS       obsolete 
+        STATUS        current
         DESCRIPTION
-               "The Source IP of SNMP Packets.
-	        This object has been obsoleted. Use the alaIpManagedIntfEntry objects
-		in AlcatelIND1Ip.mib"
+               "The Source IP of SNMP Packets"
         ::= {  alcatelIND1SNMPAgentMIBObjects 5 }
 
 --
@@ -196,7 +189,8 @@ snmpAgtCommunityMode OBJECT-TYPE
 
             MANDATORY-GROUPS
             {
-                snmpAgtConfigGroup
+                snmpAgtConfigGroup,
+                snmpAgtCtlFilesGroup
             }
 
         ::= { alcatelIND1SNMPAgentMIBCompliances 1 }
@@ -217,5 +211,73 @@ snmpAgtCommunityMode OBJECT-TYPE
             "Collection of objects for SNMP Agent configuration."
         ::= { alcatelIND1SNMPAgentMIBGroups 1 }
 
+snmpAgtCtlFilesGroup OBJECT-GROUP
+        OBJECTS
+        {
+            snmpAgtSourceIpConfig,
+            snmpAgtSourceIp
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for SNMP Agent Contorl Files configuration."
+        ::= { alcatelIND1SNMPAgentMIBGroups 2 }
 
+--	 
+--    SNMP View local database configuration table	 
+--	 
+    snmpAgtViewMIB    OBJECT IDENTIFIER ::= { alcatelIND1SNMPAgentMIBObjects 6 }	 
+	 
+    snmpAgtViewTable OBJECT-TYPE	 
+        SYNTAX        SEQUENCE OF SnmpAgtViewEntry	 
+        MAX-ACCESS    not-accessible	 
+        STATUS        current	 
+        DESCRIPTION	 
+            "This table shows current configuration for the local SNMP View database."	 
+        ::= { snmpAgtViewMIB 1 }	 
+	 
+    snmpAgtViewEntry OBJECT-TYPE	 
+        SYNTAX        SnmpAgtViewEntry	 
+        MAX-ACCESS    not-accessible	 
+        STATUS        current	 
+        DESCRIPTION	 
+            "An View configuration identified by its View name."	 
+	INDEX { snmpAgtViewName,snmpAgtViewTableID }
+        ::= { snmpAgtViewTable 1 }	 
+	 
+    SnmpAgtViewEntry ::= SEQUENCE	 
+        {	 
+            snmpAgtViewName                   DisplayString,	 
+            snmpAgtViewTableID                DisplayString,	 
+            snmpAgtViewType                   INTEGER	 
+       }	 
+           	 
+    snmpAgtViewName OBJECT-TYPE	 
+        SYNTAX        DisplayString ( SIZE( 0 .. 63 ) )	 
+        MAX-ACCESS    not-accessible
+        STATUS        current	 
+        DESCRIPTION	 
+            "Name of the View."	 
+        ::= { snmpAgtViewEntry 1}	 
+                	 
+    snmpAgtViewTableID OBJECT-TYPE	 
+        SYNTAX        DisplayString ( SIZE( 0 .. 63 ) )
+        MAX-ACCESS    not-accessible
+        STATUS        current	 
+        DESCRIPTION	 
+            "OID need to added in view table"	 
+        ::= { snmpAgtViewEntry 2}	 
+                	 
+    snmpAgtViewType OBJECT-TYPE	 
+        SYNTAX        INTEGER	 
+                      {	 
+                           include(1),	 
+                           exclude(2)  	 
+                      }	 
+        MAX-ACCESS    not-accessible
+        STATUS        current	 
+        DESCRIPTION	 
+            "Specifies type of the Table OID to be added in the view table.	 
+                 include(1) - If OID is need to be allowed for the user.	 
+                 exclude(2) - If OID is not to be allowed for the user."	 
+        ::= { snmpAgtViewEntry 3}	 
 END

@@ -9,35 +9,29 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 
 
 	alcatelIND1VLANMgrMIB MODULE-IDENTITY
-		LAST-UPDATED "200704030000Z"
-		ORGANIZATION "Alcatel-Lucent"
+		LAST-UPDATED "201910070000Z"
+		ORGANIZATION "ALE USA Inc"
 		CONTACT-INFO
             "Please consult with Customer Service to ensure the most appropriate
              version of this document is used with the products in question:
 
-                        Alcatel-Lucent, Enterprise Solutions Division
-                       (Formerly Alcatel Internetworking, Incorporated)
+                            Alcatel-Lucent Enterprise,
                                26801 West Agoura Road
                             Agoura Hills, CA  91301-5122
                               United States Of America
 
-            Telephone:               North America  +1 800 995 2696
-                                     Latin America  +1 877 919 9526
-                                     Europe         +31 23 556 0100
-                                     Asia           +65 394 7933
-                                     All Other      +1 818 878 4507
+            Telephone:               +1 800 995 2696
 
-            Electronic Mail:         support@ind.alcatel.com
-            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+            Electronic Mail:         ebg_global_supportcenter@al-enterprise.com
+            World Wide Web:          https://www.al-enterprise.com"  
 
 		DESCRIPTION
 			"This module describes an authoritative enterprise-specific Simple
              Network Management Protocol (SNMP) Management Information Base (MIB):
 
-                 For the Birds Of Prey Product Line
+                 For the OmniSwitch Product Line
                  Vlan Manager for the distribution of vlan configuration information,
-				 including the association between vlans and ports.
+		 including the association between vlans and ports.
 
              The right to make changes in specification and other information
              contained in this document without prior notice is reserved.
@@ -50,12 +44,13 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
 
-                         Copyright (C) 1995-2007 Alcatel-Lucent
-                             ALL RIGHTS RESERVED WORLDWIDE"
+                         Copyright (C) ALE USA Inc. 2014-2019
+			 Copyright (C) 1995-2013 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
 
-		REVISION      "200704030000Z"
-        DESCRIPTION
-            "The latest version of this MIB Module."
+		REVISION      "201910070000Z"
+                DESCRIPTION
+                     "Updated the latest contact and Copyright information for ALE USA Inc."
 		::= { softentIND1VlanMgt 1}
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -181,6 +176,8 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
                 vlanSvlanPriority
         		INTEGER,
                 vlanMacLearningControlStatus          
+                        INTEGER,
+                vlanSvlanMacTunnelStatus
                         INTEGER
 	}
 
@@ -195,7 +192,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 
 	vlanDescription  OBJECT-TYPE
 	    SYNTAX  DisplayString (SIZE (0..32))
-	    MAX-ACCESS  read-write
+	    MAX-ACCESS  read-create
 	    STATUS  current
 	    DESCRIPTION
 		 "Textual description of the VLAN instance."
@@ -206,7 +203,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 	    	enabled(1),
 	    	disabled(2)
 	    }
-	    MAX-ACCESS  read-write
+	    MAX-ACCESS  read-create
 	    STATUS  current
 	    DESCRIPTION
 		"The administrative status which can be set by
@@ -230,7 +227,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 
 	 vlanStatus  OBJECT-TYPE
 	 	SYNTAX  RowStatus
-		MAX-ACCESS  read-write
+		MAX-ACCESS  read-create
 		STATUS  current
 		DESCRIPTION
 			"Row status to control creation/deletion of vlans."
@@ -241,7 +238,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 			enabled(1),
 			disabled(2)
 		}
-		MAX-ACCESS  read-write
+		MAX-ACCESS  read-create
 		STATUS  current
 		DESCRIPTION
 		"Indicates status of spanning tree for the current VLAN."
@@ -253,7 +250,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 			enabled(1),
 			disabled(2)
 		}
-		MAX-ACCESS  read-write
+		MAX-ACCESS  read-create
 		STATUS  current
 		DESCRIPTION
 		"Indicates status of authentication for the current VLAN."
@@ -266,7 +263,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 			enabled(1),
 			disabled(2)
 		}
-		MAX-ACCESS  read-write
+		MAX-ACCESS  read-create
 		STATUS  current
 		DESCRIPTION
 		"Indicates status of voice usage for the current VLAN."
@@ -276,7 +273,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 
 	vlanIpAddress  OBJECT-TYPE
 		SYNTAX  IpAddress
-		MAX-ACCESS  read-write
+		MAX-ACCESS  read-create
 		STATUS  current
 		DESCRIPTION
 			"IP address of the VLAN's virtual router port.
@@ -289,7 +286,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 
 	vlanIpMask OBJECT-TYPE
 		SYNTAX IpAddress
-		MAX-ACCESS read-write
+		MAX-ACCESS read-create
 		STATUS current
 		DESCRIPTION
 			"Subnetwork mask for VLAN IP Address.
@@ -302,7 +299,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 			snap (2),
 			notApplicable(3)
 		}
-		MAX-ACCESS read-write
+		MAX-ACCESS read-create
 	    STATUS current
 		DESCRIPTION
 		"VLAN's IP router port encapsulation.
@@ -316,7 +313,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 			disable(2),
 			notApplicable(3)
 		}
-		MAX-ACCESS read-write
+		MAX-ACCESS read-create
 	    STATUS current
 		DESCRIPTION
 		"VLAN's IP router port ip frame forwarding (disabled = ip host only).
@@ -329,7 +326,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 			add(1),
 			delete(2)
 		}
-		MAX-ACCESS read-write
+		MAX-ACCESS read-create
 		STATUS current
 		DESCRIPTION
 		"Provides ability to add and remove the VLAN ip address."
@@ -337,7 +334,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 
 	vlanIpxNet OBJECT-TYPE
 		SYNTAX IpxNetworkAddress
-		MAX-ACCESS read-write
+		MAX-ACCESS read-create
 		STATUS current
 		DESCRIPTION
 		"IPX network address.
@@ -356,7 +353,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 			snap (4),
 			notApplicable(5)
 		}
-		MAX-ACCESS read-write
+		MAX-ACCESS read-create
 		STATUS current
 		DESCRIPTION
 		"IPX of frame enapsulation of IPX VLAN router port.
@@ -372,7 +369,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 			inactive(4),
 			notApplicable(5)
 		}
-		MAX-ACCESS read-write
+		MAX-ACCESS read-create
 		STATUS current
 		DESCRIPTION
 		"IPX advertisement mode.
@@ -382,7 +379,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 
 	vlanIpxDelayTicks OBJECT-TYPE
 		SYNTAX INTEGER (0..65535)
-		MAX-ACCESS read-write
+		MAX-ACCESS read-create
 		STATUS current
 		DESCRIPTION
 		"Tick metric to use for supporting IPX routing decisions."
@@ -394,7 +391,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 			add(1),
 			delete(2)
 		}
-		MAX-ACCESS read-write
+		MAX-ACCESS read-create
 		STATUS current
 		DESCRIPTION
 		"Provides ability to add and remove the VLAN ipx network node."
@@ -405,7 +402,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
                         enable(1),
                         disable(2)
                 }
-                MAX-ACCESS read-write
+                MAX-ACCESS read-create
                 STATUS current
                 DESCRIPTION
                 "When enabled for a VLAN, a mobile port will be moved to the
@@ -430,7 +427,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
        			enable(1),
        			disable(2)
      		}
-     		MAX-ACCESS read-write
+     		MAX-ACCESS read-create
      		STATUS current
      		DESCRIPTION
        		"When enabled for a VLAN, local proxy ARP processing happens on this=
@@ -439,11 +436,11 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 
 	vlanMtu  OBJECT-TYPE
                 SYNTAX  INTEGER (1280..9198)
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
-                 "Maximum transmission unit i.e. the maximum size of packet that this
-                  vlan can handle. It ranges from 1280 to 9198."
+                  "Maximum transmission unit i.e. the maximum size of packet that this
+                   vlan can handle. It ranges from 1280 to 9198."
                 ::= { vlanEntry 22 }
 
 	vlan1x1StpStatus  OBJECT-TYPE
@@ -451,7 +448,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 			enabled(1),
 			disabled(2)
 		}
-		MAX-ACCESS  read-write
+		MAX-ACCESS  read-create
 		STATUS  current
 		DESCRIPTION
 		"Indicates status of 1x1 spanning tree for the current VLAN."
@@ -463,7 +460,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 			enabled(1),
 			disabled(2)
 		}
-		MAX-ACCESS  read-write
+		MAX-ACCESS  read-create
 		STATUS  current
 		DESCRIPTION
 		"Indicates status of flat spanning tree for the current VLAN."
@@ -472,7 +469,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 
 	vlanHABandwidth OBJECT-TYPE
                 SYNTAX  INTEGER (0..50)
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "Bandwidth of flood queue allocated by Q-driver for High Availability
@@ -489,8 +486,13 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
                                 eServiceCustomer(6),
                                 eServiceManagement(7),
                                 eServiceMulticastVlanStacking(8)
+                                -- unknown1(9),
+                                -- unknown2(10),
+                                -- unknown3(11),
+                                -- vip(12),
+                                -- mcm(13)
                         }
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "The created SVLAN is desired for carrying customer or
@@ -501,7 +503,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 
    	vlanSvlanPriority OBJECT-TYPE
                 SYNTAX  INTEGER (-1..7)
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "All traffic getting mapped to this Svlan should be either
@@ -514,12 +516,27 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
                                       enabled (1),
                                       disabled (2)
                                        }
-                MAX-ACCESS      read-write
+                MAX-ACCESS      read-create
                 STATUS          current
                 DESCRIPTION
                 "Status of Mac Learning on a vlan"
                         DEFVAL { enabled }
                 ::= { vlanEntry 28 }
+
+        vlanSvlanMacTunnelStatus OBJECT-TYPE
+                SYNTAX      INTEGER {
+                                     enable (1),
+                                     disable (2)
+                                    }
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                "Status of whether MAC Tunneling is enabled on this S-VLAN. 
+                Default Value is disable. 
+                This value will only take precedence when the value of the
+                Object alaEServiceL2MacTunnel is DISABLED"
+                         DEFVAL { disable }
+                ::= { vlanEntry 29 }
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -600,7 +617,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
                  4. mirrored   - Set internally when the vpa created is on
               	                 a mirrored port.
                  6. slvan      - Service vlan vpa's which are created.
-                 7. dynamic    - Created by dynamic GVRP or MVRP Protocol."
+                 7. dynamic	- Created by dynamic GVRP or MVRP Protocol."
 
                 ::= { vpaEntry 3 }
 
@@ -623,7 +640,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 
 	vpaStatus  OBJECT-TYPE
 		SYNTAX  RowStatus
-		MAX-ACCESS  read-write
+		MAX-ACCESS  read-create
 		STATUS  current
 		DESCRIPTION
 		"This is used to create or delete staticPrimary VPAs (default vlans
@@ -639,7 +656,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 			egress(2),
 			inapplicable(3)
 		}
-		MAX-ACCESS read-write
+		MAX-ACCESS read-create
 		STATUS current
 		DESCRIPTION
 		"Value of this field will decide whether the port represented by vpaIfIndex is a ingress port or egress port. This fiels is applicable only for portMac vlans"
@@ -760,7 +777,7 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 
         vlanHAPortRowStatus OBJECT-TYPE
                 SYNTAX  RowStatus
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "This indicate whether to add or delete the ifIndex"
@@ -816,7 +833,8 @@ ALCATEL-IND1-VLAN-MGR-MIB DEFINITIONS ::= BEGIN
 			vlanIpxEncap,
 			vlanIpxRipSapMode,
 			vlanIpxDelayTicks,
-			vlanIpxStatus
+			vlanIpxStatus,
+                        vlanSvlanMacTunnelStatus
         }
         STATUS  current
         DESCRIPTION
