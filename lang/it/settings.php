@@ -254,7 +254,10 @@ return [
             ],
         ],
         'astext' => [
-            'description' => 'Key to hold cache of autonomous systems descriptions',
+            'description' => 'Descrizioni dei Sistemi Autonomi',
+            'help' => 'Elenco di ASN e relative descrizioni per mostrare nomi personalizzati nei contesti di Routing',
+            'keyPlaceholder' => 'ASN',
+            'valuePlaceholder' => 'Descrizione',
         ],
         'auth' => [
             'socialite' => [
@@ -939,6 +942,8 @@ return [
         ],
         'nfsen_lasts' => [
             'description' => 'Default Last Options',
+            'keyPlaceholder' => 'Secondi',
+            'valuePlaceholder' => 'Etichetta di visualizzazione',
         ],
         'nfsen_split_char' => [
             'description' => 'Split Char',
@@ -1569,15 +1574,18 @@ return [
         'seconds' => 'seconds',
     ],
     'validate' => [
-        'boolean' => ':value is not a valid boolean',
-        'color' => ':value is not a valid hex color code',
-        'email' => ':value is not a valid email',
-        'integer' => ':value is not an integer',
-        'password' => 'The password is incorrect',
-        'select' => ':value is not an allowed value',
-        'text' => ':value is not allowed',
-        'array' => 'Invalid format',
-        'executable' => ':value is not a valid executable',
-        'directory' => ':value is not a valid directory',
+        'boolean' => ':value non è un booleano valido',
+        'color' => ':value non è un codice colore esadecimale valido',
+        'email' => ':value non è un indirizzo email valido',
+        'integer' => ':value non è un intero',
+        'password' => 'La password non è corretta',
+        'select' => ':value non è un valore consentito',
+        'text' => ':value non è consentito',
+        'array' => 'Formato non valido',
+        'key' => 'Chiave non valida',
+        'regex' => 'Pattern regex non valido',
+        'duplicate_key' => 'La chiave esiste già',
+        'executable' => ':value non è un eseguibile valido',
+        'directory' => ':value non è una directory valida',
     ],
 ];

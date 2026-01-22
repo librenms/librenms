@@ -83,7 +83,26 @@ class DynamicConfigItem implements \ArrayAccess
             return filter_var($value, FILTER_VALIDATE_EMAIL);
         } elseif ($this->type == 'array') {
             return is_array($value); // this should probably have more complex validation via validator rules
-        } elseif ($this->type == 'array-sub-keyed') {
+        } elseif ($this->type == 'map') {
+            if (! is_array($value)) {
+                return false;
+            }
+
+            foreach ($value as $key => $v) {
+                // values must be scalar (not arrays) for flat key-value maps
+                if (is_array($v)) {
+                    return false;
+                }
+
+                if (! $this->checkKey($key)) {
+                    return false;
+                }
+            }
+
+            return true;
+        } elseif ($this->type == 'nested-map' || $this->type == 'array-sub-keyed') {
+            // Note: 'array-sub-keyed' is deprecated, kept for backwards compatibility.
+            // Use 'nested-map' for new settings.
             if (! is_array($value)) {
                 return false;
             }
@@ -93,8 +112,7 @@ class DynamicConfigItem implements \ArrayAccess
                     return false;
                 }
 
-                // check keys not empty
-                if (is_string($key) && strlen(trim($key)) == 0) {
+                if (! $this->checkKey($key)) {
                     return false;
                 }
             }
@@ -252,6 +270,20 @@ class DynamicConfigItem implements \ArrayAccess
     public function getName()
     {
         return $this->name;
+    }
+
+    public function checkKey($key): bool
+    {
+        $key = (string) $key;
+        if (strlen(trim($key)) === 0) {
+            return false;
+        }
+
+        if (($this->validate['key'] ?? null) === 'regex' && @preg_match($key, '') === false) {
+            return false;
+        }
+
+        return true;
     }
 
     private function descriptionTranslationKey()

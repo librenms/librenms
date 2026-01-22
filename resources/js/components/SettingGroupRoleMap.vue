@@ -61,13 +61,21 @@ export default {
         },
         methods: {
             addItem() {
-                this.localList[this.newItem] = {roles: this.newItemRoles};
+                if (!this.newItem || !this.newItem.trim()) return;
+                if (Object.prototype.hasOwnProperty.call(this.localList, this.newItem)) return;
+                // Use spread for Vue 2 reactivity
+                this.localList = {
+                    ...this.localList,
+                    [this.newItem]: {roles: this.newItemRoles}
+                };
                 this.newItem = "";
                 this.newItemRoles = [];
                 this.$emit('input', this.localList)
             },
             removeItem(index) {
-                delete this.localList[index]
+                // Use destructuring for Vue 2 reactivity
+                const { [index]: removed, ...rest } = this.localList;
+                this.localList = rest;
                 this.$emit('input', this.localList)
             },
             updateItem(oldValue, newValue) {
@@ -79,8 +87,14 @@ export default {
                 this.$emit('input', this.localList)
             },
             updateRoles(group, roles) {
-                console.log(group, roles, this.lock);
-                this.localList[group].roles = roles;
+                // Use spread for Vue 2 reactivity
+                this.localList = {
+                    ...this.localList,
+                    [group]: {
+                        ...this.localList[group],
+                        roles: roles
+                    }
+                };
                 this.$emit('input', this.localList)
             },
             parseValue(value) {

@@ -340,7 +340,10 @@ return [
             ],
         ],
         'astext' => [
-            'description' => 'Key to hold cache of autonomous systems descriptions',
+            'description' => 'Autonomous Systems Descriptions',
+            'help' => 'List of ASNs and their descriptions to show custom names in Routing contexts',
+            'keyPlaceholder' => 'ASN',
+            'valuePlaceholder' => 'Description',
         ],
         'auth' => [
             'allow_get_login' => [
@@ -1455,6 +1458,8 @@ return [
         'ipmi_unit' => [
             'description' => 'IPMI Unit',
             'help' => 'IPMI unit types that can be discovered.',
+            'keyPlaceholder' => 'IPMI Unit',
+            'valuePlaceholder' => 'Sensor Type',
         ],
         'libvirt_protocols' => [
             'description' => 'Libvirt Protocols',
@@ -1467,14 +1472,20 @@ return [
         'location_map' => [
             'description' => 'Specific Location Map',
             'help' => 'Map a sysLocation value to another value.',
+            'keyPlaceholder' => 'SNMP sysLocation',
+            'valuePlaceholder' => 'Mapped Location',
         ],
         'location_map_regex' => [
             'description' => 'Specific Location Map using regex',
             'help' => 'Map a sysLocation value to another value using regex.',
+            'keyPlaceholder' => 'Regex Pattern',
+            'valuePlaceholder' => 'Mapped Location',
         ],
         'location_map_regex_sub' => [
             'description' => 'Specific Location Map using regex substitution',
             'help' => 'Substitute the sysLocation value using regex substitution.',
+            'keyPlaceholder' => 'Regex Pattern',
+            'valuePlaceholder' => 'Replacement',
         ],
         'login_message' => [
             'description' => 'Logon Message',
@@ -1550,6 +1561,8 @@ return [
         ],
         'nfsen_lasts' => [
             'description' => 'Default Last Options',
+            'keyPlaceholder' => 'Seconds',
+            'valuePlaceholder' => 'Display Label',
         ],
         'nfsen_base' => [
             'description' => 'NFSen Base Directory',
@@ -1987,6 +2000,12 @@ return [
         'rewrite_if' => [
             'description' => 'Rewrite ifDescr',
             'help' => 'Rewrite ifDescr to remove the interface type and number, e.g. GigabitEthernet0/1 becomes GigabitEthernet',
+        ],
+        'rewrite_if_regexp' => [
+            'description' => 'Rewrite ifDescr using regex',
+            'help' => 'Rewrite ifDescr values using regular expression substitution.',
+            'keyPlaceholder' => 'Regex Pattern',
+            'valuePlaceholder' => 'Replacement',
         ],
         'route_purge' => [
             'description' => 'Route entries older than',
@@ -2519,6 +2538,9 @@ return [
         'select' => ':value is not an allowed value',
         'text' => ':value is not allowed',
         'array' => 'Invalid format',
+        'key' => 'Invalid key',
+        'regex' => 'Invalid regex pattern',
+        'duplicate_key' => 'Key already exists',
         'executable' => ':value is not a valid executable',
         'directory' => ':value is not a valid directory',
     ],

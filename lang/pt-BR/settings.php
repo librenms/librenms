@@ -274,7 +274,10 @@ return [
             ],
         ],
         'astext' => [
-            'description' => 'Chave para armazenar cache de descrições de sistemas autônomos',
+            'description' => 'Descrições de Sistemas Autônomos',
+            'help' => 'Lista de ASNs e suas descrições para exibir nomes personalizados em contextos de Roteamento',
+            'keyPlaceholder' => 'ASN',
+            'valuePlaceholder' => 'Descrição',
         ],
         'auth' => [
             'allow_get_login' => [
@@ -1304,6 +1307,8 @@ return [
         ],
         'nfsen_lasts' => [
             'description' => 'Opções Padrão de Último',
+            'keyPlaceholder' => 'Segundos',
+            'valuePlaceholder' => 'Rótulo de exibição',
         ],
         'nfsen_base' => [
             'description' => 'Diretório Base do NFSen',
@@ -2074,6 +2079,9 @@ return [
         'select' => ':value não é um valor permitido',
         'text' => ':value não é permitido',
         'array' => 'Formato inválido',
+        'key' => 'Chave inválida',
+        'regex' => 'Padrão regex inválido',
+        'duplicate_key' => 'Chave já existe',
         'executable' => ':value não é um executável válido',
         'directory' => ':value não é um diretório válido',
     ],

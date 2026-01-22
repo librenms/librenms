@@ -32,7 +32,8 @@
             required: Boolean,
             pattern: String,
             "update-status": String,
-            options: {}
+            options: {},
+            validate: {}
         }
     }
 </script>

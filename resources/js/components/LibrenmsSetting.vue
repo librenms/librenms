@@ -36,6 +36,7 @@
                        :disabled="setting.overridden"
                        :required="setting.required"
                        :options="setting.options"
+                       :validate="setting.validate"
                        :update-status="updateStatus"
                        @input="changeValue($event)"
                        @change="changeValue($event)"

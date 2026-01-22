@@ -120,6 +120,8 @@
                                     "text",
                                     "boolean",
                                     "array",
+                                    "map",
+                                    "nested-map",
                                     "array-sub-keyed",
                                     "password",
                                     "email",

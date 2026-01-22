@@ -472,7 +472,7 @@
                 "65332": "Cymru FullBogon Feed",
                 "65333": "Cymru Bogon Feed"
             },
-            "type": "array",
+            "type": "map",
             "group": "discovery",
             "section": "general",
             "order": 4
@@ -537,7 +537,7 @@
             "group": "auth",
             "section": "socialite",
             "order": 3,
-            "type": "array-sub-keyed",
+            "type": "nested-map",
             "validate": {
                 "value": "array|array_keys_not_empty",
                 "value.*": "array|array_keys_not_empty",
@@ -5122,7 +5122,7 @@
                 "discrete": "",
                 "percent": "load"
             },
-            "type": "array",
+            "type": "map",
             "group": "discovery",
             "section": "ipmi",
             "order": 1
@@ -5255,7 +5255,7 @@
         },
         "location_map": {
             "default": null,
-            "type": "array",
+            "type": "map",
             "validate": {
                 "value": "array",
                 "value.*": "string"
@@ -5266,8 +5266,9 @@
         },
         "location_map_regex": {
             "default": null,
-            "type": "array",
+            "type": "map",
             "validate": {
+                "key": "regex",
                 "value": "array",
                 "value.*": "string"
             },
@@ -5277,8 +5278,9 @@
         },
         "location_map_regex_sub": {
             "default": null,
-            "type": "array",
+            "type": "map",
             "validate": {
+                "key": "regex",
                 "value": "array",
                 "value.*": "string"
             },
@@ -5576,7 +5578,7 @@
                 "115200": "36 hours",
                 "153600": "48 hours"
             },
-            "type": "array"
+            "type": "map"
         },
         "nfsen_base": {
             "default": [],
@@ -6531,12 +6533,13 @@
             "default": {
                 "/^cpu interface/": "Mgmt"
             },
-            "type": "array",
+            "type": "map",
             "group": "discovery",
             "section": "ports",
             "validate": {
+                "key": "regex",
                 "value": "array",
-                "value.*": "is_regex"
+                "value.*": "string"
             },
             "order": 10
         },

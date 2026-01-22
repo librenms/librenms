@@ -254,7 +254,10 @@ return [
             ],
         ],
         'astext' => [
-            'description' => 'Ключ для кешу описів автономних систем',
+            'description' => 'Описи автономних систем',
+            'help' => 'Список ASN та їх описів для відображення власних назв у контекстах маршрутизації',
+            'keyPlaceholder' => 'ASN',
+            'valuePlaceholder' => 'Опис',
         ],
         'auth' => [
             'socialite' => [
@@ -930,6 +933,8 @@ return [
         ],
         'nfsen_lasts' => [
             'description' => 'Default Last Options',
+            'keyPlaceholder' => 'Секунди',
+            'valuePlaceholder' => 'Мітка відображення',
         ],
         'nfsen_split_char' => [
             'description' => 'Символ-роздільник',
@@ -1560,6 +1565,9 @@ return [
         'select' => ':value не є дозволеним значенням',
         'text' => ':value не є дозволеним',
         'array' => 'Невірний формат',
+        'key' => 'Невірний ключ',
+        'regex' => 'Невірний шаблон regex',
+        'duplicate_key' => 'Ключ вже існує',
         'executable' => ':value не є валідним виконуваним файлом',
         'directory' => ':value не є валідною директорією',
     ],

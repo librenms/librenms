@@ -1,7 +1,8 @@
 <!--
   - SettingArraySubKeyed.vue
   -
-  - Description-
+  - @deprecated Use SettingNestedMap.vue (type: 'nested-map') for new settings.
+  -             This component is kept for backwards compatibility with 'array-sub-keyed' type.
   -
   - This program is free software: you can redistribute it and/or modify
   - it under the terms of the GNU General Public License as published by
