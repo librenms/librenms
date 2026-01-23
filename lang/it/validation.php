@@ -65,7 +65,7 @@ return [
     'ip_or_hostname' => ':attribute deve essere un indirizzo IP od un nome valido.',
     'ipv4' => ':attribute deve essere un indirizzo IPv4 valido.',
     'ipv6' => ':attribute deve essere un indirizzo IPv6 valido.',
-    'is_regex' => ':attribute non è un\'espressione regolare valida.',
+    'is_regex' => ':attribute non è un\'espressione regolare valida. I pattern devono includere delimitatori (es: /pattern/).',
     'json' => ':attribute deve essere una stringa JSON valida.',
     'lt' => [
         'numeric' => ':attribute deve essere minori di :value.',

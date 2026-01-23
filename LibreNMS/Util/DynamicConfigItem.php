@@ -64,26 +64,8 @@ class DynamicConfigItem implements \ArrayAccess
      */
     public function checkValue($value)
     {
-        if ($this->validate) {
-            return $this->buildValidator($value)->passes();
-        } elseif ($this->type == 'boolean') {
-            return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null;
-        } elseif ($this->type == 'integer') {
-            return (! is_bool($value) && filter_var($value, FILTER_VALIDATE_INT)) || $value === '0' || $value === 0;
-        } elseif ($this->type == 'float') {
-            return filter_var($value, FILTER_VALIDATE_FLOAT) !== false;
-        } elseif ($this->type == 'select') {
-            return in_array($value, array_keys($this->options));
-        } elseif ($this->type == 'email') {
-            // allow email format that includes display text
-            if (preg_match('/.* <(.*)>/', (string) $value, $matches)) {
-                $value = $matches[1];
-            }
-
-            return filter_var($value, FILTER_VALIDATE_EMAIL);
-        } elseif ($this->type == 'array') {
-            return is_array($value); // this should probably have more complex validation via validator rules
-        } elseif ($this->type == 'map') {
+        // For map and nested-map types, do key validation first (Laravel Validator can't validate array keys)
+        if ($this->type == 'map') {
             if (! is_array($value)) {
                 return false;
             }
@@ -97,6 +79,11 @@ class DynamicConfigItem implements \ArrayAccess
                 if (! $this->checkKey($key)) {
                     return false;
                 }
+            }
+
+            // After key validation passes, run Laravel validator for value rules if present
+            if ($this->validate) {
+                return $this->buildValidator($value)->passes();
             }
 
             return true;
@@ -117,7 +104,32 @@ class DynamicConfigItem implements \ArrayAccess
                 }
             }
 
+            // After key validation passes, run Laravel validator for value rules if present
+            if ($this->validate) {
+                return $this->buildValidator($value)->passes();
+            }
+
             return true;
+        } elseif ($this->validate) {
+            // For other types with validate rules, use Laravel validator
+            return $this->buildValidator($value)->passes();
+        } elseif ($this->type == 'boolean') {
+            return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null;
+        } elseif ($this->type == 'integer') {
+            return (! is_bool($value) && filter_var($value, FILTER_VALIDATE_INT)) || $value === '0' || $value === 0;
+        } elseif ($this->type == 'float') {
+            return filter_var($value, FILTER_VALIDATE_FLOAT) !== false;
+        } elseif ($this->type == 'select') {
+            return in_array($value, array_keys($this->options));
+        } elseif ($this->type == 'email') {
+            // allow email format that includes display text
+            if (preg_match('/.* <(.*)>/', (string) $value, $matches)) {
+                $value = $matches[1];
+            }
+
+            return filter_var($value, FILTER_VALIDATE_EMAIL);
+        } elseif ($this->type == 'array') {
+            return is_array($value); // this should probably have more complex validation via validator rules
         } elseif ($this->type == 'color') {
             return (bool) preg_match('/^#?[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/', (string) $value);
         } elseif (in_array($this->type, ['text', 'password'])) {
@@ -240,9 +252,46 @@ class DynamicConfigItem implements \ArrayAccess
      */
     public function getValidationMessage($value)
     {
-        return $this->validate
-            ? implode(" \n", $this->buildValidator($value)->messages()->all())
-            : __('settings.validate.' . $this->type, ['id' => $this->name, 'value' => json_encode($value)]);
+        // For map and nested-map types, check for key validation errors first
+        if (in_array($this->type, ['map', 'nested-map', 'array-sub-keyed']) && is_array($value)) {
+            foreach ($value as $key => $v) {
+                if (! $this->checkKey($key)) {
+                    // Return the is_regex validation message for regex key validation
+                    if (($this->validate['key'] ?? null) === 'regex') {
+                        $validator = Validator::make(
+                            ['key' => $key],
+                            ['key' => 'is_regex'],
+                            [],
+                            ['key' => __('Key') . " '$key'"]
+                        );
+
+                        if ($validator->fails()) {
+                            return $validator->errors()->first('key');
+                        }
+                    }
+
+                    return __('settings.validate.key', ['id' => $this->name, 'value' => json_encode($key)]);
+                }
+            }
+        }
+
+        if (! $this->validate) {
+            return __('settings.validate.' . $this->type, ['id' => $this->name, 'value' => json_encode($value)]);
+        }
+
+        $messages = $this->buildValidator($value)->messages()->all();
+
+        // Make array index references more user-friendly
+        // "The value.0 is invalid" -> "item 1 is invalid"
+        $messages = array_map(function ($message) {
+            return preg_replace_callback(
+                '/\bvalue\.(\d+)\b/i',
+                fn ($matches) => strtolower(__('Item')) . ' ' . ((int) $matches[1] + 1),
+                $message
+            );
+        }, $messages);
+
+        return implode(" \n", $messages);
     }
 
     // ArrayAccess functions
@@ -279,8 +328,8 @@ class DynamicConfigItem implements \ArrayAccess
             return false;
         }
 
-        if (($this->validate['key'] ?? null) === 'regex' && @preg_match($key, '') === false) {
-            return false;
+        if (($this->validate['key'] ?? null) === 'regex') {
+            return Validator::make(['key' => $key], ['key' => 'is_regex'])->passes();
         }
 
         return true;

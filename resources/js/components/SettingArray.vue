@@ -25,26 +25,41 @@
 <template>
     <div v-tooltip="disabled ? $t('settings.readonly') : false">
         <draggable v-model="localList" @end="dragged()" :disabled="disabled">
-            <div v-for="(item, index) in localList" class="input-group">
+            <div v-for="(item, index) in localList" :key="index" :class="['input-group', errorIndex === index ? 'has-error' : '']">
                 <span :class="['input-group-addon', disabled ? 'disabled' : '']">{{ index+1 }}.</span>
                 <input type="text"
                        class="form-control"
-                       :value="item"
-                       :readonly="disabled"
+                       :value="editingIndex === index ? editingValue : item"
+                       :readonly="disabled || isPending"
+                       @focus="startEdit(index, item)"
                        @blur="updateItem(index, $event.target.value)"
                        @keyup.enter="updateItem(index, $event.target.value)"
+                       @input="onEditInput(index, $event.target.value)"
+                       :ref="'itemInput' + index"
                 >
                 <span class="input-group-btn">
-                    <button v-if="!disabled" @click="removeItem(index)" type="button" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button>
+                    <button v-if="!disabled" @click="removeItem(index)" type="button" class="btn btn-danger" :disabled="isPending"><i class="fa fa-minus-circle"></i></button>
                 </span>
             </div>
         </draggable>
+        <div v-if="errorIndex !== null && errorIndex < localList.length" class="text-danger error-message">
+            {{ errorMessage }}
+        </div>
         <div v-if="!disabled">
-            <div class="input-group">
-                <input type="text" v-model="newItem" @keyup.enter="addItem" class="form-control">
+            <div :class="['input-group', errorIndex === 'new' ? 'has-error' : '']">
+                <input type="text"
+                       v-model="newItem"
+                       @keyup.enter="addItem"
+                       :class="['form-control', errorIndex === 'new' ? 'is-invalid' : '']"
+                       :readonly="isPending"
+                       ref="newItemInput"
+                >
                 <span class="input-group-btn">
-                    <button @click="addItem" type="button" class="btn btn-primary"><i class="fa fa-plus-circle"></i></button>
+                    <button @click="addItem" type="button" class="btn btn-primary" :disabled="isPending"><i class="fa fa-plus-circle"></i></button>
                 </span>
+            </div>
+            <div v-if="errorIndex === 'new'" class="text-danger error-message">
+                {{ errorMessage }}
             </div>
         </div>
     </div>
@@ -63,35 +78,110 @@
         data() {
             return {
                 localList: this.value ?? [],
-                newItem: ""
+                newItem: "",
+                pendingItem: null,
+                editingIndex: null,
+                editingValue: null,
+                errorIndex: null
+            }
+        },
+        computed: {
+            hasError() {
+                return this.updateStatus === 'error' && this.errorMessage;
+            },
+            isPending() {
+                return this.updateStatus === 'pending';
             }
         },
         methods: {
             addItem() {
-                if (this.disabled) return;
+                if (this.disabled || this.isPending || !this.newItem.trim()) return;
+                this.clearError();
+                this.pendingItem = this.newItem;
+                this.errorIndex = 'new';
                 this.localList.push(this.newItem);
                 this.$emit('input', this.localList);
-                this.newItem = "";
             },
             removeItem(index) {
-                if (this.disabled) return;
+                if (this.disabled || this.isPending) return;
+                this.clearError();
                 this.localList.splice(index, 1);
                 this.$emit('input', this.localList);
             },
+            startEdit(index, value) {
+                if (this.isPending) return;
+                this.editingIndex = index;
+                this.editingValue = value;
+            },
+            onEditInput(index, value) {
+                if (this.editingIndex === index) {
+                    this.editingValue = value;
+                }
+            },
             updateItem(index, value) {
-                if (this.disabled || this.localList[index] === value) return;
+                if (this.disabled || this.isPending) return;
+                // If no change from original, just clear editing state
+                if (this.localList[index] === value) {
+                    this.editingIndex = null;
+                    this.editingValue = null;
+                    return;
+                }
+                this.clearError();
+                this.errorIndex = index;
+                this.editingIndex = index;
+                this.editingValue = value;
                 this.localList[index] = value;
-                this.$emit('input', this.localList);
+                this.$emit('input', [...this.localList]);
             },
             dragged() {
-                if (this.disabled) return;
+                if (this.disabled || this.isPending) return;
+                this.clearError();
                 this.$emit('input', this.localList);
+            },
+            clearError() {
+                this.errorIndex = null;
             }
         },
         watch: {
             value(updated) {
-                // careful to avoid loops with this
-                this.localList = updated;
+                // Don't reset if we're currently showing an error for an edit
+                if (this.hasError && this.editingIndex !== null && this.errorIndex === this.editingIndex) {
+                    // Keep the editing value in place, but update the rest
+                    const newList = updated ? [...updated] : [];
+                    if (this.editingIndex < newList.length) {
+                        newList[this.editingIndex] = this.editingValue;
+                    }
+                    this.localList = newList;
+                    return;
+                }
+                this.localList = updated ? [...updated] : [];
+            },
+            updateStatus(newStatus) {
+                if (newStatus === 'success') {
+                    // Clear all pending state on successful save
+                    this.newItem = "";
+                    this.pendingItem = null;
+                    this.editingIndex = null;
+                    this.editingValue = null;
+                    this.errorIndex = null;
+                } else if (newStatus === 'error') {
+                    if (this.pendingItem !== null && this.errorIndex === 'new') {
+                        // On error for new item, restore to input field and remove from list
+                        this.newItem = this.pendingItem;
+                        // Remove the invalid item from the list (it was added optimistically)
+                        const indexToRemove = this.localList.lastIndexOf(this.pendingItem);
+                        if (indexToRemove !== -1) {
+                            this.localList.splice(indexToRemove, 1);
+                        }
+                        this.pendingItem = null;
+                        this.$nextTick(() => {
+                            if (this.$refs.newItemInput) {
+                                this.$refs.newItemInput.focus();
+                            }
+                        });
+                    }
+                    // For edits, the editingValue is already preserved via the template binding
+                }
             }
         }
     }
@@ -104,5 +194,15 @@
 
     .input-group-addon:not(.disabled) {
         cursor: move;
+    }
+
+    .error-message {
+        font-size: 0.85em;
+        margin-top: 4px;
+        margin-bottom: 8px;
+    }
+
+    .has-error .form-control {
+        border-color: #a94442;
     }
 </style>

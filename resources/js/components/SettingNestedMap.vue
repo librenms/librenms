@@ -25,7 +25,8 @@
         <div v-for="(item, index) in localList">
             <b>{{ index }}</b>
             <div v-for="(subItem, subindex) in item" class="input-group">
-                <span :class="['input-group-addon', disabled ? 'disabled' : '']">{{ subindex }}</span>
+                <span :class="['input-group-addon', disabled ? 'disabled' : '', keyErrors[index] === subindex ? 'btn-danger' : '']" v-if="keyErrors[index] === subindex" v-tooltip="keyErrorMessages[index]">{{ subindex }}</span>
+                <span :class="['input-group-addon', disabled ? 'disabled' : '']" v-else>{{ subindex }}</span>
                 <input type="text"
                        class="form-control"
                        :value="subItem"
@@ -83,10 +84,48 @@
                 newSubItemValue: {},
                 newSubArray: "",
                 newSubArrayError: "",
-                newSubItemKeyErrors: {}
+                newSubItemKeyErrors: {},
+                keyErrors: {},
+                keyErrorMessages: {}
             }
         },
         methods: {
+            parseServerError(errorMessage) {
+                // NOTE: This is a fallback because the API does not return structured
+                // per-key errors for nested-map settings. If/when the API provides
+                // structured error data, this parsing should be removed in favor of that.
+                // Try to extract the key from server error messages like:
+                // "The Key '/^cpu interface' is not a valid regular expression..." etc.
+                if (!errorMessage) return;
+
+                const tryMatch = (label) => {
+                    if (!label) return null;
+                    const escapedLabel = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const regex = new RegExp(escapedLabel + "\\s+'([^']+)'", 'i');
+                    return errorMessage.match(regex);
+                };
+
+                // Try translation first, then fallback to English
+                let match = tryMatch(this.$t('Key'));
+                if (!match && this.$t('Key') !== 'Key') {
+                    match = tryMatch('Key');
+                }
+
+                if (match && match[1]) {
+                    const errorKey = match[1];
+
+                    // For NestedMap, we need to find which parent key contains this child key
+                    // We scan the localList structure
+                    for (const parentKey in this.localList) {
+                        const childObj = this.localList[parentKey];
+                         if (Object.prototype.hasOwnProperty.call(childObj, errorKey)) {
+                            this.$set(this.keyErrors, parentKey, errorKey);
+                            this.$set(this.keyErrorMessages, parentKey, errorMessage);
+                            return; // Stop after finding the first match
+                        }
+                    }
+                }
+            },
             validateNewParentKey() {
                 if (!this.newSubArray || !this.newSubArray.trim()) {
                     this.newSubArrayError = '';
@@ -197,6 +236,16 @@
             value(updated) {
                 // careful to avoid loops with this
                 this.localList = updated ?? {};
+            },
+            errorMessage(newError) {
+                // When server returns an error, try to associate it with a specific key
+                if (newError) {
+                    this.parseServerError(newError);
+                } else {
+                    // Clear all key errors when error is cleared
+                    this.keyErrors = {};
+                    this.keyErrorMessages = {};
+                }
             }
         }
     }

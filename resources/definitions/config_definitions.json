@@ -6524,7 +6524,7 @@
             "type": "boolean"
         },
         "rewrite_if": {
-            "type": "array",
+            "type": "map",
             "group": "discovery",
             "section": "ports",
             "order": 9

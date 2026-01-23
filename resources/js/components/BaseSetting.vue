@@ -32,6 +32,7 @@
             required: Boolean,
             pattern: String,
             "update-status": String,
+            "error-message": String,
             options: {},
             validate: {}
         }

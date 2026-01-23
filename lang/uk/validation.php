@@ -67,7 +67,7 @@ return [
     'ip_or_hostname' => ':attribute має бути валідною IP адресою/підмережею або іменем хоста.',
     'ipv4' => ':attribute має бути валідною IPv4.',
     'ipv6' => ':attribute має бути валідною IPv6 адресою.',
-    'is_regex' => ':attribute не є валідним регулярним виразом',
+    'is_regex' => ':attribute не є валідним регулярним виразом. Шаблони повинні включати роздільники (наприклад: /pattern/).',
     'json' => ':attribute має бути валідним JSON.',
     'lt' => [
         'numeric' => ':attribute має бути меншим за :value.',

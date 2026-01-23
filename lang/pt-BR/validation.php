@@ -155,7 +155,7 @@ return [
     // Específico do LibreNMS
     'alpha_space' => 'O campo :attribute pode conter apenas letras, números, sublinhados e espaços.',
     'ip_or_hostname' => 'O campo :attribute deve ser um endereço IP/rede ou nome de host válido.',
-    'is_regex' => 'O campo :attribute não é uma expressão regular válida',
+    'is_regex' => 'O campo :attribute não é uma expressão regular válida. Os padrões devem incluir delimitadores (ex: /padrão/).',
 
     /*
     |--------------------------------------------------------------------------

@@ -111,36 +111,13 @@
                 const settingKey = 'settings.settings.' + this.name + '.valuePlaceholder';
                 const translated = this.$t(settingKey);
                 return translated !== settingKey ? translated : this.$t('Value');
-            },
-            validateKeyAsRegex() {
-                return this.validate?.key === 'regex';
             }
         },
         methods: {
-            isValidRegex(pattern) {
-                if (!pattern || !pattern.trim()) return false;
-
-                // Try to create a RegExp - if it fails, it's invalid
-                try {
-                    // Check if pattern has delimiters (like /pattern/flags)
-                    const match = pattern.match(/^\/(.*)\/([gimsuy]*)$/);
-                    if (match) {
-                        new RegExp(match[1], match[2]);
-                    } else {
-                        new RegExp(pattern);
-                    }
-                    return true;
-                } catch (e) {
-                    return false;
-                }
-            },
             validateKey(key) {
+                // Only do basic empty check client-side; regex validation is done server-side
                 if (!key || !key.trim()) {
                     return this.$t('settings.validate.key');
-                }
-
-                if (this.validateKeyAsRegex && !this.isValidRegex(key)) {
-                    return this.$t('settings.validate.regex');
                 }
 
                 return '';
@@ -262,12 +239,51 @@
                     [key]: value
                 };
                 this.$emit('input', this.localList);
+            },
+            parseServerError(errorMessage) {
+                // NOTE: This is a fallback because the API does not return structured
+                // per-key errors for map settings. If/when the API provides structured
+                // error data, this parsing should be removed in favor of that.
+                // Try to extract the key from server error messages like:
+                // "The Key '/^cpu interface' is not a valid regular expression..."
+                if (!errorMessage) return;
+
+                const tryMatch = (label) => {
+                    if (!label) return null;
+                    const escapedLabel = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const regex = new RegExp(escapedLabel + "\\s+'([^']+)'", 'i');
+                    return errorMessage.match(regex);
+                };
+
+                let match = tryMatch(this.$t('Key'));
+
+                // Fallback to English 'Key' if translation didn't match and is different
+                if (!match && this.$t('Key') !== 'Key') {
+                    match = tryMatch('Key');
+                }
+
+                if (match && match[1]) {
+                    const errorKey = match[1];
+                    // Find if this key exists in our localList
+                    if (Object.prototype.hasOwnProperty.call(this.localList, errorKey)) {
+                        this.$set(this.keyErrors, errorKey, errorMessage);
+                    }
+                }
             }
         },
         watch: {
             value(updated) {
                 // careful to avoid loops with this
                 this.localList = updated ?? {};
+            },
+            errorMessage(newError) {
+                // When server returns an error, try to associate it with a specific key
+                if (newError) {
+                    this.parseServerError(newError);
+                } else {
+                    // Clear all key errors when error is cleared
+                    this.keyErrors = {};
+                }
             }
         }
     }

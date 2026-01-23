@@ -584,7 +584,7 @@ return [
         ],
         'bad_entity_sensor_regex' => [
             'description' => 'Bad Entity Sensor Regex',
-            'help' => 'Regex to match bad entity sensors, these will not be displayed in the web interface.',
+            'help' => 'Regex to match bad entity sensors, these will not be displayed in the web interface. Patterns must include delimiters (e.g., /pattern/). Case-insensitive matching is applied automatically.',
         ],
         'billing' => [
             '95th_default_agg' => [
@@ -722,7 +722,7 @@ return [
         ],
         'disabled_sensors_regex' => [
             'description' => 'Disabled Sensors Regex',
-            'help' => 'Sensors that match this regex will not be polled or displayed in the web interface.',
+            'help' => 'Sensors that match this regex will not be polled or displayed in the web interface. Patterns must include delimiters and any flags (e.g., /pattern/i for case-insensitive).',
         ],
         'discovery_modules' => [
             'arp-table' => [
@@ -1025,6 +1025,10 @@ return [
                 'description' => 'fping timeout',
                 'help' => 'The amount of milliseconds to wait for an echo response before giving up',
             ],
+        ],
+        'good_if' => [
+            'description' => 'Good Interface ifDescr',
+            'help' => 'Network interface IF-MIB::ifDescr strings that should always be included (overrides bad_if exclusions). Case-insensitive substring matching is used.',
         ],
         'geoloc' => [
             'api_key' => [
@@ -1682,19 +1686,19 @@ return [
         ],
         'bad_if_regexp' => [
             'description' => 'Bad Interface ifDescr Regex',
-            'help' => 'Network interface IF-MIB:!:ifDescr which should be ignored using regular expressions',
+            'help' => 'Network interface IF-MIB::ifDescr which should be ignored using regular expressions. Patterns must include delimiters (e.g., /pattern/). Case-insensitive matching is applied automatically.',
         ],
         'bad_ifalias_regexp' => [
             'description' => 'Bad Interface ifAlias Regex',
-            'help' => 'Network interface IF-MIB:!:ifAlias which should be ignored using regular expressions',
+            'help' => 'Network interface IF-MIB::ifAlias which should be ignored using regular expressions. Patterns must include delimiters (e.g., /pattern/). Case-insensitive matching is applied automatically.',
         ],
         'bad_ifname_regexp' => [
             'description' => 'Bad Interface ifName Regex',
-            'help' => 'Network interface IF-MIB:!:ifName which should be ignored using regular expressions',
+            'help' => 'Network interface IF-MIB::ifName which should be ignored using regular expressions. Patterns must include delimiters (e.g., /pattern/). Case-insensitive matching is applied automatically.',
         ],
         'bad_ifoperstatus' => [
-            'description' => 'Bad Interface ifOperStatus Status',
-            'help' => 'Network interface IF-MIB:!:ifOperStatus which should be ignored',
+            'description' => 'Bad Interface ifOperStatus',
+            'help' => 'Network interface IF-MIB::ifOperStatus values which should be ignored',
         ],
         'bad_iftype' => [
             'description' => 'Bad Interface ifType',
@@ -1999,10 +2003,12 @@ return [
         ],
         'rewrite_if' => [
             'description' => 'Rewrite ifDescr',
-            'help' => 'Rewrite ifDescr to remove the interface type and number, e.g. GigabitEthernet0/1 becomes GigabitEthernet',
+            'help' => 'Replace interface labels completely when a substring match is found. The key is plain text (not regex) matched case-insensitively. If found anywhere in the label, the entire label is replaced with the value.',
+            'keyPlaceholder' => 'Search Text',
+            'valuePlaceholder' => 'Replacement Label',
         ],
         'rewrite_if_regexp' => [
-            'description' => 'Rewrite ifDescr using regex',
+            'description' => 'Rewrite ifDescr with Regex',
             'help' => 'Rewrite ifDescr values using regular expression substitution.',
             'keyPlaceholder' => 'Regex Pattern',
             'valuePlaceholder' => 'Replacement',

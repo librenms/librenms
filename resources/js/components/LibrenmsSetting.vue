@@ -38,6 +38,7 @@
                        :options="setting.options"
                        :validate="setting.validate"
                        :update-status="updateStatus"
+                       :error-message="errorMessage"
                        @input="changeValue($event)"
                        @change="changeValue($event)"
             ></component>
@@ -65,30 +66,39 @@ export default {
             return {
                 value: this.setting.value,
                 updateStatus: 'none',
-                feedback: ''
+                feedback: '',
+                errorMessage: ''
             }
         },
         methods: {
             persistValue(value) {
                 this.updateStatus = 'pending';
+                this.errorMessage = '';
                 axios.put(route(this.prefix + '.update', this.getRouteParams()), {value: value})
                     .then((response) => {
                         this.value = response.data.value;
                         this.$emit('setting-updated', {name: this.setting.name, value: this.value});
                         this.updateStatus = 'success';
                         this.feedback = 'has-success';
+                        this.errorMessage = '';
                         setTimeout(() => this.feedback = '', 3000);
                     })
                     .catch((error) => {
                         this.feedback = 'has-error';
                         this.updateStatus = 'error';
+                        this.errorMessage = error.response.data.message;
                         toastr.error(error.response.data.message);
 
                         // don't reset certain types back to actual value on error
+                        // this preserves user input so they can fix validation errors
                         const ignore = [
                             'text',
                             'email',
-                            'password'
+                            'password',
+                            'array',
+                            'map',
+                            'nested-map',
+                            'array-sub-keyed'
                         ];
                         if (!ignore.includes(this.setting.type)) {
                             this.value = error.response.data.value;

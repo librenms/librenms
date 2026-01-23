@@ -172,7 +172,32 @@ class AppServiceProvider extends ServiceProvider
             return IP::isValid($ip) || Validate::hostname($value);
         });
 
-        Validator::extend('is_regex', fn ($attribute, $value) => @preg_match($value, '') !== false);
+        // Validates that a string is a valid PCRE regex pattern with proper delimiters.
+        // Requires patterns to use standard delimiters (/, #, ~, !, @, %, etc.) at start and end.
+        // This ensures patterns work correctly both when used directly and when flags are appended.
+        Validator::extend('is_regex', function ($attribute, $value) {
+            if (! is_string($value) || strlen($value) < 2) {
+                return false;
+            }
+
+            $delimiter = $value[0];
+
+            // Must start with a valid non-alphanumeric, non-backslash, non-whitespace delimiter
+            // Reject bracket-style delimiters ([, (, {, <) as they cause confusing behavior
+            if (ctype_alnum($delimiter) || $delimiter === '\\' || ctype_space($delimiter)
+                || in_array($delimiter, ['[', '(', '{', '<'])) {
+                return false;
+            }
+
+            // Check that the pattern ends with the same delimiter (possibly followed by flags)
+            // Valid flags are: i, m, s, x, A, D, S, U, X, J, u
+            if (! preg_match('/^' . preg_quote($delimiter, '/') . '.*' . preg_quote($delimiter, '/') . '[imsxADSUXJu]*$/', $value)) {
+                return false;
+            }
+
+            // Finally, verify it's actually valid with preg_match
+            return @preg_match($value, '') !== false;
+        });
 
         Validator::extend('zero_or_exists', function ($attribute, $value, $parameters, $validator) {
             if ($value === 0 || $value === '0') {
