@@ -2158,9 +2158,6 @@ return [
             'description' => 'Service Health File',
             'help' => 'Path to health file to ensure the dispatcher service is running',
         ],
-        'sfdp' => [
-            'description' => 'Path to sfdp',
-        ],
         'shorthost_target_length' => [
             'description' => 'Shortened hostname maximum length',
             'help' => 'Shrinks hostname to maximum length, but always complete subdomain parts',
