@@ -283,13 +283,11 @@ class DynamicConfigItem implements \ArrayAccess
 
         // Make array index references more user-friendly
         // "The value.0 is invalid" -> "item 1 is invalid"
-        $messages = array_map(function ($message) {
-            return preg_replace_callback(
-                '/\bvalue\.(\d+)\b/i',
-                fn ($matches) => strtolower(__('Item')) . ' ' . ((int) $matches[1] + 1),
-                $message
-            );
-        }, $messages);
+        $messages = array_map(fn($message) => preg_replace_callback(
+            '/\bvalue\.(\d+)\b/i',
+            fn ($matches) => strtolower(__('Item')) . ' ' . ((int) $matches[1] + 1),
+            (string) $message
+        ), $messages);
 
         return implode(" \n", $messages);
     }
