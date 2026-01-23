@@ -2008,10 +2008,6 @@
             "default": false,
             "type": "boolean"
         },
-        "dot": {
-            "default": "/usr/bin/dot",
-            "type": "executable"
-        },
         "email_auto_tls": {
             "default": true,
             "group": "alerting",
@@ -6856,13 +6852,6 @@
             "section": "dispatcherservice",
             "order": 26,
             "type": "boolean"
-        },
-        "sfdp": {
-            "default": "/usr/bin/sfdp",
-            "group": "external",
-            "section": "binaries",
-            "order": 7,
-            "type": "executable"
         },
         "shorthost_target_length": {
             "group": "webui",
