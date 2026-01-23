@@ -150,6 +150,6 @@ modules:
                     group: transceiver
                     skip_values:
                         - 
-                            oid: opticalSupportDDM
+                            oid: NMS-OPTICAL-MIB::opticalSupportDDM
                             op: '!='
                             value: '1'
