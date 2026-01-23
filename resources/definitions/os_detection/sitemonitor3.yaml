@@ -3,7 +3,8 @@ text: 'Packetflux SiteMonitor Base 3'
 type: appliance
 icon: packetflux
 over:
-    - { graph: device_poller_perf, text: 'Poller time' }
+    - { graph: device_voltage, text: 'Voltage' }
+    - { graph: device_temperature, text: 'Temperature' }
 snmp_bulk: false
 mib_dir: packetflux
 discovery:
