@@ -1,4 +1,4 @@
-@php echo '<?xml version="1.0" encoding="UTF-8"?>'; @endphp
+{!! '<?xml version="1.0" encoding="UTF-8"?>' !!}
 <svg width="100%" height="100%" viewBox="0 0 {{ $width }} {{ $height }}" preserveAspectRatio="none" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"
      onload="init(evt)">
   <g id="graph">
@@ -27,6 +27,12 @@
     <text id="collect_initial" x="{{ $width * 0.5 }}" y="{{ $height * 0.5 }}" visibility="hidden" fill="gray" font-family="Tahoma, Verdana, Arial, Helvetica, sans-serif" font-size="4" text-anchor="middle">Collecting initial data, please wait...</text>
   </g>
   <script type="application/ecmascript">
+    /*  adapted from
+    * @author     T. Lechat <dev@lechat.org>, Manuel Kasper <mk@neon1.net>, Jonathan Watt <jwatt@jwatt.org>
+    * @copyright  2004-2006 T. Lechat <dev@lechat.org>, Manuel Kasper <mk@neon1.net>, Jonathan Watt <jwatt@jwatt.org>
+    * @license    BSD
+    */
+
     <![CDATA[
     let svgDoc = null;
     let lastIn = 0;
