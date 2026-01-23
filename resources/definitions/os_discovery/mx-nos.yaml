@@ -22,17 +22,35 @@ modules:
                 -
                     oid:
                        - MOXA-POE-BT-MIB::poeBtStatBudgetLimit
-        #               - MOXA-TURBOCHAIN-MIB::turboChainConfigInterface
+                       - MOXA-POE-BT-MIB::poeBtStatAllocatedPower
+                       - MOXA-PORT-MIB::portStatState
         power:
             data:
                 -
                     oid: MOXA-SYSTEM-UTILIZATION-MIB::usStatPowerConsumption
                     value: MOXA-SYSTEM-UTILIZATION-MIB::usStatPowerConsumption
                     num_oid: '.1.3.6.1.4.1.8691.602.1.3.2.4.{{ $index }}'
-                    descr: 'Power Consumption'
+                    descr: 'System Power Consumption'
                     index: 'usStatPowerConsumption.{{ $index }}'
-                    high_limit: 30
-                    low_limit: 0
+                -
+                    oid: MOXA-POE-BT-MIB::poeBtStatConsumedPower
+                    value: MOXA-POE-BT-MIB::poeBtStatConsumedPower
+                    num_oid: '.1.3.6.1.4.1.8691.608.2.2.1.4.{{ $index }}'
+                    descr: 'Total POE Power Consumption'
+                    index: 'poeBtStatConsumedPower.{{ $index }}'
+                    high_limit: MOXA-POE-BT-MIB::poeBtStatBudgetLimit
+                    warn_limit: MOXA-POE-BT-MIB::poeBtStatAllocatedPower
+                -
+                    oid: MOXA-POE-BT-MIB::poeBtStatPortTable
+                    value: MOXA-POE-BT-MIB::poeBtStatConsumption
+                    num_oid: '.1.3.6.1.4.1.8691.602.2.2.1.6.1.6.{{ $index }}'
+                    descr: 'Port-{{ $index }} POE Consumption'
+                    index: 'poeBtStatConsumption.{{ $index }}'
+                    skip_values:
+                    -
+                      oid: MOXA-POE-BT-MIB::poeBtStatPowerOutput
+                      op: '=='
+                      value: 2
         state:
             data:
                 -
@@ -44,7 +62,7 @@ modules:
                     state_name: deviceioStatSystemPowerStatus
                     states:
                         - { descr: 'off', graph: 1, value: 0, generic: 1 }
-                        - { descr: 'on', graph: 1, value: 1, generic: 0 }
+                        - { descr: 'on',  graph: 1, value: 1, generic: 0 }
                 -
                     oid: MOXA-DEVICE-IO-MIB::deviceioStatDiTable
                     value: MOXA-DEVICE-IO-MIB::deviceioStatDiStatus
@@ -53,7 +71,7 @@ modules:
                     index: 'deviceioStatDiStatus.{{ $index }}'
                     state_name: deviceioStatDiStatus
                     states:
-                        - { descr: 'open', graph: 1, value: 0, generic: 0 }
+                        - { descr: 'open',  graph: 1, value: 0, generic: 0 }
                         - { descr: 'short', graph: 1, value: 1, generic: 0 }
                 -
                     oid: MOXA-DEVICE-IO-MIB::deviceioStatRelayTable
@@ -63,14 +81,15 @@ modules:
                     index: 'deviceioStatRelayStatus.{{ $index }}'
                     state_name: deviceioStatRelayStatus
                     states:
-                        - { descr: 'open', graph: 1, value: 0, generic: 0 }
+                        - { descr: 'open',  graph: 1, value: 0, generic: 0 }
                         - { descr: 'short', graph: 1, value: 1, generic: 0 }
                 -
                     oid: MOXA-POE-BT-MIB::poeBtStatPortTable
                     value: MOXA-POE-BT-MIB::poeBtStatPowerOutput
                     num_oid: '.1.3.6.1.4.1.8691.608.2.2.1.6.1.2.{{ $index }}'
-                    descr: 'POE Port-{{ $index }} Power Output'
+                    descr: 'Port-{{ $index }} POE Power Output'
                     index: 'poeBtStatPowerOutput.{{ $index }}'
+                    group: 'POE Status'
                     state_name: poeBtStatPowerOutput
                     states:
                         - { descr: 'Enabled',  graph: 1, value: 1, generic: 0 }
@@ -84,17 +103,18 @@ modules:
                     oid: MOXA-POE-BT-MIB::poeBtStatPortTable
                     value: MOXA-POE-BT-MIB::poeBtStatDeviceType
                     num_oid: '.1.3.6.1.4.1.8691.608.2.2.1.6.1.7.{{ $index }}'
-                    descr: 'POE Port-{{ $index }} PD Type'
+                    descr: 'Port-{{ $index }} POE PD Type'
                     index: 'poeBtStatDeviceType.{{ $index }}'
+                    group: 'POE Status'
                     state_name: poeBtStatDeviceType
                     states:
-                        - { descr: 'notPresent',            graph: 1, value: 0, generic: 0 }
+                        - { descr: 'notPresent',            graph: 1, value: 0, generic: 1 }
                         - { descr: 'legacy',                graph: 1, value: 1, generic: 0 }
                         - { descr: 'dot3af',                graph: 1, value: 2, generic: 0 }
                         - { descr: 'dot3at',                graph: 1, value: 3, generic: 0 }
-                        - { descr: 'reserved',              graph: 1, value: 4, generic: 0 }
-                        - { descr: 'nonPdOrPdShortCircuit', graph: 1, value: 5, generic: 0 }
-                        - { descr: 'unknown',               graph: 1, value: 6, generic: 0 }
+                        - { descr: 'reserved',              graph: 1, value: 4, generic: 3 }
+                        - { descr: 'nonPdOrPdShortCircuit', graph: 1, value: 5, generic: 2 }
+                        - { descr: 'unknown',               graph: 1, value: 6, generic: 3 }
                         - { descr: 'na',                    graph: 1, value: 7, generic: 0 }
                         - { descr: 'dot3btss',              graph: 1, value: 8, generic: 0 }
                         - { descr: 'dot3btds',              graph: 1, value: 9, generic: 0 }
@@ -107,13 +127,14 @@ modules:
                     oid: MOXA-POE-BT-MIB::poeBtStatPortTable
                     value: MOXA-POE-BT-MIB::poeBtStatConfigSuggestion
                     num_oid: '.1.3.6.1.4.1.8691.608.2.2.1.6.1.8.{{ $index }}'
-                    descr: 'POE Port-{{ $index }} Config Suggestion'
+                    descr: 'Port-{{ $index }} POE Config Suggestion'
                     index: 'poeBtStatConfigSuggestion.{{ $index }}'
+                    group: 'POE Status'
                     state_name: poeBtStatConfigSuggestion
                     states:
                         - { descr: 'noSuggestion',        graph: 1, value: 0, generic: 0 }
-                        - { descr: 'enablePoe',           graph: 1, value: 1, generic: 3 }
-                        - { descr: 'disablePoe',          graph: 1, value: 2, generic: 3 }
+                        - { descr: 'enablePoe',           graph: 1, value: 1, generic: 2 }
+                        - { descr: 'disablePoe',          graph: 1, value: 2, generic: 2 }
                         - { descr: 'selectAuto',          graph: 1, value: 3, generic: 3 }
                         - { descr: 'selectHighPower',     graph: 1, value: 4, generic: 3 }
                         - { descr: 'selectForce',         graph: 1, value: 5, generic: 3 }
@@ -130,6 +151,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.603.3.5.1.1.{{ $index }}'
                     descr: 'Turbo Chain Enabled'
                     index: 'turboChainConfigEnable.{{ $index }}'
+                    group: 'Turbo Chain'
                     state_name: turboChainConfigEnable
                     states:
                         - { descr: 'Enabled',  graph: 1, value: 1, generic: 0 }
@@ -140,6 +162,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.603.3.5.1.2.{{ $index }}'
                     descr: 'Turbo Chain Role'
                     index: 'turboChainConfigRole.{{ $index }}'
+                    group: 'Turbo Chain'
                     state_name: turboChainConfigRole
                     states:
                         - { descr: 'Head',   graph: 1, value: 1, generic: 0 }
@@ -156,6 +179,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.603.3.5.2.1.{{ $index }}'
                     descr: 'Turbo Chain Primary Interface Status'
                     index: 'turboChainStatPrimaryInterfaceStatus.{{ $index }}'
+                    group: 'Turbo Chain'
                     state_name: turboChainStatPrimaryInterfaceStatus
                     states:
                         - { descr: 'initiated',   graph: 1, value: 0, generic: 3 }
@@ -175,6 +199,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.603.3.5.2.1.{{ $index }}'
                     descr: 'Turbo Chain Secondary Interface Status'
                     index: 'turboChainStatSecondaryInterfaceStatus.{{ $index }}'
+                    group: 'Turbo Chain'
                     state_name: turboChainStatSecondaryInterfaceStatus
                     states:
                         - { descr: 'initiated',   graph: 1, value: 0, generic: 3 }
@@ -194,6 +219,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.603.3.4.1.1.{{ $index }}'
                     descr: 'Turbo Ring Enabled'
                     index: 'trv2ConfigEnable.{{ $index }}'
+                    group: 'Turbo Ring'
                     state_name: trv2ConfigEnable
                     states:
                         - { descr: 'Enabled',  graph: 1, value: 1, generic: 0 }
@@ -204,6 +230,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.603.3.4.2.1.1.2.{{ $index }}'
                     descr: 'Turbo Ring {{ $index }} Master Status'
                     index: 'trv2StatRingTableEntryMasterStatus.{{ $index }}'
+                    group: 'Turbo Ring'
                     state_name: trv2StatRingTableEntryMasterStatus
                     states:
                         - { descr: 'Master',  graph: 1, value: 1, generic: 0 }
@@ -219,6 +246,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.603.3.4.2.1.1.4.{{ $index }}'
                     descr: 'Turbo Ring {{ $index }} First Port'
                     index: 'trv2StatRingTableEntryFirstRingPort.{{ $index }}'
+                    group: 'Turbo Ring'
                     state_name: trv2StatRingTableEntryFirstRingPort
                     states:
                         - { descr: 'disabled',    graph: 1, value: 1, generic: 1 }
@@ -238,6 +266,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.603.3.4.2.1.1.4.{{ $index }}'
                     descr: 'Turbo Ring {{ $index }} Second Port'
                     index: 'trv2StatRingTableEntrySecondRingPort.{{ $index }}'
+                    group: 'Turbo Ring'
                     state_name: trv2StatRingTableEntrySecondRingPort
                     states:
                         - { descr: 'disabled',    graph: 1, value: 1, generic: 1 }
@@ -257,6 +286,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.603.3.4.2.1.1.6.{{ $index }}'
                     descr: 'Turbo Ring {{ $index }} State'
                     index: 'trv2StatRingTableEntryBrokenStatus.{{ $index }}'
+                    group: 'Turbo Ring'
                     state_name: trv2StatRingTableEntryBrokenStatus
                     states:
                         - { descr: 'NA',       graph: 1, value: 0, generic: 3 }
@@ -273,6 +303,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.603.3.7.1.1.{{ $index }}'
                     descr: 'Dual Homing Enabled'
                     index: 'dualhomingConfigEnable.{{ $index }}'
+                    group: 'Dual Homing'
                     state_name: dualhomingConfigEnable
                     states:
                         - { descr: 'Enabled',  graph: 1, value: 1, generic: 0 }
@@ -283,6 +314,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.603.3.7.2.1.1.{{ $index }}'
                     descr: 'Dual Homing Primary Port'
                     index: 'dualhomingProtocolStatePrimary.{{ $index }}'
+                    group: 'Dual Homing'
                     state_name: dualhomingProtocolStatePrimary
                     states:
                         - { descr: 'linkDown',   graph: 1, value: 0, generic: 2 }
@@ -300,6 +332,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.603.3.7.2.2.2.{{ $index }}'
                     descr: 'Dual Homing Secondary Port'
                     index: 'dualhomingProtocolStateSecondary.{{ $index }}'
+                    group: 'Dual Homing'
                     state_name: dualhomingProtocolStateSecondary
                     states:
                         - { descr: 'linkDown',   graph: 1, value: 0, generic: 2 }
@@ -320,6 +353,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.608.2.2.1.6.1.5.{{ $index }}'
                     descr: 'Port-{{ $index }} POE Voltage'
                     index: 'poeBtStatVoltage.{{ $index }}'
+                    group: 'POE Voltage'
                     skip_values:
                     -
                       oid: MOXA-POE-BT-MIB::poeBtStatPowerOutput
@@ -329,8 +363,14 @@ modules:
                     oid: MOXA-FIBER-CHECK-MIB::fiberCheckStatPortTable
                     value: MOXA-FIBER-CHECK-MIB::fiberCheckStatVoltage
                     num_oid: '.1.3.6.1.4.1.8691.603.5.3.2.1.1.1.7.{{ $index }}'
-                    descr: 'Port-{{ $index }} - {{ MOXA-FIBER-CHECK-MIB::fiberCheckStatModelName }} Voltage'
+                    descr: 'Port-{{ $index }} {{ MOXA-FIBER-CHECK-MIB::fiberCheckStatModelName }} Voltage'
                     index: 'fiberCheckStatVoltage.{{ $index }}'
+                    group: 'SFP Voltage'
+                    skip_values:
+                    -
+                      oid: MOXA-PORT-MIB::portStatState
+                      op: '=='
+                      value: 1
         current:
             data:
                 -
@@ -339,18 +379,13 @@ modules:
                     num_oid: '.1.3.6.1.4.1.8691.608.2.2.1.6.1.4.{{ $index }}'
                     descr: 'Port-{{ $index }} POE Current'
                     index: 'poeBtStatCurrent.{{ $index }}'
+                    divisor: 100
                     skip_values:
                     -
                       oid: MOXA-POE-BT-MIB::poeBtStatPowerOutput
                       op: '=='
                       value: 2
-                -
-                    oid: MOXA-POE-BT-MIB::poeBtStatConsumedPower
-                    value: MOXA-POE-BT-MIB::poeBtStatConsumedPower
-                    num_oid: '.1.3.6.1.4.1.8691.608.2.2.1.4.{{ $index }}'
-                    descr: 'Port-{{ $index }} POE Current'
-                    index: 'poeBtStatConsumedPower.{{ $index }}'
-                    high_limit: MOXA-POE-BT-MIB::poeBtStatBudgetLimit
+
         temperature:
             data:
                 -
@@ -360,6 +395,11 @@ modules:
                     descr: 'Port-{{ $index }} {{ MOXA-FIBER-CHECK-MIB::fiberCheckStatModelName }} Temperature'
                     index: 'fiberCheckStatTemperatureC.{{ $index }}'
                     high_limit: MOXA-FIBER-CHECK-MIB::fiberCheckStatTemperatureLimitC
+                    skip_values:
+                    -
+                      oid: MOXA-PORT-MIB::portStatState
+                      op: '=='
+                      value: 1
         dbm:
             data:
                 -
@@ -369,6 +409,11 @@ modules:
                     descr: 'Port-{{ $index }} {{ MOXA-FIBER-CHECK-MIB::fiberCheckStatModelName }} TX Power'
                     index: 'fiberCheckStatTxPower.{{ $index }}'
                     #high_limit: MOXA-FIBER-CHECK-MIB::fiberCheckStatTxPowerLimit
+                    skip_values:
+                    -
+                      oid: MOXA-PORT-MIB::portStatState
+                      op: '=='
+                      value: 1
                 -
                     oid: MOXA-FIBER-CHECK-MIB::fiberCheckStatPortTable
                     value: MOXA-FIBER-CHECK-MIB::fiberCheckStatRxPower
@@ -376,8 +421,13 @@ modules:
                     descr: 'Port-{{ $index }} {{ MOXA-FIBER-CHECK-MIB::fiberCheckStatModelName }} RX Power'
                     index: 'fiberCheckStatRxPower.{{ $index }}'
                     #high_limit: MOXA-FIBER-CHECK-MIB::fiberCheckStatRxPowerLimit
+                    skip_values:
+                    -
+                      oid: MOXA-PORT-MIB::portStatState
+                      op: '=='
+                      value: 1
 
 
-# <Future> MOXA-POE-BT-MIB::poeBtStatPortTable  <- POE stats table
-# <Future> MOXA-FIBER-CHECK-MIB::fiberCheckConfigPortTable  <- Fiber Warn High/Low table
-# <Future> MOXA-FIBER-CHECK-MIB::fiberCheckStatPortTable  <- Fiber Stats table
+# MOXA-POE-BT-MIB::poeBtStatPortTable  <- POE stats table
+# MOXA-FIBER-CHECK-MIB::fiberCheckConfigPortTable  <- Fiber Warn High/Low table
+# MOXA-FIBER-CHECK-MIB::fiberCheckStatPortTable  <- Fiber Stats table
