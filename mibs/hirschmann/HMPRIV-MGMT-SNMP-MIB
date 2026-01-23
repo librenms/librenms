@@ -36,14 +36,15 @@ IMPORTS
                                         FROM SNMPv2-SMI
     TEXTUAL-CONVENTION, MacAddress, DisplayString,
     TruthValue,RowStatus				FROM SNMPv2-TC
+    SnmpAdminString                     FROM SNMP-FRAMEWORK-MIB
     InetAddressType, InetAddress        FROM INET-ADDRESS-MIB -- RFC4001  
 	dot1dStaticAddress					FROM BRIDGE-MIB
 	AddressFamilyNumbers			    FROM IANA-ADDRESS-FAMILY-NUMBERS-MIB
 	TimeFilter 		 					FROM RMON2-MIB
-   	ifIndex                             FROM IF-MIB;
+   	ifIndex,InterfaceIndexOrZero		FROM IF-MIB;
 
 hmConfiguration MODULE-IDENTITY
-        LAST-UPDATED "201209041200Z" -- 04 Sep 2012 12:00:00 GMT
+        LAST-UPDATED "201301171200Z" -- 17 Jan 2013 12:00:00 GMT
         ORGANIZATION "Hirschmann Automation and Control GmbH"
         CONTACT-INFO
           "Customer Support
@@ -79,10 +80,72 @@ hmConfiguration MODULE-IDENTITY
 		  "201209041200Z" -- 04 Sep 2012 12:00:00 GMT
 		DESCRIPTION
 		  "Update for platform version 07.1.04: hmGmrpUnknownMode added"  
+		REVISION
+		  "201211011200Z" -- 01 Nov 2012 12:00:00 GMT
+		DESCRIPTION
+		  "Update for platform version 8.0: hmNetPTP2TCProfile and 
+		  hmNetPTP2TCPowerTLVCheck added"
+        REVISION
+          "201211021200Z" -- 02 Nov 2012 12:00:00 GMT
+        DESCRIPTION
+          "Update for platform version 8.0: hmRelayIfaceDhcpRelayAdminState and 
+          hmRelayIfaceDhcpRelayOperState added"
+		REVISION
+		  "201211071200Z" -- 07 Nov 2012 12:00:00 GMT
+		DESCRIPTION
+		  "Update for platform version 8.0: hmIfaceExtAcceptableFrameTypes added"
+		REVISION
+          "201211121200Z" -- 12 Nov 2012 12:00:00 GMT
+        DESCRIPTION
+          "Update for platform version 8.0: IEC61850 related objects 
+          hmIEC61850ConfigGroup and hmIEC61850StatisticsGroup added"  
+		REVISION
+		  "201211261200Z" -- 26 Nov 2012 12:00:00 GMT
+		DESCRIPTION
+		  "Update for platform version 8.0: hmConfigurationSignature added"
+        REVISION
+		  "201301171200Z" -- 17 Jan 2013 12:00:00 GMT
+        DESCRIPTION
+          "new variable hmSysModAdminState added;
+           value 2 (none) added for hmSysModType MIB"
         ::= { hirschmann 14 }
     
 
 -- Textual Conventions
+HmLargeDisplayString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2048a"
+    STATUS       current
+    DESCRIPTION
+            "Represents textual information taken from the NVT ASCII
+            character set, as defined in pages 4, 10-11 of RFC 854.
+
+            To summarize RFC 854, the NVT ASCII repertoire specifies:
+
+              - the use of character codes 0-127 (decimal)
+
+              - the graphics characters (32-126) are interpreted as
+                US ASCII
+
+              - NUL, LF, CR, BEL, BS, HT, VT and FF have the special
+                meanings specified in RFC 854
+
+              - the other 25 codes have no standard interpretation
+
+              - the sequence 'CR LF' means newline
+
+              - the sequence 'CR NUL' means carriage-return
+
+              - an 'LF' not preceded by a 'CR' means moving to the
+                same column on the next line.
+
+              - the sequence 'CR x' for any x other than LF or NUL is
+                illegal.  (Note that this also means that a string may
+                end with either 'CR LF' or 'CR NUL', but not with CR.)
+
+            Any object defined using this syntax may not exceed 2048
+            characters in length."
+    SYNTAX       OCTET STRING (SIZE (0..2048))
+
 HmAgentLogSeverity ::= TEXTUAL-CONVENTION
         STATUS       current
     DESCRIPTION  "Severity code used in determining the SysLog Priority value."
@@ -171,6 +234,19 @@ PTPClockQuality ::= TEXTUAL-CONVENTION
 			 Measurement and Control Systems page 19"
     SYNTAX   OCTET STRING (SIZE (4))
 
+PTPSubdomainName ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+			"The values of the octets for the subdomain name may be
+			chosen from the set consisting of the values of the printable
+			ASCII characters starting with hex value 0x21 (!) up to and
+			including hex value 0x7E (~)."
+	REFERENCE
+			"IEEE P1588 D2.21 Draft Standard for a Precision Clock
+			 Synchronization Protocol for Networked
+			 Measurement and Control Systems page 19"
+    SYNTAX   OCTET STRING (SIZE (16))
+
 BridgeIdOrNull ::= TEXTUAL-CONVENTION
    STATUS	current
    DESCRIPTION
@@ -178,43 +254,45 @@ BridgeIdOrNull ::= TEXTUAL-CONVENTION
    			 no valid data is available"
    SYNTAX	OCTET STRING (SIZE (0|8))   
 
-hirschmann    OBJECT IDENTIFIER ::= { enterprises 248 }
-hmChassis	  OBJECT IDENTIFIER ::= { hmConfiguration 1 }
-hmAgent 	  OBJECT IDENTIFIER ::= { hmConfiguration 2 }
-hmProducts	  OBJECT IDENTIFIER ::= { hmConfiguration 10 }
-rs2 		  OBJECT IDENTIFIER ::= { hmProducts 2 }
-mach3000	  OBJECT IDENTIFIER ::= { hmProducts 3 }
-ms2108-2	  OBJECT IDENTIFIER ::= { hmProducts 4 }
-ms3124-4	  OBJECT IDENTIFIER ::= { hmProducts 5 }
-rs2-16		  OBJECT IDENTIFIER ::= { hmProducts 6 }
-rs2-4r		  OBJECT IDENTIFIER ::= { hmProducts 7 }
-ms4128-5      OBJECT IDENTIFIER ::= { hmProducts 10 }
-eagle         OBJECT IDENTIFIER ::= { hmProducts 20 }
-rr-epl        OBJECT IDENTIFIER ::= { hmProducts 21 }  
-eagle-mguard  OBJECT IDENTIFIER ::= { hmProducts 22 }
-eagle20       OBJECT IDENTIFIER ::= { hmProducts 23 }
-ms20          OBJECT IDENTIFIER ::= { hmProducts 30 }
-ms30          OBJECT IDENTIFIER ::= { hmProducts 31 }
-rs20          OBJECT IDENTIFIER ::= { hmProducts 40 }
-rs30          OBJECT IDENTIFIER ::= { hmProducts 41 } -- Also valid for cs30, rs40
--- Not used: rs40          OBJECT IDENTIFIER ::= { hmProducts 42 }
--- Not used: cs30          OBJECT IDENTIFIER ::= { hmProducts 43 }
-rsb20         OBJECT IDENTIFIER ::= { hmProducts 44 }
-osb20         OBJECT IDENTIFIER ::= { hmProducts 45 }
+hirschmann    		OBJECT IDENTIFIER ::= { enterprises 248 }
+hmChassis	  		OBJECT IDENTIFIER ::= { hmConfiguration 1 }
+hmAgent	 	  		OBJECT IDENTIFIER ::= { hmConfiguration 2 }
+hmProducts	  		OBJECT IDENTIFIER ::= { hmConfiguration 10 }
+rs2			  		OBJECT IDENTIFIER ::= { hmProducts 2 }
+mach3000	  		OBJECT IDENTIFIER ::= { hmProducts 3 }
+ms2108-2	  		OBJECT IDENTIFIER ::= { hmProducts 4 }
+ms3124-4	  		OBJECT IDENTIFIER ::= { hmProducts 5 }
+rs2-16		  		OBJECT IDENTIFIER ::= { hmProducts 6 }
+rs2-4r		  		OBJECT IDENTIFIER ::= { hmProducts 7 }
+ms4128-5      		OBJECT IDENTIFIER ::= { hmProducts 10 }
+eagle         		OBJECT IDENTIFIER ::= { hmProducts 20 }
+rr-epl        		OBJECT IDENTIFIER ::= { hmProducts 21 }  
+eagle-mguard  		OBJECT IDENTIFIER ::= { hmProducts 22 }
+eagle20       		OBJECT IDENTIFIER ::= { hmProducts 23 }
+eagleone      		OBJECT IDENTIFIER ::= { hmProducts 24 }
+ms20          		OBJECT IDENTIFIER ::= { hmProducts 30 }
+ms30          		OBJECT IDENTIFIER ::= { hmProducts 31 }
+rs20          		OBJECT IDENTIFIER ::= { hmProducts 40 }
+rs30        		OBJECT IDENTIFIER ::= { hmProducts 41 } -- Also valid for cs30, rs40
+-- Not used: rs40   OBJECT IDENTIFIER ::= { hmProducts 42 }
+-- Not used: cs30   OBJECT IDENTIFIER ::= { hmProducts 43 }
+rsb20         		OBJECT IDENTIFIER ::= { hmProducts 44 }
+osb20         		OBJECT IDENTIFIER ::= { hmProducts 45 }
 
-mach4002-48-4G OBJECT IDENTIFIER ::= { hmProducts 50 }
-octopus 	  OBJECT IDENTIFIER ::= { hmProducts 60 }
-mach4002-24G OBJECT IDENTIFIER ::= { hmProducts 70 }
-mach4002-24G-3X OBJECT IDENTIFIER ::= { hmProducts 71 }
-mach4002-48G OBJECT IDENTIFIER ::= { hmProducts 75 }
-mach4002-48G-3X OBJECT IDENTIFIER ::= { hmProducts 76 }
-ruggedswitch 	  OBJECT IDENTIFIER ::= { hmProducts 90 }
-railswitchrugged  OBJECT IDENTIFIER ::= { hmProducts 100 }
-mach100   OBJECT IDENTIFIER ::= { hmProducts 110 }
-octopus-os   OBJECT IDENTIFIER ::= { hmProducts 120 }
-mach100ge     OBJECT IDENTIFIER ::= { hmProducts 130 }
-mach1000ge    OBJECT IDENTIFIER ::= { hmProducts 131 }
-eem1		  OBJECT IDENTIFIER ::= { hmProducts 200 }
+mach4002-48-4G 		OBJECT IDENTIFIER ::= { hmProducts 50 }
+octopus 	  		OBJECT IDENTIFIER ::= { hmProducts 60 }
+mach4002-24G 		OBJECT IDENTIFIER ::= { hmProducts 70 }
+mach4002-24G-3X 	OBJECT IDENTIFIER ::= { hmProducts 71 }
+mach4002-48G 		OBJECT IDENTIFIER ::= { hmProducts 75 }
+mach4002-48G-3X 	OBJECT IDENTIFIER ::= { hmProducts 76 }
+ruggedswitch 	  	OBJECT IDENTIFIER ::= { hmProducts 90 }
+railswitchrugged  	OBJECT IDENTIFIER ::= { hmProducts 100 }
+mach100   			OBJECT IDENTIFIER ::= { hmProducts 110 }
+octopus-os   		OBJECT IDENTIFIER ::= { hmProducts 120 }
+mach100ge     		OBJECT IDENTIFIER ::= { hmProducts 130 }
+mach1000ge    		OBJECT IDENTIFIER ::= { hmProducts 131 }
+eem1		  		OBJECT IDENTIFIER ::= { hmProducts 200 }
+gecko				OBJECT IDENTIFIER ::= { hmProducts 300 }
 
 
 --
@@ -310,6 +388,14 @@ hmSysProduct OBJECT-TYPE
 							  eagle20-mm-sc-lh-sc(547),
 							  rr-epl-tx-tx(550),
 							  rr-epl-tx-mm-sc(551),
+							  eagleone-tx-tx(560),
+							  eagleone-tx-mm(561),
+							  eagleone-mm-tx(562),
+							  eagleone-mm-mm(563),
+							  eagleone-tx-sm(564),
+							  eagleone-sm-tx(565),
+                              eagleone-sm-mm(566),
+                              eagleone-mm-sm(567),
 							  ms20-0800(600),
 							  ms20-2400(601),
 							  ms30-0802(620),
@@ -386,7 +472,8 @@ hmSysProduct OBJECT-TYPE
 							  mach104-16tx-poep-2x (1107),
 							  mach104-16tx-poep-2x-r (1108),
 							  mach104-16tx-poep-2x-e(1109),
-							  eem1 (1200)
+							  eem1 (1200),
+							  gecko-4tx-tx (1300)
              }
 			 MAX-ACCESS       read-only
 			 STATUS 		  current
@@ -538,11 +625,11 @@ hmSysGroupType	 OBJECT-TYPE
 							   mach4002-48G (75),
 							   mach4002-48G-3X (76),
 							   ruggedswitch (90),
-							   railswitchrugged (100),
 							   mach100 (110),
 							   mach100ge (130),
 							   mach1000ge (131),
-							   eem1 (200)
+							   eem1 (200),
+							   gecko (300)
 							 }
 
 			 MAX-ACCESS 		 read-only
@@ -693,7 +780,8 @@ HmSysModuleEntry ::= SEQUENCE {
 			 hmSysModNumOfPorts 	Integer32,
 			 hmSysModFirstMauIndex	Integer32,
 			 hmSysModStatus			INTEGER,
-             hmSysModSerialNum		DisplayString			 
+             hmSysModSerialNum		DisplayString,
+             hmSysModAdminState     INTEGER
 			 }
  
 hmSysModGroupID   OBJECT-TYPE
@@ -717,6 +805,7 @@ hmSysModID	 OBJECT-TYPE
 hmSysModType   OBJECT-TYPE
 			 SYNTAX 		 INTEGER {
 							   unknown		 (1),
+							   none          (2),
 							   m-fast-8tp-rj (100),
 							   m-fast-8mm-mt (101),
 							   m-fast-2mm-sc (102),
@@ -864,8 +953,22 @@ hmSysModSerialNum	 OBJECT-TYPE
 			 MAX-ACCESS 		 read-only
 			 STATUS 		 current
 			 DESCRIPTION
-				"The serial number provided by vendor (ASCII). "
+			 	"The serial number provided by vendor (ASCII). "
 			 ::= { hmSysModuleEntry 9 }
+
+hmSysModAdminState   OBJECT-TYPE
+             SYNTAX  INTEGER {
+                     enable (1),
+                     disable (2)
+                    }
+             MAX-ACCESS      read-write
+             STATUS      current
+             DESCRIPTION
+             "Enable or disable the module. If disabled, module 
+             plugged in this slot will not be activated. "
+             DEFVAL { enable }
+             ::= { hmSysModuleEntry 10 }
+
 
 
 hmInterfaceTable   OBJECT-TYPE
@@ -903,17 +1006,18 @@ HmInterfaceEntry ::= SEQUENCE {
 			 hmIfaceStpBpduGuardEnable INTEGER,
 			 hmIfaceStpBpduGuardStatus INTEGER,
 			 hmIfaceCapability		   Integer32,
-             hmIfaceIngressLimiterMode INTEGER,
-             hmIfaceIngressLimiterCalculationMode INTEGER,
-             hmIfaceIngressLimiterRate Integer32,
-             hmIfaceEgressLimiterMode  INTEGER,
-             hmIfaceEgressLimiterCalculationMode INTEGER,
+			 hmIfaceIngressLimiterMode INTEGER,
+			 hmIfaceIngressLimiterCalculationMode INTEGER,
+			 hmIfaceIngressLimiterRate Integer32,
+			 hmIfaceEgressLimiterMode  INTEGER,
+			 hmIfaceEgressLimiterCalculationMode INTEGER,
 			 hmIfaceEgressLimiterRate  Integer32,
 			 hmIfaceUtilizationAlarmUpperThreshold	Integer32,
 			 hmIfaceUtilizationAlarmLowerThreshold	Integer32,
 			 hmIfaceUtilizationAlarmCondition	TruthValue,
 			 hmIfaceCableCrossing	INTEGER,
-			 hmIfacePhyFastLinkDetection	INTEGER
+			 hmIfacePhyFastLinkDetection	INTEGER,
+			 hmIfaceAcceptableFrameTypes	INTEGER
 			 }
 
 hmIfaceGroupID	 OBJECT-TYPE
@@ -1309,7 +1413,81 @@ hmIfacePhyFastLinkDetection	OBJECT-TYPE
 					any type of port."
 				DEFVAL { disable }
 				::= { hmInterfaceEntry 28 }
-			
+
+hmIfaceAcceptableFrameTypes OBJECT-TYPE
+				SYNTAX  INTEGER
+				{
+					admitAll(1),
+					admitOnlyVlanTagged(2),
+					admitOnlyUntagged(3)
+				}
+				MAX-ACCESS  read-write
+				STATUS      obsolete
+				DESCRIPTION
+					"This object is 'obsolete' and is replaced by hmIfaceExtAcceptableFrameTypes.
+					 When this is admitOnlyVlanTagged(2) the device will
+					 discard untagged frames received on this port. 
+					 When admitOnlyUntagged(3), the device will discard any 
+					 frames with a VLAN tag. When admitAll(1), all frames are 
+					 accepted and untagged or Priority-Tagged frames received 
+					 on this port will be assigned to the PVID for this port.
+
+					 This control does not affect VLAN independent BPDU
+					 frames, such as GVRP and STP.  It does affect VLAN
+					 dependent BPDU frames, such as GMRP."
+				DEFVAL      { admitAll }
+				::= { hmInterfaceEntry 29  }
+
+--
+-- hmInterfaceExtTable
+-- 
+hmInterfaceExtTable   OBJECT-TYPE
+			 SYNTAX 		 SEQUENCE OF HmInterfaceExtEntry
+			 MAX-ACCESS      not-accessible
+			 STATUS 		 current
+			 DESCRIPTION
+				 "This table contains variables for each interface of
+				 the switch."
+			 ::= { hmSystemTable 100 }
+
+hmInterfaceExtEntry	 OBJECT-TYPE
+			 SYNTAX 		 HmInterfaceExtEntry
+			 MAX-ACCESS 	 not-accessible
+			 STATUS 		 current
+			 DESCRIPTION     "The entry of the hmInterfaceExtTable."
+			 INDEX			 { ifIndex }
+			 ::= { hmInterfaceExtTable 1 }
+
+HmInterfaceExtEntry ::= SEQUENCE {
+				 hmIfaceExtAcceptableFrameTypes	INTEGER
+			 }
+				
+hmIfaceExtAcceptableFrameTypes OBJECT-TYPE
+			SYNTAX  INTEGER
+			{
+				admitAll(1),
+				admitOnlyVlanTagged(2),
+				admitOnlyUntagged(3)
+			}
+			MAX-ACCESS  read-write
+			STATUS      current
+			DESCRIPTION
+				"When this is admitOnlyVlanTagged(2) the device will
+				discard untagged frames received on this port. 
+				When admitOnlyUntagged(3), the device will discard any 
+				frames with a VLAN tag. When admitAll(1), all frames are 
+				accepted and untagged or Priority-Tagged frames received 
+				on this port will be assigned to the PVID for this port.
+
+				This control does not affect VLAN independent BPDU
+				frames, such as GVRP and STP.  It does affect VLAN
+				dependent BPDU frames, such as GMRP."
+			DEFVAL      { admitAll }
+			::= { hmInterfaceExtEntry 1  }
+
+--
+-- hmTrunkTable
+--
 hmTrunkTable   OBJECT-TYPE
 			 SYNTAX 		 SEQUENCE OF HmTrunkEntry
 			 MAX-ACCESS 		 not-accessible
@@ -1737,6 +1915,14 @@ hmSfpRxPowerdBm	 OBJECT-TYPE
 			 
 --  { hmSystemTable 13 }
  
+hmSysBootVersion OBJECT-TYPE
+			 SYNTAX 		  DisplayString
+			 MAX-ACCESS 	  read-only
+			 STATUS 		  current
+			 DESCRIPTION
+				 "This value is a string that contains the version of the Bootcode"
+			 ::= { hmSystemTable 19 } 
+ 
 hmSysChassisName OBJECT-TYPE
 			 SYNTAX 		  DisplayString
 			 MAX-ACCESS 		  read-write
@@ -2057,6 +2243,55 @@ hmLEDRSRRelay2 OBJECT-TYPE
 		"Status from the Relay2 LED."
     ::= { hmLEDRSRGroup 6 }
     
+hmLEDMarGroup OBJECT IDENTIFIER ::= { hmLEDGroup 4 }
+
+hmLEDMarPowerSupply OBJECT-TYPE
+    SYNTAX  LEDState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Status from the PowerSupply LED."
+    ::= { hmLEDMarGroup 1 }
+
+hmLEDMarStandby OBJECT-TYPE
+    SYNTAX  LEDState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Status from the Standby LED."
+    ::= { hmLEDMarGroup 2 }
+
+hmLEDMarRedundancyManager OBJECT-TYPE
+    SYNTAX  LEDState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Status from the RM LED."
+    ::= { hmLEDMarGroup 3 }
+
+hmLEDMarFault OBJECT-TYPE
+    SYNTAX  LEDState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Status from the Fault LED."
+    ::= { hmLEDMarGroup 4 }
+
+hmLEDMarRelay1 OBJECT-TYPE
+    SYNTAX  LEDState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Status from the Relay1 LED."
+    ::= { hmLEDMarGroup 5 }
+
+hmLEDMarRelay2 OBJECT-TYPE
+    SYNTAX  LEDState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Status from the Relay2 LED."
+    ::= { hmLEDMarGroup 6 }
     
 hmDIPSwitchGroup OBJECT IDENTIFIER ::= { hmSystemTable 36 }
  
@@ -2117,6 +2352,28 @@ hmDIPSwitchMICEConfig OBJECT-TYPE
 		off (2) indicates DIP switch configuration is disabled."
 	::= { hmDIPSwitchMICEGroup 4 }
 
+hmDIPSwitchAdminState OBJECT-TYPE
+    SYNTAX INTEGER {
+                     enable (1),
+                     disable (2)
+                   }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Enable or Disable the DIP switch configuration. 
+          If set to disable DIP switches are ignored."
+    DEFVAL {enable}
+    ::= { hmDIPSwitchGroup 10 }
+
+hmDIPSwitchConflict OBJECT-TYPE
+    SYNTAX TruthValue
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "TRUE if hmDIPSwitchAdminState is set to disable and hardware DIP 
+         switch setting is enabled."
+    ::= { hmDIPSwitchGroup 11 }
 
 hmSysMaxTrunks   OBJECT-TYPE
 			 SYNTAX 		 Integer32
@@ -2277,7 +2534,8 @@ hmSysSwitchMRU  OBJECT-TYPE
 			 SYNTAX			 INTEGER {
                              size1522 (1522),
                              size1552 (1552),                             
-                             size1632 (1632)
+                             size1632 (1632),
+                             size9022 (9022)
                              }
 			 MAX-ACCESS 		 read-write
 			 STATUS			 current
@@ -2535,6 +2793,23 @@ hmSysSelftestRebootOnHdxError   OBJECT-TYPE
                    Half duplex mismatch error is detected. The option depends on hmSysSelftestRebootOnError."
         	 DEFVAL      { enabled }
          	::= { hmSysSelftestGroup 4 }
+
+hmSysSelftestSysMon OBJECT-TYPE
+		SYNTAX			 INTEGER {
+                        enabled (1),
+                        disabled (2)
+                        }
+		 MAX-ACCESS      read-write
+		 STATUS			 current
+		 DESCRIPTION
+			 "Enable or disable the System Monitor access during 
+			  the boot phase. Please note: If the System Monitor 
+			  is disabled, it is possible to lose access to the 
+			  device permanently in case of loosing administrator
+			  password or misconfiguration."
+		 DEFVAL			 { enabled }
+		 ::= { hmSysSelftestGroup 5 }
+
 --
 -- System / OEM Group
 --
@@ -2603,7 +2878,42 @@ hmSysSkipAcaOnBoot OBJECT-TYPE
 		     DEFVAL  { disable }				 
 			::= { hmSystemTable 46 }
 
-		 
+hmSysConsoleServiceShellAdminState OBJECT-TYPE
+			SYNTAX			 INTEGER {
+							 enable  (1),
+							 disable (2)
+							 }
+        		MAX-ACCESS  read-write
+		        STATUS      current
+		        DESCRIPTION
+                		    "Admin State of service shell. (1=enable, 2=disable)."
+		        DEFVAL      { enable }
+		        ::= { hmSystemTable 47 }
+
+--
+-- System / EmWeb Web Server HTTPS certificate fingerprint
+--         	
+hmSysHttpsCertFingerPrintType OBJECT-TYPE
+     	 SYNTAX INTEGER {
+               				sha1(1),
+               				sha256(2)
+                 		}
+	     MAX-ACCESS  read-write
+	     STATUS      current
+	     DESCRIPTION
+         	"Controls HTTPS certificate fingerprint generation. If set to 'sha1' hmSysHttpsCertFingerPrint
+         	 will show the SHA1 fingerprint of the certificate."
+	     DEFVAL { sha256 } 
+     ::= { hmSystemTable  48 }
+     
+hmSysHttpsCertFingerPrint    OBJECT-TYPE
+     	SYNTAX         DisplayString
+     	MAX-ACCESS     read-only
+     	STATUS         current
+     	DESCRIPTION
+        	"The HTTPS certificate fingerprint as hash. The type of the hash is defined with hmSysHttpsCertFingerPrintType."                        
+     ::= { hmSystemTable  49 }
+
 --
 -- chassis / Power Supply Table  --
 --
@@ -4363,6 +4673,31 @@ hmNetACDIfId  OBJECT-TYPE
             "The integer value used to identify the interface number
             on the local system where the ip address conflict was detected."
     ::= { hmNetACDAddrEntry 9 }			 
+
+--
+-- hmNetwork / MAC Address Conflict Detection group  --
+--
+hmNetMacACDGroup	OBJECT IDENTIFIER ::= { hmNetwork 13 }
+
+hmNetMacACDStatus OBJECT-TYPE
+			SYNTAX INTEGER {
+				enable(1),
+				disable(2)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+         		"Sets the status of the MAC address conflict detection mechanism on this device."
+			DEFVAL { disable }				
+			::= { hmNetMacACDGroup 1 }
+
+hmNetMacACDConflictAddress	OBJECT-TYPE
+			SYNTAX		MacAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+					"MAC address in case of a conflict."					 
+			::= { hmNetMacACDGroup 2 }
 			 
 --
 -- hmNetwork / HiDiscovery-group  --
@@ -4402,6 +4737,14 @@ hmNetHiDiscoveryRelay	OBJECT-TYPE
 			"Relay/bridge HiDiscovery frames."
 			DEFVAL { disable }
 			::= { hmNetHiDiscoveryGroup 2 }
+			
+hmNetHiDiscoveryProtocol	OBJECT-TYPE
+			SYNTAX	BITS { none(0), v1(1), v2(2) }
+			MAX-ACCESS	read-only
+			STATUS	current
+			DESCRIPTION
+			"Shows the HiDiscovery protocols supported by the device."
+			::= { hmNetHiDiscoveryGroup 3 }
 
 --
 -- hmNetwork / sntp-group  --
@@ -4515,6 +4858,7 @@ hmNetSNTPOperStatus OBJECT-TYPE
 			DESCRIPTION
 			"Operational status of the SNTP sub-system.
 			 The value is a bit mask:
+			    0  SNTP disabled
 			    1  local system clock synchronized
 			    2  SNTP loop detected
 			    4  generic error
@@ -4529,7 +4873,7 @@ hmNetSNTPOperStatus OBJECT-TYPE
 			::= { hmNetSNTPGroup 11 }
 
 hmNetSNTPTimeAdjustThreshold OBJECT-TYPE
-			SYNTAX Integer32 (0..2147483647)
+			SYNTAX Integer32 (0..2000)
 			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION
@@ -4540,7 +4884,7 @@ hmNetSNTPTimeAdjustThreshold OBJECT-TYPE
 			and the received SNTP time is fewer than the hmNetSNTPTimeAdjustThreshold
 			value, the local clock will not be set. If the difference between the local clock time
 			and the received SNTP time is equal or larger than the hmNetSNTPTimeAdjustThreshold
-			value, the local clock will be set."
+			value, the local clock will be set. Value must be in the <0-2000> milliseconds interval."
 			DEFVAL { 0 }
 			::= { hmNetSNTPGroup 12 }
 			
@@ -4917,7 +5261,7 @@ hmNetPTPSyncInterval OBJECT-TYPE
 
 
 hmNetPTPSubdomainName OBJECT-TYPE
-		SYNTAX		OCTET STRING (SIZE (16))
+		SYNTAX		PTPSubdomainName
 		MAX-ACCESS		read-write
 		STATUS		current
 		DESCRIPTION
@@ -4925,11 +5269,7 @@ hmNetPTPSubdomainName OBJECT-TYPE
 			by all PTP clocks in the subdomain as the basis for sending
 			and receiving PTP communications. Changes are applied after 
 			the initialization with the init key init-with-nvm or afer 
-			reboot if the configuration was saved. The values of the 
-			octets for the subdomain name may be chosen from the set 
-			consisting of the values of the printable ASCII characters 
-			starting with hex value 0x21 (!) up to and including hex 
-			value 0x7E (~)."
+			reboot if the configuration was saved."
 		::= { hmNetPTPConfiguration 13 }
 
 
@@ -5761,6 +6101,31 @@ hmNetPTP2TCVlanPriority	OBJECT-TYPE
 		DEFVAL  { 4 }
 		::= { hmNetPTP2TCConfiguration 11 }
 
+hmNetPTP2TCProfile OBJECT-TYPE
+		SYNTAX		INTEGER {
+			 						user-defined (1),
+									default-e2e (2),
+				 					default-p2p (3),
+								 	power (4)
+							}
+		MAX-ACCESS 	read-write
+		STATUS 		current
+		DESCRIPTION
+			"Configures PTP parameters to a specific profile. Setting the object
+			 to user-defined (1) has no effect."
+
+		::= { hmNetPTP2TCConfiguration 12 }
+			
+hmNetPTP2TCPowerTLVCheck OBJECT-TYPE
+		SYNTAX 		TruthValue
+		MAX-ACCESS 	read-write
+		STATUS 		current
+		DESCRIPTION
+			"If set to true only Announce messages including the TLVs specified in 
+ 			the Power Profile (C37.238) are accepted for syntonization"
+		DEFVAL  { false }
+		::= { hmNetPTP2TCConfiguration 13 }
+
 hmNetPTP2TCPortTable OBJECT-TYPE
 		SYNTAX		SEQUENCE OF HmNetPTP2TCPortEntry
 		MAX-ACCESS		not-accessible
@@ -5910,7 +6275,7 @@ hmNetSNMPSynchronizeV1V3Status  	OBJECT-TYPE
 			webinterface.
 			Further, if enabled the first read-only community in 
 			hmAuthCommTable is used for the SNMPv3 user password."						
-			DEFVAL  { enable }
+			DEFVAL  { disable }
 			::= { hmNetSNMPGroup 5 }
 
 hmNetSNMPPortNumber  	OBJECT-TYPE
@@ -5960,6 +6325,19 @@ hmNetSNMPv3EncryptionReadOnlyStatus 	OBJECT-TYPE
 			"Enables/disables the SNMPv3 user Data Encryption."						
 			DEFVAL  { disable }
 			::= { hmNetSNMPGroup 9 }
+			
+hmNetSNMPSynchronizeV3V1Status 	OBJECT-TYPE
+			SYNTAX	INTEGER {
+				enable(1),
+				disable(2)
+			}
+			MAX-ACCESS	read-write
+			STATUS	current
+			DESCRIPTION
+			"Enables/disables the synchronization between the SNMPv3 password table (hmAgentUserConfigTable) 
+			and the SNMPv1/v2 community table (hmAgentSnmpCommunityConfigTable)."						
+			DEFVAL  { disable }
+			::= { hmNetSNMPGroup 11 }
 			
 --
 -- hmNetwork / GPS-group  --
@@ -6034,7 +6412,8 @@ HmRMAEntry ::= SEQUENCE {
 				hmRMASrvHttp INTEGER,
 				hmRMASrvSnmp INTEGER, 
 				hmRMASrvTelnet INTEGER,
-				hmRMASrvSsh INTEGER
+				hmRMASrvSsh INTEGER,
+				hmRMASrvHttps INTEGER
 			}
 
 hmRMATable OBJECT-TYPE
@@ -6089,7 +6468,7 @@ hmRMASrvHttp OBJECT-TYPE
 			}
 			MAX-ACCESS read-write
 			STATUS current
-			DESCRIPTION "Enables/disables HHTP access"
+			DESCRIPTION "Enables/disables HTTP access"
 			DEFVAL { enabled }
 			::= { hmRMAEntry 5 }
 
@@ -6125,6 +6504,17 @@ hmRMASrvSsh OBJECT-TYPE
 			DESCRIPTION "Enables/disables SSH access"
 			DEFVAL { enabled }
 			::= { hmRMAEntry 8 }
+
+hmRMASrvHttps OBJECT-TYPE
+			SYNTAX INTEGER {
+				enabled (1),
+				disabled(2)
+			}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION "Enables/disables HTTPS access"
+			DEFVAL { enabled }
+			::= { hmRMAEntry 9 }
 
 --
 -- agent / File System Table --
@@ -6293,6 +6683,15 @@ hmConfigurationStatus	OBJECT-TYPE
 			notInSync(2):  Local and running configuration don't match,
 						   configuration has not yet been saved."
 			::= { hmFSTable 12 } 
+
+hmConfigurationSignature	OBJECT-TYPE
+			SYNTAX 		OCTET STRING(SIZE (4))
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+                 "Signature of the stored configuration. The signature 
+                 changes each time the configuration is saved."
+			::= { hmFSTable 13 }
  
 hmFSFileTable	OBJECT-TYPE
 			 SYNTAX 		 SEQUENCE OF HmFSFileEntry
@@ -7620,7 +8019,8 @@ hmIGMPQuerierTransmitInterval OBJECT-TYPE
     So this is the time between general periodic queries being
     sent out of the switch when it is acting as the IGMP querier.
     Large values lead to IGMP queries being sent less often.
-    The default is 125 seconds and the range is 2 to 3599 seconds."
+    The default is 125 seconds and the range is 2 to 3599 seconds.
+    Note: The following dependency is needed: Max. Response Time < Querier Transmit Interval < Group Membership Interval."
 	DEFVAL  { 125 }    
     ::= { hmIGMPQuerierGroup 3 }
 
@@ -7748,9 +8148,10 @@ hmRelayServerGroup	OBJECT IDENTIFIER ::= { hmRelayGroup 10 }
 hmRelayDHCPServerIpAddr  OBJECT-TYPE
         SYNTAX  IpAddress
         MAX-ACCESS  read-write
-        STATUS  current
+        STATUS  obsolete
         DESCRIPTION
-             "The IP address of the first DHCP-server to be addressed 
+             "This object is 'obsolete' and is replaced by hmRelayServerAddrEntry.
+             The IP address of the first DHCP-server to be addressed 
 		     by the relay agent.
              If 0.0.0.0, DHCP relaying is switched off for this entry."
 	::= { hmRelayServerGroup 1 }
@@ -7758,9 +8159,10 @@ hmRelayDHCPServerIpAddr  OBJECT-TYPE
 hmRelayDHCPServer2IpAddr  OBJECT-TYPE
         SYNTAX  IpAddress
         MAX-ACCESS  read-write
-        STATUS  current
+        STATUS  obsolete
         DESCRIPTION
-             "The IP address of the second DHCP-server to be addressed
+             "This object is 'obsolete' and is replaced by hmRelayServerAddrEntry.
+             The IP address of the second DHCP-server to be addressed
 		     by the relay agent.
              If 0.0.0.0, DHCP relaying is switched off for this entry."
     ::= { hmRelayServerGroup 2  }
@@ -7768,9 +8170,10 @@ hmRelayDHCPServer2IpAddr  OBJECT-TYPE
 hmRelayDHCPServer3IpAddr  OBJECT-TYPE
         SYNTAX  IpAddress
         MAX-ACCESS  read-write
-        STATUS  current
+        STATUS  obsolete
         DESCRIPTION
-             "The IP address of the third DHCP-server to be addressed
+             "This object is 'obsolete' and is replaced by hmRelayServerAddrEntry.
+             The IP address of the third DHCP-server to be addressed
 		     by the relay agent.
              If 0.0.0.0, DHCP relaying is switched off for this entry."
     ::= { hmRelayServerGroup 3 }
@@ -7778,9 +8181,10 @@ hmRelayDHCPServer3IpAddr  OBJECT-TYPE
 hmRelayDHCPServer4IpAddr  OBJECT-TYPE
         SYNTAX  IpAddress
         MAX-ACCESS  read-write
-        STATUS  current
+        STATUS  obsolete
         DESCRIPTION
-             "The IP address of the fourth DHCP-server to be addressed 
+             "This object is 'obsolete' and is replaced by hmRelayServerAddrEntry.
+             The IP address of the fourth DHCP-server to be addressed 
 		     by the relay agent.
              If 0.0.0.0, DHCP relaying is switched off for this entry."
     ::= { hmRelayServerGroup 4  }
@@ -7807,7 +8211,9 @@ HmRelayInterfaceEntry ::= SEQUENCE {
 		 hmRelayIfaceID	   				Integer32,
 		 hmRelayIfaceOption82Enable  	INTEGER,
 		 hmRelayIfaceBCRequestFwd		INTEGER,
-		 hmRelayIfaceCircuitID			OCTET STRING
+		 hmRelayIfaceCircuitID			OCTET STRING,
+         hmRelayIfaceDhcpRelayAdminState INTEGER,
+         hmRelayIfaceDhcpRelayOperState INTEGER
 		 }
 
 hmRelayIfaceGroupID	 OBJECT-TYPE
@@ -7862,6 +8268,102 @@ hmRelayIfaceCircuitID OBJECT-TYPE
 				 It is a best guess value, since some information is not known 
 				 before the actual reception of a BOOTP/DHCP request message."
 	 ::= { hmRelayInterfaceEntry 5 }
+
+hmRelayIfaceDhcpRelayAdminState OBJECT-TYPE
+         SYNTAX    INTEGER {
+                 enable (1),
+                 disable (2)
+                 }
+         MAX-ACCESS      read-write
+         STATUS      current
+         DESCRIPTION
+                "Enable or disable DHCP Relay Agent on this physical port."
+         DEFVAL  { enable }                
+     ::= { hmRelayInterfaceEntry 6 }
+
+hmRelayIfaceDhcpRelayOperState OBJECT-TYPE
+         SYNTAX    INTEGER {
+                 disable (1),
+                 relay (2),
+                 server (3)
+                 }
+         MAX-ACCESS      read-only
+         STATUS      current
+         DESCRIPTION
+                "Current active DHCP protocol on this physical port."
+         DEFVAL  { disable }                
+     ::= { hmRelayInterfaceEntry 7 }
+
+
+-- *************************************************************
+-- hmRelayGroup / Relay-Server-AddrTable  --
+-- *************************************************************
+
+hmRelayServerAddrTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF HmRelayServerAddrEntry
+   MAX-ACCESS       not-accessible
+   STATUS       current
+   DESCRIPTION
+        "This table contains objects to configure
+         DHCP Servers."
+   ::= { hmRelayGroup 12 }
+
+hmRelayServerAddrEntry OBJECT-TYPE
+   SYNTAX       HmRelayServerAddrEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION 
+        "The DHCP Server objects."
+   INDEX { hmRelayServerAddrIndex }
+   ::= { hmRelayServerAddrTable 1 }
+
+HmRelayServerAddrEntry ::= SEQUENCE {
+   hmRelayServerAddrIndex       Integer32,
+   hmRelayServerAddr            IpAddress,
+   hmRelayServerInterface       InterfaceIndexOrZero,
+   hmRelayServerRowStatus       RowStatus
+   }
+
+-- *************************************************************
+-- hmRelayServer entry
+-- *************************************************************
+hmRelayServerAddrIndex OBJECT-TYPE
+   SYNTAX       Integer32 (1..16)
+   MAX-ACCESS       not-accessible
+   STATUS       current
+   DESCRIPTION
+        "Index for server table."
+   ::= { hmRelayServerAddrEntry 1 }
+
+hmRelayServerAddr  OBJECT-TYPE
+   SYNTAX       IpAddress
+   MAX-ACCESS       read-create
+   STATUS       current
+   DESCRIPTION
+        "The address of the external DHCP server."
+   DEFVAL { '00000000'H } -- 0.0.0.0                
+   ::= { hmRelayServerAddrEntry 2 }
+
+hmRelayServerInterface OBJECT-TYPE
+   SYNTAX       InterfaceIndexOrZero
+   MAX-ACCESS       read-create
+   STATUS       current
+   DESCRIPTION
+    "If an Interface is set, only DHCP packets from this interface are relayed to the server."
+   DEFVAL { 0 }       
+   ::= { hmRelayServerAddrEntry 3 }
+ 
+hmRelayServerRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicates the status of an entry in this table,
+         and is used to create/delete entries. Objects
+         within this table can by changed while the status
+         is 'active'."
+    ::= { hmRelayServerAddrEntry 4 }
+
 
 hmRelayBCPktInCnt OBJECT-TYPE
 			SYNTAX Counter32
@@ -7956,7 +8458,8 @@ HmSigConConfigEntry ::= SEQUENCE {
 			 hmSigConSensePS6State		 	INTEGER,
 			 hmSigConSensePS7State		 	INTEGER,
 			 hmSigConSensePS8State		 	INTEGER,
-			 hmSigConSenseACANotInSync   	INTEGER
+			 hmSigConSenseACANotInSync   	INTEGER,
+			 hmSigConSenseSRedNotGuaranteed	INTEGER
 			 }
 
 hmSigConID   OBJECT-TYPE
@@ -7989,7 +8492,8 @@ hmSigConTrapCause   OBJECT-TYPE
 			 		moduleRemoval(7),
 			 		acaRemoval(8),
 			 		fanFailure(9),
-			 		acaNotInSync(10)
+			 		acaNotInSync(10),
+			 		sRedNotGuaranteed(11)
 	 				}
 			 MAX-ACCESS 	 read-only
 			 STATUS 		 current
@@ -8063,7 +8567,7 @@ hmSigConSenseRedNotGuaranteed   OBJECT-TYPE
 			 MAX-ACCESS 		 read-write
 			 STATUS 		 current
 			 DESCRIPTION
-				 "Sets the monitoring of the HIPER-Ring."
+				 "Sets the monitoring of the HIPER-Ring, MRP-Ring or Fast HIPER-Ring."
 			 DEFVAL  { disable }                
 				::= { hmSigConConfigEntry 10 }
 
@@ -8178,6 +8682,18 @@ hmSigConSenseACANotInSync   OBJECT-TYPE
 		 	 DEFVAL  { disable }
 			 ::= { hmSigConConfigEntry 23 }
 
+hmSigConSenseSRedNotGuaranteed   OBJECT-TYPE
+			 SYNTAX 		 INTEGER { enable(1), disable(2) }
+			 MAX-ACCESS 		 read-write
+			 STATUS 		 current
+			 DESCRIPTION
+				 "Sets the monitoring of sub-rings if configured and activated on the device."
+			 DEFVAL  { disable }                
+				::= { hmSigConConfigEntry 24 }
+
+--
+-- hmSigConLinkTable
+--
 hmSigConLinkTable   OBJECT-TYPE
 			 SYNTAX 		 SEQUENCE OF HmSigConLinkEntry
 			 MAX-ACCESS 		 not-accessible
@@ -8261,7 +8777,8 @@ HmDevMonConfigEntry ::= SEQUENCE {
 			 hmDevMonSensePS6State		 	INTEGER,
 			 hmDevMonSensePS7State		 	INTEGER,
 			 hmDevMonSensePS8State		 	INTEGER,
-			 hmDevMonSenseACANotInSync   	INTEGER
+			 hmDevMonSenseACANotInSync   	INTEGER,
+			 hmDevMonSenseSRedNotGuaranteed	INTEGER
 			 }
 
 hmDevMonID   OBJECT-TYPE
@@ -8294,7 +8811,8 @@ hmDevMonTrapCause   OBJECT-TYPE
 			 		moduleRemoval(7),
 			 		acaRemoval(8),
 			 		fanFailure(9),
-			 		acaNotInSync(10)
+			 		acaNotInSync(10),
+			 		sRedNotGuaranteed(11)
 	 				}
 			 MAX-ACCESS 		 read-only
 			 STATUS 		 current
@@ -8346,7 +8864,7 @@ hmDevMonSenseRedNotGuaranteed   OBJECT-TYPE
 			 MAX-ACCESS 		 read-write
 			 STATUS 		 current
 			 DESCRIPTION
-				 "Sets the monitoring of the HIPER-Ring."
+				 "Sets the monitoring of the HIPER-Ring, MRP-Ring or Fast HIPER-Ring."
 			 DEFVAL  { ignore }                
 				::= { hmDevMonConfigEntry 8 }
 
@@ -8463,6 +8981,14 @@ hmDevMonSenseACANotInSync OBJECT-TYPE
 		 	DEFVAL  { ignore }
 		 	 ::= { hmDevMonConfigEntry 21 }
 
+hmDevMonSenseSRedNotGuaranteed   OBJECT-TYPE
+			 SYNTAX 		 INTEGER { error(1), ignore(2) }
+			 MAX-ACCESS 		 read-write
+			 STATUS 		 current
+			 DESCRIPTION
+				 "Sets the monitoring of sub-rings if configured and activated on the device."
+			 DEFVAL  { ignore }                
+				::= { hmDevMonConfigEntry 22 }
 
 --##############################################################################
 
@@ -8960,8 +9486,8 @@ hmPOEFastStartup OBJECT-TYPE
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-    "Enables/disables Power over Ethernet on this device.
-    The default value is enable."
+    "Enables/disables Fast Power over Ethernet on this device.
+    The default value is disabled."
     DEFVAL { disable }
     ::= { hmPOEGlobalGroup 4 }              
             
@@ -8989,7 +9515,9 @@ hmPOEPortEntry OBJECT-TYPE
 
 HmPOEPortEntry ::= SEQUENCE {
 	hmPOEPortIndex 		   		Integer32,
-	hmPOEPortConsumptionPower 	Integer32
+	hmPOEPortConsumptionPower 	Integer32,
+	hmPOEPortMaxConsumptionPower Integer32,
+	hmPOEPortPowerLimit          Integer32
 	}
 
 hmPOEPortIndex OBJECT-TYPE
@@ -9007,6 +9535,27 @@ hmPOEPortConsumptionPower OBJECT-TYPE
 	DESCRIPTION
 	"Measured usage power per interface expressed in Milliwatts."
 	::= { hmPOEPortEntry 2 }
+
+hmPOEPortMaxConsumptionPower  OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The  maximum observed power consumption (hmPOEPortConsumptionPower)   
+	value expressed in milliwatts used by the PD. 
+	The value is reset to 0 if the PoE admin state is set to disable 
+	or if a disconnect of the PD is detected."
+	::= { hmPOEPortEntry 3 }
+
+hmPOEPortPowerLimit OBJECT-TYPE
+	SYNTAX Integer32 (0..30000)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"The power limit per port expressed in milliwatts. If set to
+	zero the power consumption limitation is disabled."
+	DEFVAL { 0 }
+	::= { hmPOEPortEntry 4 }
 
 --
 -- Power Over Ethernet Module Group --
@@ -9266,6 +9815,8 @@ hmProfinetIOConfigGroup OBJECT IDENTIFIER ::= { hmIndustrialEthernetProtocols 1 
 hmProfinetIOStatisticsGroup OBJECT IDENTIFIER ::= { hmIndustrialEthernetProtocols 2 }
 hmEthernetIPConfigGroup OBJECT IDENTIFIER ::= { hmIndustrialEthernetProtocols 3 }
 hmEthernetIPStatisticsGroup OBJECT IDENTIFIER ::= { hmIndustrialEthernetProtocols 4 }
+hmIEC61850ConfigGroup OBJECT IDENTIFIER ::= { hmIndustrialEthernetProtocols 5 }
+hmIEC61850StatisticsGroup OBJECT IDENTIFIER ::= { hmIndustrialEthernetProtocols 6 }
 
 --
 -- ProfinetIO 
@@ -9400,6 +9951,22 @@ hmPNIONameOfStation OBJECT-TYPE
           It must be conform to the restrictions 
           as decribed in PNIO protocol specification."
    ::= { hmProfinetIOConfigGroup 11 }
+   
+hmPNIONumActiveApplicationRelations OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Returns the number of active application relations."
+  ::= { hmProfinetIOConfigGroup 12 }
+  
+
+hmPNIOMgmtSEEErrorIDGroup OBJECT IDENTIFIER ::= { hmProfinetIOConfigGroup 100 }
+
+hmPNIOApplicationRelationActive OBJECT-IDENTITY
+	STATUS      current
+	DESCRIPTION 	"Set not allowed, a Profinet application relation is active."
+	::= { hmPNIOMgmtSEEErrorIDGroup 1 }
 
 --
 -- EtherNet/IP
@@ -9503,25 +10070,121 @@ hmEtherNetIPVendorObjRequests  OBJECT-TYPE
 	::= { hmEthernetIPStatisticsGroup 3 }
 
 --
+-- IEC61850
+--
+
+hmIEC61850MMSServerAdminStatus  OBJECT-TYPE
+		SYNTAX INTEGER {
+			enable(1),
+			disable(2)
+		}
+		MAX-ACCESS read-write
+   	    STATUS  current
+		DESCRIPTION
+			"Enables/disables the IEC61850 MMS server functionality
+		     on this device. 
+		     If disabled(2), the MMS Server is deactivated, 
+		     but the IEC61850 MIBs can be accessed.  
+		     The default value is disabled."
+		DEFVAL  { disable }		     
+	::= { hmIEC61850ConfigGroup 1 }
+
+hmIEC61850MMSServerWriteAccessStatus  OBJECT-TYPE
+		SYNTAX INTEGER {
+			enable(1),
+			disable(2)
+		}
+		MAX-ACCESS read-write
+   	    STATUS  current
+		DESCRIPTION
+			"Enables/disables the Read/Write capability of the IEC61850 MMS. 
+		     If disabled(2), the MMS Server is accessible Read-Only,  
+		     if enabled(2) the devices configuration can be changed using 
+		     the IEC61850 MMS protocol.  
+		     The default value is disabled."
+		DEFVAL  { disable }		     
+	::= { hmIEC61850ConfigGroup 2 }
+
+
+hmIEC61850MMSServerTechnicalKey  OBJECT-TYPE
+	    SYNTAX SnmpAdminString (SIZE (0..32))
+		MAX-ACCESS read-write
+   	    STATUS  current
+		DESCRIPTION
+			"The IEC61850 MMS server technical key setting corresponds to the IEC61850 IED name. 
+			 This name is used to identify the device via a IEC61850 MMS client. 
+			 The size is restricted to 32 characters. According to IEC61850-7-2 Ed. the TechnicalKey represents
+			 an IEC61850 VisibleString. Thus the following characters are allowed:
+			 VisibleString ( FROM
+				('A'|'a'|'B'|'b'|'C'|'c'|'D'|'d'|'E'|'e'|'F'|'f'|
+				'G'|'g'|'H'|'h'|'I'|'i'|'J'|'j'|'K'|'k'|'L'|'l'|
+				'M'|'m'|'N'|'n'|'O'|'o'|'P'|'p'|'Q'|'q'|'R'|'r'|
+				'S'|'s'|'T'|'t'|'U'|'u'|'V'|'v'|'W'|'w'|'X'|'x'|
+				'Y'|'y'|'Z'|'z'|'_'|'0'|'1'|'2'|'3'|'4'|'5'|'6'|
+				'7'|'8'|'9') )"
+		DEFVAL  { "" }		 
+	::= { hmIEC61850ConfigGroup 3 }
+
+--
 -- Agent / Login Group
 --
 
 hmAgentLoginGroup OBJECT IDENTIFIER ::= { hmAgent 17 }
 
 hmAgentLoginBanner  OBJECT-TYPE
- 			 SYNTAX 		OCTET STRING (SIZE (0..255))			 
+ 			 SYNTAX 		HmLargeDisplayString (SIZE (0..255))			 
  			 MAX-ACCESS     read-write
  			 STATUS			current
  			 DESCRIPTION
- 				 "The text added in this variable by the user will be display in
+ 				 "The text added in this variable by the user will be displayed in
  				 the system login page as banner on every login into the CLI 
- 				 (local or remote) or when login into the system web interface.
+ 				 (local or remote) or when performing login into the system web interface.
  				 The default value is an empty string, which will not be displayed.
  				 Special meaning have the sequences '\t' and '\n' which
  				 allow the user to format the string with tabulator (t) 
- 				 and newline (n) format instructions."
+ 				 and newline (n) format instructions. The percent character ('%') is not allowed."
  			 DEFVAL  { "" }                
  			 ::= { hmAgentLoginGroup 1 }
+ 			 
+hmAgentLoginBannerAdminStatus	OBJECT-TYPE
+			 SYNTAX		INTEGER {
+		                          enable (1),
+		                          disable (2)
+		                      }
+			 MAX-ACCESS	read-write
+			 STATUS		current
+			 DESCRIPTION
+			 "Enables/disables the display of the pre login banner text."
+			 DEFVAL  { disable }			
+			 ::= { hmAgentLoginGroup 2 }
+			 
+hmAgentCliBannerText  OBJECT-TYPE
+			 SYNTAX       HmLargeDisplayString (SIZE (0..2048))			 
+			 MAX-ACCESS   read-write
+			 STATUS		  current
+			 DESCRIPTION
+			 "The text added in this variable by the user will be displayed in
+			 the system login page (local or remote) instead of the systemoverview.
+			 The default value is an empty string.
+			 Special meaning have the sequences '\t' and '\n' which
+			 allow the user to format the string with tabulator (\t) 
+			 and newline (\n) format instructions.
+			 The Banner must be enabled using hmAgentCliBannerAdminStatus."
+			 DEFVAL  { "" }                
+			 ::= { hmAgentLoginGroup 3 }
+ 			 
+hmAgentCliBannerAdminStatus	OBJECT-TYPE
+			 SYNTAX		INTEGER {
+		                          enable (1),
+		                          disable (2)
+		                      }
+			 MAX-ACCESS	read-write
+			 STATUS		current
+			 DESCRIPTION
+			 "Enables/disables the display of the cli login banner text
+			 instead of the standard login banner."
+			 DEFVAL  { disable }			
+			 ::= { hmAgentLoginGroup 4 }
 
 hmPortMonitorGroup			OBJECT IDENTIFIER ::= { hmAgent 18 }
 
@@ -9580,18 +10243,19 @@ hmPortMonitorIntfReset		OBJECT-TYPE
 hmPortMonitorIntfAction		OBJECT-TYPE
 			SYNTAX			INTEGER {
 							port-disable(1),
-							trap-only (2)
+							trap-only (2),
+							auto-disable(3)
 							}
 			MAX-ACCESS		read-write
 			STATUS			current
 			DESCRIPTION
 							"Interface link disable state."
-			DEFVAL			{ port-disable }
+			DEFVAL			{ auto-disable }
 			::= { hmPortMonitorIntfEntry 3 }
 
 hmPortMonitorConditionGroup	OBJECT IDENTIFIER ::= { hmPortMonitorGroup 3 }
 
-hmPortMonitorConditionTable	OBJECT-TYPE
+hmPortMonitorConditionIntfTable	OBJECT-TYPE
 			SYNTAX			SEQUENCE OF HmPortMonitorConditionIntfEntry
 			MAX-ACCESS		not-accessible
 			STATUS			current
@@ -9606,12 +10270,14 @@ hmPortMonitorConditionIntfEntry	OBJECT-TYPE
 			DESCRIPTION
 							"Port state action interface entry."
 			INDEX			{ ifIndex }
-			::= { hmPortMonitorConditionTable 1 }
+			::= { hmPortMonitorConditionIntfTable 1 }
 			
 HmPortMonitorConditionIntfEntry ::=
 			SEQUENCE		{
 							hmPortMonitorConditionLinkFlapMode TruthValue,
 							hmPortMonitorConditionCrcFragmentsMode TruthValue,
+							hmPortMonitorConditionOverloadDetectionMode TruthValue,
+							hmPortMonitorConditionSpeedDuplexMode TruthValue,
 							hmPortMonitorConditionField BITS
 							}
 
@@ -9633,11 +10299,31 @@ hmPortMonitorConditionCrcFragmentsMode		OBJECT-TYPE
 			DEFVAL			{ false }
 			::= { hmPortMonitorConditionIntfEntry 2 }
 
+hmPortMonitorConditionOverloadDetectionMode		OBJECT-TYPE
+			SYNTAX			TruthValue
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION
+							"Interface Overload Detection mode."
+			DEFVAL			{ false }
+			::= { hmPortMonitorConditionIntfEntry 4 }
+
+hmPortMonitorConditionSpeedDuplexMode		OBJECT-TYPE
+			SYNTAX			TruthValue
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION
+							"Interface Speed and Duplex monitor mode."
+			DEFVAL			{ false }
+			::= { hmPortMonitorConditionIntfEntry 5 }
+
 hmPortMonitorConditionField		OBJECT-TYPE
 		   SYNTAX      		BITS {
 		   					none(0),
 		   					link-flap(1),
-		   					crcFragments(2)
+		   					crcFragments(2),
+							overload-detection(3),
+							speed-duplex(4)
     	               		}
 			MAX-ACCESS		read-only
 			STATUS			current
@@ -9763,6 +10449,389 @@ hmPortMonitorConditionCrcFragmentsCountTotal	OBJECT-TYPE
 							"Total CrcFragments count."
 			::= { hmPortMonitorConditionCrcFragmentsIntfEntry 2 }
 
+hmPortMonitorConditionOverloadDetectionGroup	OBJECT IDENTIFIER ::= { hmPortMonitorConditionGroup 4 }
+
+hmPortMonitorConditionOverloadDetectionInterval		OBJECT-TYPE
+			SYNTAX			Integer32(1..20)
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION
+							"Measure interval in seconds (1-20s) for overload detection."
+			DEFVAL			{ 1 }
+			::= { hmPortMonitorConditionOverloadDetectionGroup 1 }
+
+hmPortMonitorConditionOverloadDetectionIntfTable	OBJECT-TYPE
+			SYNTAX			SEQUENCE OF HmPortMonitorConditionOverloadDetectionIntfEntry
+			MAX-ACCESS		not-accessible
+			STATUS			current
+			DESCRIPTION
+							"Port condition overload detection interface table."
+			::= { hmPortMonitorConditionOverloadDetectionGroup 2 }
+
+hmPortMonitorConditionOverloadDetectionIntfEntry	OBJECT-TYPE
+			SYNTAX			HmPortMonitorConditionOverloadDetectionIntfEntry
+			MAX-ACCESS		not-accessible
+			STATUS			current
+			DESCRIPTION
+							"Port condition overload detection interface entry."
+			INDEX			{ ifIndex }
+			::= { hmPortMonitorConditionOverloadDetectionIntfTable 1 }
+
+HmPortMonitorConditionOverloadDetectionIntfEntry ::=
+			SEQUENCE		{
+							hmPortMonitorConditionOverloadDetectionTrafficType INTEGER,
+							hmPortMonitorConditionOverloadDetectionThresholdType INTEGER,
+							hmPortMonitorConditionOverloadDetectionLowerThresholdValue Integer32,
+							hmPortMonitorConditionOverloadDetectionUpperThresholdValue Integer32							
+							}
+
+hmPortMonitorConditionOverloadDetectionTrafficType 	OBJECT-TYPE
+			SYNTAX 		INTEGER{
+							all(1),
+							bc(2),
+							bc-mc(3)							
+						}
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION
+							"Overload detection conditon traffic type."
+			DEFVAL			{ bc }
+			::= { hmPortMonitorConditionOverloadDetectionIntfEntry 1 }
+
+hmPortMonitorConditionOverloadDetectionThresholdType 	OBJECT-TYPE
+			SYNTAX 		INTEGER{
+							pps(1),
+							kbps(2),
+							link-capacity(3)							
+						}
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION
+							"Overload detection conditon threshold type."
+			DEFVAL			{ pps }
+			::= { hmPortMonitorConditionOverloadDetectionIntfEntry 2 }
+
+hmPortMonitorConditionOverloadDetectionLowerThresholdValue 	OBJECT-TYPE
+			SYNTAX			Integer32(0..10000000)
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION
+							"Overload detection conditon lower threshold value."
+			DEFVAL			{ 0 }
+			::= { hmPortMonitorConditionOverloadDetectionIntfEntry 3 }
+
+hmPortMonitorConditionOverloadDetectionUpperThresholdValue 	OBJECT-TYPE
+			SYNTAX			Integer32(0..10000000)
+			MAX-ACCESS		read-write
+			STATUS			current
+			DESCRIPTION
+							"Overload detection condition upper threshold value."
+			DEFVAL			{ 0 }
+			::= { hmPortMonitorConditionOverloadDetectionIntfEntry 4 }
+
+hmPortMonitorConditionSpeedDuplexGroup	OBJECT IDENTIFIER ::= { hmPortMonitorConditionGroup 5 }
+
+hmPortMonitorConditionSpeedDuplexTable	OBJECT-TYPE
+			SYNTAX	SEQUENCE OF HmPortMonitorConditionSpeedDuplexEntry
+			MAX-ACCESS		not-accessible
+			STATUS			current
+			DESCRIPTION
+				"Port condition speed-duplex interface table."
+			::= { hmPortMonitorConditionSpeedDuplexGroup 1 }
+
+hmPortMonitorConditionSpeedDuplexEntry	OBJECT-TYPE
+			SYNTAX			HmPortMonitorConditionSpeedDuplexEntry
+			MAX-ACCESS		not-accessible
+			STATUS			current
+			DESCRIPTION
+							"Port condition speed-duplex interface entry."
+			INDEX			{ ifIndex }
+			::= { hmPortMonitorConditionSpeedDuplexTable 1 }
+	
+	
+HmPortMonitorConditionSpeedDuplexEntry ::= SEQUENCE {
+		hmPortMonitorConditionSpeedDuplexValue 			BITS
+	}
+    
+   hmPortMonitorConditionSpeedDuplexValue	OBJECT-TYPE
+		SYNTAX		BITS  {
+							hdx-10(0),
+							fdx-10(1),
+							hdx-100(2),
+							fdx-100(3),
+							hdx-1000(4),
+							fdx-1000(5),
+							fdx-10000(6)
+							}
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"Speed and duplex combination allowed by port-monitor."
+		DEFVAL	{ { hdx-10, fdx-10, hdx-100, fdx-100, hdx-1000, fdx-1000, fdx-10000 } }
+	::= { hmPortMonitorConditionSpeedDuplexEntry 1 }
+
+hmAutoDisGroup	OBJECT IDENTIFIER ::= { hmAgent 19 }
+
+hmAutoDisIntfTable	 OBJECT-TYPE
+		SYNTAX	SEQUENCE OF HmAutoDisIntfEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Port Auto Disable interface table."
+	::= { hmAutoDisGroup 1 }
+
+hmAutoDisIntfEntry	OBJECT-TYPE
+		SYNTAX		HmAutoDisIntfEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Port Auto Disable interface entry."
+		INDEX	{ ifIndex }
+	::= { hmAutoDisIntfTable 1 }
+
+HmAutoDisIntfEntry ::=
+		SEQUENCE {
+				hmAutoDisIntfRemainingTime	Integer32,
+				hmAutoDisIntfComponentName	DisplayString,
+				hmAutoDisIntfErrorReason	INTEGER,
+				hmAutoDisIntfTimer	Integer32,
+				hmAutoDisIntfReset	TruthValue,
+				hmAutoDisIntfOperState	INTEGER
+			}
+
+
+hmAutoDisIntfRemainingTime	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+		"Remaining time in seconds until the activation of the port."
+	::= { hmAutoDisIntfEntry 1}
+
+hmAutoDisIntfComponentName	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Name of the component that triggered the error"
+	::= { hmAutoDisIntfEntry 2}
+
+hmAutoDisIntfErrorReason	OBJECT-TYPE
+		SYNTAX INTEGER {
+					none(0),
+					link-flap(1),
+					crc-error(2),
+					overload-detection(3),
+					speed-duplex(4),
+					port-security(5)
+				}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Error disable reason"
+	::= { hmAutoDisIntfEntry 3}
+
+hmAutoDisIntfTimer	OBJECT-TYPE
+		SYNTAX		Integer32(0|30..2147483)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+		   "Timer value in seconds after which a deactivated port is activated again.
+		   Possible values are: 30-2147483.
+		   A value of 0 disables the timer."
+		DEFVAL	{0}
+	::= { hmAutoDisIntfEntry 4 }
+
+hmAutoDisIntfReset	OBJECT-TYPE
+		SYNTAX		TruthValue
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Port Auto Disable interface reset."
+		DEFVAL	{ false }
+	::= { hmAutoDisIntfEntry 5 }
+
+hmAutoDisIntfOperState	OBJECT-TYPE
+	SYNTAX		INTEGER  {
+				active(1),
+				inactive(2)
+				}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Status of Auto Disable interface admin state"
+			DEFVAL			{inactive}
+	::= { hmAutoDisIntfEntry 6 }
+
+hmAutoDisReasonTable	OBJECT-TYPE
+					SYNTAX	SEQUENCE OF HmAutoDisReasonEntry
+					MAX-ACCESS	not-accessible
+					STATUS		current
+					DESCRIPTION
+					"Possible reasons for Auto Disable"
+					::= { hmAutoDisGroup 2 }
+
+hmAutoDisReasonEntry OBJECT-TYPE
+					SYNTAX			HmAutoDisReasonEntry
+					MAX-ACCESS		not-accessible
+					STATUS			current
+					DESCRIPTION
+					"Port Auto Disable interface entry."
+					INDEX	{ hmAutoDisReasons }
+					::= { hmAutoDisReasonTable 1 }
+
+HmAutoDisReasonEntry ::=
+					SEQUENCE {
+					hmAutoDisReasons			INTEGER,
+					hmAutoDisReasonOperation	INTEGER
+					}
+
+hmAutoDisReasons OBJECT-TYPE
+					SYNTAX INTEGER {
+							link-flap(1),
+							crc-error(2),
+							overload-detection(3),
+							speed-duplex(4),
+							port-security(5)
+					}
+					MAX-ACCESS	not-accessible
+					STATUS		current
+					DESCRIPTION
+					"Reason for deactivation a port"
+				::= { hmAutoDisReasonEntry 1}
+
+hmAutoDisReasonOperation		OBJECT-TYPE
+					SYNTAX INTEGER {
+							enable(1),
+							disable(2)
+							 }
+					MAX-ACCESS		read-write
+					STATUS			current
+					DESCRIPTION
+					"Enables/disables recovery by reason on this device."
+					DEFVAL		{ disable }
+					::= { hmAutoDisReasonEntry 2 }
+
+--
+-- *************************************************************
+-- hmMACNotificationGroup
+-- *************************************************************
+--
+hmMACNotificationGroup			OBJECT IDENTIFIER ::= { hmConfiguration 17 }
+hmMACNotifyMibObjects   		OBJECT IDENTIFIER ::= { hmMACNotificationGroup 1 }
+hmMACNotifyInterfaceMibObjects  OBJECT IDENTIFIER ::= { hmMACNotificationGroup 2 }
+
+--
+-- *************************************************************
+-- hmMACNotifyMibObjects
+-- *************************************************************
+--
+--
+-- MAC Notification Global Group
+--
+hmMACNotifyAdminState    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                      enable(1),
+                      disable(2)
+                      }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable or disable MAC Notification global." 
+    DEFVAL  { disable }
+    ::= { hmMACNotifyMibObjects 1 }
+
+hmMACNotifyInterval    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "MAC Notification interval in seconds.
+        Range is between 0 and 2147483647." 
+    DEFVAL  { 1 }
+    ::= { hmMACNotifyMibObjects 2 }
+
+
+--
+-- MAC Notification Interface Group
+--
+hmMACNotifyInterfaceTable  OBJECT-TYPE 
+    SYNTAX      SEQUENCE OF HmMACNotifyInterfaceEntry 
+    MAX-ACCESS  not-accessible 
+    STATUS      current 
+    DESCRIPTION 
+        "A table containing current configuration information
+        for each interface." 
+    ::= { hmMACNotifyInterfaceMibObjects 1 } 
+ 
+hmMACNotifyInterfaceEntry  OBJECT-TYPE 
+    SYNTAX      HmMACNotifyInterfaceEntry 
+    MAX-ACCESS  not-accessible 
+    STATUS      current 
+    DESCRIPTION 
+        "A logical row in the hmMACNotifyInterfaceTable." 
+    INDEX { 
+        ifIndex 
+    } 
+    ::= { hmMACNotifyInterfaceTable 1}
+ 
+HmMACNotifyInterfaceEntry ::= SEQUENCE { 
+    hmMACNotifyInterfaceAdminState              INTEGER,
+    hmMACNotifyInterfaceMACAddr                 MacAddress,
+    hmMACNotifyInterfaceMACStatus               INTEGER,
+    hmMACNotifyInterfaceMode					INTEGER
+}
+
+hmMACNotifyInterfaceAdminState  OBJECT-TYPE 
+    SYNTAX      INTEGER {
+                enable(1),
+                disable(2)
+    }
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+        "Enable or disable MAC Notification on this interface." 
+    DEFVAL  { disable } 
+    ::= { hmMACNotifyInterfaceEntry 1 }
+
+hmMACNotifyInterfaceMACAddr  OBJECT-TYPE 
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION 
+        "Last MAC address on this interface that have been added or 
+        removed from the address table." 
+    ::= { hmMACNotifyInterfaceEntry 2 }
+
+hmMACNotifyInterfaceMACStatus  OBJECT-TYPE 
+    SYNTAX      INTEGER
+        {
+            other(1),
+            added(2),
+            removed(3)
+        } 
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION 
+        "Status of the last MAC address on this interface." 
+    ::= { hmMACNotifyInterfaceEntry 3 }
+
+hmMACNotifyInterfaceMode OBJECT-TYPE
+	SYNTAX 		INTEGER
+				{
+				 add(1),
+				 remove(2),
+				 addAndRemove(3)
+				} 
+	MAX-ACCESS 	read-write 
+	STATUS 	  	current
+	DESCRIPTION
+		"Setting this object to 'add' (1) causes that only notifications are sent when entries are added to the FDB.
+		 Setting this object to 'remove' (2) causes that only notifications are sent when entries are removed from the FDB.
+		 Setting this object to 'addAndRemove' (3) causes that notifications are sent when entries are added or removed in the FDB."
+	DEFVAL  { addAndRemove }
+	::= { hmMACNotifyInterfaceEntry 4 }
+
 -- **************************************************************************
 -- *																		*
 -- *	Notifications (Traps)												*
@@ -9796,10 +10865,12 @@ hmPortMonitorConditionCrcFragmentsCountTotal	OBJECT-TYPE
 -- * hmConfigurationSavedTrap        (8)                                    *
 -- * hmConfigurationChangedTrap      (9)                                    *
 -- * hmAddressRelearnDetectTrap     (10)                                    *
--- * hmDuplexMismatchTrap           (11)  
--- * hmPortMonitorPortDisableTrap   (13)                                   *
+-- * hmDuplexMismatchTrap           (11)                                    *
+-- * hmPortMonitorPortDisableTrap   (13)                                    *
 -- * hmPOEModulePowerUsageOffNotification (14)								*
 -- * hmPOEModulePowerUsageOffNotification (15)								*
+-- * hmSysSelftestPortError         (16)                                    *
+-- * hmMACNotificationTrap          (17)                                    *
 -- **************************************************************************
 
 hmChassisEvent  OBJECT-IDENTITY
@@ -10066,4 +11137,29 @@ hmSysSelftestPortError NOTIFICATION-TYPE
 	"This trap is sent when the agent wants to reboot due to Opal Workaround 4. It shows
 	that the specific port is in an error state and a device reboot is needed."
 	::= { hmAgentEvent 16 }
+	
+hmMACNotificationTrap  NOTIFICATION-TYPE
+    OBJECTS     { ifIndex, hmMACNotifyInterfaceMACAddr, hmMACNotifyInterfaceMACStatus }
+    STATUS      current
+    DESCRIPTION	
+        "This trap is sent when a MAC address has been added to or 
+        removed from the FDB on a specific interface."
+    ::= { hmAgentEvent 17 }
+	
+hmPOEPortMaxConfiguredPowerLimitExceeded NOTIFICATION-TYPE
+	OBJECTS	{ hmPOEPortIndex, hmPOEPortMaxConsumptionPower,     
+				hmPOEPortPowerLimit }
+	STATUS  current	
+	DESCRIPTION 
+		"This trap reports an exceeding of the configured power limit. 
+		This notification indicates that a PD consumes more power that the maximum configured on the port and the system reserved the maximum power required for the negotiated class."
+	::= { hmAgentEvent 18 }
+
+hmNetMacACDNotification NOTIFICATION-TYPE
+		OBJECTS	{ ifIndex, hmNetMacACDConflictAddress }
+		STATUS  current
+		DESCRIPTION	
+		"This trap reports a MAC address conflict with it's own MAC address."
+		::= { hmAgentEvent 19 }
+	
 END
