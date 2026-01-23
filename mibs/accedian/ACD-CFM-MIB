@@ -1,7 +1,7 @@
 --
 -- Accedian Enterprise Specific MIB
 --
--- Copyright (c) 2005-2008, Accedian Networks, Inc.
+-- Copyright (c) 2005-2016, Accedian Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -14,8 +14,10 @@ IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE,
     Integer32, Unsigned32, Counter32, Counter64, Gauge32
         FROM SNMPv2-SMI
-    TruthValue, DateAndTime, RowStatus, DisplayString
+    TruthValue, DateAndTime, RowStatus, MacAddress, TEXTUAL-CONVENTION, DisplayString
         FROM SNMPv2-TC
+    VlanIdOrNone     FROM Q-BRIDGE-MIB  -- [RFC4363]
+
     MODULE-COMPLIANCE, OBJECT-GROUP
         FROM SNMPv2-CONF
 
@@ -24,18 +26,61 @@ IMPORTS
 
 acdCfm MODULE-IDENTITY
 
-    LAST-UPDATED "201112210100Z"
+    LAST-UPDATED "201609230100Z"
     ORGANIZATION "Accedian Networks, Inc."
     CONTACT-INFO
             "Accedian Technical Assistance Center
              Accedian Networks, Inc.
-             4878 Levy, suite 202
-             Saint-Laurent, Quebec Canada H4R 2P1
+             2351 Alfred-Nobel blvd., Suite N-410
+             Saint-Laurent, Quebec Canada H4S 2A9
              E-mail: support@accedian.com"
     DESCRIPTION
             "This MIB is complementary to the IEEE P802.1ag(TM) CFM MIB. It
              covers the delay measurment and the packet loss configuration
              and results."
+
+    REVISION "201609230100Z"        -- 23 September 2016
+    DESCRIPTION
+            "Add the history indexes to the corresponding OBJECT-GROUPs.
+             Remove acdCfmCfgIfAssignInstIdx out of acdCfmCfgIfAssignGroup.
+             Correct the description of acdCfmCfgIfAssignGroup."
+
+    REVISION "201607050100Z"        -- 05 July 2016
+    DESCRIPTION
+            "Set acdCfmSlmHistResultPeriodIndex instead of
+             acdCfmSlmHistResultInstanceIndex as the index for
+             acdCfmSlmHistResultTable."
+
+    REVISION "201605260100Z"        -- 26 May 2016
+    DESCRIPTION
+            "Set access level to read-only for acdCfmHistResultOneWayDelayID,
+             acdCfmHistResultOneWayDelaySampleIndex, acdCfmHistResultOneWayDvID,
+             acdCfmHistResultOneWayDvSampleIndex, acdCfmHistResultTwoWayDelayID,
+             acdCfmHistResultTwoWayDelaySampleIndex, acdCfmHistResultTwoWayDvID,
+             acdCfmHistResultTwoWayDvSampleIndex, acdCfmHistResultPktLossID,
+             acdCfmHistResultPktLossSampleIndex, acdCfmSlmHistResultID,
+             acdCfmSlmHistResultInstanceIndex."
+
+    REVISION "201407040100Z"        -- 04 July 2014
+    DESCRIPTION
+            "Add InterfaceStatusTLVEnable to acdCfmMepCfgTable."
+
+    REVISION "201301070100Z"        -- 07 January 2013
+    DESCRIPTION
+            "Add configured name for statistics and history tables."
+
+    REVISION "201204100100Z"        -- 10 April 2012
+    DESCRIPTION
+            "Add support for invalid CSF PDU counters."
+
+    REVISION "201201180100Z"        -- 18 Jan 2012
+    DESCRIPTION
+            "Add support for configuration of MEP instance."
+
+    REVISION "201201090100Z"        -- 09 Jan 2012
+    DESCRIPTION
+            "Add support for DMM and Pkt-Loss instance naming."
+
 
     REVISION "201112210100Z"        -- 21 Dec 2011
     DESCRIPTION
@@ -77,7 +122,69 @@ acdCfmDelayMeasurement  OBJECT IDENTIFIER ::= { acdCfmMIBObjects 1 }
 acdCfmPacketLoss        OBJECT IDENTIFIER ::= { acdCfmMIBObjects 2 }
 acdCfmMep               OBJECT IDENTIFIER ::= { acdCfmMIBObjects 3 }
 acdCfmStack             OBJECT IDENTIFIER ::= { acdCfmMIBObjects 4 }
-acdCfmSlm		    OBJECT IDENTIFIER ::= { acdCfmMIBObjects 5 }
+acdCfmSlm               OBJECT IDENTIFIER ::= { acdCfmMIBObjects 5 }
+acdCfmConfig            OBJECT IDENTIFIER ::= { acdCfmMIBObjects 6 }
+
+-- ******************************************************************
+-- Textual conventions
+-- ******************************************************************
+AcdCfmMepDirection ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates the direction in which the Maintenance
+        association (MEP) faces on the bridge port:
+
+        down(1)    Sends Continuity Check Messages away from the
+                   MAC Relay Entity.
+        up(2)      Sends Continuity Check Messages towards the
+                   MAC Relay Entity.
+       "
+    SYNTAX      INTEGER {
+                  down  (1),
+                  up    (2)
+                }
+
+AcdCfmMepLowestAlarmPri ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "An integer value specifying the lowest priority defect
+        that is allowed to generate a Fault Alarm (20.9.5), either:
+
+        soamAll(1)           DefRDICCM, DefMACstatus, DefRemoteCCM,
+                            DefErrorCCM, and DefXconCCM;
+        soamMacRemErrXcon(2)    Only DefMACstatus, DefRemoteCCM,
+                            DefErrorCCM, and DefXconCCM (default);
+        soamRemErrXcon(3)       Only DefRemoteCCM, DefErrorCCM,
+                            and DefXconCCM;
+        soamErrXcon(4)          Only DefErrorCCM and DefXconCCM;
+        soamXcon(5)             Only DefXconCCM; or
+        soamAis(6)           No defects DefXcon or lower are to be
+                            reported
+        soamNone(7)             No defects will be reported"
+    SYNTAX      INTEGER {
+                  soamAll              (1),
+                  soamMacRemErrXcon (2),
+                  soamRemErrXcon     (3),
+                  soamErrXcon         (4),
+                  soamXcon             (5),
+                  soamAis              (6),
+                  soamNone             (7)
+                }
+
+AcdCfmInterfaceAssign ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates the assignment configuration/state of a system interface
+
+        unassigned(1)    Interface has not been assigned to a cfm
+        assigned(2)      Interface has been assigned to a cfm
+       "
+    SYNTAX      INTEGER {
+                  unassigned  (1),
+                  assigned    (2)
+                }
+
+
 
 ---------------------------------------------------------------------------
  -- The Delay Measurement configuration table
@@ -125,7 +232,8 @@ AcdCfmDmCfgEntry ::= SEQUENCE {
     acdCfmDmCfgTwoWayDvEnable           TruthValue,
     acdCfmDmCfgTwoWayDvMax              Unsigned32,
     acdCfmDmCfgTwoWayDvThresh           Unsigned32,
-    acdCfmDmCfgTwoWayAvgDvThresh        Unsigned32
+    acdCfmDmCfgTwoWayAvgDvThresh        Unsigned32,
+    acdCfmDmCfgName                     DisplayString
 }
 
 acdCfmDmCfgID  OBJECT-TYPE
@@ -349,6 +457,15 @@ acdCfmDmCfgTwoWayAvgDvThresh  OBJECT-TYPE
      DEFVAL      { 10 }
     ::= { acdCfmDmCfgEntry 24 }
 
+acdCfmDmCfgName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A unique name used to identify this instance. The length includes the terminating NULL character."
+    ::= { acdCfmDmCfgEntry 25 }
+
+
 ---------------------------------------------------------------------------
  -- The CFM DMM One Way delay Results table
  -- This table contains all CFM DMM One Way delay entry results.
@@ -383,7 +500,8 @@ AcdCfmResultOneWayDelayEntry ::= SEQUENCE {
     acdCfmResultOneWayDelayMaxValue         Integer32,
     acdCfmResultOneWayDelayAvgValue         Integer32,
     acdCfmResultOneWayDelayThreshExc        Unsigned32,
-    acdCfmResultOneWayDelayInstValue        Integer32
+    acdCfmResultOneWayDelayInstValue        Integer32,
+    acdCfmResultOneWayDelayName             DisplayString
 }
 
 acdCfmResultOneWayDelayID  OBJECT-TYPE
@@ -495,6 +613,15 @@ acdCfmResultOneWayDelayInstValue  OBJECT-TYPE
         micro-seconds."
     ::= { acdCfmResultOneWayDelayEntry 12 }
 
+acdCfmResultOneWayDelayName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique string used to identify this instance."
+
+    ::= { acdCfmResultOneWayDelayEntry 13 }
+
 ---------------------------------------------------------------------------
  -- The CFM DMM One Way delay variation Results table
  -- This table contains all CFM DMM One Way delay variation entry results.
@@ -529,7 +656,8 @@ AcdCfmResultOneWayDvEntry ::= SEQUENCE {
     acdCfmResultOneWayDvMaxValue        Integer32,
     acdCfmResultOneWayDvAvgValue        Integer32,
     acdCfmResultOneWayDvThreshExc       Unsigned32,
-    acdCfmResultOneWayDvInstValue       Integer32
+    acdCfmResultOneWayDvInstValue       Integer32,
+    acdCfmResultOneWayDvName            DisplayString
 }
 
 acdCfmResultOneWayDvID  OBJECT-TYPE
@@ -641,6 +769,16 @@ acdCfmResultOneWayDvInstValue  OBJECT-TYPE
         expressed in micro-seconds."
     ::= { acdCfmResultOneWayDvEntry 12 }
 
+acdCfmResultOneWayDvName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique string used to identify this instance. The length includes the terminating NULL character."
+
+    ::= { acdCfmResultOneWayDvEntry 13 }
+
+
 ---------------------------------------------------------------------------
  -- The CFM DMM Two Way delay Results table
  -- This table contains all CFM DMM Two Way delay entry results.
@@ -675,7 +813,8 @@ AcdCfmResultTwoWayDelayEntry ::= SEQUENCE {
     acdCfmResultTwoWayDelayMaxValue         Integer32,
     acdCfmResultTwoWayDelayAvgValue         Integer32,
     acdCfmResultTwoWayDelayThreshExc        Unsigned32,
-    acdCfmResultTwoWayDelayInstValue        Integer32
+    acdCfmResultTwoWayDelayInstValue        Integer32,
+    acdCfmResultTwoWayDelayName             DisplayString
 }
 
 acdCfmResultTwoWayDelayID  OBJECT-TYPE
@@ -787,6 +926,16 @@ acdCfmResultTwoWayDelayInstValue  OBJECT-TYPE
         micro-seconds."
     ::= { acdCfmResultTwoWayDelayEntry 12 }
 
+acdCfmResultTwoWayDelayName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique string used to identify this instance. The length includes the terminating NULL character."
+
+    ::= { acdCfmResultTwoWayDelayEntry 13 }
+
+
 ---------------------------------------------------------------------------
  -- The CFM DMM Two Way delay variation Results table
  -- This table contains all CFM DMM Two Way delay variation entry results.
@@ -821,7 +970,8 @@ AcdCfmResultTwoWayDvEntry ::= SEQUENCE {
     acdCfmResultTwoWayDvMaxValue         Integer32,
     acdCfmResultTwoWayDvAvgValue         Integer32,
     acdCfmResultTwoWayDvThreshExc        Unsigned32,
-    acdCfmResultTwoWayDvInstValue        Integer32 
+    acdCfmResultTwoWayDvInstValue        Integer32, 
+    acdCfmResultTwoWayDvName             DisplayString
 }
 
 acdCfmResultTwoWayDvID  OBJECT-TYPE
@@ -933,6 +1083,15 @@ acdCfmResultTwoWayDvInstValue  OBJECT-TYPE
         expressed in micro-seconds."
     ::= { acdCfmResultTwoWayDvEntry 12 }
 
+acdCfmResultTwoWayDvName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique string used to identify this instance. The length includes the terminating NULL character."
+
+    ::= { acdCfmResultTwoWayDvEntry 13 }
+
 ---------------------------------------------------------------------------
  -- The CFM DMM One Way delay History Results table
  -- This table contains all CFM DMM One Way delay entry History results.
@@ -966,12 +1125,13 @@ AcdCfmHistResultOneWayDelayEntry ::= SEQUENCE {
     acdCfmHistResultOneWayDelayMinValue         Integer32,
     acdCfmHistResultOneWayDelayMaxValue         Integer32,
     acdCfmHistResultOneWayDelayAvgValue         Integer32,
-    acdCfmHistResultOneWayDelayThreshExc        Unsigned32
+    acdCfmHistResultOneWayDelayThreshExc        Unsigned32,
+    acdCfmHistResultOneWayDelayName             DisplayString
 }
 
 acdCfmHistResultOneWayDelayID  OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "Unique value for each Delay Measurement instance. This value follows
@@ -980,7 +1140,7 @@ acdCfmHistResultOneWayDelayID  OBJECT-TYPE
 
 acdCfmHistResultOneWayDelaySampleIndex  OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "An index that uniquely identifies the particular sample this entry
@@ -1065,6 +1225,14 @@ acdCfmHistResultOneWayDelayThreshExc  OBJECT-TYPE
         "Indicates the number of samples exceeding the limit."
     ::= { acdCfmHistResultOneWayDelayEntry 10 }
 
+acdCfmHistResultOneWayDelayName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique name used to identify this instance. The length includes the terminating NULL character."
+    ::= { acdCfmHistResultOneWayDelayEntry 11 }
+
 ---------------------------------------------------------------------------
  -- The CFM DMM One Way delay variation History Results table
  -- This table contains all CFM DMM One Way delay variation entry History results.
@@ -1098,12 +1266,14 @@ AcdCfmHistResultOneWayDvEntry ::= SEQUENCE {
     acdCfmHistResultOneWayDvMinValue        Integer32,
     acdCfmHistResultOneWayDvMaxValue        Integer32,
     acdCfmHistResultOneWayDvAvgValue        Integer32,
-    acdCfmHistResultOneWayDvThreshExc       Unsigned32
+    acdCfmHistResultOneWayDvThreshExc       Unsigned32,
+    acdCfmHistResultOneWayDvName            DisplayString
 }
+
 
 acdCfmHistResultOneWayDvID  OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "Unique value for each Delay variation Measurement instance. This value follows
@@ -1112,7 +1282,7 @@ acdCfmHistResultOneWayDvID  OBJECT-TYPE
 
 acdCfmHistResultOneWayDvSampleIndex  OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "An index that uniquely identifies the particular sample this entry
@@ -1195,6 +1365,13 @@ acdCfmHistResultOneWayDvThreshExc  OBJECT-TYPE
         "Indicates the number of samples exceeding the limit."
     ::= { acdCfmHistResultOneWayDvEntry 10 }
 
+acdCfmHistResultOneWayDvName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique name used to identify this instance. The length includes the terminating NULL character."
+    ::= { acdCfmHistResultOneWayDvEntry 11 }
 
 ---------------------------------------------------------------------------
  -- The CFM DMM Two Way delay History Results table
@@ -1229,12 +1406,13 @@ AcdCfmHistResultTwoWayDelayEntry ::= SEQUENCE {
     acdCfmHistResultTwoWayDelayMinValue         Integer32,
     acdCfmHistResultTwoWayDelayMaxValue         Integer32,
     acdCfmHistResultTwoWayDelayAvgValue         Integer32,
-    acdCfmHistResultTwoWayDelayThreshExc        Unsigned32
+    acdCfmHistResultTwoWayDelayThreshExc        Unsigned32,
+    acdCfmHistResultTwoWayDelayName             DisplayString
 }
 
 acdCfmHistResultTwoWayDelayID  OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "Unique value for each Delay Measurement instance. This value follows
@@ -1243,7 +1421,7 @@ acdCfmHistResultTwoWayDelayID  OBJECT-TYPE
 
 acdCfmHistResultTwoWayDelaySampleIndex  OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "An index that uniquely identifies the particular sample this entry
@@ -1326,6 +1504,14 @@ acdCfmHistResultTwoWayDelayThreshExc  OBJECT-TYPE
         "Indicates the number of samples exceeding the limit."
     ::= { acdCfmHistResultTwoWayDelayEntry 10 }
 
+acdCfmHistResultTwoWayDelayName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique name used to identify this instance. The length includes the terminating NULL character."
+    ::= { acdCfmHistResultTwoWayDelayEntry 11 }
+
 
 ---------------------------------------------------------------------------
  -- The CFM DMM Two Way delay variation History Results table
@@ -1360,12 +1546,13 @@ AcdCfmHistResultTwoWayDvEntry ::= SEQUENCE {
     acdCfmHistResultTwoWayDvMinValue         Integer32,
     acdCfmHistResultTwoWayDvMaxValue         Integer32,
     acdCfmHistResultTwoWayDvAvgValue         Integer32,
-    acdCfmHistResultTwoWayDvThreshExc        Unsigned32
+    acdCfmHistResultTwoWayDvThreshExc        Unsigned32,
+    acdCfmHistResultTwoWayDvName             DisplayString
 }
 
 acdCfmHistResultTwoWayDvID  OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "Unique value for each Delay variation Measurement instance. This
@@ -1374,7 +1561,7 @@ acdCfmHistResultTwoWayDvID  OBJECT-TYPE
 
 acdCfmHistResultTwoWayDvSampleIndex  OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "An index that uniquely identifies the particular sample this entry
@@ -1457,6 +1644,14 @@ acdCfmHistResultTwoWayDvThreshExc  OBJECT-TYPE
         "Indicates the number of samples exceeding the limit."
     ::= { acdCfmHistResultTwoWayDvEntry 10 }
 
+acdCfmHistResultTwoWayDvName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique name used to identify this instance. The length includes the terminating NULL character."
+    ::= { acdCfmHistResultTwoWayDvEntry 11 }
+
 
 ---------------------------------------------------------------------------
  -- The Packet Loss configuration table
@@ -1491,7 +1686,8 @@ AcdCfmPktLossCfgEntry ::= SEQUENCE {
     acdCfmPktLossCfgInterval        Unsigned32,
     acdCfmPktLossCfgRefPeriod       Unsigned32,
     acdCfmPktLossCfgThresh          Unsigned32,
-    acdCfmPktLossCfgRatioThresh     Unsigned32
+    acdCfmPktLossCfgRatioThresh     Unsigned32,
+    acdCfmPktLossCfgName            DisplayString
 }
 
 acdCfmPktLossCfgID  OBJECT-TYPE
@@ -1587,6 +1783,18 @@ acdCfmPktLossCfgRatioThresh  OBJECT-TYPE
      DEFVAL      { 0 }
     ::= { acdCfmPktLossCfgEntry 10 }
 
+acdCfmPktLossCfgName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Unique string for each Packet Loss instance. The length includes the terminating NULL character."
+    DEFVAL      { ''H }   -- the empty string
+    ::= { acdCfmPktLossCfgEntry 11 }
+
+
+
+
 ---------------------------------------------------------------------------
  -- The CFM Packet Loss Results table
  -- This table contains all CFM DMM Packet Loss results.
@@ -1628,7 +1836,8 @@ AcdCfmResultPktLossEntry ::= SEQUENCE {
     acdCfmResultPktLossLargestGap           Counter32,
     acdCfmResultPktLossOverflowLargestGap   Counter32,
     acdCfmResultPktLossHCLargestGap         Counter64,
-    acdCfmResultPktLossRatio                Unsigned32
+    acdCfmResultPktLossRatio                Unsigned32,
+    acdCfmResultPktLossName                 DisplayString
 }
 
 acdCfmResultPktLossID  OBJECT-TYPE
@@ -1795,6 +2004,16 @@ acdCfmResultPktLossRatio  OBJECT-TYPE
          (1,000,000 is 1%)."
     ::= { acdCfmResultPktLossEntry 18 }
 
+acdCfmResultPktLossName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unique string for each Packet Loss instance. The length includes the terminating NULL character."
+    ::= { acdCfmResultPktLossEntry 19 }
+
+
+
 ---------------------------------------------------------------------------
  -- The CFM Packet Loss History Results table
  -- This table contains all CFM Packet Loss History results.
@@ -1837,12 +2056,13 @@ AcdCfmHistResultPktLossEntry ::= SEQUENCE {
     acdCfmHistResultPktLossLargestGap           Counter32,
     acdCfmHistResultPktLossOverflowLargestGap   Counter32,
     acdCfmHistResultPktLossHCLargestGap         Counter64,
-    acdCfmHistResultPktLossRatio                Unsigned32
+    acdCfmHistResultPktLossRatio                Unsigned32,
+    acdCfmHistResultPktLossName                 DisplayString
 }
 
 acdCfmHistResultPktLossID  OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "Unique value for each Delay variation Measurement instance. This
@@ -1851,7 +2071,7 @@ acdCfmHistResultPktLossID  OBJECT-TYPE
 
 acdCfmHistResultPktLossSampleIndex  OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "An index that uniquely identifies the particular sample this entry
@@ -2018,6 +2238,14 @@ acdCfmHistResultPktLossRatio  OBJECT-TYPE
          (1,000,000 is 1%)."
     ::= { acdCfmHistResultPktLossEntry 18 }
 
+acdCfmHistResultPktLossName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A unique name used to identify this instance. The length includes the terminating NULL character."
+    ::= { acdCfmHistResultPktLossEntry 19 }
+
 ---------------------------------------------------------------------------
  -- The SLM configuration table
  -- This table contains all SLM entry configurations.
@@ -2149,7 +2377,7 @@ acdCfmSlmCfgFarEndThresh  OBJECT-TYPE
     ::= { acdCfmSlmCfgEntry 10 }
 
 acdCfmSlmCfgName  OBJECT-TYPE
-    SYNTAX      DisplayString (SIZE (1..31))
+    SYNTAX      DisplayString (SIZE (1..32))
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -2195,7 +2423,8 @@ AcdCfmSlmResultEntry ::= SEQUENCE {
     acdCfmSlmResultNearEndRatio           Gauge32,
     acdCfmSlmResultFarEndRatio            Gauge32,
     acdCfmSlmResultNbrGaps              Counter32,
-    acdCfmSlmResultLargestGap           Counter32
+    acdCfmSlmResultLargestGap           Counter32,
+    acdCfmSlmResultName                 DisplayString
 }
 
 acdCfmSlmResultID  OBJECT-TYPE
@@ -2290,19 +2519,23 @@ acdCfmSlmResultFarEndNbrLoss  OBJECT-TYPE
     ::= { acdCfmSlmResultEntry 11 }
 
 acdCfmSlmResultNearEndRatio  OBJECT-TYPE
-    SYNTAX      Gauge32
+    SYNTAX      Gauge32 (0..100000000)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "This is the packet loss ratio at the near end."
+        "This is the packet loss ratio at the near end.
+        Indicates the availability ratio in millionth of a percent
+        (1,000,000 is 1%)."
     ::= { acdCfmSlmResultEntry 12 }
 
 acdCfmSlmResultFarEndRatio  OBJECT-TYPE
-    SYNTAX      Gauge32
+    SYNTAX      Gauge32 (0..100000000)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "This is the packet loss ratio at the far end."
+        "This is the packet loss ratio at the far end.
+        Indicates the availability ratio in millionth of a percent
+        (1,000,000 is 1%)."
     ::= { acdCfmSlmResultEntry 13 }
 
 acdCfmSlmResultNbrGaps  OBJECT-TYPE
@@ -2321,6 +2554,15 @@ acdCfmSlmResultLargestGap  OBJECT-TYPE
         "This is the largest gap."
     ::= { acdCfmSlmResultEntry 15 }
 
+acdCfmSlmResultName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unique string for each SLM instance. The length includes the terminating 
+         NULL character. This is a duplicate of acdCfmSlmCfgName"
+    DEFVAL      { ''H }   -- the empty string
+    ::= { acdCfmSlmResultEntry 16 }
 
 ---------------------------------------------------------------------------
  -- The SLM History Results table
@@ -2342,7 +2584,7 @@ acdCfmSlmHistResultEntry OBJECT-TYPE
     DESCRIPTION
         "An entry consisting of SLM  history result for a specific
         MEP and remote MEP pair."
-    INDEX   { acdCfmSlmHistResultInstanceIndex, acdCfmSlmHistResultID }
+    INDEX   { acdCfmSlmHistResultID, acdCfmSlmHistResultPeriodIndex }
     ::=  { acdCfmSlmHistResultTable 1 }
 
 AcdCfmSlmHistResultEntry ::= SEQUENCE {
@@ -2356,13 +2598,13 @@ AcdCfmSlmHistResultEntry ::= SEQUENCE {
     acdCfmSlmHistResultFarEndRatio            Gauge32,
     acdCfmSlmHistResultNbrGaps              Counter32,
     acdCfmSlmHistResultLargestGap           Counter32,
-    acdCfmSlmHistResultInstanceIndex        Unsigned32
-
+    acdCfmSlmHistResultInstanceIndex        Unsigned32,
+    acdCfmSlmHistResultName              	DisplayString
 }
 
 acdCfmSlmHistResultID  OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "Unique value for each SLM instance. This
@@ -2413,19 +2655,23 @@ acdCfmSlmHistResultRemoteRxSlm  OBJECT-TYPE
     ::= { acdCfmSlmHistResultEntry 6 }
 
 acdCfmSlmHistResultNearEndRatio  OBJECT-TYPE
-    SYNTAX      Gauge32
+    SYNTAX      Gauge32 (0..100000000)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "This is the packet loss ratio at the near end."
+        "This is the packet loss ratio at the near end.
+        Indicates the availability ratio in millionth of a percent
+        (1,000,000 is 1%)."
     ::= { acdCfmSlmHistResultEntry 7 }
 
 acdCfmSlmHistResultFarEndRatio  OBJECT-TYPE
-    SYNTAX      Gauge32
+    SYNTAX      Gauge32 (0..100000000)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "This is the packet loss ratio at the far end."
+        "This is the packet loss ratio at the far end.
+        Indicates the availability ratio in millionth of a percent
+        (1,000,000 is 1%)."
     ::= { acdCfmSlmHistResultEntry 8 }
 
 acdCfmSlmHistResultNbrGaps  OBJECT-TYPE
@@ -2446,11 +2692,21 @@ acdCfmSlmHistResultLargestGap  OBJECT-TYPE
 
 acdCfmSlmHistResultInstanceIndex  OBJECT-TYPE
     SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The instance index."
     ::= { acdCfmSlmHistResultEntry 11 }
+
+acdCfmSlmHistResultName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unique string for each SLM instance. The length includes the terminating 
+         NULL character. This is a duplicate of acdCfmSlmCfgName"
+    DEFVAL      { ''H }   -- the empty string
+    ::= { acdCfmSlmHistResultEntry 12 }
 
 ---------------------------------------------------------------------------
  -- The MEP Transmit Statistics table
@@ -2498,7 +2754,9 @@ AcdCfmMepStatsTxEntry ::= SEQUENCE {
     acdCfmMepStatsTxVsrPdu                  Counter64,
     acdCfmMepStatsTxCsfPdu                  Counter64,
     acdCfmMepStatsTxSlmPdu                  Counter64,
-    acdCfmMepStatsTxSlrPdu                  Counter64
+    acdCfmMepStatsTxSlrPdu                  Counter64,
+    acdCfmMepStatsTxName                    DisplayString
+
 }
 
 acdCfmMepStatsTxID  OBJECT-TYPE
@@ -2717,6 +2975,16 @@ acdCfmMepStatsTxSlrPdu  OBJECT-TYPE
          PDU transmitted by the MEP (OpCode 54)."
     ::= { acdCfmMepStatsTxEntry 24 }
 
+acdCfmMepStatsTxName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unique string for each Mep instance. The length includes the terminating 
+         NULL character. This is a duplicate of acdCfmMepCfgName"
+    DEFVAL      { ''H }   -- the empty string
+    ::= { acdCfmMepStatsTxEntry 25 }
+
 
 
 ---------------------------------------------------------------------------
@@ -2772,7 +3040,10 @@ AcdCfmMepStatsRxEntry ::= SEQUENCE {
     acdCfmMepStatsRxLbrDataErrors           Counter64,
     acdCfmMepStatsRxCsfPdu                  Counter64,
     acdCfmMepStatsRxSlmPdu                  Counter64,
-    acdCfmMepStatsRxSlrPdu                  Counter64
+    acdCfmMepStatsRxSlrPdu                  Counter64,
+    acdCfmMepStatsRxCsfInvalidFlags         Counter64,
+    acdCfmMepStatsRxName                    DisplayString
+
 }
 
 acdCfmMepStatsRxID  OBJECT-TYPE
@@ -3043,6 +3314,26 @@ acdCfmMepStatsRxSlrPdu  OBJECT-TYPE
          PDU received by the MEP (OpCode 54)."
     ::= { acdCfmMepStatsRxEntry 30 }
 
+acdCfmMepStatsRxCsfInvalidFlags  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is a count of the total number of ETH-CSF PDUs received with
+         invalid flags."
+    ::= { acdCfmMepStatsRxEntry 31 }
+
+acdCfmMepStatsRxName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unique string for each Mep instance. The length includes the terminating 
+         NULL character. This is a duplicate of acdCfmMepCfgName"
+    DEFVAL      { ''H }   -- the empty string
+    ::= { acdCfmMepStatsRxEntry 32 }
+
+
 
 ---------------------------------------------------------------------------
  -- The DMM/DMR Statistics table
@@ -3072,7 +3363,8 @@ AcdCfmMepDmStatsEntry ::= SEQUENCE {
     acdCfmMepDmStatsTxDmmPdu                Counter64,
     acdCfmMepDmStatsRxDmmPdu                Counter64,
     acdCfmMepDmStatsTxDmrPdu                Counter64,
-    acdCfmMepDmStatsRxDmrPdu                Counter64
+    acdCfmMepDmStatsRxDmrPdu                Counter64,
+    acdCfmMepDmStatsName                    DisplayString
 }
 
 acdCfmMepDmStatsID  OBJECT-TYPE
@@ -3127,6 +3419,252 @@ acdCfmMepDmStatsRxDmrPdu  OBJECT-TYPE
         "This is a count of the total number of Delay Measurement Reply (DMR)
          (OpCode 46) PDU received by the MEP for this specific priority level."
     ::= { acdCfmMepDmStatsEntry 6 }
+
+acdCfmMepDmStatsName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unique string for each Mep instance. The length includes the terminating 
+         NULL character. This is a duplicate of acdCfmMepCfgName"
+    DEFVAL      { ''H }   -- the empty string
+    ::= { acdCfmMepDmStatsEntry 7 }
+
+---------------------------------------------------------------------------
+ -- The MEP configuration table
+ -- This table contains all MEP entry configurations.
+---------------------------------------------------------------------------
+
+acdCfmMepCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdCfmMepCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Configuration table of all MEP entries."
+    ::= { acdCfmMep 5 }
+
+acdCfmMepCfgEntry OBJECT-TYPE
+    SYNTAX      AcdCfmMepCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all settings to manage a MEP instance."
+    INDEX   { acdCfmMepCfgIdx }
+    ::=  { acdCfmMepCfgTable 1 }
+
+
+AcdCfmMepCfgEntry ::= SEQUENCE {
+    acdCfmMepCfgIdx                       Unsigned32,
+    acdCfmMepCfgRowStatus                 RowStatus,
+    acdCfmMepCfgMdIdx                     Unsigned32,
+    acdCfmMepCfgMaIdx                     Unsigned32,
+    acdCfmMepCfgMepId                     Unsigned32,
+    acdCfmMepCfgName                      DisplayString,
+    acdCfmMepCfgPortId                    Unsigned32,
+    acdCfmMepCfgPortIdMacAddr             MacAddress,
+    acdCfmMepCfgDirection                 AcdCfmMepDirection,
+    acdCfmMepCfgPrimaryVid                VlanIdOrNone,
+    acdCfmMepCfgActive                    TruthValue,
+    acdCfmMepCfgCciEnable                 TruthValue,
+    acdCfmMepCfgCcmSeqEnable              TruthValue,
+    acdCfmMepCfgPriority                  Unsigned32,
+    acdCfmMepCfgAlarmPri                  AcdCfmMepLowestAlarmPri,
+    acdCfmMepCfgFngAlarmTime              Unsigned32,
+    acdCfmMepCfgFngResetTime              Unsigned32,
+    acdCfmMepCfgFpEnable                  TruthValue,
+    acdCfmMepCfgFpPortId                  Unsigned32,
+    acdCfmMepCfgCsfEnable                 TruthValue,
+    acdCfmMepCfgInterfaceStatusTLVEnable  TruthValue
+}
+
+acdCfmMepCfgIdx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unique value for each MEP instance. This value follows the
+         ordering the status table."
+    ::= { acdCfmMepCfgEntry 1 }
+
+acdCfmMepCfgRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The writable columns in a row can not be changed if the row is active.
+       All columns must have a valid value before a row can be activated."
+    ::= { acdCfmMepCfgEntry 2 }
+
+acdCfmMepCfgMdIdx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maintenance Domain instance index."
+     ::= { acdCfmMepCfgEntry 3 }
+
+acdCfmMepCfgMaIdx  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8191)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Maintenance Association instance index."
+    ::= { acdCfmMepCfgEntry 4 }
+
+acdCfmMepCfgMepId  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8191)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Maintenance association End Point Identifier."
+    ::= { acdCfmMepCfgEntry 5 }
+
+acdCfmMepCfgName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Unique string for each Mep instance. The length includes the terminating NULL character."
+    DEFVAL      { ''H }   -- the empty string
+    ::= { acdCfmMepCfgEntry 6 }
+
+acdCfmMepCfgPortId  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Port Identifier."
+     DEFVAL      { 1 }
+    ::= { acdCfmMepCfgEntry 7 }
+
+acdCfmMepCfgPortIdMacAddr  OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MAC Address of the port."
+     ::= { acdCfmMepCfgEntry 8 }
+
+acdCfmMepCfgDirection  OBJECT-TYPE
+    SYNTAX      AcdCfmMepDirection
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Direction in which the Maintenance association (MEP) faces on the bridge port."
+     DEFVAL      { 1 }
+    ::= { acdCfmMepCfgEntry 9 }
+
+acdCfmMepCfgPrimaryVid  OBJECT-TYPE
+    SYNTAX      VlanIdOrNone
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Primary Vlan Id."
+     DEFVAL      { 0 }
+    ::= { acdCfmMepCfgEntry 10 }
+
+acdCfmMepCfgActive  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Administrative state of the MEP.
+        A Boolean indicating the administrative state of the MEP."
+     DEFVAL      { false }
+    ::= { acdCfmMepCfgEntry 11 }
+
+acdCfmMepCfgCciEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If set to true, the MEP will generate CCM messages."
+     DEFVAL      { false }
+    ::= { acdCfmMepCfgEntry 12 }
+
+acdCfmMepCfgCcmSeqEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If set to true, the sequence number in the CCM PDU will increment."
+     DEFVAL      { false }
+    ::= { acdCfmMepCfgEntry 13 }
+
+acdCfmMepCfgPriority  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The priority value for CCMs and LTMs transmitted by the MEP."
+    ::= { acdCfmMepCfgEntry 14 }
+
+acdCfmMepCfgAlarmPri  OBJECT-TYPE
+    SYNTAX      AcdCfmMepLowestAlarmPri
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The highest priority defect that has been present since the
+        MEPs Fault Notification Generator State Machine was last in
+        the FNG_RESET state."
+     ::= { acdCfmMepCfgEntry 15 }
+
+acdCfmMepCfgFngAlarmTime  OBJECT-TYPE
+    SYNTAX      Unsigned32  (2500..10000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time that defects must be present before a Fault Alarm is
+        issued (default 2500 milliseconds)."
+    DEFVAL { 2500 }
+     ::= { acdCfmMepCfgEntry 16 }
+
+acdCfmMepCfgFngResetTime  OBJECT-TYPE
+    SYNTAX      Unsigned32  (2500..10000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time that defects must be present before a Fault Alarm is
+        issued (default 10000 milliseconds)."
+    DEFVAL { 10000 }
+     ::= { acdCfmMepCfgEntry 17 }
+
+acdCfmMepCfgFpEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If set to true, the faults generated by this MEP will be propagated to the Fault Propagation port."
+     DEFVAL      { false }
+     ::= { acdCfmMepCfgEntry 18 }
+
+acdCfmMepCfgFpPortId  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The fault propagation port used to propagate faults."
+     ::= { acdCfmMepCfgEntry 19 }
+
+acdCfmMepCfgCsfEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If set to true, Client Signal Fail errors will be propagated to the Fault Propagation port."
+     DEFVAL      { false }
+     ::= { acdCfmMepCfgEntry 20 }
+
+acdCfmMepCfgInterfaceStatusTLVEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If set to true, Interface Status TLV will be included in Down MEP CCM PDU. Interface status is obtained from the Fault Propagation port."
+     DEFVAL      { false }
+     ::= { acdCfmMepCfgEntry 21 }
+
+
 
 ---------------------------------------------------------------------------
  -- The Configuration manager Stack Table...
@@ -3190,6 +3728,71 @@ acdCfmMepIdx  OBJECT-TYPE
     ::= { acdCfmStackEntry 4 }
 
 
+---------------------------------------------------------------------------
+ -- The Interface Assign configuration table
+ -- This table contains the Interface Assign entry configurations.
+---------------------------------------------------------------------------
+
+acdCfmCfgIfAssignTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AcdCfmCfgIfAssignEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Configuration table of interface assign entries."
+    ::= { acdCfmConfig 1 }
+
+acdCfmCfgIfAssignEntry OBJECT-TYPE
+    SYNTAX      AcdCfmCfgIfAssignEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry consisting of all settings to assign/unassign an
+         interface to a mep."
+    INDEX   { acdCfmCfgIfAssignInstIdx }
+    ::=  { acdCfmCfgIfAssignTable 1 }
+
+AcdCfmCfgIfAssignEntry ::= SEQUENCE {
+    acdCfmCfgIfAssignRowStatus                RowStatus,
+    acdCfmCfgIfAssignInstIdx                  Unsigned32,
+    acdCfmCfgIfAssignIfName                   DisplayString,
+    acdCfmCfgIfAssignLockAssign               AcdCfmInterfaceAssign
+}
+
+acdCfmCfgIfAssignRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "All columns must have a valid value before a row can be activated."
+    ::= { acdCfmCfgIfAssignEntry 1 }
+
+acdCfmCfgIfAssignInstIdx  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Interface ID of interface to assign/unassing. The numbering of 
+         this index is non-contiguous. Interfaces not present in the
+         table cannot be assigned to a mep."
+    ::= { acdCfmCfgIfAssignEntry 2 }
+
+acdCfmCfgIfAssignIfName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "System interface name of the interface to assign/unassign."
+    ::= { acdCfmCfgIfAssignEntry 3 }
+
+acdCfmCfgIfAssignLockAssign  OBJECT-TYPE
+    SYNTAX      AcdCfmInterfaceAssign
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The current lock assignment configuration on an interface."
+    DEFVAL      { unassigned }
+    ::= { acdCfmCfgIfAssignEntry 4 }
+
 --------------------------------------------------------------------------
  -- ACD-CFM-MIB Module - Conformance Information
 ---------------------------------------------------------------------------
@@ -3225,7 +3828,8 @@ acdCfmDmCfgGroup OBJECT-GROUP
         acdCfmDmCfgTwoWayDvEnable,
         acdCfmDmCfgTwoWayDvMax,
         acdCfmDmCfgTwoWayDvThresh,
-        acdCfmDmCfgTwoWayAvgDvThresh
+        acdCfmDmCfgTwoWayAvgDvThresh,
+        acdCfmDmCfgName
     }
     STATUS      current
     DESCRIPTION
@@ -3244,7 +3848,8 @@ acdCfmResultOneWayDelayGroup OBJECT-GROUP
         acdCfmResultOneWayDelayMaxValue,
         acdCfmResultOneWayDelayAvgValue,
         acdCfmResultOneWayDelayThreshExc,
-        acdCfmResultOneWayDelayInstValue
+        acdCfmResultOneWayDelayInstValue,
+        acdCfmResultOneWayDelayName
     }
     STATUS      current
     DESCRIPTION
@@ -3263,7 +3868,8 @@ acdCfmResultOneWayDvGroup OBJECT-GROUP
         acdCfmResultOneWayDvMaxValue,
         acdCfmResultOneWayDvAvgValue,
         acdCfmResultOneWayDvThreshExc,
-        acdCfmResultOneWayDvInstValue
+        acdCfmResultOneWayDvInstValue,
+        acdCfmResultOneWayDvName
     }
     STATUS      current
     DESCRIPTION
@@ -3282,7 +3888,8 @@ acdCfmResultTwoWayDelayGroup OBJECT-GROUP
         acdCfmResultTwoWayDelayMaxValue,
         acdCfmResultTwoWayDelayAvgValue,
         acdCfmResultTwoWayDelayThreshExc,
-        acdCfmResultTwoWayDelayInstValue
+        acdCfmResultTwoWayDelayInstValue,
+        acdCfmResultTwoWayDelayName
     }
     STATUS      current
     DESCRIPTION
@@ -3301,7 +3908,8 @@ acdCfmResultTwoWayDvGroup OBJECT-GROUP
         acdCfmResultTwoWayDvMaxValue,
         acdCfmResultTwoWayDvAvgValue,
         acdCfmResultTwoWayDvThreshExc,
-        acdCfmResultTwoWayDvInstValue
+        acdCfmResultTwoWayDvInstValue,
+        acdCfmResultTwoWayDvName
     }
     STATUS      current
     DESCRIPTION
@@ -3310,6 +3918,8 @@ acdCfmResultTwoWayDvGroup OBJECT-GROUP
 
 acdCfmHistResultOneWayDelayGroup OBJECT-GROUP
     OBJECTS {
+        acdCfmHistResultOneWayDelayID,
+        acdCfmHistResultOneWayDelaySampleIndex,
         acdCfmHistResultOneWayDelayStatus,
         acdCfmHistResultOneWayDelayDuration,
         acdCfmHistResultOneWayDelayIntervalEnd,
@@ -3317,7 +3927,8 @@ acdCfmHistResultOneWayDelayGroup OBJECT-GROUP
         acdCfmHistResultOneWayDelayMinValue,
         acdCfmHistResultOneWayDelayMaxValue,
         acdCfmHistResultOneWayDelayAvgValue,
-        acdCfmHistResultOneWayDelayThreshExc
+        acdCfmHistResultOneWayDelayThreshExc,
+        acdCfmHistResultOneWayDelayName
     }
     STATUS      current
     DESCRIPTION
@@ -3326,6 +3937,8 @@ acdCfmHistResultOneWayDelayGroup OBJECT-GROUP
 
 acdCfmHistResultOneWayDvGroup OBJECT-GROUP
     OBJECTS {
+        acdCfmHistResultOneWayDvID,
+        acdCfmHistResultOneWayDvSampleIndex,
         acdCfmHistResultOneWayDvStatus,
         acdCfmHistResultOneWayDvDuration,
         acdCfmHistResultOneWayDvIntervalEnd,
@@ -3333,7 +3946,8 @@ acdCfmHistResultOneWayDvGroup OBJECT-GROUP
         acdCfmHistResultOneWayDvMinValue,
         acdCfmHistResultOneWayDvMaxValue,
         acdCfmHistResultOneWayDvAvgValue,
-        acdCfmHistResultOneWayDvThreshExc
+        acdCfmHistResultOneWayDvThreshExc,
+        acdCfmHistResultOneWayDvName
     }
     STATUS      current
     DESCRIPTION
@@ -3342,6 +3956,8 @@ acdCfmHistResultOneWayDvGroup OBJECT-GROUP
 
 acdCfmHistResultTwoWayDelayGroup OBJECT-GROUP
     OBJECTS {
+        acdCfmHistResultTwoWayDelayID,
+        acdCfmHistResultTwoWayDelaySampleIndex,
         acdCfmHistResultTwoWayDelayStatus,
         acdCfmHistResultTwoWayDelayDuration,
         acdCfmHistResultTwoWayDelayIntervalEnd,
@@ -3349,7 +3965,8 @@ acdCfmHistResultTwoWayDelayGroup OBJECT-GROUP
         acdCfmHistResultTwoWayDelayMinValue,
         acdCfmHistResultTwoWayDelayMaxValue,
         acdCfmHistResultTwoWayDelayAvgValue,
-        acdCfmHistResultTwoWayDelayThreshExc
+        acdCfmHistResultTwoWayDelayThreshExc,
+        acdCfmHistResultTwoWayDelayName
     }
     STATUS      current
     DESCRIPTION
@@ -3358,6 +3975,8 @@ acdCfmHistResultTwoWayDelayGroup OBJECT-GROUP
 
 acdCfmHistResultTwoWayDvGroup OBJECT-GROUP
     OBJECTS {
+        acdCfmHistResultTwoWayDvID,
+        acdCfmHistResultTwoWayDvSampleIndex,
         acdCfmHistResultTwoWayDvStatus,
         acdCfmHistResultTwoWayDvDuration,
         acdCfmHistResultTwoWayDvIntervalEnd,
@@ -3365,7 +3984,8 @@ acdCfmHistResultTwoWayDvGroup OBJECT-GROUP
         acdCfmHistResultTwoWayDvMinValue,
         acdCfmHistResultTwoWayDvMaxValue,
         acdCfmHistResultTwoWayDvAvgValue,
-        acdCfmHistResultTwoWayDvThreshExc
+        acdCfmHistResultTwoWayDvThreshExc,
+        acdCfmHistResultTwoWayDvName
     }
     STATUS      current
     DESCRIPTION
@@ -3383,7 +4003,8 @@ acdCfmPktLossCfgGroup OBJECT-GROUP
         acdCfmPktLossCfgInterval,
         acdCfmPktLossCfgRefPeriod,
         acdCfmPktLossCfgThresh,
-        acdCfmPktLossCfgRatioThresh
+        acdCfmPktLossCfgRatioThresh,
+	acdCfmPktLossCfgName
     }
     STATUS      current
     DESCRIPTION
@@ -3408,7 +4029,8 @@ acdCfmResultPktLossGroup OBJECT-GROUP
         acdCfmResultPktLossLargestGap,
         acdCfmResultPktLossOverflowLargestGap,
         acdCfmResultPktLossHCLargestGap,
-        acdCfmResultPktLossRatio
+        acdCfmResultPktLossRatio,
+        acdCfmResultPktLossName
     }
     STATUS      current
     DESCRIPTION
@@ -3417,6 +4039,8 @@ acdCfmResultPktLossGroup OBJECT-GROUP
 
 acdCfmHistResultPktLossGroup OBJECT-GROUP
     OBJECTS {
+        acdCfmHistResultPktLossID,
+        acdCfmHistResultPktLossSampleIndex,
         acdCfmHistResultPktLossStatus,
         acdCfmHistResultPktLossDuration,
         acdCfmHistResultPktLossIntervalEnd,
@@ -3432,7 +4056,8 @@ acdCfmHistResultPktLossGroup OBJECT-GROUP
         acdCfmHistResultPktLossLargestGap,
         acdCfmHistResultPktLossOverflowLargestGap,
         acdCfmHistResultPktLossHCLargestGap,
-        acdCfmHistResultPktLossRatio
+        acdCfmHistResultPktLossRatio,
+        acdCfmHistResultPktLossName
     }
     STATUS      current
     DESCRIPTION
@@ -3463,7 +4088,8 @@ acdCfmMepStatsTxGroup OBJECT-GROUP
         acdCfmMepStatsTxVsrPdu,
         acdCfmMepStatsTxCsfPdu,
         acdCfmMepStatsTxSlmPdu,
-        acdCfmMepStatsTxSlrPdu
+        acdCfmMepStatsTxSlrPdu,
+        acdCfmMepStatsTxName
     }
     STATUS      current
     DESCRIPTION
@@ -3499,7 +4125,9 @@ acdCfmMepStatsRxGroup OBJECT-GROUP
         acdCfmMepStatsRxLbrUnexpectedPdu,
         acdCfmMepStatsRxLbrDataErrors,
         acdCfmMepStatsRxCsfPdu,
-        acdCfmMepStatsRxSlrPdu
+        acdCfmMepStatsRxSlrPdu,
+        acdCfmMepStatsRxCsfInvalidFlags,
+        acdCfmMepStatsRxName
     }
     STATUS      current
     DESCRIPTION
@@ -3511,7 +4139,8 @@ acdCfmMepDmStatsGroup OBJECT-GROUP
         acdCfmMepDmStatsTxDmmPdu,
         acdCfmMepDmStatsRxDmmPdu,
         acdCfmMepDmStatsTxDmrPdu,
-        acdCfmMepDmStatsRxDmrPdu
+        acdCfmMepDmStatsRxDmrPdu,
+        acdCfmMepDmStatsName
     }
     STATUS      current
     DESCRIPTION
@@ -3550,7 +4179,7 @@ acdCfmSlmCfgGroup OBJECT-GROUP
         acdCfmSlmCfgRefPeriod,
         acdCfmSlmCfgNearEndThresh,
         acdCfmSlmCfgFarEndThresh,
-	acdCfmSlmCfgName
+        acdCfmSlmCfgName
     }
     STATUS      current
     DESCRIPTION
@@ -3572,7 +4201,8 @@ acdCfmSlmResultGroup OBJECT-GROUP
         acdCfmSlmResultNearEndRatio,
         acdCfmSlmResultFarEndRatio,
         acdCfmSlmResultNbrGaps,
-        acdCfmSlmResultLargestGap
+        acdCfmSlmResultLargestGap,
+        acdCfmSlmResultName
     }
     STATUS      current
     DESCRIPTION
@@ -3581,6 +4211,7 @@ acdCfmSlmResultGroup OBJECT-GROUP
 
 acdCfmSlmHistResultGroup OBJECT-GROUP
     OBJECTS {
+	acdCfmSlmHistResultID,
 	acdCfmSlmHistResultPeriodIndex,
 	acdCfmSlmHistResultIntervalEnd,
 	acdCfmSlmHistResultTxSlm,
@@ -3589,12 +4220,54 @@ acdCfmSlmHistResultGroup OBJECT-GROUP
 	acdCfmSlmHistResultNearEndRatio,
 	acdCfmSlmHistResultFarEndRatio,
 	acdCfmSlmHistResultNbrGaps,
-	acdCfmSlmHistResultLargestGap
+	acdCfmSlmHistResultLargestGap,
+	acdCfmSlmHistResultInstanceIndex,
+	acdCfmSlmHistResultName
     }
     STATUS      current
     DESCRIPTION
        "Objects for SLM history result Group."
     ::= { acdCfmGroups 20 }
+
+acdCfmMepCfgGroup OBJECT-GROUP
+    OBJECTS {
+        acdCfmMepCfgRowStatus,
+        acdCfmMepCfgMdIdx,
+        acdCfmMepCfgMaIdx,
+        acdCfmMepCfgMepId,
+        acdCfmMepCfgName,
+        acdCfmMepCfgPortId,
+        acdCfmMepCfgPortIdMacAddr,
+        acdCfmMepCfgDirection,
+        acdCfmMepCfgPrimaryVid,
+        acdCfmMepCfgActive,
+        acdCfmMepCfgCciEnable,
+        acdCfmMepCfgCcmSeqEnable,
+        acdCfmMepCfgPriority,
+        acdCfmMepCfgAlarmPri,
+        acdCfmMepCfgFngAlarmTime,
+        acdCfmMepCfgFngResetTime,
+        acdCfmMepCfgFpEnable,
+        acdCfmMepCfgFpPortId,
+        acdCfmMepCfgCsfEnable,
+        acdCfmMepCfgInterfaceStatusTLVEnable
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for MEP Config Group."
+    ::= { acdCfmGroups 21 }
+
+acdCfmCfgIfAssignGroup OBJECT-GROUP
+    OBJECTS {
+        acdCfmCfgIfAssignRowStatus,
+        acdCfmCfgIfAssignIfName,
+        acdCfmCfgIfAssignLockAssign
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for configuration of interface assign Group."
+    ::= { acdCfmGroups 22 }
+
 
 acdCfmCompliance MODULE-COMPLIANCE
     STATUS      current
@@ -3618,10 +4291,12 @@ acdCfmCompliance MODULE-COMPLIANCE
             acdCfmMepStatsRxGroup,
             acdCfmMepDmStatsGroup,
             acdCfmMepStackGroup,
-	  acdCfmMepSlmStatsGroup,
-	  acdCfmSlmCfgGroup,
-	  acdCfmSlmResultGroup,
-	  acdCfmSlmHistResultGroup
+            acdCfmMepSlmStatsGroup,
+            acdCfmSlmCfgGroup,
+            acdCfmSlmResultGroup,
+            acdCfmSlmHistResultGroup,
+            acdCfmMepCfgGroup,
+            acdCfmCfgIfAssignGroup
          }
 
     OBJECT  acdCfmDmCfgRowStatus
@@ -3637,6 +4312,17 @@ acdCfmCompliance MODULE-COMPLIANCE
     OBJECT  acdCfmSlmCfgRowStatus
       SYNTAX       RowStatus { active(1) }
       DESCRIPTION "Support for createAndWait is not required."
+
+    OBJECT  acdCfmMepCfgRowStatus
+      SYNTAX       RowStatus { active(1) }
+      WRITE-SYNTAX RowStatus { createAndGo(4), destroy(6) }
+      DESCRIPTION "Support for createAndWait is not required."
+
+    OBJECT  acdCfmCfgIfAssignRowStatus
+      SYNTAX       RowStatus { active(1) }
+      WRITE-SYNTAX RowStatus { createAndGo(4), destroy(6) }
+      DESCRIPTION "Support for createAndWait is not required."
+
 
     ::= { acdCfmCompliances 1 }
 END
