@@ -95,14 +95,15 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
 
         d_echo($agent_data);
 
-        include 'unix-agent/packages.inc.php';
-        include 'unix-agent/munin-plugins.inc.php';
+        include base_path('includes/polling/unix-agent/packages.inc.php');
+        include base_path('includes/polling/unix-agent/munin-plugins.inc.php');
 
         foreach (array_keys($agent_data) as $key) {
-            if (file_exists("includes/polling/unix-agent/$key.inc.php")) {
+            $parser_file = base_path("includes/polling/unix-agent/$key.inc.php");
+            if (file_exists($parser_file)) {
                 d_echo("Including: unix-agent/$key.inc.php");
 
-                include "unix-agent/$key.inc.php";
+                include $parser_file;
             }
         }
 
@@ -148,7 +149,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
         }
 
         foreach (array_keys($agent_data['app'] ?? []) as $key) {
-            if (file_exists("includes/polling/applications/$key.inc.php")) {
+            if (file_exists(base_path("includes/polling/applications/$key.inc.php"))) {
                 d_echo("Enabling $key for " . $device['hostname'] . " if not yet enabled\n");
 
                 if (in_array($key, $agentapps)) {
@@ -189,9 +190,9 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
 
     // Use agent DMI data if available
     if (isset($agent_data['dmi'])) {
-        // Parse DMI string into associative array
-        $dmi = array_column(array_map(fn ($l) => explode('=', $l, 2), explode("\n", trim($agent_data['dmi']))), 1, 0);
-        $getDmiValue = function ($system_key, $baseboard_key, $generic_value) use ($dmi) {
+        $getDmiValue = function ($system_key, $baseboard_key, $generic_value) use ($agent_data) {
+            $dmi = $agent_data['dmi'];
+
             if (isset($dmi[$system_key]) && $dmi[$system_key] !== $generic_value) {
                 return $dmi[$system_key];
             }
