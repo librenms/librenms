@@ -1,13 +1,39 @@
+
+-- $Id: CISCO-CONFIG-MAN-MIB.my,v 3.3.52.1 1996/06/11 19:38:20 snyder
 -- Exp $
+-- $Source: /release/112/cvs/Xsys/MIBS/CISCO-CONFIG-MAN-MIB.my,v $
 -- *****************************************************************
 -- CISCO-CONFIG-MAN-MIB.my:  Configuration Management MIB
 --   
 -- January 2002, A S Kiran Koushik
 --   
--- Copyright (c) 1995-2004, 2006 by cisco systems, Inc.
---   
+-- Copyright (c) 1995-1996, 2002, 2004-2006, 2014 by cisco Systems, Inc.
 -- All rights reserved.
 --   
+-- *****************************************************************
+-- $Log: CISCO-CONFIG-MAN-MIB.my,v $
+-- Revision 3.3.52.1  1996/06/11  19:38:20  snyder
+-- CSCdi60118:  MIB doc spellink errors
+-- Branch: California_branch
+--   
+-- Revision 3.3  1995/11/28  22:18:48  bstewart
+-- CSCdi43134:  Configuration Management MIB needs a ciscoMgmt arc
+-- assigned
+-- Got a proper number.
+--   
+-- Revision 3.2  1995/11/17  08:33:54  hampton
+-- Remove old entries from the RCS header logs.
+--   
+-- Revision 3.1  1995/11/09  10:49:43  shaker
+-- Bump version numbers from 2.x to 3.x.
+--   
+-- Revision 2.2  1995/11/08  20:48:22  shaker
+-- Merge Arkansas_branch into 11.1 mainline.
+--   
+-- Revision 2.1  1995/09/15  22:38:24  thille
+-- Add placeholders for Bob's config history feature and MIB.
+--   
+
 -- *****************************************************************
 -- $Endlog
 
@@ -45,7 +71,7 @@ IMPORTS
 
 
 ciscoConfigManMIB MODULE-IDENTITY
-    LAST-UPDATED    "200704270000Z"
+    LAST-UPDATED    "200608220000Z"
     ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
             "Cisco Systems
@@ -65,9 +91,9 @@ ciscoConfigManMIB MODULE-IDENTITY
             The MIB represents a model of configuration data that
             exists in various locations:
 
-            running       in use by the running system
-            terminal      saved to whatever is attached as the terminal        
-            local         saved locally in NVRAM or flash
+            running        in use by the running system
+            terminal    operator's mind or attached hardware
+            local        saved locally in NVRAM or flash
             remote        saved to some server on the network
 
             Although some of the system functions that relate here
@@ -94,12 +120,11 @@ ciscoConfigManMIB MODULE-IDENTITY
                 Acronyms and terms:
 
                 CLI   Command Line Interface."
-                
-    REVISION        "200704270000Z"
+    REVISION        "201903110000Z"
     DESCRIPTION
-        "Changes to definition of terminal as an output
-        location."
-                
+            "Added new varbind ccmHistoryEventTerminalUser to 
+            ciscoConfigManEvent and ccmCLIRunningConfigChanged 
+            notifications"
     REVISION        "200608170000Z"
     DESCRIPTION
             "Added a new group of objects to store the information
@@ -723,7 +748,8 @@ ciscoConfigManEvent NOTIFICATION-TYPE
     OBJECTS         {
                         ccmHistoryEventCommandSource,
                         ccmHistoryEventConfigSource,
-                        ccmHistoryEventConfigDestination
+                        ccmHistoryEventConfigDestination,
+                        ccmHistoryEventTerminalUser
                     }
     STATUS          current
     DESCRIPTION
@@ -735,7 +761,8 @@ ciscoConfigManEvent NOTIFICATION-TYPE
 ccmCLIRunningConfigChanged NOTIFICATION-TYPE
     OBJECTS         {
                         ccmHistoryRunningLastChanged,
-                        ccmHistoryEventTerminalType
+                        ccmHistoryEventTerminalType,
+                        ccmHistoryEventTerminalUser
                     }
     STATUS          current
     DESCRIPTION
@@ -1005,3 +1032,5 @@ ciscoConfigManCTIDObjectGroup OBJECT-GROUP
     ::= { ciscoConfigManMIBGroups 7 }
 
 END
+
+

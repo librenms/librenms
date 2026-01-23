@@ -6,7 +6,7 @@
 -- August 2000, Timothy Kurnik and Bo Berry
 -- December 2001, Liwei Wang
 --   
--- Copyright (c) 2000-2006 by Cisco Systems Inc.
+-- Copyright (c) 2000-2006, 2023 by Cisco Systems Inc.
 -- All rights reserved.
 -- ****************************************************************
 
@@ -39,7 +39,7 @@ IMPORTS
 
 
 ciscoRFMIB MODULE-IDENTITY
-    LAST-UPDATED    "200509010000Z"
+    LAST-UPDATED    "202307130000Z"
     ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
             "Cisco Systems Customer Service
@@ -49,6 +49,9 @@ ciscoRFMIB MODULE-IDENTITY
             Tel: +1 800 553-NETS
 
             E-mail: cs-rf-mib@cisco.com"
+    DESCRIPTION
+        "Added descriptions for enums 8 and 9 in RFSwactReasonType"
+    REVISION        "202307130000Z"
     DESCRIPTION
         "This MIB provides configuration control and status for the
         Redundancy Framework (RF) subsystem. RF provides a mechanism
@@ -314,6 +317,8 @@ RFState ::= TEXTUAL-CONVENTION
         activeHandback
             - unit is active, processing calls and is in the process
               of handing some resources to the other unit in the system
+        standbyWarm
+            - unit is ready when using RPR+ mode
 
         * Sub-state of 'standbyCold'"
     SYNTAX          INTEGER  {
@@ -332,7 +337,8 @@ RFState ::= TEXTUAL-CONVENTION
                         activePostconfig(13),
                         active(14),
                         activeExtraload(15),
-                        activeHandback(16)
+                        activeHandback(16),
+                        standbyWarm(17)
                     }
 
 RFMode ::= TEXTUAL-CONVENTION
@@ -425,7 +431,11 @@ RFSwactReasonType ::= TEXTUAL-CONVENTION
         activeUnitFailed
             - active unit failure caused an auto SWACT
         activeUnitRemoved
-            - active unit removal caused an auto SWACT"
+            - active unit removal caused an auto SWACT
+        activeGWdown
+            - SWACT due to active losing gateway connectivity
+        activeRMIportdown
+            - SWACT due to RMI port going down on active"
     SYNTAX          INTEGER  {
                         unsupported(1),
                         none(2),
@@ -433,7 +443,9 @@ RFSwactReasonType ::= TEXTUAL-CONVENTION
                         userInitiated(4),
                         userForced(5),
                         activeUnitFailed(6),
-                        activeUnitRemoved(7)
+                        activeUnitRemoved(7),
+                        activeGWdown(8),
+                        activeRMIportdown(9)
                     }
 
 RFUnitIdentifier ::= TEXTUAL-CONVENTION
