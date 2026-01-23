@@ -1,57 +1,74 @@
 --  =================================================================
--- Copyright (C) 2009 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description: HUAWEI HTTP MIB, this mib will maintain information of HTTP 
 --              protocol for datacomm product.  
 -- Reference:
--- Version:     V1.00
+-- Version:     V1.05
 -- History:
 --  
 --  V1.00 2009-03-27 initial version
+--  V1.01  Wang Feng,2014-04-14,Add nodes for wlan npe trusted host
 -- =================================================================
 HUAWEI-HTTP-MIB DEFINITIONS ::= BEGIN
-	IMPORTS
-    DateAndTime
+    IMPORTS
+    hwDatacomm
+        FROM HUAWEI-MIB
+    DateAndTime, RowStatus
         FROM SNMPv2-TC
-        
-		OBJECT-GROUP			
+   OBJECT-GROUP,MODULE-COMPLIANCE			
         FROM SNMPv2-CONF        
 
     MODULE-IDENTITY, OBJECT-TYPE, Integer32,OBJECT-IDENTITY,
     IpAddress, Unsigned32, NOTIFICATION-TYPE
         FROM SNMPv2-SMI
         
- 	EnabledStatus            
-        FROM P-BRIDGE-MIB         
-                
-    hwDatacomm
-        FROM HUAWEI-MIB;
-               
+    EnabledStatus            
+        FROM P-BRIDGE-MIB;    
+                               
     hwHttpMIB MODULE-IDENTITY
-        LAST-UPDATED "200903271630Z"		-- July 15, 2008 at 14:30 GMT
+        LAST-UPDATED "201506091049Z"		-- June 09, 2015 at 10:49 GMT
         ORGANIZATION 
-            "Huawei Technologies co.,Ltd."
+             "Huawei Technologies Co.,Ltd."
         CONTACT-INFO 
-            "R&D NanJing, Huawei Technologies co.,Ltd.
-				High hope mansion, 
-				Baixia road,
-				Nanjing city
-				Zip:100085
-				Http://www.huawei.com
-				E-mail:support@huawei.com        
-				Zip:100000
-            "
+	    "Huawei Industrial Base
+  	                        Bantian, Longgang
+   	                        Shenzhen 518129
+   		   People's Republic of China
+  		   Website: http://www.huawei.com
+   		   Email: support@huawei.com"
         DESCRIPTION
             "This file is a HTTP MIB. It provides the functions such as
            globally enabling or disabling the HTTP service, configuring the global
            port number, showing http server and users information."
-            ::= { hwDatacomm 192 }
+		REVISION "201506091049Z"        
+        DESCRIPTION 
+                "Modify the access rights for mib nodes ."
+        REVISION "201506091049Z"        
+        DESCRIPTION 
+                "Modify the description for http login trap ."			
+        REVISION "201506091049Z"        
+        DESCRIPTION 
+                "Add Http login trap."	
+        REVISION "201506091049Z"        
+        DESCRIPTION 
+                "Add lync mib."
+        REVISION "201404221430Z"        
+        DESCRIPTION 
+                "Modified to add nodes for wlan npe trusted host."
+
+        REVISION "200903271430Z"        
+        DESCRIPTION 
+                "The initial revision of this MIB module."
+
+        ::= { hwDatacomm 192 }
             
     -- ============================================================================
     -- Node definitions
     -- ============================================================================ 
 		hwHttpObjects  OBJECT IDENTIFIER ::= { hwHttpMIB 1 }
 		hwHttpConformance  OBJECT IDENTIFIER ::= { hwHttpMIB 2 }
+                hwHttpNotification  OBJECT IDENTIFIER ::= { hwHttpMIB 3 }
 		
 	  -- ============================================================================
 	  --
@@ -59,9 +76,10 @@ HUAWEI-HTTP-MIB DEFINITIONS ::= BEGIN
 	  --
 	  -- ============================================================================ 		
 		hwHttpConfiguration  OBJECT IDENTIFIER ::= { hwHttpObjects 1 }
+		hwLyncListener OBJECT IDENTIFIER ::= { hwHttpObjects 2 }
 		
     hwHttpEnable OBJECT-TYPE 
-    SYNTAX   EnabledStatus
+    SYNTAX   INTEGER
 		{
 			 enabled(1),
 			 disabled(2)
@@ -72,7 +90,7 @@ HUAWEI-HTTP-MIB DEFINITIONS ::= BEGIN
 			"The object indicates globally enable or disable the HTTP configuration. If the hwHttpEnable 
        	 	is 1, HTTP server is enabled. If the hwHttpEnable is 2, HTTP server is 
        	 	disabled. By default, HTTP server is enabled."   
-		DEFVAL { 1 }
+		DEFVAL { enabled }
 		::= { hwHttpConfiguration 1 }
 		
 	hwHttpPortNum OBJECT-TYPE 
@@ -145,7 +163,8 @@ HUAWEI-HTTP-MIB DEFINITIONS ::= BEGIN
   	    	hwHttpUserName             OCTET STRING,
   	    	hwHttpUserIpAddr           IpAddress,
 			hwHttpUserLoginTime        DateAndTime,
-			hwHttpUserTimeOut          Integer32 					      		
+			hwHttpUserTimeOut          Integer32, 
+			hwHttpUserInfoChannel	   OCTET STRING 					      		
       		}
   
    hwHttpUserIndex  OBJECT-TYPE
@@ -158,7 +177,7 @@ HUAWEI-HTTP-MIB DEFINITIONS ::= BEGIN
      		
   hwHttpUserName  OBJECT-TYPE
   	SYNTAX OCTET STRING(SIZE(1..64))
-  	MAX-ACCESS read-only
+  	MAX-ACCESS accessible-for-notify
   	STATUS current
  		DESCRIPTION 
  				"The object indicates the user name of user has logined HTTP server. It ranges from 1
@@ -167,7 +186,7 @@ HUAWEI-HTTP-MIB DEFINITIONS ::= BEGIN
    		
   hwHttpUserIpAddr  OBJECT-TYPE
   	SYNTAX IpAddress
-  	MAX-ACCESS read-only
+  	MAX-ACCESS accessible-for-notify
   	STATUS current
  		DESCRIPTION 
  				"The object indicates the source IP address of user has logined HTTP server."     
@@ -188,6 +207,115 @@ HUAWEI-HTTP-MIB DEFINITIONS ::= BEGIN
  		DESCRIPTION 
  				"The object indicates the overtime of user logined HTTP server."     
    		::= {hwHttpUserInfoEntry 5}
+
+    hwHttpUserInfoChannel OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..16))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+                "This object indicates the channel number of the user for login."
+        ::= { hwHttpUserInfoEntry 6 }
+
+
+   hwHttpHostPermitTable OBJECT-TYPE
+  	SYNTAX SEQUENCE OF HwHttpHostPermitEntry
+  	MAX-ACCESS not-accessible
+  	STATUS current
+  	DESCRIPTION
+ 		"This object indicates trusted host table."
+   		::= { hwHttpConfiguration 8 }
+		
+
+   hwHttpHostPermitEntry OBJECT-TYPE
+  	SYNTAX HwHttpHostPermitEntry
+  	MAX-ACCESS not-accessible
+  	STATUS current
+  	DESCRIPTION
+ 		"This object indicates trusted the entry of trusted host table."
+   		INDEX { hwHttpHostPermitIndex }
+   		::= { hwHttpHostPermitTable 1 }
+		
+   HwHttpHostPermitEntry ::=
+  	SEQUENCE { 
+ 		hwHttpHostPermitIndex
+ 		Integer32,
+ 		hwHttpHostPermitIpAddress
+ 		IpAddress,
+ 		hwHttpHostPermitMaskAddress
+ 		IpAddress,
+ 		hwHttpHostPermitInformation
+ 		OCTET STRING,
+ 		hwHttpHostPermitRowState
+ 		RowStatus
+ 		}
+
+   hwHttpHostPermitIndex OBJECT-TYPE
+  	SYNTAX Integer32 (0..7)
+  	MAX-ACCESS read-write
+  	STATUS current
+  	DESCRIPTION
+ 		"The value of this object identifies the index of trusted host table."
+ 		::= { hwHttpHostPermitEntry 1 }
+		
+   hwHttpHostPermitIpAddress OBJECT-TYPE
+  	SYNTAX IpAddress
+  	MAX-ACCESS read-write
+  	STATUS current
+  	DESCRIPTION
+ 		"The value of this object identifies ip address of trusted host."
+ 		::= { hwHttpHostPermitEntry 2 }
+		
+   hwHttpHostPermitMaskAddress OBJECT-TYPE
+  	SYNTAX IpAddress
+  	MAX-ACCESS read-write
+  	STATUS current
+  	DESCRIPTION
+ 		"The value of this object identifies mask address of trusted host."
+ 		::= { hwHttpHostPermitEntry 3 }
+		
+   hwHttpHostPermitInformation OBJECT-TYPE
+  	SYNTAX OCTET STRING (SIZE (0..127))
+  	MAX-ACCESS read-write
+  	STATUS current
+  	DESCRIPTION
+ 		"The value of this object identifies the description of trusted host."
+ 		::= { hwHttpHostPermitEntry 4 }
+		
+   hwHttpHostPermitRowState OBJECT-TYPE
+  	SYNTAX RowStatus
+  	MAX-ACCESS read-write
+  	STATUS current
+  	DESCRIPTION
+ 		"This object identifies the status of a row."
+ 		::= { hwHttpHostPermitEntry 5 }
+		
+   hwLyncListenerEnable OBJECT-TYPE
+  	SYNTAX EnabledStatus
+  	{
+  	disable(1),
+  	enable(2)
+  	}
+  	MAX-ACCESS read-write
+  	STATUS current
+  	DESCRIPTION
+ 		"Config lync listener."
+ 		::= { hwLyncListener 1 }
+
+   hwLyncListenerPort OBJECT-TYPE
+  	SYNTAX Integer32 (1025..55535)
+  	MAX-ACCESS read-write
+  	STATUS current
+  	DESCRIPTION
+ 		"Config lync listener port."
+ 		::= { hwLyncListener 2 }
+
+   hwLyncListenerHttpsSslPolicy OBJECT-TYPE
+  	SYNTAX OCTET STRING (SIZE (1..31))
+  	MAX-ACCESS read-write
+  	STATUS current
+  	DESCRIPTION
+ 		"Config lync listener ssl policy."
+ 		::= { hwLyncListener 3 }
 
     --
 	-- ***********************************************************
@@ -234,12 +362,35 @@ HUAWEI-HTTP-MIB DEFINITIONS ::= BEGIN
 	hwHttpUserName,
 	hwHttpUserIpAddr,
 	hwHttpUserLoginTime,
-	hwHttpUserTimeOut
+	hwHttpUserTimeOut,
+        hwHttpUserInfoChannel
 	}
 	STATUS current
 	DESCRIPTION
 		"The collection of objects indicates the information of HTTP server and users."
-	::= { hwHttpGroups 2 }	
+	::= { hwHttpGroups 2 }
+
+	
+        hwHttpUserLogin NOTIFICATION-TYPE
+                OBJECTS { hwHttpUserName, hwHttpUserIpAddr, hwHttpUserInfoChannel }
+                STATUS current
+                DESCRIPTION 
+                "When a user logs in through HTTP, the user name, IP address for login, and used tunnel are reported."
+            ::= { hwHttpNotification 1 }
+        
+        hwHttpUserLoginFail NOTIFICATION-TYPE
+                OBJECTS { hwHttpUserName, hwHttpUserIpAddr }
+                STATUS current
+                DESCRIPTION 
+                "When a user fails to log in through HTTP, the user name and IP address for login are reported."
+            ::= { hwHttpNotification 2 }     
+
+        hwHttpUserLogout NOTIFICATION-TYPE
+                OBJECTS { hwHttpUserName, hwHttpUserIpAddr, hwHttpUserInfoChannel }
+                STATUS current
+                DESCRIPTION 
+                "When a user logs out of the HTTP server, the user name, IP address for logout, and used tunnel are reported."
+            ::= { hwHttpNotification 3 }  	
 	
 	END     
     
@@ -248,5 +399,3 @@ HUAWEI-HTTP-MIB DEFINITIONS ::= BEGIN
 --    		 						 						 		
 						 		
             
-
-
