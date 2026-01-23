@@ -5,6 +5,7 @@
 -- Juniper Networks Enterprise MIB
 --   E-series System MIB
 --
+-- Copyright (c) 2008-2010 Juniper Networks, Inc.  All rights reserved.
 -- Copyright (c) 2002-2008 Juniper Networks, Inc.  All Rights Reserved.
 -- *****************************************************************************
 
@@ -30,7 +31,7 @@ IMPORTS
         FROM Juniper-TC;
 
 juniSystemMIB  MODULE-IDENTITY
-    LAST-UPDATED "200806111101Z"  -- 11-Jun-08 07:01 AM EDT
+    LAST-UPDATED "201203130512Z"  -- 13-Mar-12 10:42 AM EST
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
         "       Juniper Networks, Inc.
@@ -52,6 +53,16 @@ juniSystemMIB  MODULE-IDENTITY
             ERX   - first generation E-series systems
             ES2    - second generation E-series systems "
     -- Revision History
+    REVISION    "201203130512Z"  -- 13-Mar-12 10:42 AM EST  - JUNOSe 13.3
+    DESCRIPTION
+        "Added fpga corruption trap for linecard fpga corruption detection"
+    REVISION    "201010250512Z"  -- 25-Oct-10 10:42 AM EST  - JUNOSe 9.3
+    DESCRIPTION
+        "Added new state for juniSystemTempStatus object to reflect the
+        new temperature state 'maxfanSpeed'."
+    REVISION    "201003121345Z"  -- 12-Mar-10 07:15 PM EST  - JUNOSe 11.2
+    DESCRIPTION
+        "Added environment trap for sfps thresholds"
     REVISION    "200806111101Z"  -- 11-Jun-08 07:01 AM EDT  - JUNOSe 10.0
     DESCRIPTION
         "Added es2Lm10s support."
@@ -2193,9 +2204,10 @@ juniSystemTempStatus  OBJECT-TYPE
                     failed(1),
                     tooLow(2),
                     nominal(3),
-                    tooHigh(4),
-                    tooLowWarning(5),
-                    tooHighWarning(6) }
+                    increasedFanSpeed(4),
+                    tooHigh(5),
+                    tooLowWarning(6),
+                    tooHighWarning(7) }
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -2204,6 +2216,7 @@ juniSystemTempStatus  OBJECT-TYPE
             failed            - sensor is broken
             tooLow            - temperature is below nominal range
             nominal           - temperature is within nominal range
+            increasedFanSpeed - temperature is within nominal range
             tooHigh           - temperature is above nominal range
             tooLowWarning     - temperature is near the nominal lower limit
             tooHighWarning    - temperature is near the nominal upper limit "
@@ -2880,6 +2893,47 @@ juniSystemUtilizationTrapEnable  OBJECT-TYPE
     DEFVAL    { true }
     ::= { juniSystemGeneral 22 }
 
+juniSystemPortSfpPowerThresholdIfIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "interface phy-uid."
+    ::= { juniSystemGeneral 24 }
+
+juniSystemPortSfpPowerThresholdValue OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..16))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "represents power tx/rx max/min threshold value of sfp. currently displays
+         1.0000 for trap raised, 0.0000 for trap cleared"
+    ::= { juniSystemGeneral 25 }
+
+juniSystemInterfaceName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the InterfaceName."
+    ::= { juniSystemGeneral 26 }
+
+juniSystemUserName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the UserName."
+    ::= { juniSystemGeneral 27 }
+
+juniSystemDefectiveSlotInformation  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the Defective Slot Location."
+    ::= { juniSystemGeneral 28 }
+
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Notifications
@@ -3018,6 +3072,57 @@ juniSystemIssuStateChange    NOTIFICATION-TYPE
         object is also supported on ERX-1440 in JUNOSe 9.2 and
         subsequent system releases."
     ::= { juniSystemTrap 10 }
+
+juniSystemPortSfpTxMaxPowerThreshold NOTIFICATION-TYPE
+    OBJECTS {
+        juniSystemPortSfpPowerThresholdIfIndex,
+        juniSystemPortSfpPowerThresholdValue }
+    STATUS      current
+    DESCRIPTION
+        "Notification says that trap raised/cleared is with
+         respect to link sfp's tx-max power threshold"
+    ::= { juniSystemTrap 11 }
+
+juniSystemPortSfpTxMinPowerThreshold NOTIFICATION-TYPE
+    OBJECTS {
+        juniSystemPortSfpPowerThresholdIfIndex,
+        juniSystemPortSfpPowerThresholdValue }
+    STATUS      current
+    DESCRIPTION
+        "Notification says that trap raised/cleared is with
+         respect to link sfp's tx-min power threshold"
+    ::= { juniSystemTrap 12 }
+
+juniSystemPortSfpRxMaxPowerThreshold NOTIFICATION-TYPE
+    OBJECTS {
+        juniSystemPortSfpPowerThresholdIfIndex,
+        juniSystemPortSfpPowerThresholdValue }
+    STATUS      current
+    DESCRIPTION
+        "Notification says that trap raised/cleared is with
+         respect to link sfp's rx-max power threshold"
+    ::= { juniSystemTrap 13 }
+
+juniSystemPortSfpRxMinPowerThreshold NOTIFICATION-TYPE
+    OBJECTS {
+        juniSystemPortSfpPowerThresholdIfIndex,
+        juniSystemPortSfpPowerThresholdValue }
+    STATUS      current
+    DESCRIPTION
+        "Notification says that trap raised/cleared is with
+         respect to link sfp's rx-min power threshold"
+    ::= { juniSystemTrap 14 }
+
+juniSystemFpgaCorruptionDetected NOTIFICATION-TYPE
+    OBJECTS {
+        juniSystemInterfaceName,
+        juniSystemUserName, 
+        juniSystemDefectiveSlotInformation }
+    STATUS      current
+    DESCRIPTION
+        "Notification says that trap raised is with
+         respect to linecard fpga corruption detection"
+    ::= { juniSystemTrap 15 }
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Conformance information
@@ -3186,7 +3291,7 @@ juniSystemCompliance6  MODULE-COMPLIANCE
     ::= { juniSystemCompliances 6 }                                -- JUNOSe 8.0
 
 juniSystemCompliance7  MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The compliance statement for entities that implement the Juniper
         E-series System MIB."
@@ -3206,6 +3311,30 @@ juniSystemCompliance7  MODULE-COMPLIANCE
             juniSystemIssuGroup,
             juniSystemNotificationGroup3 }
     ::= { juniSystemCompliances 7 }                                -- JUNOSe 9.0
+
+juniSystemCompliance8  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities that implement the Juniper
+        E-series System MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniSystemGeneralGroup2,
+            juniSystemSubsystemGroup,
+            juniSystemModuleGroup3,
+            juniSystemPortGroup,
+            juniSystemTimingGroup,
+            juniSystemFabricGroup,
+            juniSystemNvsGroup,
+            juniSystemPowerGroup,
+            juniSystemTemperatureGroup,
+            juniSystemUtilizationGroup2,
+            juniSystemNotificationObjectsGroup,
+            juniSystemIssuGroup,
+            juniSystemNotificationGroup3,
+            juniSystemNotificationGroup4 }
+    ::= { juniSystemCompliances 8 }                                -- JUNOSe 11.2
+
 --
 -- units of conformance
 --
@@ -3613,10 +3742,34 @@ juniSystemNotificationGroup3	NOTIFICATION-GROUP
         juniSystemReloadCommand,
         juniSystemUtilizationThreshold,
         juniSystemIssuStateChange }
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION		
         "A collection of notifications for system events in a Juniper E-series
         product."
 	::= { juniSystemGroups 19 }                                   -- JUNOSe 9.0
 
+
+juniSystemNotificationGroup4	NOTIFICATION-GROUP
+	NOTIFICATIONS	{
+        juniSystemHighMemUtil,
+        juniSystemAbatedMemUtil,
+        juniSystemModuleOperStatusChange,
+        juniSystemPowerStatusChange,
+        juniSystemFanStatusChange,
+        juniSystemTempStatusChange,
+        juniSystemTempProtectionStatusChange,
+        juniSystemReloadCommand,
+        juniSystemUtilizationThreshold,
+        juniSystemIssuStateChange,
+        juniSystemPortSfpTxMaxPowerThreshold,
+        juniSystemPortSfpTxMinPowerThreshold,
+        juniSystemPortSfpRxMaxPowerThreshold,
+        juniSystemPortSfpRxMinPowerThreshold }
+	STATUS		current
+	DESCRIPTION		
+        "A collection of notifications for system events in a Juniper E-series
+        product."
+	::= { juniSystemGroups 20 }                                   -- JUNOSe 11.2
+
 END
+

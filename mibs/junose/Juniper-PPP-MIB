@@ -7,17 +7,16 @@
 --
 -- Copyright (c) 1998, 1999 Redstone Communications, Inc.
 -- Copyright (c) 1999, 2002 Unisphere Networks, Inc.
--- Copyright (c) 2002-2007 Juniper Networks, Inc.
--- Copyright (c) 2008 Juniper Networks, Inc.
+-- Copyright (c) 2002-2010 Juniper Networks, Inc.
 --   All Rights Reserved.
 -- *****************************************************************************
 
 Juniper-PPP-MIB  DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, IpAddress, TimeTicks
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32, Counter32, IpAddress, TimeTicks
         FROM SNMPv2-SMI
-    TEXTUAL-CONVENTION, TruthValue, RowStatus
+    TEXTUAL-CONVENTION, DisplayString, TruthValue, RowStatus
         FROM SNMPv2-TC
     MODULE-COMPLIANCE, OBJECT-GROUP
         FROM SNMPv2-CONF
@@ -31,7 +30,7 @@ IMPORTS
         FROM Juniper-TC;
 
 juniPppMIB  MODULE-IDENTITY
-    LAST-UPDATED "200909180724Z"  -- 18-Sep-09 03:24 AM EDT
+    LAST-UPDATED "201302210640Z"  -- 21-Feb-13 02:40 AM EST
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
         "       Juniper Networks, Inc.
@@ -43,10 +42,16 @@ juniPppMIB  MODULE-IDENTITY
     
     DESCRIPTION
         "The Point-to-Point Protocol (PPP) MIB for the Juniper enterprise."
-    -- Revision History  
+    -- Revision History     
+    REVISION    "201302210640Z"  -- 21-Feb-13 02:40 AM EST  - JUNOSe 15.1
+    DESCRIPTION 
+        "Added fpga user corruption detection trap " 
+    REVISION    "201002091106Z"  -- 09-Feb-10 04:36 PM EST  - JUNOSe 11.2
+    DESCRIPTION
+        "Added new ppp mib object juniPppPeerIpAddressOptional"
     REVISION    "200909180724Z"  -- 18-Sep-09 03:24 AM EDT  - JUNOSe 11.1
     DESCRIPTION
-		"Added new multiclass multilink objects. Added new traffic class 
+        "Added new multiclass multilink objects. Added new traffic class 
 		mapping for multiclasses."
     REVISION    "200908101423Z"  -- 10-Aug-09 07:53 PM EST  - JUNOSe 11.0
     DESCRIPTION
@@ -161,6 +166,7 @@ JuniPppMlPppBundleName ::= TEXTUAL-CONVENTION
 -- Managed objects
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 juniPppObjects     OBJECT IDENTIFIER ::= { juniPppMIB 1 }
+juniPppTraps       OBJECT IDENTIFIER ::= { juniPppMIB 2 }
 
 --
 -- This MIB contains managed objects for PPP interfaces.
@@ -178,15 +184,18 @@ juniPppObjects     OBJECT IDENTIFIER ::= { juniPppMIB 1 }
 --
 -- MIB object definitions are organized into the following
 -- functional sections:
---
-juniPppLcp        OBJECT IDENTIFIER   ::= { juniPppObjects 1 }
-juniPppSec        OBJECT IDENTIFIER   ::= { juniPppObjects 2 }     -- reserved
-juniPppIp         OBJECT IDENTIFIER   ::= { juniPppObjects 3 }
-juniPppOsi        OBJECT IDENTIFIER   ::= { juniPppObjects 4 }
-juniPppSession    OBJECT IDENTIFIER   ::= { juniPppObjects 5 }
-juniPppMlPpp      OBJECT IDENTIFIER   ::= { juniPppObjects 6 }
-juniPppSummary    OBJECT IDENTIFIER   ::= { juniPppObjects 7 }
-juniPppIpv6       OBJECT IDENTIFIER   ::= { juniPppObjects 8 }
+--    
+
+juniPppLcp            OBJECT IDENTIFIER   ::= { juniPppObjects 1 }
+juniPppSec            OBJECT IDENTIFIER   ::= { juniPppObjects 2 }     -- reserved
+juniPppIp             OBJECT IDENTIFIER   ::= { juniPppObjects 3 }
+juniPppOsi            OBJECT IDENTIFIER   ::= { juniPppObjects 4 }
+juniPppSession        OBJECT IDENTIFIER   ::= { juniPppObjects 5 }
+juniPppMlPpp          OBJECT IDENTIFIER   ::= { juniPppObjects 6 }
+juniPppSummary        OBJECT IDENTIFIER   ::= { juniPppObjects 7 }
+juniPppIpv6           OBJECT IDENTIFIER   ::= { juniPppObjects 8 }
+juniPppGlobalConfig   OBJECT IDENTIFIER   ::= { juniPppObjects 9 }   
+juniPppGeneral        OBJECT IDENTIFIER   ::= { juniPppObjects 10 }
 
 
 -- /////////////////////////////////////////////////////////////////////////////
@@ -3116,14 +3125,70 @@ juniPppIpv6ConfigMaxIpv6cpRenegotiation OBJECT-TYPE
     ::= { juniPppIpv6ConfigEntry 3 }
 
 
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- PPP Globals
+--
+--  The globals are non interface based objects
+--
+-- /////////////////////////////////////////////////////////////////////////////
+juniPppPeerIpAddressOptional OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This option is used to ignore the conflicts between ppp client’s requested 
+         IP address and radius/local pool returned address in server during IPNCP 
+         negotiation. Enabling this will ensure the IPNCP negotiation to 
+         succeed even though the client does not include IP address option in the 
+         IPNCP configure request."    
+    ::= { juniPppGlobalConfig 1 }
+
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Notifications
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- No notifications are defined in this MIB.  Placeholders follow.
 -- juniPppTrapControl      OBJECT IDENTIFIER ::= { juniPppMIB 2 }
--- juniPppTraps            OBJECT IDENTIFIER ::= { juniPppMIB 3 }
+-- juniPppTraps            OBJECT IDENTIFIER ::= { juniPppMIB 3 }     
 -- juniPppTrapPrefix       OBJECT IDENTIFIER ::= { juniPppTraps 0 }
+juniPppFpgaCorruptionDetection NOTIFICATION-TYPE
+    OBJECTS {
+        juniPppInterfaceName,
+        juniPppUserName, 
+        juniPppDefectiveSlotInformation }
+    STATUS      current
+    DESCRIPTION
+        "Notification says that trap raised is with
+         respect to linecard fpga stats corruption detection.
+         PPP user statistics got corrupted."
+    ::= { juniPppTraps 1 }
+                               
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notification control objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++   
+juniPppInterfaceName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the InterfaceName."
+    ::= { juniPppGeneral 1 }
 
+juniPppUserName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the UserName."
+    ::= { juniPppGeneral 2 }
+
+juniPppDefectiveSlotInformation  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the Defective Slot Location."
+    ::= { juniPppGeneral 3 }
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Conformance information
@@ -3471,10 +3536,11 @@ juniPppCompliance14  MODULE-COMPLIANCE
     ::= { juniPppCompliances 14 }                                  -- JUNOSe 10.1
 
 juniPppCompliance15  MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The compliance statement for entities which implement the Juniper PPP
-        MIB."
+         MIB. This statement was obsoleted when MCMP traffic class mapping was
+         added. New group juniPppMlPppMulticlassTcGroup1 was added."
     MODULE   -- this module
         MANDATORY-GROUPS {
             juniPppLcpGroup8,
@@ -3498,15 +3564,14 @@ juniPppCompliance15  MODULE-COMPLIANCE
     ::= { juniPppCompliances 15 }                                  -- JUNOSe 11.0
 
 juniPppCompliance16  MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The compliance statement for entities which implement the Juniper PPP
-        MIB. This statement was obsoleted when MCMP traffic class mapping was
-		added. New group juniPppMlPppMulticlassTcGroup1 was added."
+        MIB. This statement was obsoleted when juniPppPeerIpAddressOptional was added."
     MODULE   -- this module
         MANDATORY-GROUPS {
             juniPppLcpGroup8,
-            juniPppIpGroup5,
+            juniPppIpGroup6,
             juniPppOsiGroup2,
             juniPppSessionGroup2,
             juniPppSummaryBasicGroup3,
@@ -3525,10 +3590,40 @@ juniPppCompliance16  MODULE-COMPLIANCE
                 that support multi-link functionality."
         GROUP		juniPppMlPppMulticlassTcGroup1
         	DESCRIPTION
-        		"The Multilink multiclass traffic class group is mandatory only 
-				for PPP entities that support multi-link functionality."
+       		"The Multilink multiclass traffic class group is mandatory only 
+		for PPP entities that support multi-link functionality."
     ::= { juniPppCompliances 16 }                                  -- JUNOSe 11.1
     
+juniPppCompliance17  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper PPP
+        MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppLcpGroup8,
+            juniPppIpGroup7,
+            juniPppOsiGroup2,
+            juniPppSessionGroup2,
+            juniPppSummaryBasicGroup3,
+            juniPppIpv6Group2 }
+        GROUP       juniPppMlPppGroup9
+            DESCRIPTION
+                "The multi-link PPP group is mandatory only for PPP entities
+                that support multi-link functionality."
+        GROUP       juniPppSummaryLinkGroup2
+            DESCRIPTION
+                "The link summary group is mandatory only for PPP entities that
+                support multi-link functionality."
+        GROUP       juniPppSummaryNetworkGroup3
+            DESCRIPTION
+                "The network summary group is mandatory only for PPP entities
+                that support multi-link functionality."
+        GROUP		juniPppMlPppMulticlassTcGroup1
+        	DESCRIPTION
+       		"The Multilink multiclass traffic class group is mandatory only 
+		for PPP entities that support multi-link functionality."
+    ::= { juniPppCompliances 17 }                                  -- JUNOSe 11.2
 --
 -- units of conformance
 --
@@ -4493,10 +4588,11 @@ juniPppIpGroup6  OBJECT-GROUP
         juniPppIpConfigMaxIpcpRenegotiation,
         juniPppIpConfigPromptIpcpDnsOption,
         juniPppIpConfigIpcpLockout }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "A collection of objects providing management of IP network control
-        protocol functionality (IPCP) of PPP interfaces in a Juniper product."
+        protocol functionality (IPCP) of PPP interfaces in a Juniper product.
+        This group became obsolete when juniPppPeerIpAddressOptional object added"
     ::= { juniPppGroups 37 }                                        --JUNOSe 11.0
 
 juniPppMlPppGroup9  OBJECT-GROUP
@@ -4544,6 +4640,32 @@ juniPppMlPppMulticlassTcGroup1  OBJECT-GROUP
     	" A collection of object providing management of MCMP traffic class
 		mapping functionality of PPP link interfaces in a Juniper product."
 	::= { juniPppGroups 39 }										-- JUNOSe 11.1
+
+juniPppIpGroup7  OBJECT-GROUP
+    OBJECTS {
+        juniPppIpServiceStatus,
+        juniPppIpTerminateReason,
+        juniPppIpTerminateNegFailOption,
+        juniPppIpLocalIpAddress,
+        juniPppIpRemoteIpAddress,
+        juniPppIpRemotePrimaryDnsAddress,
+        juniPppIpRemoteSecondaryDnsAddress,
+        juniPppIpRemotePrimaryWinsAddress,
+        juniPppIpRemoteSecondaryWinsAddress,
+        juniPppIpNetworkStatusIpcpRenegoTerminates,
+        juniPppIpConfigPeerDnsPriority,
+        juniPppIpConfigPeerWinsPriority,
+        juniPppIpConfigIpcpNetmask,
+        juniPppIpConfigInitiateIp,
+        juniPppIpConfigMaxIpcpRenegotiation,
+        juniPppIpConfigPromptIpcpDnsOption,
+        juniPppIpConfigIpcpLockout,
+        juniPppPeerIpAddressOptional }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of IP network control
+        protocol functionality (IPCP) of PPP interfaces in a Juniper product."
+    ::= { juniPppGroups 40 }                                        --JUNOSe 11.2
 
 END
 
