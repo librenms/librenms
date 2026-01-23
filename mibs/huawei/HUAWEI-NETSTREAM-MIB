@@ -1,14 +1,11 @@
 --  =================================================================
--- Copyright (C) 2015 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2021 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: Huawei NETSTREAM MIB File for environment
 -- Reference:   
--- Version:     V2.01
+-- Version:     V2.05
 -- History:
--- 
---  2005-10-26  V1.00   Zhang Xiaomeng(ht09867), Initial Version 
---  2015-08-01  V2.00   d00296290
---  2015-08-06  V2.01   d00296290, add node for template refresh
+--              V1.00
 -- =================================================================
 
 HUAWEI-NETSTREAM-MIB DEFINITIONS ::= BEGIN
@@ -18,7 +15,7 @@ HUAWEI-NETSTREAM-MIB DEFINITIONS ::= BEGIN
             FROM HUAWEI-MIB
         MODULE-COMPLIANCE, OBJECT-GROUP,NOTIFICATION-GROUP
             FROM SNMPv2-CONF
-        BITS, OBJECT-TYPE, MODULE-IDENTITY,NOTIFICATION-TYPE,Integer32
+        OBJECT-TYPE, MODULE-IDENTITY,NOTIFICATION-TYPE,Integer32
             FROM SNMPv2-SMI
         DateAndTime
             FROM SNMPv2-TC;
@@ -26,7 +23,7 @@ HUAWEI-NETSTREAM-MIB DEFINITIONS ::= BEGIN
 
     --  Oct 25, 2005 at 19:00 GMT
     hwNetStreamMIB MODULE-IDENTITY 
-        LAST-UPDATED "201507250000Z"
+        LAST-UPDATED "202112011138Z"
         ORGANIZATION 
             "Huawei Technologies Co.,Ltd."
         CONTACT-INFO 
@@ -40,6 +37,14 @@ HUAWEI-NETSTREAM-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION 
             "The private mib file includes the general extent information of 
              the device.hwDatacomm(25).htNetStream(110)"
+        REVISION "202112011138Z" 
+        DESCRIPTION "Add hwNetStreamAggCpuOverThreshold"
+        REVISION "202111181056Z" 
+        DESCRIPTION "Modify 202111181056Z"
+        REVISION "202009040000Z" 
+        DESCRIPTION "Add hwNsmSampleRateInconsistent"
+        REVISION "201907190000Z" 
+        DESCRIPTION "Initial version"
         REVISION "201507250000Z" 
         DESCRIPTION "Initial version"
         ::= { hwDatacomm 110 }
@@ -122,6 +127,48 @@ hwNetStreamNotifications       OBJECT IDENTIFIER ::= { hwNetStreamMIB 2 }
 	DESCRIPTION
 	"The object used to trigger netstream resend all templates."
 	::= { hwNetStreamObjects 3 }
+
+        -- 1.3.6.1.4.1.2011.5.25.110.1.4
+    hwNetstreamScalar OBJECT IDENTIFIER ::= { hwNetStreamObjects 4 }
+    -- 1.3.6.1.4.1.2011.5.25.110.1.4.1
+    hwNsmScalar OBJECT IDENTIFIER ::= { hwNetstreamScalar 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.110.1.4.1.1
+    hwNsmSlotId OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..64))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Slot Id."
+        ::= { hwNsmScalar 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.110.1.4.1.2
+    hwNsmFixPacketsLowerLimit OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..64))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Lower limit for fixed-packet-number-based sampling ratio."
+        ::= { hwNsmScalar 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.110.1.4.1.3
+    hwNsmRandomPacketsLowerLimit OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..64))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Lower limit for fixed-time-based sampling ratio."
+        ::= { hwNsmScalar 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.110.1.4.1.4
+    hwNsmFixTimeLowerLimit OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..64))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Lower limit for random-packet-number-based sampling ratio."
+        ::= { hwNsmScalar 4 }
+
 -- Type definitions
 --1 , 3 , 6 , 1 , 4 , 1 , 2011 , 5 , 25 , 110 , 2 , 0
 hwNetStreamTrapPrefix        OBJECT IDENTIFIER ::= { hwNetStreamNotifications 0 }
@@ -148,7 +195,34 @@ hwNetStreamTrapPrefix        OBJECT IDENTIFIER ::= { hwNetStreamNotifications 0 
             "The object indicates if the session is full."
 
     ::= { hwNetStreamTrapPrefix 3 }
-    
+--1 , 3 , 6 , 1 , 4 , 1 , 2011 , 5 , 25 , 110 , 2 , 0 , 4
+    hwNetStreamAggCpuOverThreshold NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION
+            "The object indicates if the current CPU usage exceeds the CPU threshold for aggregated traffic collection."
+
+    ::= { hwNetStreamTrapPrefix 4 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.110.2.1
+    hwNsmNotifications OBJECT IDENTIFIER ::= { hwNetStreamNotifications 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.110.2.1.1
+    hwNsmSampleRateInconsistent NOTIFICATION-TYPE
+        OBJECTS { hwNsmSlotId, hwNsmFixPacketsLowerLimit, hwNsmRandomPacketsLowerLimit, hwNsmFixTimeLowerLimit }
+        STATUS current
+        DESCRIPTION 
+            "The configured NetStream sampling ratio was different from the effective one."
+        ::= { hwNsmNotifications 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.110.2.1.2
+    hwNsmSampleRateInconsistentResume NOTIFICATION-TYPE
+        OBJECTS { hwNsmSlotId, hwNsmFixPacketsLowerLimit, hwNsmRandomPacketsLowerLimit, hwNsmFixTimeLowerLimit }
+        STATUS current
+        DESCRIPTION 
+            "The configured NetStream sampling ratio was same from the effective one."
+        ::= { hwNsmNotifications 2 }
+
 -- conformance information 
 
    hwNetstreamConformance OBJECT IDENTIFIER ::= { hwNetStreamMIB 3 } 
@@ -172,9 +246,10 @@ hwNetstreamExtGroup OBJECT-GROUP
        "The HUAWEI Netstream extension Table."
     ::= { hwNetstreamGroups 2 } 
 hwNotificationExtGroup NOTIFICATION-GROUP
-    NOTIFICATIONS { hwNetStreamIndexUsedUp, hwNetStreamIndexStatusChanged, hwNetStreamSessionFull }
+    NOTIFICATIONS { hwNetStreamIndexUsedUp, hwNetStreamIndexStatusChanged, hwNetStreamSessionFull, hwNetStreamAggCpuOverThreshold}
     STATUS  current
     DESCRIPTION
         "The HUAWEI Netstream trap info."
     ::= { hwNetstreamGroups 3 }
+    
 END

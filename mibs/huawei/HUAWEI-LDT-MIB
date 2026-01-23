@@ -1,12 +1,12 @@
 --  =================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- Copyright (C) 2021 by  HUAWEI TECHNOLOGIES. All rights reserved
 -- 
 -- Description: HUAWEI LDT MIB, this mib will maintain infomation of LDT 
 --              for datacomm product.  
 -- Reference:
--- Version:     V1.02
+-- Version:     V1.07
 -- History:
---  
+--  V1.03 2018-01-09 Add new node hwPortLoopDetectL2vpnTable,hwPortL2vpnLoopDetect,hwPortL2vpnLoopDetectRecovery.
 --  V1.00 2008-07-15 initial version
 -- =================================================================
 
@@ -35,7 +35,7 @@ HUAWEI-LDT-MIB DEFINITIONS ::= BEGIN
         FROM P-BRIDGE-MIB;
          
     hwLdtMIB MODULE-IDENTITY
-			LAST-UPDATED "201706081108Z"		-- June 08, 2017 at 11:08 GMT
+			LAST-UPDATED "202108211000Z"	    -- August 21, 2021 at 19:00 GMT
 			ORGANIZATION 
 				 "Huawei Technologies Co.,Ltd."
 			CONTACT-INFO 
@@ -46,16 +46,31 @@ HUAWEI-LDT-MIB DEFINITIONS ::= BEGIN
           Website: http://www.huawei.com
           Email: support@huawei.com
          "
-        DESCRIPTION
+		 DESCRIPTION
+            "V1.07, Modify node hwLdtPortMode."
+            REVISION "202108211000Z"	    -- August 21, 2021 at 19:00 GMT
+            DESCRIPTION "Roll back modification"
+
+            REVISION "202106091000Z"	    -- June 09, 2021 at 19:00 GMT
+            DESCRIPTION "Update node hwLdtInterfaceIndex,hwLdtPortMode,hwPortLoopDetectIfIndex,hwPortLoopDetectAction."
+
+            REVISION "202105211001Z"	    -- May 21, 2021 at 10:00 GMT
+            DESCRIPTION
             "This file is an LDT-MIB. It provides such functions of 
            globally enabling or disabling the LDT function, enabling the global
            alarm, clearing statistics on ports and configuring work mode and so on."
 
+                   REVISION "201809181001Z"	    -- Sept 18, 2018 at 10:00 GMT
+                   DESCRIPTION "Modify node hwLdtPortMode,hwLdtPortLdtEnable."
+
+	REVISION "201801091000Z"	    -- Jan 09, 2018 at 10:00 GMT
+	DESCRIPTION "Add new node hwPortLoopDetectL2vpnTable,hwPortL2vpnLoopDetect,hwPortL2vpnLoopDetectRecovery."
+	
 	REVISION "201706081108Z"		-- June 08, 2017 at 11:08 GMT
 	DESCRIPTION "Add new node hwLdtPortLoopAutoTrapVlanList."
 
-        REVISION  "201512031528Z"
-        DESCRIPTION  "Update size list of hwPortLoopDetectRecoveryTime."
+    REVISION  "201512031528Z"
+    DESCRIPTION  "Update size list of hwPortLoopDetectRecoveryTime."
 
             ::= { hwDatacomm 174 }  
                                               
@@ -175,7 +190,7 @@ HUAWEI-LDT-MIB DEFINITIONS ::= BEGIN
             "Interface enable or disable. If the hwLdtPortLdtEnable 
                 is 1, it is enabled. If the hwLdtPortLdtEnable is 2, it is disabled. 
             By default, it is disabled."   
-        DEFVAL { 1 }
+        DEFVAL { enabled }
         ::= { hwLdtPortConfigEntry 3 }   
                 
     hwLdtPortMode OBJECT-TYPE 
@@ -186,14 +201,13 @@ HUAWEI-LDT-MIB DEFINITIONS ::= BEGIN
             noLearning(3),
             shutdown(4),
             quitvlan(5)
-
         }
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
             "Action of Loop detection, including trap, blocking, noLearning, shutdown and quitvlan. By default the mode
              is shutdown."     
-        DEFVAL { 2 }
+        DEFVAL { shutdown }
         ::= { hwLdtPortConfigEntry 4 }   
         
     hwLdtPortStatus OBJECT-TYPE 
@@ -291,8 +305,8 @@ HUAWEI-LDT-MIB DEFINITIONS ::= BEGIN
         SEQUENCE {
                         hwPortLoopDetectIfIndex
                                 InterfaceIndex,
-						hwLPortLoopDetectIfName	
-								OCTET STRING,
+                        hwLPortLoopDetectIfName	
+                                OCTET STRING,
                         hwPortLoopDetectEnabled
                                 EnabledStatus,
                         hwPortLoopDetectRecoveryTime
@@ -303,10 +317,10 @@ HUAWEI-LDT-MIB DEFINITIONS ::= BEGIN
                                 INTEGER,
                         hwPortLoopDetectProtocol
                                 OCTET STRING,
-						hwPortLoopDetectVlanLow
-								OCTET STRING(SIZE (256)),						
-						hwPortLoopDetectVlanHigh
-								OCTET STRING(SIZE (256))
+                        hwPortLoopDetectVlanLow
+                                OCTET STRING(SIZE (256)),						
+                        hwPortLoopDetectVlanHigh
+                                OCTET STRING(SIZE (256))
                  }
 
     hwPortLoopDetectIfIndex OBJECT-TYPE
@@ -350,7 +364,7 @@ HUAWEI-LDT-MIB DEFINITIONS ::= BEGIN
 			blocking(2),
 			trap(3),
 			noLearning(4),
-			quitvlan(5)
+            quitvlan(5)
         }
         MAX-ACCESS read-write
         STATUS current
@@ -366,7 +380,7 @@ HUAWEI-LDT-MIB DEFINITIONS ::= BEGIN
 			shutdown(3),
 			trap(4),
 			noLearning(5),
-			quitvlan(6)
+            quitvlan(6)
         }
         MAX-ACCESS read-only
         STATUS current
@@ -414,7 +428,60 @@ HUAWEI-LDT-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "The period of sending detecting packet, the default value is 5 second."     
         ::= { hwLdtConfiguration 9 }		
-    
+                                   
+
+	hwPortLoopDetectL2vpnTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwPortLoopDetectL2vpnEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table containing the port external l2vpn loop information for device.
+            It can protect the port from external l2vpn loop."
+        ::= { hwLdtConfiguration  10 }
+
+    hwPortLoopDetectL2vpnEntry OBJECT-TYPE
+        SYNTAX HwPortLoopDetectL2vpnEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Entries of the port external l2vpn loop-detect table."
+        INDEX { hwPortLoopDetectL2vpnIfIndex }
+        ::= { hwPortLoopDetectL2vpnTable 1 }
+
+    HwPortLoopDetectL2vpnEntry ::=
+        SEQUENCE {
+                        hwPortLoopDetectL2vpnIfIndex
+                                InterfaceIndex,
+                        hwPortLoopDetectL2vpnIfName	
+                                OCTET STRING,
+                        hwPortLoopDetectL2vpnVsiName
+                                OCTET STRING
+				 }
+
+    hwPortLoopDetectL2vpnIfIndex OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "The port number which will be configured port external loop detect."
+        ::= { hwPortLoopDetectL2vpnEntry 1 }
+		
+	hwPortLoopDetectL2vpnIfName   OBJECT-TYPE 
+        SYNTAX OCTET STRING(SIZE(0..48))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The interface name."
+        ::= { hwPortLoopDetectL2vpnEntry 2 }
+
+	hwPortLoopDetectL2vpnVsiName   OBJECT-TYPE 
+        SYNTAX OCTET STRING(SIZE(1..31))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The VsiName of this port bind."
+        ::= { hwPortLoopDetectL2vpnEntry 3 }
+         
     hwLdtPortLoopVlanListLow OBJECT-TYPE 
         SYNTAX OCTET STRING(SIZE (256))
         MAX-ACCESS accessible-for-notify
@@ -463,7 +530,22 @@ HUAWEI-LDT-MIB DEFINITIONS ::= BEGIN
 	    "VLANs for which only an alarm is reported after a loop is detected."
 		::= { hwLdtPortTrapObjects 6 }
 		
-			
+	hwPortLoopDetectL2vpnPeVlanList OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..2048))
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+	    "The possible pe-vlan for discovering loop."
+		::= { hwLdtPortTrapObjects 7 }
+		
+	hwPortLoopDetectL2vpnCeVlanList OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE (0..2048))
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+	    "The possible ce-vlan for discovering loop."
+		::= { hwLdtPortTrapObjects 8 }
+
 ---Notifycation    
     
       hwLdtPortLoop  NOTIFICATION-TYPE
@@ -501,7 +583,24 @@ HUAWEI-LDT-MIB DEFINITIONS ::= BEGIN
           "Notify the NMS that Loopback disappeared on this port."
     ::= { hwLdtTraps 4}  
 
-
+    
+	  hwPortL2vpnLoopDetect  NOTIFICATION-TYPE
+      OBJECTS {hwPortLoopDetectL2vpnIfName,hwPortLoopDetectL2vpnVsiName,hwPortLoopDetectL2vpnPeVlanList,hwPortLoopDetectL2vpnCeVlanList}
+     STATUS current    
+    DESCRIPTION 
+          "Notify the NMS that L2VPN Loop does exist on this port,      
+          hwPortLoopDetectL2vpnIfName node is the interface name,
+          hwPortLoopDetectL2vpnVsiName node is the VsiName of this port bind,   
+          hwPortLoopDetectL2vpnPeVlanList node indicates that which PE-VLAN exits L2VPN loop,
+		  hwPortLoopDetectL2vpnCeVlanList node indicates that which CE-VLAN exits L2VPN loop."
+    ::= { hwLdtTraps 5}  
+	
+      hwPortL2vpnLoopDetectRecovery  NOTIFICATION-TYPE
+      OBJECTS {hwPortLoopDetectL2vpnIfName}
+     STATUS current    
+    DESCRIPTION 
+          "Notify the NMS that L2VPN Loop disappeared on this port."
+    ::= { hwLdtTraps 6}     
 	
     --
     -- ***********************************************************
@@ -535,8 +634,8 @@ HUAWEI-LDT-MIB DEFINITIONS ::= BEGIN
     hwLdtIntervalTime,
     hwLdtVlanListLow,
     hwLdtVlanListHigh,
-	hwLoopDetectInterval,
-	hwLoopDetectSendingPacketInterval
+    hwLoopDetectInterval,
+    hwLoopDetectSendingPacketInterval
     }
     STATUS current
     DESCRIPTION
@@ -545,21 +644,22 @@ HUAWEI-LDT-MIB DEFINITIONS ::= BEGIN
         This group is mandatory for agents which implement the LDT."
     ::= { hwLdtGroups 1 }     
     
-    hwLdtPortConfigGroup OBJECT-GROUP
+   hwLdtPortConfigGroup OBJECT-GROUP
     OBJECTS {      
     hwLdtPortLdtEnable,
     hwLdtInterfaceName,
     hwLdtPortMode,
     hwLdtPortStatus,
     hwLdtPortRecoveryTime,
-	hwLPortLoopDetectIfName,
-	hwPortLoopDetectEnabled,
-	hwPortLoopDetectRecoveryTime,
-	hwPortLoopDetectAction,
-	hwPortLoopDetectStatus,
-	hwPortLoopDetectProtocol,
-	hwPortLoopDetectVlanLow,
-	hwPortLoopDetectVlanHigh
+    hwLPortLoopDetectIfName,
+    hwPortLoopDetectEnabled,
+    hwPortLoopDetectRecoveryTime,
+    hwPortLoopDetectAction,
+    hwPortLoopDetectStatus,
+    hwPortLoopDetectProtocol,
+    hwPortLoopDetectVlanLow,
+    hwPortLoopDetectVlanHigh, 
+    hwPortLoopDetectL2vpnIfName
     }
     STATUS current
     DESCRIPTION
@@ -573,7 +673,10 @@ HUAWEI-LDT-MIB DEFINITIONS ::= BEGIN
     hwLdtPortRecoverVlanListLow, 
     hwLdtPortRecoverVlanListHigh,
     hwLdtPortLoopDetectVlanList,
-    hwLdtPortLoopAutoTrapVlanList
+    hwLdtPortLoopAutoTrapVlanList,
+    hwPortLoopDetectL2vpnPeVlanList,
+    hwPortLoopDetectL2vpnCeVlanList,
+    hwPortLoopDetectL2vpnVsiName
 	}
     STATUS current
     DESCRIPTION
@@ -585,16 +688,17 @@ HUAWEI-LDT-MIB DEFINITIONS ::= BEGIN
     NOTIFICATIONS {
     hwLdtPortLoop,
     hwLdtPortRecovry,
-	hwLdtPortLoopDetect,
-	hwLdtPortLoopDetectRecovery
+    hwLdtPortLoopDetect,
+    hwLdtPortLoopDetectRecovery,  
+    hwPortL2vpnLoopDetect,
+    hwPortL2vpnLoopDetectRecovery
     }
     STATUS current
     DESCRIPTION
         "The collection of notifications used to indicate HUAWEI-LDT-MIB
         data consistency and general status information."
     ::= { hwLdtGroups 4 }  
-    
-END     
+  END     
     
 --
 -- HUAWEI-LDT-MIB.mib
