@@ -31,7 +31,7 @@ Datastore::init();
 
 $scheduler = LibrenmsConfig::get('schedule_type.billing');
 if (! isset($options['f']) && $scheduler != 'legacy' && $scheduler != 'cron') {
-    Log::debug("Billing is not enabled for cron scheduling. Add the -f command argument if you want to force this command to run.");
+    Log::debug('Billing is not enabled for cron scheduling. Add the -f command argument if you want to force this command to run.');
     exit(0);
 }
 
@@ -98,7 +98,7 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
         }
         //////////////////////////////////CountersValidation$DB-Update
         //For debugging
-        Log::debug("****$now: " . $bill->bill_name . " Billing DB SNMP counters received.");
+        Log::debug("****$now: " . $bill->bill_name . ' Billing DB SNMP counters received.');
         Log::debug('in_measurement: ' . $port_data['in_measurement'] . '  out_measurement: ' . $port_data['out_measurement'] . "\nThe data types are. in_measurement:" . gettype($port_data['in_measurement']) . ' and out_measurement: ' . gettype($port_data['out_measurement']));
         Log::debug('IN_delta: ' . $port_data['in_delta'] . ' OUT_delta: ' . $port_data['out_delta'] . "\nLast_IN_delta: " . ($port_data['last_in_delta'] ?? '') . ' last_OUT_delta: ' . ($port_data['last_out_delta'] ?? ''));
 
