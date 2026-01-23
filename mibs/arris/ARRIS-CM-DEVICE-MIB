@@ -1,31 +1,276 @@
 ARRIS-CM-DEVICE-MIB DEFINITIONS ::= BEGIN
  
 IMPORTS
-   MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress
-      FROM SNMPv2-SMI
+   MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, Gauge32,
+   IpAddress, NOTIFICATION-TYPE
+      FROM SNMPv2-SMI  
+   InetAddress,
+   InetAddressType  
+      FROM INET-ADDRESS-MIB
    arrisProdIdCM
       FROM ARRIS-MIB
    TruthValue, DisplayString, TEXTUAL-CONVENTION
-      FROM SNMPv2-TC;
+      FROM SNMPv2-TC
+   docsDevEvLevel,
+   docsDevEvId,
+   docsDevEvText
+       FROM DOCS-CABLE-DEVICE-MIB
+   ifPhysAddress
+       FROM IF-MIB
+   SnmpAdminString
+      FROM SNMP-FRAMEWORK-MIB   
+   docsIfCmCmtsAddress,
+   docsIfDocsisBaseCapability,
+   docsIfCmStatusDocsisOperMode,
+   docsIfCmStatusModulationType
+       FROM DOCS-IF-MIB; -- draft-ietf-ipcdn-docs-rfmibv2-05
 
 
   arrisCmDevMib MODULE-IDENTITY
-     LAST-UPDATED    "0212100000Z" -- December 10, 2002
+     LAST-UPDATED    "1102160000Z" -- Feb. 16, 2011
      ORGANIZATION    "ARRIS Broadband"
-     CONTACT-INFO    "Robert Coley
+     CONTACT-INFO    "Rodney Osborne
                       Postal: ARRIS Broadband
                       3871 Lakefield Drive
                       Suite 300
                       Suwanee, GA 30024-1242
                       U.S.A.
                       Phone:  +1 770-622-8400
-                      E-mail: robert.coley@arrisi.com"
+                      E-mail: rodney.osborne@arrisi.com"
      DESCRIPTION
        "This MIB module supplies the basic proprietary (ARRIS-specific)
         management objects for ARRIS Cable Modem (CM) devices."
     
        
 -- Revision history
+REVISION    "1105060000Z" -- May. 6, 2011
+    DESCRIPTION
+         "Added object 'arrisCmDevEthernetPower'."
+         
+REVISION    "1102160000Z" -- Feb. 16, 2011
+    DESCRIPTION
+         "Added bit (keepCpeOnIfDisconnect) to 'arrisCmDevModemFeatureSwitch2'."
+         
+REVISION    "1101060000Z" -- Jan. 6, 2011
+    DESCRIPTION
+         "Added bit (replaceMtaDHCPOption12HostnameWithMtaMac) to 'arrisCmDevModemFeatureSwitch2'."
+         
+REVISION    "1003250000Z" -- Mar. 25, 2010
+    DESCRIPTION
+         "Added bit (disableMtaDHCPOption60SupportedCodecs) to 'arrisCmDevModemFeatureSwitch2'."
+         
+REVISION    "1003120000Z" -- Mar. 12, 2010
+    DESCRIPTION
+         "Added object 'arrisCmDevTftpMtaIpOverride'."
+
+REVISION    "1002220000Z" -- Feb. 22, 2010
+    DESCRIPTION
+         "Added object 'arrisCmDevWrmProvFileNameMacEnable'."
+
+REVISION    "0911260000Z" -- Nov. 26, 2009
+    DESCRIPTION
+         "Changed object 'arrisMtaDevDhcpOfferedLeaseTime' to 'arrisCmDevDhcpOfferedLeaseTime'."
+
+REVISION    "0909010000Z" -- Sept. 17, 2009
+    DESCRIPTION
+         "Added object 'arrisCmDevSetupMddIpModeOverride'."
+         
+REVISION    "0908050000Z" -- Aug. 5, 2009
+    DESCRIPTION
+        "Added 'arrisCmDevUniqueConfigFileEnable','arrisCmDevUniqueConfigFileServerAddrType',
+         and 'arrisCmDevUniqueConfigFileServerAddr'."
+
+REVISION    "0907200000Z" -- July. 20, 2009
+    DESCRIPTION
+         "Added object 'arrisCmDevUGSTxQueueSize'."
+
+REVISION    "0906110000Z" -- Jun. 11, 2009
+    DESCRIPTION
+         "Added bit (resetMtaTicketsOnProvisioningTimerExpiry) to 'arrisCmDevModemFeatureSwitch2'."
+
+REVISION    "0811210000Z" -- Nov. 21, 2008
+    DESCRIPTION
+        "Added object 'arrisCmDevWrmProvFile'"
+
+REVISION    "0809230000Z" -- Sep. 23, 2008
+    DESCRIPTION
+        "deprecated bits (wrmMaxCPEBypass) and (dectMaxCPEBypass) in 'arrisCmDevModemFeatureSwitch2'"
+
+REVISION    "0809220000Z" -- Sept. 22, 2008
+    DESCRIPTION
+        "Added object 'arrisCmDevRestoreNvmFactoryDefault'."
+
+
+REVISION    "0807300000Z" -- July. 30, 2008
+    DESCRIPTION
+        "Added object 'arrisCmDevDSTPolicy'."
+
+REVISION    "0807280000Z" -- Jul. 28, 2008
+    DESCRIPTION
+        "Added bit (disableWrmFactDefaultButton) in 'arrisCmDevModemFeatureSwitch2'."
+
+REVISION    "0807140000Z" -- July. 14, 2008
+    DESCRIPTION
+        "Added object 'arrisCmDevWrmProvServer' and 'arrisCmDevWrmProvFileName'."
+
+REVISION    "0807090000Z" -- July. 9, 2008
+    DESCRIPTION
+        "Added object 'arrisCmDevTODTimeOffset'."
+
+REVISION    "0806300000Z" -- June. 30, 2008
+    DESCRIPTION
+        "Added object 'arrisCmDevTftpBlkSize'."
+
+REVISION    "0806180000Z" -- June. 18, 2008
+    DESCRIPTION
+        "Added object 'arrisCmDevDualModeDiscoveredMarket'."
+ 
+REVISION    "0806170000Z" -- June. 12, 2008
+    DESCRIPTION
+       "Added a new bit (dectMaxCPEBypass) in 'arrisCmDevModemFeatureSwitch2'." 
+        
+REVISION    "0806120000Z" -- June. 12, 2008
+    DESCRIPTION
+        "Added object 'arrisCmDevDectReset'."
+ 
+REVISION    "0805270000Z" -- May. 29, 2008
+    DESCRIPTION
+        "Added objects 'arrisCmDevSwServerAddressType', 'arrisCmDevSwServerAddress'"
+       
+REVISION    "0805270000Z" -- May. 27, 2008
+    DESCRIPTION
+        "Added objects 'arrisCmDevDhcpIpMode','arrisCmDevDhcpCmIpAddrV6','arrisCmDevDhcpCmSubNetMaskV6'
+        'arrisCmDevDhcpCmGatewayIpAddrV6','arrisCmDevDhcpPrimaryDhcpServerIpAddrV6'
+        'arrisCmDevDhcpTftpSvrIpAddrV6','arrisCmDevDhcpTimeSvrIpAddrV6'."
+
+REVISION    "0804170000Z" -- Apr. 17, 2008
+    DESCRIPTION
+        "Added objects 'arrisCmDevRipTransmitStatus'."
+    
+REVISION    "0804150000Z" -- Apr 15, 2008
+    DESCRIPTION
+        "Added a new bit (allowCpeOverflowWrap) in 'arrisCmDevModemFeatureSwitch2'.
+         Added a new bit (wrmMaxCPEBypass) in 'arrisCmDevModemFeatureSwitch2'." 
+
+    REVISION    "0705250000Z" -- Dec. 17, 2007
+    DESCRIPTION
+        "Added objects 'arrisCmDevRouterLanIpAddr','arrisCmDevRouterLanSubNetMask'
+        'arrisCmDevRouterLanEnable' and 'arrisCmDevRouterLanReset'."
+    
+    REVISION    "0711270000Z" -- Nov. 27, 2007    
+    DESCRIPTION        "Added objects for last 10 reset reason logging."    
+    
+    REVISION    "0705250000Z" -- May 25, 2007
+    DESCRIPTION
+        "Added objects 'arrisCmDevWirelessRegion' and 'arrisCmDevRouterMode'."
+
+    REVISION    "0705220000Z" -- May 22, 2007
+    DESCRIPTION
+        "Removed bit (disableMtaProvisionTodFail) in 'arrisCmDevModemFeatureSwitch2'. and
+         moved bit (enableBroadcastDhcpProtection) in 'arrisCmDevModemFeatureSwitch2'." 
+
+    REVISION    "0705170000Z" -- May 17, 2007
+    DESCRIPTION
+        "Remapped bit (enableBroadcastDhcpProtection) in 'arrisCmDevModemFeatureSwitch2' and 
+         added bit   (disableMtaProvisionTodFail) in 'arrisCmDevModemFeatureSwitch2'."
+
+    REVISION    "0703300000Z" -- March 30, 2007
+    DESCRIPTION
+        "Added a new bit (enableBroadcastDhcpProtection) to 'arrisCmDevModemFeatureSwitch2'."
+
+    REVISION    "0610160000Z" -- October 16, 2006
+    DESCRIPTION
+        "Added objects 'arrisCmDevDhcpNoSvcImpact' and 'arrisCmDevDhcpOption51Override'."
+
+    REVISION    "0602230000Z" -- February 23, 2006
+    DESCRIPTION
+        "Added DHCP informational objects to satisfy Pd76971 Comcast RFF."
+
+
+    REVISION    "0601230000Z" -- January 23, 2006
+    DESCRIPTION
+        "Added object 'arrisCmDevCLITimeout'."
+
+    REVISION    "0601190000Z" -- January 19, 2006
+    DESCRIPTION
+        "Added object 'arrisCmDevDocsQosParamSetActiveTimeout'."
+
+    REVISION    "0509150000Z" -- September 15, 2005
+    DESCRIPTION
+        "Added object 'arrisCmDevModemFeatureSwitch2'."
+
+    REVISION    "0503170000Z" -- March 17, 2005
+    DESCRIPTION
+        "Added object 'arrisCmDevRangeDelay'."
+
+    REVISION    "0411290000Z" -- November 29, 2004
+    DESCRIPTION
+        "Added gupiEncryptedMtaConfig  to ArrsCmDevProvMethod."
+
+    REVISION    "0410110000Z" -- October 11, 2004
+    DESCRIPTION
+        "Added new MIB arrisCmDevEnableLoggingPersistence."
+
+    REVISION    "0408230000Z" -- September 1, 2004
+    DESCRIPTION
+        "Added new MIBs to control DHCP option 177 and DOCSIS1.0+ operation"
+
+    REVISION    "0406030000Z" -- June 3, 2004
+    DESCRIPTION
+        "Updated help text for LAN/WAN http mibs"
+
+    REVISION    "0405260000Z" -- May 26, 2004
+    DESCRIPTION
+        "Added new MIB arrisCmDevReportLevelsMasterOff."
+
+    REVISION    "0405250000Z" -- May 25, 2004
+    DESCRIPTION
+        "Added new arrisCmDevWanIsolationState settings."
+
+    REVISION    "0404270000Z" -- April 27, 2004
+    DESCRIPTION
+        "Added arrisCmDevScanningSetup MIB Objects."
+
+    REVISION    "0402100000Z" -- February 10, 2004
+    DESCRIPTION
+        "Added IPv6 Multicast change and octets counter change."
+
+    REVISION    "0310310000Z" -- October 31, 2003
+    DESCRIPTION
+        "Added Touchstone Software Upgrade objects."
+        
+    REVISION    "0309250000Z" -- September 25, 2003
+    DESCRIPTION
+        "Added DHCP Server MIB objects."
+        
+    REVISION    "0308200000Z" -- August 20, 2003
+    DESCRIPTION
+        "Added proprietary Arris CM notifications."
+        
+    REVISION    "0307300000Z" -- July 30, 2003
+    DESCRIPTION
+        "Updated the 'arrisCmDevModemFeatureSwitch'."
+
+    REVISION    "0307140000Z"  -- July 14, 2003
+    DESCRIPTION
+        "Added TurboDox MIB objects."
+    
+    REVISION    "0305300000Z" -- May 30, 2003
+    DESCRIPTION
+        "Updated the 'arrisCmDevModemFeatureSwitch'."
+        
+    REVISION    "0305120000Z" -- May 12, 2003
+    DESCRIPTION
+        "Modified the SYNTAX of the 'arrisCmDevHttpClientSeed' MIB object."
+                
+    REVISION    "0302140000Z" -- February 14, 2003
+    DESCRIPTION
+        "Added MIB objects for HTTP support."
+        
+    REVISION    "0301290000Z" -- January 29, 2003
+    DESCRIPTION
+        "Added object 'arrisCmDevModemFeatureSwitch'."
+
     REVISION    "0211080000Z" -- November 08, 2002
     DESCRIPTION
         "Added object 'arrisCmDevEnableDocsis20'."
@@ -46,7 +291,7 @@ IMPORTS
 
 -- Textual Conventions
 ArrsCmDevProvMethod ::= TEXTUAL-CONVENTION
-    STATUS current
+    STATUS deprecated
     DESCRIPTION "These are the various provisioning methods that are 
                  supported by the device."
     SYNTAX INTEGER {
@@ -55,16 +300,23 @@ ArrsCmDevProvMethod ::= TEXTUAL-CONVENTION
         packetCableMinusKDC(2),
         cps(3),
         gupi(4),
-        singleMAC(5)
+        singleMAC(5),
+        basic1(6),
+        basic2(7),
+        gupiEncryptedMtaConfig(8),
+        gupiMacMta(9),
+        gupiEncryptedMacMta(10),
+        gupiTftpSvrOverride(11) 
     } 
 
 
 arrisCmDevMibObjects OBJECT IDENTIFIER ::= { arrisCmDevMib 1 }
-arrisCmDevBase       OBJECT IDENTIFIER ::= {arrisCmDevMibObjects 1 }
+arrisCmDevBase       OBJECT IDENTIFIER ::= { arrisCmDevMibObjects 1 }
 
 -- This MIB module contains the following groups.
 arrisCmDevCmSetup              OBJECT IDENTIFIER ::= { arrisCmDevMibObjects 2}
 arrisCmDevCmTest               OBJECT IDENTIFIER ::= { arrisCmDevMibObjects 3}
+arrisCmDevSoftware             OBJECT IDENTIFIER ::= { arrisCmDevMibObjects 4}
 
 -- Production groups
 arrisCmDevPermanentSetup       OBJECT IDENTIFIER ::= { arrisCmDevCmSetup 2}
@@ -78,7 +330,9 @@ arrisCmDevOperationalTest      OBJECT IDENTIFIER ::= { arrisCmDevCmTest 3}
 arrisCmDevWanIsolationState OBJECT-TYPE
      SYNTAX INTEGER { 
          off-InActiveMode(1), 
-         on-ActiveMode(2) 
+         on-ActiveMode(2), 
+         off-InActiveMode-ButtonDisabled(3), 
+         on-ActiveMode-ButtonDisabled(4) 
      }
      MAX-ACCESS read-write
      STATUS current
@@ -87,12 +341,23 @@ arrisCmDevWanIsolationState OBJECT-TYPE
           the state is as follows:
           
           off-InActiveMode(1) - Data traffic passes freely between 
-             the home user’s network and the outside network (i.e. the Internet).  
+             the home user's network and the outside network (i.e. the Internet).  
              In this mode, the WAN Isolation state is considered 'InActive'.
 
-          on-ActiveMode(2) - The home user’s network is isolated from the Internet.  
+          on-ActiveMode(2) - The home user's network is isolated from the Internet.  
              Data traffic will not pass between the home user's network and the Internet.  
-             In this mode, the WAN Isolation state is considered 'Active'."                           
+             In this mode, the WAN Isolation state is considered 'Active'. 
+                                       
+          off-InActiveMode-ButtonDisabled(3) - Data traffic passes freely between 
+             the home user's network and the outside network (i.e. the Internet).  
+             In this mode, the WAN Isolation state is considered 'InActive'.
+             Also the button is disabled so the end user cannot change the state.
+
+          on-ActiveMode-ButtonDisabled(4) - The home user's network is isolated from the Internet.  
+             Data traffic will not pass between the home user's network and the Internet.  
+             In this mode, the WAN Isolation state is considered 'Active'.
+             Also the button is disabled so the end user cannot change the state.
+             "                           
      ::= { arrisCmDevBase 1 } 
 
 arrisCmDevSwImageName OBJECT-TYPE
@@ -112,15 +377,327 @@ arrisCmDevSwImageBuildTime OBJECT-TYPE
           this device."
      ::= { arrisCmDevBase 3 }
 
+arrisCmDevRangeDelay OBJECT-TYPE
+     SYNTAX     INTEGER
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Reports range delay value in use by the modem.  This value can be adjusted by the CMTS through the periodic ranging process.  This MIB is provided to enable MSOs to determine when a modem has undergone a significant change in range delay."
+     ::= { arrisCmDevBase 4 }
+
+--  DHCP Informational Mib for PD76971
+
+--
+-- The following group describes the Dhcp parameters objects
+-- in the Arris CM device.
+--
+arrisCmDevDhcp                 OBJECT IDENTIFIER ::= { arrisCmDevBase 5 }
+arrisCmDevDhcpCmParameters     OBJECT IDENTIFIER ::= { arrisCmDevDhcp 1 }
+arrisCmDevDhcpSvrParameters    OBJECT IDENTIFIER ::= { arrisCmDevDhcp 2 }
+arrisCmDevDhcpLeaseParameters  OBJECT IDENTIFIER ::= { arrisCmDevDhcp 3 }
+
+arrisCmDevRegistrationState OBJECT-TYPE
+     SYNTAX  INTEGER {
+        docsis-DownstreamScanning   (1),
+        docsis-DownstreamRanging    (2),
+        docsis-UpstreamRanging      (3),
+        docsis-DHCP                 (4),
+        docsis-TFTP                 (5),
+        docsis-DataRegComplete      (6),
+        telephony-DHCP              (7),
+        telephony-TFTP              (8),
+        telephony-RegWithCallServer (9),
+        telephony-RegComplete       (10)
+      }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION 
+         "The last registration step completed as the E-MTA provisioning progresses through the DOCSIS/PacketCable registration and provisioning steps."
+     ::= { arrisCmDevBase 6 }
+
+-- arrisCmDevDhcpCmIpFQDN OBJECT-TYPE
+--     SYNTAX SnmpAdminString
+--     MAX-ACCESS read-only
+--     STATUS current
+--     DESCRIPTION 
+--       "This displays the currently defined MTA FQDN."
+--     ::= { arrisCmDevDhcpCmParameters 1 }
+
+arrisCmDevDhcpCmIpAddr OBJECT-TYPE
+     SYNTAX IpAddress
+     MAX-ACCESS read-only
+     STATUS deprecated
+     DESCRIPTION 
+         "This object is deprecated. See arrisCmDevDhcpCmIpAddrV6 for its replacement. This displays the currently leased IP address ."
+     ::= { arrisCmDevDhcpCmParameters 1 }
+
+arrisCmDevDhcpCmSubNetMask OBJECT-TYPE
+     SYNTAX IpAddress
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION 
+         "This displays the current IP subnet mask in use."
+     ::= { arrisCmDevDhcpCmParameters 2 }
+
+arrisCmDevDhcpCmGatewayIpAddr OBJECT-TYPE
+     SYNTAX IpAddress
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION 
+         "This displays the current IP gateway address in use."
+     ::= { arrisCmDevDhcpCmParameters 3 }
+
+arrisCmDevDhcpCmConfigFile OBJECT-TYPE
+     SYNTAX SnmpAdminString
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION 
+         "This displays the CM configuration file to be retrieved."
+     ::= { arrisCmDevDhcpCmParameters 4 }
+
+arrisCmDevDhcpIpMode OBJECT-TYPE
+     SYNTAX InetAddressType
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION 
+         "This displays the current DHCP IP address mode,ipv4 or ipv6."
+     ::= { arrisCmDevDhcpCmParameters 5 } 
+
+arrisCmDevDhcpCmIpAddrV6 OBJECT-TYPE
+     SYNTAX InetAddress
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION 
+         "This displays the currently leased IPv6 address ."
+     ::= { arrisCmDevDhcpCmParameters 6 }
+
+arrisCmDevDhcpCmSubNetMaskV6 OBJECT-TYPE
+     SYNTAX Integer32 
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION 
+         "This displays the current IPv6 subnet mask in use."
+     ::= { arrisCmDevDhcpCmParameters 7 }
+
+arrisCmDevDhcpCmGatewayIpAddrV6 OBJECT-TYPE
+     SYNTAX InetAddress
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION 
+         "This displays the current IPv6 gateway address in use."
+     ::= { arrisCmDevDhcpCmParameters 8 }
+
+arrisCmDevDhcpState OBJECT-TYPE
+     SYNTAX  INTEGER {
+        idle      (0),    -- MTA is waiting to start the DHCP process.  
+        discover  (1),    -- MTA is currently trying to discover its IP address.
+        selecting (2),    -- MTA is currently trying to select its IP address.
+        requesting(3),    -- MTA is currently trying to request its IP address.
+        bound     (4),    -- IP Address is leased and no rebind/renew operation is taking place.
+        renew     (5),    -- MTA is currently trying to renew its IP address.
+        rebind    (6)     -- MTA is currently trying to rebind its IP address.
+     }
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION 
+         "This displays the current Dhcp state of the CM."
+     ::= { arrisCmDevDhcpSvrParameters 1 }
+
+arrisCmDevDhcpPrimaryDhcpServerIpAddr OBJECT-TYPE
+     SYNTAX IpAddress
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION 
+         "This displays the primary Dhcp server address."
+     ::= { arrisCmDevDhcpSvrParameters 2 }
+
+arrisCmDevDhcpTftpSvrIpAddr OBJECT-TYPE
+     SYNTAX IpAddress
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION 
+         "This displays the current Tftp Server IP address in use."
+     ::= { arrisCmDevDhcpSvrParameters 3 }
+
+arrisCmDevDhcpTimeSvrIpAddr OBJECT-TYPE
+     SYNTAX IpAddress
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION 
+         "This displays the current Time server IP address in use."
+     ::= { arrisCmDevDhcpSvrParameters 4 }
+
+arrisCmDevDhcpCmTimeOffset OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION 
+         "This displays the current Time offset being used by the CM."
+     ::= { arrisCmDevDhcpSvrParameters 5 } 
+
+arrisCmDevDhcpPrimaryTeleDhcpSvr OBJECT-TYPE
+     SYNTAX IpAddress
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION 
+         "This displays the current Time offset being used by the CM."
+     ::= { arrisCmDevDhcpSvrParameters 6 } 
+
+arrisCmDevDhcpSecondaryTeleDhcpSvr OBJECT-TYPE
+     SYNTAX IpAddress
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION 
+         "This displays the current Time offset being used by the CM."
+     ::= { arrisCmDevDhcpSvrParameters 7 }    
+
+arrisCmDevDhcpPrimaryDhcpServerIpAddrV6 OBJECT-TYPE
+     SYNTAX InetAddress
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION 
+         "This displays the primary Dhcp server IPv6 address."
+     ::= { arrisCmDevDhcpSvrParameters 8 }  
+ 
+arrisCmDevDhcpTftpSvrIpAddrV6 OBJECT-TYPE
+     SYNTAX InetAddress
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION 
+         "This displays the current Tftp Server IPv6 address in use."
+     ::= { arrisCmDevDhcpSvrParameters 9 }
+
+arrisCmDevDhcpTimeSvrIpAddrV6 OBJECT-TYPE
+     SYNTAX InetAddress
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION 
+         "This displays the current Time server IPv6 address in use."
+     ::= { arrisCmDevDhcpSvrParameters 10 }
+
+
+arrisCmDevDhcpOfferedLeaseTime OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION 
+         "This displays the Offered IP Lease time expressed in seconds."
+     ::= { arrisCmDevDhcpLeaseParameters 1 }
+
+arrisCmDevDhcpLeaseTimeRemaining OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION 
+         "This displays the Remaining IP Lease time expressed in seconds."
+     ::= { arrisCmDevDhcpLeaseParameters 2 }
+ 
+arrisCmDevDhcpTimeUntilRenew OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION 
+         "This displays the current time remaining before the MTA starts the lease renewal
+          process.  This time is expressed in seconds."
+     ::= { arrisCmDevDhcpLeaseParameters 3 }
+ 
+arrisCmDevDhcpTimeUntilRebind OBJECT-TYPE
+     SYNTAX Integer32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION 
+         "This displays the current time remaining before the CM starts the lease rebinding
+          process.  This time is expressed in seconds."
+     ::= { arrisCmDevDhcpLeaseParameters 4 } 
+
+--
+-- The following object defines the Reset Logging folder
+-- in the Arris CM device.
+--
+arrisCmDevResetReasonLog       OBJECT IDENTIFIER ::= { arrisCmDevBase 7 }
+
+arrisCmDevLastHwResetReason OBJECT-TYPE
+     SYNTAX     DisplayString
+     MAX-ACCESS read-only 
+     STATUS     current
+     DESCRIPTION
+         "The last reset reason retrieved from the actual processor HW. This reason
+          is used to determine if the HW or FW caused the reset.  The majority of the time 
+          this reset will indicate that the FW reset the device. It should
+          be noted that this reason is not stored off and will show only the last reason
+          for the HW to reset."
+     ::= { arrisCmDevResetReasonLog 1 }
+
+arrisCmDevResetReasonLogTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF ArrisCmDevResetReasonLogEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "This table contains the last 10 reset reasons."
+     ::= { arrisCmDevResetReasonLog 2 }
+
+arrisCmDevResetReasonLogEntry OBJECT-TYPE
+     SYNTAX      ArrisCmDevResetReasonLogEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "This table contains the last 10 reset reasons."
+     INDEX { arrisCmDevResetReasonLogIndex  }
+     ::= {  arrisCmDevResetReasonLogTable 1 }
+
+ArrisCmDevResetReasonLogEntry ::= SEQUENCE {
+         arrisCmDevResetReasonLogIndex   INTEGER,
+         arrisCmDevResetReasonLogText    DisplayString
+     }
+
+arrisCmDevResetReasonLogIndex OBJECT-TYPE
+     SYNTAX      INTEGER (1..10)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "Index used to report log reasons."
+     ::= { arrisCmDevResetReasonLogEntry 1 }
+
+arrisCmDevResetReasonLogText OBJECT-TYPE
+     SYNTAX     DisplayString
+     MAX-ACCESS read-only 
+     STATUS     current
+     DESCRIPTION
+         "The reported reset reason log text."
+     ::= { arrisCmDevResetReasonLogEntry 2 }
+
+arrisCmDevResetReasonLogDisable OBJECT-TYPE
+     SYNTAX     TruthValue
+     MAX-ACCESS read-write 
+     STATUS     current
+     DESCRIPTION
+         "Disables the storage of the reset reasons to the Reset Reasons
+          LOG table thus saving writes to NVM.  This will default to false(2) 
+          allowing the logging to occur.
+          NOTE:  This value can only be modified via the CM Config file. Manual 
+                 SNMP sets will return NOT_WRITABLE error code."
+     ::= { arrisCmDevResetReasonLog 3 }
+     
+arrisCmDevDualModeDiscoveredMarket OBJECT-TYPE
+     SYNTAX  INTEGER {
+        noDualMode    (0),      
+        europe        (1),    
+        northAmerica  (2)  
+     }
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "This MIB object reports the Dual Mode Discovered Market from the CM."
+     ::= { arrisCmDevBase 8 }       
 
 -- arrisCmDevOperationalSetup Group objects --
 
--- [ARRIS NOTE: For the published (publicly available) MIB, the MAX-ACCESS clause should 
---              have a value of 'read-only' for the 'arrisCmDevProvMethodIndicator' object.]
+-- [ARRIS NOTE: For the published (publicly available) MIB, the MAX-ACCESS clause for
+--  the 'arrisCmDevProvMethodIndicator' object should have a value of 'read-only'.]
 arrisCmDevProvMethodIndicator OBJECT-TYPE
      SYNTAX ArrsCmDevProvMethod
      MAX-ACCESS read-write
-     STATUS current
+     STATUS deprecated
      DESCRIPTION 
          "Indicates the method used to provision the device.  This object should only be 
           changed by the configuration file.  The following provisioning methods are supported:
@@ -137,7 +714,24 @@ arrisCmDevProvMethodIndicator OBJECT-TYPE
              gupi(4)                - SNMPv2, with no SNMP Informs and IPSEC disabled
              
              singleMAC(5)           - single config file (SNMPv2, single IP address, 
-                                      single MAC address, no SNMP Informs, IPSEC disabled)"
+                                      single MAC address, no SNMP Informs, IPSEC disabled
+             
+             basic1(6)              - SNMPv2, without the SNMP Enrollment and Status Informs
+             
+             basic2(7)              - SNMPv2, without the SNMP Enrollment Inform)
+             
+             gupiEncryptedMtaConfig(8) - Same a gupi(4) above with the MTA config file encrypted
+                                         useing an Arris proprietary method.
+                                         
+             gupiMacMta(9)          - gupi provisioning that uses MTA MAC address as the MTA config
+                                      file name. (ie- 1337c0ded00d.bin)
+                                      
+             gupiEncryptedMacMta(10) - gupi encrypted mta config provisioning that uses MTA MAC address
+                                       as the MTA config file name. (ie- 1337c0ded00d.bin)
+             
+             gupiTftpSvrOverride(11) - gupi provisioning where the FQDN of the MTA TFTP server is expected to 
+                                       be present in the MIB arrisMtaDevTFTPServerAddrOverrideFQDN"
+                                       
      ::= { arrisCmDevOperationalSetup 2 }
 
 arrisCmDevEnableDocsis20 OBJECT-TYPE
@@ -155,5 +749,1176 @@ arrisCmDevEnableDocsis20 OBJECT-TYPE
            will automatically reboot."
         ::= { arrisCmDevOperationalSetup 3 }
 
-                                            
+arrisCmDevModemFeatureSwitch OBJECT-TYPE
+        SYNTAX BITS { 
+            badMapDiscard(0),
+            wanIsolationOverride(1),
+            usbDisable(2),
+            concatDisable(3),
+            octetCounterChange(4),
+            reserved5(5),
+            reserved6(6),
+            unused7(7)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+          "This object is used to enable proprietary features of the Arris cable 
+           modem.  From left to right, the specified bit indicates whether or not 
+           the corresponding modem feature is enabled.  For example, if the first 
+           bit is set, then the badMapDiscard feature is enabled. If it is zero, 
+           the feature is disabled.  NO bits are set by default.
+           
+           /** BIT Descriptions **/
+           0x80 : badMapDiscard - if Set, bad Maps will be discarded.
+           0x40 : wanIsolationOverride - if Set, the WAN isolation switch will be 
+                  overriden.  Internet access will remain enabled regardless of 
+                  the position of the WAN isolation switch (Standby button).
+           0x20 : usbDisable - if Set, the USB hardware will be disabled.
+           0x10 : concatDisable - if Set, concatenation and fragmentation will 
+                  be disabled when operating with a 1.0 config file.
+           0x08 : octetCounterChange - if Set, SYNC and MAP messages are not
+                  counted in the ifInOctets MIB.
+           0x04 : RESERVED
+           0x02 : RESERVED
+           0x01 : Unused"
+        DEFVAL { '00'h }
+        ::= { arrisCmDevOperationalSetup 4 }
+
+-- HTTP MIB objects --
+arrisCmDevHttp OBJECT IDENTIFIER ::= { arrisCmDevOperationalSetup 5 } 
+
+-- Http MIB object Placeholder ::= { arrisCmDevHttp 1 }
+-- Http MIB object Placeholder ::= { arrisCmDevHttp 2 }
+
+arrisCmDevHttpLanAccess OBJECT-TYPE
+        SYNTAX INTEGER { 
+            off(1), 
+            basic(2), 
+            advanced(3),
+            until-registered(4) 
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+          "Controls the level of LAN-side HTTP access to the modem.  
+           The levels are described as:
+              off(1)              - LAN-side HTTP access is denied.
+              basic(2)            - allow basic HTTP access.
+              advanced(3)         - allow ARRIS proprietary HTTP access; not valid for CM.
+              until-registered(4) - allow basic HTTP access until the 
+                                    modem is registered.  Once registered, 
+                                    LAN-side HTTP access is denied.
+           This object can only be changed by the configuration file.                         
+           The default value for this object is until-registered(4)."
+        DEFVAL { until-registered } 
+        ::= { arrisCmDevHttp 3 }
+        
+arrisCmDevHttpWanAccess OBJECT-TYPE
+        SYNTAX INTEGER { 
+            off(1), 
+            basic(2), 
+            advanced(3) 
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+          "Controls the level of WAN-side HTTP access to the modem.  
+           The levels are described as:
+              off(1)      - WAN-side HTTP access is denied.
+              basic(2)    - allow basic HTTP access.
+              advanced(3) - allow ARRIS proprietary HTTP access; not valid for CM.
+           This object can only be changed by the configuration file.
+           The default value for this object is off(1)."
+        DEFVAL { off }          
+        ::= { arrisCmDevHttp 4 }
+        
+arrisCmDevHttpClientSeed OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (8))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+          "The DES encoded seed--provided by the user--that will be used 
+           to generate the password for access to the HTTP Advanced Pages.  
+           When read, this object will return a zero-length string."
+        ::= { arrisCmDevHttp 5 }
+
+arrisCmDevHttpAdvLink OBJECT-TYPE
+        SYNTAX INTEGER { unrestricted(1), restricted(2) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+          "This object provides the ability to show or hide the ADV link
+           on the HTTP Web Page."
+        DEFVAL { unrestricted }
+        ::= { arrisCmDevHttp 6 }        
+
+--
+-- TurboDox MIB objects --
+--
+arrisCmDevTurboDoxConfiguration   OBJECT IDENTIFIER ::= { arrisCmDevOperationalSetup 6 }
+
+arrisCmDevTurboDoxEnable OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "This object is used to enable/disable TurboDox operation.
+          Set to true(1) to enable TurboDox operation mode.
+          Set to false(2) to disable TurboDox operation mode.  This 
+          object can only be changed by the configuration file."
+     ::= { arrisCmDevTurboDoxConfiguration 3 }
+
+arrisCmDevTurboDoxDeleteTimer OBJECT-TYPE
+     SYNTAX  INTEGER (1..65535)
+     UNITS       "100 msec"
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "This object represents the TCP session delete timeout value.  
+          This object can only be changed by the configuration file.  
+          The default value for this object is 15."
+     DEFVAL { 15 }
+     ::= { arrisCmDevTurboDoxConfiguration 4 }
+
+arrisCmDevTurboDoxSlowStartTimer OBJECT-TYPE
+     SYNTAX  INTEGER (1..65535)
+     UNITS       "100 msec"
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "This object represents the TCP slow start timeout value.  
+          This object can only be changed by the configuration file.  
+          The default value for this object is 10."
+     DEFVAL { 10 }
+     ::= { arrisCmDevTurboDoxConfiguration 5 }
+
+arrisCmDevTurboDoxVersion OBJECT-TYPE
+     SYNTAX  DisplayString (SIZE (0..15))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "This object indicates the TurboDox version."
+     ::= { arrisCmDevTurboDoxConfiguration 6 }
+
+arrisCmDevDhcpServerEnable OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "This object is used to enable/disable the local DHCP Server. 
+          As long as the CM is not operational, the local DHCP Server 
+          is working if enabled.  Set to true(1) to enable the DHCP 
+          server.  Set to false(2) to disable it."
+     ::= { arrisCmDevOperationalSetup 7 }
+
+arrisCmDevDhcpServerState OBJECT-TYPE
+     SYNTAX INTEGER {
+         active(1),
+         inactive(2)
+     }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Indicates the current state of the local DHCP Server."
+     ::= { arrisCmDevOperationalSetup 8 }
+
+--
+-- Scanning Setup MIB objects --
+--
+arrisCmDevScanningSetup   OBJECT IDENTIFIER ::= { arrisCmDevOperationalSetup 9 }
+
+arrisCmDevPresetFrequencyTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF ArrisCmDevPresetFrequencyEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "This table contains all the MIB variables required for Preset Frequency Scanning."
+     ::= { arrisCmDevScanningSetup 1 }
+
+arrisCmDevPresetFrequencyEntry OBJECT-TYPE
+     SYNTAX      ArrisCmDevPresetFrequencyEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "This table contains all the MIB variables required for Preset Frequency Scanning."
+     INDEX { arrisCmDevPresetFrequencyIndex  }
+     ::= {  arrisCmDevPresetFrequencyTable 1 }
+
+ArrisCmDevPresetFrequencyEntry ::= SEQUENCE {
+         arrisCmDevPresetFrequencyIndex   INTEGER,
+         arrisCmDevPresetFrequency        Unsigned32
+     }
+
+arrisCmDevPresetFrequencyIndex OBJECT-TYPE
+     SYNTAX      INTEGER (1..20)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "Index used to order the arrisCmDevPresetFrequencyTable entries."
+     ::= { arrisCmDevPresetFrequencyEntry 1 }
+
+arrisCmDevPresetFrequency OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "Preset Frequency used in scanning. This value should be entered in Hz (Hertz)."
+     ::= { arrisCmDevPresetFrequencyEntry 2 }
+
+arrisCmDevClearPresetFrequencies OBJECT-TYPE
+     SYNTAX INTEGER {
+         true(1),
+         false(2)
+     }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "If set to True(1), the device will erase all the Preset frequencies. When read False(2) 
+          will always be returned"
+     ::= { arrisCmDevScanningSetup 2 }
+
+arrisCmDevClearCachedFrequencies OBJECT-TYPE
+     SYNTAX INTEGER {
+         true(1),
+         false(2)
+     }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "If set to True(1), the device will erase all the Cached frequencies. When read False(2) 
+          will always be returned"
+     ::= { arrisCmDevScanningSetup 3 }
+
+arrisCmDevReportLevelsMasterOff OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "If set to True(1) all Report Levels and Debug Tracing will be turned Off, and Logits Logs 
+          will return to thier default values. When this object is read False(2) will be returned."
+     ::= { arrisCmDevOperationalSetup 10 }
+
+arrisCmDevEraseLogBlock OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "If set to True(1) this MIB object will erase the Arris log block. When this object is read 
+          False(2) will be returned."
+     ::= { arrisCmDevOperationalSetup 11 }
+
+arrisCmDevEnableDocsis10Plus OBJECT-TYPE
+     SYNTAX TruthValue
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+          "This object is used to enable/disable DOCSIS 1.0+ operational mode.  
+           This setting is stored into NVRAM and therefore will survive resets.  
+                      
+           Set to true(1) to enable DOCSIS 1.0+ operational mode.  In this mode
+           the modem will register as a DOCSIS 1.0 device and will use DOCSIS 1.0+ 
+           functionality rather than DOCSIS 1.1 or DOCSIS 2.0.
+
+           Set to false(2) to disable DOCSIS 1.0+ operational mode. In this mode
+           the modem will register and perform as a DOCSIS 1.1 or DOCSIS 2.0 device 
+           rather than using DOCSIS 1.0+."
+     ::= { arrisCmDevOperationalSetup 12 } 
+
+arrisCmDevEnableOption177 OBJECT-TYPE
+     SYNTAX TruthValue
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+          "This object is used to enable/disable sending only DHCP option 177 rather 
+           than sending both option 122 and 177.  
+           This setting is stored into NVRAM and therefore will survive resets.  
+                      
+           Set to true(1) to enable sending only option 177.  In this mode
+           the modem will report support only for option 177.
+
+           Set to false(2) to disable sending only option 177.  In this mode the 
+           modem will report support for both options 122 and 177 in its DHCP
+           DISCOVER message."
+     ::= { arrisCmDevOperationalSetup 13 } 
+
+arrisCmDevEnableLoggingPersistence OBJECT-TYPE
+     SYNTAX TruthValue
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+          "This object is used to enable/disable the telnet logging persistence feature.
+           This setting is stored into NVRAM and therefore will survive resets.  
+                      
+           Set to true(1) to enable logging persistence.  In this mode,
+           exiting a telnet session will leave all debug logging enabled.
+
+           Set to false(2) to disable logging persistence.  In this mode,
+           exiting a telnet session will cause all debug logging to be turned
+           off."
+     ::= { arrisCmDevOperationalSetup 14 } 
+
+arrisCmDevModemFeatureSwitch2 OBJECT-TYPE
+  SYNTAX BITS { 
+      disableTftpTimeoutOption(0),
+      enableBroadcastDhcpProtection(1),
+      allowCpeOverflowWrap(2),
+      wrmMaxCPEBypass(3),
+      dectMaxCPEBypass(4),
+      disableWrmFactDefaultButton(5),
+      resetMtaTicketsOnProvisioningTimerExpiry(6),
+      disableMtaDHCPOption60SupportedCodecs(7),
+      replaceMtaDHCPOption12HostnameWithMtaMac(8),
+      keepCpeOnIfDisconnect(9),
+      ignoreSigDevToneProvisioning(10),
+      unused11(11),
+      unused12(12),
+      unused13(13),
+      unused14(14),
+      unused15(15),
+      unused16(16),
+      unused17(17),
+      unused18(18),
+      unused19(19),
+      unused20(20),
+      unused21(21),
+      unused22(22),
+      unused23(23),
+      reservedForMergeToCMFS24(24),
+      reservedForMergeToCMFS25(25),
+      reservedForMergeToCMFS26(26),
+      reservedForMergeToCMFS27(27),
+      reservedForMergeToCMFS28(28),
+      reservedForMergeToCMFS29(29),
+      reservedForMergeToCMFS30(30),
+      reservedForMergeToCMFS31(31)
+  }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "This object is used to enable proprietary features of the Arris cable 
+     modem.  From left to right, the specified bit indicates whether or not 
+     the corresponding modem feature is enabled.  For example, if the first 
+     bit is set, then the disableTftpTimeoutOption feature is enabled. If 
+     it is zero, the feature is disabled.  NO bits are set by default.
+     Field is 32 bits long and all 32 bits must be written.
+           
+     /** BIT Descriptions **/
+     0x80000000 : disableTftpTimeoutOption - Turn off timeout opt in TFTP
+     0x40000000 : enableBroadcastDhcpProtection - Turn on broadcast DHCP filtering for CPE devices
+     0x20000000 : allowCpeOverflowWrap - Turn on to allow wrapping of CPE MAC learning table
+     0x10000000 : wrmMaxCPEBypass - deprecated - WRM MAC address is not counted against the MaxCpeAllowed variable.
+     0x08000000 : dectMaxCPEBypass - deprecated - DECT MAC address is not counted against the MaxCpeAllowed variable.
+     0x04000000 : disableWrmFactDefaultButton - when set, holding WRM reset button for >8 seconds does NOT revert WRM to factory defaults.
+     0x02000000 : resetMtaTicketsOnProvisioningTimerExpiry - Turn on to allow security tickets to be invalidated when MTA provisioning timer expires.
+     0x01000000 : disableMtaDHCPOption60SupportedCodecs - when set, DHCP option 60 won't include supported codecs.
+     0x00800000 : replaceMtaDHCPOption12HostnameWithMtaMac - when set, ignore Option 12 hostname never mind it's exist or not. 
+                  The Option 12 hostname will be set to MTA's MAC.
+     0x00400000 : keepCpeOnIfDisconnect - Turn on to keep the MAC address of the disconnected CPE.
+     0x00200000 : ignoreSigDevToneProvisioning - Turn on to ignore SigDevTone provisioning.
+     0x00100000 : Reserved for Future.
+     0x00080000 : Reserved for Future.
+     0x00040000 : Reserved for Future.
+     0x00020000 : Reserved for Future.
+     0x00010000 : Reserved for Future.
+     0x00008000 : Reserved for Future.
+     0x00004000 : Reserved for Future.
+     0x00002000 : Reserved for Future.
+     0x00001000 : Reserved for Future.
+     0x00000800 : Reserved for Future.
+     0x00000400 : Reserved for Future.
+     0x00000200 : Reserved for Future.
+     0x00000100 : Reserved for Future.
+     0x00000080 : Reserved for Future.
+     0x00000040 : Reserved for Future.
+     0x00000020 : Reserved for Future.
+     0x00000010 : Reserved for Future.
+     0x00000008 : Reserved for Future.
+     0x00000004 : Reserved for Future.
+     0x00000002 : Reserved for Future.
+     0x00000001 : Reserved for Future."
+  DEFVAL { '00000000'h }
+ ::= { arrisCmDevOperationalSetup 15 }
+
+arrisCmDevDocsQosParamSetActiveTimeout OBJECT-TYPE
+     SYNTAX      INTEGER (0..65535)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "Send QOS Timeout parameter to CMTS for upstream flow IF
+         feature switch for DSX DQOS is enabled AND the value of this MIB
+         is set to a value other than the default of 0."
+     DEFVAL { 0 }
+     ::= { arrisCmDevOperationalSetup 16 }
+
+arrisCmDevCLITimeout OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "Max time that a telnet/SSH session can be idle before it is terminated.  
+          Range is 0-1440 minutes, where 0 disables the timer completely."
+     ::= { arrisCmDevOperationalSetup 17 }
+     
+arrisCmDevTODSyncTimeOut OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..4320)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "This value determines the interval between the TOD sync operations.  
+          Range is 0-4320 hours, where 0 disables the sync completely.  This 
+          value sets the interval starting from the setting of the new value. Hence,
+          a setting of 10 causes the TOD server to sync every 10 hours from the
+          time the value was set.  
+          Feature is disabled by default."
+     DEFVAL { 0 }
+     ::= { arrisCmDevOperationalSetup 18 }
+
+arrisCmDevDhcpNoSvcImpact OBJECT-TYPE
+     SYNTAX INTEGER { 
+         off(1), 
+         dontSend(2), 
+         sendIgnore(3) 
+     }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+          "This object is used to enable/disable the DHCP RENEW interruption feature.
+           During an active call DHCP lease renewal will be stalled until all endpoints 
+           are onhook.
+           Set to off(1) to disable DHCP lease renewal interruption.  DHCP lease renewal
+           will adhere to normal operating procedures.
+           Set to dontSend(2) to enable complete DHCP lease renewal interruption.  When 
+           an endpoint is offhook the DHCP RENEW or REBIND REQUEST will be suppressed until 
+           all endpoints are returned to the onhook condition.
+           Set to sendIgnore(3) to enable partial DHCP lease renewal interruption.  When an 
+           endpoint is offhook the DHCP RENEW or REBIND REQUEST will be sent and a valid 
+           DHCP ACK RESPONSE will be processed.  However, a DHCP NAK RESPONSE will not be 
+           processed until all endpoints are returned to the onhook condition, then the NAK 
+           will be processed immediately."
+     ::= { arrisCmDevOperationalSetup 19 }
+
+arrisCmDevDhcpOption51Override OBJECT-TYPE
+     SYNTAX INTEGER {
+         off(1),
+         onCm(2),
+         onMta(3),
+         onCmAndMta(4)
+     }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+         "Enable or Disable the inclusion of DHCP option code 51 in the DHCP REQUEST message.  
+         A value of off(1) will cause DHCP option code 51 to be included in the DHCP 
+         REQUEST message.  
+         A value of onCm(2) will cause DHCP option code 51 to NOT be included in 
+         the CM DHCP REQUEST message.
+         A value of onMta(3) will cause DHCP option code 51 to NOT be included in 
+         the MTA DHCP REQUEST message.
+         A value of onCmAndMta(4) will cause DHCP option code 51 to NOT be included in 
+         both the CM and the MTA DHCP REQUEST message.
+         The default value is off(1)."
+     DEFVAL { off }
+     ::= { arrisCmDevOperationalSetup 20 }
+
+arrisCmDevDEAControl OBJECT-TYPE
+     SYNTAX INTEGER {
+         on(1),
+         off(2),
+         onPerm(3),
+         offPerm(4)
+     }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+         "Turn on or off the DEA algorithm. The default value is on(1)."
+     DEFVAL { on }
+     ::= { arrisCmDevOperationalSetup 21 }
+
+arrisCmDevSinglePasswd OBJECT-TYPE
+     SYNTAX DisplayString
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+        "The encoded password--provided by the user--that will be used 
+         for single password access to the CLI & HTTP Advanced Pages.  
+         When read, this object will return a zero-length string."
+     ::= { arrisCmDevOperationalSetup 22 }
+
+arrisCmDevTelnetEnable OBJECT-TYPE
+     SYNTAX INTEGER {
+         disable(0),
+         permEnable(1),
+         tempEnable(2)
+     }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+        "Used to enable/disable Telnet access.  TempEnable enables Telnet for
+         one session only.  For Telnet to be enabled, arrisCmDevTelnetAllow must
+         also be set to 'allow'."
+     ::= { arrisCmDevOperationalSetup 23 }
+
+arrisCmDevSSHEnable OBJECT-TYPE
+     SYNTAX INTEGER {
+         disable(0),
+         permEnable(1),
+         tempEnable(2)
+     }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+        "Used to enable/disable SSH access.  TempEnable enables SSH for one
+         session only.  For SSH to be enabled, arrisCmDevSSHAllow must also
+         be set to 'allow'."
+     ::= { arrisCmDevOperationalSetup 24 }
+
+arrisCmDevTelnetAllow OBJECT-TYPE
+     SYNTAX INTEGER {
+         inhibit(0),
+         allow(1)
+     }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+        "Used to allow/inhibit Telnet access.  For Telnet to be allowed,
+         arrisCmDevTelnetEnable must also be set to 'enable'."
+     ::= { arrisCmDevOperationalSetup 25 }
+
+arrisCmDevSSHAllow OBJECT-TYPE
+     SYNTAX INTEGER {
+         inhibit(0),
+         allow(1)
+     }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+        "Used to allow/inhibit SSH access.  For SSH to be allowed,
+         arrisCmDevSSHEnable must also be set to 'enable'."
+     ::= { arrisCmDevOperationalSetup 26 }
+
+arrisCmDevWirelessRegion OBJECT-TYPE
+     SYNTAX INTEGER {
+        africa(1),
+        asia(2),
+        australia(3),
+        canada(4),
+        europe(5),
+        france(6),
+        israel(7),
+        japan(8),
+        mexico(9),
+        southAmerica(10),
+        unitedStates(11)                    
+     }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+        "This value specifies the region that the modem operates in so it can determine the range of
+         channels which may be selected by the user for 802.11 operation.  This value only
+         affects modems that support 802.11.  If this value is not specified, standard DOCSIS units will
+         default to United States, Japanese DOCSIS units will default to Japan, and EuroDOCSIS units
+         will default to Europe."
+     ::= { arrisCmDevOperationalSetup 27 }
+
+arrisCmDevRouterMode OBJECT-TYPE
+     SYNTAX INTEGER {
+         useExistingSetting(0),
+         routerEnabled(1),
+         routerDisabled(2),
+         routerDisabled-Fixed(3)
+     }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+        "This value specifies what operating mode should be used by the embedded router in Touchstone
+         products that include a router.  If not specified, the router will be left in its existing
+         configuration.
+         0: Leave router configuration unchanged from existing setting
+         1: All router functionality is enabled
+         2: All router functionality is disabled, modem acts as simple bridge
+         3: All router functionality is disabled, modem acts as simple bridge, and all router 
+            configuration web pages are removed from the webGUI so that the end user cannot
+            change this"
+     ::= { arrisCmDevOperationalSetup 28 }
+
+arrisCmDevEnableDHCPLog OBJECT-TYPE
+     SYNTAX INTEGER {
+         disable(0),
+         enable(1)
+     }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+        "Used to enable/disable CM DHCP Logging."
+     ::= { arrisCmDevOperationalSetup 29 }
+
+arrisCmDevClearDHCPLog OBJECT-TYPE
+     SYNTAX INTEGER {
+         clear(1)
+     }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+        "Used to Clear the CM DHCP Logs."
+     ::= { arrisCmDevOperationalSetup 30 }
+
+arrisCmDevRouterLanIpAddr OBJECT-TYPE
+     SYNTAX IpAddress
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+        "This is the current Router Lan IP address."
+     ::= { arrisCmDevOperationalSetup 31 }
+
+arrisCmDevRouterLanSubNetMask OBJECT-TYPE
+     SYNTAX IpAddress
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+        "This is the current Router Lan Subnet Mask."
+     ::= { arrisCmDevOperationalSetup 32 }
+
+arrisCmDevRouterLanEnable OBJECT-TYPE
+     SYNTAX INTEGER {
+         disable(0),
+         enable(1)
+     }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+        "Used to enable/disable Router Lan."
+     ::= { arrisCmDevOperationalSetup 33 }
+
+arrisCmDevRouterLanReset OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "Setting this object to true(1) will reset the Router Lan 
+            Setting this object to false(2) will do nothing. 
+            Reading this object always returns false(2)."
+    ::= { arrisCmDevOperationalSetup 34 }
+    
+arrisCmDevRipTransmitStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+         active(1),
+         inactive(2)
+     }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "Active when the RIP on puma is actively transmitting RIP 
+            updates. In order for arrisCmDevRipTransmitStatus to be
+            active, arrisCmDevRouterLanEnable must be enabled, and 
+            all RIP parameters must be configured correctly."
+    ::= { arrisCmDevOperationalSetup 35 }
+
+arrisCmDevDectReset OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "Setting this object to true(1) will reset the Dect module 
+            Setting this object to false(2) will do nothing. 
+            Reading this object always returns false(2)."
+    ::= { arrisCmDevOperationalSetup 36 }
+
+arrisCmDevTftpBlkSize OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "This object is used for the TFTP Blocksize Option (RFC 2348).
+           Valid values range between 32 and 1448 octets, inclusive.
+           Setting this object to 0(default) disables this option, and
+           a 512 blksize is used as per TFTP spec."
+    ::= { arrisCmDevOperationalSetup 37 }
+
+arrisCmDevTODTimeOffset OBJECT-TYPE
+     SYNTAX      Integer32 (-43200..46800)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "This mib is used to update CM TOD time offset. 
+         The range of the offset is -12*60*60(-43200) to 13*60*60(46800) in seconds.
+         13 is Daylight Savings Time in the +12 time zone).  The CM TOD time offset 
+         is overwritten when this mib is set or CM dhcp time offset option is received."
+     DEFVAL { 0 }
+     ::= { arrisCmDevOperationalSetup 38 }
+
+arrisCmDevWrmProvServer OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "This object is used to store the TFTP Server Name for the WRM 
+           card if it cannot be included in the DHCP Offer."
+    ::= { arrisCmDevOperationalSetup 39 }
+
+arrisCmDevWrmProvFileName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "This object is used to store the Bootfile name for the WRM 
+           card if it cannot be included in the DHCP Offer."
+    ::= { arrisCmDevOperationalSetup 40 }
+
+arrisCmDevDSTPolicy OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..50))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "This object is used to get and set the daylight saving time policy. This parameter 
+          is a rule with two fields separated by semicolon (;) as shown below:
+          start=<start-time>;end=<end-time>
+          <start-time> and <end-time> are of the form: <month>/<day>/<weekday>/<HH> 
+          <month> = 1,2,12 (for Jan, Feb, Dec) 
+          <day> = [+|-]1,2,3,...,,31. If <day> is -1, it means the <weekday> on or before the end-of-the-month 
+          (in other words the last occurrence of <weekday> in that month) 
+          <weekday> = 1, 2, 3,..., 7 (for Mon, Tue, ..., Sun), or 0. If <weekday> is 0, it means the date to 
+          start or end daylight saving is at exactly the given date. In that case, the <day> value must not be 
+          negative. If <weekday> is not zero, then the daylight saving starts or ends on the <weekday> on or 
+          after the given date if <day> is positive, or on or before the given date if <day> is negative. 
+          <HH> = hour (0-23).
+          The following example reflects the new change starting March 2007 in U.S.A. DST starts on the second Sunday 
+          in March and ends on the first Sunday in November: 
+          start=3/8/7/02;end=11/1/7/02"  
+    ::= { arrisCmDevOperationalSetup 41 }
+
+arrisCmDevRestoreNvmFactoryDefault OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Setting this object to true(1) will reset the NVM to default values:
+           Setting this object to false(2) will do nothing. 
+           Reading this object always returns false(2)."
+    ::= { arrisCmDevOperationalSetup 42 }  
+        
+arrisCmDevWrmProvFile OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..2048))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "This object is used to store the Bootfile for the WRM
+           card if it cannot be provisioned by the usual TFTP server."
+    ::= { arrisCmDevOperationalSetup 43 }
+
+arrisCmDevUGSTxQueueSize OBJECT-TYPE
+    SYNTAX INTEGER{
+         disable(0),
+         qsize1(1),
+         qsize2(2),
+         qsize3(3),
+         qsize4(4)
+     }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+         "Controls the permitted depth of HW upstream buffer queue for UGS service flows. Packets are discarded if depth of queue exceeds this setting.
+A setting of  disable (0) indicates that the queue will not be restricted, and will be allowed to fill to allocated size.The recommended queue size is 2."
+     DEFVAL { 0 }
+     ::= { arrisCmDevOperationalSetup 44 }
+
+arrisCmDevUniqueConfigFileEnable OBJECT-TYPE
+    SYNTAX INTEGER {
+         disable(0),
+         enable(1)
+     }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+        "Used to enable/disable downloading the ARRIS unique config file. Default value
+        is set to 'disable'. This MIB can only be set via the CM config file, but sets will
+        be ignored if CM is working in IPV6 mode."
+     ::= { arrisCmDevOperationalSetup 45 }
+
+arrisCmDevUniqueConfigFileServerAddrType OBJECT-TYPE
+     SYNTAX InetAddressType
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+         "This object is used to get and set the IP address mode of the TFTP server for the ARRIS unique 
+         config file. This MIB can only be set via the CM config file, and only IPV4 address type is accepted.
+         This MIB should be set before setting 'arrisCmDevUniqueConfigFileServerAddr'."
+     ::= { arrisCmDevOperationalSetup 46 }
+
+arrisCmDevUniqueConfigFileServerAddr OBJECT-TYPE
+     SYNTAX InetAddress
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+         "This object is used to get and set the TFTP server address that will be used to download the
+         ARRIS unique config file. This MIB can only be set via the CM config file, and only a IPV4 address is accepted.
+         'arrisCmDevUniqueConfigFileServerAddrType'should be set to correct value before setting this MIB."
+     ::= { arrisCmDevOperationalSetup 47 }
+
+arrisCmDevSetupMddIpModeOverride OBJECT-TYPE
+    SYNTAX INTEGER{
+         disable(0),
+         ipv4(1),
+         ipv6(2),
+         apm(3),
+         dpm(4)
+     }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+         "This object is used to override the IP Mode TLV in the MDD message.
+          0 = use the MDD value
+          1 = IPv4 Only
+          2 = IPv6 Only
+          3 = Alternate (APM)
+          4 = Dual-stack (DPM)"
+     DEFVAL { 0 }
+     ::= { arrisCmDevOperationalSetup 48 }
+     
+arrisCmDevWrmProvFileNameMacEnable OBJECT-TYPE
+     SYNTAX INTEGER {
+         disable(0),
+         enable(1)
+     }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+        "When Enabled in the CM configuration file, and the MIB value of
+         arrisCmDevWrmProvFileName is blank, the CM would generate the MIB
+         rrisCmDevWrmProvFileName to be the WAN MAC address cfg file.
+         Note: This MIB could only be set in CM configuration file"
+     DEFVAL { 0 }
+     ::= { arrisCmDevOperationalSetup 49 }
+
+arrisCmDevTftpMtaIpOverride OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "This object is used to store the TFTP Server IP Address 
+           and it will override the DHCP Offer."
+     ::= { arrisCmDevOperationalSetup 50 }
+
+arrisCmDevEthernetPower OBJECT-TYPE
+     SYNTAX INTEGER {
+         off(0),
+         on(1),
+         default(2)
+     }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+        "off(0) - power off Ethernet interface.
+         on(1) - power on Ethernet interface
+         default(2) - power off Ethernet interface for CM600, power on Ethernet interface for other models."
+      ::= { arrisCmDevOperationalSetup 51 }
+     
+-- arrisCmDevSoftware MIB objects --
+
+arrisCmDevSwTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF ArrisCmDevSwEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "This table contains all the MIB variables required for the
+          Touchstone Software Upgrade System."
+     ::= { arrisCmDevSoftware 1 }
+
+arrisCmDevSwEntry OBJECT-TYPE
+     SYNTAX      ArrisCmDevSwEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "This table contains all the MIB variables required for the
+          Touchstone Software Upgrade System."
+     INDEX { arrisCmDevSwIndex  }
+     ::= {  arrisCmDevSwTable 1 }
+
+ArrisCmDevSwEntry ::= SEQUENCE {
+         arrisCmDevSwIndex           INTEGER,
+         arrisCmDevSwCustomerLoadId  DisplayString,
+         arrisCmDevSwHwModel         DisplayString,
+         arrisCmDevSwHwRev           INTEGER,
+         arrisCmDevSwServer          IpAddress,
+         arrisCmDevSwFilename        DisplayString,
+--         arrisCmDevSwFilenameFinal   DisplayString,
+         arrisCmDevSwServerAddressType InetAddressType,
+         arrisCmDevSwServerAddress     InetAddress
+     }
+
+arrisCmDevSwIndex OBJECT-TYPE
+     SYNTAX      INTEGER (1..32)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "Index used to order the arrisCmDevSwTable entries."
+     ::= { arrisCmDevSwEntry 1 }
+
+arrisCmDevSwCustomerLoadId OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (0..64))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "Custom string to identify Touchstone Software Upgrade 
+          load lineups.
+          (OPTIONAL)"
+     ::= { arrisCmDevSwEntry 2 }
+
+arrisCmDevSwHwModel OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (0..16))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "HW Model of Touchstone product to be downloaded.
+          (REQUIRED)"
+     ::= { arrisCmDevSwEntry 3 }
+
+arrisCmDevSwHwRev OBJECT-TYPE
+     SYNTAX      INTEGER (0..255)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "HW Revision of Touchstone product to be downloaded.
+          (OPTIONAL)"
+     ::= { arrisCmDevSwEntry 4 }
+
+arrisCmDevSwServer OBJECT-TYPE
+     SYNTAX      IpAddress
+     MAX-ACCESS  read-write
+     STATUS      deprecated
+     DESCRIPTION
+          "The address of the TFTP server used for software
+          upgrades.  If the TFTP server is unknown or is a
+          non-IPv4 address, return 0.0.0.0.
+
+          This object is deprecated. See arrisCmDevSwServerAddress
+          for its replacement.  This object will have its value
+          modified, given a valid SET to arrisCmDevSwServerAddress."
+     DEFVAL { 10 }
+     ::= { arrisCmDevSwEntry 5 }
+
+arrisCmDevSwFilename OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE (0..64))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "The file name of the Touchstone software image to be loaded 
+          on to this device.
+          (REQUIRED)"
+     ::= { arrisCmDevSwEntry 6 }
+
+--arrisCmDevSwFilenameFinal OBJECT-TYPE
+--    SYNTAX      DisplayString (SIZE (0..64))
+--    MAX-ACCESS  read-write
+--    STATUS      current
+--    DESCRIPTION
+--        "The file name of the Touchstone software image to be loaded 
+--         on to this device after arrisCmDevFilename has been loaded.
+--         (OPTIONAL)"
+--    ::= { arrisCmDevSwEntry 7 }
+
+arrisCmDevSwServerAddressType OBJECT-TYPE
+     SYNTAX InetAddressType
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+         "This get/set IP address mode of the server for Touchstone 
+         Software Upgrading,ipv4 or ipv6.
+         (REQUIRED)"
+     ::= { arrisCmDevSwEntry 8 } 
+
+arrisCmDevSwServerAddress OBJECT-TYPE
+     SYNTAX InetAddress
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+         "This object is used to get/set the IPv6 or IPv4 TFTP server address
+         that will be used to download the image. A set of this object to
+         an IPv4 address will result in also setting the value of 
+         arrisCmDevSwServer to that address.  If this object is set to an
+         IPv6 address, arrisCmDevSwServer is set to 0.0.0.0. If 
+         arrisCmDevSwServer is set, this object is also set to that value.
+         Note that before setting this object, setting
+         arrisCmDevSwServerAddressType to a correct value is a must.
+         (REQUIRED)"
+     ::= { arrisCmDevSwEntry 9 }
+
+arrisCmDevSwAdminStatus OBJECT-TYPE
+     SYNTAX INTEGER {
+         upgradeFromArrisMgt(1),
+         allowArrisProvisioningUpgrade(2),
+         ignoreArrisProvisioningUpgrade(3)
+     }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "If set to upgradeFromArrisMgt(1), the device will initiate a
+          TFTP software image download using arrisCmDevSwFilename for
+          the matching HW model type and revision in the 
+          arrisCmDevSwTable.
+
+          If set to allowArrisProvisioningUpgrade(2), the device will
+          use the Touchstone Software Upgrade information supplied by 
+          the provisioning server when next rebooting (this does not
+          cause a reboot).
+
+          When set to ignoreArrisProvisioningUpgrade(3), the device
+          will disregard Touchstone Software Upgrade information from
+          the provisioning server.
+
+          At initial startup, this object has the default value of
+          ignoreArrisProvisioningUpgrade(3)."
+     ::= { arrisCmDevSoftware 2 }
+
+
+--
+-- Arris CM Device Notification definitions.
+--
+arrisCmDevNotification OBJECT IDENTIFIER ::= { arrisCmDevMib 10 }
+arrisCmDevTraps        OBJECT IDENTIFIER ::= { arrisCmDevNotification 0 }
+        
+arrisCmDevTftpDownloadInitTrap NOTIFICATION-TYPE
+     OBJECTS { docsDevEvLevel,
+               docsDevEvId,
+               docsDevEvText,
+               ifPhysAddress,
+               docsIfCmCmtsAddress,
+               docsIfDocsisBaseCapability,
+               docsIfCmStatusDocsisOperMode,
+               docsIfCmStatusModulationType }
+     STATUS current
+     DESCRIPTION
+         "An event that indicates a TFTP download initiated 
+          request.  The values of docsDevEvLevel, docsDevId, 
+          and docsDevEvText are from the entry which logs 
+          this event in the docsDevEventTable. The 
+          docsIfDocsisBaseCapability value indicates the DOCSIS 
+          version information. The docsIfCmStatusDocsisOperMode 
+          value indicates the QOS level of the CM, while the 
+          docsIfCmStatusModulationType indicates the upstream 
+          modulation methodology used by the CM.  The 
+          ifPhysAddress value is the MAC address of the cable 
+          interface of this cable modem.  The docsIfCmCmtsAddress 
+          specifies the MAC address of the CMTS to which the CM 
+          is connected (if there is a cable card/ interface in 
+          the CMTS, then it is actually the MAC address of the 
+          cable interface which connected to the CM).  This part 
+          of the trap information is uniform across all CM traps."
+     ::= { arrisCmDevTraps 2 }
+
+arrisCmDevTftpDownloadCompleteTrap NOTIFICATION-TYPE
+     OBJECTS { docsDevEvLevel,
+               docsDevEvId,
+               docsDevEvText,
+               ifPhysAddress,
+               docsIfCmCmtsAddress,
+               docsIfDocsisBaseCapability,
+               docsIfCmStatusDocsisOperMode,
+               docsIfCmStatusModulationType }
+     STATUS current
+     DESCRIPTION
+         "An event that indicates the TFTP download 
+          completed successfully."
+     ::= { arrisCmDevTraps 3 }
+
+arrisCmDevTftpDownloadFailTrap NOTIFICATION-TYPE
+     OBJECTS { docsDevEvLevel,
+               docsDevEvId,
+               docsDevEvText,
+               ifPhysAddress,
+               docsIfCmCmtsAddress,
+               docsIfDocsisBaseCapability,
+               docsIfCmStatusDocsisOperMode,
+               docsIfCmStatusModulationType }
+     STATUS current
+     DESCRIPTION
+         "An event that indicates the failure of the TFTP 
+          download attempt."
+     ::= { arrisCmDevTraps 4 }
+
+arrisCmDevTftpDownloadRetryTrap NOTIFICATION-TYPE
+     OBJECTS { docsDevEvLevel,
+               docsDevEvId,
+               docsDevEvText,
+               ifPhysAddress,
+               docsIfCmCmtsAddress,
+               docsIfDocsisBaseCapability,
+               docsIfCmStatusDocsisOperMode,
+               docsIfCmStatusModulationType }
+     STATUS current
+     DESCRIPTION
+         "An event that indicates a TFTP download retry attempt."
+     ::= { arrisCmDevTraps 5 }      
+
+arrisCmDevMtaCertificateValidationFailTrap NOTIFICATION-TYPE
+     OBJECTS { docsDevEvLevel,
+               docsDevEvId,
+               docsDevEvText,
+               ifPhysAddress,
+               docsIfCmCmtsAddress,
+               docsIfDocsisBaseCapability,
+               docsIfCmStatusDocsisOperMode,
+               docsIfCmStatusModulationType }
+     STATUS current
+     DESCRIPTION
+         "An event that indicates a Service Provider Certificate Chain Validation Failed."
+     ::= { arrisCmDevTraps 6 }      
+    
+arrisCmDevSoftwareUpgradeFailedBeforeDLTrap NOTIFICATION-TYPE
+     OBJECTS { docsDevEvLevel,
+               docsDevEvId,
+               docsDevEvText,
+               ifPhysAddress,
+               docsIfCmCmtsAddress,
+               docsIfDocsisBaseCapability,
+               docsIfCmStatusDocsisOperMode,
+               docsIfCmStatusModulationType }
+     STATUS current
+     DESCRIPTION
+         "An event that indicates the Software Upgrade Failed before downloading."
+     ::= { arrisCmDevTraps 8 }      
+    
+arrisCmDevSoftwareUpgradeFailedTrap NOTIFICATION-TYPE
+     OBJECTS { docsDevEvLevel,
+               docsDevEvId,
+               docsDevEvText,
+               ifPhysAddress,
+               docsIfCmCmtsAddress,
+               docsIfDocsisBaseCapability,
+               docsIfCmStatusDocsisOperMode,
+               docsIfCmStatusModulationType }
+     STATUS current
+     DESCRIPTION
+         "An event that indicates the Software Upgrade Failed."
+     ::= { arrisCmDevTraps 9 }      
+    
+arrisCmDevSoftwareUpgradeCompleteTrap NOTIFICATION-TYPE
+     OBJECTS { docsDevEvLevel,
+               docsDevEvId,
+               docsDevEvText,
+               ifPhysAddress,
+               docsIfCmCmtsAddress,
+               docsIfDocsisBaseCapability,
+               docsIfCmStatusDocsisOperMode,
+               docsIfCmStatusModulationType }
+     STATUS current
+     DESCRIPTION
+         "An event that indicates the Software Upgrade was Completed."
+     ::= { arrisCmDevTraps 10 }      
+    
+arrisCmDevSoftwareUpgradeAbortedACFailTrap NOTIFICATION-TYPE
+     OBJECTS { docsDevEvLevel,
+               docsDevEvId,
+               docsDevEvText,
+               ifPhysAddress,
+               docsIfCmCmtsAddress,
+               docsIfDocsisBaseCapability,
+               docsIfCmStatusDocsisOperMode,
+               docsIfCmStatusModulationType }
+     STATUS current
+     DESCRIPTION
+         "An event that indicates the Software Upgrade was Aborted due to battery AC-FAIL condition."
+     ::= { arrisCmDevTraps 11 }      
+    
 END
+

@@ -1,74 +1,36 @@
 ARRIS-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY
-            FROM SNMPv2-SMI
-    enterprises
-            FROM RFC1155-SMI;
+    MODULE-IDENTITY, enterprises
+            FROM SNMPv2-SMI;
 
 arris MODULE-IDENTITY
-    LAST-UPDATED    "1009250000Z" -- September 25th, 2010
+    LAST-UPDATED    "201101140000Z" -- January 14, 2011
     ORGANIZATION    "Arris Interactive"
     CONTACT-INFO   
-        "Robert Coley
+        "Chris Hare
          Postal: Arris Interactive
                  3871 Lakefield Drive
                  Suite 300
                  Suwanee, GA 30024-1242
                  U.S.A.
-         Phone:  +1 770 622 8500
-         E-mail: robert.coley@arrisi.com
+                 Phone:  +1 770 473 5165
+                 E-mail: chris.hare@arrisi.com"
    
-         Initial MIB creator: Angela Lyda
-         Postal: Arris Interactive
-                  3871 Lakefield Drive
-                  Suite 300
-                  Suwanee, GA 30024-1242
-                  U.S.A.
-          Phone:  +1 770 622 8743
-          E-mail: angela.lyda@arrisi.com"
     DESCRIPTION
-        "This is a header for the Arris enterprise MIB.  All objects appear
+        "This is a header for the Arris Docsis 3.0 enterprise MIB.  All objects appear
          elsewhere."        
                   
 -- Revision history 
-   REVISION     "1009250000Z"  -- September 25th, 2010
-   DESCRIPTION
-       "Added Product Identifier 'arrisD5AM' for D5 Application Manager to the arrisProdIdVideo group"
-
-   REVISION     "0503140000Z"  -- March 14, 2005
-   DESCRIPTION
-       "Updated Q5 naming to D5"
-
-   REVISION     "0409100000Z"  -- September 10, 2004
-   DESCRIPTION
-       "Added Product Group 'arrisProdIdVideo' for ARRIS video products.
-        Also added Product Identifier 'arrisQ5Wan' for Q5 WAN device."
-
-   REVISION     "0402020000Z"  -- February 2, 2004
-   DESCRIPTION
-       "Added Product Identifier 'cmtsCommon' for common CMTS products."
-
-   REVISION     "0206240000Z"  -- June 24, 2002
-   DESCRIPTION
-       "Added a ProductID OID for the 'tcm' product.       
-        Added the Global Access product line rooted at arrisProdIdGlobalAccess."	
-       
-   REVISION     "0110040000Z"  -- October 4, 2001
-   DESCRIPTION
-       "Added a Product Identifier OID for the CM (Cable Modem) product line.
-        Added Product Identifier OIDs for the 'ttm' and 'ttp' products."
-       
-    REVISION    "0101240000Z"  -- January 24, 2001
-    DESCRIPTION
-        "Added a Product Identifier OID for the MRC (Modular Redundant Chassis) product line.
-         Added a Product Identifier OID for the MRC Controller"
-        
-    REVISION    "0010170000Z"  -- October 17, 2000
-    DESCRIPTION
-	    "Added a Product Identifier OID for the CMTS product line.
-	     Added a Product Identifier OID for the MSAS (MultiService Access System) CMTS product."
-         
+	REVISION "201101140000Z" -- January 14, 2011
+         DESCRIPTION
+             "Reserver .50->.59 for FMC"      
+	REVISION "201101130000Z" -- January 13, 2011
+         DESCRIPTION
+             "Renumbered arrisProIdRouter and arrisProdIdMoxi and reserved OID ranges for other products i.e. ServAssure, and OnDemand"      
+      REVISION "201002230000Z" -- February 23, 2010
+         DESCRIPTION
+             "Added arrisProIdRouter and arrisProdIdMoxi and fixed minor validation errors"      
     ::= { enterprises 4115 }
 
 arrisProducts OBJECT IDENTIFIER ::= { arris 1 }   
@@ -80,17 +42,51 @@ arrisProdIdCM    OBJECT IDENTIFIER ::= { arrisProducts 3 }  -- Cable Modem
 arrisProdIdCMTS  OBJECT IDENTIFIER ::= { arrisProducts 4 }  -- Cable Modem Termination System
 arrisProdIdMRC   OBJECT IDENTIFIER ::= { arrisProducts 5 }  -- Modular Redundant Chassis
 arrisProdIdGlobalAccess  OBJECT IDENTIFIER ::= { arrisProducts 6 }  -- Global Access (Fiber) products
+arrisTools			OBJECT IDENTIFIER ::= { arrisProducts 7 }  -- Arris Tools
 arrisProdIdVideo  OBJECT IDENTIFIER ::= { arrisProducts 8 }  -- Video Products (D5 et al)
+
+-- Arris E6 reserved arrisProducts 9 ?
+
+
+
+-- Arris eRouter and Video products
+-- Reserved OIDs [20..29]
+arrisProdIdRouter	OBJECT IDENTIFIER ::= { arrisProducts 20 }  -- Arris Router/Gateway products (non-video)
+arrisProdIdMG		OBJECT IDENTIFIER ::= { arrisProducts 25 }  -- Arris Multimedia Gateway and IP STB Products
+
+
+-- Arris Assurance products
+-- Reserved OIDs [30..39]
+arrisProdIdAssurance       OBJECT IDENTIFIER ::= { arrisProducts 30 }  -- Arris Assurance products
+
+
+-- Arris OnDemand products - i.e. Video Server, Ad Insertion, CMM
+-- Reserved OIDs [40..49]
+arrisSME        OBJECT IDENTIFIER ::= { arrisProducts 40 } --ARRIS Streaming Media Engine
+
+-- Arris FMC products
+-- Reserved OIDs [50..59]
 
 
 
 -- Product Identifiers for the CM product line
-tcm  OBJECT IDENTIFIER ::= { arrisProdIdCM 8 }      -- Touchstone Cable Modem
-ttm  OBJECT IDENTIFIER ::= { arrisProdIdCM 9 }      -- Touchstone Telephony Modem 
-ttp  OBJECT IDENTIFIER ::= { arrisProdIdCM 10 }     -- Touchstone Telephony Port
+tcm             OBJECT IDENTIFIER ::= { arrisProdIdCM 8 }      -- Touchstone Cable Modem
+ttm             OBJECT IDENTIFIER ::= { arrisProdIdCM 9 }      -- Touchstone Telephony Modem 
+ttp             OBJECT IDENTIFIER ::= { arrisProdIdCM 10 }     -- Touchstone Telephony Port
+-- MIB Identifiers for the CM product
+arrisMtaDevMib         OBJECT IDENTIFIER ::= { arrisProdIdCM 3 }
+arrisCmDoc30Mib        OBJECT IDENTIFIER ::= { arrisProdIdCM 4 }
+arrisMtaDoc30Mib       OBJECT IDENTIFIER ::= { arrisProdIdCM 5 }
+arrisSpeedTestMib      OBJECT IDENTIFIER ::= { arrisProdIdCM 6 }
+arrisTR69Mib           OBJECT IDENTIFIER ::= { arrisProdIdCM 7 }
+arrisQamDetectionMib   OBJECT IDENTIFIER ::= { arrisProdIdCM 12 }
+arrisNetPerfMonitorMib OBJECT IDENTIFIER ::= { arrisProdIdCM 13 }
+arrisKddiFeatMib       OBJECT IDENTIFIER ::= { arrisProdIdCM 14 }
+arrisDectMib           OBJECT IDENTIFIER ::= { arrisProdIdCM 15 }
+arrisHorizOvertempProtModeMib        OBJECT IDENTIFIER ::= { arrisProdIdCM 16 }
 
 -- Product Identifiers for the CMTS product line
-cmtsMSAS   OBJECT IDENTIFIER ::= { arrisProdIdCMTS 1 } -- CMTS MultiService Access System
+cmtsMSAS OBJECT IDENTIFIER ::= { arrisProdIdCMTS 1 } -- CMTS MultiService Access System    
 cmts1500   OBJECT IDENTIFIER ::= { arrisProdIdCMTS 2 } -- CMTS 1500
 cmtsC3     OBJECT IDENTIFIER ::= { arrisProdIdCMTS 3 } -- C3 CMTS
 cmtsC4     OBJECT IDENTIFIER ::= { arrisProdIdCMTS 4 } -- C4 CMTS
@@ -106,10 +102,7 @@ arrisGlobalAccessMib OBJECT IDENTIFIER ::= { arrisProdIdGlobalAccess 1 }
 -- add Global Access sysObjectId values here.
 arrisGlobalAccessProductUas OBJECT IDENTIFIER ::= { arrisProdIdGlobalAccess 2 } -- FttH Universal Access Switch
 
--- add Video Product sysObjectId values here.
-arrisD5UEQam OBJECT IDENTIFIER ::= { arrisProdIdVideo 1 } -- D5 WAN card
 
--- add D5AM Video Product sysObjectId values here.
-arrisD5AM OBJECT IDENTIFIER ::= { arrisProdIdVideo 2 } -- D5 Application Manager
 
 END
+
