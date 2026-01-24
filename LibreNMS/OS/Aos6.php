@@ -180,20 +180,20 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
             $authId = sprintf('%d-%s-%d', $ifIndex, $macNoSep, $vlan);
 
             $nac->push(new PortsNac([
-                'port_id'      => $portId,
-                'auth_id'      => $authId,
-                'domain'       => ($profile !== '' && $profile !== '--') ? $profile : 'UNP',
-                'username'     => $username,
-                'mac_address'  => $macNoSep,
-                'ip_address'   => $ip, // never null (DB constraint)
-                'host_mode'    => $hostMode,
+                'port_id' => $portId,
+                'auth_id' => $authId,
+                'domain' => ($profile !== '' && $profile !== '--') ? $profile : 'UNP',
+                'username' => $username,
+                'mac_address' => $macNoSep,
+                'ip_address' => $ip, // never null (DB constraint)
+                'host_mode' => $hostMode,
                 'authz_status' => $authzStatus,
-                'authz_by'     => $authBy,
+                'authz_by' => $authBy,
                 'authc_status' => $authcStatus,
-                'method'       => $method,
-                'timeout'      => 0,
-                'time_left'    => null,
-                'vlan'         => $vlan,
+                'method' => $method,
+                'timeout' => 0,
+                'time_left' => null,
+                'vlan' => $vlan,
                 'time_elapsed' => $timeElapsed > 0 ? $timeElapsed : null,
             ]));
         }
