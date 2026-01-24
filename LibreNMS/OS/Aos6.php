@@ -124,7 +124,7 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
         // Best-effort "Auth By" from configured RADIUS servers (not per-session)
         $authBy = $this->getConfiguredRadiusServersString() ?: 'RADIUS';
 
-        foreach ($rows as $index => $row) {
+        foreach ($rows as $row) {
             $slot = (int) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusSlotNumber') ?? 0);
             $port = (int) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusPortNumber') ?? 0);
             if ($slot <= 0 || $port <= 0) {
@@ -230,7 +230,7 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
         foreach ($entityData as $eIndex => $entry) {
             $name = $entry['entPhysicalName'] ?? '';
             // Match "NI-1", "NI-2", etc.
-            if (preg_match('/^NI-(\d+)$/', $name, $matches)) {
+            if (preg_match('/^NI-(\d+)$/', (string) $name, $matches)) {
                 $slotMap[$eIndex] = (int) $matches[1];
             }
         }
@@ -238,7 +238,7 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
         // 4. Build a Map: Calculated ifIndex -> Entity Data
         // AOS6 ifIndex = (Slot * 1000) + Port
         $entityByIfIndex = [];
-        foreach ($entityData as $eIndex => $entry) {
+        foreach ($entityData as $entry) {
             $parentIndex = $entry['entPhysicalContainedIn'] ?? 0;
             $portNum = $entry['entPhysicalParentRelPos'] ?? 0;
 
