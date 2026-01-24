@@ -29,7 +29,7 @@ For snmp.community, this is the definition:
     "group": "poller",
     "section": "snmp",
     "order": 2,
-    "type": "array",
+    "type": "list",
     "default": [
         "public"
     ]
@@ -54,7 +54,11 @@ types can be defined and implemented in a vue.js component
 * `string`: A string
 * `integer`: A number
 * `boolean`: A simple toggle switch
-* `array`: A list of values that can be added, removed, and re-ordered.
+* `list`: A list of values that can be added, removed, and re-ordered.
+* `map`: A simple key/value map (uses SettingMap)
+* `nested-map`: A nested key/value structure (uses SettingNestedMap)
+* `array-sub-keyed`: Legacy nested map type (uses SettingArraySubKeyed). Deprecated; use `nested-map`.
+* `array`: Legacy list type (uses SettingArray). Deprecated; use `list`.
 * `select`: A dropdown box with predefined options. Requires the option field.
 * `email`: Will validate the input is the correct format for an email
 * `password`: Will mask the value of the input (but does not keep it fully private)

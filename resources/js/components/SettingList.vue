@@ -1,8 +1,7 @@
 <!--
-  - SettingArray.vue
+  - SettingList.vue
   -
-  - @deprecated Use SettingList.vue (type: 'list') for new settings.
-  -             This component is kept for backwards compatibility with 'array' type.
+  - Component for editing list (array) type settings with drag-and-drop reordering.
   -
   - This program is free software: you can redistribute it and/or modify
   - it under the terms of the GNU General Public License as published by
@@ -71,7 +70,7 @@
     import draggable from 'vuedraggable'
 
     export default {
-        name: "SettingArray",
+        name: "SettingList",
         mixins: [BaseSetting],
         components: {
             draggable,

@@ -119,6 +119,7 @@
                                     "integer",
                                     "text",
                                     "boolean",
+                                    "list",
                                     "array",
                                     "map",
                                     "nested-map",

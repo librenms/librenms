@@ -128,7 +128,8 @@ class DynamicConfigItem implements \ArrayAccess
             }
 
             return filter_var($value, FILTER_VALIDATE_EMAIL);
-        } elseif ($this->type == 'array') {
+        } elseif ($this->type == 'list' || $this->type == 'array') {
+            // Note: 'array' is deprecated, kept for backwards compatibility. Use 'list' for new settings.
             return is_array($value); // this should probably have more complex validation via validator rules
         } elseif ($this->type == 'color') {
             return (bool) preg_match('/^#?[0-9a-fA-F]{6}([0-9a-fA-F]{2})?$/', (string) $value);

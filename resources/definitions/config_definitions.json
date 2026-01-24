@@ -31,7 +31,7 @@
             "type": "boolean"
         },
         "alert.macros.rule": {
-            "type": "array",
+            "type": "list",
             "validate": {
                  "value": "array",
                  "value.*": "string"
@@ -172,7 +172,7 @@
             "type": "integer"
         },
         "alerts.bgp.whitelist": {
-            "type": "array"
+            "type": "list"
         },
         "alerts.email.default_only": {
             "type": "boolean"
@@ -317,7 +317,7 @@
             "group": "webui",
             "section": "graph",
             "order": 6,
-            "type": "array"
+            "type": "list"
         },
         "api.cors.allowheaders": {
             "default": [
@@ -330,7 +330,7 @@
             "group": "api",
             "section": "cors",
             "order": 4,
-            "type": "array"
+            "type": "list"
         },
         "api.cors.allowcredentials": {
             "default": false,
@@ -350,7 +350,7 @@
             "group": "api",
             "section": "cors",
             "order": 2,
-            "type": "array"
+            "type": "list"
         },
         "api.cors.enabled": {
             "default": false,
@@ -371,7 +371,7 @@
             "group": "api",
             "section": "cors",
             "order": 5,
-            "type": "array"
+            "type": "list"
         },
         "api.cors.maxage": {
             "default": 86400,
@@ -389,7 +389,7 @@
             "group": "api",
             "section": "cors",
             "order": 3,
-            "type": "array"
+            "type": "list"
         },
         "apps.powerdns-recursor.api-key": {
             "type": "text",
@@ -552,7 +552,7 @@
             "group": "auth",
             "section": "socialite",
             "order": 4,
-            "type": "array"
+            "type": "list"
         },
         "auth.socialite.default_role": {
             "group": "auth",
@@ -915,7 +915,7 @@
             "type": "boolean"
         },
         "autodiscovery.cdp_exclude.platform_regexp": {
-            "type": "array",
+            "type": "list",
             "default": [],
             "group": "discovery",
             "section": "autodiscovery",
@@ -929,7 +929,7 @@
             "group": "discovery",
             "section": "autodiscovery",
             "order": 2,
-            "type": "array",
+            "type": "list",
             "default": [
                 "0.0.0.0/8",
                 "127.0.0.0/8",
@@ -960,7 +960,7 @@
             "order": 4
         },
         "autodiscovery.xdp_exclude.sysdesc_regexp": {
-            "type": "array",
+            "type": "list",
             "default": [],
             "group": "discovery",
             "section": "autodiscovery",
@@ -971,7 +971,7 @@
             }
         },
         "autodiscovery.xdp_exclude.sysname_regexp": {
-            "type": "array",
+            "type": "list",
             "default": [],
             "group": "discovery",
             "section": "autodiscovery",
@@ -983,7 +983,7 @@
         },
         "bad_entity_sensor_regex": {
             "default": null,
-            "type": "array",
+            "type": "list",
             "validate": {
                 "value": "array",
                 "value.*": "is_regex"
@@ -994,10 +994,10 @@
         },
         "bad_disk_regexp": {
             "default": [],
-            "type": "array"
+            "type": "list"
         },
         "bad_if": {
-            "type": "array",
+            "type": "list",
             "group": "discovery",
             "section": "ports",
             "order": 1,
@@ -1027,7 +1027,7 @@
             ]
         },
         "bad_if_regexp": {
-            "type": "array",
+            "type": "list",
             "group": "discovery",
             "section": "ports",
             "order": 2,
@@ -1041,7 +1041,7 @@
             }
         },
         "bad_ifalias_regexp": {
-            "type": "array",
+            "type": "list",
             "group": "discovery",
             "section": "ports",
             "order": 6,
@@ -1052,7 +1052,7 @@
             }
         },
         "bad_ifname_regexp": {
-            "type": "array",
+            "type": "list",
             "group": "discovery",
             "section": "ports",
             "order": 7,
@@ -1063,7 +1063,7 @@
             }
         },
         "bad_iftype": {
-            "type": "array",
+            "type": "list",
             "group": "discovery",
             "section": "ports",
             "order": 3,
@@ -1084,7 +1084,7 @@
             ]
         },
         "bad_ifoperstatus": {
-            "type": "array",
+            "type": "list",
             "group": "discovery",
             "section": "ports",
             "order": 4,
@@ -1113,7 +1113,7 @@
             "default": {
                 "default": {}
             },
-            "type": "array",
+            "type": "list",
             "validate": {
                 "value": "array",
                 "value.*": "array"
@@ -1147,7 +1147,7 @@
         },
         "core_descr": {
             "default": ["core"],
-            "type": "array",
+            "type": "list",
             "group": "webui",
             "section": "port-descr",
             "order": 2
@@ -1158,7 +1158,7 @@
         },
         "custom_descr": {
             "default": [""],
-            "type": "array",
+            "type": "list",
             "group": "webui",
             "section": "port-descr",
             "order": 4
@@ -1290,7 +1290,7 @@
         },
         "custom_map.legend_colours": {
             "default": null,
-            "type": "array",
+            "type": "list",
             "validate": {
                  "value": "array",
                  "value.*": "string"
@@ -1385,7 +1385,7 @@
         },
         "customers_descr": {
             "default": ["cust"],
-            "type": "array",
+            "type": "list",
             "group": "webui",
             "section": "port-descr",
             "order": 3
@@ -1499,7 +1499,7 @@
                 "/null/",
                 "/dummy/"
             ],
-            "type": "array"
+            "type": "list"
         },
         "device_traffic_iftype": {
             "default": [
@@ -1511,7 +1511,7 @@
                 "/l2vlan/",
                 "/ppp/"
             ],
-            "type": "array",
+            "type": "list",
             "group": "webui",
             "section": "graph",
             "order": 8
@@ -1584,7 +1584,7 @@
                     "type": "workstation"
                 }
             ],
-            "type": "array",
+            "type": "list",
             "validate": {
                 "value": "array",
                 "value.*.icon": "required|string",
@@ -1594,14 +1594,14 @@
         },
         "disabled_sensors": {
             "default": null,
-            "type": "array",
+            "type": "list",
             "group": "discovery",
             "section": "sensors",
             "order": 1
         },
         "disabled_sensors_regex": {
             "default": null,
-            "type": "array",
+            "type": "list",
             "validate": {
                 "value": "array",
                 "value.*": "is_regex"
@@ -1995,7 +1995,7 @@
                 2592000,
                 31536000
             ],
-            "type": "array",
+            "type": "list",
             "validate": {
                 "value": "array",
                 "value.*": "int"
@@ -2505,7 +2505,7 @@
         },
         "good_if": {
             "default": null,
-            "type": "array",
+            "type": "list",
             "group": "discovery",
             "section": "ports",
             "order": 8
@@ -2526,7 +2526,7 @@
                 "5151A3",
                 "3D3D99"
             ],
-            "type": "array"
+            "type": "list"
         },
         "graph_colours.default": {
             "default": [
@@ -2537,7 +2537,7 @@
                 "202048",
                 "000033"
             ],
-            "type": "array"
+            "type": "list"
         },
         "graph_colours.greens": {
             "default": [
@@ -2548,7 +2548,7 @@
                 "49A81E",
                 "0C990C"
             ],
-            "type": "array"
+            "type": "list"
         },
         "graph_colours.manycolours": {
             "default": [
@@ -2588,7 +2588,7 @@
                 "BC1C39",
                 "B30023"
             ],
-            "type": "array"
+            "type": "list"
         },
         "graph_colours.mixed": {
             "default": [
@@ -2601,7 +2601,7 @@
                 "FF0084",
                 "91B13C"
             ],
-            "type": "array"
+            "type": "list"
         },
         "graph_colours.oranges": {
             "default": [
@@ -2614,7 +2614,7 @@
                 "FB9700",
                 "FFA700"
             ],
-            "type": "array"
+            "type": "list"
         },
         "graph_colours.pinks": {
             "default": [
@@ -2625,7 +2625,7 @@
                 "5C1F1E",
                 "401F10"
             ],
-            "type": "array"
+            "type": "list"
         },
         "graph_colours.psychedelic": {
             "default": [
@@ -2662,7 +2662,7 @@
                 "FB9700",
                 "FFA700"
             ],
-            "type": "array"
+            "type": "list"
         },
         "graph_colours.purples": {
             "default": [
@@ -2673,7 +2673,7 @@
                 "5B185B",
                 "3F003F"
             ],
-            "type": "array"
+            "type": "list"
         },
         "graph_colours.rainbow": {
             "default": [
@@ -2690,7 +2690,7 @@
                 "3366BB",
                 "663399"
             ],
-            "type": "array"
+            "type": "list"
         },
         "graph_colours.rainbow_stats_green": {
             "default": [
@@ -2706,7 +2706,7 @@
                 "44DD88",
                 "663399"
             ],
-            "type": "array"
+            "type": "list"
         },
         "graph_colours.rainbow_stats_purple": {
             "default": [
@@ -2722,7 +2722,7 @@
                 "44DD88",
                 "99DD55"
             ],
-            "type": "array"
+            "type": "list"
         },
         "graph_colours.varied": {
             "default": [
@@ -2735,7 +2735,7 @@
                 "663399",
                 "00BFFF"
             ],
-            "type": "array"
+            "type": "list"
         },
         "graph_descr.device_processor": {
             "default": "This is an aggregate graph of all processors in the system.",
@@ -4393,7 +4393,7 @@
                 "month": "One Month",
                 "year": "One Year"
             },
-            "type": "array"
+            "type": "list"
         },
         "graphs.mini.widescreen": {
             "default": {
@@ -4406,7 +4406,7 @@
                 "year": "One Year",
                 "twoyear": "Two Years"
             },
-            "type": "array"
+            "type": "list"
         },
         "graphs.port_speed_zoom": {
             "default": false,
@@ -4427,7 +4427,7 @@
                 "year": "One Year",
                 "twoyear": "Two Years"
             },
-            "type": "array"
+            "type": "list"
         },
         "graylog.base_uri": {
             "type": "text",
@@ -4535,7 +4535,7 @@
         },
         "html.device.links": {
             "default": [],
-            "type": "array",
+            "type": "list",
             "validate": {
                 "value": "array",
                 "value.*": "array",
@@ -4621,7 +4621,7 @@
             "order": 6,
             "default": [
             ],
-            "type": "array"
+            "type": "list"
         },
         "ignore_junos_os_drives": {
             "group": "discovery",
@@ -4629,7 +4629,7 @@
             "order": 7,
             "default": [
             ],
-            "type": "array"
+            "type": "list"
         },
         "ignore_mount": {
             "group": "discovery",
@@ -4644,7 +4644,7 @@
                 "/compat/linux/sys",
                 "/sys/fs/cgroup"
             ],
-            "type": "array"
+            "type": "list"
         },
         "ignore_mount_type": {
             "group": "discovery",
@@ -4655,7 +4655,7 @@
                 "hrStorageNetworkDisk",
                 "hrStorageCompactDisc"
             ],
-            "type": "array"
+            "type": "list"
         },
         "ignore_mount_regexp": {
             "group": "discovery",
@@ -4675,7 +4675,7 @@
                 "/^\\/Volumes\\/OS X Base System/",
                 "/^\\/run\\/user\\//"
             ],
-            "type": "array",
+            "type": "list",
             "validate": {
                 "value": "array",
                 "value.*": "is_regex"
@@ -4694,7 +4694,7 @@
                 "UMA",
                 "MALLOC"
             ],
-            "type": "array"
+            "type": "list"
         },
         "ignore_unmapable_port": {
             "default": false,
@@ -4778,7 +4778,7 @@
         },
         "influxdb.measurements": {
             "default": [],
-            "type": "array",
+            "type": "list",
             "validate": {
                 "value": "array",
                 "value.*": "string"
@@ -4873,7 +4873,7 @@
             "group": "poller",
             "section": "influxdbv2",
             "order": 10,
-            "type": "array",
+            "type": "list",
             "default": [
             ]
         },
@@ -4885,7 +4885,7 @@
             "order": 0
         },
         "kafka.groups-exclude": {
-            "type": "array",
+            "type": "list",
             "group": "poller",
             "section": "kafka",
             "validate": {
@@ -4895,7 +4895,7 @@
             "order": 1
         },
         "kafka.measurement-exclude": {
-            "type": "array",
+            "type": "list",
             "group": "poller",
             "section": "kafka",
             "validate": {
@@ -5107,7 +5107,7 @@
                 "imb",
                 "open"
             ],
-            "type": "array",
+            "type": "list",
             "group": "discovery",
             "section": "ipmi",
             "order": 0
@@ -5151,7 +5151,7 @@
             "type": "integer"
         },
         "irc_chan": {
-            "type": "array"
+            "type": "list"
         },
         "irc_ctcp": {
             "default": false,
@@ -5213,7 +5213,7 @@
                 "qemu+ssh",
                 "xen+ssh"
             ],
-            "type": "array",
+            "type": "list",
             "group": "discovery",
             "section": "virtualization",
             "order": 2
@@ -5360,7 +5360,7 @@
             "type": "directory"
         },
         "nets": {
-            "type": "array",
+            "type": "list",
             "default": [],
             "group": "discovery",
             "section": "autodiscovery",
@@ -5382,7 +5382,7 @@
                 "xdp",
                 "mac"
             ],
-            "type": "array"
+            "type": "list"
         },
         "network_map_legend": {
             "default": {
@@ -5427,7 +5427,7 @@
                     "borderWidth": 3
                 }
             },
-            "type": "array"
+            "type": "list"
         },
         "network_map_show_on_worldmap": {
             "default": false,
@@ -5484,7 +5484,7 @@
             "group": "external",
             "section": "nfsen",
             "order": 2,
-            "type": "array"
+            "type": "list"
         },
         "nfsen_subdirlayout": {
             "default": 1,
@@ -5531,7 +5531,7 @@
             "group": "external",
             "section": "nfsen",
             "order": 6,
-            "type": "array"
+            "type": "list"
         },
         "nfsen_top_default": {
             "default": 20,
@@ -5585,7 +5585,7 @@
             "group": "external",
             "section": "nfsen",
             "order": 10,
-            "type": "array"
+            "type": "list"
         },
         "nfsen_split_char": {
             "group": "external",
@@ -5671,7 +5671,7 @@
                     "text": "Memory Usage"
                 }
             ],
-            "type": "array"
+            "type": "list"
         },
         "os_group.unix.over": {
             "default": [
@@ -5684,7 +5684,7 @@
                     "text": "Memory Usage"
                 }
             ],
-            "type": "array"
+            "type": "list"
         },
         "os_group.unix.processor_stacked": {
             "default": true,
@@ -5749,7 +5749,7 @@
         },
         "oxidized.ignore_os": {
             "default": [],
-            "type": "array",
+            "type": "list",
             "group": "external",
             "section": "oxidized",
             "order": 7,
@@ -5760,7 +5760,7 @@
         },
         "oxidized.ignore_types": {
             "default": [],
-            "type": "array",
+            "type": "list",
             "group": "external",
             "section": "oxidized",
             "order": 8,
@@ -5906,7 +5906,7 @@
             "default": [
                 "peering"
             ],
-            "type": "array",
+            "type": "list",
             "group": "webui",
             "section": "port-descr",
             "order": 0
@@ -6459,7 +6459,7 @@
             "group": "auth",
             "section": "radius",
             "order": 3,
-            "type": "array"
+            "type": "list"
         },
         "radius.enforce_roles": {
             "default": true,
@@ -6470,7 +6470,7 @@
         },
         "rancid_configs": {
             "default": [],
-            "type": "array",
+            "type": "list",
             "group": "external",
             "section": "rancid",
             "order": 0
@@ -6925,7 +6925,7 @@
             "group": "poller",
             "section": "snmp",
             "order": 2,
-            "type": "array",
+            "type": "list",
             "default": [
                 "public"
             ]
@@ -6956,14 +6956,14 @@
             "group": "poller",
             "section": "snmp",
             "order": 20,
-            "type": "array",
+            "type": "list",
             "default": []
         },
         "snmp.oids.unordered": {
             "group": "poller",
             "section": "snmp",
             "order": 21,
-            "type": "array",
+            "type": "list",
             "default": []
         },
         "snmp.timeout": {
@@ -6991,7 +6991,7 @@
             "group": "poller",
             "section": "snmp",
             "order": 0,
-            "type": "array",
+            "type": "list",
             "default": [
                 "udp",
                 "udp6",
@@ -7024,7 +7024,7 @@
             "group": "poller",
             "section": "snmp",
             "order": 1,
-            "type": "array",
+            "type": "list",
             "default": [
                 "v2c",
                 "v3",
@@ -7174,7 +7174,7 @@
         },
         "sso.trusted_proxies":{
             "default": [],
-            "type": "array",
+            "type": "list",
             "group": "auth",
             "section": "sso",
             "validate": {
@@ -7222,7 +7222,7 @@
                 "ipSystemStatsTable node ipSystemStatsOutFragOKs not implemented",
                 "diskio.c"
             ],
-            "type": "array"
+            "type": "list"
         },
         "syslog_purge": {
             "default": 30,
@@ -7233,7 +7233,7 @@
             "type": "integer"
         },
         "syslog_xlate": {
-            "type": "array"
+            "type": "list"
         },
         "temp_dir": {
             "type": "directory"
@@ -7261,7 +7261,7 @@
         },
         "transit_descr": {
             "default": ["transit"],
-            "type": "array",
+            "type": "list",
             "group": "webui",
             "section": "port-descr",
             "order": 1
@@ -7403,7 +7403,7 @@
             "default": [],
             "group": "webui",
             "section": "style",
-            "type": "array",
+            "type": "list",
             "order": 4
         },
         "webui.default_dashboard_id": {

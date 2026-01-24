@@ -95,6 +95,7 @@ export default {
                             'text',
                             'email',
                             'password',
+                            'list',
                             'array',
                             'map',
                             'nested-map',
