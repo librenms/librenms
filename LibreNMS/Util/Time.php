@@ -205,7 +205,7 @@ class Time
     }
 
     /**
-     * Returns current time
+     * Returns current time in the server's timezone
      */
     public static function now(): Carbon
     {
@@ -213,11 +213,22 @@ class Time
     }
 
     /**
-     * Returns server time from unix timestamp
+     * Convert a timestamp to a time object in the server's timezone
      */
     public static function fromTimestamp(int $timestamp): Carbon
     {
         return Carbon::createFromTimestamp($timestamp);
+    }
+
+    /**
+     * Parse a time string into a time object in the server's timezone.
+     *
+     * ISO8601 strings in Zulu timezone are parsed correctly here
+     * Time strings without a timezone will be assumed to already be in the server timezone.
+     */
+    public static function parse(string $time): Carbon
+    {
+        return Carbon::parse($time)->setTimezone(date_default_timezone_get());
     }
 
     /**
@@ -229,44 +240,18 @@ class Time
     }
 
     /**
-     * Convert a time string from the DB to server time
-     * DB time is the same as local time, so we just parse the time
-     */
-    public static function fromDb(string $time): Carbon
-    {
-        return Carbon::parse($time);
-    }
-
-    /**
-     * Converts from PHP to the DB timezone
-     * DB time is the same as server time, so this does nothing
-     */
-    public static function toDb(Carbon $input): Carbon
-    {
-        return $input;
-    }
-
-    /**
-     * Convert a time string from an ISO string to server time
-     */
-    public static function fromIso(string $time): Carbon
-    {
-        return Carbon::parse($time)->setTimezone(date_default_timezone_get());
-    }
-
-    /**
-     * Return IOS date string
+     * Return ISO date string
      */
     public static function toIso(Carbon $input): string
     {
-        return $input->toISOString();
+        return $input->toIso8601ZuluString();
     }
 
     /**
-     * Converts from PHP to the user timezone
+     * Format a timestamp for display to users in their selected timezone
      */
-    public static function toUser(Carbon $input): Carbon
+    public static function format(Carbon $input, string $format): string
     {
-        return $input->setTimezone(session('preferences.timezone'));
+        return $input->setTimezone(session('preferences.timezone'))->format($format);
     }
 }
