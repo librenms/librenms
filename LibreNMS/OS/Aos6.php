@@ -105,7 +105,7 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
 
         // Infer host_mode by counting successful auth sessions per ifIndex
         $successCountByIfIndex = [];
-        foreach ($rows as $index => $row) {
+        foreach ($rows as $row) {
             $slot = (int) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusSlotNumber') ?? 0);
             $port = (int) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusPortNumber') ?? 0);
             if ($slot <= 0 || $port <= 0) {
