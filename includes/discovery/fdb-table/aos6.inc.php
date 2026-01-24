@@ -37,7 +37,7 @@ use LibreNMS\Util\Mac;
  * * Special handling for AOS6 LAG "phantom" bridge ports (e.g. 4098, 4100)
  * - Optional remap physical member -> parent LAG using IF-MIB::ifStackStatus
  */
-$fdbPort_table = $fdbPort_table ?? [];
+$fdbPort_table ??= [];
 $vlans_dict = (isset($vlans_dict) && is_array($vlans_dict)) ? $vlans_dict : [];
 
 // Build per-VLAN FDB table (prefer vendor MIB for VLAN accuracy)
@@ -193,7 +193,7 @@ foreach ($fdbPort_table as $vlan => $data) {
 
         try {
             $mac_address = Mac::parse($mac)->hex();
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             continue;
         }
 
