@@ -747,7 +747,7 @@ function dynamic_override_config($type, $name, $device)
     if ($type == 'checkbox') {
         return '<input type="checkbox" id="override_config" name="override_config" data-attrib="' . htmlentities((string) $name) . '" data-device_id="' . $device['device_id'] . '" data-size="small" ' . $checked . '>';
     } elseif ($type == 'text') {
-        return '<input type="text" id="override_config_text" name="override_config_text" data-attrib="' . htmlentities((string) $name) . '" data-device_id="' . $device['device_id'] . '" value="' . htmlentities((string) $attrib_val) . '">';
+        return '<input class="form-control" type="text" id="override_config_text" name="override_config_text" data-attrib="' . htmlentities((string) $name) . '" data-device_id="' . $device['device_id'] . '" value="' . htmlentities((string) $attrib_val) . '">';
     }
 }//end dynamic_override_config()
 
