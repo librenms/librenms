@@ -26250,6 +26250,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Accton",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -26269,6 +26270,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "3Y POWER",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -26288,6 +26290,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -26307,7 +26310,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "Fiberstore",
-                    "ifIndex": 10034
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10015,
@@ -26326,7 +26330,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10092
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10021,
@@ -26345,7 +26350,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "IBM-Amphenol",
-                    "ifIndex": 10017
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10023,
@@ -26364,7 +26370,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "IBM-Amphenol",
-                    "ifIndex": 10025
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10024,
@@ -26383,7 +26390,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 24,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10029
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10026,
@@ -26402,7 +26410,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 26,
                     "entPhysicalMfgName": "Molex Inc.",
-                    "ifIndex": 10122
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10030,
@@ -26421,7 +26430,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 30,
                     "entPhysicalMfgName": "Amphenol",
-                    "ifIndex": 10005
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10031,
@@ -26440,7 +26450,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 31,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10009
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10032,
@@ -26459,7 +26470,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 32,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10013
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 }
             ]
         },
@@ -26946,7 +26958,7 @@
                     "model": "QSFP28-SR4-100G",
                     "revision": "1A",
                     "serial": "Z9999999999",
-                    "date": "2018-09-05",
+                    "date": "180905",
                     "ddm": 1,
                     "encoding": "enc-nrz",
                     "cable": null,
@@ -26965,7 +26977,7 @@
                     "model": "00D5803-N13692A",
                     "revision": "H",
                     "serial": "ZZ99ZZ9999ZZ",
-                    "date": "2013-03-16",
+                    "date": "130316",
                     "ddm": 0,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,
@@ -26984,7 +26996,7 @@
                     "model": "00D5803-N13692A",
                     "revision": "H",
                     "serial": "ZZ99ZZ9999ZZ",
-                    "date": "2013-03-16",
+                    "date": "130316",
                     "ddm": 0,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,
@@ -27003,7 +27015,7 @@
                     "model": "Q28-PC03",
                     "revision": "A",
                     "serial": "Z9999999999-9",
-                    "date": "2018-08-03",
+                    "date": "180803",
                     "ddm": 0,
                     "encoding": "enc-unspecified",
                     "cable": null,
@@ -27022,7 +27034,7 @@
                     "model": "74757-1101",
                     "revision": "",
                     "serial": "999999999",
-                    "date": "2012-02-15",
+                    "date": "120215",
                     "ddm": 0,
                     "encoding": "enc-unspecified",
                     "cable": null,
@@ -27041,7 +27053,7 @@
                     "model": "NDAAFF-0003",
                     "revision": "A",
                     "serial": "ZZZ99999999Z9Z",
-                    "date": "2017-10-11",
+                    "date": "171011",
                     "ddm": 0,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,
@@ -27060,7 +27072,7 @@
                     "model": "QSFP28-SR4-100G",
                     "revision": "1A",
                     "serial": "Z9999999999",
-                    "date": "2022-04-09",
+                    "date": "220409",
                     "ddm": 1,
                     "encoding": "enc-nrz",
                     "cable": null,
@@ -27079,7 +27091,7 @@
                     "model": "Q28-PC005",
                     "revision": "A",
                     "serial": "Z9999999999-9",
-                    "date": "2022-03-08",
+                    "date": "220308",
                     "ddm": 0,
                     "encoding": "enc-unspecified",
                     "cable": null,
@@ -27098,7 +27110,7 @@
                     "model": "QSFP28-SR4-100G",
                     "revision": "A4",
                     "serial": "Z9999999999",
-                    "date": "2017-11-07",
+                    "date": "171107",
                     "ddm": 1,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,

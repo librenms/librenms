@@ -14365,6 +14365,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -14384,7 +14385,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 5003
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10004,
@@ -14403,7 +14405,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "PRECISION",
-                    "ifIndex": 5002
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10009,
@@ -14422,7 +14425,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10017
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10010,
@@ -14441,7 +14445,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10021
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10011,
@@ -14460,7 +14465,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10025
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10012,
@@ -14479,7 +14485,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10029
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10013,
@@ -14498,7 +14505,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10033
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10014,
@@ -14517,7 +14525,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10037
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10021,
@@ -14536,7 +14545,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 5020
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10022,
@@ -14555,7 +14565,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 22,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 5021
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10023,
@@ -14574,7 +14585,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 5022
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10024,
@@ -14593,7 +14605,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 24,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 5023
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 }
             ]
         },
@@ -15193,7 +15206,7 @@
                     "model": "QSFP28-ER4-100G",
                     "revision": "01",
                     "serial": "C2207340033",
-                    "date": "2022-09-17",
+                    "date": "220917",
                     "ddm": 1,
                     "encoding": "enc-nrz",
                     "cable": null,
@@ -15212,7 +15225,7 @@
                     "model": "QSFP28-ER4-100G",
                     "revision": "01",
                     "serial": "C2207340037",
-                    "date": "2022-09-17",
+                    "date": "220917",
                     "ddm": 1,
                     "encoding": "enc-nrz",
                     "cable": null,
@@ -15231,7 +15244,7 @@
                     "model": "Q28-100/112G-20",
                     "revision": "01",
                     "serial": "C2207340052",
-                    "date": "2022-09-17",
+                    "date": "220917",
                     "ddm": 1,
                     "encoding": "enc-nrz",
                     "cable": null,
@@ -15250,7 +15263,7 @@
                     "model": "Q28-100/112G-20",
                     "revision": "01",
                     "serial": "C2207340050",
-                    "date": "2022-09-17",
+                    "date": "220917",
                     "ddm": 1,
                     "encoding": "enc-nrz",
                     "cable": null,
@@ -15269,7 +15282,7 @@
                     "model": "Q28-100/112G-20",
                     "revision": "01",
                     "serial": "C2207340051",
-                    "date": "2022-09-17",
+                    "date": "220917",
                     "ddm": 1,
                     "encoding": "enc-nrz",
                     "cable": null,
@@ -15288,7 +15301,7 @@
                     "model": "QSFP28-SR4-100G",
                     "revision": "1A",
                     "serial": "G2240009709",
-                    "date": "2022-11-01",
+                    "date": "221101",
                     "ddm": 1,
                     "encoding": "enc-nrz",
                     "cable": null,
@@ -15307,7 +15320,7 @@
                     "model": "QSFP28-SR4-100G",
                     "revision": "1A",
                     "serial": "C2308132559",
-                    "date": "2023-08-08",
+                    "date": "230808",
                     "ddm": 1,
                     "encoding": "enc-nrz",
                     "cable": null,
@@ -15326,7 +15339,7 @@
                     "model": "QSFP28-SR4-100G",
                     "revision": "1A",
                     "serial": "C2308132557",
-                    "date": "2023-08-08",
+                    "date": "230808",
                     "ddm": 1,
                     "encoding": "enc-nrz",
                     "cable": null,
@@ -15345,7 +15358,7 @@
                     "model": "QSFP28-SR4-100G",
                     "revision": "04",
                     "serial": "G2140602253",
-                    "date": "2021-12-16",
+                    "date": "20211216",
                     "ddm": 1,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,
@@ -15364,7 +15377,7 @@
                     "model": "SFP-10GSR-85",
                     "revision": "A",
                     "serial": "C2209528977",
-                    "date": "2022-09-28",
+                    "date": "220928",
                     "ddm": 1,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,
@@ -15383,7 +15396,7 @@
                     "model": "PRE-SFP-T",
                     "revision": "A",
                     "serial": "DC200543720",
-                    "date": "2020-05-21",
+                    "date": "200521",
                     "ddm": 0,
                     "encoding": "enc-8b-or-10b",
                     "cable": null,
@@ -15402,7 +15415,7 @@
                     "model": "QSFP28-ZR4-100G",
                     "revision": "01",
                     "serial": "C2207340024",
-                    "date": "2022-09-16",
+                    "date": "220916",
                     "ddm": 1,
                     "encoding": "enc-nrz",
                     "cable": null,

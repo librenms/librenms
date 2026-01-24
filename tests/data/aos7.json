@@ -76097,7 +76097,7 @@
                     "entPhysicalName": "1/SLOT-1",
                     "entPhysicalHardwareRev": "13",
                     "entPhysicalFirmwareRev": "0.20",
-                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "true",
@@ -76107,6 +76107,7 @@
                     "entPhysicalContainedIn": 209,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Alcatel-Lucent",
+                    "entPhysicalMfgDate": "2016-6-3,15:50:16.0",
                     "ifIndex": null
                 },
                 {
@@ -76126,6 +76127,7 @@
                     "entPhysicalContainedIn": 210,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Alcatel-Lucent",
+                    "entPhysicalMfgDate": "2019-5-29,0:20:41.0",
                     "ifIndex": null
                 },
                 {
@@ -76145,6 +76147,7 @@
                     "entPhysicalContainedIn": 211,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Alcatel-Lucent",
+                    "entPhysicalMfgDate": "2018-9-14,23:22:59.0",
                     "ifIndex": null
                 },
                 {
@@ -76164,6 +76167,7 @@
                     "entPhysicalContainedIn": 212,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Alcatel-Lucent",
+                    "entPhysicalMfgDate": "2018-9-14,16:35:33.0",
                     "ifIndex": null
                 },
                 {
@@ -76183,6 +76187,7 @@
                     "entPhysicalContainedIn": 210,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Alcatel-Lucent",
+                    "entPhysicalMfgDate": "2018-8-1,16:9:2.0",
                     "ifIndex": null
                 },
                 {
@@ -76192,7 +76197,7 @@
                     "entPhysicalName": "1/CMM-A",
                     "entPhysicalHardwareRev": "13",
                     "entPhysicalFirmwareRev": "0.20",
-                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "true",
@@ -76202,6 +76207,7 @@
                     "entPhysicalContainedIn": 209,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Alcatel-Lucent",
+                    "entPhysicalMfgDate": "2016-6-3,15:50:16.0",
                     "ifIndex": null
                 },
                 {
@@ -76221,6 +76227,7 @@
                     "entPhysicalContainedIn": 210,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Alcatel-Lucent",
+                    "entPhysicalMfgDate": "2019-5-29,0:20:41.0",
                     "ifIndex": null
                 },
                 {
@@ -76240,6 +76247,7 @@
                     "entPhysicalContainedIn": 211,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Alcatel-Lucent",
+                    "entPhysicalMfgDate": "2018-9-14,23:22:59.0",
                     "ifIndex": null
                 },
                 {
@@ -76259,6 +76267,7 @@
                     "entPhysicalContainedIn": 212,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Alcatel-Lucent",
+                    "entPhysicalMfgDate": "2018-9-14,16:35:33.0",
                     "ifIndex": null
                 },
                 {
@@ -76278,6 +76287,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Alcatel-Lucent",
+                    "entPhysicalMfgDate": "2016-6-3,15:50:16.0",
                     "ifIndex": null
                 },
                 {
@@ -76286,7 +76296,7 @@
                     "entPhysicalClass": "chassis",
                     "entPhysicalName": "CHASSIS-2",
                     "entPhysicalHardwareRev": "01",
-                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "8.7.277.R01",
                     "entPhysicalAlias": "N/A",
                     "entPhysicalAssetID": "",
@@ -76297,6 +76307,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Alcatel-Lucent",
+                    "entPhysicalMfgDate": "2019-5-29,0:20:41.0",
                     "ifIndex": null
                 },
                 {
@@ -76305,7 +76316,7 @@
                     "entPhysicalClass": "chassis",
                     "entPhysicalName": "CHASSIS-3",
                     "entPhysicalHardwareRev": "03",
-                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "8.7.277.R01",
                     "entPhysicalAlias": "N/A",
                     "entPhysicalAssetID": "",
@@ -76316,6 +76327,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Alcatel-Lucent",
+                    "entPhysicalMfgDate": "2018-9-14,23:22:59.0",
                     "ifIndex": null
                 },
                 {
@@ -76324,7 +76336,7 @@
                     "entPhysicalClass": "chassis",
                     "entPhysicalName": "CHASSIS-4",
                     "entPhysicalHardwareRev": "03",
-                    "entPhysicalFirmwareRev": null,
+                    "entPhysicalFirmwareRev": "",
                     "entPhysicalSoftwareRev": "8.7.277.R01",
                     "entPhysicalAlias": "N/A",
                     "entPhysicalAssetID": "",
@@ -76335,6 +76347,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
                     "entPhysicalMfgName": "Alcatel-Lucent",
+                    "entPhysicalMfgDate": "2018-9-14,16:35:33.0",
                     "ifIndex": null
                 },
                 {
@@ -76354,6 +76367,7 @@
                     "entPhysicalContainedIn": 209,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Alcatel-Lucent Enterprise",
+                    "entPhysicalMfgDate": "2016-4-20,11:29:26.0",
                     "ifIndex": null
                 },
                 {
@@ -76373,6 +76387,7 @@
                     "entPhysicalContainedIn": 209,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Alcatel-Lucent Enterprise",
+                    "entPhysicalMfgDate": "2016-4-20,11:12:55.0",
                     "ifIndex": null
                 },
                 {
@@ -76392,6 +76407,7 @@
                     "entPhysicalContainedIn": 210,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "3Y Power",
+                    "entPhysicalMfgDate": "2012-6-10,15:2:23.0",
                     "ifIndex": null
                 },
                 {
@@ -76411,6 +76427,7 @@
                     "entPhysicalContainedIn": 210,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Alcatel-Lucent Enterprise",
+                    "entPhysicalMfgDate": "2018-6-30,5:29:55.0",
                     "ifIndex": null
                 },
                 {
@@ -76430,6 +76447,7 @@
                     "entPhysicalContainedIn": 211,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Alcatel-Lucent Enterprise",
+                    "entPhysicalMfgDate": "2018-6-30,5:27:30.0",
                     "ifIndex": null
                 },
                 {
@@ -76449,6 +76467,7 @@
                     "entPhysicalContainedIn": 211,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Alcatel-Lucent Enterprise",
+                    "entPhysicalMfgDate": "2018-6-30,5:31:7.0",
                     "ifIndex": null
                 },
                 {
@@ -76468,6 +76487,7 @@
                     "entPhysicalContainedIn": 212,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Alcatel-Lucent Enterprise",
+                    "entPhysicalMfgDate": "2018-6-30,5:30:18.0",
                     "ifIndex": null
                 },
                 {
@@ -76487,6 +76507,7 @@
                     "entPhysicalContainedIn": 212,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "Alcatel-Lucent Enterprise",
+                    "entPhysicalMfgDate": "2018-6-30,5:26:14.0",
                     "ifIndex": null
                 },
                 {
@@ -76494,9 +76515,9 @@
                     "entPhysicalDescr": "",
                     "entPhysicalClass": "fan",
                     "entPhysicalName": "1/FANTRAY-1",
-                    "entPhysicalHardwareRev": null,
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "true",
@@ -76506,6 +76527,7 @@
                     "entPhysicalContainedIn": 209,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Alcatel-Lucent",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -76513,9 +76535,9 @@
                     "entPhysicalDescr": "",
                     "entPhysicalClass": "fan",
                     "entPhysicalName": "2/FANTRAY-1",
-                    "entPhysicalHardwareRev": null,
-                    "entPhysicalFirmwareRev": null,
-                    "entPhysicalSoftwareRev": null,
+                    "entPhysicalHardwareRev": "",
+                    "entPhysicalFirmwareRev": "",
+                    "entPhysicalSoftwareRev": "",
                     "entPhysicalAlias": "",
                     "entPhysicalAssetID": "",
                     "entPhysicalIsFRU": "true",
@@ -76525,63 +76547,67 @@
                     "entPhysicalContainedIn": 210,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Alcatel-Lucent",
+                    "entPhysicalMfgDate": "0-0-0,0:0:0.0",
                     "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 453,
-                    "entPhysicalDescr": "",
-                    "entPhysicalClass": "",
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": null,
                     "entPhysicalName": "2/FANTRAY-1",
                     "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": null,
                     "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
-                    "entPhysicalIsFRU": "",
-                    "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "",
-                    "entPhysicalSerialNum": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": null,
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "",
+                    "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 455,
-                    "entPhysicalDescr": "",
-                    "entPhysicalClass": "",
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": null,
                     "entPhysicalName": "3/FANTRAY-1",
                     "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": null,
                     "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
-                    "entPhysicalIsFRU": "",
-                    "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "",
-                    "entPhysicalSerialNum": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": null,
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "",
+                    "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 457,
-                    "entPhysicalDescr": "",
-                    "entPhysicalClass": "",
+                    "entPhysicalDescr": null,
+                    "entPhysicalClass": null,
                     "entPhysicalName": "4/FANTRAY-1",
                     "entPhysicalHardwareRev": null,
                     "entPhysicalFirmwareRev": null,
                     "entPhysicalSoftwareRev": null,
-                    "entPhysicalAlias": "",
-                    "entPhysicalAssetID": "",
-                    "entPhysicalIsFRU": "",
-                    "entPhysicalModelName": "",
-                    "entPhysicalVendorType": "",
-                    "entPhysicalSerialNum": "",
+                    "entPhysicalAlias": null,
+                    "entPhysicalAssetID": null,
+                    "entPhysicalIsFRU": null,
+                    "entPhysicalModelName": null,
+                    "entPhysicalVendorType": null,
+                    "entPhysicalSerialNum": null,
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": -1,
-                    "entPhysicalMfgName": "",
+                    "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -76601,6 +76627,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "FINISAR CORP.",
+                    "entPhysicalMfgDate": "2016-1-3,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -76620,6 +76647,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "FINISAR CORP.",
+                    "entPhysicalMfgDate": "2016-1-3,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -76639,6 +76667,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "FINISAR CORP.",
+                    "entPhysicalMfgDate": "2015-12-19,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -76658,6 +76687,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "FINISAR CORP.",
+                    "entPhysicalMfgDate": "2016-1-3,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -76677,6 +76707,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 5,
                     "entPhysicalMfgName": "SFP-GIG-SX",
+                    "entPhysicalMfgDate": "2016-11-28,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -76696,6 +76727,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 6,
                     "entPhysicalMfgName": "SFP-GIG-SX",
+                    "entPhysicalMfgDate": "2016-5-19,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -76715,6 +76747,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 7,
                     "entPhysicalMfgName": "SFP-GIG-SX",
+                    "entPhysicalMfgDate": "2016-5-19,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -76734,6 +76767,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "SFP-GIG-SX",
+                    "entPhysicalMfgDate": "2016-5-19,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -76753,6 +76787,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "SFP-GIG-SX",
+                    "entPhysicalMfgDate": "2016-5-19,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -76772,6 +76807,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "CISCO-AVAGO",
+                    "entPhysicalMfgDate": "2007-1-31,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -76791,6 +76827,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 12,
                     "entPhysicalMfgName": "SFP-GIG-SX",
+                    "entPhysicalMfgDate": "2016-5-19,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -76810,6 +76847,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "SFP-GIG-SX",
+                    "entPhysicalMfgDate": "2016-5-19,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -76829,6 +76867,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "SFP-GIG-SX",
+                    "entPhysicalMfgDate": "2016-5-19,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -76848,6 +76887,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "SFP-GIG-SX",
+                    "entPhysicalMfgDate": "2016-11-28,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -76867,6 +76907,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 16,
                     "entPhysicalMfgName": "SFP-GIG-SX",
+                    "entPhysicalMfgDate": "2016-11-28,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -76886,6 +76927,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 17,
                     "entPhysicalMfgName": "OEM",
+                    "entPhysicalMfgDate": "2012-1-6,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -76905,6 +76947,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 18,
                     "entPhysicalMfgName": "FINISAR CORP.",
+                    "entPhysicalMfgDate": "2016-1-3,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -76924,6 +76967,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 19,
                     "entPhysicalMfgName": "FINISAR CORP.",
+                    "entPhysicalMfgDate": "2016-1-3,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -76943,6 +76987,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 20,
                     "entPhysicalMfgName": "FINISAR CORP.",
+                    "entPhysicalMfgDate": "2016-1-3,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -76962,6 +77007,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "FINISAR CORP.",
+                    "entPhysicalMfgDate": "2016-1-3,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -76981,6 +77027,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 22,
                     "entPhysicalMfgName": "SFP-GIG-SX",
+                    "entPhysicalMfgDate": "2016-2-12,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77000,6 +77047,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "CISCO-FINISAR",
+                    "entPhysicalMfgDate": "2012-11-13,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77019,6 +77067,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 24,
                     "entPhysicalMfgName": "SFP-GIG-SX",
+                    "entPhysicalMfgDate": "2016-3-29,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77038,6 +77087,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 25,
                     "entPhysicalMfgName": "SFP-GIG-SX",
+                    "entPhysicalMfgDate": "2016-5-21,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77057,6 +77107,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 26,
                     "entPhysicalMfgName": "SFP-GIG-SX",
+                    "entPhysicalMfgDate": "2016-5-19,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77076,6 +77127,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "SFP-GIG-SX",
+                    "entPhysicalMfgDate": "2016-5-19,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77095,6 +77147,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 28,
                     "entPhysicalMfgName": "OEM",
+                    "entPhysicalMfgDate": "2012-8-22,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77114,6 +77167,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 30,
                     "entPhysicalMfgName": "SFP-10G-SR",
+                    "entPhysicalMfgDate": "2016-4-23,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77133,6 +77187,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 31,
                     "entPhysicalMfgName": "FINISAR CORP.",
+                    "entPhysicalMfgDate": "2012-10-18,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77152,6 +77207,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 34,
                     "entPhysicalMfgName": "FIBERXON INC.",
+                    "entPhysicalMfgDate": "2007-12-15,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77171,6 +77227,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 35,
                     "entPhysicalMfgName": "APAC Opto",
+                    "entPhysicalMfgDate": "2009-8-28,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77190,6 +77247,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 36,
                     "entPhysicalMfgName": "LevelOne",
+                    "entPhysicalMfgDate": "2012-7-11,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77209,6 +77267,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 37,
                     "entPhysicalMfgName": "APAC Opto",
+                    "entPhysicalMfgDate": "2009-8-28,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77228,6 +77287,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 38,
                     "entPhysicalMfgName": "FINISAR CORP.",
+                    "entPhysicalMfgDate": "2016-7-19,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77247,6 +77307,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 39,
                     "entPhysicalMfgName": "FINISAR CORP.",
+                    "entPhysicalMfgDate": "2016-7-19,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77266,6 +77327,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 0,
                     "entPhysicalMfgName": "FINISAR CORP.",
+                    "entPhysicalMfgDate": "2010-8-21,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77285,6 +77347,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "FINISAR CORP.",
+                    "entPhysicalMfgDate": "2010-8-21,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77304,6 +77367,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 48,
                     "entPhysicalMfgName": "ISFP-10G-C3M",
+                    "entPhysicalMfgDate": "2017-9-18,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77323,6 +77387,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 49,
                     "entPhysicalMfgName": "SFP-10G-T",
+                    "entPhysicalMfgDate": "2017-11-20,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77342,6 +77407,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 50,
                     "entPhysicalMfgName": "ISFP-10G-C1M",
+                    "entPhysicalMfgDate": "2018-10-9,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77361,6 +77427,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "SFP-10G-C1M",
+                    "entPhysicalMfgDate": "2016-3-21,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77380,6 +77447,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 52,
                     "entPhysicalMfgName": "QSFP-40G-C1M",
+                    "entPhysicalMfgDate": "2017-10-17,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77399,6 +77467,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 53,
                     "entPhysicalMfgName": "QSFP-40G-C3M",
+                    "entPhysicalMfgDate": "2018-4-5,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77418,6 +77487,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 52,
                     "entPhysicalMfgName": "QSFP-40G-C1M",
+                    "entPhysicalMfgDate": "2017-10-17,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77437,6 +77507,7 @@
                     "entPhysicalContainedIn": 2,
                     "entPhysicalParentRelPos": 53,
                     "entPhysicalMfgName": "QSFP-40G-C1M",
+                    "entPhysicalMfgDate": "2017-10-17,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77456,6 +77527,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 48,
                     "entPhysicalMfgName": "ISFP-10G-C3M",
+                    "entPhysicalMfgDate": "2017-9-18,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77475,6 +77547,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 50,
                     "entPhysicalMfgName": "ISFP-10G-C1M",
+                    "entPhysicalMfgDate": "2019-11-8,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77494,6 +77567,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 52,
                     "entPhysicalMfgName": "QSFP-40G-C1M",
+                    "entPhysicalMfgDate": "2017-10-17,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77513,6 +77587,7 @@
                     "entPhysicalContainedIn": 3,
                     "entPhysicalParentRelPos": 53,
                     "entPhysicalMfgName": "QSFP-40G-C1M",
+                    "entPhysicalMfgDate": "2017-10-17,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77532,6 +77607,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 8,
                     "entPhysicalMfgName": "LevelOne",
+                    "entPhysicalMfgDate": "2012-7-11,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77551,6 +77627,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "LevelOne",
+                    "entPhysicalMfgDate": "2012-7-11,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77570,6 +77647,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "APAC Opto",
+                    "entPhysicalMfgDate": "2014-4-2,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77589,6 +77667,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "FIBERXON INC.",
+                    "entPhysicalMfgDate": "2005-12-25,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77608,6 +77687,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 13,
                     "entPhysicalMfgName": "LevelOne",
+                    "entPhysicalMfgDate": "2012-5-15,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77627,6 +77707,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 14,
                     "entPhysicalMfgName": "LevelOne",
+                    "entPhysicalMfgDate": "2012-7-11,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77646,6 +77727,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 18,
                     "entPhysicalMfgName": "FINISAR CORP.",
+                    "entPhysicalMfgDate": "2016-7-19,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77665,6 +77747,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 22,
                     "entPhysicalMfgName": "APAC Opto",
+                    "entPhysicalMfgDate": "2014-4-2,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77684,6 +77767,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "SFP-10G-C3M",
+                    "entPhysicalMfgDate": "2016-5-9,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77703,6 +77787,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 25,
                     "entPhysicalMfgName": "SFP-10G-C3M",
+                    "entPhysicalMfgDate": "2016-5-9,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77722,6 +77807,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 26,
                     "entPhysicalMfgName": "LevelOne",
+                    "entPhysicalMfgDate": "2012-5-15,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77741,6 +77827,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "OEM",
+                    "entPhysicalMfgDate": "2012-8-22,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77760,6 +77847,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 28,
                     "entPhysicalMfgName": "OEM",
+                    "entPhysicalMfgDate": "2012-8-22,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77779,6 +77867,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 31,
                     "entPhysicalMfgName": "FINISAR CORP.",
+                    "entPhysicalMfgDate": "2011-5-10,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77798,6 +77887,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 34,
                     "entPhysicalMfgName": "CISCO-FINISAR",
+                    "entPhysicalMfgDate": "2012-7-28,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77817,6 +77907,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 35,
                     "entPhysicalMfgName": "FIBERXON INC.",
+                    "entPhysicalMfgDate": "2007-12-11,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77836,6 +77927,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 36,
                     "entPhysicalMfgName": "CISCO-FINISAR",
+                    "entPhysicalMfgDate": "2012-7-29,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77855,6 +77947,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 38,
                     "entPhysicalMfgName": "FINISAR CORP.",
+                    "entPhysicalMfgDate": "2016-7-19,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77874,6 +77967,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 39,
                     "entPhysicalMfgName": "FINISAR CORP.",
+                    "entPhysicalMfgDate": "2016-7-19,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77893,6 +77987,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 48,
                     "entPhysicalMfgName": "ISFP-10G-C3M",
+                    "entPhysicalMfgDate": "2016-12-5,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77912,6 +78007,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 10,
                     "entPhysicalMfgName": "FINISAR CORP.",
+                    "entPhysicalMfgDate": "2016-7-19,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77931,6 +78027,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "SFP-10G-C1M",
+                    "entPhysicalMfgDate": "2016-3-21,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77950,6 +78047,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 52,
                     "entPhysicalMfgName": "QSFP-40G-C3M",
+                    "entPhysicalMfgDate": "2018-4-5,0:0:0.0",
                     "ifIndex": null
                 },
                 {
@@ -77969,6 +78067,7 @@
                     "entPhysicalContainedIn": 4,
                     "entPhysicalParentRelPos": 53,
                     "entPhysicalMfgName": "QSFP-40G-C1M",
+                    "entPhysicalMfgDate": "2017-10-17,0:0:0.0",
                     "ifIndex": null
                 }
             ]

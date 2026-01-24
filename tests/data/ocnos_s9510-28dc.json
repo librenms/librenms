@@ -8050,6 +8050,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Ufi Space",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8069,7 +8070,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Fiberstore",
-                    "ifIndex": 10001
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10002,
@@ -8088,7 +8090,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 2,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10009
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10003,
@@ -8107,7 +8110,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 3,
                     "entPhysicalMfgName": "BROCADE",
-                    "ifIndex": 10017
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10004,
@@ -8126,7 +8130,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 4,
                     "entPhysicalMfgName": "BROCADE",
-                    "ifIndex": 10021
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10009,
@@ -8145,7 +8150,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 9,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10029
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10011,
@@ -8164,7 +8170,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 11,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10031
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10019,
@@ -8183,7 +8190,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 19,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10039
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10020,
@@ -8202,7 +8210,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 20,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 5020
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10021,
@@ -8221,7 +8230,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 21,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10041
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10023,
@@ -8240,7 +8250,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10043
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10024,
@@ -8259,7 +8270,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 24,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10044
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10027,
@@ -8278,7 +8290,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 27,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10047
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10028,
@@ -8297,7 +8310,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 28,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10048
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 }
             ]
         },
@@ -8315,7 +8329,7 @@
                     "model": "Q28-PC01",
                     "revision": "A",
                     "serial": "F1813156512-1",
-                    "date": "2018-02-22",
+                    "date": "180222",
                     "ddm": 0,
                     "encoding": "enc-unspecified",
                     "cable": null,
@@ -8334,7 +8348,7 @@
                     "model": "SFP-GB-GE-T",
                     "revision": "",
                     "serial": "S2202039280",
-                    "date": "2022-03-07",
+                    "date": "220307",
                     "ddm": 0,
                     "encoding": "enc-8b-or-10b",
                     "cable": null,
@@ -8353,7 +8367,7 @@
                     "model": "SFP-10GSR-85",
                     "revision": "",
                     "serial": "G2130532986",
-                    "date": "2022-03-21",
+                    "date": "220321",
                     "ddm": 1,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,
@@ -8372,7 +8386,7 @@
                     "model": "Q28-PC03",
                     "revision": "A",
                     "serial": "S1807464248-1",
-                    "date": "2018-08-03",
+                    "date": "180803",
                     "ddm": 0,
                     "encoding": "enc-unspecified",
                     "cable": null,
@@ -8391,7 +8405,7 @@
                     "model": "SFP-10GSR-85",
                     "revision": "",
                     "serial": "G2130533009",
-                    "date": "2022-03-21",
+                    "date": "220321",
                     "ddm": 1,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,
@@ -8410,7 +8424,7 @@
                     "model": "SFP-10GSR-85",
                     "revision": "",
                     "serial": "G2130532997",
-                    "date": "2022-03-21",
+                    "date": "220321",
                     "ddm": 1,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,
@@ -8429,7 +8443,7 @@
                     "model": "SFP-10GSR-85",
                     "revision": "A",
                     "serial": "G2220529031",
-                    "date": "2022-06-16",
+                    "date": "220616",
                     "ddm": 1,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,
@@ -8448,7 +8462,7 @@
                     "model": "SFP-10GSR-85",
                     "revision": "",
                     "serial": "G2130532961",
-                    "date": "2022-03-21",
+                    "date": "220321",
                     "ddm": 1,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,
@@ -8467,7 +8481,7 @@
                     "model": "SFP-10GSR-85",
                     "revision": "A",
                     "serial": "G2210603049",
-                    "date": "2022-04-08",
+                    "date": "220408",
                     "ddm": 1,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,
@@ -8486,7 +8500,7 @@
                     "model": "SFP-10GSR-85",
                     "revision": "",
                     "serial": "G2130532968",
-                    "date": "2022-03-21",
+                    "date": "220321",
                     "ddm": 1,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,
@@ -8505,7 +8519,7 @@
                     "model": "QSFP28-100G-DAC",
                     "revision": "A",
                     "serial": "F1800349407-2",
-                    "date": "2018-02-01",
+                    "date": "180201",
                     "ddm": 0,
                     "encoding": "enc-unspecified",
                     "cable": null,
@@ -8524,7 +8538,7 @@
                     "model": "QSFP28-100G-DAC",
                     "revision": "A",
                     "serial": "F1800349409-1",
-                    "date": "2018-02-01",
+                    "date": "180201",
                     "ddm": 0,
                     "encoding": "enc-unspecified",
                     "cable": null,
@@ -8543,7 +8557,7 @@
                     "model": "SFP-10GSR-85",
                     "revision": "A",
                     "serial": "G2210603058",
-                    "date": "2022-04-08",
+                    "date": "220408",
                     "ddm": 1,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,

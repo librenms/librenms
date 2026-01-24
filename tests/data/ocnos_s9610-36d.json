@@ -8850,6 +8850,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": null,
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -8869,7 +8870,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 15,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10262
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10023,
@@ -8888,7 +8890,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 23,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10041
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10024,
@@ -8907,7 +8910,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 24,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10049
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10029,
@@ -8926,7 +8930,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 29,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10089
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10030,
@@ -8945,7 +8950,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 30,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10097
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10031,
@@ -8964,7 +8970,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 31,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10105
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10032,
@@ -8983,7 +8990,8 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 32,
                     "entPhysicalMfgName": "FS",
-                    "ifIndex": 10113
+                    "entPhysicalMfgDate": null,
+                    "ifIndex": null
                 },
                 {
                     "entPhysicalIndex": 10035,
@@ -9002,6 +9010,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 35,
                     "entPhysicalMfgName": "FS",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -9021,6 +9030,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 36,
                     "entPhysicalMfgName": "FS",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]
@@ -9039,7 +9049,7 @@
                     "model": "QSFP-SR4-100G",
                     "revision": "1A",
                     "serial": "C2410891766",
-                    "date": "2024-10-31",
+                    "date": "241031",
                     "ddm": 1,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,
@@ -9058,7 +9068,7 @@
                     "model": "QSFP-SR4-100G",
                     "revision": "1A",
                     "serial": "C2410891313",
-                    "date": "2024-10-31",
+                    "date": "241031",
                     "ddm": 1,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,
@@ -9077,7 +9087,7 @@
                     "model": "QSFP-SR4-100G",
                     "revision": "1A",
                     "serial": "C2410891292",
-                    "date": "2024-10-31",
+                    "date": "241031",
                     "ddm": 1,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,
@@ -9096,7 +9106,7 @@
                     "model": "QSFP-LR4-100G",
                     "revision": "01",
                     "serial": "S2406402002",
-                    "date": "2024-02-02",
+                    "date": "240202",
                     "ddm": 1,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,
@@ -9115,7 +9125,7 @@
                     "model": "QSFP-LR4-100G",
                     "revision": "01",
                     "serial": "S2406402001",
-                    "date": "2024-02-02",
+                    "date": "240202",
                     "ddm": 1,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,
@@ -9134,7 +9144,7 @@
                     "model": "QSFP-LR4-100G",
                     "revision": "01",
                     "serial": "S2406402006",
-                    "date": "2024-02-02",
+                    "date": "240202",
                     "ddm": 1,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,
@@ -9153,7 +9163,7 @@
                     "model": "QSFP-LR4-100G",
                     "revision": "01",
                     "serial": "S2406402007",
-                    "date": "2024-02-02",
+                    "date": "240202",
                     "ddm": 1,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,
@@ -9172,7 +9182,7 @@
                     "model": "QSFP-SR4-100G",
                     "revision": "1A",
                     "serial": "S2407658241",
-                    "date": "2024-02-07",
+                    "date": "240207",
                     "ddm": 1,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,
@@ -9191,7 +9201,7 @@
                     "model": "QSFP-SR4-100G",
                     "revision": "1A",
                     "serial": "S2407658244",
-                    "date": "2024-02-07",
+                    "date": "240207",
                     "ddm": 1,
                     "encoding": "enc-64b-or-66b",
                     "cable": null,

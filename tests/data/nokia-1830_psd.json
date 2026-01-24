@@ -322,6 +322,7 @@
                     "entPhysicalContainedIn": 0,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "Nokia",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 },
                 {
@@ -341,6 +342,7 @@
                     "entPhysicalContainedIn": 1,
                     "entPhysicalParentRelPos": 1,
                     "entPhysicalMfgName": "NOK",
+                    "entPhysicalMfgDate": null,
                     "ifIndex": null
                 }
             ]
@@ -1969,7 +1971,7 @@
                     "model": "N/A",
                     "revision": null,
                     "serial": "23-LTC57001415",
-                    "date": "2023-09-13",
+                    "date": "230913",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
@@ -1988,7 +1990,7 @@
                     "model": "N/A",
                     "revision": null,
                     "serial": "21--AN68000284",
-                    "date": "2021-11-24",
+                    "date": "211124",
                     "ddm": null,
                     "encoding": null,
                     "cable": null,
