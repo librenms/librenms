@@ -65,7 +65,7 @@ foreach (dbFetchRows($sql, $param) as $device) {
     }
     $response[] = [
         'hostname' => generate_device_link($device, null, ['tab' => 'graphs', 'group' => 'poller']),
-        'last_polled' => Time::toUser(Time::fromDb($device['last_polled']))->format(LibrenmsConfig::get('dateformat.compact')),
+        'last_polled' => Time::format(Time::parse($device['last_polled']), LibrenmsConfig::get('dateformat.compact')),
         'poller_group' => $device['group_name'],
         'location' => $device['location'],
         'last_polled_timetaken' => round($device['last_polled_timetaken'], 2),

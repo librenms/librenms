@@ -336,10 +336,10 @@ class Device extends BaseModel
         $deviceOutage = $this->getCurrentOutage();
 
         if ($deviceOutage) {
-            return Time::toUser(Time::fromTimestamp((int) $deviceOutage->going_down));
+            return Time::fromTimestamp((int) $deviceOutage->going_down);
         }
 
-        return $this->last_polled ?? Time::toUser(Time::now());
+        return $this->last_polled ?? Time::now();
     }
 
     /**

@@ -25,7 +25,7 @@ $icon = '<span class="alert-status ' . $severity_colour . '"></span>';
 
 echo '<tr>';
 echo '<td>' . $icon . '</td>';
-echo '<td>' . Time::toUser(Time::fromDb($entry['datetime'])) . '</td>';
+echo '<td>' . Time::format(Time::parse($entry['datetime']), LibrenmsConfig::get('dateformat.compact')) . '</td>';
 
 echo '<td style="white-space: nowrap;max-width: 100px;overflow: hidden;text-overflow: ellipsis;">';
 

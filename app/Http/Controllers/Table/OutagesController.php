@@ -150,7 +150,7 @@ class OutagesController extends TableController
         }
 
         // Convert epoch to local time
-        return Time::toUser(Time::fromTimestamp($timestamp))->format(LibrenmsConfig::get('dateformat.compact'));
+        return Time::format(Time::fromTimestamp($timestamp), LibrenmsConfig::get('dateformat.compact'));
     }
 
     private function statusLabel(DeviceOutage $outage): string
