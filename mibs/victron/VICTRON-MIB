@@ -1,0 +1,340 @@
+VICTRON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, enterprises
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC;
+
+victronEnergy MODULE-IDENTITY
+    LAST-UPDATED "202512300000Z"
+    ORGANIZATION "Victron Energy"
+    CONTACT-INFO "https://www.victronenergy.com"
+    DESCRIPTION "MIB for Victron Energy GX devices"
+    ::= { enterprises 41312 }
+
+victronGX OBJECT IDENTIFIER ::= { victronEnergy 1 }
+
+-- AC Input Section
+acInput OBJECT IDENTIFIER ::= { victronGX 1 }
+
+acInActiveInput OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Active input number"
+    ::= { acInput 1 }
+
+acInL1Frequency OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "L1 Frequency (divide by 100 for Hz)"
+    ::= { acInput 2 }
+
+acInL1Current OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "L1 Current (divide by 100 for Amps)"
+    ::= { acInput 3 }
+
+acInL1Voltage OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "L1 Voltage (divide by 100 for Volts)"
+    ::= { acInput 4 }
+
+acInL1Power OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "L1 Power in Watts"
+    ::= { acInput 5 }
+
+-- AC Output Section
+acOutput OBJECT IDENTIFIER ::= { victronGX 2 }
+
+acOutL1Frequency OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "L1 Frequency (divide by 100 for Hz)"
+    ::= { acOutput 1 }
+
+acOutL1Current OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "L1 Current (divide by 100 for Amps)"
+    ::= { acOutput 2 }
+
+acOutL1Voltage OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "L1 Voltage (divide by 100 for Volts)"
+    ::= { acOutput 3 }
+
+acOutL1Power OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "L1 Power in Watts"
+    ::= { acOutput 4 }
+
+acOutL1NominalPower OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Nominal Inverter Power in Watts"
+    ::= { acOutput 5 }
+
+-- Alarms Section
+alarms OBJECT IDENTIFIER ::= { victronGX 3 }
+
+alarmEnergyMeterMissing OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Energy meter missing alarm (0=OK, 1=Warning, 2=Alarm)"
+    ::= { alarms 1 }
+
+alarmGridLost OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Grid lost alarm (0=OK, 1=Warning, 2=Alarm)"
+    ::= { alarms 2 }
+
+alarmHighTemperature OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "High temperature alarm (0=OK, 1=Warning, 2=Alarm)"
+    ::= { alarms 3 }
+
+alarmHighVoltage OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "High voltage alarm (0=OK, 1=Warning, 2=Alarm)"
+    ::= { alarms 4 }
+
+alarmHighVoltageAcOut OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "High AC output voltage alarm (0=OK, 1=Warning, 2=Alarm)"
+    ::= { alarms 5 }
+
+alarmLowSoc OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Low state of charge alarm (0=OK, 1=Warning, 2=Alarm)"
+    ::= { alarms 6 }
+
+alarmLowVoltage OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Low voltage alarm (0=OK, 1=Warning, 2=Alarm)"
+    ::= { alarms 7 }
+
+alarmLowVoltageAcOut OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Low AC output voltage alarm (0=OK, 1=Warning, 2=Alarm)"
+    ::= { alarms 8 }
+
+alarmOverload OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Overload alarm (0=OK, 1=Warning, 2=Alarm)"
+    ::= { alarms 9 }
+
+alarmPhaseRotation OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Phase rotation alarm (0=OK, 1=Warning, 2=Alarm)"
+    ::= { alarms 10 }
+
+alarmRipple OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ripple alarm (0=OK, 1=Warning, 2=Alarm)"
+    ::= { alarms 11 }
+
+alarmShortCircuit OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Short circuit alarm (0=OK, 1=Warning, 2=Alarm)"
+    ::= { alarms 12 }
+
+-- DC/Battery Section
+dcBattery OBJECT IDENTIFIER ::= { victronGX 4 }
+
+dcCurrent OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Battery current (divide by 100 for Amps)"
+    ::= { dcBattery 1 }
+
+dcPower OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Battery power in Watts"
+    ::= { dcBattery 2 }
+
+dcRippleVoltage OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ripple voltage (divide by 1000 for Volts)"
+    ::= { dcBattery 3 }
+
+dcTemperature OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Battery temperature (divide by 10 for Celsius)"
+    ::= { dcBattery 4 }
+
+dcVoltage OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Battery voltage (divide by 100 for Volts)"
+    ::= { dcBattery 5 }
+
+-- Energy Counters Section
+energyCounters OBJECT IDENTIFIER ::= { victronGX 5 }
+
+energyOutToInverter OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Energy to inverter (divide by 100 for kWh)"
+    ::= { energyCounters 1 }
+
+energySolarToAcIn1 OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Solar to AC In 1 (divide by 100 for kWh)"
+    ::= { energyCounters 2 }
+
+energySolarToAcIn2 OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Solar to AC In 2 (divide by 100 for kWh)"
+    ::= { energyCounters 3 }
+
+energySolarToAcOut OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Solar to AC Out (divide by 100 for kWh)"
+    ::= { energyCounters 4 }
+
+energySolarToBattery OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Solar to Battery (divide by 100 for kWh)"
+    ::= { energyCounters 5 }
+
+-- PV Trackers Section
+pvTrackers OBJECT IDENTIFIER ::= { victronGX 6 }
+
+pvEnabled OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Tracker enabled (0/1)"
+    ::= { pvTrackers 1 }
+
+pvMppMode OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "MPP mode (0=Off, 1=Limited, 2=MPPT active)"
+    ::= { pvTrackers 2 }
+
+pvName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Tracker name"
+    ::= { pvTrackers 3 }
+
+pvPower OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Tracker power (divide by 100 for Watts)"
+    ::= { pvTrackers 4 }
+
+pvVoltage OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Tracker voltage (divide by 100 for Volts)"
+    ::= { pvTrackers 5 }
+
+-- System Section
+system OBJECT IDENTIFIER ::= { victronGX 7 }
+
+systemSoc OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "State of charge in percent"
+    ::= { system 1 }
+
+systemState OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "System state (0=Off, 1=Low Power, 2=Fault, 3=Bulk, etc.)"
+    ::= { system 2 }
+
+systemTimeToGo OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Time to empty in seconds"
+    ::= { system 3 }
+
+systemYieldPower OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Current yield (divide by 100 for Watts)"
+    ::= { system 4 }
+
+systemYieldSystem OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Total system yield (divide by 100 for kWh)"
+    ::= { system 5 }
+
+systemYieldUser OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "User-resettable yield (divide by 100 for kWh)"
+    ::= { system 6 }
+
+END
