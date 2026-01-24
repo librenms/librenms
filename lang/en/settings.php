@@ -70,6 +70,7 @@ return [
             'snmptrapd' => ['name' => 'SNMP Traps Integration'],
             'rancid' => ['name' => 'RANCID Integration'],
             'collectd' => ['name' => 'Collectd Integration'],
+            'syslog' => ['name' => 'Syslog Integration'],
         ],
         'poller' => [
             'availability' => ['name' => 'Device Availability'],
@@ -2338,8 +2339,16 @@ return [
             'description' => 'Default Storage Percentage Warning',
             'help' => 'Default Percentage of storage used before a warning is raised. 0 disables warning.',
         ],
+        'syslog_file' => [
+            'description' => 'Syslog file path',
+            'help' => 'Write received syslog messages to this file. Leave empty to disable.',
+        ],
         'syslog_filter' => [
             'description' => 'Filter syslog messages containing',
+        ],
+        'syslog_log_unmatched' => [
+            'description' => 'Log unmatched syslog hosts',
+            'help' => 'Log a warning when syslog is received from a host that cannot be matched to a device.',
         ],
         'syslog_purge' => [
             'description' => 'Syslog entries older than',
