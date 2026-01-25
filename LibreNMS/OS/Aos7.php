@@ -310,7 +310,7 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
                 return [0, '', '', null];
             }
 
-            $macColon = implode(':', array_map(fn($b) => str_pad(dechex((int) $b), 2, '0', STR_PAD_LEFT), $macBytes));
+            $macColon = implode(':', array_map(fn ($b) => str_pad(dechex((int) $b), 2, '0', STR_PAD_LEFT), $macBytes));
 
             $macColon = strtolower($macColon);
             $macNoSep = $this->normalizeMacNoSep($macColon);
