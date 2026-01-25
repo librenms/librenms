@@ -6,38 +6,42 @@ modules:
                 total: NETGEAR-SWITCHING-MIB::agentSwitchCpuProcessMemAvailable
                 free: NETGEAR-SWITCHING-MIB::agentSwitchCpuProcessMemFree
                 precision: 1024
+
     os:
         sysDescr_regex: '/^(?<hardware>\S+) .*, (?<version>[\d.]+),/'
         serial: ENTITY-MIB::entPhysicalSerialNum.1
         version: ENTITY-MIB::entPhysicalSoftwareRev.1
+
     sensors:
         additional_oids:
             data:
                 -
                     oid:
-                        - boxServicesNormalTempRangeMin
-                        - boxServicesNormalTempRangeMax
+                        - NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesNormalTempRangeMin
+                        - NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesNormalTempRangeMax
+
         temperature:
             data:
                 # Chassis/Switch-Temperature
                 -
-                    oid: boxServicesTempSensorsTable
-                    value: boxServicesTempSensorTemperature
+                    oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesTempSensorsTable
+                    value: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesTempSensorTemperature
                     num_oid: '.1.3.6.1.4.1.4526.10.43.1.8.1.5.{{ $index }}'
                     descr: 'Switch {{ $subindex0 }} Sensor {{ $subindex1 }} Temperature'
                     index: 'boxServicesTempSensorTemperature.{{ $index }}'
-                    low_limit: boxServicesNormalTempRangeMin
-                    high_limit: boxServicesNormalTempRangeMax
+                    low_limit: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesNormalTempRangeMin
+                    high_limit: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesNormalTempRangeMax
 
-                # SFP-/Port-Temperature
+                # SFP-/Port-Temperature (deci-°C -> /10)
                 -
-                    oid: boxServicesFiberPortsOpticsTable
-                    value: boxServicesFiberPortOpticsTemperature
+                    oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsTable
+                    value: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsTemperature
                     num_oid: '.1.3.6.1.4.1.4526.10.43.1.18.1.2.{{ $index }}'
                     index: 'boxServicesFiberPortOpticsTemperature.{{ $index }}'
                     descr: 'Port {{ $index }} Optic Temperature'
                     ifIndex: true
                     group: 'Interfaces'
+                    divisor: 10
                     skip_values: [0, 0.0]
                     skip_value_regex: '/^\s*0(?:\.0+)?\s*(?:°C)?\s*$/i'
                     low_limit: 0
@@ -47,15 +51,16 @@ modules:
 
         dbm:
             data:
-                # TX Power (Output) – Limits here: -8.2 … +0.5 dBm
+                # TX Power (milli-dBm -> /1000)
                 -
-                    oid: boxServicesFiberPortsOpticsTable
-                    value: boxServicesFiberPortOpticsPowerOut
+                    oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsTable
+                    value: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsPowerOut
                     num_oid: '.1.3.6.1.4.1.4526.10.43.1.18.1.5.{{ $index }}'
                     index: 'boxServicesFiberPortOpticsPowerOut.{{ $index }}'
                     descr: 'Port {{ $index }} TX Power'
                     ifIndex: true
                     group: 'Interfaces'
+                    divisor: 1000
                     skip_values: [0, 0.0]
                     skip_value_regex: '/^\s*\+?0(?:\.0+)?\s*(?:dBm)?\s*$/i'
                     low_limit: -8.2
@@ -63,15 +68,16 @@ modules:
                     warn_limit: 0.3
                     high_limit: 0.5
 
-                # RX Power (Input) – Limits here: -14.4 … +0.5 dBm (overload)
+                # RX Power (milli-dBm -> /1000)
                 -
-                    oid: boxServicesFiberPortsOpticsTable
-                    value: boxServicesFiberPortOpticsPowerIn
+                    oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsTable
+                    value: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsPowerIn
                     num_oid: '.1.3.6.1.4.1.4526.10.43.1.18.1.6.{{ $index }}'
                     index: 'boxServicesFiberPortOpticsPowerIn.{{ $index }}'
                     descr: 'Port {{ $index }} RX Power'
                     ifIndex: true
                     group: 'Interfaces'
+                    divisor: 1000
                     skip_values: [0, 0.0]
                     skip_value_regex: '/^\s*\+?0(?:\.0+)?\s*(?:dBm)?\s*$/i'
                     low_limit: -14.4
@@ -81,16 +87,17 @@ modules:
 
         voltage:
             data:
-                # Supply Voltage Vcc – Limits: 3.15 … 3.43 V (Nominal 3.30 V)
+                # Supply Voltage Vcc mV -> /1000 => Volt
                 -
-                    oid: boxServicesFiberPortsOpticsTable
-                    value: boxServicesFiberPortOpticsVoltage
+                    oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsTable
+                    value: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsVoltage
                     num_oid: '.1.3.6.1.4.1.4526.10.43.1.18.1.3.{{ $index }}'
                     index: 'boxServicesFiberPortOpticsVoltage.{{ $index }}'
                     descr: 'Port {{ $index }} Vcc'
                     ifIndex: true
                     group: 'Interfaces'
                     skip_values: [0, 0.0]
+                    divisor: 1000
                     low_limit: 3.15
                     low_warn_limit: 3.20
                     warn_limit: 3.40
@@ -98,17 +105,17 @@ modules:
 
         current:
             data:
-                # Supply Current – Limits: Low Err 20 mA, Low Warn 30 mA, High Warn 50 mA, High Err 60 mA
+                # Supply Current –mA -> /10000 => Ampere
                 -
-                    oid: boxServicesFiberPortsOpticsTable
-                    value: boxServicesFiberPortOpticsCurrent
+                    oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsTable
+                    value: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortOpticsCurrent
                     num_oid: '.1.3.6.1.4.1.4526.10.43.1.18.1.4.{{ $index }}'
                     index: 'boxServicesFiberPortOpticsCurrent.{{ $index }}'
                     descr: 'Port {{ $index }} Current'
                     ifIndex: true
                     group: 'Interfaces'
                     skip_values: [0, 0.0]
-                    divisor: 1000
+                    divisor: 10000
                     low_limit: 0.02
                     low_warn_limit: 0.03
                     warn_limit: 0.05
@@ -117,12 +124,12 @@ modules:
         state:
             data:
                 -
-                    oid: boxServicesFansTable
-                    value: boxServicesFanItemState
+                    oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFansTable
+                    value: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFanItemState
                     num_oid: '.1.3.6.1.4.1.4526.10.43.1.6.1.3.{{ $index }}'
                     descr: 'Switch {{ $subindex0 }} Fan {{ $subindex1 }} State'
                     index: 'boxServicesFanItemState.{{ $index }}'
-                    state_name: boxServicesFanItemState
+                    state_name: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFanItemState
                     states:
                         - { value: 1, generic: 0, graph: 0, descr: notpresent }
                         - { value: 2, generic: 0, graph: 0, descr: operational }
@@ -131,13 +138,14 @@ modules:
                         - { value: 5, generic: 3, graph: 0, descr: nopower }
                         - { value: 6, generic: 3, graph: 0, descr: notpowering }
                         - { value: 7, generic: 1, graph: 0, descr: incompatible }
+
                 -
-                    oid: boxServicesPowSuppliesTable
-                    value: boxServicesPowSupplyItemState
+                    oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesPowSuppliesTable
+                    value: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesPowSupplyItemState
                     num_oid: '.1.3.6.1.4.1.4526.10.43.1.7.1.3.{{ $index }}'
                     descr: 'PSU {{ $subindex0 }} State'
                     index: 'boxServicesPowSupplyItemState.{{ $index }}'
-                    state_name: boxServicesPowSupplyItemState
+                    state_name: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesPowSupplyItemState
                     states:
                         - { value: 1, generic: 0, graph: 0, descr: notpresent }
                         - { value: 2, generic: 0, graph: 0, descr: operational }
