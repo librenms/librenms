@@ -258,10 +258,10 @@ class MapDataController extends Controller
             // If we have a device ID, we want to show if we are the soure or target of a link
             $linkQuery->where(function ($q) use ($device_id, $remote_port_attr): void {
                 $q->whereHas($remote_port_attr, function ($q) use ($device_id): void {
-                    $q->where('device_id', $device_id);
+                    $q->where($q->qualifyColumn('device_id'), $device_id);
                 })
                     ->orWhereHas('device', function ($q) use ($device_id): void {
-                        $q->where('device_id', $device_id);
+                        $q->where($q->qualifyColumn('device_id'), $device_id);
                     });
             });
         }
@@ -478,7 +478,7 @@ class MapDataController extends Controller
             if ($device->status) {
                 $updowntime = \LibreNMS\Util\Time::formatInterval($device->uptime);
             } elseif ($device->last_polled) {
-                $updowntime = \LibreNMS\Util\Time::formatInterval(time() - strtotime($device->last_polled));
+                $updowntime = \LibreNMS\Util\Time::formatInterval(time() - strtotime((string) $device->last_polled));
             } else {
                 $updowntime = '';
             }
@@ -489,7 +489,7 @@ class MapDataController extends Controller
                 'id' => $device->device_id,
                 'icon' => $device->icon,
                 'typeIcon' => $deviceTypes->get($device->type, 'server'),
-                'icontitle' => $device->icon ? str_replace(['.svg', '.png'], '', basename($device->icon)) : $device->os,
+                'icontitle' => $device->icon ? str_replace(['.svg', '.png'], '', basename((string) $device->icon)) : $device->os,
                 'sname' => $device->shortDisplayName(),
                 'status' => $device->status,
                 'uptime' => $device->uptime,
@@ -770,7 +770,7 @@ class MapDataController extends Controller
             if ($service->device->status) {
                 $updowntime = \LibreNMS\Util\Time::formatInterval($service->device->uptime);
             } elseif ($service->device->last_polled) {
-                $updowntime = \LibreNMS\Util\Time::formatInterval(time() - strtotime($service->device->last_polled));
+                $updowntime = \LibreNMS\Util\Time::formatInterval(time() - strtotime((string) $service->device->last_polled));
             } else {
                 $updowntime = '';
             }
@@ -781,7 +781,7 @@ class MapDataController extends Controller
                 'type' => $service->service_type,
                 'status' => $service->service_status,
                 'icon' => $service->device->icon,
-                'icontitle' => $service->device->icon ? str_replace(['.svg', '.png'], '', basename($service->device->icon)) : $service->device->os,
+                'icontitle' => $service->device->icon ? str_replace(['.svg', '.png'], '', basename((string) $service->device->icon)) : $service->device->os,
                 'device_name' => $service->device->shortDisplayName(),
                 'url' => \Blade::render('<x-device-link-map :device="$device" />', ['device' => $service->device]),
                 'updowntime' => $updowntime,

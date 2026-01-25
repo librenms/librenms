@@ -1,0 +1,125 @@
+STORMSHIELD-QOS-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64 FROM SNMPv2-SMI
+      DisplayString                                      FROM SNMPv2-TC
+      stormshieldMIB                                     FROM STORMSHIELD-SMI-MIB;
+
+   snsQos MODULE-IDENTITY
+      LAST-UPDATED  "201702200000Z"
+      ORGANIZATION  "Stormshield"
+      CONTACT-INFO
+         "Customer Support
+
+         22 rue du Gouverneur General Eboue
+         92130 Issy-les-Moulineaux
+         FRANCE
+
+         Tel: +33 (0)9 69 32 96 29
+         E-mail: support@stormshield.eu
+         http://www.stormshield.eu"
+      DESCRIPTION   "stormshield QoS Statistics"
+      REVISION      "201702200000Z"
+      DESCRIPTION   "Initial"
+      ::= { stormshieldMIB 15 }
+
+   snsQosStatsTable OBJECT-TYPE
+      SYNTAX        SEQUENCE OF SnsQosStatsEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION   "QoS Queues Informations"
+      ::= { snsQos 1 }
+
+   snsQosStatsEntry OBJECT-TYPE
+      SYNTAX        SnsQosStatsEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION   "Each entry in the snsQosStatsTable hold a QoS queue information."
+      INDEX         { snsQosEntryIndex }
+      ::= { snsQosStatsTable 1 }
+
+   SnsQosStatsEntry ::=
+      SEQUENCE {
+         snsQosEntryIndex          Integer32,
+         snsQosEntryName           DisplayString,
+         snsQosEntryType           DisplayString,
+         snsQosEntryInCounter      Counter64,
+         snsQosEntryInMaxPeak      Counter64,
+         snsQosEntryInSpeedLimit   Counter64,
+         snsQosEntryOutCounter     Counter64,
+         snsQosEntryOutMaxPeak     Counter64,
+         snsQosEntryOutSpeedLimit  Counter64,
+         snsQosEntryComment        DisplayString
+      }
+
+   snsQosEntryIndex OBJECT-TYPE
+      SYNTAX        Integer32 (0..65535)
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Index of QoS queue in table"
+    ::= { snsQosStatsEntry 1 }
+
+   snsQosEntryName OBJECT-TYPE
+      SYNTAX        DisplayString
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Name of the queue"
+    ::= { snsQosStatsEntry 2 }
+
+   snsQosEntryType OBJECT-TYPE
+      SYNTAX        DisplayString
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Type of the queue"
+    ::= { snsQosStatsEntry 3 }
+
+   snsQosEntryInCounter OBJECT-TYPE
+      SYNTAX        Counter64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Traffic In Counter [Bytes]"
+    ::= { snsQosStatsEntry 4 }
+
+   snsQosEntryInMaxPeak OBJECT-TYPE
+      SYNTAX        Counter64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Traffic In Max Peak [Bytes per second]"
+    ::= { snsQosStatsEntry 5 }
+
+   snsQosEntryInSpeedLimit OBJECT-TYPE
+      SYNTAX        Counter64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Speed In Limit [KBytes per second]"
+    ::= { snsQosStatsEntry 6 }
+
+   snsQosEntryOutCounter OBJECT-TYPE
+      SYNTAX        Counter64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Traffic Out Counter [Bytes]"
+    ::= { snsQosStatsEntry 7 }
+
+   snsQosEntryOutMaxPeak OBJECT-TYPE
+      SYNTAX        Counter64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Traffic Out Max Peak [Bytes per second]"
+    ::= { snsQosStatsEntry 8 }
+
+   snsQosEntryOutSpeedLimit OBJECT-TYPE
+      SYNTAX        Counter64
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Speed Out Limit [KBytes per second]"
+    ::= { snsQosStatsEntry 9 }
+
+    snsQosEntryComment OBJECT-TYPE
+      SYNTAX        DisplayString
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "User Comment of the queue"
+    ::= { snsQosStatsEntry 10 }
+
+END

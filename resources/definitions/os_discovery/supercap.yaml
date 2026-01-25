@@ -1,0 +1,2560 @@
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS01-AmbientTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS01-AmbientTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.2{{ $noindex }}'
+                    descr: 'BMS 01 Ambient Temperature'
+                    index: 'BMS01-AmbientTemperature'
+                    divisor: 100
+                    group: 'BMS 01'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS01-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS01-PowerTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS01-PowerTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.3{{ $noindex }}'
+                    descr: 'BMS 01 Power Temperature'
+                    index: 'BMS01-PowerTemperature'
+                    divisor: 100
+                    group: 'BMS 01'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS01-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS02-AmbientTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS02-AmbientTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.15{{ $noindex }}'
+                    descr: 'BMS 02 Ambient Temperature'
+                    index: 'BMS02-AmbientTemperature'
+                    divisor: 100
+                    group: 'BMS 02'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS02-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS02-PowerTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS02-PowerTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.16{{ $noindex }}'
+                    descr: 'BMS 02 Power Temperature'
+                    index: 'BMS02-PowerTemperature'
+                    divisor: 100
+                    group: 'BMS 02'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS02-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS03-AmbientTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS03-AmbientTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.28{{ $noindex }}'
+                    descr: 'BMS 03 Ambient Temperature'
+                    index: 'BMS03-AmbientTemperature'
+                    divisor: 100
+                    group: 'BMS 03'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS03-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS03-PowerTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS03-PowerTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.29{{ $noindex }}'
+                    descr: 'BMS 03 Power Temperature'
+                    index: 'BMS03-PowerTemperature'
+                    divisor: 100
+                    group: 'BMS 03'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS03-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS04-AmbientTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS04-AmbientTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.41{{ $noindex }}'
+                    descr: 'BMS 04 Ambient Temperature'
+                    index: 'BMS04-AmbientTemperature'
+                    divisor: 100
+                    group: 'BMS 04'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS04-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS04-PowerTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS04-PowerTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.42{{ $noindex }}'
+                    descr: 'BMS 04 Power Temperature'
+                    index: 'BMS04-PowerTemperature'
+                    divisor: 100
+                    group: 'BMS 04'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS04-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS05-AmbientTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS05-AmbientTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.54{{ $noindex }}'
+                    descr: 'BMS 05 Ambient Temperature'
+                    index: 'BMS05-AmbientTemperature'
+                    divisor: 100
+                    group: 'BMS 05'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS05-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS05-PowerTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS05-PowerTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.55{{ $noindex }}'
+                    descr: 'BMS 05 Power Temperature'
+                    index: 'BMS05-PowerTemperature'
+                    divisor: 100
+                    group: 'BMS 05'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS05-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS06-AmbientTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS06-AmbientTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.67{{ $noindex }}'
+                    descr: 'BMS 06 Ambient Temperature'
+                    index: 'BMS06-AmbientTemperature'
+                    divisor: 100
+                    group: 'BMS 06'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS06-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS06-PowerTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS06-PowerTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.68{{ $noindex }}'
+                    descr: 'BMS 06 Power Temperature'
+                    index: 'BMS06-PowerTemperature'
+                    divisor: 100
+                    group: 'BMS 06'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS06-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS07-AmbientTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS07-AmbientTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.80{{ $noindex }}'
+                    descr: 'BMS 07 Ambient Temperature'
+                    index: 'BMS07-AmbientTemperature'
+                    divisor: 100
+                    group: 'BMS 07'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS07-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS07-PowerTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS07-PowerTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.81{{ $noindex }}'
+                    descr: 'BMS 07 Power Temperature'
+                    index: 'BMS07-PowerTemperature'
+                    divisor: 100
+                    group: 'BMS 07'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS07-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS08-AmbientTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS08-AmbientTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.93{{ $noindex }}'
+                    descr: 'BMS 08 Ambient Temperature'
+                    index: 'BMS08-AmbientTemperature'
+                    divisor: 100
+                    group: 'BMS 08'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS08-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS08-PowerTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS08-PowerTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.94{{ $noindex }}'
+                    descr: 'BMS 08 Power Temperature'
+                    index: 'BMS08-PowerTemperature'
+                    divisor: 100
+                    group: 'BMS 08'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS08-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS09-AmbientTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS09-AmbientTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.106{{ $noindex }}'
+                    descr: 'BMS 09 Ambient Temperature'
+                    index: 'BMS09-AmbientTemperature'
+                    divisor: 100
+                    group: 'BMS 09'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS09-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS09-PowerTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS09-PowerTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.107{{ $noindex }}'
+                    descr: 'BMS 09 Power Temperature'
+                    index: 'BMS09-PowerTemperature'
+                    divisor: 100
+                    group: 'BMS 09'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS09-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS10-AmbientTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS10-AmbientTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.119{{ $noindex }}'
+                    descr: 'BMS 10 Ambient Temperature'
+                    index: 'BMS10-AmbientTemperature'
+                    divisor: 100
+                    group: 'BMS 10'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS10-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS10-PowerTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS10-PowerTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.120{{ $noindex }}'
+                    descr: 'BMS 10 Power Temperature'
+                    index: 'BMS10-PowerTemperature'
+                    divisor: 100
+                    group: 'BMS 10'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS10-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS11-AmbientTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS11-AmbientTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.132{{ $noindex }}'
+                    descr: 'BMS 11 Ambient Temperature'
+                    index: 'BMS11-AmbientTemperature'
+                    divisor: 100
+                    group: 'BMS 11'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS11-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS11-PowerTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS11-PowerTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.133{{ $noindex }}'
+                    descr: 'BMS 11 Power Temperature'
+                    index: 'BMS11-PowerTemperature'
+                    divisor: 100
+                    group: 'BMS 11'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS11-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS12-AmbientTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS12-AmbientTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.145{{ $noindex }}'
+                    descr: 'BMS 12 Ambient Temperature'
+                    index: 'BMS12-AmbientTemperature'
+                    divisor: 100
+                    group: 'BMS 12'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS12-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS12-PowerTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS12-PowerTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.146{{ $noindex }}'
+                    descr: 'BMS 12 Power Temperature'
+                    index: 'BMS12-PowerTemperature'
+                    divisor: 100
+                    group: 'BMS 12'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS12-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS13-AmbientTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS13-AmbientTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.158{{ $noindex }}'
+                    descr: 'BMS 13 Ambient Temperature'
+                    index: 'BMS13-AmbientTemperature'
+                    divisor: 100
+                    group: 'BMS 13'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS13-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS13-PowerTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS13-PowerTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.159{{ $noindex }}'
+                    descr: 'BMS 13 Power Temperature'
+                    index: 'BMS13-PowerTemperature'
+                    divisor: 100
+                    group: 'BMS 13'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS13-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS14-AmbientTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS14-AmbientTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.171{{ $noindex }}'
+                    descr: 'BMS 14 Ambient Temperature'
+                    index: 'BMS14-AmbientTemperature'
+                    divisor: 100
+                    group: 'BMS 14'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS14-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS14-PowerTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS14-PowerTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.172{{ $noindex }}'
+                    descr: 'BMS 14 Power Temperature'
+                    index: 'BMS14-PowerTemperature'
+                    divisor: 100
+                    group: 'BMS 14'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS14-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS15-AmbientTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS15-AmbientTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.184{{ $noindex }}'
+                    descr: 'BMS 15 Ambient Temperature'
+                    index: 'BMS15-AmbientTemperature'
+                    divisor: 100
+                    group: 'BMS 15'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS15-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS15-PowerTemperature
+                    value: SUPERCAPBATTERY-MIB::BMS15-PowerTemperature
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.185{{ $noindex }}'
+                    descr: 'BMS 15 Power Temperature'
+                    index: 'BMS15-PowerTemperature'
+                    divisor: 100
+                    group: 'BMS 15'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS15-PowerTemperature
+                            op: '='
+                            value: 0
+        current:
+            data:
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS01-Current
+                    value: SUPERCAPBATTERY-MIB::BMS01-Current
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.4{{ $noindex }}'
+                    descr: 'BMS 01 Current'
+                    index: 'BMS01-Current'
+                    divisor: 10
+                    group: 'BMS 01'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS01-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS02-Current
+                    value: SUPERCAPBATTERY-MIB::BMS02-Current
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.17{{ $noindex }}'
+                    descr: 'BMS 02 Current'
+                    index: 'BMS02-Current'
+                    divisor: 10
+                    group: 'BMS 02'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS02-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS03-Current
+                    value: SUPERCAPBATTERY-MIB::BMS03-Current
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.30{{ $noindex }}'
+                    descr: 'BMS 03 Current'
+                    index: 'BMS03-Current'
+                    divisor: 10
+                    group: 'BMS 03'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS03-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS04-Current
+                    value: SUPERCAPBATTERY-MIB::BMS04-Current
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.43{{ $noindex }}'
+                    descr: 'BMS 04 Current'
+                    index: 'BMS04-Current'
+                    divisor: 10
+                    group: 'BMS 04'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS04-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS05-Current
+                    value: SUPERCAPBATTERY-MIB::BMS05-Current
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.56{{ $noindex }}'
+                    descr: 'BMS 05 Current'
+                    index: 'BMS05-Current'
+                    divisor: 10
+                    group: 'BMS 05'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS05-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS06-Current
+                    value: SUPERCAPBATTERY-MIB::BMS06-Current
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.69{{ $noindex }}'
+                    descr: 'BMS 06 Current'
+                    index: 'BMS06-Current'
+                    divisor: 10
+                    group: 'BMS 06'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS06-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS07-Current
+                    value: SUPERCAPBATTERY-MIB::BMS07-Current
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.82{{ $noindex }}'
+                    descr: 'BMS 07 Current'
+                    index: 'BMS07-Current'
+                    divisor: 10
+                    group: 'BMS 07'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS07-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS08-Current
+                    value: SUPERCAPBATTERY-MIB::BMS08-Current
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.95{{ $noindex }}'
+                    descr: 'BMS 08 Current'
+                    index: 'BMS08-Current'
+                    divisor: 10
+                    group: 'BMS 08'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS08-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS09-Current
+                    value: SUPERCAPBATTERY-MIB::BMS09-Current
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.108{{ $noindex }}'
+                    descr: 'BMS 09 Current'
+                    index: 'BMS09-Current'
+                    divisor: 10
+                    group: 'BMS 09'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS09-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS10-Current
+                    value: SUPERCAPBATTERY-MIB::BMS10-Current
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.121{{ $noindex }}'
+                    descr: 'BMS 10 Current'
+                    index: 'BMS10-Current'
+                    divisor: 10
+                    group: 'BMS 10'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS10-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS11-Current
+                    value: SUPERCAPBATTERY-MIB::BMS11-Current
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.134{{ $noindex }}'
+                    descr: 'BMS 11 Current'
+                    index: 'BMS11-Current'
+                    divisor: 10
+                    group: 'BMS 11'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS11-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS12-Current
+                    value: SUPERCAPBATTERY-MIB::BMS12-Current
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.147{{ $noindex }}'
+                    descr: 'BMS 12 Current'
+                    index: 'BMS12-Current'
+                    divisor: 10
+                    group: 'BMS 12'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS12-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS13-Current
+                    value: SUPERCAPBATTERY-MIB::BMS13-Current
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.160{{ $noindex }}'
+                    descr: 'BMS 13 Current'
+                    index: 'BMS13-Current'
+                    divisor: 10
+                    group: 'BMS 13'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS13-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS14-Current
+                    value: SUPERCAPBATTERY-MIB::BMS14-Current
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.173{{ $noindex }}'
+                    descr: 'BMS 14 Current'
+                    index: 'BMS14-Current'
+                    divisor: 10
+                    group: 'BMS 14'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS14-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS15-Current
+                    value: SUPERCAPBATTERY-MIB::BMS15-Current
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.186{{ $noindex }}'
+                    descr: 'BMS 15 Current'
+                    index: 'BMS15-Current'
+                    divisor: 10
+                    group: 'BMS 15'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS15-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS01-RemainingCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS01-RemainingCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.6{{ $noindex }}'
+                    descr: 'BMS 01 Remaining Capacity (AH)'
+                    index: 'BMS01-RemainingCapacity'
+                    divisor: 100
+                    group: 'BMS 01'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS01-RemainingCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS01-TotalCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS01-TotalCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.7{{ $noindex }}'
+                    descr: 'BMS 01 Total Capacity (AH)'
+                    index: 'BMS01-TotalCapacity'
+                    divisor: 100
+                    group: 'BMS 01'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS01-TotalCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS01-TotalDischargeCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS01-TotalDischargeCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.9{{ $noindex }}'
+                    descr: 'BMS 01 Total Discharge Capacity (AH)'
+                    index: 'BMS01-TotalDischargeCapacity'
+                    group: 'BMS 01'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS01-TotalDischargeCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS02-RemainingCapacity   
+                    value: SUPERCAPBATTERY-MIB::BMS02-RemainingCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.19{{ $noindex }}'
+                    descr: 'BMS 02 Remaining Capacity (AH)'
+                    index: 'BMS02-RemainingCapacity'
+                    divisor: 100
+                    group: 'BMS 02'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS02-RemainingCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS02-TotalCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.20{{ $noindex }}'
+                    descr: 'BMS 02 Total Capacity (AH)'
+                    index: 'BMS02-TotalCapacity'
+                    divisor: 100
+                    group: 'BMS 02'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS02-TotalCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS02-TotalDischargeCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS02-TotalDischargeCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.21{{ $noindex }}'
+                    descr: 'BMS 02 Total Discharge Capacity (AH)'
+                    index: 'BMS02-TotalDischargeCapacity'
+                    group: 'BMS 02'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS02-TotalDischargeCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS03-RemainingCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS03-RemainingCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.32{{ $noindex }}'
+                    descr: 'BMS 03 Remaining Capacity (AH)'
+                    index: 'BMS03-RemainingCapacity'
+                    divisor: 100
+                    group: 'BMS 03'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS03-RemainingCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS03-TotalCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS03-TotalCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.33{{ $noindex }}'
+                    descr: 'BMS 03 Total Capacity (AH)'
+                    index: 'BMS03-TotalCapacity'
+                    divisor: 100
+                    group: 'BMS 03'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS03-TotalCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS03-TotalDischargeCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS03-TotalDischargeCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.35{{ $noindex }}'
+                    descr: 'BMS 03 Total Discharge Capacity (AH)'
+                    index: 'BMS03-TotalDischargeCapacity'
+                    group: 'BMS 03'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS03-TotalDischargeCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS04-RemainingCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS04-RemainingCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.45{{ $noindex }}'
+                    descr: 'BMS 04 Remaining Capacity (AH)'
+                    index: 'BMS04-RemainingCapacity'
+                    divisor: 100
+                    group: 'BMS 04'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS04-RemainingCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS04-TotalCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS04-TotalCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.46{{ $noindex }}'
+                    descr: 'BMS 04 Total Capacity (AH)'
+                    index: 'BMS04-TotalCapacity'
+                    divisor: 100
+                    group: 'BMS 04'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS04-TotalCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS04-TotalDischargeCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS04-TotalDischargeCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.48{{ $noindex }}'
+                    descr: 'BMS 04 Total Discharge Capacity (AH)'
+                    index: 'BMS04-TotalDischargeCapacity'
+                    group: 'BMS 04'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS04-TotalDischargeCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS05-RemainingCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS05-RemainingCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.58{{ $noindex }}'
+                    descr: 'BMS 05 Remaining Capacity (AH)'
+                    index: 'BMS05-RemainingCapacity'
+                    divisor: 100
+                    group: 'BMS 05'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS05-RemainingCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS05-TotalCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS05-TotalCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.59{{ $noindex }}'
+                    descr: 'BMS 05 Total Capacity (AH)'
+                    index: 'BMS05-TotalCapacity'
+                    divisor: 100
+                    group: 'BMS 05'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS05-TotalCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS05-TotalDischargeCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS05-TotalDischargeCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.61{{ $noindex }}'
+                    descr: 'BMS 05 Total Discharge Capacity (AH)'
+                    index: 'BMS05-TotalDischargeCapacity'
+                    group: 'BMS 05'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS05-TotalDischargeCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS06-RemainingCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS06-RemainingCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.71{{ $noindex }}'
+                    descr: 'BMS 06 Remaining Capacity (AH)'
+                    index: 'BMS06-RemainingCapacity'
+                    divisor: 100
+                    group: 'BMS 06'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS06-RemainingCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS06-TotalCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS06-TotalCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.72{{ $noindex }}'
+                    descr: 'BMS 06 Total Capacity (AH)'
+                    index: 'BMS06-TotalCapacity'
+                    divisor: 100
+                    group: 'BMS 06'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS06-TotalCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS06-TotalDischargeCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS06-TotalDischargeCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.74{{ $noindex }}'
+                    descr: 'BMS 06 Total Discharge Capacity (AH)'
+                    index: 'BMS06-TotalDischargeCapacity'
+                    group: 'BMS 06'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS06-TotalDischargeCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS07-RemainingCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS07-RemainingCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.84{{ $noindex }}'
+                    descr: 'BMS 07 Remaining Capacity (AH)'
+                    index: 'BMS07-RemainingCapacity'
+                    divisor: 100
+                    group: 'BMS 07'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS07-RemainingCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS07-TotalCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.85{{ $noindex }}'
+                    descr: 'BMS 07 Total Capacity (AH)'
+                    index: 'BMS07-TotalCapacity'
+                    divisor: 100
+                    group: 'BMS 07'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS07-TotalCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS07-TotalDischargeCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS07-TotalDischargeCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.87{{ $noindex }}'
+                    descr: 'BMS 07 Total Discharge Capacity (AH)'
+                    index: 'BMS07-TotalDischargeCapacity'
+                    group: 'BMS 07'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS07-TotalDischargeCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS08-RemainingCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS08-RemainingCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.97{{ $noindex }}'
+                    descr: 'BMS 08 Remaining Capacity (AH)'
+                    index: 'BMS08-RemainingCapacity'
+                    divisor: 100
+                    group: 'BMS 08'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS08-RemainingCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS08-TotalCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS08-TotalCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.98{{ $noindex }}'
+                    descr: 'BMS 08 Total Capacity (AH)'
+                    index: 'BMS08-TotalCapacity'
+                    divisor: 100
+                    group: 'BMS 08'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS08-TotalCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS08-TotalDischargeCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS08-TotalDischargeCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.100{{ $noindex }}'
+                    descr: 'BMS 08 Total Discharge Capacity (AH)'
+                    index: 'BMS08-TotalDischargeCapacity'
+                    group: 'BMS 08'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS08-TotalDischargeCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS09-RemainingCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS09-RemainingCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.110{{ $noindex }}'
+                    descr: 'BMS 09 Remaining Capacity (AH)'
+                    index: 'BMS09-RemainingCapacity'
+                    divisor: 100
+                    group: 'BMS 09'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS09-RemainingCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS09-TotalCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS09-TotalCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.111{{ $noindex }}'
+                    descr: 'BMS 09 Total Capacity (AH)'
+                    index: 'BMS09-TotalCapacity'
+                    divisor: 100
+                    group: 'BMS 09'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS09-TotalCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS09-TotalDischargeCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS09-TotalDischargeCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.113{{ $noindex }}'
+                    descr: 'BMS 09 Total Discharge Capacity (AH)'
+                    index: 'BMS09-TotalDischargeCapacity'
+                    group: 'BMS 09'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS09-TotalDischargeCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS10-RemainingCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS10-RemainingCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.123{{ $noindex }}'
+                    descr: 'BMS 10 Remaining Capacity (AH)'
+                    index: 'BMS10-RemainingCapacity'
+                    divisor: 100
+                    group: 'BMS 10'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS10-RemainingCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS10-TotalCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS10-TotalCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.124{{ $noindex }}'
+                    descr: 'BMS 10 Total Capacity (AH)'
+                    index: 'BMS10-TotalCapacity'
+                    divisor: 100
+                    group: 'BMS 10'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS10-TotalCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS10-TotalDischargeCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS10-TotalDischargeCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.126{{ $noindex }}'
+                    descr: 'BMS 10 Total Discharge Capacity (AH)'
+                    index: 'BMS10-TotalDischargeCapacity'
+                    group: 'BMS 10'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS10-TotalDischargeCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS11-RemainingCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS11-RemainingCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.136{{ $noindex }}'
+                    descr: 'BMS 11 Remaining Capacity (AH)'
+                    index: 'BMS11-RemainingCapacity'
+                    divisor: 100
+                    group: 'BMS 11'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS11-RemainingCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS11-TotalCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS11-TotalCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.137{{ $noindex }}'
+                    descr: 'BMS 11 Total Capacity (AH)'
+                    index: 'BMS11-TotalCapacity'
+                    divisor: 100
+                    group: 'BMS 11'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS11-TotalCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS11-TotalDischargeCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS11-TotalDischargeCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.139{{ $noindex }}'
+                    descr: 'BMS 11 Total Discharge Capacity (AH)'
+                    index: 'BMS11-TotalDischargeCapacity'
+                    group: 'BMS 11'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS11-TotalDischargeCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS12-RemainingCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS12-RemainingCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.149{{ $noindex }}'
+                    descr: 'BMS 12 Remaining Capacity (AH)'
+                    index: 'BMS12-RemainingCapacity'
+                    divisor: 100
+                    group: 'BMS 12'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS12-RemainingCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS12-TotalCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS12-TotalCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.150{{ $noindex }}'
+                    descr: 'BMS 12 Total Capacity (AH)'
+                    index: 'BMS12-TotalCapacity'
+                    divisor: 100
+                    group: 'BMS 12'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS12-TotalCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS12-TotalDischargeCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS12-TotalDischargeCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.152{{ $noindex }}'
+                    descr: 'BMS 12 Total Discharge Capacity (AH)'
+                    index: 'BMS12-TotalDischargeCapacity'
+                    group: 'BMS 12'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS12-TotalDischargeCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS13-RemainingCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS13-RemainingCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.162{{ $noindex }}'
+                    descr: 'BMS 13 Remaining Capacity (AH)'
+                    index: 'BMS13-RemainingCapacity'
+                    divisor: 100
+                    group: 'BMS 13'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS13-RemainingCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS13-TotalCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS13-TotalCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.163{{ $noindex }}'
+                    descr: 'BMS 13 Total Capacity (AH)'
+                    index: 'BMS13-TotalCapacity'
+                    divisor: 100
+                    group: 'BMS 13'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS13-TotalCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS13-TotalDischargeCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS13-TotalDischargeCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.165{{ $noindex }}'
+                    descr: 'BMS 13 Total Discharge Capacity (AH)'
+                    index: 'BMS13-TotalDischargeCapacity'
+                    group: 'BMS 13'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS13-TotalDischargeCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS14-RemainingCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS14-RemainingCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.175{{ $noindex }}'
+                    descr: 'BMS 14 Remaining Capacity (AH)'
+                    index: 'BMS14-RemainingCapacity'
+                    divisor: 100
+                    group: 'BMS 14'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS14-RemainingCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS14-TotalCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS14-TotalCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.176{{ $noindex }}'
+                    descr: 'BMS 14 Total Capacity (AH)'
+                    index: 'BMS14-TotalCapacity'
+                    divisor: 100
+                    group: 'BMS 14'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS14-TotalCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS14-TotalDischargeCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS14-TotalDischargeCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.178{{ $noindex }}'
+                    descr: 'BMS 14 Total Discharge Capacity (AH)'
+                    index: 'BMS14-TotalDischargeCapacity'
+                    group: 'BMS 14'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS14-TotalDischargeCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS15-RemainingCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS15-RemainingCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.188{{ $noindex }}'
+                    descr: 'BMS 15 Remaining Capacity (AH)'
+                    index: 'BMS15-RemainingCapacity'
+                    divisor: 100
+                    group: 'BMS 15'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS15-RemainingCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS15-TotalCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS15-TotalCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.189{{ $noindex }}'
+                    descr: 'BMS 15 Total Capacity (AH)'
+                    index: 'BMS15-TotalCapacity'
+                    divisor: 100
+                    group: 'BMS 15'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS15-TotalCapacity
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS15-TotalDischargeCapacity
+                    value: SUPERCAPBATTERY-MIB::BMS15-TotalDischargeCapacity
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.191{{ $noindex }}'
+                    descr: 'BMS 15 Total Discharge Capacity (AH)'
+                    index: 'BMS15-TotalDischargeCapacity'
+                    group: 'BMS 15'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS15-TotalDischargeCapacity
+                            op: '='
+                            value: 0
+        count:
+            data:
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS01-Cycles
+                    value: SUPERCAPBATTERY-MIB::BMS01-Cycles
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.8{{ $noindex }}'
+                    descr: 'BMS 01 Cycles'
+                    index: 'BMS01-Cycles'
+                    group: 'BMS 01'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS01-Cycles
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS02-Cycles
+                    value: SUPERCAPBATTERY-MIB::BMS02-Cycles
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.21{{ $noindex }}'
+                    descr: 'BMS 02 Cycles'
+                    index: 'BMS02-Cycles'
+                    group: 'BMS 02'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS02-Cycles
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS03-Cycles
+                    value: SUPERCAPBATTERY-MIB::BMS03-Cycles
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.34{{ $noindex }}'
+                    descr: 'BMS 03 Cycles'
+                    index: 'BMS03-Cycles'
+                    group: 'BMS 03'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS03-Cycles
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS04-Cycles
+                    value: SUPERCAPBATTERY-MIB::BMS04-Cycles
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.47{{ $noindex }}'
+                    descr: 'BMS 04 Cycles'
+                    index: 'BMS04-Cycles'
+                    group: 'BMS 04'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS04-Cycles
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS05-Cycles
+                    value: SUPERCAPBATTERY-MIB::BMS05-Cycles
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.60{{ $noindex }}'
+                    descr: 'BMS 05 Cycles'
+                    index: 'BMS05-Cycles'
+                    group: 'BMS 05'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS05-Cycles
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS06-Cycles
+                    value: SUPERCAPBATTERY-MIB::BMS06-Cycles
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.73{{ $noindex }}'
+                    descr: 'BMS 06 Cycles'
+                    index: 'BMS06-Cycles'
+                    group: 'BMS 06'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS06-Cycles
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS07-Cycles
+                    value: SUPERCAPBATTERY-MIB::BMS07-Cycles
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.86{{ $noindex }}'
+                    descr: 'BMS 07 Cycles'
+                    index: 'BMS07-Cycles'
+                    group: 'BMS 07'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS07-Cycles
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS08-Cycles
+                    value: SUPERCAPBATTERY-MIB::BMS08-Cycles
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.99{{ $noindex }}'
+                    descr: 'BMS 08 Cycles'
+                    index: 'BMS08-Cycles'
+                    group: 'BMS 08'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS08-Cycles
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS09-Cycles
+                    value: SUPERCAPBATTERY-MIB::BMS09-Cycles
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.112{{ $noindex }}'
+                    descr: 'BMS 09 Cycles'
+                    index: 'BMS09-Cycles'
+                    group: 'BMS 09'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS09-Cycles
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS10-Cycles
+                    value: SUPERCAPBATTERY-MIB::BMS10-Cycles
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.125{{ $noindex }}'
+                    descr: 'BMS 10 Cycles'
+                    index: 'BMS10-Cycles'
+                    group: 'BMS 10'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS10-Cycles
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS11-Cycles
+                    value: SUPERCAPBATTERY-MIB::BMS11-Cycles
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.138{{ $noindex }}'
+                    descr: 'BMS 11 Cycles'
+                    index: 'BMS11-Cycles'
+                    group: 'BMS 11'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS11-Cycles
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS12-Cycles
+                    value: SUPERCAPBATTERY-MIB::BMS12-Cycles
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.151{{ $noindex }}'
+                    descr: 'BMS 12 Cycles'
+                    index: 'BMS12-Cycles'
+                    group: 'BMS 12'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS12-Cycles
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS13-Cycles
+                    value: SUPERCAPBATTERY-MIB::BMS13-Cycles
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.164{{ $noindex }}'
+                    descr: 'BMS 13 Cycles'
+                    index: 'BMS13-Cycles'
+                    group: 'BMS 13'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS13-Cycles
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS14-Cycles
+                    value: SUPERCAPBATTERY-MIB::BMS14-Cycles
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.177{{ $noindex }}'
+                    descr: 'BMS 14 Cycles'
+                    index: 'BMS14-Cycles'
+                    group: 'BMS 14'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS14-Cycles
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS15-Cycles
+                    value: SUPERCAPBATTERY-MIB::BMS15-Cycles
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.190{{ $noindex }}'
+                    descr: 'BMS 15 Cycles'
+                    index: 'BMS15-Cycles'
+                    group: 'BMS 15'
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS15-Cycles
+                            op: '='
+                            value: 0
+        percent:
+            data:
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS01-HealthStatus
+                    value: SUPERCAPBATTERY-MIB::BMS01-HealthStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.10{{ $noindex }}'
+                    descr: 'BMS 01 Health Status (%)'
+                    index: 'BMS01-HealthStatus'
+                    group: 'BMS 01'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS01-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS02-HealthStatus
+                    value: SUPERCAPBATTERY-MIB::BMS02-HealthStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.23{{ $noindex }}'
+                    descr: 'BMS 02 Health Status (%)'
+                    index: 'BMS02-HealthStatus'
+                    group: 'BMS 02'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS02-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS03-HealthStatus
+                    value: SUPERCAPBATTERY-MIB::BMS03-HealthStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.36{{ $noindex }}'
+                    descr: 'BMS 03 Health Status (%)'
+                    index: 'BMS03-HealthStatus'
+                    group: 'BMS 03'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS03-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS04-HealthStatus
+                    value: SUPERCAPBATTERY-MIB::BMS04-HealthStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.49{{ $noindex }}'
+                    descr: 'BMS 04 Health Status (%)'
+                    index: 'BMS04-HealthStatus'
+                    group: 'BMS 04'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS04-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS05-HealthStatus
+                    value: SUPERCAPBATTERY-MIB::BMS05-HealthStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.62{{ $noindex }}'
+                    descr: 'BMS 05 Health Status (%)'
+                    index: 'BMS05-HealthStatus'
+                    group: 'BMS 05'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS05-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS06-HealthStatus
+                    value: SUPERCAPBATTERY-MIB::BMS06-HealthStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.75{{ $noindex }}'
+                    descr: 'BMS 06 Health Status (%)'
+                    index: 'BMS06-HealthStatus'
+                    group: 'BMS 06'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS06-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS07-HealthStatus
+                    value: SUPERCAPBATTERY-MIB::BMS07-HealthStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.88{{ $noindex }}'
+                    descr: 'BMS 07 Health Status (%)'
+                    index: 'BMS07-HealthStatus'
+                    group: 'BMS 07'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS07-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS08-HealthStatus
+                    value: SUPERCAPBATTERY-MIB::BMS08-HealthStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.101{{ $noindex }}'
+                    descr: 'BMS 08 Health Status (%)'
+                    index: 'BMS08-HealthStatus'
+                    group: 'BMS 08'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS08-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS09-HealthStatus
+                    value: SUPERCAPBATTERY-MIB::BMS09-HealthStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.114{{ $noindex }}'
+                    descr: 'BMS 09 Health Status (%)'
+                    index: 'BMS09-HealthStatus'
+                    group: 'BMS 09'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS09-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS10-HealthStatus
+                    value: SUPERCAPBATTERY-MIB::BMS10-HealthStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.127{{ $noindex }}'
+                    descr: 'BMS 10 Health Status (%)'
+                    index: 'BMS10-HealthStatus'
+                    group: 'BMS 10'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS10-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS11-HealthStatus
+                    value: SUPERCAPBATTERY-MIB::BMS11-HealthStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.140{{ $noindex }}'
+                    descr: 'BMS 11 Health Status (%)'
+                    index: 'BMS11-HealthStatus'
+                    group: 'BMS 11'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS11-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS12-HealthStatus
+                    value: SUPERCAPBATTERY-MIB::BMS12-HealthStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.153{{ $noindex }}'
+                    descr: 'BMS 12 Health Status (%)'
+                    index: 'BMS12-HealthStatus'
+                    group: 'BMS 12'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS12-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS13-HealthStatus
+                    value: SUPERCAPBATTERY-MIB::BMS13-HealthStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.166{{ $noindex }}'
+                    descr: 'BMS 13 Health Status (%)'
+                    index: 'BMS13-HealthStatus'
+                    group: 'BMS 13'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS13-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS14-HealthStatus
+                    value: SUPERCAPBATTERY-MIB::BMS14-HealthStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.179{{ $noindex }}'
+                    descr: 'BMS 14 Health Status (%)'
+                    index: 'BMS14-HealthStatus'
+                    group: 'BMS 14'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS14-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS15-HealthStatus
+                    value: SUPERCAPBATTERY-MIB::BMS15-HealthStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.192{{ $noindex }}'
+                    descr: 'BMS 15 Health Status (%)'
+                    index: 'BMS15-HealthStatus'
+                    group: 'BMS 15'
+                    divisor: 100
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS15-AmbientTemperature
+                            op: '='
+                            value: 0
+        state:
+            data:
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS01-AmbientTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS01-AmbientTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.11{{ $noindex }}'
+                    descr: 'BMS 01 Ambient Temperature Alarm Status'
+                    index: 'BMS01-AmbientTempAlarmStatus'
+                    group: 'BMS 01'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS01-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS01-PowerTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS01-PowerTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.12{{ $noindex }}'
+                    descr: 'BMS 01 Power Temperature Alarm Status'
+                    index: 'BMS01-PowerTempAlarmStatus'
+                    group: 'BMS 01'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS01-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS01-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS01-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.13{{ $noindex }}'
+                    descr: 'BMS 01 Charge Discharge Current Alarm Status'
+                    index: 'BMS01-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 01'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS01-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS01-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS01-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.14{{ $noindex }}'
+                    descr: 'BMS 01 Battery Voltage Alarm Status'
+                    index: 'BMS01-BatteryVoltageAlarmStatus'
+                    group: 'BMS 01'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS01-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS02-AmbientTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS02-AmbientTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.24{{ $noindex }}'
+                    descr: 'BMS 02 Ambient Temperature Alarm Status'
+                    index: 'BMS02-AmbientTempAlarmStatus'
+                    group: 'BMS 02'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS02-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS02-PowerTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS02-PowerTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.25{{ $noindex }}'
+                    descr: 'BMS 02 Power Temperature Alarm Status'
+                    index: 'BMS02-PowerTempAlarmStatus'
+                    group: 'BMS 02'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS02-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS02-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS02-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.26{{ $noindex }}'
+                    descr: 'BMS 02 Charge Discharge Current Alarm Status'
+                    index: 'BMS02-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 02'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS02-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS02-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS02-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.27{{ $noindex }}'
+                    descr: 'BMS 02 Battery Voltage Alarm Status'
+                    index: 'BMS02-BatteryVoltageAlarmStatus'
+                    group: 'BMS 02'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS02-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS03-AmbientTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS03-AmbientTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.37{{ $noindex }}'
+                    descr: 'BMS 03 Ambient Temperature Alarm Status'
+                    index: 'BMS03-AmbientTempAlarmStatus'
+                    group: 'BMS 03'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS03-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS03-PowerTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS03-PowerTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.38{{ $noindex }}'
+                    descr: 'BMS 03 Power Temperature Alarm Status'
+                    index: 'BMS03-PowerTempAlarmStatus'
+                    group: 'BMS 03'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS03-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS03-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS03-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.39{{ $noindex }}'
+                    descr: 'BMS 03 Charge Discharge Current Alarm Status'
+                    index: 'BMS03-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 03'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS03-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS03-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS03-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.40{{ $noindex }}'
+                    descr: 'BMS 03 Battery Voltage Alarm Status'
+                    index: 'BMS03-BatteryVoltageAlarmStatus'
+                    group: 'BMS 03'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS03-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS04-AmbientTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS04-AmbientTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.50{{ $noindex }}'
+                    descr: 'BMS 04 Ambient Temperature Alarm Status'
+                    index: 'BMS04-AmbientTempAlarmStatus'
+                    group: 'BMS 04'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS04-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS04-PowerTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS04-PowerTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.51{{ $noindex }}'
+                    descr: 'BMS 04 Power Temperature Alarm Status'
+                    index: 'BMS04-PowerTempAlarmStatus'
+                    group: 'BMS 04'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS04-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS04-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS04-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.52{{ $noindex }}'
+                    descr: 'BMS 04 Charge Discharge Current Alarm Status'
+                    index: 'BMS04-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 04'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS04-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS04-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS04-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.53{{ $noindex }}'
+                    descr: 'BMS 04 Battery Voltage Alarm Status'
+                    index: 'BMS04-BatteryVoltageAlarmStatus'
+                    group: 'BMS 04'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS04-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS05-AmbientTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS05-AmbientTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.63{{ $noindex }}'
+                    descr: 'BMS 05 Ambient Temperature Alarm Status'
+                    index: 'BMS05-AmbientTempAlarmStatus'
+                    group: 'BMS 05'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS05-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS05-PowerTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS05-PowerTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.64{{ $noindex }}'
+                    descr: 'BMS 05 Power Temperature Alarm Status'
+                    index: 'BMS05-PowerTempAlarmStatus'
+                    group: 'BMS 05'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS05-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS05-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS05-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.65{{ $noindex }}'
+                    descr: 'BMS 05 Charge Discharge Current Alarm Status'
+                    index: 'BMS05-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 05'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS05-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS05-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS05-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.66{{ $noindex }}'
+                    descr: 'BMS 05 Battery Voltage Alarm Status'
+                    index: 'BMS05-BatteryVoltageAlarmStatus'
+                    group: 'BMS 05'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS05-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS06-AmbientTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS06-AmbientTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.76{{ $noindex }}'
+                    descr: 'BMS 06 Ambient Temperature Alarm Status'
+                    index: 'BMS06-AmbientTempAlarmStatus'
+                    group: 'BMS 06'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS06-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS06-PowerTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS06-PowerTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.77{{ $noindex }}'
+                    descr: 'BMS 06 Power Temperature Alarm Status'
+                    index: 'BMS06-PowerTempAlarmStatus'
+                    group: 'BMS 06'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS06-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS06-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS06-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.78{{ $noindex }}'
+                    descr: 'BMS 06 Charge Discharge Current Alarm Status'
+                    index: 'BMS06-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 06'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS06-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS06-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS06-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.79{{ $noindex }}'
+                    descr: 'BMS 06 Battery Voltage Alarm Status'
+                    index: 'BMS06-BatteryVoltageAlarmStatus'
+                    group: 'BMS 06'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS06-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS07-AmbientTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS07-AmbientTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.89{{ $noindex }}'
+                    descr: 'BMS 07 Ambient Temperature Alarm Status'
+                    index: 'BMS07-AmbientTempAlarmStatus'
+                    group: 'BMS 07'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS07-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS07-PowerTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS07-PowerTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.90{{ $noindex }}'
+                    descr: 'BMS 07 Power Temperature Alarm Status'
+                    index: 'BMS07-PowerTempAlarmStatus'
+                    group: 'BMS 07'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS07-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS07-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS07-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.91{{ $noindex }}'
+                    descr: 'BMS 07 Charge Discharge Current Alarm Status'
+                    index: 'BMS07-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 07'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS07-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS07-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS07-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.92{{ $noindex }}'
+                    descr: 'BMS 07 Battery Voltage Alarm Status'
+                    index: 'BMS07-BatteryVoltageAlarmStatus'
+                    group: 'BMS 07'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS07-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS08-AmbientTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS08-AmbientTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.102{{ $noindex }}'
+                    descr: 'BMS 08 Ambient Temperature Alarm Status'
+                    index: 'BMS08-AmbientTempAlarmStatus'
+                    group: 'BMS 08'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS08-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS08-PowerTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS08-PowerTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.103{{ $noindex }}'
+                    descr: 'BMS 08 Power Temperature Alarm Status'
+                    index: 'BMS08-PowerTempAlarmStatus'
+                    group: 'BMS 08'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS08-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS08-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS08-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.104{{ $noindex }}'
+                    descr: 'BMS 08 Charge Discharge Current Alarm Status'
+                    index: 'BMS08-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 08'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS08-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS08-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS08-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.105{{ $noindex }}'
+                    descr: 'BMS 08 Battery Voltage Alarm Status'
+                    index: 'BMS08-BatteryVoltageAlarmStatus'
+                    group: 'BMS 08'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS08-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS09-AmbientTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS09-AmbientTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.115{{ $noindex }}'
+                    descr: 'BMS 09 Ambient Temperature Alarm Status'
+                    index: 'BMS09-AmbientTempAlarmStatus'
+                    group: 'BMS 09'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS09-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS09-PowerTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS09-PowerTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.116{{ $noindex }}'
+                    descr: 'BMS 09 Power Temperature Alarm Status'
+                    index: 'BMS09-PowerTempAlarmStatus'
+                    group: 'BMS 09'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS09-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS09-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS09-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.117{{ $noindex }}'
+                    descr: 'BMS 09 Charge Discharge Current Alarm Status'
+                    index: 'BMS09-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 09'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS09-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS09-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS09-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.118{{ $noindex }}'
+                    descr: 'BMS 09 Battery Voltage Alarm Status'
+                    index: 'BMS09-BatteryVoltageAlarmStatus'
+                    group: 'BMS 09'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS09-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS10-AmbientTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS10-AmbientTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.128{{ $noindex }}'
+                    descr: 'BMS 10 Ambient Temperature Alarm Status'
+                    index: 'BMS10-AmbientTempAlarmStatus'
+                    group: 'BMS 10'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS10-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS10-PowerTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS10-PowerTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.129{{ $noindex }}'
+                    descr: 'BMS 10 Power Temperature Alarm Status'
+                    index: 'BMS10-PowerTempAlarmStatus'
+                    group: 'BMS 10'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS10-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS10-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS10-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.130{{ $noindex }}'
+                    descr: 'BMS 10 Charge Discharge Current Alarm Status'
+                    index: 'BMS10-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 10'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS10-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS10-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS10-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.131{{ $noindex }}'
+                    descr: 'BMS 10 Battery Voltage Alarm Status'
+                    index: 'BMS10-BatteryVoltageAlarmStatus'
+                    group: 'BMS 10'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS10-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS11-AmbientTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS11-AmbientTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.141{{ $noindex }}'
+                    descr: 'BMS 11 Ambient Temperature Alarm Status'
+                    index: 'BMS11-AmbientTempAlarmStatus'
+                    group: 'BMS 11'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS11-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS11-PowerTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS11-PowerTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.142{{ $noindex }}'
+                    descr: 'BMS 11 Power Temperature Alarm Status'
+                    index: 'BMS11-PowerTempAlarmStatus'
+                    group: 'BMS 11'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS11-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS11-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS11-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.143{{ $noindex }}'
+                    descr: 'BMS 11 Charge Discharge Current Alarm Status'
+                    index: 'BMS11-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 11'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS11-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS11-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS11-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.144{{ $noindex }}'
+                    descr: 'BMS 11 Battery Voltage Alarm Status'
+                    index: 'BMS11-BatteryVoltageAlarmStatus'
+                    group: 'BMS 11'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS11-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS12-AmbientTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS12-AmbientTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.154{{ $noindex }}'
+                    descr: 'BMS 12 Ambient Temperature Alarm Status'
+                    index: 'BMS12-AmbientTempAlarmStatus'
+                    group: 'BMS 12'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS12-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS12-PowerTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS12-PowerTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.155{{ $noindex }}'
+                    descr: 'BMS 12 Power Temperature Alarm Status'
+                    index: 'BMS12-PowerTempAlarmStatus'
+                    group: 'BMS 12'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS12-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS12-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS12-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.156{{ $noindex }}'
+                    descr: 'BMS 12 Charge Discharge Current Alarm Status'
+                    index: 'BMS12-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 12'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS12-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS12-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS12-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.157{{ $noindex }}'
+                    descr: 'BMS 12 Battery Voltage Alarm Status'
+                    index: 'BMS12-BatteryVoltageAlarmStatus'
+                    group: 'BMS 12'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS12-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS13-AmbientTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS13-AmbientTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.167{{ $noindex }}'
+                    descr: 'BMS 13 Ambient Temperature Alarm Status'
+                    index: 'BMS13-AmbientTempAlarmStatus'
+                    group: 'BMS 13'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS13-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS13-PowerTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS13-PowerTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.168{{ $noindex }}'
+                    descr: 'BMS 13 Power Temperature Alarm Status'
+                    index: 'BMS13-PowerTempAlarmStatus'
+                    group: 'BMS 13'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS13-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS13-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS13-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.169{{ $noindex }}'
+                    descr: 'BMS 13 Charge Discharge Current Alarm Status'
+                    index: 'BMS13-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 13'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS13-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS13-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS13-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.170{{ $noindex }}'
+                    descr: 'BMS 13 Battery Voltage Alarm Status'
+                    index: 'BMS13-BatteryVoltageAlarmStatus'
+                    group: 'BMS 13'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS13-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS14-AmbientTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS14-AmbientTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.180{{ $noindex }}'
+                    descr: 'BMS 14 Ambient Temperature Alarm Status'
+                    index: 'BMS14-AmbientTempAlarmStatus'
+                    group: 'BMS 14'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS14-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS14-PowerTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS14-PowerTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.181{{ $noindex }}'
+                    descr: 'BMS 14 Power Temperature Alarm Status'
+                    index: 'BMS14-PowerTempAlarmStatus'
+                    group: 'BMS 14'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS14-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS14-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS14-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.182{{ $noindex }}'
+                    descr: 'BMS 14 Charge Discharge Current Alarm Status'
+                    index: 'BMS14-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 14'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS14-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS14-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS14-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.183{{ $noindex }}'
+                    descr: 'BMS 14 Battery Voltage Alarm Status'
+                    index: 'BMS14-BatteryVoltageAlarmStatus'
+                    group: 'BMS 14'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS14-Voltage
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS15-AmbientTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS15-AmbientTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.193{{ $noindex }}'
+                    descr: 'BMS 15 Ambient Temperature Alarm Status'
+                    index: 'BMS15-AmbientTempAlarmStatus'
+                    group: 'BMS 15'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS15-AmbientTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS15-PowerTempAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS15-PowerTempAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.194{{ $noindex }}'
+                    descr: 'BMS 15 Power Temperature Alarm Status'
+                    index: 'BMS15-PowerTempAlarmStatus'
+                    group: 'BMS 15'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS15-PowerTemperature
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS15-ChargeDischargeCurrentAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS15-ChargeDischargeCurrentAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.195{{ $noindex }}'
+                    descr: 'BMS 15 Charge Discharge Current Alarm Status'
+                    index: 'BMS15-ChargeDischargeCurrentAlarmStatus'
+                    group: 'BMS 15'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS15-Current
+                            op: '='
+                            value: 0
+                -
+                    oid: SUPERCAPBATTERY-MIB::BMS15-BatteryVoltageAlarmStatus
+                    value: SUPERCAPBATTERY-MIB::BMS15-BatteryVoltageAlarmStatus
+                    num_oid: '.1.3.6.1.2.1.555.1.1.1.196{{ $noindex }}'
+                    descr: 'BMS 15 Battery Voltage Alarm Status'
+                    index: 'BMS15-BatteryVoltageAlarmStatus'
+                    group: 'BMS 15'
+                    state_name: supercapStatus
+                    states:
+                        - { value: 0, descr: "OK", graph: 1, generic: 0 }
+                        - { value: 1, descr: "Warning", graph: 1, generic: 1 }
+                        - { value: 2, descr: "Alarm", graph: 1, generic: 2 }
+                    skip_values:
+                        -
+                            oid: SUPERCAPBATTERY-MIB::BMS15-Voltage
+                            op: '='
+                            value: 0

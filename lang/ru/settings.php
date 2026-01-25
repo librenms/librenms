@@ -1564,7 +1564,7 @@ return [
                 'help' => 'Метод планирования задач обнаружения. Устаревший метод будет использовать cron, если запись crontab существует, и службу диспетчера, если устаревшая конфигурация service_discovery_enabled установлена в true.',
                 'options' => [
                     'legacy' => 'Устаревший (Без ограничений)',
-                    'cron' => 'Cron (discovery.php)',
+                    'cron' => 'Cron (lnms device:discover)',
                     'dispatcher' => 'Служба диспетчера',
                 ],
             ],
@@ -1660,9 +1660,6 @@ return [
         'service_watchdog_log' => [
             'description' => 'Файл журнала для мониторинга',
             'help' => 'По умолчанию это файл журнала LibreNMS. Устанавливает значение по умолчанию для всех узлов.',
-        ],
-        'sfdp' => [
-            'description' => 'Путь к sfdp',
         ],
         'shorthost_target_length' => [
             'description' => 'Максимальная длина сокращенного имени хоста',

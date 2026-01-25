@@ -32,6 +32,7 @@ theme:
     - content.tabs.link
     - content.action.edit
     - content.code.copy
+    - search.share
 site_dir: out
 site_url: https://docs.librenms.org
 markdown_extensions:
@@ -186,7 +187,7 @@ nav:
       - Bare Dashboard: Support/Bare-Dashboard.md
       - Cleanup Options: Support/Cleanup-options.md
       - Customizing the Web UI: Extensions/Customizing-the-Web-UI.md
-      - Dispatcher Service (RC): Extensions/Dispatcher-Service.md
+      - Dispatcher Service: Extensions/Dispatcher-Service.md
       - Environment Variables: Support/Environment-Variables.md
       - Fast Ping Checking: Extensions/Fast-Ping-Check.md
       - Galera Database Cluster: Extensions/Galera-Cluster.md
@@ -248,6 +249,7 @@ nav:
       - Inventory: API/Inventory.md
       - Locations: API/Locations.md
       - Logs: API/Logs.md
+      - Pollers: API/Pollers.md
       - PollerGroups: API/PollerGroups.md
       - Port_Groups: API/Port_Groups.md
       - PortGroups: API/PortGroups.md

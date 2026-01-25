@@ -31,15 +31,11 @@ modules:
                 oid: nmscardCPUUtilization
                 num_oid: '.1.3.6.1.4.1.3320.3.6.10.1.11.{{ $index }}'
     sensors:
-        data:
-            -
-                oid:
-                 - ifName
-                 - vendname
-                 - vendorPN
-                 - sfpSeqNum
-                 - waveLen
-                 - sfpPresentStatus
+        additional_oids:
+            data:
+                -
+                    oid:
+                     - IF-MIB::ifName
         temperature:
             data:
                 -
@@ -50,9 +46,9 @@ modules:
                     oid: ifSfpParameterTable
                     value: temperature
                     num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.4.{{ $index }}'
-                    descr: '{{ $ifName }} temperature'
+                    descr: '{{ IF-MIB::ifName }} temperature'
                     index: 'ifSfpParameterTable.temperature.{{ $index }}'
-                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 256
@@ -71,9 +67,9 @@ modules:
                     oid: ifSfpParameterTable
                     value: vlotage
                     num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.5.{{ $index }}'
-                    descr: '{{ $ifName }} voltage'
+                    descr: '{{ IF-MIB::ifName }} voltage'
                     index: 'ifSfpParameterTable.vlotage.{{ $index }}'
-                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 10000
@@ -88,9 +84,9 @@ modules:
                     oid: ifSfpParameterTable
                     value: curr1
                     num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.6.{{ $index }}'
-                    descr: '{{ $ifName }} current1'
+                    descr: '{{ IF-MIB::ifName }} current1'
                     index: 'ifSfpParameterTable.curr1.{{ $index }}'
-                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 500000
@@ -103,9 +99,9 @@ modules:
                     oid: ifSfpParameterTable
                     value: curr2
                     num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.10.{{ $index }}'
-                    descr: '{{ $ifName }} current2'
+                    descr: '{{ IF-MIB::ifName }} current2'
                     index: 'ifSfpParameterTable.curr2.{{ $index }}'
-                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 500000
@@ -118,9 +114,9 @@ modules:
                     oid: ifSfpParameterTable
                     value: curr3
                     num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.13.{{ $index }}'
-                    descr: '{{ $ifName }} current3'
+                    descr: '{{ IF-MIB::ifName }} current3'
                     index: 'ifSfpParameterTable.curr3.{{ $index }}'
-                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 500000
@@ -133,9 +129,9 @@ modules:
                     oid: ifSfpParameterTable
                     value: curr4
                     num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.16.{{ $index }}'
-                    descr: '{{ $ifName }} current4'
+                    descr: '{{ IF-MIB::ifName }} current4'
                     index: 'ifSfpParameterTable.curr4.{{ $index }}'
-                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 500000
@@ -150,9 +146,9 @@ modules:
                     oid: ifSfpParameterTable
                     value: rxPower1
                     num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.3.{{ $index }}'
-                    descr: '{{ $ifName }} rxPower1'
+                    descr: '{{ IF-MIB::ifName }} rxPower1'
                     index: 'ifSfpParameterTable.rxPower1.{{ $index }}'
-                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 100
@@ -165,9 +161,9 @@ modules:
                     oid: ifSfpParameterTable
                     value: rxPower2
                     num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.9.{{ $index }}'
-                    descr: '{{ $ifName }} rxPower2'
+                    descr: '{{ IF-MIB::ifName }} rxPower2'
                     index: 'ifSfpParameterTable.rxPower2.{{ $index }}'
-                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 100
@@ -180,9 +176,9 @@ modules:
                     oid: ifSfpParameterTable
                     value: rxPower3
                     num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.12.{{ $index }}'
-                    descr: '{{ $ifName }} rxPower3'
+                    descr: '{{ IF-MIB::ifName }} rxPower3'
                     index: 'ifSfpParameterTable.rxPower3.{{ $index }}'
-                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 100
@@ -195,9 +191,9 @@ modules:
                     oid: ifSfpParameterTable
                     value: rxPower4
                     num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.15.{{ $index }}'
-                    descr: '{{ $ifName }} rxPower4'
+                    descr: '{{ IF-MIB::ifName }} rxPower4'
                     index: 'ifSfpParameterTable.rxPower4.{{ $index }}'
-                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 100
@@ -210,9 +206,9 @@ modules:
                     oid: ifSfpParameterTable
                     value: txPower1
                     num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.2.{{ $index }}'
-                    descr: '{{ $ifName }} txPower1'
+                    descr: '{{ IF-MIB::ifName }} txPower1'
                     index: 'ifSfpParameterTable.txPower1.{{ $index }}'
-                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 100
@@ -225,9 +221,9 @@ modules:
                     oid: ifSfpParameterTable
                     value: txPower2
                     num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.8.{{ $index }}'
-                    descr: '{{ $ifName }} txPower2'
+                    descr: '{{ IF-MIB::ifName }} txPower2'
                     index: 'ifSfpParameterTable.txPower2.{{ $index }}'
-                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 100
@@ -240,9 +236,9 @@ modules:
                     oid: ifSfpParameterTable
                     value: txPower3
                     num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.11.{{ $index }}'
-                    descr: '{{ $ifName }} txPower3'
+                    descr: '{{ IF-MIB::ifName }} txPower3'
                     index: 'ifSfpParameterTable.txPower3.{{ $index }}'
-                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 100
@@ -255,9 +251,9 @@ modules:
                     oid: ifSfpParameterTable
                     value: txPower4
                     num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.14.{{ $index }}'
-                    descr: '{{ $ifName }} txPower4'
+                    descr: '{{ IF-MIB::ifName }} txPower4'
                     index: 'ifSfpParameterTable.txPower4.{{ $index }}'
-                    group: 'Transceiver: {{ $ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     divisor: 100
@@ -294,9 +290,9 @@ modules:
                     oid: ifSfpParameterTable
                     value: sfpLostStatus
                     num_oid: '.1.3.6.1.4.1.3320.9.63.1.7.1.21.{{ $index }}'
-                    descr: 'LOS'
+                    descr: '{{ IF-MIB::ifName }} LOS'
                     index: 'ifSfpParameterTable.sfpLostStatus.{{ $index }}'
-                    group: 'Transceiverr: {{ $ifName }} (Vendor: {{ $vendname }} PN: {{ $vendorPN }} S/N: {{ $sfpSeqNum }} {{ $waveLen }}nm)'
+                    group: transceiver
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     states:

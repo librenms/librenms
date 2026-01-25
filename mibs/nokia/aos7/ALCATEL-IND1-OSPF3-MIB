@@ -10,32 +10,27 @@ IMPORTS
     ospfv3AreaEntry, ospfv3IfEntry
         FROM OSPFV3-MIB
     Ipv6Address, Ipv6IfIndexOrZero
-        FROM IPV6-TC;
+        FROM IPV6-TC
+    InetAddress, InetAddressType
+        FROM INET-ADDRESS-MIB;
 
 
 alcatelIND1OSPF3MIB MODULE-IDENTITY
-
-    LAST-UPDATED  "201410060000Z"
-    ORGANIZATION  "Alcatel-Lucent"
+    LAST-UPDATED "202207050000Z"
+    ORGANIZATION "ALE USA Inc."
     CONTACT-INFO
-        "Please consult with Customer Service to ensure the most appropriate
-         version of this document is used with the products in question:
+     "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
 
-                    Alcatel-Lucent, Enterprise Solutions Division
-                   (Formerly Alcatel Internetworking, Incorporated)
-                           26801 West Agoura Road
-                        Agoura Hills, CA  91301-5122
-                          United States Of America
+                      ALE USA Inc. Enterprise
+                        26801 West Agoura Road
+                     Agoura Hills, CA  91301-5122
+                       United States Of America
 
-        Telephone:               North America  +1 800 995 2696
-                                 Latin America  +1 877 919 9526
-                                 Europe         +31 23 556 0100
-                                 Asia           +65 394 7933
-                                 All Other      +1 818 878 4507
+     Telephone:          +1 800 995 2696
 
-        Electronic Mail:         support@ind.alcatel.com
-        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+     Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+     World Wide Web:     https://www.al-enterprise.com"
 
     DESCRIPTION
         "This module describes an authoritative enterprise-specific Simple
@@ -56,8 +51,17 @@ r
          non-exclusive license to use this specification in connection with
          management of the products for which it is intended to be used.
 
-                     Copyright (C) 1995-2003 Alcatel-Lucent
-                         ALL RIGHTS RESERVED WORLDWIDE"
+                   Copyright (C) ALE USA Inc. 2014-2019
+                   Copyright (C) 1995-2013 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "202207050000Z"
+    DESCRIPTION
+        "Added support for alaOspf3BorderRouterTable."
+
+    REVISION      "201911270000Z"
+    DESCRIPTION
+        "Updated the latest contact and Copyright information for ALE USA Inc."
 
     REVISION      "201410060000Z"
     DESCRIPTION
@@ -66,14 +70,13 @@ r
     REVISION      "200704030000Z"
     DESCRIPTION
         "The latest version of this MIB Module."
-
     ::= { routingIND1Ospf3 1 }
 
 alcatelIND1OSPF3MIBObjects    OBJECT IDENTIFIER ::= { alcatelIND1OSPF3MIB 1 }
 alaProtocolOspf3    OBJECT IDENTIFIER ::= { alcatelIND1OSPF3MIBObjects 1 }
 
 alaOspf3OrigRouteTag    OBJECT-TYPE
-                SYNTAX                  Unsigned32
+    SYNTAX      Unsigned32
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -90,8 +93,8 @@ alaOspf3TimerSpfDelay   OBJECT-TYPE
     DEFVAL     { 5 }
     ::= {alaProtocolOspf3 2 }
 
-alaOspf3TimerSpfHold    OBJECT-TYPE
-                SYNTAX                  Integer32 ( 0 .. 65535 )
+alaOspf3TimerSpfHold   OBJECT-TYPE
+    SYNTAX      Integer32 ( 0 .. 65535 )
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -99,12 +102,12 @@ alaOspf3TimerSpfHold    OBJECT-TYPE
     DEFVAL     { 10 }
     ::= {alaProtocolOspf3 3 }
 
-alaOspf3RestartHelperSupport    OBJECT-TYPE
-                SYNTAX                  INTEGER
-                                                                {
-                                                                        enable (1),
-                                                                        disable (2)
-                                                                }
+alaOspf3RestartHelperSupport   OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                  enable (1),
+                  disable (2)
+                }
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -112,32 +115,32 @@ alaOspf3RestartHelperSupport    OBJECT-TYPE
     DEFVAL     { enable }
     ::= {alaProtocolOspf3 4 }
 
-alaOspf3RestartStrictLsaChecking        OBJECT-TYPE
-                SYNTAX                  INTEGER
-                                                                {
-                                                                        enable (1),
-                                                                        disable (2)
-                                                                }
+alaOspf3RestartStrictLsaChecking   OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                  enable (1),
+                  disable (2)
+                }
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      deprecated 
     DESCRIPTION
                 "Will changed LSA result in restart termination"
     DEFVAL     { enable }
     ::= {alaProtocolOspf3 5 }
 
-alaOspf3RestartInitiate OBJECT-TYPE
-                SYNTAX                  INTEGER
-                                                                {
-                                                                        enable (1),
-                                                                        disable (2)
-                                                                }
+alaOspf3RestartInitiate   OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                  enable (1),
+                  disable (2)
+                }
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-                "Start a graceful restart"
+                "Start a planned graceful restart"
     ::= {alaProtocolOspf3 6 }
 
-alaOspf3MTUCheck        OBJECT-TYPE
+alaOspf3MTUCheck   OBJECT-TYPE
     SYNTAX      INTEGER
                 {
                   enable (1),
@@ -437,9 +440,194 @@ alaOspf3AreaSummarizationRangeCount OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-    "This object indicates the summarization range count."
+      "This object indicates the summarization range count."
     ::= { alaOspf3AreaAugEntry 8 }
 
+alaOspf3RestartHelperStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                   notHelping(1),
+                   helping(2)
+                }
+    MAX-ACCESS   read-only
+    STATUS   current
+    DESCRIPTION
+      "Indicates whether this OSPF router is operating as a Helper to a
+       restarting router."
+    ::= { alaProtocolOspf3 13 }
+
+-- OSPF3 border router table
+
+alaOspf3BorderRouterTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AlaOspf3BorderRouterEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "OSPF3 Routing table which
+        allows collections of contiguous 
+        networks and hosts to be grouped together."
+    ::= { alaProtocolOspf3 14 }
+
+alaOspf3BorderRouterEntry OBJECT-TYPE
+    SYNTAX     AlaOspf3BorderRouterEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "OSPF3 Routing table which
+        allows collections of contiguous
+        networks and hosts to be grouped together."
+    INDEX
+        {
+            alaOspf3BorderRouterAreaIdType,
+            alaOspf3BorderRouterAreaId,
+            alaOspf3BorderRouterIdType,
+            alaOspf3BorderRouterId,
+            alaOspf3BorderRouterPathType,
+            alaOspf3BorderRouterNextHopType,
+            alaOspf3BorderRouterNextHop
+        }
+    ::= { alaOspf3BorderRouterTable 1 }
+
+AlaOspf3BorderRouterEntry ::=
+    SEQUENCE {
+        alaOspf3BorderRouterAreaIdType      InetAddressType,
+        alaOspf3BorderRouterAreaId          InetAddress,
+        alaOspf3BorderRouterIdType          InetAddressType,
+        alaOspf3BorderRouterId              InetAddress,
+        alaOspf3BorderRouterPathType        INTEGER,
+        alaOspf3BorderRouterNextHopType     InetAddressType,
+        alaOspf3BorderRouterNextHop         InetAddress,
+        alaOspf3BorderRouterMetric          Integer32,
+        alaOspf3BorderRouterType            INTEGER
+    }
+
+alaOspf3BorderRouterAreaIdType OBJECT-TYPE
+     SYNTAX      InetAddressType {ipv4(1)}
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+            "The IP address type of the area to which the border router belongs to.
+             InetAddressIPv4 (1) type is supported."
+     ::= { alaOspf3BorderRouterEntry 1 }
+
+alaOspf3BorderRouterAreaId OBJECT-TYPE
+     SYNTAX      InetAddress
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+            "The area to which the border router belongs to."
+     ::= { alaOspf3BorderRouterEntry 2 }
+
+alaOspf3BorderRouterIdType OBJECT-TYPE
+     SYNTAX      InetAddressType {ipv4(1)}
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+            "The IP address type of the router idenitifer of this border router.
+             InetAddressIPv4 (1) type is supported."
+     ::= { alaOspf3BorderRouterEntry 3 }
+
+alaOspf3BorderRouterId OBJECT-TYPE
+     SYNTAX      InetAddress
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+            "The router idenitifer of this border router."
+     ::= { alaOspf3BorderRouterEntry 4 }
+
+alaOspf3BorderRouterPathType OBJECT-TYPE
+    SYNTAX     INTEGER
+               {
+                  intraArea(1),          -- intra area route
+                  interArea(2),          -- inter area route
+                  externalType1(3),      -- external type-1 route
+                  externalType2(4)       -- external type-2 route
+               }
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The routing metric path type for this route."
+    ::= { alaOspf3BorderRouterEntry 5 }
+
+alaOspf3BorderRouterNextHopType OBJECT-TYPE
+        SYNTAX      InetAddressType {ipv6(2)}
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The IP address type of the address of the next hop to reach this border router.
+             InetAddressIPv6 (2) type is supported."
+        ::= { alaOspf3BorderRouterEntry 6 }
+
+alaOspf3BorderRouterNextHop OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The address of the next hop to reach this border router."
+        ::= { alaOspf3BorderRouterEntry 7 }
+
+alaOspf3BorderRouterMetric OBJECT-TYPE
+        SYNTAX      Integer32 ( 0 .. 65535 )
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The cost to reach the border router."
+        DEFVAL      { 0 }
+        ::= { alaOspf3BorderRouterEntry 8 }
+
+alaOspf3BorderRouterType OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        abr (1),        -- Area Border Router (ABR)
+                        asbr (2),       -- Autonomous Border Router (ASBR)
+                        abrAsbr (3)     -- ABR and ASBR
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "The type of border router."
+        DEFVAL      { abr }
+        ::= { alaOspf3BorderRouterEntry 9 }
+
+alaOspf3DefaultOriginate OBJECT-TYPE
+    SYNTAX      INTEGER { 
+                    none (1),
+                    only (2),
+                    always (3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether this ASBR router originates the default route
+        into the OSPFv3 normal area(s).  If set to 'only', the default route
+        is advertised into the OSPFv3 normal area, provided the ASBR has
+        a route to 0.0.0.0/0 in its routing table. Alternatively, if set
+        to 'always', a default route is advertised into the OSPFv3 domain
+        regardless of whether the ASBR has a route to 0.0.0.0/0. A value of
+        'none' has the effect of not originating the default route."
+    DEFVAL  { none }
+    ::= { alaProtocolOspf3 15 }
+
+alaOspf3DefaultOriginateMetricType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    type1 (1), -- comparable cost
+                    type2 (2)  -- non-comparable cost
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Type of metric to be used with the default route."
+    DEFVAL  { type2 }
+    ::= { alaProtocolOspf3 16 }
+
+alaOspf3DefaultOriginateMetric OBJECT-TYPE
+    SYNTAX      Integer32 ( 1 .. 65535 )
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Default metric to be used for the default route."
+    DEFVAL  { 1 }
+    ::= { alaProtocolOspf3 17 }
 
 -- conformance information
 
@@ -471,7 +659,11 @@ alaOSPF3ConfigMIBGroup OBJECT-GROUP
                         alaOspf3RestartHelperSupport,
                         alaOspf3RestartStrictLsaChecking,
                         alaOspf3RestartInitiate,
-                        alaOspf3MTUCheck
+                        alaOspf3MTUCheck,
+                        alaOspf3RestartHelperStatus,
+                        alaOspf3DefaultOriginate,
+                        alaOspf3DefaultOriginateMetricType,
+                        alaOspf3DefaultOriginateMetric
             }
     STATUS  current
     DESCRIPTION
@@ -513,4 +705,16 @@ alaOspf3AreaGroup OBJECT-GROUP
         DESCRIPTION
             "Collection of objects for management of Router LSAs."
         ::= { alcatelIND1OSPF3MIBGroups 3 }
+
+alaOspf3BorderRouterGroup OBJECT-GROUP
+        OBJECTS
+        {
+            -- OSPF3 Border Router table
+            alaOspf3BorderRouterMetric,
+            alaOspf3BorderRouterType
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for management of routes to Border Routers."
+        ::= { alcatelIND1OSPF3MIBGroups 4 }
 END

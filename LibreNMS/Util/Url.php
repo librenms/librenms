@@ -76,7 +76,7 @@ class Url
     public static function deviceLink($device, $text = '', $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
     {
         if (! $device instanceof Device || ! $device->hostname) {
-            return $escape_text ? htmlentities($text) : (string) $text;
+            return $escape_text ? htmlentities((string) $text) : (string) $text;
         }
 
         if (! $device->canAccess(Auth::user())) {
@@ -351,7 +351,7 @@ class Url
         $url = empty($vars) ? '' : $prefix;
         foreach ($vars as $var => $value) {
             if ($value == '0' || $value != '' && ! Str::contains($var, 'opt') && ! is_numeric($var)) {
-                $url .= urlencode($var) . '=' . urlencode($value) . '/';
+                $url .= urlencode((string) $var) . '=' . urlencode((string) $value) . '/';
             }
         }
 
@@ -649,7 +649,7 @@ class Url
         if (strlen($base_url) > 1) {
             $segments = explode('/', trim(str_replace($base_url, '', $path), '/'));
         } else {
-            $segments = explode('/', trim($path, '/'));
+            $segments = explode('/', trim((string) $path, '/'));
         }
 
         // parse the path

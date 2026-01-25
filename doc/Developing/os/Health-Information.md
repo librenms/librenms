@@ -150,6 +150,48 @@ well as pre-fetched data. The index ($index) and the sub_indexes (in
 case the oid is indexed multiple times) are also available: if
 $index="1.20", then $subindex0="1" and $subindex1="20".
 
+To fetch data not available to your sensor you can use `additional_oids`.
+
+!!! note
+    `additional_oids` should only be used when data is not fetched by your sensor.
+
+ `additional_oids` can also be used within a class.
+ This is the preferred way if the `additional_oids` are only used inside the class.
+ See `additional_oids` in the `temperature` class below aswell as `additional_oids` on the `sensors` level.
+ 
+!!! note
+     Only one `additional_oids` statements should be used for the same oid and this is only an example showing both cases.
+
+```
+sensors:
+    additional_oids:
+        data:
+            -
+                oid:
+                    - Stulz-WIB8000-MIB::unitsettingName
+    temperature:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - Stulz-WIB8000-MIB::unitsettingName
+        data:
+            -
+                oid: Stulz-WIB8000-MIB::unitTemperature
+                value: Stulz-WIB8000-MIB::unitTemperature
+                num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.1.1.1.1170.{{ $index }}'
+                index: 'unitTemperature.{{ $index }}'
+                descr: 'Unit {{ Stulz-WIB8000-MIB::unitsettingName:0-1 }} temp'
+                divisor: 10
+            -
+                oid: Stulz-WIB8000-MIB::unitSupplyAirTemperature
+                value: Stulz-WIB8000-MIB::unitSupplyAirTemperature
+                num_oid: '.1.3.6.1.4.1.29462.10.2.1.1.1.1.1.1.1.1193.{{ $index }}'
+                index: 'unitSupplyAirTemperature.{{ $index }}'
+                descr: 'Unit {{ Stulz-WIB8000-MIB::unitsettingName:0-1 }} supply temp'
+                divisor: 10
+```
+
 If you want access a string in an index, `{{ $index_string }}` can be used,
 optionally suffixed with a format string to specify how to extract the string.
 `{{ $index_string:nns }}` will skip two numeric indexes and return the string after.
@@ -191,15 +233,15 @@ mix sensor types in a single table.
 ```yaml
                     skip_values:
                     -
-                      oid: sensUnit
+                      oid: STE2-MIB::sensUnit
                       op: '!='
                       value: 4
                     -
-                      oid: sensConfig.0
+                      oid: STE2-MIB::sensConfig.0
                       op: '!='
                       value: 1
                     -
-                      device: hardware
+                      device: STE2-MIB::hardware
                       op: 'contains'
                       value: 'rev2'
 ```
@@ -215,7 +257,7 @@ Example:
 ```yaml
                     skip_values:
                     -
-                      oid: sensorName
+                      oid: MIB-NAME::sensorName
                       op: 'not_in_array'
                       value: ['sensor1', 'sensor2']
 ```
@@ -223,22 +265,27 @@ Example:
 ```yaml
                     skip_values:
                     -
-                      oid: sensorOptionalOID
+                      oid: MIB-NAME::sensorOptionalOID
                       op: 'exists'
                       value: false
 ```
 
 ```yaml
         temperature:
+            additional_oids:
+                data:
+                    -
+                        oid:
+                            - ENTITY-MIB::entPhysicalName
             data:
                 -
-                    oid: hwOpticalModuleInfoTable
-                    value: hwEntityOpticalTemperature
-                    descr: '{{ $entPhysicalName }}'
+                    oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
+                    value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTemperature
+                    descr: '{{ ENTITY-MIB::entPhysicalName }}'
                     index: '{{ $index }}'
                     skip_values:
                         -
-                            oid: hwEntityOpticalMode
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalMode
                             op: '='
                             value: '1'
 ```
@@ -428,12 +475,12 @@ names Ethernet 1-1-1-1, 1-1-1-2, etc, and they are indexed as oid.1.1.1.1, oid.1
 the mib.
 
 Next the program checks which table the port exists in and that the connector type is 'fiber'. There
-are other port tables in the full code that were ommitted from the example for brevity. Copper
+are other port tables in the full code that were omitted from the example for brevity. Copper
 media won't have optical readings, so if the media type isn't fiber we skip discovery for that port.
 
 The next two lines build the OIDs for getting the optical receive and transmit values using the
 `$index` for the port. Using the OIDs the program gets the current receive and transmit values
-($currentRx and $currentTx repectively) to verify the values are not 0. Not all SFPs collect digital
+($currentRx and $currentTx respectively) to verify the values are not 0. Not all SFPs collect digital
 optical monitoring (DOM) data, in the case of Adva the value of both transmit and receive will be
 0 if DOM is not available. While 0 is a valid value for optical power, its extremely unlikely that
 both will be 0 if DOM is present. If DOM is not available, then the program stops discovery for
@@ -452,7 +499,7 @@ Lastly the program calls `discover_sensor()` and passes the information collecte
 steps. The `null` values are for low, low warning, high, and high warning values, which are not
 collected in the Adva's MIB.
 
-You can manually run discovery to verify the code works by running `./discovery.php -h $device_id -m sensors`.
+You can manually run discovery to verify the code works by running `lnms device:discover $device_id -m sensors`.
 You can use `-v` to see what calls are being used during discovery and `-d` to see debug output.
 In the output under `#### Load disco module sensors ####` you can see a list of sensors types. If
 there is a `+` a sensor is added, if there is a `-` one was deleted, and a `.` means no change. If
@@ -460,7 +507,7 @@ there is nothing next to the sensor type then the sensor was not discovered. The
 information about changes to the database and RRD files at the bottom.
 
 ```
-[librenms@nms-test ~]$ ./discovery.php -h 2 -m sensors
+[librenms@nms-test ~]$ lnms device:discover 2 -m sensors
 LibreNMS Discovery
 164.113.194.250 2 adva_fsp150
 

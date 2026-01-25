@@ -127,7 +127,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('logs/graylog', Device\Tabs\GraylogController::class)->name('graylog');
         Route::get('logs/outages', Device\Tabs\OutagesController::class)->name('outages');
         Route::get('logs/syslog', Device\Tabs\SyslogController::class)->name('syslog');
-        Route::get('popup', \App\Http\Controllers\DevicePopupController::class)->name('popup');
+        Route::get('popup', App\Http\Controllers\DevicePopupController::class)->name('popup');
         Route::put('notes', [Device\Tabs\NotesController::class, 'update'])->name('notes.update');
         Route::put('module/{module}', [Device\Tabs\ModuleController::class, 'update'])->name('module.update');
         Route::delete('module/{module}', [Device\Tabs\ModuleController::class, 'delete'])->name('module.delete');
@@ -193,6 +193,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::put('alert-rule/{alert_rule}/toggle', [AlertRuleController::class, 'toggle'])->name('alert-rule.toggle');
         Route::get('alert-rule-from-template/{template_id}', [AlertRuleTemplateController::class, 'template'])->name('alert-rule-template');
         Route::get('alert-rule-from-rule/{alert_rule}', [AlertRuleTemplateController::class, 'rule'])->name('alert-rule-template.rule');
+        Route::get('alertlog/{alertLog}/details', Ajax\AlertDetailsController::class)->name('alertlog.details');
 
         Route::get('plugin/settings', App\Http\Controllers\PluginAdminController::class)->name('plugin.admin');
         Route::get('plugin/settings/{plugin:plugin_name}', PluginSettingsController::class)->name('plugin.settings');
@@ -200,7 +201,7 @@ Route::middleware(['auth'])->group(function (): void {
 
         Route::resource('port-groups', PortGroupController::class);
         Route::get('validate', [ValidateController::class, 'index'])->name('validate');
-        Route::get('validate/results', [ValidateController::class, 'runValidation'])->name('validate.results');
+        Route::get('validate/results/{group?}', [ValidateController::class, 'runValidation'])->name('validate.results');
         Route::post('validate/fix', [ValidateController::class, 'runFixer'])->name('validate.fix');
     });
 
@@ -273,6 +274,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::get('syslog', Select\SyslogController::class)->name('ajax.select.syslog');
             Route::get('location', Select\LocationController::class)->name('ajax.select.location');
             Route::get('munin', Select\MuninPluginController::class)->name('ajax.select.munin');
+            Route::get('os', Select\OsController::class)->name('ajax.select.os');
             Route::get('role', Select\RoleController::class)->name('ajax.select.role');
             Route::get('service', Select\ServiceController::class)->name('ajax.select.service');
             Route::get('customoid', Select\CustomoidController::class)->name('ajax.select.customoid');
@@ -280,10 +282,14 @@ Route::middleware(['auth'])->group(function (): void {
             Route::get('poller-group', Select\PollerGroupController::class)->name('ajax.select.poller-group');
             Route::get('port', Select\PortController::class)->name('ajax.select.port');
             Route::get('port-field', Select\PortFieldController::class)->name('ajax.select.port-field');
+            Route::get('sensor', Select\SensorController::class)->name('ajax.select.sensor');
         });
 
         // jquery bootgrid data controllers
         Route::prefix('table')->group(function (): void {
+            Route::any('address-search/ipv4', Table\Ipv4AddressSearchController::class)->name('search.ipv4');
+            Route::any('address-search/ipv6', Table\Ipv6AddressSearchController::class)->name('search.ipv6');
+            Route::any('address-search/mac', Table\MacSearchController::class)->name('search.mac');
             Route::post('alert-schedule', Table\AlertScheduleController::class);
             Route::post('customers', Table\CustomersController::class);
             Route::post('diskio', Table\DiskioController::class)->name('table.diskio');
@@ -295,7 +301,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('graylog', Table\GraylogController::class)->name('table.graylog');
             Route::post('inventory', Table\InventoryController::class)->name('table.inventory');
             Route::get('inventory/export', [Table\InventoryController::class, 'export']);
-            Route::post('location', Table\LocationController::class);
+            Route::post('location', Table\LocationController::class)->name('table.location');
             Route::post('mempools', Table\MempoolsController::class)->name('table.mempools');
             Route::get('mempools/export', [Table\MempoolsController::class, 'export']);
             Route::post('outages', Table\OutagesController::class)->name('table.outages');

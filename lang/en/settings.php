@@ -6,6 +6,7 @@ return [
     'groups' => [
         'alerting' => 'Alerting',
         'api' => 'API',
+        'apps' => 'Applications',
         'auth' => 'Authentication',
         'authorization' => 'Authorization',
         'external' => 'External',
@@ -27,6 +28,11 @@ return [
         'api' => [
             'cors' => ['name' => 'CORS'],
         ],
+        'apps' => [
+            'powerdns-recursor' => ['name' => 'PowerDNS Recursor'],
+            'oslv_monitor' => ['name' => 'OSLV Monitor'],
+            'sneck' => ['name' => 'Sneck'],
+        ],
         'auth' => [
             'general' => ['name' => 'General Authentication Settings'],
             'ad' => ['name' => 'Active Directory Settings'],
@@ -34,6 +40,7 @@ return [
             'radius' => ['name' => 'Radius Settings'],
             'socialite' => ['name' => 'Socialite Settings'],
             'http' => ['name' => 'HTTP Auth Settings'],
+            'sso' => ['name' => 'Single Sign-on'],
         ],
         'authorization' => [
             'device-group' => ['name' => 'Device Group Settings'],
@@ -71,6 +78,7 @@ return [
             'influxdb' => ['name' => 'Datastore: InfluxDB'],
             'influxdbv2' => ['name' => 'Datastore: InfluxDBv2'],
             'kafka' => ['name' => 'Datastore: Kafka'],
+            'mtu' => ['name' => 'MTU Check'],
             'opentsdb' => ['name' => 'Datastore: OpenTSDB'],
             'ping' => ['name' => 'Ping'],
             'prometheus' => ['name' => 'Datastore: Prometheus'],
@@ -292,6 +300,42 @@ return [
                 'port' => [
                     'description' => 'PowerDNS Recursor port',
                     'help' => 'TCP port to use for the PowerDNS Recursor app when connecting directly',
+                ],
+            ],
+            'oslv_monitor' => [
+                'seen_age' => [
+                    'description' => 'Seen age threshold',
+                    'help' => 'Age in seconds after which items are considered stale',
+                ],
+                'linux_pg_memory_stats' => [
+                    'description' => 'Linux page memory stats',
+                    'help' => 'Enable Linux page memory statistics collection',
+                ],
+                'misc_linux_memory_stats' => [
+                    'description' => 'Misc Linux memory stats',
+                    'help' => 'Enable miscellaneous Linux memory statistics collection',
+                ],
+                'zswap_size' => [
+                    'description' => 'ZSwap size stats',
+                    'help' => 'Enable ZSwap size statistics collection',
+                ],
+                'zswap_activity' => [
+                    'description' => 'ZSwap activity stats',
+                    'help' => 'Enable ZSwap activity statistics collection',
+                ],
+                'workingset_stats' => [
+                    'description' => 'Working set stats',
+                    'help' => 'Enable working set statistics collection',
+                ],
+                'thp_activity' => [
+                    'description' => 'THP activity stats',
+                    'help' => 'Enable Transparent Huge Pages activity statistics collection',
+                ],
+            ],
+            'sneck' => [
+                'polling_time_diff' => [
+                    'description' => 'Polling time difference',
+                    'help' => 'Enable polling time difference tracking for Sneck',
                 ],
             ],
         ],
@@ -829,6 +873,9 @@ return [
         'distributed_poller_memcached_port' => [
             'description' => 'Memcached port',
             'help' => 'The port for the memcached server. Default is 11211',
+        ],
+        'enable_ports_etherlike' => [
+            'description' => 'Enable etherlike graphs for ports',
         ],
         'email_auto_tls' => [
             'description' => 'Auto TLS support',
@@ -1445,6 +1492,12 @@ return [
         'mtr' => [
             'description' => 'Path to mtr',
         ],
+        'mtu_options' => [
+            'bytes' => [
+                'description' => 'MTU test packet size',
+                'help' => 'Size of packets for MTU test in bytes (blank to disable MTU tests)',
+            ],
+        ],
         'mydomain' => [
             'description' => 'Primary Domain',
             'help' => 'This domain is used for network auto-discovery and other processes. LibreNMS will attempt to append it to unqualified hostnames.',
@@ -1799,6 +1852,10 @@ return [
             'description' => 'Port NAC entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
+        'ports_page_default' => [
+            'description' => 'Default ports tab',
+            'help' => 'Default tab to open when viewing ports on the device page',
+        ],
         'ports_purge' => [
             'description' => 'Purge ports deleted',
             'help' => 'Cleanup done by daily.sh',
@@ -1901,6 +1958,10 @@ return [
             'description' => 'RANCID Repository Type',
             'help' => 'Type of repository used by RANCID, used to display config diffs on device pages',
         ],
+        'rancid_repo_url' => [
+            'description' => 'RANCID Repository URL',
+            'help' => 'RANCID repository URL, used to point at GitWeb that visualizes a bare Git repository',
+        ],
         'rancid_ignorecomments' => [
             'description' => 'RANCID Ignore Comments',
             'help' => 'Ignore comments when comparing RANCID configs, used to display config diffs on device pages',
@@ -1990,7 +2051,7 @@ return [
                 'help' => 'Discovery task scheduling method. Legacy will use cron if the crontab entry exists and the dispatcher service if the legacy config option service_discovery_enabled is set to true.',
                 'options' => [
                     'legacy' => 'Legacy (Unrestricted)',
-                    'cron' => 'Cron (discovery.php)',
+                    'cron' => 'Cron (lnms device:discover)',
                     'dispatcher' => 'Dispatcher Service',
                 ],
             ],
@@ -2096,9 +2157,6 @@ return [
         'service_health_file' => [
             'description' => 'Service Health File',
             'help' => 'Path to health file to ensure the dispatcher service is running',
-        ],
-        'sfdp' => [
-            'description' => 'Path to sfdp',
         ],
         'shorthost_target_length' => [
             'description' => 'Shortened hostname maximum length',
@@ -2213,6 +2271,68 @@ return [
         ],
         'snmpwalk' => [
             'description' => 'Path to snmpwalk',
+        ],
+        'sso' => [
+            'create_users' => [
+                'description' => 'Create Users',
+                'help' => 'If new users should be created upon login.',
+            ],
+            'descr_attr' => [
+                'description' => 'User Description Attribute',
+                'help' => 'The attribute containing a description of the user.',
+            ],
+            'email_attr' => [
+                'description' => 'Email Attribute',
+                'help' => 'The attribute containing the email address of the user.',
+            ],
+            'group_attr' => [
+                'description' => 'Group Attribute',
+                'help' => 'The attribute containing the groups information if using mapping.',
+            ],
+            'group_delimiter' => [
+                'description' => 'Group Delimiter',
+                'help' => 'The delimiter to use for group information if using the mapping group strategy.',
+            ],
+            'group_filter' => [
+                'description' => 'Group Filter Regexp',
+                'help' => 'Used for filtering group information if using mapping group strategy.',
+            ],
+            'group_level_map' => [
+                'description' => 'Group Level Map',
+                'help' => 'Group to role mapping.',
+            ],
+            'group_strategy' => [
+                'description' => 'Group Strategy',
+                'help' => 'How the group mapping should be done.',
+            ],
+            'level_attr' => [
+                'description' => 'Level Attribute',
+                'help' => 'The attribute to use if using the attribute group strategy.',
+            ],
+            'mode' => [
+                'description' => 'Mode',
+                'help' => 'If it should use the evironment variables or HTTP header.',
+            ],
+            'realname_attr' => [
+                'description' => 'Realname Attribute',
+                'help' => 'The attribute containing the realname of the user.',
+            ],
+            'static_level' => [
+                'description' => 'Static Level',
+                'help' => 'If static is in use, the role level value to use for every one with access.',
+            ],
+            'trusted_proxies' => [
+                'description' => 'Trusted Proxies',
+                'help' => 'A listed of trusted proxies.',
+            ],
+            'update_users' => [
+                'description' => 'Update Users',
+                'help' => 'If users should be updated upon login.',
+            ],
+            'user_attr' => [
+                'description' => 'User Attribute',
+                'help' => 'The attribute containing the username.',
+            ],
         ],
         'storage_perc_warn' => [
             'description' => 'Default Storage Percentage Warning',
@@ -2352,6 +2472,10 @@ return [
         'device_location_map_show_device_dependencies' => [
             'description' => 'Show devices dependecies on location map',
             'help' => 'Show links between devices on the location map based on parent dependencies',
+        ],
+        'device_stats_avg_factor' => [
+            'description' => 'Averaging factor',
+            'help' => 'We calculate a moving average using an exponential weighted moving average function.  This is the factor used by the function to control how much the current value affects the average.  Values closer to 1 will make the average change quicker.',
         ],
         'whois' => [
             'description' => 'Path to whois',

@@ -55,7 +55,7 @@ final class OSDiscoveryTest extends TestCase
     {
         $os = array_keys(self::osProvider());
 
-        $invalid_os_name = array_filter($os, fn ($os_name) => preg_match('/[^a-z0-9\-]/', $os_name));
+        $invalid_os_name = array_filter($os, fn ($os_name) => preg_match('/[^a-z0-9\-]/', (string) $os_name));
 
         // DO NOT ADD ANY OS HERE!
         $exceptions = [

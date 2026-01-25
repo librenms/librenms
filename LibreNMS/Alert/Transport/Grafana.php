@@ -71,7 +71,7 @@ class Grafana extends Transport
             'transport_name' => $alert_data['transport_name'] ?? '',
         ];
 
-        $tmp_msg = json_decode($alert_data['msg'], true);
+        $tmp_msg = json_decode((string) $alert_data['msg'], true);
         if (isset($tmp_msg['title']) && isset($tmp_msg['message'])) {
             $data = array_merge($data, $tmp_msg);
         } else {

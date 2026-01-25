@@ -176,6 +176,7 @@ class Ocnos extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
             'Ufi Space S9600-32X-R' => $prefix . ($this->portBreakoutEnabled() ? ($cmmTransType == 'qsfp' ? $cmmTransIndex - 5 : $cmmTransIndex - 2) : $cmmTransIndex - 1),
             'Ufi Space S9510-28DC-B' => $prefix . ($cmmTransIndex - 1),
             'Ufi Space S9610-36D-R' => 'cd' . $cmmTransIndex . '/1',
+            'Ufi Space S9502-12SM-8' => $prefix . ($cmmTransIndex - 1),
             'Ufi Space S9500-30XS-P' => $prefix . ($cmmTransType == 'qsfp' ? $cmmTransIndex - 29 : $cmmTransIndex - 1),
             'Ufi Space S9600-72XC-R' => $prefix . $cmmTransIndex,
             'Edgecore 7316-26XB-O-48V-F' => $prefix . ($cmmTransType == 'qsfp' ? $cmmTransIndex - 1 : $cmmTransIndex - 3),
@@ -262,7 +263,7 @@ class Ocnos extends OS implements EntityPhysicalDiscovery, TransceiverDiscovery
             // check for xe ports in ifTable
             $this->portBreakoutEnabled = $this->getDevice()->ports()->exists()
                 ? $this->getDevice()->ports()->where('ifName', 'LIKE', 'xe%')->exists() // ports module has run
-                : str_contains(SnmpQuery::cache()->walk('IF-MIB::ifName')->raw, 'xe'); // no ports in db
+                : str_contains((string) SnmpQuery::cache()->walk('IF-MIB::ifName')->raw, 'xe'); // no ports in db
         }
 
         return $this->portBreakoutEnabled;

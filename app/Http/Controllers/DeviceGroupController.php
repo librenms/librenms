@@ -66,7 +66,7 @@ class DeviceGroupController extends Controller
             $deviceGroup->devices()->sync($request->devices);
         }
 
-        $toast->success(__('Device Group :name created', ['name' => htmlentities($deviceGroup->name)]));
+        $toast->success(__('Device Group :name created', ['name' => htmlentities((string) $deviceGroup->name)]));
 
         return redirect()->route('device-groups.index');
     }
@@ -124,9 +124,9 @@ class DeviceGroupController extends Controller
         $devices_updated = false;
         if ($deviceGroup->type == 'static') {
             // sync device_ids from input
-            $updated = $deviceGroup->devices()->sync($request->get('devices', []));
+            $updated = $deviceGroup->devices()->sync($request->input('devices', []));
             // check for attached/detached/updated
-            $devices_updated = array_sum(array_map(fn ($device_ids) => count($device_ids), $updated)) > 0;
+            $devices_updated = array_sum(array_map(count(...), $updated)) > 0;
         } else {
             $deviceGroup->rules = json_decode($request->rules);
         }

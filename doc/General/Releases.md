@@ -9,7 +9,7 @@ We have two branches available for you to use. The default is the `master` branc
 
 ## Development branch
 
-Our `master` branch is our dev branch, this is actively commited to
+Our `master` branch is our dev branch, this is actively committed to
 and it's not uncommon for multiple commits to be merged in daily. As
 such sometimes changes will be introduced which will cause unintended
 issues. If this happens we are usually quick to fix or revert those changes.

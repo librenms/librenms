@@ -108,7 +108,7 @@ class IRCBot
         $this->server = $this->config['irc_host'];
         if ($this->config['irc_port'][0] == '+') {
             $this->ssl = true;
-            $this->port = substr($this->config['irc_port'], 1);
+            $this->port = substr((string) $this->config['irc_port'], 1);
         } else {
             $this->port = $this->config['irc_port'];
         }
@@ -118,8 +118,8 @@ class IRCBot
         }
 
         if ($this->config['irc_alert_chan']) {
-            if (strstr($this->config['irc_alert_chan'], ',')) {
-                $this->config['irc_alert_chan'] = explode(',', $this->config['irc_alert_chan']);
+            if (strstr((string) $this->config['irc_alert_chan'], ',')) {
+                $this->config['irc_alert_chan'] = explode(',', (string) $this->config['irc_alert_chan']);
             } elseif (! is_array($this->config['irc_alert_chan'])) {
                 $this->config['irc_alert_chan'] = [$this->config['irc_alert_chan']];
             }
@@ -145,7 +145,7 @@ class IRCBot
 
         $this->log('Caching external commands...');
         if (! is_array($this->config['irc_external'])) {
-            $this->config['irc_external'] = explode(',', $this->config['irc_external']);
+            $this->config['irc_external'] = explode(',', (string) $this->config['irc_external']);
         }
 
         foreach ($this->config['irc_external'] as $ext) {
@@ -277,7 +277,7 @@ class IRCBot
     private function alertData()
     {
         if (($alert = $this->read('alert')) !== false) {
-            $alert = json_decode($alert, true);
+            $alert = json_decode((string) $alert, true);
             if (! is_array($alert)) {
                 return false;
             }
@@ -321,24 +321,24 @@ class IRCBot
 
     private function sendAlert($sendto, $severity, $alert)
     {
-        $sendto = explode(' ', $sendto)[0];
-        $this->ircRaw('PRIVMSG ' . $sendto . ' :' . $severity . trim($alert['title']));
+        $sendto = explode(' ', (string) $sendto)[0];
+        $this->ircRaw('PRIVMSG ' . $sendto . ' :' . $severity . trim((string) $alert['title']));
         if ($this->config['irc_alert_short']) {
             // Only send the title if set to short
 
             return;
         }
 
-        foreach (explode("\n", $alert['msg']) as $line) {
+        foreach (explode("\n", (string) $alert['msg']) as $line) {
             $line = trim($line);
             if (strlen($line) < 1) {
                 continue;
             }
             $line = $this->_html2irc($line);
-            $line = strip_tags($line);
+            $line = strip_tags((string) $line);
 
             // We don't need to repeat the title
-            if (trim($line) != trim($alert['title'])) {
+            if (trim($line) != trim((string) $alert['title'])) {
                 $this->log("Sending alert $line");
                 if ($this->config['irc_floodlimit'] > 100) {
                     $this->floodcount += strlen($line);
@@ -363,7 +363,7 @@ class IRCBot
         if (($data = $this->read('irc')) !== false) {
             $this->last_activity = time();
             $this->data = $data;
-            $ex = explode(' ', $this->data);
+            $ex = explode(' ', (string) $this->data);
             if ($ex[0] == 'PING') {
                 return $this->ircRaw('PONG ' . $ex[1]);
             }
@@ -377,7 +377,7 @@ class IRCBot
 
             if ($this->config['irc_ctcp'] && preg_match('/^:' . chr(1) . '.*/', $ex[3])) {
                 // Handle CTCP
-                $ctcp = trim(preg_replace('/[^A-Z]/', '', $ex[3]));
+                $ctcp = trim((string) preg_replace('/[^A-Z]/', '', $ex[3]));
                 $ctcp_reply = null;
                 $this->log('Received irc CTCP: ' . $ctcp . ' from ' . $this->getUser($this->data));
                 switch ($ctcp) {
@@ -455,7 +455,7 @@ class IRCBot
     private function handleCommand()
     {
         $this->command = str_replace(':.', '', $this->command);
-        $tmp = explode(':.' . $this->command . ' ', $this->data);
+        $tmp = explode(':.' . $this->command . ' ', (string) $this->data);
         $this->user = $this->getAuthdUser();
         $this->log('isAuthd-1? ' . $this->isAuthd());
         if (! $this->isAuthd() && (isset($this->config['irc_auth']))) {
@@ -475,7 +475,7 @@ class IRCBot
 
     private function proceedCommand($command, $params)
     {
-        $command = strtolower($command);
+        $command = strtolower((string) $command);
         if (in_array($command, $this->commands)) {
             $this->chkdb();
             $this->log($command . " ( '" . $params . "' )");
@@ -497,14 +497,14 @@ class IRCBot
     {
         $chan = $this->getChan($this->data);
 
-        return $this->sendMessage($msg, strstr($chan, '#') ? $chan : $this->getUser($this->data));
+        return $this->sendMessage($msg, strstr((string) $chan, '#') ? $chan : $this->getUser($this->data));
     }
 
     //end respond()
 
     private function getChan($param)
     {
-        $data = explode('PRIVMSG ', $this->data, 3);
+        $data = explode('PRIVMSG ', (string) $this->data, 3);
         $data = explode(' ', $data[1], 2);
 
         return $data[0];
@@ -514,7 +514,7 @@ class IRCBot
 
     private function getUser($param)
     {
-        $arrData = explode('!', $param, 2);
+        $arrData = explode('!', (string) $param, 2);
 
         return str_replace(':', '', $arrData[0]);
     }
@@ -523,7 +523,7 @@ class IRCBot
 
     private function getUserHost($param)
     {
-        $arrData = explode(' ', $param, 2);
+        $arrData = explode(' ', (string) $param, 2);
 
         return str_replace(':', '', $arrData[0]);
     }
@@ -591,17 +591,17 @@ class IRCBot
     private function sendMessage($message, $chan)
     {
         if ($this->debug) {
-            $this->log("Sending 'PRIVMSG " . trim($chan) . ' :' . trim($message) . "'");
+            $this->log("Sending 'PRIVMSG " . trim((string) $chan) . ' :' . trim((string) $message) . "'");
         }
 
-        return $this->ircRaw('PRIVMSG ' . trim($chan) . ' :' . trim($message));
+        return $this->ircRaw('PRIVMSG ' . trim((string) $chan) . ' :' . trim((string) $message));
     }
 
     //end sendMessage()
 
     private function log($msg)
     {
-        $log = '[' . date('r') . '] IRCbot ' . trim($msg) . "\n";
+        $log = '[' . date('r') . '] IRCbot ' . trim((string) $msg) . "\n";
         echo $log;
         file_put_contents($this->config['log_dir'] . '/irc.log', $log, FILE_APPEND);
 
@@ -653,11 +653,11 @@ class IRCBot
         global $authorizer;
         foreach ($this->config['irc_auth'] as $nms_user => $hosts) {
             foreach ($hosts as $host) {
-                $host = preg_replace("/\*/", '.*', $host);
+                $host = preg_replace("/\*/", '.*', (string) $host);
                 if ($this->debug) {
                     $this->log("HostAuth on irc matching $host to " . $this->getUserHost($this->data));
                 }
-                if (preg_match("/$host/", $this->getUserHost($this->data))) {
+                if (preg_match("/$host/", (string) $this->getUserHost($this->data))) {
                     $user = User::firstWhere('username', $nms_user);
                     $this->user['user'] = $user;
                     $this->user['expire'] = (time() + ($this->config['irc_authtime'] * 3600));
@@ -685,7 +685,7 @@ class IRCBot
     private function _auth($params)
     {
         global $authorizer;
-        $params = explode(' ', $params, 2);
+        $params = explode(' ', (string) $params, 2);
         if (strlen($params[0]) == 64) {
             if ($this->tokens[$this->getUser($this->data)] == $params[0]) {
                 $this->user['expire'] = (time() + ($this->config['irc_authtime'] * 3600));
@@ -792,7 +792,7 @@ class IRCBot
     {
         $num = 1;
         $hostname = '';
-        $params = explode(' ', $params);
+        $params = explode(' ', (string) $params);
         if ($params[0] > 1) {
             $num = $params[0];
         }
@@ -807,12 +807,12 @@ class IRCBot
             $response = $logline->datetime . ' ';
             $response .= $this->_color($logline->device->displayName(), null, null, 'bold') . ' ';
             if ($this->config['irc_alert_utf8']) {
-                if (preg_match('/critical alert/', $logline->message)) {
-                    $response .= preg_replace('/critical alert/', $this->_color('critical alert', 'red'), $logline->message) . ' ';
-                } elseif (preg_match('/warning alert/', $logline->message)) {
-                    $response .= preg_replace('/warning alert/', $this->_color('warning alert', 'yellow'), $logline->message) . ' ';
-                } elseif (preg_match('/recovery/', $logline->message)) {
-                    $response .= preg_replace('/recovery/', $this->_color('recovery', 'green'), $logline->message) . ' ';
+                if (preg_match('/critical alert/', (string) $logline->message)) {
+                    $response .= preg_replace('/critical alert/', (string) $this->_color('critical alert', 'red'), (string) $logline->message) . ' ';
+                } elseif (preg_match('/warning alert/', (string) $logline->message)) {
+                    $response .= preg_replace('/warning alert/', (string) $this->_color('warning alert', 'yellow'), (string) $logline->message) . ' ';
+                } elseif (preg_match('/recovery/', (string) $logline->message)) {
+                    $response .= preg_replace('/recovery/', (string) $this->_color('recovery', 'green'), (string) $logline->message) . ' ';
                 } else {
                     $response .= $logline->message . ' ';
                 }
@@ -858,7 +858,7 @@ class IRCBot
 
     private function _device($params)
     {
-        $params = explode(' ', $params);
+        $params = explode(' ', (string) $params);
         $hostname = $params[0];
         $device = Device::hasAccess($this->user['user'])->firstWhere('hostname', $hostname);
         if (! $device) {
@@ -876,7 +876,7 @@ class IRCBot
 
     private function _port($params)
     {
-        $params = explode(' ', $params);
+        $params = explode(' ', (string) $params);
         $hostname = $params[0];
         $ifname = $params[1];
         if (! $hostname || ! $ifname) {
@@ -916,7 +916,7 @@ class IRCBot
 
     private function _status($params)
     {
-        $params = explode(' ', $params);
+        $params = explode(' ', (string) $params);
         $statustype = $params[0];
 
         switch ($statustype) {
@@ -1046,13 +1046,13 @@ class IRCBot
 
     private function _html2irc($string)
     {
-        $string = urldecode($string);
+        $string = urldecode((string) $string);
         $string = preg_replace('#<b>#i', chr(2), $string);
-        $string = preg_replace('#</b>#i', chr(2), $string);
-        $string = preg_replace('#<i>#i', chr(22), $string);
-        $string = preg_replace('#</i>#i', chr(22), $string);
-        $string = preg_replace('#<u>#i', chr(31), $string);
-        $string = preg_replace('#</u>#i', chr(31), $string);
+        $string = preg_replace('#</b>#i', chr(2), (string) $string);
+        $string = preg_replace('#<i>#i', chr(22), (string) $string);
+        $string = preg_replace('#</i>#i', chr(22), (string) $string);
+        $string = preg_replace('#<u>#i', chr(31), (string) $string);
+        $string = preg_replace('#</u>#i', chr(31), (string) $string);
 
         $colors = [
             'white' => '00',
@@ -1074,8 +1074,8 @@ class IRCBot
         ];
 
         foreach ($colors as $color => $code) {
-            $string = preg_replace("#<$color>#i", chr(3) . $code, $string);
-            $string = preg_replace("#</$color>#i", chr(3), $string);
+            $string = preg_replace("#<$color>#i", chr(3) . $code, (string) $string);
+            $string = preg_replace("#</$color>#i", chr(3), (string) $string);
         }
 
         return $string;

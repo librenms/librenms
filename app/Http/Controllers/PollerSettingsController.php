@@ -41,7 +41,7 @@ class PollerSettingsController extends Controller
             return response()->json(['error' => 'Invalid setting'], 422);
         }
 
-        $poller->$setting = $request->get('value');
+        $poller->$setting = $request->input('value');
         $poller->save();
 
         return response()->json(['value' => $poller->$setting]);

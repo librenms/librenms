@@ -219,6 +219,7 @@ class QueueManager:
                 sentinel=self.config.redis_sentinel,
                 sentinel_service=self.config.redis_sentinel_service,
                 socket_timeout=self.config.redis_timeout,
+                ssl=(self.config.redis_scheme == "tls"),
             )
 
         except ImportError:
@@ -612,8 +613,12 @@ class DiscoveryQueueManager(TimedQueueManager):
         ):
             logger.info("Discovering device {}".format(device_id))
 
-            args = ("-d", "-h", device_id) if self.config.debug else ("-h", device_id)
-            exit_code, output = LibreNMS.call_script("discovery.php", args)
+            args = (
+                ("device:discover", device_id, "-vv")
+                if self.config.debug
+                else ("device:discover", device_id, "-q")
+            )
+            exit_code, output = LibreNMS.call_script("lnms", args)
 
             if self.config.log_output:
                 with open(
@@ -627,7 +632,7 @@ class DiscoveryQueueManager(TimedQueueManager):
             if exit_code == 0:
                 self.unlock(device_id)
             else:
-                if exit_code == 5:
+                if exit_code == 6:
                     logger.info(
                         "Device {} is down, cannot discover, waiting {}s for retry".format(
                             device_id, self.config.down_retry

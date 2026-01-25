@@ -139,7 +139,7 @@ class RoutesTablesController extends TableController
      */
     public function sort($request, $query)
     {
-        $sort = $request->get('sort');
+        $sort = $request->input('sort');
         if (isset($sort['inetCidrRouteIfIndex'])) {
             $query->orderBy('ifDescr', $sort['inetCidrRouteIfIndex'])
                 ->orderBy('inetCidrRouteIfIndex', $sort['inetCidrRouteIfIndex']);
@@ -218,7 +218,7 @@ class RoutesTablesController extends TableController
 
         $item['context_name'] = '[global]';
         if ($route_entry->context_name != '') {
-            $item['context_name'] = '<a href="' . Url::generate(['page' => 'routing', 'protocol' => 'vrf', 'vrf' => $route_entry->context_name]) . '">' . htmlspecialchars($route_entry->context_name) . '</a>';
+            $item['context_name'] = '<a href="' . Url::generate(['page' => 'routing', 'protocol' => 'vrf', 'vrf' => $route_entry->context_name]) . '">' . htmlspecialchars((string) $route_entry->context_name) . '</a>';
         }
 
         return $item;

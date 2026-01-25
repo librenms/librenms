@@ -195,17 +195,17 @@ class ServiceTemplateController extends Controller
         $devices_updated = false;
         if ($template->type == 'static') {
             // sync device_ids from input
-            $updated = $template->devices()->sync($request->get('devices', []));
+            $updated = $template->devices()->sync($request->input('devices', []));
             // check for attached/detached/updated
-            $devices_updated = array_sum(array_map(fn ($device_ids) => count($device_ids), $updated)) > 0;
+            $devices_updated = array_sum(array_map(count(...), $updated)) > 0;
         } elseif ($template->type == 'dynamic') {
             $template->rules = json_decode($request->rules);
         }
 
         // sync device_group_ids from input
-        $updated = $template->groups()->sync($request->get('groups', []));
+        $updated = $template->groups()->sync($request->input('groups', []));
         // check for attached/detached/updated
-        $device_groups_updated = array_sum(array_map(fn ($device_group_ids) => count($device_group_ids), $updated)) > 0;
+        $device_groups_updated = array_sum(array_map(count(...), $updated)) > 0;
 
         if ($template->isDirty() || $devices_updated || $device_groups_updated) {
             try {

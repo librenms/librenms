@@ -55,9 +55,7 @@ try {
     if ($authorizer instanceof \LibreNMS\Authentication\ActiveDirectoryAuthorizer) {
         // peek inside the class
         $lc_rp = new ReflectionProperty($authorizer, 'ldap_connection');
-        $lc_rp->setAccessible(true);
         $adbind_rm = new ReflectionMethod($authorizer, 'bind');
-        $adbind_rm->setAccessible(true);
 
         $bind_success = false;
         if (LibrenmsConfig::has('auth_ad_binduser') && LibrenmsConfig::has('auth_ad_bindpassword')) {

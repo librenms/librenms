@@ -12,57 +12,49 @@ modules:
             data:
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkASfpLoad1m
-                    value: PRIMEKEY-APPLIANCE-MIB::pkASfpLoad1m
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.5.108.111.97.100.50.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.5.108.111.97.100.50.1{{ $noindex }}'
                     descr: '1m CPU load'
                     group: 'CPU'
                     index: pkASfpLoad1m
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkASfpLoad5m
-                    value: PRIMEKEY-APPLIANCE-MIB::pkASfpLoad5m
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.5.108.111.97.100.51.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.5.108.111.97.100.51.1{{ $noindex }}'
                     descr: '5m CPU load'
                     group: 'CPU'
                     index: pkASfpLoad5m
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkASfpLoad15m
-                    value: PRIMEKEY-APPLIANCE-MIB::pkASfpLoad15m
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.5.108.111.97.100.52.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.5.108.111.97.100.52.1{{ $noindex }}'
                     descr: '15m CPU load'
                     group: 'CPU'
                     index: pkASfpLoad15m
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkAClusterLocalNodeID
-                    value: PRIMEKEY-APPLIANCE-MIB::pkAClusterLocalNodeID
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.49.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.49.1{{ $noindex }}'
                     descr: 'Node ID'
                     group: 'Database'
                     index: pkAClusterLocalNodeID
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkAClusterSize
-                    value: PRIMEKEY-APPLIANCE-MIB::pkAClusterSize
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.50.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.50.1{{ $noindex }}'
                     descr: 'Node Count'
                     group: 'Database'
                     index: pkAClusterSize
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkAClusterActiveNodes
-                    value: PRIMEKEY-APPLIANCE-MIB::pkAClusterActiveNodes
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.51.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.51.1{{ $noindex }}'
                     descr: 'Nodes Active'
                     group: 'Database'
                     index: pkAClusterActiveNodes
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkASfpRaidTotalDevices
-                    value: PRIMEKEY-APPLIANCE-MIB::pkASfpRaidTotalDevices
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.52.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.52.1{{ $noindex }}'
                     descr: 'RAID Devices'
                     group: 'RAID'
                     index: pkASfpRaidTotalDevices
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkASfpRaidActiveDevices
-                    value: PRIMEKEY-APPLIANCE-MIB::pkASfpRaidActiveDevices
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.54.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.54.1{{ $noindex }}'
                     descr: 'RAID Active'
                     group: 'RAID'
                     index: pkASfpRaidActiveDevices
@@ -72,29 +64,25 @@ modules:
             data:
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkASfpCpuFan
-                    value: PRIMEKEY-APPLIANCE-MIB::pkASfpCpuFan
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.49.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.49.1{{ $noindex }}'
                     descr: 'CPU Fan'
                     group: 'CPU'
                     index: pkASfpCpuFan
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkASfpSysFan1
-                    value: PRIMEKEY-APPLIANCE-MIB::pkASfpSysFan1
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.50.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.50.1{{ $noindex }}'
                     descr: 'System Fan 1'
                     group: 'System'
                     index: pkASfpSysFan1
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkASfpSysFan2
-                    value: PRIMEKEY-APPLIANCE-MIB::pkASfpSysFan2
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.51.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.51.1{{ $noindex }}'
                     descr: 'System Fan 2'
                     group: 'System'
                     index: pkASfpSysFan2
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkASfpSysFan3
-                    value: PRIMEKEY-APPLIANCE-MIB::pkASfpSysFan3
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.52.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.52.1{{ $noindex }}'
                     descr: 'System Fan 3'
                     group: 'System'
                     index: pkASfpSysFan3
@@ -104,8 +92,7 @@ modules:
             data:
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkAVdbUsagePercent
-                    value: PRIMEKEY-APPLIANCE-MIB::pkAVdbUsagePercent
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.4.118.100.98.49.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.4.118.100.98.49.1{{ $noindex }}'
                     descr: 'DB Usage %'
                     group: 'Database'
                     index: pkAVdbUsagePercent
@@ -115,8 +102,7 @@ modules:
             data:
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkASfpVmStatus
-                    value: PRIMEKEY-APPLIANCE-MIB::pkASfpVmStatus
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.2.118.109.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.2.118.109.1{{ $noindex }}'
                     descr: 'Health VMs'
                     group: 'Health of VMs'
                     index: pkASfpVmStatus
@@ -126,8 +112,7 @@ modules:
                         -  { value: 1, generic: 2, graph: 1, descr: 'Some Inactive' }
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkAEJBCAHealth
-                    value: PRIMEKEY-APPLIANCE-MIB::pkAEJBCAHealth
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.8.104.101.97.108.116.104.101.50.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.8.104.101.97.108.116.104.101.50.1{{ $noindex }}'
                     descr: 'Health EJBCA'
                     group: 'Health of VMs'
                     index: pkAEJBCAHealth
@@ -137,8 +122,7 @@ modules:
                         -  { value: 1, generic: 3, graph: 1, descr: 'Not Running or Unhealthy' }
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkASignServerHealth
-                    value: PRIMEKEY-APPLIANCE-MIB::pkASignServerHealth
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.8.104.101.97.108.116.104.115.50.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.8.104.101.97.108.116.104.115.50.1{{ $noindex }}'
                     descr: 'Health SignServer'
                     group: 'Health of VMs'
                     index: pkASignServerHealth
@@ -149,8 +133,7 @@ modules:
                         -  { value: 1, generic: 3, graph: 1, descr: 'Not Running or Unhealthy' }
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkASfpCpuFanStatus
-                    value: PRIMEKEY-APPLIANCE-MIB::pkASfpCpuFanStatus
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.53.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.53.1{{ $noindex }}'
                     descr: 'Fan CPU'
                     group: 'Fans'
                     index: pkASfpCpuFanStatus
@@ -160,8 +143,7 @@ modules:
                         -  { value: 1, generic: 2, graph: 1, descr: 'Fail' }
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkASfpSysFansStatus
-                    value: PRIMEKEY-APPLIANCE-MIB::pkASfpSysFansStatus
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.54.1'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.54.1{{ $noindex }}'
                     descr: 'Fans System'
                     group: 'Fans'
                     index: pkASfpSysFansStatus
@@ -171,8 +153,7 @@ modules:
                         -  { value: 1, generic: 1, graph: 1, descr: 'Fail' }
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkAVdbStatus
-                    value: PRIMEKEY-APPLIANCE-MIB::pkAVdbStatus
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.4.118.100.98.50.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.4.118.100.98.50.1{{ $noindex }}'
                     descr: 'DB Storage'
                     group: 'Database'
                     index: pkAVdbStatus
@@ -182,8 +163,7 @@ modules:
                         -  { value: 1, generic: 2, graph: 1, descr: '> 80% full' }
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkAClusterLocalGaleraState
-                    value: PRIMEKEY-APPLIANCE-MIB::pkAClusterLocalGaleraState
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.52.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.52.1{{ $noindex }}'
                     descr: 'DB Enum'
                     group: 'Database'
                     index: pkAClusterLocalGaleraState
@@ -209,8 +189,7 @@ modules:
                         -  { value: 6, generic: 2, graph: 6, descr: 'Max' }
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkASfpRaidStatus
-                    value: PRIMEKEY-APPLIANCE-MIB::pkASfpRaidStatus
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.49.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.49.1{{ $noindex }}'
                     descr: 'RAID Health'
                     group: 'RAID'
                     index: pkASfpRaidStatus
@@ -220,8 +199,7 @@ modules:
                         -  { value: 1, generic: 2, graph: 1, descr: 'Degraded' }
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkAHsmStatusEnum
-                    value: PRIMEKEY-APPLIANCE-MIB::pkAHsmStatusEnum
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.50.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.50.1{{ $noindex }}'
                     descr: 'HSM Enum'
                     group: 'HSM'
                     index: pkAHsmStatusEnum
@@ -236,8 +214,7 @@ modules:
                         -  { value: 5, generic: 3, graph: 6, descr: 'STATUS_is_OTHER' }
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkAHsmStatusBool
-                    value: PRIMEKEY-APPLIANCE-MIB::pkAHsmStatusBool
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.51.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.51.1{{ $noindex }}'
                     descr: 'HSM Healthy'
                     group: 'HSM'
                     index: pkAHsmStatusBool
@@ -247,8 +224,7 @@ modules:
                         -  { value: 1, generic: 2, graph: 1, descr: 'Fail' }
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkAHsmBatteryIntStatus
-                    value: PRIMEKEY-APPLIANCE-MIB::pkAHsmBatteryIntStatus
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.53.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.53.1{{ $noindex }}'
                     descr: 'Battery Int'
                     group: 'HSM'
                     index: pkAHsmBatteryIntStatus
@@ -258,8 +234,7 @@ modules:
                         -  { value: 1, generic: 2, graph: 1, descr: 'Low or Fail' }
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkAHsmBatteryExtStatus
-                    value: PRIMEKEY-APPLIANCE-MIB::pkAHsmBatteryExtStatus
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.56.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.56.1{{ $noindex }}'
                     descr: 'Battery Ext'
                     group: 'HSM'
                     index: pkAHsmBatteryExtStatus
@@ -272,8 +247,7 @@ modules:
             data:
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkASfpCpuTemp
-                    value: PRIMEKEY-APPLIANCE-MIB::pkASfpCpuTemp
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.3.99.112.117.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.3.99.112.117.1{{ $noindex }}'
                     descr: 'CPU Temp'
                     group: 'CPU'
                     index: pkASfpCpuTemp
@@ -283,16 +257,14 @@ modules:
             data:
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkAHsmBatteryInt
-                    value: PRIMEKEY-APPLIANCE-MIB::pkAHsmBatteryInt
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.52.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.52.1{{ $noindex }}'
                     descr: 'Int Battery'
                     group: 'HSM'
                     index: pkAHsmBatteryInt
                     user_func: \LibreNMS\Util\Number::cast
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkAHsmBatteryExt
-                    value: PRIMEKEY-APPLIANCE-MIB::pkAHsmBatteryExt
-                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.55.1{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.55.1{{ $noindex }}'
                     descr: 'Ext Battery'
                     group: 'HSM'
                     index: pkAHsmBatteryExt

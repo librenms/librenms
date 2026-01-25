@@ -635,7 +635,7 @@ class Vrp extends OS implements
         }
 
         foreach ($sla_table as $sla_key => $sla_config) {
-            [$owner, $test] = explode('.', $sla_key, 2);
+            [$owner, $test] = explode('.', (string) $sla_key, 2);
 
             $slas->push(new Sla([
                 'sla_nr' => hexdec(hash('crc32', $owner . $test)), // indexed by owner+test, convert to int
@@ -755,12 +755,14 @@ class Vrp extends OS implements
                         $vlansOnPort = StringHelpers::bitsToIndices($vlanArray[$oid]);
                         foreach ($vlansOnPort as $vlanIdOnPort) {
                             $vlanIdOnPort = ($hilo == 'High') ? ($vlanIdOnPort + 2047) : ($vlanIdOnPort - 1);
-                            $ports->push(new PortVlan([
-                                'vlan' => $vlanIdOnPort,
-                                'baseport' => $baseport,
-                                'untagged' => 0,
-                                'port_id' => PortCache::getIdFromIfIndex($portsIndexes[$baseport] ?? 0, $this->getDeviceId()) ?? 0, // ifIndex from device
-                            ]));
+                            if ($vlans->contains('vlan_vlan', $vlanIdOnPort)) {
+                                $ports->push(new PortVlan([
+                                    'vlan' => $vlanIdOnPort,
+                                    'baseport' => $baseport,
+                                    'untagged' => 0,
+                                    'port_id' => PortCache::getIdFromIfIndex($portsIndexes[$baseport] ?? 0, $this->getDeviceId()) ?? 0, // ifIndex from device
+                                ]));
+                            }
                         }
                     }
                 }

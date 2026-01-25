@@ -32,7 +32,7 @@ use LibreNMS\Util\Http;
 
 class GraylogApi
 {
-    private \Illuminate\Http\Client\PendingRequest $client;
+    private readonly \Illuminate\Http\Client\PendingRequest $client;
     private string $api_prefix = '';
 
     public function __construct()

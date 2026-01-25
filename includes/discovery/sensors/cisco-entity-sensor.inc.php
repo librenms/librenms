@@ -91,42 +91,19 @@ if ($device['os_group'] == 'cisco') {
                 $current = $entry['entSensorValue'];
                 $type = $entitysensor[$entry['entSensorType']];
 
-                // echo("$index : ".$entry['entSensorScale']."|");
-                // FIXME this stuff is foul
-                if ($entry['entSensorScale'] == 'nano') {
-                    $divisor = '1000000000';
-                    $multiplier = '1';
-                }
-
-                if ($entry['entSensorScale'] == 'micro') {
-                    $divisor = '1000000';
-                    $multiplier = '1';
-                }
-
-                if ($entry['entSensorScale'] == 'milli') {
-                    $divisor = '1000';
-                    $multiplier = '1';
-                }
-
-                if ($entry['entSensorScale'] == 'units') {
-                    $divisor = '1';
-                    $multiplier = '1';
-                }
-
-                if ($entry['entSensorScale'] == 'kilo') {
-                    $divisor = '1';
-                    $multiplier = '1000';
-                }
-
-                if ($entry['entSensorScale'] == 'mega') {
-                    $divisor = '1';
-                    $multiplier = '1000000';
-                }
-
-                if ($entry['entSensorScale'] == 'giga') {
-                    $divisor = '1';
-                    $multiplier = '1000000000';
-                }
+                // Try to handle the scale
+                [$divisor, $multiplier] = match ($entry['entSensorScale']) {
+                    'zepto' => [1000000000000000000, 1],
+                    'nano' => [1000000000, 1],
+                    'micro' => [1000000, 1],
+                    'milli' => [1000, 1],
+                    'units' => [1, 1],
+                    'kilo' => [1, 1000],
+                    'mega' => [1, 1000000],
+                    'giga' => [1, 1000000000],
+                    'yocto' => [1, 1],
+                    default => [1, 1],
+                };
 
                 if (is_numeric($entry['entSensorPrecision'])
                         && $entry['entSensorPrecision'] > '0'
@@ -222,7 +199,7 @@ if ($device['os_group'] == 'cisco') {
                         if ($entPhysicalClass === 'port') {
                             $entAliasMappingIdentifier = $entity_array[$phys_index][0]['entAliasMappingIdentifier'];
                             if (Str::contains($entAliasMappingIdentifier, 'ifIndex.')) {
-                                [, $tmp_ifindex] = explode('.', $entAliasMappingIdentifier);
+                                [, $tmp_ifindex] = explode('.', (string) $entAliasMappingIdentifier);
                             }
                             break;
                             //or sensor entity has a parent entity with module class and entPhysicalName set to an existing ifName.

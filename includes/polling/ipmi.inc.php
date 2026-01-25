@@ -41,14 +41,14 @@ if (is_array($ipmi_rows)) {
         // so we dont use wrong arguments for ipmitool
         if ($ipmi['type'] != '') {
             array_push($cmd, '-I', $ipmi['type'], '-c', 'sdr');
-            $results = trim(external_exec($cmd));
+            $results = trim((string) external_exec($cmd));
             d_echo($results);
             echo " done.\n";
         } else {
             echo " type not yet discovered.\n";
         }
 
-        foreach (explode("\n", $results) as $row) {
+        foreach (explode("\n", (string) $results) as $row) {
             [$desc, $value, $type, $status] = explode(',', $row);
             $desc = trim($desc, ' ');
             $ipmi_unit_type = LibrenmsConfig::get("ipmi_unit.$type");

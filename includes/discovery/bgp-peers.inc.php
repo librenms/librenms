@@ -1,14 +1,13 @@
 <?php
 
-use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 
 //
 // Load OS specific file
 //
-if (file_exists(LibrenmsConfig::get('install_dir') . "/includes/discovery/bgp-peers/{$device['os']}.inc.php")) {
-    include LibrenmsConfig::get('install_dir') . "/includes/discovery/bgp-peers/{$device['os']}.inc.php";
+if (file_exists(base_path("includes/discovery/bgp-peers/{$device['os']}.inc.php"))) {
+    include base_path("includes/discovery/bgp-peers/{$device['os']}.inc.php");
 }
 
 if (empty($bgpLocalAs)) {
@@ -43,7 +42,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
 
         if (empty($peers_data)) {
             $bgp4_mib = true;
-            $peers_data = preg_replace('/= /', '', snmp_walk($device, 'bgpPeerRemoteAs', '-OQ', 'BGP4-MIB'));
+            $peers_data = preg_replace('/= /', '', (string) snmp_walk($device, 'bgpPeerRemoteAs', '-OQ', 'BGP4-MIB'));
         }
     } else {
         echo 'No BGP on host';
@@ -121,13 +120,13 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
                     $j_prefixes = snmpwalk_cache_multi_oid($device, 'jnxBgpM2PrefixCountersTable', [], 'BGP4-V2-MIB-JUNIPER', 'junos');
                     $j_afisafi = [];
                     foreach (array_keys($j_prefixes) as $key) {
-                        [$index,$afisafi] = explode('.', $key, 2);
+                        [$index,$afisafi] = explode('.', (string) $key, 2);
                         $j_afisafi[$index][] = $afisafi;
                     }
                 }
 
                 foreach ($j_afisafi[$j_peerIndexes[$peer['ip']]] ?? [] as $afisafi) {
-                    [$afi,$safi] = explode('.', $afisafi);
+                    [$afi,$safi] = explode('.', (string) $afisafi);
                     $afi = $afis[$afi];
                     $safi = $safis[$safi];
                     $af_list[$peer['ip']][$afi][$safi] = 1;

@@ -14,32 +14,27 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
 			FROM ALCATEL-IND1-BASE;
 
 	alcatelIND1SystemMIB MODULE-IDENTITY
-		LAST-UPDATED "200709040000Z"
-		ORGANIZATION "Alcatel-Lucent"
+		LAST-UPDATED "201910070000Z"
+		ORGANIZATION "ALE USA Inc"
 		CONTACT-INFO
 		     "Please consult with Customer Service to ensure the most appropriate
              version of this document is used with the products in question:
 
-                        Alcatel-Lucent, Enterprise Solutions Division
-                       (Formerly Alcatel Internetworking, Incorporated)
-                               26801 West Agoura Road
+                        Alcatel-Lucent Enterprise,                 
+                          26801 West Agoura Road
+			Agoura Hills, CA  91301-5122
+                         United States Of America
 
-            Telephone:               North America  +1 800 995 2696
-                                     Latin America  +1 877 919 9526
-                                     Europe         +31 23 556 0100
-                                     Asia           +65 394 7933
-                                     All Other      +1 818 878 4507
+            Telephone:               +1 800 995 2696 				                                                    
 
-            Electronic Mail:         support@ind.alcatel.com
-            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
-
-
-		DESCRIPTION
+            Electronic Mail:         ebg_global_supportcenter@al-enterprise.com
+            World Wide Web:          https://www.al-enterprise.com"
+  
+	    DESCRIPTION
             "This module describes an authoritative enterprise-specific Simple
              Network Management Protocol (SNMP) Management Information Base (MIB):
 
-                 For the Birds Of Prey Product Line
+                 For the OmniSwitch Product Line
                  Proprietary System Subsystem.
 
 
@@ -51,12 +46,13 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
 
-                         Copyright (C) 1995-2007 Alcatel-Lucent
-                             ALL RIGHTS RESERVED WORLDWIDE"
+                          Copyright (C) ALE USA Inc. 2014-2019
+			  Copyright (C) 1995-2013 Alcatel-Lucent
+                          ALL RIGHTS RESERVED WORLDWIDE"
 
-        REVISION      "200706180000Z"
+        REVISION      "201910070000Z"
         DESCRIPTION
-            "The latest version of this MIB Module."
+             "Updated the latest contact and Copyright information for ALE USA Inc."
 
             ::= {hardentIND1System 1 }
 
@@ -88,6 +84,9 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
             "Branch For Alcatel IND BOP Proprietary System
             Subsystem Compliance Statements."
         ::= { alcatelIND1SystemMIBConformance 2 }
+    alcatelIND1SystemTrapObjects OBJECT IDENTIFIER ::= { alcatelIND1SystemMIB 3 }
+    alaSystemMgrTraps OBJECT IDENTIFIER ::= { alcatelIND1SystemMIB 4 }
+
 
 	-- textual conventions
 
@@ -119,8 +118,9 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
 		SYNTAX	INTEGER	{
 							loaded(1),		-- the loaded directory
 							certified(2),	-- the certified directory
-							working(3),		-- the working directory
-							issu(4)		    -- the in-service software update directory
+							working(3)		-- the working directory
+							-- issu(4),
+							-- signature(5)	  
 						}
 
 	AppIdIndex ::= TEXTUAL-CONVENTION
@@ -172,38 +172,38 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
 					severityLevelDbg3 (9)  -- maximum verbosity dbg specific msg
 				}
 
-	SysLogFacilityId ::= TEXTUAL-CONVENTION
-   		STATUS       current
-		DESCRIPTION
-	           ""
+       SysLogFacilityId ::= TEXTUAL-CONVENTION
+                STATUS       current
+                DESCRIPTION
+                   ""
 
-		SYNTAX		INTEGER
-				{ 
-					uucp(0),
-					user(1),
-					system(2),
-					syslog(3),
-					secAuth2(4),
-					secAuth1(5),
-					ntp(6),
-					netNews(7),
-					mail(8),
-					lptr(9),
-					logAudit(10),
-					logAlert(11),
-					local7(12),
-					local6(13),
-					local5(14),
-					local4(15),
-					local3(16),
-					local2(17),
-					local1(18),
-					local0(19),
-					kernel(20),
-					ftp(21),
-					clock2(22),
-					clock1(23)
-				} 
+                SYNTAX          INTEGER
+                                {
+                                        uucp(0),
+                                        user(1),
+                                        system(2),
+                                        syslog(3),
+                                        secAuth2(4),
+                                        secAuth1(5),
+                                        ntp(6),
+                                        netNews(7),
+                                        mail(8),
+                                        lptr(9),
+                                        logAudit(10),
+                                        logAlert(11),
+                                        local7(12),
+                                        local6(13),
+                                        local5(14),
+                                        local4(15),
+                                        local3(16),
+                                        local2(17),
+                                        local1(18),
+                                        local0(19),
+                                        kernel(20),
+                                        ftp(21),
+                                        clock2(22),
+                                        clock1(23)
+                                }
 
 	CommandPercentComplete ::= TEXTUAL-CONVENTION
 		STATUS	current
@@ -220,6 +220,7 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
 	systemServices		OBJECT IDENTIFIER	::= {alcatelIND1SystemMIBObjects 5 }
 	systemSwitchLogging	OBJECT IDENTIFIER	::= {alcatelIND1SystemMIBObjects 6 }
 	systemDNS		OBJECT IDENTIFIER	::= {alcatelIND1SystemMIBObjects 7 }
+	systemSignature		OBJECT IDENTIFIER	::= {alcatelIND1SystemMIBObjects 8 }
 
 	-- systemMicrocode group.  This group contains the CMM specific
 	-- microcode information.
@@ -509,7 +510,7 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
 	-- regarding this CMM.
 
     systemHardwareFlashMfg	OBJECT-TYPE
-		SYNTAX		INTEGER {other(1), amd(2), intel(3), atmel(4), toshiba(7), sandisk(8), sst(9), spansion(10) }
+		SYNTAX		INTEGER {other(1), amd(2), intel(3), atmel(4), micron(5), toshiba(7), sandisk(8), sst(9), spansion(10), macronix(16), winbond(17)}
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION
@@ -641,8 +642,7 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION
-			"This is the major version of one of the FPGA devices on this CMM. 
-		 	 refer to the systemHardwareMinorFpgaVersion for the minor number."
+			"This is the major version of one of the FPGA devices on this CMM"
 		::={systemHardwareFpgaVersionEntry 2}
 
 	systemHardwareBootRomVersion	OBJECT-TYPE
@@ -679,8 +679,7 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
 		MAX-ACCESS	read-only
 		STATUS		current
 		DESCRIPTION
-		"A string that identifies the minor FPGA version. Refer to the 
-		 systemHardwareFpgaVersion for the major FPGA version number."
+		"A string that identifies the minor FPGA version."
 		DEFVAL		{ "" }
 		::={ systemHardware 15 }
 
@@ -996,14 +995,13 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
 					ssh6(41),
 					sftp6(42),
 					mount(43),
-					umount(44),
+					unmount(44),
 					backup(45),
 					restore(46),
 					tftp(47),
 					fscollect(48),
-					fpgani(49),
-					fscollectForce(50)
-
+					fpgani(49)
+					-- fscollectForce(50)
 				}
 	    MAX-ACCESS	read-write
 		STATUS		current
@@ -1028,15 +1026,12 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
                         no-repair depending on if autocorrection is requested.
                         To see all file systems currently mounted, refer to the
                         systemFileSystemTable.
-
                         For backup and restore, systemServicesArg1 contains the
                         archive name and systemServicesArg2 through Arg9 contains the 
                         directories and/or files to be archived/extracted.
-
                         For newfs, fsck, backup and restore, the
                         systemServicesActionPercentComplete variable can be
                         inspected to see a progress indication."
-
 		::= { systemServices 24 }
 
 	systemServicesResultCode OBJECT-TYPE
@@ -1393,8 +1388,53 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
 		STATUS      current
 		DESCRIPTION
 			"disable/enable the USB disaster-recovery factility"
-		::= { systemServices 40}
-	
+   		::= { systemServices 40}
+
+	systemServicesFipsEnable OBJECT-TYPE
+             		SYNTAX        Enable
+                	MAX-ACCESS    read-write
+      	         	STATUS        current
+                	DESCRIPTION
+             		"Enable or disable the FIPS mode on AOS switches 
+                    		The default value is disabled."
+                	DEFVAL        { disabled }
+                	::= { systemServices 41 }
+        
+	systemServicesFipsStatus OBJECT-TYPE
+	         	SYNTAX        Enable
+                	MAX-ACCESS    read-only
+                	STATUS        current
+                	DESCRIPTION
+               		"Status of the FIPS mode on AOS switches"
+                	::= { systemServices 42 }
+
+systemServicesArg10 OBJECT-TYPE
+			SYNTAX      INTEGER
+			MAX-ACCESS  read-write
+			STATUS      current
+			DESCRIPTION
+			"Argument for storing the VRF id"
+			DEFVAL  {0}
+			::= { systemServices 43 }
+
+	systemServicesCommonCriteriaEnable OBJECT-TYPE
+             		SYNTAX        Enable
+                	MAX-ACCESS    read-write
+      	         	STATUS        current
+                	DESCRIPTION
+             		"Enable or disable the Common Criteria mode on AOS switches 
+                    		The default value is disabled."
+                	DEFVAL        { disabled }
+                	::= { systemServices 44 }
+        
+	systemServicesCommonCriteriaStatus OBJECT-TYPE
+	         	SYNTAX        Enable
+                	MAX-ACCESS    read-only
+                	STATUS        current
+                	DESCRIPTION
+               		"Status of the Common Criteria mode on AOS switches"
+                	::= { systemServices 45 }
+
 
 --systemFileSystem group.  This group contains the parameters for
 --the multiple File Systems on the platform. 
@@ -1694,8 +1734,8 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
 	SystemSwitchLoggingHostEntry  ::= SEQUENCE {
             systemSwitchLoggingHostIpAddr     IpAddress,
             systemSwitchLoggingHostPort       INTEGER,
-	    systemSwitchLoggingHostUserCommandHost	Enable,
-            systemSwitchLoggingHostStatus     RowStatus
+            systemSwitchLoggingHostStatus     RowStatus,
+            systemSwitchLoggingHostUserCommandHost      Enable
 	    }
 
 	systemSwitchLoggingHostIpAddr	OBJECT-TYPE
@@ -1755,8 +1795,8 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
 	SystemSwitchLoggingHostv6Entry  ::= SEQUENCE {
             systemSwitchLoggingHostv6IpAddr    Ipv6Address,
             systemSwitchLoggingHostv6Port      INTEGER,
-	    systemSwitchLoggingHostv6UserCommandHost	Enable,
-            systemSwitchLoggingHostv6Status    RowStatus
+            systemSwitchLoggingHostv6Status    RowStatus,
+             systemSwitchLoggingHostv6UserCommandHost    Enable
 	    }
 
 	systemSwitchLoggingHostv6IpAddr	OBJECT-TYPE
@@ -1827,47 +1867,55 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
 		::={ systemSwitchLogging 14}
 
 	systemSwitchLoggingSysLogFacilityId  OBJECT-TYPE
-		SYNTAX	      SysLogFacilityId
-		MAX-ACCESS    read-write
-		STATUS        current
-		DESCRIPTION   "This textual convention enumerates the facilities
-        	    that originate syslog messages.
-	
-        	    The Facilities of syslog messages are numerically
-	            coded with decimal values.
-	            Some of the operating system daemons and processes
-	            are traditionally designated by the Facility values
-	            given below. Daemons and processes that do not have
-	            an explicitly assigned Facility may use any of the
-	            'local use' Facilities or they may use the 'user-level'
-	            Facility.
+                SYNTAX        SysLogFacilityId
+                MAX-ACCESS    read-write
+                STATUS        current
+                DESCRIPTION   "This textual convention enumerates the facilities
+                    that originate syslog messages.
 
-	            For interoperability and backwards compatibility
-	            reasons, mapping specified in this document between
-	            a label which represents a Facility and
-	            the value which represents the corresponding code, is
-	            normative. So the mapping from a label configured by
-	            operators in syslog.conf or equivalent will consistently
-	            map to the same Facility code regardless of
-	            implementation, but the label itself is often
-	            semantically meaningless, because it is impractical to
-	            attempt to enumerate all possible facilities, and the
-	            enumeration (label and corresponding value) that is used
-	            by an actual Facility is, and has historically been,
-	            implementation-dependent.
+                    The Facilities of syslog messages are numerically
+                    coded with decimal values.
+                    Some of the operating system daemons and processes
+                    are traditionally designated by the Facility values
+                    given below. Daemons and processes that do not have
+                    an explicitly assigned Facility may use any of the
+                    'local use' Facilities or they may use the 'user-level'
+                    Facility.
 
-	            For example, the foobar application might log messages
-	            as having come from local7, even though there is no
-	            'local' process on the device, and the operator can
-	            configure syslog.conf to have local7.critical messages
-	            be relayed, even though there might be multiple facilities
-	            using Facility local7. This is typical current practice,
-	            and originators, relays and collectors know how to handle
-	            this situation. For improved accuracy, the foobar
-	            application can also include an APPNAME Structured Data
-	            Element."
-		DEFVAL  { uucp }
-		::={ systemSwitchLogging 15}
+                    For interoperability and backwards compatibility
+                    reasons, mapping specified in this document between
+                    a label which represents a Facility and
+                    the value which represents the corresponding code, is
+                    normative. So the mapping from a label configured by
+                    operators in syslog.conf or equivalent will consistently
+                    map to the same Facility code regardless of
+                    implementation, but the label itself is often
+                    semantically meaningless, because it is impractical to
+                    attempt to enumerate all possible facilities, and the
+                    enumeration (label and corresponding value) that is used
+                    by an actual Facility is, and has historically been,
+                    implementation-dependent.
+
+                    For example, the foobar application might log messages
+                    as having come from local7, even though there is no
+                    'local' process on the device, and the operator can
+                    configure syslog.conf to have local7.critical messages
+                    be relayed, even though there might be multiple facilities
+                    using Facility local7. This is typical current practice,
+                    and originators, relays and collectors know how to handle
+                    this situation. For improved accuracy, the foobar
+                    application can also include an APPNAME Structured Data
+                    Element."
+                DEFVAL  { uucp }
+                ::={ systemSwitchLogging 15}
+
+	  systemSwlogViewPassword OBJECT-TYPE
+	     SYNTAX        DisplayString ( SIZE( 0 .. 32 ) )
+	     MAX-ACCESS    read-create
+	     STATUS        current
+	     DESCRIPTION
+	      "Password to be used for authenticating swlog view for registered user"
+	      ::= { systemSwitchLogging 16}
 
 	--systemDNS group.  This group contains the Domain Name Service
 	--configuration information.
@@ -1896,7 +1944,7 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
 		STATUS		current
 		DESCRIPTION
 			"1st part of address used by the Domain Name Service"
-		DEFVAL { 0 }
+		DEFVAL { '00000000'h }
 		::={ systemDNS 3 }
 
 	systemDNSNsAddr2	OBJECT-TYPE
@@ -1905,7 +1953,7 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
 		STATUS		current
 		DESCRIPTION
 			"2nd part of address used by the Domain Name Service"
-		DEFVAL { 0 }
+		DEFVAL { '00000000'h }
 		::={ systemDNS 4 }
 
 	systemDNSNsAddr3	OBJECT-TYPE
@@ -1914,7 +1962,7 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
 		STATUS		current
 		DESCRIPTION
 			"3rd part of address used by the Domain Name Service"
-		DEFVAL { 0 }
+		DEFVAL { '00000000'h }
 		::={ systemDNS 5 }
 
 	systemDNSNsIPv6Addr1	OBJECT-TYPE
@@ -1923,7 +1971,7 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
 		STATUS		current
 		DESCRIPTION
 			"IPv6 address of the Primary DNS server"
-		DEFVAL { "" }
+		DEFVAL { '00000000000000000000000000000000'h }
 		::={ systemDNS 6 }
 
 	systemDNSNsIPv6Addr2	OBJECT-TYPE
@@ -1932,7 +1980,7 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
 		STATUS		current
 		DESCRIPTION
 			"IPv6 address of the Secondary DNS server"
-		DEFVAL { "" }
+		DEFVAL { '00000000000000000000000000000000'h }
 		::={ systemDNS 7 }
 
 	systemDNSNsIPv6Addr3	OBJECT-TYPE
@@ -1941,8 +1989,60 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
 		STATUS		current
 		DESCRIPTION
 			"IPv6 address of the third DNS server"
-		DEFVAL { "" }
+		DEFVAL { '00000000000000000000000000000000'h }
 		::={ systemDNS 8 }
+
+	--systemSignature group.  This group contains the signature for 
+	--ceritifed, working and issu directory.
+	systemSignatureCertified	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"The signature of certified directory"
+		::={ systemSignature 1 }
+	systemSignatureWorking		OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"The signature of working directory"
+		::={ systemSignature 2 }
+	systemSignatureIssu		OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"The signature of Issu directory"
+		::={ systemSignature 3 }
+
+-------------------------------------------------------
+-- System Services Trap Objects 
+-------------------------------------------------------
+
+   systemSwlogName OBJECT-TYPE  
+   SYNTAX 	DisplayString (SIZE (0..255) ) 
+   MAX-ACCESS	read-only
+   STATUS	current
+   DESCRIPTION
+   "SWLOG file name whose size exceeded preconfigured value"
+   ::= { alcatelIND1SystemTrapObjects 1 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+--  NOTIFICATIONS
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+   systemSwlogSizeTrap NOTIFICATION-TYPE
+   OBJECTS    {
+               systemSwlogName 	  
+              }
+   STATUS  current
+   DESCRIPTION
+          "The size of the specified file has exceeded 90 percent
+           of preconfigured value, please do back up before getting overwritten."
+   ::= { alaSystemMgrTraps 0 1 }
+
+
 --
 -- Compliance Statements
 --
@@ -1962,7 +2062,10 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
 				systemServicesGroup,
 				systemFileSystemGroup,
 				systemSwitchLoggingGroup,
-				systemDNSGroup
+				systemDNSGroup,
+				systemSwitchLoggingHostGroup,
+				systemSignatureGroup,
+                            systemNotificationGroup
             }
 
         ::= { alcatelIND1SystemMIBCompliances 1 }
@@ -2021,7 +2124,14 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
 			systemHardwareFpgaVersion,
 			systemHardwareBootRomVersion,
 			systemHardwareDefaultMiniBootVersion,
-			systemHardwareBackupMiniBootVersion
+			systemHardwareBackupMiniBootVersion,
+			systemHardwareCpldVersion,
+			systemHardwareMinorFpgaVersion ,
+			systemHardwareProdRegId ,
+			systemHardwareRevisionRegister,
+			systemHardwareUbootMinibootVersion,
+			systemHardwareUbootVersion ,
+			systemHardwareXfpId
         }
         STATUS      current
         DESCRIPTION
@@ -2053,6 +2163,7 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
 				systemServicesArg7,
 				systemServicesArg8,
 				systemServicesArg9,
+				systemServicesArg10,
 				systemServicesAction,
 				systemServicesResultCode,
 				systemServicesResultString,
@@ -2074,7 +2185,9 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
                                 systemServicesArchiveAttr,
 				systemServicesUsbEnable,
 				systemServicesUsbAutoCopyEnable,
-				systemServicesUsbDisasterRecoveryEnable
+				systemServicesUsbDisasterRecoveryEnable,
+				systemServicesArchiveIndex ,
+				systemServicesCurrentArchivePathName
 			}
         STATUS  current
         DESCRIPTION
@@ -2111,7 +2224,9 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
 				systemSwitchLoggingClear,
 				systemSwitchLoggingFileSize,
 				systemSwitchLoggingLevel,
-				systemSwitchLoggingLevelAppId
+				systemSwitchLoggingLevelAppId,
+				systemSwitchLoggingSysLogFacilityId,
+				systemSwlogViewPassword
 			}
         	STATUS      current
         	DESCRIPTION
@@ -2134,6 +2249,41 @@ ALCATEL-IND1-SYSTEM-MIB DEFINITIONS ::= BEGIN
          	"Group all the systemDNS parameters together"
         	::= { alcatelIND1SystemMIBGroups 7 }
 
+	systemSwitchLoggingHostGroup OBJECT-GROUP
+		OBJECTS{     
+					systemSwitchLoggingHostCount,
+					systemSwitchLoggingHostIpAddr,
+					systemSwitchLoggingHostPort,
+					systemSwitchLoggingHostStatus ,
+					systemSwitchLoggingHostUserCommandHost ,
+					systemSwitchLoggingHostv6IpAddr ,
+					systemSwitchLoggingHostv6Port,
+					systemSwitchLoggingHostv6Status,
+					systemSwitchLoggingHostv6UserCommandHost 
+					
+				}
+        	STATUS      current
+        	DESCRIPTION
+         	"A remote switch logging server entry."
+        	::= { alcatelIND1SystemMIBGroups 8 }
+	systemSignatureGroup OBJECT-GROUP
+		OBJECTS{
+				systemSignatureCertified,
+				systemSignatureWorking,
+				systemSignatureIssu
+			}
+        	STATUS      current
+        	DESCRIPTION
+         	"Group the signature of all directories together."
+        	::= { alcatelIND1SystemMIBGroups 9 }
+       systemNotificationGroup NOTIFICATION-GROUP
+              NOTIFICATIONS {
+                             systemSwlogSizeTrap 
+                            }
+              STATUS  current
+              DESCRIPTION
+                    "A collection of notifications for System Services events."
+              ::= { alcatelIND1SystemMIBGroups 10 }
 END
 
 
