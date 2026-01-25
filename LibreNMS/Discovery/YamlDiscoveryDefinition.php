@@ -150,8 +150,10 @@ class YamlDiscoveryDefinition
                 /** @var YamlDiscoveryField $field */
                 foreach ($this->fields as $field) {
                     // fill attributes
-                    $field->calculateValue($yamlItem, $fetchedData, $index, $count);
-                    $modelAttributes[$field->model_column] = $field->value;
+                    if ($field->model_column !== null) {
+                        $field->calculateValue($yamlItem, $fetchedData, $index, $count);
+                        $modelAttributes[$field->model_column] = $field->value;
+                    }
                 }
 
                 // if no pollable oid found, skip this index
