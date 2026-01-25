@@ -9,9 +9,10 @@ import threading
 import timeit
 from collections import deque
 from logging.handlers import RotatingFileHandler
-from math import ceil
 from queue import Queue
 from time import time
+
+from math import ceil
 
 from .command_runner import command_runner
 from .service import LogOutput
@@ -211,7 +212,9 @@ def call_script(script, args=(), log_dest=None):
         kwargs["stderr"] = log_dest
     elif isinstance(log_dest, LogOutput):
         if log_dest is LogOutput.FILE:
-            raise ValueError("For FILE mode, pass a file path string instead of LogOutput.FILE")
+            raise ValueError(
+                "For FILE mode, pass a file path string instead of LogOutput.FILE"
+            )
 
         elif log_dest is LogOutput.NONE:
             kwargs["stdout"] = subprocess.DEVNULL

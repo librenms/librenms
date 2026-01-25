@@ -447,9 +447,13 @@ class ServicesQueueManager(TimedQueueManager):
         if self.lock(device_id, timeout=self.config.services.frequency):
             logger.info("Checking services on device {}".format(device_id))
 
-            output = "{}/dispatch_device_{}_services.log".format(
-                self.config.logdir, device_id
-            ) if self.config.log_output == LibreNMS.LogOutput.FILE else self.config.log_output
+            output = (
+                "{}/dispatch_device_{}_services.log".format(
+                    self.config.logdir, device_id
+                )
+                if self.config.log_output == LibreNMS.LogOutput.FILE
+                else self.config.log_output
+            )
 
             args = ("-d", "-h", device_id) if self.config.debug else ("-h", device_id)
             exit_code, output = LibreNMS.call_script("check-services.php", args, output)
@@ -493,7 +497,11 @@ class AlertQueueManager(TimedQueueManager):
     def do_work(self, device_id, group):
         logger.info("Checking alerts")
 
-        output = "{}/dispatch_alerts.log".format(self.config.logdir) if self.config.log_output == LibreNMS.LogOutput.FILE else self.config.log_output
+        output = (
+            "{}/dispatch_alerts.log".format(self.config.logdir)
+            if self.config.log_output == LibreNMS.LogOutput.FILE
+            else self.config.log_output
+        )
 
         args = ("-d", "-f") if self.config.debug else ("-f",)
         exit_code, output = LibreNMS.call_script("alerts.php", args, output)
@@ -521,9 +529,11 @@ class PollerQueueManager(QueueManager):
         if self.lock(device_id, timeout=self.config.poller.frequency):
             logger.info("Polling device {}".format(device_id))
 
-            output = "{}/dispatch_device_{}_poller.log".format(
-                self.config.logdir, device_id
-            ) if self.config.log_output == LibreNMS.LogOutput.FILE else self.config.log_output
+            output = (
+                "{}/dispatch_device_{}_poller.log".format(self.config.logdir, device_id)
+                if self.config.log_output == LibreNMS.LogOutput.FILE
+                else self.config.log_output
+            )
 
             args = (
                 ("device:poll", device_id, "-vv")
@@ -585,9 +595,13 @@ class DiscoveryQueueManager(TimedQueueManager):
         ):
             logger.info("Discovering device {}".format(device_id))
 
-            output = "{}/dispatch_device_{}_discovery.log".format(
-                self.config.logdir, device_id
-            ) if self.config.log_output == LibreNMS.LogOutput.FILE else self.config.log_output
+            output = (
+                "{}/dispatch_device_{}_discovery.log".format(
+                    self.config.logdir, device_id
+                )
+                if self.config.log_output == LibreNMS.LogOutput.FILE
+                else self.config.log_output
+            )
 
             args = (
                 ("device:discover", device_id, "-vv")
