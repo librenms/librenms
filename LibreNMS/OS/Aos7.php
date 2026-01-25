@@ -289,28 +289,49 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
         };
     }
 
+    /**
+     * Parse AOS DA index forms.
+     *
+     * Supports:
+     *  - "ifIndex.mac.vlan" where mac may be "00:11:22:33:44:55" OR "0:1:2:3:4:5"
+     *  - "ifIndex.<byte>.<byte>.<byte>.<byte>.<byte>.<byte>.vlan" (numeric bytes)
+     */
     private function parseAosDaIndex(string $index): array
     {
         $parts = explode('.', $index);
 
+        // Most common: "<ifIndex>.<mac>.<vlan>"
         if (count($parts) === 3) {
             $ifIndex = (int) $parts[0];
-            $macColon = $this->normalizeMacColon($parts[1]);
+            $macRaw = (string) $parts[1];
+            $vlanRaw = $parts[2];
+
+            if ($ifIndex <= 0 || ! is_numeric($vlanRaw)) {
+                return [0, '', '', null];
+            }
+
+            // Normalize MAC even if it comes as "0:0:1b:0:34:5a"
+            $macColon = $this->normalizeMacColon($macRaw);
             $macNoSep = $this->normalizeMacNoSep($macColon);
-            $vlan = (int) $parts[2];
+            $vlan = (int) $vlanRaw;
 
             return [$ifIndex, $macColon, $macNoSep, $vlan];
         }
 
+        // Numeric-octet style: "<ifIndex>.<b1>.<b2>.<b3>.<b4>.<b5>.<b6>.<vlan>"
         if (count($parts) >= 8) {
             $ifIndex = (int) $parts[0];
             $macBytes = array_slice($parts, 1, 6);
             $vlanPart = $parts[7];
+
             if ($ifIndex <= 0 || ! is_numeric($vlanPart)) {
                 return [0, '', '', null];
             }
 
-            $macColon = implode(':', array_map(fn ($b) => str_pad(dechex((int) $b), 2, '0', STR_PAD_LEFT), $macBytes));
+            $macColon = implode(':', array_map(
+                static fn ($b) => str_pad(dechex((int) $b), 2, '0', STR_PAD_LEFT),
+                $macBytes
+            ));
 
             $macColon = strtolower($macColon);
             $macNoSep = $this->normalizeMacNoSep($macColon);
@@ -322,17 +343,36 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
         return [0, '', '', null];
     }
 
+    /**
+     * Normalize MAC string to colon-separated lower hex with zero-padding.
+     * Accepts "0:0:1b:0:34:5a", "00:00:1b:00:34:5a", "00-00-1b-00-34-5a"
+     */
     private function normalizeMacColon(string $mac): string
     {
         $mac = strtolower(trim($mac));
         $parts = preg_split('/[:\-]/', $mac);
+
         if (! $parts || count($parts) !== 6) {
             return $mac;
         }
-        $parts = array_map(fn ($p) => str_pad($p, 2, '0', STR_PAD_LEFT), $parts);
+
+        $parts = $this->normalizeMacIndexGroups($parts);
 
         return implode(':', $parts);
     }
+
+    /**
+     * Zero-pad each MAC group to 2 hex digits.
+     */
+    private function normalizeMacIndexGroups(array $parts): array
+{
+    return array_map(static function ($p) {
+        $p = strtolower(trim((string) $p));
+        // keep only hex chars
+        $p = preg_replace('/[^0-9a-f]/', '', $p) ?? '';
+        return str_pad($p, 2, '0', STR_PAD_LEFT);
+    }, $parts);
+}
 
     private function normalizeMacNoSep(string $macColon): string
     {
