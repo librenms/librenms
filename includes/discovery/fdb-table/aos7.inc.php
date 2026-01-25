@@ -40,12 +40,12 @@ $vlans_dict = (isset($vlans_dict) && is_array($vlans_dict)) ? $vlans_dict : [];
 $dot1d = snmpwalk_group($device, 'slMacAddressGblManagement', 'ALCATEL-IND1-MAC-ADDRESS-MIB', 0, [], 'nokia/aos7');
 
 if (! empty($dot1d['slMacAddressGblManagement'])) {
-    foreach ($dot1d['slMacAddressGblManagement'] as $type => $fids) {
+    foreach ($dot1d['slMacAddressGblManagement'] as $fids) {
         if (! is_array($fids)) {
             continue;
         }
 
-        foreach ($fids as $fid => $mappings) {
+        foreach ($fids as $mappings) {
             if (! is_array($mappings)) {
                 continue;
             }
@@ -77,7 +77,7 @@ if (! empty($dot1d['slMacAddressGblManagement'])) {
                         continue;
                     }
 
-                    foreach ($timeMarks as $timeMark => $macs) {
+                    foreach ($timeMarks as $macs) {
                         if (! is_array($macs)) {
                             continue;
                         }

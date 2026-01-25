@@ -310,9 +310,7 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
                 return [0, '', '', null];
             }
 
-            $macColon = implode(':', array_map(function ($b) {
-                return str_pad(dechex((int) $b), 2, '0', STR_PAD_LEFT);
-            }, $macBytes));
+            $macColon = implode(':', array_map(fn($b) => str_pad(dechex((int) $b), 2, '0', STR_PAD_LEFT), $macBytes));
 
             $macColon = strtolower($macColon);
             $macNoSep = $this->normalizeMacNoSep($macColon);
@@ -375,7 +373,7 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
         $bytes = $m[0];
 
         if (count($bytes) === 4) {
-            $octets = array_map(fn ($b) => hexdec($b), $bytes);
+            $octets = array_map(hexdec(...), $bytes);
 
             return implode('.', $octets);
         }
@@ -452,7 +450,7 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
             }
 
             $match_entity = null;
-            if (! empty($port->ifName) && preg_match('/^(\d+)\/(\d+)\/(\d+)[A-Z]?$/', $port->ifName, $matches)) {
+            if (! empty($port->ifName) && preg_match('/^(\d+)\/(\d+)\/(\d+)[A-Z]?$/', (string) $port->ifName, $matches)) {
                 $expectedName = "{$matches[1]}/SLOT-{$matches[2]} TRANSCEIVER-{$matches[3]}";
                 $match_entity = $entities->first(fn ($item) => (string) $item->entPhysicalName === $expectedName);
             }
