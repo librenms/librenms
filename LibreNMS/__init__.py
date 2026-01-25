@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import re
 import signal
 import subprocess
 import sys
@@ -227,7 +228,33 @@ def call_script(script, args=(), log_dest=None):
     base_dir = os.path.realpath(os.path.dirname(__file__) + "/..")
     cmd = base + ("{}/{}".format(base_dir, script),) + tuple(map(str, args))
     logger.debug("Running {}".format(cmd))
-    return command_runner(cmd, **kwargs)
+    exit_code, output = command_runner(cmd, **kwargs)
+
+    if log_dest is LogOutput.LOGGER:
+        if output:
+            for line in output.splitlines():
+                level = infer_log_level(line)
+                logger.log(level, line)
+
+    return exit_code, output
+
+
+def infer_log_level(line):
+    """Infer log level from a log line."""
+    upper_line = line.upper()
+
+    if re.match(r"^\s*(\[)?(CRITICAL|FATAL)(]|:|\s|-)", upper_line):
+        return logging.CRITICAL
+    elif re.match(r"^\s*(\[)?(ERROR|ERR)(]|:|\s|-)", upper_line):
+        return logging.ERROR
+    elif re.match(r"^\s*(\[)?(WARN|WARNING)(]|:|\s|-)", upper_line):
+        return logging.WARNING
+    elif re.match(r"^\s*(\[)?(INFO|INFORMATION)(]|:|\s|-)", upper_line):
+        return logging.INFO
+    elif re.match(r"^\s*(\[)?(DEBUG|TRACE)(]|:|\s|-)", upper_line):
+        return logging.DEBUG
+
+    return logging.INFO
 
 
 class DB:
