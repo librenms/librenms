@@ -42,8 +42,7 @@ logger = logging.getLogger(__name__)
 
 class LogOutput(Enum):
     NONE = "none"
-    STDOUT = "stdout"
-    STDERR = "stderr"
+    PASSTHROUGH = "passthrough"
     LOGGER = "logger"
     FILE = "file"
 

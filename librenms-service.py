@@ -34,7 +34,7 @@ if __name__ == "__main__":
         help=(
             "Where to direct poller log messages.\n"
             "  --log-output         = log to file (same as --log-output file)\n"
-            "  --log-output DEST    = log to stdout, stderr, logger, file\n"
+            "  --log-output DEST    = log to none, passthrough, logger, file\n"
             "  (not specified)      = no dedicated poller output logging (=none)"
         ),
     )
