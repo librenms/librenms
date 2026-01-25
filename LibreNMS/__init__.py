@@ -220,7 +220,7 @@ def call_script(script, args=(), log_dest=None):
             kwargs["stdout"] = subprocess.DEVNULL
             kwargs["stderr"] = subprocess.DEVNULL
 
-        elif log_dest in (LogOutput.STDOUT, LogOutput.STDERR):
+        elif log_dest is LogOutput.PASSTHROUGH:
             kwargs["stdout"] = sys.stdout
             kwargs["stderr"] = sys.stderr
 
