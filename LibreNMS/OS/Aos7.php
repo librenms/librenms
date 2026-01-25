@@ -365,14 +365,14 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
      * Zero-pad each MAC group to 2 hex digits.
      */
     private function normalizeMacIndexGroups(array $parts): array
-{
-    return array_map(static function ($p) {
-        $p = strtolower(trim((string) $p));
-        // keep only hex chars
-        $p = preg_replace('/[^0-9a-f]/', '', $p) ?? '';
-        return str_pad($p, 2, '0', STR_PAD_LEFT);
-    }, $parts);
-}
+    {
+        return array_map(static function ($p) {
+            $p = strtolower(trim((string) $p));
+            // keep only hex chars
+            $p = preg_replace('/[^0-9a-f]/', '', $p) ?? '';
+            return str_pad($p, 2, '0', STR_PAD_LEFT);
+        }, $parts);
+    }
 
     private function normalizeMacNoSep(string $macColon): string
     {
