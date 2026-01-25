@@ -4,7 +4,7 @@
  * Aos7.php
  *
  * -Description-
- * 
+ *
  * Base Alcatel-Lucent OS (AOS7/AOS8)
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -160,20 +160,20 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
             $authzBy = ($authSrv !== '' && $authSrv !== '-') ? $authSrv : 'RADIUS';
 
             $entry = new PortsNac([
-                'port_id'      => $portId,
-                'auth_id'      => $authId,
-                'domain'       => ($profile !== '' && $profile !== '-') ? $profile : 'UNP',
-                'username'     => $username,
-                'mac_address'  => $macNoSep,
-                'ip_address'   => $ip,
-                'host_mode'    => $hostMode,
+                'port_id' => $portId,
+                'auth_id' => $authId,
+                'domain' => ($profile !== '' && $profile !== '-') ? $profile : 'UNP',
+                'username' => $username,
+                'mac_address' => $macNoSep,
+                'ip_address' => $ip,
+                'host_mode' => $hostMode,
                 'authz_status' => $authzStatus,
-                'authz_by'     => $authzBy,
+                'authz_by' => $authzBy,
                 'authc_status' => $authcStatus,
-                'method'       => $method,
-                'timeout'      => $timeoutValue,
-                'time_left'    => null,
-                'vlan'         => (int) $vlan,
+                'method' => $method,
+                'timeout' => $timeoutValue,
+                'time_left' => null,
+                'vlan' => (int) $vlan,
                 'time_elapsed' => $timeElapsed > 0 ? $timeElapsed : null,
             ]);
 
