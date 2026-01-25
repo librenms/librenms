@@ -34,10 +34,11 @@ namespace LibreNMS\Alert;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
-use App\Models\Alert;
 use App\Models\AlertTransport;
 use App\Models\ApplicationMetric;
 use App\Models\Eventlog;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\MaintenanceStatus;
@@ -510,10 +511,16 @@ class RunAlerts
                 $alert['details']['count'] = 0;
             }
 
-            $status_check = Alert::where('alerts.device_id', $alert['device_id'])
+            $status_check = DB::table('alerts')
                 ->where('alerts.rule_id', $alert['rule_id'])
-                ->join('devices', 'alerts.device_id', '=', 'devices.device_id')
+                ->leftJoin('devices', 'alerts.device_id', '=', 'devices.device_id')
                 ->first(['alerts.alerted', 'devices.ignore', 'devices.disabled']);
+
+            if ($status_check === null) {
+                Log::error('Alert rule not found');
+
+                return;
+            }
 
             if ($status_check->alerted == $alert['state']) {
                 $noiss = true;
