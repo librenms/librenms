@@ -370,8 +370,7 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
             $p = strtolower(trim((string) $p));
             // keep only hex chars
             $p = preg_replace('/[^0-9a-f]/', '', $p) ?? '';
-            
-            return str_pad($p, 2, '0', STR_PAD_LEFT);
+                return str_pad($p, 2, '0', STR_PAD_LEFT);
         }, $parts);
     }
 
