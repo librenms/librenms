@@ -25,7 +25,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-o",
         "--log-output",
-        nargs='?',
+        nargs="?",
         const="file",
         default="none",
         type=LibreNMS.LogOutput,
