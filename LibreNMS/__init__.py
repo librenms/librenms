@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import signal
+import subprocess
 import sys
 import tempfile
 import threading
@@ -13,17 +14,7 @@ from queue import Queue
 from time import time
 
 from .command_runner import command_runner
-from .queuemanager import (
-    QueueManager,
-    TimedQueueManager,
-    BillingQueueManager,
-    PingQueueManager,
-    ServicesQueueManager,
-    AlertQueueManager,
-    PollerQueueManager,
-    DiscoveryQueueManager,
-)
-from .service import Service, ServiceConfig
+from .service import LogOutput
 
 # Hard limit script execution time so we don't get to "hang"
 DEFAULT_SCRIPT_TIMEOUT = 3600
@@ -190,13 +181,15 @@ def reset_signals():
     signal.signal(signal.SIGCHLD, signal.SIG_DFL)
 
 
-def call_script(script, args=()):
+def call_script(script, args=(), log_dest=None):
     """
     Run a LibreNMS script.  Captures all output returns exit code.
     Blocks parent signals (like SIGINT and SIGTERM).
     Kills script if it takes too long
     :param script: the name of the executable relative to the base directory
     :param args: a tuple of arguments to send to the command
+    :param log_dest: LogOutput enum or file path
+    :type log_dest: str | LogOutput | None
     :returns the output of the command
     """
     if script.endswith(".php"):
@@ -205,17 +198,33 @@ def call_script(script, args=()):
     else:
         base = ()
 
+    # preexec_fn=reset_signals ensures we don't receive signals from children (close_fds=True is default, but may become false in a future release)
+    kwargs = {
+        "preexec_fn": reset_signals,
+        "close_fds": True,
+        "start_new_session": True,
+        "timeout": DEFAULT_SCRIPT_TIMEOUT,
+    }
+
+    if isinstance(log_dest, str):
+        kwargs["stdout"] = log_dest
+        kwargs["stderr"] = log_dest
+    elif isinstance(log_dest, LogOutput):
+        if log_dest is LogOutput.FILE:
+            raise ValueError("For FILE mode, pass a file path string instead of LogOutput.FILE")
+
+        elif log_dest is LogOutput.NONE:
+            kwargs["stdout"] = subprocess.DEVNULL
+            kwargs["stderr"] = subprocess.DEVNULL
+
+        elif log_dest in (LogOutput.STDOUT, LogOutput.STDERR):
+            kwargs["stdout"] = sys.stdout
+            kwargs["stderr"] = sys.stderr
+
     base_dir = os.path.realpath(os.path.dirname(__file__) + "/..")
     cmd = base + ("{}/{}".format(base_dir, script),) + tuple(map(str, args))
     logger.debug("Running {}".format(cmd))
-    # preexec_fn=reset_signals ensures we don't receive signals from children (close_fds=True is default, but may become false in a future release)
-    return command_runner(
-        cmd,
-        preexec_fn=reset_signals,
-        close_fds=True,
-        start_new_session=True,
-        timeout=DEFAULT_SCRIPT_TIMEOUT,
-    )
+    return command_runner(cmd, **kwargs)
 
 
 class DB:
