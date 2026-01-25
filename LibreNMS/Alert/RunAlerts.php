@@ -34,6 +34,7 @@ namespace LibreNMS\Alert;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
+use App\Models\Alert;
 use App\Models\AlertTransport;
 use App\Models\ApplicationMetric;
 use App\Models\Eventlog;
@@ -509,9 +510,12 @@ class RunAlerts
                 $alert['details']['count'] = 0;
             }
 
-            $chk = dbFetchRow('SELECT alerts.alerted,devices.ignore,devices.disabled FROM alerts,devices WHERE alerts.device_id = ? && devices.device_id = alerts.device_id && alerts.rule_id = ?', [$alert['device_id'], $alert['rule_id']]);
+            $status_check = Alert::where('alerts.device_id', $alert['device_id'])
+                ->where('alerts.rule_id', $alert['rule_id'])
+                ->join('devices', 'alerts.device_id', '=', 'devices.device_id')
+                ->first(['alerts.alerted', 'devices.ignore', 'devices.disabled']);
 
-            if ($chk['alerted'] == $alert['state']) {
+            if ($status_check->alerted == $alert['state']) {
                 $noiss = true;
             }
 
@@ -561,7 +565,7 @@ class RunAlerts
                     $noiss = false;
                 }
             }
-            if ($chk['ignore'] == 1 || $chk['disabled'] == 1) {
+            if ($status_check->ignore || $status_check->disabled) {
                 $noiss = true;
                 $updet = false;
                 $noacc = false;
