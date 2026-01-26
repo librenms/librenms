@@ -33,7 +33,7 @@ for step and heartbeat intervals:
 - Heartbeat is how long to wait for data before registering a null
   value, i.e 120 seconds.
 
-If you are using the dispatcher service, you also need to navigate to 
+If you are using the dispatcher service, you also need to navigate to
 `/settings/poller/dispatcherservice/` within your WebUI. And either
 set the poller frequency to null, or at least the same value as the
 RRD step setting above (60 for 1 minute polling).

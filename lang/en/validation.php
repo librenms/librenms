@@ -195,6 +195,12 @@ return [
                 'ok' => 'Redis is functional',
                 'unavailable' => 'Redis is unavailable',
             ],
+            'CheckSchedules' => [
+                'dispatcher_poll_fast' => 'Dispatcher service is set to poll faster than the RRD step.  This will cause unnecessary load on the server if you are not saving to other time series databases becuase the RRD fill cannot store data at the granularity of polling.',
+                'dispatcher_poll_slow' => 'Dispatcher service is set to poll slower than the RRD step.  This can cause errors with graphs because the RRD file is expecting data more frequently. It is recommneded to set service_poller_frequency to null so polling frequency will match the RRD step.',
+                'dispatcher_poll_slow' => 'Dispatcher service is set to poll slower than the ping RRD step.  This can cause errors with graphs because the RRD file is expecting data more frequently. It is recommneded to set service_ping_frequency to null so it will match the ping RRD step.',
+                'no_errors' => 'No errors found with poller schedules',
+            ],
         ],
     ],
 ];
