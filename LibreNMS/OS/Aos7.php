@@ -478,7 +478,7 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
         $bytes = $m[0];
 
         if (count($bytes) === 4) {
-            $octets = array_map('hexdec', $bytes);
+            $octets = array_map(hexdec(...), $bytes);
 
             return implode('.', $octets);
         }
