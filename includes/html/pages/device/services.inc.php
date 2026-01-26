@@ -119,7 +119,7 @@ if (count($services) > '0') {
             $graphs = json_decode($service['service_ds'], true);
             foreach ($graphs as $k => $v) {
                 $graph_title = $k;
-                if(isset($v["full_name"])) {
+                if (isset($v['full_name'])) {
                     $graph_title = htmlentities((string) $v['full_name']);
                 }
                 $graph_array['device'] = $device['device_id'];
