@@ -85,7 +85,7 @@ class Alertmanager extends Transport
                 if ($username !== '' && $password !== '') {
                     $req = $req->withBasicAuth($username, $password);
                 }
-                
+
                 return $req->post(rtrim($baseUrl, '/') . '/api/v2/alerts', $data);
             }, $urls);
         });
