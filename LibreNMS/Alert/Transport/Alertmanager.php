@@ -79,14 +79,14 @@ class Alertmanager extends Transport
 
         $client = Http::client()->timeout(2);
 
-        if ($username !== '' && $password !== '') {
-            $client = $client->withBasicAuth($username, $password);
-        }
+        $responses = $client->pool(fn (Pool $pool) => array_map(function (string $baseUrl) use ($pool, $username, $password, $data) {
+            $req = $pool;
+            if ($username !== '' && $password !== '') {
+                $req = $req->withBasicAuth($username, $password);
+            }
 
-        $responses = $client->pool(fn (Pool $pool): array => array_map(
-            static fn (string $baseUrl) => $pool->post(rtrim($baseUrl, '/') . '/api/v2/alerts', $data),
-            $urls
-        ));
+            return $req->post(rtrim($baseUrl, '/') . '/api/v2/alerts', $data);
+        }, $urls));
 
         foreach ($responses as $res) {
             if ($res instanceof ConnectionException) {
