@@ -64,21 +64,6 @@ function parse_modules($type, $options)
     return $override;
 }
 
-function logfile($string)
-{
-    $file = LibrenmsConfig::get('log_file');
-    $fd = fopen($file, 'a');
-
-    if ($fd === false) {
-        print_error("Error: Could not write to log file: $file");
-
-        return;
-    }
-
-    fwrite($fd, $string . "\n");
-    fclose($fd);
-}
-
 function renamehost($id, $new, $source = 'console')
 {
     $host = gethostbyid($id);
