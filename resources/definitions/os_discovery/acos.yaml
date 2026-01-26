@@ -20,8 +20,10 @@ modules:
         state:
             data:
                 -
-                    oid: A10-AX-MIB::axHAGroupLocalStatus 
+                    oid: A10-AX-MIB::axHAGroupLocalStatus
+                    value: A10-AX-MIB::axHAGroupLocalStatus
                     num_oid: '.1.3.6.1.4.1.22610.2.4.3.17.2.2.1.2.{{ $index }}'
+                    state_name: axHAGroupLocalStatus
                     index: 'axHAGroupLocalStatus.{{ $index }}'
                     descr: HA Local Status
                     group: HA
@@ -33,6 +35,7 @@ modules:
                     oid: A10-AX-MIB::axSysPowerSupplyStatusTable
                     value: A10-AX-MIB::axPowerSupplyStatus
                     num_oid: '.1.3.6.1.4.1.22610.2.4.1.5.12.1.3.{{ $index }}'
+                    state_name: axPowerSupplyStatus
                     descr: A10-AX-MIB::axPowerSupplyName
                     index: 'axPowerSupplyStatus.{{ $index }}'
                     group: Hardware
@@ -45,6 +48,7 @@ modules:
                     oid: A10-AX-MIB::axSysFanStatusTable
                     value: A10-AX-MIB::axFanStatus
                     num_oid: '.1.3.6.1.4.1.22610.2.4.1.5.9.1.3.{{ $index }}'
+                    state_name: axFanStatus
                     descr: A10-AX-MIB::axFanName
                     index: 'axFanStatus.{{ $index }}'
                     group: Hardware
@@ -60,6 +64,7 @@ modules:
                     oid: A10-AX-MIB::axPowerSupplyVoltageTable
                     value: A10-AX-MIB::axPowerSupplyVoltageStatus
                     num_oid: '.1.3.6.1.4.1.22610.2.4.1.5.11.1.2.{{ $index }}'
+                    state_name: axPowerSupplyVoltageStatus
                     descr: A10-AX-MIB::axPowerSupplyVoltageDescription
                     index: 'axPowerSupplyVoltageStatus.{{ $index }}'
                     group: Hardware
@@ -69,7 +74,9 @@ modules:
                         - { value: 2, descr: unknown, graph: 1, generic: 3 }
                 -
                     oid: A10-AX-MIB::axSysHwPhySystemTempStatus
+                    value: A10-AX-MIB::axSysHwPhySystemTempStatus
                     num_oid: '.1.3.6.1.4.1.22610.2.4.1.5.5.{{ $index }}'
+                    state_name: axSysHwPhySystemTempStatus
                     descr: System Temp
                     index: 'axSysHwPhySystemTempStatus.{{ $index }}'
                     group: Hardware
