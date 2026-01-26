@@ -332,7 +332,6 @@ class Aos7 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
 
     /**
      * If NAC indicates blocking in the server message, force authzFail.
-     * (User requirement: "blocked is blocked", regardless of reason.)
      */
     private function adjustAosAuthzStatusForServerMessage(string $authzStatus, string $srvMsgTrim): string
     {
