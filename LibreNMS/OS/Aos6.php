@@ -427,7 +427,7 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
      */
     private function formatAuthByServers(array $servers): string
     {
-        $servers = array_values(array_filter(array_map('trim', $servers)));
+        $servers = array_values(array_filter(array_map(trim(...), $servers)));
         if (empty($servers)) {
             return 'RADIUS';
         }
