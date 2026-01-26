@@ -110,24 +110,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function dbFetchCell\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 3
-			path: LibreNMS/Billing.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchColumn\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 3
-			path: LibreNMS/Billing.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbFetchRow\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
@@ -141,7 +123,7 @@ parameters:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
 			identifier: function.deprecated
-			count: 4
+			count: 7
 			path: LibreNMS/Billing.php
 
 		-
