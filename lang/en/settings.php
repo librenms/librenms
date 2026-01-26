@@ -1649,8 +1649,8 @@ return [
             'description' => 'Path to ping',
         ],
         'ping_rrd_step' => [
-            'description' => 'Ping Frequency',
-            'help' => 'How often to check. Sets the default value for all nodes. Warning! If you change this you must make additional changes.  Check the Fast Ping docs.',
+            'description' => 'Ping RRD Step',
+            'help' => 'How often we expect to get ping stats. Warning! If you change this you must make additional changes.  Check the Fast Ping docs.',
         ],
         'poller_modules' => [
             'unix-agent' => [
@@ -2052,9 +2052,17 @@ return [
             'description' => 'Master Dispatcher Timeout',
             'help' => 'The amount of time before the master lock expires.  If master goes away, it will take this much time for another node to take over.  However if it takes longer than the timeout to dispatch the work, you will have multiple masters',
         ],
+        'service_ping_frequency' => [
+            'description' => 'Ping Frequency',
+            'help' => 'How often to run fast ping on all devices. It should almost always match ping RRD step, which it will default to if set to null.',
+        ],
         'service_poller_workers' => [
             'description' => 'Poller Workers',
             'help' => 'Amount of poller workers to spawn. Sets the default value for all nodes.',
+        ],
+        'service_poller_frequency' => [
+            'description' => 'Poller Frequency',
+            'help' => 'How often to poll devices. Sets the default value for all nodes. It should almost always match rrd step, which it will default to if set to null.',
         ],
         'service_poller_down_retry' => [
             'description' => 'Device Down Retry',

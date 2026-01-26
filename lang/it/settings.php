@@ -1036,8 +1036,8 @@ return [
             'description' => 'Path to ping',
         ],
         'ping_rrd_step' => [
-            'description' => 'Ping Frequency',
-            'help' => 'How often to check. Sets the default value for all nodes. Warning! If you change this you must make additional changes.  Check the Fast Ping docs.',
+            'description' => 'Ping RRD Step',
+            'help' => 'How often we expect to get ping stats. Warning! If you change this you must make additional changes.  Check the Fast Ping docs.',
         ],
         'poller_modules' => [
             'unix-agent' => [
@@ -1268,9 +1268,17 @@ return [
             'description' => 'Sets the version of rrdtool on your server',
             'help' => 'Anything over 1.5.5 supports all features LibreNMS uses, do not set higher than your installed version',
         ],
+        'service_ping_frequency' => [
+            'description' => 'Ping Frequency',
+            'help' => 'How often to run fast ping on all devices. It should almost always match ping RRD step, which it will default to if set to null.',
+        ],
         'service_poller_workers' => [
             'description' => 'Poller Workers',
             'help' => 'Amount of poller workers to spawn. Sets the default value for all nodes.',
+        ],
+        'service_poller_frequency' => [
+            'description' => 'Poller Frequency',
+            'help' => 'How often to poll devices. Sets the default value for all nodes. Warning! Changing this without fixing rrd files will break graphs. See docs for more info.',
         ],
         'service_poller_down_retry' => [
             'description' => 'Device Down Retry',

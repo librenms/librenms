@@ -1451,10 +1451,15 @@
             "default": 0.05,
             "group": "poller",
             "section": "ping",
-            "order": 4,
+            "order": 6,
             "type": "float",
             "validate": {
                 "value": "numeric|between:0.000001,0.9"
+            },
+            "when": {
+                "setting": "icmp_check",
+                "operator": "equals",
+                "value": true
             }
         },
         "device_traffic_descr": {
@@ -2326,24 +2331,39 @@
             "default": 3,
             "group": "poller",
             "section": "ping",
-            "order": 1,
-            "type": "text"
+            "order": 3,
+            "type": "text",
+            "when": {
+                "setting": "icmp_check",
+                "operator": "equals",
+                "value": true
+            }
         },
         "fping_options.interval": {
             "default": 500,
             "units": "ms",
             "group": "poller",
             "section": "ping",
-            "order": 2,
-            "type": "text"
+            "order": 4,
+            "type": "text",
+            "when": {
+                "setting": "icmp_check",
+                "operator": "equals",
+                "value": true
+            }
         },
         "fping_options.timeout": {
             "default": 500,
             "units": "ms",
             "group": "poller",
             "section": "ping",
-            "order": 3,
-            "type": "text"
+            "order": 5,
+            "type": "text",
+            "when": {
+                "setting": "icmp_check",
+                "operator": "equals",
+                "value": true
+            }
         },
         "front_page": {
             "default": "default",
@@ -4579,7 +4599,7 @@
             "default": true,
             "group": "poller",
             "section": "ping",
-            "order": 5,
+            "order": 1,
             "type": "boolean"
         },
         "ignore_bsd_os_drives": {
@@ -5911,6 +5931,19 @@
             "order": 6,
             "type": "executable"
         },
+        "ping_rrd_step": {
+            "default": 300,
+            "group": "poller",
+            "section": "ping",
+            "order": 2,
+            "type": "integer",
+            "units": "Seconds",
+            "when": {
+                "setting": "icmp_check",
+                "operator": "equals",
+                "value": true
+            }
+        },
         "plugin_dir": {
             "type": "directory"
         },
@@ -6693,6 +6726,17 @@
             "type": "integer",
             "units": "Workers"
         },
+        "service_poller_frequency": {
+            "default": null,
+            "group": "poller",
+            "section": "dispatcherservice",
+            "order": 7,
+            "type": "integer",
+            "units": "Seconds",
+            "validate": {
+                "value": "int|nullable|between:1,3600"
+            }
+        },
         "service_poller_down_retry": {
             "default": 60,
             "group": "poller",
@@ -6757,13 +6801,16 @@
             "type": "integer",
             "units": "Seconds"
         },
-        "ping_rrd_step": {
-            "default": 300,
+        "service_ping_frequency": {
+            "default": null,
             "group": "poller",
             "section": "dispatcherservice",
             "order": 21,
             "type": "integer",
-            "units": "Seconds"
+            "units": "Seconds",
+            "validate": {
+                "value": "int|nullable|between:1,3600"
+            }
         },
         "service_update_enabled": {
             "default": true,

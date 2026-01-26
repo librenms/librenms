@@ -67,6 +67,7 @@ Nodes appear automatically after running for a few minutes.
     lnms config:set service_poller_workers 24
     lnms config:set service_services_workers 8
     lnms config:set service_discovery_workers 16
+    lnms config:set service_poller_frequency null
     lnms config:set service_services_frequency 300
     lnms config:set service_discovery_frequency 21600
     lnms config:set service_billing_frequency 300
@@ -74,6 +75,7 @@ Nodes appear automatically after running for a few minutes.
     lnms config:set service_poller_down_retry 60
     lnms config:set service_loglevel INFO
     lnms config:set service_update_frequency 86400
+    lnms config:set service_ping_frequency null
     ```
 
 ### Restrict Processing to Dispatcher
