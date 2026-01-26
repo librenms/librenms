@@ -8,9 +8,6 @@ class HostNameEmptyException extends HostExistsException
      * @var string
      */
     public $hostname;
-    /**
-     * @var string
-     */
 
     public function __construct()
     {

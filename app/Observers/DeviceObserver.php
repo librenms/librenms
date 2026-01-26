@@ -92,7 +92,7 @@ class DeviceObserver
      */
     public function deleted(Device $device): void
     {
-        if (!empty($device->hostname)) {
+        if (! empty($device->hostname)) {
             // delete rrd files
             $host_dir = Rrd::dirFromHost($device->hostname);
             try {
@@ -106,7 +106,7 @@ class DeviceObserver
             }
         }
 
-        Eventlog::log("Device " . ($device->hostname ?: $device->device_id) . " has been removed", 0, 'system', Severity::Notice);
+        Eventlog::log('Device ' . ($device->hostname ?: $device->device_id) . ' has been removed', 0, 'system', Severity::Notice);
 
         (new Oxidized)->reloadNodes();
     }

@@ -56,8 +56,7 @@ class ValidateDeviceAndCreate
      */
     public function execute(): bool
     {
-
-        if ((empty($this->device->hostname))) {
+        if (empty($this->device->hostname)) {
             throw new HostNameEmptyException();
         }
 
