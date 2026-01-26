@@ -27,7 +27,6 @@
 namespace LibreNMS\Validations\Poller;
 
 use App\Facades\LibrenmsConfig;
-use App\Models\PollerCluster;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\ValidationResult;
 
