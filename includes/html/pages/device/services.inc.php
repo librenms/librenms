@@ -118,15 +118,19 @@ if (count($services) > '0') {
 
             $graphs = json_decode($service['service_ds'], true);
             foreach ($graphs as $k => $v) {
+                $graph_title = $k;
+                if(isset($v["full_name"])) {
+                  $graph_title = htmlentities($v["full_name"]);
+                }
                 $graph_array['device'] = $device['device_id'];
                 $graph_array['type'] = 'service_graph';
                 $graph_array['id'] = $service['service_id'];
                 $graph_array['ds'] = $k;
 
                 echo '<tr>';
-                echo '<td colspan="7">';
+                echo '<td colspan="7" style="padding: 0">';
 
-                include 'includes/html/print-graphrow.inc.php';
+                include 'includes/html/print-device-graph.php';
 
                 echo '</td>';
                 echo '</tr>';
