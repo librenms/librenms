@@ -120,7 +120,7 @@ if (count($services) > '0') {
             foreach ($graphs as $k => $v) {
                 $graph_title = $k;
                 if(isset($v["full_name"])) {
-                  $graph_title = htmlentities($v["full_name"]);
+                    $graph_title = htmlentities((string) $v["full_name"]);
                 }
                 $graph_array['device'] = $device['device_id'];
                 $graph_array['type'] = 'service_graph';

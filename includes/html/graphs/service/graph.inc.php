@@ -70,7 +70,7 @@ if ($services[$vars['service']]['service_ds'] != '') {
     // Need: DS name, Label
     $ds = $vars['ds'];
     // use is_array for backwards compatibility
-    $label = (is_array($graphinfo[$vars['ds']]) ? $graphinfo[$vars['ds']]["uom"] : $graphinfo[$vars['ds']]);
+    $label = (is_array($graphinfo[$vars['ds']]) ? $graphinfo[$vars['ds']]['uom'] : $graphinfo[$vars['ds']]);
 
     if (Rrd::checkRrdExists($rrd_filename)) {
         if (isset($check_graph)) {
