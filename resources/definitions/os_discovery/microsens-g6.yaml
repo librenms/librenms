@@ -1,0 +1,309 @@
+modules:
+    os:
+        hardware:
+            - G6-FACTORY-MIB::factoryArticleNumber.0
+            - G6-FACTORY-MIB::factoryHardwareVersion.0
+        hardware_template: '{{ G6-FACTORY-MIB::factoryArticleNumber.0 }} HWVer:{{ G6-FACTORY-MIB::factoryHardwareVersion.0 }}'
+        serial: G6-FACTORY-MIB::factorySerialNumber.0
+        #location: 
+        version:
+            - G6-SYSTEM-MIB::firmwareRunningVersion.0
+            - G6-SYSTEM-MIB::firmwareBuildNumber.0
+        version_template: '{{ G6-SYSTEM-MIB::firmwareRunningVersion.0 }} Build:{{ G6-SYSTEM-MIB::firmwareBuildNumber.0 }}'
+
+    sensors:
+        additional_oids:
+            data:
+                -
+                    oid: 
+                       - G6-HARDWARE-MIB::portInfoInterfaceType
+                       - G6-RING-MIB::configEnableRing
+
+        temperature:
+            data:
+                -
+                    oid: G6-SYSTEM-MIB::systemTemperature
+                    value: G6-SYSTEM-MIB::systemTemperature
+                    num_oid: '.1.3.6.1.4.1.3181.10.6.1.30.104.{{ $index }}'
+                    descr: 'System Temperature'
+                    index: 'systemTemperature.{{ $index }}'
+                -
+                    oid: G6-SFP-MIB::informationTable
+                    value: G6-SFP-MIB::informationTemperature
+                    num_oid: '.1.3.6.1.4.1.3181.10.6.1.34.100.1.20.{{ $index }}'
+                    descr: 'SFP-{{ $index }} {{ G6-SFP-MIB::informationPartNumber }} {{ G6-SFP-MIB::informationSerialNumber }} Temperature'
+                    index: 'informationTemperature.{{ $index }}'                   
+
+        state:
+            data:
+                -
+                    oid: G6-SYSTEM-MIB::systemClimateLevel
+                    value: G6-SYSTEM-MIB::systemClimateLevel
+                    num_oid: '.1.3.6.1.4.1.3181.10.6.1.30.105.{{ $index }}'
+                    descr: 'System Temperature State'
+                    index: 'systemClimateLevel.{{ $index }}'
+                    state_name: systemClimateLevel
+                    states:
+                        - { descr: 'Unknown',      graph: 1, value: 0, generic: 3 }
+                        - { descr: 'criticalLow',  graph: 1, value: 1, generic: 2 }
+                        - { descr: 'low',          graph: 1, value: 2, generic: 0 }
+                        - { descr: 'normal',       graph: 1, value: 3, generic: 0 }
+                        - { descr: 'increased',    graph: 1, value: 4, generic: 0 }
+                        - { descr: 'high',         graph: 1, value: 5, generic: 1 }
+                        - { descr: 'criticalHigh', graph: 1, value: 6, generic: 2 }
+                        - { descr: 'shutdown',     graph: 1, value: 7, generic: 2 }
+                -
+                    oid: G6-HARDWARE-MIB::hardwarePowerSupply1Status
+                    value: G6-HARDWARE-MIB::hardwarePowerSupply1Status
+                    num_oid: '.1.3.6.1.4.1.3181.10.6.1.31.100.{{ $index }}'
+                    descr: 'Power Supply 1 Status'
+                    index: 'hardwarePowerSupply1Status.{{ $index }}'
+                    state_name: hardwarePowerSupply1Status
+                    states:
+                        - { descr: 'Ok',             graph: 1, value: 0, generic: 0 }
+                        - { descr: 'overload',       graph: 1, value: 1, generic: 2 }
+                        - { descr: 'inputLow',       graph: 1, value: 2, generic: 1 }
+                        - { descr: 'fuseFail',       graph: 1, value: 3, generic: 2 }
+                        - { descr: 'notApplicable',  graph: 1, value: 4, generic: 3 }
+                        - { descr: 'unmanaged',      graph: 1, value: 5, generic: 3 }
+                        - { descr: 'notInstalled',   graph: 1, value: 6, generic: 3 }
+                -
+                    oid: G6-HARDWARE-MIB::hardwarePowerSupply2Status
+                    value: G6-HARDWARE-MIB::hardwarePowerSupply2Status
+                    num_oid: '.1.3.6.1.4.1.3181.10.6.1.31.101.{{ $index }}'
+                    descr: 'Power Supply 2 Status'
+                    index: 'hardwarePowerSupply2Status.{{ $index }}'
+                    state_name: hardwarePowerSupply2Status
+                    states:
+                        - { descr: 'Ok',             graph: 1, value: 0, generic: 0 }
+                        - { descr: 'overload',       graph: 1, value: 1, generic: 2 }
+                        - { descr: 'inputLow',       graph: 1, value: 2, generic: 1 }
+                        - { descr: 'fuseFail',       graph: 1, value: 3, generic: 2 }
+                        - { descr: 'notApplicable',  graph: 1, value: 4, generic: 3 }
+                        - { descr: 'unmanaged',      graph: 1, value: 5, generic: 3 }
+                        - { descr: 'notInstalled',   graph: 1, value: 6, generic: 3 }
+                -
+                    oid: G6-HARDWARE-MIB::hardwareFanStatus
+                    value: G6-HARDWARE-MIB::hardwareFanStatus
+                    num_oid: '.1.3.6.1.4.1.3181.10.6.1.31.103.{{ $index }}'
+                    descr: 'Fan Status'
+                    index: 'hardwareFanStatus.{{ $index }}'
+                    state_name: hardwareFanStatus
+                    states:
+                        - { descr: 'unused',   graph: 1, value: 0, generic: 3 }
+                        - { descr: 'Ok',       graph: 1, value: 1, generic: 0 }
+                        - { descr: 'degraded', graph: 1, value: 2, generic: 1 }
+                        - { descr: 'fail',     graph: 1, value: 3, generic: 2 }
+                        - { descr: 'missing',  graph: 1, value: 4, generic: 2 }
+                -
+                    oid: G6-HARDWARE-MIB::hardwareSdCardStatus
+                    value: G6-HARDWARE-MIB::hardwareSdCardStatus
+                    num_oid: '.1.3.6.1.4.1.3181.10.6.1.31.104.{{ $index }}'
+                    descr: 'SD Card Status Status'
+                    index: 'hardwareSdCardStatus.{{ $index }}'
+                    state_name: hardwareSdCardStatus
+                    states:
+                        - { descr: 'empty',          graph: 1, value: 0, generic: 3 }
+                        - { descr: 'inserted',       graph: 1, value: 1, generic: 0 }
+                        - { descr: 'writeProtected', graph: 1, value: 2, generic: 1 }
+                        - { descr: 'writing',        graph: 1, value: 3, generic: 1 }
+                -
+                    oid: G6-POE-MIB::statusTable
+                    value: G6-POE-MIB::statusCondition
+                    num_oid: '.1.3.6.1.4.1.3181.10.6.1.33.101.1.2.{{ $index }}'
+                    descr: 'POE Port-{{ $index }} Status'
+                    index: 'statusCondition.{{ $index }}'
+                    state_name: statusCondition
+                    states:
+                        - { descr: 'disabled',       graph: 1, value: 0, generic: 3 }
+                        - { descr: 'powerOff',       graph: 1, value: 1, generic: 3 }
+                        - { descr: 'discovering',    graph: 1, value: 2, generic: 1 }
+                        - { descr: 'powered',        graph: 1, value: 3, generic: 0 }
+                        - { descr: 'classMismatch',  graph: 1, value: 4, generic: 2 }
+                        - { descr: 'shortCircuit',   graph: 1, value: 5, generic: 2 }
+                        - { descr: 'rejected',       graph: 1, value: 6, generic: 2 }
+                        - { descr: 'overCurrent',    graph: 1, value: 7, generic: 2 }
+                        - { descr: 'overTemp',       graph: 1, value: 8, generic: 2 }
+                        - { descr: 'voltageTooLow',  graph: 1, value: 9, generic: 2 }
+                    skip_values:
+                     -
+                      oid: G6-HARDWARE-MIB::portInfoInterfaceType
+                      op: '=='
+                      value: 1
+                -
+                    oid: G6-POE-MIB::statusTable
+                    value: G6-POE-MIB::statusDeterminedClass
+                    num_oid: '.1.3.6.1.4.1.3181.10.6.1.33.101.1.2.{{ $index }}'
+                    descr: 'POE Port-{{ $index }} Class'
+                    index: 'statusDeterminedClass.{{ $index }}'
+                    state_name: statusDeterminedClass
+                    states:
+                        - { descr: 'isClass0',       graph: 1, value: 0, generic: 0 }
+                        - { descr: 'isClass1',       graph: 1, value: 1, generic: 0 }
+                        - { descr: 'isClass2',       graph: 1, value: 2, generic: 0 }
+                        - { descr: 'isClass3',       graph: 1, value: 3, generic: 0 }
+                        - { descr: 'isClass4',       graph: 1, value: 4, generic: 0 }
+                        - { descr: 'isOverload',     graph: 1, value: 5, generic: 2 }
+                        - { descr: 'probesNotEqual', graph: 1, value: 7, generic: 2 }
+                        - { descr: 'isUnknown',      graph: 1, value: 255, generic: 2 }
+                    skip_values:
+                     -
+                      oid: G6-POE-MIB::statusCondition
+                      op: '<='
+                      value: 1
+                -
+                    oid: G6-WIFI-MIB::statusTable
+                    value: G6-WIFI-MIB::statusOverallStatus
+                    num_oid: '.1.3.6.1.4.1.3181.10.6.1.98.100.1.2.{{ $index }}'
+                    descr: 'Wifi {{ $index }} Status'
+                    index: 'statusOverallStatus.{{ $index }}'
+                    state_name: statusOverallStatus
+                    states:
+                        - { descr: 'notPresent',  graph: 1, value: 0, generic: 3 }
+                        - { descr: 'disabled',    graph: 1, value: 1, generic: 3 }
+                        - { descr: 'fault',       graph: 1, value: 2, generic: 2 }
+                        - { descr: 'operational', graph: 1, value: 3, generic: 0 }
+                -
+                    oid: G6-RING-MIB::statusTable
+                    value: G6-RING-MIB::statusState
+                    num_oid: '.1.3.6.1.4.1.3181.10.6.2.45.100.1.2.{{ $index }}'
+                    descr: 'Ring {{ $index }} Status'
+                    index: 'statusOverallStatus.{{ $index }}'
+                    state_name: statusOverallStatus
+                    states:
+                        - { descr: 'unused',               graph: 1, value: 0, generic: 3 }
+                        - { descr: 'normal',               graph: 1, value: 1, generic: 0 }
+                        - { descr: 'backup',               graph: 1, value: 2, generic: 0 }
+                        - { descr: 'error',                graph: 1, value: 3, generic: 2 }
+                        - { descr: 'remoteConfigMismatch', graph: 1, value: 4, generic: 2 }
+                    skip_values:
+                     -
+                      oid: G6-RING-MIB::configEnableRing
+                      op: '=='
+                      value: 0
+                -
+                    oid: G6-RING-MIB::statusTable
+                    value: G6-RING-MIB::statusRingPortANeighbor
+                    num_oid: '.1.3.6.1.4.1.3181.10.6.2.45.100.1.9.{{ $index }}'
+                    descr: 'Ring {{ $index }} Port A Status'
+                    index: 'statusRingPortANeighbor.{{ $index }}'
+                    state_name: statusRingPortANeighbor
+                    states:
+                        - { descr: 'unused',                    graph: 1, value: 0,  generic: 3 }
+                        - { descr: 'ok',                        graph: 1, value: 1,  generic: 0 }
+                        - { descr: 'localLldpDisabled',         graph: 1, value: 2,  generic: 2 }
+                        - { descr: 'waitingForRemoteLldp',      graph: 1, value: 3,  generic: 2 }
+                        - { descr: 'remoteLldpDisabled',        graph: 1, value: 5,  generic: 2 }
+                        - { descr: 'illegalDeviceDetected',     graph: 1, value: 6,  generic: 2 }
+                        - { descr: 'remoteOlderFwVersion',      graph: 1, value: 7,  generic: 2 }
+                        - { descr: 'remoteRingDisbled',         graph: 1, value: 8,  generic: 2 }
+                        - { descr: 'wrongRemotePort',           graph: 1, value: 9,  generic: 2 }
+                        - { descr: 'wrongRemoteRingId',         graph: 1, value: 10, generic: 2 }
+                        - { descr: 'differentProtocolVersions', graph: 1, value: 11, generic: 2 }
+                        - { descr: 'multipleMasterError',       graph: 1, value: 12, generic: 2 }
+                    skip_values:
+                     -
+                      oid: G6-RING-MIB::configEnableRing
+                      op: '=='
+                      value: 0
+                -
+                    oid: G6-RING-MIB::statusTable
+                    value: G6-RING-MIB::statusRingPortBNeighbor
+                    num_oid: '.1.3.6.1.4.1.3181.10.6.2.45.100.1.9.{{ $index }}'
+                    descr: 'Ring {{ $index }} Port A Status'
+                    index: 'statusRingPortBNeighbor.{{ $index }}'
+                    state_name: statusRingPortBNeighbor
+                    states:
+                        - { descr: 'unused',                    graph: 1, value: 0,  generic: 3 }
+                        - { descr: 'ok',                        graph: 1, value: 1,  generic: 0 }
+                        - { descr: 'localLldpDisabled',         graph: 1, value: 2,  generic: 2 }
+                        - { descr: 'waitingForRemoteLldp',      graph: 1, value: 3,  generic: 2 }
+                        - { descr: 'remoteLldpDisabled',        graph: 1, value: 5,  generic: 2 }
+                        - { descr: 'illegalDeviceDetected',     graph: 1, value: 6,  generic: 2 }
+                        - { descr: 'remoteOlderFwVersion',      graph: 1, value: 7,  generic: 2 }
+                        - { descr: 'remoteRingDisbled',         graph: 1, value: 8,  generic: 2 }
+                        - { descr: 'wrongRemotePort',           graph: 1, value: 9,  generic: 2 }
+                        - { descr: 'wrongRemoteRingId',         graph: 1, value: 10, generic: 2 }
+                        - { descr: 'differentProtocolVersions', graph: 1, value: 11, generic: 2 }
+                        - { descr: 'multipleMasterError',       graph: 1, value: 12, generic: 2 }
+                    skip_values:
+                     -
+                      oid: G6-RING-MIB::configEnableRing
+                      op: '=='
+                      value: 0
+
+        current:
+            data:
+                -
+                    oid: G6-POE-MIB::statusTable
+                    value: G6-POE-MIB::statusOutputCurrent
+                    num_oid: '.1.3.6.1.4.1.3181.10.6.1.33.101.1.4.{{ $index }}'
+                    descr: 'POE Port-{{ $index }} Current'
+                    index: 'statusOutputCurrent.{{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                     -
+                      oid: G6-POE-MIB::statusCondition
+                      op: '<='
+                      value: 1
+
+        voltage:
+            data:
+                -
+                    oid: G6-POE-MIB::statusTable
+                    value: G6-POE-MIB::statusOutputVoltage
+                    num_oid: '.1.3.6.1.4.1.3181.10.6.1.33.101.1.5.{{ $index }}'
+                    descr: 'POE Port-{{ $index }} Voltage'
+                    index: 'statusOutputVoltage.{{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                     -
+                      oid: G6-POE-MIB::statusCondition
+                      op: '<='
+                      value: 1
+
+        power:
+            data:
+                -
+                    oid: G6-POE-MIB::statusTable
+                    value: G6-POE-MIB::statusOutputPower
+                    num_oid: '.1.3.6.1.4.1.3181.10.6.1.33.101.1.6.{{ $index }}'
+                    descr: 'POE Port-{{ $index }} Wattage'
+                    index: 'statusOutputPower.{{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                     -
+                      oid: G6-POE-MIB::statusCondition
+                      op: '<='
+                      value: 1
+                -
+                    oid: G6-POE-MIB::poeTotalPowerConsumed
+                    value: G6-POE-MIB::poeTotalPowerConsumed
+                    num_oid: '.1.3.6.1.4.1.3181.10.6.1.33.100.{{ $index }}'
+                    descr: 'POE Total Power Consumed'
+                    index: 'poeTotalPowerConsumed.{{ $index }}'
+                    divisor: 1000
+
+        dbm:
+            data:
+                -
+                    oid: G6-SFP-MIB::informationTable
+                    value: G6-SFP-MIB::informationTxPower
+                    num_oid: '.1.3.6.1.4.1.3181.10.6.1.34.100.1.18.{{ $index }}'
+                    descr: 'SFP-{{ $index }} {{ G6-SFP-MIB::informationPartNumber }} {{ G6-SFP-MIB::informationSerialNumber }} TX Power'
+                    index: 'informationTxPower.{{ $index }}'
+                -
+                    oid: G6-SFP-MIB::informationTable
+                    value: G6-SFP-MIB::informationRxPower
+                    num_oid: '.1.3.6.1.4.1.3181.10.6.1.34.100.1.18.{{ $index }}'
+                    descr: 'SFP-{{ $index }} {{ G6-SFP-MIB::informationPartNumber }} {{ G6-SFP-MIB::informationSerialNumber }} RX Power'
+                    index: 'informationRxPower.{{ $index }}'
+
+        count:
+            data:
+                -
+                    oid: G6-WIFI-MIB::statusTable
+                    value: G6-WIFI-MIB::statusNumberOfConnections
+                    num_oid: '.1.3.6.1.4.1.3181.10.6.1.98.100.1.3.{{ $index }}'
+                    descr: 'Wifi {{ $index }} Status'
+                    index: 'statusNumberOfConnections.{{ $index }}'
