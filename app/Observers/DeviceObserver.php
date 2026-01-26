@@ -10,7 +10,6 @@ use App\Models\Eventlog;
 use File;
 use Illuminate\Support\Facades\App;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Exceptions\HostNameEmptyException;
 use LibreNMS\Exceptions\HostRenameException;
 use Log;
 
