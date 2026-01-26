@@ -79,7 +79,7 @@ class Alertmanager extends Transport
 
         $client = Http::client()->timeout(2);
 
-        $responses = $client->pool(fn(Pool $pool) => array_map(function (string $baseUrl) use ($pool, $username, $password, $data) {
+        $responses = $client->pool(fn (Pool $pool) => array_map(function (string $baseUrl) use ($pool, $username, $password, $data) {
             $req = $pool;
             if ($username !== '' && $password !== '') {
                 $req = $req->withBasicAuth($username, $password);
