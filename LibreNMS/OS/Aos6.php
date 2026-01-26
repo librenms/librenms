@@ -46,6 +46,9 @@ use SnmpQuery;
 
 class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDiscovery, NacPolling
 {
+    // ports_nac.* string columns are typically VARCHAR(50) (authz_by definitely is)
+    private const PORTS_NAC_STR_MAX = 50;
+
     public function discoverVlans(): Collection
     {
         if (($QBridgeMibVlans = parent::discoverVlans())->isNotEmpty()) {
@@ -83,10 +86,13 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
     /**
      * Poll NAC sessions for AOS6 using ALCATEL-IND1-DOT1X-MIB.
      *
-     * AOS6 does NOT provide per-session RADIUS server "used" (like AOS7/AOS8).
-     * To populate authz_by, we read configured RADIUS servers from ALCATEL-IND1-AAA-MIB::aaas* (no secrets walked).
+     * AOS6 does NOT provide per-session "RADIUS server used" like AOS7/AOS8.
+     * To populate authz_by, we read the configured *front-hand* (NAC) RADIUS server lists:
+     *  - 802.1X: ALCATEL-IND1-AAA-MIB::aaaAuth8021xTable (aaatxName1..4)
+     *  - MAC auth: ALCATEL-IND1-AAA-MIB::aaaAuthMACTable (aaaMacSrvrName1..4)
      *
      * IP address is often 0/empty on AOS6 for MAB; ports_nac.ip_address cannot be NULL, so we store 0.0.0.0.
+     * AOS6 can also return IPv4 as a 32-bit integer; we convert to dotted IPv4.
      */
     public function pollNac(): Collection
     {
@@ -102,6 +108,10 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
         if ($rows->isEmpty()) {
             return $nac;
         }
+
+        // Pre-fetch "Auth By" (configured NAC RADIUS pools) once (avoid per-row SNMP)
+        $authByDot1x = $this->formatAuthByServers($this->getNacRadiusServersDot1x());
+        $authByMac = $this->formatAuthByServers($this->getNacRadiusServersMac());
 
         // Infer host_mode by counting successful auth sessions per ifIndex
         $successCountByIfIndex = [];
@@ -120,9 +130,6 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
                 $successCountByIfIndex[$ifIndex] = ($successCountByIfIndex[$ifIndex] ?? 0) + 1;
             }
         }
-
-        // Best-effort "Auth By" from configured RADIUS servers (not per-session)
-        $authBy = $this->getConfiguredRadiusServersString() ?: 'RADIUS';
 
         foreach ($rows as $row) {
             $slot = (int) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusSlotNumber') ?? 0);
@@ -148,10 +155,14 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
             $vlan = (int) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusVlan') ?? 0);
 
             $profile = trim((string) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusProfileUsed') ?? ''));
+            $domain = ($profile !== '' && $profile !== '--') ? $profile : 'UNP';
+            $domain = $this->limitString($domain, self::PORTS_NAC_STR_MAX);
+
             $username = trim((string) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusUserName') ?? ''));
             if ($username === '' || $username === '--') {
                 $username = $macColon !== '' ? $macColon : $macNoSep;
             }
+            $username = $this->limitString($username, self::PORTS_NAC_STR_MAX);
 
             $ipRaw = $this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusIPAddress');
             $ip = $this->normalizeIpAddress($ipRaw);
@@ -165,6 +176,14 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
                 3 => 'captivePortal',
                 default => 'unknown',
             };
+
+            // Pick configured NAC RADIUS server list depending on method
+            $authBy = match ($method) {
+                'mab' => $authByMac,
+                'dot1x' => $authByDot1x,
+                default => 'RADIUS',
+            };
+            $authBy = $this->limitString($authBy, self::PORTS_NAC_STR_MAX);
 
             // Auth result: notApplicable(0), inProgress(1), success(2), fail(3)
             $authResult = (int) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusAuthResult') ?? 0);
@@ -182,7 +201,7 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
             $nac->push(new PortsNac([
                 'port_id' => $portId,
                 'auth_id' => $authId,
-                'domain' => ($profile !== '' && $profile !== '--') ? $profile : 'UNP',
+                'domain' => $domain,
                 'username' => $username,
                 'mac_address' => $macNoSep,
                 'ip_address' => $ip, // never null (DB constraint)
@@ -332,60 +351,103 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
     }
 
     /**
-     * Best-effort: list configured RADIUS servers from ALCATEL-IND1-AAA-MIB.
-     * We only walk non-sensitive columns (protocol, hostname, ip).
+     * AOS6 NAC "front-hand" RADIUS servers used for 802.1X (configured list, not per-session).
+     * Returns server names in order (Name1..Name4), filtered of blanks, de-duplicated.
      */
-    private function getConfiguredRadiusServersString(): string
+    private function getNacRadiusServersDot1x(): array
     {
-        $protoRows = collect(
+        $table = collect(
             SnmpQuery::mibDir('nokia')
-                ->walk('ALCATEL-IND1-AAA-MIB::aaasProtocol')
+                ->walk('ALCATEL-IND1-AAA-MIB::aaaAuth8021xTable')
                 ->valuesByIndex()
         );
 
-        if ($protoRows->isEmpty()) {
+        if ($table->isEmpty()) {
+            return [];
+        }
+
+        $row = (array) $table->first();
+
+        $names = [];
+        foreach ([
+            'ALCATEL-IND1-AAA-MIB::aaatxName1',
+            'ALCATEL-IND1-AAA-MIB::aaatxName2',
+            'ALCATEL-IND1-AAA-MIB::aaatxName3',
+            'ALCATEL-IND1-AAA-MIB::aaatxName4',
+        ] as $oid) {
+            $name = trim((string) ($this->rowValue($row, $oid) ?? ''));
+            if ($name !== '') {
+                $names[] = $name;
+            }
+        }
+
+        $names = array_values(array_unique($names));
+
+        return $names;
+    }
+
+    /**
+     * AOS6 NAC "front-hand" RADIUS servers used for MAC authentication (configured list, not per-session).
+     * Returns server names in order (Name1..Name4), filtered of blanks, de-duplicated.
+     */
+    private function getNacRadiusServersMac(): array
+    {
+        $table = collect(
+            SnmpQuery::mibDir('nokia')
+                ->walk('ALCATEL-IND1-AAA-MIB::aaaAuthMACTable')
+                ->valuesByIndex()
+        );
+
+        if ($table->isEmpty()) {
+            return [];
+        }
+
+        $row = (array) $table->first();
+
+        $names = [];
+        foreach ([
+            'ALCATEL-IND1-AAA-MIB::aaaMacSrvrName1',
+            'ALCATEL-IND1-AAA-MIB::aaaMacSrvrName2',
+            'ALCATEL-IND1-AAA-MIB::aaaMacSrvrName3',
+            'ALCATEL-IND1-AAA-MIB::aaaMacSrvrName4',
+        ] as $oid) {
+            $name = trim((string) ($this->rowValue($row, $oid) ?? ''));
+            if ($name !== '') {
+                $names[] = $name;
+            }
+        }
+
+        $names = array_values(array_unique($names));
+
+        return $names;
+    }
+
+    /**
+     * Format authz_by from configured server names. This is NOT "server actually used" per session.
+     */
+    private function formatAuthByServers(array $servers): string
+    {
+        $servers = array_values(array_filter(array_map('trim', $servers)));
+        if (empty($servers)) {
+            return 'RADIUS';
+        }
+
+        $s = implode(',', $servers);
+
+        return $this->limitString($s, self::PORTS_NAC_STR_MAX);
+    }
+
+    private function limitString(string $value, int $max): string
+    {
+        if ($max <= 0) {
             return '';
         }
 
-        $hostRows = collect(
-            SnmpQuery::mibDir('nokia')
-                ->walk('ALCATEL-IND1-AAA-MIB::aaasHostName')
-                ->valuesByIndex()
-        );
-
-        $ipRows = collect(
-            SnmpQuery::mibDir('nokia')
-                ->walk('ALCATEL-IND1-AAA-MIB::aaasIpAddress')
-                ->valuesByIndex()
-        );
-
-        $names = [];
-        foreach ($protoRows as $nameIdx => $val) {
-            $proto = (int) ($this->rowValue($val, 'ALCATEL-IND1-AAA-MIB::aaasProtocol') ?? $val ?? 0);
-            if ($proto !== 1) { // radius(1)
-                continue;
-            }
-
-            $name = trim((string) $nameIdx);
-            if ($name !== '') {
-                $names[] = $name;
-                continue;
-            }
-
-            // Fallback to host/ip if index name isn't usable
-            $host = trim((string) ($this->rowValue($hostRows->get($nameIdx), 'ALCATEL-IND1-AAA-MIB::aaasHostName') ?? ''));
-            $ip = $this->normalizeIpAddress($ipRows->get($nameIdx));
-
-            if ($host !== '') {
-                $names[] = $host;
-            } elseif ($ip !== '') {
-                $names[] = $ip;
-            }
+        if (strlen($value) <= $max) {
+            return $value;
         }
 
-        $names = array_values(array_unique(array_filter($names)));
-
-        return implode(',', $names);
+        return substr($value, 0, $max);
     }
 
     private function normalizeMacColon(string $mac): string
@@ -429,6 +491,25 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
             return '0.0.0.0';
         }
 
+        // Already dotted IPv4?
+        if (filter_var($s, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            return $s;
+        }
+
+        // AOS6 sometimes returns IPv4 as a 32-bit decimal integer (e.g. 168142917)
+        if (ctype_digit($s)) {
+            $n = (int) $s;
+
+            // Valid unsigned 32-bit range
+            if ($n > 0 && $n <= 4294967295) {
+                $ip = @inet_ntop(pack('N', $n)); // big-endian / network order
+                if ($ip !== false && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                    return $ip;
+                }
+            }
+        }
+
+        // Fallback: keep whatever we got (better than null)
         return $s;
     }
 
