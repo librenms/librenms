@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2019 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI Private MIB
 -- Reference:
--- Version: V2.03
+-- Version: V2.04
 -- History: V1.0 
 --   <author>, <date>, <contents>
 --  qiyanqing, 2007-05-14, publish
@@ -29,14 +29,14 @@
                 FROM SNMP-FRAMEWORK-MIB            
             OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE            
                 FROM SNMPv2-CONF            
-            Integer32, Unsigned32, Counter32, Counter64, BITS, OBJECT-TYPE, 
+            Integer32, Unsigned32, Counter32, Counter64, OBJECT-TYPE, 
             MODULE-IDENTITY, NOTIFICATION-TYPE            
                 FROM SNMPv2-SMI
             TruthValue, TimeStamp, RowStatus            
                 FROM SNMPv2-TC;
     
         hwTunnelTeMib MODULE-IDENTITY 
-      	    LAST-UPDATED "201708171607Z"        -- August 17, 2017 at 16:07 GMT
+      	    LAST-UPDATED "201907131000Z"        -- July 13, 2019 at 15:00 GMT
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -52,6 +52,9 @@
                 definitions for the binding information."   		         
 
            --  Revision history
+            REVISION    "201907131000Z"
+            DESCRIPTION "V2.04, Delete BITS ."
+
             REVISION   "201708171607Z"
             DESCRIPTION "V2.03, modify description."
 
