@@ -558,7 +558,7 @@ class ModuleTestHelper
         }
 
         // Remove existing device in case it didn't get removed previously, if we're not running in CI
-        if (! getenv('CI') && ($existing_device = device_by_name($snmpSimIp)) && isset($existing_device['device_id'])) {
+        if (! getenv('CI') && DeviceCache::get($snmpSimIp)->exists) {
             Device::query()->where('hostname', $snmpSimIp)->get()->each->delete();
             DeviceCache::flush();
         }
