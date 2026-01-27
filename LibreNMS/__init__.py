@@ -511,9 +511,10 @@ class RedisLock(Lock):
             self._redis = redis.Redis(**kwargs)
         self._redis.ping()
         self._namespace = namespace
+        socket_timeout = redis_kwargs.get("socket_timeout")
         logger.debug(
             "Created redis lock manager with socket_timeout of {}s".format(
-                redis_kwargs["socket_timeout"]
+                socket_timeout if socket_timeout is not None else "default"
             )
         )
 
