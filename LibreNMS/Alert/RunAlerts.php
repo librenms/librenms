@@ -512,14 +512,14 @@ class RunAlerts
             }
 
             $status_check = DB::table('alerts')
-                ->where('alerts.rule_id', $alert['rule_id'])
+                ->where('alerts.id', $alert['id'])
                 ->leftJoin('devices', 'alerts.device_id', '=', 'devices.device_id')
                 ->first(['alerts.alerted', 'devices.ignore', 'devices.disabled']);
 
             if ($status_check === null) {
-                Log::error('Alert rule not found');
+                Log::error('Alert not found');
 
-                return;
+                continue;
             }
 
             if ($status_check->alerted == $alert['state']) {
