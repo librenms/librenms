@@ -23,8 +23,8 @@
     <text id="graphlast" x="{{ $width * 0.48 }}" y="17" fill="black" font-family="Tahoma, Verdana, Arial, Helvetica, sans-serif" font-size="4">Graph shows last {{ $graphDuration }} seconds</text>
     <text id="cachewarning" x="{{ $width * 0.48 }}" y="22" fill="darkorange" font-family="Tahoma, Verdana, Arial, Helvetica, sans-serif" font-size="4" visibility="hidden">Caching may be in effect (<tspan id="cacheinterval">?</tspan>s)</text>
     <polygon id="axis_arrow_x" fill="black" stroke="black" points="{{ $width . ',' . $height }} {{ ($width - 2) . ',' . ($height - 2) }} {{ ($width - 2) . ',' . $height }}"/>
-    <text id="error" x="{{ $width * 0.5 }}" y="{{ $height * 0.5 }}" visibility="hidden" fill="blue" font-family="Arial" font-size="4" text-anchor="middle">{{ $errorText }}</text>
-    <text id="collect_initial" x="{{ $width * 0.5 }}" y="{{ $height * 0.5 }}" visibility="hidden" fill="gray" font-family="Tahoma, Verdana, Arial, Helvetica, sans-serif" font-size="4" text-anchor="middle">Collecting initial data, please wait...</text>
+    <text id="error" x="{{ $width * 0.5 }}" y="{{ $height * 0.4 }}" visibility="hidden" fill="blue" font-family="Arial" font-size="4" text-anchor="middle">{{ $errorText }}</text>
+    <text id="collect_initial" x="{{ $width * 0.5 }}" y="{{ $height * 0.4 }}" visibility="hidden" fill="gray" font-family="Tahoma, Verdana, Arial, Helvetica, sans-serif" font-size="4" text-anchor="middle">Collecting initial data, please wait...</text>
   </g>
   <script type="application/ecmascript">
     {{--  adapted from
