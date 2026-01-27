@@ -11,38 +11,30 @@ IMPORTS
 	NOTIFICATION-GROUP             FROM SNMPv2-CONF
 	healthMonTraps,
         softentIND1Health              FROM ALCATEL-IND1-BASE
-        ifIndex                        FROM IF-MIB;
- 
-
+	ifIndex				FROM IF-MIB;
  
 	alcatelIND1HealthMonitorMIB MODULE-IDENTITY
-		LAST-UPDATED "200704030000Z"
-		ORGANIZATION "Alcatel-Lucent"
+		LAST-UPDATED "201910070000Z"
+		ORGANIZATION "ALE USA Inc"
 		CONTACT-INFO
             "Please consult with Customer Service to ensure the most appropriate
              version of this document is used with the products in question:
          
-                        Alcatel-Lucent, Enterprise Solutions Division
-                       (Formerly Alcatel Internetworking, Incorporated)
+                              Alcatel-Lucent Enterprise, 
                                26801 West Agoura Road
                             Agoura Hills, CA  91301-5122
                               United States Of America
         
-            Telephone:               North America  +1 800 995 2696
-                                     Latin America  +1 877 919 9526
-                                     Europe         +31 23 556 0100
-                                     Asia           +65 394 7933
-                                     All Other      +1 818 878 4507
-        
-            Electronic Mail:         support@ind.alcatel.com
-            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
-
+            Telephone:               +1 800 995 2696 
+				      
+            Electronic Mail:         ebg_global_supportcenter@al-enterprise.com 
+            World Wide Web:          https://www.al-enterprise.com"
+          
 		DESCRIPTION
 			"This module describes an authoritative enterprise-specific Simple
              Network Management Protocol (SNMP) Management Information Base (MIB):
          
-                 For the Birds Of Prey Product Line
+                 For the OmniSwitch Product Line
 		 Health Monitoring for dissemination of resource consumption information.
          
              The right to make changes in specification and other information
@@ -55,13 +47,14 @@ IMPORTS
              Vendors, end-users, and other interested parties are granted
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
-         
-                         Copyright (C) 1995-2007 Alcatel-Lucent
-                             ALL RIGHTS RESERVED WORLDWIDE"
+		
+			Copyright (C) ALE USA Inc. 2014-2019                         
+			Copyright (C) 1995-2013 Alcatel-Lucent
+                        ALL RIGHTS RESERVED WORLDWIDE"
 
-		REVISION      "200704030000Z"
-        DESCRIPTION
-            "Addressing discrepancies with Alcatel Standard."
+		REVISION      "201910070000Z"
+                DESCRIPTION
+                  "Updated the latest contact and Copyright information for ALE USA Inc."
      	        ::= { softentIND1Health 1}
 
 
@@ -592,6 +585,16 @@ IMPORTS
 	    healthPortRxTx1HrAvg
 			INTEGER,
 	    healthPortRxTx1HrMax
+			INTEGER,
+	    healthPortTxLatest
+		        INTEGER,
+            healthPortTx1MinAvg
+                        INTEGER,
+            healthPortTx1HrAvg
+                        INTEGER,
+            healthPortTx1HrMax
+                        INTEGER,
+	    healthPortThresholdTrapStatus	
 			INTEGER
 	    }
 
@@ -690,6 +693,55 @@ IMPORTS
 		"Maximum one-minute port-level i/o utilization over the 
 		 last hour (percent)."
 	    ::= { healthPortEntry 11 }
+   
+        healthPortTxLatest  OBJECT-TYPE
+            SYNTAX  INTEGER (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Average port-level output utilization over the
+                 latest sample period (percent)."
+            ::= { healthPortEntry 12 }
+
+        healthPortTx1MinAvg  OBJECT-TYPE
+            SYNTAX  INTEGER (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Average port-level output utilization over the
+                 last minute (percent)."
+            ::= { healthPortEntry 13 }
+
+        healthPortTx1HrAvg  OBJECT-TYPE
+            SYNTAX  INTEGER (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Average port-level output utilization over the
+                 last hour (percent)."
+            ::= { healthPortEntry 14 }
+
+        healthPortTx1HrMax  OBJECT-TYPE
+            SYNTAX  INTEGER (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Maximum one-minute port-level output utilization over the
+                 last hour (percent)."
+            ::= { healthPortEntry 15 }
+
+	healthPortThresholdTrapStatus OBJECT-TYPE
+	    SYNTAX INTEGER {
+	               enabled(1),
+	               disabled(2)
+	           }
+	    MAX-ACCESS  read-write
+	    STATUS current
+	    DESCRIPTION
+                "1 - Enable sending trap when the rx or rxtx threshold goes above or below the configured threshold,
+                 2 - Disable sending trap when the rx threshold goes above or below the configured threshold"
+	    DEFVAL { enabled }
+	    ::= { healthPortEntry 16 }
 
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -956,37 +1008,37 @@ IMPORTS
 			INTEGER,
 	    healthFabricSecondaryRxTx1HrMax
 			INTEGER,
-	    healthFabricPrimaryLink1RxLatest 
+	    healthFabricPrimaryLink1RxLatest
 			INTEGER,
-    	healthFabricPrimaryLink1Rx1MinAvg
+    	    healthFabricPrimaryLink1Rx1MinAvg
 			INTEGER,
-    	healthFabricPrimaryLink1Rx1HrAvg 
+    	    healthFabricPrimaryLink1Rx1HrAvg
 			INTEGER,
-    	healthFabricPrimaryLink1Rx1HrMax 
+       	    healthFabricPrimaryLink1Rx1HrMax
 			INTEGER,
-    	healthFabricPrimaryLink1RxTxLatest  
+    	    healthFabricPrimaryLink1RxTxLatest
 			INTEGER,
-    	healthFabricPrimaryLink1RxTx1MinAvg 
+    	    healthFabricPrimaryLink1RxTx1MinAvg
 			INTEGER,
-    	healthFabricPrimaryLink1RxTx1HrAvg  
+    	    healthFabricPrimaryLink1RxTx1HrAvg
 			INTEGER,
-    	healthFabricPrimaryLink1RxTx1HrMax  
+    	    healthFabricPrimaryLink1RxTx1HrMax
 			INTEGER,
-    	healthFabricSecondaryLink1RxLatest  
+    	    healthFabricSecondaryLink1RxLatest
 			INTEGER,
-    	healthFabricSecondaryLink1Rx1MinAvg 
+    	    healthFabricSecondaryLink1Rx1MinAvg
 			INTEGER,
-    	healthFabricSecondaryLink1Rx1HrAvg  
+    	    healthFabricSecondaryLink1Rx1HrAvg
 			INTEGER,
-    	healthFabricSecondaryLink1Rx1HrMax  
+    	    healthFabricSecondaryLink1Rx1HrMax
 			INTEGER,
-    	healthFabricSecondaryLink1RxTxLatest  
+    	    healthFabricSecondaryLink1RxTxLatest
 			INTEGER,
-    	healthFabricSecondaryLink1RxTx1MinAvg 
+    	    healthFabricSecondaryLink1RxTx1MinAvg
 			INTEGER,
-    	healthFabricSecondaryLink1RxTx1HrAvg  
+    	    healthFabricSecondaryLink1RxTx1HrAvg
 			INTEGER,
-    	healthFabricSecondaryLink1RxTx1HrMax  
+    	    healthFabricSecondaryLink1RxTx1HrMax
 			INTEGER
 	    }
 
@@ -1005,8 +1057,7 @@ IMPORTS
 	    STATUS  current
 	    DESCRIPTION
 		"Average primary fabric input utilization over the
-		 latest sample period (percent). If the switch has multiple 
-		 fabric links it represents the value for Link0 of the fabric."
+		 latest sample period (percent)."
 	    ::= { healthFabricEntry 2 }
 
 	healthFabricPrimaryRx1MinAvg  OBJECT-TYPE
@@ -1015,8 +1066,7 @@ IMPORTS
 	    STATUS  current
 	    DESCRIPTION
 		"Average primary fabric input utilization over the
-		 last minute (percent). If the switch has multiple fabric
-		 links it represents the value for Link0 of the fabric."
+		 last minute (percent)."
 	    ::= { healthFabricEntry 3 }
 
 	healthFabricPrimaryRx1HrAvg  OBJECT-TYPE
@@ -1025,8 +1075,7 @@ IMPORTS
 	    STATUS  current
 	    DESCRIPTION
 		"Average primary fabric input utilization over the
-		 last hour (percent). If the switch has multiple fabric
-		 links it represents the value for Link0 of the fabric."
+		 last hour (percent)."
 	    ::= { healthFabricEntry 4 }
 
 	healthFabricPrimaryRx1HrMax  OBJECT-TYPE
@@ -1035,8 +1084,7 @@ IMPORTS
 	    STATUS  current
 	    DESCRIPTION
 		"Maximum one-minute primary fabric input utilization over the
-		 last hour (percent). If the switch has multiple fabric
-		 links it represents the value for Link0 of the fabric."
+		 last hour (percent)."
 	    ::= { healthFabricEntry 5 }
 
 
@@ -1046,8 +1094,7 @@ IMPORTS
 	    STATUS  current
 	    DESCRIPTION
 		"Average primary fabric i/o utilization over the
-		 latest sample period (percent). If the switch has multiple
-		 fabric links it represents the value for Link0 of the fabric."
+		 latest sample period (percent)."
 	    ::= { healthFabricEntry 6 }
 
 	healthFabricPrimaryRxTx1MinAvg  OBJECT-TYPE
@@ -1056,8 +1103,7 @@ IMPORTS
 	    STATUS  current
 	    DESCRIPTION
 		"Average primary fabric i/o utilization over the
-		 last minute (percent). If the switch has multiple fabric
-		 links it represents the value for Link0 of the fabric."
+		 last minute (percent)."
 	    ::= { healthFabricEntry 7 }
 
 	healthFabricPrimaryRxTx1HrAvg  OBJECT-TYPE
@@ -1066,8 +1112,7 @@ IMPORTS
 	    STATUS  current
 	    DESCRIPTION
 		"Average primary fabric i/o utilization over the
-		 last hour (percent). If the switch has multiple fabric
-		 links it represents the value for Link0 of the fabric."
+		 last hour (percent)."
 	    ::= { healthFabricEntry 8 }
 
 	healthFabricPrimaryRxTx1HrMax  OBJECT-TYPE
@@ -1076,8 +1121,7 @@ IMPORTS
 	    STATUS  current
 	    DESCRIPTION
 		"Maximum one-minute primary fabric i/o utilization over the
-		 last hour (percent). If the switch has multiple fabric
-		 links it represents the value for Link0 of the fabric."
+		 last hour (percent)."
 	    ::= { healthFabricEntry 9 }
 
 
@@ -1087,8 +1131,7 @@ IMPORTS
 	    STATUS  current
 	    DESCRIPTION
 		"Average secondary fabric input utilization over the
-		 latest sample period (percent). If the switch has multiple
-		 fabric links it represents the value for Link0 of the fabric."
+		 latest sample period (percent)."
 	    ::= { healthFabricEntry 10 }
 
 	healthFabricSecondaryRx1MinAvg  OBJECT-TYPE
@@ -1097,8 +1140,7 @@ IMPORTS
 	    STATUS  current
 	    DESCRIPTION
 		"Average secondary fabric input utilization over the
-		 last minute (percent). If the switch has multiple fabric
-		 links it represents the value for Link0 of the fabric."
+		 last minute (percent)."
 	    ::= { healthFabricEntry 11 }
 
 	healthFabricSecondaryRx1HrAvg  OBJECT-TYPE
@@ -1107,8 +1149,7 @@ IMPORTS
 	    STATUS  current
 	    DESCRIPTION
 		"Average secondary fabric input utilization over the
-		 last hour (percent). If the switch has multiple fabric
-		 links it represents the value for Link0 of the fabric."
+		 last hour (percent)."
 	    ::= { healthFabricEntry 12 }
 
 	healthFabricSecondaryRx1HrMax  OBJECT-TYPE
@@ -1117,8 +1158,7 @@ IMPORTS
 	    STATUS  current
 	    DESCRIPTION
 		"Maximum one-minute secondary fabric input utilization over the
-		 last hour (percent). If the switch has multiple fabric
-		 links it represents the value for Link0 of the fabric."
+		 last hour (percent)."
 	    ::= { healthFabricEntry 13 }
 
 	healthFabricSecondaryRxTxLatest  OBJECT-TYPE
@@ -1127,8 +1167,7 @@ IMPORTS
 	    STATUS  current
 	    DESCRIPTION
 		"Average secondary fabric i/o utilization over the
-		 latest sample period (percent). If the switch has multiple
-		 fabric links it represents the value for Link0 of the fabric."
+		 latest sample period (percent)."
 	    ::= { healthFabricEntry 14 }
 
 	healthFabricSecondaryRxTx1MinAvg  OBJECT-TYPE
@@ -1137,8 +1176,7 @@ IMPORTS
 	    STATUS  current
 	    DESCRIPTION
 		"Average secondary fabric i/o utilization over the
-		 last minute (percent). If the switch has multiple fabric
-		 links it represents the value for Link0 of the fabric."
+		 last minute (percent)."
 	    ::= { healthFabricEntry 15 }
 
 	healthFabricSecondaryRxTx1HrAvg  OBJECT-TYPE
@@ -1147,8 +1185,7 @@ IMPORTS
 	    STATUS  current
 	    DESCRIPTION
 		"Average secondary fabric i/o utilization over the
-		 last hour (percent). If the switch has multiple fabric
-		 links it represents the value for Link0 of the fabric."
+		 last hour (percent)."
 	    ::= { healthFabricEntry 16 }
 
 	healthFabricSecondaryRxTx1HrMax  OBJECT-TYPE
@@ -1157,11 +1194,10 @@ IMPORTS
 	    STATUS  current
 	    DESCRIPTION
 		"Maximum one-minute secondary fabric i/o utilization over the
-		 last hour (percent). If the switch has multiple fabric
-		 links it represents the value for Link0 of the fabric."
+		 last hour (percent)."
 	    ::= { healthFabricEntry 17 }
 
-  healthFabricPrimaryLink1RxLatest  OBJECT-TYPE
+	healthFabricPrimaryLink1RxLatest  OBJECT-TYPE
 	    SYNTAX  INTEGER  (0..100)
 	    MAX-ACCESS  read-only
 	    STATUS  current
@@ -1170,7 +1206,6 @@ IMPORTS
 		 latest sample period (percent). Only used for a switch
 		 with multiple fabric links."
 	    ::= { healthFabricEntry 18 }
-
 	healthFabricPrimaryLink1Rx1MinAvg  OBJECT-TYPE
 	    SYNTAX  INTEGER  (0..100)
 	    MAX-ACCESS  read-only
@@ -1180,7 +1215,6 @@ IMPORTS
 		 last minute (percent). Only used for a switch
 		 with multiple fabric links."
 	    ::= { healthFabricEntry 19 }
-
 	healthFabricPrimaryLink1Rx1HrAvg  OBJECT-TYPE
 	    SYNTAX  INTEGER  (0..100)
 	    MAX-ACCESS  read-only
@@ -1190,18 +1224,15 @@ IMPORTS
 		 last hour (percent). Only used for a switch
 		 with multiple fabric links."
 	    ::= { healthFabricEntry 20 }
-
 	healthFabricPrimaryLink1Rx1HrMax  OBJECT-TYPE
 	    SYNTAX  INTEGER  (0..100)
 	    MAX-ACCESS  read-only
 	    STATUS  current
 	    DESCRIPTION
 		"Maximum one-minute primary fabric link1 input utilization over the
-		 last hour (percent). Only used for a switch with multiple fabric 
+		 last hour (percent). Only used for a switch with multiple fabric
 		 links."
 	    ::= { healthFabricEntry 21 }
-
-
 	healthFabricPrimaryLink1RxTxLatest  OBJECT-TYPE
 	    SYNTAX  INTEGER  (0..100)
 	    MAX-ACCESS  read-only
@@ -1211,7 +1242,6 @@ IMPORTS
 		 latest sample period (percent). Only used for a switch
 		 with multiple fabric links."
 	    ::= { healthFabricEntry 22 }
-
 	healthFabricPrimaryLink1RxTx1MinAvg  OBJECT-TYPE
 	    SYNTAX  INTEGER  (0..100)
 	    MAX-ACCESS  read-only
@@ -1221,7 +1251,6 @@ IMPORTS
 		 last minute (percent). Only used for a switch
 		 with multiple fabric links."
 	    ::= { healthFabricEntry 23 }
-
 	healthFabricPrimaryLink1RxTx1HrAvg  OBJECT-TYPE
 	    SYNTAX  INTEGER  (0..100)
 	    MAX-ACCESS  read-only
@@ -1231,18 +1260,15 @@ IMPORTS
 		 last hour (percent). Only used for a switch
 		 with multiple fabric links."
 	    ::= { healthFabricEntry 24 }
-
 	healthFabricPrimaryLink1RxTx1HrMax  OBJECT-TYPE
 	    SYNTAX  INTEGER  (0..100)
 	    MAX-ACCESS  read-only
 	    STATUS  current
 	    DESCRIPTION
 		"Maximum one-minute primary fabric link1 i/o utilization over the
-		 last hour (percent). Only used for a switch with multiple fabric 
+		 last hour (percent). Only used for a switch with multiple fabric
 		 links."
 	    ::= { healthFabricEntry 25 }
-
-
 	healthFabricSecondaryLink1RxLatest  OBJECT-TYPE
 	    SYNTAX  INTEGER  (0..100)
 	    MAX-ACCESS  read-only
@@ -1252,7 +1278,6 @@ IMPORTS
 		 latest sample period (percent). Only used for a switch
 		 with multiple fabric links."
 	    ::= { healthFabricEntry 26 }
-
 	healthFabricSecondaryLink1Rx1MinAvg  OBJECT-TYPE
 	    SYNTAX  INTEGER  (0..100)
 	    MAX-ACCESS  read-only
@@ -1262,7 +1287,6 @@ IMPORTS
 		 last minute (percent). Only used for a switch
 		 with multiple fabric links."
 	    ::= { healthFabricEntry 27 }
-
 	healthFabricSecondaryLink1Rx1HrAvg  OBJECT-TYPE
 	    SYNTAX  INTEGER  (0..100)
 	    MAX-ACCESS  read-only
@@ -1272,17 +1296,15 @@ IMPORTS
 		 last hour (percent). Only used for a switch
 		 with multiple fabric links."
 	    ::= { healthFabricEntry 28 }
-
 	healthFabricSecondaryLink1Rx1HrMax  OBJECT-TYPE
 	    SYNTAX  INTEGER  (0..100)
 	    MAX-ACCESS  read-only
 	    STATUS  current
 	    DESCRIPTION
 		"Maximum one-minute secondary fabric link1 input utilization over the
-		 last hour (percent). Only used for a switch with multiple fabric 
+		 last hour (percent). Only used for a switch with multiple fabric
 		 links."
 	    ::= { healthFabricEntry 29 }
-
 	healthFabricSecondaryLink1RxTxLatest  OBJECT-TYPE
 	    SYNTAX  INTEGER  (0..100)
 	    MAX-ACCESS  read-only
@@ -1292,7 +1314,6 @@ IMPORTS
 		 latest sample period (percent). Only used for a switch
 		 with multiple fabric links."
 	    ::= { healthFabricEntry 30 }
-
 	healthFabricSecondaryLink1RxTx1MinAvg  OBJECT-TYPE
 	    SYNTAX  INTEGER  (0..100)
 	    MAX-ACCESS  read-only
@@ -1302,7 +1323,6 @@ IMPORTS
 		 last minute (percent). Only used for a switch
 		 with multiple fabric links."
 	    ::= { healthFabricEntry 31 }
-
 	healthFabricSecondaryLink1RxTx1HrAvg  OBJECT-TYPE
 	    SYNTAX  INTEGER  (0..100)
 	    MAX-ACCESS  read-only
@@ -1312,14 +1332,13 @@ IMPORTS
 		 last hour (percent). Only used for a switch
 		 with multiple fabric links."
 	    ::= { healthFabricEntry 32 }
-
 	healthFabricSecondaryLink1RxTx1HrMax  OBJECT-TYPE
 	    SYNTAX  INTEGER  (0..100)
 	    MAX-ACCESS  read-only
 	    STATUS  current
 	    DESCRIPTION
 		"Maximum one-minute secondary fabric link1 i/o utilization over the
-		 last hour (percent). Only used for a switch with multiple fabric 
+		 last hour (percent). Only used for a switch with multiple fabric
 		 links."
 	    ::= { healthFabricEntry 33 }
 
@@ -1336,7 +1355,8 @@ IMPORTS
  	    SYNTAX  INTEGER  {
 		     crossedBelowThreshold (1),
 		     noChange              (2),
-		     crossedAboveThreshold (3)
+		     crossedAboveThreshold (3),
+		     noTrapConfigured(4)
                              }
 	    MAX-ACCESS  read-only
 	    STATUS  current
@@ -1348,7 +1368,8 @@ IMPORTS
  	    SYNTAX  INTEGER  {
 		     crossedBelowThreshold (1),
 		     noChange              (2),
-		     crossedAboveThreshold (3)
+		     crossedAboveThreshold (3),
+		     noTrapConfigured(4)
                              }
 	    MAX-ACCESS  read-only
 	    STATUS  current
@@ -1518,17 +1539,16 @@ IMPORTS
                "IPC pools exceed usage/ causing trap."
             ::= { healthMonTraps 0 4 }
 
-        healthMonCpuShutPortTrap  NOTIFICATION-TYPE
-                  OBJECTS { 
+	healthMonCpuShutPortTrap  NOTIFICATION-TYPE
+                  OBJECTS {
                       healthModuleSlot,
                       ifIndex,
                       healthModuleCpuLatest
                           }
                   STATUS   current
-                  DESCRIPTION 
+                  DESCRIPTION
                       "Port Shutdown notification for CPU spike."
               ::= { healthMonTraps 0 5 }
-
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 -- COMPLIANCE
@@ -1565,7 +1585,6 @@ IMPORTS
 	                healthDeviceRx1HrMax,
 	                healthDeviceRxTxLatest,
 	                healthDeviceRxTx1MinAvg,
-	                healthDeviceRxTx1MinAvg,
 	                healthDeviceRxTx1HrAvg,
 	                healthDeviceRxTx1HrMax,
 	                healthDeviceMemoryLatest,
@@ -1580,7 +1599,6 @@ IMPORTS
 	                healthDeviceTemperatureChasLatest,
 	                healthDeviceTemperatureChas1MinAvg,
 	                healthDeviceTemperatureChas1HrAvg,
-	                healthDeviceTemperatureChas1HrMax,
 	                healthDeviceTemperatureCmmCpuLatest,
 	                healthDeviceTemperatureCmmCpu1MinAvg,
 	                healthDeviceTemperatureCmmCpu1HrAvg,
@@ -1601,7 +1619,6 @@ IMPORTS
 	                healthModuleRx1HrAvg,
 	                healthModuleRx1HrMax,
 	                healthModuleRxTxLatest,
-	                healthModuleRxTx1MinAvg,
 	                healthModuleRxTx1MinAvg,
 	                healthModuleRxTx1HrAvg,
 	                healthModuleRxTx1HrMax,
@@ -1631,9 +1648,10 @@ IMPORTS
 	                healthPortRx1HrMax,
 	                healthPortRxTxLatest,
 	                healthPortRxTx1MinAvg,
-	                healthPortRxTx1MinAvg,
 	                healthPortRxTx1HrAvg,
-	                healthPortRxTx1HrMax
+	                healthPortRxTx1HrMax,
+                        healthPortUpDn,
+	                healthPortThresholdTrapStatus
         }
         STATUS  current
         DESCRIPTION
@@ -1685,7 +1703,8 @@ IMPORTS
 	                healthMonPrimaryFabricRxStatus,
 	                healthMonPrimaryFabricRxTxStatus,
 	                healthMonSecondaryFabricRxStatus,
-	                healthMonSecondaryFabricRxTxStatus
+	                healthMonSecondaryFabricRxTxStatus,
+                        healthMonIpcPoolStatus
         }
         STATUS  current
         DESCRIPTION
@@ -1698,7 +1717,8 @@ IMPORTS
 	                healthMonDeviceTrap,
 	                healthMonModuleTrap,
 	                healthMonPortTrap,
-			healthMonIpcTrap
+			healthMonIpcTrap,
+                        healthMonCpuShutPortTrap
 	}
         STATUS  current
         DESCRIPTION
@@ -1739,22 +1759,23 @@ IMPORTS
 	                healthFabricSecondaryRxTx1MinAvg,
 	                healthFabricSecondaryRxTx1HrAvg,
 	                healthFabricSecondaryRxTx1HrMax,
-	                healthFabricPrimaryLink1RxLatest, 
+                        healthFabricPrimaryLink1RxLatest,
                 	healthFabricPrimaryLink1Rx1MinAvg,
-                	healthFabricPrimaryLink1Rx1HrAvg, 
-                	healthFabricPrimaryLink1Rx1HrMax, 
-                	healthFabricPrimaryLink1RxTxLatest,  
-                	healthFabricPrimaryLink1RxTx1MinAvg, 
-                	healthFabricPrimaryLink1RxTx1HrAvg,  
-                	healthFabricPrimaryLink1RxTx1HrMax,  
-                	healthFabricSecondaryLink1RxLatest,  
-                	healthFabricSecondaryLink1Rx1MinAvg, 
-                	healthFabricSecondaryLink1Rx1HrAvg,  
-                	healthFabricSecondaryLink1Rx1HrMax,  
-                	healthFabricSecondaryLink1RxTxLatest,  
-                	healthFabricSecondaryLink1RxTx1MinAvg, 
-                	healthFabricSecondaryLink1RxTx1HrAvg,  
-                	healthFabricSecondaryLink1RxTx1HrMax
+                	healthFabricPrimaryLink1Rx1HrAvg,
+                	healthFabricPrimaryLink1Rx1HrMax,
+                	healthFabricPrimaryLink1RxTxLatest,
+                	healthFabricPrimaryLink1RxTx1MinAvg,
+                	healthFabricPrimaryLink1RxTx1HrAvg,
+                	healthFabricPrimaryLink1RxTx1HrMax,
+                	healthFabricSecondaryLink1RxLatest,
+                	healthFabricSecondaryLink1Rx1MinAvg,
+                	healthFabricSecondaryLink1Rx1HrAvg,
+                	healthFabricSecondaryLink1Rx1HrMax,
+                	healthFabricSecondaryLink1RxTxLatest,
+                	healthFabricSecondaryLink1RxTx1MinAvg,
+                	healthFabricSecondaryLink1RxTx1HrAvg,
+                	healthFabricSecondaryLink1RxTx1HrMax,
+                	healthFabricSlot
         }
         STATUS  current
         DESCRIPTION
