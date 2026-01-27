@@ -147,6 +147,9 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
                 Log::info("#### Unload discovery module $module ####\n");
             }
         }
+
+        // Remove listener to allow this object to be garbage collected
+        Event::forget(OsChangedEvent::class);
     }
 
     private function handleOsChange(OS $os): OS
