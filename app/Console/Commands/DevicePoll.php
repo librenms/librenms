@@ -80,7 +80,6 @@ class DevicePoll extends LnmsCommand
 
     private function dispatchWork(): int
     {
-        \Log::setDefaultDriver('stack');
         $modules = ModuleList::fromUserOverrides($this->option('modules'));
         $devices = Device::whereDeviceSpec($this->argument('device spec'))->pluck('device_id');
 
