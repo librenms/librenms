@@ -1,8 +1,11 @@
 <?php
 
-// polling/ports/os
+d_echo('');
+d_echo('/opt/librenms/includes/polling/ports/os/mx-nos.inc.php');
+d_echo('--Start--');
 
 $tcstStat_port_stats = SnmpQuery::walk('MOXA-TCST-MIB::tcstStatGroupTable')->table(1);
+$PortMib_port = SnmpQuery::walk('MOXA-PORT-MIB::portConfigDescription')->table(1);
 
 foreach ($tcstStat_port_stats as $index => $moxaport_stats) {
     //print_r($moxaport_stats);
@@ -22,4 +25,11 @@ foreach ($tcstStat_port_stats as $index => $moxaport_stats) {
     $port_stats[$index]['ifOutDiscards'] = $moxaport_stats['MOXA-TCST-MIB::tcstStatTxDiscardsPackets'];
 }
 
+foreach ($PortMib_port as $index => $moxaport) {
+    $port_stats[$index]['ifAlias'] = $moxaport['MOXA-PORT-MIB::portConfigDescription'];
+}
+unset($PortMib_port);
 unset($tcstStat_port_stats);
+
+d_echo('');
+d_echo('--End--');
