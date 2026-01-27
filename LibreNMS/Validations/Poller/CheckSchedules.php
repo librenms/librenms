@@ -55,6 +55,10 @@ class CheckSchedules implements \LibreNMS\Interfaces\Validation
                     return ValidationResult::warn(trans('validation.validations.poller.CheckSchedules.dispatcher_ping_fast'));
                 }
             }
+        } elseif (LibrenmsConfig::get('schedule_type.ping') == 'disabled') {
+            if (LibrenmsConfig::get('rrd.step') != LibrenmsConfig::get('ping_rrd_step')) {
+                return ValidationResult::fail(trans('validation.validations.poller.CheckSchedules._dispatcher_ping_rrd_diff'));
+            }
         }
 
         return ValidationResult::ok(trans('validation.validations.poller.CheckSchedules.no_errors'));
