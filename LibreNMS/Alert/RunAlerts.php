@@ -34,6 +34,7 @@ namespace LibreNMS\Alert;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
+use App\Models\Alert;
 use App\Models\AlertTransport;
 use App\Models\ApplicationMetric;
 use App\Models\Eventlog;
@@ -511,18 +512,18 @@ class RunAlerts
                 $alert['details']['count'] = 0;
             }
 
-            $status_check = DB::table('alerts')
-                ->where('alerts.id', $alert['id'])
-                ->leftJoin('devices', 'alerts.device_id', '=', 'devices.device_id')
-                ->first(['alerts.alerted', 'devices.ignore', 'devices.disabled']);
+            $status_check = DB::table('devices')
+                ->where('device_id', $alert['device_id'])
+                ->first(['ignore', 'disabled']);
 
             if ($status_check === null) {
-                Log::error('Alert not found');
+                Log::warning("Alert #{$alert['id']} references non-existent device {$alert['device_id']}, cleaning up");
+                Alert::query()->where('id', $alert['id'])->delete();
 
                 continue;
             }
 
-            if ($status_check->alerted == $alert['state']) {
+            if ($alert['alerted'] == $alert['state']) {
                 $noiss = true;
             }
 
