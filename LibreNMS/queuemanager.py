@@ -535,11 +535,13 @@ class PollerQueueManager(QueueManager):
                 else self.config.log_output
             )
 
-            args = (
-                ("device:poll", device_id, "-vv")
-                if self.config.debug
-                else ("device:poll", device_id, "-q")
-            )
+            args_list = ["device:poll", device_id]
+            if self.config.debug:
+                args_list.append("-vv")
+            elif self.config.log_output is LogOutput.NONE:
+                args_list.append("-q")
+            args = tuple(args_list)
+
             exit_code, output = LibreNMS.call_script("lnms", args, output)
 
             if exit_code == 0:
@@ -603,11 +605,13 @@ class DiscoveryQueueManager(TimedQueueManager):
                 else self.config.log_output
             )
 
-            args = (
-                ("device:discover", device_id, "-vv")
-                if self.config.debug
-                else ("device:discover", device_id, "-q")
-            )
+            args_list = ["device:poll", device_id]
+            if self.config.debug:
+                args_list.append("-vv")
+            elif self.config.log_output is LogOutput.NONE:
+                args_list.append("-q")
+            args = tuple(args_list)
+
             exit_code, output = LibreNMS.call_script("lnms", args, output)
 
             if exit_code == 0:
