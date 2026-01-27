@@ -5,6 +5,7 @@ IMPORTS
 	OBJECT-IDENTITY,
 	OBJECT-TYPE,
 	NOTIFICATION-TYPE,
+	Integer32,
 	IpAddress            FROM SNMPv2-SMI
 	DisplayString,
 	RowStatus            FROM SNMPv2-TC
@@ -15,32 +16,27 @@ IMPORTS
 	switchMgtTraps       FROM ALCATEL-IND1-BASE;
 
 alcatelIND1SessionMgrMIB MODULE-IDENTITY
-	LAST-UPDATED "200704030000Z"
-	ORGANIZATION "Alcatel-Lucent"
+	LAST-UPDATED "201910070000Z"
+	ORGANIZATION "ALE USA Inc"
 	CONTACT-INFO
 	    "Please consult with Customer Service to ensure the most appropriate
 	     version of this document is used with the products in question:
 
-			Alcatel-Lucent, Enterprise Solutions Division
-		       (Formerly Alcatel Internetworking, Incorporated)
+			    Alcatel-Lucent Enterprise,
 			       26801 West Agoura Road
 			    Agoura Hills, CA  91301-5122
 			      United States Of America
 
-	    Telephone:               North America  +1 800 995 2696
-				     Latin America  +1 877 919 9526
-				     Europe         +31 23 556 0100
-				     Asia           +65 394 7933
-				     All Other      +1 818 878 4507
-
-	    Electronic Mail:         support@ind.alcatel.com
-	    World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-	    File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+	    Telephone:               +1 800 995 2696 
+ 				               
+	    Electronic Mail:         ebg_global_supportcenter@al-enterprise.com
+	    World Wide Web:          https://www.al-enterprise.com"
+ 
 	DESCRIPTION
 	    "This module describes an authoritative enterprise-specific Simple
              Network Management Protocol (SNMP) Management Information Base (MIB):
 
-                 For the Birds Of Prey Product Line
+                 For the OmniSwitch Product Line
                  User Sessions Manager Subsystem.
 
              The right to make changes in specification and other information
@@ -54,9 +50,14 @@ alcatelIND1SessionMgrMIB MODULE-IDENTITY
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
 
-                         Copyright (C) 1995-2007 Alcatel-Lucent
+                         Copyright (C) ALE USA Inc. 2014-2019
+			 Copyright (C) 1995-2013 Alcatel-Lucent
                              ALL RIGHTS RESERVED WORLDWIDE"
-	::= { softentIND1Sesmgr 1}
+	
+             REVISION      "201910070000Z"
+             DESCRIPTION
+                 "Updated the latest contact and Copyright information for ALE USA Inc."
+             ::= { softentIND1Sesmgr 1}
 
     alcatelIND1SessionMgrMIBObjects OBJECT-IDENTITY
         STATUS current
@@ -86,7 +87,6 @@ alcatelIND1SessionMgrMIB MODULE-IDENTITY
         ::= { alcatelIND1SessionMgrMIBConformance 2 }
 
     sessionMgr  OBJECT IDENTIFIER ::= { alcatelIND1SessionMgrMIBObjects 1 }
-
 -- Session configuration table
 
 	sessionConfigTable  OBJECT-TYPE
@@ -110,7 +110,9 @@ alcatelIND1SessionMgrMIB MODULE-IDENTITY
 	    sessionType			INTEGER,
 	    sessionBannerFileName	DisplayString,
 	    sessionInactivityTimerValue	INTEGER,
-	    sessionDefaultPromptString	DisplayString
+	    sessionDefaultPromptString	DisplayString,
+	    sessionDefaultPromptSysName Integer32,
+		sessionDefaultPromptSuffix	DisplayString
 	    }
 
 	sessionType  OBJECT-TYPE
@@ -156,7 +158,26 @@ alcatelIND1SessionMgrMIB MODULE-IDENTITY
             DEFVAL  { "-> " }
 	    ::= { sessionConfigEntry 4 }
 
+	sessionDefaultPromptSysName  OBJECT-TYPE
+	    SYNTAX  Integer32(0..1)
+	    MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "Prompt system-name.
+                For CLI sessions only."
+            DEFVAL  { 0 }
+	    ::= { sessionConfigEntry 5 }
 
+	sessionDefaultPromptSuffix  OBJECT-TYPE
+	    SYNTAX  DisplayString (SIZE (0..31))
+	    MAX-ACCESS  read-write
+	    STATUS  current
+	    DESCRIPTION
+		"Prompt Suffix.
+		For CLI sessions only."
+            DEFVAL  { "" }
+	    ::= { sessionConfigEntry 6 }
+		
 -- Session active table
 
 	sessionActiveTable  OBJECT-TYPE
@@ -280,7 +301,7 @@ alcatelIND1SessionMgrMIB MODULE-IDENTITY
 
 	sessionRowStatus  OBJECT-TYPE
 	    SYNTAX  RowStatus
-	    MAX-ACCESS  read-write
+	    MAX-ACCESS  read-create
 	    STATUS  current
 	    DESCRIPTION
 		"The status of this table entry.
@@ -343,15 +364,85 @@ alcatelIND1SessionMgrMIB MODULE-IDENTITY
             DEFVAL  { disable }
 	    ::= { sessionMgr 6 }
 
+-- Session Access table
+        sessionAccessTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF SessionAccessEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "The configuration parameters of a service."
+            ::= { sessionMgr 7 }
+        sessionAccessEntry  OBJECT-TYPE
+            SYNTAX  SessionAccessEntry
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                "An entry of the session Access table."
+            INDEX { sessionServiceType }
+            ::= { sessionAccessTable 1 }
+        SessionAccessEntry ::= SEQUENCE {
+            sessionServiceType                 INTEGER,
+            sessionReauthInterval	       Integer32
+            }
+        sessionServiceType  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                console (1),
+                telnet (2),
+                ftp (3),
+		http (4),
+                ssh (5),
+		https (6)
+            }
+            MAX-ACCESS read-only
+	    STATUS  current
+            DESCRIPTION
+                "The type of the service."
+            ::= { sessionAccessEntry 1 }
+       sessionReauthInterval	 OBJECT-TYPE
+           SYNTAX  Integer32(0 .. 60)
+           UNITS   "minutes"
+           MAX-ACCESS  read-write
+           STATUS  current
+           DESCRIPTION
+                 "reauth-interval defines the authentication refresh period for the session. Reauth-interval of 0 indicates re-authentication disabled for that session."
+           DEFVAL { 5 }
+             ::= { sessionAccessEntry 2 }
+
+-- Console CLI session enable/disable for Zero Touch Priovisioning 
+ 
+		sessionConsoleStatus OBJECT-TYPE
+			SYNTAX  INTEGER {
+				enable(1),
+				disable(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+					"Enable or disable Console CLI shell"
+				DEFVAL  { enable }
+				::= { sessionMgr 8 }
 
 
+-- CLI auto complete space
+
+      sessionCliAutoCompleteSpace OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 enable(1),
+                 disable(2)
+         }
+         MAX-ACCESS  read-write
+         STATUS  current
+         DESCRIPTION
+            "This object is used to enable or diable the cli automation
+             using space key. Default is disabled."
+         DEFVAL { disable }
+         ::= { sessionMgr 9 }
 --
 -- Trap description
 --
 
 switchMgtTrapsDesc  OBJECT IDENTIFIER ::= { switchMgtTraps 1 }
 switchMgtTrapsObj  OBJECT IDENTIFIER ::= { switchMgtTraps 2 }
-
     sessionAuthenticationTrap  NOTIFICATION-TYPE
         OBJECTS {
 	    sessionAccessType,
@@ -364,6 +455,7 @@ switchMgtTrapsObj  OBJECT IDENTIFIER ::= { switchMgtTraps 2 }
 	    "Authentication Failure Trap is sent each time a user
 	    authentication is refused."
 	::= {switchMgtTrapsDesc 0 1 }
+
 
 --
 -- Object used in the trap
@@ -393,7 +485,8 @@ switchMgtTrapsObj  OBJECT IDENTIFIER ::= { switchMgtTraps 2 }
             {
                 sessionConfigGroup,
                 sessionActiveGroup,
-                sessionTrapsGroup
+                sessionTrapsGroup,
+                sessionAccessGroup
             }
 
         ::= { alcatelIND1SessionMgrMIBCompliances 1 }
@@ -409,7 +502,9 @@ switchMgtTrapsObj  OBJECT IDENTIFIER ::= { switchMgtTraps 2 }
 	    sessionType,           -- Session configuration table
 	    sessionBannerFileName,
 	    sessionInactivityTimerValue,
-	    sessionDefaultPromptString
+	    sessionDefaultPromptString,
+	    sessionDefaultPromptSysName,
+		sessionDefaultPromptSuffix
         }
         STATUS  current
         DESCRIPTION
@@ -444,6 +539,30 @@ switchMgtTrapsObj  OBJECT IDENTIFIER ::= { switchMgtTraps 2 }
         DESCRIPTION
             "Collection of Traps for management of users sessions."
         ::= { alcatelIND1SessionMgrMIBGroups 3 }
+    
+sessionAccessGroup OBJECT-GROUP
+        OBJECTS
+        {
+            sessionReauthInterval
+	}
+        STATUS  current
+        DESCRIPTION
+            "Conformance object for sessionAccessGroup."
+        ::= { alcatelIND1SessionMgrMIBGroups 4 }
+
+sessionMgrGroup OBJECT-GROUP
+	OBJECTS
+	{
+		sessionLoginTimeout,
+		sessionLoginAttempt,
+		sessionCliCommandLogEnable,
+		sessionXonXoffEnable,
+		sessionConsoleStatus
+	}
+	STATUS  current
+	DESCRIPTION
+		"Collection of objects for Session Manager global configuration."
+	::= { alcatelIND1SessionMgrMIBGroups 5 }
 
 
 END

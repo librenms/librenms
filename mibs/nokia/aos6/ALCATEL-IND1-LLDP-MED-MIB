@@ -7,38 +7,33 @@ ALCATEL-IND1-LLDP-MED-MIB DEFINITIONS ::= BEGIN
 		PolicyAppType, Dscp	FROM LLDP-EXT-MED-MIB
 		MODULE-COMPLIANCE, OBJECT-GROUP
 							FROM SNMPv2-CONF
-		RowStatus, TruthValue		FROM SNMPv2-TC
+		RowStatus, TruthValue,DisplayString     FROM SNMPv2-TC
+		lldpPortConfigEntry     FROM LLDP-MIB 
 		softentIND1LldpMed	FROM ALCATEL-IND1-BASE;
 
 
 	alcatelIND1LLDPMEDMIB MODULE-IDENTITY
-		LAST-UPDATED "200908110000Z"
-		ORGANIZATION "Alcatel-Lucent"
+		LAST-UPDATED "201910070000Z"
+		ORGANIZATION "ALE USA Inc"
 		CONTACT-INFO
 			"Please consult with Customer Service to insure the most appropriate
 			version of this document is used with the products in question:
 
-			Alcatel-Lucent, Enterprise Solutions Division
-			(Formerly Alcatel Internetworking, Incorporated)
+			Alcatel-Lucent Enterprise, 		
 			26801 West Agoura Road
 			Agoura Hills, CA  91301-5122
 			United States Of America
 
-			Telephone:				North America  +1 800 995 2696
-								Latin America  +1 877 919 9526
-								Europe         +31 23 556 0100
-								Asia           +65 394 7933
-								All Other      +1 818 878 4507
-
-			Electronic Mail:		support@ind.alcatel.com
-			World Wide Web:			http://alcatel-lucent.com/wps/portal/enterprise
-			File Transfer Protocol:	ftp://ftp.ind.alcatel.com/pub/products/mibs"
+			Telephone:                      +1 800 995 2696 
+ 				              
+			Electronic Mail:		ebg_global_supportcenter@al-enterprise.com
+			World Wide Web:			https://www.al-enterprise.com"
 
 		DESCRIPTION
 			"This module describes an authoritative enterprise-specific Simple
 			Network Management Protocol (SNMP) Management Information Base (MIB):
 
-			For the Birds Of Prey Product Line
+			For the OmniSwitch Product Line
 			LLDP MED Management Information base for Media Endpoint Discovery Information.
 
 			The right to make changes in specification and other information
@@ -52,13 +47,15 @@ ALCATEL-IND1-LLDP-MED-MIB DEFINITIONS ::= BEGIN
 			non-exclusive license to use this specification in connection with
 			management of the products for which it is intended to be used.
 
-			Copyright (C) 1995-2009 Alcatel-Lucent, Incorporated
+			Copyright (C) ALE USA Inc. 2014-2019
+			Copyright (C) 1995-2013 Alcatel-Lucent
 			ALL RIGHTS RESERVED WORLDWIDE"
 
-		REVISION	"200908110000Z"
+		REVISION	"201910070000Z"
 
 		DESCRIPTION
-			"LLDP MED - ALCATEL-LUCENT proprietary MIB"
+			"LLDP MED - ALCATEL-LUCENT Enterprise proprietary MIB. 
+                         Updated the latest contact and Copyright information for ALE USA Inc."
 		::= { softentIND1LldpMed 1}
 
 ----------------------------------------------------------------
@@ -73,6 +70,83 @@ ALCATEL-IND1-LLDP-MED-MIB DEFINITIONS ::= BEGIN
 
 -- This MIB contains the following groups
 	alaLldpMedLocMediaPolicyAttributes OBJECT IDENTIFIER ::= { alcatelIND1LLDPMEDMIBObjects 1}
+    alaLldpProprietaryAttributes OBJECT IDENTIFIER ::= { alcatelIND1LLDPMEDMIBObjects 2}
+
+ ----------------------------------------------------------------
+ -- LLDP Proprietary MIB
+ ----------------------------------------------------------------
+ 
+         alaLldpPropConfigTable OBJECT-TYPE
+             SYNTAX      SEQUENCE OF AlaLldpPropConfigEntry
+             MAX-ACCESS  not-accessible
+             STATUS      current
+             DESCRIPTION
+                     "A table that controls the transmission of AP Location TLVs."
+             ::= { alaLldpProprietaryAttributes 1 }
+ 
+         alaLldpPropConfigEntry OBJECT-TYPE
+             SYNTAX      AlaLldpPropConfigEntry
+             MAX-ACCESS  not-accessible
+             STATUS      current
+             DESCRIPTION
+                     "LLDP configuration information that controls the
+                     transmission of IEEE 802.1 organizationally defined AP 
+                     Location TLV on LLDP transmission capable ports.
+ 
+                     This configuration object augments the
+                     lldpPortConfigEntry of the LLDP-MIB, therefore it is only
+                     present along with the port configuration defined by the
+                     associated lldpPortConfigEntry entry.
+ 
+                     Each active lldpConfigEntry is restored from non-volatile
+                     storage (along with the corresponding
+                     lldpPortConfigEntry) after a re-initialization of the
+                     management system."
+              AUGMENTS { lldpPortConfigEntry }
+              ::= { alaLldpPropConfigTable 1 }
+ 
+         AlaLldpPropConfigEntry ::= SEQUENCE {
+             alaLldpPropAPLocation  TruthValue,
+	     alaLldpPropVlan	       Integer32,
+	     alaLldpPropLocationDesc DisplayString 
+         }
+ 
+         alaLldpPropAPLocation OBJECT-TYPE
+             SYNTAX      TruthValue
+             MAX-ACCESS  read-write
+             STATUS      current
+             DESCRIPTION
+                     "The alaLldpPropAPLocation, which is defined
+                     as a truth value and configured by the network management,
+                     determines whether the organizationally defined
+                     Access Point Location transmission is allowed on a given LLDP
+                     transmission capable port.
+ 
+                     The value of this object is restored from non-volatile
+                     storage after a re-initialization of the management system."
+             DEFVAL  { false }
+             ::= { alaLldpPropConfigEntry 1 }
+
+         alaLldpPropVlan OBJECT-TYPE
+             SYNTAX      Integer32 
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                     "The alaLldpPropVlan is the Vlan in which AP is connected.	 
+	             It represents the Management Vlan information if the AP is connected	 
+       		     to a dot1x port or it denotes the default vlan of the port."
+             ::= { alaLldpPropConfigEntry 2 }
+
+         alaLldpPropLocationDesc OBJECT-TYPE
+             SYNTAX      DisplayString (SIZE (0..255))
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                     "The alaLldpPropLocationDesc describes the AP Location,	 
+		     which may be portAlias, system Location, system Name or	 
+	             default location (chassis ID + port Number), to which the	 
+       		     AP is connected." 
+             ::= { alaLldpPropConfigEntry 3 }
 
 ----------------------------------------------------------------
        
@@ -125,7 +199,7 @@ ALCATEL-IND1-LLDP-MED-MIB DEFINITIONS ::= BEGIN
 	}
 	
 	alaLldpXMedLocMediaPolicyId	OBJECT-TYPE
-	    SYNTAX	Integer32
+	    SYNTAX	Integer32 (1..2147483647)
 	    MAX-ACCESS	not-accessible
 	    STATUS      current
 	    DESCRIPTION

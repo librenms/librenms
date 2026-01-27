@@ -13,33 +13,29 @@ ALCATEL-IND1-LBD-MIB DEFINITIONS ::= BEGIN
 
 
                 alcatelIND1LBDMIB MODULE-IDENTITY
-                LAST-UPDATED "200812100000Z"
-                ORGANIZATION "Alcatel - Architects Of An Internet World"
+                LAST-UPDATED "201910070000Z"
+                ORGANIZATION "ALE USA Inc"
                 CONTACT-INFO
                 "Please consult with Customer Service to insure the most appropriate
                 version of this document is used with the products in question:
 
-                        Alcatel Internetworking, Incorporated
-                        (Division 1, Formerly XYLAN Corporation)
+                        Alcatel-Lucent Enterprise,                   
                         26801 West Agoura Road
                         Agoura Hills, CA  91301-5122
                         United States Of America
 
-                        Telephone:      North America  +1 800 995 2696
-                                        Latin America  +1 877 919 9526
-                                        Europe         +31 23 556 0100
-                                        Asia           +65 394 7933
-                                        All Other      +1 818 878 4507
+                Telephone:              +1 800 995 2696 
+ 				    	 
 
-                Electronic Mail:         support@ind.alcatel.com
-                World Wide Web:          http://www.ind.alcatel.com
-                File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+                Electronic Mail:        ebg_global_supportcenter@al-enterprise.com
+                World Wide Web:         https://www.al-enterprise.com"
+		
 
                 DESCRIPTION
                         "This module describes an authoritative enterprise-specific Simple
                         Network Management Protocol (SNMP) Management Information Base (MIB):
 
-                        For the Birds Of Prey Product Line
+                        For the OmniSwitch Product Line
                         LBD for detection loopback.
 
                         The right to make changes in specification and other information
@@ -53,7 +49,8 @@ ALCATEL-IND1-LBD-MIB DEFINITIONS ::= BEGIN
                         non-exclusive license to use this specification in connection with
                         management of the products for which it is intended to be used.
 
-                        Copyright (C) 1995-2002 Alcatel Internetworking, Incorporated
+                        Copyright (C) ALE USA Inc. 2014-2019
+ 			Copyright (C) 1995-2013 Alcatel-Lucen
                         ALL RIGHTS RESERVED WORLDWIDE"
 
                 REVISION      "200812100000Z"
@@ -64,6 +61,10 @@ ALCATEL-IND1-LBD-MIB DEFINITIONS ::= BEGIN
 			a loopback detection exists due to any physical or logical problem. In case 
 			such problem, it shall take appropriate measures for the port based upon the 
 			configured mode of operation and raise a trap to the user."
+
+                REVISION      "201910070000Z"
+                DESCRIPTION
+                	"Updated the latest contact and Copyright information for ALE USA Inc."
                 ::= { softentIND1Lbd 1}
 
 -- --------------------------------------------------------------
@@ -437,7 +438,8 @@ ALCATEL-IND1-LBD-MIB DEFINITIONS ::= BEGIN
 			alaLbdPortStatusGroup,
 			alaLbdStateTrapToShutdownGroup,
 			alaLbdStateTrapForClearViolationAllGroup,
-			alaLbdStateTrapForAutoRecoveryGroup
+			alaLbdStateTrapForAutoRecoveryGroup,
+			alaLbdTrapsGroup
 		}
    		::= { alcatelIND1LBDMIBCompliances 1 }
 
@@ -515,6 +517,18 @@ ALCATEL-IND1-LBD-MIB DEFINITIONS ::= BEGIN
                         "Collection of objects for LBD State Traps due to
 			auto-recovery mechanism."
 		::= { alcatelIND1LBDMIBGroups 6 }
+
+		alaLbdTrapsGroup NOTIFICATION-GROUP
+        	NOTIFICATIONS
+        	{
+			alaLbdStateChangeForAutoRecovery ,	
+			alaLbdStateChangeForClearViolationAll,
+			alaLbdStateChangeToShutdown
+		}
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { alcatelIND1LBDMIBGroups 7 }
 			
 -- -------------------------------------------------------------
 

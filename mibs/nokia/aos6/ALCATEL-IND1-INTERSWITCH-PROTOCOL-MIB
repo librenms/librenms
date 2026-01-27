@@ -18,33 +18,28 @@ ALCATEL-IND1-INTERSWITCH-PROTOCOL-MIB DEFINITIONS ::= BEGIN
 			;
 
         alcatelIND1InterswitchProtocolMIB MODULE-IDENTITY
-                LAST-UPDATED "200704030000Z"
-                ORGANIZATION "Alcatel-Lucent"
+                LAST-UPDATED "201910070000Z"
+                ORGANIZATION "ALE USA Inc"
                 CONTACT-INFO
             "Please consult with Customer Service to ensure the most appropriate
              version of this document is used with the products in question:
 
-                        Alcatel-Lucent, Enterprise Solutions Division
-                       (Formerly Alcatel Internetworking, Incorporated)
+                        Alcatel-Lucent Enterprise, 
                                26801 West Agoura Road
                             Agoura Hills, CA  91301-5122
                               United States Of America
 
-            Telephone:               North America  +1 800 995 2696
-                                     Latin America  +1 877 919 9526
-                                     Europe         +31 23 556 0100
-                                     Asia           +65 394 7933
-                                     All Other      +1 818 878 4507
-
-            Electronic Mail:         support@ind.alcatel.com
-            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+            Telephone:                +1 800 995 2696 
+ 				     
+            Electronic Mail:          ebg_global_supportcenter@al-enterprise.com 
+            World Wide Web:           https://www.al-enterprise.com"
+           
 
                 DESCRIPTION
                         "This module describes an authoritative enterprise-specific Simple
              Network Management Protocol (SNMP) Management Information Base (MIB):
 
-                 For the Birds Of Prey Product Line
+                 For the OmniSwitch Product Line
                  Health Monitoring for dissemination of resource consumption information.
 
              The right to make changes in specification and other information
@@ -58,12 +53,20 @@ ALCATEL-IND1-INTERSWITCH-PROTOCOL-MIB DEFINITIONS ::= BEGIN
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
 
-                         Copyright (C) 1995-2007 Alcatel-Lucent
-                             ALL RIGHTS RESERVED WORLDWIDE"
+ 				Copyright (C) ALE USA Inc. 2014-2019                        
+ 				Copyright (C) 1995-2013 Alcatel-Lucent
+                                ALL RIGHTS RESERVED WORLDWIDE"
+		REVISION      "201105060000Z"
+		DESCRIPTION
+			"Added OmniSwitch 6450 Series Product Type in aipAMAPRemDeviceType." 
 
-                REVISION      "200704030000Z"
-        DESCRIPTION
-            "Addressing discrepancies with Alcatel Standard."
+		REVISION      "200902210000Z"
+		DESCRIPTION
+			"Added OmniSwitch 6250 Series Product Type in aipAMAPRemDeviceType." 
+
+                REVISION      "201910070000Z"
+                DESCRIPTION
+                        "Updated the latest contact and Copyright information for ALE USA Inc."
                 ::= { softentIND1Aip 1 }
 
 alcatelIND1InterswitchProtocolMIBObjects OBJECT IDENTIFIER ::= { alcatelIND1InterswitchProtocolMIB 1 }
@@ -294,6 +297,17 @@ aipAMAPcommontime OBJECT-TYPE
 	DEFVAL	{ 300 }
 	::= { aipAMAPconfig 3 }
 
+aipAMAPportstatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enable  (1),
+                disable (2)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION "Current state of the AMAP port."
+        DEFVAL  { enable }
+        ::= { aipAMAPconfig 10 }
+
 -- AMAP Trap elements *********************
 
 aipAMAPLastTrapReason OBJECT-TYPE
@@ -452,9 +466,9 @@ aipAMAPRemDeviceType OBJECT-TYPE
 	omniSwitch9600      (4),
 	omniSwitch9700	    (5),
 	omniSwitch9800	    (6),
-	omniSwitch9600E     (7),
-	omniSwitch9700E     (8),
-	omniSwitch9800E     (9),
+	-- omniSwitch9600E     (7),
+	-- omniSwitch9700E     (8),
+	-- omniSwitch9800E     (9), 
 	omniSwitch8800      (10),
 	omniSwitch6624      (20),
 	omniSwitch6648      (21),
@@ -467,6 +481,9 @@ aipAMAPRemDeviceType OBJECT-TYPE
 	omniSwitch6850-24   (34),
 	omniSwitch6850-48   (35),
 	omniSwitch6850-24Fiber (36),
+	-- omniSwitch6850E24   (37),
+	-- omniSwitch6850E48   (38),
+	-- omniSwitch6850E24Fiber (39),
 	omniSwitch5slotXOS  (40),
 	omniSwitch9slotXOS  (41),
 	omniSwitchRouterXOS (42),
@@ -485,17 +502,29 @@ aipAMAPRemDeviceType OBJECT-TYPE
 	omniAccess280       (62),
 	ipPhone             (70),
 	omniPCX4400         (71),
-    omniSwitch6855-14   (72),
+        omniSwitch6855-14   (72),
 	omniSwitch6855-U10  (73),
 	omniSwitch6855-24   (74),
 	omniSwitch6855-U24  (75),
-    omniSwitch6424      (76),
-    omniSwitch6448      (77),
-    omniSwitch6424Fiber (78),
-	omniSwitch6855-U24X	(79),
-        omniSwitch62508ME   (80),
-        omniSwitch625024ME  (81),
-        omniSwitch625024SMB (82),
+        omniSwitch6424      (76),
+        omniSwitch6448      (77),
+        omniSwitch6424Fiber (78),
+  	omniSwitch6855-U24X (79),
+	omniSwitch62508ME   (80),
+	omniSwitch625024ME  (81),
+	omniSwitch625024SMB (82),
+	omniSwitch645010    (87), --Kingfisher2
+	omniSwitch6450645024  (88),
+	omniSwitch6450645024U (89),
+	omniSwitch645048   (90),
+	omniSwitch6250U24M (91),
+	omniSwitch645024SF (92),
+	omniSwitch645048SF (93),
+	omniSwitch6450S10  (94),
+	omniSwitch635024   (95),
+	omniSwitch6350P24  (96),
+	omniSwitch635048   (97),
+	omniSwitch6350P48  (98),
 	omniSwitch6200-MIXED-STACK    (214),
 	omniSwitch6224     (215),
 	omniSwitch6224P    (216),
@@ -637,6 +666,24 @@ aipLLDPConfigManAddrTlvTxEnable	OBJECT-TYPE
     DEFVAL  { false }
     ::= { aipLLDPConfigManAddrEntry 2 }
 
+-- ------------------------
+-- Global objects for LLDP 
+-- ------------------------
+
+aipLLDPDestMac  OBJECT-TYPE
+    SYNTAX INTEGER
+				{
+					nearestBridge(1),
+					nearestEdge(2)
+				}
+    MAX-ACCESS  read-write
+	STATUS      current
+	    DESCRIPTION
+		"This object specifies LLDP destination mac address on global level. 
+		The default value for this object is nearestBridge(1)."
+	DEFVAL { nearestBridge }
+	::= { aipLLDPConfig 2 }
+
 
 -- AIP Conformance
 
@@ -674,6 +721,7 @@ aipAMAPConfGroup OBJECT-GROUP
 	aipAMAPstate,
 	aipAMAPdisctime,
 	aipAMAPcommontime,
+	aipAMAPportstatus,
 	aipAMAPLastTrapReason,
 	aipAMAPLastTrapPort,
 	aipAMAPLocalConnectionIndex,
@@ -703,6 +751,23 @@ aipNotificationGroup NOTIFICATION-GROUP
             "A collection of notifications for signaling AIP events."
     ::= { alcatelIND1InterswitchProtocolMIBGroups 3 }
 
+aipLLDPConfGroup OBJECT-GROUP
+    OBJECTS {
+		aipLLDPDestMac
+			}
+	 STATUS      current
+	     DESCRIPTION
+		 	"A collection of LLDP Global Objects."
+	::= { alcatelIND1InterswitchProtocolMIBGroups 4 }
+
+aipLLDPConfigManAddrEntryGroup OBJECT-GROUP
+    OBJECTS {
+        aipLLDPConfigManAddrTlvTxEnable
+    }
+    STATUS      current
+    DESCRIPTION
+        "LLDP configuration information Group."
+    ::= { alcatelIND1InterswitchProtocolMIBGroups 5 }
 
 
 alcatelIND1InterswitchProtocolMIBCompliance MODULE-COMPLIANCE
@@ -715,7 +780,9 @@ alcatelIND1InterswitchProtocolMIBCompliance MODULE-COMPLIANCE
         MANDATORY-GROUPS {
             aipGMAPConfGroup,
             aipAMAPConfGroup,
-	    aipNotificationGroup
+            aipNotificationGroup,
+	    aipLLDPConfGroup,
+            aipLLDPConfigManAddrEntryGroup
         }
 
     ::= { alcatelIND1InterswitchProtocolMIBCompliances 1 }

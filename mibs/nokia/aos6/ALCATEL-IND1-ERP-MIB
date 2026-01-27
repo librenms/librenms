@@ -4,7 +4,7 @@ ALCATEL-IND1-ERP-MIB DEFINITIONS ::= BEGIN
                 Counter32, Unsigned32, MODULE-IDENTITY, OBJECT-IDENTITY,
                 NOTIFICATION-TYPE, OBJECT-TYPE, TimeTicks, Integer32
                                         FROM SNMPv2-SMI
-                InterfaceIndex          FROM IF-MIB
+                InterfaceIndexOrZero, InterfaceIndex          FROM IF-MIB
                 VlanId                  FROM Q-BRIDGE-MIB
                 MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
                                         FROM SNMPv2-CONF
@@ -14,33 +14,28 @@ ALCATEL-IND1-ERP-MIB DEFINITIONS ::= BEGIN
 
 
         alcatelIND1ERPMIB MODULE-IDENTITY
-                LAST-UPDATED "200807100000Z"    --      07/10/2008 00:00 GMT
-                ORGANIZATION "Alcatel-Lucent"
+                LAST-UPDATED "201910070000Z"          
+                ORGANIZATION "ALE USA Inc"
                 CONTACT-INFO
                 "Please consult with Customer Service to insure the most appropriate
                 version of this document is used with the products in question:
 
-                Alcatel-Lucent, Enterprise Solutions Division
-                (Formerly Alcatel Internetworking, Incorporated)
+                Alcatel-Lucent Enterprise, 
                 26801 West Agoura Road
                 Agoura Hills, CA  91301-5122
                 United States Of America
 
-                Telephone:              North America  +1 800 995 2696
-                                        Latin America  +1 877 919 9526
-                                        Europe         +31 23 556 0100
-                                        Asia           +65 394 7933
-                                        All Other      +1 818 878 4507
-
-                Electronic Mail:         support@ind.alcatel.com
-                World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-                File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+                Telephone:               +1 800 995 2696 
+ 				     
+                Electronic Mail:         ebg_global_supportcenter@al-enterprise.com 
+                World Wide Web:          https://www.al-enterprise.com"
+                
 
                 DESCRIPTION
                         "This module describes an authoritative enterprise-specific Simple
                         Network Management Protocol (SNMP) Management Information Base (MIB):
 
-                        For the Birds Of Prey Product Line
+                        For the OmniSwitch Product Line
                         ERP Switching is protection switching mechanism for ETH Layer Ethernet Ring
                         topologies.
 
@@ -55,19 +50,25 @@ ALCATEL-IND1-ERP-MIB DEFINITIONS ::= BEGIN
                         non-exclusive license to use this specification in connection with
                         management of the products for which it is intended to be used.
 
-                        Copyright (C) 1995-2008 Alcatel-Lucent, Incorporated
+                        Copyright (C) ALE USA Inc. 2014-2019
+                        Copyright (C) 1995-2013 Alcatel-Lucent
                         ALL RIGHTS RESERVED WORLDWIDE"
 
-                REVISION      "200807100000Z"
+		REVISION      "200807100000Z"
+		
+		DESCRIPTION
+			"The ERP MIB defines a set of ERP related management objects for ports
+			that support Ethernet Ring Protection (ERP) Switching Protocol for ETH
+			Layer Ring Topologies. With this, rapid protection switching of 50ms can
+			be achieved.
+
+			This MIB comprises proprietary managed objects as well the objects required
+			for conforming to the protocol."	
+
+                REVISION      "201910070000Z"
 
                 DESCRIPTION
-                        "The ERP MIB defines a set of ERP related management objects for ports
-                        that support Ethernet Ring Protection (ERP) Switching Protocol for ETH
-                        Layer Ring Topologies. With this, rapid protection switching of 50ms can
-                        be achieved.
-
-                        This MIB comprises proprietary managed objects as well the objects required
-                        for conforming to the protocol."
+                        "Updated the latest contact and Copyright information for ALE USA Inc."
        ::= { softentIND1Erp 1}
 
 -- This MIB contains the following groups
@@ -184,11 +185,11 @@ alaErpRingEntry OBJECT-TYPE
     ::= { alaErpRingTable 1 }
 
 AlaErpRingEntry ::= SEQUENCE {
-      alaErpRingId                      INTEGER,
+      alaErpRingId                      Integer32,
       alaErpRingServiceVid              VlanId,
       alaErpRingMEGLevel                AlaErpRingMEGLevel,
       alaErpRingPort1                   InterfaceIndex,
-      alaErpRingPort2                   InterfaceIndex,
+      alaErpRingPort2                   InterfaceIndexOrZero,
       alaErpRingStatus                  INTEGER,
       alaErpRingState                   INTEGER,
       alaErpRingWaitToRestoreTimer      Unsigned32,
@@ -196,11 +197,16 @@ AlaErpRingEntry ::= SEQUENCE {
       alaErpRingClearStats              INTEGER,
       alaErpRingLastStateChange         TimeStamp,
       alaErpRingTimeToRevert            TimeTicks,
-      alaErpRingRowStatus               RowStatus
+      alaErpRingRowStatus               RowStatus,
+      alaErpRingVirtualChannel          INTEGER,
+      alaErpRingRevertive               INTEGER,
+      alaErpRingClearAction             INTEGER,
+      alaErpRingActiveVersion           Unsigned32,
+      alaErpRingResetVersionFallback    INTEGER
     }
 
 alaErpRingId OBJECT-TYPE
-    SYNTAX      INTEGER (1 .. 2147483647)
+    SYNTAX      Integer32 (1 .. 2147483647)
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION
@@ -245,7 +251,7 @@ alaErpRingPort1 OBJECT-TYPE
     ::= { alaErpRingEntry 4 }
 
 alaErpRingPort2 OBJECT-TYPE
-    SYNTAX      InterfaceIndex
+    SYNTAX      InterfaceIndexOrZero
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -278,7 +284,11 @@ alaErpRingState OBJECT-TYPE
     SYNTAX      INTEGER
                 {
                   idle (0),
-                  protection (1)
+                  protection (1),
+                  init (2),
+                  manualSwitch (3),
+                  forcedSwitch (4),
+                  pending      (5)
                 }
     MAX-ACCESS  read-only
     STATUS              current
@@ -362,6 +372,65 @@ alaErpRingRowStatus OBJECT-TYPE
         is active. All columns must have a valid value before a row
         can be activated."
     ::= { alaErpRingEntry 13 }
+
+alaErpRingVirtualChannel OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                  enabled(1),
+                  disabled(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "A Integer value indicating whether the ring is operating with the
+        Virtual channel enabled or not."
+    DEFVAL  { enabled }
+    ::= { alaErpRingEntry 14 }
+alaErpRingRevertive OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                  enabled(1),
+                  disabled(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "A Integer value indicating whether the ring is operating with the
+        revertive mode enabled or not "
+    DEFVAL  { enabled }
+    ::= { alaErpRingEntry 15 }
+alaErpRingClearAction OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                  default(0),
+                  reset(1)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "Defines clear action for ERP ring
+        The value reset(1) will give CLEAR action to ERP state machine"
+    DEFVAL  { default }
+    ::= { alaErpRingEntry 16 }
+alaErpRingActiveVersion OBJECT-TYPE
+     SYNTAX      Unsigned32 ( 1 .. 2)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This object indicates active ERP Ring protocol version."
+     ::= { alaErpRingEntry 17 }
+alaErpRingResetVersionFallback OBJECT-TYPE
+     SYNTAX      INTEGER
+                 {
+                   default(0),
+                   reset(1)
+                 }
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Resets ERP running protocol"
+     DEFVAL  { default }
+     ::= { alaErpRingEntry 18 }
 
 -- ******************************************************************
 -- The ERP RING Port Table
@@ -502,7 +571,7 @@ alaErpRingVlanProtectedVid OBJECT-TYPE
 
 alaErpRingVlanRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
-    MAX-ACCESS  read-create
+    MAX-ACCESS  not-accessible 
     STATUS      current
     DESCRIPTION
        "The status of the row.
@@ -725,6 +794,7 @@ alaErpGlobalGroup OBJECT-GROUP
 alaErpRingAttributesGroup OBJECT-GROUP
    OBJECTS
    {
+        alaErpRingId,
         alaErpRingServiceVid,
         alaErpRingMEGLevel,
         alaErpRingPort1,
@@ -737,12 +807,14 @@ alaErpRingAttributesGroup OBJECT-GROUP
         alaErpRingLastStateChange,
         alaErpRingTimeToRevert,
         alaErpRingRowStatus,
+        alaErpRingVirtualChannel,
+        alaErpRingRevertive,
+        alaErpRingClearAction,
         alaErpRingPortStatus,
         alaErpRingPortType,
         alaErpRingPortEthOAMEvent,
         alaErpRingPortClearStats,
         alaErpRingPortRmepId,
-        alaErpRingVlanRowStatus,
         alaErpStatsSignalFailPduTx,
         alaErpStatsSignalFailPduRx,
         alaErpStatsSignalFailPduDrop,
@@ -752,7 +824,9 @@ alaErpRingAttributesGroup OBJECT-GROUP
         alaErpStatsRPLBlockPDUTx,
         alaErpStatsRPLBlockPDURx,
         alaErpStatsRPLBlockPDUDrop,
-        alaErpStatsPDUErr
+        alaErpStatsPDUErr,
+        alaErpRingActiveVersion,
+        alaErpRingResetVersionFallback
    }
    STATUS      current
    DESCRIPTION

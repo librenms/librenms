@@ -17,33 +17,28 @@ ALCATEL-IND1-DHCP-SRV-MIB DEFINITIONS ::= BEGIN
 
 
                 alcatelIND1DhcpSrvMIB MODULE-IDENTITY
-                LAST-UPDATED "200812100000Z"
-                ORGANIZATION "Alcatel - Architects Of An Internet World"
+                LAST-UPDATED "201910070000Z"
+                ORGANIZATION "ALE USA Inc"
                 CONTACT-INFO
                 "Please consult with Customer Service to insure the most appropriate
                 version of this document is used with the products in question:
 
-                        Alcatel Internetworking, Incorporated
-                        (Division 1, Formerly XYLAN Corporation)
-                        26801 West Agoura Road
-                        Agoura Hills, CA  91301-5122
+                        Alcatel-Lucent Enterprise
+                         26801 West Agoura Road
+                       Agoura Hills, CA  91301-5122
                         United States Of America
 
-                        Telephone:      North America  +1 800 995 2696
-                                        Latin America  +1 877 919 9526
-                                        Europe         +31 23 556 0100
-                                        Asia           +65 394 7933
-                                        All Other      +1 818 878 4507
-
-                Electronic Mail:         support@ind.alcatel.com
-                World Wide Web:          http://www.ind.alcatel.com
-                File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+                Telephone:                +1 800 995 2696 
+ 				     
+                Electronic Mail:          ebg_global_supportcenter@al-enterprise.com 
+                World Wide Web:           https://www.al-enterprise.com"
+               
 
                 DESCRIPTION
                         "This module describes an authoritative enterprise-specific Simple
                         Network Management Protocol (SNMP) Management Information Base (MIB):
 
-                        For the Birds Of Prey Product Line
+                        For the OmniSwitch Product Line
                         DhcpSrv for dynamically assigning IP to clients.
 
                         The right to make changes in specification and other information
@@ -57,7 +52,8 @@ ALCATEL-IND1-DHCP-SRV-MIB DEFINITIONS ::= BEGIN
                         non-exclusive license to use this specification in connection with
                         management of the products for which it is intended to be used.
 
-                        Copyright (C) 1995-2002 Alcatel Internetworking, Incorporated
+                        Copyright (C) ALE USA Inc. 2014-2019
+                        Copyright (C) 1995-2013 Alcatel-Lucent
                         ALL RIGHTS RESERVED WORLDWIDE"
 
                 REVISION      "200910260000Z"
@@ -69,6 +65,10 @@ ALCATEL-IND1-DHCP-SRV-MIB DEFINITIONS ::= BEGIN
                         additional configuration options.
 
                         This MIB provides the configuration information for DHCP Server."
+
+                REVISION      "201910070000Z"
+                DESCRIPTION
+                        "Updated the latest contact and Copyright information for ALE USA Inc."
                 ::= { softentIND1DhcpSrv 1 }
 
 -- --------------------------------------------------------------
@@ -148,6 +148,28 @@ alaDhcpSrvGlobalClearStat OBJECT-TYPE
         DEFVAL  { default }
 ::= { alcatelIND1DhcpSrvMIBObjects 3 }
 
+alaDhcpSrvGlobalLeaseDeleteAll OBJECT-TYPE
+	SYNTAX INTEGER
+		{
+		 default(0),
+		 deleteall(1)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	 "This object is used to DeleteAll(1) the DHCP Server leases on the switch. Default value is
+	 default(0) which user can not set."
+	DEFVAL { default }
+::= { alcatelIND1DhcpSrvMIBObjects 6 }
+
+alaDhcpSrvGlobalLeaseDelete OBJECT-TYPE
+	 SYNTAX     IpAddress
+	 MAX-ACCESS read-write
+	 STATUS     current
+	 DESCRIPTION
+		"This is the IP address to be deleted from the lease entroes."
+	 DEFVAL { '00000000'h }
+	 ::= { alcatelIND1DhcpSrvMIBObjects  7 }
 -- --------------------------------------------------------------
 
 alaDhcpSrvLease OBJECT IDENTIFIER ::= { alcatelIND1DhcpSrvMIBObjects 4 }
@@ -189,7 +211,7 @@ alaDhcpSrvLeaseInetAddressType OBJECT-TYPE
 
 alaDhcpSrvLeaseInetAddress OBJECT-TYPE
         SYNTAX          InetAddress (SIZE(1 .. 16))
-        MAX-ACCESS      not-accessible 
+        MAX-ACCESS      not-accessible
         STATUS          current
         DESCRIPTION
             "This object specifies IP address assigned to the client."
@@ -288,7 +310,8 @@ alcatelIND1DhcpSrvMIBCompliance MODULE-COMPLIANCE
         {
                 alaDhcpSrvGlobalConfigGroup,
                 alaDhcpSrvLeaseGroup,
-                alaDhcpSrvNotificationGroup
+                alaDhcpSrvNotificationGroup,
+                alaDhcpSrvLeaseUtilizationThresholdGroup
         }
         ::= { alcatelIND1DhcpSrvMIBCompliances 1 }
 
@@ -329,6 +352,20 @@ alaDhcpSrvNotificationGroup NOTIFICATION-GROUP
         DESCRIPTION
             "Collection of objects for DHCP Server Trap information."
 ::= { alcatelIND1DhcpSrvMIBGroups 3 }
+
+alaDhcpSrvLeaseUtilizationThresholdGroup OBJECT-GROUP
+        OBJECTS
+        {
+        	alaDhcpSrvLeaseThresholdStatus,
+            alaDhcpSrvSubnetDescriptor
+        }
+        STATUS  current
+        DESCRIPTION
+            "When the lease utilization in a subnet exceeds or deceeds threshold
+                value set by the application, a notification is sent to the Management Entity,
+                with the DHCP Server lease utilization information."
+::= { alcatelIND1DhcpSrvMIBGroups 4 }
+
 
 -- -------------------------------------------------------------
 

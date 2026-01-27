@@ -21,33 +21,27 @@ IMPORTS
 		
  
 	alcatelIND1PortMirrorMonitoringMIB MODULE-IDENTITY
-		LAST-UPDATED "200704030000Z"
-		ORGANIZATION "Alcatel-Lucent"
+		LAST-UPDATED "201910070000Z"
+		ORGANIZATION "ALE USA Inc"
 		CONTACT-INFO
-            "Please consult with Customer Service to ensure the most appropriate
-             version of this document is used with the products in question:
+                  "Please consult with Customer Service to ensure the most appropriate
+                   version of this document is used with the products in question:
          
-                        Alcatel-Lucent, Enterprise Solutions Division
-                       (Formerly Alcatel Internetworking, Incorporated)
+                           Alcatel-Lucent Enterprise,               
                                26801 West Agoura Road
                             Agoura Hills, CA  91301-5122
                               United States Of America
         
-            Telephone:               North America  +1 800 995 2696
-                                     Latin America  +1 877 919 9526
-                                     Europe         +31 23 556 0100
-                                     Asia           +65 394 7933
-                                     All Other      +1 818 878 4507
-        
-            Electronic Mail:         support@ind.alcatel.com
-            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+            Telephone:               +1 800 995 2696 
+ 				                     
+            Electronic Mail:         ebg_global_supportcenter@al-enterprise.com
+            World Wide Web:          https://www.al-enterprise.com" 
 
 		DESCRIPTION
 			"This module describes an authoritative enterprise-specific Simple
              Network Management Protocol (SNMP) Management Information Base (MIB):
          
-                 For the Birds Of Prey Product Line
+                 For the OmniSwitch Product Line
 		 Port Mirroring and Monitoring for mirroring/monitoring session control
          
              The right to make changes in specification and other information
@@ -61,12 +55,13 @@ IMPORTS
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
          
-                         Copyright (C) 1995-2007 Alcatel-Lucent
-                             ALL RIGHTS RESERVED WORLDWIDE"
+                         Copyright (C) ALE USA Inc. 2014-2019
+			 Copyright (C) 1995-2013 Alcatel-Lucent
+                         ALL RIGHTS RESERVED WORLDWIDE"
 
-		REVISION      "200704030000Z"
-        DESCRIPTION
-            "Addressing discrepancies with Alcatel Standard."
+		REVISION      "201910070000Z"
+                DESCRIPTION
+                     "Updated the latest contact and Copyright information for ALE USA Inc."
      	        ::= { softentIND1PortMirroringMonitoring 1}
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -144,8 +139,10 @@ MirrorEntry ::= SEQUENCE {
 		INTEGER,
 	mirrorSessOperStatus
 		INTEGER,
-        mirrorTaggedVLAN
-                INTEGER
+    mirrorTaggedVLAN
+        INTEGER,
+	mirrorModeLoopback
+		INTEGER
 	}
 
 mirrorSessionNumber OBJECT-TYPE
@@ -159,7 +156,7 @@ mirrorSessionNumber OBJECT-TYPE
 
 mirrorMirroredIfindex  OBJECT-TYPE
 	SYNTAX  InterfaceIndex
-	MAX-ACCESS  read-write
+	MAX-ACCESS  read-create
 	STATUS deprecated 
 	DESCRIPTION
 		" This variable is deprecated and value will be ignored. Please use mirrorSrcTable
@@ -169,7 +166,7 @@ mirrorMirroredIfindex  OBJECT-TYPE
 
 mirrorMirroringIfindex  OBJECT-TYPE
 	SYNTAX  InterfaceIndex
-	MAX-ACCESS  read-write
+	MAX-ACCESS  read-create
 	STATUS  current
 	DESCRIPTION
 		" The physical identification number for this mirroring port instance (mirroring port)."
@@ -180,7 +177,7 @@ mirrorStatus  OBJECT-TYPE
 		off (1),
 		on (2)
 	}
-	MAX-ACCESS  read-write
+	MAX-ACCESS  read-create
 	STATUS  current
 	DESCRIPTION
 		"Whether mirroring is enabled or disabled for this port.
@@ -194,7 +191,7 @@ mirrorStatus  OBJECT-TYPE
 
 mirrorUnblockedVLAN OBJECT-TYPE
 	SYNTAX  INTEGER  (0..2147483647)
-	MAX-ACCESS read-write
+	MAX-ACCESS read-create
 	STATUS current
 	DESCRIPTION
 		"A VLAN identifier which specifies the VLAN identifier that must remain unblocked no matter what is the output of the spanning tree algorithm.Value 0 indicates this parameter is not set"
@@ -204,7 +201,7 @@ mirrorUnblockedVLAN OBJECT-TYPE
 
 mirrorRowStatus OBJECT-TYPE
 	 	SYNTAX  RowStatus
-		MAX-ACCESS  read-write
+		MAX-ACCESS  read-create
 		STATUS  current
 		DESCRIPTION
 		        "The status of this table entry.  
@@ -217,7 +214,7 @@ mirrorDirection  OBJECT-TYPE
 		outport (2),
 		bidirectional (3)
 	}
-	MAX-ACCESS  read-write
+	MAX-ACCESS  read-create
 	STATUS  deprecated
 	DESCRIPTION
 		 " This variable is deprecated and the value will be ignored.
@@ -240,13 +237,25 @@ mirrorSessOperStatus OBJECT-TYPE
 
 mirrorTaggedVLAN OBJECT-TYPE
         SYNTAX  INTEGER  (0..2147483647)
-        MAX-ACCESS read-write
+        MAX-ACCESS read-create
         STATUS current
         DESCRIPTION
                 "A VLAN identifier which specifies the VLAN identifier that must used to tag the mirrored packets going
 out of the MTP for remote port mirroring .Value 0 indicates this parameter is not set"
            ::= { mirrorEntry 9 }
 
+mirrorModeLoopback OBJECT-TYPE
+	SYNTAX  INTEGER {
+		enable (1)
+	}
+	MAX-ACCESS  read-create
+	STATUS  current
+	DESCRIPTION
+		 " To Enable loopback mechanism on the destination port of the respective 
+		 remote port mirroring session. To disable the loopback mechanism, remove the session completely."
+    DEFVAL  { enable }
+	    ::= { mirrorEntry 10 }		   
+		   
 -- xxxxxxxxxxxxxxxxxxx
 -- Mirror Source Table 
 -- xxxxxxxxxxxxxxxxxxx
@@ -297,7 +306,7 @@ mirrorSrcStatus  OBJECT-TYPE
 		disable (1),
 		enable (2)
 	}
-	MAX-ACCESS  read-write
+	MAX-ACCESS  read-create
 	STATUS  current
 	DESCRIPTION
 		"Whether mirroring is enabled or disabled for this port.
@@ -313,7 +322,7 @@ mirrorSrcDirection  OBJECT-TYPE
 		outport (2),
 		bidirectional (3)
 	}
-	MAX-ACCESS  read-write
+	MAX-ACCESS  read-create
 	STATUS  current
 	DESCRIPTION
 		 "Direction of mirroring on the source port of this entry."
@@ -322,7 +331,7 @@ mirrorSrcDirection  OBJECT-TYPE
 
 mirrorSrcRowStatus OBJECT-TYPE
 	 	SYNTAX  RowStatus
-		MAX-ACCESS  read-write
+		MAX-ACCESS  read-create
 		STATUS  current
 		DESCRIPTION
 		        "The status of this table entry.Row Status to control creation,
@@ -410,7 +419,7 @@ monitorTable OBJECT-TYPE
        
        monitorIfindex  OBJECT-TYPE
                SYNTAX  InterfaceIndex
-               MAX-ACCESS  read-write
+               MAX-ACCESS  read-create
                STATUS  current
                DESCRIPTION
                        "The physical identification number for this monitoring port instance."
@@ -422,7 +431,7 @@ monitorTable OBJECT-TYPE
                        off (1),
                        on (2)
                }
-               MAX-ACCESS read-write
+               MAX-ACCESS read-create
                STATUS current
                DESCRIPTION
                        "The status of the file option of a monitoring port instance (default off)"
@@ -431,7 +440,7 @@ monitorTable OBJECT-TYPE
        
        monitorFileName  OBJECT-TYPE
                SYNTAX  DisplayString(SIZE(0..255))
-               MAX-ACCESS  read-write
+               MAX-ACCESS  read-create
                STATUS  current 
                DESCRIPTION
                        "The name of the file in which the traffic will be stored (default PMONITOR.ENC)."
@@ -439,7 +448,7 @@ monitorTable OBJECT-TYPE
        
        monitorFileSize OBJECT-TYPE     
                SYNTAX  INTEGER  (1..2147483647)
-               MAX-ACCESS read-write
+               MAX-ACCESS read-create
                STATUS current
                DESCRIPTION
        "The number of  16384 ( 16K ) bytes allowed for the file. The file contains only the last monitorFileSize bytes of the current port monitoring instance (default 16384 bytes)." 
@@ -451,7 +460,7 @@ monitorTable OBJECT-TYPE
                        off (1),
                        on (2)
                }
-               MAX-ACCESS  read-write
+               MAX-ACCESS  read-create
                STATUS  current
                DESCRIPTION
                        "The status of the screen option of a monitoring port instance (default off)"
@@ -460,7 +469,7 @@ monitorTable OBJECT-TYPE
        
        monitorScreenLine  OBJECT-TYPE
                SYNTAX  INTEGER  (1..2147483647)
-               MAX-ACCESS  read-write
+               MAX-ACCESS  read-create
                STATUS  current
                DESCRIPTION
                        "The number of lines used when the screen option is activated (default 24)"
@@ -478,7 +487,7 @@ monitorTable OBJECT-TYPE
                        unibroad    (6),
                        multibroad  (7)
                }
-               MAX-ACCESS  read-write
+               MAX-ACCESS  read-create
                STATUS  current
                DESCRIPTION
                        "The type of traffic being monitored (default all)"
@@ -491,7 +500,7 @@ monitorTable OBJECT-TYPE
                        on  (2),
                        suspended (3)
                }
-               MAX-ACCESS  read-write
+               MAX-ACCESS  read-create
                STATUS  current
                DESCRIPTION
                        "The status of the port monitoring instance"
@@ -505,7 +514,7 @@ monitorTable OBJECT-TYPE
                        off (1),
                        on (2)
                }
-               MAX-ACCESS  read-write
+               MAX-ACCESS  read-create
                STATUS  current
                DESCRIPTION
                        "The status of the File Over Write option of a monitoring port instance (default on)"
@@ -517,7 +526,7 @@ monitorTable OBJECT-TYPE
                                 outport (2),
                                 bidirectional (3)
                        }
-                       MAX-ACCESS  read-write
+                       MAX-ACCESS  read-create
                        STATUS  current
                        DESCRIPTION
                                 "Direction of monitoring."
@@ -528,7 +537,7 @@ monitorTable OBJECT-TYPE
 
        monitorTimeout OBJECT-TYPE     
                SYNTAX  INTEGER  (0..2147483647)
-               MAX-ACCESS read-write
+               MAX-ACCESS read-create
                STATUS current
                DESCRIPTION
                        "The number of seconds allowed for this session before the session gets deleted.
@@ -539,7 +548,7 @@ monitorTable OBJECT-TYPE
 
        monitorRowStatus OBJECT-TYPE
                        SYNTAX  RowStatus
-                       MAX-ACCESS  read-write
+                       MAX-ACCESS  read-create
                        STATUS  current
                        DESCRIPTION
                                "The status of this table entry.  
@@ -764,31 +773,27 @@ mirrorUnlikeNi	NOTIFICATION-TYPE
                       user(2)
                  }   
            MAX-ACCESS read-write    
-           STATUS       obsolete 
+           STATUS        current    
            DESCRIPTION    
                   "The Agent Config Information    
                    1 -- Default    
-                   2 -- sFlow Interface IP Specified by User
-		   This object has been obsoleted. Use the alaIpManagedIntfEntry objects
-		   in AlcatelIND1Ip.mib"
+                   2 -- sFlow Interface IP Specified by User"    
            DEFVAL        { default }    
           ::= {  mirmonSFlowObjects 3}  
  
        alasFlowAgentAddressType OBJECT-TYPE
                SYNTAX      InetAddressType
                MAX-ACCESS  read-write
-               STATUS      obsolete 
+               STATUS      current
                DESCRIPTION
                  "The address type of the address associated with this agent.
-                  Only ipv4 and ipv6 types are supported.
-		  This object has been obsoleted. Use the alaIpManagedIntfEntry objects
-		  in AlcatelIND1Ip.mib"
+                  Only ipv4 and ipv6 types are supported."
                ::= { mirmonSFlowObjects 4}
  
        alasFlowAgentAddress OBJECT-TYPE   
            SYNTAX InetAddress   
            MAX-ACCESS  read-write   
-           STATUS      obsolete 
+           STATUS      current   
            DESCRIPTION   
                  "The IP address associated with this agent. In the case of a   
                   multi-homed agent, this should be the loopback address of the   
@@ -798,9 +803,7 @@ mirrorUnlikeNi	NOTIFICATION-TYPE
                   added or removed. A manager should be able to use the   
                   sFlowAgentAddress as a unique key that will identify this   
                   agent over extended periods of time so that a history can   
-                  be maintained.
-		  This object has been obsoleted. Use the alaIpManagedIntfEntry objects
-		  in AlcatelIND1Ip.mib"   
+                  be maintained."   
            ::= { mirmonSFlowObjects 5 }   
           
 
@@ -818,7 +821,8 @@ mirrorUnlikeNi	NOTIFICATION-TYPE
             {
                 portMirroringGroup,
                 portMonitoringGroup,
-                portNotificationVarsGroup 
+                portNotificationVarsGroup,
+                mirmonSFlowObjectsGroup 
             }
 
         ::= { alcatelIND1PortMirMonMIBCompliances 1 }
@@ -900,5 +904,19 @@ mirrorUnlikeNi	NOTIFICATION-TYPE
             "Collection of Traps for port mirroring and monitoring."
         ::= { alcatelIND1PortMirMonMIBGroups 4 }
 
+
+		mirmonSFlowObjectsGroup OBJECT-GROUP
+        OBJECTS
+        {
+        alasFlowAgentAddress,
+        alasFlowAgentAddressType,
+        alasFlowAgentConfigType ,
+        alasFlowCpDeleteEntry ,
+        alasFlowFsDeleteEntry 
+        }
+        STATUS  current
+        DESCRIPTION
+            "flow samplers within a device."
+        ::= { alcatelIND1PortMirMonMIBGroups 5 }
 
 	END

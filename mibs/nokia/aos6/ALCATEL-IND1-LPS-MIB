@@ -21,33 +21,27 @@ IMPORTS
 
 
 alcatelIND1LearnedPortSecurityMIB MODULE-IDENTITY
-    LAST-UPDATED "200704030000Z"
-    ORGANIZATION "Alcatel-Lucent, Enterprise Solutions Division"
+    LAST-UPDATED "201910070000Z"
+    ORGANIZATION "ALE USA Inc"
     CONTACT-INFO
      "Please consult with Customer Service to ensure the most appropriate
       version of this document is used with the products in question:
 
-                 Alcatel-Lucent, Enterprise Solutions Division
-                (Formerly Alcatel Internetworking, Incorporated)
+                     Alcatel-Lucent Enterprise,
                         26801 West Agoura Road
                      Agoura Hills, CA  91301-5122
                        United States Of America
 
-     Telephone:               North America  +1 800 995 2696
-                              Latin America  +1 877 919 9526
-                              Europe         +31 23 556 0100
-                              Asia           +65 394 7933
-                              All Other      +1 818 878 4507
+     Telephone:               +1 800 995 2696 
+ 				              
+     Electronic Mail:         ebg_global_supportcenter@al-enterprise.com
+     World Wide Web:          https://www.al-enterprise.com"
 
-     Electronic Mail:         support@ind.alcatel.com
-     World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-     File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
-    
      DESCRIPTION
        "This module describes an authoritative enterprise-specific Simple
         Network Management Protocol (SNMP) Management Information Base (MIB):
 
-        For the Birds Of Prey Product Line, this is the MIB module for
+        For the OmniSwitch Product Line, this is the MIB module for
         address learning mac addresses entity.
 
         The right to make changes in specification and other information
@@ -61,13 +55,17 @@ alcatelIND1LearnedPortSecurityMIB MODULE-IDENTITY
         non-exclusive license to use this specification in connection with
         management of the products for which it is intended to be used.
 
-                   Copyright (C) 1995-2007 Alcatel-Lucent
-                       ALL RIGHTS RESERVED WORLDWIDE"
+                   Copyright (C) ALE USA Inc. 2014-2019
+		   Copyright (C) 1995-2013 Alcatel-Lucent
+                   ALL RIGHTS RESERVED WORLDWIDE"
 
     REVISION      "200704030000Z"
-
     DESCRIPTION
         "The MIB module for Learned Port Security entity."
+
+    REVISION      "201910070000Z"
+    DESCRIPTION
+        "Updated the latest contact and Copyright information for ALE USA Inc."
     ::= { softentIND1MacAddress 2 }
 
 
@@ -128,11 +126,11 @@ learnedPortSecurityEntry  OBJECT-TYPE
 
 LearnedPortSecurityEntry ::=
     SEQUENCE {
+   lpsViolationOption
+  INTEGER,
  lpsMaxMacNum
   INTEGER,
- lpsViolationOption
-  INTEGER,
- lpsLoMacRange
+  lpsLoMacRange
   MacAddress,
  lpsHiMacRange
   MacAddress,
@@ -144,27 +142,30 @@ LearnedPortSecurityEntry ::=
   RowStatus,
  lpsRelease
   INTEGER,
- lpsMaxFilteredMacNum  
+ lpsMaxFilteredMacNum
   INTEGER,
  lpsLearnTrapThreshold
-  INTEGER
+  INTEGER,
+ lpsViolatingMac
+ MacAddress
 }
 
 lpsViolationOption OBJECT-TYPE
     SYNTAX   INTEGER {
     restrict (1),
-    shutdown (2)
+    shutdown (2),
+    discard (3)
     }
-    MAX-ACCESS   read-write
+    MAX-ACCESS   read-create
     STATUS   current
     DESCRIPTION
-    "The handle option for LPS violation "
+    "The handle option for LPS violation restrictt(1), Port will not learn any new Mac address & traffic for learned  MAC address will flow.shutdown(2), Admin-state of port shall be disabled.discard(3), Port will be in Discard state,all RX and TX packets shall be dropped, Admin-state of port shall be enabled"
     DEFVAL  {restrict}
     ::= { learnedPortSecurityEntry 1 }
 
 lpsMaxMacNum OBJECT-TYPE
-    SYNTAX   INTEGER ( 1 .. 100 )
-    MAX-ACCESS   read-write
+    SYNTAX   INTEGER ( 1 .. 1000 )
+    MAX-ACCESS   read-create
     STATUS   current
     DESCRIPTION
     "The maximum number of MAC addresses that the LPS port could learn."
@@ -173,30 +174,31 @@ lpsMaxMacNum OBJECT-TYPE
 
 lpsLoMacRange OBJECT-TYPE
     SYNTAX   MacAddress
-    MAX-ACCESS   read-write
-    STATUS   current
+    MAX-ACCESS  not-accessible 
+    STATUS   deprecated 
     DESCRIPTION
     "The low end of Mac range which is allowed to be learned on LPS
      port"
-    DEFVAL  {"00:00:00:00:00:00"}
+    DEFVAL  { '000000000000'H }
     ::= { learnedPortSecurityEntry 3 }
 
 lpsHiMacRange OBJECT-TYPE
     SYNTAX   MacAddress
-    MAX-ACCESS   read-write
-    STATUS   current
+    MAX-ACCESS  not-accessible 
+    STATUS   deprecated 
     DESCRIPTION
     "The high end of Mac range which is allowed to be learned on LPS
      port"
-    DEFVAL  {"ff:ff:ff:ff:ff:ff"}
+    DEFVAL  {'ffffffffffff'h}
     ::= { learnedPortSecurityEntry 4 }
 
 lpsAdminStatus OBJECT-TYPE
     SYNTAX   INTEGER {
     up (1),
-    down (2)
+    down (2),
+    locked(3)
     }
-    MAX-ACCESS   read-write
+    MAX-ACCESS   read-create
     STATUS   current
     DESCRIPTION
     "This object specifies the desired administrative state of
@@ -208,7 +210,8 @@ lpsOperStatus OBJECT-TYPE
     SYNTAX INTEGER {
     up(1),
     down(2),
-    securityViolated(3)
+    securityViolated(3),
+    locked(4)
     }
     MAX-ACCESS read-only
     STATUS current
@@ -220,7 +223,7 @@ lpsOperStatus OBJECT-TYPE
 
 lpsRowStatus OBJECT-TYPE
     SYNTAX   RowStatus
-    MAX-ACCESS   read-write
+    MAX-ACCESS   read-create
     STATUS   current
     DESCRIPTION
     "The RowStatus for this table."
@@ -231,7 +234,7 @@ lpsRelease OBJECT-TYPE
     SYNTAX INTEGER {
     release(1)
     }
-    MAX-ACCESS read-write
+    MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
       "This object causes the release of LPS port if it is in violated state."
@@ -239,23 +242,35 @@ lpsRelease OBJECT-TYPE
 
 lpsMaxFilteredMacNum OBJECT-TYPE
     SYNTAX   INTEGER ( 0 .. 100 )
-    MAX-ACCESS   read-write
+    MAX-ACCESS   read-create
     STATUS   current
     DESCRIPTION
-    "The maximum number of Filtered MAC addresses that the LPS port 
+    "The maximum number of Filtered MAC addresses that the LPS port
      could learn. The default is 5."
     DEFVAL  {5}
     ::= { learnedPortSecurityEntry 9 }
 
 lpsLearnTrapThreshold OBJECT-TYPE
-    SYNTAX   INTEGER ( 0 .. 100 )
-    MAX-ACCESS   read-write
+    SYNTAX   INTEGER ( 0 .. 1000 )
+    MAX-ACCESS   read-create
     STATUS   current
     DESCRIPTION
-    "When the number of bridged MACs learned matches this value, a trap will 
+    "When the number of bridged MACs learned matches this value, a trap will
      from then on be generated for every additional MAC that is learned."
     DEFVAL  {5}
     ::= { learnedPortSecurityEntry 10 }
+
+lpsViolatingMac OBJECT-TYPE
+    SYNTAX   MacAddress
+    MAX-ACCESS   read-only
+    STATUS   current
+    DESCRIPTION
+    "The MAC Address which caused the Violation on this Port.
+    This field is set when LPS port is in Violated state,
+    it is cleared when Port comes out of violation"
+    DEFVAL  { '000000000000'H }
+    ::= { learnedPortSecurityEntry 11 }
+
 
 
 --- Learned Port Security MacAddress MIB Table
@@ -294,7 +309,7 @@ LearnedPortSecurityMacAddressEntry ::=
 
 lpsMacAddress OBJECT-TYPE
     SYNTAX   MacAddress
-    MAX-ACCESS   read-write
+    MAX-ACCESS   read-only
     STATUS   deprecated
     DESCRIPTION
     "The MacAddress that is either configured or dynamically learnt on the LPS port.
@@ -316,7 +331,7 @@ lpsMacAddressLearnType OBJECT-TYPE
 
 lpsMacAddressRowStatus OBJECT-TYPE
     SYNTAX   RowStatus
-    MAX-ACCESS   read-write
+    MAX-ACCESS   read-create
     STATUS   deprecated
     DESCRIPTION
     "The RowStatus for this table.
@@ -329,7 +344,7 @@ lpsMacAddressRowStatus OBJECT-TYPE
 learnedPortSecurityGlobalGroup OBJECT IDENTIFIER ::= {alcatelIND1LearnedPortSecurityMIBObjects 3 }
 
 lpsLearningWindowTime OBJECT-TYPE
-    SYNTAX   INTEGER ( 0 .. 65536)
+    SYNTAX   INTEGER ( 0 .. 65535)
     MAX-ACCESS   read-write
     STATUS   current
     DESCRIPTION
@@ -346,7 +361,7 @@ lpsLearningWindowTimeWithStaticConversion OBJECT-TYPE
     STATUS   current
     DESCRIPTION
     "If it is enabled, when the learning window is expired, the dynamic MACs learned
-     on all LPS ports will be converted to static. It is configurable only when 
+     on all LPS ports will be converted to static. It is configurable only when
      the learning window is enabled."
     ::= { learnedPortSecurityGlobalGroup 2 }
 
@@ -366,10 +381,56 @@ lpsLearningWindowNoAging OBJECT-TYPE
 	              disable(2)
 	             }
     MAX-ACCESS   read-write
-    STATUS  obsolete 
+    STATUS  current
     DESCRIPTION
     "If it is enabled, all mac-address learnt on the port would be deferred from aging"
-    ::= { learnedPortSecurityGlobalGroup 4 }	 
+    ::= { learnedPortSecurityGlobalGroup 4 }	
+
+lpsLearningWindowBootupStatus  OBJECT-TYPE
+       SYNTAX   INTEGER {
+	              enable(1),
+	              disable(2)
+	             }
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+        "If it is enabled, Learning window will start at boot-up time"
+          ::= { learnedPortSecurityGlobalGroup 5 }
+
+lpsLearningWindowExpiryStatus  OBJECT-TYPE
+       SYNTAX   INTEGER {
+                      enable(1),
+                      disable(2)
+                     }   
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+        "If it is enabled Learning Window is Running, if Disabled Learning Window has Expired"
+          ::= { learnedPortSecurityGlobalGroup 6 } 
+
+ lpsLearningWindowLearnAsStatic OBJECT-TYPE
+       SYNTAX   INTEGER {
+            enable(1),
+            disable(2)
+        }
+       MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+       "If it is enabled, all mac-address learnt on the port would be directly converted to static"
+        DEFVAL  {disable} 
+        ::= { learnedPortSecurityGlobalGroup 7 }
+ 
+ lpsLearningWindowPseudoMacMove  OBJECT-TYPE
+       SYNTAX   INTEGER {
+            enable(1),
+            disable(2)
+        }
+       MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+       "If it is enabled, pseudo-static MACs will be subject to MAC move"
+        DEFVAL  {disable}
+        ::= { learnedPortSecurityGlobalGroup 8 }
 
 --- Learned Port Security L2 Mac Address MIB Table
 
@@ -394,20 +455,20 @@ learnedPortSecurityL2MacAddressEntry  OBJECT-TYPE
 
 LearnedPortSecurityL2MacAddressEntry ::=
     SEQUENCE {
- lpsL2VlanId  
+ lpsL2VlanId
   INTEGER,
  lpsL2MacAddress
   MacAddress,
  lpsL2MacAddressLearnType
   INTEGER,
  lpsL2MacAddressRowStatus
-  RowStatus 
+  RowStatus
 }
 
 
 lpsL2VlanId OBJECT-TYPE
     SYNTAX   INTEGER (0..4094)
-    MAX-ACCESS   read-write
+    MAX-ACCESS   not-accessible
     STATUS   current
     DESCRIPTION
     "The VLAN ID assigned to the packet; A value of 0 is allowed only while creating a row to use the default VLAN ID of the port."
@@ -415,7 +476,7 @@ lpsL2VlanId OBJECT-TYPE
 
 lpsL2MacAddress OBJECT-TYPE
     SYNTAX   MacAddress
-    MAX-ACCESS   read-write
+    MAX-ACCESS   not-accessible
     STATUS   current
     DESCRIPTION
     "The MacAddress that is either configured or dynamically learnt on the LPS port."
@@ -436,11 +497,71 @@ lpsL2MacAddressLearnType OBJECT-TYPE
 
 lpsL2MacAddressRowStatus OBJECT-TYPE
     SYNTAX   RowStatus
-    MAX-ACCESS   read-write
+    MAX-ACCESS   read-create
     STATUS   current
     DESCRIPTION
     "The RowStatus for this table."
     ::= { learnedPortSecurityL2MacAddressEntry 4 }
+
+
+
+--- A new MIB table is introduced in AlcatelIND1LPS.mib to support MAC range
+--- Learned Port Security L2 Mac Range MIB Table
+
+learnedPortSecurityL2MacRangeTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF LearnedPortSecurityL2MacRangeEntry
+    MAX-ACCESS    not-accessible
+    STATUS   current
+    DESCRIPTION
+        "A table contains Learned Port Security L2 Mac Range addresses."
+    ::= { alcatelIND1LearnedPortSecurityMIBObjects  5}
+
+learnedPortSecurityL2MacRangeEntry  OBJECT-TYPE
+    SYNTAX   LearnedPortSecurityL2MacRangeEntry
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+    "Definition of the Learned Port Security mac range table entries."
+    INDEX { ifIndex , lpsL2LowMacAddress, lpsL2HighMacAddress}
+    ::= { learnedPortSecurityL2MacRangeTable 1 }
+
+
+LearnedPortSecurityL2MacRangeEntry ::=
+    SEQUENCE {
+ lpsL2LowMacAddress
+  MacAddress,
+ lpsL2HighMacAddress
+  MacAddress,
+ lpsL2MacRangeRowStatus
+  RowStatus
+}
+
+lpsL2LowMacAddress OBJECT-TYPE
+    SYNTAX   MacAddress
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+    "The Low MacAddress is configured by the user on the LPS port for validation."
+    ::= { learnedPortSecurityL2MacRangeEntry 1 }
+
+
+lpsL2HighMacAddress OBJECT-TYPE
+    SYNTAX   MacAddress
+    MAX-ACCESS  not-accessible 
+    STATUS   current
+    DESCRIPTION
+    "The High MacAddress is configured by the user on the LPS port for validation."
+    ::= { learnedPortSecurityL2MacRangeEntry 2 }
+
+
+lpsL2MacRangeRowStatus OBJECT-TYPE
+    SYNTAX   RowStatus
+    MAX-ACCESS   read-create
+    STATUS   current
+    DESCRIPTION
+    "The RowStatus for this table."
+    ::= { learnedPortSecurityL2MacRangeEntry 3 }
+
 
 
 
@@ -466,7 +587,8 @@ lpsViolationTrap       NOTIFICATION-TYPE
       lpsTrapViolatingMac,
       lpsTrapViolationType,
       systemServicesDate,
-      systemServicesTime
+      systemServicesTime,
+      lpsTrapSwitchVlan
     }
     STATUS  current
     DESCRIPTION
@@ -484,7 +606,7 @@ lpsPortUpAfterLearningWindowExpiredTrap  NOTIFICATION-TYPE
     STATUS  current
     DESCRIPTION
         "When an LPS port joins or is enabled after the Learning Window is expired,
-         the MAC address learning on the port will be disabled, and this trap is 
+         the MAC address learning on the port will be disabled, and this trap is
          generated as a notification. This trap will also be generated at the time
 	 the Learning Window expires, with a slice and port value of 0"
     ::= { lpsTrapsDesc 0 2 }
@@ -494,9 +616,10 @@ lpsLearnMac  NOTIFICATION-TYPE
       lpsTrapSwitchName,
       lpsTrapSwitchSlice,
       lpsTrapSwitchPort,
-      lpsTrapSwitchVlan, 
+      lpsTrapSwitchVlan,
       systemServicesDate,
-      systemServicesTime
+      systemServicesTime,
+      lpsTrapBridgeMac
     }
     STATUS  current
     DESCRIPTION
@@ -509,8 +632,8 @@ lpsLearnMac  NOTIFICATION-TYPE
 
 -- Switch Name
 lpsTrapSwitchName        OBJECT-TYPE
-    SYNTAX                    DisplayString (SIZE (1..255))
-    MAX-ACCESS                read-only
+    SYNTAX                    DisplayString (SIZE (0..255))
+    MAX-ACCESS                accessible-for-notify
     STATUS                    current
     DESCRIPTION               "The name of the switch."
     ::= { lpsTrapsObj 1 }
@@ -518,7 +641,7 @@ lpsTrapSwitchName        OBJECT-TYPE
 -- Switch IP
 lpsTrapSwitchIpAddr       OBJECT-TYPE
     SYNTAX                IpAddress
-    MAX-ACCESS            read-only
+    MAX-ACCESS            accessible-for-notify
     STATUS                current
     DESCRIPTION           "The IP address of switch."
     ::= { lpsTrapsObj 2 }
@@ -526,7 +649,7 @@ lpsTrapSwitchIpAddr       OBJECT-TYPE
 -- Switch Slice
 lpsTrapSwitchSlice	OBJECT-TYPE
         SYNTAX          Integer32
-        MAX-ACCESS      read-only
+        MAX-ACCESS      accessible-for-notify
         STATUS          current
         DESCRIPTION     "The physical slice number for the LPS port on which
                          violation occured. "
@@ -535,7 +658,7 @@ lpsTrapSwitchSlice	OBJECT-TYPE
 -- Switch Port
 lpsTrapSwitchPort	OBJECT-TYPE
         SYNTAX          Integer32
-        MAX-ACCESS      read-only
+        MAX-ACCESS      accessible-for-notify
         STATUS          current
         DESCRIPTION     "The physical port number on which
                          violation occured. "
@@ -544,7 +667,7 @@ lpsTrapSwitchPort	OBJECT-TYPE
 -- Violating Mac Address
 lpsTrapViolatingMac	OBJECT-TYPE
         SYNTAX          MacAddress
-        MAX-ACCESS      read-only
+        MAX-ACCESS      accessible-for-notify
         STATUS          current
         DESCRIPTION     "The violating MAC address. "
     ::= { lpsTrapsObj 5 }
@@ -556,7 +679,7 @@ lpsTrapViolationType	OBJECT-TYPE
                                  macOutOfRange(2),
                                  macsLearnLimitReached(3)
                                 }
-    MAX-ACCESS          read-only
+    MAX-ACCESS          accessible-for-notify
     STATUS              current
     DESCRIPTION         "The type of violation that occured on the LPS port."
     ::= { lpsTrapsObj 6 }
@@ -564,12 +687,20 @@ lpsTrapViolationType	OBJECT-TYPE
 -- Switch VLAN
 lpsTrapSwitchVlan	OBJECT-TYPE
 	SYNTAX          Integer32
-        MAX-ACCESS      read-only
+        MAX-ACCESS      accessible-for-notify
         STATUS          current
         DESCRIPTION     "The VLAN number on which
                          violation occured. "
     ::= { lpsTrapsObj 7 }
 
+-- Switch Bridge MAC address
+lpsTrapBridgeMac       OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "The Bridge MAC address
+                         when learn trap threshold exceeds."
+    ::= { lpsTrapsObj 8 }
 
 
 
@@ -588,7 +719,10 @@ alcatelIND1LearnedPortSecurityMIBCompliance MODULE-COMPLIANCE
             learnedPortSecurityGroup,
             learnedPortSecurityMacAddressGroup,
             learnedPortSecurityGlobGroup,
-            learnedPortSecurityTrapsGroup
+            learnedPortSecurityTrapsGroup,
+            learnedPortSecurityTrapObjectsGroup,
+            learnedPortSecurityL2MacAddressGroup
+            
         }
     ::= { alcatelIND1LearnedPortSecurityMIBCompliances 1 }
 
@@ -602,13 +736,16 @@ learnedPortSecurityGroup OBJECT-GROUP
    {
         lpsViolationOption,
      	lpsMaxMacNum,
-     	lpsLoMacRange,
-     	lpsHiMacRange,
+     	-- lpsLoMacRange,
+     	-- lpsHiMacRange,
         lpsAdminStatus,
         lpsOperStatus,
      	lpsRowStatus,
       lpsRelease,
-      lpsMaxFilteredMacNum
+      lpsMaxFilteredMacNum,
+      lpsViolatingMac,
+      lpsLearnTrapThreshold
+
    }
    STATUS  current
    DESCRIPTION
@@ -634,7 +771,10 @@ learnedPortSecurityGlobGroup OBJECT-GROUP
       lpsLearningWindowTime,
       lpsLearningWindowTimeWithStaticConversion,
       lpsConvertToStatic,
-      lpsLearningWindowNoAging
+      lpsLearningWindowNoAging,
+      lpsLearningWindowBootupStatus,
+      lpsLearningWindowLearnAsStatic,
+      lpsLearningWindowPseudoMacMove
    }
    STATUS  current
    DESCRIPTION
@@ -645,7 +785,8 @@ learnedPortSecurityTrapsGroup NOTIFICATION-GROUP
    NOTIFICATIONS
    {
        lpsViolationTrap,
-       lpsPortUpAfterLearningWindowExpiredTrap
+       lpsPortUpAfterLearningWindowExpiredTrap,
+       lpsLearnMac
    }
    STATUS  current
    DESCRIPTION
@@ -656,12 +797,31 @@ learnedPortSecurityL2MacAddressGroup OBJECT-GROUP
    OBJECTS
    {
       lpsL2MacAddressLearnType,
-      lpsL2MacAddressRowStatus
+      lpsL2MacAddressRowStatus,
+      lpsMacAddressRowStatus
    }
    STATUS  current
    DESCRIPTION
         "Collection of objects for learned port security MacAddress table."
    ::= { alcatelIND1LearnedPortSecurityMIBGroups 5 }
+
+
+learnedPortSecurityTrapObjectsGroup OBJECT-GROUP
+   OBJECTS
+   {
+       lpsTrapBridgeMac,
+       lpsTrapSwitchIpAddr,
+       lpsTrapSwitchName,
+       lpsTrapSwitchPort,
+       lpsTrapSwitchSlice,
+       lpsTrapSwitchVlan,
+       lpsTrapViolatingMac,
+       lpsTrapViolationType
+   }
+   STATUS  current
+   DESCRIPTION
+        "Collection of notification Objects for learned port security."
+   ::= { alcatelIND1LearnedPortSecurityMIBGroups 6 }
 
 
 END

@@ -6,38 +6,35 @@ ALCATEL-IND1-E-SERVICE-MIB DEFINITIONS ::= BEGIN
                 OBJECT-IDENTITY,
 		OBJECT-TYPE, 
                 Integer32, Counter64	        FROM SNMPv2-SMI
+                Counter32	                    FROM SNMPv2-SMI
 		OBJECT-GROUP, 
                 MODULE-COMPLIANCE	        FROM SNMPv2-CONF
-		softentIND1eService    	FROM ALCATEL-IND1-BASE
+		softentIND1eService    	        FROM ALCATEL-IND1-BASE
 		RowStatus, 
                 TEXTUAL-CONVENTION,
                 DisplayString,
                 MacAddress			FROM SNMPv2-TC
 		InterfaceIndex 			FROM IF-MIB
+                SnmpAdminString                 FROM SNMP-FRAMEWORK-MIB
 		;
 
         alcatelIND1EServiceMIB MODULE-IDENTITY
-		LAST-UPDATED "201001200000Z"
-		ORGANIZATION "Alcatel-Lucent"
+		LAST-UPDATED "201910070000Z"
+		ORGANIZATION "ALE USA Inc"
 		CONTACT-INFO
                 "Please consult with Customer Service to ensure the most appropriate
                 version of this document is used with the products in question:
  	
-				                   Alcatel-Lucent, Enterprise Solutions Division
-			                    (Formerly Alcatel Internetworking, Incorporated)
+				                   Alcatel-Lucent Enterprise, 			                    	
 				                         26801 West Agoura Road
 			 	                       Agoura Hills, CA  91301-5122
 			      		                United States Of America
 	
-                Telephone:	    North America	+1 800 995 2696
-				                        Latin America 	+1 877 919 9526
-                                Europe		+31 23 556 0100
-                                Asia		+65 394 7933
-                                All Other	+1 818 878 4507
-	
-                Electronic Mail:	support@ind.alcatel.com
-                World Wide Web:		http://alcatel-lucent.com/wps/portal/enterprise
-                File Transfer Protocol:	ftp://ftp.ind.alcatel.com/pub/products/mibs"
+                Telephone:               +1 800 995 2696 
+ 				     	
+                Electronic Mail:	 ebg_global_supportcenter@al-enterprise.com 
+                World Wide Web:		 https://www.al-enterprise.com"
+               
                 DESCRIPTION
                 "The parameters for configuration of the E-Service feature.
 
@@ -52,20 +49,20 @@ ALCATEL-IND1-E-SERVICE-MIB DEFINITIONS ::= BEGIN
                 non-exclusive license to use this specification in connection with 
                 management of the products for which it is intended to be used.
 
-                               Copyright (C) 1995-2006 Alcatel-Lucent
-	                                 ALL RIGHTS RESERVED WORLDWIDE"
+ 					Copyright (C) ALE USA Inc. 2014-2019                               
+					Copyright (C) 1995-2013 Alcatel-Lucent
+	                                ALL RIGHTS RESERVED WORLDWIDE"
 
-		REVISION "201001200000Z"
-		DESCRIPTION
-			 "Added notAssigned value for objects alaEServiceSapProfilePriorityMapMode 
-			  	and alaEServiceSapProfileBandwidthShare."
-	
-		REVISION "200912160000Z"
+		REVISION     "201001190000Z"
 		DESCRIPTION
 			 "The below listed objects are made as read-create in 6.6.1.680.R01
 				  Post GA.
 				alaEServiceUNIProfile8021xTreatment, alaEServiceUNIProfile8021ABTreatment,
 				alaEServiceUNIProfile8023adTreatment & alaEServiceUNIProfileAmapTreatment."
+           
+               REVISION      "201910070000Z"
+	       DESCRIPTION
+                         "Updated the latest contact and Copyright information for ALE USA Inc."
 
 		::= { softentIND1eService 1}
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -87,9 +84,26 @@ AlaEServiceUNIProfileProtocolTreatment ::= TEXTUAL-CONVENTION
                 tunnel (1),
                 drop (2),
                 peer (3),
-		macTunnel (4)
+                macTunnel (4)
         }
 
+AlaEServiceL2CustomProtocolType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The type of the custom L2 protocol entry is defined by this mib object.
+         mask-type (1) - specifies a MAC+Mask entry
+         mac-type (2) - specifies a MAC alone entry
+         ssapdsap-type (3) - specifies a MAC+SSAP/DSAP+PID entry
+         ether-type (4) - specifies a MAC+ETHERTYPE entry."
+        SYNTAX   INTEGER
+        {
+                maskType (1),
+                macType (2),
+                ssapdsapType (3),
+                etherType (4),
+                ethersubType (5)
+        }
+        
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 alcatelIND1eServiceMIBObjects OBJECT-IDENTITY
@@ -144,21 +158,51 @@ alaEServiceMode  OBJECT-TYPE
 
 alaEServiceStatReset   OBJECT-TYPE
         SYNTAX  INTEGER
-        {
-                default(0),
-                reset(1)
-        }
-        MAX-ACCESS      read-write
+	{
+		default(0),
+		reset(1)
+	}
+	MAX-ACCESS      read-write
         STATUS  current
         DESCRIPTION
-        "Defines the global clear statistics control for ethernet-service
-        counters.
-        default(0) - default value for this object,
-        reset(1)   - indicates that all ethernet-service counters should be
-                     cleared."
-        DEFVAL  { default }
-        ::= { alaEServiceInfo 2 }
+	"Defines the global clear statistics control for ethernet-service 
+	counters.
+	default(0) - default value for this object,
+	reset(1)   - indicates that all ethernet-service counters should be 
+		     cleared."
+	DEFVAL  { default }
+  	::= { alaEServiceInfo 2 }	
 
+alaEServiceL2MacTunnel OBJECT-TYPE
+        SYNTAX  INTEGER
+	{
+		enable(1),
+		disable(2)
+	}
+	MAX-ACCESS      read-write
+        STATUS  current
+        DESCRIPTION
+	"Controls the layer 2 Mac tunnel globaly.
+	enable(1)  - MAC tunneling is enabled globally.
+	disable(2) - MAC tunneling is disabled globally."
+	DEFVAL  { enable }
+  	::= { alaEServiceInfo 3 }
+
+alaEServiceUntaggedMode OBJECT-TYPE
+                SYNTAX  INTEGER
+     	{
+      		enable(1),
+ 		disable(2)
+      	}
+      	MAX-ACCESS      read-write
+         STATUS  current
+           DESCRIPTION
+   	    "Controls the status of cvlan on untagged frames feature globally. 
+       	    enable(1)  - Untagged Mode is enabled globally.
+       	    disable(2) - Untagged Mode is disabled globally."
+        	DEFVAL  { disable }
+          	::= { alaEServiceInfo 4 }
+	
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 --   The E-Service SAP Profile Table
@@ -193,13 +237,13 @@ AlaEServiceSapProfileEntry ::= SEQUENCE
 		alaEServiceSapProfileIngressBW    		Integer32,
                 alaEServiceSapProfileBandwidthShare             INTEGER,
 		alaEServiceSapProfileRowStatus                  RowStatus,
-                alaEServiceSapProfileEgressBW                   Integer32,
-                alaEServiceSapProfileCIR                        Integer32,
-                alaEServiceSapProfileCBS                        Integer32,
-                alaEServiceSapProfilePIR                        Integer32,
-                alaEServiceSapProfilePBS                        Integer32
-
-        }
+		alaEServiceSapProfileEgressBW                   Integer32,
+		alaEServiceSapProfileCIR			Integer32,
+		alaEServiceSapProfileCBS			Integer32,
+		alaEServiceSapProfilePIR		 	Integer32,
+		alaEServiceSapProfilePBS			Integer32,
+		alaEServiceSapProfileDepth		        Integer32
+	}
 
 alaEServiceSapProfileID OBJECT-TYPE
         SYNTAX  DisplayString (SIZE (1..31))
@@ -238,7 +282,7 @@ alaEServiceSapProfileReplacementCVLAN  OBJECT-TYPE
 alaEServiceSapProfilePriorityMapMode  OBJECT-TYPE
         SYNTAX  INTEGER
         {
-		notAssigned(0),
+                notAssigned(0),
                 mapInnerPtoOuterP (1),
                 mapInnerDscpToOuterP(2),
                 fixedP (3)
@@ -247,13 +291,13 @@ alaEServiceSapProfilePriorityMapMode  OBJECT-TYPE
         STATUS  current
         DESCRIPTION
         "This object describes the source of the value for the priority field of the SVLAN 
-        802.1Q tag when pre-pended to the customer data frame.  If set to notAssigned(0), SAP 
-	priority limit parameter will not be effective, QoS priority settings needs to be 
-	configured. mapInnerPtoOuterP (1) uses the priority field of the incoming frame when 
-	tagged to fill in the priority field of the SVLAN tag. mapInnerDscpToOuterP (2) uses 
-	the frames priority bits in its IP DSCP field to fill in the priority field of the
-        SVLAN tag. FixedP (3) uses the supplied FixedPriorityValue to fill in the SVLAN tag 
-	priority bits."
+        802.1Q tag when pre-pended to the customer data frame. If set to notAssigned(0), SAP
+        priority limit parameter will not be effective, QoS priority settings needs to be
+        configured. MapInnerPtoOuterP (1) uses the priority field of the incoming frame when
+        tagged to fill in the priority field of the SVLAN tag. mapInnerDscpToOuterP (2) uses
+        the frames priority bits in its IP DSCP field to fill in the priority field of the
+        SVLAN tag. FixedP (3) uses the supplied FixedPriorityValue to fill in the SVLAN tag
+        priority bits."
         DEFVAL { fixedP }
         ::= { alaEServiceSapProfileEntry 4 }
 
@@ -284,8 +328,8 @@ alaEServiceSapProfileBandwidthShare  OBJECT-TYPE
 	        notApplicable(0),	
                 shared (1),
                 notShared(2),
-		notAssigned(3)
-        }
+                notAssigned(3)
+	}
         MAX-ACCESS  read-create
         STATUS  current
         DESCRIPTION
@@ -294,8 +338,8 @@ alaEServiceSapProfileBandwidthShare  OBJECT-TYPE
 	to Shared (1), all the ports that are part of the SAP will use aggregated
         bandwidth, sharing some part of the bandwidth limit. If set to notShared (2),
         each port will use its own bandwidth meter for this SAP. This value is not used
-        if ingressBandwidth is 0. If set to notAssigned(3), SAP bandwidth limit parameter 
-	will not be effective, QoS bandwith settings needs to be configured."
+        if ingressBandwidth is 0.If set to notAssigned(3), SAP bandwidth limit parameter
+        will not be effective, QoS bandwith settings needs to be configured."
         DEFVAL { shared }
         ::= { alaEServiceSapProfileEntry 7 }
 
@@ -305,53 +349,61 @@ alaEServiceSapProfileRowStatus OBJECT-TYPE
         STATUS  current
         DESCRIPTION
         "The status of this table entry."
-        ::= { alaEServiceSapProfileEntry 8 }
+        ::= { alaEServiceSapProfileEntry 8 }	
 
 alaEServiceSapProfileEgressBW  OBJECT-TYPE
         SYNTAX  Integer32
         MAX-ACCESS  read-create
         STATUS  current
         DESCRIPTION
-        "This object describes this limit of egress bandwidth for each UNI 
-        of the SAP to which this profile is applied. If 0, no bandwidth limit 
-        is applied.  This number represents traffic in units of Megabits per 
-        second. Note that all CVLAN that belong to this SAP will share this 
+        "This object describes this limit of egress bandwidth for each UNI
+        of the SAP to which this profile is applied. If 0, no bandwidth limit
+        is applied.  This number represents traffic in units of Megabits per
+        second. Note that all CVLAN that belong to this SAP will share this
         aggregated limit."
-        DEFVAL { 0 } 
+        DEFVAL { 0 }
         ::= { alaEServiceSapProfileEntry 9 }
 
 alaEServiceSapProfileCIR OBJECT-TYPE
-        SYNTAX      Integer32
-        MAX-ACCESS  read-create
-        STATUS      current
-        DESCRIPTION "Committed Information Rate - bandwidth values in bits per second."
-        DEFVAL      { 0 }
-        ::= { alaEServiceSapProfileEntry 10 }
+	SYNTAX      Integer32 
+	MAX-ACCESS  read-create
+	STATUS      current
+	DESCRIPTION "Committed Information Rate - bandwidth values in bits per second."
+	DEFVAL      { 0 }
+	::= { alaEServiceSapProfileEntry 10 }
 
 alaEServiceSapProfileCBS  OBJECT-TYPE
-        SYNTAX      Integer32
+        SYNTAX      Integer32 
         MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION "Committed Burst Size - bucket size in byte."
-        DEFVAL      { 0 }
-        ::= { alaEServiceSapProfileEntry 11 }
+	DEFVAL      { 0 }
+	::= { alaEServiceSapProfileEntry 11 }
 
 alaEServiceSapProfilePIR  OBJECT-TYPE
-        SYNTAX      Integer32
+        SYNTAX      Integer32 
         MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION "Peak Information Rate - bandwidth values in bits per second."
-        DEFVAL      { 0 }
+	DEFVAL      { 0 }
         ::= { alaEServiceSapProfileEntry 12 }
 
 alaEServiceSapProfilePBS  OBJECT-TYPE
-        SYNTAX      Integer32
+        SYNTAX      Integer32 
         MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION "Peak Burst Size - bucket size in byte."
+	DEFVAL      { 0 }
+	::= { alaEServiceSapProfileEntry 13 } 
+
+alaEServiceSapProfileDepth  OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the depth limit."
         DEFVAL      { 0 }
-        ::= { alaEServiceSapProfileEntry 13 }
-  
+        ::= { alaEServiceSapProfileEntry 14 }	
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 --   The E-Service UNI Profile Table
@@ -386,7 +438,7 @@ AlaEServiceUNIProfileEntry ::= SEQUENCE
 		alaEServiceUNIProfileGvrpTreatment		AlaEServiceUNIProfileProtocolTreatment,
 		alaEServiceUNIProfileAmapTreatment		AlaEServiceUNIProfileProtocolTreatment,
 		alaEServiceUNIProfileRowStatus                  RowStatus,
-                alaEServiceUNIProfileMvrpTreatment                AlaEServiceUNIProfileProtocolTreatment,
+		alaEServiceUNIProfileMvrpTreatment              AlaEServiceUNIProfileProtocolTreatment,
 		alaEServiceUNIProfileTunnelMac                  MacAddress,
                 alaEServiceUNIProfileLacpMarkerTreatment        AlaEServiceUNIProfileProtocolTreatment,
                 alaEServiceUNIProfileOamTreatment               AlaEServiceUNIProfileProtocolTreatment,
@@ -397,7 +449,8 @@ AlaEServiceUNIProfileEntry ::= SEQUENCE
                 alaEServiceUNIProfileCiscoDtpTreatment          AlaEServiceUNIProfileProtocolTreatment,
                 alaEServiceUNIProfileCiscoPvstTreatment         AlaEServiceUNIProfileProtocolTreatment,
                 alaEServiceUNIProfileCiscoVlanTreatment         AlaEServiceUNIProfileProtocolTreatment,
-                alaEServiceUNIProfileCiscoUplinkTreatment       AlaEServiceUNIProfileProtocolTreatment
+                alaEServiceUNIProfileCiscoUplinkTreatment       AlaEServiceUNIProfileProtocolTreatment,
+                alaEServiceUNIProfileIeeeMacTreatment           INTEGER
         }
 
 alaEServiceUNIProfileID OBJECT-TYPE
@@ -430,7 +483,8 @@ alaEServiceUNIProfile8021xTreatment  OBJECT-TYPE
         frames received on the UNI. Tunnel (1) enables the PDU to be tunneled across 
         the provider network.  Discard (2) causes the PDU of the protocol to be discarded 
         and not enter the provider network. Peer (3) means that on this port the bridge 
-        is to participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling."
+        is to participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling.
+        From 6.6.1.680.R01 Post GA, this object became read-create."
         DEFVAL { drop }
         ::= { alaEServiceUNIProfileEntry 3 }
 
@@ -443,7 +497,8 @@ alaEServiceUNIProfile8021ABTreatment  OBJECT-TYPE
         frames received on the UNI. Tunnel (1) enables the PDU to be tunneled across 
         the provider network.  Discard (2) causes the PDU of the protocol to be discarded 
         and not enter the provider network. Peer (3) means that on this port the bridge 
-        is to participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling." 
+        is to participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling. 
+        From 6.6.1.680.R01 Post GA, this object became read-create."
         DEFVAL { drop }
         ::= { alaEServiceUNIProfileEntry 4 }
 
@@ -456,7 +511,8 @@ alaEServiceUNIProfile8023adTreatment  OBJECT-TYPE
         frames received on the UNI. Tunnel (1) enables the PDU to be tunneled across 
         the provider network.  Discard (2) causes the PDU of the protocol to be discarded 
         and not enter the provider network. Peer (3) means that on this port the bridge 
-        is to participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling."
+        is to participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling.
+        From 6.6.1.680.R01 Post GA, this object became read-create."
         DEFVAL { peer }
         ::= { alaEServiceUNIProfileEntry 5 }
 
@@ -482,8 +538,8 @@ alaEServiceUNIProfileAmapTreatment  OBJECT-TYPE
         propietary AMAP PDU frames received on the UNI. Tunnel (1) enables the PDU to 
         be tunneled across the provider network.  Discard (2) causes the PDU of the 
         protocol to be discarded and not enter the provider network. Peer (3) means 
-        that on this port the bridge is to participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling.
-        Currenly mac-tunnel is not supported"
+        that on this port the bridge is to participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling. Currenly mac-tunnel is not supported.
+        From 6.6.1.680.R01 Post GA, this object became read-create."
         DEFVAL { drop }
         ::= { alaEServiceUNIProfileEntry 7 }
 
@@ -495,18 +551,18 @@ alaEServiceUNIProfileRowStatus OBJECT-TYPE
         "The status of this table entry."
         ::= { alaEServiceUNIProfileEntry 8 }	
 
-alaEServiceUNIProfileMvrpTreatment  OBJECT-TYPE	 
-         SYNTAX  AlaEServiceUNIProfileProtocolTreatment	 
-         MAX-ACCESS  read-create	 
-         STATUS  current	 
-         DESCRIPTION	 
-         "This object describes the behavior of the bridge in regards to the MVRP PDU 	 
-         frames received on the UNI. Tunnel (1) enables the PDU to be tunneled across 	 
-         the provider network.  Discard (2) causes the PDU of the protocol to be discarded 	 
-         and not enter the provider network. Peer (3) means that on this port the bridge 	 
-         is to participate in the protocol. Currently peer is not supported for MVRP"	 
-         DEFVAL { tunnel }	 
-         ::= { alaEServiceUNIProfileEntry 9 }
+alaEServiceUNIProfileMvrpTreatment  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the MVRP PDU
+        frames received on the UNI. Tunnel (1) enables the PDU to be tunneled across
+        the provider network.  Discard (2) causes the PDU of the protocol to be discarded
+        and not enter the provider network. Peer (3) means that on this port the bridge
+        is to participate in the protocol. Mac-Tunnel (4) enables mac-tunnelling."
+        DEFVAL { tunnel }
+        ::= { alaEServiceUNIProfileEntry 9 }
 
 alaEServiceUNIProfileTunnelMac OBJECT-TYPE
         SYNTAX MacAddress
@@ -515,7 +571,6 @@ alaEServiceUNIProfileTunnelMac OBJECT-TYPE
         DESCRIPTION
         "This object specifies the tunnel mac used to tunnel L2 protocol to NNI ports"
         ::= { alaEServiceUNIProfileEntry 10 }
-
 
 alaEServiceUNIProfileLacpMarkerTreatment  OBJECT-TYPE
         SYNTAX  AlaEServiceUNIProfileProtocolTreatment
@@ -655,6 +710,21 @@ alaEServiceUNIProfileCiscoUplinkTreatment OBJECT-TYPE
         DEFVAL { drop }
         ::= { alaEServiceUNIProfileEntry 20 }
 
+alaEServiceUNIProfileIeeeMacTreatment OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  unknown(0),
+                  ieeeFwdAll(1),
+                  ieeeDropAll(2)
+                }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the IEEEE Mac treatment
+        unknown (0) the type is not defined.
+        ieee-fwd-all(1) - Forwards all IEEE MAC's
+        ieee-drop-all(2) - Discards all IEEE MAC's."
+        DEFVAL { ieeeFwdAll }
+        ::= { alaEServiceUNIProfileEntry 21 }
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -686,9 +756,10 @@ AlaEServiceEntry ::=   SEQUENCE
 		alaEServiceSVLAN    		INTEGER,
                 alaEServiceVlanType             INTEGER,
 		alaEServiceRowStatus		RowStatus,
-                alaEServiceStatGreenCount       Counter64,
-                alaEServiceStatYellowCount      Counter64,
-                alaEServiceStatRedCount         Counter64
+		alaEServiceStatGreenCount       Counter64,
+		alaEServiceStatYellowCount      Counter64,
+		alaEServiceStatRedCount	 	Counter64,
+		alaEServiceStatTotalCount       Counter64
         }
 
 alaEServiceID  OBJECT-TYPE
@@ -733,30 +804,38 @@ alaEServiceRowStatus OBJECT-TYPE
 
 alaEServiceStatGreenCount  OBJECT-TYPE
         SYNTAX  Counter64
-        MAX-ACCESS  read-only
-        STATUS  current
+	MAX-ACCESS  read-only
+	STATUS  current
         DESCRIPTION
-        "Counter for the number of packets/bytes being Green compliant (i.e. in case of srTCM
-        and trTCM, packet is CIR/CBS compliant)."
-        ::= { alaEServiceEntry 5 }
+	"Counter for the number of packets/bytes being Green compliant (i.e. in case of srTCM
+	and trTCM, packet is CIR/CBS compliant)."
+	::= { alaEServiceEntry 5 }
 
 alaEServiceStatYellowCount  OBJECT-TYPE
         SYNTAX  Counter64
         MAX-ACCESS  read-only
         STATUS  current
         DESCRIPTION
-        "Counter for the number of packets/bytes being Yellow compliant (i.e. in case of srTCM
-        and trTCM, packet is PIR/PBS compliant)."
-        ::= { alaEServiceEntry 6 }
+	"Counter for the number of packets/bytes being Yellow compliant (i.e. in case of srTCM
+	and trTCM, packet is PIR/PBS compliant)."
+	::= { alaEServiceEntry 6 }
 
 alaEServiceStatRedCount  OBJECT-TYPE
-SYNTAX  Counter64
+        SYNTAX  Counter64
         MAX-ACCESS  read-only
         STATUS  current
         DESCRIPTION
-        "Counter for the number of packets/bytes being Red compliant (i.e. in case of srTCM
-        and trTCM, packet is neither CIR/CBS nor PIR/PBS compliant)."
-        ::= { alaEServiceEntry 7 }
+	"Counter for the number of packets/bytes being Red compliant (i.e. in case of srTCM
+        and trTCM, packet is neither CIR/CBS nor PIR/PBS compliant)." 
+	::= { alaEServiceEntry 7 } 
+
+alaEServiceStatTotalCount  OBJECT-TYPE
+        SYNTAX  Counter64 
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+	"Counter for the total number of packets/bytes (sum of Green, Yellow and Red counters)."
+	::= { alaEServiceEntry 8 } 
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -790,7 +869,7 @@ AlaEServiceSapEntry ::=   SEQUENCE
         }
 
 alaEServiceSapID  OBJECT-TYPE
-        SYNTAX Integer32 
+        SYNTAX Integer32 (1..2147483647)
         MAX-ACCESS  not-accessible
         STATUS  current
         DESCRIPTION
@@ -859,7 +938,7 @@ AlaEServiceSapCvlanEntry ::=   SEQUENCE
         }
 
 alaEServiceSapCvlanSapID  OBJECT-TYPE
-        SYNTAX Integer32 
+        SYNTAX Integer32 (1..2147483647)
         MAX-ACCESS  not-accessible
         STATUS  current
         DESCRIPTION
@@ -938,7 +1017,7 @@ AlaEServicePortEntry ::=   SEQUENCE
 		alaEServicePortLegacyGvrpPdu	INTEGER,
 		alaEServicePortUniProfile	DisplayString,
 		alaEServicePortTransBridging    INTEGER,
-                alaEServicePortLegacyMvrpPdu        INTEGER
+		alaEServicePortLegacyMvrpPdu        INTEGER
         }
 
 alaEServicePortID  OBJECT-TYPE
@@ -1020,32 +1099,31 @@ alaEServicePortUniProfile OBJECT-TYPE
 
 alaEServicePortTransBridging  OBJECT-TYPE
         SYNTAX  INTEGER
-        {
-                enable (1),
-                disable (2)
-        }
-        MAX-ACCESS  read-write
-        STATUS  current
-        DESCRIPTION
-        "The Transparent Bridging status for the nni Port."
-        DEFVAL { disable }
-        ::= { alaEServicePortEntry 7 }
+	{
+		enable (1),
+		disable (2)
+	}
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+	"The Transparent Bridging status for the nni Port."
+	DEFVAL { disable }
+	::= { alaEServicePortEntry 7 }
 
-alaEServicePortLegacyMvrpPdu  OBJECT-TYPE	 
-       SYNTAX  INTEGER	 
-       {	 
-               notApplicable (0),	 
-               enable (1),	 
-               disable (2)	 
-       }	 
-       MAX-ACCESS  read-write	 
-       STATUS  current	 
-       DESCRIPTION	 
-       "The legacy MVRP PDU treatment for this port if NNI. It defines the type of processing 	 
-        applied to MVRP PDUs on network ports. "	 
-       DEFVAL { disable }	 
-       ::= { alaEServicePortEntry 8 }	
-
+alaEServicePortLegacyMvrpPdu  OBJECT-TYPE	
+       SYNTAX  INTEGER	
+       {	
+               notApplicable (0),	
+               enable (1),	
+               disable (2)	
+       }	
+       MAX-ACCESS  read-write	
+       STATUS  current	
+       DESCRIPTION	
+       "The legacy MVRP PDU treatment for this port if NNI. It defines the type of processing 	
+        applied to MVRP PDUs on network ports. "	
+       DEFVAL { disable }	
+       ::= { alaEServicePortEntry 8 }
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 --  The E-Service SAP-UNI Binding Table 
@@ -1067,19 +1145,20 @@ alaEServiceSapUniEntry  OBJECT-TYPE
         STATUS  current
         DESCRIPTION
         "The list of SAP-UNI bindings being used by EService."
-        INDEX   { alaEServiceSapUniSap, alaEServiceSapUniUni}
+          INDEX   { alaEServiceSapUniSap, alaEServiceSapUniUni, alaEServiceSapUniCvlan }
         ::= { alaEServiceSapUniTable 1 }
         
 AlaEServiceSapUniEntry ::=   SEQUENCE 
         {
                 alaEServiceSapUniSap		Integer32,
                 alaEServiceSapUniUni	        InterfaceIndex,
-		alaEServiceSapUniRowStatus	RowStatus
+      		  alaEServiceSapUniRowStatus	RowStatus,
+		  alaEServiceSapUniCvlan      InterfaceIndex
         }
 
 
 alaEServiceSapUniSap  OBJECT-TYPE
-        SYNTAX Integer32 
+        SYNTAX Integer32 (1..2147483647)
         MAX-ACCESS  not-accessible
         STATUS  current
         DESCRIPTION
@@ -1102,6 +1181,14 @@ alaEServiceSapUniRowStatus OBJECT-TYPE
         "The status of this table entry. The supported value for set are 
         createAndGo (4) and destroy(6), to add or remove a binding"
         ::= { alaEServiceSapUniEntry 3 }
+
+alaEServiceSapUniCvlan  OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS  not-accessible
+             STATUS  current
+             DESCRIPTION
+                "Cvlan to be inserted for untagged frames incoming in this UNI Port if Cvlan insertion feature enabled else 0"
+                ::= { alaEServiceSapUniEntry 4 }
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -1174,76 +1261,76 @@ alaEServiceNniSvlanVpaType  OBJECT-TYPE
         controlled by STP."
         DEFVAL  { stp }
         ::= { alaEServiceNniSvlanEntry 4 }
-
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
---  The E-Service srTCM and trTCM Counter Statistics Table
+--  The E-Service srTCM and trTCM Counter Statistics Table 
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 alaEServiceSapCvlanPortStatTable OBJECT-TYPE
         SYNTAX  SEQUENCE OF  AlaEServiceSapCvlanPortStatEntry
-        MAX-ACCESS  not-accessible
+	MAX-ACCESS  not-accessible
         STATUS  current
         DESCRIPTION
-        "A statistics table that contains the counters per SAP."
-        ::= { alaEService 10 }
+	"A statistics table that contains the counters per SAP." 
+	::= { alaEService 10 }
 
 alaEServiceSapCvlanPortStatEntry OBJECT-TYPE
         SYNTAX  AlaEServiceSapCvlanPortStatEntry
-        MAX-ACCESS  not-accessible
+	MAX-ACCESS  not-accessible
         STATUS  current
         DESCRIPTION
-        "A E-Service Statistics Entry."
-        INDEX { alaEServiceSapCvlanPortStatSapID,
-                alaEServiceSapCvlanPortStatCvlanID,
-                alaEServiceSapCvlanPortStatPortID }
-        ::= { alaEServiceSapCvlanPortStatTable 1 }
+	"A E-Service Statistics Entry."
+	INDEX { alaEServiceSapCvlanPortStatSapID, 
+		alaEServiceSapCvlanPortStatCvlanID,
+		alaEServiceSapCvlanPortStatPortID }
+	::= { alaEServiceSapCvlanPortStatTable 1 }
 
 AlaEServiceSapCvlanPortStatEntry ::=   SEQUENCE
         {
-                alaEServiceSapCvlanPortStatSapID        Integer32,
-                alaEServiceSapCvlanPortStatCvlanID      INTEGER,
-                alaEServiceSapCvlanPortStatPortID       InterfaceIndex,
-                alaEServiceSapCvlanPortStatGreenCount   Counter64,
-                alaEServiceSapCvlanPortStatYellowCount  Counter64,
-                alaEServiceSapCvlanPortStatRedCount     Counter64
-        }
+		alaEServiceSapCvlanPortStatSapID        Integer32,
+		alaEServiceSapCvlanPortStatCvlanID      INTEGER,
+		alaEServiceSapCvlanPortStatPortID       InterfaceIndex,
+		alaEServiceSapCvlanPortStatGreenCount   Counter64,
+		alaEServiceSapCvlanPortStatYellowCount  Counter64,
+		alaEServiceSapCvlanPortStatRedCount     Counter64,
+		alaEServiceSapCvlanPortStatTotalCount   Counter64
+	}
 
 alaEServiceSapCvlanPortStatSapID OBJECT-TYPE
-        SYNTAX Integer32
+        SYNTAX Integer32 (1..2147483647)
         MAX-ACCESS  not-accessible
         STATUS  current
         DESCRIPTION
         "A Number given to uniquely identify the SAP."
-        ::= { alaEServiceSapCvlanPortStatEntry 1 }
+	::= { alaEServiceSapCvlanPortStatEntry 1 }
 
 alaEServiceSapCvlanPortStatCvlanID OBJECT-TYPE
         SYNTAX INTEGER (0..4094)
-        MAX-ACCESS  not-accessible
+	MAX-ACCESS  not-accessible
         STATUS  current
         DESCRIPTION
-        "This object is the CVLAN ID that this binding is targeted at.  The CVLAN ID
+	"This object is the CVLAN ID that this binding is targeted at.  The CVLAN ID
         may be 0, which indicates an all or untagged only mapping type."
-        ::= { alaEServiceSapCvlanPortStatEntry 2 }
+	::= { alaEServiceSapCvlanPortStatEntry 2 }
 
 alaEServiceSapCvlanPortStatPortID OBJECT-TYPE
-        SYNTAX InterfaceIndex
+	SYNTAX InterfaceIndex
         MAX-ACCESS  not-accessible
         STATUS  current
         DESCRIPTION
         "The IfIndex of this UNI Port."
-        ::= { alaEServiceSapCvlanPortStatEntry 3 }
+	::= { alaEServiceSapCvlanPortStatEntry 3 }
 
 alaEServiceSapCvlanPortStatGreenCount OBJECT-TYPE
-        SYNTAX  Counter64
+	SYNTAX  Counter64
         MAX-ACCESS  read-only
         STATUS  current
         DESCRIPTION
         "Counter for the number of packets/bytes being Green compliant (i.e. in case of srTCM
-        and trTCM, packet is CIR/CBS compliant) per UNI port, per CVLAN. This object is applicable
-        only when ingress bandwidth is not shared across SAP ports and CVLANs."
-        ::= { alaEServiceSapCvlanPortStatEntry 4 }
+        and trTCM, packet is CIR/CBS compliant) per UNI port, per CVLAN. This object is applicable 
+	only when ingress bandwidth is not shared across SAP ports and CVLANs."
+	::= { alaEServiceSapCvlanPortStatEntry 4 }
 
 alaEServiceSapCvlanPortStatYellowCount  OBJECT-TYPE
         SYNTAX  Counter64
@@ -1251,9 +1338,9 @@ alaEServiceSapCvlanPortStatYellowCount  OBJECT-TYPE
         STATUS  current
         DESCRIPTION
         "Counter for the number of packets/bytes being Yellow compliant (i.e. in case of srTCM
-        and trTCM, packet is PIR/PBS compliant) per UNI port, per CVLAN. This object is applicable
-        only when ingress bandwidth is not shared across SAP ports and CVLANs."
-        ::= { alaEServiceSapCvlanPortStatEntry 5 }
+        and trTCM, packet is PIR/PBS compliant) per UNI port, per CVLAN. This object is applicable 
+	only when ingress bandwidth is not shared across SAP ports and CVLANs."
+	::= { alaEServiceSapCvlanPortStatEntry 5 }
 
 alaEServiceSapCvlanPortStatRedCount  OBJECT-TYPE
         SYNTAX  Counter64
@@ -1261,10 +1348,765 @@ alaEServiceSapCvlanPortStatRedCount  OBJECT-TYPE
         STATUS  current
         DESCRIPTION
         "Counter for the number of packets/bytes being Red compliant (i.e. in case of srTCM
-        and trTCM, packet is neither CIR/CBS nor PIR/PBS compliant) per UNI port, per CVLAN.
-        This object is applicable only when ingress bandwidth is not shared across SAP
-        ports and CVLANs."
-        ::= { alaEServiceSapCvlanPortStatEntry 6 }
+        and trTCM, packet is neither CIR/CBS nor PIR/PBS compliant) per UNI port, per CVLAN. 
+	This object is applicable only when ingress bandwidth is not shared across SAP 
+	ports and CVLANs."
+	::= { alaEServiceSapCvlanPortStatEntry 6 }
+
+alaEServiceSapCvlanPortStatTotalCount  OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Counter for the total number of packets/bytes (sum of Green, Yellow and Red counters) per
+        UNI port, per CVLAN. This object is applicable only when ingress bandwidth is not shared across 
+	SAP ports and CVLANs."
+ 	::= { alaEServiceSapCvlanPortStatEntry 7 }
+	
+-- Added in 6.6.3.R01 *** Begin
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+-- The E-Service UNI Profile L2 Custom protocol association entries Table
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaEServiceUNIProfileL2CustomProtocolTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AlaEServiceUNIProfileL2CustomProtocolEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+        "A table that contains l2 custom protocol entries with name and action associated
+         to a uni profile. An entry in this table is created when an l2 custom protocol
+         entry is associated to uni profile."
+        ::= {alaEService 11}
+
+alaEServiceUNIProfileL2CustomProtocolEntry  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileL2CustomProtocolEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "An E-Service Service Profile entry associated with l2 custom protocol entry."
+        INDEX {alaEServiceL2CustomProtocolUNIProfileID, alaEServiceUNIProfileL2CustomProtocolID}
+        ::= {alaEServiceUNIProfileL2CustomProtocolTable 1}
+
+AlaEServiceUNIProfileL2CustomProtocolEntry ::= SEQUENCE 
+        {
+	   alaEServiceL2CustomProtocolUNIProfileID	  SnmpAdminString, 
+	   alaEServiceUNIProfileL2CustomProtocolID	  SnmpAdminString,
+	   alaEServiceUNIProfileL2CustomProtocolTreatment AlaEServiceUNIProfileProtocolTreatment,
+	   alaEServiceUNIProfileL2CustomProtocolRowStatus RowStatus
+        }
+
+alaEServiceL2CustomProtocolUNIProfileID OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (1..31))
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "A label given to uniquely identify this profile. Must be at least one character long."
+        ::= {alaEServiceUNIProfileL2CustomProtocolEntry  1}
+
+alaEServiceUNIProfileL2CustomProtocolID OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (1..32))
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "Name of the L2 Custom protocol entry associated to UNI profile. Must be at least
+        one character long."
+        ::= { alaEServiceUNIProfileL2CustomProtocolEntry  2 }
+
+alaEServiceUNIProfileL2CustomProtocolTreatment  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the destination Mac address
+        matching with the L2 Custom protocol entry mac address on the UNI. Tunnel (1) enables the
+        PDU to be tunneled across the provider network.  Discard (2) causes the PDU of the protocol
+        to be discarded and not enter the provider network. Peer (3) means that on this port the
+        bridge is to participate in the protocol. Mac-Tunnel (4) enables mac-tunneling."
+        DEFVAL {tunnel}
+        ::= { alaEServiceUNIProfileL2CustomProtocolEntry  3 }
+
+alaEServiceUNIProfileL2CustomProtocolRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "The status of this table entry."
+        ::= { alaEServiceUNIProfileL2CustomProtocolEntry  4 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+-- The E-Service L2 Custom protocol entries Table
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaEServiceL2CustomProtocolTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF  AlaEServiceL2CustomProtocolEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A table that contains l2 custom protocol entries with name, Mac address, mask,
+        ether type and ether sub type."
+        ::= { alaEService 12 }
+
+alaEServiceL2CustomProtocolEntry  OBJECT-TYPE
+        SYNTAX  AlaEServiceL2CustomProtocolEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "An E-Service Service with l2 custom protocol entry."
+        INDEX {alaEServiceL2CustomProtocolID }
+        ::= { alaEServiceL2CustomProtocolTable 1 }
+
+AlaEServiceL2CustomProtocolEntry ::= SEQUENCE 
+        {
+	    alaEServiceL2CustomProtocolID		SnmpAdminString,
+	    alaEServiceL2CustomProtocolEntryType	AlaEServiceL2CustomProtocolType,
+	    alaEServiceL2CustomProtocolMac		MacAddress,
+	    alaEServiceL2CustomProtocolMask		MacAddress,
+	    alaEServiceL2CustomProtocolEtherType	INTEGER,
+	    alaEServiceL2CustomProtocolEtherSubType	INTEGER,
+	    alaEServiceL2CustomProtocolSsap		INTEGER,
+	    alaEServiceL2CustomProtocolDsap		INTEGER,
+	    alaEServiceL2CustomProtocolPid		INTEGER,
+	    alaEServiceL2CustomProtocolRowStatus	RowStatus
+        }
+
+alaEServiceL2CustomProtocolID OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (1..32))
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "Name of the L2 Custom protocol entry which is an identifier to this table.
+        Must be at least one character long."
+        ::= { alaEServiceL2CustomProtocolEntry  1 }
+
+alaEServiceL2CustomProtocolEntryType  OBJECT-TYPE
+        SYNTAX AlaEServiceL2CustomProtocolType
+        MAX-ACCESS read-create
+        STATUS  current
+        DESCRIPTION
+        "This object specifies the custom L2 protocol entry type"
+        DEFVAL {macType}
+        ::= { alaEServiceL2CustomProtocolEntry  2 }
+
+alaEServiceL2CustomProtocolMac        OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-create
+        STATUS  current
+        DESCRIPTION
+        "This object specifies the destination mac address that needs L2 protocol handling"
+        ::= { alaEServiceL2CustomProtocolEntry  3 }
+
+alaEServiceL2CustomProtocolMask       OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-create
+        STATUS  current
+        DESCRIPTION
+        "This object specifies the range of destination mac address that that needs
+        L2 protocol handling"
+        ::= { alaEServiceL2CustomProtocolEntry  4 }
+
+ alaEServiceL2CustomProtocolEtherType       OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "Ether type value for generic ethertype."
+        ::= { alaEServiceL2CustomProtocolEntry  5 }
+
+ alaEServiceL2CustomProtocolEtherSubType       OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "if Ether type >1536 then the sub type is allowed to be configured"
+        ::= { alaEServiceL2CustomProtocolEntry  6 }
+
+alaEServiceL2CustomProtocolSsap       OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "SSAP value for generic SSAP and SNAP rules, when Ether type < 1536"
+        ::= { alaEServiceL2CustomProtocolEntry  7 }
+
+alaEServiceL2CustomProtocolDsap       OBJECT-TYPE
+        SYNTAX  INTEGER (0..255)
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "DSAP value for generic DSAP and SNAP rules, when Ether type < 1536"
+        ::= { alaEServiceL2CustomProtocolEntry  8 }
+
+alaEServiceL2CustomProtocolPid	       OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "protocol identifier in case of LLC SNAP packet"
+        ::= { alaEServiceL2CustomProtocolEntry  9 }
+
+alaEServiceL2CustomProtocolRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "The status of this table entry."
+        ::= { alaEServiceL2CustomProtocolEntry  10}
+
+-- Added in 6.6.3.R01 *** End
+
+-- Added in 6.6.3.R01 *** Statistics Begin
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--   The E-Service UNI Port L2 Statistics entries Table
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaEServiceUNIPortL2ProtocolStatisticsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF AlaEServiceUNIPortL2ProtocolStatisticsEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+        "A table, that contains UNI port L2 protocol frame statistics."
+        ::= {alaEService 13}
+
+alaEServiceUNIPortL2ProtocolStatisticsEntry  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIPortL2ProtocolStatisticsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "An E-Service Service UNI port L2 protocol statistics entry associated with an L2 protocol and a port entry."
+        INDEX   {alaEServiceUNIPortID, IMPLIED alaEServiceUNIPortL2ProtocolID}
+        ::= {alaEServiceUNIPortL2ProtocolStatisticsTable 1}
+
+AlaEServiceUNIPortL2ProtocolStatisticsEntry ::= SEQUENCE
+        {
+                alaEServiceUNIPortID                             InterfaceIndex,
+                alaEServiceUNIPortL2ProtocolID                   SnmpAdminString,
+                alaEServiceUNIPortL2RxFrames                     Counter32,
+                alaEServiceUNIPortL2TunneledFrames               Counter32,
+                alaEServiceUNIPortL2DroppedFrames                Counter32,
+                alaEServiceUNIPortL2PeeredFrames                 Counter32,
+                alaEServiceUNIPortL2MACTunneledFrames            Counter32,
+                alaEServiceUNIPortL2MACDeTunneledFrames          Counter32,
+                alaEServiceUNIPortL2LastSourceMAC                MacAddress
+        }
+
+alaEServiceUNIPortID OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The interface index of the UNI."
+        ::= {alaEServiceUNIPortL2ProtocolStatisticsEntry  1}
+
+alaEServiceUNIPortL2ProtocolID OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (1..31))
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+"Name of the L2 protocol entry. Must be at least one character long."
+        ::= { alaEServiceUNIPortL2ProtocolStatisticsEntry  2 }
+
+alaEServiceUNIPortL2RxFrames  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+"This object describes the total number of frames of this protocol received on this port and trapped to CPU."
+        ::= { alaEServiceUNIPortL2ProtocolStatisticsEntry  3 }
+
+alaEServiceUNIPortL2TunneledFrames  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+"This object describes the total number of frames of this protocol received on this port trapped to CPU and tunneled."
+        ::= { alaEServiceUNIPortL2ProtocolStatisticsEntry  4 }
+
+alaEServiceUNIPortL2DroppedFrames  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+"This object describes the total number of frames of this protocol received on this port trapped to CPU and dropped."
+        ::= { alaEServiceUNIPortL2ProtocolStatisticsEntry  5 }
+
+alaEServiceUNIPortL2PeeredFrames  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+"This object describes the total number of frames of this protocol received on this port trapped to CPU and peered."
+        ::= { alaEServiceUNIPortL2ProtocolStatisticsEntry  6 }
+
+alaEServiceUNIPortL2MACTunneledFrames  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+"This object describes the total number of frames of this protocol received on this port trapped to CPU and MAC tunneled."
+        ::= { alaEServiceUNIPortL2ProtocolStatisticsEntry  7 }
+
+alaEServiceUNIPortL2MACDeTunneledFrames  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+"This object describes the total number of frames of this protocol received on this port trapped to CPU and MAC de-tunneled."
+        ::= { alaEServiceUNIPortL2ProtocolStatisticsEntry  8 }
+
+alaEServiceUNIPortL2LastSourceMAC        OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+        "This object specifies the source MAC address of last frame of this protocol on this port trapped to CPU"
+        ::= { alaEServiceUNIPortL2ProtocolStatisticsEntry  9 }
+
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--   The E-Service NNI Port L2 Statistics entries Table
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaEServiceNNIPortL2ProtocolStatisticsTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AlaEServiceNNIPortL2ProtocolStatisticsEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+        "A table, that contains NNI port L2 protocol frame statistics."
+        ::= {alaEService 14}
+
+alaEServiceNNIPortL2ProtocolStatisticsEntry  OBJECT-TYPE
+        SYNTAX  AlaEServiceNNIPortL2ProtocolStatisticsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "An E-Service NNI port L2 protocol statistics entry associated with port."
+        INDEX   {alaEServiceNNIPortID}
+        ::= {alaEServiceNNIPortL2ProtocolStatisticsTable 1}
+
+AlaEServiceNNIPortL2ProtocolStatisticsEntry ::= SEQUENCE
+        {
+                alaEServiceNNIPortID                           InterfaceIndex,
+                alaEServiceNNIPortL2RxMACTunneledFrames        Counter32,
+                alaEServiceNNIPortL2MACTunneledDiscardFrames   Counter32,
+                alaEServiceNNIPortL2ClearStats                 INTEGER
+        }
+
+alaEServiceNNIPortID OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The interface index of the NNI."
+        ::= {alaEServiceNNIPortL2ProtocolStatisticsEntry  1}
+
+alaEServiceNNIPortL2RxMACTunneledFrames  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+"This object describes the total number of frames trapped to CPU with tunnel MAC."
+        ::= { alaEServiceNNIPortL2ProtocolStatisticsEntry  2 }
+
+alaEServiceNNIPortL2MACTunneledDiscardFrames  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+"This object describes the total number of discarded frames that are trapped to CPU with tunnel MAC."
+        ::= { alaEServiceNNIPortL2ProtocolStatisticsEntry  3 }
+
+alaEServiceNNIPortL2ClearStats      OBJECT-TYPE
+        SYNTAX  INTEGER {
+                                default(0),
+                                reset(1)
+                                }
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+"This object is used to clear the NNI port statistics of the interface."
+        DEFVAL  { default }
+        ::= { alaEServiceNNIPortL2ProtocolStatisticsEntry  4 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+-- The E-Service UNI Profile L2 Total RX Statistics entries Table
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaEServiceUNIProfileL2ProtocolTotalStatisticsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF AlaEServiceUNIProfileL2ProtocolTotalStatisticsEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+        "A table, that contains UNI profile L2 protocol frame total RX statistics of all ports of the profile"
+        ::= {alaEService 15}
+
+alaEServiceUNIProfileL2ProtocolTotalStatisticsEntry  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileL2ProtocolTotalStatisticsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "An E-Service UNI profile L2 protocol total RX statistics entry associated with all ports of the UNI profile."
+        INDEX   {IMPLIED alaEServiceUNIProfile}
+        ::= {alaEServiceUNIProfileL2ProtocolTotalStatisticsTable 1}
+
+AlaEServiceUNIProfileL2ProtocolTotalStatisticsEntry ::= SEQUENCE
+        {
+                alaEServiceUNIProfile                               SnmpAdminString,
+                alaEServiceUNIProfileL2ProtocolTotalRxFrames        Counter32,
+                alaEServiceUNIProfileL2ProtocolClearStats           INTEGER
+        }
+
+alaEServiceUNIProfile OBJECT-TYPE
+      SYNTAX  SnmpAdminString (SIZE (1..31))
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+      "A label given to uniquely identify this profile. Must be at least one character long."
+      ::= { alaEServiceUNIProfileL2ProtocolTotalStatisticsEntry 1}
+
+alaEServiceUNIProfileL2ProtocolTotalRxFrames  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+"This object describes the total number of frames L2 protocol frames received by all the ports of bind to this profile."
+        ::= { alaEServiceUNIProfileL2ProtocolTotalStatisticsEntry 2 }
+
+alaEServiceUNIProfileL2ProtocolClearStats      OBJECT-TYPE
+        SYNTAX  INTEGER {
+                                default(0),
+                                reset(1)
+                                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+"This object is used to clear the UNI profile statistics of the interface."
+        DEFVAL  { default }
+        ::= { alaEServiceUNIProfileL2ProtocolTotalStatisticsEntry 3 }
+
+--   The E-Service UNI Profile L2 Well Known protocl RX Statistics entries Table
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+alaEServiceUNIProfileIEEEL2ProtocolStatisticsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF AlaEServiceUNIProfileIEEEL2ProtocolStatisticsEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+        "A table, that contains UNI profile L2 well known protocol frame RX statistics of all ports of the profile"
+        ::= {alaEService 16}
+
+alaEServiceUNIProfileIEEEL2ProtocolStatisticsEntry  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileIEEEL2ProtocolStatisticsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "An E-Service UNI profile L2 well known protocol RX statistics entry associated with all ports of the UNI profile."
+        INDEX   {alaEServiceUNIProfileIEEEL2ProfileID, alaEServiceUNIProfileIEEEL2ProtocolIndex}
+        ::= {alaEServiceUNIProfileIEEEL2ProtocolStatisticsTable 1}
+
+AlaEServiceUNIProfileIEEEL2ProtocolStatisticsEntry ::= SEQUENCE
+        {
+                alaEServiceUNIProfileIEEEL2ProfileID               SnmpAdminString,
+                alaEServiceUNIProfileIEEEL2ProtocolIndex           INTEGER, 
+                alaEServiceUNIProfileIEEEL2ProtocolRxFrames        Counter32,
+	        alaEServiceUNIProfileIEEEL2ProtocolTreatment       INTEGER 
+        }
+
+alaEServiceUNIProfileIEEEL2ProfileID OBJECT-TYPE
+      SYNTAX  SnmpAdminString (SIZE (1..31))
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+      "A label given to uniquely identify this profile. Must be at least one character long."
+      ::= { alaEServiceUNIProfileIEEEL2ProtocolStatisticsEntry 1}
+
+alaEServiceUNIProfileIEEEL2ProtocolIndex OBJECT-TYPE
+        SYNTAX   INTEGER
+        {
+                lacpLacpmarkerOam (1),
+                ieee802dot1x (2),
+                lldp (3),
+                amap (4),
+                cisco (5),
+                stp (6),
+                gvrpMvrp (7)
+        }
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+        "This object specifies the well known protocol group this row corresponds to."
+        ::= {alaEServiceUNIProfileIEEEL2ProtocolStatisticsEntry 2 }
+
+alaEServiceUNIProfileIEEEL2ProtocolRxFrames  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "This object describes the number of frames this L2 well known protocol frames
+        received by all the ports of bind to this profile."
+        ::= { alaEServiceUNIProfileIEEEL2ProtocolStatisticsEntry 3 }
+
+alaEServiceUNIProfileIEEEL2ProtocolTreatment  OBJECT-TYPE
+        SYNTAX  INTEGER 
+        {
+             invalid (0),
+             fwd (1),
+             drop (2),
+             cpu (3)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the destination Mac address
+        matching with the L2 Custom protocol entry mac address on the UNI. Tunnel (1) enables the
+        PDU to be tunneled across the provider network.  Discard (2) causes the PDU of the protocol
+        to be discarded and not enter the provider network. Peer (3) means that on this port the
+        bridge is to participate in the protocol. Mac-Tunnel (4) enables mac-tunneling."
+        ::= { alaEServiceUNIProfileIEEEL2ProtocolStatisticsEntry  4 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--   The E-Service UNI Profile L2 RX Statistics entries Table
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaEServiceUNIProfileCustomL2ProtocolStatisticsTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF AlaEServiceUNIProfileCustomL2ProtocolStatisticsEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+        "A table, that contains UNI profile L2 protocol frame RX statistics of all ports of the profile.  Each entry
+         represents statistics collected for one protocol of the UNI profile."
+        ::= {alaEService 17}
+
+
+alaEServiceUNIProfileCustomL2ProtocolStatisticsEntry  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileCustomL2ProtocolStatisticsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "An E-Service UNI profile L2 protocol RX statistics entry associated with all ports of the UNI profile."
+        INDEX   {alaEServiceUNIProfileCustomL2StatsProfileID, alaEServiceUNIProfileCustomL2ProtocolIndex}
+        ::= {alaEServiceUNIProfileCustomL2ProtocolStatisticsTable 1}
+
+AlaEServiceUNIProfileCustomL2ProtocolStatisticsEntry ::= SEQUENCE
+        {
+                alaEServiceUNIProfileCustomL2StatsProfileID            SnmpAdminString,
+                alaEServiceUNIProfileCustomL2ProtocolIndex             SnmpAdminString,
+                alaEServiceUNIProfileCustomL2ProtocolRxFrames          Counter32,
+	        alaEServiceUNIProfileCustomL2ProtocolTreatment         INTEGER 
+        }
+
+alaEServiceUNIProfileCustomL2StatsProfileID OBJECT-TYPE
+      SYNTAX  SnmpAdminString (SIZE (1..31))
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+      "A label given to uniquely identify this profile. Must be at least one character long."
+      ::= { alaEServiceUNIProfileCustomL2ProtocolStatisticsEntry 1}
+
+alaEServiceUNIProfileCustomL2ProtocolIndex OBJECT-TYPE
+      SYNTAX  SnmpAdminString (SIZE (1..31))
+      MAX-ACCESS not-accessible 
+      STATUS  current
+      DESCRIPTION
+"Name of the L2 protocol entry. Must be at least one character long."
+      ::= { alaEServiceUNIProfileCustomL2ProtocolStatisticsEntry  2 }
+
+alaEServiceUNIProfileCustomL2ProtocolRxFrames  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+"This object describes the total number of frames of this protocol received on this port and trapped to CPU."
+        ::= { alaEServiceUNIProfileCustomL2ProtocolStatisticsEntry  3 }
+
+alaEServiceUNIProfileCustomL2ProtocolTreatment  OBJECT-TYPE
+        SYNTAX INTEGER 
+        {
+             invalid (0),
+             fwd (1),
+             drop (2),
+             cpu (3)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the destination Mac address
+        matching with the L2 Custom protocol entry mac address on the UNI. Tunnel (1) enables the
+        PDU to be tunneled across the provider network.  Discard (2) causes the PDU of the protocol
+        to be discarded and not enter the provider network. Peer (3) means that on this port the
+        bridge is to participate in the protocol. Mac-Tunnel (4) enables mac-tunneling."
+        ::= { alaEServiceUNIProfileCustomL2ProtocolStatisticsEntry  4 }
+
+alaEServiceL2PTProtocolStatisticsClear OBJECT IDENTIFIER ::= { alaEService 18 }
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--   The E-Service UNI Port L2  Statistics Global Clear
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaEServiceUNIPortL2GlobalClearStatistics         OBJECT-TYPE
+                SYNTAX          INTEGER {
+                                default(0),
+                                reset(1)
+                                }
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                        "Defines the global clear control for L2 protocol statistics of all UNI ports
+                        The value reset (1) indicates  clear UNI port statistics
+                        of all ports in the system. By default, this object contains a zero value."
+                DEFVAL  { default }
+                ::= { alaEServiceL2PTProtocolStatisticsClear 1 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--   The E-Service NNI Port L2 Statistics Global Clear
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaEServiceNNIPortL2GlobalClearStatistics         OBJECT-TYPE
+                SYNTAX          INTEGER {
+                                default(0),
+                                reset(1)
+                                }
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                        "Defines the global clear control for L2 protocol statistics of all NNI ports
+                        The value reset (1) indicates  clear NNI port statistics
+                        of all ports in the system. By default, this object contains a zero value."
+                DEFVAL  { default }
+                ::= { alaEServiceL2PTProtocolStatisticsClear 2 }
+
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--   The E-Service UNI Profile L2 Statistics Global Clear
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaEServiceUNIProfileL2GlobalClearStatistics         OBJECT-TYPE
+                SYNTAX          INTEGER {
+                                default(0),
+                                reset(1)
+                                }
+                MAX-ACCESS      read-write
+                STATUS          current
+                DESCRIPTION
+                        "Defines the global clear control for L2 protocol statistics of all UNI profiles
+                        The value reset (1) indicates  clear UNI profile statistics
+                        of all ports in the system. By default, this object contains a zero value."
+                DEFVAL  { default }
+                ::= { alaEServiceL2PTProtocolStatisticsClear 3 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+--   The E-Service UNI Port L2 Statistics Clear Table
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaEServiceUNIPortL2ProtocolStatisticsClearTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF AlaEServiceUNIPortL2ProtocolStatisticsClearEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+        "A table, to clear UNI port L2 protocol frame statistics."
+        ::= {alaEService 19}
+
+alaEServiceUNIPortL2ProtocolStatisticsClearEntry  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIPortL2ProtocolStatisticsClearEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "An E-Service Service UNI port L2 protocol statistics clear entry associated with port."
+        INDEX   {alaEServiceUNIPortClearID}
+        ::= {alaEServiceUNIPortL2ProtocolStatisticsClearTable 1}
+
+AlaEServiceUNIPortL2ProtocolStatisticsClearEntry ::= SEQUENCE
+        {
+                alaEServiceUNIPortClearID                             InterfaceIndex,
+                alaEServiceUNIPortL2ClearStats                   INTEGER
+        }
+
+alaEServiceUNIPortClearID OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The interface index of the UNI."
+        ::= {alaEServiceUNIPortL2ProtocolStatisticsClearEntry  1}
+
+alaEServiceUNIPortL2ClearStats      OBJECT-TYPE
+        SYNTAX  INTEGER {
+                                default(0),
+                                reset(1)
+                                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+"This object is used to clear the UNI port statistics of the interface."
+        DEFVAL  { default }
+        ::= { alaEServiceUNIPortL2ProtocolStatisticsClearEntry  2 }
+
+ alaEServiceNNIPortL2ProtocolStatisticsClearTable OBJECT-TYPE   
+ SYNTAX SEQUENCE OF AlaEServiceNNIPortL2ProtocolStatisticsClearEntry    
+ MAX-ACCESS  not-accessible   
+ STATUS current   
+ DESCRIPTION   
+ "A table, to clear NNI port L2 protocol frame statistics."   
+ ::= {alaEService 20}   
+    
+ alaEServiceNNIPortL2ProtocolStatisticsClearEntry OBJECT-TYPE   
+ SYNTAX AlaEServiceNNIPortL2ProtocolStatisticsClearEntry   
+ MAX-ACCESS  not-accessible   
+ STATUS current   
+ DESCRIPTION   
+ "An E-serive to clear NNI port L2 protocol frame statistics."   
+ INDEX   {alaEServiceNNIPortClearID}   
+ ::= { alaEServiceNNIPortL2ProtocolStatisticsClearTable 1 }   
+
+    
+ AlaEServiceNNIPortL2ProtocolStatisticsClearEntry ::= SEQUENCE   
+ {   
+                 alaEServiceNNIPortClearID                             InterfaceIndex,   
+                 alaEServiceNNIPortL2ClearStatistics                 INTEGER   
+ }   
+    
+ alaEServiceNNIPortClearID OBJECT-TYPE   
+ SYNTAX  InterfaceIndex   
+ MAX-ACCESS not-accessible   
+ STATUS current   
+ DESCRIPTION   
+ "The interface index of the NNI."   
+ ::= {alaEServiceNNIPortL2ProtocolStatisticsClearEntry  1}   
+    
+ alaEServiceNNIPortL2ClearStatistics      OBJECT-TYPE    
+  SYNTAX  INTEGER {    
+  default(0),    
+  reset(1)    
+  }    
+ MAX-ACCESS  read-write    
+ STATUS  current    
+ DESCRIPTION  "This object is used to clear the NNI port statistics of the interface."    
+ DEFVAL  { default }    
+          ::= { alaEServiceNNIPortL2ProtocolStatisticsClearEntry 2 }   
+
+
+-- Added in 6.6.3.R01 *** Statistics End
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 -- COMPLIANCE
@@ -1275,7 +2117,7 @@ alcatelIND1EServiceMIBCompliance MODULE-COMPLIANCE
         DESCRIPTION
         "Compliance statement for E-Service."
         MODULE  MANDATORY-GROUPS
-                {
+        {
                 alaEServiceSapProfileGroup,
                 alaEServiceUNIProfileGroup,
                 alaEServiceGroup,
@@ -1288,7 +2130,6 @@ alcatelIND1EServiceMIBCompliance MODULE-COMPLIANCE
                 alaEServiceInfoGroup
                 }
         ::= { alcatelIND1EServiceMIBCompliances 1 }
-
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 -- UNITS OF CONFORMANCE
@@ -1304,11 +2145,12 @@ alaEServiceSapProfileGroup OBJECT-GROUP
 		alaEServiceSapProfileIngressBW,         
                 alaEServiceSapProfileBandwidthShare,
 		alaEServiceSapProfileRowStatus,
-                alaEServiceSapProfileEgressBW,
-                alaEServiceSapProfileCIR,
-                alaEServiceSapProfileCBS,
-                alaEServiceSapProfilePIR,
-                alaEServiceSapProfilePBS
+		alaEServiceSapProfileEgressBW,
+		alaEServiceSapProfileCIR,
+		alaEServiceSapProfileCBS,
+		alaEServiceSapProfilePIR,
+		alaEServiceSapProfilePBS,
+		alaEServiceSapProfileDepth     
         }
         STATUS  current
         DESCRIPTION
@@ -1325,7 +2167,7 @@ alaEServiceUNIProfileGroup OBJECT-GROUP
 		alaEServiceUNIProfileGvrpTreatment,	   
 		alaEServiceUNIProfileAmapTreatment,	   
 		alaEServiceUNIProfileRowStatus,
-                alaEServiceUNIProfileMvrpTreatment,
+		alaEServiceUNIProfileMvrpTreatment,
 		alaEServiceUNIProfileTunnelMac,
                 alaEServiceUNIProfileLacpMarkerTreatment,       
                 alaEServiceUNIProfileOamTreatment,      
@@ -1336,7 +2178,8 @@ alaEServiceUNIProfileGroup OBJECT-GROUP
                 alaEServiceUNIProfileCiscoDtpTreatment,        
                 alaEServiceUNIProfileCiscoPvstTreatment,          
                 alaEServiceUNIProfileCiscoVlanTreatment,            
-                alaEServiceUNIProfileCiscoUplinkTreatment          
+                alaEServiceUNIProfileCiscoUplinkTreatment,
+                alaEServiceUNIProfileIeeeMacTreatment          
         }
         STATUS current
         DESCRIPTION
@@ -1349,9 +2192,10 @@ alaEServiceGroup OBJECT-GROUP
 		alaEServiceSVLAN,    	
                 alaEServiceVlanType,
 		alaEServiceRowStatus,
-                alaEServiceStatGreenCount,
-                alaEServiceStatYellowCount,
-                alaEServiceStatRedCount
+		alaEServiceStatGreenCount,
+		alaEServiceStatYellowCount,
+		alaEServiceStatRedCount,
+		alaEServiceStatTotalCount	
         }
         STATUS  current
         DESCRIPTION
@@ -1393,7 +2237,7 @@ alaEServicePortGroup OBJECT-GROUP
 		alaEServicePortLegacyGvrpPdu,
 		alaEServicePortUniProfile,
 		alaEServicePortTransBridging,
-                alaEServicePortLegacyMvrpPdu
+		alaEServicePortLegacyMvrpPdu
         }
         STATUS  current
         DESCRIPTION
@@ -1424,29 +2268,158 @@ alaEServiceNniSvlanGroup OBJECT-GROUP
         "Collection of objects for management of E-Service SVLAN to NNI
         Binding."
         ::= { alcatelIND1EServiceMIBGroups 8 }
-
 alaEServiceSapCvlanPortStatGroup OBJECT-GROUP
         OBJECTS
         {
-                alaEServiceSapCvlanPortStatGreenCount,
-                alaEServiceSapCvlanPortStatYellowCount,
-                alaEServiceSapCvlanPortStatRedCount
-        }
-        STATUS  current
+		alaEServiceSapCvlanPortStatGreenCount,
+		alaEServiceSapCvlanPortStatYellowCount,
+		alaEServiceSapCvlanPortStatRedCount,
+		alaEServiceSapCvlanPortStatTotalCount
+	}
+	STATUS  current
         DESCRIPTION
         "Collection of objects for srTCM and trTCM Counters."
-        ::= { alcatelIND1EServiceMIBGroups 9 }
+	::= { alcatelIND1EServiceMIBGroups 9 }
 
-alaEServiceInfoGroup    OBJECT-GROUP
+alaEServiceInfoGroup	OBJECT-GROUP
         OBJECTS
         {
-                alaEServiceMode,
-                alaEServiceStatReset
+		alaEServiceMode,
+		alaEServiceStatReset,
+      		alaEServiceL2MacTunnel,
+      		alaEServiceUntaggedMode
+	}
+	STATUS  current
+	DESCRIPTION
+	"Collection of E-Service Global Objects."
+	::= { alcatelIND1EServiceMIBGroups 10 } 
+
+-- Added in 6.6.3.R01 *** Begin
+
+alaEServiceUNIProfileL2CustomProtocolGroup OBJECT-GROUP
+      OBJECTS
+      {
+            alaEServiceUNIProfileL2CustomProtocolTreatment,
+            alaEServiceUNIProfileL2CustomProtocolRowStatus
+      }
+      STATUS  current
+      DESCRIPTION
+      "Collection of objects for management of E-Service UNI Profile
+      to L2 Custom Protocol bindings."
+      ::= { alcatelIND1EServiceMIBGroups 11 }
+
+alaEServiceL2CustomProtocolGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaEServiceL2CustomProtocolEntryType,
+            alaEServiceL2CustomProtocolMac,
+            alaEServiceL2CustomProtocolMask,
+            alaEServiceL2CustomProtocolEtherType,
+            alaEServiceL2CustomProtocolEtherSubType,
+            alaEServiceL2CustomProtocolSsap,
+            alaEServiceL2CustomProtocolDsap,
+            alaEServiceL2CustomProtocolPid,
+            alaEServiceL2CustomProtocolRowStatus
         }
         STATUS  current
         DESCRIPTION
-        "Collection of E-Service Global Objects."
-        ::= { alcatelIND1EServiceMIBGroups 10 }
+        "Collection of objects for management of E-Service L2 Custom Protocol Group."
+        ::= { alcatelIND1EServiceMIBGroups 12}
+-- Added in 6.6.3.R01 *** End
+
+-- Added in 6.6.3.R01 *** Begin Statistics
+alaEServiceUNIPortL2StatisticsGroup  OBJECT-GROUP 
+        OBJECTS
+        {
+                alaEServiceUNIPortL2RxFrames,
+                alaEServiceUNIPortL2TunneledFrames,
+                alaEServiceUNIPortL2DroppedFrames,
+                alaEServiceUNIPortL2PeeredFrames,
+                alaEServiceUNIPortL2MACTunneledFrames,
+                alaEServiceUNIPortL2MACDeTunneledFrames,
+                alaEServiceUNIPortL2LastSourceMAC
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for UNI port statistics management of E-Service L2 Tunneling Protocol Group."
+        ::= { alcatelIND1EServiceMIBGroups 13}
+
+alaEServiceNNIPortL2StatisticsGroup OBJECT-GROUP 
+        OBJECTS
+        {
+                alaEServiceNNIPortL2RxMACTunneledFrames,
+		  alaEServiceNNIPortL2MACTunneledDiscardFrames
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for NNI port statistics management of E-Service L2 Tunneling Protocol Group."
+        ::= { alcatelIND1EServiceMIBGroups 14}
+
+alaEServiceUNIProfileL2ProtocolTotalStatisticsGroup OBJECT-GROUP 
+        OBJECTS
+        {
+                alaEServiceUNIProfileL2ProtocolTotalRxFrames,
+                alaEServiceUNIProfileL2ProtocolClearStats
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for UNI profile statistics management of E-Service L2 Tunneling Protocol Group."
+        ::= { alcatelIND1EServiceMIBGroups 15}
+
+alaEServiceUNIProfileIEEEL2ProtocolStatisticsGroup OBJECT-GROUP
+        OBJECTS
+        {
+                alaEServiceUNIProfileIEEEL2ProtocolRxFrames,
+	            alaEServiceUNIProfileIEEEL2ProtocolTreatment
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for UNI profile statistics for well known protocols of E-Service L2 Tunneling Protocol Group."
+        ::= { alcatelIND1EServiceMIBGroups 16}
+
+alaEServiceUNIProfileL2ProtocolStatisticsGroup OBJECT-GROUP
+        OBJECTS
+        {
+                alaEServiceUNIProfileCustomL2ProtocolRxFrames,
+	            alaEServiceUNIProfileCustomL2ProtocolTreatment
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for UNI profile statistics management of E-Service L2 Tunneling Protocol Group."
+        ::= { alcatelIND1EServiceMIBGroups 17}
+
+alaEServiceL2PTProtocolStatisticsClearGroup OBJECT-GROUP 
+        OBJECTS
+        {
+                alaEServiceUNIPortL2GlobalClearStatistics,
+                alaEServiceNNIPortL2GlobalClearStatistics,
+				alaEServiceUNIProfileL2GlobalClearStatistics
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for UNI profile statistics management of E-Service L2 Tunneling Protocol Group."
+        ::= { alcatelIND1EServiceMIBGroups 18}
+
+alaEServiceUNIPortL2StatisticsClearGroup  OBJECT-GROUP 
+        OBJECTS
+        {
+                alaEServiceUNIPortL2ClearStats
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for UNI port statistics management of E-Service L2 Tunneling Protocol Group."
+        ::= { alcatelIND1EServiceMIBGroups 19}
+ alaEServiceNNIPortL2StatisticsClearGroup  OBJECT-GROUP    
+	OBJECTS   
+	{
+		alaEServiceNNIPortL2ClearStatistics   
+	}
+	STATUS  current
+	DESCRIPTION 
+		"Collection of objects for NNI port statistics management of E-Service L2 Tunneling Protocol Group."
+	::= { alcatelIND1EServiceMIBGroups 20} 
+
+-- Added in 6.6.3.R01 *** End Statistics
 
 END
 

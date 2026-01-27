@@ -8,33 +8,28 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
                 softentIND1GroupMobility, groupmobilityTraps             FROM ALCATEL-IND1-BASE;
 
         alcatelIND1GroupMobilityMIB MODULE-IDENTITY
-                LAST-UPDATED "200704030000Z"
-                ORGANIZATION "Alcatel-Lucent"
+                LAST-UPDATED "201910070000Z"
+                ORGANIZATION "ALE USA Inc"
                 CONTACT-INFO
             "Please consult with Customer Service to ensure the most appropriate
              version of this document is used with the products in question:
 
-                        Alcatel-Lucent, Enterprise Solutions Division
-                       (Formerly Alcatel Internetworking, Incorporated)
+                        Alcatel-Lucent Enterprise, 
                                26801 West Agoura Road
                             Agoura Hills, CA  91301-5122
                               United States Of America
 
-            Telephone:               North America  +1 800 995 2696
-                                     Latin America  +1 877 919 9526
-                                     Europe         +31 23 556 0100
-                                     Asia           +65 394 7933
-                                     All Other      +1 818 878 4507
-
-            Electronic Mail:         support@ind.alcatel.com
-            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+            Telephone:               +1 800 995 2696 
+ 				     
+            Electronic Mail:         ebg_global_supportcenter@al-enterprise.com 
+            World Wide Web:          https://www.al-enterprise.com"
+         
 
                 DESCRIPTION
                         "This module describes an authoritative enterprise-specific Simple
              Network Management Protocol (SNMP) Management Information Base (MIB):
 
-                 For the Birds Of Prey Product Line
+                 For the OmniSwitch Product Line
                  Group Mobility for dynamic vlan assignment to source learning
                                  entries and ports.
 
@@ -50,12 +45,13 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
 
-                         Copyright (C) 1995-2007 Alcatel-Lucent
+			Copyright (C) ALE USA Inc. 2014-2019                         
+			Copyright (C) 1995-2013 Alcatel-Lucent
                              ALL RIGHTS RESERVED WORLDWIDE"
 
-                REVISION      "200704030000Z"
-        DESCRIPTION
-            "Addressing discrepancies with Alcatel Standard."
+                REVISION      "201910070000Z"
+                DESCRIPTION
+                      "Updated the latest contact and Copyright information for ALE USA Inc."
                 ::= { softentIND1GroupMobility 1}
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -160,7 +156,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vIpNetRuleVlanId  OBJECT-TYPE
             SYNTAX  INTEGER (1..4094)
-            MAX-ACCESS  read-write
+            MAX-ACCESS  read-create
             STATUS  current
             DESCRIPTION
                  "The VLAN number identifying this instance. Valid
@@ -169,7 +165,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vIpNetRuleStatus  OBJECT-TYPE
             SYNTAX  RowStatus
-            MAX-ACCESS  read-write
+            MAX-ACCESS  read-create
             STATUS  current
             DESCRIPTION
                 "Row Status for creating/deleting rules."
@@ -222,7 +218,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
                         llc (3),
                         snap (4)
                 }
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "IPX frame encapsulation."
@@ -231,7 +227,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vIpxNetRuleVlanId  OBJECT-TYPE
                 SYNTAX  INTEGER (1..4094)
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "The VLAN number identifying this instance. Valid
@@ -240,7 +236,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vIpxNetRuleStatus  OBJECT-TYPE
                 SYNTAX  RowStatus
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "Row Status for creating/deleting rules."
@@ -286,7 +282,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vMacRuleVlanId  OBJECT-TYPE
                 SYNTAX  INTEGER (1..4094)
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "The VLAN number identifying this instance. Valid
@@ -295,7 +291,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vMacRuleStatus  OBJECT-TYPE
                 SYNTAX  RowStatus
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "Row Status for creating/deleting rules."
@@ -343,7 +339,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vMacRangeRuleHiAddr  OBJECT-TYPE
                 SYNTAX  MacAddress
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "The upper bound of MAC address range used for VLAN classification."
@@ -351,7 +347,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vMacRangeRuleVlanId  OBJECT-TYPE
                 SYNTAX  INTEGER (1..4094)
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "The VLAN number identifying this instance. Valid
@@ -360,7 +356,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vMacRangeRuleStatus  OBJECT-TYPE
                 SYNTAX  RowStatus
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "Row Status for creating/deleting rules."
@@ -410,7 +406,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vMacPortIpBRuleIfIndex  OBJECT-TYPE
                 SYNTAX  Unsigned32 (1001..4294967295)
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "The ifIndex corresponding to a potentially mobile port."
@@ -418,7 +414,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vMacPortIpBRuleIp  OBJECT-TYPE
                 SYNTAX  IpAddress
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "The IP address used for binding VLAN classification."
@@ -426,7 +422,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vMacPortIpBRuleVlanId  OBJECT-TYPE
                 SYNTAX  INTEGER (1..4094)
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "The VLAN number identifying this instance. Valid
@@ -435,7 +431,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vMacPortIpBRuleStatus  OBJECT-TYPE
                 SYNTAX  RowStatus
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "Row Status for creating/deleting rules."
@@ -483,7 +479,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vPortIpBRuleIfIndex  OBJECT-TYPE
                 SYNTAX  Unsigned32 (1001..4294967295)
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "The ifIndex corresponding to a potentially mobile port."
@@ -492,7 +488,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vPortIpBRuleVlanId  OBJECT-TYPE
                 SYNTAX  INTEGER (1..4094)
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "The VLAN number identifying this instance. Valid
@@ -501,7 +497,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vPortIpBRuleStatus  OBJECT-TYPE
                 SYNTAX  RowStatus
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "Row Status for creating/deleting rules."
@@ -549,7 +545,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vMacIpBRuleIp  OBJECT-TYPE
                 SYNTAX  IpAddress
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "The IP address used for binding VLAN classification."
@@ -557,7 +553,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vMacIpBRuleVlanId  OBJECT-TYPE
                 SYNTAX  INTEGER (1..4094)
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "The VLAN number identifying this instance. Valid
@@ -566,7 +562,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vMacIpBRuleStatus  OBJECT-TYPE
                 SYNTAX  RowStatus
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "Row Status for creating/deleting rules."
@@ -614,7 +610,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vMacPortBRuleIfIndex  OBJECT-TYPE
                 SYNTAX  Unsigned32 (1001..4294967295)
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "The ifIndex corresponding to a potentially mobile port."
@@ -623,7 +619,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vMacPortBRuleVlanId  OBJECT-TYPE
                 SYNTAX  INTEGER (1..4094)
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "The VLAN number identifying this instance. Valid
@@ -632,7 +628,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vMacPortBRuleStatus  OBJECT-TYPE
                 SYNTAX  RowStatus
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "Row Status for creating/deleting rules."
@@ -687,7 +683,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vMacPortProtoBRuleIfIndex  OBJECT-TYPE
                 SYNTAX  Unsigned32 (1001..4294967295)
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "The ifIndex corresponding to a potentially mobile port."
@@ -735,7 +731,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vMacPortProtoBRuleVlanId  OBJECT-TYPE
                 SYNTAX  INTEGER (1..4094)
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "The VLAN number identifying this instance. Valid
@@ -744,7 +740,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vMacPortProtoBRuleStatus  OBJECT-TYPE
                 SYNTAX  RowStatus
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "Row Status for creating/deleting rules."
@@ -817,14 +813,14 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
                 ::= { vPortProtoBRuleEntry 2 }
 
         vPortProtoBRuleEthertype  OBJECT-TYPE
-                SYNTAX  INTEGER (0 | 1536..65535)
+                SYNTAX  INTEGER (0|1536..65535)
                 MAX-ACCESS  read-write
                 STATUS  current
                 DESCRIPTION
                 "Ethertype value for generic ethertype or snap rule.
                  This value has no meaning for vPortProtoBRuleProtoClass
-                 set to values other than 9 or 11. The value 0 will be
-                 used for this index when vPortProtoBRuleProtoClass has 
+                 set to values other than 9 or 11.The value 0 will be
+                 used for this index when vPortProtoBRuleProtoClass has
                  values other than 9 and 11."
                 ::= { vPortProtoBRuleEntry 3 }
 
@@ -840,7 +836,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vPortProtoBRuleVlanId  OBJECT-TYPE
                 SYNTAX  INTEGER (1..4094)
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "The VLAN number identifying this instance. Valid
@@ -849,7 +845,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vPortProtoBRuleStatus  OBJECT-TYPE
                 SYNTAX  RowStatus
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "Row Status for creating/deleting rules."
@@ -895,7 +891,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vDhcpMacRuleVlanId  OBJECT-TYPE
                 SYNTAX  INTEGER (1..4094)
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "The VLAN number identifying this instance. Valid
@@ -904,7 +900,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vDhcpMacRuleStatus  OBJECT-TYPE
                 SYNTAX  RowStatus
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "Row Status for creating/deleting rules."
@@ -950,7 +946,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vDhcpPortRuleVlanId  OBJECT-TYPE
                 SYNTAX  INTEGER (1..4094)
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "The VLAN number identifying this instance. Valid
@@ -959,7 +955,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vDhcpPortRuleStatus  OBJECT-TYPE
                 SYNTAX  RowStatus
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "Row Status for creating/deleting rules."
@@ -1004,7 +1000,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vDhcpGenericRuleStatus  OBJECT-TYPE
                 SYNTAX  RowStatus
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "Row Status for creating/deleting rules."
@@ -1097,7 +1093,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vProtoRuleStatus  OBJECT-TYPE
                 SYNTAX  RowStatus
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "Row Status for creating/deleting rules."
@@ -1147,7 +1143,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vCustomRuleMask  OBJECT-TYPE
                 SYNTAX  Unsigned32 (0..4294967295)
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "Mask applied to value for rule matching."
@@ -1164,7 +1160,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vCustomRuleVlanId  OBJECT-TYPE
                 SYNTAX  INTEGER (1..4094)
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "The VLAN number identifying this instance. Valid
@@ -1173,7 +1169,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vCustomRuleStatus  OBJECT-TYPE
                 SYNTAX  RowStatus
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "Row Status for creating/deleting rules."
@@ -1219,7 +1215,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vPortRuleVlanId  OBJECT-TYPE
                 SYNTAX  INTEGER (1..4094)
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "The VLAN number identifying this instance. Valid
@@ -1228,7 +1224,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vPortRuleStatus  OBJECT-TYPE
                 SYNTAX  RowStatus
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "Row Status for creating/deleting rules."
@@ -1276,7 +1272,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vDhcpMacRangeRuleHiAddr  OBJECT-TYPE
                 SYNTAX  MacAddress
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "The higher bound of MAC address range used for DHCP VLAN classification."
@@ -1284,7 +1280,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vDhcpMacRangeRuleVlanId  OBJECT-TYPE
                 SYNTAX  INTEGER (1..4094)
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "The VLAN number identifying this instance. Valid
@@ -1293,7 +1289,7 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
 
         vDhcpMacRangeRuleStatus  OBJECT-TYPE
                 SYNTAX  RowStatus
-                MAX-ACCESS  read-write
+                MAX-ACCESS  read-create
                 STATUS  current
                 DESCRIPTION
                 "Row Status for creating/deleting rules."
@@ -1746,7 +1742,9 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
             {
                 groupMobilityRuleGroup,
                 groupMobilityPortGroup,
-                groupMobilityTrapGroup
+                groupMobilityTrapGroup,
+                gmBindRuleTypeGroup,
+                gmHwVlanRuleTableOverloadAlertGroup
             }
 
         ::= { alcatelIND1GroupMobilityMIBCompliances 1 }
@@ -1880,6 +1878,41 @@ ALCATEL-IND1-GROUP-MOBILITY-MIB DEFINITIONS ::= BEGIN
        DESCRIPTION
             "Collection of notifications for learned port security."
        ::= { alcatelIND1GroupMobilityMIBGroups 4 }
+
+     gmBindRuleTypeGroup OBJECT-GROUP
+        OBJECTS
+        {
+        	gmBindRuleDsapSsap,
+        	gmBindRuleEthertype,
+        	gmBindRuleIPAddress,
+        	gmBindRuleMacAddress,
+        	gmBindRulePortIfIndex,
+        	gmBindRuleProtoClass,
+        	gmBindRuleType,
+        	gmBindRuleVlanId
+        	
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for Bind-violation trap Variables."
+        ::= { alcatelIND1GroupMobilityMIBGroups 5 }
+        gmHwVlanRuleTableOverloadAlertGroup OBJECT-GROUP
+        OBJECTS
+        {	
+        	gmOverloadRuleIpAddress,
+        	gmOverloadRuleIpxNetwork,
+        	gmOverloadRuleMacAddress,
+        	gmOverloadRuleProtocol,
+        	gmOverloadRuleSlice,
+        	gmOverloadRuleTable ,
+        	gmOverloadRuleType ,
+        	gmOverloadRuleVlanId ,
+        	gmSubnetRuleTable
+        }
+        STATUS  current
+        DESCRIPTION
+            "Collection of objects for overload trap variables."
+        ::= { alcatelIND1GroupMobilityMIBGroups 6 }
 
 
 

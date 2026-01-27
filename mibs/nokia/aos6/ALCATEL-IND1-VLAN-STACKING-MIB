@@ -9,32 +9,27 @@ ALCATEL-IND1-VLAN-STACKING-MIB DEFINITIONS ::= BEGIN
 		OBJECT-GROUP, 
                 MODULE-COMPLIANCE	        FROM SNMPv2-CONF
 		softentIND1VlanStackingMgt	FROM ALCATEL-IND1-BASE
-		RowStatus			FROM SNMPv2-TC 
+		RowStatus                       FROM SNMPv2-TC
 		InterfaceIndex 			FROM IF-MIB
 		;
 
         alcatelIND1VLANStackingMIB MODULE-IDENTITY
-		LAST-UPDATED "200704030000Z"
-		ORGANIZATION "Alcatel-Lucent"
+		LAST-UPDATED "201910070000Z"
+		ORGANIZATION "ALE USA Inc"
 		CONTACT-INFO
                 "Please consult with Customer Service to ensure the most appropriate
                 version of this document is used with the products in question:
  	
-				                   Alcatel-Lucent, Enterprise Solutions Division
-			                    (Formerly Alcatel Internetworking, Incorporated)
+				                       Alcatel-Lucent Enterprise,
 				                         26801 West Agoura Road
 			 	                       Agoura Hills, CA  91301-5122
 			      		                United States Of America
 	
-                Telephone:	    North America	+1 800 995 2696
-				                        Latin America 	+1 877 919 9526
-                                Europe		+31 23 556 0100
-                                Asia		+65 394 7933
-                                All Other	+1 818 878 4507
-	
-                Electronic Mail:	support@ind.alcatel.com
-                World Wide Web:		http://alcatel-lucent.com/wps/portal/enterprise
-                File Transfer Protocol:	ftp://ftp.ind.alcatel.com/pub/products/mibs"
+                Telephone:              +1 800 995 2696 
+ 				                
+                Electronic Mail:	ebg_global_supportcenter@al-enterprise.com
+                World Wide Web:		https://www.al-enterprise.com"
+				
                 DESCRIPTION
                 "The parameters for configuration of the VLAN Stacking feature, 
                 including the association between ports and svlans.
@@ -50,8 +45,13 @@ ALCATEL-IND1-VLAN-STACKING-MIB DEFINITIONS ::= BEGIN
                 non-exclusive license to use this specification in connection with 
                 management of the products for which it is intended to be used.
 
-                               Copyright (C) 1995-2006 Alcatel-Lucent
-	                                 ALL RIGHTS RESERVED WORLDWIDE"
+                               Copyright (C) ALE USA Inc. 2014-2019
+			       Copyright (C) 1995-2013 Alcatel-Lucent
+	                       ALL RIGHTS RESERVED WORLDWIDE"
+
+                REVISION      "201910070000Z"
+                DESCRIPTION
+                     "Updated the latest contact and Copyright information for ALE USA Inc."
 		::= { softentIND1VlanStackingMgt 1}
 
 
@@ -139,7 +139,7 @@ alaVstkPortType  OBJECT-TYPE
                 userProvider (2),
                 network (3)
         }
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS  current
         DESCRIPTION
         "The type of this VLAN Stacking port. User-customer (1) is  a VLAN Stacking 
@@ -151,7 +151,7 @@ alaVstkPortType  OBJECT-TYPE
 
 alaVstkPortVendorTpid  OBJECT-TYPE
         SYNTAX  Integer32 
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS  current
         DESCRIPTION
         "The TPID for this port. It is used for the incoming data
@@ -167,7 +167,7 @@ alaVstkPortBpduTreatment  OBJECT-TYPE
                 flooded (1),
                 dropped (2)
         }
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS  current
         DESCRIPTION
         "The customer bpdu treatment for this port. It defines the type of 
@@ -185,7 +185,7 @@ alaVstkPortAcceptFrameType  OBJECT-TYPE
                 untagged (2),
                 all (3)
         }
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS  current
         DESCRIPTION
         "The acceptable frame types on this port." 
@@ -198,7 +198,7 @@ alaVstkPortLookupMiss  OBJECT-TYPE
                 drop (1),
                 default (2)
         }
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS  current
         DESCRIPTION
         "Treatment of tagged packets upon vlan lookup miss. Drop (1) means that on lookup
@@ -210,7 +210,7 @@ alaVstkPortLookupMiss  OBJECT-TYPE
 
 alaVstkPortDefaultSvlan  OBJECT-TYPE
         SYNTAX  INTEGER (1..4094)
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS  current
         DESCRIPTION
         "The default svlan of this port."
@@ -218,7 +218,7 @@ alaVstkPortDefaultSvlan  OBJECT-TYPE
 
 alaVstkPortRowStatus OBJECT-TYPE
         SYNTAX  RowStatus
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS  current
         DESCRIPTION
         "The status of this table entry.  The supported value supported for set are 
@@ -231,7 +231,7 @@ alaVstkPortLegacyStpBpdu  OBJECT-TYPE
                 enable (1),
                 disable (2)
         }
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS  current
         DESCRIPTION
         "The legacy STP BPDU treatment for this port. It defines the type of processing 
@@ -308,7 +308,7 @@ alaVstkSvlanPortMode  OBJECT-TYPE
         	doubleTag (1),
         	translate (2)
         }
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS  current
         DESCRIPTION
         "The vlan stacking mode: double tagging (1) or vlan translation/mapping (2).
@@ -317,7 +317,7 @@ alaVstkSvlanPortMode  OBJECT-TYPE
         
 alaVstkSvlanPortRowStatus OBJECT-TYPE
         SYNTAX  RowStatus
-        MAX-ACCESS  read-write
+        MAX-ACCESS  read-create
         STATUS  current
         DESCRIPTION
         "The status of this table entry.  The supported value for set are 
@@ -357,7 +357,8 @@ vlanStackingPortGroup OBJECT-GROUP
                 alaVstkPortAcceptFrameType,
                 alaVstkPortLookupMiss,
                 alaVstkPortDefaultSvlan,
-                alaVstkPortRowStatus
+                alaVstkPortRowStatus,
+                alaVstkPortLegacyStpBpdu
         }
         STATUS  current
         DESCRIPTION

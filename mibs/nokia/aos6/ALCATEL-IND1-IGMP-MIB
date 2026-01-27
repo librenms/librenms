@@ -5,7 +5,7 @@ IMPORTS
         FROM SNMPv2-SMI
     RowStatus
         FROM SNMPv2-TC
-    InetAddressIPv4, InetAddressType, InetAddress
+    InetAddressIPv4, InetAddressType, InetAddress, InetAddressPrefixLength
         FROM INET-ADDRESS-MIB
     MODULE-COMPLIANCE, OBJECT-GROUP
         FROM SNMPv2-CONF
@@ -16,27 +16,22 @@ IMPORTS
 
 
 alcatelIND1IgmpMIB MODULE-IDENTITY
-    LAST-UPDATED "200903310000Z" 
-    ORGANIZATION "Alcatel-Lucent"
+    LAST-UPDATED "201910070000Z" 
+    ORGANIZATION "ALE USA Inc"
     CONTACT-INFO
         "Please consult with Customer Service to ensure the most appropriate
          version of this document is used with the products in question:
          
-                    Alcatel-Lucent, Enterprise Solutions Division
-                   (Formerly Alcatel Internetworking, Incorporated)
-                           26801 West Agoura Road
-                        Agoura Hills, CA  91301-5122
-                          United States Of America
+                    Alcatel-Lucent Enterprise, 
+                      26801 West Agoura Road
+                   Agoura Hills, CA  91301-5122
+                     United States Of America
         
-        Telephone:               North America  +1 800 995 2696
-                                 Latin America  +1 877 919 9526
-                                 Europe         +31 23 556 0100
-                                 Asia           +65 394 7933
-                                 All Other      +1 818 878 4507
-        
-        Electronic Mail:         support@ind.alcatel.com
-        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+        Telephone:               +1 800 995 2696 
+ 				           
+        Electronic Mail:         ebg_global_supportcenter@al-enterprise.com 
+        World Wide Web:          https://www.al-enterprise.com"
+       
 
     DESCRIPTION
         "This module describes an authoritative enterprise-specific Simple
@@ -55,7 +50,8 @@ alcatelIND1IgmpMIB MODULE-IDENTITY
          non-exclusive license to use this specification in connection with
          management of the products for which it is intended to be used.
          
-                     Copyright (C) 1995-2007 Alcatel-Lucent
+			 Copyright (C) 1995-2007 Alcatel-Lucent                    
+			 Copyright (C) ALE USA Inc.,2017
                          ALL RIGHTS RESERVED WORLDWIDE"
 
     REVISION      "200903310000Z"
@@ -70,7 +66,9 @@ alcatelIND1IgmpMIB MODULE-IDENTITY
     REVISION      "200704030000Z"
     DESCRIPTION
         "The revised version of this MIB Module."
-
+    REVISION      "201910070000Z"
+    DESCRIPTION
+        "Updated the latest contact and Copyright information for ALE USA Inc."
     ::= { softentIND1Igmp 1 }
 
 alcatelIND1IgmpMIBObjects OBJECT IDENTIFIER ::= { alcatelIND1IgmpMIB 1 }
@@ -266,6 +264,63 @@ no longer help an IGMP report to an remote address.  Must be set at the
 same time as alaIgmpHelperAddressType"
     ::= { alaIgmp 19 }
 
+alaIgmpBufferPacket OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable buffering and routing of initial multicast packets in case of
+    flood and prune multicast routing protocols"
+    DEFVAL        { disable }
+    ::= { alaIgmp 20 }
+
+alaIgmpIndexSharing OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Set the IGMP Index Sharing mode for IPv4 multicast entries in hardware."
+    DEFVAL        { disable }
+    ::= { alaIgmp 21 }
+
+alaDynamicControlStatus OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+    "All IPv4 or IPv6 multicast protocols are copied to the CPU"
+    DEFVAL        { disable }
+    ::= { alaIgmp 22 }
+
+alaDynamicControlIpv4Status OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "If enabled traffic will be forwarded without any CPU processing. If disabled traffic
+    will be trapped to CPU for processing."
+    DEFVAL        { disable }
+    ::= { alaIgmp 23 }
+
+alaIgmpStaticNeighborFastLearning OBJECT-TYPE
+    SYNTAX          INTEGER
+                    {
+                        enable(1),
+                        disable(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Administratively enable IGMP Static Neighbor Fast Learning globally."
+    ::= { alaIgmp 25 }
+
+alaIgmpStarg OBJECT-TYPE	 
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }	 
+    MAX-ACCESS      read-write	 
+    STATUS          current	 
+    DESCRIPTION	    "Administratively enable IPV4 Star-G globally."
+    DEFVAL          { disable }
+    ::= { alaIgmp 26 }
+	
 --
 --  VLAN Configuration Table
 --
@@ -312,7 +367,9 @@ IgmpVlanEntry ::= SEQUENCE {
     alaIgmpVlanMaxGroupLimit  		  Unsigned32,
     alaIgmpVlanMaxGroupExceedAction       INTEGER,
     alaIgmpVlanSpoofAddressType           InetAddressType,
-    alaIgmpVlanSpoofAddress		  InetAddress
+    alaIgmpVlanSpoofAddress		  InetAddress,
+    alaIgmpVlanIndexSharing		  INTEGER,
+    alaIgmpVlanStarg                      INTEGER
 }
 
 alaIgmpVlanIndex OBJECT-TYPE
@@ -477,7 +534,22 @@ alaIgmpVlanSpoofAddress OBJECT-TYPE
         "Set the SpoofAddress for the VLAN."
     ::= { alaIgmpVlanEntry 19 }
 
+alaIgmpVlanIndexSharing OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable Index-Sharing on the VLAN."
+    DEFVAL        { disable }
+    ::= { alaIgmpVlanEntry 20 }
 
+alaIgmpVlanStarg OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable IGMP Star-G on the VLAN."
+    ::= { alaIgmpVlanEntry 21 }
 
 --
 --  Group Membership Table
@@ -1375,6 +1447,437 @@ alaIgmpPortVlanMaxGroupExceedAction OBJECT-TYPE
     ::= { alaIgmpPortVlanEntry 4 }
 
 
+
+--
+--
+--  Static Group Membership Table with Receiver VLAN option
+--
+ 
+ alaIgmpStaticMemberReceiverVlan OBJECT IDENTIFIER ::= { alcatelIND1IgmpMIBObjects 14 }
+ 
+ alaIgmpStaticMemberReceiverVlanTable OBJECT-TYPE
+     SYNTAX          SEQUENCE OF IgmpStaticMemberReceiverVlanEntry
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "The table listing the receiver vlans entries with static IGMP group membership information."
+::= { alaIgmpStaticMemberReceiverVlan 1 }
+ 
+ alaIgmpStaticMemberReceiverVlanEntry OBJECT-TYPE
+     SYNTAX          IgmpStaticMemberReceiverVlanEntry
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "An entry corresponding to a receiver vlan and a static IGMP group membership request."
+     INDEX         { 
+                     alaIgmpStaticMemberReceiverVlanMemberVlan,
+                     alaIgmpStaticMemberReceiverVlanPortIfIndex,
+                     alaIgmpStaticMemberReceiverVlanGroupAddress,
+                     alaIgmpStaticMemberReceiverVlanId
+                   }
+     ::= { alaIgmpStaticMemberReceiverVlanTable 1 }
+ 
+ IgmpStaticMemberReceiverVlanEntry ::= SEQUENCE {
+     alaIgmpStaticMemberReceiverVlanMemberVlan         Unsigned32, 
+     alaIgmpStaticMemberReceiverVlanPortIfIndex        InterfaceIndex,
+     alaIgmpStaticMemberReceiverVlanGroupAddress       InetAddressIPv4,
+     alaIgmpStaticMemberReceiverVlanId                 Unsigned32,
+     alaIgmpStaticMemberReceiverVlanRowStatus          RowStatus
+ }
+ 
+ alaIgmpStaticMemberReceiverVlanMemberVlan OBJECT-TYPE
+     SYNTAX          Unsigned32         
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "The static group membership request's VLAN."
+     ::= { alaIgmpStaticMemberReceiverVlanEntry 1 }
+ 
+ alaIgmpStaticMemberReceiverVlanPortIfIndex OBJECT-TYPE
+     SYNTAX          InterfaceIndex
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "The static group membership request's ifIndex."
+     ::= { alaIgmpStaticMemberReceiverVlanEntry 2 }
+ 
+
+ alaIgmpStaticMemberReceiverVlanGroupAddress OBJECT-TYPE
+     SYNTAX          InetAddressIPv4
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "The static group membership request's IPv4 group address."
+     ::= { alaIgmpStaticMemberReceiverVlanEntry 3 }
+ 
+ alaIgmpStaticMemberReceiverVlanId OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "The Receiver Vlan to be associated to this static group membership."
+     ::= { alaIgmpStaticMemberReceiverVlanEntry 4 }
+ 
+ alaIgmpStaticMemberReceiverVlanRowStatus OBJECT-TYPE
+     SYNTAX          RowStatus
+     MAX-ACCESS      read-create
+     STATUS          current
+     DESCRIPTION
+         "Used in accordance with installation and removal conventions
+          for conceptual rows."
+     ::= { alaIgmpStaticMemberReceiverVlanEntry 5 }
+ 
+ 
+ --
+ --  Group Membership Table with Receiver VLAN
+ --
+ 
+ alaIgmpReceiverVlanMember OBJECT IDENTIFIER ::= { alcatelIND1IgmpMIBObjects 15 }
+ 
+ alaIgmpReceiverVlanMemberTable OBJECT-TYPE
+     SYNTAX          SEQUENCE OF IgmpReceiverVlanMemberEntry
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "The table listing the IGMP group membership information with Receiver VLAN."
+     ::= { alaIgmpReceiverVlanMember 1 }
+ 
+ alaIgmpReceiverVlanMemberEntry OBJECT-TYPE
+     SYNTAX          IgmpReceiverVlanMemberEntry
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "An entry corresponding to an IGMP group membership request with Receiver VLAN."
+     INDEX         { 
+                     alaIgmpReceiverVlanMemberVlan,
+                     alaIgmpReceiverVlanMemberIfIndex,
+                     alaIgmpReceiverVlanMemberGroupAddress,
+                     alaIgmpReceiverVlanMemberSourceAddress,
+                     alaIgmpReceiverVlanMemberReceiverVlan
+                   }
+     ::= { alaIgmpReceiverVlanMemberTable 1 }
+ 
+ IgmpReceiverVlanMemberEntry ::= SEQUENCE {
+     alaIgmpReceiverVlanMemberVlan                     Unsigned32,
+     alaIgmpReceiverVlanMemberIfIndex                  InterfaceIndex,
+     alaIgmpReceiverVlanMemberGroupAddress             InetAddressIPv4,
+     alaIgmpReceiverVlanMemberSourceAddress            InetAddressIPv4,
+     alaIgmpReceiverVlanMemberReceiverVlan             Unsigned32,
+     alaIgmpReceiverVlanMemberMode                     INTEGER,
+     alaIgmpReceiverVlanMemberCount                    Counter32,
+     alaIgmpReceiverVlanMemberTimeout                  TimeTicks
+ }
+ 
+ alaIgmpReceiverVlanMemberVlan OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "The group membership request's VLAN."
+     ::= { alaIgmpReceiverVlanMemberEntry 1 }
+ 
+ alaIgmpReceiverVlanMemberIfIndex OBJECT-TYPE
+     SYNTAX          InterfaceIndex
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "The group membership request's ifIndex."
+     ::= { alaIgmpReceiverVlanMemberEntry 2 }
+ 
+
+ alaIgmpReceiverVlanMemberGroupAddress OBJECT-TYPE
+     SYNTAX          InetAddressIPv4
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "The group membership request's IPv4 group address."
+     ::= { alaIgmpReceiverVlanMemberEntry 3 }
+ 
+ alaIgmpReceiverVlanMemberSourceAddress OBJECT-TYPE
+     SYNTAX          InetAddressIPv4
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "The group membership request's IPv4 source address."
+     ::= { alaIgmpReceiverVlanMemberEntry 4 }
+ 
+ alaIgmpReceiverVlanMemberReceiverVlan OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "The group membership request's Receiver VLAN."
+     ::= { alaIgmpReceiverVlanMemberEntry 5 }
+ 
+ alaIgmpReceiverVlanMemberMode OBJECT-TYPE
+     SYNTAX          INTEGER { include(1), exclude(2) }
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+         "The group membership request's IGMP source filter mode."
+     ::= { alaIgmpReceiverVlanMemberEntry 6 }
+ 
+ alaIgmpReceiverVlanMemberCount OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+         "The group membership request's counter."
+     ::= { alaIgmpReceiverVlanMemberEntry 7 }
+ 
+ alaIgmpReceiverVlanMemberTimeout OBJECT-TYPE
+     SYNTAX          TimeTicks
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+         "The group membership request's timeout."
+     ::= { alaIgmpReceiverVlanMemberEntry 8 }
+ 
+ 
+ --
+ --  Forward Table with Receiver VLAN
+ --
+ 
+ alaIgmpReceiverVlanForward OBJECT IDENTIFIER ::= { alcatelIND1IgmpMIBObjects 16 }
+ 
+ alaIgmpReceiverVlanForwardTable OBJECT-TYPE
+     SYNTAX          SEQUENCE OF IgmpReceiverVlanForwardEntry
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "The table listing the IP multicast forward information."
+     ::= { alaIgmpReceiverVlanForward 1 }
+ 
+ alaIgmpReceiverVlanForwardEntry OBJECT-TYPE
+     SYNTAX          IgmpReceiverVlanForwardEntry
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "An entry corresponding to an IP multicast forwarded flow."
+     INDEX         { 
+                     alaIgmpReceiverVlanForwardVlan,
+                     alaIgmpReceiverVlanForwardGroupAddress,
+                     alaIgmpReceiverVlanForwardHostAddress,
+                     alaIgmpReceiverVlanForwardDestAddress,
+                     alaIgmpReceiverVlanForwardOrigAddress,
+                     alaIgmpReceiverVlanForwardNextVlan,
+                     alaIgmpReceiverVlanForwardNextIfIndex,
+                     alaIgmpReceiverVlanForwardReceiverVlan
+                   }
+     ::= { alaIgmpReceiverVlanForwardTable 1 }
+ 
+ IgmpReceiverVlanForwardEntry ::= SEQUENCE {
+     alaIgmpReceiverVlanForwardVlan                    Unsigned32,
+     alaIgmpReceiverVlanForwardIfIndex                 InterfaceIndex,
+     alaIgmpReceiverVlanForwardGroupAddress            InetAddressIPv4,
+     alaIgmpReceiverVlanForwardHostAddress             InetAddressIPv4,
+     alaIgmpReceiverVlanForwardDestAddress             InetAddressIPv4,
+     alaIgmpReceiverVlanForwardOrigAddress             InetAddressIPv4,
+     alaIgmpReceiverVlanForwardType                    INTEGER,
+     alaIgmpReceiverVlanForwardNextVlan                Unsigned32,
+     alaIgmpReceiverVlanForwardNextIfIndex             InterfaceIndex,
+     alaIgmpReceiverVlanForwardNextType                INTEGER,
+     alaIgmpReceiverVlanForwardReceiverVlan            Unsigned32
+ }
+ 
+ alaIgmpReceiverVlanForwardVlan OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "The IP multicast forwarded flow's VLAN."
+     ::= { alaIgmpReceiverVlanForwardEntry 1 }
+ 
+ alaIgmpReceiverVlanForwardIfIndex OBJECT-TYPE
+     SYNTAX          InterfaceIndex
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+         "The IP multicast forwarded flow's ifIndex."
+     ::= { alaIgmpReceiverVlanForwardEntry 2 }
+ 
+
+ alaIgmpReceiverVlanForwardGroupAddress OBJECT-TYPE
+     SYNTAX          InetAddressIPv4
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "The IP multicast forwarded flow's IPv4 group address."
+     ::= { alaIgmpReceiverVlanForwardEntry 3 }
+ 
+ alaIgmpReceiverVlanForwardHostAddress OBJECT-TYPE
+     SYNTAX          InetAddressIPv4
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "The IP multicast forwarded flow's IPv4 host address."
+     ::= { alaIgmpReceiverVlanForwardEntry 4 }
+ 
+ alaIgmpReceiverVlanForwardDestAddress OBJECT-TYPE
+     SYNTAX          InetAddressIPv4
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "The IP multicast forwarded flow's IPv4 tunnel destination address."
+     ::= { alaIgmpReceiverVlanForwardEntry 5 }
+ 
+ alaIgmpReceiverVlanForwardOrigAddress OBJECT-TYPE
+     SYNTAX          InetAddressIPv4
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "The IP multicast forwarded flow's IPv4 tunnel source address."
+     ::= { alaIgmpReceiverVlanForwardEntry 6 }
+ 
+ alaIgmpReceiverVlanForwardType OBJECT-TYPE
+     SYNTAX          INTEGER { mcast(1), pim(2), ipip(3) }
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+         "The IP multicast forwarded flow's encapsulation type."
+     ::= { alaIgmpReceiverVlanForwardEntry 7 }
+ 
+ alaIgmpReceiverVlanForwardNextVlan OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "The IP multicast forwarded flow's next VLAN."
+     ::= { alaIgmpReceiverVlanForwardEntry 8 }
+ 
+ alaIgmpReceiverVlanForwardNextIfIndex OBJECT-TYPE
+     SYNTAX          InterfaceIndex
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "The IP multicast forwarded flow's next ifIndex."
+     ::= { alaIgmpReceiverVlanForwardEntry 9 }
+ 
+ alaIgmpReceiverVlanForwardNextType OBJECT-TYPE
+     SYNTAX          INTEGER { mcast(1), pim(2), ipip(3) }
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+         "The IP multicast forwarded flow's next encapsulation type."
+     ::= { alaIgmpReceiverVlanForwardEntry 10 }
+ 
+ alaIgmpReceiverVlanForwardReceiverVlan OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "The IP multicast forwarded flow's Receiver VLAN."
+     ::= { alaIgmpReceiverVlanForwardEntry 11 }
+ 
+  --
+  -- Static SSM Map Table
+  --
+
+alaIgmpStaticSsmMap OBJECT IDENTIFIER ::= { alcatelIND1IgmpMIBObjects 17 }
+
+alaIgmpStaticSsmMapTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF IgmpStaticSsmMapEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table is used for mapping IGMPv1/v2 reports to PIM-SSM.
+
+        For the group address/prefix configured the configured source address
+        configured will be mapped."
+    ::= { alaIgmpStaticSsmMap 1 }
+
+alaIgmpStaticSsmMapEntry OBJECT-TYPE
+    SYNTAX     IgmpStaticSsmMapEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry (conceptual row) in the alaIgmpStaticSsmMapTable."
+    INDEX      { alaIgmpStaticSsmMapGrpAddressType,
+                 alaIgmpStaticSsmMapGrpAddress,
+                 alaIgmpStaticSsmMapSrcAddressType,
+                 alaIgmpStaticSsmMapSrcAddress,
+                 alaIgmpStaticSsmMapGrpPrefixLength }
+    ::= { alaIgmpStaticSsmMapTable 1 }
+
+IgmpStaticSsmMapEntry ::= SEQUENCE {
+    alaIgmpStaticSsmMapGrpAddressType      InetAddressType,
+    alaIgmpStaticSsmMapGrpAddress       InetAddress,
+    alaIgmpStaticSsmMapSrcAddressType   InetAddressType,
+    alaIgmpStaticSsmMapSrcAddress       InetAddress,
+    alaIgmpStaticSsmMapGrpPrefixLength  InetAddressPrefixLength,
+    alaIgmpStaticSsmMapRowStatus        RowStatus
+}
+
+alaIgmpStaticSsmMapGrpAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType (1)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The address type of this entry. Must be ipv4 (1)."
+::= { alaIgmpStaticSsmMapEntry 1 }
+
+alaIgmpStaticSsmMapGrpAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The multicast group address that when combined with
+        alaIgmpStaticSsmMapGrpPrefixLength gives the group prefix
+        for this entry. The InetAddressType is given by the
+        alaIgmpStaticSsmMapAddressType object.
+
+        This address object is only significant up to
+        alaIgmpStaticSsmMapGrpPrefixLength bits. The remainder of
+        the address bits are zero.  This is especially important for
+        this index field which is part of the index of this entry.
+        Any non-zero bits would signify an entirely different
+        entry."
+::= { alaIgmpStaticSsmMapEntry 2 }
+
+alaIgmpStaticSsmMapSrcAddressType OBJECT-TYPE
+   SYNTAX     InetAddressType (1)
+   MAX-ACCESS not-accessible
+   STATUS     current
+    DESCRIPTION
+       "The address type of this entry. Must be ipv4 (1)."
+    ::= { alaIgmpStaticSsmMapEntry 3 }
+
+
+alaIgmpStaticSsmMapSrcAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+    "The IP address of the source to be used for groups within
+    this group prefix."
+::= { alaIgmpStaticSsmMapEntry 4 }
+
+alaIgmpStaticSsmMapGrpPrefixLength OBJECT-TYPE
+    SYNTAX     InetAddressPrefixLength (4..32)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The multicast group prefix length that when combined
+        with alaIgmpStaticSsmMapGrpAddress gives the group prefix
+        for this entry.  This object must be in the range 4..32."
+::= { alaIgmpStaticSsmMapEntry 5 }
+
+
+alaIgmpStaticSsmMapRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+    "The status of this row by which rows in this table can
+    be created and destroyed.
+
+    This status object cannot be set to active(1) before a valid
+    value has been written to alaIgmpStaticSsmMapSrcAddress.
+
+    All writeable objects in this entry can be modified when the
+    status of this entry is active(1)."
+::= { alaIgmpStaticSsmMapEntry 6 }
+ 
 --
 --  Conformance Table
 --
@@ -1394,7 +1897,8 @@ alaIgmpCompliance MODULE-COMPLIANCE
                        alaIgmpStaticNeighborGroup, alaIgmpQuerierGroup,
                        alaIgmpStaticQuerierGroup, alaIgmpSourceGroup, 
                        alaIgmpForwardGroup, alaIgmpTunnelGroup,
-                       alaIgmpPortGroup, alaIgmpPortVlanGroup}
+                       alaIgmpPortGroup, alaIgmpPortVlanGroup, alaIgmpStaticMemberReceiverVlanGroup,
+                       alaIgmpReceiverVlanMemberGroup, alaIgmpReceiverVlanForwardGroup }
 
     ::= { alcatelIND1IgmpMIBCompliances 1 }
 
@@ -1407,7 +1911,9 @@ alaIgmpGroup OBJECT-GROUP
               alaIgmpRouterTimeout, alaIgmpSourceTimeout, alaIgmpProxying,
               alaIgmpUnsolicitedReportInterval, alaIgmpQuerierForwarding,
               alaIgmpMaxGroupLimit, alaIgmpMaxGroupExceedAction,
-              alaIgmpFloodUnknown, alaIgmpHelperAddressType, alaIgmpHelperAddress }
+              alaIgmpFloodUnknown, alaIgmpHelperAddressType,
+              alaIgmpHelperAddress, alaIgmpBufferPacket, alaDynamicControlIpv4Status,
+			  alaIgmpStaticNeighborFastLearning, alaIgmpStarg }
     STATUS          current
     DESCRIPTION
         "A collection of objects to support management of IPv4 multicast switching
@@ -1422,7 +1928,7 @@ alaIgmpVlanGroup OBJECT-GROUP
               alaIgmpVlanSourceTimeout, alaIgmpVlanProxying, 
               alaIgmpVlanUnsolicitedReportInterval, alaIgmpVlanQuerierForwarding,
 	      alaIgmpVlanMaxGroupLimit, alaIgmpVlanMaxGroupExceedAction,
-              alaIgmpVlanSpoofAddressType, alaIgmpVlanSpoofAddress }
+              alaIgmpVlanSpoofAddressType, alaIgmpVlanSpoofAddress, alaIgmpVlanIndexSharing, alaIgmpVlanStarg }
     STATUS          current
     DESCRIPTION
         "A collection of objects to support management of IPv4 multicast switching
@@ -1515,5 +2021,31 @@ alaIgmpPortVlanGroup OBJECT-GROUP
         "An object to support IPv4 multicast switching group limit information 
 	for a port/vlan instance."
     ::= { alcatelIND1IgmpMIBGroups 13 }
+
+alaIgmpStaticMemberReceiverVlanGroup OBJECT-GROUP
+     OBJECTS { alaIgmpStaticMemberReceiverVlanRowStatus }
+     STATUS          current
+
+     DESCRIPTION
+         "A collection of objects to support IPv4 multicast switching and routing 
+          static group membership information tables on a receiver vlan."
+     ::= { alcatelIND1IgmpMIBGroups 14 }
+ 
+ alaIgmpReceiverVlanMemberGroup OBJECT-GROUP
+     OBJECTS { alaIgmpReceiverVlanMemberMode, alaIgmpReceiverVlanMemberCount, alaIgmpReceiverVlanMemberTimeout }
+     STATUS          current
+     DESCRIPTION
+         "A collection of objects to support IPv4 multicast switching and routing 
+          group membership information with Receiver VLAN."
+     ::= { alcatelIND1IgmpMIBGroups 15 }
+ 
+ alaIgmpReceiverVlanForwardGroup OBJECT-GROUP
+     OBJECTS { alaIgmpReceiverVlanForwardIfIndex, alaIgmpReceiverVlanForwardType, alaIgmpReceiverVlanForwardNextType }
+     STATUS          current
+     DESCRIPTION
+         "A collection of objects to support IPv4 multicast switching and routing 
+          IP multicast forward information with Receiver VLAN."
+     ::= { alcatelIND1IgmpMIBGroups 16 }
+ 
 
 END

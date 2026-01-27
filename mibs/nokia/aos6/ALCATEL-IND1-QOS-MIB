@@ -1,7 +1,6 @@
 -- FILE: alcatelIND1QoS.mib
 
--- Alcatel
--- Architects Of An Internet World
+-- Alcatel-Lucent Enterprise
 
 -- This module provides authoritative enterprise-specific Simple Network
 -- Management Protocol (SNMP) Management Information Base (MIB) definitions.
@@ -20,23 +19,18 @@
 -- Please consult with Customer Service to ensure the most appropriate version
 -- of this document is used with the products in question:
 
--- Alcatel-Lucent, Enterprise Solutions Division
--- (Formerly Alcatel Internetworking, Incorporated)
+-- Alcatel-Lucent Enterprise,
 -- 26801 West Agoura Road
--- Calabasas, CA 91301
+-- Agoura Hills, CA 91301-5122
 -- United States Of America
 
--- Telephone: North America 800.995.2696
--- Latin America 877.919.9526
--- Europe 31.23.556.0100
--- Asia 65.394.7933
--- All Other 818.878.4507
+-- Telephone:               +1 800 995 2696 
 
--- Electronic Mail: support@ind.alcatel.com
--- World Wide Web: http://alcatel-lucent.com/wps/portal/enterprise
--- File Transfer Protocol: ftp://ftp.ind.alcatel.com/pub/products/mibs
+-- Electronic Mail: ebg_global_supportcenter@al-enterprise.com
+-- World Wide Web: https://www.al-enterprise.com
 
--- Copyright (C) 1995-2007 Alcatel-Lucent
+-- Copyright (C) ALE USA Inc. 2014-2019
+-- Copyright (C) 1995-2013 Alcatel-Lucent
 -- ALL RIGHTS RESERVED WORLDWIDE
 
 ALCATEL-IND1-QOS-MIB DEFINITIONS ::= BEGIN
@@ -58,13 +52,24 @@ IMPORTS
 
 
 alaQoSMIB MODULE-IDENTITY
-  LAST-UPDATED "200704030000Z"
-  ORGANIZATION "Alcatel IND"
+  LAST-UPDATED "201910070000Z"
+  ORGANIZATION "ALE USA Inc."
   CONTACT-INFO
-    "David Morgan
-    E-Mail: David.Morgan@ind.alcatel.com"
+        "Alcatel-Lucent Enterprise
+          26801 West Agoura Road
+        Agoura Hills, CA  91301-5122
+          United States Of America
+
+  Telephone:               +1 800 995 2696
+  Electronic Mail:         ebg_global_supportcenter@al-enterprise.com
+  World Wide Web:          https://www.al-enterprise.com"
+
   DESCRIPTION
-    "QoS and Filtering MIB"
+		"QOS and filtering MIB"
+		
+  REVISION      "201910070000Z"
+  DESCRIPTION
+        "Updated the latest contact and Copyright information for ALE USA Inc."
   ::= { softentIND1QoS 1 }
 
 
@@ -122,12 +127,17 @@ QoSRuleEntry ::=
     alaQoSRuleType                                          Integer32,
     alaQoSRuleTrapEvents                                    INTEGER,
     alaQoSRuleDefaultList                                   INTEGER,
-    alaQoSRuleGreenCount                                    Counter64,
+    alaQoSRuleGreenCount								    Counter64,
     alaQoSRuleYellowCount                                   Counter64,
-    alaQoSRuleRedCount                                      Counter64,
+    alaQoSRuleRedCount				           				 Counter64,
     alaQoSRuleNonGreenCount                                 Counter64,
-    alaQoSRuleNonRedCount                                   Counter64
-  }
+    alaQoSRuleNonRedCount                                   Counter64,
+    alaQoSRuleAccounting                                    INTEGER,
+    alaQoSRulePacketRate                                 Counter64,
+    alaQoSRuleAccPacketCount                                           Counter64,
+    alaQoSRuleAccByteCount                                    Counter64,
+    alaQoSRuleBitRate                                           Counter64 
+}
 
 alaQoSRuleName OBJECT-TYPE
   SYNTAX      DisplayString (SIZE(0..31))
@@ -373,7 +383,7 @@ alaQoSRuleYellowCount  OBJECT-TYPE
 
 alaQoSRuleRedCount  OBJECT-TYPE
   SYNTAX      Counter64
-  MAX-ACCESS  read-only
+ MAX-ACCESS  read-only
   STATUS      current
   DESCRIPTION "Counter for the number of packets being red compliant."
   ::= { alaQoSRuleEntry 27 }
@@ -391,6 +401,48 @@ alaQoSRuleNonRedCount  OBJECT-TYPE
   STATUS      current
   DESCRIPTION "Counter for the number of packets being non-red compliant."
   ::= { alaQoSRuleEntry 29 }
+
+alaQoSRuleAccounting OBJECT-TYPE
+  SYNTAX      INTEGER {
+                enabled (1),
+                disabled (2)
+              }
+
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION "Flag for enabling/disbling the accounting mode."
+  DEFVAL      {2}
+  ::= { alaQoSRuleEntry 30}
+
+alaQoSRulePacketRate OBJECT-TYPE
+  SYNTAX      Counter64
+
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION " Shows the packet per second rate "
+  ::= { alaQoSRuleEntry 31}
+
+alaQoSRuleAccPacketCount OBJECT-TYPE
+ SYNTAX      Counter64
+ MAX-ACCESS  read-only
+ STATUS      current
+ DESCRIPTION "Counter for packets patching this rule"
+ ::= { alaQoSRuleEntry 32 }
+
+alaQoSRuleAccByteCount OBJECT-TYPE
+SYNTAX      Counter64
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "Counter for packets patching this rule"
+::= { alaQoSRuleEntry 33 }
+
+alaQoSRuleBitRate OBJECT-TYPE
+  SYNTAX      Counter64
+ 
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION " Shows the Bits per second rate "
+  ::= { alaQoSRuleEntry 34}
 
 --
 -- Definition of rule table
@@ -440,11 +492,17 @@ QoSAppliedRuleEntry ::=
     alaQoSAppliedRuleType                                   Integer32,
     alaQoSAppliedRuleTrapEvents                             INTEGER,
     alaQoSAppliedRuleDefaultList                            INTEGER,
-    alaQoSAppliedRuleGreenCount                             Counter64,
+    alaQoSAppliedRuleGreenCount    			    Counter64,
     alaQoSAppliedRuleYellowCount                            Counter64,
-    alaQoSAppliedRuleRedCount                               Counter64,
+    alaQoSAppliedRuleRedCount				    Counter64,
     alaQoSAppliedRuleNonGreenCount                          Counter64,
-    alaQoSAppliedRuleNonRedCount                            Counter64
+    alaQoSAppliedRuleNonRedCount                            Counter64,
+    alaQoSAppliedRuleAccounting                                 INTEGER,
+    alaQoSAppliedRulePacketRate					Counter64,
+    alaQoSAppliedRuleAccPacketCount                              Counter64,
+    alaQoSAppliedRuleAccByteCount                                Counter64,
+    alaQoSAppliedRuleBitRate					 Counter64
+ 
   }
 
 alaQoSAppliedRuleName OBJECT-TYPE
@@ -685,7 +743,7 @@ alaQoSAppliedRuleRedCount OBJECT-TYPE
   MAX-ACCESS  read-only
   STATUS      current
   DESCRIPTION "Counter for the number of packets being red compliant."
-  ::= { alaQoSAppliedRuleEntry 27 }
+  ::= { alaQoSAppliedRuleEntry 27 } 
 
 alaQoSAppliedRuleNonGreenCount OBJECT-TYPE
   SYNTAX      Counter64
@@ -700,6 +758,157 @@ alaQoSAppliedRuleNonRedCount OBJECT-TYPE
   STATUS      current
   DESCRIPTION "Counter for the number of packets being non-red compliant."
   ::= { alaQoSAppliedRuleEntry 29 }
+
+alaQoSAppliedRuleAccounting OBJECT-TYPE
+  SYNTAX      INTEGER {
+                enabled (1),
+                disabled (2)
+              }
+
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION " Flag for enabling/disabling the accounting mode."
+  DEFVAL      {2}
+  ::= { alaQoSAppliedRuleEntry 30}
+
+alaQoSAppliedRulePacketRate OBJECT-TYPE
+  SYNTAX      Counter64
+
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION " Shows the packet per second rate "
+  ::= { alaQoSAppliedRuleEntry 31}
+
+
+alaQoSAppliedRuleAccPacketCount OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for packets patching this rule"
+  ::= { alaQoSAppliedRuleEntry 32 }
+  
+
+alaQoSAppliedRuleAccByteCount OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for packets patching this rule"
+  ::= { alaQoSAppliedRuleEntry 33 }
+
+alaQoSAppliedRuleBitRate OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION " Shows the Bits per second rate "
+  ::= { alaQoSAppliedRuleEntry 34}
+-- Definition of extended rule table
+--
+alaQoSExtendedRuleTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF QoSExtendedRuleEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Table of QoS Rule definitions for extending port group behavior on individual port basis or group basis"
+  ::= { alaQoSMIBObjects 54 }
+alaQoSExtendedRuleEntry OBJECT-TYPE
+  SYNTAX      QoSExtendedRuleEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Definition of QoS Rule" 
+  INDEX {
+	   alaQoSRuleName,
+	   alaQoSExtendedRuleSlot,        
+	   alaQoSExtendedRulePort        
+   	}
+  ::= { alaQoSExtendedRuleTable 1 }
+QoSExtendedRuleEntry ::=
+   SEQUENCE
+	{
+		alaQoSExtendedRuleSlot            		Integer32,
+		alaQoSExtendedRulePort            		Integer32,                             
+		alaQoSExtendedRuleMatches         		Counter32,
+		alaQoSExtendedRulePacketCount     		Counter64,
+		alaQoSExtendedRuleByteCount       		Counter64,   
+   		alaQoSExtendedRuleExcessPacketCount   	Counter64,    
+		alaQoSExtendedRuleExcessByteCount     	Counter64,    
+		alaQoSExtendedRuleGreenCount          	Counter64,
+		alaQoSExtendedRuleYellowCount     		Counter64,
+		alaQoSExtendedRuleRedCount        		Counter64,    
+		alaQoSExtendedRuleNonGreenCount       	Counter64,
+		alaQoSExtendedRuleNonRedCount     		Counter64    
+	}	
+alaQoSExtendedRuleSlot OBJECT-TYPE
+  SYNTAX      Integer32
+  MAX-ACCESS  not-accessible 
+  STATUS      current
+  DESCRIPTION "Slot on which rate-limit is enabled."
+  ::= { alaQoSExtendedRuleEntry 1 }
+alaQoSExtendedRulePort OBJECT-TYPE
+  SYNTAX      Integer32
+  MAX-ACCESS  not-accessible 
+  STATUS      current
+  DESCRIPTION "Port on which rate-limit is enabled."
+  ::= { alaQoSExtendedRuleEntry 2 }
+alaQoSExtendedRuleMatches OBJECT-TYPE
+  SYNTAX      Counter32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Number of times this rule has been matched."
+  ::= { alaQoSExtendedRuleEntry 3 }
+alaQoSExtendedRulePacketCount OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for packets matching this rule"
+  ::= { alaQoSExtendedRuleEntry 4 }
+alaQoSExtendedRuleByteCount OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for bytes matching this rule"
+  ::= { alaQoSExtendedRuleEntry 5 }
+alaQoSExtendedRuleExcessPacketCount OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for packets out of the bandwidth parameters"
+  ::= { alaQoSExtendedRuleEntry 6 }
+alaQoSExtendedRuleExcessByteCount OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for bytes out of the bandwidth parameters"
+  ::= { alaQoSExtendedRuleEntry 7 }
+alaQoSExtendedRuleGreenCount  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for the number of packets which are green compliant."
+  ::= { alaQoSExtendedRuleEntry 8 }
+alaQoSExtendedRuleYellowCount  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for the number of packets which are yellow compliant."
+  ::= { alaQoSExtendedRuleEntry 9 }
+alaQoSExtendedRuleRedCount  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for the number of packets which are red compliant."
+  ::= { alaQoSExtendedRuleEntry 10 }
+alaQoSExtendedRuleNonGreenCount  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for the number of packets which are non-green compliant."
+  ::= { alaQoSExtendedRuleEntry 11 }
+alaQoSExtendedRuleNonRedCount  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Counter for the number of packets which are non-red compliant."
+  ::= { alaQoSExtendedRuleEntry 12 }
+--
 
 --
 -- Definition of condition table
@@ -846,7 +1055,9 @@ QoSConditionEntry ::=
     alaQoSConditionSourceVlanGroup			    DisplayString,
     alaQoSConditionSourceVlanGroupStatus		    INTEGER,
     alaQoSConditionInnerSourceVlanGroup 		    DisplayString,
-    alaQoSConditionInnerSourceVlanGroupStatus		    INTEGER
+    alaQoSConditionInnerSourceVlanGroupStatus		    INTEGER,
+    alaQoSConditionSIP					     INTEGER,
+    alaQoSConditionSIPStatus				     INTEGER
   }
 
 alaQoSConditionName OBJECT-TYPE
@@ -2043,6 +2254,29 @@ alaQoSConditionInnerSourceVlanGroupStatus OBJECT-TYPE
 	      source vlan group."
   ::= { alaQoSConditionEntry 122 } 
 
+alaQoSConditionSIP OBJECT-TYPE
+  SYNTAX      INTEGER {
+				audio (1),
+		  		video (2),
+		  		other (3)
+			  }		
+  MAX-ACCESS  	read-create
+  STATUS      	current
+  DESCRIPTION 	"SIP type to use for traffic classification"
+  DEFVAL      	{ audio }
+  ::= { alaQoSConditionEntry 123 }
+alaQoSConditionSIPStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+				enabled (1),
+		  		disabled (2)
+			  }		
+  MAX-ACCESS  	read-create
+  STATUS      	current
+  DESCRIPTION 	"SIP Status field indicates whether SIP is enabled or disabled 
+  				for traffic classification"
+  DEFVAL      	{ enabled }
+  ::= { alaQoSConditionEntry 124 }
+
 --
 -- Definition of condition table
 --
@@ -2188,7 +2422,9 @@ QoSAppliedConditionEntry ::=
     alaQoSAppliedConditionSourceVlanGroup 		    DisplayString,
     alaQoSAppliedConditionSourceVlanGroupStatus 	    INTEGER,
     alaQoSAppliedConditionInnerSourceVlanGroup 		    DisplayString,
-    alaQoSAppliedConditionInnerSourceVlanGroupStatus        INTEGER 
+    alaQoSAppliedConditionInnerSourceVlanGroupStatus        INTEGER,
+    alaQoSAppliedConditionSIP				    INTEGER,
+    alaQoSAppliedConditionSIPStatus			    INTEGER 
   }
 
 alaQoSAppliedConditionName OBJECT-TYPE
@@ -3308,6 +3544,28 @@ alaQoSAppliedConditionInnerSourceVlanGroupStatus OBJECT-TYPE
               source vlan group."
   ::= { alaQoSAppliedConditionEntry 122 }
 
+alaQoSAppliedConditionSIP OBJECT-TYPE
+  SYNTAX      INTEGER {
+				audio (1),
+		  		video (2),
+		  		other (3)
+			  }					
+  MAX-ACCESS  	read-create
+  STATUS      	current
+  DESCRIPTION 	"SIP type to use for traffic classification"
+  DEFVAL      	{ audio }
+  ::= { alaQoSAppliedConditionEntry 123 }
+alaQoSAppliedConditionSIPStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+       	        enabled (1),
+		        disabled (2)
+              }		
+  MAX-ACCESS  	read-create
+  STATUS      	current
+  DESCRIPTION 	"SIP Status field indicates whether SIP is enabled or disabled 
+				for traffic classification"
+  DEFVAL      	{ enabled }
+  ::= { alaQoSAppliedConditionEntry 124 }
 --
 -- Definition of service table
 --
@@ -4501,7 +4759,8 @@ QoSPortGroupsEntry ::=
   {
     alaQoSPortGroupsName                                    DisplayString,
     alaQoSPortGroupsSource                                  INTEGER,
-    alaQoSPortGroupsStatus                                  RowStatus
+    alaQoSPortGroupsStatus                                  RowStatus,
+    alaQoSPortGroupsMode  	                            INTEGER
   }
 
 alaQoSPortGroupsName OBJECT-TYPE
@@ -4533,7 +4792,15 @@ alaQoSPortGroupsStatus OBJECT-TYPE
                RowStatus convention"
   ::= { alaQoSPortGroupsEntry 3 }
 
-
+alaQoSPortGroupsMode  	OBJECT-TYPE
+  SYNTAX       INTEGER {
+		  split(1),
+		  nonSplit(2)
+	       }
+  MAX-ACCESS  		read-create
+  STATUS      		current
+  DESCRIPTION 		"Mode for policy action on the per port basis or group basis."
+  ::= { alaQoSPortGroupsEntry 4 }
 --
 -- Definition of port group table
 --
@@ -4560,7 +4827,8 @@ QoSAppliedPortGroupsEntry ::=
   {
     alaQoSAppliedPortGroupsName                             DisplayString,
     alaQoSAppliedPortGroupsSource                           INTEGER,
-    alaQoSAppliedPortGroupsStatus                           RowStatus
+    alaQoSAppliedPortGroupsStatus                           RowStatus,
+    alaQoSAppliedPortGroupsMode                             INTEGER
   }
 
 alaQoSAppliedPortGroupsName OBJECT-TYPE
@@ -4591,6 +4859,15 @@ alaQoSAppliedPortGroupsStatus OBJECT-TYPE
                RowStatus convention"
   ::= { alaQoSAppliedPortGroupsEntry 3 }
 
+alaQoSAppliedPortGroupsMode  	OBJECT-TYPE
+  SYNTAX       INTEGER {
+		   split(1),
+		   nonSplit(2)
+	       }
+  MAX-ACCESS  		read-create
+  STATUS      		current
+  DESCRIPTION 		"Mode for policy action on the per port basis or group basis."
+  ::= { alaQoSAppliedPortGroupsEntry 4 }
 
 --
 -- Definition of port group entry table
@@ -5064,14 +5341,20 @@ QoSActionEntry ::=
     alaQoSActionMirrorMode                                  INTEGER,
     alaQoSActionMirrorModeStatus                            INTEGER,
     alaQoSActionCIR                                         Integer32,
-    alaQoSActionCIRStatus                                   INTEGER,
+    alaQoSActionCIRStatus         			    INTEGER,
     alaQoSActionCBS                                         Integer32,
-    alaQoSActionCBSStatus                                   INTEGER,
+    alaQoSActionCBSStatus		                    INTEGER,
     alaQoSActionPIR                                         Integer32,
-    alaQoSActionPIRStatus                                   INTEGER,
+    alaQoSActionPIRStatus		                    INTEGER,
     alaQoSActionPBS                                         Integer32,
-    alaQoSActionPBSStatus                                   INTEGER,
-	alaQoSActionCounterColor                                INTEGER
+    alaQoSActionPBSStatus		          	    INTEGER,
+    alaQoSActionCounterColor                                INTEGER,
+    alaQoSActionRTCPMonitor                                 INTEGER,
+    alaQoSActionRTCPMonitorStatus                           INTEGER,
+    alaQoSActionRTCPDSCP                                    Integer32,
+    alaQoSActionRTCPDSCPStatus	                            INTEGER,
+    alaQoSActionTrustDSCP                                   INTEGER,
+    alaQoSActionTrustDSCPStatus	                            INTEGER      				
   }
 
 alaQoSActionName OBJECT-TYPE
@@ -5754,7 +6037,7 @@ alaQoSActionMirrorMode OBJECT-TYPE
   MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Mirroring mode"
-  DEFVAL      { 1 }
+  DEFVAL      { ingress }
   ::= { alaQoSActionEntry 67 }
 
 alaQoSActionMirrorModeStatus OBJECT-TYPE
@@ -5769,8 +6052,8 @@ alaQoSActionMirrorModeStatus OBJECT-TYPE
   ::= { alaQoSActionEntry 68 }
 
 alaQoSActionCIR OBJECT-TYPE
-  SYNTAX      Integer32
-  UNITS       "kilobits per second"
+  SYNTAX      Integer32 
+  UNITS	      "kilobits per second" 
   MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Committed Information Rate - bandwidth values in kilobits per second."
@@ -5785,12 +6068,12 @@ alaQoSActionCIRStatus OBJECT-TYPE
   MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Status field indicating whether CIR value is specified(enabled)
-                          or not(disabled)."
+			  or not(disabled)."
   DEFVAL      { disabled }
   ::= { alaQoSActionEntry 70 }
 
 alaQoSActionCBS OBJECT-TYPE
-  SYNTAX      Integer32(0 .. 2147450880)
+  SYNTAX      Integer32(0 .. 2147450880) 
   MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Committed Burst Size - bucket size in byte."
@@ -5810,8 +6093,8 @@ alaQoSActionCBSStatus OBJECT-TYPE
   ::= { alaQoSActionEntry 72 }
 
 alaQoSActionPIR OBJECT-TYPE
-  SYNTAX      Integer32
-  UNITS       "kilobits per second"
+  SYNTAX      Integer32 
+  UNITS	      "kilobits per second" 
   MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Peak Information Rate - bandwidth values in kilobits per second."
@@ -5831,7 +6114,7 @@ alaQoSActionPIRStatus OBJECT-TYPE
   ::= { alaQoSActionEntry 74 }
 
 alaQoSActionPBS OBJECT-TYPE
-  SYNTAX      Integer32(0 .. 2147450880)
+  SYNTAX      Integer32(0 .. 2147450880) 
   MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Peak Burst Size - bucket size in byte."
@@ -5849,7 +6132,7 @@ alaQoSActionPBSStatus OBJECT-TYPE
               or not(disabled)."
   DEFVAL      { disabled }
   ::= { alaQoSActionEntry 76 }
-  
+
 alaQoSActionCounterColor OBJECT-TYPE
   SYNTAX      INTEGER {
                         rednonred (1),
@@ -5863,6 +6146,62 @@ alaQoSActionCounterColor OBJECT-TYPE
   DESCRIPTION "Specifies the color mode for the counters which will be used for sr/trTCM."
   DEFVAL      { redyellow }
   ::= { alaQoSActionEntry 77 }
+alaQoSActionRTCPMonitor OBJECT-TYPE
+  SYNTAX      INTEGER {
+				enable (1),
+		   		disable (2)
+				}	
+  MAX-ACCESS  	read-create
+  STATUS      	current
+  DESCRIPTION 	"RTCP Monitor status for the traffic."
+  DEFVAL      	{ enable }
+  ::= { alaQoSActionEntry 78 }
+alaQoSActionRTCPMonitorStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+				enabled (1),
+		   		disabled (2)
+				}	
+  MAX-ACCESS  	read-create
+  STATUS      	current
+  DESCRIPTION 	"Status of the RTCP Monitor field for the traffic."
+  DEFVAL      	{ enabled }
+  ::= { alaQoSActionEntry 79 }
+alaQoSActionRTCPDSCP OBJECT-TYPE
+  SYNTAX		Integer32
+  MAX-ACCESS  	read-create
+  STATUS      	current
+  DESCRIPTION 	"RTCP DSCP number for the traffic."
+  ::= { alaQoSActionEntry 80 }
+alaQoSActionRTCPDSCPStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+				enabled (1),
+		   		disabled (2)
+				}	
+  MAX-ACCESS  	read-create
+  STATUS      	current
+  DESCRIPTION 	"Status of the RTCP DSCP field for the traffic."
+  DEFVAL      	{ enabled }
+  ::= { alaQoSActionEntry 81 }
+alaQoSActionTrustDSCP OBJECT-TYPE
+  SYNTAX      INTEGER {
+				yes (1),
+		   		no (2)
+				}	
+  MAX-ACCESS  	read-create
+  STATUS      	current
+  DESCRIPTION 	"Trust DSCP status for the traffic."
+  DEFVAL      	{ no }
+  ::= { alaQoSActionEntry 82 }
+alaQoSActionTrustDSCPStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+				enabled (1),
+		   		disabled (2)
+				}	
+  MAX-ACCESS  	read-create
+  STATUS      	current
+  DESCRIPTION 	"Status of the Trust DSCP field for the traffic."
+  DEFVAL      	{ enabled }
+  ::= { alaQoSActionEntry 83 }
 
 --
 -- Definition of action table
@@ -5959,12 +6298,18 @@ QoSAppliedActionEntry ::=
     alaQoSAppliedActionCIR                                  Integer32,
     alaQoSAppliedActionCIRStatus                            INTEGER,
     alaQoSAppliedActionCBS                                  Integer32,
-    alaQoSAppliedActionCBSStatus                            INTEGER,
+    alaQoSAppliedActionCBSStatus			    INTEGER,
     alaQoSAppliedActionPIR                                  Integer32,
-    alaQoSAppliedActionPIRStatus                            INTEGER,
+    alaQoSAppliedActionPIRStatus			    INTEGER,
     alaQoSAppliedActionPBS                                  Integer32,
-    alaQoSAppliedActionPBSStatus                            INTEGER,
-	alaQoSAppliedActionCounterColor						    INTEGER	
+    alaQoSAppliedActionPBSStatus			    INTEGER,
+    alaQoSAppliedActionCounterColor                         INTEGER,
+    alaQoSAppliedActionRTCPMonitor                          INTEGER,
+    alaQoSAppliedActionRTCPMonitorStatus                    INTEGER,
+    alaQoSAppliedActionRTCPDSCP                             Integer32,
+    alaQoSAppliedActionRTCPDSCPStatus                       INTEGER,
+    alaQoSAppliedActionTrustDSCP                            INTEGER,
+    alaQoSAppliedActionTrustDSCPStatus                      INTEGER
   }
 
 alaQoSAppliedActionName OBJECT-TYPE
@@ -6587,7 +6932,7 @@ alaQoSAppliedActionMirrorMode OBJECT-TYPE
   MAX-ACCESS  read-only
   STATUS      current
   DESCRIPTION "Mirroring mode"
-  DEFVAL      { 1 }
+  DEFVAL      { ingress }
   ::= { alaQoSAppliedActionEntry 67 }
 
 alaQoSAppliedActionMirrorModeStatus OBJECT-TYPE
@@ -6602,7 +6947,7 @@ alaQoSAppliedActionMirrorModeStatus OBJECT-TYPE
 
 alaQoSAppliedActionCIR OBJECT-TYPE
   SYNTAX      Integer32
-  UNITS       "kilobits per second"
+  UNITS       "kilobits per second" 
   MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Committed Information Rate - bandwidth values in kilobits per second."
@@ -6625,7 +6970,7 @@ alaQoSAppliedActionCBS OBJECT-TYPE
   SYNTAX      Integer32(0 .. 2147450880)
   MAX-ACCESS  read-create
   STATUS      current
-  DESCRIPTION "Committed Burst Size - bucket size in byte."
+  DESCRIPTION "Committed Burst Size - bucket size in byte." 
   DEFVAL      { 0 }
   ::= { alaQoSAppliedActionEntry 71 }
 
@@ -6643,7 +6988,7 @@ alaQoSAppliedActionCBSStatus OBJECT-TYPE
 
 alaQoSAppliedActionPIR OBJECT-TYPE
   SYNTAX      Integer32
-  UNITS       "kilobits per second"
+  UNITS       "kilobits per second" 
   MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "Peak Information Rate - bandwidth values in kilobits per second."
@@ -6695,7 +7040,61 @@ alaQoSAppliedActionCounterColor OBJECT-TYPE
   DESCRIPTION "Specifies the color mode for the counters which will be used for sr/trTCM."
   DEFVAL      { redyellow }
   ::= { alaQoSAppliedActionEntry 77 }
-
+alaQoSAppliedActionRTCPMonitor OBJECT-TYPE
+  SYNTAX      INTEGER {
+				enable (1),
+		   		disable (2)
+				}	
+  MAX-ACCESS  	read-create
+  STATUS      	current
+  DESCRIPTION 	"RTCP Monitor status for the traffic."
+  DEFVAL      	{ enable }
+  ::= { alaQoSAppliedActionEntry 78 }
+alaQoSAppliedActionRTCPMonitorStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+				enable (1),
+		   		disable (2)
+				}	
+  MAX-ACCESS  	read-create
+  STATUS      	current
+  DESCRIPTION 	"Status of the RTCP Monitor field for the traffic."
+  DEFVAL      	{ enable }
+  ::= { alaQoSAppliedActionEntry 79 }
+alaQoSAppliedActionRTCPDSCP OBJECT-TYPE
+  SYNTAX		Integer32
+  MAX-ACCESS  	read-create
+  STATUS      	current
+  DESCRIPTION 	"RTCP DSCP number for the traffic."
+  ::= { alaQoSAppliedActionEntry 80 }
+alaQoSAppliedActionRTCPDSCPStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+				enable (1),
+		   		disable (2)
+				}	
+  MAX-ACCESS  	read-create
+  STATUS      	current
+  DESCRIPTION 	"Status of the RTCP DSCP field for the traffic."
+  ::= { alaQoSAppliedActionEntry 81 }
+alaQoSAppliedActionTrustDSCP OBJECT-TYPE
+  SYNTAX      INTEGER {
+				yes (1),
+		   		no (2)
+				}	
+  MAX-ACCESS  	read-create
+  STATUS      	current
+  DESCRIPTION 	"Trust DSCP status for the traffic."
+  DEFVAL      	{ no }
+  ::= { alaQoSAppliedActionEntry 82 }
+alaQoSAppliedActionTrustDSCPStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+				enable (1),
+		   		disable (2)
+				}	
+  MAX-ACCESS  	read-create
+  STATUS      	current
+  DESCRIPTION 	"Status of the Trust DSCP field for the traffic."
+  DEFVAL      	{ enable }
+  ::= { alaQoSAppliedActionEntry 83 }
 
 --
 -- Definition of port table
@@ -6811,8 +7210,8 @@ QoSPortEntry ::=
     alaQoSPortEnqueuingThresholdP3Lower                     Integer32,
     alaQoSPortEnqueuingThresholdP3Upper                     Integer32,
     alaQoSPortEnqueuingThresholdStatus                      INTEGER,
-    alaQoSPortServicingMode                                 INTEGER,
     alaQoSPortHighDensity                                   INTEGER,
+    alaQoSPortServicingMode                                 INTEGER, 
     alaQoSPortFreeFFPRules                                  Integer32,
     alaQoSPortUsedFFPRules                                  Integer32,
     alaQoSPortFreeFFPMasks                                  Integer32,
@@ -6857,9 +7256,9 @@ QoSPortEntry ::=
     alaQoSPortCOS7MinimumBandwidthStatus                    INTEGER,
     alaQoSPortMaximumIngBandwidth                           Integer32,
     alaQoSPortMaximumIngBandwidthStatus                     INTEGER,
-    alaQoSPortDEIMarking 				    INTEGER,
-    alaQoSPortMonitor					    INTEGER,
-    alaQoSPortDEIMapping				    INTEGER
+    alaQoSPortDEIMarking 				                    INTEGER,
+    alaQoSPortMonitor                                       INTEGER,
+    alaQoSPortDEIMapping				                    INTEGER
   }
 
 alaQoSPortSlot OBJECT-TYPE
@@ -8106,10 +8505,10 @@ alaQoSPortMonitor OBJECT-TYPE
   MAX-ACCESS  read-create
   STATUS      current
   DESCRIPTION "This object is used to monitor a slot/port on which user is interested
-	      to get the cos egress statistics. 
+	      to get the cos egress statistics.
 	
-	      enabled(1)  -- monitor the slot/port to gather per port cos egress  
-			     statistics. 
+	      enabled(1)  -- monitor the slot/port to gather per port cos egress
+			     statistics.
 	      disabled(2) -- reset the previously monitored slot/port."
    DEFVAL      { disabled }
   ::= { alaQoSPortEntry 137 }
@@ -8715,6 +9114,175 @@ alaQoSConfigStatsResetEgress OBJECT-TYPE
   DESCRIPTION "Set to reset global Egress QoS statistics counters"
   ::= { alaQoSConfig 55 }
 
+alaQoSConfigForceYellowPriority  OBJECT-TYPE
+SYNTAX      INTEGER {
+                pri0 (0),
+                pri1 (1),
+                pri2 (2),
+                pri3 (3),
+                pri4 (4),
+                pri5 (5),
+                pri6 (6),
+                pri7 (7),
+                disable (8)
+              }
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION "Change the Priority for Yellow Traffic 
+              pri0-7 - will replace the priority.
+              disable - will unconfigure to feature."
+  DEFVAL 	{ pri0 }
+  ::= { alaQoSConfig 56 }
+
+alaQoSConfigMulticastRateLimit OBJECT-TYPE
+  SYNTAX      INTEGER {
+             pps128 (1),
+             pps256 (2),
+             pps512 (3),
+             pps1024 (4)
+}
+ MAX-ACCESS  read-write
+ STATUS      current
+ DESCRIPTION "Used to set rate Limit in case of Qos debug"
+ ::= { alaQoSConfig 57 }
+
+alaQoSConfigForceYellowDSCP OBJECT-TYPE
+SYNTAX      INTEGER {
+                pri0 (0),
+                pri1 (1),
+                pri2 (2),
+                pri3 (3),
+                pri4 (4),
+                pri5 (5),
+                pri6 (6),
+                pri7 (7),
+                pri8 (8),
+                pri9 (9),
+                pri10 (10),
+                pri11 (11),
+                pri12 (12),
+                pri13 (13),
+                pri14 (14),
+                pri15 (15),
+                pri16 (16),
+                pri17 (17),
+                pri18 (18),
+                pri19 (19),
+                pri20 (20),
+                pri21 (21),
+                pri22 (22),
+                pri23 (23),
+                pri24 (24),
+                pri25 (25),
+                pri26 (26),
+                pri27 (27),
+                pri28 (28),
+                pri29 (29),
+                pri30 (30),
+                pri31 (31),
+                pri32 (32),
+                pri33 (33),
+                pri34 (34),
+                pri35 (35),
+                pri36 (36),
+                pri37 (37),
+                pri38 (38),
+                pri39 (39),
+                pri40 (40),
+                pri51 (51),
+                pri52 (52),
+                pri53 (53),
+                pri54 (54),
+                pri55 (55),
+                pri56 (56),
+                pri57 (57),
+                pri58 (58),
+                pri59 (59),
+                pri60 (60),
+                pri61 (61),
+                pri62 (62),
+                pri63 (63),
+                disable (64)
+              }
+ 
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION "Change the DSCP value for Yellow Traffic
+              pri0-63 - will replace the priority.
+              disable - will unconfigure the feature."
+  DEFVAL        { pri0 }
+  ::= { alaQoSConfig 59 }
+
+alaQoSConfigUserportLinkShutdown OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION "Events/protocols that trigger link shut down of a Userport.
+				Event bits values are:
+				spoof = 1
+				bpdu = 2
+				bgp = 4
+				ospf = 8
+				rip = 16
+				vrrp = 32
+				dhcp-server = 64
+				pim = 128
+				dvmrp = 256
+				is-is = 512
+				dnsreply = 1024"
+  ::= { alaQoSConfig 61 }
+
+alaQoSConfigAppliedUserportLinkShutdown OBJECT-TYPE
+  SYNTAX      Integer32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Events/protocols that trigger Link shut down of a Userport.
+                Event bits values are:
+                spoof = 1
+                bpdu = 2
+                bgp = 4
+                ospf = 8
+                rip = 16
+                vrrp = 32
+                dhcp-server = 64
+                pim = 128
+                dvmrp = 256
+                is-is = 512
+                dnsreply = 1024"
+
+  ::= { alaQoSConfig 62 }
+
+alaQoSConfigNATFlush OBJECT-TYPE   
+  SYNTAX      INTEGER {   
+                yes (1),   
+                no (2)   
+              }   
+  MAX-ACCESS  read-write   
+  STATUS      current   
+  DESCRIPTION "Flush all NAT Flow entries"   
+  ::= { alaQoSConfig 63 } 
+  
+
+alaQoSConfigForceYellowUserPriority OBJECT-TYPE
+SYNTAX      INTEGER {
+                pri0 (0),
+                pri1 (1),
+                pri2 (2),
+                pri3 (3),
+                pri4 (4),
+                pri5 (5),
+                pri6 (6),
+                pri7 (7),
+                disable (8)
+              }
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION "Change the 8021P Priority for Yellow Traffic
+              pri0-7 - will replace the priority.
+              disable - will unconfigure the feature."
+  DEFVAL        { pri0 }
+  ::= { alaQoSConfig 64 }
+  
 --
 -- Definition of queue table
 --
@@ -8761,7 +9329,7 @@ QoSQueueEntry ::=
   }
 
 alaQoSQueueId OBJECT-TYPE
-  SYNTAX      Integer32
+  SYNTAX      Integer32(0..2147483647)
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Internal queue identifier"
@@ -10664,7 +11232,7 @@ QoSImportEntry ::=
   }
 
 alaQoSImportIndex OBJECT-TYPE
-  SYNTAX      Integer32
+  SYNTAX      Integer32 (0..2147483647)
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Index of entry in import list"
@@ -10769,7 +11337,7 @@ QoSAppliedImportEntry ::=
   }
 
 alaQoSAppliedImportIndex OBJECT-TYPE
-  SYNTAX      Integer32
+  SYNTAX      Integer32  (0..2147483647)
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Index of entry in import list"
@@ -10861,7 +11429,7 @@ QoSRuleGroupsEntry ::=
     alaQoSRuleGroupsType                                 INTEGER,
     alaQoSRuleGroupsEnabled                              INTEGER,
     alaQoSRuleGroupsStatus                               RowStatus
-  }
+ }
 
 alaQoSRuleGroupsName OBJECT-TYPE
   SYNTAX      DisplayString (SIZE(0..31))
@@ -10918,7 +11486,6 @@ alaQoSRuleGroupsStatus OBJECT-TYPE
                RowStatus convention"
   ::= { alaQoSRuleGroupsEntry 5 }
 
-
 --
 -- Definition of rule group table
 --
@@ -10948,7 +11515,7 @@ QoSAppliedRuleGroupsEntry ::=
     alaQoSAppliedRuleGroupsType                          INTEGER,
     alaQoSAppliedRuleGroupsEnabled                       INTEGER,
     alaQoSAppliedRuleGroupsStatus                        RowStatus
-  }
+ }
 
 alaQoSAppliedRuleGroupsName OBJECT-TYPE
   SYNTAX      DisplayString (SIZE(0..31))
@@ -11033,8 +11600,12 @@ QoSRuleGroupEntry ::=
     alaQoSRuleGroupCountType                          INTEGER,
     alaQoSRuleGroupPacketCount                        Counter64,
     alaQoSRuleGroupByteCount                          Counter64,
-    alaQoSRuleGroupStatus                             RowStatus
-  }
+    alaQoSRuleGroupStatus                             RowStatus,
+    alaQoSRuleGroupPacketRate                         Counter64,
+    alaQoSRuleGroupBitRate                           Counter64,
+    alaQoSRuleGroupAccPacketCount                     Counter64, 
+    alaQoSRuleGroupAccByteCount                          Counter64
+}
 
 alaQoSRuleGroupRuleName OBJECT-TYPE
   SYNTAX      DisplayString (SIZE(0..31))
@@ -11084,6 +11655,36 @@ alaQoSRuleGroupStatus OBJECT-TYPE
   ::= { alaQoSRuleGroupEntry 6 }
 
 
+
+alaQoSRuleGroupPacketRate OBJECT-TYPE
+ SYNTAX      Counter64 
+ MAX-ACCESS  read-only
+ STATUS      current
+ DESCRIPTION "Packets mathcing the rule per second ."
+ ::= {alaQoSRuleGroupEntry 7}
+
+
+alaQoSRuleGroupBitRate OBJECT-TYPE
+ SYNTAX      Counter64  
+ MAX-ACCESS  read-only
+ STATUS      current 
+ DESCRIPTION "Bytes mathcing the rule per second ."
+ ::= {alaQoSRuleGroupEntry 8} 
+
+alaQoSRuleGroupAccPacketCount OBJECT-TYPE
+ SYNTAX      Counter64
+ MAX-ACCESS  read-only
+ STATUS      current
+ DESCRIPTION "Counter for packets matching this rule"
+ ::= { alaQoSRuleGroupEntry 9 }  
+ 
+ alaQoSRuleGroupAccByteCount OBJECT-TYPE
+ SYNTAX      Counter64
+ MAX-ACCESS  read-only
+ STATUS      current
+ DESCRIPTION "Counter for bytes matching this rule"
+ ::= { alaQoSRuleGroupEntry 10 }
+
 --
 -- Definition of rule group entry table
 --
@@ -11114,7 +11715,12 @@ QoSAppliedRuleGroupEntry ::=
     alaQoSAppliedRuleGroupCountType                   INTEGER,
     alaQoSAppliedRuleGroupPacketCount                 Counter64,
     alaQoSAppliedRuleGroupByteCount                   Counter64,
-    alaQoSAppliedRuleGroupStatus                      RowStatus
+    alaQoSAppliedRuleGroupStatus                      RowStatus,
+    alaQosAppliedRuleGroupPacketRate		        Counter64,
+    alaQosAppliedRuleGroupBitRate		              Counter64,
+    alaQoSAppliedRuleGroupAccPacketCount                  Counter64,
+    alaQoSAppliedRuleGroupAccByteCount                   Counter64
+
   }
 
 alaQoSAppliedRuleGroupRuleName OBJECT-TYPE
@@ -11163,6 +11769,34 @@ alaQoSAppliedRuleGroupStatus OBJECT-TYPE
   DESCRIPTION "Used to create/delete rule group entries according to the
                RowStatus convention"
   ::= { alaQoSAppliedRuleGroupEntry 6 }
+
+alaQosAppliedRuleGroupPacketRate OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Shows the packet rate for policy list"
+  ::= { alaQoSAppliedRuleGroupEntry 7 }
+
+alaQosAppliedRuleGroupBitRate OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Shows the bit rate for policy list"
+  ::= { alaQoSAppliedRuleGroupEntry 8 }
+
+alaQoSAppliedRuleGroupAccPacketCount OBJECT-TYPE
+SYNTAX      Counter64
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "Counter for packets matching this rule"
+::= { alaQoSAppliedRuleGroupEntry 9 }
+
+alaQoSAppliedRuleGroupAccByteCount OBJECT-TYPE
+SYNTAX      Counter64
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "Counter for bytes matching this rule"
+::= { alaQoSAppliedRuleGroupEntry 10 }
 
 
 alaQoSVlanGroupsTable OBJECT-TYPE
@@ -11307,14 +11941,14 @@ QoSVlanGroupEntry ::=
   }
 
 alaQoSVlanGroupVlan OBJECT-TYPE
-  SYNTAX      Integer32 (1..16)
+  SYNTAX      Integer32 (0..4095)
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Vlan range start for vlan group entry"
   ::= { alaQoSVlanGroupEntry 1 }
 
 alaQoSVlanGroupVlanEnd OBJECT-TYPE
-  SYNTAX      Integer32 (1..16)
+  SYNTAX      Integer32 (0..4095)
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Vlan range end for vlan group entry"
@@ -11361,14 +11995,14 @@ QoSAppliedVlanGroupEntry ::=
   }
 
 alaQoSAppliedVlanGroupVlan OBJECT-TYPE
-  SYNTAX      Integer32 (1..4095)
+  SYNTAX      Integer32 (0..4095)
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Vlan range start for vlan group entry"
   ::= { alaQoSAppliedVlanGroupEntry 1 }
 
 alaQoSAppliedVlanGroupVlanEnd OBJECT-TYPE
-  SYNTAX      Integer32 (1..4095)
+  SYNTAX      Integer32 (0..4095)
   MAX-ACCESS  not-accessible
   STATUS      current
   DESCRIPTION "Vlan range end for vlan group entry"
@@ -11409,7 +12043,8 @@ QoSHwLoopbackProfileEntry ::=
     alaQoSHwLoopbackPort                                   InterfaceIndex,           
     alaQoSHwLoopbackType                               INTEGER,   
     alaQoSHwLoopbackProfileStatus                     INTEGER,   
-    alaQoSHwLoopbackProfileRowStatus                  RowStatus     
+    alaQoSHwLoopbackProfileRowStatus                  RowStatus,
+    alaQosHwLoopbackSapId                             Integer32     
   }   
    
 alaQoSHwLoopbackProfileName OBJECT-TYPE   
@@ -11438,7 +12073,7 @@ alaQoSHwLoopbackDestinationMac OBJECT-TYPE
   ::= { alaQoSHwLoopbackProfileEntry 3 }   
    
 alaQoSHwLoopbackVlan OBJECT-TYPE   
-  SYNTAX       Integer32 (1..4094)   
+  SYNTAX       Integer32 (0..4094)   
   MAX-ACCESS   read-create   
   STATUS       current   
   DESCRIPTION  "Vlan used in Hardware Loopback Profile Config"   
@@ -11471,14 +12106,140 @@ alaQoSHwLoopbackProfileStatus OBJECT-TYPE
   STATUS       current   
   DESCRIPTION  "The status of the Hardware Profile Config"   
   ::= { alaQoSHwLoopbackProfileEntry 7 }   
-   
+
 alaQoSHwLoopbackProfileRowStatus OBJECT-TYPE   
   SYNTAX      RowStatus   
   MAX-ACCESS  read-create   
   STATUS      current   
   DESCRIPTION "Used to create/delete the Profile Config"   
   ::= { alaQoSHwLoopbackProfileEntry 8 }   
- 
+
+alaQosHwLoopbackSapId OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS  read-create
+  STATUS  current
+  DESCRIPTION
+  "A Number given to uniquely identify the SAP."
+  ::= { alaQoSHwLoopbackProfileEntry 9 }
+
+-----------------------------------
+-- Definition of queue  Stats table
+-----------------------------------
+
+alaQoSQueueStatsTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF QoSQueueStatsEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Table of QoS Queue Stats definitions"
+  ::= { alaQoSMIBObjects 53 }
+
+alaQoSQueueStatsEntry OBJECT-TYPE
+  SYNTAX      QoSQueueStatsEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Definition of QoS Queue Stats "
+  INDEX {
+          alaQoSQueueStatsId
+        }
+  ::= { alaQoSQueueStatsTable 1 }
+
+QoSQueueStatsEntry ::=
+  SEQUENCE
+  {
+    alaQoSQueueStatsId                                         	Integer32,
+    alaQoSQueueStatsSlot                                       	Integer32,
+    alaQoSQueueStatsPort                                        Integer32,
+    alaQoSQueueStatsTransmitQueue                               Integer32 ,
+    alaQoSQueueStatsPriority                                    INTEGER ,	
+    alaQoSQueueStatsPacketsSent                                 Counter32,
+    alaQoSQueueStatsPacketsDropped             	                Counter32,
+    alaQoSQueueStatsBytesSent                                   Counter64,
+    alaQoSQueueStatsBytesDropped                                Counter64,
+    alaQoSQueueStatsRateSent                                    Counter64,
+    alaQoSQueueStatsRateDropped                                 Counter64
+  }
+
+alaQoSQueueStatsId OBJECT-TYPE
+  SYNTAX      Integer32 (0..2147483647)
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Internal queue identifier"
+  ::= { alaQoSQueueStatsEntry 1 }
+
+alaQoSQueueStatsSlot OBJECT-TYPE
+  SYNTAX      Integer32 (0..255)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Physical slot queue is destined to"
+  ::= { alaQoSQueueStatsEntry 2 }
+
+alaQoSQueueStatsPort OBJECT-TYPE
+  SYNTAX      Integer32 (0..255)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Physical port queue is destined to"
+  ::= { alaQoSQueueStatsEntry 3 }
+
+alaQoSQueueStatsTransmitQueue OBJECT-TYPE
+  SYNTAX      Integer32 (0..7)
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION " Transmit queue number"
+  ::= { alaQoSQueueStatsEntry 4 }
+
+alaQoSQueueStatsPriority OBJECT-TYPE
+  SYNTAX      INTEGER {
+                high (1),
+                low (2)
+              }
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION " Transmit priority  for the queue"
+  ::= { alaQoSQueueStatsEntry 5 }
+  
+alaQoSQueueStatsPacketsSent OBJECT-TYPE
+  SYNTAX      Counter32
+  MAX-ACCESS  read-only
+
+  STATUS      current
+  DESCRIPTION "Number of packets sent through the queue"
+  ::= { alaQoSQueueStatsEntry 6}
+
+alaQoSQueueStatsPacketsDropped OBJECT-TYPE
+  SYNTAX      Counter32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Number of packets dropped trying to queue into this queue"
+  ::= { alaQoSQueueStatsEntry 7}
+
+alaQoSQueueStatsBytesSent OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Number of bytes sent through the queue"
+  ::= { alaQoSQueueStatsEntry 8}
+
+alaQoSQueueStatsBytesDropped OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Number of bytes dropped trying to queue into this queue"
+  ::= { alaQoSQueueStatsEntry 9}
+  
+alaQoSQueueStatsRateSent OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Rate(Mbits/sec) sent through the queue"
+  ::= { alaQoSQueueStatsEntry 10}
+
+alaQoSQueueStatsRateDropped OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION "Rate(Mbits/sec) dropped trying to queue into this queue"
+  ::= { alaQoSQueueStatsEntry 11}  
+
 alaQoSMIBConformance OBJECT-IDENTITY
   STATUS      current
   DESCRIPTION "Branch for QoS Managed Conformance Information."
@@ -11523,7 +12284,12 @@ alaQoSMIBRuleObjects OBJECT-GROUP
     alaQoSRuleYellowCount,
     alaQoSRuleRedCount,
     alaQoSRuleNonGreenCount,
-    alaQoSRuleNonRedCount
+    alaQoSRuleNonRedCount,
+    alaQoSRuleAccounting,
+    alaQoSRulePacketRate,
+    alaQoSRuleAccPacketCount,
+    alaQoSRuleAccByteCount,
+    alaQoSRuleBitRate
   }
   STATUS      current
   DESCRIPTION "Collections of objects providing information for Rules"
@@ -11558,7 +12324,12 @@ alaQoSMIBAppliedRuleObjects OBJECT-GROUP
     alaQoSAppliedRuleYellowCount,
     alaQoSAppliedRuleRedCount,
     alaQoSAppliedRuleNonGreenCount,
-    alaQoSAppliedRuleNonRedCount
+    alaQoSAppliedRuleNonRedCount,
+    alaQoSAppliedRuleAccounting,
+    alaQoSAppliedRulePacketRate,
+    alaQoSAppliedRuleAccPacketCount,
+    alaQoSAppliedRuleAccByteCount,
+    alaQoSAppliedRuleBitRate
   }
   STATUS      current
   DESCRIPTION "Collections of objects providing information
@@ -12137,7 +12908,7 @@ alaQoSMIBActionObjects OBJECT-GROUP
     alaQoSActionPIRStatus,
     alaQoSActionPBS,
     alaQoSActionPBSStatus,
-	alaQoSActionCounterColor
+    alaQoSActionCounterColor
   }
   STATUS      current
   DESCRIPTION "Collections of objects providing information for Actions"
@@ -12405,6 +13176,7 @@ alaQoSMIBConfigObjects OBJECT-GROUP
     alaQoSConfigReset,
     alaQoSConfigStatsReset,
     alaQoSConfigFlush,
+    alaQoSConfigNATFlush,
     alaQoSConfigDebug,
     alaQoSConfigServicingMode,
     alaQoSConfigLowPriorityWeight,
@@ -12426,7 +13198,12 @@ alaQoSMIBConfigObjects OBJECT-GROUP
     alaQoSConfigQMPath,
     alaQoSConfigDEIMapping,
     alaQoSConfigDEIMarking,
-    alaQoSConfigStatsResetEgress
+    alaQoSConfigStatsResetEgress,
+    alaQoSConfigForceYellowPriority,
+    alaQoSConfigUserportLinkShutdown,
+    alaQoSConfigAppliedUserportLinkShutdown,
+    alaQoSConfigForceYellowUserPriority,
+    alaQoSConfigForceYellowDSCP
   }
   STATUS      current
   DESCRIPTION "Collections of objects providing information for Configs"
@@ -12577,7 +13354,11 @@ alaQoSMIBRuleGroupObjects OBJECT-GROUP
     alaQoSRuleGroupCountType,
     alaQoSRuleGroupPacketCount,
     alaQoSRuleGroupByteCount,
-    alaQoSRuleGroupStatus
+    alaQoSRuleGroupStatus,
+    alaQoSRuleGroupPacketRate,
+    alaQoSRuleGroupBitRate,
+    alaQoSRuleGroupAccPacketCount,
+    alaQoSRuleGroupAccByteCount 
   }
   STATUS      current
   DESCRIPTION "Collections of objects providing information for RuleGroups"
@@ -12589,7 +13370,11 @@ alaQoSMIBAppliedRuleGroupObjects OBJECT-GROUP
     alaQoSAppliedRuleGroupCountType,
     alaQoSAppliedRuleGroupPacketCount,
     alaQoSAppliedRuleGroupByteCount,
-    alaQoSAppliedRuleGroupStatus
+    alaQoSAppliedRuleGroupStatus,
+    alaQosAppliedRuleGroupPacketRate,
+    alaQosAppliedRuleGroupBitRate,
+    alaQoSAppliedRuleGroupAccPacketCount,
+    alaQoSAppliedRuleGroupAccByteCount
   }
   STATUS      current
   DESCRIPTION "Collections of objects providing information
@@ -12640,13 +13425,233 @@ alaQoSMIBHwLoopBackProfileObjects OBJECT-GROUP
    alaQoSHwLoopbackPort,   
    alaQoSHwLoopbackType,   
    alaQoSHwLoopbackProfileStatus,   
-   alaQoSHwLoopbackProfileRowStatus    
+   alaQoSHwLoopbackProfileRowStatus,
+   alaQosHwLoopbackSapId    
  }   
  STATUS      current   
  DESCRIPTION "Collections of objects providing information   
               for Hardware Loopback"   
  ::= { alaQoSMIBGroups 43 } 
 
+alQosQueueStatsGroupObjects OBJECT-GROUP
+  OBJECTS {
+    alaQoSQueueStatsSlot,
+    alaQoSQueueStatsPort,
+    alaQoSQueueStatsTransmitQueue,
+    alaQoSQueueStatsPriority,
+    alaQoSQueueStatsPacketsSent,
+    alaQoSQueueStatsPacketsDropped,
+    alaQoSQueueStatsBytesSent,
+    alaQoSQueueStatsBytesDropped,
+    alaQoSQueueStatsRateSent, 
+    alaQoSQueueStatsRateDropped
+   }
+  STATUS      current
+  DESCRIPTION "Collection of objects providing statistics information 
+	     for egress queues."
+  ::= { alaQoSMIBGroups 44 }
+
+alaQoSAppliedImportGroup OBJECT-GROUP
+  OBJECTS {
+    alaQoSAppliedImportPrecedence,
+    alaQoSAppliedImportPrefix,
+    alaQoSAppliedImportSlot,
+    alaQoSAppliedImportPort,
+    alaQoSAppliedImportPortend,
+    alaQoSAppliedImportPortgroup,
+    alaQoSAppliedImportRowStatus
+  }
+  STATUS      current
+  DESCRIPTION "Definition of QoS Applied Import."
+  ::= { alaQoSMIBGroups 45 }
+alaQoSAppliedValidityPeriodGroup OBJECT-GROUP
+  OBJECTS {
+    alaQoSAppliedValidityPeriodSource,
+    alaQoSAppliedValidityPeriodDays,
+    alaQoSAppliedValidityPeriodDaysStatus,
+    alaQoSAppliedValidityPeriodMonths,
+    alaQoSAppliedValidityPeriodMonthsStatus,
+    alaQoSAppliedValidityPeriodHour,
+    alaQoSAppliedValidityPeriodHourStatus,
+    alaQoSAppliedValidityPeriodEndHour,
+    alaQoSAppliedValidityPeriodInterval,
+    alaQoSAppliedValidityPeriodIntervalStatus,
+    alaQoSAppliedValidityPeriodEndInterval,
+    alaQoSAppliedValidityPeriodRowStatus
+  }
+  STATUS      current
+  DESCRIPTION "Definition of QoS Applied Import."
+  ::= { alaQoSMIBGroups 46 }
+alaQoSImportGroup OBJECT-GROUP
+  OBJECTS 
+  {
+  		alaQoSImportPort,
+  		alaQoSImportPortend ,
+  		alaQoSImportPortgroup ,
+  		alaQoSImportPrecedence,
+  		alaQoSImportPrefix,
+  		alaQoSImportRowStatus,
+  		alaQoSImportSlot     
+  }
+  STATUS      current
+  DESCRIPTION "Definition of QoS Import."
+  ::= { alaQoSMIBGroups 47 }
+ 
+  alaQoSPortPdiGroup  OBJECT-GROUP
+  OBJECTS 
+  {
+  	alaQoSPortPdiPriorityP0,
+  	alaQoSPortPdiPriorityP1,
+  	alaQoSPortPdiPriorityP2,
+  	alaQoSPortPdiPriorityP3,
+  	alaQoSPortPdiPriorityP4,
+  	alaQoSPortPdiPriorityP5,
+  	alaQoSPortPdiPriorityP6 ,
+  	alaQoSPortPdiPriorityP7,
+  	alaQoSPortPdiPriorityType,
+  	alaQoSPortProtocolClassification
+  }
+  STATUS      current
+  DESCRIPTION "Definition of QoS PortPdi."
+  ::= { alaQoSMIBGroups 48 }
+  
+  alaQoSPortPriorityGroup  OBJECT-GROUP
+  OBJECTS 
+  {
+  	alaQoSPortProtocolPriorityP0,
+  	alaQoSPortProtocolPriorityP1,
+  	alaQoSPortProtocolPriorityP2,
+  	alaQoSPortProtocolPriorityP3,
+  	alaQoSPortProtocolPriorityP4,
+  	alaQoSPortProtocolPriorityP5,
+  	alaQoSPortProtocolPriorityP6,
+  	alaQoSPortProtocolPriorityP7,
+  	alaQoSPortProtocolRowStatus  
+  }
+  STATUS      current
+  DESCRIPTION "Definition of QoS Port Priority."
+  ::= { alaQoSMIBGroups 49 }
+  
+ alaQoSSlotDscpGroup   OBJECT-GROUP
+  OBJECTS 
+  {
+  	alaQoSSlotDscpPriority 
+  }
+  STATUS      current
+  DESCRIPTION "Definition of QoS SlotDscp."
+  ::= { alaQoSMIBGroups 50 }
+  
+  alaQoSSlotPcamGroup   OBJECT-GROUP
+  OBJECTS 
+  {
+  	alaQoSSlotPcam8023Enabled,
+  	alaQoSSlotPcamDsap,
+  	alaQoSSlotPcamEnable8023,
+  	alaQoSSlotPcamEnableDsap,
+  	alaQoSSlotPcamEnableEntry,
+  	alaQoSSlotPcamEnableEthertype ,
+  	alaQoSSlotPcamEnableSsap,
+  	alaQoSSlotPcamEthertype,
+  	alaQoSSlotPcamProtocolNumber,
+  	alaQoSSlotPcamSsap
+  	 
+  	 
+  }
+  STATUS      current
+  DESCRIPTION "Definition of QoS SlotDscp."
+  ::= { alaQoSMIBGroups 51 }
+  
+	alaQoSSlotProtocolGroup  OBJECT-GROUP
+  OBJECTS 
+  {
+  	alaQoSSlotProtocol8023Enabled ,
+  	alaQoSSlotProtocolDsap ,
+  	alaQoSSlotProtocolEthertype,
+  	 alaQoSSlotProtocolRowStatus,
+  	 alaQoSSlotProtocolSsap,
+  	 alaQoSSlotProtocolType
+  	  
+  }
+   STATUS      current
+  DESCRIPTION "Definition of QoS SlotDscp."
+  ::= { alaQoSMIBGroups 52 }
+  
+  alaQoSValidityPeriodGroup OBJECT-GROUP
+  OBJECTS 
+  {
+	  	alaQoSValidityPeriodDays,
+	  	alaQoSValidityPeriodDaysStatus ,
+	  	alaQoSValidityPeriodEndHour,
+	  	alaQoSValidityPeriodEndInterval,
+	  	alaQoSValidityPeriodHour,
+	  	alaQoSValidityPeriodHourStatus,
+	  	alaQoSValidityPeriodInterval,
+	  	alaQoSValidityPeriodIntervalStatus,
+	  	alaQoSValidityPeriodMonths,
+	  	alaQoSValidityPeriodMonthsStatus,
+	  	alaQoSValidityPeriodRowStatus,
+	  	alaQoSValidityPeriodSource       
+  }
+   STATUS      current
+  DESCRIPTION "Definition of QoS SlotDscp."
+  ::= { alaQoSMIBGroups 53 }
+  
+--
+-- Definition of DSCP table
+--
+alaQoSDSCPTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF QoSDSCPEntry 
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Table of QoS Condition definitions"
+  ::= { alaQoSMIBObjects 55 }
+alaQoSDSCPEntry OBJECT-TYPE
+  SYNTAX      QoSDSCPEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION "Definition of QoS DSCP"
+  INDEX {
+          alaQoSDSCPEntryNumber
+        }
+  ::= { alaQoSDSCPTable 1 }
+QoSDSCPEntry ::=
+  SEQUENCE
+  {
+	alaQoSDSCPEntryNumber		Integer32,
+	alaQoSDSCPPriority			Integer32,
+	alaQoSDSCPDropPrecedence	INTEGER,
+        alaQoSDSCPRowStatus             RowStatus 
+   }
+alaQoSDSCPEntryNumber OBJECT-TYPE
+  SYNTAX      		Integer32
+  MAX-ACCESS  		not-accessible
+  STATUS      		current
+  DESCRIPTION 		"DSCP Entry number for the traffic."
+  ::= { alaQoSDSCPEntry 1}
+alaQoSDSCPPriority OBJECT-TYPE
+  SYNTAX      		Integer32
+  MAX-ACCESS 		read-create
+  STATUS      		current
+  DESCRIPTION 		"DSCP priority for the traffic."
+  ::= { alaQoSDSCPEntry 2}
+alaQoSDSCPDropPrecedence OBJECT-TYPE
+  SYNTAX	INTEGER {
+				low (1),
+				medium (2),
+				high (3)
+			}		
+  MAX-ACCESS 		read-create
+  STATUS      		current
+  DESCRIPTION 		"DSCP drop precedence for the traffic."
+  DEFVAL      	{low}
+  ::= { alaQoSDSCPEntry 3}
+alaQoSDSCPRowStatus OBJECT-TYPE
+  SYNTAX      		RowStatus 
+  MAX-ACCESS 		read-create
+  STATUS      		current
+  DESCRIPTION 		"RowStatus entry for QoS DSCP."
+  ::= { alaQoSDSCPEntry 4}
+ 
 alaQoSMIBCompliance MODULE-COMPLIANCE
   STATUS      current
   DESCRIPTION "Compliance statement for QoS."
@@ -12694,7 +13699,17 @@ alaQoSMIBCompliance MODULE-COMPLIANCE
     alaQoSAppliedVlanGroupsObjects,
     alaQoSVlanGroupObjects,
     alaQoSAppliedVlanGroupObjects,
-    alaQoSMIBHwLoopBackProfileObjects 
+    alaQoSMIBHwLoopBackProfileObjects,
+    alQosQueueStatsGroupObjects,
+    alaQoSAppliedImportGroup,
+    alaQoSAppliedValidityPeriodGroup,
+    alaQoSImportGroup,
+    alaQoSPortPdiGroup,
+    alaQoSPortPriorityGroup,
+    alaQoSSlotDscpGroup,
+    alaQoSSlotPcamGroup,
+    alaQoSSlotProtocolGroup,
+    alaQoSValidityPeriodGroup 
   }
   ::= { alaQoSMIBCompliances 1 }
 
