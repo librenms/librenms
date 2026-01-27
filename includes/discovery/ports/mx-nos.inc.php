@@ -13,4 +13,5 @@ foreach ($PortMib_port as $index => $moxaport) {
 unset($PortMib_port);
 
 d_echo('');
+d_echo('/opt/librenms/includes/discovery/mx-nos.inc.php');
 d_echo('--End--');
