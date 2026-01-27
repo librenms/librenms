@@ -16,7 +16,15 @@ from time import time
 from math import ceil
 
 from .command_runner import command_runner
-from .service import LogOutput
+from .queuemanager import (
+    AlertQueueManager,
+    BillingQueueManager,
+    DiscoveryQueueManager,
+    PingQueueManager,
+    PollerQueueManager,
+    ServicesQueueManager,
+)
+from .service import Service, ServiceConfig, LogOutput
 
 # Hard limit script execution time so we don't get to "hang"
 DEFAULT_SCRIPT_TIMEOUT = 3600
