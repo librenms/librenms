@@ -1,0 +1,4315 @@
+NAG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE 		  FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,RowStatus,TimeStamp, TruthValue  FROM SNMPv2-TC
+    MODULE-IDENTITY, OBJECT-TYPE, mib-2,
+    Integer32, Counter32, Counter64,Gauge32,Unsigned32, NOTIFICATION-TYPE,
+    IpAddress, TimeTicks,experimental             FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP,NOTIFICATION-GROUP               FROM SNMPv2-CONF
+	ifIndex FROM RFC1213-MIB
+
+    TRAP-TYPE FROM RFC-1215
+
+    enterprises         FROM RFC1155-SMI;
+
+nag 	MODULE-IDENTITY
+		LAST-UPDATED	"202510281200Z"		-- Okt 28, 2025
+		ORGANIZATION	"NAG"
+		CONTACT-INFO	"support@nag.ru"
+		DESCRIPTION		"MIB module for SNR-S5XXX series switches"
+		
+        REVISION		"202510281200Z"		-- Okt 28, 2025
+		DESCRIPTION		"eNOS 1.17.3
+                         1. Add erpsMgt(7.100.39) object
+						 2. Add erpsGroup(7.101.125) object"
+		
+		REVISION		"202509051200Z"		-- Sept 05, 2025
+		DESCRIPTION		"eNOS 1.17.0
+                         1. Add sysVlanMac(7.100.1.105) object"
+                         
+        REVISION		"202506181200Z"		-- Jun 18, 2025
+		DESCRIPTION		"eNOS 1.16.0
+                         1. Add isolatePortCfg(7.100.100) object"
+		
+	    REVISION		"202503121200Z"		-- Mar 12, 2025
+		DESCRIPTION		"eNOS 1.15.0
+                         1. Add acl(7.100.10.1) object
+                         2. Add dcscm(7.100.20) object
+						 3. Add loopbackDetecIntervalTime(7.100.3.4.2) object
+						 4. Add loopbackDetecCtrlTable(7.100.3.4.3) object
+	                     5. Add loopbackDetecBlockCtrlRecovery(7.100.3.4.20) object
+						 6. Add loopbackDetectEnableTable(7.100.3.4.21) object
+						 7. Add errdisableTimeoutEnable(7.100.3.30) object
+						 8. Add errdisableTimeoutInterval(7.100.3.31) object
+						 9. Add mode 'private-vlan host' in portMode object
+						 10. Add mode 'private-vlan promiscuous' in portMode object
+						 11. Add  loopBackDetect-trap(7.101.112) object"
+
+		REVISION		"202502041200Z"		-- Feb 4, 2025
+		DESCRIPTION		"eNOS 1.14.0
+                         1. Add switchCPUOneMinuteIdle(7.100.1.11.25) object
+                         2. Add switchFlashOccupiedSizeInBytes(7.100.1.11.15) object
+                         3. Add portClearCountTable(7.100.3.15) object
+                         4. Add slotNum(7.100.3.2.1.4) object
+						 5. Add mode 'full2500' in speedDuplex object"
+
+		
+		REVISION		"202412061200Z"		-- Dec 6, 2024
+		DESCRIPTION		"eNOS 1.13.0
+                         1. Add macNotifications(7.101.107) object
+                         2. Add stormControlTable(7.100.3.3) object
+                         3. Add stormControlActionTable(7.100.3.20) object
+                         4. Add bandwidthControlStatus(7.100.3.2.1.7) object
+                         5. Add maxBandwidth(7.100.3.2.1.8) object
+                         6. Add receiveBandwidth(7.100.3.2.1.9) object
+                         7. Add transmitBandwidth(7.100.3.2.1.10) object
+                         8. Add macNotificationMib(7.100.33) object"
+                         
+
+        
+        REVISION		"202411131200Z"		-- Nov 13, 2024
+		DESCRIPTION		"eNOS 1.12.0
+                         1. Add sysWriteConfig(7.100.1.6) object
+                         2. Add switchFlashSizeInBytes(7.100.1.11.14) object
+						 3. Add priDhcp(7.100.13) object" 
+
+
+        REVISION		"202409171200Z"		-- Sept 17, 2024
+		DESCRIPTION		"eNOS 1.11.0
+                         1. Add portSecurity(7.100.32) object
+                         2. Add priPoeConfig(7.100.26.10) object"
+  
+  
+        REVISION		"202406201200Z"		-- June 20, 2024
+		DESCRIPTION		"eNOS 1.9.0
+                         1. Add poeCurrentPower(7.100.26.6) object
+                         2. Add sysPowerStateTable(7.100.1.7) object"
+
+		::= { enterprises 40418 }
+
+    MacAddress ::= OCTET STRING (SIZE (17))
+    						    -- a 17 octet address
+                                                    -- in the
+                                                    -- "canonical"
+                                                    -- order
+    DisplayString ::= OCTET STRING
+
+
+
+PhysAddress ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:"
+    STATUS       current
+    DESCRIPTION
+            "Represents media- or physical-level addresses."
+    SYNTAX       OCTET STRING
+
+InetAddressType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A value that represents a type of Internet address.
+
+         unknown(0)  An unknown address type.  This value MUST
+                     be used if the value of the corresponding
+                     InetAddress object is a zero-length string.
+                     It may also be used to indicate an IP address
+                     that is not in one of the formats defined
+                     below.
+
+                     InetAddressIPv4 textual convention.
+
+         ipv6(2)     An IPv6 address as defined by the
+                     InetAddressIPv6 textual convention.
+
+         ipv4z(3)    A non-global IPv4 address including a zone
+                     index as defined by the InetAddressIPv4z
+                     textual convention.
+
+         ipv6z(4)    A non-global IPv6 address including a zone
+                     index as defined by the InetAddressIPv6z
+                     textual convention.
+
+         dns(16)     A DNS domain name as defined by the
+                     InetAddressDNS textual convention.
+
+         Each definition of a concrete InetAddressType value must be
+         accompanied by a definition of a textual convention for use
+         with that InetAddressType.
+
+         To support future extensions, the InetAddressType textual
+         convention SHOULD NOT be sub-typed in object type definitions.
+         It MAY be sub-typed in compliance statements in order to
+         require only a subset of these address types for a compliant
+         implementation.
+
+         Implementations must ensure that InetAddressType objects
+         and any dependent objects (e.g., InetAddress objects) are
+         consistent.  An inconsistentValue error must be generated
+         if an attempt to change an InetAddressType object would,
+         for example, lead to an undefined InetAddress value.  In
+
+         particular, InetAddressType/InetAddress pairs must be
+         changed together if the address type changes (e.g., from
+         ipv6(2) to ipv4(1))."
+    SYNTAX       INTEGER {
+                     unknown(0),
+                     ipv4(1),
+                     ipv6(2),
+                     ipv4z(3),
+                     ipv6z(4),
+                     dns(16)
+                 }
+
+InetAddress ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Denotes a generic Internet address.
+
+         An InetAddress value is always interpreted within the context
+         of an InetAddressType value.  Every usage of the InetAddress
+         textual convention is required to specify the InetAddressType
+         object that provides the context.  It is suggested that the
+         InetAddressType object be logically registered before the
+         object(s) that use the InetAddress textual convention, if
+         they appear in the same logical row.
+
+         The value of an InetAddress object must always be
+         consistent with the value of the associated InetAddressType
+         object.  Attempts to set an InetAddress object to a value
+         inconsistent with the associated InetAddressType
+         must fail with an inconsistentValue error.
+
+         When this textual convention is used as the syntax of an
+         index object, there may be issues with the limit of 128
+         sub-identifiers specified in SMIv2, STD 58.  In this case,
+         the object definition MUST include a 'SIZE' clause to
+         limit the number of potential instance sub-identifiers;
+         otherwise the applicable constraints MUST be stated in
+         the appropriate conceptual row DESCRIPTION clauses, or
+         in the surrounding documentation if there is no single
+         DESCRIPTION clause that is appropriate."
+    SYNTAX       OCTET STRING (SIZE (0..255))
+
+    VlanList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+         "Vlan ID range is (1..4094),
+         Each octet within this value specifies a set of eight
+         vlans, with the first octet specifying vlans 1 through
+         8, the second octet specifying vlans 9 through 16, etc.
+         Within each octet, the most significant bit represents
+         the lowest numbered vlan, and the least significant bit
+         represents the highest numbered vlan.  If that bit has
+         a value of '1' then that vlan is allowed to pass ;
+         the vlan is not allowed if its bit has a value of '0'.
+         the value is a changing cells:if the maximum of vlans is 8,you
+         sends one octet to me;the remnant octet's value is defaulted '0',
+         the remnant octet needn't to send to me."
+    SYNTAX      OCTET STRING
+
+    PortList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Each octet within this value specifies a set of eight
+        ports, with the first octet specifying ports 1 through
+        8, the second octet specifying ports 9 through 16, etc.
+        Within each octet, the most significant bit represents
+        the lowest numbered port, and the least significant bit
+        represents the highest numbered port.  Thus, each port
+        of the bridge is represented by a single bit within the
+        value of this object.  If that bit has a value of '1'
+        then that port is included in the set of ports; the port
+        is not included if its bit has a value of '0'."
+    SYNTAX      OCTET STRING
+
+    EnabledStatusPrivate ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A simple status value for the object."
+    SYNTAX      INTEGER { enabled(1), disabled(0) }
+
+    ValidStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A simple status value for the object to create and destroy
+         a table entry. This is a simplified variant of RowStatus as it
+         supports only two values. Setting it to valid(1) creates an entry.
+         Setting it to invalid(2) destroys an entry."
+    SYNTAX      INTEGER { valid(1), invalid(0) }
+
+    OspfBigMetric ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "The OSPF External Metric."
+    SYNTAX      Integer32 (0..'FFFFFE'h)
+
+    OspfAreaID ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "An OSPF Area Identifier."
+    SYNTAX      IpAddress
+
+    SnmpAdminString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255t"
+    STATUS       current
+    DESCRIPTION "An octet string containing administrative
+                 information, preferably in human-readable form.
+
+                 To facilitate internationalization, this
+                 information is represented using the ISO/IEC
+                 IS 10646-1 character set, encoded as an octet
+                 string using the UTF-8 transformation format
+                 described in [RFC2279].
+
+                 Since additional code points are added by
+                 amendments to the 10646 standard from time
+                 to time, implementations must be prepared to
+                 encounter any code point from 0x00000000 to
+                 0x7fffffff.  Byte sequences that do not
+                 correspond to the valid UTF-8 encoding of a
+                 code point or are outside this range are
+                 prohibited.
+
+                 The use of control codes should be avoided.
+
+                 When it is necessary to represent a newline,
+                 the control code sequence CR LF should be used.
+
+                 The use of leading or trailing white space should
+                 be avoided.
+
+                 For code points not directly supported by user
+                 interface hardware or software, an alternative
+                 means of entry and display, such as hexadecimal,
+                 may be provided.
+
+                 For information encoded in 7-bit US-ASCII,
+                 the UTF-8 encoding is identical to the
+                 US-ASCII encoding.
+
+                 UTF-8 may require multiple bytes to represent a
+                 single character / code point; thus the length
+                 of this object in octets may be different from
+                 the number of characters encoded.  Similarly,
+                 size constraints refer to the number of encoded
+                 octets, not the number of characters represented
+                 by an encoding.
+
+                 Note that when this TC is used for an object that
+                 is used or envisioned to be used as an index, then
+                 a SIZE restriction MUST be specified so that the
+                 number of sub-identifiers for any object instance
+                 does not exceed the limit of 128, as defined by
+                 [RFC3416].
+
+                 Note that the size of an SnmpAdminString object is
+                 measured in octets, not characters.
+                "
+    SYNTAX       OCTET STRING (SIZE (0..255))
+
+    -- InterfaceIndex contains the semantics of ifIndex and should be used
+-- for any objects defined in other MIB modules that need these semantics.
+
+InterfaceIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+            "A unique value, greater than zero, for each interface or
+            interface sub-layer in the managed system.  It is
+            recommended that values are assigned contiguously starting
+            from 1.  The value for each interface sub-layer must remain
+            constant at least from one re-initialization of the entity's
+            network management system to the next re-initialization."
+    SYNTAX       Integer32 (1..2147483647)
+
+InterfaceIndexOrZero ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+            "This textual convention is an extension of the
+            InterfaceIndex convention.  The latter defines a greater
+            than zero value used to identify an interface or interface
+            sub-layer in the managed system.  This extension permits the
+            additional value of zero.  the value zero is object-specific
+            and must therefore be defined as part of the description of
+            any object which uses this syntax.  Examples of the usage of
+            zero might include situations where interface was unknown,
+            or when none or all interfaces need to be referenced."
+    SYNTAX       Integer32 (0..2147483647)
+
+-- textual conventions
+
+TimeFilter ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+
+
+
+
+
+        "To be used for the index to a table.  Allows an application
+        to download only those rows changed since a particular time.
+        A row is considered changed if the value of any object in the
+        row changes or if the row is created or deleted.
+
+        When sysUpTime is equal to zero, this table shall be empty.
+
+        One entry exists for each past value of sysUpTime, except that
+        the whole table is purged should sysUpTime wrap.
+
+        As this basic row is updated new conceptual rows are created
+        (which still share the now updated object values with all
+        other instances).  The number of instances which are created
+        is determined by the value of sysUpTime at which the basic row
+        was last updated.  One instance will exist for each value of
+        sysUpTime at the last update time for the row.  A new
+        timeMark instance is created for each new sysUpTime value.
+        Each new conceptual row will be associated with the timeMark
+        instance which was created at the value of sysUpTime with
+        which the conceptual row is to be associated.
+
+        By definition all conceptual rows were updated at or after
+        time zero and so at least one conceptual row (associated with
+        timeMark.0) must exist for each underlying (basic) row.
+
+        See the appendix for further discussion of this variable.
+
+        Consider the following fooTable:
+
+        fooTable ...
+        INDEX { fooTimeMark, fooIndex }
+
+        FooEntry {
+           fooTimeMark  TimeFilter
+           fooIndex     INTEGER,
+           fooCounts    Counter
+        }
+
+        Should there be two basic rows in this table (fooIndex == 1,
+        fooIndex == 2) and row 1 was updated most recently at time 6,
+        while row 2 was updated most recently at time 8, and both rows
+        had been updated on several earlier occasions such that the
+        current values were 5 and 9 respectively then the following
+        fooCounts instances would exist.
+
+        fooCounts.0.1  5
+        fooCounts.0.2  9
+        fooCounts.1.1  5
+
+
+
+
+
+        fooCounts.1.2  9
+        fooCounts.2.1  5
+        fooCounts.2.2  9
+        fooCounts.3.1  5
+        fooCounts.3.2  9
+        fooCounts.4.1  5
+        fooCounts.4.2  9
+        fooCounts.5.1  5
+        fooCounts.5.2  9
+        fooCounts.6.1  5
+        fooCounts.6.2  9
+        fooCounts.7.2  9    -- note that row 1 doesn't exist for
+        fooCounts.8.2  9    -- times 7 and 8"
+    SYNTAX    TimeTicks
+
+Ipv6Address ::= TEXTUAL-CONVENTION
+     DISPLAY-HINT "2x:"
+     STATUS       current
+     DESCRIPTION
+       "This data type is used to model IPv6 addresses.
+        This is a binary string of 16 octets in network
+        byte-order."
+     SYNTAX       OCTET STRING (SIZE (16))
+--********************************************************************************************************
+--********************************************************************************************************
+     
+                                                
+    snr                       OBJECT IDENTIFIER ::= { nag 7 }
+
+    
+
+    os          		  OBJECT IDENTIFIER ::= { snr 100 }
+    notifications     		  OBJECT IDENTIFIER ::= { snr 101 }
+    conformance          	  OBJECT IDENTIFIER ::= { snr 102 }
+
+
+--xxx.100.1 
+    priSystem                     OBJECT IDENTIFIER ::= { os 1 }
+--xxx.100.3
+    priPorts                 	  OBJECT IDENTIFIER ::= { os 3 }
+--xxx.100.8
+    priIgmpSnoopingMib            OBJECT IDENTIFIER ::= { os 8 }	
+--xxx.100.10
+    prisecurity			 OBJECT IDENTIFIER ::= { os 10 }
+--xxx.100.13
+    pridhcp    		  	  OBJECT IDENTIFIER ::= { os 13 } 	
+--xxx.100.20   
+    dcscm                         OBJECT IDENTIFIER ::= { os 20 }	
+--xxx.100.26
+    priPoeConfig    		  OBJECT IDENTIFIER ::= { os 26 }      
+--xxx.100.30 
+    ddm	     			 OBJECT IDENTIFIER ::= { os 30 }
+--xxx.100.32 
+    portSecurity               OBJECT IDENTIFIER ::= { os  32 } 
+--xxx.100.33 
+    macNotificationMib         OBJECT IDENTIFIER ::= { os  33 }
+--xxx.100.39
+    erpsMgt               	  OBJECT IDENTIFIER ::= { os 39 }    
+--xxx.100.100 
+    isolatePortCfg	           OBJECT IDENTIFIER ::= { os  100 }	
+
+                    
+--********************************************************************************************************
+--******************************************************************************************************** 
+
+-- (xxx.100.1)   System group
+
+--xxx.100.1.1
+sysResetUnit OBJECT-TYPE
+    SYNTAX  INTEGER {
+                noReset(1),
+                setfactory (2),
+                warmReset (3)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        " setfactory(2)
+	  warmReset(3)
+	  noReset(1)
+	  default the status is 1 "
+    ::= { priSystem  1}
+
+--xxx.100.1.6
+sysWriteConfig OBJECT-TYPE
+    SYNTAX  INTEGER {
+                write(1)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "write(1)save the current configuration"
+    ::= { priSystem  6 }  
+
+
+--xxx.100.1.7
+sysPowerStateTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SysPowerStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "the power supply status for hot-swap PSU switch"
+    ::= { priSystem   7}
+
+--xxx.100.1.7.1
+sysPowerStateEntry OBJECT-TYPE
+        SYNTAX  SysPowerStateEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "power supply status"
+        INDEX   { sysPowerSlotIndex }
+        ::= { sysPowerStateTable 1 }
+
+SysPowerStateEntry
+        ::= SEQUENCE
+            {
+                sysPowerSlotIndex         INTEGER,
+                sysPowerState		  INTEGER,
+                sysPowerStatus		  INTEGER
+		    }
+
+--xxx.100.1.7.1.1
+sysPowerSlotIndex OBJECT-TYPE
+        SYNTAX  INTEGER (1..2)
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Module model No."
+        ::= { sysPowerStateEntry 1 }
+
+--xxx.100.1.7.1.2
+sysPowerState  OBJECT-TYPE
+       	SYNTAX      INTEGER
+        {
+            sysPowerInstalled(1),
+            sysPowerNotInstalled(0)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "if the power supply insert"
+        ::= { sysPowerStateEntry 2 }
+
+
+--xxx.100.1.7.1.5
+sysPowerStatus OBJECT-TYPE
+         SYNTAX  INTEGER
+         {
+            normal(0),
+            abnormal(1)
+        }
+         MAX-ACCESS  read-only
+         STATUS  current
+         DESCRIPTION "Power Status"
+            ::= { sysPowerStateEntry 5 }
+
+--xxx.100.1.10
+switchFileCopy                    OBJECT IDENTIFIER ::= { priSystem 10 }
+
+--xxx.100.1.10.1
+fileUserName OBJECT-TYPE
+	    SYNTAX      DisplayString (SIZE(1..100))
+	    MAX-ACCESS  read-write
+	    STATUS      current
+	    DESCRIPTION	"ftp/sftp/scp user name"
+	    ::= { switchFileCopy  1 }
+
+--xxx.100.1.10.2
+fileUserPassword OBJECT-TYPE
+	    SYNTAX      DisplayString (SIZE(1..100))
+	    MAX-ACCESS  read-write
+	    STATUS      current
+	    DESCRIPTION
+	        "ftp/sftp/scp user password"
+	    ::= { switchFileCopy  2 }
+	    
+--xxx.100.1.10.3
+fileIPaddress OBJECT-TYPE
+	    SYNTAX      DisplayString (SIZE(1..100))
+	    MAX-ACCESS  read-write
+	    STATUS      current
+	    DESCRIPTION
+	        "server ip address"
+	    ::= { switchFileCopy  3 }
+
+--xxx.100.1.10.4
+sourceFileCopy OBJECT-TYPE
+	    SYNTAX      DisplayString (SIZE(1..100))
+	    MAX-ACCESS  read-write
+	    STATUS      current
+	    DESCRIPTION
+	        "Source file name or Copy from current system configuration
+	                   ."
+	    ::= { switchFileCopy  4 }
+
+--xxx.100.1.10.5
+destinationFileCopy OBJECT-TYPE
+	    SYNTAX      DisplayString  (SIZE(1..100))
+	    MAX-ACCESS  read-write
+	    STATUS      current
+	    DESCRIPTION
+	        "Destination file name or Copy to startup configuration."
+	    ::= { switchFileCopy  5 }
+
+            
+--xxx.100.1.10.7
+fileCopyUseMode OBJECT-TYPE
+            SYNTAX  INTEGER
+            	    {
+            	    	ftp(1),
+               		tftp(2),
+					sftp(3),
+					scp(4),
+					local(5)
+            	    }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "ftp(1): ftp server or client;
+                 tftp(2): tftp server or client;
+				 sftp(3): ftp server or client;
+				 scp(4): ftp server or client;
+				 local(5): local copy."
+            ::= { switchFileCopy  7 } 
+
+--xxx.100.1.10.8
+fileCopy OBJECT-TYPE
+            SYNTAX  INTEGER
+            	    {
+               		upload(1),
+               		download(2)
+            	    }
+	    MAX-ACCESS  read-write
+	    STATUS      current
+	    DESCRIPTION
+            "File copy configurate."
+    	    ::= { switchFileCopy  8 }
+    	    
+--xxx.100.1.10.9
+fileCopyResult OBJECT-TYPE
+            SYNTAX  INTEGER
+            	    {
+            	        error(0),
+               		ok(1),
+               		uploading(2),
+               		downloading(3),
+               		idle(4)
+            	    }
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+            "The result of file copy:error(0):copy file failure;ok(1):copy file success;
+            uploading(2):in process of upload file;downloading(3):in process of download file;
+            idle(4):be out of copy file."
+    	    ::= { switchFileCopy  9 }	
+			
+--xxx.100.1.11
+    switchInfo            	  OBJECT IDENTIFIER ::= { priSystem 11 } 
+
+--xxx.100.1.11.1
+switchCPUType OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The CPU type of switch"
+    ::= { switchInfo  1}
+
+--xxx.100.1.11.2
+switchCPUFiveSecondIdle OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Last  5 second CPU IDLE"
+    ::= { switchInfo  2 }  
+    
+--xxx.100.1.11.3
+switchCPUThirtySecondIdle OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Last 30 second CPU IDLE"
+    ::= { switchInfo  3 } 
+    
+--xxx.100.1.11.4
+switchCPUFiveMinuteIdle OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Last  5 minute CPU IDLE"
+    ::= { switchInfo  4 } 
+    
+--xxx.100.1.11.5
+switchCPUIdle OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "From  running  CPU IDLE"
+    ::= { switchInfo  5 }  
+    
+ --xxx.100.1.11.6
+switchMemorySize OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "memory size"
+    ::= { switchInfo  6 }  
+    
+ --xxx.100.1.11.7
+switchMemoryBusy OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "memory usage rent"
+    ::= { switchInfo  7 } 
+
+ --xxx.100.1.11.8
+switchFlashSize OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The flash capacity of switch."
+    ::= { switchInfo  8 }   
+
+ --xxx.100.1.11.9
+switchTemperature OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The Temperature of switch"
+    ::= { switchInfo  9 }  
+
+--xxx.100.1.11.10
+switchCpuUsage OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The CPU usage of switch."
+    ::= { switchInfo  10 }  
+    
+--xx.100.1.11.11
+switchMemoryUsage OBJECT-TYPE
+	SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The memory usage of switch."
+    ::= { switchInfo  11 } 
+	
+--xxx.100.1.12
+sysFanTable OBJECT-TYPE 
+    SYNTAX  SEQUENCE OF SysFanEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        " the state of fan."
+    ::= { priSystem   12}
+
+--xxx.100.1.11.14
+switchFlashSizeInBytes OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The flash capacity of switch."
+    ::= { switchInfo  14 }
+
+--xxx.100.1.11.15
+switchFlashOccupiedSizeInBytes OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The occupied flash size of switch."
+    ::= { switchInfo  15 }
+
+--xxx.100.1.11.25
+switchCPUOneMinuteIdle OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Last  1 minute CPU IDLE"
+    ::= { switchInfo  25 } 
+
+--xxx.100.1.12.1
+sysFanEntry OBJECT-TYPE
+        SYNTAX  SysFanEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION "fan supply status"
+        INDEX   { sysFanIndex }
+        ::= { sysFanTable 1 }
+        
+SysFanEntry
+        ::= SEQUENCE
+            {
+            	sysFanIndex	          INTEGER,
+                sysFanStatus	      INTEGER,
+                sysFanSpeedRpm	      INTEGER
+            }
+            
+--xxx.100.1.12.1.1.1
+sysFanIndex OBJECT-TYPE
+        SYNTAX  INTEGER (1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION "system fan entry index"
+        ::= { sysFanEntry 1 }
+
+        
+--xxx.100.1.12.1.1.3
+sysFanStatus  OBJECT-TYPE
+        SYNTAX INTEGER {
+		               error(2),
+                       abnormal(1),
+                       normal(0)            
+                   } 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Whether the slot fan is error, normal or abnormal."
+        ::= { sysFanEntry 3 } 
+                
+--xxx.100.1.12.1.1.10
+sysFanSpeedRpm OBJECT-TYPE
+	SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION
+	"Rpm of fan"
+    ::= { sysFanEntry  10 }
+
+--xxx.100.1.13
+switchBootImgPrimary OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..128))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Set or get filename of boot img for first time,and the length of filename is between 1 and 128."
+    ::= { priSystem  13}
+	
+--xxx.100.1.15 
+switchBootStartUpCfg OBJECT-TYPE
+  SYNTAX      DisplayString(SIZE(1..128))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+      "Get filename of boot startup config ,and the length of filename is between 1 and 128."
+  ::= { priSystem  15}	
+
+--xxx.100.1.22
+ sysAddUser     OBJECT IDENTIFIER ::= { priSystem 22 }    
+
+--xxx.100.1.22.1
+sysUserName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(2..16))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "set the username."
+        ::= { sysAddUser 1 }
+
+--xxx.100.1.22.2
+sysUserPassword OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(1..106))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "set the password."
+        ::= { sysAddUser 2 }
+
+--xxx.100.1.22.3
+sysUserPasswordOption OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    unencrypted(0),
+                    encrypted(7)
+                }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "set a uncrypted(0) or crypted(7) password,default uncrypted(0)."
+        ::= { sysAddUser 3 }
+
+--xxx.100.1.22.4
+sysUserNamePrivilege OBJECT-TYPE
+    SYNTAX  INTEGER {
+	               network-user (1),
+				   network-operator (10),
+				   network-admin (15)
+					 }     
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "set username privilege. 1 - network-user ,10 - network-operator ,15 - network-admin(default)."
+    ::= { sysAddUser  4}
+    
+--xxx.100.1.22.5
+sysAddUserStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                delluser (0),
+                adduser (1)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "add user (1) user name or change password and priv. lvl.delete user (0)"
+    ::= { sysAddUser  5}  
+--xxx.100.1.23
+    powerInfo            	  OBJECT IDENTIFIER ::= { priSystem 23 } 
+	
+
+--xxx.100.1.23.2
+priACPowerStatus OBJECT-TYPE
+       SYNTAX      INTEGER
+        {
+          ac-normal(1),
+          ac-abnormal(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "get AC power status(1:Normal; 2:Abnormal)."
+        ::= { powerInfo 2 }
+
+--xxx.100.1.23.3
+priBatteryStatus OBJECT-TYPE
+       SYNTAX      INTEGER
+        {
+        batteryCharged(1),
+		batteryDischarging(2),
+		batteryNotConnect(5),
+		batteryFail(6),
+		batteryCharging(7)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "get Battery status"
+        ::= { powerInfo 3 }
+		
+--xxx.100.1.23.4
+priBatteryVoltage OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Battery Voltage x10"
+        ::= { powerInfo 4 }
+ 
+--xxx.100.1.23.5
+priBatteryLevel OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Battery level percentage"
+        ::= { powerInfo 5 }
+
+--xxx.100.1.23.6
+priSecPowerStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+		{
+        none(0),
+		normal(1),
+		abnormal(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "get secondary power status"
+        ::= { powerInfo 6 }	
+        
+--xxx.100.1.105
+sysVlanMac OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "The MAC Address of the switch's VLAN CPU"
+    ::= { priSystem  105 }
+    
+--xxx.100.1.200
+        switchModel  OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..255))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+					"Switch model name"
+            ::= { priSystem 200 }
+
+--xxx.100.1.201
+         reloadAfter OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+					"Reload after"
+            ::= { priSystem 201 }
+
+--********************************************************************************************************
+--******************************************************************************************************** 
+    
+-- (xxx.100.3)   Ports group
+
+--xxx.100.3.2
+priPortTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF PriPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        " A list of port entries."
+    ::= { priPorts   2 }
+
+--xxx.100.3.2.1
+    priPortEntry OBJECT-TYPE
+        SYNTAX  PriPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            " A port entry containing port information, 
+            status, and control."
+        INDEX   { portIndex }
+        ::= { priPortTable 1 }
+
+    PriPortEntry
+        ::= SEQUENCE
+            {
+                portIndex               INTEGER,
+                portName                DisplayString,
+                slotNum 		        INTEGER,
+                portType                INTEGER,
+                bandwidthControlStatus	INTEGER,  
+                maxBandwidth	INTEGER, 
+                receiveBandwidth	INTEGER,
+                transmitBandwidth	INTEGER,
+                shutdown		INTEGER,
+                speedDuplex		INTEGER,
+                portMode		INTEGER,
+                pvid			INTEGER,
+				vctAction           INTEGER,
+                vctLastStatus       DisplayString,
+                portTrunkAllowedvlan  OCTET STRING,
+                portHybridTaggedAllowedvlan  OCTET STRING,                
+                portHybridUntaggedAllowedvlan  OCTET STRING,
+                portComboMediaType  INTEGER
+                
+            }
+
+--xxx.100.3.2.1.1
+        portIndex OBJECT-TYPE
+            SYNTAX  INTEGER (1..2147483647)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "port No."
+            ::= { priPortEntry 1 }
+   
+
+--xxx.100.3.2.1.2
+        portName  OBJECT-TYPE
+            SYNTAX  DisplayString (SIZE(0..32))
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                   " Name of the port. exp:financial."
+            ::= { priPortEntry 2 }
+
+--xxx.100.3.2.1.4
+       slotNum  OBJECT-TYPE
+          SYNTAX  INTEGER(0..16)
+            MAX-ACCESS  not-accessible
+            STATUS  current
+            DESCRIPTION
+                   " This value is denoting the number of slot.
+                   For the static slot,the value is 1,while for 
+                   the extended slot the value is real extended slot number."
+            ::= { priPortEntry 4 }
+            
+
+--xxx.100.3.2.1.5
+            portType  OBJECT-TYPE
+                   SYNTAX      INTEGER
+                    {
+                        typeSFP(0),
+                    	typeCombo(1),
+                    	typeElecGE(8),
+                    	typePortAGG(9),
+                    	typeOptXge(11)
+
+						
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Type of expansion module in this port."
+        ::= { priPortEntry 5 }
+
+--xxx.100.3.2.1.7
+            bandwidthControlStatus  OBJECT-TYPE
+                SYNTAX      INTEGER
+                    {
+                         ingress(0),
+                    	 egress(1),
+                    	 both(2),
+                    	 none(3)
+                    }
+	        MAX-ACCESS  read-only
+	        STATUS      current
+	        DESCRIPTION 
+	        	"The bandwidth-control status of the port. 
+	        	Its functionality is to stop the bandwidth control.
+	        	The only way to enable bandwidth control is to set receiveBandwidth or transmitBandwith."
+	        ::= { priPortEntry 7 }
+        
+--xxx.100.3.2.1.8
+            maxBandwidth  OBJECT-TYPE
+                SYNTAX      INTEGER
+                	    {
+													default(0),
+													bw100M(1),
+													bw1000M(2),
+													bw10000M(3),
+													bw40000M(4),
+													bw20000M(5),
+													bw25G(6),
+													bw100G(7)
+                	    }
+	        MAX-ACCESS  read-only
+ 	        STATUS      current
+	        DESCRIPTION 
+	        	"The max bandwidth of the port."
+	        ::= { priPortEntry 8 }
+
+--xxx.100.3.2.1.9
+            receiveBandwidth  OBJECT-TYPE
+                SYNTAX      INTEGER
+	        MAX-ACCESS  read-write
+ 	        STATUS      current
+	        DESCRIPTION 
+	        	"The recevice bandwidth of the port. Its unit is kbs.
+	        	The command 'bandwidth control 50 both' in console mode equals
+	        	setting both receiveBandwidth and transmitBandwidth to 50 kbs.
+	        	Set 0 is no bandwidth."
+	        ::= { priPortEntry 9 }
+
+--xxx.100.3.2.1.10
+            transmitBandwidth  OBJECT-TYPE
+                SYNTAX      INTEGER
+	        MAX-ACCESS  read-write
+ 	        STATUS      current
+	        DESCRIPTION 
+	        	"The transmit bandwidth of the port. Its unit is kbs.
+	        	Set 0 is no bandwidth."
+	        ::= { priPortEntry 10 }
+	        
+
+
+--xxx.100.3.2.1.12
+            shutdown  OBJECT-TYPE
+                SYNTAX      INTEGER
+                {
+                        shutDown(0),
+                    	noshutdown(1)
+                }               
+	        MAX-ACCESS  read-write
+ 	        STATUS      current
+	        DESCRIPTION 
+	        	"Close or open to specify the port."
+	        ::= { priPortEntry 12 }
+	        
+	        
+--xxx.100.3.2.1.14
+            speedDuplex  OBJECT-TYPE
+                SYNTAX      INTEGER
+                {
+                        auto(0),
+                    	half10(1),
+                    	full10(2),
+                    	half100(3),
+                    	full100(4),
+                    	full1000(6),
+                    	neg-10-1000-auto(7),
+                    	neg-10-1000-full(8),
+                    	neg-100-auto(9),
+                    	neg-100-full(10),
+                    	neg-100-half(11),
+                    	neg-1000-auto(12),
+                    	neg-1000-full(13),
+                    	neg-100-1000-auto(14),
+                    	neg-100-1000-full(15),
+                    	neg-10-auto(16),
+                    	neg-10-full(17),
+                    	neg-10-half(18),
+                    	neg-10-100-auto(19),
+                    	neg-10-100-full(20),
+                     	neg-10-100-half(21),
+                     	neg-10-100-1000-full(22),
+                     	neg-10-100-1000-half(23),
+						full-10g(25),
+						dac100cm(26),
+						dac300cm(27), 
+						dac500cm(28), 
+						dac50cm(29),
+						full2500(30)
+                        						
+                    	
+                }                                   
+	        MAX-ACCESS  read-write
+ 	        STATUS      current
+	        DESCRIPTION 
+	        	"The speed and duplex status of the port."
+	        ::= { priPortEntry 14 }	
+	        
+--xxx.100.3.2.1.15
+            portMode  OBJECT-TYPE
+                SYNTAX      INTEGER
+                {
+                        access(1),
+                    	trunk(2),
+                    	hybrid(3),
+                        private-vlan-host(4),
+                        private-vlan-promiscuous(5)								
+                }                                   
+	        MAX-ACCESS  read-write
+ 	        STATUS      current
+	        DESCRIPTION 
+	        	"port mode: 1 is access,2 is trunk,3 is hybrid, 4 is private-vlan host, 5 is private-vlan promiscuous"
+	        ::= { priPortEntry 15 }	
+	        
+--xxx.100.3.2.1.16
+            pvid  OBJECT-TYPE
+                SYNTAX      INTEGER                                   
+	        MAX-ACCESS  read-write
+ 	        STATUS      current
+	        DESCRIPTION 
+	        	"port of native vlan No."
+	        ::= { priPortEntry 16 }	
+
+--xxx.100.3.2.1.18
+	vctAction OBJECT-TYPE 
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object indicates the VCT action of the port, the value 1 is permitted 
+                    when SET this entry though you can GET 1(processing) and 0(succeed);
+                    The specified port will operate the virtual-cable-test when one sets 1 to this entry .
+					You can get the status of VCT from the entry vctLastStatus."
+	        ::= { priPortEntry 18 }	  
+
+--xxx.100.3.2.1.19
+	vctLastStatus OBJECT-TYPE 
+        SYNTAX      DisplayString (SIZE(0..1000))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Indicates the last VCT status of the port."
+	        ::= { priPortEntry 19 }		  
+	        
+--xxx.100.3.2.1.20
+            portTrunkAllowedvlan  OBJECT-TYPE
+            SYNTAX      OCTET STRING
+	          MAX-ACCESS  read-write
+ 	          STATUS      current
+	          DESCRIPTION 
+	        	"trunk port allowed vlan list string"
+	          ::= { priPortEntry 20 }	
+	        	               
+--xxx.100.3.2.1.21
+            portHybridTaggedAllowedvlan  OBJECT-TYPE
+            SYNTAX      OCTET STRING
+	          MAX-ACCESS  read-write
+ 	          STATUS      current
+	          DESCRIPTION 
+	        	"hybrid port tagged allowed vlan list string"
+	          ::= { priPortEntry 21 }	
+	          
+--xxx.100.3.2.1.22
+            portHybridUntaggedAllowedvlan  OBJECT-TYPE
+            SYNTAX      OCTET STRING
+	          MAX-ACCESS  read-write
+ 	          STATUS      current
+	          DESCRIPTION 
+	        	"hybrid port untagged allowed vlan list string"
+	          ::= { priPortEntry 22 }
+	          
+
+		  
+--xxx.100.3.2.1.31		  
+ portComboMediaType  OBJECT-TYPE
+            SYNTAX      INTEGER 
+                        {
+                            phyModeCopperForced(2),
+                            phyModeFiberForced(4)
+                        }                           
+	          MAX-ACCESS  read-write
+ 	          STATUS      current
+	          DESCRIPTION 
+	        	"The media type of combo port"
+	          ::= { priPortEntry 31 }
+
+--********************************************************************************************************
+--********************************************************************************************************
+--xxx.100.3.3
+stormControlTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF StormControlEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "storm-contol table"
+    ::= { priPorts   3 }
+
+--xxx.100.3.3.1
+    stormControlEntry OBJECT-TYPE
+        SYNTAX  StormControlEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            " storm-control entry"
+        INDEX   { stormControlIndex,stormControlType }
+        ::= { stormControlTable 1 }
+
+    StormControlEntry
+        ::= SEQUENCE
+            {
+                stormControlIndex   INTEGER,
+                stormControlType		INTEGER,
+                stormControlRate 		INTEGER,
+                stormControlStatus  INTEGER,
+                stormControlSuppressRateUnit INTEGER
+                      
+            }
+
+--xxx.100.3.3.1.1
+        stormControlIndex OBJECT-TYPE
+            SYNTAX  INTEGER (1..2147483647)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "port index"
+            ::= { stormControlEntry 1 }
+   
+
+--xxx.100.3.3.1.2
+        stormControlType  OBJECT-TYPE
+            SYNTAX  INTEGER
+            				{
+            					broadcast(0),
+            					multicast(1),
+            					unicast(2),
+            					dlf(3),
+            					brmc(4),
+            					brmcdlf(5),
+            					all(6)
+            				}
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                   "broadcast(broadcast rate suppression),multicast(multicast rate suppression),
+                   unicast(unicast rate suppression),dlf(Destination Lookup Failure rate suppression),
+                   brmc(broadcast and multicast rate suppression),brmcdlf(Broadcast, multicast and DLF rate suppression)"
+            ::= { stormControlEntry 2 }
+
+            
+--xxx.100.3.3.1.3
+       stormControlRate  OBJECT-TYPE
+          SYNTAX  INTEGER
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                   "the suppress rate.the value range at <1-1488095> or <1-1000000> on different devices."
+            ::= { stormControlEntry 3 }
+
+--xxx.100.3.3.1.4
+       stormControlStatus  OBJECT-TYPE
+          SYNTAX  INTEGER
+          {
+          		destroy(0),
+          		active(1)
+          }
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                   "Setting it to  active(1) to creates an entry,setting it to destroy(2) to destroy an entry "
+            ::= { stormControlEntry 4 }
+            
+--xxx.100.3.3.1.10
+       stormControlSuppressRateUnit  OBJECT-TYPE
+          SYNTAX  INTEGER
+          {
+                pps(1), 
+                kbps(2)
+          }
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                   "Suppress rate unit. Pps(1),kbps(2)."
+            ::= { stormControlEntry 10 }
+            
+
+--********************************************************************************************************
+--********************************************************************************************************
+
+--xxx.100.3.4
+  loopbackDetection      OBJECT IDENTIFIER ::= { priPorts 4 }
+--**************************************************************
+
+--xxx.100.3.4.2
+loopbackDetecIntervalTime     OBJECT IDENTIFIER ::= { loopbackDetection 2 }
+--xxx.100.3.4.2.1
+lpbackDetecExistInterval    OBJECT-TYPE
+          SYNTAX        INTEGER(1..300)
+          MAX-ACCESS    read-write
+          STATUS         current
+          DESCRIPTION   "This detection time interval is present when the loop exists,
+                         in seconds, the range of 1 to 300. The default value is 3."
+          ::= { loopbackDetecIntervalTime 1 } 
+--xxx.100.3.4.2.2
+lpbackDetecNoExistInterval    OBJECT-TYPE
+          SYNTAX          INTEGER(1..300)
+          MAX-ACCESS      read-write
+          STATUS           current
+          DESCRIPTION     "This detection time interval is present when the loop exists,
+                           in seconds, the range of 1 to 300. The default value is 3."
+         ::= { loopbackDetecIntervalTime 2 } 
+
+--xxx.100.3.4.3    
+loopbackDetecCtrlTable      OBJECT-TYPE
+         SYNTAX             SEQUENCE OF LoopbackDetecCtrlEntry
+         MAX-ACCESS         not-accessible
+         STATUS             current
+         DESCRIPTION        "A table containing current configuration information for
+          the function of loopback detection control."
+         ::= { loopbackDetection 3 } 
+ 
+--xxx.100.3.4.3.1
+loopbackDetecCtrlEntry      OBJECT-TYPE
+         SYNTAX            LoopbackDetecCtrlEntry
+         MAX-ACCESS        not-accessible
+         STATUS            current
+         DESCRIPTION       "An entry in the loopback detection control table."
+         INDEX            { lpbackDetecCtrlIndex}
+         ::= { loopbackDetecCtrlTable 1 }
+
+LoopbackDetecCtrlEntry ::= SEQUENCE
+                            {
+                             lpbackDetecCtrlIndex    INTEGER,
+                             lpbackDetecCtrlMode    INTEGER
+                            }
+
+--xxx.100.3.4.3.1.1  
+lpbackDetecCtrlIndex        OBJECT-TYPE
+          SYNTAX          INTEGER(1..2147483647)
+          MAX-ACCESS      read-only
+          STATUS           current
+          DESCRIPTION      "An unique value for each port."
+          ::={ loopbackDetecCtrlEntry 1 }
+
+--xxx.100.3.4.3.1.2
+lpbackDetecCtrlMode      OBJECT-TYPE
+          SYNTAX         INTEGER {
+                                 shutdown(1),
+                                 block(2)
+                                }                       
+          MAX-ACCESS      read-write
+          STATUS          current
+          DESCRIPTION    "Indicates the control type of the configuration of the loopback detection.
+                          The default value is 1. "
+          ::= { loopbackDetecCtrlEntry 2 }
+
+
+--xxx.100.3.4.5
+loopbackDetecShowTable  OBJECT-TYPE
+         SYNTAX          SEQUENCE OF LoopbackDetecShowEntry
+         MAX-ACCESS      not-accessible
+         STATUS           current
+         DESCRIPTION    "Show the config and state of loopback detection for the specified port."
+          ::= { loopbackDetection 5 } 
+     
+--xxx.100.3.4.5.1
+loopbackDetecShowEntry   OBJECT-TYPE
+         SYNTAX            LoopbackDetecShowEntry
+         MAX-ACCESS        not-accessible
+         STATUS            current
+         DESCRIPTION        "An entry in the loopbackDetecShowTable."
+         INDEX              { lpbackDetecShowPortIndex }
+         ::= { loopbackDetecShowTable 1 }   
+LoopbackDetecShowEntry ::= SEQUENCE
+        {
+         lpbackDetecShowPortIndex    INTEGER,
+         lpbackDetecShowInformation      DisplayString
+        }    
+--xxx.100.3.4.5.1.1
+lpbackDetecShowPortIndex     OBJECT-TYPE
+          SYNTAX         INTEGER (1..2147483647)
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION    "An unique value for each port."
+           ::= { loopbackDetecShowEntry 1 }
+        
+--xxx.100.3.4.5.1.2
+lpbackDetecShowInformation          OBJECT-TYPE
+          SYNTAX          DisplayString (SIZE(1..1024))
+          MAX-ACCESS      read-only
+          STATUS           current
+          DESCRIPTION      "The value display the configuration and state of loopback detection for the specified port."
+          ::= { loopbackDetecShowEntry 2 } 
+
+		  
+--********************************************************************************************************
+--xxx.100.3.4.20
+loopbackDetecBlockCtrlRecovery     OBJECT-TYPE
+    SYNTAX  INTEGER (0..3600)  
+    MAX-ACCESS  read-write	
+    STATUS  current
+    DESCRIPTION "Set loopback-detection block control recovery timeout interval. The default value is 0.  But when the value is 0, does not restore state."
+     ::= { loopbackDetection 20 } 		  
+
+--********************************************************************************************************
+--xxx.100.3.4.21
+loopbackDetectEnableTable  OBJECT-TYPE
+         SYNTAX          SEQUENCE OF LoopbackDetectEnableEntry
+         MAX-ACCESS      not-accessible
+         STATUS           current
+         DESCRIPTION    " Loopback detection enable ports table.	"
+          ::= { loopbackDetection 21 } 
+     
+--xxx.100.3.4.21.1
+loopbackDetectEnableEntry   OBJECT-TYPE
+         SYNTAX            LoopbackDetectEnableEntry
+         MAX-ACCESS        not-accessible
+         STATUS            current
+         DESCRIPTION        "An entry in the loopbackDetectEnableTable."
+         INDEX              { loopbackDetectEnableIndex }
+         ::= { loopbackDetectEnableTable 1 }   
+LoopbackDetectEnableEntry ::= SEQUENCE
+        {
+         loopbackDetectEnableIndex    INTEGER,
+         loopbackDetectEnablePort     INTEGER
+        }    
+		
+--xxx.100.3.4.21.1.1
+loopbackDetectEnableIndex     OBJECT-TYPE
+          SYNTAX         INTEGER (1..2147483647)
+          MAX-ACCESS      read-only
+          STATUS          current
+          DESCRIPTION    " An unique value for each port."
+           ::= { loopbackDetectEnableEntry 1 }		
+
+--xxx.100.3.4.21.1.2
+loopbackDetectEnablePort     OBJECT-TYPE
+          SYNTAX         INTEGER {
+                                 enable(1),
+                                 disable(0)
+                                }     
+          MAX-ACCESS      read-write
+          STATUS          current
+          DESCRIPTION    "Indicates the status of the  loopback detection per port.
+                          The default value is 0. "
+           ::= { loopbackDetectEnableEntry 2 }		
+
+		   
+
+--********************************************************************************************************
+--********************************************************************************************************
+
+--xxx.100.3.15
+ portClearCountTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF PortClearCountEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        " Clear port count table"
+    ::= { priPorts   15 }
+ --xxx.100.3.15.1
+    portClearCountEntry OBJECT-TYPE
+        SYNTAX  PortClearCountEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            " Clear port count entry"
+        INDEX   { slotNum }
+        ::= { portClearCountTable 1 }
+
+    PortClearCountEntry
+        ::= SEQUENCE
+            {    
+                portClearCountAll                   			INTEGER,
+                portClearCountPortEth	              			OCTET STRING
+            }
+--xxx.100.3.15.1.1   
+	portClearCountAll OBJECT-TYPE
+	   SYNTAX      INTEGER
+						{
+              clearCountAll(1)
+						}
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "clear counters all"
+       ::= { portClearCountEntry 1 }     
+--xxx.100.3.15.1.2
+    portClearCountPortEth OBJECT-TYPE
+       SYNTAX      OCTET STRING
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "clear counters port ethernet,for example: ge1"
+       ::= { portClearCountEntry 2 } 
+
+
+
+--********************************************************************************************************
+--********************************************************************************************************
+
+--xxx.100.3.20
+stormControlActionTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF StormControlActionEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "storm-contol table"
+    ::= { priPorts   20 }
+
+--xxx.100.3.20.1
+    stormControlActionEntry OBJECT-TYPE
+        SYNTAX  StormControlActionEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            " A port entry containing storm control action status information"
+        INDEX   { stormControlActionIndex }
+        ::= { stormControlActionTable 1 }
+
+    StormControlActionEntry
+        ::= SEQUENCE
+            {
+                stormControlActionIndex               INTEGER,
+                stormControlActionType                INTEGER
+                
+            }
+
+--xxx.100.3.20.1.1
+        stormControlActionIndex OBJECT-TYPE
+            SYNTAX  INTEGER (1..2147483647)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "port index."
+            ::= { stormControlActionEntry 1 }
+   
+
+--xxx.100.3.20.1.2
+        stormControlActionType  OBJECT-TYPE
+            SYNTAX  INTEGER (1..2)
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                   " Type of action.Errdisable(1),log(2)."
+            ::= { stormControlActionEntry 2 }
+
+--********************************************************************************************************
+--xxx.100.3.30
+    errdisableTimeoutEnable OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        enable(1),
+                        disable(0)
+                    }    
+    MAX-ACCESS  read-write	
+    STATUS  current
+    DESCRIPTION
+        "Enable/disable errdisable timeout. The default value is 1. "
+    ::= { priPorts   30 }
+       
+
+--xxx.100.3.31
+    errdisableTimeoutInterval OBJECT-TYPE
+    SYNTAX  INTEGER (10..1000000)  
+    MAX-ACCESS  read-write	
+    STATUS  current
+    DESCRIPTION
+        "Set errdisable timeout interval. The default value is 60.  "
+    ::= { priPorts   31 }
+	
+--********************************************************************************************************
+--******************************************************************************************************** 
+         
+-- (xxx.100.8)   priIgmpSnoopingMib			  
+
+--xxx.100.8.3
+priIgmpSnoopingBindTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF PriIgmpSnoopingBindEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        " IgmpSnoing bind configuration."
+    ::= { priIgmpSnoopingMib   3 }
+    
+--xxx.100.8.3.1
+    priIgmpSnoopingBindEntry OBJECT-TYPE
+        SYNTAX  PriIgmpSnoopingBindEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            " IgmpSnooping bind configuration."
+        INDEX   { priIgmpSnoopingVlanID, priIgmpSnoopingGroupAddress }
+        ::= { priIgmpSnoopingBindTable 1 }
+
+    PriIgmpSnoopingBindEntry
+        ::= SEQUENCE
+            {
+    		        priIgmpSnoopingVlanID                  INTEGER,     
+                priIgmpSnoopingGroupAddress               IpAddress,
+                priIgmpSnoopingPortBitmap              OCTET STRING                                     
+            }
+
+--xxx.100.8.3.1.1
+priIgmpSnoopingVlanID OBJECT-TYPE
+        SYNTAX      INTEGER (1..2147483647) 
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This value is vlan's ID."
+        ::= { priIgmpSnoopingBindEntry 1 }           
+        
+--xxx.100.8.3.1.2
+priIgmpSnoopingGroupAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This value is group's ip address."
+        ::= { priIgmpSnoopingBindEntry 2 }
+        
+--xxx.100.8.3.1.3
+priIgmpSnoopingPortBitmap OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Port's bitmap."
+        ::= { priIgmpSnoopingBindEntry 3 }
+  
+
+
+--********************************************************************************************************
+--********************************************************************************************************              
+
+-- (xxx.100.10)   prisecurity group
+
+--xxx.100.10.1
+    acl         	    OBJECT IDENTIFIER ::= { prisecurity 1 }   
+--xxx.100.10.1.3
+   aclConfig         	    OBJECT IDENTIFIER ::= { acl 3 }    
+--xxx.100.10.1.4
+   aclAttach        	    OBJECT IDENTIFIER ::= { acl 4 }
+                   
+  
+--********************************************************************************************************
+
+--xxx.100.10.1.3.1
+numAclGroupTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF NumAclGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+            DESCRIPTION
+                "this table is used for building a num-acl list."
+            ::= { aclConfig 1  } 
+            
+--xxx.100.10.1.3.1.1
+   numAclGroupEntry OBJECT-TYPE
+        SYNTAX  NumAclGroupEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "numAclGroup Table's Entry"
+        INDEX   { numAclGroupAclIndex }
+        ::= { numAclGroupTable 1 }
+
+    NumAclGroupEntry
+        ::= SEQUENCE
+            {
+               numAclGroupAclIndex        INTEGER,
+               numAclGroupStatus           INTEGER,
+			   numAclRemark                DisplayString
+            }
+--xxx.100.10.1.3.1.1.1
+        numAclGroupAclIndex OBJECT-TYPE
+            SYNTAX  INTEGER (1..2147483647) 
+            MAX-ACCESS read-only
+            STATUS  current
+            DESCRIPTION
+                "the index of number acl,ip standard <1-99>,ip extern <100-199>,
+				 ip standart expanded range <1300-1399>,ip extern expanded range <2000-2699>, mac-ip extern <3100-3199>"
+            ::= { numAclGroupEntry 1 }
+
+ 
+ --xxx.100.10.1.3.1.1.4
+       numAclGroupStatus OBJECT-TYPE
+            SYNTAX  INTEGER 
+                  {
+                     createAndGo(0),
+                     active(1),
+                     destroy(2)
+                  }
+            MAX-ACCESS read-create
+            STATUS  current
+            DESCRIPTION
+                "the status of number acl."
+            ::= { numAclGroupEntry 4 }
+			
+ --xxx.100.10.1.3.1.1.10
+       numAclRemark OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(100))
+            MAX-ACCESS read-create
+            STATUS  current
+            DESCRIPTION
+                "Acl remark."
+            ::= { numAclGroupEntry 10 }		
+            
+			
+--***************************************************************************************************************
+--xxx.100.10.1.3.3
+ipStandardAclTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF IpStandardAclEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+            DESCRIPTION
+                "config ip Standard Acl "
+            ::= { aclConfig 3  } 
+            
+--xxx.100.10.1.3.3.1
+    ipStandardAclEntry OBJECT-TYPE
+        SYNTAX  IpStandardAclEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "ip standard  Table's Entry"
+        INDEX   { ipStandardIndex, ipStandardSubIndex}
+        ::= { ipStandardAclTable 1 }
+
+    IpStandardAclEntry
+        ::= SEQUENCE
+            {
+               ipStandardIndex        INTEGER,
+               ipStandardSubIndex     INTEGER,
+               ipStandardAct		      INTEGER,
+               ipStandardSrcIp		    IpAddress,
+               ipStandardSrcIpWild    IpAddress,
+               ipStandardStatus       INTEGER
+            }
+                                                           
+--xxx.100.10.1.3.3.1.1
+        ipStandardIndex OBJECT-TYPE
+            SYNTAX  INTEGER (1..2147483647) 
+            MAX-ACCESS read-only
+            STATUS  current
+            DESCRIPTION
+                "The index of ip-standard-acl group."
+            ::= { ipStandardAclEntry 1 }
+            
+--xxx.100.10.1.3.3.1.2
+        ipStandardSubIndex OBJECT-TYPE
+            SYNTAX  INTEGER (1..2147483647) 
+            MAX-ACCESS read-only
+            STATUS  current
+            DESCRIPTION
+                "The index of ip-standard-acl rule."
+            ::= { ipStandardAclEntry 2 }
+
+            
+                        
+--xxx.100.10.1.3.3.1.4
+        ipStandardAct OBJECT-TYPE
+            SYNTAX  INTEGER 
+             	    {
+            	    	deny(0),
+               		  permit(1)
+            	    }            
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                " The action of acl rule."
+            ::= { ipStandardAclEntry 4 }
+
+            
+--xxx.100.10.1.3.3.1.5
+        ipStandardSrcIp OBJECT-TYPE
+            SYNTAX  IpAddress            
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                " Source IP-address of basic acl rule."
+            ::= { ipStandardAclEntry 5 }
+            
+--xxx.100.10.1.3.3.1.6
+        ipStandardSrcIpWild OBJECT-TYPE
+            SYNTAX  IpAddress           
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                " Source IP-address wild  of basic acl rule."
+            ::= { ipStandardAclEntry 6 }
+
+--xxx.100.10.1.3.3.1.7
+        ipStandardStatus OBJECT-TYPE
+            SYNTAX  INTEGER
+            	    {
+            	    	createAndGo(0),
+               		  active(1),
+               		  destroy(2)
+            	    }
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                " status of the ipStandardAclTable."
+            ::= { ipStandardAclEntry 7 } 
+
+--********************************************************************************************************
+            
+--xxx.100.10.1.3.4
+ipExternAclTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF IpExternAclEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+            DESCRIPTION
+                "ip extern Acl Table"
+            ::= { aclConfig 4  } 
+            
+--xxx.100.10.1.3.4.1
+    ipExternAclEntry OBJECT-TYPE
+        SYNTAX  IpExternAclEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "ip extern Table's Entry"
+        INDEX   { ipExternIndex,ipExternSubIndex }
+        ::= { ipExternAclTable 1 }
+
+    IpExternAclEntry
+        ::= SEQUENCE
+            {
+               ipExternIndex        INTEGER,
+               ipExternSubIndex     INTEGER,              
+               ipExternAct		      INTEGER,
+               ipExternProtocol     Integer32,
+               ipExternSrcIp		    IpAddress,
+               ipExternSrcIpWild    IpAddress,
+               ipExternDstIp        IpAddress,
+               ipExternDstIpWild    IpAddress,
+               ipExternSrcPort1     INTEGER,
+               ipExternDstPort1     INTEGER,
+               ipExternStatus         INTEGER
+            }
+            
+--xxx.100.10.1.3.4.1.1
+        ipExternIndex OBJECT-TYPE
+            SYNTAX  INTEGER (1..2147483647) 
+            MAX-ACCESS read-only
+            STATUS  current
+            DESCRIPTION
+                "The index of ip-Extern-acl group ."
+            ::= { ipExternAclEntry 1 }
+            
+--xxx.100.10.1.3.4.1.2
+        ipExternSubIndex OBJECT-TYPE
+            SYNTAX  INTEGER (1..2147483647) 
+            MAX-ACCESS read-only
+            STATUS  current
+            DESCRIPTION
+                "The index of ip-Extern-acl rule ."
+            ::= { ipExternAclEntry 2 }
+            
+                       
+--xxx.100.10.1.3.4.1.4
+        ipExternAct OBJECT-TYPE
+            SYNTAX  INTEGER 
+             	    {
+            	    	deny(0),
+               		permit(1)
+            	    }            
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                " The action of acl rule."
+            ::= { ipExternAclEntry 4 }
+
+--xxx.100.10.1.3.4.1.5
+        ipExternProtocol OBJECT-TYPE
+            SYNTAX Integer32(0..255|65535)           
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                "The protocol number field in the IP header used to indicate
+        the higher layer protocol as specified in RFC 1700. A value 
+        value of 65535 matches every IP packet. 
+        
+        For example :
+        1 is ICMP, 2 is IGMP, 4 is IP in IP encapsulation,
+        6 is TCP, 9 is IGRP, 17 is UDP, 47 is GRE, 50 is ESP, 51 is AH,
+        88 is EIGRP, 89 is OSPF, 94 is KA9Q/NOS compatible IP over IP,
+        103 is PIMv2, 108 is PCP, 65535 is ip."
+            ::= { ipExternAclEntry 5}
+            
+--xxx.100.10.1.3.4.1.6
+        ipExternSrcIp OBJECT-TYPE
+            SYNTAX  IpAddress            
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                " Source IP-address of advanced acl rule,for example 10.1.1.0 ."
+            ::= { ipExternAclEntry 6}
+            
+--xxx.100.10.1.3.4.1.7
+        ipExternSrcIpWild OBJECT-TYPE
+            SYNTAX  IpAddress           
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                " Source IP-address wild  of advanced acl rule,for example 0.0.0.255 ."
+            ::= { ipExternAclEntry 7 }
+
+            
+--xxx.100.10.1.3.4.1.8
+        ipExternDstIp OBJECT-TYPE
+            SYNTAX  IpAddress            
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                " Destination IP-address of advanced acl rule,for example 10.1.1.0 ."
+            ::= { ipExternAclEntry 8 }
+            
+--xxx.100.10.1.3.4.1.9
+        ipExternDstIpWild OBJECT-TYPE
+            SYNTAX  IpAddress           
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                " Destination IP-address wild  of advanced acl rule,for example 0.0.0.255 ."
+            ::= { ipExternAclEntry 9 }
+
+
+
+--xxx.100.10.1.3.4.1.12
+        ipExternSrcPort1 OBJECT-TYPE
+            SYNTAX INTEGER(0..65535)          
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                "The source port number of the TCP or UDP protocol."
+            ::= { ipExternAclEntry 12 }
+
+        
+
+--xxx.100.10.1.3.4.1.15
+        ipExternDstPort1 OBJECT-TYPE
+            SYNTAX INTEGER(0..65535)          
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                "The destination port number of the TCP or UDP protocol."
+            ::= { ipExternAclEntry 15 }
+     
+
+--xxx.100.10.1.3.4.1.17
+        ipExternStatus OBJECT-TYPE
+            SYNTAX  INTEGER
+            	    {
+            	    	createAndGo(0),
+               		active(1),
+               		destroy(2)
+            	    }
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                " now state of the access-list."
+            ::= { ipExternAclEntry 17 } 
+            
+--*************************************************************************************************************************************           
+--*************************************************************************************************************************************           
+
+
+--xxx.100.10.1.3.6
+ macExternAclTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF MacExternAclEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+            DESCRIPTION
+                "mac extern Acl Table"
+            ::= { aclConfig 6  } 
+                      
+ --xxx.100.10.1.3.6.1
+    macExternAclEntry OBJECT-TYPE
+        SYNTAX  MacExternAclEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "mac extern  Table's Entry"
+        INDEX   { macExternIndex, macExternSubIndex}
+        ::= { macExternAclTable 1 }
+
+    MacExternAclEntry
+        ::= SEQUENCE
+            {
+               macExternIndex        INTEGER,
+               macExternSubIndex       INTEGER,
+               macExternAct		       INTEGER,            
+               macExternSrcMac		     DisplayString,
+               macExternSrcMacWild    DisplayString,
+               macExternDstMac       DisplayString,
+               macExternDstMacWild   DisplayString,
+               macExternEtherType    INTEGER,
+               macExternCos	           INTEGER,
+               macExternVlanId		     INTEGER,
+               macExternStatus       INTEGER
+            }
+                  
+ --xxx.100.10.1.3.6.1.1
+        macExternIndex OBJECT-TYPE
+            SYNTAX  INTEGER (1..2147483647) 
+            MAX-ACCESS read-only
+            STATUS  current
+            DESCRIPTION
+                "The index of Mac-Extern-acl group."
+            ::= { macExternAclEntry 1 }
+            
+ --xxx.100.10.1.3.6.1.2
+      macExternSubIndex OBJECT-TYPE
+           SYNTAX  INTEGER (1..2147483647)
+           MAX-ACCESS  read-only
+           STATUS  current
+           DESCRIPTION
+               " The index of Mac-Extern-acl rule."
+          ::= { macExternAclEntry 2 }
+
+          
+ --xxx.100.10.1.3.6.1.4
+        macExternAct OBJECT-TYPE
+            SYNTAX  INTEGER 
+             	    {
+            	    	deny(0),
+               		  permit(1)
+            	    }            
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                " The action of acl rule."
+            ::= { macExternAclEntry 4 }
+                        
+ --xxx.100.10.1.3.6.1.5
+        macExternSrcMac OBJECT-TYPE
+            SYNTAX  DisplayString(SIZE(17))            
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                "  Source Mac-address of advanced acl rule,for example :aaaa.aaaa.aaaa."
+            ::= { macExternAclEntry 5 }
+            
+ --xxx.100.10.1.3.6.1.6
+        macExternSrcMacWild OBJECT-TYPE
+            SYNTAX  DisplayString(SIZE(17))           
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                " Source Mac-address's anti-mask  of advanced acl rule,for example : ff-ff-ff-ff-00-00."
+            ::= { macExternAclEntry 6 }
+
+ --xxx.100.10.1.3.6.1.7
+        macExternDstMac OBJECT-TYPE
+            SYNTAX  DisplayString(SIZE(17))            
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                " Destination Mac-address of advanced acl rule,for example :aaaa.aaaa.aaaa."
+            ::= { macExternAclEntry 7 }
+            
+ --xxx.100.10.1.3.6.1.8
+        macExternDstMacWild OBJECT-TYPE
+            SYNTAX  DisplayString(SIZE(17))           
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                " Destination Mac-address's anti-mask  of advanced acl rule,for example : ff-ff-ff-ff-00-00."
+            ::= { macExternAclEntry 8 }    
+            
+
+ --xxx.100.10.1.3.6.1.10
+	macExternEtherType OBJECT-TYPE
+    	    SYNTAX INTEGER(1536..65535)
+    	    MAX-ACCESS read-create
+    	    STATUS current
+    	    DESCRIPTION
+                "Value of the ethertype"
+    	    ::= { macExternAclEntry 10 }   
+
+
+ --xxx.100.10.1.3.6.1.12
+	macExternCos OBJECT-TYPE
+    	    SYNTAX INTEGER(0..7)
+    	    MAX-ACCESS read-create
+    	    STATUS current
+    	    DESCRIPTION
+                "value of the cos"
+    	    ::= { macExternAclEntry 12 }
+
+
+ --xxx.100.10.1.3.6.1.14
+	macExternVlanId OBJECT-TYPE
+    	    SYNTAX INTEGER(1..4094)
+    	    MAX-ACCESS read-create
+    	    STATUS current
+    	    DESCRIPTION
+                "vlan id"
+    	    ::= { macExternAclEntry 14 }
+
+    	        	        	        	        	        	             
+ --xxx.100.10.1.3.6.1.16
+        macExternStatus OBJECT-TYPE
+            SYNTAX  INTEGER
+            	    {
+            	    	createAndGo(0),
+               		  active(1),
+               		  destroy(2)
+            	    }
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                " now state of the access-list."
+            ::= { macExternAclEntry 16 }            
+--********************************************************************************************************
+
+
+--xxx.100.10.1.3.9
+macIpExternAclTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF MacIpExternAclEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+            DESCRIPTION
+                "mac-ip extern Acl Table"
+            ::= { aclConfig 9  } 
+            
+--xxx.100.10.1.3.9.1
+    macIpExternAclEntry OBJECT-TYPE
+        SYNTAX  MacIpExternAclEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "mac-ip extern Table's Entry"
+        INDEX   { macIpExternIndex,macIpExternSubIndex }
+        ::= { macIpExternAclTable 1 }
+
+    MacIpExternAclEntry
+        ::= SEQUENCE
+            {
+               macIpExternIndex        INTEGER,
+               macIpExternSubIndex     INTEGER,              
+               macIpExternAct		      INTEGER,
+               macIpExternProtocol     Integer32,
+               macIpExternSrcMac		     DisplayString,
+               macIpExternSrcMacWild    DisplayString,
+               macIpExternDstMac       DisplayString,
+               macIpExternDstMacWild   DisplayString,
+               macIpExternSrcIp		    IpAddress,
+               macIpExternSrcIpWild    IpAddress,
+               macIpExternDstIp        IpAddress,
+               macIpExternDstIpWild    IpAddress,
+               macIpExternSrcPort1     INTEGER,
+               macIpExternDstPort1     INTEGER,
+               macIpExternPrecedence    INTEGER,
+               macIpExternStatus         INTEGER,
+               macIpExternVlanId         INTEGER,
+			   macIpExternDscp           INTEGER,
+			   macIpExternCos            INTEGER,
+               macIpExternEtherType      INTEGER			   
+            }
+            
+--xxx.100.10.1.3.9.1.1
+        macIpExternIndex OBJECT-TYPE
+            SYNTAX  INTEGER (1..2147483647) 
+            MAX-ACCESS read-only
+            STATUS  current
+            DESCRIPTION
+                "The index of macIp-Extern-acl group ."
+            ::= { macIpExternAclEntry 1 }
+            
+--xxx.100.10.1.3.9.1.2
+        macIpExternSubIndex OBJECT-TYPE
+            SYNTAX  INTEGER (1..2147483647) 
+            MAX-ACCESS read-only
+            STATUS  current
+            DESCRIPTION
+                "The index of macIp-Extern-acl rule ."
+            ::= { macIpExternAclEntry 2 }
+            
+                       
+--xxx.100.10.1.3.9.1.4
+        macIpExternAct OBJECT-TYPE
+            SYNTAX  INTEGER 
+             	    {
+            	    	deny(0),
+               		  permit(1)
+            	    }            
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                " The action of acl rule."
+            ::= { macIpExternAclEntry 4 }
+
+--xxx.100.10.1.3.9.1.5
+        macIpExternProtocol OBJECT-TYPE
+            SYNTAX Integer32(0..255|65535)           
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                "The protocol number field in the IP header used to indicate
+        the higher layer protocol as specified in RFC 1700. A value 
+        value of 65535 matches every IP packet. 
+        
+        For example :
+        1 is ICMP, 2 is IGMP, 4 is IP in IP encapsulation,
+        6 is TCP, 9 is IGRP, 17 is UDP, 47 is GRE, 50 is ESP, 51 is AH,
+        88 is EIGRP, 89 is OSPF, 94 is KA9Q/NOS compatible IP over IP,
+        103 is PIMv2, 108 is PCP, 65535 is ip."
+            ::= { macIpExternAclEntry 5}
+
+
+ --xxx.100.10.1.3.9.1.6
+        macIpExternSrcMac OBJECT-TYPE
+            SYNTAX  DisplayString(SIZE(17))            
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                "Source Mac-address of advanced acl rule, for example: aa:aa:aa:aa:aa:aa."
+            ::= { macIpExternAclEntry 6 }
+            
+ --xxx.100.10.1.3.9.1.7
+        macIpExternSrcMacWild OBJECT-TYPE
+            SYNTAX  DisplayString(SIZE(17))           
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                " Source Mac-address's anti-mask  of advanced acl rule,for example : ff-ff-ff-ff-00-00."
+            ::= { macIpExternAclEntry 7 }
+
+ --xxx.100.10.1.3.9.1.8
+        macIpExternDstMac OBJECT-TYPE
+            SYNTAX  DisplayString(SIZE(17))            
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                " Destination Mac-address of advanced acl rule,for example :aa:aa:aa:aa:aa:aa."
+            ::= { macIpExternAclEntry 8 }
+            
+ --xxx.100.10.1.3.9.1.9
+        macIpExternDstMacWild OBJECT-TYPE
+            SYNTAX  DisplayString(SIZE(17))           
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                " Destination Mac-address's anti-mask  of advanced acl rule,for example : ff-ff-ff-ff-00-00."
+            ::= { macIpExternAclEntry 9 }    
+            
+                        
+--xxx.100.10.1.3.9.1.10
+        macIpExternSrcIp OBJECT-TYPE
+            SYNTAX  IpAddress            
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                " Source IP-address of advanced acl rule,for example 10.1.1.0 ."
+            ::= { macIpExternAclEntry 10}
+            
+--xxx.100.10.1.3.9.1.11
+        macIpExternSrcIpWild OBJECT-TYPE
+            SYNTAX  IpAddress           
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                " Source IP-address wild  of advanced acl rule,for example 0.0.0.255 ."
+            ::= { macIpExternAclEntry 11 }
+
+            
+--xxx.100.10.1.3.9.1.12
+        macIpExternDstIp OBJECT-TYPE
+            SYNTAX  IpAddress            
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                " Destination IP-address of advanced acl rule,for example 10.1.1.0 ."
+            ::= { macIpExternAclEntry 12 }
+            
+--xxx.100.10.1.3.9.1.13
+        macIpExternDstIpWild OBJECT-TYPE
+            SYNTAX  IpAddress           
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                " Destination IP-address wild  of advanced acl rule,for example 0.0.0.255 ."
+            ::= { macIpExternAclEntry 13 }
+
+
+--xxx.100.10.1.3.9.1.16
+        macIpExternSrcPort1 OBJECT-TYPE
+            SYNTAX INTEGER(0..65535)          
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                "The source port number of the TCP or UDP protocol."
+            ::= { macIpExternAclEntry 16 }
+
+
+--xxx.100.10.1.3.9.1.19
+        macIpExternDstPort1 OBJECT-TYPE
+            SYNTAX INTEGER(0..65535)          
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                "The destination port number of the TCP or UDP protocol."
+            ::= { macIpExternAclEntry 19 }
+
+
+
+--xxx.100.10.1.3.9.1.21			
+  macIpExternPrecedence OBJECT-TYPE
+      SYNTAX  INTEGER(0..7)
+      MAX-ACCESS read-create
+      STATUS  current
+      DESCRIPTION
+          "The precedence of macIp-Extern-acl  ."
+      ::= { macIpExternAclEntry 21 }
+
+            
+--xxx.100.10.1.3.9.1.23
+        macIpExternStatus OBJECT-TYPE
+            SYNTAX  INTEGER
+            	    {
+            	    	createAndGo(0),
+               		  active(1),
+               		  destroy(2)
+            	    }
+            MAX-ACCESS  read-create
+            STATUS  current
+            DESCRIPTION
+                " state of the access-list."
+            ::= { macIpExternAclEntry 23 } 
+
+--xxx.100.10.1.3.9.1.24
+        macIpExternVlanId OBJECT-TYPE
+    	   SYNTAX INTEGER(1..4094)
+    	   MAX-ACCESS read-create
+    	   STATUS current
+    	   DESCRIPTION
+        	"The vlan Id"
+    		::= { macIpExternAclEntry 24 }
+
+--xxx.100.10.1.3.9.1.40
+        macIpExternDscp OBJECT-TYPE
+    	   SYNTAX INTEGER(0..63)
+    	   MAX-ACCESS read-create
+    	   STATUS current
+    	   DESCRIPTION
+        	"Dscp"
+    		::= { macIpExternAclEntry 40 }
+			
+--xxx.100.10.1.3.9.1.41
+        macIpExternCos OBJECT-TYPE
+    	   SYNTAX INTEGER(0..7)
+    	   MAX-ACCESS read-create
+    	   STATUS current
+    	   DESCRIPTION
+        	"Cos"
+    		::= { macIpExternAclEntry 41 }
+
+--xxx.100.10.1.3.9.1.50
+        macIpExternEtherType OBJECT-TYPE
+    	   SYNTAX INTEGER(1536..65535)
+    	   MAX-ACCESS read-create
+    	   STATUS current
+    	   DESCRIPTION
+        	"Value of the ethertype"
+    		::= { macIpExternAclEntry 50 }
+
+			
+
+--********************************************************************************************************
+--xxx.100.10.1.4.1
+aclActiveTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AclActiveEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+            DESCRIPTION
+                "bind  Acl in port or vlan."
+            ::= { aclAttach 1  } 
+            
+--xxx.100.10.1.4.1.1
+    aclActiveEntry OBJECT-TYPE
+        SYNTAX  AclActiveEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Entry for aclActiveTable"
+        INDEX   { aclActiveBindType,aclActiveIndex,aclActiveType, aclActiveDirection }
+        ::= { aclActiveTable 1 }
+
+    AclActiveEntry
+        ::= SEQUENCE
+            {
+               aclActiveBindType     INTEGER,
+               aclActiveIndex        INTEGER,
+               aclActiveType		      INTEGER,
+               aclActiveDirection		    INTEGER,                           
+               aclActiveAclIndex     INTEGER,                           
+               aclActiveStatus         INTEGER
+            }
+                                                           
+
+
+--xxx.100.10.1.4.1.1.1
+        aclActiveBindType  OBJECT-TYPE
+            SYNTAX  INTEGER 
+                    {
+                      port(0),
+                      vlan(1)
+                    }
+            MAX-ACCESS read-only
+            STATUS  current
+            DESCRIPTION
+                "point out the type of position of the bind-acl."
+            ::= { aclActiveEntry 1 }
+            
+--xxx.100.10.1.4.1.1.2
+        aclActiveIndex  OBJECT-TYPE
+            SYNTAX  INTEGER (1..2147483647) 
+            MAX-ACCESS read-only
+            STATUS  current
+            DESCRIPTION
+                "The value of port id or vlan id  ."
+            ::= { aclActiveEntry 2 }       
+                 
+--xxx.100.10.1.4.1.1.3
+        aclActiveType  OBJECT-TYPE
+            SYNTAX  INTEGER
+                {
+                   ip(1), 
+                   mac(5),
+                   macIp(8)
+                                 
+                }  
+            MAX-ACCESS read-only
+            STATUS  current
+            DESCRIPTION
+                "the type of acl."
+            ::= { aclActiveEntry 3 }
+            
+ --xxx.100.10.1.4.1.1.4
+        aclActiveDirection  OBJECT-TYPE
+            SYNTAX  INTEGER
+                {
+                   in(1)
+                }  
+            MAX-ACCESS read-only
+            STATUS  current
+            DESCRIPTION
+                "the direction of a binding acl."
+            ::= { aclActiveEntry 4 }           
+            
+--xxx.100.10.1.4.1.1.5
+        aclActiveAclIndex  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            MAX-ACCESS read-create
+            STATUS  current
+            DESCRIPTION
+                "the value of acl index,you have configured in aclNumAccessGroupTable"
+            ::= { aclActiveEntry 5 }
+                       
+            
+ 
+--xxx.100.10.1.4.1.1.7
+        aclActiveStatus  OBJECT-TYPE
+            SYNTAX  INTEGER
+                {
+                   disable(0),
+                   enable(1)
+                }  
+            MAX-ACCESS read-create
+            STATUS  current
+            DESCRIPTION
+                "access or delete the bind-acl."
+            ::= { aclActiveEntry 7} 
+
+        
+  
+--********************************************************************************************************
+--********************************************************************************************************  
+--xxx.100.10.4
+    am         	    OBJECT IDENTIFIER ::= { prisecurity 4 } 
+    
+--********************************************************************************************************         
+
+amGlobalEnable OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enable (1),
+                disable (2)
+            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION " Global Enable or disable the Access Management."
+        ::= { am 1 }
+
+--********************************************************************************************************
+      
+amPortInfoTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AmPortInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Access Management information list of port."
+        ::= { am 2 }
+
+amPortInfoEntry OBJECT-TYPE
+        SYNTAX  AmPortInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            ""
+        INDEX   { amPortIndex,amPortIp }
+        ::= { amPortInfoTable 1 } 
+
+    AmPortInfoEntry
+        ::= SEQUENCE
+            {
+                amPortIndex               		        INTEGER,
+                amPortEnable				        INTEGER,
+                amPortForwardingType				INTEGER,
+                amPortIp					IpAddress,
+                amPortMac				        MacAddress,
+                amPortCount					INTEGER,
+                amPortStatus				        INTEGER        
+            }
+            
+amPortIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "port index"
+        ::= { amPortInfoEntry 1 }       
+        
+amPortEnable OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enable (1),
+                disable (2)
+            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Enable or disable the Access Management on the port."
+        ::= { amPortInfoEntry 2 }
+                
+amPortForwardingType OBJECT-TYPE
+        SYNTAX  INTEGER{
+			ip-pool(1),
+			mac-ip-pool(2)
+            }   
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Access Management forwarding type."
+        ::= { amPortInfoEntry 3 }
+ 
+amPortIp OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "IP address of Access Management."
+        ::= { amPortInfoEntry 4 } 
+        
+amPortMac OBJECT-TYPE
+        SYNTAX      MacAddress         
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Mac address of Access Management."
+        ::= { amPortInfoEntry 5 }          
+
+amPortCount OBJECT-TYPE
+        SYNTAX      INTEGER(1..32)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Seriate IP address number."
+        ::= { amPortInfoEntry 6 }  
+
+amPortStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+            	    	createAndGo(0),
+               		active(1),
+               		destroy(2)
+                    }  
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION ""
+        ::= { amPortInfoEntry 7 }  
+
+--********************************************************************************************************
+      
+--xxx.100.10.4.3
+amPortStateTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AmPortStateEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Access Management information list of port am.."
+    ::= { am 3}
+
+--xxx.100.10.4.3.1
+		  amPortStateEntry OBJECT-TYPE
+		  SYNTAX     AmPortStateEntry
+		  MAX-ACCESS not-accessible
+		  STATUS     current
+		  DESCRIPTION
+		          "entry for port am information."
+		  INDEX      { amIfIndex }
+		  ::= { amPortStateTable 1 }
+		
+		
+		AmPortStateEntry::= SEQUENCE {
+		  amIfIndex    	INTEGER,
+		  amIfName         DisplayString,
+		  amIfState          INTEGER
+		}
+
+    amIfIndex    OBJECT-TYPE
+			  SYNTAX  INTEGER (1..2147483647) 
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "interface NO."
+			  ::= { amPortStateEntry 1 }
+
+    amIfName   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(0..32)) 
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "interface  name."
+			  ::= { amPortStateEntry 2 }
+
+    amIfState   OBJECT-TYPE
+			    SYNTAX      INTEGER
+        	         {
+                   	     disable(0),
+                    	     enable(1)
+              		  }
+
+			  MAX-ACCESS  read-write
+			  STATUS  current
+			  DESCRIPTION
+			      "1:Enable;0:Disable"
+			  ::= { amPortStateEntry 3 }
+         
+
+	
+         
+--********************************************************************************************************
+--********************************************************************************************************
+--xxx.100.13.3 
+    dhcpSnooping                     OBJECT IDENTIFIER ::= { pridhcp 3 }
+
+--xxx.100.13.3.1
+        dhcpSnoopingEnable OBJECT-TYPE
+            SYNTAX  INTEGER
+            	{
+               		noEnable(0),
+               		enable(1)              		           	
+            	}
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION "Enable the dhcp snooping function."
+            ::= { dhcpSnooping 1 } 
+
+--xxx.100.13.3.2
+        dhcpSnoopingBindingEnalbe OBJECT-TYPE
+            SYNTAX  INTEGER
+            	{
+               		noEnable(0),
+               		enable(1)              		           	
+            	}
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION "Enable the dhcp snooping binding function."
+            ::= { dhcpSnooping 2 }
+			
+--xxx.100.13.3.3
+        dhcpSnoopingVlanEnable OBJECT-TYPE
+          SYNTAX      OCTET STRING
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION " Enable the dhcp snooping on vlan list string, the vlan list string is input 
+						like as '1-2'. If the next time input the string '3-5',then the final vlan list
+						is '1-5'.If input the string 'NULL',then delete the whole vlan list."
+            ::= { dhcpSnooping 3 }	
+
+--xxx.100.13.3.4
+        dhcpSnoopingInformationEnalbe OBJECT-TYPE
+            SYNTAX  INTEGER
+            	{
+               		noEnable(0),
+               		enable(1)              		           	
+            	}
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION "Enable the dhcp snooping information function."
+            ::= { dhcpSnooping 4 }	
+			
+					
+--xxx.100.13.3.11			
+		dhcpSnoopingInformationOptionAllowUntrusted   OBJECT-TYPE
+			SYNTAX  INTEGER
+            	{
+               		notAllowUntrusted(0),
+               		allowUntrusted(1)              		           	
+            	}
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION "If set(0), the dhcp packets with option82 are discarded, 
+						if set (1), the dhcp packets with option82 are permitted, and the content of option82 is not changed,
+						if set (2), the dhcp packets with option82 are permitted, and the content of option82 is replaced,
+						the default value is (2)"
+            ::= { dhcpSnooping 11 }  
+
+--xxx.100.13.3.12
+        dhcpSnoopingOptionSelfDefinedSubscriberIDFormat   OBJECT-TYPE
+            SYNTAX  INTEGER
+            	{
+               		hex(0),
+					ascii(1)
+            	}
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION "If set(1), then use ASCII format to generate sub-scriber ID,
+			              set(0), use hex format to generate sub-scriber ID,
+						  the default value is set(1)."
+            ::= { dhcpSnooping 12 }				
+
+
+--************************************************************************			
+--dhcp snooping sub table
+--************************************************************************
+--dhcpSnoopingPortConfigTable
+--xxx.100.13.3.17
+		dhcpSnoopingPortConfigTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF DhcpSnoopingPortConfigEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION "After enable the dhcp snooping function, the administrator can configure the port information."
+          ::= { dhcpSnooping 17 }
+          	   
+--xxx.100.13.3.17.1
+dhcpSnoopingPortConfigEntry OBJECT-TYPE
+          SYNTAX      DhcpSnoopingPortConfigEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION "A conceptual row of dhcpSnoopingPortConfigTable."
+          INDEX { dhcpSnoopingPortIndex } 
+          ::= { dhcpSnoopingPortConfigTable 1 }
+          
+DhcpSnoopingPortConfigEntry ::= SEQUENCE
+{
+    dhcpSnoopingPortIndex	        INTEGER,
+	dhcpSnoopingUserControlMaxNum	INTEGER,
+	dhcpSnoopingUserControl		INTEGER,
+	dhcpSnoopingTrust	        OCTET STRING
+}
+
+--xxx.100.13.3.17.1.1
+dhcpSnoopingPortIndex OBJECT-TYPE
+          SYNTAX      INTEGER(0..1024)
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION "Configure the dhcp snooping function on the specified port."
+          ::= { dhcpSnoopingPortConfigEntry 1 }       
+
+--xxx.100.13.3.17.1.2
+dhcpSnoopingUserControlMaxNum OBJECT-TYPE
+          SYNTAX      INTEGER(0..1024)
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION "Configure the maximum of the binding users on a port, the range of binding users number is 
+		              0-254,the default number is 254."
+          ::= { dhcpSnoopingPortConfigEntry 2 }  
+
+--xxx.100.13.3.17.1.3
+dhcpSnoopingUserControl OBJECT-TYPE
+          SYNTAX      INTEGER
+		  {
+				notEnable(0),
+				enable(1)
+		  }
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION "If set(0), not enable the user control function on a specified port,
+		               if set(1), enable the user control function on a specified port,
+					   the default value is set(0)."
+          ::= { dhcpSnoopingPortConfigEntry 3 } 
+
+--xxx.100.13.3.17.1.4
+dhcpSnoopingTrust OBJECT-TYPE
+          SYNTAX      OCTET STRING
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION "Configure trust function on a port or vlan list string.If input the string 'all', then trust 
+		              all the vlan. If input the string '1-2', then only trust the DHCP packets with that 
+					  vlan ID is 1 or 2. If input string 'NULL', then close the trust function on the port."
+          ::= { dhcpSnoopingPortConfigEntry 4 }
+
+
+--********************************************************************************************************
+--xxx.100.20.1 Dcscm dc
+
+--xxx.100.20.2
+
+-- The Dcscm dc Acl Table
+
+dcscmdcAclTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF DcscmdcAclEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "dcscm dst control multicast"
+    ::= { dcscm 2 }
+            
+--xxx.100.20.2.1
+dcscmdcAclEntry OBJECT-TYPE
+    SYNTAX     DcscmdcAclEntry 
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "dcscm dst control multicast entry"
+    INDEX      { dcscmdcAclNumber,dcscmdcAclSubNumber }
+    ::= { dcscmdcAclTable 1 }
+    DcscmdcAclEntry
+        ::= SEQUENCE
+            {
+               dcscmdcAclNumber  INTEGER,
+               dcscmdcAclSubNumber  INTEGER,
+               dcscmdcAclDestinationIp  IpAddress,
+               dcscmdcAclDestinationMask  IpAddress,
+               dcscmdcAclPermitOrDeny  INTEGER
+            }
+
+--xxx.100.20.2.1.1
+dcscmdcAclNumber  OBJECT-TYPE
+            SYNTAX      INTEGER  (6000..7999)
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "Acl number of Dcscm destination control multicast,the range is 6000-7999."
+            ::= { dcscmdcAclEntry 1 }
+
+--xxx.100.20.2.1.2
+dcscmdcAclSubNumber  OBJECT-TYPE
+            SYNTAX      INTEGER  (1..2147483645)
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "Acl sub number of Dcscm destination control multicast,the range is <1-2147483645>."
+            ::= { dcscmdcAclEntry 2 }
+               
+
+--xxx.100.20.2.1.5
+dcscmdcAclDestinationIp  OBJECT-TYPE
+            SYNTAX      IpAddress 
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "Destination IP-address of multicast destination control  acl rule."
+            ::= { dcscmdcAclEntry 5}              
+            
+--xxx.100.20.2.1.6
+dcscmdcAclDestinationMask  OBJECT-TYPE
+            SYNTAX      IpAddress 
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "Destination Mask of acl entry. the destination mask should meet the request of muticast group address. "
+            ::= { dcscmdcAclEntry 6} 
+
+--xxx.100.20.2.1.7
+dcscmdcAclPermitOrDeny  OBJECT-TYPE
+            SYNTAX      INTEGER  
+            {
+            permit(1),
+            deny(0),
+            deltheAcl(2)
+            }
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                " acl entry permit or deny ; 0:deny; 1:permit; 2:del this acl entry"
+            ::= { dcscmdcAclEntry 7}    
+            
+            
+--xxx.100.20.5
+
+-- The DCSCM Port Destination binding Table
+
+dcscmdcPortbindingTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF DcscmdcPortbindingEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "dcscm destination control multicast, Acl is binded to Port"
+    ::= { dcscm 5 }
+--xxx.100.20.5.1
+dcscmdcPortbindingEntry OBJECT-TYPE
+    SYNTAX     DcscmdcPortbindingEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The index of this table is PortName"
+    INDEX      { dcscmdcPortbindingPortName }
+    ::= { dcscmdcPortbindingTable 1 }
+
+DcscmdcPortbindingEntry
+        ::= SEQUENCE
+            {
+                dcscmdcPortbindingPortName           INTEGER,
+                dcscmdcPortbindingAclNumber         INTEGER
+            }
+            
+--xxx.100.20.5.1.1
+dcscmdcPortbindingPortName  OBJECT-TYPE
+            SYNTAX      INTEGER (1..2147483647)
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                " Dcscm destination control multicast,The Port index of rule"
+            ::= { dcscmdcPortbindingEntry 1 }  
+ 
+--xxx.100.20.5.1.2
+dcscmdcPortbindingAclNumber  OBJECT-TYPE
+            SYNTAX      INTEGER  (0|6000..7999)
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                " Dcscm destination control multicast,The Acl number of rule;0 means del the rule binded to port"
+            ::= { dcscmdcPortbindingEntry 2 }              
+
+
+--********************************************************************************************************
+
+-- (xxx.100.26)   priPoeConfig group
+
+--xxx.100.26.6
+poeCurrentPower OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        " The power inline current export power. It is a real time value."
+    ::= { priPoeConfig   6 }
+  		                                      
+--xxx.100.26.10
+    poePortConfigTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF PoePortConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            " The power inline port configuration table"
+        ::= { priPoeConfig 10 }
+        
+--xxx.100.26.10.1
+    poePortConfigEntry OBJECT-TYPE
+        SYNTAX  PoePortConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            " The power inline configuration in port."
+        INDEX   { portIndex }
+        ::= { poePortConfigTable 1 }        
+
+    PoePortConfigEntry
+        ::= SEQUENCE
+            {
+                poePortStatus              INTEGER,
+                poePortPriority	           INTEGER, 
+                poePortCurrentPower        INTEGER,
+                poePortCurrentCurrent	   INTEGER,
+                poePortCurrentVoltage      INTEGER,
+                poePortPdClass		   INTEGER
+            }
+            
+        
+--xxx.100.26.10.1.2
+poePortStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+ 	    {		         	
+		         	disabled (0),
+		         	enabled (1) 
+	    }        
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+        " The power inline port switch. Enable expresses it is turned on, while disable indicates that off."
+        ::= { poePortConfigEntry 2 } 
+        
+--xxx.100.26.10.1.3
+poePortPriority OBJECT-TYPE
+        SYNTAX      INTEGER
+ 	    {
+                               critical (0), 
+                               high (1), 
+                               low (2)
+	    }        
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+        " The power inline port priority."
+        ::= { poePortConfigEntry 3 }          
+        
+--xxx.100.26.10.1.5
+poePortCurrentPower OBJECT-TYPE
+        SYNTAX      INTEGER        
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+        " The power inline port used power. It is a real time value."
+        ::= { poePortConfigEntry 5 }    
+        
+--xxx.100.26.10.1.6
+poePortCurrentCurrent OBJECT-TYPE
+        SYNTAX      INTEGER        
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+        " The power inline port export current. It is a real time value."
+        ::= { poePortConfigEntry 6 }  
+        
+--xxx.100.26.10.1.7
+poePortCurrentVoltage OBJECT-TYPE
+        SYNTAX      INTEGER        
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+        " The power inline port export voltage. It is a real time value."
+        ::= { poePortConfigEntry 7 }
+        
+        
+--xxx.100.26.10.1.9
+poePortPdClass OBJECT-TYPE
+        SYNTAX      INTEGER        
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+        " The connected PD class of power inline"
+        ::= { poePortConfigEntry 9 }   
+                                                 	                                                                  	             
+--********************************************************************************************************
+--********************************************************************************************************
+
+--DDM
+--***********************************************************************************************************************************
+-- xxx.100.30.1
+
+ddmTranscDiagnosisTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF DdmTranscDiagnosisEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of  ddm transceiver diagnosis information."
+    ::= { ddm 1 }
+-- xxx.100.30.1.1
+		ddmTranscDiagnosisEntry OBJECT-TYPE
+		    SYNTAX     DdmTranscDiagnosisEntry
+		    MAX-ACCESS not-accessible
+		    STATUS     current
+		    DESCRIPTION
+							"entry for ddm transceiver diagnosis information."
+		    INDEX   { ddmDiagnosisIfIndex }
+		    ::= { ddmTranscDiagnosisTable 1 }
+
+		DdmTranscDiagnosisEntry ::= SEQUENCE {
+		    ddmDiagnosisIfIndex		    INTEGER,
+		    ddmDiagnosisTemperature        DisplayString,    
+		    ddmDiagTempHighAlarmThreshold   DisplayString,
+		    ddmDiagTempLowAlarmThreshold    DisplayString,
+		    ddmDiagTempHighWarnThreshold    DisplayString,
+		    ddmDiagTempLowWarnThreshold     DisplayString,
+		    ddmDiagnosisVoltage		         DisplayString,
+		    ddmDiagVoltHighAlarmThreshold   DisplayString,
+		    ddmDiagVoltLowAlarmThreshold    DisplayString,
+		    ddmDiagVoltHighWarnThreshold    DisplayString,
+		    ddmDiagVoltLowWarnThreshold     DisplayString,
+		    ddmDiagnosisBias		           DisplayString,
+		    ddmDiagBiasHighAlarmThreshold    DisplayString,
+		    ddmDiagBiasLowAlarmThreshold     DisplayString,
+		    ddmDiagBiasHighWarnThreshold     DisplayString,
+		    ddmDiagBiasLowWarnThreshold      DisplayString,
+		    ddmDiagnosisRXPower		           DisplayString,
+		    ddmDiagRXPowerHighAlarmThreshold   DisplayString,
+		    ddmDiagRXPowerLowAlarmThreshold   DisplayString,
+		    ddmDiagRXPowerHighWarnThreshold   DisplayString,
+		    ddmDiagRXPowerLowWarnThreshold    DisplayString,
+		    ddmDiagnosisTXPower		            DisplayString,
+		    ddmDiagTXPowerHighAlarmThreshold  DisplayString,
+		    ddmDiagTXPowerLowAlarmThreshold   DisplayString,
+		    ddmDiagTXPowerHighWarnThreshold   DisplayString,
+		    ddmDiagTXPowerLowWarnThreshold    DisplayString
+		}
+-- xxx.100.30.1.1.1	
+    ddmDiagnosisIfIndex   OBJECT-TYPE
+			  SYNTAX  INTEGER (1..2147483647) 
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "interface NO."
+			  ::= { ddmTranscDiagnosisEntry 1 }
+-- xxx.100.30.1.1.2
+    ddmDiagnosisTemperature   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..32)) 
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "current Temperature of the port,and the unit is C."
+			  ::= { ddmTranscDiagnosisEntry 2 }
+-- xxx.100.30.1.1.3  		  
+	ddmDiagTempHighAlarmThreshold   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..16))  
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "High alarm threshold of Temperature."
+			  ::= { ddmTranscDiagnosisEntry 3 }
+			  
+	ddmDiagTempLowAlarmThreshold   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..16))  
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "Low alarm threshold of Temperature."
+			  ::= { ddmTranscDiagnosisEntry 4 }
+-- xxx.100.30.1.1.9			  
+	 ddmDiagTempHighWarnThreshold   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..16))  
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "High warn threshold of Temperature."
+			  ::= { ddmTranscDiagnosisEntry 5 }
+-- xxx.100.30.1.1.10			  
+	 ddmDiagTempLowWarnThreshold   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..16))  
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "Low warn threshold of Temperature."
+			  ::= { ddmTranscDiagnosisEntry 6}
+			  
+	ddmDiagnosisVoltage   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..32))  
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "voltage of the port,and the unit is V."
+			  ::= { ddmTranscDiagnosisEntry 7 }
+-- xxx.100.30.1.1.11		  
+	 ddmDiagVoltHighAlarmThreshold   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..16))  
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "High alarm threshold of Voltage."
+			  ::= { ddmTranscDiagnosisEntry 8 }
+			  
+	ddmDiagVoltLowAlarmThreshold   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..16))  
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "Low alarm threshold of Voltage."
+			  ::= { ddmTranscDiagnosisEntry 9 }
+			  
+  ddmDiagVoltHighWarnThreshold   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..16)) 
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "High warn threshold of Voltage."
+			  ::= { ddmTranscDiagnosisEntry 10}
+-- xxx.100.30.1.1.14
+    ddmDiagVoltLowWarnThreshold   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..16))  
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "Low warn threshold of Voltage."
+			  ::= { ddmTranscDiagnosisEntry 11 }
+			  
+		ddmDiagnosisBias   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..32))  
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "bias of the port,the unit is mA."
+			  ::= { ddmTranscDiagnosisEntry 12 }
+-- xxx.100.30.1.1.15		  
+	 ddmDiagBiasHighAlarmThreshold   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..16))  
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "High alarm threshold of Bias."
+			  ::= { ddmTranscDiagnosisEntry 13 }
+-- xxx.100.30.1.1.16			  
+	 ddmDiagBiasLowAlarmThreshold   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..16))  
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "Low alarm threshold of Bias."
+			  ::= { ddmTranscDiagnosisEntry 14 }
+-- xxx.100.30.1.1.17		  
+	 ddmDiagBiasHighWarnThreshold   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..16))  
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "High warn threshold of Bias."
+			  ::= { ddmTranscDiagnosisEntry 15 }
+			  
+	ddmDiagBiasLowWarnThreshold   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..16))  
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "Low warn threshold of Bias."
+			  ::= { ddmTranscDiagnosisEntry 16 }
+			  
+	ddmDiagnosisRXPower   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..32))  
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "RXPower of the port,and the unit is dBM,if the value of RXPower is infinitesimal,then set it to '-'."
+			  ::= { ddmTranscDiagnosisEntry 17 }		
+			    
+	ddmDiagRXPowerHighAlarmThreshold   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..16))  
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "High alarm threshold of RXPower."
+			  ::= { ddmTranscDiagnosisEntry 18 }
+-- xxx.100.30.1.1.20 			  
+	 ddmDiagRXPowerLowAlarmThreshold   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..16))  
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "Low alarm threshold of RXPower."
+			  ::= { ddmTranscDiagnosisEntry 19 }
+
+-- xxx.100.30.1.1.21		  
+	 ddmDiagRXPowerHighWarnThreshold   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..16))  
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "High warn threshold of RXPower."
+			  ::= { ddmTranscDiagnosisEntry 20 }
+-- xxx.100.30.1.1.22		  
+	 ddmDiagRXPowerLowWarnThreshold   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..16))  
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "Low warn threshold of RXPower."
+			  ::= { ddmTranscDiagnosisEntry 21 }
+			  
+	 ddmDiagnosisTXPower   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..32))  
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "TXPower of the port,and the unit is dBM,if the value of TXPoweris infinitesimal,then set it to '-'."
+			  ::= { ddmTranscDiagnosisEntry 22 }		  
+			  
+	ddmDiagTXPowerHighAlarmThreshold   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..16))  
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "High alarm threshold of TXPower."
+			  ::= { ddmTranscDiagnosisEntry 23 }
+			  
+	ddmDiagTXPowerLowAlarmThreshold   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..16))  
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "k=Low alarm threshold of TXPower."
+			  ::= { ddmTranscDiagnosisEntry 24 }
+-- xxx.100.30.1.1.25			  
+	 ddmDiagTXPowerHighWarnThreshold   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..16))  
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "High warn threshold of TXPower."
+			  ::= { ddmTranscDiagnosisEntry 25 }
+-- xxx.100.30.1.1.26		  
+	 ddmDiagTXPowerLowWarnThreshold   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(1..16))  
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "Low warn threshold of TXPower."
+			  ::= { ddmTranscDiagnosisEntry 26 }
+			  
+--  xxx.100.30.3
+
+ddmTranscBasicInfoTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF DdmTranscBasicInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Basic info of  ddm transceiver alarm information."
+    ::= { ddm 3}
+--  xxx.100.30.3.1
+ddmTranscBasicInfoEntry OBJECT-TYPE
+    SYNTAX     DdmTranscBasicInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+	"entry for ddm transceiver basic information."
+    INDEX   { ddmDiagnosisIfIndex }   
+    ::= { ddmTranscBasicInfoTable 1 }
+		
+		
+    DdmTranscBasicInfoEntry ::= SEQUENCE { 
+        ddmTransSerialIndex       INTEGER,
+        ddmTransSerialName        DisplayString,
+    	ddmTransSerialNo          DisplayString,
+    	ddmTransSerialVendorName  DisplayString,
+    	ddmTransSerialModelName   DisplayString,
+    	ddmTransSerialTypeName    DisplayString,
+	ddmTransSerialBitRate    DisplayString,
+	ddmTransSerialWaveLength    DisplayString
+    }
+ --  xxx.100.30.3.1.1
+    ddmTransSerialIndex   OBJECT-TYPE
+			  SYNTAX  INTEGER (1..2147483647) 
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "ddm Trans Serial Index ."
+			  ::= { ddmTranscBasicInfoEntry 1 }
+--  xxx.100.30.3.1.2
+    ddmTransSerialName   OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(0..512)) 
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "ddm Trans Serial Name."
+			  ::= { ddmTranscBasicInfoEntry 2 } 
+--  xxx.100.30.3.1.3
+    ddmTransSerialNo  OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(0..32)) 
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "ddm transceiver Serial number."
+			  ::= { ddmTranscBasicInfoEntry 3 }           
+--  xxx.100.30.3.1.4
+    ddmTransSerialVendorName  OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(0..32)) 
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "ddm transceiver Vendor Name."
+			  ::= { ddmTranscBasicInfoEntry 4 }
+--  xxx.100.30.3.1.5
+    ddmTransSerialModelName  OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(0..32)) 
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "ddm transceiver Model Name:SFP,SFP+,QSFP+,QSFP,XFP,etc."
+			  ::= { ddmTranscBasicInfoEntry 5 }
+--  xxx.100.30.3.1.6
+    ddmTransSerialTypeName  OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(0..32)) 
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "ddm transceiver Type Name:1000BASE-T,10GBASE-LR,etc."
+			  ::= { ddmTranscBasicInfoEntry 6 }
+--  xxx.100.30.3.1.7
+    ddmTransSerialBitRate  OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(0..128)) 
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "ddm transceiver bit rate:1300Mbit/s,10300Mbit/s,etc."
+			  ::= { ddmTranscBasicInfoEntry 7 }
+--  xxx.100.30.3.1.8
+    ddmTransSerialWaveLength  OBJECT-TYPE
+			  SYNTAX  DisplayString(SIZE(0..64)) 
+			  MAX-ACCESS  read-only
+			  STATUS  current
+			  DESCRIPTION
+			      "ddm transceiver Wave Length:1310nm,etc."
+			  ::= { ddmTranscBasicInfoEntry 8 }
+              
+--xxx.100.32.1 PortSecurity 
+newPortSecurityTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF NewPortSecurityEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The Port Security information table."
+    ::= { portSecurity 1 }
+--xxx.100.32.1.1
+newPortSecurityEntry OBJECT-TYPE
+    SYNTAX     NewPortSecurityEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The index of this table is port index."
+    INDEX      { portSecurityPortIndex }
+    ::= { newPortSecurityTable 1 }
+NewPortSecurityEntry
+        ::= SEQUENCE
+            {
+                portSecurityPortIndex           INTEGER,
+                portSecurityState               INTEGER,
+                portSecurityMaxMacNum           INTEGER,
+                portSecurityVioMode             INTEGER                                 
+            }
+--xxx.100.32.1.1.1
+portSecurityPortIndex  OBJECT-TYPE
+            SYNTAX      INTEGER (1..2147483647)
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Secure Port Index."
+            ::= { newPortSecurityEntry 1 }
+--xxx.100.32.1.1.2
+portSecurityState       OBJECT-TYPE
+            SYNTAX      INTEGER   
+						{
+						enable(1),
+            disable(0)
+						}			
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "enable or disable port security on this port."
+            ::= { newPortSecurityEntry 2 }                            
+--xxx.100.32.1.1.4
+portSecurityMaxMacNum   OBJECT-TYPE
+            SYNTAX      INTEGER(0..4096) 
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "The maximum number of security mac can be set or learned on the secure port."
+            ::= { newPortSecurityEntry 4 }                                         
+--xxx.100.32.1.1.10
+portSecurityVioMode   OBJECT-TYPE
+            SYNTAX      INTEGER   
+						{
+							protect(1),
+	            restrict(2),
+	            shutdown(3)
+						}
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "The violation mode of secure port mac count reach the threshold.The default mode is shutdown,if you want to disable violation mode,you can
+                config shutdown mode."
+            ::= { newPortSecurityEntry 10 }   
+
+
+--**********************************************************************
+--Mac Notification Global Group
+--**********************************************************************            
+macNotificationMibObjects OBJECT IDENTIFIER
+    ::= { macNotificationMib 1 }                                                                            
+
+-- MAC Notification MIB consists of the following groups
+-- [1]  Mac Notification Global Group (cmnGlobalObjects).
+-- [2]  Mac Notification Interface Group (cmnInterfaceObjects).
+macNotificationGlobalObjects     OBJECT IDENTIFIER
+    ::= { macNotificationMibObjects 1 }
+macNotificationInterfaceObjects     OBJECT IDENTIFIER
+    ::= { macNotificationMibObjects 2 }
+
+
+macNotificationNotificationInterval  OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "seconds"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object specifies the maximum interval of time between
+        macNotificationMacChangedNotifications being generated by the device.
+        If the value of macNotificationNotificationsEnabled is true(1), the
+        device will send out the generated macNotificationMacChangedNotifications
+        and archive the MAC change notification events in the
+        macNotificationHistoryTable. If the value of macNotificationNotificationEnabled is
+        false(2), the device will not send out the generated
+        macNotificationMacChangedNotifications but it will archive these events
+        in the macNotificationHistoryTable.   
+        
+        If the value of this object is equal to 0, the device will 
+        generate macNotificationMacChangedNotifications and archive the MAC 
+        change notification events in the macNotificationHistoryTable as soon as
+        there is MAC address learnt or removed by the device.
+
+        If the value of this object is greater than 0, the device will
+        wait for a period of time equal to the value of this object
+        before generate the macNotificationMacChangedNotifications and archive
+        the MAC change notification events in the macNotificationHistoryTable."
+    ::= { macNotificationGlobalObjects 2 }
+
+
+macNotificationNotificationsEnabled OBJECT-TYPE
+     SYNTAX          TruthValue
+     MAX-ACCESS      read-write
+     STATUS          current
+     DESCRIPTION
+         "Indicates whether macNotificationMacChangedNotification notifications
+          will or will not be sent when there are MAC addresses
+          learnt or removed from the device's forwarding database. 
+          Disabling notifications does not prevent the MAC address
+          info from being added to the macNotificationHistoryTable."
+     DEFVAL { false }
+     ::= { macNotificationGlobalObjects 5 }
+
+
+macNotificationHistTableMaxLength OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "entries"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The upper limit on the number of entries that the
+        macNotificationHistoryTable may contain.  A value of 0 will
+        prevent any history from being retained. When this
+        table is full, the oldest entry will be deleted and
+        a new one will be created."
+    ::= { macNotificationGlobalObjects 7 }
+
+--*********************************************************************
+--  Mac Notification Interface Group
+--*********************************************************************
+
+--
+-- macNotificationIfConfigTable
+--
+macNotificationIfConfigTable  OBJECT-TYPE
+    SYNTAX        SEQUENCE OF MacNotificationIfConfigEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table enables or disables the generation of notification
+        at each interface when MAC address is learnt or removed." 
+    ::= { macNotificationInterfaceObjects 1 }
+
+macNotificationIfConfigEntry  OBJECT-TYPE
+    SYNTAX        MacNotificationIfConfigEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry contains the configuration for enabling the
+        MAC notification at each interface that supports this
+        feature." 
+	INDEX { portIndex }
+    ::= { macNotificationIfConfigTable 1 }
+
+MacNotificationIfConfigEntry  ::= SEQUENCE {
+    macNotificationMacAddrLearntEnable    TruthValue, 
+    macNotificationMacAddrRemovedEnable   TruthValue 
+}
+
+macNotificationMacAddrLearntEnable OBJECT-TYPE
+    SYNTAX        TruthValue 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates whether this interface is enabled to send 
+        macNotificationMacChangedNotification when it learns a new MAC address. This
+        variable has no effect when the value of macNotificationGlobalFeatureEnabled
+        object is false(2).
+
+        Setting this object to true(1) enables the sending of
+        macNotificationMacChangedNotification when this interface learns a 
+        new MAC address.
+
+        Setting this object to false(2) disables the sending
+        of macNotificationMacChangedNotification when this interface learns
+        a new MAC address."      
+    DEFVAL { false }
+    ::= { macNotificationIfConfigEntry 1 }
+
+macNotificationMacAddrRemovedEnable OBJECT-TYPE
+    SYNTAX        TruthValue 
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates whether this interface is enabled to send 
+        macNotificationMacChangedNotification when a MAC address which it learnt
+        previously is removed from the forwarding table. This variable
+        has no effect when the value of macNotificationGlobalFeatureEnabled object
+        is false(2). 
+
+        Setting this object to true(1) enables the sending of
+        macNotificationMacChangedNotification when a MAC address which this
+        interface learnt previously is removed from the forwarding
+        table.
+
+        Setting this object to false(2) disables the sending of
+        macNotificationMacChangedNotification when a MAC address which this
+        interface learnt previously is removed from the forwarding
+        table."
+    DEFVAL { false }
+    ::= { macNotificationIfConfigEntry 2 }
+
+--********************************************************************************************************
+--********************************************************************************************************
+
+--xxx.100.39  erpsMgt
+
+--xxx.100.39.2
+erpsRingConfigTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF ErpsRingConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "Erps Ring configration table."
+    ::= { erpsMgt 2 }
+--xxx.100.39.2.1    
+erpsRingConfigEntry OBJECT-TYPE
+    SYNTAX     ErpsRingConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Erps Ring configration entry."
+    INDEX      {erpsRingNameIndex}
+    ::= { erpsRingConfigTable 1 }
+
+ErpsRingConfigEntry
+        ::= SEQUENCE
+            {
+                erpsRingNameIndex        INTEGER,
+                erpsRingName             DisplayString,
+                erpsOpenRing             INTEGER,				
+                erpsRingPort0            DisplayString,
+				erpsRingPort1ExistFlag    INTEGER,
+				erpsRingPort1            DisplayString,
+                erpsRingRowStatus        INTEGER
+            }
+--xxx.100.39.2.1.1
+erpsRingNameIndex  OBJECT-TYPE
+            SYNTAX      INTEGER(1..65535)
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "erps ring name index, the max number is 32."
+           ::= { erpsRingConfigEntry 1}
+--xxx.100.39.2.1.2        
+erpsRingName  OBJECT-TYPE
+            SYNTAX      DisplayString(SIZE (1..64))    
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "erps ring name."
+            ::= { erpsRingConfigEntry 2}
+--xxx.100.39.2.1.4        
+erpsOpenRing   OBJECT-TYPE
+            SYNTAX      INTEGER
+            {
+                none-open(0),
+                open(1)
+            } 
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "set Erps ring topology type ."
+            ::= { erpsRingConfigEntry 4}			
+--xxx.100.39.2.1.6        
+erpsRingPort0   OBJECT-TYPE
+            SYNTAX      DisplayString(SIZE (1..64))
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "ERPS ring's member port0 ."
+            ::= { erpsRingConfigEntry 6} 
+erpsRingPort1ExistFlag   OBJECT-TYPE
+            SYNTAX      INTEGER 
+			{
+	            none(0),				
+				not-none(1)
+            }
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "ERPS ring's member port1 whether has been set none; 
+				 can not be set alone,must be set with erpsRingPort0 together."
+            ::= { erpsRingConfigEntry 8}  			
+--xxx.100.39.2.1.9        
+erpsRingPort1   OBJECT-TYPE
+            SYNTAX      DisplayString(SIZE (1..64))
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "ERPS ring's member port1 ."
+            ::= { erpsRingConfigEntry 9} 
+--xxx.100.39.2.1.11        
+erpsRingRowStatus   OBJECT-TYPE
+            SYNTAX      INTEGER
+            {
+	            unset(0),				
+				set(1)
+            }
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "ERPS ring's row status ."
+            ::= { erpsRingConfigEntry 11}              
+	     
+--xxx.100.39.3                      
+            
+erpsInstanceConfigTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF ErpsInstanceConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "erps Instance configration table."
+    ::= { erpsMgt 3 }
+--xxx.100.39.3.1    
+erpsInstanceConfigEntry OBJECT-TYPE
+    SYNTAX     ErpsInstanceConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A set of configuration parameters for erps Instance."
+    INDEX      {erpsRingNameIndex, erpsInstanceId}
+    ::= { erpsInstanceConfigTable 1 } 
+    
+ErpsInstanceConfigEntry
+        ::= SEQUENCE
+            {
+                --erpsRingName               DisplayString,
+		        erpsInstanceId             INTEGER,          
+                erpsRplPort0Role           INTEGER,
+                erpsRplPort1Role           INTEGER,
+                erpsWtrTimer               INTEGER,
+                erpsProtectedInstance      DisplayString,
+                erpsControlVlan            INTEGER,
+                erpsInstanceRowStatus      INTEGER  
+            } 
+ --erpsRingName  OBJECT-TYPE
+--            SYNTAX      DisplayString(SIZE (1..64)) 
+ --           MAX-ACCESS  not-accessible
+ --           STATUS      current
+ --           DESCRIPTION
+  --              "ERPS Ring Name."
+  --          ::= { erpsInstanceConfigEntry 18}           
+ --xxx.100.39.3.1.1
+erpsInstanceId  OBJECT-TYPE
+            SYNTAX      INTEGER(1..65535)
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "erps instance id.scope:<1-48>"
+            ::= { erpsInstanceConfigEntry 1}
+--xxx.100.39.3.1.4        
+erpsRplPort0Role   OBJECT-TYPE
+            SYNTAX      INTEGER
+            {
+                default(0),
+                owner(1),
+                neighbour(2)
+            } 
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "Set Ring membor port0's role."
+            ::= { erpsInstanceConfigEntry 4}  
+--xxx.100.39.3.1.5        
+erpsRplPort1Role   OBJECT-TYPE
+            SYNTAX      INTEGER
+            {
+                default(0),
+                owner(1),
+                neighbour(2)
+            } 
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "Set Ring membor port1's role."
+            ::= { erpsInstanceConfigEntry 5}
+
+           
+--xxx.100.39.3.1.9        
+erpsWtrTimer   OBJECT-TYPE
+            SYNTAX      INTEGER            
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "Wait To Restore configuration.scope:<1-12>"
+            ::= { erpsInstanceConfigEntry 9}             
+--xxx.100.39.3.1.10        
+erpsProtectedInstance    OBJECT-TYPE
+            SYNTAX      DisplayString(SIZE (1..64))             
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "Protection vlan reference MSTP instance configuration"
+            ::= { erpsInstanceConfigEntry 10} 
+--xxx.100.39.3.1.12        
+erpsControlVlan    OBJECT-TYPE
+            SYNTAX      INTEGER             
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "Control vlan configuration"
+            ::= { erpsInstanceConfigEntry 12}          
+
+--xxx.100.39.3.1.17        
+erpsInstanceRowStatus    OBJECT-TYPE
+            SYNTAX      INTEGER
+            {
+                unset(0),				
+				set(1)
+            }             
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "Clear an administrative command"
+            ::= { erpsInstanceConfigEntry 17}          
+
+--xxx.100.39.4
+erpsStatus         	                    OBJECT IDENTIFIER ::= { erpsMgt 4 }
+--xxx.100.39.4.1
+--erpsInstanceStatusTable         	    OBJECT IDENTIFIER ::= { erpsStatus  1 } 
+--xxx.100.39.4.2
+--erpsPort0StatusTable         	        OBJECT IDENTIFIER ::= { erpsStatus  2 }
+--xxx.100.39.4.3
+--erpsPort1StatusTable         	        OBJECT IDENTIFIER ::= { erpsStatus  3 } 
+
+
+--xxx.100.39.4.1                     
+erpsInstanceStatusTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF ErpsInstanceStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "erps Instance status table."
+    ::= { erpsStatus 1 }
+--xxx.100.39.4.1.1    
+erpsInstanceStatusEntry OBJECT-TYPE
+    SYNTAX     ErpsInstanceStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "erps instance status."
+    INDEX      {erpsRingNameIndex,erpsInstanceId}
+    ::= { erpsInstanceStatusTable 1 } 
+    
+ErpsInstanceStatusEntry
+        ::= SEQUENCE
+            {
+                erpsActiveStatus             INTEGER,          
+                erpsNodeState                INTEGER 
+            } 
+            
+ --xxx.100.39.4.1.1.1
+erpsActiveStatus  OBJECT-TYPE
+            SYNTAX      INTEGER    
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "erps instance active status."
+            ::= { erpsInstanceStatusEntry 1}  
+ --xxx.100.39.4.1.1.2
+erpsNodeState  OBJECT-TYPE
+            SYNTAX      INTEGER  
+			{
+					idle(1),
+					protection(2),
+					manual-switch(3),
+					force-switch(4),
+					pending(5),
+					init(6)
+			}			
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "erps instance node state."
+            ::= { erpsInstanceStatusEntry 2}
+
+-------------------------------------------
+--xxx.100.39.4.2                     
+erpsPort0StatusTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF ErpsPort0StatusEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "erps port status table."
+    ::= { erpsStatus 2 }
+--xxx.100.39.4.2.1    
+erpsPort0StatusEntry OBJECT-TYPE
+    SYNTAX     ErpsPort0StatusEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "erps port0 status."
+    INDEX      {erpsRingNameIndex, erpsInstanceId}
+    ::= { erpsPort0StatusTable 1 } 
+    
+ErpsPort0StatusEntry
+        ::= SEQUENCE
+            {
+                erpsPort0Name                  DisplayString,          
+                erpsPort0Status                INTEGER,
+                erpsPort0SignalStatus          INTEGER,
+                erpsPort0RapsNodeId           DisplayString,
+                erpsPort0BPR                   INTEGER
+            } 
+ --xxx.100.39.4.2.1.1
+erpsPort0Name  OBJECT-TYPE
+            SYNTAX      DisplayString(SIZE (1..64))    
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "erps port0's name."
+            ::= { erpsPort0StatusEntry 1}  
+ --xxx.100.39.4.2.1.2
+erpsPort0Status  OBJECT-TYPE
+            SYNTAX      INTEGER    
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "erps port0's block status."
+            ::= { erpsPort0StatusEntry 2}
+ --xxx.100.39.4.2.1.3
+erpsPort0SignalStatus  OBJECT-TYPE
+            SYNTAX      INTEGER    
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "erps port0's siginal status."
+            ::= { erpsPort0StatusEntry 3}
+ --xxx.100.39.4.2.1.4
+erpsPort0RapsNodeId  OBJECT-TYPE
+            SYNTAX      DisplayString(SIZE (1..64))   
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "erps port0's R-APS-NodeId."
+            ::= { erpsPort0StatusEntry 4} 
+ --xxx.100.39.4.2.1.5
+erpsPort0BPR  OBJECT-TYPE
+            SYNTAX      INTEGER    
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "erps port0's BPR value."
+            ::= { erpsPort0StatusEntry 5}
+           
+--xxx.100.39.4.3                     
+erpsPort1StatusTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF ErpsPort1StatusEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "erps port1 status table."
+    ::= { erpsStatus 3 }
+--xxx.100.39.4.3.1    
+erpsPort1StatusEntry OBJECT-TYPE
+    SYNTAX     ErpsPort1StatusEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "erps port1 status."
+    INDEX      {erpsRingNameIndex, erpsInstanceId}
+    ::= { erpsPort1StatusTable 1 } 
+    
+ErpsPort1StatusEntry
+        ::= SEQUENCE
+            {
+                erpsPort1Name                  DisplayString,          
+                erpsPort1Status                INTEGER,
+                erpsPort1SignalStatus          INTEGER,
+                erpsPort1RapsNodeId           DisplayString,
+                erpsPort1BPR                   INTEGER
+
+            }            
+ --xxx.100.39.4.3.1.1
+erpsPort1Name  OBJECT-TYPE
+            SYNTAX      DisplayString(SIZE (1..64))    
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "erps port1's name."
+            ::= { erpsPort1StatusEntry 1}  
+ --xxx.100.39.4.3.1.2
+erpsPort1Status  OBJECT-TYPE
+            SYNTAX      INTEGER    
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "erps port1's block status."
+            ::= { erpsPort1StatusEntry 2}
+ --xxx.100.39.4.3.1.3
+erpsPort1SignalStatus  OBJECT-TYPE
+            SYNTAX      INTEGER    
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "erps port1's siginal status."
+            ::= { erpsPort1StatusEntry 3}
+ --xxx.100.39.4.3.1.4
+erpsPort1RapsNodeId  OBJECT-TYPE
+            SYNTAX      DisplayString(SIZE (1..64))   
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "erps port1's R-APS-NodeId."
+            ::= { erpsPort1StatusEntry 4} 
+ --xxx.100.39.4.3.1.5
+erpsPort1BPR  OBJECT-TYPE
+            SYNTAX      INTEGER    
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "erps port1's BPR value."
+            ::= { erpsPort1StatusEntry 5}
+
+--********************************************************************************************************
+--xxx.100.100.1 isolatePortCfg 
+isolatePortCfgTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF IsolatePortCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The Port Security information table."
+    ::= { isolatePortCfg 1 }
+--xxx.100.100.1.1
+isolatePortCfgEntry OBJECT-TYPE
+    SYNTAX     IsolatePortCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Isolate-port information entry."
+    INDEX      { isolatePortCfgIndex }
+    ::= { isolatePortCfgTable 1 }
+IsolatePortCfgEntry
+        ::= SEQUENCE
+            {
+                isolatePortCfgIndex           INTEGER,
+                isolatePortCfgPorts           DisplayString
+            }
+--xxx.100.100.1.1.1
+isolatePortCfgIndex  OBJECT-TYPE
+            SYNTAX      INTEGER (1..2147483647)
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "An unique value for each port."
+            ::= { isolatePortCfgEntry 1 }
+--xxx.100.100.1.1.2
+isolatePortCfgPorts       OBJECT-TYPE
+            SYNTAX      DisplayString   			
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+                "It specifies the ports indexes to which traffic is prohibited from being sent.
+                 Example: 5001 5002 5003 . Set empty value to remove OID."
+            ::= { isolatePortCfgEntry 2 }                
+
+
+
+
+--********************************************************************************************************
+--******************************************************************************************************** 
+                
+
+--trap  
+
+--xxx.101.102
+    power                    OBJECT IDENTIFIER ::= { notifications 102 }      
+--******************************************************************************************************** 
+--xxx.101.102.1
+powerAbnormalOID NOTIFICATION-TYPE
+                            STATUS current
+                            DESCRIPTION "sys power DC is working!"
+                            ::= { power 1 }
+--xxx.101.102.2    
+powerNormalOID NOTIFICATION-TYPE
+                            STATUS current
+                            DESCRIPTION "sys power AC is working!"
+                            ::= { power 2 }
+--xxx.101.102.3
+powerInsertOID NOTIFICATION-TYPE
+                            STATUS current
+                            DESCRIPTION "sys power insert!"
+                            ::= { power 3 }
+--xxx.101.102.4			
+powerPullOutOID NOTIFICATION-TYPE
+                            STATUS current
+                            DESCRIPTION "sys power pull out!"
+                            ::= { power 4 }
+--xxx.101.102.5			
+powerLowVoltageOID NOTIFICATION-TYPE
+                            STATUS current
+                            DESCRIPTION "Battery Voltage low"
+                            ::= { power 5 }
+
+--********************************************************************************************************       
+--trap  
+--xxx.101.105
+    stormControl  OBJECT 	IDENTIFIER ::= { notifications 105 }    
+--
+--********************************************************************************************************       
+--xxx.101.105.1
+   stromControlErrdisable NOTIFICATION-TYPE
+                              STATUS current
+                              DESCRIPTION "Errdisable interface due to (broadcast|multicast|unicast) rate exceed strom-control limit"
+                              ::= { stormControl 1 } 
+--xxx.101.105.5
+   stromControlLog NOTIFICATION-TYPE
+                               STATUS current
+                               DESCRIPTION "Broadcast|Multicast|Unicast traffic rate on Interface exceed storm-control rate"
+                               ::= { stormControl 5 } 
+--********************************************************************************************************       
+--trap  
+--xxx.101.107
+    macNotifications  OBJECT 	IDENTIFIER ::= { notifications 107 }    
+--
+--********************************************************************************************************       
+--xxx.101.107.1
+   macNotificationAdd NOTIFICATION-TYPE
+                              STATUS current
+                              DESCRIPTION "Notification due to new src mac reached on interface"
+                              ::= { macNotifications 1 } 
+--xxx.101.107.2
+   macNotificationRemove NOTIFICATION-TYPE
+                               STATUS current
+                               DESCRIPTION "Notification due to src mac removed on interface"
+                               ::= { macNotifications 2 } 
+--******************************************************************************************************** 
+
+--trap  
+--xxx.101.111
+    portSecurity-trap  OBJECT 	IDENTIFIER ::= { notifications 111 }    
+--
+--******************************************************************************************************** 
+--xxx.101.111.1
+   portSecurityTrap NOTIFICATION-TYPE
+                              STATUS current
+                              DESCRIPTION "Port-security has reached the threshold on Interface"
+                              ::= { portSecurity-trap 1 } 
+
+--******************************************************************************************************** 
+--trap  
+--xxx.101.112
+    loopBackDetect-trap  OBJECT 	IDENTIFIER ::= { notifications 112 }    
+--
+--******************************************************************************************************** 
+--xxx.101.112.1
+   loopBackDetectTrap NOTIFICATION-TYPE
+                              STATUS current
+                              DESCRIPTION "Loopbackdetect has reached on Interface"
+                              ::= { loopBackDetect-trap 1 } 
+
+--******************************************************************************************************** 
+--trap  
+--xxx.101.125
+    erpsGroup                    OBJECT IDENTIFIER ::= { notifications 125 }      
+--******************************************************************************************************** 
+--xxx.101.125.10
+   erpsStatusChangedTrap NOTIFICATION-TYPE
+                            STATUS current
+                            DESCRIPTION "ERPS status changed"
+                            ::= { erpsGroup  10 }
+							
+--********************************************************************************************************
+
+--******************************************************************************************************** 
+
+--trap  
+--xxx.101.126
+    authLogGroup  OBJECT IDENTIFIER ::= { notifications 126 }    
+--******************************************************************************************************** 
+--xxx.101.126.1
+    authLogin NOTIFICATION-TYPE
+                            STATUS current
+                            DESCRIPTION "User Login."
+                            ::= { authLogGroup 1 }    
+
+
+--xxx.101.126.2
+    authLogout NOTIFICATION-TYPE
+                            STATUS current
+                            DESCRIPTION "User Logout."
+                            ::= { authLogGroup 2 }
+
+--********************************************************************************************************
+
+--xxx.101.131
+    reloadInfo            OBJECT IDENTIFIER ::= { notifications 131 }
+--xxx.101.131.1
+reloadInfoTrapOID      NOTIFICATION-TYPE
+                            STATUS current
+                            DESCRIPTION "reload information"
+                            ::= { reloadInfo 1 }
+--********************************************************************************************************
+
+ END
