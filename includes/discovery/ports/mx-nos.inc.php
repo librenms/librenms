@@ -1,8 +1,8 @@
 <?php
 
-d_echo('');
-d_echo('/opt/librenms/includes/discovery/mx-nos.inc.php');
-d_echo('--Start--');
+d_echo ('');
+d_echo ('/opt/librenms/includes/discovery/mx-nos.inc.php');
+d_echo ('--Start--');
 
 $PortMib_port = SnmpQuery::walk('MOXA-PORT-MIB::portConfigDescription')->table(1);
 
@@ -12,6 +12,8 @@ foreach ($PortMib_port as $index => $moxaport) {
 
 unset($PortMib_port);
 
-d_echo('');
-d_echo('/opt/librenms/includes/discovery/mx-nos.inc.php');
-d_echo('--End--');
+d_echo ('');
+d_echo ('/opt/librenms/includes/discovery/mx-nos.inc.php');
+d_echo ('--End--');
+
+?>
