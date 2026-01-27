@@ -27,11 +27,11 @@
     <text id="collect_initial" x="{{ $width * 0.5 }}" y="{{ $height * 0.5 }}" visibility="hidden" fill="gray" font-family="Tahoma, Verdana, Arial, Helvetica, sans-serif" font-size="4" text-anchor="middle">Collecting initial data, please wait...</text>
   </g>
   <script type="application/ecmascript">
-    /*  adapted from
+    {{--  adapted from
     * @author     T. Lechat <dev@lechat.org>, Manuel Kasper <mk@neon1.net>, Jonathan Watt <jwatt@jwatt.org>
     * @copyright  2004-2006 T. Lechat <dev@lechat.org>, Manuel Kasper <mk@neon1.net>, Jonathan Watt <jwatt@jwatt.org>
     * @license    BSD
-    */
+    --}}
 
     <![CDATA[
     let svgDoc = null;
