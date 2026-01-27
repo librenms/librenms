@@ -34,7 +34,6 @@ use App\Models\Device;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Data\Source\SnmpResponse;
@@ -560,7 +559,7 @@ class ModuleTestHelper
 
         // Remove existing device in case it didn't get removed previously, if we're not running in CI
         if (! getenv('CI') && ($existing_device = device_by_name($snmpSimIp)) && isset($existing_device['device_id'])) {
-            DB::table('devices')->where('hostname', $snmpSimIp)->delete();
+            Device::query()->where('hostname', $snmpSimIp)->get()->each->delete();
             DeviceCache::flush();
         }
 
