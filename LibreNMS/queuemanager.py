@@ -538,7 +538,7 @@ class PollerQueueManager(QueueManager):
             args_list = ["device:poll", device_id]
             if self.config.debug:
                 args_list.append("-vv")
-            elif self.config.log_output is LogOutput.NONE:
+            elif self.config.log_output is LibreNMS.LogOutput.NONE:
                 args_list.append("-q")
             args = tuple(args_list)
 
@@ -608,7 +608,7 @@ class DiscoveryQueueManager(TimedQueueManager):
             args_list = ["device:poll", device_id]
             if self.config.debug:
                 args_list.append("-vv")
-            elif self.config.log_output is LogOutput.NONE:
+            elif self.config.log_output is LibreNMS.LogOutput.NONE:
                 args_list.append("-q")
             args = tuple(args_list)
 
