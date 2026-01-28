@@ -1,4 +1,4 @@
-mib: NAG-MIB:IF-MIB
+mib: NAG-MIB
 modules:
     os:
         sysDescr_regex:
@@ -7,13 +7,13 @@ modules:
             - '/^(?<hardware>SNR-S\S+) Device/s'
     mempools:
         data:
-            # S5XXX series - uses .1.8.1.7/8
+            # S5XXX series (slot-based) - sysMemorySize/sysMemoryBusy
             -
                 total: .1.3.6.1.4.1.40418.7.100.1.8.1.7.1
                 used: .1.3.6.1.4.1.40418.7.100.1.8.1.8.1
                 descr: 'Memory'
                 index: 0
-            # S2XXX series - uses .1.11.6/7
+            # S2XXX series (switch-based) - switchMemorySize/switchMemoryBusy
             -
                 total: .1.3.6.1.4.1.40418.7.100.1.11.6.0
                 used: .1.3.6.1.4.1.40418.7.100.1.11.7.0
@@ -21,7 +21,13 @@ modules:
                 index: 1
     processors:
         data:
-            # S5XXX series
+            # S5XXX series (slot-based)
+            -
+                oid: sysCpuUsage
+                num_oid: '.1.3.6.1.4.1.40418.7.100.1.8.1.11.{{ $index }}'
+                descr: 'Slot {{ $index }} CPU'
+                index: 'sysCpuUsage.{{ $index }}'
+            # S2XXX series (switch-based)
             -
                 oid: switchCpuUsage
                 num_oid: '.1.3.6.1.4.1.40418.7.100.1.11.10.{{ $index }}'
@@ -35,13 +41,17 @@ modules:
                         - IF-MIB::ifName
         temperature:
             data:
+                # S5XXX series (slot-based)
                 -
                     oid: sysTemperature
+                    value: sysTemperature
                     num_oid: '.1.3.6.1.4.1.40418.7.100.1.8.1.10.{{ $index }}'
                     descr: 'Slot {{ $index }} Temperature'
                     index: 'sysTemperature.{{ $index }}'
+                # S2XXX series (switch-based) - skip_value_gt filters invalid bitmask values (268435356)
                 -
                     oid: switchTemperature
+                    value: switchTemperature
                     num_oid: '.1.3.6.1.4.1.40418.7.100.1.11.9.{{ $index }}'
                     descr: 'Switch Temperature'
                     index: 'switchTemperature.{{ $index }}'
@@ -50,6 +60,7 @@ modules:
             data:
                 -
                     oid: sysFanStatus
+                    value: sysFanStatus
                     num_oid: '.1.3.6.1.4.1.40418.7.100.1.12.1.1.3.{{ $index }}'
                     descr: 'Fan {{ $index }} Status'
                     index: 'sysFanStatus.{{ $index }}'
@@ -58,6 +69,7 @@ modules:
                         - { descr: Abnormal, graph: 0, value: 1, generic: 2 }
                 -
                     oid: sysFanSpeed
+                    value: sysFanSpeed
                     num_oid: '.1.3.6.1.4.1.40418.7.100.1.12.1.4.{{ $index }}'
                     descr: 'Fan {{ $index }} Speed'
                     index: 'sysFanSpeed.{{ $index }}'
@@ -70,6 +82,7 @@ modules:
                         - { value: 5, generic: 2, graph: 0, descr: high }
                 -
                     oid: showSwitchStartUpStatus
+                    value: showSwitchStartUpStatus
                     num_oid: '.1.3.6.1.4.1.40418.7.100.1.16.{{ $index }}'
                     descr: 'Switch {{ $index }} Startup Status'
                     index: 'showSwitchStartUpStatus.{{ $index }}'
@@ -80,6 +93,7 @@ modules:
                         - { descr: inProgress, graph: 0, value: 4, generic: 3 }
         dbm:
             options:
+                # skip_value_lt: -50 filters disconnected SFP modules that return -Inf
                 skip_value_lt: -50
             data:
                 -
