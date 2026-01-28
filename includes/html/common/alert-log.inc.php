@@ -40,8 +40,6 @@ if (Auth::user()->hasGlobalAdmin()) {
     $admin_verbose_details = '<th data-column-id="verbose_details" data-sortable="false">Details</th>';
 }
 
-$device_id = (int) (request()->input('device_id') ?: ($vars['device'] ?? 0));
-
 $common_output[] = '<div class="panel panel-default panel-condensed">
                 <div class="panel-heading">
                     <div class="row">
@@ -52,7 +50,7 @@ $common_output[] = '<div class="panel panel-default panel-condensed">
                 </div>
             ';
 
-$device = DeviceCache::get($device_id);
+$device = DeviceCache::get(request()->input('device_id') ?: ($vars['device'] ?? 0));
 $device_selected = json_encode($device->exists ? ['id' => $device->device_id, 'text' => $device->displayName()] : '');
 
 $common_output[] = '
@@ -94,17 +92,19 @@ if (isset($vars['fromdevice']) && ! $vars['fromdevice']) {
 
 $common_output[] = '<div class="form-group"> \
                <select name="state" id="state" class="form-control input-sm"> \\';
+
+$selected_state = request()->input('state', '');
 foreach ($alert_states as $text => $value) {
-    $selected = $value == (request()->input('state', '')) ? ' selected' : '';
+    $selected = $value == $selected_state ? ' selected' : '';
     $common_output[] = '<option value="' . htmlspecialchars((string) $value) . "\"$selected>$text</option> \\";
 }
 $common_output[] = '</select> \
                </div> \
                <div class="form-group"> \
                <select name="severity[]" id="severity" class="form-control input-sm" multiple> \\';
-$current_severity = request()->input('severity', []);
+$selected_severity = request()->input('severity', []);
 foreach ($alert_severities as $text => $value) {
-    $selected = in_array($value, (array) $current_severity) ? ' selected' : '';
+    $selected = in_array($value, (array) $selected_severity) ? ' selected' : '';
     $common_output[] = "<option value=\"$value\"$selected>$text</option> \\";
 }
 $common_output[] = '</select> \
@@ -115,7 +115,7 @@ $common_output[] = '</select> \
         },
         post: function () {
             return {
-                device_id: $(\'#device_id\').val() || \'' . ($device_id ? (int) $device_id : '') . '\',
+                device_id: $(\'#device_id\').val() || \'' . $device->device_id . '\',
                 state: $(\'#state\').val(),
                 severity: $(\'#severity\').val() || []
             };

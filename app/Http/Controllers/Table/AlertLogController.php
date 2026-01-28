@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Table;
 
-use App\Http\Formatters\AlertLogDetailFormatter;
+use App\Http\Formatters\AlertLogDetailBuilder;
 use App\Models\AlertLog;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -14,7 +14,7 @@ class AlertLogController extends TableController
     protected $default_sort = ['time_logged' => 'asc'];
 
     public function __construct(
-        private readonly AlertLogDetailFormatter $formatter
+        private readonly AlertLogDetailBuilder $formatter
     ) {
     }
 

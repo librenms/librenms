@@ -9,133 +9,158 @@ use Illuminate\Support\Str;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Url;
 
+/**
+ * Alert log detail formatter that converts alert details into structured arrays
+ *
+ * @package App\Http\Formatters
+ */
 class AlertLogDetailFormatter
 {
-    public function format(array $alert_details): string
-    {
-        $all_fault_detail = '';
+    /** @var array<int, array{label: string, value: string, url?: string}> */
+    private array $fields = [];
 
-        // Check if we have a diff (alert status changed, worse and better)
+    /**
+     * Format alert details into structured array
+     *
+     * @param array $alert_details
+     * @return array{sections: array<int, array{title?: string, items: array<int, array{row: int, type?: string, fields: array<int, array{label: string, value: string, url?: string}>}>}>}
+     */
+    public function format(array $alert_details): array
+    {
+        $sections = [];
+
         if (isset($alert_details['diff'])) {
-            // Add a "title" for the modifications
-            $all_fault_detail .= '<b>Modifications:</b><br>';
+            $items = [];
 
-            // Check if we have added
             foreach (array_values($alert_details['diff']['added'] ?? []) as $index => $tmp_alerts_added) {
-                $all_fault_detail .= $this->formatDetails($index, $tmp_alerts_added, 'Added');
+                $items[] = $this->parseItem($index, $tmp_alerts_added, 'added');
             }
 
-            // Check if we have resolved
             foreach (array_values($alert_details['diff']['resolved'] ?? []) as $index => $tmp_alerts_resolved) {
-                $all_fault_detail .= $this->formatDetails($index, $tmp_alerts_resolved, 'Resolved');
+                $items[] = $this->parseItem($index, $tmp_alerts_resolved, 'resolved');
             }
 
-            // Add a "title" for the complete list
-            $all_fault_detail .= '<br><b>All current items:</b><br>';
+            $sections[] = [
+                'title' => 'Modifications',
+                'items' => $items,
+            ];
         }
 
+        // Process main rule items
+        $items = [];
         foreach ($alert_details['rule'] ?? [] as $index => $tmp_alerts_rule) {
-            $all_fault_detail .= $this->formatDetails($index, $tmp_alerts_rule);
+            $items[] = $this->parseItem($index, $tmp_alerts_rule);
         }
 
-        return $all_fault_detail;
+        $section = ['items' => $items];
+        if (isset($alert_details['diff'])) {
+            $section = ['title' => 'All current items'] + $section;
+        }
+        $sections[] = $section;
+
+        return ['sections' => $sections];
     }
 
-    private function formatDetails(int $row, array $alert_detail, ?string $type_info = null): string
+    /**
+     * Parse a single item using available parsers or fallback
+     *
+     * @param int $row
+     * @param array $alert_detail
+     * @param string|null $type
+     * @return array{row: int, type?: string, fields: array<int, array{label: string, value: string, url?: string}>}
+     */
+    private function parseItem(int $row, array $alert_detail, ?string $type = null): array
     {
-        $items = array_filter([
-            $this->formatBill($alert_detail),
-            $this->formatPort($alert_detail),
-            $this->formatSensor($alert_detail),
-            $this->formatAccessPoint($alert_detail),
-            $this->formatService($alert_detail),
-            $this->formatBgpPeer($alert_detail),
-            $this->formatMempool($alert_detail),
-            $this->formatApplication($alert_detail),
-        ]);
+        $this->fields = [];
 
-        $fault_detail = $type_info ? $type_info . ' ' : '';
-        $fault_detail .= '#' . ($row + 1) . ': ';
-        $fault_detail .= empty($items)
-            ? $this->fallbackFormatting($alert_detail)
-            : implode('<br>', $items);
+        // Try all parsers - multiple can succeed
+        $this->parseBill($alert_detail);
+        $this->parsePort($alert_detail);
+        $this->parseSensor($alert_detail);
+        $this->parseAccessPoint($alert_detail);
+        $this->parseService($alert_detail);
+        $this->parseBgpPeer($alert_detail);
+        $this->parseMempool($alert_detail);
+        $this->parseApplication($alert_detail);
 
-        return $fault_detail . '<br>';
-    }
-
-    private function fallbackFormatting(array $detail): string
-    {
-        $skip_keys = ['device_id', 'sysObjectID', 'sysDescr', 'location_id'];
-        $skip_key_contains = ['id', 'desc', 'msg', 'last'];
-
-        $lines = [];
-        foreach ($detail as $k => $v) {
-            if (empty($v)) {
-                continue;
-            }
-
-            if (in_array($k, $skip_keys)) {
-                continue;
-            }
-
-            if (Str::contains($k, $skip_key_contains, ignoreCase: true)) {
-                continue;
-            }
-
-            $lines[] = $this->line($k, $v);
+        // If no parser added fields, use fallback
+        if (empty($this->fields)) {
+            $this->parseFallback($alert_detail);
         }
 
-        return $this->lines($lines);
+        $item = [
+            'row' => $row,
+            'fields' => $this->fields,
+        ];
+
+        if ($type !== null) {
+            $item['type'] = $type;
+        }
+
+        return $item;
     }
 
-    private function formatBill(array $detail): ?string
+    /**
+     * Add a field to the current item being built
+     */
+    private function addField(string $label, string $value, ?string $url = null): void
+    {
+        $field = [
+            'label' => $label,
+            'value' => $value,
+        ];
+
+        if ($url !== null) {
+            $field['url'] = $url;
+        }
+
+        $this->fields[] = $field;
+    }
+
+    // ========================================
+    // Entity Parsers
+    // ========================================
+
+    private function parseBill(array $detail): void
     {
         if (empty($detail['bill_id'])) {
-            return null;
+            return;
         }
 
-        $bill_url = Url::generate(['page' => 'bill', 'bill_id' => $detail['bill_id']]);
-
-        return $this->linkLine('Bill', $bill_url, $detail['bill_name'] ?? 'Bill');
+        $this->addField(
+            'Bill',
+            $detail['bill_name'] ?? 'Bill',
+            Url::generate(['page' => 'bill', 'bill_id' => $detail['bill_id']])
+        );
     }
 
-    private function formatPort(array $detail): ?string
+    private function parsePort(array $detail): void
     {
         if (empty($detail['port_id'])) {
-            return null;
+            return;
         }
 
         $port = new Port($detail);
 
-        return $this->lines([
-            $this->line('Port', Url::portLink($port), escape: false),
-            ($port->ifAlias && $port->ifAlias != $port->ifDescr)
-                ? $this->line('Alias', $port->ifAlias)
-                : null,
-            ! empty($detail['isisISAdjState'])
-                ? $this->line('Adjacent', $detail['isisISAdjIPAddrAddress'] ?? 'Unknown')
-                : null,
-        ]);
-    }
-
-    private function formatAccessPoint(array $detail): ?string
-    {
-        if (empty($detail['accesspoint_id'])) {
-            return null;
-        }
-
-        $ap_url = Url::deviceUrl(
-            $detail['device_id'] ?? 0,
-            ['tab' => 'accesspoints', 'ap' => $detail['accesspoint_id']]
+        $this->addField(
+            'Port',
+            $port->getLabel(),
+            Url::portUrl($port)
         );
 
-        return $this->linkLine('Access Point', $ap_url, $detail['name'] ?? 'Access Point');
+        if ($port->ifAlias && $port->ifAlias != $port->ifDescr) {
+            $this->addField('Alias', $port->ifAlias);
+        }
+
+        if (! empty($detail['isisISAdjState'])) {
+            $this->addField('Adjacent', $detail['isisISAdjIPAddrAddress'] ?? 'Unknown');
+        }
     }
 
-    private function formatSensor(array $detail): ?string
+    private function parseSensor(array $detail): void
     {
         if (empty($detail['sensor_id'])) {
-            return null;
+            return;
         }
 
         $sensor = new Sensor($detail);
@@ -148,148 +173,184 @@ class AlertLogDetailFormatter
         }
 
         $value = $sensor->formatValue();
-        $value_line = $sensor->sensor_class == 'state'
-            ? $this->line('State', $value . ' (numerical: ' . $sensor->sensor_current . ')')
-            : $this->line('Value', $value . ' (' . $sensor->sensor_class . ')');
 
-        // Build thresholds
-        $thresholds = $this->inlineList([
-            $sensor->sensor_limit_low ? 'Low: ' . e($sensor->sensor_limit_low) : null,
-            $sensor->sensor_limit_low_warn ? 'Low Warn: ' . e($sensor->sensor_limit_low_warn) : null,
-            $sensor->sensor_limit_warn ? 'High Warn: ' . e($sensor->sensor_limit_warn) : null,
-            $sensor->sensor_limit ? 'High: ' . e($sensor->sensor_limit) : null,
-        ]);
+        $this->addField(
+            'Sensor',
+            $sensor->sensor_descr,
+            Url::sensorUrl($sensor)
+        );
 
-        return $this->lines([
-            $this->line('Sensor', Url::sensorLink($sensor), escape: false),
-            $value_line,
-            $thresholds ? $this->line('Thresholds', $thresholds, escape: false) : null,
-        ]);
+        if ($sensor->sensor_class == 'state') {
+            $this->addField('State', $value . ' (numerical: ' . $sensor->sensor_current . ')');
+        } else {
+            $this->addField('Value', $value . ' (' . $sensor->sensor_class . ')');
+        }
+
+        // Add thresholds if any exist
+        $thresholds = [];
+        if ($sensor->sensor_limit_low) {
+            $thresholds[] = 'Low: ' . $sensor->sensor_limit_low;
+        }
+        if ($sensor->sensor_limit_low_warn) {
+            $thresholds[] = 'Low Warn: ' . $sensor->sensor_limit_low_warn;
+        }
+        if ($sensor->sensor_limit_warn) {
+            $thresholds[] = 'High Warn: ' . $sensor->sensor_limit_warn;
+        }
+        if ($sensor->sensor_limit) {
+            $thresholds[] = 'High: ' . $sensor->sensor_limit;
+        }
+
+        if (! empty($thresholds)) {
+            $this->addField('Thresholds', implode(', ', $thresholds));
+        }
     }
 
-    private function formatService(array $detail): ?string
+    private function parseAccessPoint(array $detail): void
+    {
+        if (empty($detail['accesspoint_id'])) {
+            return;
+        }
+
+        $this->addField(
+            'Access Point',
+            $detail['name'] ?? 'Access Point',
+            Url::deviceUrl($detail['device_id'] ?? 0, ['tab' => 'accesspoints', 'ap' => $detail['accesspoint_id']])
+        );
+    }
+
+    private function parseService(array $detail): void
     {
         if (empty($detail['service_id'])) {
-            return null;
+            return;
         }
 
-        $device_id = $detail['device_id'] ?? 0;
         $service_name = $detail['service_name'] ?? 'Service';
-
         if (isset($detail['service_type'])) {
-            $service_name .= ' (' . e($detail['service_type']) . ')';
+            $service_name .= ' (' . $detail['service_type'] . ')';
         }
 
-        $service_url = Url::deviceUrl($device_id, ['tab' => 'services', 'view' => 'detail']);
+        $this->addField(
+            'Service',
+            $service_name,
+            Url::deviceUrl($detail['device_id'] ?? 0, ['tab' => 'services', 'view' => 'detail'])
+        );
+
         $service_host = ! empty($detail['service_ip'])
             ? $detail['service_ip']
             : ($detail['hostname'] ?? 'Unknown');
 
-        return $this->lines([
-            $this->linkLine('Service', $service_url, $service_name),
-            $this->line('Host', $service_host),
-            $this->line('Description', $detail['service_desc'] ?? null),
-            $this->line('Param', $detail['service_param'] ?? null),
-            $this->line('Message', $detail['service_message'] ?? null),
-        ]);
+        $this->addField('Host', $service_host);
+
+        if (! empty($detail['service_desc'])) {
+            $this->addField('Description', $detail['service_desc']);
+        }
+
+        if (! empty($detail['service_param'])) {
+            $this->addField('Param', $detail['service_param']);
+        }
+
+        if (! empty($detail['service_message'])) {
+            $this->addField('Message', $detail['service_message']);
+        }
     }
 
-    private function formatBgpPeer(array $detail): ?string
+    private function parseBgpPeer(array $detail): void
     {
         if (empty($detail['bgpPeer_id'])) {
-            return null;
+            return;
         }
 
-        $bgp_url = Url::deviceUrl($detail['device_id'] ?? 0, ['tab' => 'routing', 'proto' => 'bgp']);
+        $this->addField(
+            'BGP Peer',
+            $detail['bgpPeerIdentifier'] ?? 'BGP Peer',
+            Url::deviceUrl($detail['device_id'] ?? 0, ['tab' => 'routing', 'proto' => 'bgp'])
+        );
 
-        return $this->lines([
-            $this->linkLine('BGP Peer', $bgp_url, $detail['bgpPeerIdentifier'] ?? 'BGP Peer'),
-            $this->line('Description', $detail['bgpPeerDescr'] ?? null),
-            $this->line('Remote AS', $detail['bgpPeerRemoteAs'] ?? null),
-            $this->line('State', $detail['bgpPeerState'] ?? null),
-        ]);
+        if (! empty($detail['bgpPeerDescr'])) {
+            $this->addField('Description', $detail['bgpPeerDescr']);
+        }
+
+        if (! empty($detail['bgpPeerRemoteAs'])) {
+            $this->addField('Remote AS', (string) $detail['bgpPeerRemoteAs']);
+        }
+
+        if (! empty($detail['bgpPeerState'])) {
+            $this->addField('State', $detail['bgpPeerState']);
+        }
     }
 
-    private function formatMempool(array $detail): ?string
+    private function parseMempool(array $detail): void
     {
         if (empty($detail['mempool_id'])) {
-            return null;
+            return;
         }
 
-        $mempool_url = Url::graphPageUrl('mempool_usage', ['id' => $detail['mempool_id']]);
+        $this->addField(
+            'Memory Pool',
+            $detail['mempool_descr'] ?? 'Memory Pool',
+            Url::graphPageUrl('mempool_usage', ['id' => $detail['mempool_id']])
+        );
 
-        // Build usage statistics inline
-        $usage = $this->inlineList([
-            isset($detail['mempool_perc']) ? 'Usage: ' . e(Number::normalizePercent($detail['mempool_perc'])) : null,
-            isset($detail['mempool_free']) ? 'Free: ' . e(Number::formatSi($detail['mempool_free'])) : null,
-            isset($detail['mempool_total']) ? 'Total: ' . e(Number::formatSi($detail['mempool_total'])) : null,
-        ]);
+        // Build usage statistics
+        $usage = [];
+        if (isset($detail['mempool_perc'])) {
+            $usage[] = 'Usage: ' . Number::normalizePercent($detail['mempool_perc']);
+        }
+        if (isset($detail['mempool_free'])) {
+            $usage[] = 'Free: ' . Number::formatSi($detail['mempool_free']);
+        }
+        if (isset($detail['mempool_total'])) {
+            $usage[] = 'Total: ' . Number::formatSi($detail['mempool_total']);
+        }
 
-        return $this->lines([
-            $this->linkLine('Memory Pool', $mempool_url, $detail['mempool_descr'] ?? 'Memory Pool'),
-            $usage,
-        ]);
+        if (! empty($usage)) {
+            $this->addField('Usage', implode(', ', $usage));
+        }
     }
 
-    private function formatApplication(array $detail): ?string
+    private function parseApplication(array $detail): void
     {
         if (empty($detail['app_id'])) {
-            return null;
+            return;
         }
 
         $app_type = $detail['app_type'] ?? 'Application';
-        $app_url = Url::deviceUrl($detail['device_id'] ?? 0, ['tab' => 'apps', 'app' => $app_type]);
 
-        return $this->lines([
-            $this->linkLine('Application', $app_url, $app_type),
-            $this->line('Status', $detail['app_status'] ?? null),
-            ! empty($detail['metric'])
-                ? $this->line('Metric', e($detail['metric']) . ' = ' . e($detail['value'] ?? 'N/A'), escape: false)
-                : null,
-        ]);
-    }
+        $this->addField(
+            'Application',
+            $app_type,
+            Url::deviceUrl($detail['device_id'] ?? 0, ['tab' => 'apps', 'app' => $app_type])
+        );
 
-    // ========================================
-    // Helper Methods for Consistent Formatting
-    // ========================================
-
-    /**
-     * Format a labeled line with optional value
-     */
-    private function line(string $label, mixed $value, bool $escape = true): ?string
-    {
-        if (empty($value) && $value !== '0' && $value !== 0) {
-            return null;
+        if (! empty($detail['app_status'])) {
+            $this->addField('Status', $detail['app_status']);
         }
 
-        $formatted_value = $escape ? e($value) : $value;
-
-        return $label . ': ' . $formatted_value;
+        if (! empty($detail['metric'])) {
+            $this->addField('Metric', $detail['metric'] . ' = ' . ($detail['value'] ?? 'N/A'));
+        }
     }
 
-    /**
-     * Format a labeled link line
-     */
-    private function linkLine(string $label, string $url, string $text): string
+    private function parseFallback(array $detail): void
     {
-        return $label . ': <a href="' . e($url) . '">' . e($text) . '</a>';
-    }
+        $skip_keys = ['device_id', 'sysObjectID', 'sysDescr', 'location_id'];
+        $skip_key_contains = ['id', 'desc', 'msg', 'last'];
 
-    /**
-     * Join non-null values with comma separator
-     */
-    private function inlineList(array $items): ?string
-    {
-        $filtered = array_filter($items, fn ($item) => $item !== null && $item !== '');
+        foreach ($detail as $k => $v) {
+            if (empty($v) && $v !== '0' && $v !== 0) {
+                continue;
+            }
 
-        return empty($filtered) ? null : implode(', ', $filtered);
-    }
+            if (in_array($k, $skip_keys)) {
+                continue;
+            }
 
-    /**
-     * Join non-null lines with <br> separator
-     */
-    private function lines(array $lines): string
-    {
-        return implode('<br>', array_filter($lines, fn ($line) => $line !== null && $line !== ''));
+            if (Str::contains($k, $skip_key_contains, ignoreCase: true)) {
+                continue;
+            }
+
+            $this->addField($k, (string) $v);
+        }
     }
 }
