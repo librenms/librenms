@@ -68,7 +68,12 @@ class VlansController implements DeviceTab
         $useRegex = $request->boolean('useRegex');
 
         return [
-            'vlans' => self::getVlans($device, $searchVlanNumber, $searchVlanName, $useRegex),
+            'vlans' => self::getVlans(
+                $device,
+                $searchVlanNumber,
+                $searchVlanName,
+                $useRegex
+            ),
             'searchVlanNumber' => $searchVlanNumber,
             'searchVlanName' => $searchVlanName,
             'useRegex' => $useRegex,
@@ -87,18 +92,22 @@ class VlansController implements DeviceTab
         ];
     }
 
-    private static function getVlans(Device $device, $searchVlanNumber = null, $searchVlanName = null, $useRegex = false)
-    {
+    private static function getVlans(
+        Device $device,
+        $searchVlanNumber = null,
+        $searchVlanName = null,
+        $useRegex = false
+    ) {
         // port.device needed to prevent loading device multiple times
         $query = PortVlan::where('ports_vlans.device_id', $device->device_id)
             ->join('vlans', function ($join): void {
                 $join
-                ->on('ports_vlans.vlan', 'vlans.vlan_vlan')
-                ->on('vlans.device_id', 'ports_vlans.device_id');
+                    ->on('ports_vlans.vlan', 'vlans.vlan_vlan')
+                    ->on('vlans.device_id', 'ports_vlans.device_id');
             })
             ->join('ports', function ($join): void {
                 $join
-                ->on('ports_vlans.port_id', 'ports.port_id');
+                    ->on('ports_vlans.port_id', 'ports.port_id');
             })
             ->with(['port.device'])
             ->select('ports_vlans.*', 'vlans.vlan_name');
@@ -108,7 +117,11 @@ class VlansController implements DeviceTab
             if ($useRegex) {
                 $query->where('ports_vlans.vlan', 'REGEXP', $searchVlanNumber);
             } else {
-                $query->where('ports_vlans.vlan', 'LIKE', '%' . $searchVlanNumber . '%');
+                $query->where(
+                    'ports_vlans.vlan',
+                    'LIKE',
+                    '%' . $searchVlanNumber . '%'
+                );
             }
         }
 
@@ -117,12 +130,20 @@ class VlansController implements DeviceTab
             if ($useRegex) {
                 $query->where('vlans.vlan_name', 'REGEXP', $searchVlanName);
             } else {
-                $query->where('vlans.vlan_name', 'LIKE', '%' . $searchVlanName . '%');
+                $query->where(
+                    'vlans.vlan_name',
+                    'LIKE',
+                    '%' . $searchVlanName . '%'
+                );
             }
         }
 
-        $portVlan = $query->orderBy('vlan_vlan')->orderBy('ports.ifName')->orderBy('ports.ifDescr')
-            ->get()->sortBy(['vlan', 'port']);
+        $portVlan = $query
+            ->orderBy('vlan_vlan')
+            ->orderBy('ports.ifName')
+            ->orderBy('ports.ifDescr')
+            ->get()
+            ->sortBy(['vlan', 'port']);
 
         $data = $portVlan->groupBy('vlan');
 
