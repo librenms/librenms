@@ -1,10 +1,9 @@
 import logging
 import os
+import pymysql  # pylint: disable=import-error
 import sys
 import threading
 import time
-
-import pymysql  # pylint: disable=import-error
 
 import LibreNMS
 from LibreNMS.config import DBConfig
@@ -16,7 +15,6 @@ except ImportError:
 
 from datetime import timedelta
 from datetime import datetime
-from enum import Enum
 from platform import python_version
 from time import sleep
 from socket import gethostname
@@ -38,13 +36,6 @@ except ImportError:
 
 
 logger = logging.getLogger(__name__)
-
-
-class LogOutput(Enum):
-    NONE = "none"
-    PASSTHROUGH = "passthrough"
-    LOGGER = "logger"
-    FILE = "file"
 
 
 class ServiceConfig(DBConfig):
@@ -110,7 +101,7 @@ class ServiceConfig(DBConfig):
     redis_sentinel_service = None
     redis_timeout = 60
 
-    log_output = LogOutput.NONE
+    log_output = False
     logdir = "logs"
 
     watchdog_enabled = False
@@ -255,11 +246,9 @@ class ServiceConfig(DBConfig):
         self.redis_timeout = int(
             os.getenv(
                 "REDIS_TIMEOUT",
-                (
-                    self.alerting.frequency
-                    if self.alerting.frequency != 0
-                    else self.redis_timeout
-                ),
+                self.alerting.frequency
+                if self.alerting.frequency != 0
+                else self.redis_timeout,
             )
         )
 
@@ -524,21 +513,15 @@ class Service:
         )
         logger.info(
             "Queue Workers: Discovery={} Poller={} Services={} Alerting={} Billing={} Ping={}".format(
-                (
-                    self.config.discovery.workers
-                    if self.config.discovery.enabled
-                    else "disabled"
-                ),
-                (
-                    self.config.poller.workers
-                    if self.config.poller.enabled
-                    else "disabled"
-                ),
-                (
-                    self.config.services.workers
-                    if self.config.services.enabled
-                    else "disabled"
-                ),
+                self.config.discovery.workers
+                if self.config.discovery.enabled
+                else "disabled",
+                self.config.poller.workers
+                if self.config.poller.enabled
+                else "disabled",
+                self.config.services.workers
+                if self.config.services.enabled
+                else "disabled",
                 "enabled" if self.config.alerting.enabled else "disabled",
                 "enabled" if self.config.billing.enabled else "disabled",
                 "enabled" if self.config.ping.enabled else "disabled",

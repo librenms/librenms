@@ -1,30 +1,29 @@
 import json
 import logging
 import os
-import re
 import signal
-import subprocess
 import sys
 import tempfile
 import threading
 import timeit
 from collections import deque
 from logging.handlers import RotatingFileHandler
+from math import ceil
 from queue import Queue
 from time import time
 
-from math import ceil
-
 from .command_runner import command_runner
 from .queuemanager import (
-    AlertQueueManager,
+    QueueManager,
+    TimedQueueManager,
     BillingQueueManager,
-    DiscoveryQueueManager,
     PingQueueManager,
-    PollerQueueManager,
     ServicesQueueManager,
+    AlertQueueManager,
+    PollerQueueManager,
+    DiscoveryQueueManager,
 )
-from .service import Service, ServiceConfig, LogOutput
+from .service import Service, ServiceConfig
 
 # Hard limit script execution time so we don't get to "hang"
 DEFAULT_SCRIPT_TIMEOUT = 3600
@@ -191,15 +190,13 @@ def reset_signals():
     signal.signal(signal.SIGCHLD, signal.SIG_DFL)
 
 
-def call_script(script, args=(), log_dest=None):
+def call_script(script, args=()):
     """
     Run a LibreNMS script.  Captures all output returns exit code.
     Blocks parent signals (like SIGINT and SIGTERM).
     Kills script if it takes too long
     :param script: the name of the executable relative to the base directory
     :param args: a tuple of arguments to send to the command
-    :param log_dest: LogOutput enum or file path
-    :type log_dest: str | LogOutput | None
     :returns the output of the command
     """
     if script.endswith(".php"):
@@ -208,61 +205,17 @@ def call_script(script, args=(), log_dest=None):
     else:
         base = ()
 
-    # preexec_fn=reset_signals ensures we don't receive signals from children (close_fds=True is default, but may become false in a future release)
-    kwargs = {
-        "preexec_fn": reset_signals,
-        "close_fds": True,
-        "start_new_session": True,
-        "timeout": DEFAULT_SCRIPT_TIMEOUT,
-    }
-
-    if isinstance(log_dest, str):
-        kwargs["stdout"] = log_dest
-        kwargs["stderr"] = log_dest
-    elif isinstance(log_dest, LogOutput):
-        if log_dest is LogOutput.FILE:
-            raise ValueError(
-                "For FILE mode, pass a file path string instead of LogOutput.FILE"
-            )
-
-        elif log_dest is LogOutput.NONE:
-            kwargs["stdout"] = subprocess.DEVNULL
-            kwargs["stderr"] = subprocess.DEVNULL
-
-        elif log_dest is LogOutput.PASSTHROUGH:
-            kwargs["stdout"] = sys.stdout
-            kwargs["stderr"] = sys.stderr
-
     base_dir = os.path.realpath(os.path.dirname(__file__) + "/..")
     cmd = base + ("{}/{}".format(base_dir, script),) + tuple(map(str, args))
     logger.debug("Running {}".format(cmd))
-    exit_code, output = command_runner(cmd, **kwargs)
-
-    if log_dest is LogOutput.LOGGER:
-        if output:
-            for line in output.splitlines():
-                level = infer_log_level(line)
-                logger.log(level, line)
-
-    return exit_code, output
-
-
-def infer_log_level(line):
-    """Infer log level from a log line."""
-    upper_line = line.upper()
-
-    if re.match(r"^\s*(\[)?(CRITICAL|FATAL)(]|:|\s|-)", upper_line):
-        return logging.CRITICAL
-    elif re.match(r"^\s*(\[)?(ERROR|ERR)(]|:|\s|-)", upper_line):
-        return logging.ERROR
-    elif re.match(r"^\s*(\[)?(WARN|WARNING)(]|:|\s|-)", upper_line):
-        return logging.WARNING
-    elif re.match(r"^\s*(\[)?(INFO|INFORMATION)(]|:|\s|-)", upper_line):
-        return logging.INFO
-    elif re.match(r"^\s*(\[)?(DEBUG|TRACE)(]|:|\s|-)", upper_line):
-        return logging.DEBUG
-
-    return logging.INFO
+    # preexec_fn=reset_signals ensures we don't receive signals from children (close_fds=True is default, but may become false in a future release)
+    return command_runner(
+        cmd,
+        preexec_fn=reset_signals,
+        close_fds=True,
+        start_new_session=True,
+        timeout=DEFAULT_SCRIPT_TIMEOUT,
+    )
 
 
 class DB:
@@ -519,10 +472,9 @@ class RedisLock(Lock):
             self._redis = redis.Redis(**kwargs)
         self._redis.ping()
         self._namespace = namespace
-        socket_timeout = redis_kwargs.get("socket_timeout")
         logger.debug(
             "Created redis lock manager with socket_timeout of {}s".format(
-                socket_timeout if socket_timeout is not None else "default"
+                redis_kwargs["socket_timeout"]
             )
         )
 
