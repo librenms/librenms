@@ -32,7 +32,7 @@ class PortVlan extends PortRelatedModel implements Keyable
         return $value;
     }
 
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return $this->port_id . '-' . $this->vlan;
     }
