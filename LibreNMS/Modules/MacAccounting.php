@@ -95,7 +95,7 @@ class MacAccounting implements Module
         // remove older than 1 year
         $year_ago = now()->subYear();
         foreach ($existing as $key => $existing_mac) {
-            if ($existing_mac->poll_time < $year_ago) {
+            if ($existing_mac->last_polled < $year_ago) {
                 $existing_mac->delete();
                 $existing->forget($key);
             }
