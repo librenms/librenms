@@ -79,8 +79,8 @@ class StateTranslation extends Model implements Keyable
         return $this->belongsTo(StateIndex::class, 'state_index_id', 'state_index_id');
     }
 
-    public function getCompositeKey()
+    public function getCompositeKey(): int
     {
-        return $this->state_value;
+        return (int) $this->state_value;
     }
 }

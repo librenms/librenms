@@ -1,4 +1,3 @@
-mib: CM-ENTITY-MIB:CM-COMMON-MIB:CM-SYSTEM-MIB:F3-SYNC-MIB:F3-NTP-MIB:F3-PTP-MIB:CM-FACILITY-MIB
 modules:
     os:
         hardware:
@@ -12,71 +11,53 @@ modules:
             data:
                 -
                     oid:
-                        - f3PtpSOOCEntry
-        temperature:
-            data:
-                -
-                    oid: ethernetNTEOSA5412CardTemperature
-                    value: ethernetNTEOSA5412CardTemperature
-                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.102.1.6.{{ $index }}'
-                    descr: 'Ethernet NTE card'
-                    index: 'ethernetNTEOSA5412CardTemperature.{{ $index }}'
-        voltage:
-            data:
-                -
-                    oid: ethernetNTEOSA5412CardVoltage
-                    value: ethernetNTEOSA5412CardVoltage
-                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.102.1.5.{{ $index }}'
-                    descr: 'Ethernet NTE card'
-                    divisor: 1000
-                    low_limit: 10
-                    index: 'ethernetNTEOSA5412CardVoltage.{{ $index }}'
+                        - F3-PTP-MIB::f3PtpSOOCEntry
         count:
             data:
                 -
-                    oid: f3GPSReceiverPortNumTrackingSatellites
-                    value: f3GPSReceiverPortNumTrackingSatellites
+                    oid: CM-FACILITY-MIB::f3GPSReceiverPortNumTrackingSatellites
+                    value: CM-FACILITY-MIB::f3GPSReceiverPortNumTrackingSatellites
                     num_oid: '.1.3.6.1.4.1.2544.1.12.4.1.57.1.11.{{ $index }}'
                     descr: 'Current number of good/usable satellites'
                     group: GNSS
                     index: 'f3GPSReceiverPortNumTrackingSatellites.{{ $index }}'
                 -
-                    oid: f3NtpClockStratumLevel
-                    value: f3NtpClockStratumLevel
+                    oid: F3-NTP-MIB::f3NtpClockStratumLevel
+                    value: F3-NTP-MIB::f3NtpClockStratumLevel
                     num_oid: '.1.3.6.1.4.1.2544.1.12.47.1.1.1.6.{{ $index }}'
                     descr: 'Current stratum'
                     group: NTP
                     index: 'f3NtpClockStratumLevel.{{ $index }}'
                 -
-                    oid: f3PtpSOOCEntry
-                    value: f3PtpSOOCCurrentOffsetFromMaster
+                    oid: F3-PTP-MIB::f3PtpSOOCEntry
+                    value: F3-PTP-MIB::f3PtpSOOCCurrentOffsetFromMaster
                     num_oid: '.1.3.6.1.4.1.2544.1.12.18.1.4.1.27.{{ $index }}'
                     group: PTP
-                    descr: 'Offset from Master (ns): {{ $f3PtpSOOCMasterIpV4Address }}'
+                    descr: 'Offset from Master (ns): {{ F3-PTP-MIB::f3PtpSOOCMasterIpV4Address }}'
                     index: 'f3PtpSOOCCurrentOffsetFromMaster.{{ $index }}'
                     skip_values:
                         -
-                          oid: f3PtpSOOCAdminState
+                          oid: F3-PTP-MIB::f3PtpSOOCAdminState
                           op: '!='
                           value: 1
                 -
-                    oid: f3PtpSOOCEntry
-                    value: f3PtpSOOCRecentMeanPathDelay
+                    oid: F3-PTP-MIB::f3PtpSOOCEntry
+                    value: F3-PTP-MIB::f3PtpSOOCRecentMeanPathDelay
                     num_oid: '.1.3.6.1.4.1.2544.1.12.18.1.4.1.32.{{ $index }}'
                     group: PTP
-                    descr: 'Mean Path Delay Master (μs): {{ $f3PtpSOOCMasterIpV4Address }}'
+                    descr: 'Mean Path Delay Master (μs): {{ F3-PTP-MIB::f3PtpSOOCMasterIpV4Address }}'
                     index: 'f3PtpSOOCRecentMeanPathDelay.{{ $index }}'
                     divisor: 1000
                     skip_values:
                         -
-                          oid: f3PtpSOOCAdminState
+                          oid: F3-PTP-MIB::f3PtpSOOCAdminState
                           op: '!='
                           value: 1
         state:
             data:
                 -
-                    oid: psuOperationalState
-                    value: psuOperationalState
+                    oid: CM-ENTITY-MIB::psuOperationalState
+                    value: CM-ENTITY-MIB::psuOperationalState
                     num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.4.1.4.{{ $index }}'
                     descr: 'PSU'
                     index: 'psu.{{ $index }}'
@@ -84,17 +65,8 @@ modules:
                         - { value: 1, descr: ok, graph: 1, generic: 0 }
                         - { value: 2, descr: nok, graph: 1, generic: 2 }
                 -
-                    oid: ethernetNTEOSA5412CardOperationalState
-                    value: ethernetNTEOSA5412CardOperationalState
-                    num_oid: '.1.3.6.1.4.1.2544.1.12.3.1.102.1.3.{{ $index }}'
-                    descr: 'Ethernet NTE card'
-                    index: 'ethernetNTEOSA5412CardOperationalState.{{ $index }}'
-                    states:
-                        - { value: 1, descr: ok, graph: 1, generic: 0 }
-                        - { value: 2, descr: nok, graph: 1, generic: 2 }
-                -
-                    oid: telnetEnabled
-                    value: telnetEnabled
+                    oid: CM-SYSTEM-MIB::telnetEnabled
+                    value: CM-SYSTEM-MIB::telnetEnabled
                     num_oid: '.1.3.6.1.4.1.2544.1.12.2.1.3.1.{{ $index }}'
                     descr: 'Telnet'
                     group: SERVICES
@@ -103,8 +75,8 @@ modules:
                         - { value: 1, descr: enable, graph: 1, generic: 0 }
                         - { value: 2, descr: disable, graph: 1, generic: 3 }
                 -
-                    oid: sshEnabled
-                    value: sshEnabled
+                    oid: CM-SYSTEM-MIB::sshEnabled
+                    value: CM-SYSTEM-MIB::sshEnabled
                     num_oid: '.1.3.6.1.4.1.2544.1.12.2.1.3.2.{{ $index }}'
                     descr: 'SSH'
                     group: SERVICES
@@ -113,8 +85,8 @@ modules:
                         - { value: 1, descr: enable, graph: 1, generic: 0 }
                         - { value: 2, descr: disable, graph: 1, generic: 3 }
                 -
-                    oid: ftpEnabled
-                    value: ftpEnabled
+                    oid: CM-SYSTEM-MIB::ftpEnabled
+                    value: CM-SYSTEM-MIB::ftpEnabled
                     num_oid: '.1.3.6.1.4.1.2544.1.12.2.1.3.3.{{ $index }}'
                     descr: 'FTP'
                     group: SERVICES
@@ -123,8 +95,8 @@ modules:
                         - { value: 1, descr: enable, graph: 1, generic: 0 }
                         - { value: 2, descr: disable, graph: 1, generic: 3 }
                 -
-                    oid: httpEnabled
-                    value: httpEnabled
+                    oid: CM-SYSTEM-MIB::httpEnabled
+                    value: CM-SYSTEM-MIB::httpEnabled
                     num_oid: '.1.3.6.1.4.1.2544.1.12.2.1.3.6.{{ $index }}'
                     descr: 'HTTP'
                     group: SERVICES
@@ -133,8 +105,8 @@ modules:
                         - { value: 1, descr: enable, graph: 1, generic: 0 }
                         - { value: 2, descr: disable, graph: 1, generic: 3 }
                 -
-                    oid: httpsEnabled
-                    value: httpsEnabled
+                    oid: CM-SYSTEM-MIB::httpsEnabled
+                    value: CM-SYSTEM-MIB::httpsEnabled
                     num_oid: '.1.3.6.1.4.1.2544.1.12.2.1.3.7.{{ $index }}'
                     descr: 'HTTPS'
                     group: SERVICES
@@ -143,8 +115,8 @@ modules:
                         - { value: 1, descr: enable, graph: 1, generic: 0 }
                         - { value: 2, descr: disable, graph: 1, generic: 3 }
                 -
-                    oid: f3TimeClockOperationalState
-                    value: f3TimeClockOperationalState
+                    oid: F3-SYNC-MIB::f3TimeClockOperationalState
+                    value: F3-SYNC-MIB::f3TimeClockOperationalState
                     num_oid: '.1.3.6.1.4.1.2544.1.12.12.1.3.1.4.{{ $index }}'
                     descr: 'Clock Time state'
                     group: TIME
@@ -153,8 +125,8 @@ modules:
                         - { value: 1, descr: ok, graph: 1, generic: 0 }
                         - { value: 2, descr: nok, graph: 1, generic: 2 }
                 -
-                    oid: f3TimeClockClockMode
-                    value: f3TimeClockClockMode
+                    oid: F3-SYNC-MIB::f3TimeClockClockMode
+                    value: F3-SYNC-MIB::f3TimeClockClockMode
                     num_oid: '.1.3.6.1.4.1.2544.1.12.12.1.3.1.7.{{ $index }}'
                     descr: 'Clock Time mode'
                     group: TIME
@@ -167,8 +139,8 @@ modules:
                         - { value: 5, descr: holdover, graph: 1, generic: 2 }
                         - { value: 6, descr: locked, graph: 1, generic: 0 }
                 -
-                    oid: f3GPSReceiverPortOperationalState
-                    value: f3GPSReceiverPortOperationalState
+                    oid: CM-FACILITY-MIB::f3GPSReceiverPortOperationalState
+                    value: CM-FACILITY-MIB::f3GPSReceiverPortOperationalState
                     num_oid: '.1.3.6.1.4.1.2544.1.12.4.1.57.1.5.{{ $index }}'
                     group: GNSS
                     descr: 'GPS Receiver state'
@@ -177,8 +149,8 @@ modules:
                         - { value: 1, descr: ok, graph: 1, generic: 0 }
                         - { value: 2, descr: nok, graph: 1, generic: 2 }
                 -
-                    oid: f3GPSReceiverPortAntennaStatus
-                    value: f3GPSReceiverPortAntennaStatus
+                    oid: CM-FACILITY-MIB::f3GPSReceiverPortAntennaStatus
+                    value: CM-FACILITY-MIB::f3GPSReceiverPortAntennaStatus
                     num_oid: '.1.3.6.1.4.1.2544.1.12.4.1.57.1.9.{{ $index }}'
                     group: GNSS
                     descr: 'GPS Antenna status'
@@ -189,8 +161,8 @@ modules:
                         - { value: 3, descr: normal, graph: 1, generic: 0 }
                         - { value: 4, descr: unavailable, graph: 1, generic: 3 }
                 -
-                    oid: f3NtpClockOperationalState
-                    value: f3NtpClockOperationalState
+                    oid: F3-NTP-MIB::f3NtpClockOperationalState
+                    value: F3-NTP-MIB::f3NtpClockOperationalState
                     num_oid: '.1.3.6.1.4.1.2544.1.12.47.1.1.1.4.{{ $index }}'
                     group: TIME
                     descr: 'NTP state'
@@ -199,60 +171,60 @@ modules:
                         - { value: 1, descr: ok, graph: 1, generic: 0 }
                         - { value: 2, descr: nok, graph: 1, generic: 2 }
                 -
-                    oid: f3PtpMasterClockEntry
-                    value: f3PtpMasterClockOperationalState
+                    oid: F3-PTP-MIB::f3PtpMasterClockEntry
+                    value: F3-PTP-MIB::f3PtpMasterClockOperationalState
                     num_oid: '.1.3.6.1.4.1.2544.1.12.18.1.12.1.4.{{ $index }}'
                     group: PTP
-                    descr: 'Master PTP state / Domain: {{ $f3PtpMasterClockDomainNumber }} / Priority: {{ $f3PtpMasterClockPriority1 }}'
+                    descr: 'Master PTP state / Domain: {{ F3-PTP-MIB::f3PtpMasterClockDomainNumber }} / Priority: {{ F3-PTP-MIB::f3PtpMasterClockPriority1 }}'
                     index: 'f3PtpMasterClockOperationalState.{{ $index }}'
                     skip_values:
                         -
-                          oid: f3PtpMasterClockAdminState
+                          oid: F3-PTP-MIB::f3PtpMasterClockAdminState
                           op: '!='
                           value: 1
                     states:
                         - { value: 1, descr: ok, graph: 1, generic: 0 }
                         - { value: 2, descr: nok, graph: 1, generic: 2 }
                 -
-                    oid: f3PtpTSEntry
-                    value: f3PtpTSOperationalState
+                    oid: F3-PTP-MIB::f3PtpTSEntry
+                    value: F3-PTP-MIB::f3PtpTSOperationalState
                     num_oid: '.1.3.6.1.4.1.2544.1.12.18.1.3.1.4.{{ $index }}'
                     group: PTP
-                    descr: 'Telecom Slave PTP state / Domain: {{ $f3PtpTSDomainNumber }}'
+                    descr: 'Telecom Slave PTP state / Domain: {{ F3-PTP-MIB::f3PtpTSDomainNumber }}'
                     index: 'f3PtpTSOperationalState.{{ $index }}'
                     skip_values:
                         -
-                          oid: f3PtpTSAdminState
+                          oid: F3-PTP-MIB::f3PtpTSAdminState
                           op: '!='
                           value: 1
                     states:
                         - { value: 1, descr: ok, graph: 1, generic: 0 }
                         - { value: 2, descr: nok, graph: 1, generic: 2 }
                 -
-                    oid: f3PtpSOOCEntry
-                    value: f3PtpSOOCOperationalState
+                    oid: F3-PTP-MIB::f3PtpSOOCEntry
+                    value: F3-PTP-MIB::f3PtpSOOCOperationalState
                     num_oid: '.1.3.6.1.4.1.2544.1.12.18.1.4.1.5.{{ $index }}'
                     group: PTP
-                    descr: 'Master defined state: {{ $f3PtpSOOCMasterIpV4Address }}'
+                    descr: 'Master defined state: {{ F3-PTP-MIB::f3PtpSOOCMasterIpV4Address }}'
                     index: 'f3PtpSOOCOperationalState.{{ $index }}'
                     skip_values:
                         -
-                          oid: f3PtpSOOCAdminState
+                          oid: F3-PTP-MIB::f3PtpSOOCAdminState
                           op: '!='
                           value: 1
                     states:
                         - { value: 1, descr: ok, graph: 1, generic: 0 }
                         - { value: 2, descr: nok, graph: 1, generic: 2 }
                 -
-                    oid: f3PtpDynamicRemoteSlaveEntry
-                    value: f3PtpDynamicRemoteSlaveOperationalState
+                    oid: F3-PTP-MIB::f3PtpDynamicRemoteSlaveEntry
+                    value: F3-PTP-MIB::f3PtpDynamicRemoteSlaveOperationalState
                     num_oid: '.1.3.6.1.4.1.2544.1.12.18.1.16.1.4.{{ $index }}'
                     group: PTP
-                    descr: 'Dynamic Slave - {{ $f3PtpDynamicRemoteSlaveIpV4Address }}'
+                    descr: 'Dynamic Slave - {{ F3-PTP-MIB::f3PtpDynamicRemoteSlaveIpV4Address }}'
                     index: 'f3PtpDynamicRemoteSlaveEntry.{{ $index }}'
                     skip_values:
                         -
-                          oid: f3PtpDynamicRemoteSlaveAdminState
+                          oid: F3-PTP-MIB::f3PtpDynamicRemoteSlaveAdminState
                           op: '!='
                           value: 1
                     states:

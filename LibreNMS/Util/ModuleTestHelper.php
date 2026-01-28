@@ -599,7 +599,7 @@ class ModuleTestHelper
             Debug::setVerbose();
         }
         ob_start();
-        Log::setDefaultDriver('console');
+        Log::setDefaultDriver('stdout');
 
         (new DiscoverDevice($device_id, $this->modules))->handle();
 
@@ -629,7 +629,7 @@ class ModuleTestHelper
             Debug::setVerbose();
         }
         ob_start();
-        Log::setDefaultDriver('console');
+        Log::setDefaultDriver('stdout');
 
         (new PollDevice($device_id, $this->modules))->handle();
 
