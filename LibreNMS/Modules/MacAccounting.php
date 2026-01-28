@@ -168,9 +168,7 @@ class MacAccounting implements Module
     {
         return [
             'mac_accounting' => $device->macAccounting()
-                ->orderBy('mac_accounting.ifIndex')->orderBy('mac')
-                ->leftJoin('ports', 'mac_accounting.port_id', 'ports.port_id')
-                ->select(['mac_accounting.*', 'ifDescr'])
+                ->orderBy('ifIndex')->orderBy('mac')
                 ->get()->map->makeHidden(['ma_id', 'device_id', 'port_id', 'last_polled']),
         ];
     }
