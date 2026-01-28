@@ -405,7 +405,7 @@ class Number
                 ? gmp_sub($curr, $prev)
                 : gmp_add(gmp_sub(gmp_init($maxValue), $prev), gmp_add($curr, 1));
 
-            return (float) gmp_div($diff, $timeInterval);
+            return (float) gmp_strval($diff) / 1000000;
         }
 
         if (extension_loaded('bcmath')) {

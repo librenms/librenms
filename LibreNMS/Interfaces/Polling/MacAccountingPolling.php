@@ -26,13 +26,14 @@
 
 namespace LibreNMS\Interfaces\Polling;
 
+use App\Models\MacAccounting;
 use Illuminate\Support\Collection;
 
 interface MacAccountingPolling
 {
     /**
-     * @param  Collection<int, \App\Models\MacAccounting>  $macs
-     * @return Collection<int, \App\Models\MacAccounting>
+     * @param  Collection<MacAccounting>  $macs
+     * @return Collection<MacAccounting>
      */
     public function pollMacAccounting(Collection $macs): Collection;
 }
