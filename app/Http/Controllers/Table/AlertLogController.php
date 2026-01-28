@@ -99,9 +99,9 @@ class AlertLogController extends TableController
         return [
             'id' => $model->id,
             'time_logged' => $model->time_logged,
-            'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident'.$model->id.'" data-parent="#alerts"></a>',
+            'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . $model->id . '" data-parent="#alerts"></a>',
             'verbose_details' => "<button type='button' class='btn btn-alert-details verbose-alert-details' style='display:none' aria-label='Details' id='alert-details' data-alert_log_id='$model->id'><i class='fa-solid fa-circle-info'></i></button>",
-            'hostname' => '<div class="incident">'.Url::modernDeviceLink($model->device).'<div id="incident'.$model->id.'" class="collapse">'.$fault_detail.'</div></div>',
+            'hostname' => '<div class="incident">' . Url::modernDeviceLink($model->device) . '<div id="incident' . $model->id . '" class="collapse">' . $fault_detail . '</div></div>',
             'alert_rule' => e($model->rule?->name),
             'status' => $status,
             'severity' => $model->rule?->severity,

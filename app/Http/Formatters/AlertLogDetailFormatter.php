@@ -11,8 +11,6 @@ use LibreNMS\Util\Url;
 
 /**
  * Alert log detail formatter that converts alert details into structured arrays
- *
- * @package App\Http\Formatters
  */
 class AlertLogDetailFormatter
 {
@@ -22,7 +20,7 @@ class AlertLogDetailFormatter
     /**
      * Format alert details into structured array
      *
-     * @param array $alert_details
+     * @param  array  $alert_details
      * @return array{sections: array<int, array{title?: string, items: array<int, array{row: int, type?: string, fields: array<int, array{label: string, value: string, url?: string}>}>}>}
      */
     public function format(array $alert_details): array
@@ -64,9 +62,9 @@ class AlertLogDetailFormatter
     /**
      * Parse a single item using available parsers or fallback
      *
-     * @param int $row
-     * @param array $alert_detail
-     * @param string|null $type
+     * @param  int  $row
+     * @param  array  $alert_detail
+     * @param  string|null  $type
      * @return array{row: int, type?: string, fields: array<int, array{label: string, value: string, url?: string}>}
      */
     private function parseItem(int $row, array $alert_detail, ?string $type = null): array
