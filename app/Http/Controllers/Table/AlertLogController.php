@@ -82,6 +82,12 @@ class AlertLogController extends TableController
         return $query;
     }
 
+    /**
+     * Format alert log item for display
+     *
+     * @param  AlertLog  $model
+     * @return array
+     */
     public function formatItem($model): array
     {
         $format = $this->formatter->format($model->details);
@@ -96,7 +102,7 @@ class AlertLogController extends TableController
             'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident'.$model->id.'" data-parent="#alerts"></a>',
             'verbose_details' => "<button type='button' class='btn btn-alert-details verbose-alert-details' style='display:none' aria-label='Details' id='alert-details' data-alert_log_id='$model->id'><i class='fa-solid fa-circle-info'></i></button>",
             'hostname' => '<div class="incident">'.Url::modernDeviceLink($model->device).'<div id="incident'.$model->id.'" class="collapse">'.$fault_detail.'</div></div>',
-            'alert_rule' => $model->rule?->name,
+            'alert_rule' => e($model->rule?->name),
             'status' => $status,
             'severity' => $model->rule?->severity,
         ];
