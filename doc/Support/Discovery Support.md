@@ -85,7 +85,7 @@ Modules.
     lnms config:set discovery_modules.processors true
     lnms config:set discovery_modules.mempools true
     lnms config:set discovery_modules.cisco-vrf-lite true
-    lnms config:set discovery_modules.mac-accounting false
+    lnms config:set discovery_modules.mac-accounting true
     lnms config:set discovery_modules.cisco-pw false
     lnms config:set discovery_modules.vrf false
     lnms config:set discovery_modules.cisco-cef false

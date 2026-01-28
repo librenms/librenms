@@ -20,11 +20,9 @@ poller_modules:
     ucd-diskio: false
     ucd-mib: false
     cisco-cef: true
-    mac-accounting: true
     stp: true
 discovery_modules:
     cisco-cef: true
-    mac-accounting: true
     wireless: false
     mpls: false
     services: false

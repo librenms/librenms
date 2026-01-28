@@ -68,34 +68,36 @@ class MacAccounting implements Module
      */
     public function discover(OS $os): void
     {
-        if ($os instanceof MacAccountingDiscovery) {
-            $macs = $os->discoverMacAccounting();
+        if (! $os instanceof MacAccountingDiscovery) {
+            return;
+        }
 
-            ModuleModelObserver::observe(\App\Models\MacAccounting::class);
+        $macs = $os->discoverMacAccounting();
 
-            // add new
-            $existing = $os->getDevice()->macAccounting->keyBy->getCompositeKey();
+        ModuleModelObserver::observe(\App\Models\MacAccounting::class);
 
-            foreach ($macs as $mac) {
-                $key = $mac->getCompositeKey();
-                if ($existing->has($key)) {
-                    $existing_mac = $existing->get($key);
-                    $existing_mac->fill($mac->attributesToArray());
-                    $existing_mac->save(); // existing (outputs .)
-                    $existing->forget($key);
-                    continue;
-                }
+        // add new
+        $existing = $os->getDevice()->macAccounting->keyBy->getCompositeKey();
 
-                $os->getDevice()->macAccounting()->save($mac);
+        foreach ($macs as $mac) {
+            $key = $mac->getCompositeKey();
+            if ($existing->has($key)) {
+                $existing_mac = $existing->get($key);
+                $existing_mac->fill($mac->attributesToArray());
+                $existing_mac->save(); // existing (outputs .)
+                $existing->forget($key);
+                continue;
             }
 
-            // remove older than 1 year
-            $year_ago = now()->subYear();
-            foreach ($existing as $key => $existing_mac) {
-                if ($existing_mac->poll_time < $year_ago) {
-                    $existing_mac->delete();
-                    $existing->forget($key);
-                }
+            $os->getDevice()->macAccounting()->save($mac);
+        }
+
+        // remove older than 1 year
+        $year_ago = now()->subYear();
+        foreach ($existing as $key => $existing_mac) {
+            if ($existing_mac->poll_time < $year_ago) {
+                $existing_mac->delete();
+                $existing->forget($key);
             }
         }
     }
