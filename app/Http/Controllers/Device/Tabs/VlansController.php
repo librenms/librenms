@@ -29,6 +29,7 @@ namespace App\Http\Controllers\Device\Tabs;
 use App\Models\Device;
 use App\Models\PortVlan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class VlansController implements DeviceTab
@@ -55,8 +56,28 @@ class VlansController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
+        // Validate filter inputs
+        Validator::validate($request->all(), [
+            'searchVlanNumber' => 'string|nullable|max:100',
+            'searchVlanName' => 'string|nullable|max:255',
+            'useRegex' => 'boolean',
+        ]);
+
+        $searchVlanNumber = $request->query->get('searchVlanNumber');
+        $searchVlanName = $request->query->get('searchVlanName');
+        $useRegex = $request->boolean('useRegex');
+
         return [
-            'vlans' => self::getVlans($device),
+            'vlans' => self::getVlans(
+                $device,
+                $searchVlanNumber,
+                $searchVlanName,
+                $useRegex
+            ),
+            'searchVlanNumber' => $searchVlanNumber,
+            'searchVlanName' => $searchVlanName,
+            'useRegex' => $useRegex,
+            'error' => null,
             'submenu' => [
                 [
                     ['name' => 'Basic', 'url' => ''],
@@ -71,22 +92,58 @@ class VlansController implements DeviceTab
         ];
     }
 
-    private static function getVlans(Device $device)
-    {
+    private static function getVlans(
+        Device $device,
+        $searchVlanNumber = null,
+        $searchVlanName = null,
+        $useRegex = false
+    ) {
         // port.device needed to prevent loading device multiple times
-        $portVlan = PortVlan::where('ports_vlans.device_id', $device->device_id)
+        $query = PortVlan::where('ports_vlans.device_id', $device->device_id)
             ->join('vlans', function ($join): void {
                 $join
-                ->on('ports_vlans.vlan', 'vlans.vlan_vlan')
-                ->on('vlans.device_id', 'ports_vlans.device_id');
+                    ->on('ports_vlans.vlan', 'vlans.vlan_vlan')
+                    ->on('vlans.device_id', 'ports_vlans.device_id');
             })
             ->join('ports', function ($join): void {
                 $join
-                ->on('ports_vlans.port_id', 'ports.port_id');
+                    ->on('ports_vlans.port_id', 'ports.port_id');
             })
             ->with(['port.device'])
-            ->select('ports_vlans.*', 'vlans.vlan_name')->orderBy('vlan_vlan')->orderBy('ports.ifName')->orderBy('ports.ifDescr')
-            ->get()->sortBy(['vlan', 'port']);
+            ->select('ports_vlans.*', 'vlans.vlan_name');
+
+        // Apply VLAN number filter
+        if ($searchVlanNumber) {
+            if ($useRegex) {
+                $query->where('ports_vlans.vlan', 'REGEXP', $searchVlanNumber);
+            } else {
+                $query->where(
+                    'ports_vlans.vlan',
+                    'LIKE',
+                    '%' . $searchVlanNumber . '%'
+                );
+            }
+        }
+
+        // Apply VLAN name filter
+        if ($searchVlanName) {
+            if ($useRegex) {
+                $query->where('vlans.vlan_name', 'REGEXP', $searchVlanName);
+            } else {
+                $query->where(
+                    'vlans.vlan_name',
+                    'LIKE',
+                    '%' . $searchVlanName . '%'
+                );
+            }
+        }
+
+        $portVlan = $query
+            ->orderBy('vlan_vlan')
+            ->orderBy('ports.ifName')
+            ->orderBy('ports.ifDescr')
+            ->get()
+            ->sortBy(['vlan', 'port']);
 
         $data = $portVlan->groupBy('vlan');
 
