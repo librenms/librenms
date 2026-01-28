@@ -116,7 +116,7 @@ class MacAccounting implements Module
         $macs = $os->pollMacAccounting($os->getDevice()->macAccounting->keyBy->getCompositeKey());
 
         ModuleModelObserver::observe(\App\Models\MacAccounting::class);
-        $os->getDevice()->macAccounting()->saveMany($macs->each(function (\App\Models\MacAccounting $mac) {
+        $os->getDevice()->macAccounting()->saveMany($macs->each(function (\App\Models\MacAccounting $mac): void {
             $mac->port_id ??= PortCache::getIdFromIfIndex($mac->ifIndex); // ensure port_id is filled (if new)
             $mac->last_polled = time();
         }));
