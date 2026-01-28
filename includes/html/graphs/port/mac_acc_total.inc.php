@@ -10,8 +10,8 @@ $sort = $sort == 'out' ? 'bps_out' : ($sort == 'in' ? 'bps_in' : 'bps');
 $topn = empty($vars['topn']) ? 10 : $vars['topn'];
 
 $prefix = '';
-$rrd_options = '';
-$rrd_optionsb = '';
+$rrd_options = [];
+$rrd_optionsb = [];
 $stack = '';
 
 require 'includes/html/graphs/common.inc.php';
