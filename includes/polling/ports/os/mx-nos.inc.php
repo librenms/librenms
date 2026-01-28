@@ -1,14 +1,9 @@
 <?php
 
-d_echo('');
-d_echo('/opt/librenms/includes/polling/ports/os/mx-nos.inc.php');
-d_echo('--Start--');
-
 $tcstStat_port_stats = SnmpQuery::walk('MOXA-TCST-MIB::tcstStatGroupTable')->table(1);
 $PortMib_port = SnmpQuery::walk('MOXA-PORT-MIB::portConfigDescription')->table(1);
 
 foreach ($tcstStat_port_stats as $index => $moxaport_stats) {
-    //print_r($moxaport_stats);
     //in
     $port_stats[$index]['ifInOctets'] = $moxaport_stats['MOXA-TCST-MIB::tcstStatRxTotalOctets'];
     $port_stats[$index]['ifInUcastPkts'] = $moxaport_stats['MOXA-TCST-MIB::tcstStatRxUnicastPackets'];
@@ -30,6 +25,3 @@ foreach ($PortMib_port as $index => $moxaport) {
 }
 unset($PortMib_port);
 unset($tcstStat_port_stats);
-
-d_echo('');
-d_echo('--End--');
