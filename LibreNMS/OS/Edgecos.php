@@ -21,22 +21,30 @@
  * @link       https://www.librenms.org
  *
  * @copyright  2018 Tony Murray
+ * @copyright  2026 Frederik Kriewitz
  * @author     Tony Murray <murraytony@gmail.com>
+ * @author     Frederik Kriewitz <frederik@kriewitz.eu>
  */
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\Mempool;
+use App\Models\Transceiver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use LibreNMS\Data\Source\SnmpQueryInterface;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
+use LibreNMS\Util\Number;
 use LibreNMS\Util\Oid;
+use SnmpQuery;
 
-class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery
+class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery, TransceiverDiscovery
 {
     public function discoverMempools()
     {
@@ -119,6 +127,64 @@ class Edgecos extends OS implements MempoolsDiscovery, ProcessorDiscovery
         }
 
         return parent::discoverProcessors();
+    }
+
+    /**
+     * Discover transceivers.
+     * Returns an array of LibreNMS\Device\Transceiver objects that have been discovered
+     *
+     * @return Collection<Transceiver>
+     */
+    public function discoverTransceivers(): Collection
+    {
+        return $this->getSnmpQuery()->walk('portMediaInfoTable')->mapTable(function ($data, $ifIndex) {
+            $distance = Number::cast($data['portMediaInfoLinklength'] ?? null);
+            $wavelength = Number::cast($data['portMediaInfoWavelength'] ?? null);
+
+            return new Transceiver([
+                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
+                'index' => $ifIndex,
+                'entity_physical_index' => $ifIndex,
+                'type' => $data['portMediaInfoEthComplianceCodes'] ?? null,
+                'vendor' => $data['portMediaInfoVendorName'] ?? null,
+                'oui' => $data['portMediaInfoVendorOUI'] ?? null,
+                'model' => $data['portMediaInfoPartNumber'] ?? null,
+                'revision' => $data['portMediaInfoRevision'] ?? null,
+                'serial' => $data['portMediaInfoSerialNumber'] ?? null,
+                'date' => $data['portMediaInfoDateCode'] ?? null,
+                'cable' => $data['portMediaInfoFiberType'] ?? null,
+                'distance' => $distance,
+                'wavelength' => $wavelength,
+                'connector' => $data['portMediaInfoConnectorType'] ?? null,
+            ]);
+        })->filter();
+    }
+
+    /**
+     * return a SnmpQuery instance for this OS with the correct MIBs
+     *
+     * @return SnmpQueryInterface
+     */
+    public function getSnmpQuery(): SnmpQueryInterface
+    {
+        $mib = $this->findMib();
+
+        return SnmpQuery::cache()->mibs([$mib])->hideMib();
+    }
+
+    /**
+     * return transceiver DDM data
+     *
+     * @return Collection
+     */
+    public function getTransceiverDDMData(): Collection
+    {
+        return $this->getSnmpQuery()->walk(['portOpticalMonitoringInfoTable', 'portTransceiverThresholdInfoTable'])->mapTable(function ($data, $ifIndex) {
+            $data['ifIndex'] = $ifIndex;
+            $data['ifName'] = PortCache::getNameFromIfIndex($ifIndex, $this->getDevice());
+
+            return $data;
+        });
     }
 
     /**
