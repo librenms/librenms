@@ -4,7 +4,7 @@ use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Mac;
 
 if ($device['os_group'] == 'cisco') {
-    $acc_rows = dbFetchRows('SELECT *, A.poll_time AS poll_time FROM `mac_accounting` as A, `ports` AS I where A.port_id = I.port_id AND I.device_id = ?', [$device['device_id']]);
+    $acc_rows = dbFetchRows('SELECT * FROM `mac_accounting` as A, `ports` AS I where A.port_id = I.port_id AND I.device_id = ?', [$device['device_id']]);
 
     if (! empty($acc_rows)) {
         $cip_oids = [
@@ -44,12 +44,10 @@ if ($device['os_group'] == 'cisco') {
             $ifIndex = $acc['ifIndex'];
             $mac = $acc['mac'];
 
-            $polled_period = ($polled - $acc['poll_time']);
+            $polled_period = ($polled - $acc['last_polled']);
 
             if ($cip_array[$ifIndex][$mac]) {
-                $acc['update']['poll_time'] = $polled;
-                $acc['update']['poll_prev'] = $acc['poll_time'];
-                $acc['update']['poll_period'] = $polled_period;
+                $acc['update']['last_polled'] = $polled;
 
                 $mac_entries++;
 
