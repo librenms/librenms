@@ -334,8 +334,22 @@ class AlertLogDetailFormatter
 
     private function parseFallback(array $detail): void
     {
-        $skip_keys = ['device_id', 'sysObjectID', 'sysDescr', 'location_id'];
-        $skip_key_contains = ['id', 'desc', 'msg', 'last'];
+        $skip_keys = [
+            'device_id',
+            'sysObjectID',
+            'sysDescr',
+            'location_id',
+            'overwrite_ip',
+            'port',
+            'transport',
+            'icon',
+            'max_depth',
+            'port_association_mode',
+            'agent_uptime',
+            'poller_group',
+            'inserted',
+        ];
+        $skip_key_contains = ['id', 'desc', 'msg', 'last', 'auth', 'pass', 'snmp', 'community'];
 
         foreach ($detail as $k => $v) {
             if (empty($v) && $v !== '0' && $v !== 0) {

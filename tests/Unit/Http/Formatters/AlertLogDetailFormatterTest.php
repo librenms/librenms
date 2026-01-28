@@ -302,6 +302,11 @@ class AlertLogDetailFormatterTest extends TestCase
                     'some_id' => 123, // should be skipped (contains id)
                     'description' => 'test', // should be skipped (contains desc)
                     'another_val' => 'present',
+                    'sysContact' => 'admin@example.com', // should be skipped
+                    'community' => 'public', // should be skipped
+                    'snmpver' => 'v2c', // should be skipped
+                    'authname' => 'user', // should be skipped (contains auth)
+                    'cryptopass' => 'secret', // should be skipped (contains pass)
                 ],
             ],
         ];
@@ -315,5 +320,10 @@ class AlertLogDetailFormatterTest extends TestCase
         $this->assertNotContains('device_id', $labels);
         $this->assertNotContains('some_id', $labels);
         $this->assertNotContains('description', $labels);
+        $this->assertNotContains('sysContact', $labels);
+        $this->assertNotContains('community', $labels);
+        $this->assertNotContains('snmpver', $labels);
+        $this->assertNotContains('authname', $labels);
+        $this->assertNotContains('cryptopass', $labels);
     }
 }
