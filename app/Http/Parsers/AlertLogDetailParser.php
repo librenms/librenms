@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Formatters;
+namespace App\Http\Parsers;
 
 use App\Models\Port;
 use App\Models\Sensor;
@@ -10,20 +10,20 @@ use LibreNMS\Util\Number;
 use LibreNMS\Util\Url;
 
 /**
- * Alert log detail formatter that converts alert details into structured arrays
+ * Alert log detail parser that converts alert details into structured arrays
  */
-class AlertLogDetailFormatter
+class AlertLogDetailParser
 {
     /** @var array<int, array{label: string, value: string, url?: string}> */
     private array $fields = [];
 
     /**
-     * Format alert details into structured array
+     * Parse alert details into structured array
      *
      * @param  array  $alert_details
      * @return array{sections: array<int, array{title?: string, items: array<int, array{row: int, type?: string, fields: array<int, array{label: string, value: string, url?: string}>}>}>}
      */
-    public function format(array $alert_details): array
+    public function parse(array $alert_details): array
     {
         $sections = [];
 

@@ -2,17 +2,17 @@
 
 namespace LibreNMS\Tests\Unit\Http\Formatters;
 
-use App\Http\Formatters\AlertLogDetailFormatter;
+use App\Http\Parsers\AlertLogDetailParser;
 use LibreNMS\Tests\TestCase;
 
-class AlertLogDetailFormatterTest extends TestCase
+class AlertLogDetailParserTest extends TestCase
 {
-    private AlertLogDetailFormatter $formatter;
+    private AlertLogDetailParser $parser;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->formatter = new AlertLogDetailFormatter();
+        $this->parser = new AlertLogDetailParser();
     }
 
     public function testFormatBasicRuleAlert(): void
@@ -23,7 +23,7 @@ class AlertLogDetailFormatterTest extends TestCase
             ],
         ];
 
-        $output = $this->formatter->format($details);
+        $output = $this->parser->parse($details);
 
         $this->assertEquals(0, $output['sections'][0]['items'][0]['row']);
         $this->assertEquals('message', $output['sections'][0]['items'][0]['fields'][0]['label']);
@@ -48,7 +48,7 @@ class AlertLogDetailFormatterTest extends TestCase
             ],
         ];
 
-        $output = $this->formatter->format($details);
+        $output = $this->parser->parse($details);
 
         $this->assertEquals('Modifications', $output['sections'][0]['title']);
         $this->assertEquals('added', $output['sections'][0]['items'][0]['type']);
@@ -71,7 +71,7 @@ class AlertLogDetailFormatterTest extends TestCase
             ],
         ];
 
-        $output = $this->formatter->format($details);
+        $output = $this->parser->parse($details);
         $fields = $output['sections'][0]['items'][0]['fields'];
 
         $this->assertEquals('Bill', $fields[0]['label']);
@@ -92,7 +92,7 @@ class AlertLogDetailFormatterTest extends TestCase
             ],
         ];
 
-        $output = $this->formatter->format($details);
+        $output = $this->parser->parse($details);
         $fields = $output['sections'][0]['items'][0]['fields'];
 
         $this->assertEquals('Port', $fields[0]['label']);
@@ -117,7 +117,7 @@ class AlertLogDetailFormatterTest extends TestCase
             ],
         ];
 
-        $output = $this->formatter->format($details);
+        $output = $this->parser->parse($details);
         $fields = $output['sections'][0]['items'][0]['fields'];
 
         $this->assertEquals('Sensor', $fields[0]['label']);
@@ -146,7 +146,7 @@ class AlertLogDetailFormatterTest extends TestCase
             ],
         ];
 
-        $output = $this->formatter->format($details);
+        $output = $this->parser->parse($details);
         $fields = $output['sections'][0]['items'][0]['fields'];
 
         $this->assertEquals('Sensor', $fields[0]['label']);
@@ -167,7 +167,7 @@ class AlertLogDetailFormatterTest extends TestCase
             ],
         ];
 
-        $output = $this->formatter->format($details);
+        $output = $this->parser->parse($details);
         $fields = $output['sections'][0]['items'][0]['fields'];
 
         $this->assertEquals('Access Point', $fields[0]['label']);
@@ -192,7 +192,7 @@ class AlertLogDetailFormatterTest extends TestCase
             ],
         ];
 
-        $output = $this->formatter->format($details);
+        $output = $this->parser->parse($details);
         $fields = $output['sections'][0]['items'][0]['fields'];
 
         $this->assertEquals('Service', $fields[0]['label']);
@@ -222,7 +222,7 @@ class AlertLogDetailFormatterTest extends TestCase
             ],
         ];
 
-        $output = $this->formatter->format($details);
+        $output = $this->parser->parse($details);
         $fields = $output['sections'][0]['items'][0]['fields'];
 
         $this->assertEquals('BGP Peer', $fields[0]['label']);
@@ -251,7 +251,7 @@ class AlertLogDetailFormatterTest extends TestCase
             ],
         ];
 
-        $output = $this->formatter->format($details);
+        $output = $this->parser->parse($details);
         $fields = $output['sections'][0]['items'][0]['fields'];
 
         $this->assertEquals('Memory Pool', $fields[0]['label']);
@@ -279,7 +279,7 @@ class AlertLogDetailFormatterTest extends TestCase
             ],
         ];
 
-        $output = $this->formatter->format($details);
+        $output = $this->parser->parse($details);
         $fields = $output['sections'][0]['items'][0]['fields'];
 
         $this->assertEquals('Application', $fields[0]['label']);
@@ -311,7 +311,7 @@ class AlertLogDetailFormatterTest extends TestCase
             ],
         ];
 
-        $output = $this->formatter->format($details);
+        $output = $this->parser->parse($details);
         $fields = $output['sections'][0]['items'][0]['fields'];
 
         $labels = array_column($fields, 'label');
