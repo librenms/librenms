@@ -13,27 +13,23 @@ IMPORTS
 
 alcatelIND1DrcTmMIB MODULE-IDENTITY
 
-    LAST-UPDATED  "200705241500Z"
-    ORGANIZATION  "Alcatel-Lucent"
+    LAST-UPDATED  "201910070000Z"
+    ORGANIZATION  "ALE USA Inc"
+
     CONTACT-INFO
         "Please consult with Customer Service to ensure the most appropriate
          version of this document is used with the products in question:
 
-                    Alcatel-Lucent, Enterprise Solutions Division
-                   (Formerly Alcatel Internetworking, Incorporated)
+                    	Alcatel-Lucent Enterprise, 
                            26801 West Agoura Road
                         Agoura Hills, CA  91301-5122
                           United States Of America
 
-        Telephone:               North America  +1 800 995 2696
-                                 Latin America  +1 877 919 9526
-                                 Europe         +31 23 556 0100
-                                 Asia           +65 394 7933
-                                 All Other      +1 818 878 4507
-
-        Electronic Mail:         support@ind.alcatel.com
-        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+        Telephone:                +1 800 995 2696 
+ 				     
+        Electronic Mail:          ebg_global_supportcenter@al-enterprise.com 
+        World Wide Web:           https://www.al-enterprise.com"
+       
 
     DESCRIPTION
         "This module describes an authoritative enterprise-specific Simple
@@ -54,14 +50,15 @@ alcatelIND1DrcTmMIB MODULE-IDENTITY
          non-exclusive license to use this specification in connection with
          management of the products for which it is intended to be used.
 
-                     Copyright (C) 1995-2007 Alcatel-Lucent
-                         ALL RIGHTS RESERVED WORLDWIDE"
 
-    REVISION      "200704030000Z"
-    DESCRIPTION
-        "The latest version of this MIB Module."
+                        Copyright (C) ALE USA Inc. 2014-2019
+                        Copyright (C) 1995-2013 Alcatel-Lucent
+                        ALL RIGHTS RESERVED WORLDWIDE"
 
-    ::= { routingIND1Tm 1 }
+                REVISION      "201910070000Z"
+                DESCRIPTION
+                    "Updated the latest contact and Copyright information for ALE USA Inc."
+                 ::= { routingIND1Tm 1 }
 
 alcatelIND1DrcTmMIBObjects    OBJECT IDENTIFIER ::= { alcatelIND1DrcTmMIB 1 }
 alaDrcTmConfig    OBJECT IDENTIFIER ::= { alcatelIND1DrcTmMIBObjects 1 }
@@ -2320,7 +2317,7 @@ alaDrcTmCompliance MODULE-COMPLIANCE
                            alaDrcTmBgpDebugMIBGroup, alaDrcTmDvmrpDebugMIBGroup,
                            alaDrcTmPimDebugMIBGroup, alaDrcTmRipngDebugMIBGroup,
                            alaDrcTmIprmDebugMIBGroup, alaDrcTmIpmrmDebugMIBGroup,
-                           alaDrcTmOspf3DebugMIBGroup, alaDrcTmLogDestination,
+                           alaDrcTmOspf3DebugMIBGroup, alaDrcTmLogDestinationMIBGroup,
 				   alaDrcTmIsisDebugMIBGroup
                          } 
 
@@ -2344,7 +2341,9 @@ alaDrcTmConfigMIBGroup OBJECT-GROUP
 
 alaDrcTmDebugMIBGroup OBJECT-GROUP
     OBJECTS { alaDrcTmDebugError, alaDrcTmDebugTaskInfo, alaDrcTmDebugEvents,
-              alaDrcTmDebugMip, alaDrcTmDebugMisc, alaDrcTmDebugAll
+              alaDrcTmDebugMip, alaDrcTmDebugMisc, alaDrcTmDebugAll,alaDrcTmDebugLevel,
+              alaDrcTmDebugUnused1,alaDrcTmDebugUnused2 ,alaDrcTmDebugUnused3,alaDrcTmDebugUnused4,
+              alaDrcTmDebugUnusedA,alaDrcTmDebugUnusedB
             }
     STATUS  current
     DESCRIPTION
@@ -2379,7 +2378,8 @@ alaDrcTmOspfDebugMIBGroup OBJECT-GROUP
               alaDrcTmOspfDebugArea, alaDrcTmOspfDebugIntf,
               alaDrcTmOspfDebugMip, alaDrcTmOspfDebugInfo,
               alaDrcTmOspfDebugSetup, alaDrcTmOspfDebugTime,
-              alaDrcTmOspfDebugTm, alaDrcTmOspfDebugAll
+              alaDrcTmOspfDebugTm, alaDrcTmOspfDebugAll,
+              alaDrcTmOspfDebugHelper ,alaDrcTmOspfDebugRestart
             }
     STATUS  current
     DESCRIPTION
@@ -2467,7 +2467,7 @@ alaDrcTmIprmDebugMIBGroup OBJECT-GROUP
               alaDrcTmIprmDebugPrefix, alaDrcTmIprmDebugRedist,
               alaDrcTmIprmDebugRoute4, alaDrcTmIprmDebugRoute6,
               alaDrcTmIprmDebugRoutemap, alaDrcTmIprmDebugRoutepref,
-              alaDrcTmIprmDebugStatic, alaDrcTmIprmDebugBfd,
+              alaDrcTmIprmDebugStatic,alaDrcTmIprmDebugBfd,
               alaDrcTmIprmDebugAll
             }
     STATUS  current
@@ -2508,7 +2508,10 @@ alaDrcTmOspf3DebugMIBGroup OBJECT-GROUP
 
 alaDrcTmLogDestinationMIBGroup OBJECT-GROUP
     OBJECTS { alaDrcTmLogToSysFacility, alaDrcTmLogToSessionId,
-              alaDrcTmLogBufferSize
+              alaDrcTmLogBufferSize,alaDrcTmLogBufferDumpfile,
+              alaDrcTmLogClearBuffer,alaDrcTmLogCriticalBufferDumpfile,
+              alaDrcTmLogShowDate ,alaDrcTmLogShowFunction,alaDrcTmLogShowLine,
+              alaDrcTmLogShowTask,alaDrcTmLogShowTime
             }
     STATUS  current
     DESCRIPTION

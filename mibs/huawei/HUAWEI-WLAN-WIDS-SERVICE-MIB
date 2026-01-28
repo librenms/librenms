@@ -1,8 +1,8 @@
 -- ============================================================================
--- Copyright (C) 2019 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: The mib is used for WIDS.
 -- Reference: 
--- Version: V1.16
+-- Version: V1.22
 -- ============================================================================
 -- Module definition
 
@@ -22,7 +22,7 @@
 				FROM SNMPv2-TC;
 		--1.3.6.1.4.1.2011.6.139.15
 		hwWlanWidsService MODULE-IDENTITY
-			LAST-UPDATED "201904101256Z"		-- Apr 10, 2019 at 12:56 GMT
+			LAST-UPDATED "202207121041Z"		-- Jul 12, 2022 at 10:41 GMT  
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO 
@@ -33,6 +33,25 @@
 				   Website: http://www.huawei.com
 				   Email: support@huawei.com
 				  "
+                                                         DESCRIPTION 
+				"V1.21, Add hwWlanWidsProfMergeTrap"
+			REVISION "202207121041Z"		-- Jul 12, 2022 at 10:41 GMT
+                                                          DESCRIPTION 
+				"V1.21, Add enum wpa3  of  node hwWlanWidsDetDevAuthenMethod"
+			REVISION "202111122208Z"		-- Nov 12, 2021 at 22:08 GMT  
+                                                          DESCRIPTION 
+				"V1.20, Add hwWlanWidsAttackDetectedTrap"
+			REVISION "202104202208Z"		-- Apr 20, 2021 at 22:08 GMT  
+                                                          DESCRIPTION 
+				"V1.19, Modify hwWlanWidsDetDevMonitorApIP to obsolete."
+			REVISION "202003101408Z"		-- Mar 10, 2020 at 14:08 GMT
+                                                         DESCRIPTION 
+				"V1.18, Modify hwWlanWidsDetDevInterference  to obsolete."
+			REVISION "202002201856Z"		-- Feb 20, 2020 at 18:56 GMT 
+                                                          DESCRIPTION 
+				"V1.17, Modify hwWlanWidsResetDetDevTableAll , hwWlanWidsResetDetDevTableByType  to obsolete."
+			REVISION "202001162153Z"		-- Jan 16, 2020 at 21:53 GMT 
+
 			DESCRIPTION 
 				"V1.16, Add hwWlanWidsDetDevStaNum"
 			REVISION "201904101256Z"		-- Apr 10, 2019 at 12:56 GMT 
@@ -263,6 +282,20 @@
 				"This object indicates the non-Wi-Fi device alarm."
 			::= { hwWlanWidsTrap 15 }
 
+		-- 1.3.6.1.4.1.2011.6.139.15.1.1.16
+		hwWlanWidsAttackDetectedTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanWidsObjAttackDevMAC, hwWlanWidsObjAttackTypeStr, hwWlanWidsObjAttackSubTypeStr, hwWlanWidsObjDetAPID, hwWlanWidsObjDetAPName, hwWlanWidsObjDetAPMAC, hwWlanWidsObjMonitorFrequency, hwWlanWidsObjDetAPChannel, hwWlanWidsObjMonitorSSID }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the WIDS attack alarm."
+			::= { hwWlanWidsTrap 16 }
+
+		-- 1.3.6.1.4.1.2011.6.139.15.1.1.17
+		hwWlanWidsProfMergeTrap NOTIFICATION-TYPE
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the WIDS profile merge alarm."
+			::= { hwWlanWidsTrap 17 }
 		
 -- 1.3.6.1.4.1.2011.6.139.15.1.2
 		-- 1.3.6.1.4.1.2011.6.139.15.1.2
@@ -458,7 +491,36 @@
 				"Count of the specified device."
 			::= { hwWlanWidsTrapObjects 19 }
 
+-- 1.3.6.1.4.1.2011.6.139.15.1.2.20
+		-- 1.3.6.1.4.1.2011.6.139.15.1.2.20
+		hwWlanWidsObjAttackSubTypeStr OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Character string description of the attack device sub type (OCTET STRING)."
+			::= { hwWlanWidsTrapObjects 20 }
 		
+-- 1.3.6.1.4.1.2011.6.139.15.1.2.21
+		-- 1.3.6.1.4.1.2011.6.139.15.1.2.21
+		hwWlanWidsObjMonitorFrequency OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Character string description of the monitor frequency (OCTET STRING)."
+			::= { hwWlanWidsTrapObjects 21 }
+
+-- 1.3.6.1.4.1.2011.6.139.15.1.2.22
+		-- 1.3.6.1.4.1.2011.6.139.15.1.2.22
+		hwWlanWidsObjMonitorSSID OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Character string description of the monitor SSID (OCTET STRING)."
+			::= { hwWlanWidsTrapObjects 22 }
+
 -- 1.3.6.1.4.1.2011.6.139.15.2
 		-- 1.3.6.1.4.1.2011.6.139.15.2
 		hwWlanWidsGloablOper OBJECT IDENTIFIER ::= { hwWlanWidsService 2 }
@@ -722,7 +784,7 @@
 				yes(2)
 				}
 			MAX-ACCESS read-only
-			STATUS current
+			STATUS obsolete
 			DESCRIPTION
 				"This object indicates whether the device is an interference device."
 			::= { hwWlanWidsDetDevEntry 9 }
@@ -758,7 +820,8 @@
 					wpa2(5),
 					dot1x(6),
 					wapi(7),
-					wpawpa2(8)	
+					wpawpa2(8),
+					wpa3(9)
 					}
 			MAX-ACCESS read-only
 			STATUS current
@@ -2053,7 +2116,7 @@
 		hwWlanWidsDetDevMonitorApIP OBJECT-TYPE
 			SYNTAX IpAddress
 			MAX-ACCESS read-only
-			STATUS current
+			STATUS obsolete
 			DESCRIPTION
 				"This object indicates the IP address of the monitor AP."
 			::= { hwWlanWidsDetDevMonitorEntry 5 }
@@ -2803,7 +2866,7 @@
 			OBJECTS { hwWlanWidsObjRogueDevMAC, hwWlanWidsObjRogueDevType, hwWlanWidsObjRogueDevChannel, hwWlanWidsObjRogueDevRSSI, hwWlanWidsObjRogueDevSSID, 
 				hwWlanWidsObjDetAPID, hwWlanWidsObjDetRadioId, hwWlanWidsObjDetAPChannel, hwWlanWidsObjDetAPMAC, hwWlanWidsObjDetAPIP, 
 				hwWlanWidsObjNonWifiDeviceType, hwWlanWidsObjNonWifiInterChannel, hwWlanWidsObjNonWifiRssi, hwWlanWidsObjDetAPName, hwWlanWidsObjDetRadioType, 
-				hwWlanWidsObjAttackDevMAC, hwWlanWidsObjAttackType, hwWlanWidsObjAttackTypeStr }
+				hwWlanWidsObjAttackDevMAC, hwWlanWidsObjAttackType, hwWlanWidsObjAttackTypeStr, hwWlanWidsObjAttackSubTypeStr, hwWlanWidsObjMonitorFrequency, hwWlanWidsObjMonitorSSID }
 			STATUS current
 			DESCRIPTION 
 				"Description."

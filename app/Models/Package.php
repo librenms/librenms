@@ -42,7 +42,7 @@ class Package extends DeviceRelatedModel implements Keyable
         'size',
     ];
 
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
         return "$this->manager-$this->name-$this->arch";
     }

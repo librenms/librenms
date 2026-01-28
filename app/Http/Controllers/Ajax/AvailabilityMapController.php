@@ -56,7 +56,7 @@ class AvailabilityMapController extends Controller
      */
     private function setSessionValue($request, $key)
     {
-        $value = $request->get($key);
+        $value = $request->input($key);
         $request->session()->put($key, $value);
 
         return response()->json([$key, $value]);

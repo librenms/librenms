@@ -467,7 +467,7 @@ class ModuleTestHelper
         }
 
         // put data in the proper order for snmpsim
-        uksort($results, [$this, 'compareOid']);
+        uksort($results, $this->compareOid(...));
 
         $output = implode(PHP_EOL, $results) . PHP_EOL;
 
@@ -558,8 +558,9 @@ class ModuleTestHelper
         }
 
         // Remove existing device in case it didn't get removed previously, if we're not running in CI
-        if (! getenv('CI') && ($existing_device = device_by_name($snmpSimIp)) && isset($existing_device['device_id'])) {
-            delete_device($existing_device['device_id']);
+        if (! getenv('CI') && DeviceCache::get($snmpSimIp)->exists) {
+            Device::query()->where('hostname', $snmpSimIp)->get()->each->delete();
+            DeviceCache::flush();
         }
 
         // Add the test device
@@ -598,7 +599,7 @@ class ModuleTestHelper
             Debug::setVerbose();
         }
         ob_start();
-        Log::setDefaultDriver('console');
+        Log::setDefaultDriver('stdout');
 
         (new DiscoverDevice($device_id, $this->modules))->handle();
 
@@ -628,7 +629,7 @@ class ModuleTestHelper
             Debug::setVerbose();
         }
         ob_start();
-        Log::setDefaultDriver('console');
+        Log::setDefaultDriver('stdout');
 
         (new PollDevice($device_id, $this->modules))->handle();
 

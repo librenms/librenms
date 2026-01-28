@@ -17,7 +17,7 @@ modules:
                 type: ironware-system
             -
                 total: FOUNDRY-SN-AGENT-MIB::snAgentBrdMemoryTotal
-                percent_used: FOUNDRY-SN-AGENT-MIB::snAgentBrdMemoryUtil100thPercent
+                free: FOUNDRY-SN-AGENT-MIB::snAgentBrdMemoryAvailable
                 type: ironware-dyn
                 descr: '{{ FOUNDRY-SN-AGENT-MIB::snAgentBrdMainBrdDescription }}'
     os:

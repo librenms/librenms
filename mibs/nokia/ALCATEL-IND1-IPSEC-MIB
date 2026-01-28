@@ -14,27 +14,22 @@ IMPORTS
 
 
 alcatelIND1IPsecMIB MODULE-IDENTITY
-    LAST-UPDATED "200707020000Z" 
-    ORGANIZATION "Alcatel - Architects Of An Internet World"
+    LAST-UPDATED "201910070000Z" 
+    ORGANIZATION "ALE USA Inc"
     CONTACT-INFO
         "Please consult with Customer Service to insure the most appropriate
          version of this document is used with the products in question:
          
-                 Alcatel-Lucent, Enterprise Solutions Division
-                (Formerly Alcatel Internetworking, Incorporated)
+                 	Alcatel-Lucent Enterprise, 
                            26801 West Agoura Road
                         Agoura Hills, CA  91301-5122
                           United States Of America
         
-        Telephone:               North America  +1 800 995 2696
-                                 Latin America  +1 877 919 9526
-                                 Europe         +31 23 556 0100
-                                 Asia           +65 394 7933
-                                 All Other      +1 818 878 4507
-        
-        Electronic Mail:         support@ind.alcatel.com
-        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+        Telephone:               +1 800 995 2696 				  
+     
+        Electronic Mail:         ebg_global_supportcenter@al-enterprise.com  
+        World Wide Web:          https://www.al-enterprise.com"
+       
 
     DESCRIPTION
         "This module describes an authoritative enterprise-specific Simple
@@ -53,13 +48,13 @@ alcatelIND1IPsecMIB MODULE-IDENTITY
          non-exclusive license to use this specification in connection with
          management of the products for which it is intended to be used.
          
-           Copyright (C) 1995-2007 Alcatel-Lucent
+			Copyright (C) ALE USA Inc. 2014-2019          
+ 			Copyright (C) 1995-2013 Alcatel-Lucent
                          ALL RIGHTS RESERVED WORLDWIDE"
 
-    REVISION      "200707020000Z"
+    REVISION      "201910070000Z"
     DESCRIPTION
-        "The latest version of this MIB Module."
-
+         "Updated the latest contact and Copyright information for ALE USA Inc."
     ::= { softentIND1IPsec 1 }
 
 
@@ -70,11 +65,11 @@ alcatelIND1IPsecMIBObjects OBJECT IDENTIFIER ::= { alcatelIND1IPsecMIB 1 }
 --
 
 IPsecName ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT "20a"
+    DISPLAY-HINT "255a"
     STATUS	current
     DESCRIPTION
 	"The name of a table entry."
-    SYNTAX	OCTET STRING (SIZE(1..20))
+    SYNTAX	DisplayString (SIZE(1..20))
 
 IPsecDescription ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "200a"
@@ -445,7 +440,6 @@ alaIPsecStatisticsInDiscarded OBJECT-TYPE
 	"Number of incoming packets dropped because they matched
         a discard policy."
     ::= { alaIPsecStatisticsEntry 19 }
-
 alaIPsecStatisticsOutDiscarded OBJECT-TYPE
     SYNTAX	Counter32
     MAX-ACCESS	read-only
@@ -514,7 +508,7 @@ alaIPsecSecurityPolicySourceType OBJECT-TYPE
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION
-	"The type of source address specified.  Currently only ipv6(2) is allowed."
+	"The type of source address specified."
     ::= { alaIPsecSecurityPolicyEntry 2 }
 
 alaIPsecSecurityPolicySource OBJECT-TYPE
@@ -557,7 +551,7 @@ alaIPsecSecurityPolicyDestinationType OBJECT-TYPE
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION
-	"The type of destination address specified.  Currently only ipv6(2) is allowed."
+	"The type of destination address specified."
     ::= { alaIPsecSecurityPolicyEntry 6 }
 
 alaIPsecSecurityPolicyDestination OBJECT-TYPE
@@ -651,7 +645,7 @@ alaIPsecSecurityPolicyDescription OBJECT-TYPE
 alaIPsecSecurityPolicyAction OBJECT-TYPE
     SYNTAX	INTEGER {
 			  discard(0),
-                          none(1),
+			-- none(1),
 			  ipsec(2)
 			}
     MAX-ACCESS	read-create
@@ -661,9 +655,6 @@ alaIPsecSecurityPolicyAction OBJECT-TYPE
 
 	discard(0) means that all traffic covered by the policy
 	will be discarded.
-
-        none(1) means that no IPsec processing will be done on
-        the traffic covered by this policy.
 
 	ipsec(2) means that IPsec processing will take place on
 	the traffic. One or more rules should be defined in the
@@ -861,7 +852,7 @@ alaIPsecSAConfigSourceType OBJECT-TYPE
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION
-	"The type of source address specified.  Currently only ipv6(2) is allowed."
+	"The type of source address specified."
     ::= { alaIPsecSAConfigEntry 3 }
 
 alaIPsecSAConfigSource OBJECT-TYPE
@@ -877,7 +868,7 @@ alaIPsecSAConfigDestinationType OBJECT-TYPE
     MAX-ACCESS	read-create
     STATUS	current
     DESCRIPTION
-	"The type of destination address specified.  Currently only ipv6(2) is allowed."
+	"The type of destination address specified."
     ::= { alaIPsecSAConfigEntry 5 }
 
 alaIPsecSAConfigDestination OBJECT-TYPE
@@ -919,7 +910,7 @@ alaIPsecSAConfigEncryptionAlgorithm OBJECT-TYPE
     STATUS	current
     DESCRIPTION
 	"For an ESP SA, defines the encryption algorithm to be used.
-	null(11) should be specified if ESP is being used for integrity
+	none(0) should be specified if ESP is being used for integrity
 	only.  If null(11) is specified, 
 	alaIPsecSAConfigAuthenticationAlgorithm may not be none(0).
 
@@ -1135,8 +1126,8 @@ alaIPsecConfigGroup OBJECT-GROUP
     		  alaIPsecStatisticsOutNoSA,
     		  alaIPsecStatisticsOutBadPacket,
     		  alaIPsecStatisticsOutNoMemory,
-    		  alaIPsecStatisticsInDiscarded,
-    		  alaIPsecStatisticsOutDiscarded
+   		  alaIPsecStatisticsInDiscarded,
+   		  alaIPsecStatisticsOutDiscarded
 		}
     STATUS	current
     DESCRIPTION

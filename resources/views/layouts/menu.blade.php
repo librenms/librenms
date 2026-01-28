@@ -6,7 +6,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href>
+            <a class="navbar-brand" href="{{ route('home') }}">
                 <x-logo responsive="lg" class="tw:h-full tw:max-w-[170px]" />
             </a>
         </div>

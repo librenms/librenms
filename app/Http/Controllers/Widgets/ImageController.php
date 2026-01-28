@@ -47,7 +47,7 @@ class ImageController extends WidgetController
             return $this->getSettingsView($request);
         }
 
-        $dimensions = $request->get('dimensions');
+        $dimensions = $request->input('dimensions');
         $data['dimensions'] = $dimensions;
 
         // send size so generated images can generate the proper size

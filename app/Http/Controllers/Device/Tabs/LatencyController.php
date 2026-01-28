@@ -57,8 +57,8 @@ class LatencyController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        $from = $request->get('dtpickerfrom', Carbon::now(session('preferences.timezone'))->subDays(2)->format(LibrenmsConfig::get('dateformat.byminute')));
-        $to = $request->get('dtpickerto', Carbon::now(session('preferences.timezone'))->format(LibrenmsConfig::get('dateformat.byminute')));
+        $from = $request->input('dtpickerfrom', Carbon::now(session('preferences.timezone'))->subDays(2)->format(LibrenmsConfig::get('dateformat.byminute')));
+        $to = $request->input('dtpickerto', Carbon::now(session('preferences.timezone'))->format(LibrenmsConfig::get('dateformat.byminute')));
 
         $smokeping = new Smokeping($device);
         $smokeping_tabs = [];

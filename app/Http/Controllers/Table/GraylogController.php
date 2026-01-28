@@ -61,24 +61,24 @@ class GraylogController extends SimpleTableController
             'loglevel' => 'nullable|int|min:0|max:7',
         ]);
 
-        $search = $request->get('searchPhrase');
-        $device_id = (int) $request->get('device');
+        $search = $request->input('searchPhrase');
+        $device_id = (int) $request->input('device');
         $device = $device_id ? Device::find($device_id) : null;
-        $range = (int) $request->get('range', 0);
-        $limit = (int) $request->get('rowCount', 10);
-        $page = (int) $request->get('current', 1);
+        $range = (int) $request->input('range', 0);
+        $limit = (int) $request->input('rowCount', 10);
+        $page = (int) $request->input('current', 1);
         $offset = (int) (($page - 1) * $limit);
-        $loglevel = $request->get('loglevel') ?? LibrenmsConfig::get('graylog.loglevel');
+        $loglevel = $request->input('loglevel') ?? LibrenmsConfig::get('graylog.loglevel');
 
         $query = $api->buildSimpleQuery($search, $device) .
             ($loglevel !== null ? ' AND level: <=' . $loglevel : '');
 
         $sort = null;
-        foreach ($request->get('sort', []) as $field => $direction) {
+        foreach ($request->input('sort', []) as $field => $direction) {
             $sort = "$field:$direction";
         }
 
-        $stream = $request->get('stream');
+        $stream = $request->input('stream');
         $filter = $stream ? "streams:$stream" : null;
 
         try {
@@ -86,7 +86,7 @@ class GraylogController extends SimpleTableController
             $messages = $data['messages'] ?? [];
 
             return $this->formatResponse(
-                array_map([$this, 'formatMessage'], $messages),
+                array_map($this->formatMessage(...), $messages),
                 $page,
                 count($messages),
                 $data['total_results'] ?? 0,

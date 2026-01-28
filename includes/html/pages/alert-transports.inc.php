@@ -9,7 +9,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         $validator = Validator::make($request->all(), ['oauthtransport' => 'required|alpha']);
 
         if ($validator->passes()) {
-            $transport_name = $request->get('oauthtransport');
+            $transport_name = $request->input('oauthtransport');
             $class = \LibreNMS\Alert\Transport::getClass($transport_name);
             if (class_exists($class)) {
                 $transport = app($class);

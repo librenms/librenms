@@ -59,7 +59,7 @@ abstract class SelectController extends PaginatedAjaxController
     {
         $this->validate($request, $this->rules());
 
-        $limit = $request->get('limit', 50);
+        $limit = $request->input('limit', 50);
         $paginator = $this->buildQuery($this, $request)->simplePaginate($limit);
 
         return $this->formatResponse($paginator, $paginator->hasMorePages());
@@ -72,9 +72,9 @@ abstract class SelectController extends PaginatedAjaxController
             $query->select([$controller->idField, $controller->textField]);
         }
 
-        $controller->filterById($query, $request->get('id'));
+        $controller->filterById($query, $request->input('id'));
         $controller->filter($request, $query, $controller->filterFields($request));
-        $controller->search($request->get('term'), $query, $controller->searchFields($request));
+        $controller->search($request->input('term'), $query, $controller->searchFields($request));
         $controller->sort($request, $query);
 
         return $query;

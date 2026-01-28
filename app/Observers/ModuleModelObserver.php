@@ -52,7 +52,7 @@ class ModuleModelObserver
         $class = ltrim($model, '\\');
 
         if ($name) {
-            Log::channel('stdout')->info(ucwords($name) . ': ', ['nlb' => true]);
+            Log::info(ucwords($name) . ': ', ['nlb' => true]);
         }
 
         if (! in_array($class, $observed_models)) {
@@ -63,7 +63,7 @@ class ModuleModelObserver
 
     public static function done(): void
     {
-        Log::channel('stdout')->info(PHP_EOL, ['nlb' => true]);
+        Log::info(PHP_EOL, ['nlb' => true]);
     }
 
     /**

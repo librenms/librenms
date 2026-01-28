@@ -52,7 +52,7 @@ final class DocsTest extends TestCase
         $find_command = "find $dir -name '*.md' -not -path $exclude_conditions";
 
         // Run the find command with exclusions
-        $files = str_replace($dir, '', rtrim((string) `$find_command`));
+        $files = str_replace($dir, '', rtrim((string) shell_exec($find_command)));
 
         // Check for missing pages
         collect(explode(PHP_EOL, $files))

@@ -1,4 +1,4 @@
--- Copyright (C) 2004-2005, 2007, 2009-2010, 2012-2013, 2015-2017
+-- Copyright (C) 2004-2005, 2007, 2009-2010, 2012-2013, 2015-2017, 2021
 -- Hewlett Packard Enterprise Development LP
 
 -- **************************************************************************
@@ -29,7 +29,7 @@ IMPORTS
             FROM POWER-ETHERNET-MIB;
 
 hpicfPoe MODULE-IDENTITY
-   LAST-UPDATED "201806040000Z"  -- June 04, 2018
+   LAST-UPDATED "202101200000Z"  -- January 20, 2021
    ORGANIZATION "HP Networking"
    CONTACT-INFO " Hewlett Packard Company
                   8000 Foothills Blvd.
@@ -37,6 +37,13 @@ hpicfPoe MODULE-IDENTITY
    DESCRIPTION
           "This MIB module describes management objects
            that manage Power Source Equipment (PSE)."
+
+   REVISION     "202101200000Z"  -- January 20, 2021
+   DESCRIPTION  "Added following object,group and compliance.
+                 hpicfPoePethPsePortForceTwoPairMode
+                 hpicfPoePethPsePortForceTwoPairModeGroup
+                 hpicfPoeCompliance10
+                 and deprecated hpicfPoeCompliance7"
 
    REVISION     "201806040000Z"  -- June 04, 2018
    DESCRIPTION  "Added following object,group and compliance.
@@ -73,7 +80,6 @@ hpicfPoe MODULE-IDENTITY
                  Added auxFault state to hpicfPoePowerSupplyType."
    
    REVISION     "201204270000Z" -- April 27, 2012   
-   
    DESCRIPTION  "Add table for PSE Power usage features.
 		 Added following objects,group and compliance.
                  hpicfPoePethPsePortOperStatus
@@ -156,7 +162,8 @@ HpicfPoePethPsePortEntry ::=
          hpicfPoePethPsePortPreStdDetect           INTEGER,
          hpicfPoePethPsePortLowPriority            INTEGER,
          hpicfPoePethPsePortResetState             INTEGER,
-	 hpicfPoePethPsePortPowerType              INTEGER
+	 hpicfPoePethPsePortPowerType              INTEGER,
+         hpicfPoePethPsePortForceTwoPairMode       INTEGER
      }
 
 hpicfPoePethPsePortCurrent OBJECT-TYPE
@@ -352,6 +359,24 @@ hpicfPoePethPsePortPowerType OBJECT-TYPE
      DESCRIPTION "This field specifies the PD type determined
                   during physical layer classification. The default value is -1."                                  
      ::= { hpicfPoePethPsePortEntry 16}
+
+hpicfPoePethPsePortForceTwoPairMode OBJECT-TYPE
+     SYNTAX      INTEGER {
+                 off(1),
+                 on(2)
+     }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION "This field specifies the force two pair mode status
+                  for this port.This applies only on devices that support
+                  4 pair POE.
+                  A value of On - indicates that force two pair
+                  mode has been enabled for this port.
+                  A value of Off - indicates that force two pair
+                  mode has been disabled for this port.
+                  The default value is Off."
+     DEFVAL     { 1 }
+::= { hpicfPoePethPsePortEntry 17 }
 
 
 -- ------------------------------------------------------------
@@ -1178,7 +1203,7 @@ hpicfPoeCompliance6 MODULE-COMPLIANCE
         ::= { hpicfPoeCompliances 7 }
 
 hpicfPoeCompliance7 MODULE-COMPLIANCE
-        STATUS      current
+        STATUS      deprecated
         DESCRIPTION "
                 A compliance statement for HP Routing switches with PoE
                 capability"
@@ -1283,6 +1308,40 @@ hpicfPoeCompliance9 MODULE-COMPLIANCE
         DESCRIPTION "A collection of Object(s) related to 4ppoe parameters"
 
         ::= { hpicfPoeCompliances 10 }
+
+hpicfPoeCompliance10 MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "
+                A compliance statement for HP Routing switches with PoE
+                capability"
+        MODULE
+        MANDATORY-GROUPS {  hpicfPoePethPsePortTableGroup,
+                            hpicfPseParamsGroup1,
+                            hpicfPoePowerSupplyGroup,
+                            hpicfPoePethPsePortPreStdDetectGroup,
+                            hpicfPoePethPsePortForceTwoPairModeGroup
+                         }
+
+        GROUP       hpicfPoePethPsePortTableGroup
+        DESCRIPTION "A Collection of Object(s) that display
+                     the current poe port status information."
+
+        GROUP       hpicfPseParamsGroup1
+        DESCRIPTION "A Collection of Object(s) that provide information
+                     about each power source equipment instance."
+
+        GROUP       hpicfPoePowerSupplyGroup
+        DESCRIPTION "A collection of Object(s) related to power supplies."
+
+        GROUP       hpicfPoePethPsePortPreStdDetectGroup
+        DESCRIPTION "A collection of Object(s) related to port pre standard
+                     detect status."
+
+        GROUP       hpicfPoePethPsePortForceTwoPairModeGroup
+        DESCRIPTION "A collection of Object(s) related to port force two pair
+                     mode status."
+
+        ::= { hpicfPoeCompliances 11 }
 
 
 hpicfPoePethPsePortTableGroup OBJECT-GROUP
@@ -1452,4 +1511,14 @@ hpicfPoePethPseFourPairPortTableGroup OBJECT-GROUP
          STATUS          current
          DESCRIPTION     " A collection of Object(s) related to 4ppoe parameters. "
          ::= { hpicfPoeGroups 15 }
+
+hpicfPoePethPsePortForceTwoPairModeGroup OBJECT-GROUP
+        OBJECTS         {
+                        hpicfPoePethPsePortForceTwoPairMode
+                        }
+        STATUS          current
+        DESCRIPTION     "A collection of objects related to force two pair
+                         mode status. "
+        ::= { hpicfPoeGroups 16 }
 END
+

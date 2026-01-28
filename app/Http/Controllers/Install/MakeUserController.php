@@ -74,7 +74,7 @@ class MakeUserController extends InstallationController implements InstallerStep
             if (! $this->complete()) {
                 $this->configureDatabase();
                 $user = new User($request->only(['username', 'password', 'email']));
-                $user->setPassword($request->get('password'));
+                $user->setPassword($request->input('password'));
                 $res = $user->save();
 
                 $user->assignRole('admin');

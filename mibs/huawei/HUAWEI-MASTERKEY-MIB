@@ -1,8 +1,8 @@
 -- ===================================================================
--- Copyright (C) 2021 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2023 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: HUAWEI MASTER KEY MIB
 -- Reference:
--- Version: V1.14
+-- Version: V1.15
 -- ===================================================================
 
  
@@ -21,7 +21,7 @@
 
     
          hwMasterKey MODULE-IDENTITY 
-            LAST-UPDATED "202111090900Z"        
+            LAST-UPDATED "202302010900Z"        
             ORGANIZATION 
                   "Huawei Technologies Co.,Ltd."
             CONTACT-INFO 
@@ -38,6 +38,9 @@
                 and modify information. This module can only be accessed from SNMPv3 agents."
 
             -- Revision history
+            REVISION    "202302010900Z"
+            DESCRIPTION "V1.15, modify range of hwMasterKeyAutoUpdateInterval."
+
             REVISION    "202111090900Z"
             DESCRIPTION "V1.14, modify description."
 
@@ -177,7 +180,7 @@
         ::= { hwMasterKeyOperateInfo 4 }
 
         hwMasterKeyAutoUpdateInterval OBJECT-TYPE 
-        SYNTAX Unsigned32 (0..3650)
+        SYNTAX Unsigned32 (1..3650)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION

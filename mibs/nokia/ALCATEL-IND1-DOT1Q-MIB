@@ -8,33 +8,28 @@ ALCATEL-IND1-DOT1Q-MIB DEFINITIONS ::= BEGIN
 		softentIND1Dot1Q                 				    FROM ALCATEL-IND1-BASE;
 
 	alcatelIND1Dot1QMIB MODULE-IDENTITY
-		LAST-UPDATED "200704030000Z"
-		ORGANIZATION "Alcatel-Lucent"
+		LAST-UPDATED "201910070000Z"
+		ORGANIZATION "ALE USA Inc"
+
 		CONTACT-INFO
             "Please consult with Customer Service to ensure the most appropriate
              version of this document is used with the products in question:
 
-                        Alcatel-Lucent, Enterprise Solutions Division
-                       (Formerly Alcatel Internetworking, Incorporated)
-                               26801 West Agoura Road
-                            Agoura Hills, CA  91301-5122
-                              United States Of America
+                        	Alcatel-Lucent Enterprise,
+                                 26801 West Agoura Road
+                              Agoura Hills, CA  91301-5122
+                                United States Of America
 
-            Telephone:               North America  +1 800 995 2696
-                                     Latin America  +1 877 919 9526
-                                     Europe         +31 23 556 0100
-                                     Asia           +65 394 7933
-                                     All Other      +1 818 878 4507
-
-            Electronic Mail:         support@ind.alcatel.com
-            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
-
+            Telephone:              +1 800 995 2696 
+ 				     
+            Electronic Mail:        ebg_global_supportcenter@al-enterprise.com 
+            World Wide Web:         https://www.al-enterprise.com"
+          
 		DESCRIPTION
 			"This module describes an authoritative enterprise-specific Simple
              Network Management Protocol (SNMP) Management Information Base (MIB):
 
-                 For the Birds Of Prey Product Line
+                 For the OmniSwitch Product Line
                  802.1q for vlan assignment to slot/port and aggregates
 
              The right to make changes in specification and other information
@@ -48,12 +43,13 @@ ALCATEL-IND1-DOT1Q-MIB DEFINITIONS ::= BEGIN
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
 
-                         Copyright (C) 1995-2007 Alcatel-Lucent
-                             ALL RIGHTS RESERVED WORLDWIDE"
+			Copyright (C) ALE USA Inc. 2014-2019
+			Copyright (C) 1995-2013 Alcatel-Lucent
+                        ALL RIGHTS RESERVED WORLDWIDE"
 
-		REVISION      "200704030000Z"
+		REVISION      "201910070000Z"
         DESCRIPTION
-            "Addressing discrepancies with Alcatel Standard."
+	    "Updated the latest contact and Copyright information for ALE USA Inc."
 		::= { softentIND1Dot1Q 1}
 
 
@@ -151,7 +147,7 @@ qPortVlanTagValue   OBJECT-TYPE
 
 qPortVlanStatus     OBJECT-TYPE
                     SYNTAX  RowStatus
-                    MAX-ACCESS  read-write
+                    MAX-ACCESS  read-create
                     STATUS  current
                     DESCRIPTION
                 "Row Status for creating/deleting rules"
@@ -160,7 +156,7 @@ qPortVlanStatus     OBJECT-TYPE
 
 qPortVlanDescription OBJECT-TYPE
                      SYNTAX DisplayString ( SIZE (0..31) )
-                     MAX-ACCESS read-write
+                     MAX-ACCESS read-create
                      STATUS  current
                      DESCRIPTION
                      "Textual description of vlan added to a port."
@@ -172,7 +168,7 @@ qPortVlanForceTagInternal    OBJECT-TYPE
                                 on(1),
                                 off(0)
                                 }
-                    MAX-ACCESS  read-write
+                    MAX-ACCESS  read-create
                     STATUS  current
                     DESCRIPTION
                     "0-ON, 1-OFF and 2-NA"
@@ -230,7 +226,7 @@ qAggregateVlanTagValue  OBJECT-TYPE
 
 qAggregateVlanStatus     OBJECT-TYPE
                     SYNTAX  RowStatus
-                    MAX-ACCESS  read-write
+                    MAX-ACCESS  read-create
                     STATUS  current
                     DESCRIPTION
                 "Row status for creating/deleting rules."
@@ -239,7 +235,7 @@ qAggregateVlanStatus     OBJECT-TYPE
 
 qAggregateVlanDescription OBJECT-TYPE
                           SYNTAX DisplayString ( SIZE (0..31) )
-                          MAX-ACCESS read-write
+                          MAX-ACCESS read-create
                           STATUS  current
                           DESCRIPTION
                          "Textual description of vlan added to a aggregate."
@@ -323,7 +319,7 @@ QAtmIfIndexVpiVciEntry ::= SEQUENCE {
 
 qAtmIfIndexVpiVciVlanAction     OBJECT-TYPE
              SYNTAX  RowStatus
-             MAX-ACCESS  read-write
+             MAX-ACCESS  read-create
              STATUS  current
              DESCRIPTION
                 "Row Status for creating/deleting services."
@@ -332,7 +328,7 @@ qAtmIfIndexVpiVciVlanAction     OBJECT-TYPE
 
 qAtmIfIndexVpiVciVlanDescription OBJECT-TYPE
              SYNTAX DisplayString ( SIZE (0..31) )
-             MAX-ACCESS read-write
+             MAX-ACCESS read-create
              STATUS  current
              DESCRIPTION
                 "Textual description of vlan added to an Interface Index."
@@ -343,7 +339,7 @@ qAtmIfIndexVpiVciAcceptableFrameTypes   OBJECT-TYPE
                     admitAll(1),
                     admitOnlyVlanTagged(2)
                 }
-    		MAX-ACCESS  read-write
+    		MAX-ACCESS  read-create
     		STATUS      current
     		DESCRIPTION
 	        "When this is admitOnlyVlanTagged(2) the device will
@@ -365,7 +361,7 @@ qAtmIfIndexVpiVciForceTagInternal	OBJECT-TYPE
                                 on(1),
                                 off(0)
                                 }
-                    MAX-ACCESS  read-write
+                    MAX-ACCESS  read-create
                     STATUS  current
                     DESCRIPTION
                     "0-ON, 1-OFF and 2-NA"
@@ -387,7 +383,8 @@ qAtmIfIndexVpiVciForceTagInternal	OBJECT-TYPE
             MANDATORY-GROUPS
             {
                 dot1qPortGroup,
-                dot1qAggregateGroup
+                dot1qAggregateGroup,
+                qAtmIfIndexVpiVciEntryGroup
             }
 
         ::= { alcatelIND1Dot1QMIBCompliances 1 }
@@ -426,5 +423,22 @@ qAtmIfIndexVpiVciForceTagInternal	OBJECT-TYPE
         DESCRIPTION
             "Collection of objects for management of 802.1q on the aggregate."
         ::= { alcatelIND1Dot1QMIBGroups 2 }
+
+    qAtmIfIndexVpiVciEntryGroup OBJECT-GROUP
+        OBJECTS
+        {
+           qAtmIfIndex,
+           qAtmVpiValue,
+           qAtmVciValue,
+           qAtmIfIndexVpiVciVlanTagValue,
+           qAtmIfIndexVpiVciVlanAction,
+           qAtmIfIndexVpiVciVlanDescription,
+           qAtmIfIndexVpiVciAcceptableFrameTypes,
+           qAtmIfIndexVpiVciForceTagInternal
+        }
+        STATUS  current
+        DESCRIPTION
+            "An entry in 802.1q IfIndex/VPI/VCI vlan table."
+        ::= { alcatelIND1Dot1QMIBGroups 3 }
 
 END

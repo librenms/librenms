@@ -61,6 +61,10 @@ if (! empty($fdbPort_table)) {
     foreach ($vlan_cur_table as $a) {
         // Then by VLAN ID mapped to a single member array with the dot1qVlanFdbId
         foreach ($a as $vid => $data) {
+            // Skip if $data is not an array (can happen with malformed SNMP responses)
+            if (! is_array($data) || ! isset($data['dot1qVlanFdbId'])) {
+                continue;
+            }
             // Flip it round into the dictionary
             $vlan_fdb_dict[$data['dot1qVlanFdbId']] = $vid;
         }

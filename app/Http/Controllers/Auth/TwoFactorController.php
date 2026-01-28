@@ -115,7 +115,7 @@ class TwoFactorController extends Controller
             'key' => $key,
             'fails' => 0,
             'last' => 0,
-            'counter' => $request->get('twofactortype') == 'counter' ? 0 : false,
+            'counter' => $request->input('twofactortype') == 'counter' ? 0 : false,
         ];
 
         Session::put('twofactoradd', $settings);

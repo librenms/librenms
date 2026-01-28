@@ -61,7 +61,7 @@ class DiscoverDevice implements ShouldQueue
             $this->device->device_id,
             $measurement->getDuration()));
 
-        Log::channel('log_file')->alert(sprintf('INFO: device:discover %s (%s) discovered in %0.3fs',
+        Log::alert(sprintf('INFO: device:discover %s (%s) discovered in %0.3fs',
             $this->device->hostname,
             $this->device->device_id,
             $measurement->getDuration()));
@@ -147,6 +147,9 @@ EOH, $this->device->hostname, $os_group ? " ($os_group)" : '', $this->device->de
                 Log::info("#### Unload discovery module $module ####\n");
             }
         }
+
+        // Remove listener to allow this object to be garbage collected
+        Event::forget(OsChangedEvent::class);
     }
 
     private function handleOsChange(OS $os): OS

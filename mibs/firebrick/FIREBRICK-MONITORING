@@ -4,8 +4,6 @@
 -- * June 2020, Cliff Hones
 -- *
 -- * Copyright (c) 2020 by Andrews & Arnold
--- * 
--- * See the Firebrick Manuals for more information
 -- *------------------------------------------------
 
 FIREBRICK-MONITORING DEFINITIONS ::= BEGIN
@@ -24,7 +22,6 @@ IMPORTS
     OBJECT-GROUP,
     NOTIFICATION-GROUP
         FROM SNMPv2-CONF
-    TEXTUAL-CONVENTION,
     DisplayString,
     TimeStamp,
     TimeInterval,
@@ -33,11 +30,11 @@ IMPORTS
     enterprises
         FROM RFC1155-SMI
     firebrickNewStyle
-	FROM FIREBRICK-MIB
-	;
+        FROM FIREBRICK-MIB
+        ;
 
 fbMonitoringMib MODULE-IDENTITY
-    LAST-UPDATED "202006170000Z"
+    LAST-UPDATED "202207150000Z"
     ORGANIZATION "Andrews & Arnold Limited"
     CONTACT-INFO
         "Andrews & Arnold
@@ -48,10 +45,11 @@ fbMonitoringMib MODULE-IDENTITY
         Tel: +44 3333 400 999
         Email: support@aa.net.uk"
     DESCRIPTION
-        "This is a MIB Module for monitoring the Firebrick-specific structures
-        for general system features."
-    REVISION "202006170000Z"
-    DESCRIPTION "Initial version of this MIB module"
+        "Monitoring for general system features"
+    REVISION "202207150000Z"
+    DESCRIPTION "Additional validation"
+    REVISION "202207150000Z"
+    DESCRIPTION "Improved documentation"
     ::= { firebrickNewStyle 1 }
 
 fbMonReadingTable OBJECT-TYPE

@@ -23,6 +23,8 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\Pool;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
@@ -73,22 +75,41 @@ class Alertmanager extends Transport
             }
         }
 
-        $client = Http::client()->timeout(5);
+        $urls = array_values(array_filter(array_map(trim(...), explode(',', (string) $url))));
 
-        if ($username != '' && $password != '') {
-            $client->withBasicAuth($username, $password);
-        }
+        $client = Http::client()->timeout(2);
 
-        foreach (explode(',', (string) $url) as $am) {
-            $post_url = ($am . '/api/v2/alerts');
-            $res = $client->post($post_url, $data);
+        $responses = $client->pool(fn (Pool $pool) => array_map(function (string $baseUrl) use ($pool, $username, $password, $data) {
+            $req = $pool;
+            if ($username !== '' && $password !== '') {
+                $req = $req->withBasicAuth($username, $password);
+            }
 
-            if ($res->successful()) {
-                return true;
+            return $req->post(rtrim($baseUrl, '/') . '/api/v2/alerts', $data);
+        }, $urls));
+
+        foreach ($responses as $res) {
+            if ($res instanceof ConnectionException) {
+                throw new AlertTransportDeliveryException(
+                    $alert_data,
+                    0,
+                    $res->getMessage(),
+                    $alertmanager_msg,
+                    $data
+                );
+            }
+            if (! $res->successful()) {
+                throw new AlertTransportDeliveryException(
+                    $alert_data,
+                    $res->status(),
+                    $res->body(),
+                    $alertmanager_msg,
+                    $data
+                );
             }
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alertmanager_msg, $data);
+        return true;
     }
 
     public static function configTemplate(): array

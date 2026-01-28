@@ -37,6 +37,8 @@ use App\Http\Controllers\PollerSettingsController;
 use App\Http\Controllers\PortController;
 use App\Http\Controllers\PortGroupController;
 use App\Http\Controllers\PushNotificationController;
+use App\Http\Controllers\RealtimeDataController;
+use App\Http\Controllers\RealtimeGraphController;
 use App\Http\Controllers\Search\PortSecuritySearchController;
 use App\Http\Controllers\Select;
 use App\Http\Controllers\SensorController;
@@ -231,6 +233,9 @@ Route::middleware(['auth'])->group(function (): void {
         Route::post('{user}/unlock', [Auth\TwoFactorManagementController::class, 'unlock'])->name('2fa.unlock');
         Route::delete('{user}', [Auth\TwoFactorManagementController::class, 'destroy'])->name('2fa.delete');
     });
+
+    Route::get('realtime/graph/{port}', RealtimeGraphController::class)->name('realtime.graph');
+    Route::get('realtime/data/{port}', RealtimeDataController::class)->name('realtime.data');
 
     // Ajax routes
     Route::prefix('ajax')->group(function (): void {

@@ -119,7 +119,7 @@ class FdbTablesController extends TableController
      */
     public function sort($request, $query)
     {
-        $sort = $request->get('sort');
+        $sort = $request->input('sort');
 
         if (isset($sort['mac_address'])) {
             $query->orderBy('mac_address', $sort['mac_address'] == 'desc' ? 'desc' : 'asc');

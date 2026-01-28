@@ -2,90 +2,40 @@
 <?php
 
 /**
- * LibreNMS
+ * discovery.php
  *
- *   This file is part of LibreNMS.
+ * -Description-
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
-
-use LibreNMS\Util\Debug;
-
-$init_modules = ['discovery'];
+$init_modules = ['discovery', 'alerts', 'laravel'];
 require __DIR__ . '/includes/init.php';
 
-$start = microtime(true);
-$sqlparams = [];
-$options = getopt('h:m:i:n:d::v::a::q', ['os:', 'type:']);
+$options = getopt('h:m:d::v::q', ['os:', 'type:']);
 
-if (! isset($options['q'])) {
-    echo \App\Facades\LibrenmsConfig::get('project_name') . " Discovery\n";
-}
+c_echo('%RWarning: discovery.php is deprecated!%n Use %9lnms device:discover%n instead.' . PHP_EOL . PHP_EOL);
 
-$where = '';
-$doing = '';
-if (isset($options['h'])) {
-    if ($options['h'] == 'odd') {
-        $options['n'] = '1';
-        $options['i'] = '2';
-    } elseif ($options['h'] == 'even') {
-        $options['n'] = '0';
-        $options['i'] = '2';
-    } elseif ($options['h'] == 'all') {
-        $where = ' ';
-        $doing = 'all';
-    } elseif ($options['h'] == 'new') {
-        $new_discovery_lock = Cache::lock('new-discovery', 300);
-        $where = 'AND `last_discovered` IS NULL';
-        $doing = 'new';
-    } elseif ($options['h']) {
-        if (is_numeric($options['h'])) {
-            $where = 'AND `device_id` = ?';
-            $sqlparams[] = $options['h'];
-            $doing = $options['h'];
-        } else {
-            $where = 'AND `hostname` LIKE ?';
-            $sqlparams[] = str_replace('*', '%', $options['h']);
-            $doing = $options['h'];
-        }
-    }//end if
-}//end if
-
-if (isset($options['os'])) {
-    $where .= ' AND os = ?';
-    $sqlparams[] = $options['os'];
-}
-
-if (isset($options['type'])) {
-    $where .= ' AND type = ?';
-    $sqlparams[] = $options['type'];
-}
-
-if (isset($options['i']) && $options['i'] && isset($options['n'])) {
-    $where .= ' AND MOD(device_id,?) = ?';
-    $sqlparams[] = $options['i'];
-    $sqlparams[] = $options['n'];
-    $doing = $options['n'] . '/' . $options['i'];
-}
-
-if (Debug::set(isset($options['d'])) || isset($options['v'])) {
-    echo \LibreNMS\Util\Version::get()->header();
-
-    echo "DEBUG!\n";
-    Debug::setVerbose(isset($options['v']));
-    LibrenmsConfig::invalidateAndReload();
-}
-
-if (! $where) {
-    echo "-h <device id> | <device hostname wildcard>  Poll single device\n";
-    echo "-h odd             Poll odd numbered devices  (same as -i 2 -n 0)\n";
-    echo "-h even            Poll even numbered devices (same as -i 2 -n 1)\n";
-    echo "-h all             Poll all devices\n";
-    echo "-h new             Poll all devices that have not had a discovery run before\n";
-    echo "--os <os_name>     Poll devices only with specified operating system\n";
-    echo "--type <type>      Poll devices only with specified type\n";
-    echo "-i <instances> -n <number>                   Poll as instance <number> of <instances>\n";
-    echo "                   Instances start at 0. 0-3 for -n 4\n";
+if (empty($options['h'])) {
+    echo "-h <device id> | <device hostname wildcard>  Discover single device\n";
+    echo "-h odd             Discover odd numbered devices\n";
+    echo "-h even            Discover even numbered devices\n";
+    echo "-h all             Discover all devices\n";
+    echo "-h new             Discover all devices that have not had a discovery run before\n";
+    echo "--os <os_name>     Discover devices only with specified operating system\n";
+    echo "--type <type>      Discover devices only with specified type\n";
     echo "\n";
     echo "Debugging and testing options:\n";
     echo "-d                 Enable debugging output\n";
@@ -96,51 +46,27 @@ if (! $where) {
     exit;
 }
 
-// If we've specified modules with -m, use them
-$module_override = parse_modules('discovery', $options);
+$arguments = [
+    'device spec' => $options['h'],
+    '--verbose' => isset($options['v']) ? 3 : (isset($options['d']) ? 2 : 1),
+];
 
-$discovered_devices = 0;
-
-if (! empty(\App\Facades\LibrenmsConfig::get('distributed_poller_group'))) {
-    $where .= ' AND poller_group IN(' . \App\Facades\LibrenmsConfig::get('distributed_poller_group') . ')';
+if (isset($options['m'])) {
+    $arguments['--modules'] = [$options['m']];
 }
 
-global $device;
-foreach (dbFetchRows("SELECT * FROM `devices` WHERE disabled = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
-    $device_start = microtime(true);
-
-    if (discover_device($device, $module_override)) {
-        $discovered_devices++;
-
-        $device_time = round(microtime(true) - $device_start, 3);
-        DB::table('devices')->where('device_id', $device['device_id'])->update([
-            'last_discovered_timetaken' => $device_time,
-            'last_discovered' => DB::raw('NOW()'),
-        ]);
-
-        echo "Discovered in $device_time seconds\n\n";
-    }
+if (isset($options['q'])) {
+    $arguments['--quiet'] = true;
 }
 
-$end = microtime(true);
-$run = ($end - $start);
-$proctime = substr($run, 0, 5);
-
-if (isset($new_discovery_lock)) {
-    $new_discovery_lock->release();
+if (isset($options['os'])) {
+    $arguments['--os'] = $options['os'];
 }
 
-$string = $argv[0] . " $doing " . date(\App\Facades\LibrenmsConfig::get('dateformat.compact')) . " - $discovered_devices devices discovered in $proctime secs";
-d_echo("$string\n");
-
-if (! isset($options['q'])) {
-    echo PHP_EOL;
-    app(\App\Polling\Measure\MeasurementManager::class)->printStats();
+if (isset($options['type'])) {
+    $arguments['--type'] = $options['type'];
 }
 
-logfile($string);
+$return = Artisan::call('device:discover', $arguments);
 
-if ($doing !== 'new' && $discovered_devices == 0) {
-    // No discoverable devices, either down or disabled
-    exit(5);
-}
+exit($return);

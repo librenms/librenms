@@ -1,8 +1,8 @@
 -- ============================================================================
--- Copyright (C) 2020 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:  The mib is used for configuring the information of the SERVICE.
 -- Reference: 
--- Version: V1.32
+-- Version: V1.36
 -- ============================================================================
 -- Module definition
 
@@ -20,7 +20,7 @@
 				FROM SNMPv2-TC;
 		--1.3.6.1.4.1.2011.6.139.19
 		hwWlanService MODULE-IDENTITY
-			LAST-UPDATED "202003102043Z"		-- Mar 10, 2020 at 20:43 GMT
+			LAST-UPDATED "202203251018Z"		-- Mar 25, 2022 at 10:18 GMT
 			ORGANIZATION
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO
@@ -31,6 +31,18 @@
 				   Website: http://www.huawei.com
 				   Email: support@huawei.com
 				  "
+                                                          DESCRIPTION 
+				"V1.36, modify the node of hwWlanMeshLinkMeshRole and hwWlanMeshLinkIsActive"
+                                                          REVISION "202203251018Z"	      -- Mar 25, 2022 at 10:18 GMT
+			DESCRIPTION 
+				"V1.35, add the nodes of hwWlanApIotCardConnectType"
+			REVISION "202112072043Z"	      -- Dec 07, 2021 at 20:43 GMT
+                                                          DESCRIPTION 
+				"V1.34, add the nodes of hwWlanMeshLinkIsBackBone and hwWlanMeshLinkIsActive"
+			REVISION "202110272043Z"	      -- Dec 27, 2021 at 20:43 GMT
+			DESCRIPTION 
+				"V1.33, add the nodes of hwWlanApIotCardPhysicalConnectType and modify the nodes of hwWlanApIotCardIndex"
+			REVISION "202105192043Z"	      -- May 19, 2021 at 20:43 GMT
 			DESCRIPTION 
 				"V1.32, add the nodes of hwWlanAeroscoutLocationViaAcTrap and hwWlanAeroscoutLocationViaAcRestoreTrap"
 			REVISION "202003102043Z"		-- Mar 10, 2020 at 20:43 GMT
@@ -723,7 +735,11 @@
 				hwWlanMeshLinkTx
 					Unsigned32,
 				hwWlanMeshLinkRx
-					Unsigned32
+					Unsigned32,
+				hwWlanMeshLinkIsBackBone
+					INTEGER,
+				hwWlanMeshLinkIsActive
+					INTEGER
 			 }
 
 		 --1.3.6.1.4.1.2011.6.139.19.1.2.2.1.1
@@ -776,7 +792,8 @@
 			SYNTAX INTEGER
 				{
 				meshNode(1) ,
-				meshPortal(2)
+				meshPortal(2),
+                                                                             meshNodeLeaf(3)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -977,7 +994,33 @@
 				"This object indicates the receiving rate of the mesh link"
 			::= { hwWlanMeshLinkEntry 25 }
 
-		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.2.2.1.26
+		hwWlanMeshLinkIsBackBone OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				no(1),
+				yes(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates whether the link is a backbone link"
+			::= { hwWlanMeshLinkEntry 26 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.19.1.2.2.1.27
+		hwWlanMeshLinkIsActive OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+                                no(1),
+				yes(2),
+  				notVehicleAp(3)
+                                }
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates whether the link is a active link"
+			::= { hwWlanMeshLinkEntry 27 }
+
 		-- 1.3.6.1.4.1.2011.6.139.19.1.3
 		hwWlanCalibrateInfo OBJECT IDENTIFIER ::= { hwWlanServiceObjects 3 }
 
@@ -2149,6 +2192,8 @@
 				hwWlanApIotCardConnectServerStatus
 					INTEGER,
 				hwWlanApIotCardServerName
+					OCTET STRING,
+				hwWlanApIotCardPhysicalConnectType
 					OCTET STRING
 			 }
 
@@ -2163,7 +2208,7 @@
 
 		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.2
 		hwWlanApIotCardIndex OBJECT-TYPE
-			SYNTAX Integer32 (1..3)
+			SYNTAX Integer32 (1..4)
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION
@@ -2286,7 +2331,9 @@
 				ethernet(2),
 				ethernetup(3),
 				ethernetdown(4),
-				unknown(5)
+				unknown(5),
+				container(6),
+				serialorcontainer(7)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -2445,6 +2492,15 @@
 			DESCRIPTION
 				"This object indicates the IOT card server name."
 		::= { hwWlanApIotCardEntry 29 } 
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.30
+		hwWlanApIotCardPhysicalConnectType OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..32))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the IOT card physical connection type."
+		::= { hwWlanApIotCardEntry 30 } 
 
 -- 1.3.6.1.4.1.2011.6.139.19.2
 		-- 1.3.6.1.4.1.2011.6.139.19.2
@@ -2540,7 +2596,7 @@
 			OBJECTS { hwWlanApIotCardState, hwWlanApIotCardApName, hwWlanApIotCardSupportInfo, hwWlanApIotCardProtocolVer, hwWlanApIotCardWirelessStard, hwWlanApIotCardFreq,
 				hwWlanApIotCardVendorName, hwWlanApIotCardCardType, hwWlanApIotCardHardwareVer, hwWlanApIotCardFirmwareVer, hwWlanApIotCardSN, hwWlanApIotCardConnectType,
 				hwWlanApIotCardConnectStatus, hwWlanApIotBaudRate,hwWlanApIotFrameVersion,hwWlanApIotCardRecvPackets, hwWlanApIotCardSendPackets, hwWlanApIotCardRecvBytes, hwWlanApIotCardSendBytes, hwWlanApIotCardAntennaStatus,
-				hwWlanApIotCardServerName}
+				hwWlanApIotCardServerName,hwWlanApIotCardPhysicalConnectType}
 			STATUS current
 			DESCRIPTION 
 				"Description."

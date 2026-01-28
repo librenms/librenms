@@ -12,33 +12,27 @@ IMPORTS
 
 
         alcatelIND1HealthMonitorMIB MODULE-IDENTITY
-                LAST-UPDATED "201005130000Z"
-                ORGANIZATION "Alcatel-Lucent"
-                CONTACT-INFO
-            "Please consult with Customer Service to ensure the most appropriate
-             version of this document is used with the products in question:
+            LAST-UPDATED "201911270000Z"
+            ORGANIZATION "ALE USA Inc."
+            CONTACT-INFO
+             "Please consult with Customer Service to ensure the most appropriate
+              version of this document is used with the products in question:
 
-                        Alcatel-Lucent, Enterprise Solutions Division
-                       (Formerly Alcatel Internetworking, Incorporated)
-                               26801 West Agoura Road
-                            Agoura Hills, CA  91301-5122
-                              United States Of America
+                              ALE USA Inc. Enterprise
+                                26801 West Agoura Road
+                             Agoura Hills, CA  91301-5122
+                               United States Of America
 
-            Telephone:               North America  +1 800 995 2696
-                                     Latin America  +1 877 919 9526
-                                     Europe         +31 23 556 0100
-                                     Asia           +65 394 7933
-                                     All Other      +1 818 878 4507
+             Telephone:          +1 800 995 2696
 
-            Electronic Mail:         support@ind.alcatel.com
-            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+             Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+             World Wide Web:     https://www.al-enterprise.com"
 
                 DESCRIPTION
                         "This module describes an authoritative enterprise-specific Simple
              Network Management Protocol (SNMP) Management Information Base (MIB):
 
-                 For the Birds Of Prey Product Line
+                 For the OmniSwitch Product Line
                  Health Monitoring for dissemination of resource consumption information.
 
              The right to make changes in specification and other information
@@ -52,8 +46,13 @@ IMPORTS
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
 
-                         Copyright (C) 1995-2007 Alcatel-Lucent
-                             ALL RIGHTS RESERVED WORLDWIDE"
+                       Copyright (C) ALE USA Inc. 2014-2019
+                       Copyright (C) 1995-2013 Alcatel-Lucent
+                           ALL RIGHTS RESERVED WORLDWIDE"
+
+        REVISION      "201911270000Z"
+        DESCRIPTION
+            "Updated the latest contact and Copyright information for ALE USA Inc."
 
         REVISION      "201005130000Z"
         DESCRIPTION
@@ -167,7 +166,7 @@ IMPORTS
 
         healthModuleSlot  OBJECT-TYPE
             SYNTAX  Integer32 (0..7016)
-            MAX-ACCESS  not-accessible
+            MAX-ACCESS  accessible-for-notify
             STATUS  current
             DESCRIPTION
                 "The slot number for the chassis. Slot 0 is
@@ -364,12 +363,24 @@ IMPORTS
             healthPortRxTx1HrAvg
                         Integer32,
             healthPortRxTx1DayAvg
+                        Integer32,
+            healthPortRxLatest
+                        Integer32,
+            healthPortRxTxLatest
+                        Integer32,
+            healthPortTxLatest
+                        Integer32,
+            healthPortTx1MinAvg
+                        Integer32,
+            healthPortTx1HrAvg
+                        Integer32,
+            healthPortTx1DayAvg
                         Integer32
             }
 
         healthPortIfIndex  OBJECT-TYPE
             SYNTAX  Integer32 (1..2147483647)
-            MAX-ACCESS  not-accessible
+            MAX-ACCESS  accessible-for-notify
             STATUS  current
             DESCRIPTION
                 "The ifIndex representing any physical port in
@@ -429,6 +440,57 @@ IMPORTS
                 "Maximum one-minute port-level i/o utilization over the
                  last hour (percent)."
             ::= { healthPortEntry 7 }
+
+        healthPortRxLatest  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "The latest port-level input utilization (percent)."
+            ::= { healthPortEntry 8 }
+
+        healthPortRxTxLatest  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "The latest port-level i/o utilization (percent)."
+            ::= { healthPortEntry 9 }
+
+        healthPortTxLatest  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "The latest port-level output utilization (percent)."
+            ::= { healthPortEntry 10 }
+
+        healthPortTx1MinAvg  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Average port-level output utilization over the
+                 last minute (percent)."
+            ::= { healthPortEntry 11 }
+
+        healthPortTx1HrAvg  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Average port-level output utilization over the
+                 last hour (percent)."
+            ::= { healthPortEntry 12 }
+
+        healthPortTx1DayAvg  OBJECT-TYPE
+            SYNTAX  Integer32 (0..100)
+            MAX-ACCESS  read-only
+            STATUS  current
+            DESCRIPTION
+                "Maximum port-level output utilization over the
+                 last hour (percent)."
+            ::= { healthPortEntry 13 }
 
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -647,7 +709,7 @@ IMPORTS
     healthModuleGroup OBJECT-GROUP
         OBJECTS
         {
-
+                        healthModuleSlot,
                         healthModuleRx1MinAvg,
                         healthModuleRx1HrAvg,
                         healthModuleRx1DayAvg,
@@ -675,12 +737,19 @@ IMPORTS
     healthPortGroup OBJECT-GROUP
         OBJECTS
         {
+                        healthPortIfIndex,
                         healthPortRx1MinAvg,
                         healthPortRx1HrAvg,
                         healthPortRx1DayAvg,
                         healthPortRxTx1MinAvg,
                         healthPortRxTx1HrAvg,
-                        healthPortRxTx1DayAvg
+                        healthPortRxTx1DayAvg,
+                        healthPortRxLatest,
+                        healthPortRxTxLatest,
+                        healthPortTxLatest,
+                        healthPortTx1MinAvg,
+                        healthPortTx1HrAvg,
+                        healthPortTx1DayAvg
         }
         STATUS  current
         DESCRIPTION

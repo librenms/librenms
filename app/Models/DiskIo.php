@@ -16,8 +16,8 @@ class DiskIo extends DeviceRelatedModel implements Keyable
         'diskio_descr',
     ];
 
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
-        return $this->diskio_index . $this->diskio_descr;
+        return "$this->diskio_index-$this->diskio_descr";
     }
 }

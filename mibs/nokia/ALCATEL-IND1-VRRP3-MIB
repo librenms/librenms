@@ -18,27 +18,21 @@ IMPORTS
 
 
 alcatelIND1VRRP3MIB MODULE-IDENTITY
-    LAST-UPDATED "200704030000Z"
-    ORGANIZATION "Alcatel-Lucent"
+    LAST-UPDATED "201910070000Z"
+    ORGANIZATION "ALE USA Inc"
     CONTACT-INFO
         "Please consult with Customer Service to ensure the most appropriate
          version of this document is used with the products in question:
 
-                    Alcatel-Lucent, Enterprise Solutions Division
-                   (Formerly Alcatel Internetworking, Incorporated)
+                        Alcatel-Lucent Enterprise,
                            26801 West Agoura Road
                         Agoura Hills, CA  91301-5122
                           United States Of America
 
-        Telephone:               North America  +1 800 995 2696
-                                 Latin America  +1 877 919 9526
-                                 Europe         +31 23 556 0100
-                                 Asia           +65 394 7933
-                                 All Other      +1 818 878 4507
+        Telephone:               +1 800 995 2696
 
-        Electronic Mail:         support@ind.alcatel.com
-        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+        Electronic Mail:         ebg_global_supportcenter@al-enterprise.com
+        World Wide Web:          https://www.al-enterprise.com" 
 
     DESCRIPTION
         "This module describes an authoritative enterprise-specific Simple
@@ -58,11 +52,12 @@ alcatelIND1VRRP3MIB MODULE-IDENTITY
          non-exclusive license to use this specification in connection with
          management of the products for which it is intended to be used.
 
-                     Copyright (C) 1995-2007 Alcatel-Lucent
-                         ALL RIGHTS RESERVED WORLDWIDE"
+                     Copyright (C) ALE USA Inc. 2014-2019
+		     Copyright (C) 1995-2013 Alcatel-Lucent
+                     ALL RIGHTS RESERVED WORLDWIDE"
 
-    REVISION "200704030000Z"    -- 02 April 2007
-    DESCRIPTION "The latest version of this MIB Module."
+    REVISION    "201910070000Z"    
+    DESCRIPTION "Updated the latest contact and Copyright information for ALE USA Inc."
 
     ::= { softentIND1Vrrp 2 }
 

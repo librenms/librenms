@@ -15,28 +15,22 @@ IMPORTS
         FROM ALCATEL-IND1-BASE;
 
 alcatelIND1MldMIB MODULE-IDENTITY
-    LAST-UPDATED "200809100000Z" 
-    ORGANIZATION "Alcatel-Lucent"
+    LAST-UPDATED "201910070000Z" 
+    ORGANIZATION "ALE USA Inc"
     CONTACT-INFO
         "Please consult with Customer Service to ensure the most appropriate
          version of this document is used with the products in question:
          
-                    Alcatel-Lucent, Enterprise Solutions Division
-                   (Formerly Alcatel Internetworking, Incorporated)
+                        Alcatel-Lucent Enterprise,
                            26801 West Agoura Road
                         Agoura Hills, CA  91301-5122
                           United States Of America
         
-        Telephone:               North America  +1 800 995 2696
-                                 Latin America  +1 877 919 9526
-                                 Europe         +31 23 556 0100
-                                 Asia           +65 394 7933
-                                 All Other      +1 818 878 4507
-        
-        Electronic Mail:         support@ind.alcatel.com
-        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
-
+        Telephone:               +1 800 995 2696 
+ 				          
+        Electronic Mail:         ebg_global_supportcenter@al-enterprise.com
+        World Wide Web:          https://www.al-enterprise.com"  
+		
     DESCRIPTION
         "This module describes an authoritative enterprise-specific Simple
          Network Management Protocol (SNMP) Management Information Base (MIB):
@@ -55,17 +49,24 @@ alcatelIND1MldMIB MODULE-IDENTITY
          management of the products for which it is intended to be used.
          
                      Copyright (C) 1995-2007 Alcatel-Lucent
-                         ALL RIGHTS RESERVED WORLDWIDE"
+                     Copyright (C) ALE USA Inc.,2017
+                     ALL RIGHTS RESERVED WORLDWIDE"
 
-    REVISION      "200809100000Z"
+    REVISION      "200908060000Z"
     DESCRIPTION
-        "Add flood unknown object"
+        "Changed the group names in alaMldCompliance."
+
     REVISION      "200808080000Z"
     DESCRIPTION
         "The latest version of this MIB Module. Added maximum group limit objects."
+
     REVISION      "200704030000Z"
     DESCRIPTION
         "The revised version of this MIB Module."
+
+    REVISION      "201910070000Z"
+    DESCRIPTION
+        "Updated the latest contact and Copyright information for ALE USA Inc."     
 
     ::= { softentIND1Mld 1 }
 
@@ -230,6 +231,7 @@ alaMldMaxGroupExceedAction OBJECT-TYPE
 	port/vlan instance."
     DEFVAL        { none }
     ::= { alaMld 16 }
+
 alaMldFloodUnknown OBJECT-TYPE
     SYNTAX          INTEGER { none(0), enable(1), disable(2) }
     MAX-ACCESS      read-write
@@ -239,7 +241,23 @@ alaMldFloodUnknown OBJECT-TYPE
     learning and setup."
     DEFVAL        { disable }
     ::= { alaMld 17 }
-
+alaMldBufferPacket OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable buffering and routing of initial multicast packets in case of
+    flood and prune multicast routing protocols." 
+    DEFVAL        { disable }
+    ::= { alaMld 18 }
+alaMldStarg OBJECT-TYPE	 
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }	 
+    MAX-ACCESS      read-write	 
+    STATUS          current	 
+    DESCRIPTION	 
+        "Administratively enable IPV6 Star-G on the VLAN."	 
+    DEFVAL          { disable }
+    ::= { alaMld 19 }
 
 --
 --  VLAN Configuration Table
@@ -287,7 +305,8 @@ MldVlanEntry ::= SEQUENCE {
     alaMldVlanMaxGroupLimit  		  Unsigned32,
     alaMldVlanMaxGroupExceedAction        INTEGER,
     alaMldVlanSpoofAddressType		  InetAddressType,
-    alaMldVlanSpoofAddress                InetAddress
+    alaMldVlanSpoofAddress                InetAddress,
+    alaMldVlanStarg                       INTEGER
 }
 
 alaMldVlanIndex OBJECT-TYPE
@@ -443,7 +462,6 @@ alaMldVlanSpoofAddressType OBJECT-TYPE
     DESCRIPTION
         "Set the type of SpoofAddress for the VLAN."
     ::= { alaMldVlanEntry 18 }
-
 alaMldVlanSpoofAddress OBJECT-TYPE   
     SYNTAX          InetAddress        
     MAX-ACCESS      read-write   
@@ -451,6 +469,14 @@ alaMldVlanSpoofAddress OBJECT-TYPE
     DESCRIPTION   
         "Set the SpoofAddress for the VLAN."   
     ::= { alaMldVlanEntry 19 } 
+alaMldVlanStarg OBJECT-TYPE
+    SYNTAX          INTEGER { none(0), enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Administratively enable MLD Star-G on the VLAN."
+    ::= { alaMldVlanEntry 20 }
+
 
 --
 --  Group Membership Table
@@ -1363,12 +1389,12 @@ alaMldCompliance MODULE-COMPLIANCE
         "The compliance statement for systems running IPv6 multicast switch 
          and routing and implementing ALCATEL-IND1-MLD-MIB."
     MODULE
-    MANDATORY-GROUPS { alaMldGroup, alaMldVlanGroup, alaMldMemberGroup,
-                       alaMldStaticMemberGroup, alaMldNeighborGroup,
-                       alaMldStaticNeighborGroup, alaMldQuerierGroup,
-                       alaMldStaticQuerierGroup, alaMldSourceGroup,
-                       alaMldForwardGroup, alaMldTunnelGroup,
-                       alaMldPortGroup, alaMldPortVlanGroup }
+    MANDATORY-GROUPS { alaMldGroup, alaMldVlanGroup, alaMldMemberGroup, 
+		       alaMldStaticMemberGroup,alaMldNeighborGroup,
+                       alaMldStaticNeighborGroup,alaMldQuerierGroup,
+                       alaMldStaticQuerierGroup,alaMldSourceGroup,
+		       alaMldForwardGroup,alaMldTunnelGroup, 
+		       alaMldPortGroup, alaMldPortVlanGroup }
     ::= { alcatelIND1MldMIBCompliances 1 }
 
 alcatelIND1MldMIBGroups OBJECT IDENTIFIER ::= { alcatelIND1MldMIBConformance 2 }
@@ -1379,8 +1405,8 @@ alaMldGroup OBJECT-GROUP
               alaMldQueryResponseInterval, alaMldLastMemberQueryInterval,
               alaMldRouterTimeout, alaMldSourceTimeout, alaMldProxying,
               alaMldUnsolicitedReportInterval, alaMldQuerierForwarding,
-              alaMldMaxGroupLimit, alaMldMaxGroupExceedAction,
-              alaMldFloodUnknown }
+	      alaMldMaxGroupLimit, alaMldMaxGroupExceedAction,
+              alaMldFloodUnknown, alaMldBufferPacket, alaMldStarg }
     STATUS          current
     DESCRIPTION
         "A collection of objects to support management of IPv6 multicast switching
@@ -1395,7 +1421,7 @@ alaMldVlanGroup OBJECT-GROUP
               alaMldVlanSourceTimeout, alaMldVlanProxying,
               alaMldVlanUnsolicitedReportInterval, alaMldVlanQuerierForwarding, 
 	      alaMldVlanMaxGroupLimit, alaMldVlanMaxGroupExceedAction,
-              alaMldVlanSpoofAddressType, alaMldVlanSpoofAddress }
+              alaMldVlanSpoofAddressType, alaMldVlanSpoofAddress, alaMldVlanStarg }
     STATUS          current
     DESCRIPTION
         "A collection of objects to support management of IPv6 multicast switching

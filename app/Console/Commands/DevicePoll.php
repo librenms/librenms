@@ -33,6 +33,8 @@ class DevicePoll extends LnmsCommand
         parent::__construct();
         $this->addArgument('device spec', InputArgument::REQUIRED);
         $this->addOption('modules', 'm', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY);
+        $this->addOption('os', null, InputOption::VALUE_REQUIRED);
+        $this->addOption('type', null, InputOption::VALUE_REQUIRED);
         $this->addOption('no-data', 'x', InputOption::VALUE_NONE);
         $this->addOption('dispatch', null, InputOption::VALUE_NONE);
     }
@@ -61,6 +63,8 @@ class DevicePoll extends LnmsCommand
                 PollDevice::class,
                 DevicePolled::class,
                 ModuleList::fromUserOverrides($this->option('modules')),
+                $this->option('os'),
+                $this->option('type')
             );
 
             $this->line(__('commands.device:poll.starting'));
@@ -76,7 +80,6 @@ class DevicePoll extends LnmsCommand
 
     private function dispatchWork(): int
     {
-        \Log::setDefaultDriver('stack');
         $modules = ModuleList::fromUserOverrides($this->option('modules'));
         $devices = Device::whereDeviceSpec($this->argument('device spec'))->pluck('device_id');
 

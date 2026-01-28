@@ -85,7 +85,7 @@ class DeviceSearchController extends SearchController
     public function formatItem($device): array
     {
         $name = $device->displayName();
-        if (! request()->get('map') && $name !== $device->sysName) {
+        if (! request()->input('map') && $name !== $device->sysName) {
             $name .= " ($device->sysName)";
         }
 

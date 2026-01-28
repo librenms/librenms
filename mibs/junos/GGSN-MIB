@@ -209,7 +209,7 @@ ggsnNbrOfActivePdpContexts OBJECT-TYPE
    STATUS        current
    DESCRIPTION
          "The number of active PDP contexts on this GGSN.
-         
+
           Incremented when a PDP context is activated and a
           GTP response has been sent to the SGSN. Decremented
           when a PDP context is deactivated."
@@ -226,7 +226,7 @@ ggsnNbrOfSubscribers OBJECT-TYPE
           request accepted for an IMSI (which previously did not have
           a PDP context active). Decremented when the last PDP context
           for that IMSI has been deleted.
-          
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnGlobalStats 20 }
 
@@ -242,7 +242,7 @@ ggsnNbrOfSubscribersMean OBJECT-TYPE
           that IMSI has been deleted.
           The mean number of subscribers is calculated over five samples
           taken over a 15 minute period.
-          
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnGlobalStats 21 }
 
@@ -269,7 +269,7 @@ ggsnPayloadLoad OBJECT-TYPE
    DESCRIPTION
          "This gauge keeps track of the weighted load on the node for the
           payload part. The gauge is used for the new load balancing scheme.
-          
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnGlobalStats 26 }
 
@@ -288,7 +288,7 @@ ggsnNeighborSolicitationRcv  OBJECT-TYPE
    DESCRIPTION
          "The number of neighbor solicitation requests
           received by GGSN.
-          
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnGlobalStats 28 }
 
@@ -299,7 +299,7 @@ ggsnNeighborSolicitationRsp  OBJECT-TYPE
    DESCRIPTION
          "The number of neighbor solicitation responses
           from GGSN.
-          
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnGlobalStats 29 }
 
@@ -309,7 +309,7 @@ ggsnRouterSolicitationRcv  OBJECT-TYPE
    STATUS        current
    DESCRIPTION
          "The number of router solicitation requests received by GGSN.
-          
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnGlobalStats 30 }
 
@@ -319,7 +319,7 @@ ggsnRouterSolicitationRsp  OBJECT-TYPE
    STATUS        current
    DESCRIPTION
          "The number of router solicitation responses from GGSN.
-          
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnGlobalStats 31 }
 
@@ -465,7 +465,7 @@ ggsnNbrOfActivePdpContextsWlan   OBJECT-TYPE
    STATUS	 current
    DESCRIPTION
      "The number of active WLAN PDP contexts on this GGSN.
-      
+
       Note: This counter cannot be retrieved by CLI."
    ::= { ggsnGlobalStats 49 }
 
@@ -556,13 +556,13 @@ ggsnAttemptedActivation OBJECT-TYPE
    DESCRIPTION
          "The number of PDP context activation procedures
           initiated by the MS on this GGSN.
-          
+
           Incremented each time a Create PDP Context Request
           that is not silently discarded is received by the GGSN.
           This means the SNMP counter incremented each time a
           Create PDP Context Response is sent back to the SGSN with
           cause value Request Accepted or Request Rejected.
-          
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnPdpContextsStatsAttempted 1 }
 
@@ -573,10 +573,10 @@ ggsnAttemptedDeactivation OBJECT-TYPE
    DESCRIPTION
          "The number of PDP context deactivation procedures
           initiated by the MS on this GGSN.
-          
+
           Incremented each time a Delete PDP Context Request
           is received at this GGSN.
-          
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnPdpContextsStatsAttempted 2 }
 
@@ -587,10 +587,10 @@ ggsnAttemptedSelfDeactivation OBJECT-TYPE
    DESCRIPTION
          "The number of PDP context deactivation procedures
           initiated by this GGSN.
-          
+
           Incremented each time this GGSN attempts to delete a context.
           Increases for all types of internal deletes.
-          
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnPdpContextsStatsAttempted 3 }
 
@@ -601,10 +601,10 @@ ggsnAttemptedUpdate OBJECT-TYPE
    DESCRIPTION
          "The number of PDP context updates attempted on
           this GGSN.
-          
+
           Incremented each time an Update PDP Context Request
           is received at this GGSN.
-          
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnPdpContextsStatsAttempted 4 }
 
@@ -625,7 +625,7 @@ ggsnAttemptedManualDeactivation OBJECT-TYPE
    DESCRIPTION
          "The number of PDP context deactivation procedures
           initiated by this GGSN due to manual user command.
-          
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnPdpContextsStatsAttempted 6 }
 
@@ -636,13 +636,13 @@ ggsnAttemptedSecondaryActivation OBJECT-TYPE
    DESCRIPTION
          "The number of secondary PDP context activation
           procedures initiated by the MS on this GGSN.
-          
+
           All GPRS session management statistics except
           ggsnAttemptedSecondaryActivation, ggsnCompletedSecondaryActivation,
           ggsnAttemptedSecondaryActivationIpv6, and ggsnCompletedSecondaryActivationIpv6
           will accumulate all pdp contexts, that is both secondary and
-          primary. 
-          
+          primary.
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnPdpContextsStatsAttempted 7 }
 
@@ -653,7 +653,7 @@ ggsnAttemptedActivationIpv6 OBJECT-TYPE
    DESCRIPTION
          "The number of IPv6 PDP context activation procedures
           initiated by the MS on this GGSN.
-          
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnPdpContextsStatsAttempted 8 }
 
@@ -664,13 +664,13 @@ ggsnAttemptedSecondaryActivationIpv6 OBJECT-TYPE
    DESCRIPTION
          "The number of secondary IPv6 PDP context activation procedures
           initiated by the MS on this GGSN.
-          
+
           All GPRS session management statistics except
           ggsnAttemptedSecondaryActivation, ggsnCompletedSecondaryActivation,
           ggsnAttemptedSecondaryActivationIpv6, and
-          ggsnCompletedSecondaryActivationIpv6 will accumulate all 
+          ggsnCompletedSecondaryActivationIpv6 will accumulate all
           pdp contexts, that is both secondary and primary.
-          
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnPdpContextsStatsAttempted 9 }
 
@@ -681,7 +681,7 @@ ggsnAttemptedActivationWlan OBJECT-TYPE
    DESCRIPTION
          "The number of WLAN PDP context activation procedures
           initiated by the MS on this GGSN.
-          
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnPdpContextsStatsAttempted 10 }
 
@@ -690,7 +690,7 @@ ggsnAttemptedActivationConversational OBJECT-TYPE
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-         "The total number of attempted primary and secondary PDP context activation procedures 
+         "The total number of attempted primary and secondary PDP context activation procedures
           with traffic class conversational on this GGSN.
 
           Note: This counter cannot be retrieved by CLI."
@@ -701,7 +701,7 @@ ggsnAttemptedActivationStreaming OBJECT-TYPE
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-         "The total number of attempted primary and secondary PDP context activation procedures 
+         "The total number of attempted primary and secondary PDP context activation procedures
           with traffic class streaming on this GGSN.
 
           Note: This counter cannot be retrieved by CLI."
@@ -712,7 +712,7 @@ ggsnAttemptedActivationInteractive OBJECT-TYPE
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-         "The total number of attempted primary and secondary PDP context activation procedures 
+         "The total number of attempted primary and secondary PDP context activation procedures
           with traffic class interactive on this GGSN.
 
           Note: This counter cannot be retrieved by CLI."
@@ -723,7 +723,7 @@ ggsnAttemptedActivationBackground OBJECT-TYPE
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-         "The total number of attempted primary and secondary PDP context activation procedures 
+         "The total number of attempted primary and secondary PDP context activation procedures
           with traffic class background on this GGSN.
 
           Note: This counter cannot be retrieved by CLI."
@@ -747,7 +747,7 @@ ggsnAttemptedActivationIpv4v6 OBJECT-TYPE
    DESCRIPTION
          "The number of IPv4v6 PDP context activation procedures
           initiated by the MS on this GGSN.
-          
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnPdpContextsStatsAttempted 16 }
 
@@ -758,7 +758,7 @@ ggsnCompletedActivation OBJECT-TYPE
    DESCRIPTION
          "The number of successfully completed
           PDP context activation procedures initiated by an MS.
-          
+
           Incremented each time a Create PDP Context Response is sent back
           to an SGSN with cause value Request Accepted."
    ::= { ggsnPdpContextsStatsCompleted 1 }
@@ -769,8 +769,8 @@ ggsnCompletedDeactivation OBJECT-TYPE
    STATUS        current
    DESCRIPTION
          "The number of successfully completed
-          PDP context deactivation procedures initiated by an MS. 
-          
+          PDP context deactivation procedures initiated by an MS.
+
           Note: This counter can not be retrieved by CLI. "
    ::= { ggsnPdpContextsStatsCompleted 2 }
 
@@ -781,7 +781,7 @@ ggsnCompletedSelfDeactivation OBJECT-TYPE
    DESCRIPTION
          "The number of successfully completed
           PDP context deactivation procedures initiated by the GGSN.
-          
+
           Note: This counter can not be retrieved by CLI."
    ::= { ggsnPdpContextsStatsCompleted 3 }
 
@@ -792,7 +792,7 @@ ggsnCompletedUpdate OBJECT-TYPE
    DESCRIPTION
          "The number of successfully completed
           PDP context update procedures initiated by an MS.
-          
+
           Incremented each time an Update PDP Context Response is sent back
           to an SGSN with cause value Request Accepted."
    ::= { ggsnPdpContextsStatsCompleted 4 }
@@ -803,11 +803,11 @@ ggsnIdleTimeoutDeactivation OBJECT-TYPE
    STATUS	 current
    DESCRIPTION
          "The number of successfully completed
-          PDP context deactivation procedures initiated by the GGSN 
+          PDP context deactivation procedures initiated by the GGSN
           due to the idle supervision function.
-          
+
           Note: The PDP context is supervised for the time it has been idle,
-          without actual payload." 
+          without actual payload."
    ::= { ggsnPdpContextsStatsCompleted 5 }
 
 ggsnCompletedManualDeactivation OBJECT-TYPE
@@ -816,7 +816,7 @@ ggsnCompletedManualDeactivation OBJECT-TYPE
    STATUS	 current
    DESCRIPTION
          "The number of successfully completed
-          PDP context deactivation procedures initiated by the GGSN 
+          PDP context deactivation procedures initiated by the GGSN
           due to manual user command."
    ::= { ggsnPdpContextsStatsCompleted 6 }
 
@@ -827,12 +827,12 @@ ggsnCompletedSecondaryActivation OBJECT-TYPE
    DESCRIPTION
          "The number of successfully completed
           secondary PDP context activation procedures initiated by an MS.
-          
+
           Note: All GPRS session management statistics except
           ggsnAttemptedSecondaryActivation, ggsnCompletedSecondaryActivation,
           ggsnAttemptedSecondaryActivationIpv6, and
           ggsnCompletedSecondaryActivationIpv6 count all PDP
-          contexts, both secondary and primary." 
+          contexts, both secondary and primary."
    ::= { ggsnPdpContextsStatsCompleted 7 }
 
 ggsnSessionTimeoutDeactivation OBJECT-TYPE
@@ -843,7 +843,7 @@ ggsnSessionTimeoutDeactivation OBJECT-TYPE
      "The number of successfully completed
       PDP context deactivation procedures initiated by the GGSN
       due to the duration supervision function.
-      
+
       Note: The PDP context is supervised for the time it has been active,
       irrespective of the actual payload."
    ::= { ggsnPdpContextsStatsCompleted 8 }
@@ -864,7 +864,7 @@ ggsnCompletedSecondaryActivationIpv6 OBJECT-TYPE
    DESCRIPTION
          "The number of successfully completed secondary IPv6 PDP context
          activation procedures initiated by an MS.
-         
+
          Note: All GPRS session management statistics except
          ggsnAttemptedSecondaryActivation, ggsnCompletedSecondaryActivation,
          ggsnAttemptedSecondaryActivationIpv6, and
@@ -879,7 +879,7 @@ ggsnCompletedActivationWlan OBJECT-TYPE
    DESCRIPTION
          "The number of successfully completed WLAN PDP context activation
           procedures initiated by an MS.
-          
+
           Note: This counter can not be retrieved by CLI."
    ::= { ggsnPdpContextsStatsCompleted 11 }
 
@@ -888,7 +888,7 @@ ggsnCompletedActivationConversational OBJECT-TYPE
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-         "The number of successfully completed primary and secondary PDP context 
+         "The number of successfully completed primary and secondary PDP context
           activation procedures with traffic class conversational.
 
           Note: This counter can not be retrieved by CLI."
@@ -899,7 +899,7 @@ ggsnCompletedActivationStreaming OBJECT-TYPE
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-         "The number of successfully completed primary and secondary PDP context 
+         "The number of successfully completed primary and secondary PDP context
           activation procedures with traffic class streaming.
 
           Note: This counter can not be retrieved by CLI."
@@ -910,7 +910,7 @@ ggsnCompletedActivationInteractive OBJECT-TYPE
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-         "The number of successfully completed primary and secondary PDP context 
+         "The number of successfully completed primary and secondary PDP context
           activation procedures with traffic class interactive.
 
           Note: This counter can not be retrieved by CLI."
@@ -921,7 +921,7 @@ ggsnCompletedActivationBackground OBJECT-TYPE
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-         "The number of successfully completed primary and secondary PDP context 
+         "The number of successfully completed primary and secondary PDP context
           activation procedures with traffic class background.
 
           Note: This counter can not be retrieved by CLI."
@@ -934,7 +934,7 @@ ggsnCompletedActivationIpv4v6 OBJECT-TYPE
    DESCRIPTION
          "The number of successfully completed
           IPv4v6 PDP context activation procedures initiated by an MS.
-          
+
           Note: This counter can not be retrieved by CLI."
    ::= { ggsnPdpContextsStatsCompleted 16 }
 
@@ -945,9 +945,9 @@ ggsnFailedActivation OBJECT-TYPE
    DESCRIPTION
          "The number of failed PDP context activation
           procedures initiated by an MS.
-          
+
           Incremented each time a Create PDP Context Response is sent back
-          to an SGSN with cause value Request Rejected."         
+          to an SGSN with cause value Request Rejected."
    ::= { ggsnPdpContextsStatsFailed 1 }
 
 
@@ -963,7 +963,7 @@ ggsnGtpUplinkPackets	OBJECT-TYPE
     DESCRIPTION
     "Total number of uplink control plane GTP packets processed by the GGSN or PGW.
      Incremented when an uplink GTP packet is received over the Gn control plane."
-    
+
     ::= { ggsnGtpStats 1 }
 
 
@@ -1175,7 +1175,7 @@ ggsnGtpNbrOfTunnels OBJECT-TYPE
          signaling tunnel and payload tunnel,
          and each secondary PDP context is counted once for
          payload tunnel only,
-         as they share signaling tunnels with their primary PDP contexts."         
+         as they share signaling tunnels with their primary PDP contexts."
     ::= { ggsnGtpStats 23 }
 
 ggsnGtpNbrOfCreatedTunnels OBJECT-TYPE
@@ -1188,7 +1188,7 @@ ggsnGtpNbrOfCreatedTunnels OBJECT-TYPE
          signaling tunnel and payload tunnel,
          and each secondary PDP context is counted once for
          payload tunnel only,
-         as they share signaling tunnels with their primary PDP contexts."         
+         as they share signaling tunnels with their primary PDP contexts."
     ::= { ggsnGtpStats 24 }
 
 ggsnGtpPdpInitiateContextActivationRespReceived	OBJECT-TYPE
@@ -1198,7 +1198,7 @@ ggsnGtpPdpInitiateContextActivationRespReceived	OBJECT-TYPE
     DESCRIPTION
 	"The number of Initiate PDP Context Activation Responses received by the GGSN from an SGSN."
     ::= { ggsnGtpStats 25 }
-    
+
 ggsnGtpPdpInitiateContextActivationReqSent	OBJECT-TYPE
     SYNTAX 		Counter64
     MAX-ACCESS		read-only
@@ -1235,8 +1235,8 @@ ggsnGtpErrorIndicationSent		OBJECT-TYPE
     DESCRIPTION
 	"The number of Error Indications sent by the
 	 node (aggregate of error indications sent by the GTP-U).
-	 The GGSN may send an Error Indication to the SGSN or RNC 
-	 if no PDP context exists or the PDP context is inactive 
+	 The GGSN may send an Error Indication to the SGSN or RNC
+	 if no PDP context exists or the PDP context is inactive
 	 for a received GTP Packet Data Unit (G-PDU)."
     ::= { ggsnGtpErrorStats 2 }
 
@@ -1837,7 +1837,7 @@ ggsnUplinkPackets OBJECT-TYPE
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-       "Total number of uplink Gn and S5 user plane IPv4 and IPv6 packets processed by the GGSN or PGW. Incremented when an uplink packet, received over the Gn or S5 user plane interface, is sent over Gi or SGi interface."   
+       "Total number of uplink Gn and S5 user plane IPv4 and IPv6 packets processed by the GGSN or PGW. Incremented when an uplink packet, received over the Gn or S5 user plane interface, is sent over Gi or SGi interface."
    ::= { ggsnUplinkTrafficInfo 1 }
 
 ggsnUplinkBytes OBJECT-TYPE
@@ -2196,7 +2196,7 @@ ApnStats ::= SEQUENCE {
    s5ApnDownlinkBytes                                      Counter64,
    s5ApnDownlinkPacketsIpv6                                Counter64,
    s5ApnDownlinkBytesIpv6                                  Counter64,
-   s2aApnUplinkPackets                                     Counter64,  
+   s2aApnUplinkPackets                                     Counter64,
    s2aApnUplinkBytes                                       Counter64,
    s2aApnUplinkPacketsIpv6                                 Counter64,
    s2aApnUplinkBytesIpv6                                   Counter64,
@@ -2234,7 +2234,7 @@ ApnStats ::= SEQUENCE {
    ggsnApnCompletedActivationIpv4v6                        Counter64,
    pgwApnAttemptedIpv4v6EpsBearerActivation                Counter64,
    pgwApnCompletedIpv4v6EpsBearerActivation                Counter64,
-   pgwApnActiveWlanEpsBearer                               Gauge32 
+   pgwApnActiveWlanEpsBearer                               Gauge32
 }
 
 ggsnApnIndex OBJECT-TYPE
@@ -2271,12 +2271,12 @@ ggsnApnAttemptedActivation OBJECT-TYPE
          "The total number of attempted PDP context activations for this APN.
           Opposite to ggsnAttemptedActivation, the ggsnApnAttemptedActivation is incremented
           even when a Create PDP Context Request is silently discarded.
-          
-          Note1: If logical APN selection or RADIUS Assisted APN Selection (RAAS), or both are used, 
-          the counter is incremented on the chosen physical APN. 
-          If RAAS is used, and the RADIUS server does not reply or replies with an incorrect answer, 
+
+          Note1: If logical APN selection or RADIUS Assisted APN Selection (RAAS), or both are used,
+          the counter is incremented on the chosen physical APN.
+          If RAAS is used, and the RADIUS server does not reply or replies with an incorrect answer,
           the counter is incremented on the APN, using RAAS.
-                    
+
           Note2: When the SGSN resends the activation request, it is counted as two attempts
           on APN level but as only one attempt on node level. (This happens when the
           primary RADIUS server is unavailable.)"
@@ -2300,9 +2300,9 @@ ggsnApnAttemptedDeactivation OBJECT-TYPE
          "The total number of attempted PDP context
           deactivations on a per APN basis.
 
-          Note: When the SGSN resends the deactivation request, 
-          it is counted as two attempts on APN level but as 
-          only one attempt on node level. (This happens when 
+          Note: When the SGSN resends the deactivation request,
+          it is counted as two attempts on APN level but as
+          only one attempt on node level. (This happens when
           the primary RADIUS server is unavailable.)"
    ::= { ggsnApnStatsEntry 6 }
 
@@ -2313,7 +2313,7 @@ ggsnApnAttemptedSelfDeactivation OBJECT-TYPE
    DESCRIPTION
          "The number of PDP context deactivation procedures
           initiated by the GGSN on a per APN basis.
-           
+
            Note: This counter cannot be retrieved by CLI."
    ::= { ggsnApnStatsEntry 7 }
 
@@ -2358,7 +2358,7 @@ ggsnApnCompletedSelfDeactivation OBJECT-TYPE
          "The number of successfully completed deactivation
           PDP context procedures initiated by the GGSN on a
           per APN basis.
-          
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnApnStatsEntry 11 }
 
@@ -2418,9 +2418,9 @@ ggsnApnAttemptedMSActivation OBJECT-TYPE
          "The number of PDP context activation procedures
           initiated by the MS on a per APN basis of the GGSN.
 
-          Note: When the SGSN resends the activation request, 
-          it is counted as two attempts on APN level but as 
-          only one attempt on node level. (This happens when 
+          Note: When the SGSN resends the activation request,
+          it is counted as two attempts on APN level but as
+          only one attempt on node level. (This happens when
           the primary RADIUS server is unavailable.)"
    ::= { ggsnApnStatsEntry 18 }
 
@@ -2441,10 +2441,10 @@ ggsnApnAttemptedMSDeactivation OBJECT-TYPE
    DESCRIPTION
          "The number of PDP context deactivation procedures
           initiated by the MS on a per APN basis of the GGSN.
-          
-          Note: When the SGSN resends the deactivation request, 
-          it is counted as two attempts on APN level but as 
-          only one attempt on node level. (This happens when 
+
+          Note: When the SGSN resends the deactivation request,
+          it is counted as two attempts on APN level but as
+          only one attempt on node level. (This happens when
           the primary RADIUS server is unavailable.)"
    ::= { ggsnApnStatsEntry 20 }
 
@@ -2499,9 +2499,9 @@ ggsnApnAttemptedUpdateMsAndSgsn  OBJECT-TYPE
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-         "The total number of attempted PDP context updates, 
+         "The total number of attempted PDP context updates,
           initiated by a Mobile Station or an SGSN, per APN of this GGSN.
-          
+
           Note: In some cases the information in the GTP message is not
           enough (missing or incorrect IE) to detect which APN the
           update is related to. If so, this update will fail and
@@ -2523,7 +2523,7 @@ ggsnApnNbrOfTftFilters  OBJECT-TYPE
    STATUS        current
    DESCRIPTION
          "The current number of TFT filters in use per APN of this GGSN.
-         
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnApnStatsEntry 28 }
 
@@ -2730,7 +2730,7 @@ ggsnApnImsDedicatedCompletedActivation  OBJECT-TYPE
    STATUS        current
    DESCRIPTION
          "The number of successful dedicated Signaling PDP-Context Activation requests per APN.
-         
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnApnStatsEntry 52 }
 
@@ -2741,7 +2741,7 @@ ggsnApnImsDedicatedNotConfiguredActivationFailed  OBJECT-TYPE
    DESCRIPTION
          "The number of failed dedicated signaling PDP-Context Activation requests,
           due to the APN is turned OFF for Signaling PDP context Activation, per APN.
-         
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnApnStatsEntry 53 }
 
@@ -2751,7 +2751,7 @@ ggsnApnImsDedicatedNotConfiguredActivationFailed  OBJECT-TYPE
    STATUS        current
    DESCRIPTION
          "The number of successful general purpose PDP-Context Activation requests per APN.
-         
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnApnStatsEntry 54 }
 
@@ -2762,7 +2762,7 @@ ggsnApnImsGeneralNotConfiguredActivationFailed  OBJECT-TYPE
    DESCRIPTION
          "The number of failed general purpose PDP-Context Activation requests,
           due to the APN is turned OFF for general purpose PDP context Activation, per APN.
-          
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnApnStatsEntry 55 }
 
@@ -2893,7 +2893,7 @@ ggsnApnAttemptedActivationNonDuplicated OBJECT-TYPE
    STATUS        current
    DESCRIPTION
          "The total number of non-duplicated PDP context activations on a per APN basis.
-          
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnApnStatsEntry 71}
 
@@ -2904,7 +2904,7 @@ ggsnApnActivePdpContextMaxDuringLastPeriod OBJECT-TYPE
    DESCRIPTION
          "The maximum number of PDP contexts that has been active at
           the same time for the APN during the last measurement period.
-          
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnApnStatsEntry 72}
 
@@ -2912,7 +2912,7 @@ pgwApnActiveEpsBearer  OBJECT-TYPE
     SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of IPv4 and IPv6 EPS bearers associated with the APN by the PGW. Incremented when an EPS bearer is activated on this APN and a GTP response has been sent to the SGW. Decremented when entering the delete sequence."
     ::= { ggsnApnStatsEntry 73 }
 
@@ -2920,7 +2920,7 @@ pgwApnActiveIpv6EpsBearer  OBJECT-TYPE
     SYNTAX     Gauge32
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of IPv6 EPS bearers associated with the APN by the PGW. Incremented when an EPS bearer is activated on this APN and a GTP response has been sent to the SGW. Decremented when entering the delete sequence."
     ::= { ggsnApnStatsEntry 74 }
 
@@ -2928,7 +2928,7 @@ pgwApnAttemptedEpsBearerActivation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of attempted IPv4 and IPv6 EPS Bearer activations for this APN. Incremented each time a Create EPS Bearer request is received by the PGW, even when the request is silently discarded."
     ::= { ggsnApnStatsEntry 75 }
 
@@ -2936,7 +2936,7 @@ pgwApnCompletedEpsBearerActivation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of completed IPv4 and IPv6 EPS Bearer activations for this APN. Incremented when an EPS bearer is successfully activated."
     ::= { ggsnApnStatsEntry 76 }
 
@@ -2944,7 +2944,7 @@ pgwApnAttemptedIpv6EpsBearerActivation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of EPS bearer activation attempts with the APN by the PGW. Incremented each time a Create EPS Bearer request that is not silently discarded is received by the PGW. This means the counter is incremented each time a create EPS Bearer response is sent back to the SGW with cause value Request Accepted or with a reject value."
     ::= { ggsnApnStatsEntry 77 }
 
@@ -2952,7 +2952,7 @@ pgwApnCompletedIpv6EpsBearerActivation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of IPv6 EPS bearers associated with the APN by the PGW.  Incremented when an EPS bearer is successfully activated."
     ::= { ggsnApnStatsEntry 78 }
 
@@ -2960,7 +2960,7 @@ pgwApnAttemptedEpsBearerDeactivation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of attempted IPv4 and IPv6 EPS Bearer deactivations for this APN. Incremented when a deactivation is triggered by the PGW, triggered by the UE/SGW, rejected deactivation requests and silently discarded deactivation requests."
     ::= { ggsnApnStatsEntry 79 }
 
@@ -2968,7 +2968,7 @@ pgwApnCompletedEpsBearerDeactivation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of IPv4 and IPv6 EPS bearer deactivations associated with the APN by the PGW. Incremented both for successful PGW triggered deactivations and successful UE/SGW triggered deactivations."
     ::= { ggsnApnStatsEntry 80 }
 
@@ -2976,7 +2976,7 @@ pgwApnAttemptedS5NetworkDeactivation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of attempted IPv4 and IPv6 EPS bearer deactivations for this APN. Incremented when a deactivation is triggered by the PGW."
     ::= { ggsnApnStatsEntry 81 }
 
@@ -2984,7 +2984,7 @@ pgwApnCompletedS5NetworkDeactivation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of completed IPv4 and IPv6 EPS bearer deactivations for this APN. Incremented for successful PGW triggered deactivations over the S5 interface"
     ::= { ggsnApnStatsEntry 82 }
 
@@ -2992,7 +2992,7 @@ pgwApnAttemptedS5UeSgwModification  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of attempted UE/SGW initiated EPS bearer modifications (excluding modifications due to IRAT mobility from GERAN/UTRAN via SGSN using Gn/Gp to E-UTRAN)  including IPv6 EPS bearers. Attempted EPS bearer modifications include silently discarded modifications and retries of attempted modifications. Incremented at attempted UE/SGW initiated EPS bearer modifications including silently discarded modifications and retries of modifications."
     ::= { ggsnApnStatsEntry 83 }
 
@@ -3000,7 +3000,7 @@ pgwApnCompletedS5UeSgwModification  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of successful UE/SGW initiated EPS bearer modifications (excluding modifications due to IRAT mobility from GERAN/UTRAN via SGSN using Gn/Gp to E-UTRAN) including IPv6 EPS bearers. Incremented when an UE/SGW initiated EPS bearer modification is successful."
     ::= { ggsnApnStatsEntry 84 }
 
@@ -3008,7 +3008,7 @@ pgwApnAttemptedS5SgwSgsnModification  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of attempted SGW to SGSN initiated EPS bearer modifications including IPv6 EPS bearers. Attempted EPS bearer modifications include silently discarded modifications and retries of attempted modifications. Incremented at attempted SGW to SGSN initiated EPS bearer modifications including silently discarded modifications and retries of modifications."
     ::= { ggsnApnStatsEntry 85 }
 
@@ -3016,7 +3016,7 @@ pgwApnCompletedS5SgwSgsnModification  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of successful SGW to SGSN initiated EPS bearer modifications including IPv6 EPS bearers. Incremented when an SGW to SGSN initiated EPS bearer modification is successful."
     ::= { ggsnApnStatsEntry 86 }
 
@@ -3024,7 +3024,7 @@ pgwApnAttemptedS5SgsnSgwModification  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of attempted SGSN to SGW initiated EPS bearer modifications including IPv6 EPS bearers. Incremented at attempted SGSN to SGW initiated EPS bearer modifications including silently discarded modifications and retries of modifications."
     ::= { ggsnApnStatsEntry 87 }
 
@@ -3032,7 +3032,7 @@ pgwApnCompletedS5SgsnSgwModification  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of successful SGSN to SGW initiated EPS bearer modifications including IPv6 EPS bearers. Incremented when an SGSN to SGW initiated EPS bearer modification is successful."
     ::= { ggsnApnStatsEntry 88 }
 
@@ -3040,7 +3040,7 @@ pgwApnAttemptedS5NetworkModification  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of attempted network initiated EPS bearer modifications over the S5 interface including IPv6 EPS bearers. Incremented at attempted network initiated EPS bearer modifications over the S5 interface including silently discarded modifications and retries of modifications."
     ::= { ggsnApnStatsEntry 89 }
 
@@ -3048,7 +3048,7 @@ pgwApnCompletedS5NetworkModification  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of successful network initiated EPS bearer modifications over the S5 interface including IPv6 EPS bearers. Incremented when a network initiated EPS bearer modification over the S5 interface is successful."
     ::= { ggsnApnStatsEntry 90 }
 
@@ -3056,7 +3056,7 @@ pgwApnAttemptedS5UeSgwDeactivation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of attempted UE/SGW triggered EPS bearer deactivations including IPv6 EPS bearers over the S5 interface associated with this APN. Incremented when an UE/SGW triggered EPS bearer is deactivated over the S5 interface."
     ::= { ggsnApnStatsEntry 91 }
 
@@ -3064,7 +3064,7 @@ pgwApnCompletedS5UeSgwDeactivation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of successful UE/SGW triggered EPS bearer deactivations including IPv6 EPS bearers over the S5 interface associated with this APN. Incremented when an UE/SGW triggered EPS bearer is successfully deactivated over the S5 interface."
     ::= { ggsnApnStatsEntry 92 }
 
@@ -3072,7 +3072,7 @@ gnApnUplinkPackets  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of uplink Gn user plane packets processed on a per APN basis by the GGSN or PGW. Incremented when an uplink packet received over the Gn user plane interface is sent over Gi or SGi interface."
     ::= { ggsnApnStatsEntry 93 }
 
@@ -3080,7 +3080,7 @@ gnApnUplinkBytes  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of uplink Gn user plane bytes processed on a per APN basis by the GGSN or PGW. Incremented when an uplink packet received over the Gn user plane interface is sent over Gi or SGi interface."
     ::= { ggsnApnStatsEntry 94 }
 
@@ -3088,7 +3088,7 @@ gnApnUplinkPacketsIpv6   OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of uplink Gn user plane IPv6 packets processed on a per APN basis by the GGSN or PGW. Incremented when an uplink IPv6 packet received over the Gn user plane interface is sent over Gi or SGi interface."
     ::= { ggsnApnStatsEntry 95 }
 
@@ -3096,7 +3096,7 @@ gnApnUplinkBytesIpv6  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of uplink Gn user plane IPv6 bytes processed on a per APN basis by the GGSN or PGW. Incremented when an uplink IPv6 packet received over the Gn user plane interface is sent over Gi or SGi interface."
     ::= { ggsnApnStatsEntry 96 }
 
@@ -3104,7 +3104,7 @@ gnApnDownlinkPackets  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of downlink Gn user plane packets processed on a per APN basis by the GGSN or PGW. Incremented when a downlink packet is sent over the Gn user plane interface."
     ::= { ggsnApnStatsEntry 97 }
 
@@ -3112,7 +3112,7 @@ gnApnDownlinkBytes  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of downlink Gn user plane bytes processed on a per APN basis by the GGSN or PGW. Incremented when a downlink packet is sent over the Gn user plane interface."
     ::= { ggsnApnStatsEntry 98 }
 
@@ -3120,7 +3120,7 @@ gnApnDownlinkPacketsIpv6  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of downlink Gn user plane IPv6 packets processed on a per APN basis by the GGSN or PGW. Incremented when a downlink IPv6 packet is sent over the Gn user plane interface."
     ::= { ggsnApnStatsEntry 99 }
 
@@ -3128,7 +3128,7 @@ gnApnDownlinkBytesIpv6  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of downlink Gn user plane IPv6 bytes processed on a per APN basis by the GGSN or PGW. Incremented when a downlink IPv6 packet is sent over the Gn user plane interface."
     ::= { ggsnApnStatsEntry 100 }
 
@@ -3136,7 +3136,7 @@ s5ApnUplinkPackets  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of uplink S5 user plane packets processed on a per APN basis by the GGSN or PGW. Incremented when an uplink packet, received over the S5 user plane interface, is sent over Gi or SGi interface."
     ::= { ggsnApnStatsEntry 101 }
 
@@ -3144,7 +3144,7 @@ s5ApnUplinkBytes  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of uplink S5 user plane bytes processed on a per APN basis by the GGSN or PGW. Incremented when an uplink packet, received over the S5 user plane interface, is sent over Gi or SGi interface."
     ::= { ggsnApnStatsEntry 102 }
 
@@ -3152,7 +3152,7 @@ s5ApnUplinkPacketsIpv6  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of uplink S5 user plane IPv6 packets processed on a per APN basis by the GGSN or PGW. Incremented when an uplink IPv6 packet received over the S5 user plane interface is sent over Gi or SGi interface."
     ::= { ggsnApnStatsEntry 103 }
 
@@ -3160,7 +3160,7 @@ s5ApnUplinkBytesIpv6  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of uplink S5 user plane IPv6 bytes processed on a per APN basis by the GGSN or PGW. Incremented when an uplink IPv6 packet received over the S5 user plane interface is sent over Gi or SGi interface."
     ::= { ggsnApnStatsEntry 104 }
 
@@ -3168,7 +3168,7 @@ s5ApnDownlinkPackets  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of downlink S5 user plane packets processed on a per APN basis by the GGSN or PGW. Incremented when a downlink packet is sent over the S5 user plane interface."
     ::= { ggsnApnStatsEntry 105 }
 
@@ -3176,7 +3176,7 @@ s5ApnDownlinkBytes  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of downlink S5 user plane bytes processed on a per APN basis by the GGSN or PGW. Incremented when a downlink packet is sent over the S5 user plane interface."
     ::= { ggsnApnStatsEntry 106 }
 
@@ -3184,7 +3184,7 @@ s5ApnDownlinkPacketsIpv6  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of downlink S5 user plane IPv6 packets processed on a per APN basis by the GGSN or PGW. Incremented when a downlink IPv6 packet is sent over the S5 user plane interface."
     ::= { ggsnApnStatsEntry 107 }
 
@@ -3192,7 +3192,7 @@ s5ApnDownlinkBytesIpv6  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of downlink S5 user plane IPv6 bytes processed on a per APN basis by the GGSN or PGW. Incremented when a downlink IPv6 packet is sent over the S5 user plane interface."
     ::= { ggsnApnStatsEntry 108 }
 
@@ -3200,7 +3200,7 @@ gnApn3gdtUplinkBytes  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of uplink Gn user plane IPv4 and IPv6 bytes that are contained in packets which are associated with 3GDT contexts. Incremented by the GGSN or PGW per APN when these packets are received from the RNC."
     ::= { ggsnApnStatsEntry 109 }
 
@@ -3208,7 +3208,7 @@ gnApn3gdtUplinkBytesIpv6  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of uplink Gn user plane IPv6 bytes that are contained in packets which are associated with 3GDT contexts. Incremented by the GGSN or PGW per APN when these packets are received from the RNC."
     ::= { ggsnApnStatsEntry 110 }
 
@@ -3216,7 +3216,7 @@ gnApn3gdtUplinkPackets  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of uplink Gn user plane IPv4 and IPv6 packets that are associated with 3GDT contexts. Incremented by 1 by the GGSN or PGW per APN when each of these packets is received from the RNC."
     ::= { ggsnApnStatsEntry 111 }
 
@@ -3224,7 +3224,7 @@ gnApn3gdtUplinkPacketsIpv6  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of uplink Gn user plane IPv6 packets that are associated with 3GDT contexts. Incremented by 1 by the GGSN or PGW per APN when each of these packets is received from the RNC."
     ::= { ggsnApnStatsEntry 112 }
 
@@ -3232,7 +3232,7 @@ gnApn3gdtDownlinkBytes  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of downlink Gn user plane IPv4 and IPv6 bytes that are contained in packets which are associated with 3GDT contexts. Incremented by the GGSN or PGW per APN when these packets are received from the PDN."
     ::= { ggsnApnStatsEntry 113 }
 
@@ -3240,7 +3240,7 @@ gnApn3gdtDownlinkBytesIpv6  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of downlink Gn user plane IPv6 bytes that are contained in packets which are associated with 3GDT contexts. Incremented by the GGSN or PGW per APN when these packets are received from the PDN."
     ::= { ggsnApnStatsEntry 114 }
 
@@ -3248,7 +3248,7 @@ gnApn3gdtDownlinkPackets  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of downlink Gn user plane IPv4 and IPv6 packets that are associated with 3GDT contexts. Incremented by 1 by the GGSN or PGW per APN when each of these packets is received from the PDN."
     ::= { ggsnApnStatsEntry 115 }
 
@@ -3256,7 +3256,7 @@ gnApn3gdtDownlinkPacketsIpv6  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of downlink Gn user plane IPv6 packets that are associated with 3GDT contexts. Incremented by 1 by the GGSN or PGW per APN when each of these packets is received from the PDN."
     ::= { ggsnApnStatsEntry 116 }
 
@@ -3264,7 +3264,7 @@ gnApn3gdtDownlinkDropsErrorHandling  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "The total number of downlink Gn user plane IPv4 and IPv6 packets that are dropped after the RNC sends to the GGSN an error indication message that is associated with a 3GDT tunnel. Incremented by 1 when each of these packets is dropped."
     ::= { ggsnApnStatsEntry 117 }
 
@@ -3272,7 +3272,7 @@ ggsnApn3gdtGtpError  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "The number of occurrences when Update PDP Context Request/Response messages contain missing or incorrect IE values during a change of tunnel type from GTP to DT or vice versa. Specifically, the values for the SGSN-U or the TEID IEs."
     ::= { ggsnApnStatsEntry 118 }
 
@@ -3304,7 +3304,7 @@ pgwApnActiveDedicatedEpsBearer  OBJECT-TYPE
     SYNTAX     Gauge32
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of IPv4 and IPv6 dedicated EPS bearers associated with the APN by the PGW. Incremented when a dedicated EPS bearer is activated on this APN and a GTP response has been sent to the SGW. Decremented when entering the delete sequence."
     ::= { ggsnApnStatsEntry 122 }
 
@@ -3312,7 +3312,7 @@ pgwApnAttemptedDedicatedEpsBearerActivation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of attempted IPv4 and IPv6 dedicated EPS Bearer activations for this APN. Incremented each time a Create dedicated EPS Bearer request is received by the PGW, even when the request is silently discarded."
     ::= { ggsnApnStatsEntry 123 }
 
@@ -3320,7 +3320,7 @@ pgwApnCompletedDedicatedEpsBearerActivation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of completed IPv4 and IPv6 dedicated EPS Bearer activations for this APN. Incremented when a dedicated EPS bearer is successfully activated."
     ::= { ggsnApnStatsEntry 124 }
 
@@ -3328,7 +3328,7 @@ pgwApnAttemptedIpv6DedicatedEpsBearerActivation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of dedicated EPS bearer activation attempts with the APN by the PGW. Incremented each time a Create dedicated EPS Bearer request that is not silently discarded is received by the PGW. This means the counter is incremented each time a create dedicated EPS Bearer response is sent back to the SGW with cause value Request Accepted or with a reject value."
     ::= { ggsnApnStatsEntry 125 }
 
@@ -3336,7 +3336,7 @@ pgwApnCompletedIpv6DedicatedEpsBearerActivation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of IPv6 dedicated EPS bearers associated with the APN by the PGW. Incremented when a dedicated EPS bearer is successfully activated."
     ::= { ggsnApnStatsEntry 126 }
 
@@ -3344,7 +3344,7 @@ pgwApnAttemptedS5NetworkDedicatedEpsBearerDeactivation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of attempted IPv4 and IPv6 EPS dedicated bearer deactivations for this APN. Incremented when a dedicated EPS bearer is deactivated over the S5 interface."
     ::= { ggsnApnStatsEntry 127 }
 
@@ -3352,7 +3352,7 @@ pgwApnCompletedS5NetworkDedicatedEpsBearerDeactivation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of completed IPv4 and IPv6 dedicated EPS bearer deactivations for this APN. Incremented when a dedicated EPS bearer is successfully deactivated over the S5 interface."
     ::= { ggsnApnStatsEntry 128 }
 
@@ -3360,7 +3360,7 @@ pgwApnAttemptedS5NetworkDedicatedEpsBearerModification  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of attempted network initiated dedicated EPS bearer modifications over the S5 interface including IPv6 EPS bearers. Incremented at attempted network initiated dedicated EPS bearer modifications over the S5 interface including silently discarded modifications and retries of modifications."
     ::= { ggsnApnStatsEntry 129 }
 
@@ -3368,7 +3368,7 @@ pgwApnCompletedS5NetworkDedicatedEpsBearerModification  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of successful network initiated dedicated EPS bearer modifications over the S5 interface including IPv6 EPS bearers. Incremented when a network initiated dedicated EPS bearer modification over the S5 interface is successful."
     ::= { ggsnApnStatsEntry 130 }
 
@@ -3376,7 +3376,7 @@ pgwApnAttemptedS5UeSgwDedicatedEpsBearerDeactivation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of attempted UE/SGW triggered dedicated EPS bearer deactivations including IPv6 EPS bearers over the S5 interface associated with this APN. Incremented when an UE/SGW triggered dedicated EPS bearer is deactivated over the S5 interface."
     ::= { ggsnApnStatsEntry 131 }
 
@@ -3384,7 +3384,7 @@ pgwApnCompletedS5UeSgwDedicatedEpsBearerDeactivation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of successful UE/SGW triggered dedicated EPS bearer deactivations including IPv6 EPS bearers over the S5 interface associated with this APN. Incremented when an UE/SGW triggered dedicated EPS bearer is successfully deactivated over the S5 interface."
     ::= { ggsnApnStatsEntry 132 }
 
@@ -3401,7 +3401,7 @@ pgwApnActiveIpv4v6EpsBearer  OBJECT-TYPE
     SYNTAX     Gauge32
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of IPv4v6 EPS bearers associated with the APN by the PGW. Incremented when an EPS bearer is activated on this APN and a GTP response has been sent to the SGW. Decremented when entering the delete sequence."
     ::= { ggsnApnStatsEntry 134 }
 
@@ -3449,68 +3449,68 @@ pgwApnActiveWlanEpsBearer OBJECT-TYPE
     ::= { ggsnApnStatsEntry 139 }
 
 s2aApnUplinkPackets OBJECT-TYPE
-    SYNTAX     Counter64 
+    SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
         "Total number of uplink user plane packets processed by PGW over S2a interface on the APN."
-    ::= { ggsnApnStatsEntry 140 }    
-                 
+    ::= { ggsnApnStatsEntry 140 }
+
 s2aApnUplinkBytes OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
         "Total number of uplink user plane bytes processed by PGW over S2a interface on the APN."
-    ::= { ggsnApnStatsEntry 141 }  
-                                      
+    ::= { ggsnApnStatsEntry 141 }
+
 s2aApnDownlinkPackets OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
         "Total number of downlink user plane packets processed by PGW over S2a interface on the APN."
-    ::= { ggsnApnStatsEntry 142 }  
-                                  
+    ::= { ggsnApnStatsEntry 142 }
+
 s2aApnDownlinkBytes OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
         "Total number of downlink user plane bytes processed by PGW over S2a interface on the APN."
-    ::= { ggsnApnStatsEntry 143 }  
+    ::= { ggsnApnStatsEntry 143 }
 
 s2aApnUplinkPacketsIpv6 OBJECT-TYPE
-    SYNTAX     Counter64 
+    SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     deprecated
     DESCRIPTION
         "Total number of uplink user plane packets processed by PGW over S2a interface on the APN."
-    ::= { ggsnApnStatsEntry 144 }    
-                 
+    ::= { ggsnApnStatsEntry 144 }
+
 s2aApnUplinkBytesIpv6 OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     deprecated
     DESCRIPTION
         "Total number of uplink user plane bytes processed by PGW over S2a interface on the APN."
-    ::= { ggsnApnStatsEntry 145 }  
-                                      
+    ::= { ggsnApnStatsEntry 145 }
+
 s2aApnDownlinkPacketsIpv6 OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     deprecated
     DESCRIPTION
         "Total number of downlink user plane packets processed by PGW over S2a interface on the APN."
-    ::= { ggsnApnStatsEntry 146 }  
-                                  
+    ::= { ggsnApnStatsEntry 146 }
+
 s2aApnDownlinkBytesIpv6 OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     deprecated
     DESCRIPTION
         "Total number of downlink user plane bytes processed by PGW over S2a interface on the APN."
-    ::= { ggsnApnStatsEntry 147 }  
+    ::= { ggsnApnStatsEntry 147 }
 
 --
 -- GGSN APN RADIUS AUTH SERVER Statistics
@@ -3759,7 +3759,7 @@ ggsnSgsnUplinkDrops OBJECT-TYPE
    MAX-ACCESS    read-only
    STATUS        obsolete
    DESCRIPTION
-         "Number of uplink GTP-U packets dropped in the GGSN for 
+         "Number of uplink GTP-U packets dropped in the GGSN for
           this specific SGSN, that is, the number of packets dropped
           in this GGSN that were sent from this SGSN."
    ::= { ggsnSgsnStatsEntry 5 }
@@ -3942,7 +3942,7 @@ pgwNbrOfActiveEpsBearer  OBJECT-TYPE
 	SYNTAX     Gauge32
 	MAX-ACCESS read-only
 	STATUS     current
-	DESCRIPTION 
+	DESCRIPTION
 		"Total number of active IPv4 and IPv6 EPS bearers on this PGW. Incremented when successful create response has been sent to SGW. Decremented when entering the delete sequence."
 	::= { pgwGlobalStats 3 }
 
@@ -3950,7 +3950,7 @@ pgwNbrOfActiveIpv6EpsBearer  OBJECT-TYPE
 	SYNTAX     Gauge32
 	MAX-ACCESS read-only
 	STATUS     current
-	DESCRIPTION 
+	DESCRIPTION
 		"Total number of active IPv6 EPS bearer on this PGW. Incremented when successful create response has been sent to SGW. Decremented when entering the delete sequence."
 	::= { pgwGlobalStats 4 }
 
@@ -3958,7 +3958,7 @@ pgwNbrOfActiveIpv4v6EpsBearer  OBJECT-TYPE
 	SYNTAX     Gauge32
 	MAX-ACCESS read-only
 	STATUS     current
-	DESCRIPTION 
+	DESCRIPTION
 		"Total number of active IPv4v6 EPS bearer on this PGW. Incremented when successful create response has been sent to SGW. Decremented when entering the delete sequence."
 	::= { pgwGlobalStats 5 }
 
@@ -3966,7 +3966,7 @@ pgwWlanNbrOfActiveEpsBearer  OBJECT-TYPE
 	SYNTAX     Gauge32
 	MAX-ACCESS read-only
 	STATUS     current
-	DESCRIPTION 
+	DESCRIPTION
 		"Total number of active EPS bearers for WLAN on this PGW"
 	::= { pgwGlobalStats 6 }
 
@@ -3976,15 +3976,15 @@ s6bInterface
 --
 -- PDN Connections PGW
 --
-	
+
 pdnConnectionsPgw
-   OBJECT IDENTIFIER ::= { pgwGlobalStats 50 }	
-   
+   OBJECT IDENTIFIER ::= { pgwGlobalStats 50 }
+
 nbrOfPgwPdnConnections  OBJECT-TYPE
 	SYNTAX     Gauge32
 	MAX-ACCESS read-only
 	STATUS     current
-	DESCRIPTION 
+	DESCRIPTION
 		"Number of PDN connections to a PGW-enabled APN."
 	::= { pdnConnectionsPgw 1 }
 
@@ -3992,7 +3992,7 @@ nbrOfPiscPdnConnections  OBJECT-TYPE
 	SYNTAX     Gauge32
 	MAX-ACCESS read-only
 	STATUS     current
-	DESCRIPTION 
+	DESCRIPTION
 		"Number of PDN connections using PISC."
 	::= { pdnConnectionsPgw 2 }
 
@@ -4000,7 +4000,7 @@ nbrOfOnlineChargingPdnConnections  OBJECT-TYPE
 	SYNTAX     Gauge32
 	MAX-ACCESS read-only
 	STATUS     current
-	DESCRIPTION 
+	DESCRIPTION
 		"Number of PDN connections using online charging."
 	::= { pdnConnectionsPgw 3 }
 
@@ -4008,7 +4008,7 @@ nbrOfDynamicPolicyControlPdnConnections  OBJECT-TYPE
 	SYNTAX     Gauge32
 	MAX-ACCESS read-only
 	STATUS     current
-	DESCRIPTION 
+	DESCRIPTION
 		"Number of PDN connections using dynamic policy control."
 	::= { pdnConnectionsPgw 4 }
 
@@ -4016,7 +4016,7 @@ nbrOfWlanPdnConnections  OBJECT-TYPE
 	SYNTAX     Gauge32
 	MAX-ACCESS read-only
 	STATUS     current
-	DESCRIPTION 
+	DESCRIPTION
 		"Number of PDN connections with RAT type WLAN."
 	::= { pdnConnectionsPgw 5 }
 
@@ -4024,7 +4024,7 @@ nbrOfGeranPdnConnections  OBJECT-TYPE
 	SYNTAX     Gauge32
 	MAX-ACCESS read-only
 	STATUS     current
-	DESCRIPTION 
+	DESCRIPTION
 		"Number of PDN connections with RAT type GERAN."
 	::= { pdnConnectionsPgw 6 }
 
@@ -4032,7 +4032,7 @@ nbrOfUtranPdnConnections  OBJECT-TYPE
 	SYNTAX     Gauge32
 	MAX-ACCESS read-only
 	STATUS     current
-	DESCRIPTION 
+	DESCRIPTION
 		"Number of PDN connections with RAT type UTRAN."
 	::= { pdnConnectionsPgw 7 }
 
@@ -4040,7 +4040,7 @@ nbrOfHspaEvolutionPdnConnections  OBJECT-TYPE
 	SYNTAX     Gauge32
 	MAX-ACCESS read-only
 	STATUS     current
-	DESCRIPTION 
+	DESCRIPTION
 		"Number of PDN connections with RAT type HSPA Evolution."
 	::= { pdnConnectionsPgw 8 }
 
@@ -4048,12 +4048,12 @@ nbrOfEutranPdnConnections  OBJECT-TYPE
 	SYNTAX     Gauge32
 	MAX-ACCESS read-only
 	STATUS     current
-	DESCRIPTION 
+	DESCRIPTION
 		"Number of PDN connections with RAT type EUTRAN."
 	::= { pdnConnectionsPgw 9 }
- 
+
 ggsnNodeName OBJECT-TYPE
-   SYNTAX        DisplayString 
+   SYNTAX        DisplayString
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
@@ -4156,7 +4156,7 @@ pgwAttemptedEpsBearerActivation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of Active IPv4 and IPv6 EPS bearer creation attempts. Incremented each time a Create EPS Bearer request that is not silently discarded is received by the PGW. This means the counter is incremented each time a create EPS Bearer response is sent back to the SGW with cause value Request Accepted or with a reject value."
     ::= { pgwAttemptedEpsBearerStats 1 }
 
@@ -4164,7 +4164,7 @@ pgwAttemptedEpsBearerIpv6Activation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of Ipv6 EPS bearer creation attempts. Incremented each time a Create EPS Bearer request that is not silently discarded is received by the PGW. This means the counter is incremented each time a create EPS Bearer response is sent back to the SGW with cause value Request Accepted or with a reject value. Note: Counter not updated for bearers having the possibility to use either IPv4 or IPv6. Which address type that will be used is not known at this early stage."
     ::= { pgwAttemptedEpsBearerStats 2 }
 
@@ -4180,7 +4180,7 @@ pgwAttemptedEpsBearerDeactivation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of IPv4 and IPv6 EPS bearer deactivation attempts. Incremented when a deactivation is triggered by the PGW, triggered by the UE/SGW, rejected deactivation requests and silently discarded deactivation requests."
     ::= { pgwAttemptedEpsBearerStats 4 }
 
@@ -4188,7 +4188,7 @@ pgwAttemptedDedicatedEpsBearerActivation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of Active IPv4 and IPv6 EPS bearer creation attempts. Incremented each time a Create EPS Bearer request that is not silently discarded is received by the PGW. This means the counter is incremented each time a create EPS Bearer response is sent back to the SGW with cause value Request Accepted or with a reject value."
     ::= { pgwAttemptedEpsBearerStats 5 }
 
@@ -4196,7 +4196,7 @@ pgwAttemptedDedicatedEpsBearerIpv6Activation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of Ipv6 dedicated EPS bearer creation attempts. Incremented each time a Create dedicated EPS Bearer request that is not silently discarded is received by the PGW. This means the counter is incremented each time a create dedicated EPS Bearer response is sent back to the SGW with cause value Request Accepted or with a reject value. Note: Counter not updated for bearers having the possibility to use either IPv4 or IPv6. Which address type that will be used is not known at this early stage."
     ::= { pgwAttemptedEpsBearerStats 6 }
 
@@ -4220,7 +4220,7 @@ pgwCompletedEpsBearerActivation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of IPv4 and IPv6 EPS bearer creations completed. Incremented when an EPS bearer is successfully activated."
     ::= { pgwCompletedEpsBearerStats 1 }
 
@@ -4228,7 +4228,7 @@ pgwCompletedEpsBearerIpv6Activation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of Ipv6 EPS bearer creations completed. Incremented when an EPS bearer is successfully activated."
     ::= { pgwCompletedEpsBearerStats 2 }
 
@@ -4236,7 +4236,7 @@ pgwCompletedEpsBearerModification  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of IPv4 and IPv6 EPS bearer modifications completed. Incremented both for successful network and SGW initiated updates."
     ::= { pgwCompletedEpsBearerStats 3 }
 
@@ -4244,7 +4244,7 @@ pgwCompletedEpsBearerDeactivation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of IPv4 and IPv6 EPS bearer deactivations completed. Incremented both for successful PGW triggered deactivations and successful UE/SGW triggered deactivations."
     ::= { pgwCompletedEpsBearerStats 4 }
 
@@ -4252,7 +4252,7 @@ pgwCompletedDedicatedEpsBearerActivation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of IPv4 and IPv6 dedicated EPS bearer creations completed. Incremented when a dedicated EPS bearer is successfully activated."
     ::= { pgwCompletedEpsBearerStats 5 }
 
@@ -4260,7 +4260,7 @@ pgwCompletedDedicatedEpsBearerIpv6Activation  OBJECT-TYPE
     SYNTAX     Counter64
     MAX-ACCESS read-only
     STATUS     current
-    DESCRIPTION 
+    DESCRIPTION
         "Total number of Ipv6 dedicated EPS bearer creations completed. Incremented when a dedicated EPS bearer is successfully activated."
     ::= { pgwCompletedEpsBearerStats 6 }
 
@@ -4420,10 +4420,10 @@ ggsnGtpcRole OBJECT-TYPE
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-         "The current role of the GGSN-C (GTP-C) PIC. 
-         1. unknown 
-         2. master = node controller 
-         3. slave = session controller 
+         "The current role of the GGSN-C (GTP-C) PIC.
+         1. unknown
+         2. master = node controller
+         3. slave = session controller
          4. standby"
    ::= { ggsnGtpcEntry 5 }
 
@@ -4432,7 +4432,7 @@ ggsnGtpcStatus OBJECT-TYPE
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-         "The current status of the GGSN-C (GTP-C) PIC, 
+         "The current status of the GGSN-C (GTP-C) PIC,
          for example BLOCK, READY, STANDBY or NOT READY."
    ::= { ggsnGtpcEntry 6 }
 
@@ -4442,8 +4442,8 @@ ggsnGtpcControlPacketDrops OBJECT-TYPE
    STATUS        current
    DESCRIPTION
          "The number of control packets that have
-          been dropped by this GGSN-C (GTP-C) PIC. 
-          
+          been dropped by this GGSN-C (GTP-C) PIC.
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnGtpcEntry 7 }
 
@@ -4477,11 +4477,11 @@ ggsnGtpcCpuUsage OBJECT-TYPE
    STATUS        current
    DESCRIPTION
         "This counter shows the average CPU utilization percentage
-         over all cores sampled every 5 seconds 
+         over all cores sampled every 5 seconds
          in case of a Node Controller C-PIC,
          or shows the highest value from the Proxy CPU's utilization
          and the average Slave CPU's utilization sampled every 5 seconds
-         in case of a Session Controller C-PIC." 
+         in case of a Session Controller C-PIC."
    ::= { ggsnGtpcEntry 11 }
 
 ggsnGtpcTftFilterDepthMax OBJECT-TYPE
@@ -4515,8 +4515,8 @@ ggsnGtpcNbrOfActivePdpContextsIpv6 OBJECT-TYPE
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-         "The number of active IPv6 bearers on this C-PIC. 
-         
+         "The number of active IPv6 bearers on this C-PIC.
+
          Note: This counter cannot be retrieved by CLI."
    ::= { ggsnGtpcEntry 15 }
 
@@ -4660,7 +4660,7 @@ ggsnGtpuUserUplinkDrops OBJECT-TYPE
           A certain type of IP traffic (IPv4/IPv6) is not allowed
           A bandwidth limitation is defined for the APN, and the limit is exceeded
           The packet is a broadcast message from an MS
-          The IP packet source address does not match the IP address assigned to the MS by the GGSN 
+          The IP packet source address does not match the IP address assigned to the MS by the GGSN
           There is no free memory left in U-PIC"
    ::= { ggsnGtpuEntry 7 }
 
@@ -4671,7 +4671,7 @@ ggsnGtpuUserDownlinkDrops OBJECT-TYPE
    DESCRIPTION
          "The number of downlink (GTP-U) packets dropped by
           this GGSN-U PIC.
-          
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnGtpuEntry 8 }
 
@@ -4722,7 +4722,7 @@ ggsnGtpuNbrOfActivePdpContextsIpv6 OBJECT-TYPE
    STATUS        current
    DESCRIPTION
          "The number of active IPv6 bearers on this U-PIC.
-          
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnGtpuEntry 14 }
 
@@ -4742,7 +4742,7 @@ ggsnGtpuUplinkPackets OBJECT-TYPE
    DESCRIPTION
          "The number of uplink (GTP-U) packets processed by
           this GGSN-U PIC.
-          
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnGtpuEntry 16 }
 
@@ -4753,7 +4753,7 @@ ggsnGtpuDownlinkPackets OBJECT-TYPE
    DESCRIPTION
          "The number of downlink (GTP-U) packets processed by
           this GGSN-U PIC.
-          
+
           Note: This counter cannot be retrieved by CLI."
    ::= { ggsnGtpuEntry 17 }
 
@@ -4804,7 +4804,7 @@ GtptEntry ::= SEQUENCE {
 ggsnGtptIndex OBJECT-TYPE
    SYNTAX        Integer32 (0..2147483647)
    MAX-ACCESS    not-accessible
-   STATUS        deprecated 
+   STATUS        deprecated
    DESCRIPTION
          "A number uniquely identifying each GGSN-T PIC. Its value
 	  is calculated using formula 16 * (1 + FPC) + PIC."
@@ -4813,7 +4813,7 @@ ggsnGtptIndex OBJECT-TYPE
 ggsnGtptVersion OBJECT-TYPE
    SYNTAX        DisplayString
    MAX-ACCESS    read-only
-   STATUS        deprecated 
+   STATUS        deprecated
    DESCRIPTION
          "Software version running on the GGSN-T PIC."
    ::= { ggsnGtptEntry 2 }
@@ -4849,7 +4849,7 @@ ggsnGtptRole OBJECT-TYPE
 ggsnGtptStatus OBJECT-TYPE
    SYNTAX        DisplayString
    MAX-ACCESS    read-only
-   STATUS        deprecated 
+   STATUS        deprecated
    DESCRIPTION
          "The current status of the GGSN-T PIC, example BLOCK."
    ::= { ggsnGtptEntry 6 }
@@ -4875,10 +4875,10 @@ ggsnGtptCpuUsage OBJECT-TYPE
    MAX-ACCESS    read-only
    STATUS        deprecated
    DESCRIPTION
-         "This counter describes the average CPU utilization in 
-         percentage of the GGSN-T PIC calculated over 5 seconds. 
-         The GGSN-T PIC contains multiple CPUs. The counter is 
-         calculated as the max of(proxy, average of all the 
+         "This counter describes the average CPU utilization in
+         percentage of the GGSN-T PIC calculated over 5 seconds.
+         The GGSN-T PIC contains multiple CPUs. The counter is
+         calculated as the max of(proxy, average of all the
          slave CPUs load) of the GGSN-T PIC."
    ::= { ggsnGtptEntry 9 }
 
@@ -4888,8 +4888,8 @@ ggsnGtptPeakCpuUsage OBJECT-TYPE
    STATUS        deprecated
    DESCRIPTION
          "The counter describes the maximum CPU load of a GGSN-T PIC
-          in percentage. A GGSN-T PIC contains multiple CPUs. The 
-          counter is the CPU utilization of the CPU with the highest 
+          in percentage. A GGSN-T PIC contains multiple CPUs. The
+          counter is the CPU utilization of the CPU with the highest
           value calculated over a 5 second average of a GGSN-T PIC."
    ::= { ggsnGtptEntry 10 }
 --
@@ -4959,8 +4959,8 @@ ggsnAcctDataRecTransReqSent OBJECT-TYPE
    STATUS        current
    DESCRIPTION
          "The number of Data Record Transfer Request
-         messages that are sent from the GGSN to 
-         the Charging Gateway Function."   
+         messages that are sent from the GGSN to
+         the Charging Gateway Function."
    ::= { ggsnAcctBillingGatewayEntry 3 }
 
 ggsnAcctDataRecTransReqSentDup OBJECT-TYPE
@@ -4969,14 +4969,14 @@ ggsnAcctDataRecTransReqSentDup OBJECT-TYPE
    STATUS        current
    DESCRIPTION
          "The number of Data Record Transfer Request
-          messages that are sent from the GGSN to 
-          the Charging Gateway Function when the 
-          Packet Transfer Command IE has the 
+          messages that are sent from the GGSN to
+          the Charging Gateway Function when the
+          Packet Transfer Command IE has the
           'Send possibly duplicated Data Record Packet'
           value.
-          
-          Note: This counter is applicable 
-          only when using GTP Prime version 2." 
+
+          Note: This counter is applicable
+          only when using GTP Prime version 2."
    ::= { ggsnAcctBillingGatewayEntry 4 }
 
 ggsnAcctDataRecTransReqCancelled OBJECT-TYPE
@@ -4997,7 +4997,7 @@ ggsnAcctDataRecTransRespReceived OBJECT-TYPE
    DESCRIPTION
          "The number of Data Record Transfer Response
          messages that are received from the
-         Charging Gateway Function." 
+         Charging Gateway Function."
    ::= { ggsnAcctBillingGatewayEntry 6 }
 
 ggsnAcctRedirectionReqReceived OBJECT-TYPE
@@ -5412,7 +5412,7 @@ ggsnApnFbcDurationTime		OBJECT-TYPE
     STATUS			deprecated
     DESCRIPTION
     "Number of seconds measured for duration time.
-     
+
      Note: Only valid for SACC 2.0."
     ::= { ggsnApnFbcStatsEntry 19 }
 
@@ -5552,7 +5552,7 @@ ggsnFbcUserAuthPacketsDropped		OBJECT-TYPE
     "Number of packets discarded by authorization for
      service classes originating from the policy server list.
      Only dropped downlink packets result in incrementation of the counter.
-     
+
      Note: Only valid for SACC 2.0."
     ::= { ggsnFbcAuthStats 2 }
 
@@ -5565,7 +5565,7 @@ ggsnFbcDefaultAuthPacketsDropped	OBJECT-TYPE
      classes originating from the policy server communication
      error fallback list (default list).
      Only dropped downlink packets result in incrementation of the counter.
-     
+
      Note: Only valid for SACC 2.0."
     ::= { ggsnFbcAuthStats 3 }
 
@@ -5578,7 +5578,7 @@ ggsnFbcEmptyBucketPacketsDropped	OBJECT-TYPE
      classes originating from the empty-bucket based service
      class list. Only dropped downlink packets result in incrementation
      of the counter.
-     
+
      Note: Only valid for SACC 2.0."
     ::= { ggsnFbcAuthStats 4 }
 
@@ -5589,9 +5589,9 @@ ggsnFbcComFailAuthPacketsDropped	OBJECT-TYPE
     DESCRIPTION
     "Number of packets discarded by authorization for service
      classes originating from the prepaid server communication
-     error fallback list (default list). Only dropped downlink 
+     error fallback list (default list). Only dropped downlink
      packets result in incrementation of the counter.
-     
+
      Note: Only valid for SACC 2.0."
     ::= { ggsnFbcAuthStats 5 }
 
@@ -5603,7 +5603,7 @@ ggsnFbcIdentErrorPacketsDropped		OBJECT-TYPE
     "Number of packets discarded by authorization due to a
      service identification error. Only dropped downlink packets
      result in incrementation of the counter.
-     
+
      Note: Only valid for SACC 2.0."
     ::= { ggsnFbcAuthStats 6 }
 
@@ -5759,7 +5759,7 @@ ggsnApnFbcServClassActiveTime	OBJECT-TYPE
     STATUS				deprecated
     DESCRIPTION
     "Number of seconds measured for active time for service class.
-    
+
      Note: Only valid for SACC 2.0."
     ::= { ggsnApnFbcServClassStatsEntry 6 }
 
@@ -5770,7 +5770,7 @@ ggsnFbcExtPrsUpdReqNoMatch      OBJECT-TYPE
     DESCRIPTION
          "Number of externally initiated URT updates for users
           without PDP context.
-          
+
           Note: Only valid for SACC 2.0."
     ::= { ggsnFbcStats 7 }
 
@@ -5792,7 +5792,7 @@ ggsnFbcExtUpdReqFailure         OBJECT-TYPE
     DESCRIPTION
          "Number of unidentified messages including messages with
           authentication id failure.
-          
+
           Note: Only valid for SACC 2.0."
     ::= { ggsnFbcStats 9 }
 
@@ -6647,7 +6647,7 @@ pgwApnSaccRatingGroupStatsEntry		OBJECT-TYPE
     "Rating group statistics per APN."
     INDEX { ggsnGtpuIndex, ggsnApnIndex, pgwRatingGroupIndex }
     ::= { pgwApnSaccRatingGroupStatsTable 1 }
-    
+
 pgwApnSaccRatingGroupStats ::= SEQUENCE {
     pgwRatingGroupIndex			Unsigned32,
     pgwApnSaccRatingGroupUplinkBytes	Counter64,
@@ -7181,7 +7181,7 @@ ggsnTrapChanged NOTIFICATION-TYPE
              ggsnAlarmDescription }
    STATUS    current
    DESCRIPTION
-         "A trap indicating a change has occurred in the attributes of the alarm or event. 
+         "A trap indicating a change has occurred in the attributes of the alarm or event.
           The text in ggsnTrapDescription indicates the nature of the change."
    ::= { ggsnTraps 2 }
 
@@ -7582,15 +7582,15 @@ ggsnApnStatisticsGroup OBJECT-GROUP
              gnApn3gdtDownlinkDropsErrorHandling,
              ggsnApn3gdtGtpError,
              pgwApnActiveDedicatedEpsBearer,
-	         pgwApnAttemptedDedicatedEpsBearerActivation,  
-		     pgwApnCompletedDedicatedEpsBearerActivation,  
-		     pgwApnAttemptedIpv6DedicatedEpsBearerActivation,  
-		     pgwApnCompletedIpv6DedicatedEpsBearerActivation,  
-		     pgwApnAttemptedS5NetworkDedicatedEpsBearerDeactivation, 
-		     pgwApnCompletedS5NetworkDedicatedEpsBearerDeactivation,  
-		     pgwApnAttemptedS5NetworkDedicatedEpsBearerModification,  
-		     pgwApnCompletedS5NetworkDedicatedEpsBearerModification,  
-		     pgwApnAttemptedS5UeSgwDedicatedEpsBearerDeactivation,  
+	         pgwApnAttemptedDedicatedEpsBearerActivation,
+		     pgwApnCompletedDedicatedEpsBearerActivation,
+		     pgwApnAttemptedIpv6DedicatedEpsBearerActivation,
+		     pgwApnCompletedIpv6DedicatedEpsBearerActivation,
+		     pgwApnAttemptedS5NetworkDedicatedEpsBearerDeactivation,
+		     pgwApnCompletedS5NetworkDedicatedEpsBearerDeactivation,
+		     pgwApnAttemptedS5NetworkDedicatedEpsBearerModification,
+		     pgwApnCompletedS5NetworkDedicatedEpsBearerModification,
+		     pgwApnAttemptedS5UeSgwDedicatedEpsBearerDeactivation,
 		     pgwApnCompletedS5UeSgwDedicatedEpsBearerDeactivation,
              ggsnApnActivePdpContextCountIpv4v6,
              pgwApnActiveIpv4v6EpsBearer,
@@ -8006,11 +8006,11 @@ pgwAttemptedEpsBearerStatsGroup   OBJECT-GROUP
         pgwAttemptedEpsBearerActivation,
         pgwAttemptedEpsBearerIpv6Activation,
         pgwAttemptedEpsBearerModification,
-        pgwAttemptedEpsBearerDeactivation,       
+        pgwAttemptedEpsBearerDeactivation,
         pgwAttemptedDedicatedEpsBearerActivation,
         pgwAttemptedDedicatedEpsBearerIpv6Activation,
         pgwAttemptedEpsBearerIpv4v6Activation,
-        pgwAttempteds2aEpsBearerActivation 
+        pgwAttempteds2aEpsBearerActivation
     }
     STATUS current
     DESCRIPTION
@@ -8032,7 +8032,7 @@ pgwCompletedEpsBearerStatsGroup   OBJECT-GROUP
     DESCRIPTION
         "Global statistics for EPS bearer completions"
     ::= { ggsnMIBGroups 31 }
-    
+
 pgwApnSaccRatingGroupStatsGroup   OBJECT-GROUP
     OBJECTS {
         pgwApnSaccRatingGroupUplinkBytes,

@@ -320,8 +320,6 @@ SNMP program locations.
     lnms config:set nagios_plugins /usr/lib/nagios/plugins
     lnms config:set ipmitool /usr/bin/ipmitool
     lnms config:set virsh /usr/bin/virsh
-    lnms config:set dot /usr/bin/dot
-    lnms config:set sfdp /usr/bin/sfdp
     ```
 
 ## Authentication

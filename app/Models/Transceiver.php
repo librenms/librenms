@@ -40,8 +40,8 @@ class Transceiver extends PortRelatedModel implements Keyable
         ];
     }
 
-    public function getCompositeKey()
+    public function getCompositeKey(): string
     {
-        return $this->index;
+        return (string) $this->index;
     }
 }

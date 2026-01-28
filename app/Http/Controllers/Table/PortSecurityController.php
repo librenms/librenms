@@ -112,7 +112,7 @@ class PortSecurityController extends TableController
      */
     public function sort($request, $query)
     {
-        $sort = $request->get('sort');
+        $sort = $request->input('sort');
 
         if (isset($sort['device'])) {
             $query->leftJoin('devices', 'port_security.device_id', 'devices.device_id')

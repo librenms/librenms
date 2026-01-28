@@ -3,7 +3,7 @@
 -- 
 -- Description: HUAWEI EVPN Management MIB
 -- Reference:
--- Version: V1.09
+-- Version: V1.11
 -- History:
 --      V1.03 wangxiaoli, 2019-11-06, publish
 --      V1.0 wangyaru, 2018-07-09, publish
@@ -23,6 +23,9 @@ IMPORTS
     Counter64, Unsigned32
     FROM SNMPv2-SMI
 
+    InetAddress
+    FROM INET-ADDRESS-MIB
+
 	MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
     FROM SNMPv2-CONF; 
         
@@ -33,7 +36,7 @@ IMPORTS
 --	
 
     hwEvpnMib MODULE-IDENTITY
-        LAST-UPDATED "202206161100Z"
+        LAST-UPDATED "202212271143Z"
     ORGANIZATION 
         "Huawei Technologies Co.,Ltd."
     CONTACT-INFO 
@@ -46,6 +49,12 @@ IMPORTS
          "
     DESCRIPTION
         "This object indicates EVPN management information." 
+
+    REVISION    "202212271143Z"
+    DESCRIPTION "Add trap hwEvpnEvplAlarmDown and hwEvpnEvplAlarmUp; modify hwEvpnEvplNotificationGroup"
+
+    REVISION    "202211151030Z"
+	DESCRIPTION "Modify hwEvpnMacDupNotificationGroup."
 
     REVISION    "202206161100Z"
 	DESCRIPTION "Modify description for hwEvpnDiscardRoute ."
@@ -139,14 +148,14 @@ IMPORTS
     hwEvpnTraps OBJECT IDENTIFIER ::= { hwEvpnObjects 2 }
     
     hwEvpnMacDupVpnAlarm NOTIFICATION-TYPE
-            OBJECTS {hwEvpnInstanceVpnName}
+            OBJECTS {hwEvpnInstanceVpnName, hwEvpnMacRouteTag, hwEvpnInstanceMAC, hwEvpnInstanceIfName1, hwEvpnInstanceIfName2, hwEvpnInstanceIfName3, hwEvpnInstanceIfName4, hwEvpnInstanceIPAddress1, hwEvpnInstanceIPAddress2, hwEvpnInstanceIPAddress3, hwEvpnInstanceIPAddress4, hwEvpnInstanceVcId}
             STATUS current
             DESCRIPTION 
                 "This object indicates that an EVPN instance name is used to report an alarm when a MAC address is suppressed in the EVPN instance."
             ::= { hwEvpnTraps 1 }        
 
     hwEvpnMacDupVpnAlarmClear NOTIFICATION-TYPE
-            OBJECTS {hwEvpnInstanceVpnName} 
+            OBJECTS {hwEvpnInstanceVpnName, hwEvpnMacRouteTag, hwEvpnInstanceMAC, hwEvpnInstanceIfName1, hwEvpnInstanceIfName2, hwEvpnInstanceIfName3, hwEvpnInstanceIfName4, hwEvpnInstanceIPAddress1, hwEvpnInstanceIPAddress2, hwEvpnInstanceIPAddress3, hwEvpnInstanceIPAddress4, hwEvpnInstanceVcId} 
             STATUS current     
             DESCRIPTION 
                 "This object indicates that an EVPN instance name is used to clear an alarm when all MAC addresses are unsuppressed in the EVPN instance."
@@ -214,7 +223,23 @@ IMPORTS
             DESCRIPTION
                 "This object indicates that the number of EVPN qualify BUM resources returned to normal."
             ::= { hwEvpnTraps 11 }
-			
+
+    -- 1.3.6.1.4.1.2011.5.25.356.1.1.2.12
+    hwEvpnEvplAlarmDown NOTIFICATION-TYPE
+        OBJECTS { hwEvpnEvplInstanceId, hwEvpnEvplInstanceStatus }
+        STATUS current
+        DESCRIPTION
+            "The SNMP alarm trap that is generated when an EVPL instance status change to down."
+        ::= { hwEvpnTraps 12 }
+
+    -- 1.3.6.1.4.1.2011.5.25.356.1.1.2.13
+    hwEvpnEvplAlarmUp NOTIFICATION-TYPE
+        OBJECTS { hwEvpnEvplInstanceId, hwEvpnEvplInstanceStatus }
+        STATUS current
+        DESCRIPTION
+            "The SNMP alarm trap that is generated when an EVPL instance status change to up."
+        ::= { hwEvpnTraps 13 }
+
     hwEvpnTrapOid OBJECT IDENTIFIER ::= { hwEvpnObjects 3 }
     
     hwEvpnInstanceLastArgLen   OBJECT-TYPE
@@ -284,6 +309,83 @@ IMPORTS
             DESCRIPTION
                 "The upper limit of the qualify BUM resource."
             ::= { hwEvpnTrapOid 8 }
+    hwEvpnMacRouteTag     OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "Mac route tag ID."
+            ::= { hwEvpnTrapOid 9 }
+    hwEvpnInstanceMAC     OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS    accessible-for-notify
+            STATUS        current
+            DESCRIPTION
+                "Mac route prefix."
+            ::= { hwEvpnTrapOid 10 }
+    hwEvpnInstanceIfName1 OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS   accessible-for-notify
+            STATUS       current
+            DESCRIPTION
+                "Name of the interface."
+            ::= { hwEvpnTrapOid 11 }
+    hwEvpnInstanceIfName2 OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS   accessible-for-notify
+            STATUS       current
+            DESCRIPTION
+                "Name of the interface."
+            ::= { hwEvpnTrapOid 12 }
+    hwEvpnInstanceIfName3 OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS   accessible-for-notify
+            STATUS       current
+            DESCRIPTION
+                "Name of the interface."
+            ::= { hwEvpnTrapOid 13 }
+    hwEvpnInstanceIfName4 OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS   accessible-for-notify
+            STATUS       current
+            DESCRIPTION
+                "Name of the interface."
+            ::= { hwEvpnTrapOid 14 }
+    hwEvpnInstanceIPAddress1 OBJECT-TYPE
+            SYNTAX       InetAddress
+            MAX-ACCESS   accessible-for-notify
+            STATUS       current
+            DESCRIPTION
+                "IP address of a peer PE."
+            ::= { hwEvpnTrapOid 15 }
+    hwEvpnInstanceIPAddress2 OBJECT-TYPE
+            SYNTAX       InetAddress
+            MAX-ACCESS   accessible-for-notify
+            STATUS       current
+            DESCRIPTION
+                "IP address of a peer PE."
+            ::= { hwEvpnTrapOid 16 }
+    hwEvpnInstanceIPAddress3 OBJECT-TYPE
+            SYNTAX       InetAddress
+            MAX-ACCESS   accessible-for-notify
+            STATUS       current
+            DESCRIPTION
+                "IP address of a peer PE."
+            ::= { hwEvpnTrapOid 17 }
+    hwEvpnInstanceIPAddress4 OBJECT-TYPE
+            SYNTAX       InetAddress
+            MAX-ACCESS   accessible-for-notify
+            STATUS       current
+            DESCRIPTION
+                "IP address of a peer PE."
+            ::= { hwEvpnTrapOid 18 }
+    hwEvpnInstanceVcId OBJECT-TYPE
+            SYNTAX       Unsigned32
+            MAX-ACCESS   accessible-for-notify
+            STATUS       current
+            DESCRIPTION
+                "Pw vc ID."
+            ::= { hwEvpnTrapOid 19 }
 --
 --Compliance Defination
 --		
@@ -347,8 +449,8 @@ IMPORTS
             "This object indicates an EVPL instance state group."
         ::= { hwEvpnInstanceGroups 6 }
     
-    hwEvpnEvplNotificationGroup NOTIFICATION-GROUP    
-       NOTIFICATIONS { hwEvpnEvplInstDown, hwEvpnEvplInstUp}
+    hwEvpnEvplNotificationGroup NOTIFICATION-GROUP
+       NOTIFICATIONS { hwEvpnEvplInstDown, hwEvpnEvplInstUp, hwEvpnEvplAlarmDown, hwEvpnEvplAlarmUp }
        STATUS current
        DESCRIPTION
            "This object indicates an EVPL instance state group."

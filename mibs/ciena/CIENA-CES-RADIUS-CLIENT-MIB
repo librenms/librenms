@@ -1,4 +1,4 @@
--- This file was included in WWP MIB release 04-16-00-0047
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-06-00-5005
  --
  -- CIENA-CES-TCE-RADIUS-CLIENT-MIB.my
  --
@@ -16,20 +16,30 @@
    CienaGlobalState
    	 FROM CIENA-TC
    InetAddressType, InetAddress
-       FROM INET-ADDRESS-MIB;
+       FROM INET-ADDRESS-MIB
+   PreferredSourceAddress
+       FROM CIENA-CES-MGMT-INTERFACE-MIB;
    
  cienaCesRadiusClientMIB MODULE-IDENTITY
-        LAST-UPDATED "201602170000Z"
+            LAST-UPDATED "201706070000Z"
             ORGANIZATION "Ciena Corp."
             CONTACT-INFO
-        	"  Mib Meister
-               115 North Sullivan Road
-               Spokane Valley, WA 99037
-               USA            
-               Phone:  +1 509 242 9000
-               Email:  support@ciena.com"
+            "   Mib Meister
+                7035 Ridge Road
+                Hanover, Maryland 21076
+                USA
+                Phone:  +1 800 921 1144
+                Email:  support@ciena.com"
             DESCRIPTION
                "This module defines the objects used by the RADIUS client."
+
+            REVISION "201706070000Z"
+            DESCRIPTION
+               "Updated contact info."
+
+            REVISION "201701230000Z"
+            DESCRIPTION
+               "Added cienaCesRadiusClientPreferredSourceAddress."
 
             REVISION "201602170000Z"
             DESCRIPTION
@@ -177,6 +187,17 @@
      DESCRIPTION
              "This object sets the search type of the RADIUS client."
      ::= { cienaCesRadiusClientGlobal 7 }
+
+  cienaCesRadiusClientPreferredSourceAddress OBJECT-TYPE
+     SYNTAX      PreferredSourceAddress
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+             "Changes the source of syslog messages to be from the default
+             address or the loopback address."
+     DEFVAL { default }
+     ::= { cienaCesRadiusClientGlobal 8 }
+
 
 --
 -- Radius Client Server Table

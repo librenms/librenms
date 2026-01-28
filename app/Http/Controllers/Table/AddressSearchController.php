@@ -88,7 +88,7 @@ abstract class AddressSearchController extends TableController
     protected function applyBaseSearchQuery(Builder $builder, Request $request): Builder
     {
         return $builder
-            ->when($request->get('address'), function ($q, $address): void {
+            ->when($request->input('address'), function ($q, $address): void {
                 if (str_contains($address, '/')) {
                     [$address, $cidr] = explode('/', $address, 2);
                 }
@@ -99,8 +99,8 @@ abstract class AddressSearchController extends TableController
                     $q->where($this->cidrField, $cidr);
                 }
             })
-            ->when($request->get('device_id'), fn ($q, $id) => $q->whereHas('port', fn ($pq) => $pq->where('device_id', $id)))
-            ->when($request->get('interface'), fn ($q, $i) => $q->whereHas('port', fn ($pq) => $pq->where('ifDescr', 'LIKE', $i)))
+            ->when($request->input('device_id'), fn ($q, $id) => $q->whereHas('port', fn ($pq) => $pq->where('device_id', $id)))
+            ->when($request->input('interface'), fn ($q, $i) => $q->whereHas('port', fn ($pq) => $pq->where('ifDescr', 'LIKE', $i)))
             ->when($request->has('sort.hostname'), fn ($q) => $q->withAggregate('deviceViaPort', 'hostname'))
             ->when($request->has('sort.interface'), fn ($q) => $q->withAggregate('port', 'ifName'))
             ->when($request->has('sort.description'), function ($q) use ($builder): void {

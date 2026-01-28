@@ -15,7 +15,7 @@ IMPORTS
         FROM INET-ADDRESS-MIB;
 
 rcVlanMib MODULE-IDENTITY
-       LAST-UPDATED     "201310110000Z"
+       LAST-UPDATED     "202009040000Z"
        ORGANIZATION     "Bay Networks, Rapid-City Group"
        CONTACT-INFO     "
                                         Edwin Tsang
@@ -28,6 +28,63 @@ rcVlanMib MODULE-IDENTITY
                          E-mail:        edwin_tsang@baynetworks.com
                         "
        DESCRIPTION      "Enterprise MIB for the Accelar product family."
+
+
+       REVISION "202009040000Z" -- 04 Sept 2020
+       DESCRIPTION "Version 76:  Add rcVlanPortOrigin
+					Requested by Alex Rebega (Oana)"
+
+       REVISION "202003120000Z" -- 12 March 2020
+       DESCRIPTION "Version 75: Add rcVlanIsidName
+	   			Requested by Deborah Fitzgerald (Prem)"
+
+       REVISION "201908130000Z" -- 13 Aug. 2019
+       DESCRIPTION "Version 74: Add rcVlanDvrGwIpv4OneIp
+	   			Requested by Pam LeBlanc (Prem)"
+
+       REVISION "201610270000Z" -- 27 Oct. 2016
+       DESCRIPTION "Version 73: Added rcVlanPortSpoofMacTable"
+	   
+       REVISION "201608300000Z" -- 30 August 2016
+       DESCRIPTION "Version 72: Added rcVlanUntaggedPortMembers."
+	   
+       REVISION "201607060000Z" -- 6 July 2016
+       DESCRIPTION "Version 71: Added rcVlanPortUntaggedVlanIds and
+                                      rcVlanPortTaggedVlanIds and
+                                      hybrid(5) value to rcVlanPortPerformTagging."
+
+       REVISION "201606250000Z" -- 25 June 2016
+       DESCRIPTION "Version 70: Updated and removed rcVlanIpv4IpsecEnable
+	   			and rcVlanIpv6IpsecEnable"
+	   
+       REVISION "201605020000Z" -- 02 May 2016
+       DESCRIPTION "Version 69: Deprecate rcVlanIpsecEnable
+	   			Added rcVlanIpv4IpsecEnable and
+				      rcVlanIpv6IpsecEnable (malok)"	   
+	   
+       REVISION "201512240000Z" -- 24 December 2015
+       DESCRIPTION "Version 68: Added rcVlanDvrEnable and
+	   			rcVlanDvrGwIpv4Addr to rcVlanTable. (prempa)"
+
+       REVISION "201510190000Z" -- 19 October 2015
+       DESCRIPTION "Version 67: Added rcVlanIpv6FhsSnoopDhcpEnable and
+	   			rcVlanIpv6FhsNDInspectionEnable to rcVlanTable.
+	                        Requested by Shivanand - submit 25855 (prempa)"
+
+       REVISION "201508070000Z" -- 07 August 2015
+       DESCRIPTION "Version 66: Added flushIgmpStreams(12) value to rcVlanAction."
+
+       REVISION "201506240000Z" -- 24 June 2015
+       DESCRIPTION "Version 65: Changed rcVlanPimGateway to 
+	   			rcVlanPimGatewayEnable and also
+				changed the SYNTAX to TruthValue (Prem)"
+
+       REVISION "201506240000Z" -- 24 June 2015
+       DESCRIPTION "Version 64: Added rcVlanPimGateway
+	   			Requested by Julie Carleton (VOSS) (Prem)"
+
+       REVISION "201404090000Z" -- 09 April 2014
+       DESCRIPTION "Version 63: Added rcVlanNameTable by 9k 4.0.0.0"
 
        REVISION "201310110000Z" -- 11 October 2013
        DESCRIPTION "Version 62: Corrected syntax definitions. Added types to IMPORTS."
@@ -255,6 +312,13 @@ from 'RC-VIRTUAL-ROUTING-MIB'"
 
 -- Textual Conventions
 
+RcVlanMask ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Each VLAN ID is stored as a bit in a mask. The most-significant (left-most) bit
+         represents Vlan ID 1."
+    SYNTAX  OCTET STRING (SIZE (0..512))
+
 -- VLAN Table
 
 rcVlanNumVlans OBJECT-TYPE
@@ -330,15 +394,15 @@ RcVlanEntry ::= SEQUENCE {
                 rcVlanIgmpSnoopRobustness Integer32,
                 rcVlanIgmpSnoopQueryInterval Integer32,
                 rcVlanIgmpSnoopMRouterPorts PortSet,
-		rcVlanUserDefinedPid Integer32,
-		rcVlanIgmpSnoopActiveMRouterPorts PortSet,
-		rcVlanProtocolIds Integer32,
-		rcVlanIgmpSnoopActiveQuerier IpAddress,
-		rcVlanIgmpSnoopMRouterExpiration Integer32,
-		rcVlanIgmpSnoopQuerierPort InterfaceIndexOrZero,
-		rcVlanUserPriority INTEGER,
-		rcVlanQosLevel INTEGER,
-		rcVlanTosValue Integer32,
+                rcVlanUserDefinedPid Integer32,
+                rcVlanIgmpSnoopActiveMRouterPorts PortSet,
+                rcVlanProtocolIds Integer32,
+                rcVlanIgmpSnoopActiveQuerier IpAddress,
+                rcVlanIgmpSnoopMRouterExpiration Integer32,
+                rcVlanIgmpSnoopQuerierPort InterfaceIndexOrZero,
+                rcVlanUserPriority INTEGER,
+                rcVlanQosLevel INTEGER,
+                rcVlanTosValue Integer32,
                 rcVlanEncap INTEGER,
                 rcVlanFirewallVlanType INTEGER,
                 rcVlanFdbAging Integer32,
@@ -349,34 +413,42 @@ RcVlanEntry ::= SEQUENCE {
                 rcVlanTlsIpmc   EnableValue,
                 rcVlanFirewallClusterId Integer32,
                 rcVlanOspfPassivePortMember PortSet,
-		rcVlanUnkDstMacDiscard EnableValue,
+                rcVlanUnkDstMacDiscard EnableValue,
                 rcVlanNlbMode INTEGER,
                 rcVlanOperNlbMode INTEGER,
-		rcVlanVrfId	VrfIdentifier,
-		rcVlanVrfName	DisplayString,
-	        rcVlanMgmtVlan TruthValue,
+                rcVlanVrfId  VrfIdentifier,
+                rcVlanVrfName  DisplayString,
+                rcVlanMgmtVlan TruthValue,
                 rcVlanApplyBtagEthertype TruthValue,
-		rcVlanMmrp EnableValue,
-		rcVlanSource INTEGER,
+                rcVlanMmrp EnableValue,
+                rcVlanSource INTEGER,
                 rcVlanNodalMepList OCTET STRING,
                 rcVlanNumOfNodalMep Integer32,
                 rcVlanNodalMipLevelList DisplayString,
                 rcVlanNumOfNodalMipLevel Integer32,
                 rcVlanDhcpOption82Enabled TruthValue,
-	        rcVlanIpMultinettingEnable TruthValue,
-		rcVlanAssociatedIpMultinettingVlan Integer32,
+                rcVlanIpMultinettingEnable TruthValue,
+                rcVlanAssociatedIpMultinettingVlan Integer32,
                 rcVlanPlsbIsid Integer32,
                 rcVlanVoiceEnabled TruthValue,
                 rcVlanRmonEnable TruthValue,
                 rcVlanIpsecEnable TruthValue,
-		rcVlanLPortMembers LPortSet,
+                rcVlanLPortMembers LPortSet,
                 rcVlanLPortActiveMembers LPortSet,
                 rcVlanLPortStaticMembers LPortSet,
                 rcVlanLPortNotAllowToJoin LPortSet,
                 rcVlanRspanEnabled TruthValue,
                 rcVlanSpbMcast EnableValue,
                 rcVlanSecondaryVlanId RcVlanIdOrNone,
-                rcVlanSecondaryIsid Integer32
+                rcVlanSecondaryIsid Integer32,
+                rcVlanPimGatewayEnable TruthValue,
+                rcVlanIpv6FhsSnoopDhcpEnable TruthValue,
+                rcVlanIpv6FhsNDInspectionEnable TruthValue,
+                rcVlanDvrEnable   TruthValue,
+                rcVlanDvrGwIpv4Addr IpAddress,
+                rcVlanUntaggedPortMembers PortSet,
+		rcVlanDvrGwIpv4OneIp	  TruthValue,
+		rcVlanIsidName            DisplayString
         }
 
 rcVlanId OBJECT-TYPE
@@ -441,11 +513,12 @@ rcVlanAction OBJECT-TYPE
                          flushIp(4),          -- flush IP route table
                          flushDynMemb(5),     -- flush Dynamic Members
                          all(6),              -- flush all tables 
-			 flushSnoopMemb(7),   -- flush IGMP Snoop Members
+                         flushSnoopMemb(7),   -- flush IGMP Snoop Members
                          triggerRipUpdate(8), -- manually trigger rip update
-			 flushSnoopMRtr(9),    -- flush snoop multicast router
-			 flushIpRsmltEdgePeer(10), -- flush IP rsmlt edge peer
-                         flushWlanFdb(11)     -- flush entries learned via WLAN tunnel
+                         flushSnoopMRtr(9),   -- flush snoop multicast router
+                         flushIpRsmltEdgePeer(10), -- flush IP rsmlt edge peer
+                         flushWlanFdb(11),    -- flush entries learned via WLAN tunnel
+                         flushIgmpStreams(12) -- flush IGMP Multicast Streams 
                       }
         MAX-ACCESS    read-create
         STATUS        current
@@ -1031,8 +1104,11 @@ rcVlanRmonEnable OBJECT-TYPE
 rcVlanIpsecEnable OBJECT-TYPE
      SYNTAX         TruthValue
      MAX-ACCESS     read-write
-     STATUS         current
-     DESCRIPTION    "Indicate if the vlan is enabled for IPSEC"
+     STATUS         deprecated
+     DESCRIPTION    "Indicate if the vlan is enabled for IPSEC.
+	             at place of this value use RcIpConfEntry for IPV4 
+                    and use RcIpv6InterfaceEntry for IPV6. This field 
+                    changed to deprecated"
      DEFVAL         { false }
         ::= { rcVlanEntry 64 }
 
@@ -1106,6 +1182,68 @@ rcVlanSecondaryIsid OBJECT-TYPE
 	DEFVAL { 0 }
         ::= { rcVlanEntry 72 }
 
+rcVlanPimGatewayEnable OBJECT-TYPE
+        SYNTAX        TruthValue
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Enable/disable PIM Gateway on Vlan"
+        DEFVAL        { false }
+        ::= { rcVlanEntry 73 }
+
+rcVlanIpv6FhsSnoopDhcpEnable OBJECT-TYPE
+    	SYNTAX         TruthValue
+	MAX-ACCESS     read-create
+	STATUS         current
+	DESCRIPTION    "Indicate if IPv6 DHCP snooping is enabled on the vlan"
+	DEFVAL         { false }
+        ::= { rcVlanEntry 74 }
+
+rcVlanIpv6FhsNDInspectionEnable OBJECT-TYPE
+    	SYNTAX         TruthValue
+	MAX-ACCESS     read-create
+	STATUS         current
+	DESCRIPTION    "Indicate if ND inspection is enabled on the vlan"
+	DEFVAL         { false }
+        ::= { rcVlanEntry 75 }
+
+rcVlanDvrEnable OBJECT-TYPE
+        SYNTAX        TruthValue
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION   "Enable/disable DVR on Vlan"
+        DEFVAL        { false }
+        ::= { rcVlanEntry 76 }
+
+rcVlanDvrGwIpv4Addr OBJECT-TYPE
+    SYNTAX         IpAddress
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "Gateway IPv4 address for this DVR enabled node on Vlan."
+    ::= { rcVlanEntry 77 }
+
+rcVlanUntaggedPortMembers OBJECT-TYPE
+    SYNTAX        PortSet
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION   "The set of untagged ports that are members of this VLAN."
+    ::= { rcVlanEntry 78 }
+
+rcVlanDvrGwIpv4OneIp OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION   "Indicates if one IP is to be used for both Gateway 
+		   IPv4 address and DVR VLAN IP."
+    ::= { rcVlanEntry 79 }
+
+rcVlanIsidName OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..64))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The administratively-assigned name for the I-SID on
+		       this VLAN."
+        ::= { rcVlanEntry 80 }
+
 -- VLAN Port Table
 
 rcVlanPortTable OBJECT-TYPE
@@ -1148,7 +1286,10 @@ RcVlanPortEntry ::= SEQUENCE {
                 rcVlanPortClassificationPrec INTEGER,
                 rcVlanPortVlanIdList OCTET STRING,
                 rcVlanPortClassificationSourceMac TruthValue,
-	 	rcVlanPortPrivateVlanPortType INTEGER
+                rcVlanPortPrivateVlanPortType INTEGER,
+                rcVlanPortUntaggedVlanIds RcVlanMask,
+                rcVlanPortTaggedVlanIds RcVlanMask, 
+                rcVlanPortOrigin INTEGER
         }
 
 rcVlanPortIndex OBJECT-TYPE
@@ -1238,12 +1379,19 @@ rcVlanPortPerformTagging OBJECT-TYPE
                          true(1),
                          false(2),
                          tagPvidOnly(3),
-                         untagPvidOnly(4)
+                         untagPvidOnly(4),
+                         hybrid(5)
                       }
         MAX-ACCESS    read-write
         STATUS        current
         DESCRIPTION   "Enable/disable the port on the current vlan to 
-                       perform tagging on the incoming and outgoing traffic."
+                       perform tagging on the incoming and outgoing traffic.
+                       For tagPvidOnly and untagPvidOnly values the port is
+                       tagged or untagged only in the VLAN stored in
+                       rcVlanPortDefaultVlanId and vice versa in the other VLANs.
+                       For hybrid value please refer to rcVlanPortUntaggedVlanIds
+                       and rcVlanPortTaggedVlanIds to determine if the port is tagged
+                       or untagged in a VLAN."
         DEFVAL        { false }
         ::= { rcVlanPortEntry 8 }
 
@@ -1399,6 +1547,33 @@ rcVlanPortPrivateVlanPortType OBJECT-TYPE
                       non-private VLANs from the port."
         DEFVAL        { none } 
         ::= { rcVlanPortEntry 23 }
+
+rcVlanPortUntaggedVlanIds OBJECT-TYPE
+        SYNTAX          RcVlanMask
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This object is used to identify which VLANs this port
+                        is associated with as untagged."
+        ::= { rcVlanPortEntry 24 }
+
+rcVlanPortTaggedVlanIds OBJECT-TYPE
+        SYNTAX          RcVlanMask
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This object is used to identify which VLANs this port
+                        is associated with as tagged."
+        ::= { rcVlanPortEntry 25 }
+
+rcVlanPortOrigin     OBJECT-TYPE                                                                                               
+	     SYNTAX        INTEGER {                                                                                                                                       config(1),                                                                                                              
+                      autoSense(2)                                                                                                         
+                       }                                                                                                         
+        MAX-ACCESS    read-only                                                                                                 
+        STATUS        current                                                                                                   
+        DESCRIPTION   "Describes if port vlan configuration is done by                                                                         
+                               ZTF(Auto-Sense), CLI/SNMP or other."                                                                     
+        ::= { rcVlanPortEntry 26 } 
+
 
 
 -- VLAN MAC Table
@@ -2352,4 +2527,125 @@ rcVlanPortSpoofDetectVlanId OBJECT-TYPE
         DESCRIPTION   "VLAN ID that has been detected under spoof attack."
         ::= { rcVlanPortSpoofDetectEntry 6}
 
+-- rcVlanNameTable to query all Vlan regardless of VRF
+rcVlanNameTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF RcVlanNameEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "A table that can be used to map the Virtual LAN Id to
+                      IfIndex and Name for display.  It is informational only."
+        ::= { rcVlan 18 }
+
+rcVlanNameEntry OBJECT-TYPE
+        SYNTAX        RcVlanNameEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "Each entry has mapping information for a 
+                      particular Virtual LAN. This in intended for display
+                      purposes only."
+        INDEX         { rcVlanNameVlanId }
+        ::= { rcVlanNameTable 1 }
+
+RcVlanNameEntry ::= SEQUENCE {
+                rcVlanNameVlanId      RcVlanIdOrNone,
+                rcVlanNameVlanName    DisplayString,
+                rcVlanNameIfIndex     InterfaceIndex
+        }
+
+rcVlanNameVlanId OBJECT-TYPE
+        SYNTAX        RcVlanIdOrNone
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "A value that uniquely identifies the Virtual LAN 
+                      associated with this entry. This value corresponds
+                      to the lower 12 bits in the IEEE 802.1Q VLAN Tag."
+        ::= { rcVlanNameEntry 1 }
+
+rcVlanNameVlanName OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..64))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The assigned name for this VLAN."
+        ::= { rcVlanNameEntry 2 }
+
+rcVlanNameIfIndex OBJECT-TYPE
+        SYNTAX        InterfaceIndex 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "When rcVlanRoutingEnable is set to true(1), this 
+                      value indicates the 'logical' ifIndex assigned to
+                      this VLAN.  Otherwise, this value is meaningless
+                      and will be set to zero."
+        ::= { rcVlanNameEntry 3 }
+
+
+-- Vlan Port Spoof Mac detect table
+
+rcVlanPortSpoofMacTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF RcVlanPortSpoofMacEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "A table contains a list of Spoof blocked
+	               MAC address information." 
+        ::= { rcVlan 19 }
+
+rcVlanPortSpoofMacEntry OBJECT-TYPE
+        SYNTAX        RcVlanPortSpoofMacEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "Entry containing a spoof blocked MAC address"
+        INDEX         { rcVlanPortSpoofMacPortNum,
+	                rcVlanPortSpoofMacVlanId,
+			rcVlanPortSpoofMacIpAddress,
+		        rcVlanPortSpoofMacMacAddress
+	              }
+        ::= { rcVlanPortSpoofMacTable 1 }
+
+RcVlanPortSpoofMacEntry ::= SEQUENCE {
+                rcVlanPortSpoofMacPortNum    InterfaceIndex,
+                rcVlanPortSpoofMacVlanId     RcVlanIdOrNone,
+		rcVlanPortSpoofMacIpAddress  IpAddress,
+                rcVlanPortSpoofMacMacAddress MacAddress,
+		rcVlanPortSpoofMacClearMac   TruthValue
+        }
+rcVlanPortSpoofMacPortNum OBJECT-TYPE
+        SYNTAX        InterfaceIndex
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "Port interface number of the Spoof detect is enabled.
+	               Spoof mac is detected "
+        ::= { rcVlanPortSpoofMacEntry 1 }
+	
+rcVlanPortSpoofMacVlanId OBJECT-TYPE
+        SYNTAX        RcVlanIdOrNone
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "A vlan entry which the port intreface belong to. And
+	               the spoof MAC is detected"
+        ::= { rcVlanPortSpoofMacEntry 2 }
+	
+rcVlanPortSpoofMacIpAddress OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "A Local Ip address on this interface"
+        ::= { rcVlanPortSpoofMacEntry 3 }
+	 	
+rcVlanPortSpoofMacMacAddress OBJECT-TYPE
+        SYNTAX        MacAddress
+        MAX-ACCESS     not-accessible
+        STATUS        current
+        DESCRIPTION   "A spoofing Mac address that is detected in this
+	              interface"
+        ::= { rcVlanPortSpoofMacEntry 4 }
+	
+rcVlanPortSpoofMacClearMac OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Clear/delete this spoof detect mac entry when it is true.
+	 	         It always return false when query"
+        DEFVAL        { false }
+        ::= { rcVlanPortSpoofMacEntry 5 }
+    
 END

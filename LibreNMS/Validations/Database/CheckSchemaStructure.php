@@ -203,8 +203,8 @@ class CheckSchemaStructure implements Validation, ValidationFixer
 
     private function addTableSql(string $table, array $table_schema): string
     {
-        $columns = array_map([$this, 'columnToSql'], $table_schema['Columns']);
-        $indexes = array_map([$this, 'indexToSql'], $table_schema['Indexes'] ?? []);
+        $columns = array_map($this->columnToSql(...), $table_schema['Columns']);
+        $indexes = array_map($this->indexToSql(...), $table_schema['Indexes'] ?? []);
 
         $def = implode(', ', array_merge(array_values($columns), array_values($indexes)));
 

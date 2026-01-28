@@ -49,7 +49,7 @@ class Pagerduty extends Transport
         } else {
             // Legacy behaviour: strip tags and split into non-empty lines
             $safe_message = strip_tags($msg_raw) ?: 'Test';
-            $message = array_filter(explode("\n", $safe_message), fn ($value): bool => strlen($value) > 0);
+            $message = array_filter(explode("\n", $safe_message), fn ($value): bool => strlen((string) $value) > 0);
             $custom_details = ['message' => $message];
         }
         $data = [

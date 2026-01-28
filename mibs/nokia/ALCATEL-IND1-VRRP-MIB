@@ -20,29 +20,23 @@ IMPORTS
 
 
 alcatelIND1VRRPMIB MODULE-IDENTITY
-    LAST-UPDATED "200704030000Z"
-    ORGANIZATION "Alcatel-Lucent"
+    LAST-UPDATED "201910070000Z"
+    ORGANIZATION "ALE USA Inc"
     CONTACT-INFO
         "Please consult with Customer Service to ensure the most appropriate
          version of this document is used with the products in question:
 
-                    Alcatel-Lucent, Enterprise Solutions Division
-                   (Formerly Alcatel Internetworking, Incorporated)
+                        Alcatel-Lucent Enterprise,
                            26801 West Agoura Road
                         Agoura Hills, CA  91301-5122
                           United States Of America
 
-        Telephone:               North America  +1 800 995 2696
-                                 Latin America  +1 877 919 9526
-                                 Europe         +31 23 556 0100
-                                 Asia           +65 394 7933
-                                 All Other      +1 818 878 4507
+        Telephone:                +1 800 995 2696
 
-        Electronic Mail:         support@ind.alcatel.com
-        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+        Electronic Mail:         ebg_global_supportcenter@al-enterprise.com
+        World Wide Web:          https://www.al-enterprise.com"
 
-    DESCRIPTION
+     DESCRIPTION
         "This module describes an authoritative enterprise-specific Simple
          Network Management Protocol (SNMP) Management Information Base (MIB):
 
@@ -59,12 +53,13 @@ alcatelIND1VRRPMIB MODULE-IDENTITY
          non-exclusive license to use this specification in connection with
          management of the products for which it is intended to be used.
 
-                     Copyright (C) 1995-2007 Alcatel-Lucent
-                         ALL RIGHTS RESERVED WORLDWIDE"
+                     Copyright (C) ALE USA Inc. 2014-2019
+		     Copyright (C) 1995-2013 Alcatel-Lucent
+                     ALL RIGHTS RESERVED WORLDWIDE"
 
-    REVISION      "200704030000Z"
+    REVISION      "201910070000Z"
     DESCRIPTION
-        "The latest version of this MIB Module."
+        "Updated the latest contact and Copyright information for ALE USA Inc."
 
     ::= { softentIND1Vrrp 1 }
 
@@ -305,7 +300,7 @@ alaVrrpTrackState OBJECT-TYPE
          enable(1),
          disable(2)
      }
-     MAX-ACCESS   read-write
+     MAX-ACCESS   read-create
      STATUS       current
      DESCRIPTION
          "This object will enable/disable the tracking policy function."
@@ -329,7 +324,7 @@ alaVrrpTrackEntityType OBJECT-TYPE
 
 alaVrrpTrackEntityVlan OBJECT-TYPE
      SYNTAX       INTEGER (0..4094)
-     MAX-ACCESS   read-write
+     MAX-ACCESS   read-create
      STATUS       deprecated
      DESCRIPTION
          "This object contains the Tracking Policy Entity. A vlan id. 
@@ -343,7 +338,7 @@ alaVrrpTrackEntityVlan OBJECT-TYPE
 
 alaVrrpTrackEntityPort OBJECT-TYPE
      SYNTAX       InterfaceIndexOrZero
-     MAX-ACCESS   read-write
+     MAX-ACCESS   read-create
      STATUS       current
      DESCRIPTION
          "This object contains the Tracking Policy Entity. A port 
@@ -358,7 +353,7 @@ alaVrrpTrackEntityPort OBJECT-TYPE
 
 alaVrrpTrackEntityIpAddress OBJECT-TYPE
      SYNTAX       IpAddress
-     MAX-ACCESS   read-write
+     MAX-ACCESS   read-create
      STATUS       deprecated
      DESCRIPTION
          "This object contains the Tracking Policy Entity. IP Address.
@@ -372,7 +367,7 @@ alaVrrpTrackEntityIpAddress OBJECT-TYPE
 
 alaVrrpTrackPriority OBJECT-TYPE
      SYNTAX       Integer32 (1..255)
-     MAX-ACCESS   read-write
+     MAX-ACCESS   read-create
      STATUS       current
      DESCRIPTION
 	"This object specifies the value by which the priority of virtual
@@ -385,7 +380,7 @@ alaVrrpTrackPriority OBJECT-TYPE
 
 alaVrrpTrackRowStatus OBJECT-TYPE
      SYNTAX       RowStatus
-     MAX-ACCESS   read-write
+     MAX-ACCESS   read-create
      STATUS       current
      DESCRIPTION
 	 "The row status variable, used in accordance to installation
@@ -406,7 +401,7 @@ alaVrrpTrackRowStatus OBJECT-TYPE
 
 alaVrrpTrackEntityInterface OBJECT-TYPE
      SYNTAX       InterfaceIndexOrZero
-     MAX-ACCESS   read-write
+     MAX-ACCESS   read-create
      STATUS       current
      DESCRIPTION
          "This object contains the Tracking Policy Entity. An interface. 
@@ -421,7 +416,7 @@ alaVrrpTrackEntityInterface OBJECT-TYPE
 
 alaVrrpTrackEntityIpv6Interface OBJECT-TYPE
      SYNTAX       InterfaceIndexOrZero
-     MAX-ACCESS   read-write
+     MAX-ACCESS   read-create
      STATUS       current
      DESCRIPTION
          "This object contains the Tracking Policy Entity. An Ipv6 
@@ -437,7 +432,7 @@ alaVrrpTrackEntityIpv6Interface OBJECT-TYPE
 
 alaVrrpTrackEntityIpAddrType OBJECT-TYPE
      SYNTAX       InetAddressType
-     MAX-ACCESS   read-write
+     MAX-ACCESS   read-create
      STATUS       current
      DESCRIPTION
          "This object contains the Tracking Policy Entity IP Address
@@ -446,7 +441,7 @@ alaVrrpTrackEntityIpAddrType OBJECT-TYPE
 
 alaVrrpTrackEntityIpAddr OBJECT-TYPE
      SYNTAX       InetAddress
-     MAX-ACCESS   read-write
+     MAX-ACCESS   read-create
      STATUS       current
      DESCRIPTION
          "This object contains the Tracking Policy Entity. An 
@@ -461,7 +456,7 @@ alaVrrpTrackEntityIpAddr OBJECT-TYPE
 
  alaVrrpTrackBfdStatus 	OBJECT-TYPE	
 	SYNTAX		INTEGER
-	MAX-ACCESS   read-write
+	MAX-ACCESS   read-create
 	STATUS       current
 	DESCRIPTION
 		"Enables BFD for a VRRP track."
@@ -512,7 +507,7 @@ alaVrrpTrackEntityIpAddr OBJECT-TYPE
 
  alaVrrpAssoTrackRowStatus OBJECT-TYPE
      SYNTAX       RowStatus
-     MAX-ACCESS   read-write
+     MAX-ACCESS   read-create
      STATUS       current
      DESCRIPTION
          "The row status variable, used according to installation
@@ -933,7 +928,12 @@ alaVRRPCompliance MODULE-COMPLIANCE
 	"The compliance statement for switches with Alcatel VRRP and
 	implementing ALCATEL-IND1-VRRP-MIB."
     MODULE
-    MANDATORY-GROUPS { alaVRRPConfigGroup }
+    MANDATORY-GROUPS {
+     alaVRRPConfigGroup ,
+     alaVrrp3AssoTrackGroup,
+     alaVrrpGroupGroup,
+     alaVrrpTrackGroup
+    }
     ::= { alcatelIND1VRRPMIBCompliances 1 }
 
 
@@ -944,11 +944,75 @@ alaVRRPCompliance MODULE-COMPLIANCE
 alaVRRPConfigGroup OBJECT-GROUP
     OBJECTS  	{
                   alaVRRPStartDelay,
- 		  alaVrrpBfdStatus 
+ 		  alaVrrpBfdStatus,
+ 		   alaVRRPAdminState,
+ 		   alaVRRPDefaultInterval,
+ 		   alaVRRPDefaultPreemptMode ,
+ 		   alaVRRPDefaultPriority,
+ 		   alaVRRPOverride,
+ 		   alaVRRPSetParam,
+ 		   alaVrrpAssoGroupRowStatus,
+ 		   alaVrrpAssoTrackRowStatus ,
+ 		   alaVrrpCurrentPriority ,
+                   alaVrrpTrackCount ,
+ 		   alaVrrpGroupIdent 
 		}
     STATUS     current
     DESCRIPTION
 	"A collection of objects to support management of Alcatel VRRP."
     ::= { alcatelIND1VRRPMIBGroups 1 }
 
+    alaVrrp3AssoTrackGroup OBJECT-GROUP
+    OBJECTS  	
+    {
+    alaVrrp3AssoTrackRowStatus,
+    alaVrrp3CurrentPriority ,
+    alaVrrp3GroupIdent ,
+    alaVrrp3TrackCount
+    }
+	
+    STATUS     current
+    DESCRIPTION
+	"VRRP3 Associated Tracking Policy Table."
+    ::= { alcatelIND1VRRPMIBGroups 2 }
+
+    alaVrrpGroupGroup OBJECT-GROUP
+    OBJECTS  	
+    {
+    	alaVrrpGroupInterval,
+    	alaVrrpGroupPriority,
+    	alaVrrpGroupPreemptMode,
+    	alaVrrpGroupAdminState,
+    	alaVrrpGroupSetParam,
+    	alaVrrpGroupOverride,
+    	alaVrrpGroupRowStatus
+    }
+	
+    STATUS     current
+    DESCRIPTION
+	""
+    ::= { alcatelIND1VRRPMIBGroups 3 }
+
+   alaVrrpTrackGroup OBJECT-GROUP
+    OBJECTS  	
+    {
+     	alaVrrpTrackState,
+        alaVrrpTrackAdminState,
+        alaVrrpTrackEntityType,
+        alaVrrpTrackEntityVlan,
+        alaVrrpTrackEntityPort,
+        alaVrrpTrackEntityIpAddress,
+        alaVrrpTrackPriority,
+        alaVrrpTrackRowStatus,
+        alaVrrpTrackEntityInterface,
+        alaVrrpTrackEntityIpv6Interface,
+        alaVrrpTrackEntityIpAddrType,
+        alaVrrpTrackEntityIpAddr,
+    	alaVrrpTrackBfdStatus
+    }
+	
+    STATUS     current
+    DESCRIPTION
+	""
+    ::= { alcatelIND1VRRPMIBGroups 4 }
 END

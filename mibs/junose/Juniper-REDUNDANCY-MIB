@@ -6,6 +6,7 @@
 --   REDUNDANCY MIB
 --
 -- Copyright (c) 2003 Juniper Networks Inc.
+-- Copyright (c) 2004-2010 Juniper Networks Inc.
 --   All Rights Reserved.
 -- *****************************************************************************
 
@@ -24,7 +25,7 @@ IMPORTS
         FROM Juniper-MIBs;
 
 juniRedundancyMIB  MODULE-IDENTITY
-    LAST-UPDATED "200312122104Z"  -- 12-Dec-03 04:04 PM EST
+    LAST-UPDATED "201003191231Z"  -- 19-Mar-10 06:01 PM EST
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
         "       Juniper Networks, Inc.
@@ -36,6 +37,9 @@ juniRedundancyMIB  MODULE-IDENTITY
     DESCRIPTION
         "The redundancy configuration MIB for Juniper Networks enterprise."
     -- Revision History
+    REVISION    "201003191231Z"  -- 19-Mar-10 06:01 PM EST  - JUNOSe 11.0
+    DESCRIPTION
+        "Added new traps for line card redundancy."
     REVISION    "200312120000Z"  -- 12-Dec-03               - JUNOSe 6.0
     DESCRIPTION
         "Initial version of this MIB module."
@@ -139,6 +143,38 @@ JuniRedundancyHistoryCommand ::= TEXTUAL-CONVENTION
                    keep(1),
                    clear(2) }
 
+JuniLcRedundancySystemActivationType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+          "Various kinds of system activation:
+              reload      - line card has reloaded, i.e., no switchover has occurred.
+              coldSwitch  - line card switched over from active to standby linecard and no subscriber state is 
+                                  maintained 
+              warmSwitch  - line card switched over from active to standby linecards; line cards were
+                                   not reloaded during switchover."
+    SYNTAX     INTEGER {
+                   reload(1),
+                   coldSwitch(2),
+                   warmSwitch(3) }
+
+JuniLcRedundancyResetReason ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "Reason codes for the reset of active line card that might result
+       in switch of control to standby line card. 
+             poweron       - indicates 'power-on' situation.
+             notKnown      - Reason is unknown.
+             userInitiated - A safe, manual reset was initiated by the user.
+             hardware - reset was initiated due to hardware issue.
+             software - reset was initiated due to software issue."
+    SYNTAX     INTEGER {
+                   poweron(1),
+                   notKnown(2),
+                   userInitiated(3),
+                   hardware(4),
+                   software(5)}
+                   
+
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- MIB Structure
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -152,6 +188,7 @@ juniRedundancyMIBConformance   OBJECT IDENTIFIER ::= { juniRedundancyMIB 2 }
 juniRedundancyStatus               OBJECT IDENTIFIER ::= {juniRedundancyObjects 1 }
 juniRedundancyCfg                  OBJECT IDENTIFIER ::= {juniRedundancyObjects 2 }
 juniRedundancyHistory              OBJECT IDENTIFIER ::= {juniRedundancyObjects 3 }
+juniLcRedundancyStatus             OBJECT IDENTIFIER ::= {juniRedundancyObjects 4 }
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Managed objects for Redundancy 
@@ -226,6 +263,62 @@ juniRedundancyHaActiveTime OBJECT-TYPE
         indicated in juniRedundancyActiveSlotState object. The value is 0 in 
         file system synchronization redundancy mode."
     ::= { juniRedundancyStatus 8 }
+
+juniLcRedundancyActiveSlot OBJECT-TYPE
+    SYNTAX     Integer32(0..255)
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "An identifier for primary linecard slot."
+    ::= { juniLcRedundancyStatus 1 }
+
+juniLcRedundancyStandbySlot OBJECT-TYPE
+    SYNTAX     Integer32(0..255)
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "A unique identifier for secondary linecard slot."
+    ::= { juniLcRedundancyStatus 2 }
+
+
+juniLcRedundancyLastResetReason OBJECT-TYPE
+    SYNTAX     JuniLcRedundancyResetReason
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The reason for the last linecard reset."
+    ::= { juniLcRedundancyStatus 3 }
+
+
+juniLcRedundancyActivationType OBJECT-TYPE
+    SYNTAX     JuniLcRedundancySystemActivationType
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The type of linecard activation when the system became operational."
+    ::= { juniLcRedundancyStatus 4 }
+
+
+juniLcRedundancyHaActiveTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The value of sysUptime when active linecard enters 'active' state as
+        indicated in juniLcRedundancyActiveSlotState object."
+    ::= { juniLcRedundancyStatus 5}
+
+
+juniLcRedundancySwitchoverTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The value of sysUptime when the system is operational either
+        following a reload or a switchover. The value 0 is a special
+        value to indicate 'from reset'."
+     ::= { juniLcRedundancyStatus 6 }
+
     
 --
 -- Cfg sub group definitions
@@ -484,6 +577,42 @@ juniRedundancyModeNotification   NOTIFICATION-TYPE
         and vice versa." 
     ::= { juniRedundancyNotifications 6 }
 
+juniLcRedundancySwitchoverNotification  NOTIFICATION-TYPE
+    OBJECTS {
+        juniLcRedundancyActivationType,   
+        juniLcRedundancyActiveSlot,   
+        juniLcRedundancyLastResetReason, 
+        juniLcRedundancyStandbySlot, 
+        juniLcRedundancySwitchoverTime 
+    }
+    STATUS     current
+    DESCRIPTION
+        "A mode change notification sent by active linecard whenever redundancy mode and vice versa." 
+    ::= { juniRedundancyNotifications 7 }
+
+juniLcRedundancyStateEnabledNotification   NOTIFICATION-TYPE
+    OBJECTS {
+        juniLcRedundancyActiveSlot,
+        juniLcRedundancyStandbySlot,
+        juniLcRedundancyHaActiveTime 
+     }    
+    STATUS     current
+    DESCRIPTION
+        "A state change notification sent by active linecard whenever system enters 
+        'active' state." 
+    ::= { juniRedundancyNotifications 8 }
+
+juniLcRedundancyStateDisabledNotification   NOTIFICATION-TYPE
+    OBJECTS {
+        juniLcRedundancyActiveSlot,
+        juniLcRedundancyStandbySlot,
+        juniLcRedundancyHaActiveTime
+     }
+    STATUS     current
+    DESCRIPTION
+        "A state change notification sent by active linecard whenever system enters 
+        'disabled' state." 
+    ::= { juniRedundancyNotifications 9 }
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Conformance information
@@ -561,10 +690,12 @@ juniRedundancyNotificationGroup NOTIFICATION-GROUP
         juniRedundancyStateEnabledNotification,
         juniRedundancyStateDisabledNotification,
         juniRedundancyStatePendingNotification,
-        juniRedundancyModeNotification }
+        juniRedundancyModeNotification,
+        juniLcRedundancySwitchoverNotification,
+        juniLcRedundancyStateEnabledNotification,
+        juniLcRedundancyStateDisabledNotification }
     STATUS     current
     DESCRIPTION
         "The collection of notifications for redundancy events."
     ::= { juniRedundancyMIBGroups 4 }
-
 END

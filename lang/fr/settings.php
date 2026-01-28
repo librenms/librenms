@@ -951,9 +951,6 @@ return [
             'description' => 'Configurer tous les RRDs d\'interfaces pour utiliser la valuer `max`',
             'help' => 'Auto tune maximum value for rrd port files',
         ],
-        'sfdp' => [
-            'description' => 'Chemin vers `sfdp`',
-        ],
         'site_style' => [
             'description' => 'Changer la feuille de style',
             'options' => [

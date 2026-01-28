@@ -285,30 +285,16 @@ if (! empty($peers)) {
                         }
 
                         if ($address == $peer_ip) {
-                            switch ($value['fbBgpPeerState']) {
-                                case 0:
-                                    $peer_data['bgpPeerState'] = 'idle';
-                                    break;
-                                case 1:
-                                case 2:
-                                    $peer_data['bgpPeerState'] = 'active';
-                                    break;
-                                case 3:
-                                    $peer_data['bgpPeerState'] = 'opensent';
-                                    break;
-                                case 4:
-                                    $peer_data['bgpPeerState'] = 'openconfig';
-                                    break;
-                                case 5:
-                                    $peer_data['bgpPeerState'] = 'established';
-                                    break;
-                                case 6:
-                                    $peer_data['bgpPeerState'] = 'closed';
-                                    break;
-                                case 7:
-                                    $peer_data['bgpPeerState'] = 'free';
-                                    break;
-                            }
+                            // Map Firebrick BGP state (MIB enum strings) to standard BGP state names
+                            $peer_data['bgpPeerState'] = match ($value['fbBgpPeerState']) {
+                                'idle', 'closed', 'preshutdown', 'shutdown' => 'idle',
+                                'active', 'openWait' => 'active',
+                                'openSent' => 'opensent',
+                                'openConfirm' => 'openconfirm',
+                                'established' => 'established',
+                                default => 'idle',
+                            };
+
                             $peer_data['bgpPeerRemoteAddr'] = $address;
                             $peer_data['bgpPeerRemoteAs'] = $value['fbBgpPeerRemoteAS'];
                             $peer_data['bgpPeerAdminStatus'] = 'start';

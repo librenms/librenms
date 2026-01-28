@@ -40,6 +40,11 @@ juniIfMIB  MODULE-IDENTITY
         "The Generic Interfaces MIB for the Juniper Networks
         enterprise."
     -- Revision History
+    REVISION    "201403252130Z"  -- 25-Mar-14 05:30 PM EDT  - JUNOSe 11.3_bugfix
+    DESCRIPTION
+        "Uid aligned and categorized:
+            mplsL2ShimInterface(45),
+            atmVirtualCircuit(145)"
     REVISION    "200510112040Z"  -- 11-Oct-05 04:40 PM EDT  - JUNOSe 7.1
     DESCRIPTION
         "Added interface type:
@@ -176,7 +181,7 @@ JuniIfType ::= TEXTUAL-CONVENTION
                     l2fDestinationInterface(42),
                     ipsecInterface(43),
                     sgInterface(44),
-		    mplsL2ShimInterface(45),
+                    mplsL2ShimInterface(45),
                     lacGenInterface(47),
                     bridgeInterface(48),
                     ipsecTransportInterface(49),
@@ -186,8 +191,8 @@ JuniIfType ::= TEXTUAL-CONVENTION
                     osi(53),
                     lag(54),
                     ipTunnelMdt(55),
-                    -- multi-personality and pseudo interfaces
                     atmVirtualCircuit(145),
+                    -- multi-personality and pseudo interfaces
                     pppLink(256),
                     atmActiveSubInterface(257) }
 

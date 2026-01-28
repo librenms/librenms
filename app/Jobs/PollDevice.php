@@ -94,7 +94,7 @@ class PollDevice implements ShouldQueue
             $measurement->getDuration()));
 
         // add log file line, this is used by the simple python dispatcher watchdog
-        Log::channel('log_file')->alert(sprintf('INFO: device:poll %s (%s) polled in %0.3fs',
+        Log::alert(sprintf('INFO: device:poll %s (%s) polled in %0.3fs',
             $this->device->hostname,
             $this->device->device_id,
             $measurement->getDuration()));

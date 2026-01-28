@@ -98,16 +98,16 @@ class PortsController extends TableController
         $query = Port::hasAccess($request->user())
             ->with(['device', 'device.location'])
             ->leftJoin('devices', 'ports.device_id', 'devices.device_id')
-            ->where('deleted', $request->get('deleted', 0)) // always filter deleted
-            ->when($request->get('hostname'), function (Builder $query, $hostname): void {
+            ->where('deleted', $request->input('deleted', 0)) // always filter deleted
+            ->when($request->input('hostname'), function (Builder $query, $hostname): void {
                 $query->where(function (Builder $query) use ($hostname): void {
                     $query->where('devices.hostname', 'like', "%$hostname%")
                         ->orWhere('devices.sysName', 'like', "%$hostname%");
                 });
             })
-            ->when($request->get('ifAlias'), fn (Builder $query, $ifAlias) => $query->where('ifAlias', 'like', "%$ifAlias%"))
-            ->when($request->get('errors'), fn (Builder $query) => $query->hasErrors())
-            ->when($request->get('state'), fn (Builder $query, $state) => match ($state) {
+            ->when($request->input('ifAlias'), fn (Builder $query, $ifAlias) => $query->where('ifAlias', 'like', "%$ifAlias%"))
+            ->when($request->input('errors'), fn (Builder $query) => $query->hasErrors())
+            ->when($request->input('state'), fn (Builder $query, $state) => match ($state) {
                 'down' => $query->isDown(),
                 'up' => $query->isUp(),
                 'admindown' => $query->isShutdown(),
@@ -119,7 +119,7 @@ class PortsController extends TableController
             'hostname',
         ];
 
-        if (array_key_exists('secondsIfLastChange', Arr::wrap($request->get('sort')))) {
+        if (array_key_exists('secondsIfLastChange', Arr::wrap($request->input('sort')))) {
             // for sorting
             $select[] = DB::raw('`devices`.`uptime` - `ports`.`ifLastChange` / 100 as secondsIfLastChange');
         }

@@ -9,32 +9,27 @@ IMPORTS
         MODULE-COMPLIANCE, OBJECT-GROUP
             FROM SNMPv2-CONF
         dvmrpInterfaceEntry
-            FROM DVMRP-STD-MIB
+           FROM DVMRP-STD-MIB
         routingIND1Dvmrp
             FROM ALCATEL-IND1-BASE;
 
 alcatelIND1DVMRPMIB MODULE-IDENTITY
-    LAST-UPDATED  "200704030000Z"
-    ORGANIZATION  "Alcatel-Lucent"
+    LAST-UPDATED  "201910070000Z"
+    ORGANIZATION  "ALE USA Inc"
     CONTACT-INFO
         "Please consult with Customer Service to ensure the most appropriate
          version of this document is used with the products in question:
 
-                    Alcatel-Lucent, Enterprise Solutions Division
-                   (Formerly Alcatel Internetworking, Incorporated)
-                           26801 West Agoura Road
-                        Agoura Hills, CA  91301-5122
-                          United States Of America
+                    Alcatel-Lucent Enterprise,        
+                      26801 West Agoura Road
+                   Agoura Hills, CA  91301-5122
+                     United States Of America
 
-        Telephone:               North America  +1 800 995 2696
-                                 Latin America  +1 877 919 9526
-                                 Europe         +31 23 556 0100
-                                 Asia           +65 394 7933
-                                 All Other      +1 818 878 4507
-
-        Electronic Mail:         support@ind.alcatel.com
-        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+        Telephone:               +1 800 995 2696 
+ 				     
+        Electronic Mail:         ebg_global_supportcenter@al-enterprise.com 
+        World Wide Web:          https://www.al-enterprise.com"
+       
 
     DESCRIPTION
         "This module describes an authoritative enterprise-specific Simple
@@ -54,12 +49,13 @@ alcatelIND1DVMRPMIB MODULE-IDENTITY
          non-exclusive license to use this specification in connection with
          management of the products for which it is intended to be used.
 
-                     Copyright (C) 1995-2007 Alcatel-Lucent
-                         ALL RIGHTS RESERVED WORLDWIDE"
+		 	Copyright (C) ALE USA Inc. 2014-2019                     
+			Copyright (C) 1995-2013 Alcatel-Lucent
+                        ALL RIGHTS RESERVED WORLDWIDE"
 
-    REVISION      "200704030000Z"
+    REVISION      "201910070000Z"
     DESCRIPTION
-        "The latest version of this MIB Module."
+        "Updated the latest contact and Copyright information for ALE USA Inc."
 
     ::= { routingIND1Dvmrp 1 }
 
@@ -77,7 +73,6 @@ alaDvmrpTunnelXIfTable OBJECT-TYPE
         contains additional objects that are not present in the tunnelMIB
         tunnelIfTable."
         ::= { alcatelIND1DVMRPMIBObjects 3 }
-
 
 -- ***************************************************************************
 -- Global DVMRP Configuration
@@ -230,7 +225,7 @@ alaDvmrpInitNbrAsSubord OBJECT-TYPE
     DEFVAL      { true }
     ::= { alaDvmrpGlobalConfig 11}
 
- alaDvmrpBfdStatus    OBJECT-TYPE
+alaDvmrpBfdStatus    OBJECT-TYPE
 	SYNTAX	INTEGER
 			{
 			enable(1),
@@ -242,7 +237,6 @@ alaDvmrpInitNbrAsSubord OBJECT-TYPE
 	"Enables/Disables Bfd for DVMRP Protocol."
 	DEFVAL      {disable}
 	::= { alaDvmrpGlobalConfig 12}
-
  alaDvmrpBfdAllInterfaceStatus   OBJECT-TYPE
 	SYNTAX	INTEGER
 			{
@@ -500,14 +494,13 @@ alaDvmrpLocalIfIndex        OBJECT-TYPE
 
     ::= { alaDvmrpTunnelXIfEntry 2 }
 
- alaDvmrpIfAugTable OBJECT-TYPE
+alaDvmrpIfAugTable OBJECT-TYPE
 	SYNTAX     SEQUENCE OF AlaDvmrpIfAugEntry
 	MAX-ACCESS not-accessible
 	STATUS     current
 	DESCRIPTION
 		"Expansion for Dvmrp Intf table."
 		::= { alcatelIND1DVMRPMIBObjects 4 }
-
  alaDvmrpIfAugEntry OBJECT-TYPE
 	SYNTAX       AlaDvmrpIfAugEntry
 	MAX-ACCESS   not-accessible
@@ -516,12 +509,10 @@ alaDvmrpLocalIfIndex        OBJECT-TYPE
 		"An entry of alaDvmrpIfAugEntry."
     	AUGMENTS { dvmrpInterfaceEntry } 
 		::= { alaDvmrpIfAugTable 1 }
-
  AlaDvmrpIfAugEntry ::=
 	SEQUENCE {
 			alaDvmrpIfBfdStatus		INTEGER 
             	 }
-
  alaDvmrpIfBfdStatus		OBJECT-TYPE
 	SYNTAX		INTEGER
 			{
@@ -551,7 +542,7 @@ alaDvmrpCompliance MODULE-COMPLIANCE
             and implementing the ALCATEL-IND1-DVMRP MIB."
     MODULE  -- this module
         MANDATORY-GROUPS { alaDvmrpConfigMIBGroup, alaDvmrpDebugMIBGroup,
-                           alaDvmrpTunnelXIfMIBGroup,alaDvmrpIfConfigGroup }
+                           alaDvmrpTunnelXIfMIBGroup, alaDvmrpIfConfigGroup }
 
     ::= { alcatelIND1DVMRPMIBCompliances 1 }
 
@@ -563,7 +554,7 @@ alaDvmrpConfigMIBGroup OBJECT-GROUP
               alaDvmrpRouteExpirationTimeout, alaDvmrpRouteHoldDown,
               alaDvmrpNeighborProbeInterval, alaDvmrpPruneLifetime,
               alaDvmrpPruneRetransmission, alaDvmrpGraftRetransmission,
-              alaDvmrpInitNbrAsSubord,alaDvmrpBfdStatus,alaDvmrpBfdAllInterfaceStatus 
+              alaDvmrpInitNbrAsSubord, alaDvmrpBfdStatus,alaDvmrpBfdAllInterfaceStatus
             }
     STATUS  current
     DESCRIPTION
@@ -593,6 +584,7 @@ alaDvmrpTunnelXIfMIBGroup OBJECT-GROUP
             about configured DVMRP tunnels not found in the standard tunnel
             MIB."
     ::= { alcatelIND1DVMRPMIBGroups 3 }
+
 alaDvmrpIfConfigGroup    OBJECT-GROUP
    OBJECTS { alaDvmrpIfBfdStatus }
     STATUS  current
@@ -601,7 +593,5 @@ alaDvmrpIfConfigGroup    OBJECT-GROUP
             about configured DVMRP interfaces not found in the standard tunnel
             MIB."
     ::= { alcatelIND1DVMRPMIBGroups 4 }
-
-
 END
 

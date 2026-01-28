@@ -26,7 +26,7 @@ IMPORTS
         FROM Juniper-MIBs;
 
 juniSysClockMIB  MODULE-IDENTITY
-    LAST-UPDATED "200512141401Z"  -- 14-Dec-05 10:01 AM EDT
+    LAST-UPDATED "201409151400Z"  -- 15-Sep-14 10:00 AM EDT
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
         "       Juniper Networks, Inc.
@@ -47,6 +47,10 @@ juniSysClockMIB  MODULE-IDENTITY
         client/server, which adheres to RFC 1305, the 'Network Time Protocol
         (Version 3) Specification, Implementation and Analysis'."
     -- Revision History
+    REVISION    "201409151400Z"  -- 15-Sep-14 10:00 AM EDT  - JUNOSe 15.1
+    DESCRIPTION
+        "Modified the description of juniNtpSysClockFrequencyError and 
+         juniNtpSysClockFrequencyErrorNew." 
     REVISION    "200703221400Z"  -- 22-Mar-07 10:00 AM EDT  - JUNOSe7.1
     DESCRIPTION
         "Incorporate 2007 U.S.A. Daylight Saving Time changes."
@@ -502,7 +506,7 @@ juniNtpSysClockFrequencyError  OBJECT-TYPE
         by parts per millionth of a second.
 
         For example, if the frequency error is 1ppm, it means the clock is ahead
-        by 0.864 second in a day, and therefore the clock will need to be
+        by 0.0864 second in a day, and therefore the clock will need to be
         corrected by that amount in the next 24 hours for the clock to be
         accurate.
 
@@ -607,7 +611,7 @@ juniNtpSysClockFrequencyErrorNew  OBJECT-TYPE
         by parts per millionth of a second.
 
         For example, if the frequency error is 1ppm, it means the clock is ahead
-        by 0.864 second in a day, and therefore the clock will need to be
+        by 0.0864 second in a day, and therefore the clock will need to be
         corrected by that amount in the next 24 hours for the clock to be
         accurate.
 

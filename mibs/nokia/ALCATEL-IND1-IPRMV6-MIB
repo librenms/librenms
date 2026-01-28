@@ -6,6 +6,8 @@ IMPORTS
         FROM SNMPv2-SMI
     RowStatus, TruthValue
         FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
     MODULE-COMPLIANCE, OBJECT-GROUP
         FROM SNMPv2-CONF
     IANAipRouteProtocol
@@ -17,27 +19,22 @@ IMPORTS
 
 alcatelIND1IPRMV6MIB MODULE-IDENTITY
 
-    LAST-UPDATED  "200704030000Z"
-    ORGANIZATION  "Alcatel-Lucent"
+    LAST-UPDATED  "201910070000Z"
+    ORGANIZATION  "ALE USA Inc"
     CONTACT-INFO
         "Please consult with Customer Service to ensure the most appropriate
          version of this document is used with the products in question:
 
-                    Alcatel-Lucent, Enterprise Solutions Division
-                   (Formerly Alcatel Internetworking, Incorporated)
+                        Alcatel-Lucent Enterprise,
                            26801 West Agoura Road
                         Agoura Hills, CA  91301-5122
                           United States Of America
 
-        Telephone:               North America  +1 800 995 2696
-                                 Latin America  +1 877 919 9526
-                                 Europe         +31 23 556 0100
-                                 Asia           +65 394 7933
-                                 All Other      +1 818 878 4507
-
-        Electronic Mail:         support@ind.alcatel.com
-        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+        Telephone:               +1 800 995 2696 
+ 				 
+        Electronic Mail:         ebg_global_supportcenter@al-enterprise.com 
+        World Wide Web:          https://www.al-enterprise.com"
+        
 
     DESCRIPTION
         "This module describes an authoritative enterprise-specific Simple
@@ -57,12 +54,13 @@ alcatelIND1IPRMV6MIB MODULE-IDENTITY
          non-exclusive license to use this specification in connection with
          management of the products for which it is intended to be used.
 
-                     Copyright (C) 1995-2007 Alcatel-Lucent
+			Copyright (C) ALE USA Inc. 2014-2019                    
+ 			Copyright (C) 1995-2013 Alcatel-Lucent
                          ALL RIGHTS RESERVED WORLDWIDE"
 
-    REVISION      "200704030000Z"
+    REVISION      "201910070000Z"
     DESCRIPTION
-        "The latest version of this MIB Module."
+        "Updated the latest contact and Copyright information for ALE USA Inc."
 
     ::= { routingIND1Iprm 2 }
 
@@ -210,7 +208,9 @@ AlaIprmV6StaticRouteEntry ::=
         alaIprmV6StaticRouteNextHop   Ipv6Address,
         alaIprmV6StaticRouteIfIndex   Ipv6IfIndex,
         alaIprmV6StaticRouteMetric    Unsigned32,
-        alaIprmV6StaticRouteStatus    RowStatus
+        alaIprmV6StaticRouteStatus    RowStatus,
+	alaIprmV6StaticRouteTag       Unsigned32,
+        alaIprmV6StaticRouteName      SnmpAdminString    
     }
 
 alaIprmV6StaticRouteDest OBJECT-TYPE
@@ -269,6 +269,21 @@ alaIprmV6StaticRouteStatus OBJECT-TYPE
         "Used to control the addition and removal of static 
         routes."
     ::= { alaIprmV6StaticRouteEntry 6 }
+
+alaIprmV6StaticRouteTag OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Tag of the static route"
+    ::= { alaIprmV6StaticRouteEntry 7 }
+alaIprmV6StaticRouteName OBJECT-TYPE
+    SYNTAX     SnmpAdminString(SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Name of the static route."
+    ::= { alaIprmV6StaticRouteEntry 8 }
 
 
 -- IPRM's IPV6 Route Preference Configurations
@@ -355,7 +370,8 @@ alaIprmV6ConfigMIBGroup OBJECT-GROUP
                 alaIprmV6StaticRouteMetric, alaIprmV6StaticRouteStatus, 
                 alaIprmV6RtPrefLocal, alaIprmV6RtPrefStatic, 
                 alaIprmV6RtPrefOspf, alaIprmV6RtPrefRip,
-                alaIprmV6RtPrefEbgp, alaIprmV6RtPrefIbgp
+                alaIprmV6RtPrefEbgp, alaIprmV6RtPrefIbgp,
+		alaIprmV6StaticRouteTag, alaIprmV6StaticRouteName
             }
     STATUS  current
     DESCRIPTION

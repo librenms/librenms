@@ -33,6 +33,8 @@ use Spatie\Permission\Models\Role;
 
 class RoleController extends SelectController
 {
+    protected ?string $idField = 'name';
+
     protected function searchFields(Request $request): array
     {
         return ['name'];

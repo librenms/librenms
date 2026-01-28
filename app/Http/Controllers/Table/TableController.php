@@ -64,11 +64,11 @@ abstract class TableController extends PaginatedAjaxController
         $query = $this->baseQuery($request);
 
         $this->filter($request, $query, $this->filterFields($request));
-        $this->search($request->get('searchPhrase'), $query, $this->searchFields($request));
+        $this->search($request->input('searchPhrase'), $query, $this->searchFields($request));
         $this->sort($request, $query);
 
-        $limit = $request->get('rowCount', 25);
-        $page = $request->get('current', 1);
+        $limit = $request->input('rowCount', 25);
+        $page = $request->input('current', 1);
         if ($limit < 0) {
             $limit = $query->count();
             $page = null;
@@ -135,13 +135,13 @@ abstract class TableController extends PaginatedAjaxController
 
         $this->filter($request, $query, $this->filterFields($request));
 
-        if ($request->has('searchPhrase') && ! empty($request->get('searchPhrase'))) {
-            $this->search($request->get('searchPhrase'), $query, $this->searchFields($request));
+        if ($request->has('searchPhrase') && ! empty($request->input('searchPhrase'))) {
+            $this->search($request->input('searchPhrase'), $query, $this->searchFields($request));
         }
 
         if ($request->has('current') && $request->has('rowCount')) {
-            $limit = $request->get('rowCount');
-            $page = $request->get('current');
+            $limit = $request->input('rowCount');
+            $page = $request->input('current');
 
             if ($limit > 0) {
                 $offset = ($page - 1) * $limit;

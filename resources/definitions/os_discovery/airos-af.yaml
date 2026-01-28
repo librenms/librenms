@@ -1,4 +1,3 @@
-mib: UBNT-AirFIBER-MIB
 modules:
     os:
         hardware: IEEE802dot11-MIB::dot11manufacturerProductName.5
@@ -7,14 +6,14 @@ modules:
     processors:
         data:
             -
-                oid: ubntHostCpuLoad
+                oid: UBNT-AirFIBER-MIB::ubntHostCpuLoad
                 num_oid: '.1.3.6.1.4.1.41112.1.4.8.3.{{ $index }}'
                 precision: 100
     sensors:
         state:
             data:
                 -
-                    oid: curTXModRate
+                    oid: UBNT-AirFIBER-MIB::curTXModRate
                     num_oid: '.1.3.6.1.4.1.41112.1.3.2.1.2.{{ $index }}'
                     index: curTXModRate
                     descr: Tx Modulation Rate
@@ -33,7 +32,7 @@ modules:
                         - { value: 10, generic: 0, graph: 1, descr: 'qAM1024-MIMO-10x' }
                         - { value: 11, generic: 0, graph: 1, descr: 'qAM2048-MIMO-11x' }
                 -
-                    oid: gpsSync
+                    oid: UBNT-AirFIBER-MIB::gpsSync
                     num_oid: '.1.3.6.1.4.1.41112.1.3.1.1.8.{{ $index }}'
                     index: gpsSync
                     descr: GPS Sync
@@ -44,12 +43,12 @@ modules:
         temperature:
             data:
                 -
-                    oid: radio0TempC
+                    oid: UBNT-AirFIBER-MIB::radio0TempC
                     num_oid: '.1.3.6.1.4.1.41112.1.3.2.1.8.{{ $index }}'
                     index: 0
                     descr: Radio 0 Temp
                 -
-                    oid: radio1TempC
+                    oid: UBNT-AirFIBER-MIB::radio1TempC
                     num_oid: '.1.3.6.1.4.1.41112.1.3.2.1.10.{{ $index }}'
                     index: 1
                     descr: Radio 1 Temp

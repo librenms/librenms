@@ -1,6 +1,10 @@
 parameters:
 	ignoreErrors:
 		-
+			identifier: include.fileNotFound
+			path: LibreNMS/ComposerHelper.php
+			reportUnmatched: false
+		-
 			message: "#^Property LibreNMS\\\\Data\\\\Store\\\\Rrd\\:\\:\\$async_process \\(LibreNMS\\\\Proc\\) in isset\\(\\) is not nullable\\.$#"
 			count: 1
 			path: LibreNMS/Data/Store/Rrd.php

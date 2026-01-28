@@ -15,12 +15,12 @@ IMPORTS
         FROM SNMPv2-SMI;
 
 juniperMIB MODULE-IDENTITY
-    LAST-UPDATED "201703010000Z"    -- Wed Mar 01 00:00:00 2017 UTC
+    LAST-UPDATED "201912180000Z"    -- Wed Dec 18 00:00:00 2019 UTC
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
             "        Juniper Technical Assistance Center
 		     Juniper Networks, Inc.
-		     1194 N. Mathilda Avenue
+		     1133 Innovation Way
 		     Sunnyvale, CA 94089
 		     E-mail: support@juniper.net"
     DESCRIPTION
@@ -98,7 +98,65 @@ juniperMIB MODULE-IDENTITY
     DESCRIPTION
             "Add jnxOamMibRoot"
 
+    REVISION    "201806010000Z" --01-Jun-18
+    DESCRIPTION
+            "Add jnxWirelessWANStatusMibRoot"
+
+    REVISION    "201906010000Z" --01-Jun-19
+    DESCRIPTION
+            "Add jnxWlanWAPStatusMibRoot"
+
+    REVISION    "201910230924Z" --23-Oct-19
+    DESCRIPTION
+            "Add jnxjSysmonMibRoot"
+
+    REVISION    "201912180000Z" --18-Dec-19
+    DESCRIPTION
+            "Add jnxTLBMIBRoot"
+
+    REVISION    "202003250000Z" --25-Mar-20
+    DESCRIPTION
+            "Add jnxTLBNotifications"
+
+    REVISION    "202202250000Z" --25-Feb-22
+    DESCRIPTION
+            "Add jnxAsicExtMemTraps"
+
+    REVISION    "202202250000Z" --25-Feb-22
+    DESCRIPTION
+            "Add jnxAsicExtMemOKTraps"
+
+    REVISION    "202404020000Z" --02-Apr-24
+    DESCRIPTION
+            "Added jnxPoeTraps branch.
+             Added jnxPoeOKTraps branch."
     ::= { enterprises 2636 }
+
+-- for integer counters that wrap in less than one hour with only 32 bits
+Integer64 ::= TEXTUAL-CONVENTION
+       STATUS      current
+       DESCRIPTION
+           "A 64-bit signed integer.  The value is restricted to
+           the BER serialization of the following ASN.1 type:
+               I64TYPE ::= [122] IMPLICIT I64Type
+           (note: the value 122 is the sum of '30'h and '4a'h)
+           The BER serialization of the length for values of
+           this type must use the definite length, short
+           encoding form.
+
+           For example, the BER serialization of value 129
+           of type I64TYPE is '9f7a020081'h.  (The tag is '9f7a'h;
+           the length is '02'h; and the value is '0081'h.) The
+           BER serialization of value '9f7a020081'h of data
+           type Opaque is '44059f7a020081'h. (The tag is '44'h;
+           the length is '05'h; and the value is '9f7a020081'h.)
+           Also for example, the BER serialization of value -129
+           of type I64TYPE is '9f7a02ff7f'h.  (The tag is '9f7a'h;
+           the length is '02'h; and the value is 'ff7f'h.) The
+           BER serialization of value '9f7a02ff7f'h of data
+           type Opaque is '44059f7a02ff7f'h. (The tag is '44'h;
+           the length is '05'h; and the value is '9f7a02ff7f'h.)"
+       SYNTAX      Opaque (SIZE(4..11))
 
 --
 -- Juniper MIB tree structure
@@ -276,7 +334,20 @@ jnxMibs OBJECT-IDENTITY
     -- juniper URL Filtering Daemon mib
     jnxURLFMibRoot        OBJECT IDENTIFIER ::= { jnxMibs 85 }
 
-jnxTraps OBJECT-IDENTITY 
+    -- Custom OID mib root which gets added dynamically during run-time
+    jnxCustomMibRoot        OBJECT IDENTIFIER ::= { jnxMibs 86 }
+
+    jnxWirelessWANStatusMibRoot     OBJECT IDENTIFIER ::= { jnxMibs 87 }
+
+    jnxWlanWAPStatusMibRoot     OBJECT IDENTIFIER ::= { jnxMibs 88 }
+
+    jnxUserFirewallsRoot        OBJECT IDENTIFIER ::= { jnxMibs 89 }
+
+    jnxjSysmonMibRoot           OBJECT IDENTIFIER ::= { jnxMibs 90 }
+
+    jnxTLBMIBRoot       OBJECT IDENTIFIER ::= {jnxMibs 91}
+
+jnxTraps OBJECT-IDENTITY
     STATUS  current
     DESCRIPTION
             "The root of Juniper's Trap OIDs."
@@ -322,6 +393,20 @@ jnxTraps OBJECT-IDENTITY
     jnxIplcNotifications       OBJECT IDENTIFIER ::= { jnxTraps 28 }
 
     jnxIlaNotifications       OBJECT IDENTIFIER ::= { jnxTraps 29 }
+
+    -- Customer will define their custom trap OID under this root
+    jnxCustomSyslogNotifications     OBJECT IDENTIFIER ::= { jnxTraps 30 }
+
+    jnxjSysmonNotifications     OBJECT IDENTIFIER ::= { jnxTraps 31 }
+
+    jnxTLBNotifications	    OBJECT IDENTIFIER ::= { jnxTraps 32 }
+
+    jnxAsicExtMemTraps     OBJECT IDENTIFIER ::= { jnxTraps 33 }
+
+    jnxAsicExtMemOKTraps     OBJECT IDENTIFIER ::= { jnxTraps 34 }
+
+    jnxPoeTraps              OBJECT IDENTIFIER ::= { jnxTraps 35 }
+    jnxPoeOKTraps            OBJECT IDENTIFIER ::= { jnxTraps 36 }
 
 --  This is the top-level object identifier registry used by Juniper
 --  products for SNMP modules containing experimental MIB definitions.

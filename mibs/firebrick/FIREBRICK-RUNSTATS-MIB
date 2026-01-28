@@ -4,8 +4,6 @@
 -- * June 2020, Cliff Hones
 -- *
 -- * Copyright (c) 2020 by Andrews & Arnold
--- * 
--- * See the Firebrick Manuals for more information
 -- *------------------------------------------------
 
 FIREBRICK-RUNSTATS-MIB DEFINITIONS ::= BEGIN
@@ -24,11 +22,11 @@ IMPORTS
     OBJECT-GROUP
         FROM SNMPv2-CONF
     firebrickNewStyle
-	FROM FIREBRICK-MIB
+        FROM FIREBRICK-MIB
         ;
 
 fbRunMib MODULE-IDENTITY
-    LAST-UPDATED "202006170000Z"
+    LAST-UPDATED "202307030000Z"
     ORGANIZATION "Andrews & Arnold Limited"
     CONTACT-INFO
         "Andrews & Arnold
@@ -38,8 +36,11 @@ fbRunMib MODULE-IDENTITY
 
         Tel: +44 3333 400 999
         Email: support@aa.net.uk"
-    DESCRIPTION
-        "This is a MIB Module for monitoring Firebrick CPU usage."
+    DESCRIPTION "Firebrick system stats"
+    REVISION "202307030000Z"
+    DESCRIPTION "Deprecate out of date buffer count mechanism"
+    REVISION "202207150000Z"
+    DESCRIPTION "Additional validation"
     REVISION "202006170000Z"
     DESCRIPTION "Initial version of this MIB module"
     ::= { firebrickNewStyle 3 }
@@ -72,15 +73,15 @@ fbRunCore OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The CPU core number covered by this table entry.
-	 The numbering starts at 1, so CPU0 (CORE) is 1 and CPU1 (NET) is 2."
+         The numbering starts at 1, so CPU0 is 1 and CPU1 is 2 etc."
     ::= { fbRunStatsEntry 2 }
 
 fbRunBuffers OBJECT-TYPE
     SYNTAX Gauge32
     MAX-ACCESS read-only
-    STATUS current
+    STATUS deprecated
     DESCRIPTION
-        "The count of buffers which are currently free on this CPU core."
+        "The count of buffers which are currently globally free in the system."
     ::= { fbRunStatsEntry 1 }
 
 END

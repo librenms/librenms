@@ -1,7 +1,7 @@
 --
 -- Accedian Enterprise Specific MIB
 --
--- Copyright (c) 2005-2011, Accedian Networks, Inc.
+-- Copyright (c) 2005-2015, Accedian Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -23,16 +23,25 @@ IMPORTS
 
 acdFilter MODULE-IDENTITY
 
-    LAST-UPDATED "201110100100Z"
+    LAST-UPDATED "201506180100Z"
     ORGANIZATION "Accedian Networks, Inc."
     CONTACT-INFO
             "Accedian Technical Assistance Center
              Accedian Networks, Inc.
-             4878 Levy, suite 202
-             Saint-Laurent, Quebec Canada H4R 2P1
+             2351 Alfred-Nobel blvd., Suite N-410
+             Saint-Laurent, Quebec Canada H4S 2A9
              E-mail: support@accedian.com"
     DESCRIPTION
             "The Filter database for this Accedian Networks device."
+
+    REVISION "201506180100Z"        -- 18 June 2015
+    DESCRIPTION
+            "Add acdSmapIPv4FilterSrcPortLast, acdSmapIPv4FilterSrcPortOper,
+             acdSmapIPv4FilterDstPortLast and acdSmapIPv4FilterDstPortOper."
+
+    REVISION "201302130100Z"        -- 13 February 2013
+    DESCRIPTION
+            "Update AcdFilterVlanType textual convention to add t-vlan support."
 
     REVISION "201110100100Z"        -- 10 October 2011
     DESCRIPTION
@@ -78,14 +87,26 @@ AcdFilterOperator ::= TEXTUAL-CONVENTION
                     range(4)
     }
 
+AcdFilterOperatorEqualRangeOnly ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Operator for field comparaison. Valid operator types are:
+        Equal to or Range (inclusive range)."
+    SYNTAX      INTEGER {
+                    equalTo(3),
+                    range(4)
+    }
+
 AcdFilterVlanType ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-       "."
+       "The type of VLAN to be used."
     SYNTAX      INTEGER {
                     cvlan(1),
                     svlan(2),
-                    both(3)
+                    both(3),
+                    tvlan(4),
+                    any(5)
     }
 ---------------------------------------------------------------------------
  -- The L2 table
@@ -1220,7 +1241,11 @@ AcdSmapIPv4FilterEntry ::= SEQUENCE {
     acdSmapIPv4FilterIcmpTypeEn         TruthValue,
     acdSmapIPv4FilterIcmpType           Unsigned32,
     acdSmapIPv4FilterIcmpCodeEn         TruthValue,
-    acdSmapIPv4FilterIcmpCode           Unsigned32
+    acdSmapIPv4FilterIcmpCode           Unsigned32,
+    acdSmapIPv4FilterSrcPortLast        Unsigned32,
+    acdSmapIPv4FilterSrcPortOper        AcdFilterOperatorEqualRangeOnly,
+    acdSmapIPv4FilterDstPortLast        Unsigned32,
+    acdSmapIPv4FilterDstPortOper        AcdFilterOperatorEqualRangeOnly
 }
 
 acdSmapIPv4FilterID  OBJECT-TYPE
@@ -1771,6 +1796,46 @@ acdSmapIPv4FilterIcmpCode OBJECT-TYPE
     DEFVAL      { 0 }
     ::= { acdSmapIPv4FilterEntry 57 }
 
+acdSmapIPv4FilterSrcPortLast OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The UDP/TCP Source Port last value, used in range operation.
+             Its value ranges from 0 to 65535."
+    DEFVAL      { 0 }
+    ::= { acdSmapIPv4FilterEntry 58 }
+
+acdSmapIPv4FilterSrcPortOper OBJECT-TYPE
+    SYNTAX      AcdFilterOperatorEqualRangeOnly
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The UDP/TCP Source Port operator. Valid operator types are:
+             Equal to or Range (inclusive range)."
+    DEFVAL      { equalTo }
+    ::= { acdSmapIPv4FilterEntry 59 }
+
+acdSmapIPv4FilterDstPortLast OBJECT-TYPE
+    SYNTAX      Unsigned32  (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The UDP/TCP Destination Port last value, used in range operation.
+             Its value ranges from 0 to 65535."
+    DEFVAL      { 0 }
+    ::= { acdSmapIPv4FilterEntry 60 }
+
+acdSmapIPv4FilterDstPortOper OBJECT-TYPE
+    SYNTAX      AcdFilterOperatorEqualRangeOnly
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The UDP/TCP Destination Port operator. Valid operator types are:
+             Equal to or Range (inclusive range)."
+    DEFVAL      { equalTo }
+    ::= { acdSmapIPv4FilterEntry 61 }
+
 ---------------------------------------------------------------------------
  -- Filter Transaction ID Information
 ---------------------------------------------------------------------------
@@ -1978,7 +2043,11 @@ acdSmapIPv4FilterGroup OBJECT-GROUP
         acdSmapIPv4FilterIcmpTypeEn,
         acdSmapIPv4FilterIcmpType,
         acdSmapIPv4FilterIcmpCodeEn,
-        acdSmapIPv4FilterIcmpCode
+        acdSmapIPv4FilterIcmpCode,
+        acdSmapIPv4FilterSrcPortLast,
+        acdSmapIPv4FilterSrcPortOper,
+        acdSmapIPv4FilterDstPortLast,
+        acdSmapIPv4FilterDstPortOper
     }
     STATUS      current
     DESCRIPTION
