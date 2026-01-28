@@ -13,26 +13,14 @@ modules:
                 used: .1.3.6.1.4.1.40418.7.100.1.8.1.8.1
                 descr: 'Memory'
                 index: 0
-            # S2XXX series (switch-based) - switchMemorySize/switchMemoryBusy
-            -
-                total: .1.3.6.1.4.1.40418.7.100.1.11.6.0
-                used: .1.3.6.1.4.1.40418.7.100.1.11.7.0
-                descr: 'Memory'
-                index: 1
     processors:
         data:
             # S5XXX series (slot-based)
             -
                 oid: sysCpuUsage
                 num_oid: '.1.3.6.1.4.1.40418.7.100.1.8.1.11.{{ $index }}'
-                descr: 'Slot {{ $index }} CPU'
-                index: 'sysCpuUsage.{{ $index }}'
-            # S2XXX series (switch-based)
-            -
-                oid: switchCpuUsage
-                num_oid: '.1.3.6.1.4.1.40418.7.100.1.11.10.{{ $index }}'
                 descr: 'CPU'
-                index: 'switchCpuUsage.{{ $index }}'
+                index: 'sysCpuUsage.{{ $index }}'
     sensors:
         additional_oids:
             data:
@@ -46,7 +34,7 @@ modules:
                     oid: sysTemperature
                     value: sysTemperature
                     num_oid: '.1.3.6.1.4.1.40418.7.100.1.8.1.10.{{ $index }}'
-                    descr: 'Slot {{ $index }} Temperature'
+                    descr: 'Temperature'
                     index: 'sysTemperature.{{ $index }}'
                 # S2XXX series (switch-based) - skip_value_gt filters invalid bitmask values (268435356)
                 -

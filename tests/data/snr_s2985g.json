@@ -2662,10 +2662,10 @@
                 {
                     "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.40418.7.100.1.11.10.0",
-                    "processor_index": "switchCpuUsage.0",
+                    "processor_oid": ".1.3.6.1.4.1.40418.7.100.1.8.1.11.1",
+                    "processor_index": "sysCpuUsage.1",
                     "processor_type": "snr",
-                    "processor_usage": 96,
+                    "processor_usage": 12,
                     "processor_descr": "CPU",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
