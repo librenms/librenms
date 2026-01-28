@@ -63,8 +63,8 @@ class VlansController implements DeviceTab
             'useRegex' => 'boolean',
         ]);
 
-        $searchVlanNumber = $request->get('searchVlanNumber');
-        $searchVlanName = $request->get('searchVlanName');
+        $searchVlanNumber = $request->query->get('searchVlanNumber');
+        $searchVlanName = $request->query->get('searchVlanName');
         $useRegex = $request->boolean('useRegex');
 
         return [
