@@ -70,7 +70,7 @@ disable it for one device then you can do this within the WebUI Device
     lnms config:set poller_modules.cisco-remote-access-monitor false
     lnms config:set poller_modules.cisco-cef false
     lnms config:set poller_modules.slas false
-    lnms config:set poller_modules.mac-accounting false
+    lnms config:set poller_modules.mac-accounting true
     lnms config:set poller_modules.cipsec-tunnels false
     lnms config:set poller_modules.cisco-ace-loadbalancer false
     lnms config:set poller_modules.cisco-ace-serverfarms false

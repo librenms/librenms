@@ -1703,7 +1703,7 @@
             "order": 60,
             "group": "discovery",
             "section": "discovery_modules",
-            "default": false,
+            "default": true,
             "type": "boolean"
         },
         "discovery_modules.cisco-pw": {
@@ -6180,7 +6180,7 @@
             "order": 100,
             "group": "poller",
             "section": "poller_modules",
-            "default": false,
+            "default": true,
             "type": "boolean"
         },
         "poller_modules.cipsec-tunnels": {

@@ -12,7 +12,6 @@ poller_modules:
     cisco-ace-serverfarms: true
     cisco-ace-loadbalancer: true
     cisco-cef: true
-    mac-accounting: true
     cisco-remote-access-monitor: true
     slas: true
     cisco-ipsec-flow-monitor: true
@@ -22,7 +21,6 @@ poller_modules:
 discovery_modules:
     cisco-cef: true
     slas: true
-    mac-accounting: true
     cisco-otv: true
     cisco-pw: true
     vrf: true

@@ -621,8 +621,8 @@ return [
             'cisco-cef' => [
                 'description' => 'Cisco CEF',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Cisco MAC აღრიცხვა',
+            'mac-accounting' => [
+                'description' => 'MAC აღრიცხვა',
             ],
             'cisco-otv' => [
                 'description' => 'Cisco OTV',
@@ -1407,8 +1407,8 @@ return [
             'slas' => [
                 'description' => 'მომსახურების დონის შესახებ შეთანხმების თვალყურის დევნება',
             ],
-            'cisco-mac-accounting' => [
-                'description' => 'Cisco MAC აღრიცხვა',
+            'mac-accounting' => [
+                'description' => 'MAC აღრიცხვა',
             ],
             'cipsec-tunnels' => [
                 'description' => 'Cipsec გვირაბები',

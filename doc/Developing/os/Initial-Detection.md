@@ -93,7 +93,6 @@ which modules are enabled/disabled by default.
 discovery_modules:
      cisco-cef: true
      slas: true
-     mac-accounting: false
 ```
 
 `poller_modules`: This is a list of poller modules to either enable
