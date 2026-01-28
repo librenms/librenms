@@ -25,9 +25,11 @@ class AlertLogDetailFormatterTest extends TestCase
 
         $output = $this->formatter->format($details);
 
-        $this->assertStringContainsString('#1:', $output);
-        $this->assertStringContainsString('message: Test alert', $output);
-        $this->assertStringContainsString('value: 10', $output);
+        $this->assertEquals(0, $output['sections'][0]['items'][0]['row']);
+        $this->assertEquals('message', $output['sections'][0]['items'][0]['fields'][0]['label']);
+        $this->assertEquals('Test alert', $output['sections'][0]['items'][0]['fields'][0]['value']);
+        $this->assertEquals('value', $output['sections'][0]['items'][0]['fields'][1]['label']);
+        $this->assertEquals('10', $output['sections'][0]['items'][0]['fields'][1]['value']);
     }
 
     public function testFormatAlertWithDiff(): void
@@ -48,11 +50,14 @@ class AlertLogDetailFormatterTest extends TestCase
 
         $output = $this->formatter->format($details);
 
-        $this->assertStringContainsString('<b>Modifications:</b>', $output);
-        $this->assertStringContainsString('Added #1: message: New item', $output);
-        $this->assertStringContainsString('Resolved #1: message: Fixed item', $output);
-        $this->assertStringContainsString('<b>All current items:</b>', $output);
-        $this->assertStringContainsString('#1: message: Still alert', $output);
+        $this->assertEquals('Modifications', $output['sections'][0]['title']);
+        $this->assertEquals('added', $output['sections'][0]['items'][0]['type']);
+        $this->assertEquals('New item', $output['sections'][0]['items'][0]['fields'][0]['value']);
+        $this->assertEquals('resolved', $output['sections'][0]['items'][1]['type']);
+        $this->assertEquals('Fixed item', $output['sections'][0]['items'][1]['fields'][0]['value']);
+
+        $this->assertEquals('All current items', $output['sections'][1]['title']);
+        $this->assertEquals('Still alert', $output['sections'][1]['items'][0]['fields'][0]['value']);
     }
 
     public function testFormatBill(): void
@@ -67,10 +72,11 @@ class AlertLogDetailFormatterTest extends TestCase
         ];
 
         $output = $this->formatter->format($details);
+        $fields = $output['sections'][0]['items'][0]['fields'];
 
-        $this->assertStringContainsString('Bill:', $output);
-        $this->assertStringContainsString('bill_id=123', $output);
-        $this->assertStringContainsString('Test Bill', $output);
+        $this->assertEquals('Bill', $fields[0]['label']);
+        $this->assertEquals('Test Bill', $fields[0]['value']);
+        $this->assertStringContainsString('bill_id=123', $fields[0]['url']);
     }
 
     public function testFormatPort(): void
@@ -87,10 +93,12 @@ class AlertLogDetailFormatterTest extends TestCase
         ];
 
         $output = $this->formatter->format($details);
+        $fields = $output['sections'][0]['items'][0]['fields'];
 
-        $this->assertStringContainsString('Port:', $output);
-        $this->assertStringContainsString('eth0', $output);
-        $this->assertStringContainsString('Alias: WAN Interface', $output);
+        $this->assertEquals('Port', $fields[0]['label']);
+        $this->assertEquals('eth0', $fields[0]['value']);
+        $this->assertEquals('Alias', $fields[1]['label']);
+        $this->assertEquals('WAN Interface', $fields[1]['value']);
     }
 
     public function testFormatSensor(): void
@@ -110,11 +118,16 @@ class AlertLogDetailFormatterTest extends TestCase
         ];
 
         $output = $this->formatter->format($details);
+        $fields = $output['sections'][0]['items'][0]['fields'];
 
-        $this->assertStringContainsString('Sensor:', $output);
-        $this->assertStringContainsString('Value: 35', $output); // Check for value, ignore unit if it varies
-        $this->assertStringContainsString('(temperature)', $output);
-        $this->assertStringContainsString('Thresholds: High Warn: 38, High: 40', $output);
+        $this->assertEquals('Sensor', $fields[0]['label']);
+        $this->assertEquals('CPU Temp', $fields[0]['value']);
+        $this->assertEquals('Value', $fields[1]['label']);
+        $this->assertStringContainsString('35', $fields[1]['value']);
+        $this->assertStringContainsString('(temperature)', $fields[1]['value']);
+        $this->assertEquals('Thresholds', $fields[2]['label']);
+        $this->assertStringContainsString('High Warn: 38', $fields[2]['value']);
+        $this->assertStringContainsString('High: 40', $fields[2]['value']);
     }
 
     public function testFormatSensorState(): void
@@ -134,10 +147,12 @@ class AlertLogDetailFormatterTest extends TestCase
         ];
 
         $output = $this->formatter->format($details);
+        $fields = $output['sections'][0]['items'][0]['fields'];
 
-        $this->assertStringContainsString('Sensor:', $output);
-        // The formatter pre-loads the translation if state_descr is set
-        $this->assertStringContainsString('State: Critical (numerical: 2)', $output);
+        $this->assertEquals('Sensor', $fields[0]['label']);
+        $this->assertEquals('Power State', $fields[0]['value']);
+        $this->assertEquals('State', $fields[1]['label']);
+        $this->assertStringContainsString('Critical (numerical: 2)', $fields[1]['value']);
     }
 
     public function testFormatAccessPoint(): void
@@ -153,10 +168,12 @@ class AlertLogDetailFormatterTest extends TestCase
         ];
 
         $output = $this->formatter->format($details);
+        $fields = $output['sections'][0]['items'][0]['fields'];
 
-        $this->assertStringContainsString('Access Point:', $output);
-        $this->assertStringContainsString('accesspoints/ap=101', $output);
-        $this->assertStringContainsString('AP-01', $output);
+        $this->assertEquals('Access Point', $fields[0]['label']);
+        $this->assertEquals('AP-01', $fields[0]['value']);
+        $this->assertStringContainsString('accesspoints', $fields[0]['url']);
+        $this->assertStringContainsString('ap=101', $fields[0]['url']);
     }
 
     public function testFormatService(): void
@@ -176,13 +193,18 @@ class AlertLogDetailFormatterTest extends TestCase
         ];
 
         $output = $this->formatter->format($details);
+        $fields = $output['sections'][0]['items'][0]['fields'];
 
-        $this->assertStringContainsString('Service:', $output);
-        $this->assertStringContainsString('services/view=detail', $output);
-        $this->assertStringContainsString('HTTP (http)', $output);
-        $this->assertStringContainsString('Host: 1.2.3.4', $output);
-        $this->assertStringContainsString('Description: Web Service', $output);
-        $this->assertStringContainsString('Message: Connection refused', $output);
+        $this->assertEquals('Service', $fields[0]['label']);
+        $this->assertEquals('HTTP (http)', $fields[0]['value']);
+        $this->assertStringContainsString('services', $fields[0]['url']);
+        $this->assertStringContainsString('view=detail', $fields[0]['url']);
+        $this->assertEquals('Host', $fields[1]['label']);
+        $this->assertEquals('1.2.3.4', $fields[1]['value']);
+        $this->assertEquals('Description', $fields[2]['label']);
+        $this->assertEquals('Web Service', $fields[2]['value']);
+        $this->assertEquals('Message', $fields[3]['label']);
+        $this->assertEquals('Connection refused', $fields[3]['value']);
     }
 
     public function testFormatBgpPeer(): void
@@ -201,13 +223,18 @@ class AlertLogDetailFormatterTest extends TestCase
         ];
 
         $output = $this->formatter->format($details);
+        $fields = $output['sections'][0]['items'][0]['fields'];
 
-        $this->assertStringContainsString('BGP Peer:', $output);
-        $this->assertStringContainsString('routing/proto=bgp', $output);
-        $this->assertStringContainsString('10.0.0.1', $output);
-        $this->assertStringContainsString('Description: ISP-A', $output);
-        $this->assertStringContainsString('Remote AS: 65001', $output);
-        $this->assertStringContainsString('State: idle', $output);
+        $this->assertEquals('BGP Peer', $fields[0]['label']);
+        $this->assertEquals('10.0.0.1', $fields[0]['value']);
+        $this->assertStringContainsString('routing', $fields[0]['url']);
+        $this->assertStringContainsString('proto=bgp', $fields[0]['url']);
+        $this->assertEquals('Description', $fields[1]['label']);
+        $this->assertEquals('ISP-A', $fields[1]['value']);
+        $this->assertEquals('Remote AS', $fields[2]['label']);
+        $this->assertEquals('65001', $fields[2]['value']);
+        $this->assertEquals('State', $fields[3]['label']);
+        $this->assertEquals('idle', $fields[3]['value']);
     }
 
     public function testFormatMempool(): void
@@ -225,13 +252,16 @@ class AlertLogDetailFormatterTest extends TestCase
         ];
 
         $output = $this->formatter->format($details);
+        $fields = $output['sections'][0]['items'][0]['fields'];
 
-        $this->assertStringContainsString('Memory Pool:', $output);
-        $this->assertStringContainsString('mempool_usage/404', $output);
-        $this->assertStringContainsString('System RAM', $output);
-        $this->assertStringContainsString('Usage: 85.5', $output);
-        $this->assertStringContainsString('Free: 104.86 MB', $output);
-        $this->assertStringContainsString('Total: 1.07 GB', $output);
+        $this->assertEquals('Memory Pool', $fields[0]['label']);
+        $this->assertEquals('System RAM', $fields[0]['value']);
+        $this->assertStringContainsString('mempool_usage', $fields[0]['url']);
+        $this->assertStringContainsString('404', $fields[0]['url']);
+        $this->assertEquals('Usage', $fields[1]['label']);
+        $this->assertStringContainsString('Usage: 85.5', $fields[1]['value']);
+        $this->assertStringContainsString('Free: 104.86 MB', $fields[1]['value']);
+        $this->assertStringContainsString('Total: 1.07 GB', $fields[1]['value']);
     }
 
     public function testFormatApplication(): void
@@ -250,12 +280,16 @@ class AlertLogDetailFormatterTest extends TestCase
         ];
 
         $output = $this->formatter->format($details);
+        $fields = $output['sections'][0]['items'][0]['fields'];
 
-        $this->assertStringContainsString('Application:', $output);
-        $this->assertStringContainsString('apps/app=nginx', $output);
-        $this->assertStringContainsString('nginx', $output);
-        $this->assertStringContainsString('Status: up', $output);
-        $this->assertStringContainsString('Metric: requests = 5000', $output);
+        $this->assertEquals('Application', $fields[0]['label']);
+        $this->assertEquals('nginx', $fields[0]['value']);
+        $this->assertStringContainsString('apps', $fields[0]['url']);
+        $this->assertStringContainsString('app=nginx', $fields[0]['url']);
+        $this->assertEquals('Status', $fields[1]['label']);
+        $this->assertEquals('up', $fields[1]['value']);
+        $this->assertEquals('Metric', $fields[2]['label']);
+        $this->assertEquals('requests = 5000', $fields[2]['value']);
     }
 
     public function testFallbackFormatting(): void
@@ -273,11 +307,13 @@ class AlertLogDetailFormatterTest extends TestCase
         ];
 
         $output = $this->formatter->format($details);
+        $fields = $output['sections'][0]['items'][0]['fields'];
 
-        $this->assertStringContainsString('custom_key: custom_value', $output);
-        $this->assertStringContainsString('another_val: present', $output);
-        $this->assertStringNotContainsString('device_id:', $output);
-        $this->assertStringNotContainsString('some_id:', $output);
-        $this->assertStringNotContainsString('description:', $output);
+        $labels = array_column($fields, 'label');
+        $this->assertContains('custom_key', $labels);
+        $this->assertContains('another_val', $labels);
+        $this->assertNotContains('device_id', $labels);
+        $this->assertNotContains('some_id', $labels);
+        $this->assertNotContains('description', $labels);
     }
 }
