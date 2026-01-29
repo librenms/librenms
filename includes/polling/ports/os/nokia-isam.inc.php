@@ -61,4 +61,4 @@ if (! empty($port_stats) && is_array($port_stats)) {
     }
 }
 
-unset($isam_ports_stats);
+unset($isam_port_stats);
