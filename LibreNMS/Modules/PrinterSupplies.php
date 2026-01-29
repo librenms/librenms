@@ -159,9 +159,15 @@ class PrinterSupplies implements Module
     public function dump(Device $device, string $type): ?array
     {
         return [
-            'printer_supplies' => $device->printerSupplies()->orderBy('supply_oid')->orderBy('supply_index')
+            'printer_supplies' => $device->printerSupplies()
+                ->orderByColumns($this->getSortColumns('printer_supplies'))
                 ->get()->map->makeHidden(['device_id', 'supply_id']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return ['supply_oid', 'supply_index'];
     }
 
     private function discoveryLevels($device): Collection

@@ -100,8 +100,16 @@ class PortSecurity implements Module
     public function dump(Device $device, string $type): ?array
     {
         return [
-            'PortSecurity' => $device->portSecurity()->orderBy('port_id')
-                ->get()->map->makeHidden(['id', 'device_id']),
+            'port_security' => $device->portSecurity()
+                ->leftJoin('ports', 'port_security.port_id', 'ports.port_id')
+                ->select(['port_security.*', 'ifIndex'])
+                ->orderByColumns($this->getSortColumns('port_security'))
+                ->get()->map->makeHidden(['id', 'port_id', 'device_id']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return ['ifIndex'];
     }
 }

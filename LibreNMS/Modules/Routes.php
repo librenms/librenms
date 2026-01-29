@@ -205,9 +205,15 @@ class Routes implements Module
         }
 
         return [
-            'route' => $device->routes()->get()->map->makeHidden([
-                'route_id', 'created_at', 'updated_at', 'laravel_through_key']),
+            'route' => $device->routes()->get()
+                ->orderByColumns($this->getSortColumns('route'))
+                ->map->makeHidden(['route_id', 'created_at', 'updated_at', 'laravel_through_key']),
         ];
+    }
+
+    public function getSortColumns(string $table): array
+    {
+        return ['context_name', 'inetCidrRouteDestType', 'inetCidrRouteDest', 'inetCidrRoutePfxLen', 'inetCidrRouteNextHopType', 'inetCidrRouteNextHop'];
     }
 
     private function discoverInetCidrRoutes(Device $device, int $max_routes): Collection
