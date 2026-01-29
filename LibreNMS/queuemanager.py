@@ -605,7 +605,7 @@ class DiscoveryQueueManager(TimedQueueManager):
                 else self.config.log_output
             )
 
-            args_list = ["device:poll", device_id]
+            args_list = ["device:discover", device_id]
             if self.config.debug:
                 args_list.append("-vv")
             elif self.config.log_output is LibreNMS.LogOutput.NONE:
