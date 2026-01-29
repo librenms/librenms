@@ -1,0 +1,90 @@
+mib: NAG-MIB
+modules:
+    os:
+        sysDescr_regex:
+            - '/^(?<hardware>SNR-S\S+) Device.*SoftWare Version (?<version>\S+).*Serial No\.\s*:\s*(?<serial>\S+)/s'
+            - '/^(?<hardware>SNR-S\S+) Device.*SoftWare Version (?<version>\S+)/s'
+            - '/^(?<hardware>SNR-S\S+) Device/s'
+    mempools:
+        data:
+            -
+                total: .1.3.6.1.4.1.40418.7.100.1.11.6.0
+                used: .1.3.6.1.4.1.40418.7.100.1.11.7.0
+                descr: 'Memory'
+                index: 0
+    processors:
+        data:
+            -
+                oid: switchCpuUsage
+                num_oid: '.1.3.6.1.4.1.40418.7.100.1.11.10.{{ $index }}'
+                descr: 'CPU'
+                index: 'switchCpuUsage.{{ $index }}'
+    sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - IF-MIB::ifName
+        temperature:
+            data:
+                -
+                    oid: switchTemperature
+                    value: switchTemperature
+                    num_oid: '.1.3.6.1.4.1.40418.7.100.1.11.9.{{ $index }}'
+                    descr: 'Switch Temperature'
+                    index: 'switchTemperature.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: sysFanStatus
+                    value: sysFanStatus
+                    num_oid: '.1.3.6.1.4.1.40418.7.100.1.12.1.1.3.{{ $index }}'
+                    descr: 'Fan {{ $index }} Status'
+                    index: 'sysFanStatus.{{ $index }}'
+                    states:
+                        - { descr: Normal, graph: 0, value: 0, generic: 0 }
+                        - { descr: Abnormal, graph: 0, value: 1, generic: 2 }
+        dbm:
+            options:
+                skip_value_lt: -50
+            data:
+                -
+                    oid: ddmTranscDiagnosisTable
+                    value: ddmDiagnosisRXPower
+                    num_oid: '.1.3.6.1.4.1.40418.7.100.30.1.1.17.{{ $index }}'
+                    descr: '{{ IF-MIB::ifName }} RX Power'
+                    index: 'ddmDiagnosisRXPower.{{ $index }}'
+                    group: transceiver
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                -
+                    oid: ddmTranscDiagnosisTable
+                    value: ddmDiagnosisTXPower
+                    num_oid: '.1.3.6.1.4.1.40418.7.100.30.1.1.22.{{ $index }}'
+                    descr: '{{ IF-MIB::ifName }} TX Power'
+                    index: 'ddmDiagnosisTXPower.{{ $index }}'
+                    group: transceiver
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+        voltage:
+            data:
+                -
+                    oid: ddmTranscDiagnosisTable
+                    value: ddmDiagnosisVoltage
+                    num_oid: '.1.3.6.1.4.1.40418.7.100.30.1.1.7.{{ $index }}'
+                    descr: '{{ IF-MIB::ifName }} Voltage'
+                    index: 'ddmDiagnosisVoltage.{{ $index }}'
+                    group: transceiver
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+        current:
+            data:
+                -
+                    oid: ddmTranscDiagnosisTable
+                    value: ddmDiagnosisBias
+                    num_oid: '.1.3.6.1.4.1.40418.7.100.30.1.1.12.{{ $index }}'
+                    descr: '{{ IF-MIB::ifName }} Bias Current'
+                    index: 'ddmDiagnosisBias.{{ $index }}'
+                    group: transceiver
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
