@@ -127,17 +127,21 @@ trait BridgeMib
                 ]))->filter(function (PortStp $port) {
                     if ($port->enable === 'disabled') {
                         d_echo("$port->port_index ($port->vlan) disabled skipping\n");
+
                         return false;
                     }
                     if ($port->state === 'disabled') {
                         d_echo("$port->port_index ($port->vlan) state disabled skipping\n");
                         return false;
+
                     }
                     if (! $port->port_id) {
                         d_echo("$port->port_index ($port->vlan) port not found skipping\n");
+
                         return false;
                     }
                     d_echo("Discovered STP port $port->port_index ($port->vlan): $port->port_id");
+
                     return true;
                 });
 
