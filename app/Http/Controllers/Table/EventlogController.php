@@ -28,9 +28,9 @@ namespace App\Http\Controllers\Table;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Blade;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
 
 class EventlogController extends TableController
@@ -81,7 +81,7 @@ class EventlogController extends TableController
                 $query->where('message', 'like', '%' . $request->message . '%');
             })
             ->when($request->age, function ($query) use ($request): void {
-                $query->where('datetime', '>', Carbon::now()->subSeconds((int) $request->age));
+                $query->where('datetime', '>', Time::now()->subSeconds((int) $request->age));
             });
     }
 
@@ -127,7 +127,7 @@ class EventlogController extends TableController
         $output = "<span class='alert-status ";
         $output .= $this->severityLabel($eventlog->severity);
         $output .= " eventlog-status'></span>";
-        $output .= (new Carbon($eventlog->datetime))->setTimezone(session('preferences.timezone'))->format(LibrenmsConfig::get('dateformat.compact'));
+        $output .= Time::format(Time::parse($eventlog->datetime), LibrenmsConfig::get('dateformat.compact'));
 
         return $output;
     }
