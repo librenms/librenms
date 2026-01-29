@@ -2061,8 +2061,8 @@ return [
             'help' => 'Amount of poller workers to spawn. Sets the default value for all nodes.',
         ],
         'service_poller_frequency' => [
-            'description' => 'Poller Frequency',
-            'help' => 'How often to poll devices. Sets the default value for all nodes. It should almost always match rrd step, which it will default to if set to null.',
+            'description' => 'Poller Frequency (Warning!)',
+            'help' => 'How often to poll devices. Sets the default value for all nodes. Warning! This should normally be null to match the rrd step option, otherwise you may break graphs. See docs for more info.',
         ],
         'service_poller_down_retry' => [
             'description' => 'Device Down Retry',
