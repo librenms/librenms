@@ -1,6 +1,6 @@
 <?php
 
-namespace LibreNMS\Tests\Unit\Http\Formatters;
+namespace LibreNMS\Tests\Unit\Http\Parsers;
 
 use App\Http\Parsers\AlertLogDetailParser;
 use LibreNMS\Tests\TestCase;
@@ -302,7 +302,7 @@ class AlertLogDetailParserTest extends TestCase
                     'some_id' => 123, // should be skipped (contains id)
                     'description' => 'test', // should be skipped (contains desc)
                     'another_val' => 'present',
-                    'sysContact' => 'admin@example.com', // should be skipped
+                    'sysContact' => 'admin@example.com', // should be included
                     'community' => 'public', // should be skipped
                     'snmpver' => 'v2c', // should be skipped
                     'authname' => 'user', // should be skipped (contains auth)
@@ -317,10 +317,10 @@ class AlertLogDetailParserTest extends TestCase
         $labels = array_column($fields, 'label');
         $this->assertContains('custom_key', $labels);
         $this->assertContains('another_val', $labels);
+        $this->assertContains('sysContact', $labels);
         $this->assertNotContains('device_id', $labels);
         $this->assertNotContains('some_id', $labels);
         $this->assertNotContains('description', $labels);
-        $this->assertNotContains('sysContact', $labels);
         $this->assertNotContains('community', $labels);
         $this->assertNotContains('snmpver', $labels);
         $this->assertNotContains('authname', $labels);
