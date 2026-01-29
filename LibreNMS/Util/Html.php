@@ -186,7 +186,7 @@ class Html
         };
     }
 
-    public static function severityToLabel(Severity $severity, string $text): string
+    public static function severityToLabel(Severity $severity, string $text = '', string $title = '', string $class = 'label'): string
     {
         $state_label = match ($severity) {
             Severity::Ok => 'label-success',
@@ -197,6 +197,10 @@ class Html
             default => 'label-default',
         };
 
-        return "<span class=\"label $state_label\">$text</span>";
+        if ($title) {
+            $title = " title=\"$title\"";
+        }
+
+        return "<span class=\"$class $state_label\"$title>$text</span>";
     }
 }
