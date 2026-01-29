@@ -133,8 +133,8 @@ class ServiceConfig(DBConfig):
         self.poller.workers = config.get(
             "service_poller_workers", ServiceConfig.poller.workers
         )
-        self.poller.frequency = (
-            config.get("service_poller_frequency", config.get("rrd").get(
+        self.poller.frequency = config.get(
+            "service_poller_frequency", config.get("rrd").get(
                 "step", ServiceConfig.poller.frequency
             )
         )
