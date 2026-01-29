@@ -1955,7 +1955,8 @@ return [
                 'description' => 'Change the rrd heartbeat value (default 600)',
             ],
             'step' => [
-                'description' => 'Change the rrd step value (default 300)',
+                'description' => 'Change the rrd step value (default 300) (Warning!)',
+                'help' => 'Warning! Changing this without fixing rrd files and changing your polling schedule will break graphs. See docs for more info.'
             ],
         ],
         'rrd_dir' => [
