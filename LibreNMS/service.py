@@ -135,7 +135,7 @@ class ServiceConfig(DBConfig):
         )
         self.poller.frequency = config.get(
             "service_poller_frequency",
-            config.get("rrd").get("step", ServiceConfig.poller.frequency)
+            config.get("rrd").get("step", ServiceConfig.poller.frequency),
         )
         self.discovery.enabled = (
             config.get("service_discovery_enabled", True)
@@ -185,7 +185,7 @@ class ServiceConfig(DBConfig):
         )
         self.ping.frequency = config.get(
             "service_ping_frequency",
-            config.get("ping_rrd_step", ServiceConfig.ping.frequency)
+            config.get("ping_rrd_step", ServiceConfig.ping.frequency),
         )
         self.down_retry = config.get(
             "service_poller_down_retry", ServiceConfig.down_retry
