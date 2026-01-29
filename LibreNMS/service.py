@@ -123,19 +123,6 @@ class ServiceConfig(DBConfig):
         self.master_timeout = config.get(
             "service_master_timeout", ServiceConfig.master_timeout
         )
-        self.poller.workers = config.get(
-            "poller_service_workers", ServiceConfig.poller.workers
-        )
-        self.poller.frequency = config.get(
-            "poller_service_poll_frequency", ServiceConfig.poller.frequency
-        )
-        self.discovery.frequency = config.get(
-            "poller_service_discover_frequency", ServiceConfig.discovery.frequency
-        )
-        self.down_retry = config.get(
-            "poller_service_down_retry", ServiceConfig.down_retry
-        )
-        self.log_level = config.get("poller_service_loglevel", ServiceConfig.log_level)
 
         # new options
         self.poller.enabled = (
@@ -147,7 +134,8 @@ class ServiceConfig(DBConfig):
             "service_poller_workers", ServiceConfig.poller.workers
         )
         self.poller.frequency = config.get(
-            "service_poller_frequency", ServiceConfig.poller.frequency
+            "service_poller_frequency",
+            config.get("rrd").get("step", ServiceConfig.poller.frequency),
         )
         self.discovery.enabled = (
             config.get("service_discovery_enabled", True)
@@ -195,7 +183,10 @@ class ServiceConfig(DBConfig):
             if config.get("schedule_type").get("ping", "legacy") == "legacy"
             else config.get("schedule_type").get("ping", "legacy") == "dispatcher"
         )
-        self.ping.frequency = config.get("ping_rrd_step", ServiceConfig.ping.frequency)
+        self.ping.frequency = config.get(
+            "service_ping_frequency",
+            config.get("ping_rrd_step", ServiceConfig.ping.frequency),
+        )
         self.down_retry = config.get(
             "service_poller_down_retry", ServiceConfig.down_retry
         )
