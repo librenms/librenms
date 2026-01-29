@@ -204,6 +204,7 @@ nav:
       - Sub-directory Support: Extensions/Sub-Directory.md
       - Two-Factor Auth: Extensions/Two-Factor-Auth.md
       - Varnish: Extensions/Varnish.md
+      - Worker Queues (RC): Extensions/WorkerQueue.md
   - 3rd Party Integration:
     - Check_MK Setup: Extensions/Agent-Setup.md
     - Gateone: Extensions/Gateone.md
