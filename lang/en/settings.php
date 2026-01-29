@@ -1956,7 +1956,7 @@ return [
             ],
             'step' => [
                 'description' => 'Change the rrd step value (default 300) (Warning!)',
-                'help' => 'Warning! Changing this without fixing rrd files and changing your polling schedule will break graphs. See docs for more info.'
+                'help' => 'Warning! Changing this without fixing rrd files and changing your polling schedule will break graphs. See docs for more info.',
             ],
         ],
         'rrd_dir' => [
