@@ -1,0 +1,7286 @@
+--
+-- Copyright(C) 2005 ALAXALA Networks Corporation. All Rights Reserved.
+--
+-- AX2000R-MIB.my: Switching Router System information MIB file
+--
+AX2000R DEFINITIONS ::= BEGIN
+IMPORTS
+enterprises, OBJECT-TYPE, NetworkAddress, IpAddress,
+Counter, Gauge, TimeTicks
+	FROM RFC1155-SMI
+RouterID, AreaID
+	FROM RFC1253-MIB
+OBJECT-TYPE
+	FROM RFC-1212
+TRAP-TYPE
+	FROM RFC-1215
+ifIndex
+	FROM RFC-1213;
+alaxala            OBJECT IDENTIFIER ::= { enterprises 21839 }
+alaxalaProductId   OBJECT IDENTIFIER ::= { alaxala 1 }
+axRouter           OBJECT IDENTIFIER ::= { alaxalaProductId 1 }
+ax2000r            OBJECT IDENTIFIER ::= { axRouter 4 }--temporary
+
+alaxalaMib         OBJECT IDENTIFIER ::= { alaxala 2 }
+axrEx              OBJECT IDENTIFIER ::= { alaxalaMib 1 }
+
+axrMib             OBJECT IDENTIFIER ::= { axrEx 1 }
+ax2000rMib         OBJECT IDENTIFIER ::= { axrEx 4 }   --temporary
+-- device independent
+axrStats              OBJECT IDENTIFIER ::= { axrMib 1 }
+axrPhysStats          OBJECT IDENTIFIER ::= { axrStats 1 }
+axrAtmVcStats         OBJECT IDENTIFIER ::= { axrStats 2 }
+axrSonetStats         OBJECT IDENTIFIER ::= { axrStats 3 }
+axrIfStats            OBJECT IDENTIFIER ::= { axrStats 4 }
+axrAtm25MStats        OBJECT IDENTIFIER ::= { axrStats 5 }
+axrQoS                OBJECT IDENTIFIER ::= { axrStats 6 }
+axrEtherTxQoS         OBJECT IDENTIFIER ::= { axrQoS 1 }
+axrPPPTxQoS           OBJECT IDENTIFIER ::= { axrQoS 2 }
+axrFRTxQoS            OBJECT IDENTIFIER ::= { axrQoS 3 }
+axrEthShaper          OBJECT IDENTIFIER ::= { axrQoS 4 }
+axrEthVll             OBJECT IDENTIFIER ::= { axrQoS 6 }
+
+axrDHCP               OBJECT IDENTIFIER ::= { axrStats 10 }
+
+axrOspf               OBJECT IDENTIFIER ::= { axrMib 14 }
+axrOspfv3             OBJECT IDENTIFIER ::= { axrMib 15 }
+
+ax2000rRouter           OBJECT IDENTIFIER ::= { ax2000rMib 1 }
+ax2000rSoftware         OBJECT IDENTIFIER ::= { ax2000rRouter 2 }
+ax2000rSystemMsg        OBJECT IDENTIFIER ::= { ax2000rRouter 3 }
+ax2000rSnmpAgent        OBJECT IDENTIFIER ::= { ax2000rRouter 4 }
+ax2000rDevice           OBJECT IDENTIFIER ::= { ax2000rMib 2 }
+ax2000rChassis          OBJECT IDENTIFIER ::= { ax2000rDevice 1 }
+ax2000rRmBoard          OBJECT IDENTIFIER ::= { ax2000rDevice 2 }
+ax2000rRpBoard          OBJECT IDENTIFIER ::= { ax2000rDevice 3 }
+ax2000rNifBoard         OBJECT IDENTIFIER ::= { ax2000rDevice 4 }
+ax2000rPhysLine         OBJECT IDENTIFIER ::= { ax2000rDevice 5 }
+ax2000rInterface        OBJECT IDENTIFIER ::= { ax2000rDevice 6 }
+
+-- AX2000R axrPhysStats group
+
+axrPhysStatsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrPhysStatsTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A table containing  statistics for physical and time slots layer
+		interface."
+	::= { axrPhysStats 1 }
+
+axrPhysStatsEntry OBJECT-TYPE
+	SYNTAX  AxrPhysStatsTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing the physical and time slots layer statistics
+		for a particular interface."
+	INDEX   { axrPhysStatsIfIndex }
+	::= { axrPhysStatsTable 1 }
+
+	AxrPhysStatsTableEntry ::=
+		SEQUENCE {
+		  axrPhysStatsIfIndex
+			INTEGER,
+		  axrPhysStatsIfDescr
+			DisplayString,
+		  axrPhysStatsIfType
+			INTEGER,
+		  axrPhysStatsInFCSs
+			Counter,
+		  axrPhysStatsInAborts
+			Counter,
+		  axrPhysStatsOverrun
+			Counter,
+		  axrPhysStatsUnderrun
+			Counter,
+		  axrPhysStatsInOddbits
+			Counter,
+		  axrPhysStatsInShortfrms
+			Counter,
+		  axrPhysStatsSendTimeout
+			Counter
+		}
+
+axrPhysStatsIfIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The value of this object identifies the physical layer interface
+		or the time slot layer interface for WAN."
+	::= { axrPhysStatsEntry 1 }
+
+axrPhysStatsIfDescr OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A textual string containing information about the interface.
+		Same as ifDescr (MIB II)."
+	::= { axrPhysStatsEntry 2 }
+
+
+axrPhysStatsIfType OBJECT-TYPE
+	SYNTAX  INTEGER {
+		other(1),
+		v24(2),
+		v35(5),
+		x21(6),
+		bri(21),
+		j1(31),
+		j2(41),
+		oc-3(101),
+		oc-12(102),
+		oc-48(103),
+		e1(201),
+		e3(202),
+		t1(203),
+		t3(204)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The hardware type of physical interfaces."
+	::= { axrPhysStatsEntry 3 }
+
+axrPhysStatsInFCSs OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of FCS error frames that received."
+	::= { axrPhysStatsEntry 4 }
+
+axrPhysStatsInAborts OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of abort frames that received."
+	::= { axrPhysStatsEntry 5 }
+
+axrPhysStatsOverrun OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of times that overrun error occurred on receiving time."
+	::= { axrPhysStatsEntry 6 }
+
+axrPhysStatsUnderrun OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of that a transmission underrun errors occurred."
+	::= { axrPhysStatsEntry 7 }
+
+axrPhysStatsInOddbits OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of odd bit frames that received."
+	::= { axrPhysStatsEntry 8 }
+
+axrPhysStatsInShortfrms OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of short frames that received."
+	::= { axrPhysStatsEntry 9 }
+
+axrPhysStatsSendTimeout OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of times that a transmission timeout ocurred."
+	::= { axrPhysStatsEntry 10 }
+
+axrAtmVcStatsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrAtmVcStatsTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A table containing statistics for Virtual Channel Link (VCL)."
+	::= { axrAtmVcStats 1 }
+
+axrAtmVcStatsEntry OBJECT-TYPE
+	SYNTAX  AxrAtmVcStatsTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing the VCL statistics for a particular ATM
+		interface."
+	INDEX   { axrAtmVcStatsIfIndex, axrAtmVcStatsVclVpi, axrAtmVcStatsVclVci }
+	::= { axrAtmVcStatsTable 1 }
+
+	AxrAtmVcStatsTableEntry ::=
+		SEQUENCE {
+		  axrAtmVcStatsIfIndex
+			INTEGER,
+		  axrAtmVcStatsVclVpi
+			INTEGER,
+		  axrAtmVcStatsVclVci
+			INTEGER,
+		  axrAtmVcStatsInCells
+			Counter,
+		  axrAtmVcStatsInDiscards
+			Counter,
+		  axrAtmVcStatsOutCells
+			Counter,
+		  axrAtmVcStatsOutDiscards
+			Counter,
+		  axrAtmVcStatsInPkts
+			Counter,
+		  axrAtmVcStatsInDiscPkts
+			Counter,
+		  axrAtmVcStatsInOctets
+			Counter,
+		  axrAtmVcStatsOutPkts
+			Counter,
+		  axrAtmVcStatsOutDiscPkts
+			Counter,
+		  axrAtmVcStatsOutOctets
+			Counter,
+		  axrAtmVcStatsIfDescr
+			DisplayString,
+		  axrAtmVcStatsIfSpeed
+			INTEGER
+		}
+
+axrAtmVcStatsIfIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The value of this object identifies for an ATM interface.
+		This object has the same value as the ifIndex object."
+	::= { axrAtmVcStatsEntry 1 }
+
+axrAtmVcStatsVclVpi OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The VPI value of the VCL."
+	::= { axrAtmVcStatsEntry 2 }
+
+axrAtmVcStatsVclVci OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The VCI value of the VCL."
+	::= { axrAtmVcStatsEntry 3 }
+
+axrAtmVcStatsInCells OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of cells that received on this VC."
+	::= { axrAtmVcStatsEntry 4 }
+
+axrAtmVcStatsInDiscards OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of cells which have been dropped by the VCL due to lack of
+		output queue."
+	::= { axrAtmVcStatsEntry 5 }
+
+axrAtmVcStatsOutCells OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of cells that transmitted on this VCL."
+	::= { axrAtmVcStatsEntry 6 }
+
+axrAtmVcStatsOutDiscards OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of cells which have been dropped by the VCL due to input
+		queue."
+	::= { axrAtmVcStatsEntry 7 }
+
+axrAtmVcStatsInPkts OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of packets received on this VCL." 
+	::= { axrAtmVcStatsEntry 8 }
+
+axrAtmVcStatsInDiscPkts OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of inbound packets which were chosen to be discarded."
+	::= { axrAtmVcStatsEntry 9 }
+
+axrAtmVcStatsInOctets OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of octets received on this VCL."
+	::= { axrAtmVcStatsEntry 10 }
+
+axrAtmVcStatsOutPkts OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of packets transmitted out of this VCL."
+	::= { axrAtmVcStatsEntry 11 }
+
+axrAtmVcStatsOutDiscPkts OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of outbound packets which were chosen to be discarded."
+	::= { axrAtmVcStatsEntry 12 }
+
+axrAtmVcStatsOutOctets OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of octets transmitted out of this VCL."
+	::= { axrAtmVcStatsEntry 13 }
+
+axrAtmVcStatsIfDescr OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Interface name of this VC, and description."
+	::= { axrAtmVcStatsEntry 14 }
+
+axrAtmVcStatsIfSpeed OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The maximum transmitting bandwidth of VCL."
+	::= { axrAtmVcStatsEntry 15 }
+
+-- ATM Interface Configuration Extension Table
+
+axrAtmInterfaceExtTable    OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrAtmInterfaceExtTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"This table contains ATM interface configuration and monitoring
+		information not defined in the atmInterfaceConfTable from the
+		ATM-MIB.  This includes the type of connection setup procedures,
+		ILMI information, and information on the VPI/VCI range."
+	REFERENCE
+		"Tesink, K., Editor, Definitions of Managed Objects
+		for ATM Management, RFC 2515, Bell Communications
+		Research, February, 1999."
+	::= { axrAtmVcStats 2 }
+
+axrAtmInterfaceExtEntry    OBJECT-TYPE
+	SYNTAX  AxrAtmInterfaceExtTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry extends the atmInterfaceConfEntry defined in the ATM-
+		MIB.  Each entry corresponds to an ATM interface."
+	REFERENCE
+		"Tesink, K., Editor, Definitions of Managed Objects
+		for ATM Management, RFC 2515, Bell Communications
+		Research, February, 1999."
+	INDEX   { axrAtmIntfPVcIfIndex }
+	::= { axrAtmInterfaceExtTable 1 }
+
+	AxrAtmInterfaceExtTableEntry ::=
+		SEQUENCE {
+		  axrAtmIntfPVcIfIndex
+			INTEGER,
+		  axrAtmIntfPVcFailures
+			Counter,
+		  axrAtmIntfCurrentlyFailingPVcls
+			Gauge,
+		  axrAtmIntfPVcFailuresTrapEnable
+			INTEGER,
+		  axrAtmIntfPVcTrapInterval
+			INTEGER
+		}
+
+axrAtmIntfPVcIfIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The value of this object identifies for an ATM interface.
+		This object has the same value as the ifIndex object."
+	::= { axrAtmInterfaceExtEntry 1 }
+
+axrAtmIntfPVcFailures    OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of times the operational status of a PVPL or PVCL on
+		this interface has gone down."
+	::= { axrAtmInterfaceExtEntry 2 }
+
+axrAtmIntfCurrentlyFailingPVcls    OBJECT-TYPE
+	SYNTAX  Gauge
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The current number of VCLs on this interface for which there is
+		an active row."
+	::= { axrAtmInterfaceExtEntry 3 }
+
+axrAtmIntfPVcFailuresTrapEnable    OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Allows the generation of traps in response to PVCL or PVPL
+		failures on this interface."
+	DEFVAL { false }
+	::= { axrAtmInterfaceExtEntry 4 }
+
+axrAtmIntfPVcTrapInterval    OBJECT-TYPE
+	SYNTAX  INTEGER (1..3600)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The minimum interval between the sending of
+		axrAtmPVcTrap notifications for this interface."
+	DEFVAL { 30 }
+	::= { axrAtmInterfaceExtEntry 5 }
+
+-- Currently Failing PVCL Table
+
+axrAtmPVcFailingTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrAtmPVcFailingTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A table containing statistics for Virtual Channel Link (VCL)."
+	::= { axrAtmVcStats 3 }
+
+axrAtmPVcFailingEntry OBJECT-TYPE
+	SYNTAX  AxrAtmPVcFailingTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing the VCL statistics for a particular ATM
+		interface."
+	INDEX   { axrAtmPVcFailingIfIndex, axrAtmPVcFailingVclVpi, axrAtmPVcFailingVclVci }
+	::= { axrAtmPVcFailingTable 1 }
+
+	AxrAtmPVcFailingTableEntry ::=
+		SEQUENCE {
+		  axrAtmPVcFailingIfIndex
+			INTEGER,
+		  axrAtmPVcFailingVclVpi
+			INTEGER,
+		  axrAtmPVcFailingVclVci
+			INTEGER,
+		  axrAtmPVcFailingCurrentlyTimeStamp
+			TimeStamp,
+		  axrAtmPVcFailingPreviouslyTimeStamp
+			TimeStamp
+		}
+
+axrAtmPVcFailingIfIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The value of this object identifies for an ATM interface.
+		This object has the same value as the ifIndex object."
+	::= { axrAtmPVcFailingEntry 1 }
+
+axrAtmPVcFailingVclVpi OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The VPI value of the VCL."
+	::= { axrAtmPVcFailingEntry 2 }
+
+axrAtmPVcFailingVclVci OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The VCI value of the VCL."
+	::= { axrAtmPVcFailingEntry 3 }
+
+axrAtmPVcFailingCurrentlyTimeStamp    OBJECT-TYPE
+	SYNTAX  TimeStamp
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The time at which this PVCL began to fail currently."
+	::= { axrAtmPVcFailingEntry 4 }
+
+axrAtmPVcFailingPreviouslyTimeStamp    OBJECT-TYPE
+	SYNTAX  TimeStamp
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The time at which this PVCL began to fail previously."
+	::= { axrAtmPVcFailingEntry 5 }
+
+
+axrSonetSectionStatsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrSonetSectionStatsTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A table containing SONET section statistics for sonet interfaces."
+	::= { axrSonetStats 1 }
+
+axrSonetSectionStatsEntry OBJECT-TYPE
+	SYNTAX  AxrSonetSectionStatsTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing SONET section statistics for sonet interfaces."
+	INDEX   { axrSonetSectionStatsIfIndex }
+	::= { axrSonetSectionStatsTable 1 }
+
+	AxrSonetSectionStatsTableEntry ::=
+		SEQUENCE {
+		  axrSonetSectionStatsIfIndex
+			INTEGER,
+		  axrSonetSectionStatsLOS
+			Counter,
+		  axrSonetSectionStatsLOF
+			Counter,
+		  axrSonetSectionStatsOOF
+			Counter,
+		  axrSonetSectionStatsBIP8
+			Counter
+		}
+
+axrSonetSectionStatsIfIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The value of this object identifies for a SONET interface.
+		This object has the same value as the ifIndex object."
+	::= { axrSonetSectionStatsEntry 1 }
+
+axrSonetSectionStatsLOS OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of times LOS(Loss Of Signal)."
+	::= { axrSonetSectionStatsEntry 2 }
+
+axrSonetSectionStatsLOF OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of times LOF(Loss Of Frame).An LOF defect is declared
+		when OOF(Out of Frame) defect persists for a period of 3 milliseconds."
+	::= { axrSonetSectionStatsEntry 3 }
+
+axrSonetSectionStatsOOF OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This object count when out of synchronous."
+	::= { axrSonetSectionStatsEntry 4 }
+
+axrSonetSectionStatsBIP8 OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of times S-BIP8(Bit Interleaved Parity 8) Error."
+	::= { axrSonetSectionStatsEntry 5 }
+
+axrSonetLineStatsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrSonetLineStatsTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A table containing line statistics for sonet interfaces."
+	::= { axrSonetStats 2 }
+
+axrSonetLineStatsEntry OBJECT-TYPE
+	SYNTAX  AxrSonetLineStatsTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing line statistics for sonet interfaces."
+	INDEX   { axrSonetLineStatsIfIndex }
+	::= { axrSonetLineStatsTable 1 }
+
+	AxrSonetLineStatsTableEntry ::=
+		SEQUENCE {
+		  axrSonetLineStatsIfIndex
+			INTEGER,
+		  axrSonetLineStatsAIS
+			Counter,
+		  axrSonetLineStatsRDI
+			Counter,
+		  axrSonetLineStatsBIP24
+			Counter,
+		  axrSonetLineStatsFEBE
+			Counter
+		}
+
+axrSonetLineStatsIfIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The value of this object identifies for a sonet interface.
+		This object has the same value as the ifIndex object."
+	::= { axrSonetLineStatsEntry 1 }
+
+axrSonetLineStatsAIS OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of Line L-AIS(Alarm Indication Signal) that received
+		at sonet interface."
+	::= { axrSonetLineStatsEntry 2 }
+
+axrSonetLineStatsRDI OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of L-RDI(Remote Defect Indication) errors that received
+		on the sonet interface."
+	::= { axrSonetLineStatsEntry 3 }
+
+axrSonetLineStatsBIP24 OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of L-BIP24(Bit Interleaved Parity 24) errors on the sonet
+		interface."
+	::= { axrSonetLineStatsEntry 4 }
+
+axrSonetLineStatsFEBE OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of L-FEBE(Line Far End Block Error) that received on the sonet
+		interface."
+	::= { axrSonetLineStatsEntry 5 }
+
+
+axrSonetPathStatsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrSonetPathStatsTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A table containing Path statistics for SONET interface."
+	::= { axrSonetStats 3 }
+
+axrSonetPathStatsEntry OBJECT-TYPE
+	SYNTAX  AxrSonetPathStatsTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing Path statistics for SONET interface."
+	INDEX   { axrSonetPathStatsIfIndex }
+	::= { axrSonetPathStatsTable 1 }
+
+	AxrSonetPathStatsTableEntry ::=
+		SEQUENCE {
+		  axrSonetPathStatsIfIndex
+			INTEGER,
+		  axrSonetPathStatsLOP
+			Counter,
+		  axrSonetPathStatsAIS
+			Counter,
+		  axrSonetPathStatsRDI
+			Counter,
+		  axrSonetPathStatsBIP8
+			Counter,
+		  axrSonetPathStatsFEBE
+			Counter
+		}
+
+axrSonetPathStatsIfIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The IfIndex value of interface that use SONET."
+	::= { axrSonetPathStatsEntry 1 }
+
+axrSonetPathStatsLOP OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of LOP(Loss Of Pointer) errors that received on the sonet
+		interface."
+	::= { axrSonetPathStatsEntry 2 }
+
+axrSonetPathStatsAIS OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of P-AIS(Alarm Indication Signal) that received on the sonet
+		interface."
+	::= { axrSonetPathStatsEntry 3 }
+
+axrSonetPathStatsRDI OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of P-RDI(Path Remote Defect Indication) that received
+		on the sonet interface."
+	::= { axrSonetPathStatsEntry 4 }
+
+axrSonetPathStatsBIP8 OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of P-BIP8(Bit Interleaved Parity 8) errors that received
+		on the sonet interface."
+	::= { axrSonetPathStatsEntry 5 }
+
+axrSonetPathStatsFEBE OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of P-FEBE(Far End Block Error) errors that received
+		on the sonet interface."
+	::= { axrSonetPathStatsEntry 6 }
+
+
+axrIfStatsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrIfStatsTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A table containing extension statistics for more than 100,000,000
+		bps interface."
+	::= { axrIfStats 1 }
+
+axrIfStatsEntry OBJECT-TYPE
+	SYNTAX  AxrIfStatsTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing extension statistics for interface."
+	INDEX   { axrIfStatsIndex }
+	::= { axrIfStatsTable 1 }
+
+	AxrIfStatsTableEntry ::=
+		SEQUENCE {
+		  axrIfStatsIndex
+			INTEGER,
+		  axrIfStatsName
+			DisplayString,
+		  axrIfStatsInMegaOctets
+			Counter,
+		  axrIfStatsInUcastMegaPkts
+			Counter,
+		  axrIfStatsInMulticastMegaPkts
+			Counter,
+		  axrIfStatsInBroadcastMegaPkts
+			Counter,
+		  axrIfStatsOutMegaOctets
+			Counter,
+		  axrIfStatsOutUcastMegaPkts
+			Counter,
+		  axrIfStatsOutMulticastMegaPkts
+			Counter,
+		  axrIfStatsOutBroadcastMegaPkts
+			Counter,
+		  axrIfStatsHighSpeed
+			Counter
+		}
+
+axrIfStatsIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"This object value is same as Ifindex which interface index
+		of a system."
+	::= { axrIfStatsEntry 1 }
+
+axrIfStatsName OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Interfaces name. Same as ifDescr."
+	::= { axrIfStatsEntry 2 }
+
+axrIfStatsInMegaOctets OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of octets that received on the interface. This value is
+		displayed in mega-octets(M). Value of 0 through 999,999 are rounded
+		down."
+	::= { axrIfStatsEntry 3 }
+
+axrIfStatsInUcastMegaPkts OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of subnetwork-unicast packets that received on the interface.
+		This value is displayed in mega-packets(M).Value of 0 through 999,999
+		are rounded down."
+	::= { axrIfStatsEntry 4 }
+
+axrIfStatsInMulticastMegaPkts OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of multicast mega-packets that received on the interface.
+		this value is displayed in mega-packets(M).Value of 0 through 999,999
+		are rounded down."
+	::= { axrIfStatsEntry 5 }
+
+
+axrIfStatsInBroadcastMegaPkts OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of non-unicast packets delivered to a higher-layer
+		protocol. The value is displayed in mega-packets (M). Value of 0
+		through 999,999 are rounded down. "
+	::= { axrIfStatsEntry 6 }
+
+axrIfStatsOutMegaOctets OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of octets transmitted out of the interface.
+		The value is displayed in mega-octets(M). Value of 0 through 999,999
+		are rounded down."
+	::= { axrIfStatsEntry 7 }
+
+axrIfStatsOutUcastMegaPkts OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of packets that higher-level protocols requested
+		be transmitted to a subnetwork-unicast address.The value is displayed
+		in mega packets(M). Value of 0 through 999,999 are rounded down."
+	::= { axrIfStatsEntry 8 }
+
+axrIfStatsOutMulticastMegaPkts OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of multicast packets that transmitted on the interface.
+		This value is displayed in mega-packets(M). Value of 0 through
+		999,999 are rounded down."
+	::= { axrIfStatsEntry 9 }
+
+axrIfStatsOutBroadcastMegaPkts OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of broadcast packets that transmitted on the interface.
+		This value is displayed in mega-packets(M). Value of 0 through
+		999,999 are rounded down. "
+	::= { axrIfStatsEntry 10 }
+
+axrIfStatsHighSpeed OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A circuit speed.This value is displayed in mega-bps[Mbps].
+		Round off the 1,000,000bps. "
+	::= { axrIfStatsEntry 11 }
+
+-- 
+axrAtm25MStatsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrAtm25MStatsTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Statistical information table on 25 Mega ATM interface."
+	::= { axrAtm25MStats 1 }
+
+axrAtm25MStatsEntry OBJECT-TYPE
+	SYNTAX  AxrAtm25MStatsTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing error statistics for a particular 
+        25 Mega ATM interface."
+	INDEX   { axrAtm25MStatsIndex }
+	::= { axrAtm25MStatsTable 1 }
+
+	AxrAtm25MStatsTableEntry ::=
+		SEQUENCE {
+		  axrAtm25MStatsIndex
+			INTEGER,
+		  axrAtm25MStSymbolErr
+			Counter,
+		  axrAtm25MStLOS
+			Counter
+		}
+
+axrAtm25MStatsIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A ifIndex value of 25 Mega ATM  interface."
+	::= { axrAtm25MStatsEntry 1 }
+
+axrAtm25MStSymbolErr OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of times symbol error."
+	::= { axrAtm25MStatsEntry 2 }
+
+axrAtm25MStLOS OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of times LOS(Loss Of Signal)."
+	::= { axrAtm25MStatsEntry 3 }
+
+
+--  QoS interface statistics Variables
+
+
+axrEtherTxQoSStatsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrEtherTxQoSStatsEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A collection of QoS statistics kept for a particular
+		Ethernet interface."
+	::= { axrEtherTxQoS 1 }
+
+axrEtherTxQoSStatsEntry OBJECT-TYPE
+	SYNTAX  AxrEtherTxQoSStatsEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing QoS statistics for a particular 
+		Ethernet interface."
+    INDEX { axrEtherTxQoSStatsIndex }
+	::= { axrEtherTxQoSStatsTable 1 }
+
+	AxrEtherTxQoSStatsEntry ::=
+		SEQUENCE {
+            axrEtherTxQoSStatsIndex	INTEGER,
+            axrEtherTxQoSStatsMaxQnum	INTEGER,
+            axrEtherTxQoSStatsLimitQlen	INTEGER,
+            axrEtherTxQoSStatsTotalOutFrames	Counter,
+            axrEtherTxQoSStatsTotalOutBytesHigh	Counter,
+            axrEtherTxQoSStatsTotalOutBytesLow	Counter,
+            axrEtherTxQoSStatsTotalDiscardFrames	Counter
+		}
+
+axrEtherTxQoSStatsIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Identified by a particular value of this
+		index is same value of ifIndex.Its value ranges
+		between 1 and the value of ifNumber."
+	::= { axrEtherTxQoSStatsEntry 1 }
+
+axrEtherTxQoSStatsMaxQnum OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Max length of queue for an ethernet interface."
+	::= { axrEtherTxQoSStatsEntry 2 }
+
+axrEtherTxQoSStatsLimitQlen OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The limit length of outband queue for an ethernet interface."
+	::= { axrEtherTxQoSStatsEntry 3 }
+
+axrEtherTxQoSStatsTotalOutFrames OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of  packets transmitted out of the
+		interface."
+	::= { axrEtherTxQoSStatsEntry 4 }
+
+axrEtherTxQoSStatsTotalOutBytesHigh OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of octets transmitted out of the
+		interface."
+	::= { axrEtherTxQoSStatsEntry 5 }
+
+axrEtherTxQoSStatsTotalOutBytesLow OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of octets transmitted out of the
+		interface."
+	::= { axrEtherTxQoSStatsEntry 6 }
+
+axrEtherTxQoSStatsTotalDiscardFrames OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of outbound packets which were chosen
+		to be discarded ."
+	::= { axrEtherTxQoSStatsEntry 7 }
+
+axrEtherTxQoSStatsQueueTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrEtherTxQoSStatsQueueEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A collection of priority queue statistics."
+	::= { axrEtherTxQoS 2 }
+
+axrEtherTxQoSStatsQueueEntry OBJECT-TYPE
+	SYNTAX  AxrEtherTxQoSStatsQueueEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A entry of priority queue statistics."
+    INDEX { axrEtherTxQoSStatsQueueIndex , axrEtherTxQoSStatsQueueQueIndex }
+	::= { axrEtherTxQoSStatsQueueTable 1 }
+
+	AxrEtherTxQoSStatsQueueEntry ::=
+		SEQUENCE {
+            axrEtherTxQoSStatsQueueIndex	    INTEGER,
+            axrEtherTxQoSStatsQueueQueIndex	INTEGER,
+            axrEtherTxQoSStatsQueueQlen	INTEGER,
+            axrEtherTxQoSStatsQueueMaxQlen	INTEGER
+		}
+
+axrEtherTxQoSStatsQueueIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Identified by a particular value of this
+		index is same value of ifIndex.Its value ranges
+		between 1 and the value of ifNumber."
+	::= { axrEtherTxQoSStatsQueueEntry 1 }
+
+axrEtherTxQoSStatsQueueQueIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An index that uniquely identifies the particular
+		queue.Its value ranges between 1 and the value of
+		axrEtherTxQoSStatsMaxQnum."
+	::= { axrEtherTxQoSStatsQueueEntry 2 }
+
+axrEtherTxQoSStatsQueueQlen OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A length of outbound priority queue for a interface."
+	::= { axrEtherTxQoSStatsQueueEntry 3 }
+
+axrEtherTxQoSStatsQueueMaxQlen OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Max length of outband priority queue for a interface since
+		system was up."
+	::= { axrEtherTxQoSStatsQueueEntry 4 }
+
+axrPPPTxQoSStatsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrPPPTxQoSStatsEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A collection of QoS statistics kept for a particular
+		PPP interface."
+	::= { axrPPPTxQoS 1 }
+
+axrPPPTxQoSStatsEntry OBJECT-TYPE
+	SYNTAX  AxrPPPTxQoSStatsEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing QoS statistics for a particular 
+		PPP interface."
+    INDEX { axrPPPTxQoSStatsIndex }
+	::= { axrPPPTxQoSStatsTable 1 }
+
+	AxrPPPTxQoSStatsEntry ::=
+		SEQUENCE {
+            axrPPPTxQoSStatsIndex		INTEGER,
+            axrPPPTxQoSStatsMaxQnum		INTEGER,
+            axrPPPTxQoSStatsLimitQlen		INTEGER,
+            axrPPPTxQoSStatsTotalOutFrames	Counter,
+            axrPPPTxQoSStatsTotalOutBytesHigh	Counter,
+            axrPPPTxQoSStatsTotalOutBytesLow	Counter,
+            axrPPPTxQoSStatsTotalDiscardFrames	Counter
+		}
+
+axrPPPTxQoSStatsIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Identified by a particular value of this
+		index is same value of ifIndex.Its value ranges
+		between 1 and the value of ifNumber."
+	::= { axrPPPTxQoSStatsEntry 1 }
+
+axrPPPTxQoSStatsMaxQnum OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Max length of queue for a  PPP interface."
+	::= { axrPPPTxQoSStatsEntry 2 }
+
+axrPPPTxQoSStatsLimitQlen OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The limit length of outband queue for a PPP interface."
+	::= { axrPPPTxQoSStatsEntry 3 }
+
+axrPPPTxQoSStatsTotalOutFrames OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of  packets transmitted out of the
+		PPP interface."
+	::= { axrPPPTxQoSStatsEntry 4 }
+
+axrPPPTxQoSStatsTotalOutBytesHigh OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of octets transmitted out of the
+		PPP interface."
+	::= { axrPPPTxQoSStatsEntry 5 }
+
+axrPPPTxQoSStatsTotalOutBytesLow OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of octets transmitted out of the
+		PPP interface."
+	::= { axrPPPTxQoSStatsEntry 6 }
+
+axrPPPTxQoSStatsTotalDiscardFrames OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of outbound packets which were chosen
+		to be discarded ."
+	::= { axrPPPTxQoSStatsEntry 7 }
+
+axrPPPTxQoSStatsQueueTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrPPPTxQoSStatsQueueEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A collection of outbound priority queue statistics
+		for a PPP interface."
+	::= { axrPPPTxQoS 2 }
+
+axrPPPTxQoSStatsQueueEntry OBJECT-TYPE
+	SYNTAX  AxrPPPTxQoSStatsQueueEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A entry of outbound priority queue statistics.
+		for a PPP interface."
+    INDEX { axrPPPTxQoSStatsQueueIndex, axrPPPTxQoSStatsQueueQueIndex }
+	::= { axrPPPTxQoSStatsQueueTable 1 }
+
+	AxrPPPTxQoSStatsQueueEntry ::=
+		SEQUENCE {
+            axrPPPTxQoSStatsQueueIndex		INTEGER,
+            axrPPPTxQoSStatsQueueQueIndex	INTEGER,
+            axrPPPTxQoSStatsQueueQlen	INTEGER,
+            axrPPPTxQoSStatsQueueMaxQlen		INTEGER,
+            axrPPPTxQoSStatsQueueOutFrames		Counter,
+            axrPPPTxQoSStatsQueueOutBytesHigh	Counter,
+            axrPPPTxQoSStatsQueueOutBytesLow		Counter,
+            axrPPPTxQoSStatsQueueDiscardFrames	Counter
+		}
+
+axrPPPTxQoSStatsQueueIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Identified by a particular value of this
+		index is same value of ifIndex.Its value ranges
+		between 1 and the value of ifNumber."
+	::= { axrPPPTxQoSStatsQueueEntry 1 }
+
+axrPPPTxQoSStatsQueueQueIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An index that uniquely identifies the particular
+		queue.Its value ranges between 1 and the value of
+		axrPPPTxQoSStatsMaxQnum."
+	::= { axrPPPTxQoSStatsQueueEntry 2 }
+
+axrPPPTxQoSStatsQueueQlen OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A length of outbound priority queue for a PPP 
+		interface."
+	::= { axrPPPTxQoSStatsQueueEntry 3 }
+
+axrPPPTxQoSStatsQueueMaxQlen OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Max length of outband priority queue for a interface since
+		system was up."
+	::= { axrPPPTxQoSStatsQueueEntry 4 }
+
+axrPPPTxQoSStatsQueueOutFrames OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of  packets transmitted out of the
+		PPP priority queue interface."
+	::= { axrPPPTxQoSStatsQueueEntry 5 }
+
+axrPPPTxQoSStatsQueueOutBytesHigh OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of octets transmitted out of the
+		PPP priority queue interface."
+	::= { axrPPPTxQoSStatsQueueEntry 6 }
+
+axrPPPTxQoSStatsQueueOutBytesLow OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of octets transmitted out of the
+		PPP priority queue interface."
+	::= { axrPPPTxQoSStatsQueueEntry 7 }
+
+axrPPPTxQoSStatsQueueDiscardFrames OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of outbound packets which were chosen
+		to be discarded at PPP priority queue interface."
+	::= { axrPPPTxQoSStatsQueueEntry 8 }
+
+axrFRTxQoSStatsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrFRTxQoSStatsEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A collection of QoS statistics kept for a particular
+		Frame Relay interface."
+	::= { axrFRTxQoS 1 }
+
+axrFRTxQoSStatsEntry OBJECT-TYPE
+	SYNTAX  AxrFRTxQoSStatsEntry --SHIMO EDIT
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing QoS statistics for a particular 
+		Frame Relay interface."
+    INDEX { axrFRTxQoSStatsIndex }
+	::= { axrFRTxQoSStatsTable 1 }
+
+	AxrFRTxQoSStatsEntry ::=
+		SEQUENCE {
+            axrFRTxQoSStatsIndex		INTEGER,
+            axrFRTxQoSStatsMaxQnum	INTEGER,
+            axrFRTxQoSStatsLimitQlen	INTEGER,
+            axrFRTxQoSStatsTotalOutFrames	Counter,
+            axrFRTxQoSStatsTotalOutBytesHigh	Counter,
+            axrFRTxQoSStatsTotalOutBytesLow	Counter,
+            axrFRTxQoSStatsTotalDiscardFrames	Counter
+		}
+
+axrFRTxQoSStatsIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Identified by a particular value of this
+		index is same value of ifIndex.Its value ranges
+		between 1 and the value of ifNumber."
+	::= { axrFRTxQoSStatsEntry 1 }
+
+axrFRTxQoSStatsMaxQnum OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Max length of queue for a Frame Relay interface."
+	::= { axrFRTxQoSStatsEntry 2 }
+
+axrFRTxQoSStatsLimitQlen OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The limit length of outband queue for a Frame Relay interface."
+	::= { axrFRTxQoSStatsEntry 3 }
+
+axrFRTxQoSStatsTotalOutFrames OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of octets transmitted out of the
+		Frame Relay interface."
+	::= { axrFRTxQoSStatsEntry 4 }
+
+axrFRTxQoSStatsTotalOutBytesHigh OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of octets transmitted out of the
+		PFrame Relay interface."
+	::= { axrFRTxQoSStatsEntry 5 }
+
+axrFRTxQoSStatsTotalOutBytesLow OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of octets transmitted out of the
+		PFrame Relay interface."
+	::= { axrFRTxQoSStatsEntry 6 }
+
+axrFRTxQoSStatsTotalDiscardFrames OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of outbound packets which were chosen
+		to be discarded ."
+	::= { axrFRTxQoSStatsEntry 7 }
+
+axrFRTxQoSStatsQueueTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrFRTxQoSStatsQueueEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A collection of outbound priority queue statistics
+		for a Frame Relay interface."
+	::= { axrFRTxQoS 2 }
+
+axrFRTxQoSStatsQueueEntry OBJECT-TYPE
+	SYNTAX  AxrFRTxQoSStatsQueueEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A entry of outbound priority queue statistics.
+		for a Farme Relay interface."
+    INDEX { axrFRTxQoSStatsQueueIndex, axrFRTxQoSStatsQueueQueIndex}
+	::= { axrFRTxQoSStatsQueueTable 1 }
+
+	AxrFRTxQoSStatsQueueEntry ::=
+		SEQUENCE {
+            axrFRTxQoSStatsQueueIndex	INTEGER,
+            axrFRTxQoSStatsQueueQueIndex	INTEGER,
+            axrFRTxQoSStatsQueueQlen	INTEGER,
+            axrFRTxQoSStatsQueueMaxQlen	INTEGER,
+            axrFRTxQoSStatsQueueOutFrames	Counter,
+            axrFRTxQoSStatsQueueOutBytesHigh	Counter,
+            axrFRTxQoSStatsQueueOutBytesLow	Counter,
+            axrFRTxQoSStatsQueueDiscardFrames	Counter
+		}
+
+axrFRTxQoSStatsQueueIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Identified by a particular value of this
+		index is same value of ifIndex.Its value ranges
+		between 1 and the value of ifNumber."
+	::= { axrFRTxQoSStatsQueueEntry 1 }
+
+axrFRTxQoSStatsQueueQueIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An index that uniquely identifies the particular
+		queue.Its value ranges between 1 and the value of
+		axrFRTxQoSStatsMaxQnum"
+	::= { axrFRTxQoSStatsQueueEntry 2 }
+
+axrFRTxQoSStatsQueueQlen OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A length of outbound priority queue for a Frame Relay
+		interface."
+	::= { axrFRTxQoSStatsQueueEntry 3 }
+
+axrFRTxQoSStatsQueueMaxQlen OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Max length of outband priority queue for a Frame Relay 
+		interface since	system was up."
+	::= { axrFRTxQoSStatsQueueEntry 4 }
+
+axrFRTxQoSStatsQueueOutFrames OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of octets transmitted out of the
+		Frame Relay priority queue interface."
+	::= { axrFRTxQoSStatsQueueEntry 5 }
+
+axrFRTxQoSStatsQueueOutBytesHigh OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of octets transmitted out of the
+		Frame Relay priority queue interface."
+	::= { axrFRTxQoSStatsQueueEntry 6 }
+
+axrFRTxQoSStatsQueueOutBytesLow OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of octets transmitted out of the
+		Frame Relay interface."
+	::= { axrFRTxQoSStatsQueueEntry 7 }
+
+axrFRTxQoSStatsQueueDiscardFrames OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of outbound packets which were chosen
+		to be discarded ."
+	::= { axrFRTxQoSStatsQueueEntry 8 }
+
+axrEthShaperStatsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrEthShaperStatsEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A collection of Shaper statistics kept for a 
+		particular Ethernet Shaper interface."
+	::= { axrEthShaper 1 }
+
+axrEthShaperStatsEntry OBJECT-TYPE
+	SYNTAX  AxrEthShaperStatsEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing Shaper statistics for a 
+		particular Ethernet Shaper interface."
+    INDEX { axrEthShaperStatsIndex }
+	::= { axrEthShaperStatsTable 1 }
+
+	AxrEthShaperStatsEntry ::=
+		SEQUENCE {
+		  axrEthShaperStatsIndex			INTEGER,
+		  axrEthShaperStatsTotalOutFrames	Counter64,
+		  axrEthShaperStatsTotalOutBytes		Counter64,
+		  axrEthShaperStatsTotalDiscardFrames	Counter64,
+		  axrEthShaperStatsTotalDiscardBytes	Counter64
+		}
+
+axrEthShaperStatsIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Identified by a particular value of this index 
+		is same value of ifIndex.Its value ranges between 
+		1 and the value of ifNumber."
+	::= { axrEthShaperStatsEntry 1 }
+
+axrEthShaperStatsTotalOutFrames OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of packets transmitted out of 
+		the interface."
+	::= { axrEthShaperStatsEntry 2 }
+
+axrEthShaperStatsTotalOutBytes OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of octets transmitted out of 
+		the interface."
+	::= { axrEthShaperStatsEntry 3 }
+
+axrEthShaperStatsTotalDiscardFrames OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of outbound packets which 
+		were chosen to be discarded."
+	::= { axrEthShaperStatsEntry 4 }
+
+axrEthShaperStatsTotalDiscardBytes OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of outbound octets which 
+		were chosen to be discarded."
+	::= { axrEthShaperStatsEntry 5 }
+
+axrEthShaperStatsQueueTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrEthShaperStatsQueueEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A collection of priority queue statistics."
+	::= { axrEthShaper 2 }
+
+axrEthShaperStatsQueueEntry OBJECT-TYPE
+	SYNTAX  AxrEthShaperStatsQueueEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A entry of priority queue statistics."
+    INDEX { axrEthShaperStatsQueueIndex, axrEthShaperStatsQueueQueIndex }
+	::= { axrEthShaperStatsQueueTable 1 }
+
+	AxrEthShaperStatsQueueEntry ::=
+		SEQUENCE {
+		  axrEthShaperStatsQueueIndex		INTEGER,
+		  axrEthShaperStatsQueueQueIndex		INTEGER,
+		  axrEthShaperStatsQueueOutFrames	Counter64,
+		  axrEthShaperStatsQueueOutBytes		Counter64,
+		  axrEthShaperStatsQueueDiscardFrames	Counter64,
+		  axrEthShaperStatsQueueDiscardBytes	Counter64
+		}
+
+axrEthShaperStatsQueueIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Identified by a particular value of this index 
+		is same value of ifIndex.Its value ranges between 
+		1 and the value of ifNumber."
+	::= { axrEthShaperStatsQueueEntry 1 }
+
+axrEthShaperStatsQueueQueIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An index that uniquely identifies the particular queue.
+		Its value ranges between 1 and 4."
+	::= { axrEthShaperStatsQueueEntry 2 }
+
+axrEthShaperStatsQueueOutFrames OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of packets transmitted out of the priority 
+		queue interface."
+	::= { axrEthShaperStatsQueueEntry 3 }
+
+axrEthShaperStatsQueueOutBytes OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of octets transmitted out of the priority 
+		queue interface."
+	::= { axrEthShaperStatsQueueEntry 4 }
+
+axrEthShaperStatsQueueDiscardFrames OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of packets which were chosen to be discarded."
+	::= { axrEthShaperStatsQueueEntry 5 }
+
+axrEthShaperStatsQueueDiscardBytes OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of octets which were chosen to be discarded."
+	::= { axrEthShaperStatsQueueEntry 6 }
+
+axrEthShaperStatsFlowOtherFrmTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrEthShaperStatsFlowOtherFrmEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A collection of Shaper other Frame statistics kept 
+		for a particular Ethernet Shaper interface."
+	::= { axrEthShaper 3 }
+
+axrEthShaperStatsFlowOtherFrmEntry OBJECT-TYPE
+	SYNTAX  AxrEthShaperStatsFlowOtherFrmEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing Shaper other Frame statistics 
+		for a particular Ethernet Shaper interface."
+    INDEX { axrEthShaperStatsFlowOtherFrmNifIndex, 
+	    axrEthShaperStatsFlowOtherFrmLineIndex }
+	::= { axrEthShaperStatsFlowOtherFrmTable 1 }
+
+	AxrEthShaperStatsFlowOtherFrmEntry ::=
+		SEQUENCE {
+		  axrEthShaperStatsFlowOtherFrmNifIndex		INTEGER,
+		  axrEthShaperStatsFlowOtherFrmLineIndex		INTEGER,
+		  axrEthShaperStatsFlowOtherFrmOutFrames		Counter64,
+		  axrEthShaperStatsFlowOtherFrmOutBytes		Counter64,
+		  axrEthShaperStatsFlowOtherFrmDiscardFrames	Counter64,
+		  axrEthShaperStatsFlowOtherFrmDiscardBytes	Counter64
+		}
+
+axrEthShaperStatsFlowOtherFrmNifIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Identified by a particular value of this index 
+		is same value of NIF.Its value ranges between 
+		1 and the value of ax2000rNifBoardNumber."
+	::= { axrEthShaperStatsFlowOtherFrmEntry 1 }
+
+axrEthShaperStatsFlowOtherFrmLineIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Identified by a particular value of this index 
+		is same value of Physical Line.Its value ranges 
+		between 1 and the value of ax2000rNifPhysLineNumber."
+	::= { axrEthShaperStatsFlowOtherFrmEntry 2 }
+
+axrEthShaperStatsFlowOtherFrmOutFrames OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of packets transmitted outside of 
+		a target for control out of the NIF."
+	::= { axrEthShaperStatsFlowOtherFrmEntry 3 }
+
+axrEthShaperStatsFlowOtherFrmOutBytes OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of octets transmitted outside of 
+		a target for control out of the NIF."
+	::= { axrEthShaperStatsFlowOtherFrmEntry 4 }
+
+axrEthShaperStatsFlowOtherFrmDiscardFrames OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of outbound packets outside of 
+		a target for control which were chosen to be discarded."
+	::= { axrEthShaperStatsFlowOtherFrmEntry 5 }
+
+axrEthShaperStatsFlowOtherFrmDiscardBytes OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of outbound octets outside of 
+		a target for control which were chosen to be discarded."
+	::= { axrEthShaperStatsFlowOtherFrmEntry 6 }
+
+axrEthVllStatsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrEthVllStatsEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A collection of Shaper statistics kept for a 
+		particular Ethernet Vll interface."
+	::= { axrEthVll 1 }
+
+axrEthVllStatsEntry OBJECT-TYPE
+	SYNTAX  AxrEthVllStatsEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing Shaper statistics for a 
+		particular Ethernet Vll interface."
+    INDEX { axrEthVllStatsIndex } 
+	::= { axrEthVllStatsTable 1 }
+
+	AxrEthVllStatsEntry ::=
+		SEQUENCE {
+		  axrEthVllStatsIndex		        INTEGER,
+		  axrEthVllStatsTotalOutFrames		Counter64,
+		  axrEthVllStatsTotalOutBytes		Counter64,
+		  axrEthVllStatsTotalDiscardFrames	Counter64,
+		  axrEthVllStatsTotalDiscardBytes	Counter64
+		}
+
+axrEthVllStatsIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Identified by a particular value of this index 
+		is same value of ifIndex.Its value ranges between 
+		1 and the value of ifNumber."
+	::= { axrEthVllStatsEntry 1 }
+
+axrEthVllStatsTotalOutFrames OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of packets transmitted out of 
+		the interface."
+	::= { axrEthVllStatsEntry 2 }
+
+axrEthVllStatsTotalOutBytes OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of octets transmitted out of 
+		the interface."
+	::= { axrEthVllStatsEntry 3 }
+
+axrEthVllStatsTotalDiscardFrames OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of outbound packets which 
+		were chosen to be discarded."
+	::= { axrEthVllStatsEntry 4 }
+
+axrEthVllStatsTotalDiscardBytes OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of outbound octets which 
+		were chosen to be discarded."
+	::= { axrEthVllStatsEntry 5 }
+
+axrEthVllStatsQueueTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrEthVllStatsQueueEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A collection of priority queue statistics."
+	::= { axrEthVll 2 }
+
+axrEthVllStatsQueueEntry OBJECT-TYPE
+	SYNTAX  AxrEthVllStatsQueueEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		""
+    INDEX { axrEthVllStatsQueueIndex, axrEthVllStatsQueueQueIndex}
+	::= { axrEthVllStatsQueueTable 1 }
+
+	AxrEthVllStatsQueueEntry ::=
+		SEQUENCE {
+		  axrEthVllStatsQueueIndex	        INTEGER,
+		  axrEthVllStatsQueueQueIndex	    INTEGER,
+		  axrEthVllStatsQueuelimitQlen       INTEGER,
+		  axrEthVllStatsQueueQlen	        INTEGER,
+		  axrEthVllStatsQueueMaxQlen	        INTEGER,
+		  axrEthVllStatsQueueOutFrames		Counter64,
+		  axrEthVllStatsQueueOutBytes		Counter64,
+		  axrEthVllStatsQueueDiscardFrames	Counter64,
+		  axrEthVllStatsQueueDiscardBytes	Counter64
+		}
+
+axrEthVllStatsQueueIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Identified by a particular value of this index 
+		is same value of ifIndex.Its value ranges between 
+		1 and the value of ifNumber."
+	::= { axrEthVllStatsQueueEntry 1 }
+
+axrEthVllStatsQueueQueIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An index that uniquely identifies the particular queue.
+		Its value ranges between 1 and 4."
+	::= { axrEthVllStatsQueueEntry 2 }
+
+axrEthVllStatsQueuelimitQlen OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The limit value of the length of the output priority queue 
+         in the interface is indicated."
+	::= { axrEthVllStatsQueueEntry 3 }
+
+axrEthVllStatsQueueQlen OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The length of the output priority queue when information 
+         in the interface is gathered is shown. "
+	::= { axrEthVllStatsQueueEntry 4 }
+
+axrEthVllStatsQueueMaxQlen OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The maximum length of the output priority queue 
+         in a pertinent interface is shown."
+	::= { axrEthVllStatsQueueEntry 5 }
+
+axrEthVllStatsQueueOutFrames OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of packets transmitted out of the priority 
+		queue interface."
+	::= { axrEthVllStatsQueueEntry 6 }
+
+axrEthVllStatsQueueOutBytes OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of octets transmitted out of the priority 
+		queue interface."
+	::= { axrEthVllStatsQueueEntry 7 }
+
+axrEthVllStatsQueueDiscardFrames OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of packets which were chosen to be discarded."
+	::= { axrEthVllStatsQueueEntry 8 }
+
+axrEthVllStatsQueueDiscardBytes OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of octets which were chosen to be discarded."
+	::= { axrEthVllStatsQueueEntry 9 }
+
+--AX2000R DHCP group Variables
+
+
+axrDHCPAddrValue OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The number of IP addresses which are available
+		within this Router."
+	::= { axrDHCP 1 }
+
+axrDHCPFreeAddrValue OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The number of IP addresses which are available
+		within this Router. May be expressed as either
+		an absolute value."
+	::= { axrDHCP 2 }
+
+
+--  OSPF General Variables
+
+axrOspfGeneralTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrOspfGeneralEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The table of OSPF information."
+	::= { axrOspf 1 }
+
+axrOspfGeneralEntry OBJECT-TYPE
+	SYNTAX  AxrOspfGeneralEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The entry of OSPF information."
+    INDEX { axrOspfGeneralDomainNumber }
+	::= { axrOspfGeneralTable 1 }
+
+	AxrOspfGeneralEntry ::=
+		SEQUENCE {
+		    axrOspfGeneralDomainNumber	INTEGER,
+		    axrOspfRouterId				IpAddress,
+		    axrOspfAdminStat				INTEGER,
+		    axrOspfVersionNumber			INTEGER,
+		    axrOspfAreaBdrRtrStatus		INTEGER,
+		    axrOspfASBdrRtrStatus		INTEGER,
+		    axrOspfExternLsaCount		Gauge,
+		    axrOspfExternLsaCksumSum		INTEGER,
+		    axrOspfTOSSupport			INTEGER,
+		    axrOspfOriginateNewLsas		Counter,
+		    axrOspfRxNewLsas				Counter,
+		    axrOspfExtLsdbLimit			INTEGER,
+		    axrOspfMulticastExtensions	INTEGER
+		}
+
+axrOspfGeneralDomainNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Domain number in the Autonomous System."
+	::= { axrOspfGeneralEntry 1 }
+
+axrOspfRouterId OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A integer uniquely identifying the router
+		in the Autonomous System."
+	::= { axrOspfGeneralEntry 2 }
+
+axrOspfAdminStat OBJECT-TYPE
+	SYNTAX  INTEGER   { 
+				enabled(1),
+				disabled(2)
+		    }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The  administrative  status  of  OSPF  in  the
+		router.  "
+	::= { axrOspfGeneralEntry 3 }
+
+axrOspfVersionNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The current version number of the OSPF  
+		protocol is 2."
+	::= { axrOspfGeneralEntry 4 }
+
+axrOspfAreaBdrRtrStatus OBJECT-TYPE
+	SYNTAX  INTEGER { 
+				true(1),
+				false(2)
+			}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A flag to note whether this router is an  area
+		 border router."
+	::= { axrOspfGeneralEntry 5 }
+
+axrOspfASBdrRtrStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+				true(1),
+				false(2)
+			}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A flag to note whether this router is  configured
+		as an Autonomous System border router."
+	::= { axrOspfGeneralEntry 6 }
+
+axrOspfExternLsaCount OBJECT-TYPE
+	SYNTAX  Gauge
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of external (LS type 5)  link-state
+		advertisements in the link-state database."
+	::= { axrOspfGeneralEntry 7 }
+
+axrOspfExternLsaCksumSum OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The 32-bit unsigned sum of the LS checksums of
+		the  external  link-state  advertisements  contained
+		in the link-state  database."
+	::= { axrOspfGeneralEntry 8 }
+
+axrOspfTOSSupport OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The router's support for type-of-service routing.
+		 This value of false(2). "
+	::= { axrOspfGeneralEntry 9 }
+
+axrOspfOriginateNewLsas OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of  new  link-state  advertisements
+		that have been originated. "
+	::= { axrOspfGeneralEntry 10 }
+
+axrOspfRxNewLsas OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of  link-state  advertisements  received
+		determined  to  be  new instantiations."
+	::= { axrOspfGeneralEntry 11 }
+
+axrOspfExtLsdbLimit OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The maximum number of non-default AS-external-LSAs
+		entries that can be stored in the link-state database.
+		If the value is -1,  then there is no limit.
+		This value is -1"
+	::= { axrOspfGeneralEntry 12 }
+
+axrOspfMulticastExtensions OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A Bit Mask indicating whether  the  router  is
+		forwarding  IP  multicast  (Class  D) datagrams
+		based on the algorithms defined in  the  Multicast
+		Extensions to OSPF."
+	::= { axrOspfGeneralEntry 13 }
+
+axrOspfAreaTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrOspfAreaEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The router's support for demand routing."
+	::= { axrOspf 2 }
+
+axrOspfAreaEntry OBJECT-TYPE
+	SYNTAX  AxrOspfAreaEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"This entry contain ospf area information."
+    INDEX { axrOspfAreaDomainNumber, axrOspfAreaId }
+	::= { axrOspfAreaTable 1 }
+
+	AxrOspfAreaEntry ::=
+		SEQUENCE {
+		    axrOspfAreaDomainNumber	INTEGER,
+		    axrOspfAreaId			IpAddress,
+		    axrOspfAuthType			INTEGER,
+		    axrOspfImportAsExtern	INTEGER,
+		    axrOspfSpfRuns			Counter,
+		    axrOspfAreaBdrRtrCount	Gauge,
+		    axrOspfAsBdrRtrCount		Gauge,
+		    axrOspfAreaLsaCount		Gauge,
+		    axrOspfAreaLsaCksumSum	INTEGER,
+		    axrOspfAreaSummary		INTEGER,
+		    axrOspfAreaStatus		INTEGER
+		}
+
+axrOspfAreaDomainNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"An uniquely identifying number of domain."
+	::= { axrOspfAreaEntry 1 }
+
+axrOspfAreaId OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A 32-bit integer uniquely identifying an area."
+	::= { axrOspfAreaEntry 2 }
+
+axrOspfAuthType OBJECT-TYPE
+	SYNTAX  INTEGER
+			-- none(0),
+			-- simplePassword (1),
+			-- md5(2)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The authentication type specified for an area."
+	::= { axrOspfAreaEntry 3 }
+
+axrOspfImportAsExtern OBJECT-TYPE
+	SYNTAX  INTEGER { 
+				importExternal (1),
+				importNoExternal (2),
+				importNssa (3)
+			}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The area's support for importing  AS  external
+		link- state advertisements."
+	::= { axrOspfAreaEntry 4 }
+
+axrOspfSpfRuns OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of times that the intra-area  route
+		table  has  been  calculated  using this area's
+		link-state database."
+	::= { axrOspfAreaEntry 5 }
+
+axrOspfAreaBdrRtrCount OBJECT-TYPE
+	SYNTAX  Gauge
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of area border routers reachable
+		within this area."
+	::= { axrOspfAreaEntry 6 }
+
+axrOspfAsBdrRtrCount OBJECT-TYPE
+	SYNTAX  Gauge
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of AS area border routers reachable
+		within this area."
+	::= { axrOspfAreaEntry 7 }
+
+axrOspfAreaLsaCount OBJECT-TYPE
+	SYNTAX  Gauge
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of LSA(link-state  advertisements) 
+		in this area. Excluding AS External LSA's"
+	::= { axrOspfAreaEntry 8 }
+
+axrOspfAreaLsaCksumSum OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The sum of LSA's  LS  checksums  contained in this
+		area's link-state database."
+	::= { axrOspfAreaEntry 9 }
+
+axrOspfAreaSummary OBJECT-TYPE
+	SYNTAX  INTEGER  {
+				    noAreaSummary (1),
+				    sendAreaSummary (2)
+		    }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"he variable axrOspfAreaSummary controls the import
+		of summary LSAs into stub areas. Value is only 
+		sendAreaSummary(2)."
+	::= { axrOspfAreaEntry 10 }
+
+axrOspfAreaStatus OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This variable displays the status of  the  entry.
+		Value is only valid(1)."
+	::= { axrOspfAreaEntry 11 }
+
+axrOspfStubAreaTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrOspfStubAreaEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The set of metrics that will be advertised  by
+		a default Area Border Router into a stub area."
+	::= { axrOspf 3 }
+
+axrOspfStubAreaEntry OBJECT-TYPE
+	SYNTAX  AxrOspfStubAreaEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The metric for a given Type  of  Service  that
+		will be advertised by a default Area Border Router 
+		into a stub area."
+    INDEX { axrOspfStubDomainNumber, axrOspfStubAreaId,
+		    axrOspfStubTOS }
+	::= { axrOspfStubAreaTable 1 }
+
+	AxrOspfStubAreaEntry ::=
+		SEQUENCE {
+		    axrOspfStubDomainNumber	INTEGER,
+		    axrOspfStubAreaId		IpAddress,
+		    axrOspfStubTOS			INTEGER,
+		    axrOspfStubMetric		INTEGER,
+		    axrOspfStubStatus		INTEGER,
+		    axrOspfStubMetricType	INTEGER
+		}
+
+axrOspfStubDomainNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The domain identifier for the Stub  Area."
+	::= { axrOspfStubAreaEntry 1 }
+
+axrOspfStubAreaId OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The identifier for the Stub  Area."
+	::= { axrOspfStubAreaEntry 2 }
+
+axrOspfStubTOS OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The Type of Service associated with the metric.
+		Value is only 0."
+	::= { axrOspfStubAreaEntry 3 }
+
+axrOspfStubMetric OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The metric value applied at the indicated type
+		of service."
+	::= { axrOspfStubAreaEntry 4 }
+
+axrOspfStubStatus OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This variable displays the status of the entry.
+		This value is only valid(1)."
+	::= { axrOspfStubAreaEntry 5 }
+
+axrOspfStubMetricType OBJECT-TYPE
+	SYNTAX  INTEGER  {
+				ospfMetric(1),
+				comparableCost(2),
+				nonComparable(3)
+		    }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"his variable displays the type of metric advertised
+		as a default route."
+	::= { axrOspfStubAreaEntry 6 }
+
+axrOspfLsdbTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrOspfLsdbEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The OSPF Process's Link State Database."
+	::= { axrOspf 4 }
+
+axrOspfLsdbEntry OBJECT-TYPE
+	SYNTAX  AxrOspfLsdbEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		 "A single Link State Advertisement."
+    INDEX { axrOspfLsdbDomainNumber, axrOspfLsdbAreaId,
+		    axrOspfLsdbType, axrOspfLsdbLsid, axrOspfLsdbRouterId }
+	::= { axrOspfLsdbTable 1 }
+
+	AxrOspfLsdbEntry ::=
+		SEQUENCE {
+		    axrOspfLsdbDomainNumber	INTEGER,
+		    axrOspfLsdbAreaId		IpAddress,
+		    axrOspfLsdbType		INTEGER,
+		    axrOspfLsdbLsid		IpAddress,
+		    axrOspfLsdbRouterId		IpAddress,
+		    axrOspfLsdbSequence		INTEGER,
+		    axrOspfLsdbAge		INTEGER,
+		    axrOspfLsdbChecksum		INTEGER,
+		    axrOspfLsdbAdvertisement	OCTET STRING
+		}
+
+axrOspfLsdbDomainNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The identifier of the domain from  which
+		the LSA was received."
+	::= { axrOspfLsdbEntry 1 }
+
+axrOspfLsdbAreaId OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The 32 bit identifier of the Area  from  which
+		the LSA was received."
+	::= { axrOspfLsdbEntry 2 }
+
+axrOspfLsdbType OBJECT-TYPE
+	SYNTAX  INTEGER    {
+		       routerLink (1),
+		       networkLink (2),
+		       summaryLink (3),
+		       asSummaryLink (4),
+		       asExternalLink (5), -- but see axrOspfExtLsdbTable
+		       multicastLink (6),
+		       nssaExternalLink (7)
+		    }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The type  of  the  link  state  advertisement."
+	::= { axrOspfLsdbEntry 3 }
+
+axrOspfLsdbLsid OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The Link State ID . It identifies the piece of the routing
+		domain that is being described by the advertisement."
+	::= { axrOspfLsdbEntry 4 }
+
+axrOspfLsdbRouterId OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number that uniquely identifies the originating 
+		router in the Autonomous System."
+	::= { axrOspfLsdbEntry 5 }
+
+axrOspfLsdbSequence OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The sequence number field is a  signed  32-bit
+		integer."
+	::= { axrOspfLsdbEntry 6 }
+
+axrOspfLsdbAge OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This the age of the link state adver-
+		tisement in seconds."
+	::= { axrOspfLsdbEntry 7 }
+
+axrOspfLsdbChecksum OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This field is the  checksum  of  the  complete
+		contents  of  the  advertisement, excepting the
+		age field."
+	::= { axrOspfLsdbEntry 8 }
+
+axrOspfLsdbAdvertisement OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The entire Link State Advertisement, including
+		its header."
+	::= { axrOspfLsdbEntry 9 }
+
+axrOspfAreaRangeTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrOspfAreaRangeEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A range if IP addresses  specified  by  an  IP
+		address/IP  network  mask  pair."
+	::= { axrOspf 5 }
+
+axrOspfAreaRangeEntry OBJECT-TYPE
+	SYNTAX  AxrOspfAreaRangeEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A range if IP addresses specified by an IP
+		address/IP network mask pair."
+    INDEX { axrOspfAreaRangeDomainNumber, axrOspfAreaRangeAreaId,
+		    axrOspfAreaRangeNet }
+	::= { axrOspfAreaRangeTable 1 }
+
+	AxrOspfAreaRangeEntry ::=
+		SEQUENCE {
+		    axrOspfAreaRangeDomainNumber	INTEGER,
+		    axrOspfAreaRangeAreaId	IpAddress,
+		    axrOspfAreaRangeNet		IpAddress,
+		    axrOspfAreaRangeMask		IpAddress,
+		    axrOspfAreaRangeStatus	INTEGER,
+		    axrOspfAreaRangeEffect	INTEGER
+		}
+
+axrOspfAreaRangeDomainNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Domain number of the Area."
+	::= { axrOspfAreaRangeEntry 1 }
+
+axrOspfAreaRangeAreaId OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The Area the Address  Range  is  to  be  found
+		within."
+	::= { axrOspfAreaRangeEntry 2 }
+
+axrOspfAreaRangeNet OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The IP Address of the Net or Subnet  indicated
+		by the range."
+	::= { axrOspfAreaRangeEntry 3 }
+
+axrOspfAreaRangeMask OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The Subnet Mask that pertains to  the  Net  or
+		Subnet."
+	::= { axrOspfAreaRangeEntry 4 }
+
+axrOspfAreaRangeStatus OBJECT-TYPE
+	SYNTAX  INTEGER    {
+		       valid(1),
+		       invalid(2)
+		    }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This variable displays the status of  the  entry.
+		This value is only valid(1)."
+	::= { axrOspfAreaRangeEntry 5 }
+
+axrOspfAreaRangeEffect OBJECT-TYPE
+	SYNTAX  INTEGER  {
+				advertiseMatching (1),
+				doNotAdvertiseMatching (2)
+		    }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Subnets subsumed by ranges either trigger  the
+		advertisement  of the indicated summary (adver-
+		tiseMatching), or result in  the  subnet's  not
+		being advertised at all outside the area."
+	::= { axrOspfAreaRangeEntry 6 }
+
+axrOspfHostTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrOspfHostEntry --SHIMO EDIT
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The list of Hosts, and their metrics, that the
+		router will advertise as host routes."
+	::= { axrOspf 6 }
+
+axrOspfHostEntry OBJECT-TYPE
+	SYNTAX  AxrOspfHostEntry --SHIMO EDIT
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A metric to be advertised, for a given type of service,
+		when a given host is reachable."
+    INDEX { axrOspfHostDomainNumber, axrOspfHostIpAddress,
+		    axrOspfHostTOS }
+	::= { axrOspfHostTable 1 }
+
+	AxrOspfHostEntry ::=
+		SEQUENCE {
+		    axrOspfHostDomainNumber	INTEGER,
+		    axrOspfHostIpAddress		IpAddress,
+		    axrOspfHostTOS			INTEGER,
+		    axrOspfHostMetric		INTEGER,
+		    axrOspfHostStatus		INTEGER
+		}
+
+axrOspfHostDomainNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"OSPF domain number of the Host."
+	::= { axrOspfHostEntry 1 }
+
+axrOspfHostIpAddress OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The IP Address of the Host."
+	::= { axrOspfHostEntry 2 }
+
+axrOspfHostTOS OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The Type of Service of the route being configured.
+		This value is only 0."
+	::= { axrOspfHostEntry 3 }
+
+axrOspfHostMetric OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The Metric to be advertised."
+	::= { axrOspfHostEntry 4 }
+
+axrOspfHostStatus OBJECT-TYPE
+	SYNTAX  INTEGER   { 
+				valid(1),
+				invalid(2)
+		    }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This variable displays the status of  the  entry.
+		Setting it to 'invalid' has the effect of rendering
+		it inoperative. The internal effect (row removal) is
+		implementation dependent."
+	::= { axrOspfHostEntry 5 }
+
+axrOspfIfTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrOspfIfEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The OSPF Interface Table describes the interfaces
+		from the viewpoint of OSPF."
+	::= { axrOspf 7 }
+
+axrOspfIfEntry OBJECT-TYPE
+	SYNTAX  AxrOspfIfEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The OSPF Interface Entry describes one  interface
+		from the viewpoint of OSPF."
+    INDEX { axrOspfIfDomainNumber, axrOspfIfIpAddress, axrOspfAddressLessIf }
+	::= { axrOspfIfTable 1 }
+
+	AxrOspfIfEntry ::=
+		SEQUENCE {
+		    axrOspfIfDomainNumber			INTEGER,
+		    axrOspfIfIpAddress				IpAddress,
+		    axrOspfAddressLessIf				INTEGER,
+		    axrOspfIfAreaId					IpAddress,
+		    axrOspfIfType					INTEGER,
+		    axrOspfIfAdminStat				INTEGER,
+		    axrOspfIfRtrPriority				INTEGER,
+		    axrOspfIfTransitDelay			INTEGER,
+		    axrOspfIfRetransInterval			INTEGER,
+		    axrOspfIfHelloInterval			INTEGER,
+		    axrOspfIfRtrDeadInterval			INTEGER,
+		    axrOspfIfPollInterval			INTEGER,
+		    axrOspfIfState					INTEGER,
+		    axrOspfIfDesignatedRouter		IpAddress,
+		    axrOspfIfEvents					Counter,
+		    axrOspfIfAuthKey					OCTET STRING,
+		    axrOspfIfStatus					INTEGER,
+		    axrOspfIfMulticastForwarding		INTEGER,
+		    axrOspfIfBackupDesignatedRouter	IpAddress
+		}
+
+axrOspfIfDomainNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The domain number of this OSPF interface."
+	::= { axrOspfIfEntry 1 }
+
+axrOspfIfIpAddress OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The IP address of this OSPF interface."
+	::= { axrOspfIfEntry 2 }
+
+axrOspfAddressLessIf OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"For the purpose of easing  the  instancing  of
+		addressed   and  addressless  interfaces;  This
+		variable takes the value 0 on  interfaces  with
+		IP  Addresses,  and  the corresponding value of
+		ifIndex for interfaces having no IP Address."
+	::= { axrOspfIfEntry 3 }
+
+axrOspfIfAreaId OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A integer uniquely identifying the area to which 
+		the interface connects."
+	::= { axrOspfIfEntry 4 }
+
+axrOspfIfType OBJECT-TYPE
+	SYNTAX  INTEGER  {
+				 broadcast (1),
+				 nbma (2),
+				 pointToPoint (3),
+				 pointToMultipoint (5)
+		    }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The OSPF interface type."
+	::= { axrOspfIfEntry 5 }
+
+axrOspfIfAdminStat OBJECT-TYPE
+	SYNTAX  INTEGER { 
+				enabled(1),
+				disabled(2)
+		    }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The OSPF  interface's  administrative  status."
+	::= { axrOspfIfEntry 6 }
+
+axrOspfIfRtrPriority OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The priority of this interface."
+	::= { axrOspfIfEntry 7 }
+
+axrOspfIfTransitDelay OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The estimated number of seconds  it  takes  to
+		transmit  a  link state update packet over this
+		interface."
+	::= { axrOspfIfEntry 8 }
+
+axrOspfIfRetransInterval OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of seconds between link-state ad-
+		vertisement retransmissions, for adjacencies
+		belonging to this  interface."
+	::= { axrOspfIfEntry 9 }
+
+axrOspfIfHelloInterval OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The length of time, in  seconds,  between the
+		Hello  packets that the router sends on the interface."
+	::= { axrOspfIfEntry 10 }
+
+axrOspfIfRtrDeadInterval OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of seconds that  a  router's  Hello
+		packets  have  not been seen before it's neighbors 
+		declare the router down."
+	::= { axrOspfIfEntry 11 }
+
+axrOspfIfPollInterval OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The larger time interval, in seconds,  between
+		the  Hello  packets  sent  to  an inactive non-
+		broadcast multi- access neighbor."
+	::= { axrOspfIfEntry 12 }
+
+axrOspfIfState OBJECT-TYPE
+	SYNTAX  INTEGER   {
+				down (1),
+				loopback (2),
+				waiting (3),
+				pointToPoint (4),
+				designatedRouter (5),
+				backupDesignatedRouter (6),
+				otherDesignatedRouter (7)
+		    }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The OSPF Interface State."
+	::= { axrOspfIfEntry 13 }
+
+axrOspfIfDesignatedRouter OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The IP Address of the Designated Router."
+	::= { axrOspfIfEntry 14 }
+
+axrOspfIfEvents OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of times this  OSPF  interface  has
+		changed its state, or an error has occurred."
+	::= { axrOspfIfEntry 16 }
+
+axrOspfIfAuthKey OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The Authentication Key."
+	::= { axrOspfIfEntry 17 }
+
+axrOspfIfStatus OBJECT-TYPE
+	SYNTAX  INTEGER   { 
+				valid(1),
+				invalid(2)
+		    }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This variable displays the status of  the  entry.
+		this value is only valid(1)."
+	::= { axrOspfIfEntry 18 }
+
+axrOspfIfMulticastForwarding OBJECT-TYPE
+	SYNTAX  INTEGER  {
+				blocked (1),		-- no multicast forwarding
+				multicast (2),     -- using multicast address
+				unicast (3)		-- to each OSPF neighbor
+		    }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The way multicasts should  forwarded  on  this
+		interface;  not  forwarded,  forwarded  as data
+		link multicasts, or forwarded as data link unicasts."
+	::= { axrOspfIfEntry 19 }
+
+axrOspfIfBackupDesignatedRouter OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The IP Address of the Backup Designated Router."
+	::= { axrOspfIfEntry 15 }
+
+axrOspfIfMetricTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrOspfIfMetricEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The TOS metrics for a non-virtual interface identified
+		by the interface index."
+	::= { axrOspf 8 }
+
+axrOspfIfMetricEntry OBJECT-TYPE
+	SYNTAX  AxrOspfIfMetricEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A particular TOS metric for a non-virtual interface
+		identified by the interface index."
+    INDEX { axrOspfIfMetricDomainNumber, axrOspfIfMetricIpAddress,
+		    axrOspfIfMetricAddressLessIf, axrOspfIfMetricTOS }
+	::= { axrOspfIfMetricTable 1 }
+
+	AxrOspfIfMetricEntry ::=
+		SEQUENCE {
+		    axrOspfIfMetricDomainNumber	INTEGER,
+		    axrOspfIfMetricIpAddress		IpAddress,
+		    axrOspfIfMetricAddressLessIf	INTEGER,
+		    axrOspfIfMetricTOS			INTEGER,
+		    axrOspfIfMetricValue			INTEGER,
+		    axrOspfIfMetricStatus		INTEGER
+		}
+
+axrOspfIfMetricDomainNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The domain number of this OSPF interface."
+	::= { axrOspfIfMetricEntry 1 }
+
+axrOspfIfMetricIpAddress OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The IP address of this OSPF interface."
+	::= { axrOspfIfMetricEntry 2 }
+
+axrOspfIfMetricAddressLessIf OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"For the purpose of easing  the  instancing  of
+		addressed   and  addressless  interfaces;  This
+		variable takes the value 0 on  interfaces  with
+		IP  Addresses, and the value of ifIndex for in-
+		terfaces having no IP Address."
+	::= { axrOspfIfMetricEntry 3 }
+
+axrOspfIfMetricTOS OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The type of service metric  being  referenced.
+		this value is only 0."
+	::= { axrOspfIfMetricEntry 4 }
+
+axrOspfIfMetricValue OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The metric of using this type  of  service  on
+		this interface."
+	::= { axrOspfIfMetricEntry 5 }
+
+axrOspfIfMetricStatus OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This variable displays the status of the entry.
+		This entry status is only valid(1)."
+	::= { axrOspfIfMetricEntry 6 }
+
+axrOspfVirtIfTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrOspfVirtIfEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Information about this router's virtual interfaces."
+	::= { axrOspf 9 }
+
+axrOspfVirtIfEntry OBJECT-TYPE
+	SYNTAX  AxrOspfVirtIfEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Information about a single Virtual Interface."
+    INDEX { axrOspfVirtIfDomainNumber, axrOspfVirtIfAreaId,
+		    axrOspfVirtIfNeighbor }
+	::= { axrOspfVirtIfTable 1 }
+
+	AxrOspfVirtIfEntry ::=
+		SEQUENCE {
+		    axrOspfVirtIfDomainNumber	INTEGER,
+		    axrOspfVirtIfAreaId			IpAddress,
+		    axrOspfVirtIfNeighbor		IpAddress,
+		    axrOspfVirtIfTransitDelay	INTEGER,
+		    axrOspfVirtIfRetransInterval	INTEGER,
+		    axrOspfVirtIfHelloInterval	INTEGER,
+		    axrOspfVirtIfRtrDeadInterval	INTEGER,
+		    axrOspfVirtIfState			INTEGER,
+		    axrOspfVirtIfEvents			Counter,
+		    axrOspfVirtIfAuthKey			OCTET STRING,
+		    axrOspfVirtIfStatus			INTEGER
+		}
+
+axrOspfVirtIfDomainNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The domain number for this  Virtual Interface"
+	::= { axrOspfVirtIfEntry 1 }
+
+axrOspfVirtIfAreaId OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The Transit Area that the Virtual Link traverses."
+	::= { axrOspfVirtIfEntry 2 }
+
+axrOspfVirtIfNeighbor OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The Router ID of the Virtual Neighbor."
+	::= { axrOspfVirtIfEntry 3 }
+
+axrOspfVirtIfTransitDelay OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The estimated number of seconds  it  takes  to
+		transmit  a link- state update packet over this
+		interface."
+	::= { axrOspfVirtIfEntry 4 }
+
+axrOspfVirtIfRetransInterval OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of seconds between link-state advertisement
+		retransmissions, for adjacencies belonging to this
+		interface."
+	::= { axrOspfVirtIfEntry 5 }
+
+axrOspfVirtIfHelloInterval OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The length of time, in  seconds, between the
+		Hello  packets that the router sends on the in-
+		terface. "
+	::= { axrOspfVirtIfEntry 6 }
+
+axrOspfVirtIfRtrDeadInterval OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of seconds that  a  router's  Hello
+		packets  have  not been seen before it's neighbors
+		declare the router down."
+	::= { axrOspfVirtIfEntry 7 }
+
+axrOspfVirtIfState OBJECT-TYPE
+	SYNTAX  INTEGER    {
+				down (1),		    -- these use the same encoding
+				pointToPoint (4)     -- as the axrOspfIfTable
+		    }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"OSPF virtual interface states."
+	::= { axrOspfVirtIfEntry 8 }
+
+axrOspfVirtIfEvents OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of state changes or error events on
+		this Virtual Link"
+	::= { axrOspfVirtIfEntry 9 }
+
+axrOspfVirtIfAuthKey OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Authentication key of this interface."
+	::= { axrOspfVirtIfEntry 10 }
+
+axrOspfVirtIfStatus OBJECT-TYPE
+	SYNTAX  INTEGER    { 
+				valid(1),
+				invalid(2)
+		    }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This variable displays the status of  the  entry.
+		This entry is only valid(1)."
+	::= { axrOspfVirtIfEntry 11 }
+
+axrOspfNbrTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrOspfNbrEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A table of non-virtual neighbor information."
+	::= { axrOspf 10 }
+
+axrOspfNbrEntry OBJECT-TYPE
+	SYNTAX  AxrOspfNbrEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The information regarding a single neighbor."
+    INDEX { axrOspfNbrDomainNumber, axrOspfNbrIpAddr, axrOspfNbrAddressLessIndex }
+	::= { axrOspfNbrTable 1 }
+
+	AxrOspfNbrEntry ::=
+		SEQUENCE {
+		    axrOspfNbrDomainNumber		INTEGER,
+		    axrOspfNbrIpAddr				IpAddress,
+		    axrOspfNbrAddressLessIndex	INTEGER,
+		    axrOspfNbrRtrId				IpAddress,
+		    axrOspfNbrOptions			INTEGER,
+		    axrOspfNbrPriority			INTEGER,
+		    axrOspfNbrState				INTEGER,
+		    axrOspfNbrEvents				Counter,
+		    axrOspfNbrLsRetransQLen		Gauge,
+		    axrOspfNbmaNbrStatus			INTEGER,
+		    axrOspfNbmaNbrPermanence		INTEGER
+		}
+
+axrOspfNbrDomainNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"OSPF domain number of this neighbor."
+	::= { axrOspfNbrEntry 1 }
+
+axrOspfNbrIpAddr OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The IP address this neighbor is using  in  its
+		IP  Source  Address."
+	::= { axrOspfNbrEntry 2 }
+
+axrOspfNbrAddressLessIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"On an interface having an  IP  Address,  zero.
+		On  addressless  interfaces,  the corresponding
+		value of ifIndex in the Internet Standard  MIB."
+	::= { axrOspfNbrEntry 3 }
+
+axrOspfNbrRtrId OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The integer uniquely identifying the neighboring
+		router in the Autonomous System."
+	::= { axrOspfNbrEntry 4 }
+
+axrOspfNbrOptions OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A Bit Mask corresponding to the neighbor's op-
+		 tions field.
+
+		 Bit 0, if set, indicates that the  system  will
+		 operate  on  Type of Service metrics other than
+		 TOS 0.  If zero, the neighbor will  ignore  all
+		 metrics except the TOS 0 metric.
+
+		 Bit 1, if set, indicates  that  the  associated
+		 area  accepts and operates on external informa-
+		 tion; if zero, it is a stub area.
+
+		 Bit 2, if set, indicates that the system is ca-
+		 pable  of routing IP Multicast datagrams; i.e.,
+		 that it implements the Multicast Extensions  to
+		 OSPF.
+
+		 Bit 3, if set, indicates  that  the  associated
+		 area  is  an  NSSA.  These areas are capable of
+		 carrying type 7 external advertisements,  which
+		 are  translated into type 5 external advertise-
+		 ments at NSSA borders."
+	::= { axrOspfNbrEntry 5 }
+
+axrOspfNbrPriority OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The priority of this neighbor."
+	::= { axrOspfNbrEntry 6 }
+
+axrOspfNbrState OBJECT-TYPE
+	SYNTAX  INTEGER   {
+				down (1),
+				attempt (2),
+				init (3),
+				twoWay (4),
+				exchangeStart (5),
+				exchange (6),
+				loading (7),
+				full (8)
+		    }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The State of the relationship with this Neighbor."
+	::= { axrOspfNbrEntry 7 }
+
+axrOspfNbrEvents OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of times this neighbor relationship
+		has changed state, or an error has occurred."
+	::= { axrOspfNbrEntry 8 }
+
+axrOspfNbrLsRetransQLen OBJECT-TYPE
+	SYNTAX  Gauge
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The current length of the retransmission queue."
+	::= { axrOspfNbrEntry 9 }
+
+axrOspfNbmaNbrStatus OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This variable displays the status of the entry.
+		This entry value is only valid(1). And enable to response
+		this entry when axrOspfIfType is nbma."
+	::= { axrOspfNbrEntry 10 }
+
+axrOspfNbmaNbrPermanence OBJECT-TYPE
+	SYNTAX  INTEGER  {
+				dynamic (1),		-- learned through protocol
+				 permanent (2)       -- configured address
+		    }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This variable displays the status of the entry."
+	::= { axrOspfNbrEntry 11 }
+
+axrOspfVirtNbrTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrOspfVirtNbrEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A table of virtual neighbor information."
+	::= { axrOspf 11 }
+
+axrOspfVirtNbrEntry OBJECT-TYPE
+	SYNTAX  AxrOspfVirtNbrEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Virtual neighbor information."
+    INDEX { axrOspfVirtNbrDomainNumber, axrOspfVirtNbrArea,
+		    axrOspfVirtNbrRtrId }
+	::= { axrOspfVirtNbrTable 1 }
+
+	AxrOspfVirtNbrEntry ::=
+		SEQUENCE {
+		    axrOspfVirtNbrDomainNumber		INTEGER,
+		    axrOspfVirtNbrArea				IpAddress,
+		    axrOspfVirtNbrRtrId				IpAddress,
+		    axrOspfVirtNbrIpAddr				IpAddress,
+		    axrOspfVirtNbrOptions			INTEGER,
+		    axrOspfVirtNbrState				INTEGER,
+		    axrOspfVirtNbrEvents				Counter,
+		    axrOspfVirtNbrLsRetransQLen		Gauge
+		}
+
+axrOspfVirtNbrDomainNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The domain number."
+	::= { axrOspfVirtNbrEntry 1 }
+
+axrOspfVirtNbrArea OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The Transit Area Identifier."
+	::= { axrOspfVirtNbrEntry 2 }
+
+axrOspfVirtNbrRtrId OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A integer  uniquely  identifying  the neighboring
+		 router in the Autonomous System."
+	::= { axrOspfVirtNbrEntry 3 }
+
+axrOspfVirtNbrIpAddr OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The IP address this Virtual Neighbor is using."
+	::= { axrOspfVirtNbrEntry 4 }
+
+axrOspfVirtNbrOptions OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A Bit Mask corresponding to the neighbor's options
+		 field.
+
+		 Bit 1, if set, indicates that the  system  will operate
+		 on Type of Service metrics other than TOS 0. If zero,
+		 the neighbor will  ignore  all metrics except the TOS
+		 0 metric.
+
+		 Bit 2, if set, indicates  that  the  system  is Network
+		 Multicast  capable; ie, that it implements OSPF Multicast
+		 Routing."
+	::= { axrOspfVirtNbrEntry 5 }
+
+axrOspfVirtNbrState OBJECT-TYPE
+	SYNTAX  INTEGER   {
+				down (1),
+				attempt (2),
+				init (3),
+				twoWay (4),
+				exchangeStart (5),
+				exchange (6),
+				loading (7),
+				full (8)
+		    }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The state of the  Virtual  Neighbor  Relationship."
+	::= { axrOspfVirtNbrEntry 6 }
+
+axrOspfVirtNbrEvents OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of times this virtual link has changed
+		its state, or an error has occurred."
+	::= { axrOspfVirtNbrEntry 7 }
+
+axrOspfVirtNbrLsRetransQLen OBJECT-TYPE
+	SYNTAX  Gauge
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The current length of the retransmission queue."
+	::= { axrOspfVirtNbrEntry 8 }
+
+axrOspfExtLsdbTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrOspfExtLsdbEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The OSPF Process's Links State Database."
+	::= { axrOspf 12 }
+
+axrOspfExtLsdbEntry OBJECT-TYPE
+	SYNTAX  AxrOspfExtLsdbEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A single Link State Advertisement."
+    INDEX { axrOspfExtLsdbDomainNumber, axrOspfExtLsdbType,
+		    axrOspfExtLsdbLsid, axrOspfExtLsdbRouterId }
+	::= { axrOspfExtLsdbTable 1 }
+
+	AxrOspfExtLsdbEntry ::=
+		SEQUENCE {
+		    axrOspfExtLsdbDomainNumber	INTEGER,
+		    axrOspfExtLsdbType			INTEGER,
+		    axrOspfExtLsdbLsid			IpAddress,
+		    axrOspfExtLsdbRouterId		IpAddress,
+		    axrOspfExtLsdbSequence		INTEGER,
+		    axrOspfExtLsdbAge			INTEGER,
+		    axrOspfExtLsdbChecksum		INTEGER,
+		    axrOspfExtLsdbAdvertisement	OCTET STRING
+		}
+
+axrOspfExtLsdbDomainNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"OSPF domain number."
+	::= { axrOspfExtLsdbEntry 1 }
+
+axrOspfExtLsdbType OBJECT-TYPE
+	SYNTAX  INTEGER {
+				asExternalLink (5)
+		    }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The type  of  the  link  state  advertisement."
+	::= { axrOspfExtLsdbEntry 2 }
+
+axrOspfExtLsdbLsid OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The Link State ID is an LS Type Specific field
+		 containing either a Router ID or an IP Address;
+		 it identifies the piece of the  routing  domain
+		 that is being described by the advertisement."
+	::= { axrOspfExtLsdbEntry 3 }
+
+axrOspfExtLsdbRouterId OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The 32 bit number that uniquely identifies the
+		originating router in the Autonomous System."
+	::= { axrOspfExtLsdbEntry 4 }
+
+axrOspfExtLsdbSequence OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The sequence number field is a  signed  32-bit integer."
+	::= { axrOspfExtLsdbEntry 5 }
+
+axrOspfExtLsdbAge OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The age of the link state advertisement in seconds."
+	::= { axrOspfExtLsdbEntry 6 }
+
+axrOspfExtLsdbChecksum OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This field is the  checksum  of  the  complete
+		 contents  of  the  advertisement, excepting the
+		 age field.  The age field is excepted  so  that
+		 an   advertisement's  age  can  be  incremented
+		 without updating the  checksum."
+	::= { axrOspfExtLsdbEntry 7 }
+
+axrOspfExtLsdbAdvertisement OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The entire Link State Advertisement, including its header."
+	::= { axrOspfExtLsdbEntry 8 }
+
+axrOspfAreaAggregateTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrOspfAreaAggregateEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A range of IP addresses  specified  by  an  IP
+		address/IP  network  mask  pair."
+	::= { axrOspf 14 }
+
+axrOspfAreaAggregateEntry OBJECT-TYPE
+	SYNTAX  AxrOspfAreaAggregateEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A range of IP addresses  specified  by  an  IP
+		address/IP  network  mask  pair."
+    INDEX { axrOspfAreaAggregateDomainNumber, axrOspfAreaAggregateAreaID,
+		    axrOspfAreaAggregateLsdbType, axrOspfAreaAggregateNet,
+		    axrOspfAreaAggregateMask }
+	::= { axrOspfAreaAggregateTable 1 }
+
+	AxrOspfAreaAggregateEntry ::=
+		SEQUENCE {
+		    axrOspfAreaAggregateDomainNumber	INTEGER,
+		    axrOspfAreaAggregateAreaID		IpAddress,
+		    axrOspfAreaAggregateLsdbType		INTEGER,
+		    axrOspfAreaAggregateNet			IpAddress,
+		    axrOspfAreaAggregateMask			IpAddress,
+		    axrOspfAreaAggregateStatus		INTEGER,
+		    axrOspfAreaAggregateEffect		INTEGER
+		}
+
+axrOspfAreaAggregateDomainNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"OSPF domain number."
+	::= { axrOspfAreaAggregateEntry 1 }
+
+axrOspfAreaAggregateAreaID OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The Area the Address Aggregate is to be found within."
+	::= { axrOspfAreaAggregateEntry 2 }
+
+axrOspfAreaAggregateLsdbType OBJECT-TYPE
+	SYNTAX  INTEGER  {
+				summaryLink (3),
+				nssaExternalLink (7)
+		    }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The type of the Address Aggregate. This field
+		 specifies  the  Lsdb type that this Address 
+		 Aggregate applies to."
+	::= { axrOspfAreaAggregateEntry 3 }
+
+axrOspfAreaAggregateNet OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The IP Address of the Net or Subnet indicated by the range."
+	::= { axrOspfAreaAggregateEntry 4 }
+
+axrOspfAreaAggregateMask OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The Subnet Mask that pertains to the Net or Subnet."
+	::= { axrOspfAreaAggregateEntry 5 }
+
+axrOspfAreaAggregateStatus OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This variable displays the status of  the  entry.
+		This entry value is only valid(1)."
+	::= { axrOspfAreaAggregateEntry 6 }
+
+axrOspfAreaAggregateEffect OBJECT-TYPE
+	SYNTAX  INTEGER   {
+				advertiseMatching (1),
+				doNotAdvertiseMatching (2)
+		    }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Subnets subsumed by ranges either trigger  the
+		 advertisement  of  the indicated aggregate (ad-
+		 vertiseMatching), or result in the subnet's not
+		 being advertised at all outside the area."
+	::= { axrOspfAreaAggregateEntry 7 }
+
+-- axrOspfv3
+
+axrOspfv3GeneralTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrOspfv3GeneralEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The table which ospfv3 information is stored in."
+	::= { axrOspfv3 1 }
+
+axrOspfv3GeneralEntry OBJECT-TYPE
+	SYNTAX  AxrOspfv3GeneralEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The list of the ospfv3 information."
+	INDEX { axrOspfv3GeneralDomainNumber }
+	::= { axrOspfv3GeneralTable 1 }
+
+	AxrOspfv3GeneralEntry ::=
+	SEQUENCE {
+		axrOspfv3GeneralDomainNumber
+			INTEGER,
+		axrOspfv3RouterId
+			RouterID,
+		axrOspfv3AdminStat
+			Status,
+		axrOspfv3VersionNumber
+			INTEGER,
+		axrOspfv3AreaBdrRtrStatus
+			TruthValue,
+		axrOspfv3ASBdrRtrStatus
+			TruthValue,
+		axrOspfv3AsScopeLsaCount
+			Gauge32,
+		axrOspfv3AsScopeLsaCksumSum
+			Integer32,
+		axrOspfv3OriginateNewLsas
+			Integer32,
+		axrOspfv3RxNewLsas
+			Counter32,
+		axrOspfv3ExtAreaLsdbLimit
+			Integer32,
+		axrOspfv3MulticastExtensions
+			Integer32,
+		axrOspfv3DemandExtensions
+			TruthValue,
+		axrOspfv3TrafficEngineeringSupport
+			TruthValue
+		}
+
+axrOspfv3GeneralDomainNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"ospfv3 domain number."
+	::= { axrOspfv3GeneralEntry 1 }
+
+axrOspfv3RouterId OBJECT-TYPE
+	SYNTAX  RouterID
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A  32-bit  integer  uniquely  identifying  the
+		router in the Autonomous System.
+		By convention, to  ensure  uniqueness, this
+		should  default  to  the  value  of  one of the
+		router's IPv4 interface addresses if IPv4 is
+		configured."
+	::= { axrOspfv3GeneralEntry 2 }
+
+axrOspfv3AdminStat OBJECT-TYPE
+	SYNTAX  Status
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The  administrative  status  of  axrOspfv3  in  the
+		router.  The  value 'enabled' denotes that the
+		axrOspfv3 Process is active on at least  one  inter-
+		face;  'disabled'  disables  it  on  all inter-
+		faces."
+	::= { axrOspfv3GeneralEntry 3 }
+
+axrOspfv3VersionNumber OBJECT-TYPE
+	SYNTAX  INTEGER { version3 (3) }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The version number of OSPF for IPv6 is 3."
+	::= { axrOspfv3GeneralEntry 4 }
+
+axrOspfv3AreaBdrRtrStatus OBJECT-TYPE
+	SYNTAX  TruthValue
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A flag to note whether this router is an  area
+		border router."
+	REFERENCE
+		"OSPF Version 2, Section 3 Splitting the AS into
+		Areas"
+	::= { axrOspfv3GeneralEntry 5 }
+
+axrOspfv3ASBdrRtrStatus OBJECT-TYPE
+	SYNTAX  TruthValue
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A flag to note whether this router is  config-
+		ured as an Autonomous System border router."
+	REFERENCE
+		"OSPF Version 2, Section 3.3  Classification  of
+		routers"
+	::= { axrOspfv3GeneralEntry 6 }
+
+axrOspfv3AsScopeLsaCount OBJECT-TYPE
+	SYNTAX  Gauge32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of AS-Scope (e.g. AS-External) link-state
+		advertisements in the link-state database."
+	::= { axrOspfv3GeneralEntry 7 }
+
+axrOspfv3AsScopeLsaCksumSum OBJECT-TYPE
+	SYNTAX  Integer32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The 32-bit unsigned sum of the LS checksums of
+		the  AS-scoped link-state advertisements  con-
+		tained in the link-state database. This sum
+		can  be  used  to determine if there has been a
+		change in a router's link state  database,  and
+		to  compare  the  link-state  database  of  two
+		routers."
+	::= { axrOspfv3GeneralEntry 8 }
+
+axrOspfv3OriginateNewLsas OBJECT-TYPE
+	SYNTAX  Counter32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of  new  link-state  advertisements
+		that  have been originated.  This number is in-
+		cremented each time the router originates a new
+		LSA."
+	::= { axrOspfv3GeneralEntry 9 }
+
+axrOspfv3RxNewLsas OBJECT-TYPE
+	SYNTAX  Counter32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of  link-state  advertisements  re-
+		ceived  determined  to  be  new instantiations.
+		This number does not include  newer  instantia-
+		tions  of self-originated link-state advertise-
+		ments."
+	::= { axrOspfv3GeneralEntry 10 }
+
+axrOspfv3ExtAreaLsdbLimit OBJECT-TYPE
+	SYNTAX  Integer32 (-1..'7FFFFFFF'h)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The  maximum   number   of   non-default   AS-
+		external-LSAs entries that can be stored in the
+		link-state database.  If the value is -1,  then
+		there is no limit.
+		When the number of non-default AS-external-LSAs
+		in  a  router's  link-state  database  reaches
+		axrOspfv3ExtAreaLsdbLimit, the router  enters  Overflow-
+		State.  The   router  never  holds  more  than
+		axrOspfv3ExtAreaLsdbLimit  non-default  AS-external-LSAs
+		in  its  database. OspfExtAreaLsdbLimit MUST be set
+		identically in all routers attached to the axrOspfv3
+		backbone  and/or  any regular axrOspfv3 area. (i.e.,
+		axrOspfv3 stub areas and NSSAs are excluded)."
+	DEFVAL { -1 }
+	::= { axrOspfv3GeneralEntry 11 }
+
+axrOspfv3MulticastExtensions OBJECT-TYPE
+	SYNTAX  Integer32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A Bit Mask indicating whether  the  router  is
+		forwarding  IPv6  multicast datagrams
+		based on the algorithms defined in  the  Multi-
+		cast Extensions to OSPF.
+		Bit 0, if set, indicates that  the  router  can
+		forward  IPv6 multicast datagrams in the router's
+		directly attached areas (called intra-area mul-
+		ticast routing).
+		Bit 1, if set, indicates that  the  router  can
+		forward  IPv6  multicast  datagrams  between axrOspfv3
+		areas (called inter-area multicast routing).
+		Bit 2, if set, indicates that  the  router  can
+		forward  IPv6  multicast  datagrams between Auto-
+		nomous Systems (called inter-AS multicast rout-
+		ing).
+		Only certain combinations of bit  settings are
+		allowed,  namely: 0 (no multicast forwarding is
+		enabled), 1 (intra-area multicasting  only),  3
+		(intra-area  and  inter-area  multicasting),  5
+		(intra-area and inter-AS  multicasting)  and  7
+		(multicasting  everywhere). By default, no mul-
+		ticast forwarding is enabled."
+	DEFVAL { 0 }
+	::= { axrOspfv3GeneralEntry 12 }
+
+axrOspfv3DemandExtensions OBJECT-TYPE
+	SYNTAX  TruthValue
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The router's support for demand routing."
+	REFERENCE
+		"OSPF Version 2, Appendix on Demand Routing"
+	::= { axrOspfv3GeneralEntry 14 }
+
+axrOspfv3TrafficEngineeringSupport OBJECT-TYPE
+	SYNTAX  TruthValue
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The router's support for traffic engineering
+		extensions."
+	::= { axrOspfv3GeneralEntry 15 }
+
+--  The axrOspfv3 Area Data Structure contains information
+--  regarding the various areas. The interfaces and
+--  virtual links are configured as part of these areas.
+--  Area 0.0.0.0, by definition, is the Backbone Area
+
+axrOspfv3AreaTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrOspfv3AreaEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Information describing the configured  parame-
+		ters  and cumulative statistics of the router's
+		attached areas."
+	REFERENCE
+		"OSPF Version 2, Section 6  The Area Data Struc-
+		ture"
+	::= { axrOspfv3 2 }
+
+axrOspfv3AreaEntry OBJECT-TYPE
+	SYNTAX  AxrOspfv3AreaEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Information describing the configured  parame-
+		ters  and  cumulative  statistics of one of the
+		router's attached areas."
+		INDEX { axrOspfv3AreaId }
+	::= { axrOspfv3AreaTable 1 }
+
+	AxrOspfv3AreaEntry ::=
+		SEQUENCE {
+			axrOspfv3AreaDomainNumber
+				INTEGER,
+			axrOspfv3AreaId
+				AreaID,
+			axrOspfv3ImportAsExtern
+				INTEGER,
+			axrOspfv3SpfRuns
+				Counter32,
+			axrOspfv3AreaBdrRtrCount
+				Gauge32,
+			axrOspfv3AsBdrRtrCount
+				Gauge32,
+			axrOspfv3AreaScopeLsaCount
+				Gauge32,
+			axrOspfv3AreaScopeLsaCksumSum
+				Integer32,
+			axrOspfv3AreaSummary
+				INTEGER,
+			axrOspfv3AreaStatus
+				RowStatus,
+			axrOspfv3StubMetric
+				BigMetric
+--			axrOspfv3AreaNssaTranslatorRole
+--				INTEGER,
+--			axrOspfv3AreaNssaTranslatorState
+--				INTEGER,
+--			axrOspfv3AreaNssaTranslatorStabilityInterval
+--				PositiveInteger,
+--			axrOspfv3AreaNssaTranslatorEvents
+--				Counter32
+		}
+
+axrOspfv3AreaDomainNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"ospfv3 domain number."
+	::= { axrOspfv3AreaEntry 1 }
+
+axrOspfv3AreaId OBJECT-TYPE
+	SYNTAX  AreaID
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A 32-bit integer uniquely identifying an area.
+		Area ID 0.0.0.0 is used for the axrOspfv3 backbone."
+	REFERENCE
+		"OSPF Version 2, Appendix C.2 Area parameters"
+	::= { axrOspfv3AreaEntry 2 }
+
+axrOspfv3ImportAsExtern OBJECT-TYPE
+	SYNTAX  INTEGER {
+	importExternal (1),  -- normal area
+	importNoExternal (2), -- stub area
+	importNssa (3)        -- not-so-stubby-area
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Indicates whether an area is a Stub area, NSSA, or
+		standard area. AS-scope LSAs are not imported into Stub
+		Areas or NSSAs. NSSAs import AS-External data as Type-7
+		LSAs which have Area-scope"
+	REFERENCE
+		"OSPF Version 2, Appendix C.2 Area parameters"
+		DEFVAL { importExternal }
+	::= { axrOspfv3AreaEntry 3 }
+
+axrOspfv3SpfRuns OBJECT-TYPE
+	SYNTAX  Counter32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of times that the intra-area  route
+		table  has  been  calculated  using this area's
+		link-state database.  This  is  typically  done
+		using Dijkstra's algorithm."
+	::= { axrOspfv3AreaEntry 4 }
+
+axrOspfv3AreaBdrRtrCount OBJECT-TYPE
+	SYNTAX  Gauge32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of area border routers reach-
+		able within this area. This is initially zero,
+		and is calculated in each SPF Pass."
+	::= { axrOspfv3AreaEntry 5 }
+
+axrOspfv3AsBdrRtrCount OBJECT-TYPE
+	SYNTAX  Gauge32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of Autonomous  System  border
+		routers  reachable  within  this area.  This is
+		initially zero, and is calculated in  each  SPF
+		Pass."
+	::= { axrOspfv3AreaEntry 6 }
+
+axrOspfv3AreaScopeLsaCount OBJECT-TYPE
+	SYNTAX  Gauge32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+	"The total number of Area-Scope link-state
+	advertisements in  this  area's link-state
+	database."
+	::= { axrOspfv3AreaEntry 7 }
+
+axrOspfv3AreaScopeLsaCksumSum OBJECT-TYPE
+	SYNTAX  Integer32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The 32-bit unsigned sum of the Area-Scope link-state
+		advertisements'  LS  checksums  contained in this
+		area's link-state database.  The sum can be used
+		to determine if  there  has been  a  change  in a
+		router's link state database, and to compare the
+		link-state database of two routers."
+		DEFVAL  { 0 }
+	::= { axrOspfv3AreaEntry 8 }
+
+axrOspfv3AreaSummary OBJECT-TYPE
+	SYNTAX  INTEGER {
+		noAreaSummary (1),
+		sendAreaSummary (2)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The variable axrOspfv3AreaSummary controls the  im-
+		port  of  summary LSAs into stub areas.  It has
+		no effect on other areas.
+		If it is noAreaSummary, the router will neither
+		originate  nor  propagate summary LSAs into the
+		stub area.  It will rely entirely  on  its  de-
+		fault route.
+		If it is sendAreaSummary, the router will  both
+		summarize and propagate summary LSAs."
+		DEFVAL  { noAreaSummary }
+	::= { axrOspfv3AreaEntry 9 }
+
+axrOspfv3AreaStatus OBJECT-TYPE
+	SYNTAX  RowStatus
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This variable displays the status of  the  en-
+		try.  Setting it to 'invalid' has the effect of
+		rendering it inoperative.  The internal  effect
+		(row removal) is implementation dependent."
+	::= { axrOspfv3AreaEntry 10 }
+
+axrOspfv3StubMetric OBJECT-TYPE
+	SYNTAX  BigMetric
+	ACCESS  read-create
+	STATUS  mandatory
+	DESCRIPTION
+		"The metric value advertised for the default route
+		into Stub and NSSA areas."
+	::= { axrOspfv3AreaEntry 11 }
+
+--	axrOspfv3 AS-Scope Link State Database
+--		The Link State Database contains the AS-Scope Link State
+--		Advertisements from throughout the areas that the
+--		device is attached to.
+
+axrOspfv3AsLsdbTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrOspfv3AsLsdbEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The axrOspfv3 Process's AS-Scope Link State Database."
+	::= { axrOspfv3 3 }
+
+axrOspfv3AsLsdbEntry OBJECT-TYPE
+	SYNTAX  AxrOspfv3AsLsdbEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+	"A single AS-Scope Link State Advertisement."
+	INDEX { axrOspfv3AsLsdbType,
+			axrOspfv3AsLsdbRouterId,
+			axrOspfv3AsLsdbLsid }
+	::= { axrOspfv3AsLsdbTable 1 }
+
+	AxrOspfv3AsLsdbEntry ::=
+		SEQUENCE {
+			axrOspfv3AsLsdbDomainNumber
+				INTEGER,
+			axrOspfv3AsLsdbType
+				INTEGER,
+			axrOspfv3AsLsdbRouterId
+				RouterID,
+			axrOspfv3AsLsdbLsid
+				IpAddress,
+			axrOspfv3AsLsdbSequence
+				Integer32,
+			axrOspfv3AsLsdbAge
+				Integer32,
+			axrOspfv3AsLsdbChecksum
+				Integer32,
+			axrOspfv3AsLsdbAdvertisement
+				OCTET STRING
+			}
+
+axrOspfv3AsLsdbDomainNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"ospfv3 domain number."
+	::= { axrOspfv3AsLsdbEntry 1 }
+
+axrOspfv3AsLsdbType OBJECT-TYPE
+	SYNTAX  INTEGER {
+		asExternalLink (16389)  -- 0x4005
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The type  of  the  link  state  advertisement.
+		Each  link state type has a separate advertise-
+		ment format. Unrecognized AS-Scope LSAs with the
+		U-bit set are also store in this database."
+	::= { axrOspfv3AsLsdbEntry 2 }
+
+axrOspfv3AsLsdbRouterId OBJECT-TYPE
+	SYNTAX  RouterID
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The 32 bit number that uniquely identifies the
+		originating router in the Autonomous System."
+	REFERENCE
+		"OSPF Version 2, Appendix C.1 Global parameters"
+	::= { axrOspfv3AsLsdbEntry 3 }
+
+axrOspfv3AsLsdbLsid OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+	"The Link State ID is an LS Type Specific field
+	containing either a Router ID or a unique identifier;
+	it identifies the piece of the  routing  domain
+	that is being described by the advertisement.
+	In contrast to OSPF for IPv4, the LSID has no
+	addressing semantics."
+	::= { axrOspfv3AsLsdbEntry 4 }
+
+--  Note that the OSPF Sequence Number is a 32 bit signed
+--  integer.  It starts with the value '80000001'h,
+--  or -'7FFFFFFF'h, and increments until '7FFFFFFF'h
+--  Thus, a typical sequence number will be very negative.
+
+axrOspfv3AsLsdbSequence OBJECT-TYPE
+	SYNTAX  Integer32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The sequence number field is a  signed  32-bit
+		integer.   It  is used to detect old and dupli-
+		cate link state advertisements.  The  space  of
+		sequence  numbers  is  linearly  ordered.  The
+		larger the sequence number the more recent  the
+		advertisement."
+	REFERENCE
+		"OSPF Version  2,  Section  12.1.6  LS  sequence
+		number"
+	::= { axrOspfv3AsLsdbEntry 5 }
+
+axrOspfv3AsLsdbAge OBJECT-TYPE
+	SYNTAX  Integer32  -- Should be 0..MaxAge
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This field is the age of the link state adver-
+		tisement in seconds."
+	REFERENCE
+		"OSPF Version 2, Section 12.1.1 LS age"
+	::= { axrOspfv3AsLsdbEntry 6 }
+
+axrOspfv3AsLsdbChecksum OBJECT-TYPE
+	SYNTAX  Integer32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This field is the  checksum  of  the  complete
+		contents  of  the  advertisement, excepting the
+		age field.  The age field is excepted  so  that
+		an  advertisement's  age  can  be  incremented
+		without updating the  checksum.  The  checksum
+		used  is  the same that is used for ISO connec-
+		tionless datagrams; it is commonly referred  to
+		as the Fletcher checksum."
+	REFERENCE
+		"OSPF Version 2, Section 12.1.7 LS checksum"
+	::= { axrOspfv3AsLsdbEntry 7 }
+
+axrOspfv3AsLsdbAdvertisement OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (1..65535))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+	"The entire Link State Advertisement, including
+	its header."
+	::= { axrOspfv3AsLsdbEntry 8 }
+
+--  axrOspfv3 Area-Scope Link State Database
+--  The Link State Database contains the Area-Scope Link State
+--  Advertisements from throughout the area that the
+--  device is attached to.
+
+axrOspfv3AreaLsdbTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrOspfv3AreaLsdbEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The axrOspfv3 Process's Area-Scope Link State Database."
+	::= { axrOspfv3 4 }
+
+axrOspfv3AreaLsdbEntry OBJECT-TYPE
+	SYNTAX  AxrOspfv3AreaLsdbEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A single Area-Scope Link State Advertisement."
+	INDEX { axrOspfv3AreaLsdbAreaId,
+		axrOspfv3AreaLsdbType,
+		axrOspfv3AreaLsdbRouterId,
+		axrOspfv3AreaLsdbLsid }
+	::= { axrOspfv3AreaLsdbTable 1 }
+
+	AxrOspfv3AreaLsdbEntry ::=
+		SEQUENCE {
+		axrOspfv3AreaLsdbDomainNumber
+			INTEGER,
+		axrOspfv3AreaLsdbAreaId
+			AreaID,
+		axrOspfv3AreaLsdbType
+			INTEGER,
+		axrOspfv3AreaLsdbRouterId
+			RouterID,
+		axrOspfv3AreaLsdbLsid
+			IpAddress,
+		axrOspfv3AreaLsdbSequence
+			Integer32,
+		axrOspfv3AreaLsdbAge
+			Integer32,
+		axrOspfv3AreaLsdbChecksum
+			Integer32,
+		axrOspfv3AreaLsdbAdvertisement
+			OCTET STRING
+	}
+
+axrOspfv3AreaLsdbDomainNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"ospfv3 domain number."
+	::= { axrOspfv3AreaLsdbEntry 1 }
+
+axrOspfv3AreaLsdbAreaId OBJECT-TYPE
+	SYNTAX  AreaID
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The 32 bit identifier of the Area from which the
+	        LSA was received.E"
+	REFERENCE
+		"OSPF Version 2, Appendix C.2 Area parameters."
+	::= { axrOspfv3AreaLsdbEntry 2 }
+
+axrOspfv3AreaLsdbType OBJECT-TYPE
+	SYNTAX  INTEGER {
+		routerLsa          (8193),  -- 0x2001
+		networkLsa         (8194),  -- 0x2002
+		interAreaPrefixLsa (8195),  -- 0x2003
+		interAreaRouterLsa (8196),  -- 0x2004
+		groupMembershipLsa (8198),  -- 0x2006
+		nssaExternalLsa    (8199),  -- 0x2007
+		intraAreaPrefixLsa (8201)   -- 0x2009
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The type  of  the  link  state  advertisement.
+		Each  link state type has a separate advertise-
+		ment format. Unrecognized Area-Scope LSAs with
+		the U-bit set are also stored in this database."
+	::= { axrOspfv3AreaLsdbEntry 3 }
+
+axrOspfv3AreaLsdbRouterId OBJECT-TYPE
+	SYNTAX  RouterID
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The 32 bit number that uniquely identifies the
+		originating router in the Autonomous System."
+	REFERENCE
+		"OSPF Version 2, Appendix C.1 Global parameters"
+	::= { axrOspfv3AreaLsdbEntry 4 }
+
+axrOspfv3AreaLsdbLsid OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The Link State ID is an LS Type Specific field
+		containing either a Router ID or a unique identifier;
+		it identifies the piece of the  routing  domain
+		that is being described by the advertisement.
+		In contrast to OSPF for IPv4, the LSID has no
+		addressing semantics."
+	::= { axrOspfv3AreaLsdbEntry 5 }
+
+--  Note that the OSPF Sequence Number is a 32 bit signed
+--  integer.  It starts with the value '80000001'h,
+--  or -'7FFFFFFF'h, and increments until '7FFFFFFF'h
+--  Thus, a typical sequence number will be very negative.
+
+axrOspfv3AreaLsdbSequence OBJECT-TYPE
+	SYNTAX  Integer32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The sequence number field is a  signed  32-bit
+		integer.   It  is used to detect old and dupli-
+		cate link state advertisements.  The  space  of
+		sequence  numbers  is  linearly  ordered.   The
+		larger the sequence number the more recent  the
+		advertisement."
+	REFERENCE
+		"OSPF Version  2,  Section  12.1.6  LS  sequence
+		number"
+	::= { axrOspfv3AreaLsdbEntry 6 }
+
+axrOspfv3AreaLsdbAge OBJECT-TYPE
+	SYNTAX  Integer32  -- Should be 0..MaxAge
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This field is the age of the link state adver-
+		tisement in seconds."
+	REFERENCE
+		"OSPF Version 2, Section 12.1.1 LS age"
+	::= { axrOspfv3AreaLsdbEntry 7 }
+
+axrOspfv3AreaLsdbChecksum OBJECT-TYPE
+	SYNTAX  Integer32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This field is the  checksum  of  the  complete
+		contents  of  the  advertisement, excepting the
+		age field.  The age field is excepted  so  that
+		an  advertisement's  age  can  be  incremented
+		without updating the  checksum.  The  checksum
+		used  is  the same that is used for ISO connec-
+		tionless datagrams; it is commonly referred  to
+		as the Fletcher checksum."
+	REFERENCE
+		"OSPF Version 2, Section 12.1.7 LS checksum"
+	::= { axrOspfv3AreaLsdbEntry 8 }
+
+axrOspfv3AreaLsdbAdvertisement OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (1..65535))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The entire Link State Advertisement, including
+		its header."
+	::= { axrOspfv3AreaLsdbEntry 9 }
+
+--  axrOspfv3 Link-Scope Link State Database
+--    The Link State Database contains the Link-Scope Link State
+--    Advertisements from the links that the
+--    device is attached to.
+
+axrOspfv3LinkLsdbTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrOspfv3LinkLsdbEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The axrOspfv3 Process's Link-Scope Link State Database."
+	::= { axrOspfv3 5 }
+
+axrOspfv3LinkLsdbEntry OBJECT-TYPE
+	SYNTAX  AxrOspfv3LinkLsdbEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A single Link-Scope Link State Advertisement."
+	INDEX { axrOspfv3LinkLsdbIfIndex,
+		axrOspfv3LinkLsdbType,
+		axrOspfv3LinkLsdbRouterId,
+		axrOspfv3LinkLsdbLsid }
+	::= { axrOspfv3LinkLsdbTable 1 }
+
+	AxrOspfv3LinkLsdbEntry ::=
+		SEQUENCE {
+			axrOspfv3LinkLsdbDomainNumber
+				INTEGER,
+			axrOspfv3LinkLsdbIfIndex
+				Ipv6IfIndex,
+			axrOspfv3LinkLsdbType
+				INTEGER,
+			axrOspfv3LinkLsdbRouterId
+				RouterID,
+			axrOspfv3LinkLsdbLsid
+				IpAddress,
+			axrOspfv3LinkLsdbSequence
+				Integer32,
+			axrOspfv3LinkLsdbAge
+				Integer32,
+			axrOspfv3LinkLsdbChecksum
+				Integer32,
+			axrOspfv3LinkLsdbAdvertisement
+				OCTET STRING
+		}
+
+axrOspfv3LinkLsdbDomainNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"ospfv3 domain number."
+	::= { axrOspfv3LinkLsdbEntry 1 }
+
+axrOspfv3LinkLsdbIfIndex OBJECT-TYPE
+	SYNTAX  Ipv6IfIndex
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The identifier of the link from which the LSA
+		was received."
+	REFERENCE
+		"OSPF Version 2, Appendix C.2 Area parameters"
+	::= { axrOspfv3LinkLsdbEntry 2 }
+
+axrOspfv3LinkLsdbType OBJECT-TYPE
+	SYNTAX  INTEGER  {
+		linkLsa (8)  -- 0x0008
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The type  of  the  link  state  advertisement.
+		Each  link state type has a separate advertise-
+		ment format. Unrecognized Link-Scope LSAs with
+		the U-bit set are also stored in this database."
+	::= { axrOspfv3LinkLsdbEntry 3 }
+
+axrOspfv3LinkLsdbRouterId OBJECT-TYPE
+	SYNTAX  RouterID
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The 32 bit number that uniquely identifies the
+		originating router in the Autonomous System."
+	REFERENCE
+		"OSPF Version 2, Appendix C.1 Global parameters"
+	::= { axrOspfv3LinkLsdbEntry 4 }
+
+axrOspfv3LinkLsdbLsid OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The Link State ID is an LS Type Specific field
+		containing either a Router ID or a unique identifier;
+		it identifies the piece of the  routing  domain
+		that is being described by the advertisement.
+		In contrast to OSPF for IPv4, the LSID has no
+		addressing semantics."
+	::= { axrOspfv3LinkLsdbEntry 5 }
+
+--  Note that the OSPF Sequence Number is a 32 bit signed
+--  integer.  It starts with the value '80000001'h,
+--  or -'7FFFFFFF'h, and increments until '7FFFFFFF'h
+--  Thus, a typical sequence number will be very negative.
+
+axrOspfv3LinkLsdbSequence OBJECT-TYPE
+	SYNTAX  Integer32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The sequence number field is a  signed  32-bit
+		integer.   It  is used to detect old and dupli-
+		cate link state advertisements.  The  space  of
+		sequence  numbers  is  linearly  ordered.  The
+		larger the sequence number the more recent  the
+		advertisement."
+	REFERENCE
+		"OSPF Version  2,  Section  12.1.6  LS  sequence
+		number"
+	::= { axrOspfv3LinkLsdbEntry 6 }
+
+axrOspfv3LinkLsdbAge OBJECT-TYPE
+	SYNTAX  Integer32  -- Should be 0..MaxAge
+	ACCESS  read-only
+	STATUS   mandatory
+	DESCRIPTION
+		"This field is the age of the link state adver-
+		tisement in seconds."
+	REFERENCE
+		"OSPF Version 2, Section 12.1.1 LS age"
+	::= { axrOspfv3LinkLsdbEntry 7 }
+
+axrOspfv3LinkLsdbChecksum OBJECT-TYPE
+	SYNTAX  Integer32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This field is the  checksum  of  the  complete
+		contents  of  the  advertisement, excepting the
+		age field.  The age field is excepted  so  that
+		an  advertisement's  age  can  be  incremented
+		without updating the  checksum.  The  checksum
+		used  is  the same that is used for ISO connec-
+		tionless datagrams; it is commonly referred  to
+		as the Fletcher checksum."
+	REFERENCE
+		"OSPF Version 2, Section 12.1.7 LS checksum"
+	::= { axrOspfv3LinkLsdbEntry 8 }
+
+axrOspfv3LinkLsdbAdvertisement OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (1..65535))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The entire Link State Advertisement, including
+		its header."
+	::= { axrOspfv3LinkLsdbEntry 9 }
+
+--  OSPF Host Table
+--    The Host/Metric Table indicates what hosts are directly
+--    attached to the Router, and what metrics and types of
+--    service should be advertised for them.
+--  axrOspfv3 Interface Table
+
+axrOspfv3IfTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrOspfv3IfEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The axrOspfv3 Interface Table describes the  inter-
+		faces from the viewpoint of axrOspfv3."
+	REFERENCE
+		"OSPF Version 2, Appendix C.3  Router  interface
+		parameters"
+	::= { axrOspfv3 7 }
+
+axrOspfv3IfEntry OBJECT-TYPE
+	SYNTAX  AxrOspfv3IfEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The axrOspfv3 Interface Entry describes one  inter-
+		face from the viewpoint of axrOspfv3."
+	INDEX { axrOspfv3IfIndex }
+	::= { axrOspfv3IfTable 1 }
+
+	AxrOspfv3IfEntry ::=
+		SEQUENCE {
+			axrOspfv3IfDomainNumber
+				INTEGER,
+			axrOspfv3IfIndex
+				Ipv6IfIndex,
+			axrOspfv3IfAreaId
+				AreaID,
+			axrOspfv3IfType
+				INTEGER,
+			axrOspfv3IfAdminStat
+				Status,
+			axrOspfv3IfRtrPriority
+				DesignatedRouterPriority,
+			axrOspfv3IfTransitDelay
+				UpToMaxAge,
+			axrOspfv3IfRetransInterval
+				UpToMaxAge,
+			axrOspfv3IfHelloInterval
+				HelloRange,
+			axrOspfv3IfRtrDeadInterval
+				PositiveInteger,
+			axrOspfv3IfPollInterval
+				PositiveInteger,
+			axrOspfv3IfState
+				INTEGER,
+			axrOspfv3IfDesignatedRouter
+				RouterID,
+			axrOspfv3IfBackupDesignatedRouter
+				RouterID,
+			axrOspfv3IfEvents
+				Counter32,
+			axrOspfv3IfStatus
+				RowStatus,
+			axrOspfv3IfMulticastForwarding
+				INTEGER,
+			axrOspfv3IfDemand
+				TruthValue,
+			axrOspfv3IfMetricValue
+				Metric,
+			axrOspfv3IfLinkScopeLsaCount
+				Gauge32,
+			axrOspfv3IfLinkLsaCksumSum
+				Integer32,
+			axrOspfv3IfInstId
+				Integer32
+			}
+
+axrOspfv3IfDomainNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"ospfv3 domain number."
+	::= { axrOspfv3IfEntry 1 }
+
+axrOspfv3IfIndex OBJECT-TYPE
+	SYNTAX  Ipv6IfIndex
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The interface index of this axrOspfv3 interface.
+		It corresponds to the interface index of the
+		Ipv6 interface on which axrOspfv3 is configured."
+	::= { axrOspfv3IfEntry 2 }
+
+axrOspfv3IfAreaId OBJECT-TYPE
+	SYNTAX  AreaID
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A 32-bit integer uniquely identifying the area
+		to  which  the  interface  connects.   Area  ID
+		0.0.0.0 is used for the axrOspfv3 backbone."
+	DEFVAL   { '00000000'H }  -- 0.0.0.0
+	::= { axrOspfv3IfEntry 3 }
+
+axrOspfv3IfType OBJECT-TYPE
+	SYNTAX  INTEGER {
+		broadcast (1),
+		nbma (2),
+		pointToPoint (3),
+		pointToMultipoint (5)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The axrOspfv3 interface type."
+	::= { axrOspfv3IfEntry 4 }
+
+axrOspfv3IfAdminStat OBJECT-TYPE
+	SYNTAX  Status
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The axrOspfv3 interface's  administrative  status.
+		The  value formed on the interface, and the in-
+		terface will be advertised as an internal route
+		to  some  area.  The  value 'disabled' denotes
+		that the interface is external to axrOspfv3."
+	DEFVAL { enabled }
+	::= { axrOspfv3IfEntry 5 }
+
+axrOspfv3IfRtrPriority OBJECT-TYPE
+	SYNTAX  DesignatedRouterPriority
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The  priority  of  this  interface.   Used  in
+		multi-access  networks,  this  field is used in
+		the designated router election algorithm.  The
+		value 0 signifies that the router is not eligi-
+		ble to become the  designated  router  on  this
+		particular  network.   In the event of a tie in
+		this value, routers will use their Router ID as
+		a tie breaker."
+	DEFVAL { 1 }
+	::= { axrOspfv3IfEntry 6 }
+
+axrOspfv3IfTransitDelay OBJECT-TYPE
+	SYNTAX  UpToMaxAge
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The estimated number of seconds  it  takes  to
+		transmit  a  link state update packet over this
+		interface."
+	DEFVAL { 1 }
+	::= { axrOspfv3IfEntry 7 }
+
+axrOspfv3IfRetransInterval OBJECT-TYPE
+	SYNTAX  UpToMaxAge
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of seconds between  link-state  ad-
+		vertisement  retransmissions,  for  adjacencies
+		belonging to this  interface.  This  value  is
+		also used when retransmitting database descrip-
+		tion and link-state request packets."
+	DEFVAL { 5 }
+	::= { axrOspfv3IfEntry 8 }
+
+axrOspfv3IfHelloInterval OBJECT-TYPE
+	SYNTAX  HelloRange
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The length of time, in  seconds,  between  the
+		Hello  packets that the router sends on the in-
+		terface.  This value must be the same  for  all
+		routers attached to a common network."
+	DEFVAL { 10 }
+	::= { axrOspfv3IfEntry 9 }
+
+axrOspfv3IfRtrDeadInterval OBJECT-TYPE
+	SYNTAX  PositiveInteger
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of seconds that  a  router's  Hello
+		packets  have  not been seen before it's neigh-
+		bors declare the router down.  This  should  be
+		some  multiple  of  the  Hello  interval.  This
+		value must be the same for all routers attached
+		to a common network."
+	DEFVAL { 40 }
+	::= { axrOspfv3IfEntry 10 }
+
+axrOspfv3IfPollInterval OBJECT-TYPE
+	SYNTAX  PositiveInteger
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The larger time interval, in seconds,  between
+		the  Hello  packets  sent  to  an inactive non-
+		broadcast multi- access neighbor."
+	DEFVAL { 120 }
+	::= { axrOspfv3IfEntry 11 }
+
+axrOspfv3IfState OBJECT-TYPE
+	SYNTAX  INTEGER {
+		down (1),
+		loopback (2),
+		waiting (3),
+		pointToPoint (4),
+		designatedRouter (5),
+		backupDesignatedRouter (6),
+		otherDesignatedRouter (7)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The axrOspfv3 Interface State."
+	DEFVAL { down }
+	::= { axrOspfv3IfEntry 12 }
+
+axrOspfv3IfDesignatedRouter OBJECT-TYPE
+	SYNTAX  RouterID
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The Router ID of the Designated Router."
+	DEFVAL  { '00000000'H }  -- 0.0.0.0
+	::= { axrOspfv3IfEntry 13 }
+
+axrOspfv3IfBackupDesignatedRouter OBJECT-TYPE
+	SYNTAX  RouterID
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The  Router ID of  the  Backup   Designated
+		Router."
+	DEFVAL  { '00000000'H }  -- 0.0.0.0
+	::= { axrOspfv3IfEntry 15 }
+
+axrOspfv3IfEvents OBJECT-TYPE
+	SYNTAX  Counter32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of times this  OSPF  interface  has
+		changed its state, or an error has occurred."
+	::= { axrOspfv3IfEntry 16 }
+
+axrOspfv3IfStatus OBJECT-TYPE
+	SYNTAX  RowStatus
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This variable displays the status of  the  en-
+		try.  Setting it to 'invalid' has the effect of
+		rendering it inoperative.  The internal  effect
+		(row removal) is implementation dependent."
+	::= { axrOspfv3IfEntry 18 }
+
+axrOspfv3IfMulticastForwarding OBJECT-TYPE
+	SYNTAX  INTEGER {
+		blocked (1),   -- no multicast forwarding
+		multicast (2), -- using multicast address
+		unicast (3)    -- to each axrOspfv3 neighbor
+		}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The way multicasts should  forwarded  on  this
+		interface;  not  forwarded,  forwarded  as data
+		link multicasts, or forwarded as data link uni-
+		casts.  Data link multicasting is not meaning-
+		ful on point to point and NBMA interfaces, and
+		setting axrOspfv3MulticastForwarding to 0 effective-
+		ly disables all multicast forwarding."
+	DEFVAL { blocked }
+	::= { axrOspfv3IfEntry 19 }
+
+axrOspfv3IfDemand OBJECT-TYPE
+	SYNTAX  TruthValue
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Indicates whether Demand axrOspfv3 procedures (hel-
+		lo supression to FULL neighbors and setting the
+		DoNotAge flag on proogated LSAs) should be per-
+		formed on this interface."
+	DEFVAL { false }
+	::= { axrOspfv3IfEntry 20 }
+
+axrOspfv3IfMetricValue OBJECT-TYPE
+	SYNTAX  Metric
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The metric assigned to this interface.
+		The default value of the Metric is
+		10^8 / ifSpeed."
+	::= { axrOspfv3IfEntry 21 }
+
+axrOspfv3IfLinkScopeLsaCount OBJECT-TYPE
+	SYNTAX  Gauge32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of Link-Scope link-state
+		advertisements in  this  link's link-state database."
+	::= { axrOspfv3IfEntry 22 }
+
+axrOspfv3IfLinkLsaCksumSum OBJECT-TYPE
+	SYNTAX  Integer32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The 32-bit unsigned sum of the Link-Scope link-state
+		advertisements'  LS  checksums  contained in this
+		link's link-state database.  The sum can be used
+		to determine if  there  has been  a  change  in a
+		router's link state database, and to compare the
+		link-state database of two routers."
+	DEFVAL  { 0 }
+	::= { axrOspfv3IfEntry 23 }
+
+axrOspfv3IfInstId OBJECT-TYPE
+	SYNTAX  Integer32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Enables multiple instances of axrOspfv3 to be run over
+		a single link. Each protocol instance would be assigned
+		a separate ID. This ID has local link significance
+		only."
+	DEFVAL  { 0 }
+	::= { axrOspfv3IfEntry 24 }
+
+--  axrOspfv3 Virtual Interface Table
+--    The Virtual Interface Table describes the virtual
+--    links that the axrOspfv3 Process is configured to
+--    carry on.
+
+axrOspfv3VirtIfTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrOspfv3VirtIfEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Information about this router's virtual inter-
+		faces."
+	REFERENCE
+		"OSPF Version  2,  Appendix  C.4   Virtual  link
+		parameters"
+	::= { axrOspfv3 8 }
+
+axrOspfv3VirtIfEntry OBJECT-TYPE
+	SYNTAX  AxrOspfv3VirtIfEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Information about a single Virtual Interface."
+		INDEX { axrOspfv3VirtIfAreaId, axrOspfv3VirtIfNeighbor }
+	::= { axrOspfv3VirtIfTable 1 }
+
+	AxrOspfv3VirtIfEntry ::=
+		SEQUENCE {
+			axrOspfv3VirtIfDomainNumber
+				INTEGER,
+			axrOspfv3VirtIfAreaId
+				AreaID,
+			axrOspfv3VirtIfNeighbor
+				RouterID,
+			axrOspfv3VirtIfIndex
+				Ipv6IfIndex,
+			axrOspfv3VirtIfTransitDelay
+				UpToMaxAge,
+			axrOspfv3VirtIfRetransInterval
+				UpToMaxAge,
+			axrOspfv3VirtIfHelloInterval
+				HelloRange,
+			axrOspfv3VirtIfRtrDeadInterval
+				PositiveInteger,
+			axrOspfv3VirtIfState
+				INTEGER,
+			axrOspfv3VirtIfEvents
+				Counter32,
+			axrOspfv3VirtIfStatus
+				RowStatus,
+			axrOspfv3VirtIfLinkScopeLsaCount
+				Gauge32,
+			axrOspfv3VirtIfLinkLsaCksumSum
+				Integer32
+			}
+
+axrOspfv3VirtIfDomainNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"ospfv3 domain number."
+	::= { axrOspfv3VirtIfEntry 1 }
+
+axrOspfv3VirtIfAreaId OBJECT-TYPE
+	SYNTAX  AreaID
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The  Transit  Area  that  the   Virtual   Link
+		traverses.  By definition, this is not 0.0.0.0"
+	::= { axrOspfv3VirtIfEntry 2 }
+
+axrOspfv3VirtIfNeighbor OBJECT-TYPE
+	SYNTAX  RouterID
+	ACCESS  read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The Router ID of the Virtual Neighbor."
+	::= { axrOspfv3VirtIfEntry 3 }
+
+axrOspfv3VirtIfIndex OBJECT-TYPE
+	SYNTAX  Ipv6IfIndex
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The interface index of this axrOspfv3 virtual interface.
+		It must be unique among all the interface indices
+		on the router."
+		::= { axrOspfv3VirtIfEntry 4 }
+
+axrOspfv3VirtIfTransitDelay OBJECT-TYPE
+	SYNTAX  UpToMaxAge
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The estimated number of seconds  it  takes  to
+		transmit  a link- state update packet over this
+		interface."
+	DEFVAL { 1 }
+	::= { axrOspfv3VirtIfEntry 5 }
+
+axrOspfv3VirtIfRetransInterval OBJECT-TYPE
+	SYNTAX  UpToMaxAge
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of seconds between  link-state  ad-
+		vertisement  retransmissions,  for  adjacencies
+		belonging to this  interface.  This  value  is
+		also used when retransmitting database descrip-
+		tion  and  link-state  request  packets.   This
+		value  should  be well over the expected round-
+		trip time."
+	DEFVAL { 5 }
+	::= { axrOspfv3VirtIfEntry 6 }
+
+axrOspfv3VirtIfHelloInterval OBJECT-TYPE
+	SYNTAX  HelloRange
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The length of time, in  seconds,  between  the
+		Hello  packets that the router sends on the in-
+		terface.  This value must be the same  for  the
+		virtual neighbor."
+	DEFVAL { 10 }
+	::= { axrOspfv3VirtIfEntry 7 }
+
+axrOspfv3VirtIfRtrDeadInterval OBJECT-TYPE
+	SYNTAX  PositiveInteger
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of seconds that  a  router's  Hello
+		packets  have  not been seen before it's neigh-
+		bors declare the router down.  This  should  be
+		some  multiple  of  the  Hello  interval.  This
+		value must be the same for the  virtual  neigh-
+		bor."
+	DEFVAL { 60 }
+	::= { axrOspfv3VirtIfEntry 8 }
+
+axrOspfv3VirtIfState OBJECT-TYPE
+	SYNTAX  INTEGER {
+		down (1),    -- these use the same encoding
+		pointToPoint (4) -- as the axrOspfv3IfTable
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"OSPF virtual interface states."
+	DEFVAL  { down }
+	::= { axrOspfv3VirtIfEntry 9 }
+
+axrOspfv3VirtIfEvents OBJECT-TYPE
+	SYNTAX  Counter32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of state changes or error events on
+		this Virtual Link"
+	::= { axrOspfv3VirtIfEntry 10 }
+
+axrOspfv3VirtIfStatus OBJECT-TYPE
+	SYNTAX  RowStatus
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This variable displays the status of  the  en-
+		try.  Setting it to 'invalid' has the effect of
+		rendering it inoperative.  The internal  effect
+		(row removal) is implementation dependent."
+		::= { axrOspfv3VirtIfEntry 11 }
+
+axrOspfv3VirtIfLinkScopeLsaCount OBJECT-TYPE
+	SYNTAX  Gauge32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The total number of Link-Scope link-state
+		advertisements in  this  virtual link's link-state
+		database."
+	::= { axrOspfv3VirtIfEntry 12 }
+
+axrOspfv3VirtIfLinkLsaCksumSum OBJECT-TYPE
+	SYNTAX  Integer32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The 32-bit unsigned sum of the Link-Scope link-state
+		advertisements'  LS  checksums  contained in this
+		virtual link's link-state database.  The sum can be used
+		to determine if  there  has been  a  change  in a
+		router's link state database, and to compare the
+		link-state database of two routers."
+	DEFVAL  { 0 }
+	::= { axrOspfv3VirtIfEntry 13 }
+
+--  axrOspfv3 Neighbor Table
+--    The axrOspfv3 Neighbor Table describes all neighbors in
+--    the locality of the subject router.
+
+axrOspfv3NbrTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrOspfv3NbrEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A table of non-virtual neighbor information."
+	REFERENCE
+		"OSPF Version 2, Section 10  The  Neighbor  Data
+		Structure"
+	::= { axrOspfv3 9 }
+
+axrOspfv3NbrEntry OBJECT-TYPE
+	SYNTAX  AxrOspfv3NbrEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The information regarding a single neighbor."
+	REFERENCE
+		"OSPF Version 2, Section 10  The  Neighbor  Data
+		Structure"
+	INDEX { axrOspfv3NbrIfIndex, axrOspfv3NbrIpv6Addr }
+	::= { axrOspfv3NbrTable 1 }
+
+	AxrOspfv3NbrEntry ::=
+		SEQUENCE {
+			axrOspfv3NbrDomainNumber
+				INTEGER,
+			axrOspfv3NbrIfIndex
+				Ipv6IfIndex,
+			axrOspfv3NbrIpv6Addr
+				Ipv6Address,
+			axrOspfv3NbrRtrId
+				RouterID,
+			axrOspfv3NbrOptions
+				Integer32,
+			axrOspfv3NbrPriority
+				DesignatedRouterPriority,
+			axrOspfv3NbrState
+				INTEGER,
+			axrOspfv3NbrEvents
+				Counter32,
+			axrOspfv3NbrLsRetransQLen
+				Gauge32,
+--			axrOspfv3NbmaNbrStatus
+--				RowStatus,
+--			axrOspfv3NbmaNbrPermanence
+--				INTEGER,
+			axrOspfv3NbrHelloSuppressed
+				TruthValue,
+			axrOspfv3NbrIfId
+				Ipv6IfIndex
+			}
+
+axrOspfv3NbrDomainNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"ospfv3 domain number."
+	::= { axrOspfv3NbrEntry 1 }
+
+axrOspfv3NbrIfIndex OBJECT-TYPE
+	SYNTAX  Ipv6IfIndex
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The local link ID of the link over which the
+		neighbor can be reached."
+	::= { axrOspfv3NbrEntry 2 }
+
+axrOspfv3NbrIpv6Addr OBJECT-TYPE
+	SYNTAX  Ipv6Address
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The IPv6 address of the neighbor associated with
+		the local link."
+	::= { axrOspfv3NbrEntry 3 }
+
+axrOspfv3NbrRtrId OBJECT-TYPE
+	SYNTAX  RouterID
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A 32-bit integer (represented as a type  IpAd-
+		dress)  uniquely  identifying  the  neighboring
+		router in the Autonomous System."
+	::= { axrOspfv3NbrEntry 4 }
+
+axrOspfv3NbrOptions OBJECT-TYPE
+	SYNTAX  Integer32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A Bit Mask corresponding to the neighbor's op-
+		tions field."
+	DEFVAL { 0 }
+	::= { axrOspfv3NbrEntry 5 }
+
+axrOspfv3NbrPriority OBJECT-TYPE
+	SYNTAX  DesignatedRouterPriority
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The priority of this neighbor in the designat-
+		ed router election algorithm.  The value 0 sig-
+		nifies that the neighbor is not eligible to be-
+		come  the  designated router on this particular
+		network."
+	DEFVAL { 1 }
+	::= { axrOspfv3NbrEntry 6 }
+
+axrOspfv3NbrState OBJECT-TYPE
+	SYNTAX  INTEGER {
+		down (1),
+		attempt (2),
+		init (3),
+		twoWay (4),
+		exchangeStart (5),
+		exchange (6),
+		loading (7),
+		full (8)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The State of the relationship with this Neigh-
+		bor."
+	REFERENCE
+		"OSPF Version 2, Section 10.1 Neighbor States"
+	DEFVAL  { down }
+	::= { axrOspfv3NbrEntry 7 }
+
+axrOspfv3NbrEvents OBJECT-TYPE
+	SYNTAX  Counter32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of times this neighbor relationship
+		has changed state, or an error has occurred."
+	::= { axrOspfv3NbrEntry 8 }
+
+axrOspfv3NbrLsRetransQLen OBJECT-TYPE
+	SYNTAX  Gauge32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The  current  length  of  the   retransmission
+		queue."
+	::= { axrOspfv3NbrEntry 9 }
+
+axrOspfv3NbrHelloSuppressed OBJECT-TYPE
+	SYNTAX  TruthValue
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Indicates whether Hellos are being  suppressed
+		to the neighbor"
+	::= { axrOspfv3NbrEntry 12 }
+
+axrOspfv3NbrIfId OBJECT-TYPE
+	SYNTAX  Ipv6IfIndex
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The interface ID that the neighbor advertises
+		in its Hello Packets on this link, that is, the
+		neighbor's local interface index."
+	::= { axrOspfv3NbrEntry 13 }
+
+--  axrOspfv3 Virtual Neighbor Table
+--    This table describes all virtual neighbors.
+--    Since Virtual Links are configured in the
+--    virtual interface table, this table is read-only.
+
+axrOspfv3VirtNbrTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrOspfv3VirtNbrEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A table of virtual neighbor information."
+	REFERENCE
+		"OSPF Version 2, Section 15  Virtual Links"
+	::= { axrOspfv3 10 }
+
+axrOspfv3VirtNbrEntry OBJECT-TYPE
+	SYNTAX  AxrOspfv3VirtNbrEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Virtual neighbor information."
+	INDEX { axrOspfv3VirtNbrArea, axrOspfv3VirtNbrRtrId }
+	::= { axrOspfv3VirtNbrTable 1 }
+
+	AxrOspfv3VirtNbrEntry ::=
+		SEQUENCE {
+			axrOspfv3VirtNbrDomainNumber
+				INTEGER,
+			axrOspfv3VirtNbrArea
+				AreaID,
+			axrOspfv3VirtNbrRtrId
+				RouterID,
+			axrOspfv3VirtNbrIfIndex
+				Ipv6IfIndex,
+			axrOspfv3VirtNbrIpv6Addr
+				Ipv6Address,
+			axrOspfv3VirtNbrOptions
+				Integer32,
+			axrOspfv3VirtNbrState
+				INTEGER,
+			axrOspfv3VirtNbrEvents
+				Counter32,
+			axrOspfv3VirtNbrLsRetransQLen
+				Gauge32,
+			axrOspfv3VirtNbrHelloSuppressed
+				TruthValue,
+			axrOspfv3VirtNbrIfId
+				Ipv6IfIndex
+			}
+
+axrOspfv3VirtNbrDomainNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"ospfv3 domain number."
+	::= { axrOspfv3VirtNbrEntry 1 }
+
+axrOspfv3VirtNbrArea OBJECT-TYPE
+	SYNTAX  AreaID
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The Transit Area Identifier."
+	::= { axrOspfv3VirtNbrEntry 2 }
+
+axrOspfv3VirtNbrRtrId OBJECT-TYPE
+	SYNTAX  RouterID
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A  32-bit  integer  uniquely  identifying  the
+		neighboring router in the Autonomous System."
+	::= { axrOspfv3VirtNbrEntry 3 }
+
+axrOspfv3VirtNbrIfIndex OBJECT-TYPE
+	SYNTAX  Ipv6IfIndex
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The local link ID for the virtual link over
+		which the neighbor can be reached."
+	::= { axrOspfv3VirtNbrEntry 4 }
+
+axrOspfv3VirtNbrIpv6Addr OBJECT-TYPE
+	SYNTAX  Ipv6Address
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The IPv6 address used to reach this Virtual Neighbor.
+		It must be a Site-Local or Global scope address."
+	::= { axrOspfv3VirtNbrEntry 5 }
+
+axrOspfv3VirtNbrOptions OBJECT-TYPE
+	SYNTAX  Integer32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A Bit Mask corresponding to the neighbor's op-
+		tions field."
+	::= { axrOspfv3VirtNbrEntry 6 }
+
+axrOspfv3VirtNbrState OBJECT-TYPE
+	SYNTAX  INTEGER {
+		down (1),
+		attempt (2),
+		init (3),
+		twoWay (4),
+		exchangeStart (5),
+		exchange (6),
+		loading (7),
+		full (8)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The state of the  Virtual  Neighbor  Relation-
+		ship."
+	::= { axrOspfv3VirtNbrEntry 7 }
+
+axrOspfv3VirtNbrEvents OBJECT-TYPE
+	SYNTAX  Counter32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The number of  times  this  virtual  link  has
+		changed its state, or an error has occurred."
+	::= { axrOspfv3VirtNbrEntry 8 }
+
+axrOspfv3VirtNbrLsRetransQLen OBJECT-TYPE
+	SYNTAX  Gauge32
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The  current  length  of  the   retransmission
+		queue."
+	::= { axrOspfv3VirtNbrEntry 9 }
+
+axrOspfv3VirtNbrHelloSuppressed OBJECT-TYPE
+	SYNTAX  TruthValue
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Indicates whether Hellos are being  suppressed
+		to the neighbor"
+	::= { axrOspfv3VirtNbrEntry 10 }
+
+axrOspfv3VirtNbrIfId OBJECT-TYPE
+	SYNTAX  Ipv6IfIndex
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The interface ID that the neighbor advertises
+		in its Hello Packets on this virtual link, that is,
+		the neighbor's local interface index."
+	::= { axrOspfv3VirtNbrEntry 11 }
+
+ --
+ --    The axrOspfv3 Area Aggregate Table
+ --
+
+axrOspfv3AreaAggregateTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF AxrOspfv3AreaAggregateEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A range of IPv6 prefixes specified by a
+		prefix/prefix length  pair. Note that if
+		ranges are configured such that one range sub-
+		sumes  another range the most specific match is
+		the preferred one."
+	::= { axrOspfv3 11 }
+
+axrOspfv3AreaAggregateEntry OBJECT-TYPE
+	SYNTAX  AxrOspfv3AreaAggregateEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A range of IPv6 prefixes specified by a
+		prefix/prefix length  pair. Note that if
+		ranges are configured such that one range sub-
+		sumes  another range the most specific match is
+		the preferred one."
+	REFERENCE
+		"OSPF Version 2, Appendix C.2  Area parameters"
+	INDEX { axrOspfv3AreaAggregateAreaID,
+		axrOspfv3AreaAggregateAreaLsdbType,
+		axrOspfv3AreaAggregateIndex }
+	::= { axrOspfv3AreaAggregateTable 1 }
+
+	AxrOspfv3AreaAggregateEntry ::=
+		SEQUENCE {
+			axrOspfv3AreaAggregateDomainNumber
+				INTEGER,
+			axrOspfv3AreaAggregateAreaID
+				AreaID,
+			axrOspfv3AreaAggregateAreaLsdbType
+				INTEGER,
+			axrOspfv3AreaAggregateIndex
+				INTEGER,
+			axrOspfv3AreaAggregatePrefix
+				Ipv6AddressPrefix,
+			axrOspfv3AreaAggregatePrefixLen
+				INTEGER,
+			axrOspfv3AreaAggregateStatus
+				RowStatus,
+			axrOspfv3AreaAggregateEffect
+				INTEGER
+			}
+
+axrOspfv3AreaAggregateDomainNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"ospfv3 domain number."
+	::= { axrOspfv3AreaAggregateEntry 1 }
+
+axrOspfv3AreaAggregateAreaID OBJECT-TYPE
+	SYNTAX  AreaID
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The Area the Address Aggregate is to be  found
+		within."
+	REFERENCE
+		"OSPF Version 2, Appendix C.2 Area parameters"
+	::= { axrOspfv3AreaAggregateEntry 2 }
+
+axrOspfv3AreaAggregateAreaLsdbType OBJECT-TYPE
+	SYNTAX  INTEGER {
+		interAreaPrefixLsa (8195), -- 0x2003
+		nssaExternalLsa    (8199)  -- 0x2007
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The type of the Address Aggregate.  This field
+		specifies  the  Area Lsdb type that this Address Ag-
+		axregate applies to."
+	REFERENCE
+		"OSPF Version 2, Appendix A.4.1 The  Link  State
+		Advertisement header"
+	::= { axrOspfv3AreaAggregateEntry 3 }
+
+axrOspfv3AreaAggregateIndex OBJECT-TYPE
+	SYNTAX  INTEGER (1..2147483647)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A unique identifier for this aggregate table entry."
+	::= { axrOspfv3AreaAggregateEntry 4 }
+
+axrOspfv3AreaAggregatePrefix OBJECT-TYPE
+	SYNTAX  Ipv6AddressPrefix
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The IPv6 Prefix."
+	REFERENCE
+		"OSPF Version 2, Appendix C.2 Area parameters"
+	::= { axrOspfv3AreaAggregateEntry 5 }
+
+axrOspfv3AreaAggregatePrefixLen OBJECT-TYPE
+	SYNTAX  INTEGER ( 3..128 )
+--	UNITS  "bits"
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The length of the prefix (in bits). A prefix can
+		not be shorter than 3 bits."
+	REFERENCE
+		"OSPF Version 2, Appendix C.2 Area parameters"
+	::= { axrOspfv3AreaAggregateEntry 6 }
+
+axrOspfv3AreaAggregateStatus OBJECT-TYPE
+	SYNTAX  RowStatus
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"This variable displays the status of  the  en-
+		try.  Setting it to 'invalid' has the effect of
+		rendering it inoperative.  The internal  effect
+		(row removal) is implementation dependent."
+	::= { axrOspfv3AreaAggregateEntry 7 }
+
+axrOspfv3AreaAggregateEffect OBJECT-TYPE
+	SYNTAX  INTEGER {
+		advertiseMatching (1),
+		doNotAdvertiseMatching (2)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Prefixes subsumed by ranges either trigger  the
+		advertisement  of  the indicated aggregate (ad-
+		vertiseMatching), or result in the prefix not
+		being advertised at all outside the area."
+	DEFVAL  { advertiseMatching }
+	::= { axrOspfv3AreaAggregateEntry 8 }
+
+-- ax2000rRouter group
+
+ax2000rModelType OBJECT-TYPE
+	SYNTAX  INTEGER {
+		other(1),
+		model4(2),
+		model10(3),
+		model20(4),
+		model2S(11),
+		model4S(12),
+		model6H(13),
+		model10H(14),
+		model20H(15),
+		model1B(21),
+		model2B(22),
+		modelBH(23)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Model type of this system."
+	::= { ax2000rRouter 1 }
+
+--ax2000rSoftware OBJECT-TYPE
+--	SYNTAX  INTEGER
+--	ACCESS  not-accessible
+--	STATUS  mandatory
+--	DESCRIPTION
+--		"Software information of this system."
+--	::= { ax2000rRouter 2 }
+
+ax2000rSoftwareName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..16))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Software name of this system."
+	::= { ax2000rSoftware 1 }
+
+ax2000rSoftwareAbbreviation OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..16))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"System software abbreviation."
+	::= { ax2000rSoftware 2 }
+
+ax2000rSoftwareVersion OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..16))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"System software version."
+	::= { ax2000rSoftware 3 }
+
+--ax2000rSystemMsg OBJECT-TYPE
+--	SYNTAX  INTEGER
+--	ACCESS  not-accessible
+--	STATUS  mandatory
+--	DESCRIPTION
+--		"System messege group."
+--	::= { ax2000rRouter 3 }
+
+ax2000rSystemMsgText OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..256))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The text of the system log message.For information about this code,
+		see:  Operator's Manual. "
+	::= { ax2000rSystemMsg 1 }
+
+ax2000rSystemMsgType OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (1))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The event type. For information about this code, see:  Operator's Manual."
+	::= { ax2000rSystemMsg 2 }
+
+ax2000rSystemMsgTimeStamp OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (14))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The time that event occured. And that is expressed as type of
+		MM/DD hh:mm:ss
+			MM:month(01-12)
+			DD:day(01-31)
+			hh:hour(00-23)
+			mm:minute(00-59)
+			ss:second(00-59)
+		Insert space between DD and hh."
+	::= { ax2000rSystemMsg 3 }
+
+ax2000rSystemMsgLevel OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (1))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The newest system message log level.For information about this code,
+		see:  Operator's Manual. "
+	::= { ax2000rSystemMsg 4 }
+
+ax2000rSystemMsgEventPoint OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..8))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The code of part that system message error occured. For information
+		about this code,see:  Operator's Manual. "
+	::= { ax2000rSystemMsg 5 }
+
+ax2000rSystemMsgEventInterfaceID OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..40))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Interface identification of system messages. For information
+		about this code,see:  Operator's Manual."
+	::= { ax2000rSystemMsg 6 }
+
+ax2000rSystemMsgEventCode OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (4))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Event kind code of system messages. For information about this code,
+		see:  Operator's Manual. "
+	::= { ax2000rSystemMsg 7 }
+
+ax2000rSystemMsgAdditionalCode OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (6))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Additional code of system messages. For information about this code,
+		see:  Operator's Manual. "
+	::= { ax2000rSystemMsg 8 }
+
+--ax2000rSnmpAgent OBJECT-TYPE
+--	SYNTAX  INTEGER
+--	ACCESS  not-accessible
+--	STATUS  mandatory
+--	DESCRIPTION
+--		"Related information of SNMP agent."
+--	::= { ax2000rRouter 4 }
+
+ax2000rSnmpSendReceiveSize OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"SNMP packet data size in Manager-to-Agent communication. The value is
+		displayed in bytes."
+	::= { ax2000rSnmpAgent 1 }
+
+ax2000rSnmpReceiveDelay OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A recommendable interval to receive packets from Manager.The value is
+		displayed in milliseconds."
+	::= { ax2000rSnmpAgent 2 }
+
+ax2000rSnmpContinuousSend OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of times that is recommendable continuous transmission
+		packets."
+	::= { ax2000rSnmpAgent 3 }
+
+ax2000rSnmpObjectMaxNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Max number of objects that contain SNMP packet."
+	::= { ax2000rSnmpAgent 4 }
+
+ax2000rSerialNumber OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..30))
+	ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Management information (SerialNumber) of RMP2-CARD."
+        ::= { ax2000rRouter 5 }
+
+
+-- ax2000rDevice group
+
+ax2000rChassisMaxNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Max number of cluster chassis that can connect to this router."
+	::= { ax2000rChassis 1 }
+
+
+ax2000rChassisTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Ax2000rChassisTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A table containing chassis information."
+	::= { ax2000rChassis 2 }
+
+ax2000rChassisEntry OBJECT-TYPE
+	SYNTAX  Ax2000rChassisTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing specific chassis."
+	INDEX   { ax2000rChassisIndex }
+	::= { ax2000rChassisTable 1 }
+
+	Ax2000rChassisTableEntry ::=
+		SEQUENCE {
+		  ax2000rChassisIndex
+			INTEGER,
+		  ax2000rChassisType
+			INTEGER,
+		  ax2000rChassisStatus
+			INTEGER,
+		  ax2000rRmBoardDuplexMode
+			INTEGER,
+		  ax2000rPowerUnitNumber
+			INTEGER,
+		  ax2000rFanNumber
+			INTEGER,
+		  ax2000rCifNumber
+			INTEGER,
+		  ax2000rRmBoardNumber
+			INTEGER,
+		  ax2000rRpBoardNumber
+			INTEGER,
+		  ax2000rNifBoardNumber
+			INTEGER,
+		  ax2000rCswNumber
+			INTEGER,
+		  ax2000rPsInputNumber
+			INTEGER
+		}
+
+ax2000rChassisIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A number to specify ax2000rChassisEntry."
+	::= { ax2000rChassisEntry 1 }
+
+ax2000rChassisType OBJECT-TYPE
+	SYNTAX  INTEGER {
+		other(1),
+		model4(2),
+		model10(3),
+		model20(4),
+		model2S(11),
+		model4S(12),
+		model6H(13),
+		model10H(14),
+		model20H(15),
+		model1B(21),
+		model2B(22),
+		modelBH(23)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Chassis type of this system."
+	::= { ax2000rChassisEntry 2 }
+
+ax2000rChassisStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		up(2)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Current status of this chassis."
+	::= { ax2000rChassisEntry 3 }
+
+ax2000rRmBoardDuplexMode OBJECT-TYPE
+	SYNTAX  INTEGER {
+		rm-Simplex-model(1),
+		rm-Duplex-model(2)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Duplex mode of RM Board."
+	::= { ax2000rChassisEntry 4 }
+
+ax2000rPowerUnitNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of maximum power switches that this router can connect its."
+	::= { ax2000rChassisEntry 5 }
+
+ax2000rFanNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The maximum number of fans that can connect to this chassis."
+	::= { ax2000rChassisEntry 6 }
+
+ax2000rCifNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of cluster interfaces that can connect to this chassis."
+	::= { ax2000rChassisEntry 7 }
+
+ax2000rRmBoardNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of RM(Routing Manager) boards that can connect to
+		this chassis."
+	::= { ax2000rChassisEntry 8 }
+
+ax2000rRpBoardNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of RP(Routing Processor) boards that can connect to
+		this chassis."
+	::= { ax2000rChassisEntry 9 }
+
+ax2000rNifBoardNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of NIF(Network InterFace) boards that can connect to
+		this chassis."
+	::= { ax2000rChassisEntry 10 }
+
+ax2000rCswNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of CSW(Crossbar SWitch) that can load into this chassis."
+	::= { ax2000rChassisEntry 11 }
+
+ax2000rPsInputNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The maximum number of PSINPUT that can connect to this chassis."
+	::= { ax2000rChassisEntry 12 }
+
+
+ax2000rPowerUnitTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Ax2000rPowerUnitTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A table containing power unit information."
+	::= { ax2000rChassis 3 }
+
+ax2000rPowerUnitEntry OBJECT-TYPE
+	SYNTAX  Ax2000rPowerUnitTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing power unit information."
+	INDEX   { ax2000rChassisIndex,ax2000rPowerUnitIndex }
+	::= { ax2000rPowerUnitTable 1 }
+
+	Ax2000rPowerUnitTableEntry ::=
+		SEQUENCE {
+		  ax2000rPowerUnitIndex
+			INTEGER,
+		  ax2000rPowerConnectStatus
+			INTEGER,
+		  ax2000rPowerSupplyStatus
+			INTEGER
+		}
+
+ax2000rPowerUnitIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A number to position of the power units.The value from 1
+		to ax2000rPowerUnitNumber."
+	::= { ax2000rPowerUnitEntry 1 }
+ax2000rPowerConnectStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		connected(2),
+		disconnected(32)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The current connection status of the power unit."
+	::= { ax2000rPowerUnitEntry 2 }
+
+ax2000rPowerSupplyStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		ok(2),
+		fault(4)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Status of power supply."
+	::= { ax2000rPowerUnitEntry 3 }
+
+
+ax2000rFanTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Ax2000rFanTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A table containing fan information."
+	::= { ax2000rChassis 4 }
+
+ax2000rFanEntry OBJECT-TYPE
+	SYNTAX  Ax2000rFanTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"This entry containing information for a fan."
+	INDEX   { ax2000rChassisIndex,ax2000rFanIndex }
+	::= { ax2000rFanTable 1 }
+
+	Ax2000rFanTableEntry ::=
+		SEQUENCE {
+		  ax2000rFanIndex
+			INTEGER,
+		  ax2000rFanStatus
+			INTEGER
+		}
+
+ax2000rFanIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Index to indicate position of fans."
+	::= { ax2000rFanEntry 1 }
+
+ax2000rFanStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		ok(2),
+		fault(4)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Status of fans."
+	::= { ax2000rFanEntry 2 }
+
+
+ax2000rCswTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Ax2000rCswTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A table containing CSW(Crossbar SWitch) information."
+	::= { ax2000rChassis 5 }
+
+ax2000rCswEntry OBJECT-TYPE
+	SYNTAX  Ax2000rCswTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing CSW(Crossbar SWitch) information."
+	INDEX   { ax2000rChassisIndex,ax2000rCswIndex }
+	::= { ax2000rCswTable 1 }
+
+	Ax2000rCswTableEntry ::=
+		SEQUENCE {
+		  ax2000rCswIndex
+			INTEGER,
+		  ax2000rCswStatus
+			INTEGER
+		}
+
+ax2000rCswIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An unique value indicates connecting position of CSWs.The value
+		form 1 to ax2000rCswNumber."
+	::= { ax2000rCswEntry 1 }
+
+ax2000rCswStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		ok(2),
+		fault(4)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Connecting status of CSW."
+	::= { ax2000rCswEntry 2 }
+
+ax2000rPsInputTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Ax2000rPsInputTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A table containing PSINPUT information."
+	::= { ax2000rChassis 6 }
+
+ax2000rPsInputEntry OBJECT-TYPE
+	SYNTAX  Ax2000rPsInputTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing PSINPUT information."
+	INDEX   { ax2000rChassisIndex,ax2000rPsInputIndex }
+	::= { ax2000rPsInputTable 1 }
+
+	Ax2000rPsInputTableEntry ::=
+		SEQUENCE {
+		  ax2000rPsInputIndex
+			INTEGER,
+		  ax2000rPsInputType
+			INTEGER,
+		  ax2000rPsInputConnectStatus
+			INTEGER,
+		  ax2000rPsInputSupplyStatus
+			INTEGER
+		}
+
+ax2000rPsInputIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An unique value indicates connecting position of PSINPUTs.The value
+		from 1 to ax2000rPsInputNumber."
+	::= { ax2000rPsInputEntry 1 }
+
+ax2000rPsInputType OBJECT-TYPE
+	SYNTAX  INTEGER {
+		ac100(1),
+		ac200-or-dc48(2)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Type of the PSINPUT. The value is -1 when PSINPUT is disconnected."
+	::= { ax2000rPsInputEntry 2 }
+
+ax2000rPsInputConnectStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		connect(2),
+		disconnect(32)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The current connection status of the PSINPUT."
+	::= { ax2000rPsInputEntry 3 }
+
+ax2000rPsInputSupplyStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		ok(2),
+		fault(4)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Connecting status of PSINPUT.
+		The value is -1 when PSINPUT is disconnected."
+	::= { ax2000rPsInputEntry 4 }
+
+ax2000rRmBoardTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Ax2000rRmBoardTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A table containing RM(Routing Manager) boards information."
+	::= { ax2000rRmBoard 1 }
+
+ax2000rRmBoardEntry OBJECT-TYPE
+	SYNTAX  Ax2000rRmBoardTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing RM(Routing Manager) boards about specific
+		chassis."
+	INDEX   { ax2000rChassisIndex,ax2000rRmBoardIndex }
+	::= { ax2000rRmBoardTable 1 }
+
+	Ax2000rRmBoardTableEntry ::=
+		SEQUENCE {
+		  ax2000rRmBoardIndex
+			INTEGER,
+		  ax2000rRmIoBoardType
+			INTEGER,
+		  ax2000rRmCpuBoardType
+			INTEGER,
+		  ax2000rRmOperStatus
+			INTEGER,
+		  ax2000rRmOperModeStatus
+			INTEGER,
+		  ax2000rRmActiveLedStatus
+			INTEGER,
+		  ax2000rRmReadyLedStatus
+			INTEGER,
+		  ax2000rRmAlarmLedStatus
+			INTEGER,
+		  ax2000rRmErrorLedStatus
+			INTEGER,
+		  ax2000rRmEmaLedStatus
+			INTEGER,
+		  ax2000rRmStatusCode
+			INTEGER,
+		  ax2000rRmEthernetStatus
+			INTEGER,
+		  ax2000rRmAtaCardNumber
+			INTEGER,
+		  ax2000rRmAtaBootDev
+			INTEGER,
+		  ax2000rRmBoardName
+			DisplayString,
+		  ax2000rRmBoardAbbreviation
+			DisplayString,
+		  ax2000rRmIoBoardProductCode
+			INTEGER,
+		  ax2000rRmCpuBoardProductCode
+			INTEGER,
+		  ax2000rRmCpuName
+			DisplayString,
+		  ax2000rRmCpuClock
+			INTEGER,
+		  ax2000rRmMemoryTotalSize
+			INTEGER,
+		  ax2000rRmMemoryUsedSize
+			INTEGER,
+		  ax2000rRmMemoryFreeSize
+			INTEGER,
+		  ax2000rRmRomVersion
+			DisplayString,
+		  ax2000rRmCpuLoad1m
+			INTEGER,
+		  ax2000rRmTemperatureStatusNumber
+			INTEGER
+		}
+
+ax2000rRmBoardIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Position information of the RM slot. The value is from 1 to
+		ax2000rRmBoardCardNumber."
+	::= { ax2000rRmBoardEntry  1 }
+
+ax2000rRmIoBoardType OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"RM(Routing Manager) IO board ID.
+			model2S/model4 RM-IO                (4096)
+			model10/model20 RM-IO           (16781312)
+			model4S RM-IO                   (16781568)
+			model6H/model10H/model20H RM-IO (16781824)
+			model6H/model10H/model20H RMB-IO(16782080)
+			model4S RMB-IO                  (16782336)
+			model1B/model2B RMBB-IO            (10752) 
+			modelBH RMBH-IO                     (5888)
+		The value is -1 when RM board is disconnected."
+	::= { ax2000rRmBoardEntry  2 }
+
+ax2000rRmCpuBoardType OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The value of RM board ID.
+			RM(CPU)    0 (0x0000)
+			RMB(CPU) 256 (0x0100)
+		The value is -1 when RM board is disconnected."
+	::= { ax2000rRmBoardEntry 3 }
+
+ax2000rRmOperStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		other(1),
+		up(2),
+		down(4),
+		closed(5),
+		disconnect(32)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Status of LED on RM board. The value is -1 when RM board is
+		disconnected."
+	::= { ax2000rRmBoardEntry 4 }
+
+ax2000rRmOperModeStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		other(1),
+		active(2),
+		standby(3),
+		do-not-match-with-configure-mode(4),
+		do-not-match-with-software-version(5),
+		down(6),
+		mentenance(7)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Operate status on RM board. The value is -1 when RM board is
+		disconnected."
+	::= { ax2000rRmBoardEntry 5 }
+
+ax2000rRmActiveLedStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		green-light-on(2),
+		light-off(6)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Status of ACTIVE LED on RM board. The value is -1 when RM board is
+		disconnected or LED status is unknown."
+	::= { ax2000rRmBoardEntry 6 }
+
+ax2000rRmReadyLedStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		green-light-on(2),
+		light-off(6)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Status of READY LED on RM board. The value is -1 when RM board is
+		disconnected or LED status is unknown."
+	::= { ax2000rRmBoardEntry 7 }
+
+ax2000rRmAlarmLedStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		red-light-on(4),
+		light-off(6)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Status of ALARM LED on RM board. The value is -1 when RM board is
+		disconnected or LED status is unknown."
+	::= { ax2000rRmBoardEntry 8 }
+
+ax2000rRmErrorLedStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		yellow-light-on(5),
+		light-off(6)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Status of LED ERROR on RM board. The value is -1 when RM board is
+		disconnected or LED status is unknown."
+	::= { ax2000rRmBoardEntry 9 }
+
+ax2000rRmEmaLedStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		yellow-light-on(5),
+		light-off(6)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Status of LED EMA READY on RM board. The value is -1 when RM board is
+		disconnected or LED status is unknown."
+	::= { ax2000rRmBoardEntry 10 }
+
+ax2000rRmStatusCode OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The status code of 7 segments on RM board.(00-99)"
+	::= { ax2000rRmBoardEntry 11 }
+
+ax2000rRmEthernetStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		other(1),
+		active(2),
+		down(4),
+		nothing-configuration-or-locked(6),
+		maintenance(7),
+		test(9),
+		unused(10),
+		standby(12)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Operaion status on RM ethernet. The value is -1 when RM board is
+		disconnected."
+	::= { ax2000rRmBoardEntry 12 }
+
+ax2000rRmAtaCardNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of slots in ATA card. The value is 0 when RM board is
+		disconnected."
+	::= { ax2000rRmBoardEntry 13 }
+
+ax2000rRmAtaBootDev OBJECT-TYPE
+	SYNTAX  INTEGER {
+		ata-slot0(1),
+		ata-slot1(2)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The value of ATA slots number when router booted. The value is -1
+		when RM board is disconnected."
+	::= { ax2000rRmBoardEntry 14 }
+
+ax2000rRmBoardName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..16))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The product name of RM-IO board.When RM board is disconnected,
+		this will be an OCTET STRING of zero length."
+	::= { ax2000rRmBoardEntry 15 }
+
+ax2000rRmBoardAbbreviation OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..16))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The abbreviation name of RM-IO board.When RM board is disconnected,
+		this will be an OCTET STRING of zero length."
+	::= { ax2000rRmBoardEntry 16 }
+
+ax2000rRmIoBoardProductCode OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The manufacturing management number of RM-IO board.The value is
+		-1 when RM board is disconnected."
+	::= { ax2000rRmBoardEntry 17 }
+
+ax2000rRmCpuBoardProductCode OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The manufacturing management number of RM-CPU board.The value is
+		-1 when RM board is disconnected."
+	::= { ax2000rRmBoardEntry 18 }
+
+ax2000rRmCpuName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..16))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The CPU name of board that load RM.When RM board is disconnected,
+		this will be an OCTET STRING of zero length."
+	::= { ax2000rRmBoardEntry 19 }
+
+ax2000rRmCpuClock OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The CPU clock of board that load RM. The value is displayed in
+		mega-hertz(MHz). The value is -1 when RM board is disconnected."
+	::= { ax2000rRmBoardEntry 20 }
+
+ax2000rRmMemoryTotalSize OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Total memory sizes of RM. The value is displayed in kilobyte(KB).
+		The value is -1 when RM board is disconnected."
+	::= { ax2000rRmBoardEntry 21 }
+
+ax2000rRmMemoryUsedSize OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Using memory sizes of RM. The value is displayed in kilobyte(KB).
+		The value is -1 when RM board is disconnected."
+	::= { ax2000rRmBoardEntry 22 }
+
+ax2000rRmMemoryFreeSize OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Free memory sizes of RM. The value is displayed in kilobyte(KB).
+		The value is -1 when RM board is disconnected."
+	::= { ax2000rRmBoardEntry 23 }
+
+
+ax2000rRmRomVersion OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..128))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The version of Rom on RM board. When RM board is disconnected,
+		this will be an OCTET STRING of zero length."
+	::= { ax2000rRmBoardEntry 24 }
+
+ax2000rRmCpuLoad1m OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The average, over the last minute, of the percentage of time that
+		this processor was utilized to processing and transfer data.
+		The value is -1 when RM board is standby or disconnected."
+	::= { ax2000rRmBoardEntry 25 }
+
+ax2000rRmTemperatureStatusNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The maximum number of ax2000rTemperatureStatus that can be measurement at this chassis."
+	::= { ax2000rRmBoardEntry 26 }
+
+ax2000rAtaCardTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Ax2000rAtaCardTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A table containing ATA Card information."
+	::= { ax2000rRmBoard 2 }
+
+ax2000rAtaCardEntry OBJECT-TYPE
+	SYNTAX  Ax2000rAtaCardTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing ATA Card information."
+	INDEX   { ax2000rChassisIndex, ax2000rRmBoardIndex, ax2000rAtaCardIndex }
+	::= { ax2000rAtaCardTable 1 }
+
+	Ax2000rAtaCardTableEntry ::=
+		SEQUENCE {
+		  ax2000rAtaCardIndex
+			INTEGER,
+		  ax2000rAtaCardConnection
+			INTEGER,
+		  ax2000rAtaCardTotalSize
+			INTEGER,
+		  ax2000rAtaCardUsedSize
+			INTEGER,
+		  ax2000rAtaCardFreeSize
+			INTEGER,
+		  ax2000rAtaCardName
+			DisplayString,
+		  ax2000rAtaCardAbbreviation
+			DisplayString,
+		  ax2000rAtaCardMountStatus
+			INTEGER
+		}
+
+ax2000rAtaCardIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Connected position of ATA cards.The value is 1 plus slot number
+		that ATA card is inserted.The value is from 1 to ax2000rRmAtaCardNumber."
+	::= { ax2000rAtaCardEntry 1 }
+
+ax2000rAtaCardConnection OBJECT-TYPE
+	SYNTAX  INTEGER {
+		connect(2),
+		disconnect(32)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Connected status of ATA cards."
+	::= { ax2000rAtaCardEntry 2 }
+
+ax2000rAtaCardTotalSize OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Total capacity of ATA cards.The value is displayed in kilobyte
+		(kbyte).And the value is -1 when ATA cards is disconnected."
+	::= { ax2000rAtaCardEntry 3 }
+
+ax2000rAtaCardUsedSize OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Using capacity of ATA cards.The value is displayed in kilobyte
+		(kbyte).And the value is -1 when ATA cards is disconnected."
+	::= { ax2000rAtaCardEntry 4 }
+
+ax2000rAtaCardFreeSize OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The rest capacity of ATA card. The value is displayed in kilobyte
+		(kbyte). The value is -1 when ATA card is disconnected."
+	::= { ax2000rAtaCardEntry 5 }
+
+ax2000rAtaCardName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..16))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The product name of ATA card. When the ATA card is unknown,
+		this OCTET STRING value is 'unknown'. When ATA card is disconnected,
+		this will be an OCTET STRING of zero length."
+	::= { ax2000rAtaCardEntry 6 }
+
+ax2000rAtaCardAbbreviation OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..16))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The kind of ATA card. When ATA card is disconnected,this will be an
+		OCTET STRING of zero length."
+	::= { ax2000rAtaCardEntry 7 }
+
+ax2000rAtaCardMountStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		unmount(1),
+  		mount(2)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The mount state of ATA card. The value is -1 when ATA card is
+		disconnected."
+	::= { ax2000rAtaCardEntry 8 }
+
+ax2000rTemperatureStatusTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Ax2000rTemperatureStatusEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The table of ambient temperature status maintained by the
+		environmental monitor."
+	::= { ax2000rRmBoard 3 }
+
+ax2000rTemperatureStatusEntry OBJECT-TYPE
+	SYNTAX  Ax2000rTemperatureStatusEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the ambient temperature status table, representing
+		the status of the associated testpoint maintained by the
+		environmental monitor."
+	INDEX  { ax2000rChassisIndex, ax2000rRmBoardIndex, ax2000rTemperatureStatusIndex }
+	::= { ax2000rTemperatureStatusTable 1 }
+
+	Ax2000rTemperatureStatusEntry ::=
+		SEQUENCE {
+		  ax2000rTemperatureStatusIndex
+			INTEGER(0..2147483647),
+		  ax2000rTemperatureStatusDescr
+			DisplayString,
+		  ax2000rTemperatureStatusValue
+			Gauge,
+		  ax2000rTemperatureThreshold
+			INTEGER,
+		  ax2000rTemperatureState
+			INTEGER
+		}
+
+ax2000rTemperatureStatusIndex OBJECT-TYPE
+	SYNTAX  INTEGER(0..2147483647)
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Unique index for the testpoint being instrumented.
+		This index is for SNMP purposes only, and has no
+		intrinsic meaning."
+	::= { ax2000rTemperatureStatusEntry 1 }
+
+ax2000rTemperatureStatusDescr OBJECT-TYPE
+	SYNTAX  DisplayString(SIZE(0..32))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Textual description of the testpoint being instrumented.
+		This description is a short textual label, suitable as a
+		human-sensible identification for the rest of the
+		information in the entry."
+	::= { ax2000rTemperatureStatusEntry 2 }
+
+ax2000rTemperatureStatusValue OBJECT-TYPE
+	SYNTAX  Gauge
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The current measurement of the testpoint being instrumented."
+	::= { ax2000rTemperatureStatusEntry 3 }
+
+ax2000rTemperatureThreshold OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The highest value that the associated instance of the
+		object ax2000rTemperatureStatusValue may obtain
+		before an emergency shutdown of the managed device is
+		initiated."
+	::= { ax2000rTemperatureStatusEntry 4 }
+
+ax2000rTemperatureState OBJECT-TYPE
+	SYNTAX  INTEGER {
+		normal(1),
+		caution(2),
+		warning(3),
+		fatal(4)
+		}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The current state of the testpoint being instrumented."
+	::= { ax2000rTemperatureStatusEntry 5 }
+
+
+ax2000rRpBoardTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Ax2000rRpBoardTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A table containing RP(Routing Processor) boards information about
+		specific chassis."
+	::= { ax2000rRpBoard 1 }
+
+ax2000rRpBoardEntry OBJECT-TYPE
+	SYNTAX  Ax2000rRpBoardTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing RP(Routing Processor) boards about specific
+		chassis."
+	INDEX   { ax2000rChassisIndex,ax2000rRpBoardIndex }
+	::= { ax2000rRpBoardTable 1 }
+
+	Ax2000rRpBoardTableEntry ::=
+		SEQUENCE {
+		  ax2000rRpBoardIndex
+			INTEGER,
+		  ax2000rRpBoardType
+			INTEGER,
+		  ax2000rRpOperStatus
+			INTEGER,
+		  ax2000rRpBoardName
+			DisplayString,
+		  ax2000rRpBoardAbbreviation
+			DisplayString,
+		  ax2000rRpBoardProductCode
+			DisplayString,
+		  ax2000rRpMemoryTotalSize
+			INTEGER,
+		  ax2000rRpMemoryUsedSize
+			INTEGER,
+		  ax2000rRpMemoryFreeSize
+			INTEGER,
+		  ax2000rRpOption1CardName
+			DisplayString,
+		  ax2000rRpOption1CardAbbreviation
+			DisplayString,
+		  ax2000rRpOption1CardProductCode
+			INTEGER,
+		  ax2000rRpOption2CardName
+			DisplayString,
+		  ax2000rRpOption2CardAbbreviation
+			DisplayString,
+		  ax2000rRpOption2CardProductCode
+			INTEGER,
+		  ax2000rRpCpuLoad1m
+			INTEGER
+		}
+
+ax2000rRpBoardIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Position information of the RP slots. The value is from 1 to
+		ax2000rRpBoardNumber."
+	::= { ax2000rRpBoardEntry 1 }
+
+ax2000rRpBoardType OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"RP(Routing Processor) boards ID.
+        RP-A       (8192) (0x2000)
+        RP-A1      (8448) (0x2100)
+        RP-C       (9216) (0x2400)
+        RP-D       (9472) (0x2500)
+        RP-C6      (9728) (0x2600)
+        RP-D6      (9984) (0x2700)
+        The value is -1 when RP board is disconnected."
+	::= { ax2000rRpBoardEntry 2 }
+
+ax2000rRpOperStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		other(1),
+		active(2),
+		initialization(3),
+		down(4),
+		closed(5),
+		inactive(6),
+		disconnect(32)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Operation stasus of RP board.(STATUS LED)"
+	::= { ax2000rRpBoardEntry 3 }
+
+ax2000rRpBoardName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..16))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"RP board name. When RP board is disconnected, this will be an OCTET
+		STRING of zero length."
+	::= { ax2000rRpBoardEntry 4 }
+
+ax2000rRpBoardAbbreviation OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..16))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The abbreviation name of RP board. When RP board is disconnected,
+		this will be an OCTET STRING of zero length."
+	::= { ax2000rRpBoardEntry 5 }
+
+ax2000rRpBoardProductCode OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The revision of RP board. When RP board is disconnected,
+		this will be an OCTET STRING of zero length."
+	::= { ax2000rRpBoardEntry 6 }
+
+ax2000rRpMemoryTotalSize OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Total memory sizes of RP. The value is displayed in kilobyte(KB).
+		The value is -1 when RP board is disconnected."
+	::= { ax2000rRpBoardEntry 7 }
+
+ax2000rRpMemoryUsedSize OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Using memory sizes of RP. The value is displayed in kilobyte(KB).
+		The value is -1 when RP board is disconnected."
+	::= { ax2000rRpBoardEntry 8 }
+
+ax2000rRpMemoryFreeSize OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Free memory sizes of RP. The value is displayed in kilobyte(KB).
+		The value is -1 when RP board is disconnected."
+	::= { ax2000rRpBoardEntry 9 }
+
+ax2000rRpOption1CardName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..16))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Product name of RP board that is loaded onto slot of secret cord and
+		compression option. When RP board is disconnected or option card
+		isn't loaded, this will be an OCTET STRING of zero length."
+	::= { ax2000rRpBoardEntry 10 }
+
+ax2000rRpOption1CardAbbreviation OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..16))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Product name of the board which is loaded into RP cryptogram/compress
+		option slot.When RP board is disconnected, this will be an OCTET STRING
+ 		of zero length."
+	::= { ax2000rRpBoardEntry 11 }
+
+ax2000rRpOption1CardProductCode OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Product code of the board which is loaded into RP cryptogram/compress
+		option slot.When RP board is disconnected, this will be an OCTET STRING
+		of zero length."
+	::= { ax2000rRpBoardEntry 12 }
+
+ax2000rRpOption2CardName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..16))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Product name of the board which is loaded into RP statistics option
+		slot.When RP board is disconnected,this will be an OCTET STRING of zero
+		length."
+	::= { ax2000rRpBoardEntry 13 }
+
+ax2000rRpOption2CardAbbreviation OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..16))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Abbreviation name of the board which is loaded into RP statistics
+		option slot.When RP board is disconnected,this will be an OCTET STRING
+		of zero length."
+	::= { ax2000rRpBoardEntry 14 }
+
+ax2000rRpOption2CardProductCode OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Product management code of board which is loaded into RP statistics
+		option slot.When RP board is disconnected,the value is -1."
+	::= { ax2000rRpBoardEntry 15 }
+
+ax2000rRpCpuLoad1m OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The average,over the last minute,of a percentage of time that
+		this processor was utilized for processing and transferring data.
+		The rate of use CPU is -1, except that RP status is active."
+	::= { ax2000rRpBoardEntry 16 }
+
+
+ax2000rNifBoardTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Ax2000rNifBoardTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A table containing Network Interface cards (NIF) information that
+		slot is loaded."
+	::= { ax2000rNifBoard 1 }
+
+ax2000rNifBoardEntry OBJECT-TYPE
+	SYNTAX  Ax2000rNifBoardTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing NIF information about specific chassis."
+        INDEX   { ax2000rChassisIndex,ax2000rNifBoardSlotIndex }
+	::= { ax2000rNifBoardTable 1 }
+
+	Ax2000rNifBoardTableEntry ::=
+		SEQUENCE {
+		  ax2000rNifBoardSlotIndex
+			INTEGER,
+		  ax2000rNifBoardType
+			INTEGER,
+		  ax2000rNifBoardOperStatus
+			INTEGER,
+		  ax2000rNifBoardName
+			DisplayString,
+		  ax2000rNifBoardAbbreviation
+			DisplayString,
+		  ax2000rNifBoardProductCode
+			INTEGER,
+		  ax2000rNifPhysLineNumber
+			INTEGER,
+                  ax2000rNifSerialNumber
+                        DisplayString
+		}
+
+ax2000rNifBoardSlotIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Position information of NIF loading slot. The value is from 1
+		to ax2000rNifBoardNumber.
+			modelBH          : 1-2
+			model1B          : 1,3
+			model2S model2B  : 1-3
+			model4, model4S  : 1-4
+			model6H          : 1-6
+			model10,model10H : 1-10
+			model20,model20H : 1-20"
+	::= { ax2000rNifBoardEntry 1 }
+
+ax2000rNifBoardType OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Type of connecting package.The value is register value of NIF package.
+            other                                       (1)
+			8-port 10BASE-T/100BASE-TX                  (16384)
+			4-port 10BASE-T/100BASE-TX                  (16385)
+			1-port 10BASE-T/100BASE-TX                  (17153)
+			1-port 1000BASE-LX                          (16387)
+			1-port 1000BASE-SX                          (16388)
+			1-port 1000BASE-LH                          (16389)
+			4-port 100BASE-FX                           (16390)
+			4-port 100BASE-FX(middle)                   (16391)
+			4-port 100BASE-FX(long)                     (16392)
+			8-port 10BASE-T/100BASE-TX                  (16393)
+			1-port 1000BASE-LX                          (16394)
+			1-port 1000BASE-SX                          (16395)
+			1-port 1000BASE-LH8                         (16396)
+			1-port 1000BASE-LH                          (16645)
+			8-port 10BASE-T/100BASE-TX                  (16649)
+			1-port 1000BASE-LX                          (16650)
+			1-port 1000BASE-SX                          (16651)
+			1-port 1000BASE-LH8                         (16652)
+			4-port 1000BASE-X                           (16897)
+			4-port serial(V.24/V.35/X.21)               (32769)
+			8-port BRI(leasedline/dialup)               (32772)
+			4-port PRI(leasedline/dialup)               (32780)
+			2-port PRI(leasedline/dialup)               (32778)
+			4-port T1(leasedline)                       (32784)
+			2-port PRI2-port BRI(leasedline/dialup)     (32795)
+			2-port 6.3Minterface(leasedline)            (32793)
+			1-port 6.3Minterface(leasedline)            (32791)
+			4-port E1(leasedline)                       (32788)
+			8-port PRI(leasedline/dialup)               (32790)
+			8-port E1(leased line)                      (32796)
+			1-port CT3(leased line)                     (32798)
+			1-port CE3(leasedline)                      (32799)
+			2-port E3(leasedline)                       (41032)
+			2-port OC-3c/STM-1POS(single-mode)          (41090)
+			2-port OC-3c/STM-1POS(multi-mode)           (41091)
+			2-port OC-3c/STM-1POS(single-modeMPLS)      (41092)
+			2-port OC-3c/STM-1POS(multi-modeMPLS)       (41093)
+			1-port OC-12c/STM-4POS(single-mode)         (41104)
+			1-port OC-12c/STM-4POS(single-modeMPLS)     (41108)
+			1-port OC-48c/STM-16POS(single-mode)        (41120)
+			2-port T3(leasedline)                       (41024)
+			8-port OC-3c/STM-1POS(multi-mode)           (41136)
+			8-port OC-3c/STM-1POS(single-mode)          (41137)
+			4-port OC-12c/STM-4POS(multi-mode)          (41152)
+			4-port OC-12c/STM-4POS(single-mode)         (41153)
+			1-port OC-48c/STM-16POS(single-mode)        (41168)
+			1-port OC-48c/STM-16POS(single-modenif-aps) (41169)
+			1-port OC-48c/STM-16POS(single-modemiddle)  (41172)
+			1-port OC-48c/STM-16POS(single-modemiddlenif-aps)      (41173)
+			1-port OC-48c/STM-16POS(single-modelong)    (41174)
+			1-port OC-48c/STM-16POS(single-modelongnif-aps)        (41175)
+			1-port OC-3c/STM-1ATM(multi-mode)           (49152)
+			1-port OC-3c/STM-1ATM(single-mode)          (49153)
+			1-port 25MATM                               (49155)
+			8-port OC-3c/STM-1ATM(multi-mode)           (49168)
+			8-port OC-3c/STM-1ATM(single-mode)          (49169)
+			8-port OC-3c/STM-1ATM(single-mode long)     (49170)
+			2-port OC-12c/STM-4ATM(multi-mode)          (49184)
+			2-port OC-12c/STM-4ATM(single-mode)         (49185)
+			2-port OC-12c/STM-4ATM(single-mode long)    (49186)
+		The value is -1 when RP is disconnected or NIF disconnected."
+	::= { ax2000rNifBoardEntry 2 }
+
+ax2000rNifBoardOperStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		other(1),
+		active(2),
+		initialization(3),
+		down(4),
+		closed(5),
+		lock(6),
+		disconnect(32)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Operation status of Network InterFace(NIF) board.(STATUS LED)"
+	::= { ax2000rNifBoardEntry 3 }
+
+ax2000rNifBoardName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..16))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Network InterFace(NIF) board name. When RP board or NIF board is
+		disconnected,this will be an OCTET STRING of zero length."
+	::= { ax2000rNifBoardEntry 4 }
+
+ax2000rNifBoardAbbreviation OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..16))
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The abbreviation name of Network InterFace(NIF) board. When RP board
+		or NIF board is disconnected, this will be an OCTET STRING of zero
+		length."
+	::= { ax2000rNifBoardEntry 5 }
+
+ax2000rNifBoardProductCode OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The product management code of Network InterFace(NIF) board.The value
+		is -1 when RP board or NIF board is disconncted."
+	::= { ax2000rNifBoardEntry 6 }
+
+ax2000rNifPhysLineNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of Network InterFace(NIF)'s physical port.The max is 8.
+		The value is -1 when value of ax2000rNifCardType is -1 or other(1)."
+	::= { ax2000rNifBoardEntry 7 }
+
+ax2000rNifSerialNumber OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..30))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Management information (SerialNumber) of Network InterFace(NIF) package."
+        ::= { ax2000rNifBoardEntry 8 }
+
+ax2000rPhysLineTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Ax2000rPhysLineTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A table containing physical port information."
+	::= { ax2000rPhysLine 1 }
+
+ax2000rPhysLineEntry OBJECT-TYPE
+	SYNTAX  Ax2000rPhysLineTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing physical port."
+	INDEX   { ax2000rChassisIndex, ax2000rNifBoardSlotIndex, ax2000rPhysLineIndex }
+	::= { ax2000rPhysLineTable 1 }
+
+	Ax2000rPhysLineTableEntry ::=
+		SEQUENCE {
+		  ax2000rPhysLineIndex
+			INTEGER,
+		  ax2000rPhysLineConnectorType
+			INTEGER,
+		  ax2000rPhysLineOperStatus
+			INTEGER,
+		  ax2000rPhysLineIfIndexNumber
+			INTEGER
+		}
+
+ax2000rPhysLineIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Physical port number. The value is from 1 to ax2000rNifLineNumber."
+	::= { ax2000rPhysLineEntry 1 }
+
+ax2000rPhysLineConnectorType OBJECT-TYPE
+	SYNTAX  INTEGER {
+		other(1),
+		v24(2),
+		v35(5),
+		x21(6),
+		type1000BASE-LX(301),
+		type1000BASE-SX(302)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Connector type is connected physical port. The value is 1(other)
+		when connector is disconnected or connector type is unknown.When
+		displaying in pannel, requests board name of NIF,then will display it.
+		The value is -1	when RP or NIF board is disconnected."
+	::= { ax2000rPhysLineEntry 2 }
+
+ax2000rPhysLineOperStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+		other(1),
+		active(2),
+		initialization(3),
+		down(4),
+		lock(6),
+		close(7),
+		line-fault(8),
+		test(9),
+		nothing-configuration(10),
+		missing-configuration(11),
+		remote-loop-back-test-mode(12)
+	      }
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Status of physical port. The value is -1 when RP or NIF board is
+		disconnected."
+	::= { ax2000rPhysLineEntry 3 }
+
+ax2000rPhysLineIfIndexNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of ifIndex which is included in physical port.The value is -1
+		when RP board or NIF board is disconnected."
+	::= { ax2000rPhysLineEntry 4 }
+
+
+-- 
+
+ax2000rLineIfTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Ax2000rLineIfTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A table containing physical port correspond to ifIndex."
+	::= { ax2000rInterface 1 }
+
+ax2000rLineIfEntry OBJECT-TYPE
+	SYNTAX  Ax2000rLineIfTableEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing ifIndex is assigned to physical port."
+	INDEX   { ax2000rChassisIndex, ax2000rNifBoardSlotIndex, ax2000rPhysLineIndex, ax2000rLineIfIndex }
+	::= { ax2000rLineIfTable 1 }
+
+	Ax2000rLineIfTableEntry ::=
+		SEQUENCE {
+		  ax2000rLineIfIndex
+			INTEGER,
+		  ax2000rIfIndex
+			INTEGER,
+		  ax2000rIfIpAddress
+			IpAddress,
+		  ax2000rIfIpv6Address
+			OCTET STRING
+		}
+
+ax2000rLineIfIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"The value of ifIndex to distinguish entry of this table.The value is
+		from 1 to ax2000rPhysLineIfIndexNumber."
+	::= { ax2000rLineIfEntry 1 }
+
+ax2000rIfIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The value of ifIndex which is assigned to this physical port.
+		The value is 0 when ifIndex is not assigned to this physical port."
+	::= { ax2000rLineIfEntry 2 }
+
+ax2000rIfIpAddress OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The IP address correspond to ifIndex which is assigned to this
+		physical port. If IP address is not assigned, it is '0.0.0.0'."
+	::= { ax2000rLineIfEntry 3 }
+
+ax2000rIfIpv6Address OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The IPv6 address correspond to ifIndex which is assigned to this
+		physical port. If IPv6 address is not assigned,
+		it is '00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00'."
+	::= { ax2000rLineIfEntry 4 }
+
+
+-- Traps for use by AlaxalA networks AX2000R
+
+-- Traps are defined using the conventions in RFC 1215.
+
+ax2000rSystemMsgTrap TRAP-TYPE
+	ENTERPRISE      ax2000r
+	VARIABLES       { ax2000rSystemMsgType, ax2000rSystemMsgTimeStamp,
+                          ax2000rSystemMsgLevel, ax2000rSystemMsgEventPoint,
+                          ax2000rSystemMsgEventInterfaceID, ax2000rSystemMsgEventCode,
+                          ax2000rSystemMsgAdditionalCode, ax2000rSystemMsgText }
+	DESCRIPTION
+		"System message is displayed."
+	::= 1
+
+ax2000rStandbySystemUpTrap TRAP-TYPE
+	ENTERPRISE      ax2000r
+	VARIABLES       { ax2000rChassisIndex, ax2000rRmBoardIndex }
+	DESCRIPTION
+		"Standby system is restarted."
+	::= 2
+
+ax2000rStandbySystemDownTrap TRAP-TYPE
+	ENTERPRISE      ax2000r
+	VARIABLES       { ax2000rChassisIndex, ax2000rRmBoardIndex }
+	DESCRIPTION
+		"Standby system is failed."
+	::= 3
+
+ax2000rTemperatureTrap TRAP-TYPE
+	ENTERPRISE ax2000r
+	VARIABLES {
+		ax2000rChassisIndex,
+		ax2000rRmBoardIndex,
+		ax2000rTemperatureStatusIndex,
+		ax2000rTemperatureStatusDescr, 
+		ax2000rTemperatureStatusValue, 
+		ax2000rTemperatureState }
+	DESCRIPTION
+		"A ax2000rTemperatureTrap is sent if the 
+		temperature measured at a given testpoint is outside 
+		the normal range for the testpoint (i.e. is at the warning, 
+		critical, or shutdown stage)."
+	::= 4
+
+-- ATM PVC Traps
+
+ax2000rAtmPVcTrap TRAP-TYPE
+	ENTERPRISE ax2000r
+	VARIABLES {
+		ifIndex, 
+		axrAtmIntfPVcFailures, 
+		axrAtmIntfCurrentlyFailingPVcls}
+	DESCRIPTION
+		"A notification indicating that one or more PVPLs or PVCLs on
+		this interface has failed since the last axrAtmPVcFailuresTrap was
+		sent.  If this trap has not been sent for the last
+		axrAtmIntfPVcNotificationInterval, then it will be sent on the next
+		increment of axrAtmIntfPVcFailures."
+	::= 5
+
+END

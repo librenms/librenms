@@ -1,0 +1,420 @@
+--
+-- All Rights Reserved, Copyright (c) 2016, ALAXALA Networks Corp.
+--
+-- AX-AXRP-MIB.my : axAxrp group MIB file.
+--
+
+AX-AXRP-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+        Integer32, Counter64
+            FROM SNMPv2-SMI
+        TimeStamp
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        InterfaceIndexOrZero
+            FROM IF-MIB
+        axMib
+            FROM AX-SMI-MIB
+;
+
+axAxrp MODULE-IDENTITY
+    LAST-UPDATED    "201611170000Z"
+    ORGANIZATION    "ALAXALA Networks Corp."
+    CONTACT-INFO    "ALAXALA Networks Corp."
+    DESCRIPTION
+        "The MIB module for AXRP information."
+    REVISION        "201611170000Z"
+    DESCRIPTION
+        "+Modified axAxrpGroupLastTransitionTime (correction of description)"
+    REVISION        "201610170000Z"
+    DESCRIPTION
+        "Initial release."
+    ::= { axMib 200 }
+
+
+--------------------------------------------------
+-- Object Identifiers
+--------------------------------------------------
+
+
+--------------------------------------------------
+-- Object Type definitions
+--------------------------------------------------
+
+--
+--  axAxrpGroup
+--
+
+axAxrpGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AxAxrpGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table containing AXRP group information."
+    ::= { axAxrp 1 }
+
+axAxrpGroupEntry OBJECT-TYPE
+    SYNTAX      AxAxrpGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The list of AXRP group information."
+    INDEX   { axAxrpGroupRingId }
+    ::= { axAxrpGroupTable 1 }
+
+AxAxrpGroupEntry ::= SEQUENCE {
+    axAxrpGroupRingId                      Integer32,
+    axAxrpGroupRowStatus                   INTEGER,
+    axAxrpGroupMode                        INTEGER,
+    axAxrpGroupRingAttribute               INTEGER,
+    axAxrpGroupMonitoringState             INTEGER,
+    axAxrpGroupRingport1                   InterfaceIndexOrZero,
+    axAxrpGroupRingport1Shared             INTEGER,
+    axAxrpGroupRingport2                   InterfaceIndexOrZero,
+    axAxrpGroupRingport2Shared             INTEGER,
+    axAxrpGroupTransitionToFaultCounts     Counter64,
+    axAxrpGroupTransitionToNormalCounts    Counter64,
+    axAxrpGroupLastTransitionTime          TimeStamp
+}
+
+axAxrpGroupRingId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "AXRP group ring identifier."
+    ::= { axAxrpGroupEntry 1 }
+
+axAxrpGroupRowStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    valid(1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Valid/Invalid state of this entry. valid(1) fixed"
+    ::= { axAxrpGroupEntry 2 }
+
+axAxrpGroupMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    no-config(1),
+                    master(2),
+                    transit(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Operation mode of each ring ID."
+    ::= { axAxrpGroupEntry 3 }
+
+axAxrpGroupRingAttribute OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    no-config(1),
+                    rift-ring(2),
+                    rift-ring-edge1(3),
+                    rift-ring-edge2(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "When the multi ring is composed, it is an attribute of this device in the common link non-watch ring."
+    ::= { axAxrpGroupEntry 4 }
+
+axAxrpGroupMonitoringState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    init(1),
+                    disable(2),
+                    fault-monitoring(3),
+                    recovery-monitoring(4),
+                    flush-monitoring(5),
+                    not-operating(6),
+                    preempt-delay(8)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Operation and state of watch of ring."
+    ::= { axAxrpGroupEntry 5 }
+
+axAxrpGroupRingport1 OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "IfIndex of ring port 1 (port in one where Ifindex is small). This value can be zero if there are no configrations of ring port."
+    ::= { axAxrpGroupEntry 6 }
+
+axAxrpGroupRingport1Shared OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    no-ring-port(0),
+                    no-config(1),
+                    shared-edge(2),
+                    shared(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Ring port 1 is common port information."
+    ::= { axAxrpGroupEntry 7 }
+
+axAxrpGroupRingport2 OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "IfIndex of ring port 2 (port in one where Ifindex is large). This value can be zero if there are no configrations of ring port."
+    ::= { axAxrpGroupEntry 8 }
+
+axAxrpGroupRingport2Shared OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    no-ring-port(0),
+                    no-config(1),
+                    shared-edge(2),
+                    shared(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Ring port 2 is common port information."
+    ::= { axAxrpGroupEntry 9 }
+
+axAxrpGroupTransitionToFaultCounts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Frequency that shifts from state of trouble watch in state of restoration watch."
+    ::= { axAxrpGroupEntry 10 }
+
+axAxrpGroupTransitionToNormalCounts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Frequency that shifts from state of restoration watch in state of trouble watch."
+    ::= { axAxrpGroupEntry 11 }
+
+axAxrpGroupLastTransitionTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The value of sysUpTime at the time of the most recent ring 
+            state transition(from normal to fault, or from fault to normal).
+            If no transition occurs, then this object contains a zero value."
+    ::= { axAxrpGroupEntry 12 }
+
+
+--
+--  axAxrpVlanGroupTable
+--
+
+axAxrpVlanGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AxAxrpVlanGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table containing AXRP VLAN group information."
+    ::= { axAxrp 2 }
+
+axAxrpVlanGroupEntry OBJECT-TYPE
+    SYNTAX      AxAxrpVlanGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The list of AXRP VLAN group information."
+    INDEX   { axAxrpVlanGroupRingId, axAxrpVlanGroupId }
+    ::= { axAxrpVlanGroupTable 1 }
+
+AxAxrpVlanGroupEntry ::= SEQUENCE {
+    axAxrpVlanGroupRingId               Integer32,
+    axAxrpVlanGroupId                   Integer32,
+    axAxrpVlanGroupRingport1            Integer32,
+    axAxrpVlanGroupRingport1Role        INTEGER,
+    axAxrpVlanGroupRingport1OperState   INTEGER,
+    axAxrpVlanGroupRingport2            Integer32,
+    axAxrpVlanGroupRingport2Role        INTEGER,
+    axAxrpVlanGroupRingport2OperState   INTEGER
+}
+
+axAxrpVlanGroupRingId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "AXRP VLAN group ring identifier."
+    ::= { axAxrpVlanGroupEntry  1 }
+
+axAxrpVlanGroupId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "AXRP VLAN group number"
+    ::= { axAxrpVlanGroupEntry 2 }
+
+axAxrpVlanGroupRingport1 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "IfIndex of ring port 1 (port in one where Ifindex is small)"
+    ::= { axAxrpVlanGroupEntry 3 }
+
+axAxrpVlanGroupRingport1Role OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    primary(1),
+                    secondary(2),
+                    other(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Role of ring port 1"
+    ::= { axAxrpVlanGroupEntry 4 }
+
+axAxrpVlanGroupRingport1OperState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    forwarding(1),
+                    blocking(2),
+                    other(3),
+                    down(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Present of ring port 1"
+    ::= { axAxrpVlanGroupEntry 5 }
+
+axAxrpVlanGroupRingport2 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "IfIndex of ring port 2 (port in one where Ifindex is large)"
+    ::= { axAxrpVlanGroupEntry 6 }
+
+axAxrpVlanGroupRingport2Role OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    primary(1),
+                    secondary(2),
+                    other(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Role of ring port 2"
+    ::= { axAxrpVlanGroupEntry 7 }
+
+axAxrpVlanGroupRingport2OperState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    forwarding(1),
+                    blocking(2),
+                    other(3),
+                    down(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Present of ring port 2"
+    ::= { axAxrpVlanGroupEntry 8 }
+
+
+
+--------------------------------------------------
+-- Notification Type definitions
+--------------------------------------------------
+
+axAxrpNotifications         OBJECT IDENTIFIER ::= { axAxrp 0 }
+
+--
+-- axAxrp Notifications
+--
+axAxrpStateTransitionTrap NOTIFICATION-TYPE
+    OBJECTS     {
+                    axAxrpGroupRingId,
+                    axAxrpGroupMode,
+                    axAxrpGroupRingAttribute,
+                    axAxrpGroupMonitoringState
+                }
+    STATUS      current
+    DESCRIPTION
+            "axAxrp State Transition trap."
+    ::= { axAxrpNotifications 1 }
+
+
+--------------------------------------------------
+-- Conformance Statements
+--------------------------------------------------
+
+--
+-- Confoemance identifier
+--
+
+axAxrpConformance               OBJECT IDENTIFIER ::= { axAxrp 1000 }
+axAxrpCompliances               OBJECT IDENTIFIER ::= { axAxrpConformance 1 }
+axAxrpGroups                    OBJECT IDENTIFIER ::= { axAxrpConformance 2 }
+
+--
+-- Compliance
+--
+
+axAxrpCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+            "The compliance statement for AXRP."
+    MODULE      -- this module
+        MANDATORY-GROUPS    {
+                                axAxrpGroup,
+                                axAxrpNotificationGroup
+                            }
+    ::= { axAxrpCompliances 1 }
+
+--
+-- Object Group
+--
+
+axAxrpGroup OBJECT-GROUP
+    OBJECTS     {
+                -- axAxrpGroupTable
+                    axAxrpGroupRowStatus,
+                    axAxrpGroupMode,
+                    axAxrpGroupRingAttribute,
+                    axAxrpGroupMonitoringState,
+                    axAxrpGroupRingport1,
+                    axAxrpGroupRingport1Shared,
+                    axAxrpGroupRingport2,
+                    axAxrpGroupRingport2Shared,
+                    axAxrpGroupTransitionToFaultCounts,
+                    axAxrpGroupTransitionToNormalCounts,
+                    axAxrpGroupLastTransitionTime,
+                    
+                -- axAxrpVlanGroupTable
+                    axAxrpVlanGroupRingport1,
+                    axAxrpVlanGroupRingport1Role,
+                    axAxrpVlanGroupRingport1OperState,
+                    axAxrpVlanGroupRingport2,
+                    axAxrpVlanGroupRingport2Role,
+                    axAxrpVlanGroupRingport2OperState
+                }
+    STATUS      current
+    DESCRIPTION
+            "The collection of objects which are used to provide axAxrp group."
+    ::= { axAxrpGroups 1 }
+
+
+--
+-- Notification Group
+--
+axAxrpNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                        axAxrpStateTransitionTrap
+                    }
+    STATUS          current
+    DESCRIPTION
+            "The collection of notifications of axAxrp group."
+    ::= { axAxrpGroups 10 }
+
+END
