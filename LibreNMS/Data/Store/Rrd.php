@@ -58,6 +58,7 @@ class Rrd extends BaseDatastore
     private $version;
     /** @var string */
     private $rrdcached;
+    private $rrd_file_cache = [];
 
     private array $rra;
     /** @var int */
@@ -427,6 +428,17 @@ class Rrd extends BaseDatastore
         if (in_array($command, ['last', 'list', 'lastupdate']) && $this->init(false)) {
             // send this to our synchronous process so output is guaranteed
             $output = $this->sync_process->sendCommand(implode(' ', $cmd));
+            while (! strrpos((string) $output[0], 'OK u:')) {
+                $moreoutput = $this->sync_process->getOutput();
+
+                // Error if we get no output before we reach the end of command
+                if (! $moreoutput[0] && ! $moreoutput[1]) {
+                    throw new RrdException('End of command output not found for command: ' . implode(' ', $cmd));
+                }
+
+                $output[0] .= $moreoutput[0];
+                $output[1] .= $moreoutput[1];
+            }
         } elseif ($this->init()) {
             // don't care about the return of other commands, so send them to the faster async process
             $output = $this->async_process->sendCommand(implode(' ', $cmd));
@@ -553,11 +565,21 @@ class Rrd extends BaseDatastore
      */
     public function checkRrdExists($filename): bool
     {
-        if ($this->rrdcached && version_compare($this->version, '1.5', '>=')) {
-            $check_output = implode('', $this->command('last', $filename));
+        if ($this->rrdcached) {
             $filename = str_replace([$this->rrd_dir . '/', $this->rrd_dir], '', $filename);
+            [$hostpart, $filepart] = explode('/', $filename, 2);
 
-            return ! (str_contains($check_output, $filename) && str_contains($check_output, 'No such file or directory'));
+            // Error if no hostname was found
+            if (! $hostpart) {
+                throw new RrdException('Bad filename passed to checkRrdExists: ' . $filename);
+            }
+
+            // Check and fill cache for this host if needed
+            if (! isset($this->rrd_file_cache[$hostpart])) {
+                $this->rrd_file_cache[$hostpart] = array_fill_keys(explode("\n", trim($this->command('list', '/' . $hostpart, ['--recursive'])[0] ?? '')), true);
+            }
+
+            return isset($this->rrd_file_cache[$hostpart][$filepart]);
         } else {
             return is_file($filename);
         }
