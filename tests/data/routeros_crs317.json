@@ -5986,5 +5986,176 @@
                 }
             ]
         }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "ap.jason.corp.local",
+                    "remote_port": "bridge",
+                    "remote_platform": "",
+                    "remote_version": "",
+                    "ifAlias": "server-sw.jason.corp.local - SFP+1",
+                    "ifDescr": "sfp-sfpplus15",
+                    "ifName": "sfp-sfpplus15"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "core-sw.jason.corp.local",
+                    "remote_port": "bridge1/ether1",
+                    "remote_platform": "",
+                    "remote_version": "",
+                    "ifAlias": "server-sw.jason.corp.local - SFP+1",
+                    "ifDescr": "sfp-sfpplus15",
+                    "ifName": "sfp-sfpplus15"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "core-sw.jason.corp.local",
+                    "remote_port": "bridge1/shop-trunk/sfp-sfpplus14",
+                    "remote_platform": "",
+                    "remote_version": "",
+                    "ifAlias": "server-sw.jason.corp.local - SFP+1",
+                    "ifDescr": "sfp-sfpplus15",
+                    "ifName": "sfp-sfpplus15"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "router.jason.corp.local",
+                    "remote_port": "bridge1/server-trunk/ether6",
+                    "remote_platform": "",
+                    "remote_version": "",
+                    "ifAlias": "server-sw.jason.corp.local - SFP+1",
+                    "ifDescr": "sfp-sfpplus15",
+                    "ifName": "sfp-sfpplus15"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "router.jason.corp.local",
+                    "remote_port": "Guest",
+                    "remote_platform": "",
+                    "remote_version": "MikroTik RouterOS 6.44.2 (stable) RB3011UiAS",
+                    "ifAlias": "server-sw.jason.corp.local - SFP+1",
+                    "ifDescr": "sfp-sfpplus15",
+                    "ifName": "sfp-sfpplus15"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "SEP0015FAFE4806",
+                    "remote_port": "Port 1",
+                    "remote_platform": "",
+                    "remote_version": "",
+                    "ifAlias": "server-sw.jason.corp.local - SFP+1",
+                    "ifDescr": "sfp-sfpplus15",
+                    "ifName": "sfp-sfpplus15"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "router.jason.corp.local",
+                    "remote_port": "ether6",
+                    "remote_platform": "",
+                    "remote_version": "MikroTik RouterOS 6.44.2 (stable) RB3011UiAS",
+                    "ifAlias": "server-sw.jason.corp.local - SFP+2",
+                    "ifDescr": "sfp-sfpplus16",
+                    "ifName": "sfp-sfpplus16"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "router.jason.corp.local",
+                    "remote_port": "Phones",
+                    "remote_platform": "",
+                    "remote_version": "MikroTik RouterOS 6.44.2 (stable) RB3011UiAS",
+                    "ifAlias": "server-sw.jason.corp.local - SFP+2",
+                    "ifDescr": "sfp-sfpplus16",
+                    "ifName": "sfp-sfpplus16"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "ap.jason.corp.local",
+                    "remote_port": "bridge",
+                    "remote_platform": "",
+                    "remote_version": "MikroTik RouterOS 6.43 (stable) RB941-2nD",
+                    "ifAlias": "shop-sw.jason.corp.local - SFP+1",
+                    "ifDescr": "sfp-sfpplus13",
+                    "ifName": "sfp-sfpplus13"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "router.jason.corp.local",
+                    "remote_port": "ether4",
+                    "remote_platform": "",
+                    "remote_version": "MikroTik RouterOS 6.44.2 (stable) RB3011UiAS",
+                    "ifAlias": "shop-sw.jason.corp.local - SFP+1",
+                    "ifDescr": "sfp-sfpplus13",
+                    "ifName": "sfp-sfpplus13"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "router.jason.corp.local",
+                    "remote_port": "Phones",
+                    "remote_platform": "",
+                    "remote_version": "MikroTik RouterOS 6.44.2 (stable) RB3011UiAS",
+                    "ifAlias": "shop-sw.jason.corp.local - SFP+1",
+                    "ifDescr": "sfp-sfpplus13",
+                    "ifName": "sfp-sfpplus13"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "router.jason.corp.local",
+                    "remote_port": "Guest",
+                    "remote_platform": "",
+                    "remote_version": "MikroTik RouterOS 6.44.2 (stable) RB3011UiAS",
+                    "ifAlias": "shop-sw.jason.corp.local - SFP+2",
+                    "ifDescr": "sfp-sfpplus14",
+                    "ifName": "sfp-sfpplus14"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "SEP001795B0F381.jason.corp.local",
+                    "remote_port": "SW PORT",
+                    "remote_platform": "",
+                    "remote_version": "Cisco IP Phone 7941G,V, SCCP41.9-2-1S",
+                    "ifAlias": "shop-sw.jason.corp.local - SFP+2",
+                    "ifDescr": "sfp-sfpplus14",
+                    "ifName": "sfp-sfpplus14"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "SEP001930D4A025.jason.corp.local",
+                    "remote_port": "SW PORT",
+                    "remote_platform": "",
+                    "remote_version": "Cisco IP Phone 7941G,V1, SCCP41.9-2-1S",
+                    "ifAlias": "shop-sw.jason.corp.local - SFP+2",
+                    "ifDescr": "sfp-sfpplus14",
+                    "ifName": "sfp-sfpplus14"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "router.jason.corp.local",
+                    "remote_port": "Phones",
+                    "remote_platform": "",
+                    "remote_version": "MikroTik RouterOS 6.44.2 (stable) RB3011UiAS",
+                    "ifAlias": "to port 8 on router.jason.corp.local",
+                    "ifDescr": "ether1",
+                    "ifName": "ether1"
+                }
+            ]
+        }
     }
 }

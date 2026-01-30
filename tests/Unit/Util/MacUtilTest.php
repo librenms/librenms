@@ -60,6 +60,7 @@ final class MacUtilTest extends TestCase
             ['001234-ABCDEF',     '001234abcdef'],
             ['0012.34AB.CDEF',    '001234abcdef'],
             ['00:02:04:0B:0D:0F', '0002040b0d0f'],
+            ['00 02 04 0B 0D 0F', '0002040b0d0f'],
             ['0:2:4:B:D:F',       '0002040b0d0f'],
             ['0:2:4:B:D:F',       '0002040b0d0f'],
             ['00d9.d110.21f9',    '00d9d11021f9'],
