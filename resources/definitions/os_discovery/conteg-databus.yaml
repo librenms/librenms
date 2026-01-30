@@ -1,8 +1,4 @@
 modules:
-    #os:
-        #serial:  
-        #location: 
-        #version: 
     sensors:
         additional_oids:
             data:
