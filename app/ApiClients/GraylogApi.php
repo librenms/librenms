@@ -66,10 +66,16 @@ class GraylogApi
     }
 
     /**
-     * Query the Graylog server
+     * Query the Graylog server relative time
      */
-    public function query(string $query = '*', int $range = 0, int $limit = 0, int $offset = 0, ?string $sort = null, ?string $filter = null): array
-    {
+    public function queryRelative(
+        string $query = '*',
+        int $range = 0,
+        int $limit = 0,
+        int $offset = 0,
+        ?string $sort = null,
+        ?string $filter = null
+    ): array {
         if (! $this->isConfigured()) {
             return [];
         }
@@ -82,6 +88,39 @@ class GraylogApi
         $data = [
             'query' => $query,
             'range' => $range,
+            'limit' => $limit,
+            'offset' => $offset,
+            'sort' => $sort,
+            'filter' => $filter,
+        ];
+
+        $response = $this->client->get($uri, $data)->throw();
+
+        return $response->json() ?: [];
+    }
+
+    /**
+     * Query the Graylog server absolute time
+     */
+    public function queryAbsolute(
+        string $query = '*',
+        string $from = '',
+        string $to = '',
+        int $limit = 0,
+        int $offset = 0,
+        ?string $sort = null,
+        ?string $filter = null
+    ): array {
+        if (! $this->isConfigured()) {
+            return [];
+        }
+
+        $uri = $this->api_prefix . '/search/universal/absolute';
+
+        $data = [
+            'query' => $query,
+            'from' => $from,
+            'to' => $to,
             'limit' => $limit,
             'offset' => $offset,
             'sort' => $sort,
