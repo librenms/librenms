@@ -1,11 +1,11 @@
 <?php
 
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Util\Html;
 use LibreNMS\Util\Mac;
 
 // FIXME - REWRITE!
 $hostname = $device['hostname'];
-$hostid = $device['port_id'];
 $ifname = $port['ifDescr'];
 $ifIndex = $port['ifIndex'];
 $speed = \LibreNMS\Util\Number::formatSi($port['ifSpeed'], 2, 0, 'bps');
@@ -119,8 +119,8 @@ if ($vars['subview'] == 'top10') {
 ";
     unset($query);
 } else {
-    $query = 'SELECT *, (M.cipMacHCSwitchedBytes_input_rate + M.cipMacHCSwitchedBytes_output_rate) as bps FROM `mac_accounting` AS M,
-                       `ports` AS I, `devices` AS D WHERE M.port_id = ? AND I.port_id = M.port_id AND I.device_id = D.device_id ORDER BY bps DESC';
+    $query = 'SELECT *, (M.bps_in + M.bps_out) as bps FROM `mac_accounting` AS M,
+                       `ports` AS I WHERE M.port_id = ? AND I.port_id = M.port_id ORDER BY bps DESC';
     $param = [$port['port_id']];
 
     foreach (dbFetchRows($query, $param) as $acc) {
@@ -129,35 +129,27 @@ if ($vars['subview'] == 'top10') {
         } else {
             $row_colour = LibrenmsConfig::get('list_colour.odd');
         }
-
-        $addy = dbFetchRow('SELECT * FROM ipv4_mac where mac_address = ?', [$acc['mac']]);
-        // $name = gethostbyaddr($addy['ipv4_address']); FIXME - Maybe some caching for this?
-        $arp_host = dbFetchRow('SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$addy['ipv4_address']]);
+        $ipv4 = \App\Models\Ipv4Mac::where('mac_address', $acc['mac'])->value('ipv4_address');
+        $arp_host = dbFetchRow('SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$ipv4]);
         $arp_host = cleanPort($arp_host);
         if ($arp_host) {
             $arp_name = generate_device_link($arp_host);
             $arp_name .= ' ' . generate_port_link($arp_host);
         } else {
-            unset($arp_if);
+            $arp_name = '';
         }
 
-        if ($name == $addy['ipv4_address']) {
-            unset($name);
+        $name ??= $ipv4; // i don't know wtf $name is
+        if ($name == $ipv4) {
+            $name = '';
         }
 
-        if (dbFetchCell('SELECT count(*) FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?', [$acc['device_id'], $addy['ipv4_address']])) {
-            $peer_info = dbFetchRow('SELECT * FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?', [$acc['device_id'], $addy['ipv4_address']]);
-        } else {
-            unset($peer_info);
-        }
-
-        if ($peer_info) {
+        $astext = '';
+        $asn = '';
+        if (dbFetchCell('SELECT count(*) FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?', [$acc['device_id'], $ipv4])) {
+            $peer_info = dbFetchRow('SELECT * FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?', [$acc['device_id'], $ipv4]);
             $asn = 'AS' . $peer_info['bgpPeerRemoteAs'];
             $astext = $peer_info['astext'];
-        } else {
-            unset($as);
-            unset($astext);
-            unset($asn);
         }
 
         if ($vars['graph']) {
@@ -171,10 +163,10 @@ if ($vars['subview'] == 'top10') {
                 $asn = 'No Session';
             }
 
-            echo "<div style='display: block; padding: 3px; margin: 3px; min-width: 221px; max-width:221px; min-height:90px; max-height:90px; text-align: center; float: left; background-color: #e5e5e5;'>
-      " . $addy['ipv4_address'] . ' - ' . $asn . "
+            echo "<div style='display: block; padding: 3px; margin: 3px; min-width: 221px; max-width:221px; min-height:90px; max-height:90px; text-align: center; float: left;'>
+      " . $ipv4 . ' - ' . $asn . "
           <a href='#' onmouseover=\"return overlib('\
-     <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #555555;\'>" . $name . ' - ' . $addy['ipv4_address'] . ' - ' . $asn . "</div>\
+     <div style=\'font-size: 16px; padding:5px; font-weight: bold; color: #555555;\'>" . $name . ' - ' . $ipv4 . ' - ' . $asn . "</div>\
      <img src=\'graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=" . LibrenmsConfig::get('time.twoday') . '&amp;to=' . LibrenmsConfig::get('time.now') . "&amp;width=450&amp;height=150\'>\
      ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\" >
           <img src='graph.php?id=" . $acc['ma_id'] . "&amp;type=$graph_type&amp;from=" . LibrenmsConfig::get('time.twoday') . '&amp;to=' . LibrenmsConfig::get('time.now') . "&amp;width=213&amp;height=45'></a>
@@ -188,27 +180,28 @@ if ($vars['subview'] == 'top10') {
       <table>
         <tr>
           <td class=list-large width=200>' . Mac::parse($acc['mac'])->readable() . '</td>
-          <td class=list-large width=200>' . $addy['ipv4_address'] . '</td>
+          <td class=list-large width=200>' . $ipv4 . '</td>
           <td class=list-large width=500>' . $name . ' ' . $arp_name . '</td>
-          <td class=list-large width=100>' . \LibreNMS\Util\Number::formatSi($acc['cipMacHCSwitchedBytes_input_rate'] / 8, 2, 3, 'bps') . '</td>
-          <td class=list-large width=100>' . \LibreNMS\Util\Number::formatSi($acc['cipMacHCSwitchedBytes_output_rate'] / 8, 2, 3, 'bps') . '</td>
+          <td class=list-large width=100>' . \LibreNMS\Util\Number::formatSi($acc['bps_in'], 2, 3, 'bps') . '</td>
+          <td class=list-large width=100>' . \LibreNMS\Util\Number::formatSi($acc['bps_out'], 2, 3, 'bps') . '</td>
         </tr>
       </table>
+      </div>
+      <div class="row">
     ';
 
-            $peer_info['astext'];
+            $graph_array = [
+                'type' => $graph_type,
+                'id' => $acc['ma_id'],
+                'height' => 100,
+                'width' => 216,
+                'to' => Config::get('time.now'),
+            ];
 
-            $graph_array['type'] = $graph_type;
-            $graph_array['id'] = $acc['ma_id'];
-            $graph_array['height'] = '100';
-            $graph_array['width'] = '216';
-            $graph_array['to'] = LibrenmsConfig::get('time.now');
-            echo '<tr bgcolor="' . $bg_colour . '"><td colspan="7">';
-
-            include 'includes/html/print-graphrow.inc.php';
-
-            echo '</td></tr>';
-
+            foreach (Html::graphRow($graph_array) as $graph) {
+                echo "<div class='col-md-2'>$graph</div>";
+            }
+            echo '</div>';
             $i++;
         }//end if
     }//end foreach
