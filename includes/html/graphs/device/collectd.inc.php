@@ -26,7 +26,7 @@ require 'includes/html/collectd/definitions.php';
 function makeTextBlock($text, $fontfile, $fontsize, $width)
 {
     // TODO: handle explicit line-break!
-    $words = explode(' ', $text);
+    $words = explode(' ', (string) $text);
     $lines = [$words[0]];
     $currentLine = 0;
     foreach ($words as $word) {
@@ -93,16 +93,16 @@ function error($code, $code_msg, $title, $msg)
     imageline($png, 1, $h - 2, $w, $h - 2, $c_brb);
     imageline($png, 0, $h - 1, $w, $h - 1, $c_brb);
 
-    imagestring($png, 4, ceil(($w - strlen($title) * imagefontwidth(4)) / 2), 10, $title, $c_txt);
+    imagestring($png, 4, ceil(($w - strlen((string) $title) * imagefontwidth(4)) / 2), 10, (string) $title, $c_txt);
     imagestring($png, 5, 60, 35, sprintf('%s [%d]', $code_msg, $code), $c_etxt);
     if (function_exists('imagettfbbox') && is_file(LibrenmsConfig::get('error_font'))) {
         // Detailled error message
         $errorfont = LibrenmsConfig::get('error_font');
         $fmt_msg = makeTextBlock($msg, $errorfont, 10, $w - 86);
-        $fmtbox = imagettfbbox(12, 0, $errorfont, $fmt_msg);
-        imagettftext($png, 10, 0, 55, 35 + 3 + imagefontwidth(5) - $fmtbox[7] + $fmtbox[1], $c_txt, $errorfont, $fmt_msg);
+        $fmtbox = imagettfbbox(12, 0, $errorfont, (string) $fmt_msg);
+        imagettftext($png, 10, 0, 55, 35 + 3 + imagefontwidth(5) - $fmtbox[7] + $fmtbox[1], $c_txt, $errorfont, (string) $fmt_msg);
     } else {
-        imagestring($png, 4, 53, 35 + 6 + imagefontwidth(5), $msg, $c_txt);
+        imagestring($png, 4, 53, 35 + 6 + imagefontwidth(5), (string) $msg, $c_txt);
     }
 
     imagepng($png);
@@ -166,7 +166,7 @@ if (is_null($type)) {
 
 $tinst = read_var('c_type_instance', $_GET, '');
 
-$graph_identifier = $host . '/' . $plugin . (strlen($pinst) ? '-' . $pinst : '') . '/' . $type . (strlen($tinst) ? '-' . $tinst : '-*');
+$graph_identifier = $host . '/' . $plugin . (strlen($pinst) ? '-' . $pinst : '') . '/' . $type . (strlen((string) $tinst) ? '-' . $tinst : '-*');
 
 $timespan = read_var('timespan', $_GET, LibrenmsConfig::get('timespan.0.name'));
 $timespan_ok = false;
@@ -193,7 +193,7 @@ if (count($all_tinst) == 0) {
 load_graph_definitions($logscale, $tinylegend);
 
 $pinst = strlen($pinst) == 0 ? null : $pinst;
-$tinst = strlen($tinst) == 0 ? null : $tinst;
+$tinst = strlen((string) $tinst) == 0 ? null : $tinst;
 
 $opts = [];
 $opts['timespan'] = $timespan;

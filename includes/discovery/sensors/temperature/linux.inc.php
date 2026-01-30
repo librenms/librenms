@@ -5,7 +5,6 @@
  * requires snmp extend agent script from librenms-agent
  */
 
-use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
 
 $sensor_oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.1';
@@ -20,7 +19,7 @@ if (is_numeric($value)) {
 if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.232.')) {
     echo 'HP_ILO ';
     $oids = snmp_walk($device, '.1.3.6.1.4.1.232.6.2.6.8.1.2.1', '-Osqn', '');
-    $oids = trim($oids);
+    $oids = trim((string) $oids);
     foreach (explode("\n", $oids) as $data) {
         $data = trim($data);
         if ($data != '') {
@@ -44,7 +43,7 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.232.')) {
     }
 }
 
-if (preg_match('/(Linux).+(ntc)/', $device['sysDescr'])) {
+if (preg_match('/(Linux).+(ntc)/', (string) $device['sysDescr'])) {
     $sensor_type = 'chip_axp209_temperature';
     $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.10.112.111.119.101.114.45.115.116.97.';
     $lowlimit = -40;
@@ -59,4 +58,4 @@ if (preg_match('/(Linux).+(ntc)/', $device['sysDescr'])) {
     }
 }
 
-include LibrenmsConfig::get('install_dir') . '/includes/discovery/sensors/temperature/supermicro.inc.php';
+include base_path('includes/discovery/sensors/temperature/supermicro.inc.php');

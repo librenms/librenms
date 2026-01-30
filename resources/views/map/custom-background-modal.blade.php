@@ -67,11 +67,11 @@
             error: '',
             resetBackground() {
                 this.type = this.initial_type;
-                this.color = 'color' in this.initial_data ? this.initial_data.color : '{{ Config::get('custom_map.background_data.color') }}';
-                this.lat = 'lat' in this.initial_data ? this.initial_data.lat : {{ (float) Config::get('custom_map.background_data.lat') }};
-                this.lng = 'lng' in this.initial_data ? this.initial_data.lng : {{ (float) Config::get('custom_map.background_data.lng') }};
-                this.zoom = 'zoom' in this.initial_data ? this.initial_data.zoom : {{ (int) Config::get('custom_map.background_data.zoom') }};
-                this.layer = 'layer' in this.initial_data ? this.initial_data.layer :  {{ Js::from(Config::get('custom_map.background_data.layer')) }};
+                this.color = 'color' in this.initial_data ? this.initial_data.color : '{{ LibrenmsConfig::get('custom_map.background_data.color') }}';
+                this.lat = 'lat' in this.initial_data ? this.initial_data.lat : {{ (float) LibrenmsConfig::get('custom_map.background_data.lat') }};
+                this.lng = 'lng' in this.initial_data ? this.initial_data.lng : {{ (float) LibrenmsConfig::get('custom_map.background_data.lng') }};
+                this.zoom = 'zoom' in this.initial_data ? this.initial_data.zoom : {{ (int) LibrenmsConfig::get('custom_map.background_data.zoom') }};
+                this.layer = 'layer' in this.initial_data ? this.initial_data.layer :  {{ Js::from(LibrenmsConfig::get('custom_map.background_data.layer')) }};
                 this.image = this.initial_data['original_filename'];
                 this.image_content = null;
                 this.show_image_export = (! 'engine' in this.initial_data) || ! ['google', 'bing'].includes(this.initial_data['engine']);

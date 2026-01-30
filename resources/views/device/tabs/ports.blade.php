@@ -1,5 +1,12 @@
-@extends('device.submenu')
+@extends('layouts.librenmsv1')
 
-@section('tabcontent')
+@section('content')
+    <x-device.page :device="$device" :dropdown-links="$data['dropdownLinks'] ?? []">
+    @isset($data['submenu'])
+        <x-submenu :title="$title" :menu="$data['submenu']" :device-id="$device->device_id" :current-tab="$current_tab" :selected="$data['tab']" />
+    @endisset
+
     @includeFirst(['device.tabs.ports.' . $data['tab'], 'device.tabs.ports.detail'])
+
+    </x-device.page>
 @endsection

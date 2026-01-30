@@ -26,7 +26,7 @@ namespace LibreNMS\Alert\Transport;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 
-class WeechatBot extends Transport
+class Weechatbot extends Transport
 {
     protected string $name = 'Weechat Bot';
 
@@ -46,7 +46,7 @@ class WeechatBot extends Transport
         }
 
         $fp->write($pre . $alert_data['title']);
-        foreach (preg_split('/((\r?\n)|(\r\n?))/', $alert_data['msg']) as $line) {
+        foreach (preg_split('/((\r?\n)|(\r\n?))/', (string) $alert_data['msg']) as $line) {
             $fp->write($pre . $line);
         }
         $fp->close();

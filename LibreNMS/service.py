@@ -1,9 +1,10 @@
 import logging
 import os
-import pymysql  # pylint: disable=import-error
 import sys
 import threading
 import time
+
+import pymysql  # pylint: disable=import-error
 
 import LibreNMS
 from LibreNMS.config import DBConfig
@@ -15,6 +16,7 @@ except ImportError:
 
 from datetime import timedelta
 from datetime import datetime
+from enum import Enum
 from platform import python_version
 from time import sleep
 from socket import gethostname
@@ -36,6 +38,13 @@ except ImportError:
 
 
 logger = logging.getLogger(__name__)
+
+
+class LogOutput(Enum):
+    NONE = "none"
+    PASSTHROUGH = "passthrough"
+    LOGGER = "logger"
+    FILE = "file"
 
 
 class ServiceConfig(DBConfig):
@@ -90,6 +99,7 @@ class ServiceConfig(DBConfig):
 
     redis_host = "localhost"
     redis_port = 6379
+    redis_scheme = "tcp"
     redis_db = 0
     redis_user = None
     redis_pass = None
@@ -100,7 +110,7 @@ class ServiceConfig(DBConfig):
     redis_sentinel_service = None
     redis_timeout = 60
 
-    log_output = False
+    log_output = LogOutput.NONE
     logdir = "logs"
 
     watchdog_enabled = False
@@ -221,6 +231,9 @@ class ServiceConfig(DBConfig):
         self.redis_port = int(
             os.getenv("REDIS_PORT", config.get("redis_port", ServiceConfig.redis_port))
         )
+        self.redis_scheme = os.getenv(
+            "REDIS_SCHEME", config.get("redis_scheme", ServiceConfig.redis_scheme)
+        )
         self.redis_socket = os.getenv(
             "REDIS_SOCKET", config.get("redis_socket", ServiceConfig.redis_socket)
         )
@@ -242,9 +255,11 @@ class ServiceConfig(DBConfig):
         self.redis_timeout = int(
             os.getenv(
                 "REDIS_TIMEOUT",
-                self.alerting.frequency
-                if self.alerting.frequency != 0
-                else self.redis_timeout,
+                (
+                    self.alerting.frequency
+                    if self.alerting.frequency != 0
+                    else self.redis_timeout
+                ),
             )
         )
 
@@ -509,15 +524,21 @@ class Service:
         )
         logger.info(
             "Queue Workers: Discovery={} Poller={} Services={} Alerting={} Billing={} Ping={}".format(
-                self.config.discovery.workers
-                if self.config.discovery.enabled
-                else "disabled",
-                self.config.poller.workers
-                if self.config.poller.enabled
-                else "disabled",
-                self.config.services.workers
-                if self.config.services.enabled
-                else "disabled",
+                (
+                    self.config.discovery.workers
+                    if self.config.discovery.enabled
+                    else "disabled"
+                ),
+                (
+                    self.config.poller.workers
+                    if self.config.poller.enabled
+                    else "disabled"
+                ),
+                (
+                    self.config.services.workers
+                    if self.config.services.enabled
+                    else "disabled"
+                ),
                 "enabled" if self.config.alerting.enabled else "disabled",
                 "enabled" if self.config.billing.enabled else "disabled",
                 "enabled" if self.config.ping.enabled else "disabled",
@@ -708,6 +729,7 @@ class Service:
                 sentinel=self.config.redis_sentinel,
                 sentinel_service=self.config.redis_sentinel_service,
                 socket_timeout=self.config.redis_timeout,
+                ssl=(self.config.redis_scheme == "tls"),
             )
         except ImportError:
             if self.config.distributed:

@@ -13,7 +13,7 @@
 Juniper-POLICY-MIB  DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, Counter64, IpAddress,
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32, Counter32, Counter64, IpAddress,
     Unsigned32
         FROM SNMPv2-SMI
     RowStatus, TruthValue, DisplayString, TEXTUAL-CONVENTION
@@ -26,7 +26,7 @@ IMPORTS
         FROM Juniper-MIBs;
 
 juniPolicyMIB  MODULE-IDENTITY
-    LAST-UPDATED "200508081821Z"  -- 08-Aug-05 02:21 PM EDT
+    LAST-UPDATED "201209121820Z"  -- 12-Sep-12 02:20 PM EDT
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
         "       Juniper Networks, Inc.
@@ -38,6 +38,9 @@ juniPolicyMIB  MODULE-IDENTITY
     DESCRIPTION
         "The Policy MIB for the Juniper Networks enterprise."
     -- Revision History
+    REVISION    "201209121820Z"  -- 12-Sep-12 02:20 PM EDT  - JUNOSe 14.1
+    DESCRIPTION
+        "Add SNMP Trap support on Policy Resource Exhaustion."
     REVISION    "200508081821Z"  -- 08-Aug-05 02:21 PM EDT  - JUNOSe 7.2
     DESCRIPTION
         "Add support for ATM Cell Mode configuration."
@@ -141,18 +144,84 @@ JuniRateLimitProfileType ::= TEXTUAL-CONVENTION
                     oneRate(1),
                     twoRate(2) }
 
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- MIB Structure
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPolicyObjects              OBJECT IDENTIFIER ::= { juniPolicyMIB 1 }
+juniPolicyTrap                 OBJECT IDENTIFIER ::= { juniPolicyMIB 0 }
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 -- Managed objects
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-juniPolicyObjects              OBJECT IDENTIFIER ::= { juniPolicyMIB 1 }
 juniClassifierControlList      OBJECT IDENTIFIER ::= { juniPolicyObjects 1 }
 juniRateLimitControlList       OBJECT IDENTIFIER ::= { juniPolicyObjects 2 }
 juniPolicy                     OBJECT IDENTIFIER ::= { juniPolicyObjects 3 }
 juniPolicyIf                   OBJECT IDENTIFIER ::= { juniPolicyObjects 4 }
 juniPolicyProfile              OBJECT IDENTIFIER ::= { juniPolicyObjects 5 }
 juniPolicyStatistics           OBJECT IDENTIFIER ::= { juniPolicyObjects 6 }
-juniTrafficShapeControlList    OBJECT IDENTIFIER ::= { juniPolicyObjects 7 }
+juniTrafficShapeControlList    OBJECT IDENTIFIER ::= { juniPolicyObjects 7 } 
+juniPolicyTrapObject           OBJECT IDENTIFIER ::= { juniPolicyObjects 8 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+--
+-- The juniPolicyTrap OBJECT IDENTIFIER is used to define SNMPv2 notifications
+-- that may be translated into SNMPv1 traps.
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+juniPolicyResourceExhaustion NOTIFICATION-TYPE
+OBJECTS {
+    juniPolicyResourceSlotNumber,
+    juniPolicyResourcePoolType,
+    juniPolicyResourceDirection }
+    STATUS      current
+    DESCRIPTION
+         "Notification displays the slot number, resource pool type,
+          and resource direction type on policy resources exhaustion"
+    ::= { juniPolicyTrap 1 }
+    
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notification control objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+juniPolicyResourceSlotNumber OBJECT-TYPE
+    SYNTAX      	Integer32 (0..255)
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+        "Displays the slot number in which the policy resource exhausted."
+    ::= { juniPolicyTrapObject 1 }
+
+
+juniPolicyResourcePoolType OBJECT-TYPE
+    SYNTAX      	INTEGER {
+                        ipPolicyDescriptor(0),
+                        l2PolicyDescriptor(1),
+                        rateLimiter(2),
+                        statsBlock(3),
+                        camTotalEntries(4),
+                        softwareLookupRuleSet(5),
+                        parentGroup(6)             
+                    }
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+        "Displays the policy resource pool type of the policy resource exhausted."
+    ::= { juniPolicyTrapObject 2 }
+
+
+juniPolicyResourceDirection OBJECT-TYPE
+    SYNTAX      	INTEGER {
+                        ingress(0),
+                        egress(1),
+                        both(2)
+                    }
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+        "Displays the policy resource pool direction (Ingress or Egress) of the policy resource exhausted."
+    ::= { juniPolicyTrapObject 3 }
 
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

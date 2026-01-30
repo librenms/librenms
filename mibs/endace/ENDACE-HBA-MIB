@@ -1,0 +1,286 @@
+-- 
+-- LEGAL NOTICE:
+-- This source code:
+-- 
+-- a) is a proprietary trade secret of Endace Technology Limited or any of
+-- its related or affiliated companies, a New Zealand company, and its
+-- suppliers and licensors ('Endace'). You must keep it strictly
+-- confidential, and you must not copy, modify, disclose or distribute any
+-- part of it to anyone else, without the prior written
+-- authorisation of Endace Limited;
+-- 
+-- b) may also be part of inventions that are protected by patents and
+-- patent applications; and
+-- 
+-- c) is copyright (C) to Endace, 2012 to 2021. All rights reserved.
+--
+
+ENDACE-HBA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    endace
+        FROM ENDACE-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    ;
+
+hbaMIB MODULE-IDENTITY
+    LAST-UPDATED  "202107210349Z" -- July 21, 2021
+    ORGANIZATION
+        "Endace Technology"
+    CONTACT-INFO
+        "postal: Endace Technology
+         6th floor
+         KPMG Centre
+         85 Alexandra Street
+         Hamilton 3204
+         New Zealand
+
+         email:   support@endace.com"
+    DESCRIPTION
+        "Details about the optional Host Bus Adapter"
+    ::= { endace 14 }
+
+hbaNotifications OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Top level of all Host Bus Adapter notifications"
+    ::= { hbaMIB 0 }
+
+hbaFcStateLinkUp NOTIFICATION-TYPE
+    OBJECTS
+        { hbaFcPort }
+    STATUS        current
+    DESCRIPTION
+        "Signals when a Fibre Channel link went up"
+    ::= { hbaNotifications 1 }
+
+hbaFcStateLinkDown NOTIFICATION-TYPE
+    OBJECTS
+        { hbaFcPort }
+    STATUS        current
+    DESCRIPTION
+        "Signals when a Fibre Channel link went down"
+    ::= { hbaNotifications 2 }
+
+hbaPathStateOk NOTIFICATION-TYPE
+    OBJECTS
+        { hbaPathScsiId, hbaPathWwn }
+    STATUS        current
+    DESCRIPTION
+        "Signals when an Host Bus Adapter path is OK."
+    ::= { hbaNotifications 3 }
+
+hbaPathStateError NOTIFICATION-TYPE
+    OBJECTS
+        { hbaPathScsiId, hbaPathWwn }
+    STATUS        current
+    DESCRIPTION
+        "Signals when an Host Bus Adapter path is in an error state"
+    ::= { hbaNotifications 4 }
+
+hbaObjects OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+        "Top level of all Host Bus Adapter objects"
+    ::= { hbaMIB 1 }
+
+hbaFcTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF HbaFcEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Table with all Fibre Channel information"
+    ::= { hbaObjects 1 }
+
+hbaFcEntry OBJECT-TYPE
+    SYNTAX        HbaFcEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Row of table with all Fibre Channel information"
+    INDEX
+        { hbaFcIndex }
+    ::= { hbaFcTable 1 }
+
+HbaFcEntry ::= SEQUENCE
+{
+    hbaFcIndex INTEGER,
+    hbaFcPort  INTEGER,
+    hbaFcState INTEGER
+}
+
+
+hbaFcIndex OBJECT-TYPE
+    SYNTAX        INTEGER (1..16)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Index of Fibre Channel table
+
+         This index is not visible, the real port number is available in
+         the hbaFcPort object."
+    ::= { hbaFcEntry 1 }
+
+hbaFcPort OBJECT-TYPE
+    SYNTAX        INTEGER (0..15)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of Fibre Channel port"
+    ::= { hbaFcEntry 2 }
+
+hbaFcState OBJECT-TYPE
+    SYNTAX        INTEGER {
+        linkUp(1),
+        linkDown(2)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Status of Fibre Channel port"
+    ::= { hbaFcEntry 3 }
+
+hbaPathTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF HbaPathEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Table with all HBA path information"
+    ::= { hbaObjects 2 }
+
+hbaPathEntry OBJECT-TYPE
+    SYNTAX        HbaPathEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Row of table with all HBA path information"
+    INDEX
+        { hbaPathLunIndex, hbaPathIndex }
+    ::= { hbaPathTable 1 }
+
+HbaPathEntry ::= SEQUENCE
+{
+    hbaPathLunIndex INTEGER,
+    hbaPathIndex    INTEGER,
+    hbaPathLun      INTEGER,
+    hbaPathNumber   INTEGER,
+    hbaPathScsiId   DisplayString,
+    hbaPathState    INTEGER,
+    hbaPathWwn      DisplayString
+}
+
+
+hbaPathLunIndex OBJECT-TYPE
+    SYNTAX        INTEGER (1..16)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Primary Index of HBA path table
+
+         This index is not visible, the LUN number is available in the
+         hbaPathLun object."
+    ::= { hbaPathEntry 1 }
+
+hbaPathIndex OBJECT-TYPE
+    SYNTAX        INTEGER (1..16)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Secondary index of HBA path table
+
+         This index is not visible, the path number is available in the
+         hbaPathNumber object."
+    ::= { hbaPathEntry 2 }
+
+hbaPathLun OBJECT-TYPE
+    SYNTAX        INTEGER (0..15)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Ordinal number of LUN object"
+    ::= { hbaPathEntry 3 }
+
+hbaPathNumber OBJECT-TYPE
+    SYNTAX        INTEGER (0..15)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Ordinal number of HBA path"
+    ::= { hbaPathEntry 4 }
+
+hbaPathScsiId OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..64))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "SCSI ID of HBA path"
+    ::= { hbaPathEntry 5 }
+
+hbaPathState OBJECT-TYPE
+    SYNTAX        INTEGER {
+        ok(1),
+        error(2)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "State of HBA path"
+    ::= { hbaPathEntry 6 }
+
+hbaPathWwn OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..255))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "World Wide Name of the LUN"
+    ::= { hbaPathEntry 7 }
+
+hbaConformance OBJECT IDENTIFIER ::= { hbaMIB 2 }
+
+hbaCompliances OBJECT IDENTIFIER ::= { hbaConformance 1 }
+
+hbaCompliance MODULE-COMPLIANCE
+    STATUS         current
+    DESCRIPTION
+        "All objects in this MIB are only available, if a Host Bus
+         Adapter is installed and configured."
+
+    MODULE         ENDACE-HBA-MIB
+
+        GROUP          hbaObjectGroup
+        DESCRIPTION
+            "Only available, if a Host Bus Adapter is installed and
+             configured."
+
+        GROUP          hbaNotificationGroup
+        DESCRIPTION
+            "Only available, if a Host Bus adapter is installed and
+             configured."
+    ::= { hbaCompliances 1 }
+
+hbaGroups OBJECT IDENTIFIER ::= { hbaConformance 2 }
+
+hbaObjectGroup OBJECT-GROUP
+    OBJECTS
+        { hbaFcPort, hbaFcState, hbaPathLun, hbaPathNumber,
+        hbaPathScsiId, hbaPathState, hbaPathWwn }
+    STATUS        current
+    DESCRIPTION
+        "Containing all Host Bus Adapter managed objects"
+    ::= { hbaGroups 1 }
+
+hbaNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS
+        { hbaFcStateLinkDown, hbaFcStateLinkUp, hbaPathStateError,
+        hbaPathStateOk }
+    STATUS        current
+    DESCRIPTION
+        "Contains all Host Bus Adapter notifications"
+    ::= { hbaGroups 2 }
+
+END

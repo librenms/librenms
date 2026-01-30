@@ -110,7 +110,7 @@ class QueryBuilderParser implements \JsonSerializable
             if (array_key_exists('rules', $rule)) {
                 $tables = array_merge($this->findTablesRecursive($rule), $tables);
             } elseif (Str::contains($rule['field'], '.')) {
-                [$table, $column] = explode('.', $rule['field']);
+                [$table, $column] = explode('.', (string) $rule['field']);
 
                 if ($table == 'macros') {
                     $tables = array_merge($this->expandMacro($rule['field'], true), $tables);
@@ -266,17 +266,17 @@ class QueryBuilderParser implements \JsonSerializable
                 } else {
                     return $matches[0]; // this isn't a macro, don't replace
                 }
-            }, $subject);
+            }, (string) $subject);
         }
 
         if ($tables_only) {
-            preg_match_all('/%([^%.]+)\./', $subject, $matches);
+            preg_match_all('/%([^%.]+)\./', (string) $subject, $matches);
 
             return array_unique($matches[1]);
         }
 
         // clean leading %
-        $subject = preg_replace('/%([^%.]+)\./', '$1.', $subject);
+        $subject = preg_replace('/%([^%.]+)\./', '$1.', (string) $subject);
 
         // wrap entire macro result in parenthesis if needed
         if (! (Str::startsWith($subject, '(') && Str::endsWith($subject, ')'))) {
@@ -327,9 +327,7 @@ class QueryBuilderParser implements \JsonSerializable
         $shared_keys = array_filter(array_intersect(
             $this->schema->getColumns($parent),
             $this->schema->getColumns($child)
-        ), function ($table) {
-            return Str::endsWith($table, '_id');
-        });
+        ), fn ($table) => Str::endsWith($table, '_id'));
 
         if (count($shared_keys) === 1) {
             $shared_key = reset($shared_keys);

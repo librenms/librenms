@@ -197,4 +197,10 @@ return [
         'unit' => '%',
         'unit_long' => 'Percent',
     ],
+    'signal_loss' => [
+        'short' => 'SL',
+        'long' => 'Signal Loss',
+        'unit' => 'dB',
+        'unit_long' => 'Decibels',
+    ],
 ];

@@ -6,7 +6,7 @@ modules:
                 -
                     oid: pbxState
                     value: pbxState
-                    num_oid: '.1.3.6.1.4.1.637.64.4400.1.2'
+                    num_oid: '.1.3.6.1.4.1.637.64.4400.1.2{{ $noindex }}'
                     descr: 'Pbx State'
                     state_name: pbxState
                     index: 'pbxState'

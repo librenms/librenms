@@ -74,16 +74,16 @@ class SyslogController extends TableController
     {
         return Syslog::hasAccess($request->user())
             ->with('device')
-            ->when($request->device_group, function ($query, $group) {
+            ->when($request->device_group, function ($query, $group): void {
                 $query->inDeviceGroup($group);
             })
-            ->when($request->from, function ($query, $from) {
+            ->when($request->from, function ($query, $from): void {
                 $query->where('timestamp', '>=', $from);
             })
-            ->when($request->to, function ($query, $to) {
+            ->when($request->to, function ($query, $to): void {
                 $query->where('timestamp', '<=', $to);
             })
-            ->when($request->level, function ($query, $level) {
+            ->when($request->level, function ($query, $level): void {
                 if ($level >= 7) {
                     return;  // include everything
                 }
@@ -101,11 +101,11 @@ class SyslogController extends TableController
         return [
             'label' => $this->setLabel($syslog),
             'timestamp' => $syslog->timestamp,
-            'level' => htmlentities($syslog->level),
+            'level' => htmlentities((string) $syslog->level),
             'device_id' => Blade::render('<x-device-link :device="$device"/>', ['device' => $syslog->device]),
-            'program' => htmlentities($syslog->program),
-            'msg' => htmlentities($syslog->msg),
-            'priority' => htmlentities($syslog->priority),
+            'program' => htmlentities((string) $syslog->program),
+            'msg' => htmlentities((string) $syslog->msg),
+            'priority' => htmlentities((string) $syslog->priority),
         ];
     }
 
@@ -125,26 +125,17 @@ class SyslogController extends TableController
      */
     private function priorityLabel($syslog_priority)
     {
-        switch ($syslog_priority) {
-            case 'debug':
-                return 'label-default'; //Debug
-            case 'info':
-                return 'label-info'; //Informational
-            case 'notice':
-                return 'label-primary'; //Notice
-            case 'warning':
-                return 'label-warning'; //Warning
-            case 'err':
-                return 'label-danger'; //Error
-            case 'crit':
-                return 'label-danger'; //Critical
-            case 'alert':
-                return 'label-danger'; //Alert
-            case 'emerg':
-                return 'label-danger'; //Emergency
-            default:
-                return '';
-        }
+        return match ($syslog_priority) {
+            'debug' => 'label-default',
+            'info' => 'label-info',
+            'notice' => 'label-primary',
+            'warning' => 'label-warning',
+            'err' => 'label-danger',
+            'crit' => 'label-danger',
+            'alert' => 'label-danger',
+            'emerg' => 'label-danger',
+            default => '',
+        };
     }
 
     // end syslog_priority

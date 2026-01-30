@@ -33,7 +33,7 @@ use Illuminate\Support\Facades\Cache;
 class AutonomousSystem
 {
     public function __construct(
-        private int $asn
+        private readonly int $asn
     ) {
     }
 
@@ -58,11 +58,11 @@ class AutonomousSystem
                 $result = @dns_get_record("AS$this->asn.asn.cymru.com", DNS_TXT);
 
                 if (! empty($result[0]['txt'])) {
-                    $txt = explode('|', $result[0]['txt']);
+                    $txt = explode('|', (string) $result[0]['txt']);
 
                     return trim($txt[4], ' "');
                 }
-            } catch (ErrorException $e) {
+            } catch (ErrorException) {
             }
 
             return '';

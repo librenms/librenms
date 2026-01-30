@@ -26,7 +26,7 @@
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
-class AdvaObjectCreationTest extends SnmpTrapTestCase
+final class AdvaObjectCreationTest extends SnmpTrapTestCase
 {
     public function testUserCreation(): void
     {

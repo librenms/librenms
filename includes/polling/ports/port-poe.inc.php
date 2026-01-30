@@ -45,8 +45,8 @@ if ($device['os'] == 'vrp') {
     // Code for Cisco IOS and IOSXE, tested on 2960X
     if (isset($this_port['cpeExtPsePortPwrAllocated'])) {
         // if we have cpeExtPsePortPwrAllocated, we have the complete array so we can populate the RRD
-        $upd = "$polled:" . $port['cpeExtPsePortPwrAllocated'] . ':' . $port['cpeExtPsePortPwrAvailable'] . ':' .
-            $port['cpeExtPsePortPwrConsumption'] . ':' . $port['cpeExtPsePortMaxPwrDrawn'];
+        $upd = "$polled:" . $this_port['cpeExtPsePortPwrAllocated'] . ':' . $this_port['cpeExtPsePortPwrAvailable'] . ':' .
+            $this_port['cpeExtPsePortPwrConsumption'] . ':' . $this_port['cpeExtPsePortMaxPwrDrawn'];
         echo "$this_port[cpeExtPsePortPwrAllocated],$this_port[cpeExtPsePortPwrAvailable],$this_port[cpeExtPsePortPwrConsumption],$this_port[cpeExtPsePortMaxPwrDrawn]\n";
         $fields = [
             'PortPwrAllocated' => $this_port['cpeExtPsePortPwrAllocated'],
@@ -72,5 +72,18 @@ if ($device['os'] == 'vrp') {
         $tags = ['ifName' => $ifName, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
         app('Datastore')->put($device, 'poe', $tags, $fields);
         echo 'PoE(jetstream) ';
+    }
+} elseif ($device['os'] == 'ironware') {
+    if (isset($this_port['snAgentPoePortWattage'])) {
+        $fields = [
+            'PortPwrAllocated' => $this_port['snAgentPoePortWattage'],
+            'PortPwrAvailable' => $this_port['snAgentPoePortWattage'],
+            'PortConsumption' => $this_port['snAgentPoePortConsumed'],
+            'PortMaxPwrDrawn' => $this_port['snAgentPoePortWattage'],
+        ];
+
+        $tags = ['ifName' => $ifName, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
+        app('Datastore')->put($device, 'poe', $tags, $fields);
+        echo 'PoE(ironware) ';
     }
 }

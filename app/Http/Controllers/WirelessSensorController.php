@@ -11,7 +11,7 @@ class WirelessSensorController
     public function index(Request $request, string $metric = '', string $legacyview = ''): View
     {
         $metric = str_replace('metric=', '', $metric);
-        $view = str_replace('view=', '', $legacyview) ?: $request->get('view', 'detail');
+        $view = str_replace('view=', '', $legacyview) ?: $request->input('view', 'detail');
         $metrics = $this->getMetrics($request);
         $metric = $metric ?: array_key_first($metrics);
 
@@ -41,12 +41,10 @@ class WirelessSensorController
     {
         $types = \LibreNMS\Device\WirelessSensor::getTypes();
 
-        return WirelessSensor::distinct()->pluck('sensor_class')->flip()->map(function ($index, $class) use ($types, $request) {
-            return [
-                'text' => __("wireless.$class.short"),
-                'link' => route('wireless.index', $request->all() + ['metric' => $class]),
-                'icon' => 'fa-' . $types[$class]['icon'],
-            ];
-        })->all();
+        return WirelessSensor::distinct()->pluck('sensor_class')->flip()->map(fn ($index, $class) => [
+            'text' => __("wireless.$class.short"),
+            'link' => route('wireless.index', $request->all() + ['metric' => $class]),
+            'icon' => 'fa-' . $types[$class]['icon'],
+        ])->all();
     }
 }

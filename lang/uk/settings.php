@@ -850,9 +850,21 @@ return [
                 'description' => 'Користувач',
                 'help' => 'КОристувач для з\'єднання з сервером InfluxDB',
             ],
+            'batch_size' => [
+                'description' => 'Batch Size',
+                'help' => 'Number of metrics to send in a single batch, 0 means no batching',
+            ],
+            'measurements' => [
+                'description' => 'Measurements',
+                'help' => 'List of measurements to send to InfluxDB, leave empty to send all',
+            ],
             'verifySSL' => [
                 'description' => 'Перевіряти SSL',
                 'help' => 'Перевіряти чи сертифікат SSL валідний та довірений',
+            ],
+            'debug' => [
+                'description' => 'Debug',
+                'help' => 'To enable or disable verbose output to CLI',
             ],
         ],
         'ipmitool' => [
@@ -1302,9 +1314,6 @@ return [
         'service_watchdog_log' => [
             'description' => 'Спостережуваний лог файл',
             'help' => 'За замовчуванням лог файл LibreNMS. Визначає значення за замовчуванням для всіх вузлів.',
-        ],
-        'sfdp' => [
-            'description' => 'Шлях до sfdp',
         ],
         'shorthost_target_length' => [
             'description' => 'Максимальний розмір скороченого імені хоста',

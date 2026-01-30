@@ -3,56 +3,57 @@ FOUNDRY-SN-IP-MIB DEFINITIONS ::= BEGIN
 IMPORTS
 	MODULE-IDENTITY, OBJECT-TYPE,IpAddress, Counter32, TimeTicks,Counter64,Integer32
 		FROM SNMPv2-SMI
-
+		
 	TEXTUAL-CONVENTION
 		FROM SNMPv2-TC
 
 	router,snRip, snDvmrp, snFsrp,snGblRt, snPim, snLoopbackIf
 		FROM FOUNDRY-SN-ROOT-MIB
-
-        InterfaceIndex, ifIndex, InterfaceIndexOrZero
+		
+	InterfaceIndex, ifIndex, InterfaceIndexOrZero
 		FROM IF-MIB
 
-	InetAddressType
+	InetAddressType, InetAddress
 		FROM INET-ADDRESS-MIB
-
+		
 	DisplayString
 		FROM FOUNDRY-SN-AGENT-MIB
-
+		
 	PortMask
 		FROM FOUNDRY-SN-SWITCH-GROUP-MIB;
 
-
+		
 snIp MODULE-IDENTITY
-    LAST-UPDATED "201006020000Z"  -- 04 June 2010
-    ORGANIZATION "Brocade Communications Systems, Inc."
-    CONTACT-INFO
-             "Technical Support Center
-              130 Holger Way,
-              San Jose, CA  95134
-              Email:  ipsupport@brocade.com
-              Phone: 1-800-752-8061
-              URL:  www.brocade.com"
-    DESCRIPTION
-             "Copyright 1996-2010 Brocade Communications Systems, Inc.
-              All rights reserved.
-              This Brocade Communications Systems SNMP Management Information Base Specification
-              embodies Brocade Communications Systems' confidential and proprietary
-              intellectual property. Brocade Communications Systems retains all
-              title and ownership in the Specification, including any revisions.
-
-              This Specification is supplied AS IS, and Brocade Communications Systems makes
-              no warranty, either express or implied, as to the use,
-              operation, condition, or performance of the specification, and any unintended
-              consequence it may on the user environment."
-
-    REVISION        "201006020000Z"  -- 04 June 2010
-    DESCRIPTION
-        "Changed the ORGANIZATION, CONTACT-INFO and DESCRIPTION fields."
-
-    REVISION     "200909300000Z" -- September 30, 2009
-    DESCRIPTION
+	LAST-UPDATED "201708070000Z" -- Aug 7, 2017
+	ORGANIZATION "Ruckus Wireless, Inc."
+	CONTACT-INFO
+			"
+			Technical Support Center, Ruckus Wireless, Inc,
+			350 West Java Drive,
+			Sunnyvale, CA 94089, USA
+			Support URL: https://support.ruckuswireless.com
+			Phone: +1-855-782-5871
+			ROW TF Numbers: https://support.ruckuswireless.com/contact-us"
+	DESCRIPTION
+			"
+			Copyright 1996-2017 Ruckus Wireless, Inc..
+			All rights reserved.
+			This Ruckus Wireless, Inc SNMP Management Information Base Specification
+			embodies Ruckus Wireless, Inc' confidential and proprietary
+			intellectual property. Ruckus Wireless, Inc retains all
+			title and ownership in the Specification, including any
+			revisions.
+			
+			This Specification is supplied AS IS, and Ruckus Wireless, Inc makes
+			no warranty, either express or implied, as to the use,
+			operation, condition, or performance of the Specification.			
+			"        	
+	REVISION     "200909300000Z" -- September 30, 2009
+	DESCRIPTION
 			"convert from SMIv1 to SMIv2"
+	REVISION     "201708070000Z" -- Aug 7, 2017
+	DESCRIPTION
+             "Modified contact Info, Organization and Decscription"
    ::= { router 2 }
 
 	-- textual conventions
@@ -64,7 +65,7 @@ snIp MODULE-IDENTITY
 			RtrStatus Values
 			"
 		SYNTAX	INTEGER { disabled(0), enabled (1) }
-
+		
 
 
 	ClearStatus ::= TEXTUAL-CONVENTION
@@ -86,16 +87,16 @@ snIp MODULE-IDENTITY
 						valid(2),
 						delete(3),
 						create(4)
-						}
+						}		
 
 	PortIndex ::= TEXTUAL-CONVENTION
 		STATUS	  current
 		DESCRIPTION
 			"
-			The bits 0-7 = port number.
+			The bits 0-7 = port number. 
 			The bits 8-15 = slot number (slot for chassis only).
 			ve port format         bits 16-24 = 0x01, bits 0-15 = ve number
-			loopback port format bits 16-24 = 0x02, bits 0-15= lb number
+			loopback port format bits 16-24 = 0x02, bits 0-15= lb number	
 			"
 		SYNTAX	Integer32
 
@@ -115,10 +116,10 @@ snIp MODULE-IDENTITY
 			"
 			The OSPF Metric is defined as an unsigned value in the range
 			"
-		SYNTAX	INTEGER (0..65535)
+		SYNTAX	INTEGER (0..65535) 
 
 
--- SECTION 2: MIB
+-- SECTION 2: MIB 
 
 -- Global Router MIB
 -- This section contains global MIB object definitions applicable to the
@@ -144,7 +145,7 @@ snGblRtRouteOnly        OBJECT-TYPE
 -- IP general group
 
 snRtIpGeneral               OBJECT IDENTIFIER ::= { snIp 1 }
-
+		
 snRtClearArpCache       OBJECT-TYPE
 	SYNTAX  ClearStatus
 	MAX-ACCESS  read-write
@@ -183,9 +184,9 @@ snRtBootpRelayMax               OBJECT-TYPE
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
-		"Maximum number of hop the bootp packet
+		"Maximum number of hop the bootp packet 
 		should travel."
-	::= { snRtIpGeneral 5 }
+	::= { snRtIpGeneral 5 } 
 
 snRtArpAge                      OBJECT-TYPE
 	SYNTAX  INTEGER (0..240)
@@ -193,7 +194,7 @@ snRtArpAge                      OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"The time in minutes an ARP entry can
-		be valid without relearning.
+		be valid without relearning. 
 		0 - Don't not age."
 	::= { snRtIpGeneral 6 }
 
@@ -219,7 +220,7 @@ snRtIpProxyArp          OBJECT-TYPE
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
-		"Enable/disable proxy arp function
+		"Enable/disable proxy arp function 
 		in the box."
 	::= { snRtIpGeneral 9 }
 
@@ -350,12 +351,10 @@ snRtIpStaticRouteEntry  OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"An entry in the IP static route table."
-	INDEX   { snRtIpStaticRouteIndex }
+	INDEX   { snRtIpStaticRouteDest,snRtIpStaticRouteMask }
 	::= { snRtIpStaticRouteTable 1 }
 
 SnRtIpStaticRouteEntry ::= SEQUENCE {
-	snRtIpStaticRouteIndex
-		Integer32,
 	snRtIpStaticRouteDest
 		IpAddress,
 	snRtIpStaticRouteMask
@@ -367,16 +366,10 @@ SnRtIpStaticRouteEntry ::= SEQUENCE {
 	snRtIpStaticRouteRowStatus
 		RowSts,
 	snRtIpStaticRouteDistance
-		INTEGER
+		INTEGER,
+    snRtIpStaticRouteOutgoingInterface
+        InterfaceIndexOrZero
 	}
-
-snRtIpStaticRouteIndex  OBJECT-TYPE
-	SYNTAX  Integer32
-	MAX-ACCESS  read-only
-	STATUS  current
-	DESCRIPTION
-		"The table index for a static route entry."
-	::= { snRtIpStaticRouteEntry 1 }
 
 snRtIpStaticRouteDest           OBJECT-TYPE
 	SYNTAX  IpAddress
@@ -385,17 +378,17 @@ snRtIpStaticRouteDest           OBJECT-TYPE
 	DESCRIPTION
 		"Destination IP address.
 		0.0.0.0 for default route."
-	::= { snRtIpStaticRouteEntry 2 }
+	::= { snRtIpStaticRouteEntry 1 }
 
 snRtIpStaticRouteMask           OBJECT-TYPE
 	SYNTAX  IpAddress
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
-		"Subnet mask associated with
+		"Subnet mask associated with 
 		the destination IP address.
 		0.0.0.0 for default route mask."
-	::= { snRtIpStaticRouteEntry 3 }
+	::= { snRtIpStaticRouteEntry 2 }
 
 snRtIpStaticRouteNextHop        OBJECT-TYPE
 	SYNTAX  IpAddress
@@ -405,7 +398,7 @@ snRtIpStaticRouteNextHop        OBJECT-TYPE
 		"IP address of next hop router that
 		is located on one of the directly
 		attached IP subnet."
-	::= { snRtIpStaticRouteEntry 4 }
+	::= { snRtIpStaticRouteEntry 3 }
 
 snRtIpStaticRouteMetric         OBJECT-TYPE
 	SYNTAX Integer32
@@ -413,7 +406,7 @@ snRtIpStaticRouteMetric         OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"The metrics to next hop router."
-	::= { snRtIpStaticRouteEntry 5 }
+	::= { snRtIpStaticRouteEntry 4 }
 
 snRtIpStaticRouteRowStatus      OBJECT-TYPE
 	SYNTAX  RowSts
@@ -422,7 +415,7 @@ snRtIpStaticRouteRowStatus      OBJECT-TYPE
 	DESCRIPTION
 		"To create or delete a static route
 		entry."
-	::= { snRtIpStaticRouteEntry 6 }
+	::= { snRtIpStaticRouteEntry 5 }
 
 snRtIpStaticRouteDistance		OBJECT-TYPE
 	SYNTAX  INTEGER (1..255)
@@ -430,7 +423,17 @@ snRtIpStaticRouteDistance		OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"Administration distance."
-	::= { snRtIpStaticRouteEntry 7 }
+	::= { snRtIpStaticRouteEntry 6 }
+snRtIpStaticRouteOutgoingInterface      OBJECT-TYPE
+    SYNTAX  InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The outgoing interface of a static route.
+         Use the ifIndex value here to specify the outgoing interface.
+         Value of 0 indicates that outgoing interface has not been
+         configured for a static route."
+    ::= { snRtIpStaticRouteEntry 7 }
 
 -- ip filter table
 
@@ -454,9 +457,9 @@ snRtIpFilterEntry       OBJECT-TYPE
 SnRtIpFilterEntry ::= SEQUENCE {
 	snRtIpFilterIndex
 		Integer32,
-	snRtIpFilterAction
+	snRtIpFilterAction              
 		INTEGER,
-	snRtIpFilterProtocol
+	snRtIpFilterProtocol            
 		INTEGER,
 	snRtIpFilterSourceIp
 		IpAddress,
@@ -487,7 +490,7 @@ snRtIpFilterIndex       OBJECT-TYPE
 	::= { snRtIpFilterEntry 1 }
 
 snRtIpFilterAction      OBJECT-TYPE
-	SYNTAX  INTEGER { deny(0), permit(1), qosEnabled(2) }
+	SYNTAX  INTEGER { deny(0), permit(1), qosEnabled(2) } 
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
@@ -550,7 +553,7 @@ snRtIpFilterOperand     OBJECT-TYPE
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
-		"For now this only refers to transport
+		"For now this only refers to transport 
 		protocol port number. 0 means NA"
 	::= { snRtIpFilterEntry 9 }
 
@@ -865,7 +868,7 @@ snRtIpPortAccessFilters                 OBJECT-TYPE
 	MAX-ACCESS  read-write
 	STATUS  deprecated
 	DESCRIPTION
-		"1st octet correspond to 1st  filter
+		"1st octet correspond to 1st  filter 
 		number and so on."
 	::= { snRtIpPortAccessEntry 3 }
 
@@ -930,7 +933,7 @@ snRtIpPortMtu                   OBJECT-TYPE
 	::= { snRtIpPortConfigEntry 2 }
 
 snRtIpPortEncap                 OBJECT-TYPE
-	SYNTAX  INTEGER {
+	SYNTAX  INTEGER { 
 					 ethernet(1),
 					 snap(2),
 					 hdlc(3),
@@ -1089,7 +1092,7 @@ snRtIpPortIfAccessFilters                 OBJECT-TYPE
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
-		"1st octet correspond to 1st  filter
+		"1st octet correspond to 1st  filter 
 		number and so on."
 	::= { snRtIpPortIfAccessEntry 3 }
 
@@ -1131,9 +1134,7 @@ SnRtIpPortIfConfigEntry ::= SEQUENCE {
 	snRtIpPortIfMetric
 		INTEGER,
 	snRtIpPortIfDirBcastFwd
-		RtrStatus,
-	snRtIpPortConfigIfDonorInterface
-                InterfaceIndexOrZero
+		RtrStatus
 	}
 
 snRtIpPortIfConfigInterfaceIndex      OBJECT-TYPE
@@ -1158,7 +1159,7 @@ snRtIpPortIfMtu                   OBJECT-TYPE
 	::= { snRtIpPortIfConfigEntry 2 }
 
 snRtIpPortIfEncap                 OBJECT-TYPE
-	SYNTAX  INTEGER {
+	SYNTAX  INTEGER { 
 					 ethernet(1),
 					 snap(2),
 					 hdlc(3),
@@ -1190,20 +1191,6 @@ snRtIpPortIfDirBcastFwd           OBJECT-TYPE
 		"Enable/Disable directed broadcast forwarding on the port."
 	DEFVAL  { enabled }
 	::= { snRtIpPortIfConfigEntry 5 }
-
-
-snRtIpPortConfigIfDonorInterface  OBJECT-TYPE
-        SYNTAX     InterfaceIndexOrZero
-        MAX-ACCESS  read-only
-        STATUS     current
-        DESCRIPTION
-                 "If this interface is configured as an unnumbered
-                 interface, it will return the ifIndex of the donor
-                 interface. If this is configured as a donor interface, it
-                 will return its own ifIndex value. Otherwise, it will
-                 return 0."
-         ::= { snRtIpPortIfConfigEntry 6 }
-
 
 -- IP Interface Counter table
 
@@ -1492,7 +1479,7 @@ snRtUdpIfHelperEntry  OBJECT-TYPE
 		"An entry of the UDP helper table."
 	INDEX   { snRtUdpIfHelperPortIndex, snRtUdpIfHelperAddr }
 	::= { snRtUdpIfHelperTable 1 }
-
+	
 SnRtUdpIfHelperEntry ::= SEQUENCE {
 	snRtUdpIfHelperPortIndex
 		InterfaceIndex,
@@ -1542,6 +1529,137 @@ snRtUdpIfHelperRowStatus  OBJECT-TYPE
 	DESCRIPTION
 		"To create or delete a UDP helper entry."
 	::= { snRtUdpIfHelperEntry 4 }
+
+-- UDP helper table 
+-- The table indexes are ifIndex and helper address index 
+
+snRtIpIfHelperTable  OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SnRtIpIfHelperEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"IP helper address table."
+	::= { snRtUdpHelper 3 }
+
+snRtIpIfHelperEntry  OBJECT-TYPE
+	SYNTAX	SnRtIpIfHelperEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry of the IP helper address table."
+	INDEX   { snRtIpIfHelperIfIndex, snRtIpIfHelperAddrIndex }
+	::= { snRtIpIfHelperTable 1 }
+	
+SnRtIpIfHelperEntry ::= SEQUENCE {
+	snRtIpIfHelperIfIndex
+		InterfaceIndex,
+    snRtIpIfHelperAddrIndex
+        INTEGER,
+	snRtIpIfHelperAddr
+		IpAddress,
+	snRtIpIfHelperAddrType
+		INTEGER,
+	snRtIpIfHelperRowStatus
+		RowSts
+	}
+
+snRtIpIfHelperIfIndex  OBJECT-TYPE
+	SYNTAX	InterfaceIndex
+	MAX-ACCESS	not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Interface index of the port for an IP helper address entry."
+	::= { snRtIpIfHelperEntry 1 }
+
+snRtIpIfHelperAddrIndex      OBJECT-TYPE
+	SYNTAX  INTEGER (1..16)
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"The helper address table index for an IP helper address entry."
+	::= { snRtIpIfHelperEntry 2 }
+
+snRtIpIfHelperAddr       OBJECT-TYPE
+	SYNTAX	IpAddress
+	MAX-ACCESS	read-write
+	STATUS  current
+	DESCRIPTION
+		"The IP helper address. This is the address that
+		UDP packets will be forwarded. It can be a helper
+		address or a subnet broadcast address. But it
+		cannot be 255.255.255.255 or 0.0.0.0."
+	::= { snRtIpIfHelperEntry 3 }
+
+snRtIpIfHelperAddrType  OBJECT-TYPE
+	SYNTAX	INTEGER {
+					unicast(1),
+					broadcast(2)
+				}
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		"Type of the helper address. It can be unicast or subnet
+		 broadcast address."
+	::= { snRtIpIfHelperEntry 4}
+
+snRtIpIfHelperRowStatus  OBJECT-TYPE
+	SYNTAX	RowSts
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		"To create or delete an IP helper entry."
+	::= { snRtIpIfHelperEntry 5 }
+
+snRtIpv6IfHelperTable   OBJECT-TYPE
+    SYNTAX SEQUENCE OF SnRtIpv6IfHelperEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+       "IPV6 helper address table."
+       ::= { snRtUdpHelper 4 }
+
+snRtIpv6IfHelperEntry OBJECT-TYPE
+     SYNTAX    SnRtIpv6IfHelperEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+        "An entry of the IPV6 helper address table."
+     INDEX { snRtIpv6IfHelperIfIndex, snRtIpv6IfHelperAddr}
+        ::= { snRtIpv6IfHelperTable 1 }
+
+SnRtIpv6IfHelperEntry ::= SEQUENCE {
+       snRtIpv6IfHelperIfIndex
+                InterfaceIndex,
+           snRtIpv6IfHelperAddr
+                    InetAddress,
+      snRtIpv6IfHelperRowStatus
+                          RowSts
+     }
+
+snRtIpv6IfHelperIfIndex OBJECT-TYPE
+       SYNTAX InterfaceIndex
+       MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Interface index of the port for an IPV6 helper address entry."
+            ::= { snRtIpv6IfHelperEntry 1 }
+
+snRtIpv6IfHelperAddr OBJECT-TYPE
+         SYNTAX InetAddress
+         MAX-ACCESS not-accessible
+         STATUS current
+         DESCRIPTION
+               "The IPV6 helper address. This is the address that
+                client packets will be forwarded"
+            ::= { snRtIpv6IfHelperEntry 2 }
+
+snRtIpv6IfHelperRowStatus OBJECT-TYPE
+         SYNTAX RowSts
+         MAX-ACCESS read-write
+         STATUS current
+         DESCRIPTION
+             "To create or delete an IPV6IfhelperEntry."
+             ::= { snRtIpv6IfHelperEntry 3 }
 
 -- Trace route group
 -- This group uses the following method to detect routes used to reach
@@ -1619,7 +1737,7 @@ snRtIpTraceRouteControl     OBJECT-TYPE
 		"Only 'start' and 'abort' are writable values; 'success',
 		'failure' and 'inProgress' are readeable (or returned)
 		values.
-
+		
 		Writing 'start' to this object to initiate the trace route
 		operation. snRtIpTraceRouteDestAddr must have been init-
 		ialized before 'start' is writen.
@@ -1879,7 +1997,7 @@ SnIpAsPathAccessListEntry ::= SEQUENCE {
 		Integer32,
 	snIpAsPathAccessListSequence
 		Integer32,
-	snIpAsPathAccessListAction
+	snIpAsPathAccessListAction              
 		INTEGER,
 	snIpAsPathAccessListRegExpression
 		OCTET STRING,
@@ -1904,7 +2022,7 @@ snIpAsPathAccessListSequence       OBJECT-TYPE
 	::= { snIpAsPathAccessListEntry 2 }
 
 snIpAsPathAccessListAction      OBJECT-TYPE
-	SYNTAX  INTEGER { deny(0), permit(1) }
+	SYNTAX  INTEGER { deny(0), permit(1) } 
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
@@ -1977,7 +2095,7 @@ SnIpCommunityListEntry ::= SEQUENCE {
 		Integer32,
 	snIpCommunityListSequence
 		Integer32,
-	snIpCommunityListAction
+	snIpCommunityListAction              
 		INTEGER,
 	snIpCommunityListCommNum
 		OCTET STRING,
@@ -2010,7 +2128,7 @@ snIpCommunityListSequence       OBJECT-TYPE
 	::= { snIpCommunityListEntry 2 }
 
 snIpCommunityListAction      OBJECT-TYPE
-	SYNTAX  INTEGER { deny(0), permit(1) }
+	SYNTAX  INTEGER { deny(0), permit(1) } 
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
@@ -2023,12 +2141,12 @@ snIpCommunityListCommNum    OBJECT-TYPE
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
-		"A number from 1 to 0xFFFFFFFF. There are 20 of them.
+		"A number from 1 to 0xFFFFFFFF. There are 20 of them.  
 		This integer number is represented by 4 OCTETs."
 	::= { snIpCommunityListEntry 4 }
 
 snIpCommunityListInternet OBJECT-TYPE
-	SYNTAX  INTEGER { disabled(0), enabled(1) }
+	SYNTAX  INTEGER { disabled(0), enabled(1) } 
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
@@ -2036,7 +2154,7 @@ snIpCommunityListInternet OBJECT-TYPE
 	::= { snIpCommunityListEntry 5 }
 
 snIpCommunityListNoAdvertise OBJECT-TYPE
-	SYNTAX  INTEGER { false(0), true(1) }
+	SYNTAX  INTEGER { false(0), true(1) } 
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
@@ -2044,7 +2162,7 @@ snIpCommunityListNoAdvertise OBJECT-TYPE
 	::= { snIpCommunityListEntry 6 }
 
 snIpCommunityListNoExport OBJECT-TYPE
-	SYNTAX  INTEGER { false(0), true(1) }
+	SYNTAX  INTEGER { false(0), true(1) } 
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
@@ -2082,12 +2200,12 @@ snIpCommunityListRowStatus   OBJECT-TYPE
 	::= { snIpCommunityListEntry 8 }
 
 snIpCommunityListLocalAs OBJECT-TYPE
-	SYNTAX  INTEGER { false(0), true(1) }
+	SYNTAX  INTEGER { false(0), true(1) } 
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
 		"Send this route to peers in other sub-autonomous systems within
-		the local confederation. Do not advertise this route to an
+		the local confederation. Do not advertise this route to an 
 		external system."
 	::= { snIpCommunityListEntry 9 }
 
@@ -2118,12 +2236,12 @@ SnIpPrefixListEntry ::= SEQUENCE {
 		Integer32,
 	snIpPrefixListDesc
 		OCTET STRING,
-	snIpPrefixListAction
+	snIpPrefixListAction              
 		INTEGER,
 	snIpPrefixListAddr
 		IpAddress,
 	snIpPrefixListMask
-		IpAddress,
+		IpAddress, 
 	snIpPrefixListGeValue
 		INTEGER,
 	snIpPrefixListLeValue
@@ -2161,7 +2279,7 @@ snIpPrefixListDesc    OBJECT-TYPE
 	::= { snIpPrefixListEntry 3 }
 
 snIpPrefixListAction      OBJECT-TYPE
-	SYNTAX  INTEGER { deny(0), permit(1) }
+	SYNTAX  INTEGER { deny(0), permit(1) } 
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
@@ -2265,7 +2383,7 @@ SnIpAsPathAccessListStringEntry ::= SEQUENCE {
 		DisplayString,
 	snIpAsPathAccessListStringSequence
 		Integer32,
-	snIpAsPathAccessListStringAction
+	snIpAsPathAccessListStringAction              
 		INTEGER,
 	snIpAsPathAccessListStringRegExpression
 		DisplayString,
@@ -2290,7 +2408,7 @@ snIpAsPathAccessListStringSequence       OBJECT-TYPE
 	::= { snIpAsPathAccessListStringEntry 2 }
 
 snIpAsPathAccessListStringAction      OBJECT-TYPE
-	SYNTAX  INTEGER { deny(0), permit(1) }
+	SYNTAX  INTEGER { deny(0), permit(1) } 
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
@@ -2363,7 +2481,7 @@ SnIpCommunityListStringEntry ::= SEQUENCE {
 		DisplayString,
 	snIpCommunityListStringSequence
 		Integer32,
-	snIpCommunityListStringAction
+	snIpCommunityListStringAction              
 		INTEGER,
 	snIpCommunityListStringCommNum
 		OCTET STRING,
@@ -2400,7 +2518,7 @@ snIpCommunityListStringSequence       OBJECT-TYPE
 	::= { snIpCommunityListStringEntry 2 }
 
 snIpCommunityListStringAction      OBJECT-TYPE
-	SYNTAX  INTEGER { deny(0), permit(1) }
+	SYNTAX  INTEGER { deny(0), permit(1) } 
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
@@ -2413,7 +2531,7 @@ snIpCommunityListStringCommNum    OBJECT-TYPE
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
-		"A number from 1 to 0xFFFFFFFF. There are 20 of them.
+		"A number from 1 to 0xFFFFFFFF. There are 20 of them.  
 		This integer number is represented by 4 OCTETs.
 		This object is valid for standard community list.
 		For extended type, this will return NULL string.
@@ -2422,7 +2540,7 @@ snIpCommunityListStringCommNum    OBJECT-TYPE
 	::= { snIpCommunityListStringEntry 4 }
 
 snIpCommunityListStringInternet OBJECT-TYPE
-	SYNTAX  INTEGER { disabled(0), enabled(1) }
+	SYNTAX  INTEGER { disabled(0), enabled(1) } 
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
@@ -2431,7 +2549,7 @@ snIpCommunityListStringInternet OBJECT-TYPE
 	::= { snIpCommunityListStringEntry 5 }
 
 snIpCommunityListStringNoAdvertise OBJECT-TYPE
-	SYNTAX  INTEGER { false(0), true(1) }
+	SYNTAX  INTEGER { false(0), true(1) } 
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
@@ -2440,7 +2558,7 @@ snIpCommunityListStringNoAdvertise OBJECT-TYPE
 	::= { snIpCommunityListStringEntry 6 }
 
 snIpCommunityListStringNoExport OBJECT-TYPE
-	SYNTAX  INTEGER { false(0), true(1) }
+	SYNTAX  INTEGER { false(0), true(1) } 
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
@@ -2479,18 +2597,18 @@ snIpCommunityListStringRowStatus   OBJECT-TYPE
 	::= { snIpCommunityListStringEntry 8 }
 
 snIpCommunityListStringLocalAs OBJECT-TYPE
-	SYNTAX  INTEGER { false(0), true(1) }
+	SYNTAX  INTEGER { false(0), true(1) } 
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
 		"Send this route to peers in other sub-autonomous systems within
-		the local confederation. Do not advertise this route to an
+		the local confederation. Do not advertise this route to an 
 		external system.
 		Valid only for standard community list. For extended type, 0 is returned."
 	::= { snIpCommunityListStringEntry 9 }
 
 snIpCommunityListStringType OBJECT-TYPE
-	SYNTAX	INTEGER { standard(0), extended(1) }
+	SYNTAX	INTEGER { standard(0), extended(1) } 
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
@@ -2510,7 +2628,7 @@ snIpCommunityListStringRegExpr       OBJECT-TYPE
 
 
 
--- SECTION 2: MIB
+-- SECTION 2: MIB 
 
 -- Router IP RIP MIB
 
@@ -2685,7 +2803,7 @@ snRtIpRipPortPoisonReverse      OBJECT-TYPE
 
 snRtIpRipPortLearnDefault          OBJECT-TYPE
 	SYNTAX	INTEGER {
-		disabled(0),
+		disabled(0),             
 		enabled(1)
 	}
 	MAX-ACCESS	read-write
@@ -2718,7 +2836,7 @@ snRtIpRipRedisEntry             OBJECT-TYPE
 
 SnRtIpRipRedisEntry ::= SEQUENCE {
 	snRtIpRipRedisIndex
-		INTEGER,
+		INTEGER,        
 	snRtIpRipRedisAction
 		Action,
 	snRtIpRipRedisProtocol
@@ -2736,7 +2854,7 @@ SnRtIpRipRedisEntry ::= SEQUENCE {
 	snRtIpRipRedisRouteMapName
 		DisplayString
 	}
-
+			
 snRtIpRipRedisIndex             OBJECT-TYPE
 	SYNTAX  INTEGER (1..64)
 	MAX-ACCESS  read-only
@@ -2750,7 +2868,7 @@ snRtIpRipRedisAction            OBJECT-TYPE
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
-		"The action to take when match this
+		"The action to take when match this 
 		IP Rip Redistribution entry."
 	::= { snRtIpRipRedisEntry 2 }
 
@@ -2759,8 +2877,8 @@ snRtIpRipRedisProtocol          OBJECT-TYPE
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
-		"The protocol to be distributed. other(1) cannot be
-				 used for SNMP-SET."
+		"The protocol to be distributed. other(1) cannot be 
+				 used for SNMP-SET." 
 	::= { snRtIpRipRedisEntry 3 }
 
 snRtIpRipRedisIp        OBJECT-TYPE
@@ -2769,16 +2887,16 @@ snRtIpRipRedisIp        OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"The ip address of the ip route to be distributed.
-		0.0.0.0 - all routes"
+		0.0.0.0 - all routes" 
 	::= { snRtIpRipRedisEntry 4 }
 
-
+		
 snRtIpRipRedisMask              OBJECT-TYPE
 	SYNTAX  IpAddress
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
-		"The ip subnet mask of the ip route to be distributed."
+		"The ip subnet mask of the ip route to be distributed." 
 	::= { snRtIpRipRedisEntry 5 }
 
 snRtIpRipRedisMatchMetric       OBJECT-TYPE
@@ -2788,7 +2906,7 @@ snRtIpRipRedisMatchMetric       OBJECT-TYPE
 	DESCRIPTION
 		"The metric of the route to be matched
 		to determine the redistribution.
-		0 - any metric value"
+		0 - any metric value" 
 	::= { snRtIpRipRedisEntry 6 }
 
 snRtIpRipRedisSetMetric         OBJECT-TYPE
@@ -2797,7 +2915,7 @@ snRtIpRipRedisSetMetric         OBJECT-TYPE
 	STATUS  current
 	DESCRIPTION
 		"The new metric of the route to be advertised.
-		0 - use the default metric."
+		0 - use the default metric." 
 	::= { snRtIpRipRedisEntry 7 }
 
 snRtIpRipRedisRowStatus         OBJECT-TYPE
@@ -2857,7 +2975,7 @@ snRtIpRipRouteFilterId         OBJECT-TYPE
 	::= { snRtIpRipRouteFilterEntry 1 }
 
 snRtIpRipRouteFilterAction	   OBJECT-TYPE
-	SYNTAX  Action
+	SYNTAX  Action 
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
@@ -2954,7 +3072,7 @@ snRtIpRipNbrFilterId         OBJECT-TYPE
 	::= { snRtIpRipNbrFilterEntry 1 }
 
 snRtIpRipNbrFilterAction	 OBJECT-TYPE
-	SYNTAX  Action
+	SYNTAX  Action 
 	MAX-ACCESS  read-write
 	STATUS  current
 	DESCRIPTION
@@ -3150,7 +3268,7 @@ snRtIpRipPortIfPoisonReverse      OBJECT-TYPE
 
 snRtIpRipPortIfLearnDefault          OBJECT-TYPE
 	SYNTAX	INTEGER {
-		disabled(0),
+		disabled(0),             
 		enabled(1)
 	}
 	MAX-ACCESS	read-write
@@ -3477,9 +3595,8 @@ snDvmrpGraftRetransmitTime OBJECT-TYPE
 			be retransmitted if graft acknowledge message has not been
 			received. Value is in number of seconds. snDvmrpEnable must
 			be 'enabled' before this object is writen.
-			For FastIron platforms, the default value is 3 and the range is
-			between 2 to 10.
-			For NetIron platforms, the range is between 5 to 3600."
+			For FastIron platforms, the default value is 3 and the range is 
+			between 2 to 10."
 	DEFVAL     { 10 }
 	::= { snDvmrpMIBObjects 11 }
 
@@ -3877,7 +3994,7 @@ snDvmrpRouteMetric OBJECT-TYPE
 
 snDvmrpRouteExpiryTime OBJECT-TYPE
 	SYNTAX     TimeTicks
-	MAX-ACCESS     read-only
+	MAX-ACCESS     read-only			  
 	STATUS     current
 	DESCRIPTION
 			"The minimum amount of time remaining before this entry will
@@ -4187,7 +4304,7 @@ snFsrpIntf 		OBJECT IDENTIFIER ::= { snFsrp 2 }
 
 snFsrpGroupOperMode OBJECT-TYPE
 	SYNTAX  INTEGER {
-		disabled(0),
+		disabled(0),             
 		enabled(1)
 		}
 	MAX-ACCESS  read-write
@@ -4196,7 +4313,7 @@ snFsrpGroupOperMode OBJECT-TYPE
 		"The FSRP is configured on this system
 		 either enabled or disabled and the
 		 default is disabled mode.
-		 disabled(0)..........disable FSRP
+		 disabled(0)..........disable FSRP   
 		 enabled(1)...........activate FSRP"
 	::= { snFsrpGlobal 1 }
 
@@ -4214,7 +4331,7 @@ snFsrpIfStateChangeTrap OBJECT-TYPE
 
 --  Section 2: FSRP Interface Configuration Table
 
---      The FSRP (Foundry Standby Routing Protocol) Interface Table augments
+--      The FSRP (Ruckus Wireless Standby Routing Protocol) Interface Table augments 
 --		the ifTable with FSRP specific information.
 
 
@@ -4251,13 +4368,13 @@ snFsrpIfStateChangeTrap OBJECT-TYPE
 				 INTEGER,
 			 snFsrpIfTrackPortMask
 				 PortMask,
-			 snFsrpIfRowStatus
+			 snFsrpIfRowStatus 
 				 INTEGER,
 			 snFsrpIfState
 				 INTEGER,
-			 snFsrpIfKeepAliveTime
+			 snFsrpIfKeepAliveTime 
 				 INTEGER,
-			 snFsrpIfRouterDeadTime
+			 snFsrpIfRouterDeadTime 
 				 INTEGER,
 			 snFsrpIfChassisTrackPortMask
 				 OCTET STRING,
@@ -4289,7 +4406,7 @@ snFsrpIfStateChangeTrap OBJECT-TYPE
 		 STATUS   current
 		 DESCRIPTION
 			"The IP Address of the Virtual Router for the interface.
-			The Virtual Router IP address need to be configured on
+			The Virtual Router IP address need to be configured on 
 			the interface before Redundant Router Function can operate
 			on the interface.  This address has to be same on all the
 			routers that going to participate in the Redundant Router
@@ -4324,12 +4441,12 @@ snFsrpIfStateChangeTrap OBJECT-TYPE
 		 MAX-ACCESS   read-write
 		 STATUS   deprecated
 		 DESCRIPTION
-			"This object specifies the identity of the physical port
+			"This object specifies the identity of the physical port 
 			whose state is to be monitored.  Each bit is a port of
 			the system. Default value is 0.  If this object is configured
 			then the Preference Level of this interface will be adjusted
 			dynamically depending on the state of the Track Port.
-			The interface's Preference Level is reduced by value of
+			The interface's Preference Level is reduced by value of 
 			Preference Level parameter when the Track Port states first
 			changes from UP to DOWN.  When the Track Port next comes up
 			the interface's Preference Level is increased by the amount
@@ -4382,7 +4499,7 @@ snFsrpIfStateChangeTrap OBJECT-TYPE
 			init(0)...initialization state.
 			negotiating(1)...negotiating state.
 			standby(2)...standby state.
-			active(3)...active state."
+			active(3)...active state." 
 		 ::= { snFsrpIfEntry 8 }
 
 	 snFsrpIfKeepAliveTime OBJECT-TYPE
@@ -4390,7 +4507,7 @@ snFsrpIfStateChangeTrap OBJECT-TYPE
 		 MAX-ACCESS   read-write
 		 STATUS   current
 		 DESCRIPTION
-			"The heart-beat is from 1 to 120 seconds."
+			"The heart-beat is from 1 to 120 seconds." 
 		 DEFVAL { 3 }
 		 ::= { snFsrpIfEntry 9 }
 
@@ -4399,7 +4516,7 @@ snFsrpIfStateChangeTrap OBJECT-TYPE
 		 MAX-ACCESS   read-write
 		 STATUS   current
 		 DESCRIPTION
-			"The hold time of the Fsrp router is from 3 to 255 seconds."
+			"The hold time of the Fsrp router is from 3 to 255 seconds." 
 		 DEFVAL { 9 }
 		 ::= { snFsrpIfEntry 10 }
 
@@ -4408,12 +4525,12 @@ snFsrpIfStateChangeTrap OBJECT-TYPE
 		 MAX-ACCESS   read-write
 		 STATUS   deprecated
 		 DESCRIPTION
-			"This object specifies the identity of the physical port
+			"This object specifies the identity of the physical port 
 			whose state is to be monitored.  Each bit is a port of
 			the system. Default value is 0.  If this object is configured
 			then the Preference Level of this interface will be adjusted
 			dynamically depending on the state of the Track Port.
-			The interface's Preference Level is reduced by value of
+			The interface's Preference Level is reduced by value of 
 			Preference Level parameter when the Track Port states first
 			changes from UP to DOWN.  When the Track Port next comes up
 			the interface's Preference Level is increased by the amount
@@ -4427,14 +4544,14 @@ snFsrpIfStateChangeTrap OBJECT-TYPE
 		 MAX-ACCESS   read-write
 		 STATUS   current
 		 DESCRIPTION
-			"This object specifies the identity of the physical port
+			"This object specifies the identity of the physical port 
 			whose state is to be monitored.  Each port index is a
 			16-bit integer in big endian order. 8-bit is the slot
 			number, the other 8-bit is the port number. Default value
 			is 0 length octet string.  If this object is configured
 			then the Preference Level of this interface will be adjusted
 			dynamically depending on the state of the Track Port.
-			The interface's Preference Level is reduced by value of
+			The interface's Preference Level is reduced by value of 
 			Preference Level parameter when the Track Port states first
 			changes from UP to DOWN.  When the Track Port next comes up
 			the interface's Preference Level is increased by the amount
@@ -4493,19 +4610,21 @@ snPimPruneTime OBJECT-TYPE
 	::= { snPimMIBObjects 4 }
 
 snPimGraftRetransmitTime OBJECT-TYPE
-	SYNTAX     INTEGER (10..3600)
+	SYNTAX     INTEGER (2..3600)
 	MAX-ACCESS     read-write
 	STATUS     current
 	DESCRIPTION
 			"This is the time interval after which a graft message will
 			be retransmitted if graft acknowledge message has not been
 			received. Value is in number of seconds. snPimEnable must
-			be 'enabled' before this object is writen."
+			be 'enabled' before this object is writen.
+			For FastIron platforms, the default value is 3 and the range is 
+			between 2 to 10."
 	DEFVAL     { 180 }
 	::= { snPimMIBObjects 5 }
 
 snPimInactivityTime OBJECT-TYPE
-	SYNTAX     INTEGER (2..3600)
+	SYNTAX     INTEGER (10..3600)
 	MAX-ACCESS     read-write
 	STATUS     current
 	DESCRIPTION
@@ -4514,10 +4633,7 @@ snPimInactivityTime OBJECT-TYPE
 			time is reset. This is used to only keep the forwarding
 			entries for the active sessions. Value is in number of
 			seconds. snPimEnable must be 'enabled' before this object
-			is writen.
-			For FastIron platforms, the default value is 3 and the range is
-			between 2 to 10.
-			For NetIron platforms, the range is between 10 to 3600."
+			is writen."
 	DEFVAL     { 180 }
 	::= { snPimMIBObjects 6 }
 
@@ -4949,8 +5065,8 @@ snPimJoinPruneInterval OBJECT-TYPE
 	MAX-ACCESS     read-write
 	STATUS     current
 	DESCRIPTION
-			"The default interval in seconds at which periodic
-			PIM-SM Join/Prune messages are to be sent. snPimEnable must
+			"The default interval in seconds at which periodic 
+			PIM-SM Join/Prune messages are to be sent. snPimEnable must 
 			be 'enabled' before this table is read or writen."
 	::= { snPimSMMIBObjects 1 }
 
@@ -4986,7 +5102,7 @@ snPimCandidateBSRPortID OBJECT-TYPE
 	STATUS     current
 	DESCRIPTION
 			"The IP address of the PIM interface.
-		 The bit 0 to bit 7: port number.
+		 The bit 0 to bit 7: port number. 
 		 The bit 8 to bit 11: slot number."
 	::= { snPimCandidateBSREntry 1 }
 
@@ -5085,7 +5201,7 @@ snPimRPSetHoldTime OBJECT-TYPE
 	MAX-ACCESS     read-only
 	STATUS     current
 	DESCRIPTION
-			"The holdtime, in seconds, of a Candidate-RP.  If the
+			"The holdtime, in seconds, of a Candidate-RP.  If the 
 			local router is not the BSR, this value is 0."
 	::= { snPimRPSetEntry 4 }
 
@@ -5165,18 +5281,18 @@ snPimCandidateRPRowStatus OBJECT-TYPE
 	DESCRIPTION
 			"The status of this row, by which new entries may be
 			created, or old entries deleted from this table.
-			  This object is used to create and delete row in the
-			table and control if they are used. The values that
+			  This object is used to create and delete row in the 
+			table and control if they are used. The values that 
 			can be written are:
 			  delete(3)...deletes the row
 			  create(4)...creates a new row
 			  modify(5)...modifies an exsisting row
-			If the row exists, then a SET with value of create(4)
+			If the row exists, then a SET with value of create(4) 
 			returns error 'badValue'. Deleted rows go away
 			immediately. The following values can be returned on reads:
 			  noSuch(0)...no such row
 			  other(1)....some other case
-			  valid(2)....the row exists and is valid"
+			  valid(2)....the row exists and is valid"			
 	::= { snPimCandidateRPEntry 4 }
 
 
@@ -5202,7 +5318,7 @@ snLoopbackIntfConfigEntry           OBJECT-TYPE
 SnLoopbackIntfConfigEntry ::= SEQUENCE {
 	snLoopbackIntfConfigPortIndex
 		INTEGER,
-	snLoopbackIntfMode
+	snLoopbackIntfMode		
 		INTEGER,
 	snLoopbackIntfRowStatus
 		INTEGER

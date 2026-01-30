@@ -95,6 +95,33 @@ snmp-server location <YOUR-LOCATION>
 1. After rebooting the card (safe for connected load), configure Network, System and Access Control. Save config for each step.
 1. Configure SNMP. The device defaults to both SNMP v1 and v3 enabled, with default credentials. Disable what you do not need. SNMP v3 works, but uses MD5/DES. You may have to add another section to your SNMP credentials table in LibreNMS. Save.
 
+### Extreme
+
+#### EXOS
+
+```bash
+
+# General configuration (all SNMP versions)
+configure snmp sysName "<YOUR-HOSTNAME>"
+configure snmp sysLocation "<YOUR-LOCATION>"
+configure snmp sysContact "<YOUR-CONTACT>"
+
+# SNMPv3 (Read-Only)
+configure snmpv3 add user <READ-ONLY-USERNAME> authentication sha <AUTH-PASSWORD> privacy aes <PRIV-PASSWORD>
+configure snmpv3 add group <READ-ONLY-GROUP> user <READ-ONLY-USERNAME> sec-model usm
+configure snmpv3 add access <READ-ONLY-GROUP> sec-model usm sec-level priv read-view defaultAdminView write-view noAuth notify-view defaultAdminView
+disable snmp access snmp-v1v2c
+enable snmp access snmpv3
+
+# SNMPv3 (Read-Write)
+configure snmpv3 add user <READ-WRITE-USERNAME> authentication sha <AUTH-PASSWORD> privacy aes <PRIV-PASSWORD>
+configure snmpv3 add group <READ-WRITE-GROUP> user <READ-WRITE-USERNAME> sec-model usm
+configure snmpv3 add access <READ-WRITE-GROUP> sec-model usm sec-level priv read-view defaultAdminView write-view defaultAdminView notify-view defaultAdminView
+disable snmp access snmp-v1v2c
+enable snmp access snmpv3
+```
+
+
 ### HPE / 3PAR
 
 #### Comware
@@ -190,7 +217,7 @@ CLI SNMP v2 Configuration
 set [ find default=yes ] read-access=no
 add addresses=<ALLOWED-SRC-IPs/NETMASK> name=<COMMUNITY>
 /snmp
-set contact="<NAME>" enabled=yes engine-id=<ENGINE ID> location="<LOCALTION>"
+set contact="<NAME>" enabled=yes engine-id=<ENGINE ID> location="<LOCATION>"
 ```
 
 !!! note
@@ -209,12 +236,12 @@ CLI SNMP v3 Configuration for *authPriv*
 /snmp community
 add name="<COMMUNITY>" addresses="<ALLOWED-SRC-IPs/NETMASK>"
 set "<COMMUNITY>" authentication-password="<AUTH_PASS>" authentication-protocol=MD5
-set "<COMMUNITY>" encryption-password="<ENCRYP_PASS>" encryption-protocol=AES
+set "<COMMUNITY>" encryption-password="<ENCRYPT_PASS>" encryption-protocol=AES
 set "<COMMUNITY>" read-access=yes write-access=no security=private
 #Disable public SNMP
 set public read-access=no write-access=no security=private
 /snmp
-set contact="<NAME>" enabled=yes engine-id="<ENGINE ID>" location="<LOCALTION>"
+set contact="<NAME>" enabled=yes engine-id="<ENGINE ID>" location="<LOCATION>"
 ```
 
 !!! note

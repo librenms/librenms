@@ -101,7 +101,7 @@ By Defaults the backends are as below.
 | `totals_$stat`          | A stat representing a total for all stats across all OSLVMs. |
 
 Something is considered not running if it has been seen. How long
-something is considred to have been seen is controlled by
+something is considered to have been seen is controlled by
 `apps.oslv_monitor.seen_age`, which is the number of seconds ago it
 would of have to be seen. The default is `604800` which is seven days
 in seconds.

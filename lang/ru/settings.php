@@ -1023,9 +1023,21 @@ return [
                 'description' => 'Имя пользователя',
                 'help' => 'Имя пользователя для подключения к InfluxDB, если требуется',
             ],
+            'batch_size' => [
+                'description' => 'Batch Size',
+                'help' => 'Number of metrics to send in a single batch, 0 means no batching',
+            ],
+            'measurements' => [
+                'description' => 'Measurements',
+                'help' => 'List of measurements to send to InfluxDB, leave empty to send all',
+            ],
             'verifySSL' => [
                 'description' => 'Проверка SSL',
                 'help' => 'Проверяет, что SSL-сертификат действителен и доверен',
+            ],
+            'debug' => [
+                'description' => 'Debug',
+                'help' => 'To enable or disable verbose output to CLI',
             ],
         ],
         'influxdbv2' => [
@@ -1552,7 +1564,7 @@ return [
                 'help' => 'Метод планирования задач обнаружения. Устаревший метод будет использовать cron, если запись crontab существует, и службу диспетчера, если устаревшая конфигурация service_discovery_enabled установлена в true.',
                 'options' => [
                     'legacy' => 'Устаревший (Без ограничений)',
-                    'cron' => 'Cron (discovery.php)',
+                    'cron' => 'Cron (lnms device:discover)',
                     'dispatcher' => 'Служба диспетчера',
                 ],
             ],
@@ -1648,9 +1660,6 @@ return [
         'service_watchdog_log' => [
             'description' => 'Файл журнала для мониторинга',
             'help' => 'По умолчанию это файл журнала LibreNMS. Устанавливает значение по умолчанию для всех узлов.',
-        ],
-        'sfdp' => [
-            'description' => 'Путь к sfdp',
         ],
         'shorthost_target_length' => [
             'description' => 'Максимальная длина сокращенного имени хоста',

@@ -3,7 +3,7 @@
 $row = 1;
 
 foreach (dbFetchRows('SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY diskio_descr', [$device['device_id']]) as $drive) {
-    if (is_integer($row / 2)) {
+    if (is_int($row / 2)) {
         $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
     } else {
         $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');

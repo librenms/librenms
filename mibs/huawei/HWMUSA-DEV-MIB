@@ -1,9 +1,9 @@
 --  ============================================================================
--- Copyright (C)2011  by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:  The MIB module defines MIB objects which provide 
 --               device management NMS interfaces.     
 -- Reference:  
--- Version: V1.18
+-- Version: V1.27
 -- ============================================================================
 
 	HWMUSA-DEV-MIB DEFINITIONS ::= BEGIN
@@ -15,13 +15,13 @@
 				FROM HUAWEI-MIB			
 			HWPCBType,HWFrameType			
 				FROM HUAWEI-TC-MIB			
-			Integer32, OBJECT-TYPE,Unsigned32,MODULE-IDENTITY		
+			Integer32,Counter32,Counter64,OBJECT-TYPE,Unsigned32,MODULE-IDENTITY		
 				FROM SNMPv2-SMI
 			RowStatus, DateAndTime
 				FROM SNMPv2-TC;	
 				
 		musa MODULE-IDENTITY
-			LAST-UPDATED "201201180000Z"
+			LAST-UPDATED "201707050000Z"
 			ORGANIZATION
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO                                        
@@ -36,30 +36,60 @@
 				"
 				The MIB module defines MIB objects which provide device management NMS interfaces.
 				"
-		--  Revision history 
-		  	REVISION    "201203310000Z"
-		  	DESCRIPTION "V1.18, Added enumerated value 0x02000173 to hwMusaBoardLatestResetCause's value list."
-		  
-		  	REVISION    "201201170000Z"
-			DESCRIPTION "V1.17, Added hwMusaFramePowerSupplyTable node."
+			--  Revision history 
+			REVISION    "201707050000Z"
+			DESCRIPTION "V1.27, Modified the description of hwMusaServiceChannelBufferRate."
+			
+			REVISION    "201703080000Z"
+			DESCRIPTION "V1.26, Modified the description of hwMusaBoardTemperature."
 
+			REVISION    "201701110000Z"
+			DESCRIPTION "V1.25, Added hwMusaBoardRamTotal, hwMusaBoardRamUsed, hwMusaBoardRamFree,
+						 hwMusaBoardFlashTotal, hwMusaBoardFlashUsed and hwMusaBoardFlashFree node."
+			
+			REVISION    "201511040000Z"
+			DESCRIPTION "V1.24, Added enumerated value 0x0200016c and 0x0700000e to hwMusaBoardLatestResetCause's value list."
+
+			REVISION    "201510260900Z"
+			DESCRIPTION "V1.23, added hwMusaBoardResetCounter and hwMusaBoardPowerInputStatus node."
+			
+			REVISION    "201412160900Z"
+			DESCRIPTION "V1.22, Correct the node hwBroadBandFrameRowStatus from read-write to read-create,
+			             delete the '-' from enumeration name."
+
+			REVISION    "201407010900Z"
+			DESCRIPTION "V1.21, Added hwMusaBoardMaxLoadBufferSize node."
+			
+			REVISION    "201405300900Z"
+			DESCRIPTION "V1.20, Added hwMusaFrameLastOfflineTime and hwMusaFrameLastOfflineReason node."
+			
+			REVISION    "201405060900Z"
+			DESCRIPTION "V1.19, Correct the hwMusaBoardOnlineState's value list."
+			
+		  	REVISION    "201401080000Z"
+		  	DESCRIPTION "V1.18, Added enumerated value 0x02000173 to hwMusaBoardLatestResetCause's value list.
+			             Modify the description of 0x02000182 on hwMusaBoardLatestResetCause"
+			
+			REVISION    "201201170000Z"
+			DESCRIPTION "V1.17, Added hwMusaFramePowerSupplyTable node."
+			
 			REVISION    "201111180000Z"
 			DESCRIPTION "V1.16, Added enumerated value dcAndRemote(8) and acAndDc(9) to hwMusaFramePowerMode's value list."
-		
-		  	REVISION    "201107080000Z"
+			
+			REVISION    "201107080000Z"
 			DESCRIPTION "V1.15, Time and type of last Board reset on OLT devices."
 			
 			REVISION    "201101120000Z"
 			DESCRIPTION "V1.14, Added enumerated value acRemote(7) to hwMusaFramePowerMode's value list.."
-
+			
 			REVISION    "201011100000Z"
 			DESCRIPTION "V1.13, Modified the description of hwMusaSlotConfExtTable, hwMusaSlotConfExtEntry, hwMusaBoardTemperature,
 									hwMusaSlotAverageConfTable, hwMusaSlotAverageConfEntry, hwMusaBoardStatisticTime, hwXPONBoardParaTable, hwXPONBoardParaEntry,
 									hwBroadBandFrameOperTable, hwBroadBandFrameOperEntry and hwIasConfigChangeEntry."
-					
+									
 			REVISION    "201008190000Z"
 			DESCRIPTION "V1.12, Modified the description of the objects in this MIB file for MIB standardization."
-		
+			
 			REVISION    "201003240000Z"
 			DESCRIPTION "V1.11, Modified this MIB for clearing simple tester errors and warnings."
 			
@@ -138,7 +168,11 @@
 				hwMusaFramePowerMode
 					INTEGER,
 				hwMusaFramePower
-					Integer32        
+					Integer32,
+				hwMusaFrameLastOfflineTime
+					DateAndTime,
+				hwMusaFrameLastOfflineReason
+					OCTET STRING					        
 			 }
 
 		hwMusaFrameLimtBandWidth OBJECT-TYPE
@@ -277,6 +311,26 @@
 			"
 		::= { hwMusaFrameExtEntry 11 }
 
+		hwMusaFrameLastOfflineTime OBJECT-TYPE
+		SYNTAX DateAndTime
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			The last offline time of the extended frame.
+			"
+		::= { hwMusaFrameExtEntry 12 }
+
+		hwMusaFrameLastOfflineReason OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE (0..128))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			The last offline reason of the extended frame.
+			"
+		::= { hwMusaFrameExtEntry 13 }
+
 		hwMusaSlotConfExtTable OBJECT-TYPE
 		SYNTAX SEQUENCE OF HwMusaSlotConfExtEntry
 		MAX-ACCESS not-accessible
@@ -333,7 +387,25 @@
 				hwMusaBoardLatestResetTime
 				    DateAndTime,
 				hwMusaBoardLatestResetCause
-				    Integer32
+				    Integer32,
+				hwMusaBoardMaxLoadBufferSize
+				    Integer32,
+				hwMusaBoardResetCounter
+				    Counter32,
+				hwMusaBoardPowerInputStatus
+				    INTEGER,
+				hwMusaBoardRamTotal
+					Counter64,
+				hwMusaBoardRamUsed
+					Counter64,
+				hwMusaBoardRamFree
+					Counter64,
+				hwMusaBoardFlashTotal
+					Counter64,
+				hwMusaBoardFlashUsed
+					Counter64,
+				hwMusaBoardFlashFree
+					Counter64
 			 }
 
 		hwMusaBoardLimitBandWidthUp OBJECT-TYPE
@@ -417,7 +489,8 @@
 			{
 			online(1),
 			offline(2),
-			unmanageable(3)
+			unmanageable(3),
+			invalid(-1)
 			}
 		MAX-ACCESS read-only
 		STATUS current
@@ -428,6 +501,7 @@
 			1.online(1)       -board is online
 			2.offline(2)      -board is offline
 			3.unmanageable(3) -board is faulty
+			4.invalid(-1)     -invalid state
 			"
 		::= { hwMusaSlotConfExtEntry 8 }  
 			
@@ -438,7 +512,6 @@
 		DESCRIPTION
 			"
 			Service channel buffer usage.
-			It only supports the xDSL service board on the MA5600 and the MA5600T product.
 			-1 indicates that the device cannot get the value, e.g. the board does not support this operation, or the board state is abnormal.
 			"
 		::= { hwMusaSlotConfExtEntry 9 }
@@ -449,8 +522,7 @@
 		STATUS current
 		DESCRIPTION
 			"
-			Board temperature.The value 0X7FFFFFF indicates invalid temperature.
-			It only supports the H801SCUB and H801SCUL boards.
+			Board temperature.The value 0X7FFFFFFF indicates invalid temperature.
 			"
 		::= { hwMusaSlotConfExtEntry 10 }
 			
@@ -499,13 +571,128 @@
 			0x02000169 - Telnet user delivers board reset command. 
 			0x0200016b - User add board manually.  
 			0x020000a1 - The board temperature is too high, which causes the shutdown of the board. 
+			0x0200016c - The board resets because it is prohibited.
 			0x02000173 - The board resets because the working mode is changed.
 			0x02000181 - The service board is automatically shut down when it is not configured with any service. 
 			0x02000182 - The service board is automatically shut down when the mains supply is interrupted. 
 			0x020001b5 - The board is loosened or is removed forcibly.
 			0x0700000a - The active/standby switchover command is manually delivered.
+			0x0700000e - User delivers active board reset command.
 			"
 		::= { hwMusaSlotConfExtEntry 14 }
+
+		hwMusaBoardMaxLoadBufferSize OBJECT-TYPE
+		SYNTAX Integer32 (-1 | 0..524288000)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			Board max load buffer size. The value -1(0xFFFFFFF) indicates invalid buffer size.
+			It only supports the xPON service board. Other board will return -1.
+			The unit is Byte and the board max load buffer is 500MB.
+			"
+		::= { hwMusaSlotConfExtEntry 15 }
+		
+	        hwMusaBoardResetCounter OBJECT-TYPE
+		SYNTAX Counter32 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			The counter of board restart is cleared during board initialization, deletion.
+			"
+		::= { hwMusaSlotConfExtEntry 16 }
+
+		hwMusaBoardPowerInputStatus OBJECT-TYPE
+			SYNTAX INTEGER 
+			{
+			normal(1),
+			fault(2),
+			invalid(3)
+			}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			AC/DC Input Status.
+			Options:
+			1.normal(1)       -board is normal, this value is returned for a power board or virtual power board.
+			2.fault(2)            -board is faulty, this value is returned for a power board or virtual power board.
+			3.invalid(3)        -invalid state, this value is returned for a non-power board.
+			"
+		::= { hwMusaSlotConfExtEntry 17 } 
+			
+	    hwMusaBoardRamTotal OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			Board RAM total volume.
+			0 indicates that the device cannot get the value, e.g. the board does not support this operation, or the board state is abnormal. 
+			Unit: Byte
+			"
+		::= { hwMusaSlotConfExtEntry 18 }
+			
+	    hwMusaBoardRamUsed OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			Board RAM used volume.
+			0 indicates that the device cannot get the value, e.g. the board does not support this operation, or the board state is abnormal.
+			Unit: Byte
+			"
+		::= { hwMusaSlotConfExtEntry 19 }
+			
+	        hwMusaBoardRamFree OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			Board RAM free volume.
+			0 indicates that the device cannot get the value, e.g. the board does not support this operation, or the board state is abnormal.
+			Unit: Byte
+			"
+		::= { hwMusaSlotConfExtEntry 20 }
+			
+		hwMusaBoardFlashTotal OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			Board FLASH total volume.
+			0 indicates that the device cannot get the value, e.g. the board does not support this operation, or the board state is abnormal. 
+			Unit: Byte
+			"
+		::= { hwMusaSlotConfExtEntry 21 }
+			
+	    hwMusaBoardFlashUsed OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			Board FLASH used volume.
+			0 indicates that the device cannot get the value, e.g. the board does not support this operation, or the board state is abnormal. 
+			Unit: Byte
+			"
+		::= { hwMusaSlotConfExtEntry 22 }
+			
+		hwMusaBoardFlashFree OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"
+			Board FLASH free volume.
+			0 indicates that the device cannot get the value, e.g. the board does not support this operation, or the board state is abnormal.  
+			Unit: Byte
+			"
+		::= { hwMusaSlotConfExtEntry 23 }
 			
 		hwMusaSlotAverageConfTable OBJECT-TYPE
 		SYNTAX SEQUENCE OF HwMusaSlotAverageConfEntry
@@ -541,9 +728,9 @@
 		hwMusaBoardStatisticTime OBJECT-TYPE
 		SYNTAX INTEGER
 			{
-			five-seconds(1),
-			one-minute(2),
-			ten-minutes(3)
+			fiveSeconds(1),
+			oneMinute(2),
+			tenMinutes(3)
 			}
 		MAX-ACCESS read-only
 		STATUS current
@@ -551,9 +738,9 @@
 			"
 			This node is not supported.   
 			Options:
-			1. five-seconds(1) -five seconds
-			2. one-minute(2)   -one minute
-			3. ten-minutes(3)  -ten minutes 
+			1. fiveSeconds(1) -five seconds
+			2. oneMinute(2)   -one minute
+			3. tenMinutes(3)  -ten minutes 
 			"
 		::= { hwMusaSlotAverageConfEntry 1 }
 			
@@ -704,7 +891,7 @@
 			
 		hwBroadBandFrameType  OBJECT-TYPE
 		SYNTAX  HWFrameType
-		MAX-ACCESS not-accessible
+		MAX-ACCESS read-write
 		STATUS current
 		DESCRIPTION
 			"
@@ -744,7 +931,7 @@
 			
 		hwBroadBandFrameRowStatus OBJECT-TYPE
 		SYNTAX RowStatus
-		MAX-ACCESS read-write
+		MAX-ACCESS read-create
 		STATUS current
 		DESCRIPTION
 			"

@@ -1,0 +1,49 @@
+-- Top-level infrastructure of the Endace Technology enterprise MIB tree
+-- 
+-- Endace Technology enterprise-specific management objects
+-- 
+-- LEGAL NOTICE:
+-- This source code:
+-- 
+-- a) is a proprietary trade secret of Endace Technology Limited or any of
+-- its related or affiliated companies, a New Zealand company, and its
+-- suppliers and licensors ('Endace'). You must keep it strictly
+-- confidential, and you must not copy, modify, disclose or distribute any
+-- part of it to anyone else, without the prior written
+-- authorisation of Endace Limited;
+-- 
+-- b) may also be part of inventions that are protected by patents and
+-- patent applications; and
+-- 
+-- c) is copyright (C) to Endace, 2003 to 2021. All rights reserved.
+--
+
+ENDACE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, enterprises
+        FROM SNMPv2-SMI
+    ;
+
+endace MODULE-IDENTITY
+    LAST-UPDATED  "202107210349Z" -- July 21, 2021
+    ORGANIZATION
+        "Endace Technology"
+    CONTACT-INFO
+        "postal: Endace Technology
+         6th floor
+         KPMG Centre
+         85 Alexandra Street
+         Hamilton 3204
+         New Zealand
+
+         email:   support@endace.com"
+    DESCRIPTION
+        "Top-level infrastructure of the Endace Technology  enterprise
+         MIB tree"
+    REVISION      "200310170000Z" -- October 17, 2003
+    DESCRIPTION
+        "Second draft"
+    ::= { enterprises 18418 }
+
+END

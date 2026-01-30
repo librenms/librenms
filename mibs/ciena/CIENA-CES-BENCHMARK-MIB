@@ -1,4 +1,4 @@
--- This file was included in WWP MIB release 04-16-00-0047
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-06-00-5005
  --
  -- CIENA-CES-BENCHMARK-MIB.my
  --
@@ -21,17 +21,25 @@
             FROM CIENA-GLOBAL-MIB;
 
  cienaCesBenchmarkMIB MODULE-IDENTITY
-            LAST-UPDATED "201610140000Z"
-            ORGANIZATION "Ciena, Inc"
+            LAST-UPDATED "201706070000Z"
+            ORGANIZATION "Ciena Corp."
             CONTACT-INFO
-               "   Mib Meister
-               115 North Sullivan Road
-               Spokane Valley, WA 99037
-               USA
-               Phone:  +1 509 242 9000
-               Email:  support@ciena.com"
+            "   Mib Meister
+                7035 Ridge Road
+                Hanover, Maryland 21076
+                USA
+                Phone:  +1 800 921 1144
+                Email:  support@ciena.com"
             DESCRIPTION  "The MIB module for managing RFC2544/Y1564 service benchmark testing."
 
+            REVISION     "201706070000Z"
+            DESCRIPTION  "Updated contact info."
+            
+            REVISION     "201702280000Z"
+            DESCRIPTION  "Introduced cienaCesBenchmarkTestInstanceEntryConnectivityTest and 
+                          cienaCesBenchmarkTestInstanceEntryOperState attributes."
+            REVISION     "201702160000Z"
+            DESCRIPTION  "Increase the range of cienaCesBenchmarkBwRatio to 0..1,000,000."
             REVISION     "201611110000Z"
             DESCRIPTION  "The maximumLineRate(3) value for cienaCesBenchmarkProfileEntryFrameLossStartBw is not supported."
             REVISION     "201610140000Z"
@@ -1697,7 +1705,7 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
      ::= { cienaCesBenchmarkBwRatioEntry 2 }
 
  cienaCesBenchmarkBwRatio         OBJECT-TYPE
-     SYNTAX       Integer32 (0..100)
+     SYNTAX       Integer32 (0..1000000)
      MAX-ACCESS   read-write
      STATUS       current
      DESCRIPTION "Ratio of test bandwidth to allocate to the
@@ -2306,7 +2314,9 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
      cienaCesBenchmarkTestInstanceEntryLastIterStart        DateAndTime,
      cienaCesBenchmarkTestInstanceEntryClearStats           TruthValue,
      cienaCesBenchmarkTestInstanceEntryRowStatus            RowStatus,
-     cienaCesBenchmarkTestInstanceEntryAssocEntityId        Integer32
+     cienaCesBenchmarkTestInstanceEntryAssocEntityId        Integer32,
+     cienaCesBenchmarkTestInstanceEntryOperState            TruthValue,
+     cienaCesBenchmarkTestInstanceEntryConnectivityTest     TruthValue
  }
 
  cienaCesBenchmarkTestInstanceEntryId          OBJECT-TYPE
@@ -2479,6 +2489,30 @@ CienaCesBenchmarkFramelossTestState ::= TEXTUAL-CONVENTION
              "ID of the entity this test instance is associated with 
               (cienaCesBenchmarkEntityEntryId)"
      ::= { cienaCesBenchmarkTestInstanceEntry 16 }
+
+ cienaCesBenchmarkTestInstanceEntryOperState OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "Indicates the operational state of the test instance. When a generator 
+             test instance is operationally enabled it means the test is running and 
+             traffic is being generated. When a reflector test instance is operationally 
+             enabled it means that reflection is active on the specified svid:cvid combination. 
+             Use the cienaCesBenchmarkTestInstanceEntryAdminState to enable/disable a test 
+             instance since this field is read-only and meant to capture operational state."
+     ::= { cienaCesBenchmarkTestInstanceEntry 17 }
+
+ cienaCesBenchmarkTestInstanceEntryConnectivityTest    OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION
+             "Applicable to generator test instances, this field is used to trigger 
+             a connectivity test on the test instance. Setting the value to true will 
+             trigger the test by transmitting 10 packets. If no error is returned 
+             then the test has passed. If a commit error is received then the test has failed."
+     ::= { cienaCesBenchmarkTestInstanceEntry 18 }
 
  ---
  --- Generator Test Session Allocation and Status Table

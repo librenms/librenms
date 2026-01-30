@@ -29,6 +29,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class Ipv4Address extends PortRelatedModel implements Keyable
@@ -46,11 +47,22 @@ class Ipv4Address extends PortRelatedModel implements Keyable
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\Ipv4Network, $this>
+     * @return BelongsTo<Ipv4Network, $this>
      */
     public function network(): BelongsTo
     {
         return $this->belongsTo(Ipv4Network::class, 'ipv4_network_id', 'ipv4_network_id');
+    }
+
+    /**
+     * This is not a standard relationship it is a shortcut to generate an aggregate for sorting.
+     * Use port.device nested relationship to access device.
+     *
+     * @return HasOneThrough<Device, Port, $this>
+     */
+    public function deviceViaPort(): HasOneThrough
+    {
+        return $this->hasOneThrough(Device::class, Port::class, 'port_id', 'device_id', 'port_id', 'device_id');
     }
 
     public function getCompositeKey(): string

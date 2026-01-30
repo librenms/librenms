@@ -251,7 +251,6 @@ $nfs_stat_keys = [
 // list of stats that are gauges
 $gauge_stats = [
     'server_cache_CacheSize' => 1,
-    'server_Clients' => 1,
     'server_cache_TCPPeak' => 1,
     'client_Delegs' => 1,
     'client_Layouts' => 1,
@@ -815,7 +814,6 @@ $nfs_graphs = [
         '' => [
             'server_cache_CacheSize' => 'CacheSize',
             'server_cache_Inprog' => 'Inprog',
-            'server_cache_Misses' => 'Misses',
             'server_cache_Non-idem' => 'Non-idem',
             'server_cache_TCPPeak' => 'TCPPeak',
             'server_cache_hits' => 'Hits',

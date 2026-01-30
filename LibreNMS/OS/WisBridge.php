@@ -65,7 +65,7 @@ class WisBridge extends OS implements
         $device->hardware = $response->value('IEEE802dot11-MIB::dot11manufacturerProductName') ?: null;
 
         $version = $response->value('IEEE802dot11-MIB::dot11manufacturerProductVersion');
-        preg_match('/\.v(.*)$/', $version, $matches);
+        preg_match('/\.v(.*)$/', (string) $version, $matches);
         $device->version = $matches[1] ?? null;
     }
 

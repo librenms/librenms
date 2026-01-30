@@ -69,7 +69,7 @@ class Unifi extends OS implements
         $response = SnmpQuery::next(['IEEE802dot11-MIB::dot11manufacturerProductName', 'IEEE802dot11-MIB::dot11manufacturerProductVersion']);
 
         $device->hardware = $response->value('IEEE802dot11-MIB::dot11manufacturerProductName') ?: null;
-        preg_match('/(v[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/', $response->value('IEEE802dot11-MIB::dot11manufacturerProductVersion'), $matches);
+        preg_match('/(v[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/', (string) $response->value('IEEE802dot11-MIB::dot11manufacturerProductVersion'), $matches);
         $device->version = $matches[1] ?? null;
     }
 

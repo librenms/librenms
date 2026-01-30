@@ -22,14 +22,15 @@ $components = $component->getComponents($device['device_id'], $options);
 $components = $components[$device['device_id']];
 
 include 'includes/html/graphs/common.inc.php';
-$rrd_options .= ' -l 0 -E ';
-$rrd_options .= " COMMENT:'Wide IP Resolved Requests                                           Now      Avg      Max\\n'";
+$graph_params->scale_min = 0;
+
+$rrd_options[] = 'COMMENT:Wide IP Resolved Requests                                           Now      Avg      Max\\n';
 $colours = array_merge(\App\Facades\LibrenmsConfig::get('graph_colours.mixed'), \App\Facades\LibrenmsConfig::get('graph_colours.manycolours'));
 $colcount = 0;
 $count = 0;
 
 // add all GTM Wide IP Request on this device.
-foreach ($components as $compid => $comp) {
+foreach ($components as $comp) {
     $label = $comp['label'];
     $hash = $comp['hash'];
     $rrd_filename = Rrd::name($device['hostname'], [$comp['type'], $label, $hash]);
@@ -42,11 +43,11 @@ foreach ($components as $compid => $comp) {
             $colour = $colours[$colcount];
         }
 
-        $rrd_options .= ' DEF:DS' . $count . '=' . $rrd_filename . ':resolved:AVERAGE ';
-        $rrd_options .= ' LINE1.25:DS' . $count . '#' . $colour . ":'" . str_pad(substr($label, 0, 60), 60) . "'";
-        $rrd_options .= ' GPRINT:DS' . $count . ':LAST:%6.2lf%s ';
-        $rrd_options .= ' GPRINT:DS' . $count . ':AVERAGE:%6.2lf%s ';
-        $rrd_options .= ' GPRINT:DS' . $count . ":MAX:%6.2lf%s\l ";
+        $rrd_options[] = 'DEF:DS' . $count . '=' . $rrd_filename . ':resolved:AVERAGE';
+        $rrd_options[] = 'LINE1.25:DS' . $count . '#' . $colour . ':' . str_pad(substr((string) $label, 0, 60), 60);
+        $rrd_options[] = 'GPRINT:DS' . $count . ':LAST:%6.2lf%s';
+        $rrd_options[] = 'GPRINT:DS' . $count . ':AVERAGE:%6.2lf%s';
+        $rrd_options[] = 'GPRINT:DS' . $count . ":MAX:%6.2lf%s\l";
         $count++;
         $colcount++;
     }

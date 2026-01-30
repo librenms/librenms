@@ -98,7 +98,7 @@ $mapping = [
     'SlLa' => 'br',
 ];
 
-$data = explode("\n", $mysql);
+$data = explode("\n", (string) $mysql);
 
 if (count($data) < 80) {
     echo " Incorrect number of datapoints returned from device, skipping\n";
@@ -114,7 +114,7 @@ foreach ($data as $str) {
 
 $fields = [];
 foreach ($mapping as $k => $v) {
-    $fields[$k] = (isset($map[$v]) && $map[$v] >= 0) ? $map[$v] : 'U';
+    $fields[$k] = (isset($map[$v]) && $map[$v] >= 0) ? $map[$v] : null;
 }
 $metrics = $fields;
 
@@ -235,7 +235,7 @@ $rrd_def->disableNameChecking();
 
 $fields = [];
 foreach ($mapping_status as $desc => $id) {
-    $fields[$desc] = (isset($map[$id]) && $map[$id] >= 0) ? $map[$id] : 'U';
+    $fields[$desc] = (isset($map[$id]) && $map[$id] >= 0) ? $map[$id] : null;
     $rrd_def->addDataset($id, 'GAUGE', 0, 125000000000);
 }
 $metrics += $fields;

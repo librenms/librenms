@@ -2,13 +2,13 @@ mib: FIBROLAN-SFP-MIB:FIBROLAN-DEVICE-MIB
 modules:
     os:
         version: .1.0.8802.1.1.2.1.3.4.0
-        
+
     processors:
         data:
             -
                 oid: flDeviceCpuStatusEntry
                 value:  flDeviceCpuUtilization
-                num_oid: '.1.3.6.1.4.1.4467.1000.10.1.120.1.2'
+                num_oid: '.1.3.6.1.4.1.4467.1000.10.1.120.1.2.{{ $index }}'
                 descr: 'CPU Usage'
     sensors:
         dbm:

@@ -11,6 +11,8 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     $ipmi['user'] = get_dev_attrib($device, 'ipmi_username');
     $ipmi['password'] = get_dev_attrib($device, 'ipmi_password');
     $ipmi['kg_key'] = get_dev_attrib($device, 'ipmi_kg_key');
+    $ipmi['ciphersuite'] = get_dev_attrib($device, 'ipmi_ciphersuite');
+    $ipmi['timeout'] = filter_var(get_dev_attrib($device, 'ipmi_timeout'), FILTER_VALIDATE_INT) ?: '3';
 
     $cmd = [LibrenmsConfig::get('ipmitool', 'ipmitool')];
     if (LibrenmsConfig::get('own_hostname') != $device['hostname'] || $ipmi['host'] != 'localhost') {
@@ -19,17 +21,21 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
         } else {
             array_push($cmd, '-H', $ipmi['host'], '-p', $ipmi['port'], '-U', $ipmi['user'], '-P', $ipmi['password'], '-y', $ipmi['kg_key'], '-L', 'USER');
         }
+        if (! empty($ipmi['ciphersuite'])) {
+            array_push($cmd, '-C', $ipmi['ciphersuite']);
+        }
+        if (! empty($ipmi['timeout'])) {
+            array_push($cmd, '-N', $ipmi['timeout']);
+        }
     }
 
     foreach (LibrenmsConfig::get('ipmi.type', []) as $ipmi_type) {
         // Check if the IPMI type is available, catch segfaults of ipmitool/freeipmi.
         try {
             Log::debug('Trying IPMI type: ' . $ipmi_type);
-            $results = explode(PHP_EOL, external_exec(array_merge($cmd, ['-I', $ipmi_type, 'sensor'])));
+            $results = explode(PHP_EOL, (string) external_exec(array_merge($cmd, ['-I', $ipmi_type, 'sensor'])));
 
-            $results = array_values(array_filter($results, function ($line) {
-                return ! Str::contains($line, 'discrete');
-            }));
+            $results = array_values(array_filter($results, fn ($line) => ! Str::contains($line, 'discrete') && trim((string) $line) !== ''));
 
             if (! empty($results)) {
                 set_dev_attrib($device, 'ipmi_type', $ipmi_type);
@@ -46,7 +52,7 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     sort($results);
     foreach ($results as $sensor) {
         // BB +1.1V IOH     | 1.089      | Volts      | ok    | na        | 1.027     | 1.054     | 1.146     | 1.177     | na
-        $values = array_map('trim', explode('|', $sensor));
+        $values = array_map(trim(...), explode('|', (string) $sensor));
         [$desc,$current,$unit,$state,$low_nonrecoverable,$low_limit,$low_warn,$high_warn,$high_limit,$high_nonrecoverable] = $values;
 
         $index++;
@@ -79,3 +85,5 @@ $sensorDiscovery->sync(sensor_class: 'voltage', poller_type: 'ipmi');
 $sensorDiscovery->sync(sensor_class: 'temperature', poller_type: 'ipmi');
 $sensorDiscovery->sync(sensor_class: 'fanspeed', poller_type: 'ipmi');
 $sensorDiscovery->sync(sensor_class: 'power', poller_type: 'ipmi');
+$sensorDiscovery->sync(sensor_class: 'current', poller_type: 'ipmi');
+$sensorDiscovery->sync(sensor_class: 'load', poller_type: 'ipmi');

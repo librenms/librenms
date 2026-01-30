@@ -93,7 +93,7 @@ class AuthenticateGraph
                     return true;
                 }
             }
-        } catch (InvalidIpException $e) {
+        } catch (InvalidIpException) {
             d_echo("Client IP ($ip) is invalid.\n");
         }
 

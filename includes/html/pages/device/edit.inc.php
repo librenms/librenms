@@ -69,7 +69,11 @@ if (! Auth::user()->hasGlobalAdmin()) {
         } else {
         }
 
-        echo generate_link($text, $link_array, ['section' => $type]);
+        if ($type == 'device') {
+            echo '<a href="' . route('device.edit', [$device['device_id']]) . "\">$text</a>";
+        } else {
+            echo generate_link($text, $link_array, ['section' => $type]);
+        }
 
         if ($vars['section'] == $type) {
             echo '</span>';
@@ -79,7 +83,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
 
     print_optionbar_end();
 
-    $section = basename($vars['section']);
+    $section = basename((string) $vars['section']);
     if (is_file("includes/html/pages/device/edit/$section.inc.php")) {
         require "includes/html/pages/device/edit/$section.inc.php";
     }

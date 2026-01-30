@@ -124,7 +124,7 @@ class Prometheus extends BaseDatastore
             if (! $result->successful()) {
                 Log::error('Prometheus Error: ' . $result->body());
             }
-        } catch (ConnectionException $e) {
+        } catch (ConnectionException) {
             \Illuminate\Support\Facades\Log::error("%RFailed to connect to Prometheus server $this->base_uri, temporarily disabling.%n", ['color' => true]);
             $this->enabled = false;
         }

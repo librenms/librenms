@@ -91,42 +91,19 @@ if ($device['os_group'] == 'cisco') {
                 $current = $entry['entSensorValue'];
                 $type = $entitysensor[$entry['entSensorType']];
 
-                // echo("$index : ".$entry['entSensorScale']."|");
-                // FIXME this stuff is foul
-                if ($entry['entSensorScale'] == 'nano') {
-                    $divisor = '1000000000';
-                    $multiplier = '1';
-                }
-
-                if ($entry['entSensorScale'] == 'micro') {
-                    $divisor = '1000000';
-                    $multiplier = '1';
-                }
-
-                if ($entry['entSensorScale'] == 'milli') {
-                    $divisor = '1000';
-                    $multiplier = '1';
-                }
-
-                if ($entry['entSensorScale'] == 'units') {
-                    $divisor = '1';
-                    $multiplier = '1';
-                }
-
-                if ($entry['entSensorScale'] == 'kilo') {
-                    $divisor = '1';
-                    $multiplier = '1000';
-                }
-
-                if ($entry['entSensorScale'] == 'mega') {
-                    $divisor = '1';
-                    $multiplier = '1000000';
-                }
-
-                if ($entry['entSensorScale'] == 'giga') {
-                    $divisor = '1';
-                    $multiplier = '1000000000';
-                }
+                // Try to handle the scale
+                [$divisor, $multiplier] = match ($entry['entSensorScale']) {
+                    'zepto' => [1000000000000000000, 1],
+                    'nano' => [1000000000, 1],
+                    'micro' => [1000000, 1],
+                    'milli' => [1000, 1],
+                    'units' => [1, 1],
+                    'kilo' => [1, 1000],
+                    'mega' => [1, 1000000],
+                    'giga' => [1, 1000000000],
+                    'yocto' => [1, 1],
+                    default => [1, 1],
+                };
 
                 if (is_numeric($entry['entSensorPrecision'])
                         && $entry['entSensorPrecision'] > '0'
@@ -147,17 +124,27 @@ if ($device['os_group'] == 'cisco') {
 
                 // Check thresholds for this entry (bit dirty, but it works!)
                 if (isset($t_oids[$index]) && is_array($t_oids[$index])) {
-                    foreach ($t_oids[$index] as $t_index => $key) {
+                    foreach ($t_oids[$index] as $key) {
                         // Skip invalid treshold values
-                        if (! isset($key['entSensorThresholdValue']) || $key['entSensorThresholdValue'] == '-32768') {
+                        if (! isset($key['entSensorThresholdValue']) || $key['entSensorThresholdValue'] == '-32768' || $key['entSensorThresholdValue'] == '2147483647') {
+                            continue;
+                        } elseif ($type == 'fanspeed' && $key['entSensorThresholdValue'] == '-1') {
                             continue;
                         }
                         // Critical Limit
                         if (($key['entSensorThresholdSeverity'] == 'major' || $key['entSensorThresholdSeverity'] == 'critical') && ($key['entSensorThresholdRelation'] == 'greaterOrEqual' || $key['entSensorThresholdRelation'] == 'greaterThan')) {
+                            if ($key['entSensorThresholdValue'] == '0' && isset($limit)) {
+                                // Ignore a threshold of 0 if another threshold has been set (major vs critical)
+                                continue;
+                            }
                             $limit = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
 
                         if (($key['entSensorThresholdSeverity'] == 'major' || $key['entSensorThresholdSeverity'] == 'critical') && ($key['entSensorThresholdRelation'] == 'lessOrEqual' || $key['entSensorThresholdRelation'] == 'lessThan')) {
+                            if ($key['entSensorThresholdValue'] == '0' && isset($limit_low)) {
+                                // Ignore a threshold of 0 if another threshold has been set (major vs critical)
+                                continue;
+                            }
                             $limit_low = ($key['entSensorThresholdValue'] * $multiplier / $divisor);
                         }
 
@@ -212,7 +199,7 @@ if ($device['os_group'] == 'cisco') {
                         if ($entPhysicalClass === 'port') {
                             $entAliasMappingIdentifier = $entity_array[$phys_index][0]['entAliasMappingIdentifier'];
                             if (Str::contains($entAliasMappingIdentifier, 'ifIndex.')) {
-                                [, $tmp_ifindex] = explode('.', $entAliasMappingIdentifier);
+                                [, $tmp_ifindex] = explode('.', (string) $entAliasMappingIdentifier);
                             }
                             break;
                             //or sensor entity has a parent entity with module class and entPhysicalName set to an existing ifName.

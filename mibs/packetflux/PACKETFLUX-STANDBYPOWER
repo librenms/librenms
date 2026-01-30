@@ -3,7 +3,7 @@ PACKETFLUX-STANDBYPOWER DEFINITIONS ::= BEGIN
     MODULE-IDENTITY, Integer32, OBJECT-TYPE,
     Gauge32, TimeTicks
         FROM SNMPv2-SMI
-    packetfluxMgmt
+    packetfluxProductSpecific
         FROM PACKETFLUX-SMI
     OBJECT-GROUP
         FROM SNMPv2-CONF
@@ -11,15 +11,16 @@ PACKETFLUX-STANDBYPOWER DEFINITIONS ::= BEGIN
         FROM SNMPv2-TC;
 
     standbypower MODULE-IDENTITY
-        LAST-UPDATED        "201306041649Z"
+        LAST-UPDATED        "201807071300Z"
         ORGANIZATION        "PacketFlux Technologies"
-        CONTACT-INFO        "custsvc@packetflux.com                        
-                            http://www.packetflux.com"
+        CONTACT-INFO        "custsvc@packetflux.com http://www.packetflux.com"
         DESCRIPTION         "MIB for the PacketFlux Standby Power Controller"
 
+        REVISION            "201807071300Z"
+        DESCRIPTION         "Update to new packetflux standardized OID tree."
         REVISION            "201306041649Z"
         DESCRIPTION         "initial version of this module"
-        ::= { packetfluxMgmt 2 }
+        ::= { packetfluxProductSpecific 2 }
 
 
     powercontrollerstate OBJECT-TYPE
@@ -640,3 +641,4 @@ PACKETFLUX-STANDBYPOWER DEFINITIONS ::= BEGIN
 
 
 END
+

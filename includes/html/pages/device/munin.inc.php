@@ -26,7 +26,7 @@ foreach (dbFetchRows('SELECT * FROM munin_plugins WHERE device_id = ? ORDER BY m
 
 foreach ($graph_enable as $section => $nothing) {
     if (isset($graph_enable) && is_array($graph_enable[$section])) {
-        $type = strtolower($section);
+        $type = strtolower((string) $section);
         if (! $vars['group']) {
             $vars['group'] = $type;
         }

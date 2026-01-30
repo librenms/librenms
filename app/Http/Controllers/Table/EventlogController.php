@@ -41,6 +41,8 @@ class EventlogController extends TableController
             'device' => 'nullable|int',
             'device_group' => 'nullable|int',
             'eventtype' => 'nullable|string',
+            'age' => 'nullable|int',
+            'message' => 'nullable|string',
         ];
     }
 
@@ -72,8 +74,14 @@ class EventlogController extends TableController
     {
         return Eventlog::hasAccess($request->user())
             ->with('device')
-            ->when($request->device_group, function ($query) use ($request) {
+            ->when($request->device_group, function ($query) use ($request): void {
                 $query->inDeviceGroup($request->device_group);
+            })
+            ->when($request->message, function ($query) use ($request): void {
+                $query->where('message', 'like', '%' . $request->message . '%');
+            })
+            ->when($request->age, function ($query) use ($request): void {
+                $query->where('datetime', '>', Carbon::now()->subSeconds((int) $request->age));
             });
     }
 
@@ -86,7 +94,7 @@ class EventlogController extends TableController
             'datetime' => $this->formatDatetime($eventlog),
             'device_id' => Blade::render('<x-device-link :device="$device"/>', ['device' => $eventlog->device]),
             'type' => $this->formatType($eventlog),
-            'message' => htmlspecialchars($eventlog->message),
+            'message' => htmlspecialchars((string) $eventlog->message),
             'username' => $eventlog->username ?: 'System',
         ];
     }
@@ -111,7 +119,7 @@ class EventlogController extends TableController
             }
         }
 
-        return htmlspecialchars($eventlog->type);
+        return htmlspecialchars((string) $eventlog->type);
     }
 
     private function formatDatetime($eventlog)

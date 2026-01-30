@@ -14,10 +14,10 @@ class OuiLookupController extends Controller
     public function __invoke(Request $request): \Illuminate\Contracts\View\View
     {
         $results = [];
-        $query = $request->get('query');
+        $query = $request->input('query');
 
         if ($query) {
-            $lines = preg_split('/\r\n|\n|\r/', $query, flags: PREG_SPLIT_NO_EMPTY);
+            $lines = preg_split('/\r\n|\n|\r/', (string) $query, flags: PREG_SPLIT_NO_EMPTY);
             foreach ($lines as $line) {
                 $mac = Mac::parsePartial($line);
 

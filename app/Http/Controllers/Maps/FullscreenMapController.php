@@ -50,24 +50,24 @@ class FullscreenMapController extends Controller
         }
 
         $group_name = null;
-        if ($request->get('group')) {
-            $group_name = DeviceGroup::where('id', '=', $request->get('group'))->first('name');
+        if ($request->input('group')) {
+            $group_name = DeviceGroup::where('id', '=', $request->input('group'))->first('name');
             if (! empty($group_name)) {
                 $group_name = $group_name->name;
             }
         }
 
-        $init_lat = $request->get('lat');
+        $init_lat = $request->input('lat');
         if (! $init_lat) {
             $init_lat = LibrenmsConfig::get('leaflet.default_lat', 51.48);
         }
 
-        $init_lng = $request->get('lng');
+        $init_lng = $request->input('lng');
         if (! $init_lng) {
             $init_lng = LibrenmsConfig::get('leaflet.default_lng', 0);
         }
 
-        $init_zoom = $request->get('zoom');
+        $init_zoom = $request->input('zoom');
         if (! $init_zoom) {
             $init_zoom = LibrenmsConfig::get('leaflet.default_zoom', 5);
         }
@@ -85,7 +85,7 @@ class FullscreenMapController extends Controller
             'init_zoom' => $init_zoom,
             'group_radius' => LibrenmsConfig::get('leaflet.group_radius', 80),
             'tile_url' => LibrenmsConfig::get('leaflet.tile_url', '{s}.tile.openstreetmap.org'),
-            'group_id' => $request->get('group'),
+            'group_id' => $request->input('group'),
             'group_name' => $group_name,
         ];
 

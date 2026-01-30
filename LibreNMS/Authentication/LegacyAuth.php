@@ -9,14 +9,14 @@ class LegacyAuth
 {
     protected static $_instance;
     private static $configToClassMap = [
-        'mysql' => 'LibreNMS\Authentication\MysqlAuthorizer',
-        'active_directory' => 'LibreNMS\Authentication\ActiveDirectoryAuthorizer',
-        'ldap' => 'LibreNMS\Authentication\LdapAuthorizer',
-        'radius' => 'LibreNMS\Authentication\RadiusAuthorizer',
-        'http-auth' => 'LibreNMS\Authentication\HttpAuthAuthorizer',
-        'ad-authorization' => 'LibreNMS\Authentication\ADAuthorizationAuthorizer',
-        'ldap-authorization' => 'LibreNMS\Authentication\LdapAuthorizationAuthorizer',
-        'sso' => 'LibreNMS\Authentication\SSOAuthorizer',
+        'mysql' => \LibreNMS\Authentication\MysqlAuthorizer::class,
+        'active_directory' => \LibreNMS\Authentication\ActiveDirectoryAuthorizer::class,
+        'ldap' => \LibreNMS\Authentication\LdapAuthorizer::class,
+        'radius' => \LibreNMS\Authentication\RadiusAuthorizer::class,
+        'http-auth' => \LibreNMS\Authentication\HttpAuthAuthorizer::class,
+        'ad-authorization' => \LibreNMS\Authentication\ADAuthorizationAuthorizer::class,
+        'ldap-authorization' => \LibreNMS\Authentication\LdapAuthorizationAuthorizer::class,
+        'sso' => \LibreNMS\Authentication\SSOAuthorizer::class,
     ];
 
     /**
