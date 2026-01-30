@@ -13,7 +13,7 @@ ALCATEL-IND1-SERVICE-MGR-MIB DEFINITIONS ::= BEGIN
                         FROM SNMPv2-TC
                 InterfaceIndex, InterfaceIndexOrZero
                         FROM IF-MIB
-                AlaEServiceUNIProfileProtocolTreatment
+                AlaEServiceUNIProfileProtocolTreatment, AlaEServiceUNIProfileProtocolTreatmentMode
                         FROM ALCATEL-IND1-E-SERVICE-MIB
                 svcId, SdpId, ServObjDesc
                         FROM ALCATEL-IND1-TIMETRA-SERV-MIB
@@ -27,34 +27,28 @@ ALCATEL-IND1-SERVICE-MGR-MIB DEFINITIONS ::= BEGIN
                 InetAddress, InetAddressType
                         FROM INET-ADDRESS-MIB
                 MplsLdpIdentifier
-                        FROM MPLS-LDP-MIB
+                        FROM MPLS-TC-STD-MIB
                 SnmpAdminString
                         FROM SNMP-FRAMEWORK-MIB
-                ;
+        ;
                 
 
         alcatelIND1ServiceMgrMIB MODULE-IDENTITY
-        LAST-UPDATED "201208090000Z"
-        ORGANIZATION "Alcatel-Lucent"
-        CONTACT-INFO
-                "Please consult with Customer Service to ensure the most appropriate
-                version of this document is used with the products in question:
-     
-                                   Alcatel-Lucent, Enterprise Solutions Division
-                                (Formerly Alcatel Internetworking, Incorporated)
-                                         26801 West Agoura Road
-                                       Agoura Hills, CA  91301-5122
-                                        United States Of America
-    
-                Telephone:      North America   +1 800 995 2696
-                                        Latin America   +1 877 919 9526
-                                Europe      +31 23 556 0100
-                                Asia        +65 394 7933
-                                All Other   +1 818 878 4507
-    
-                Electronic Mail:    support@ind.alcatel.com
-                World Wide Web:     http://alcatel-lucent.com/wps/portal/enterprise
-                File Transfer Protocol: ftp://ftp.ind.alcatel.com/pub/products/mibs"
+            LAST-UPDATED "202211210000Z"
+            ORGANIZATION "ALE USA Inc."
+            CONTACT-INFO
+             "Please consult with Customer Service to ensure the most appropriate
+              version of this document is used with the products in question:
+
+                              ALE USA Inc. Enterprise
+                                26801 West Agoura Road
+                             Agoura Hills, CA  91301-5122
+                               United States Of America
+
+             Telephone:          +1 800 995 2696
+
+             Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+             World Wide Web:     https://www.al-enterprise.com"
                 DESCRIPTION
                 "The parameters for configuration of the service manager feature.
 
@@ -69,8 +63,17 @@ ALCATEL-IND1-SERVICE-MGR-MIB DEFINITIONS ::= BEGIN
                 non-exclusive license to use this specification in connection with
                 management of the products for which it is intended to be used.
 
-                               Copyright (C) 1995-2006 Alcatel-Lucent
-                                     ALL RIGHTS RESERVED WORLDWIDE"
+                   Copyright (C) ALE USA Inc. 2014-2019
+                   Copyright (C) 1995-2013 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
+
+            REVISION      "202211210000Z"
+            DESCRIPTION
+                "Added VPLS type for service, sdp, and sdp-bind."
+
+            REVISION      "201911270000Z"
+            DESCRIPTION
+                "Updated the latest contact and Copyright information for ALE USA Inc."
         ::= { softentIND1serviceMgr 1}
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -128,7 +131,9 @@ AluServiceType ::= TEXTUAL-CONVENTION
                         spb     (11),-- Shortest Path Bridging Mac service "SPBM"
                         vxlan   (12),-- Virtual Extensible LAN service "VxLAN"
                         local   (13), -- Local service for traffic between SAPs but no tunnel
-                        rfpoverspb (14) -- RFP over SPB
+                        rfpoverspb (14), -- RFP over SPB
+                        l2gre (15), -- L2GRE
+                        mpls (16) -- MPLS
                     }
 
 AluAllocationType ::= TEXTUAL-CONVENTION
@@ -145,7 +150,6 @@ AluSdpDynamicType ::= TEXTUAL-CONVENTION
                         dynamicUnicast          (2), -- Dynamically created unicast path "*" 
                         dynamicMcastRemote      (3), -- Dynamically created multicast path from remote node "+"
                         dynamicMcastLocal       (4)  -- Dynamically created multicast path from local node "#"
-
                     }
 
 AluSdpOriginType ::= TEXTUAL-CONVENTION
@@ -160,7 +164,12 @@ AluSdpOriginType ::= TEXTUAL-CONVENTION
                         vxlanUnicast            (5), -- Far-end Unicast Ip Addr for VxLAN Tunnel
                         vxlanMcast              (6), -- Multicast Group for VxLAN Tunnel
                         vxlanDynamicUnicast     (7), -- Dynamically created Far-end Unicast for VxLAN Tunnel
-                        vxlanDynamicMcast       (8)  -- Dynamically created Multicast group for VxLAN Tunnel
+                        vxlanDynamicMcast       (8),  -- Dynamically created Multicast group for VxLAN Tunnel
+                        l2greUnicast            (9), -- Far-end Unicast Ip Addr for L2Gre Tunnel
+                        l2greDynamicUnicast     (10), -- Dynamically created Far-end Unicast for VPLS Tunnel
+                        vplsMcast               (11), -- Multicast Group for VPLS Tunnel
+                        vplsUnicast             (12), -- Far-end Unicast IP Addr for VPLS Tunnel
+                        vplsDynamicUnicast      (13) -- Dynamically created Far-end Unicast for VPLS Tunnel
                     }
 
 AluDateAndTime ::= TEXTUAL-CONVENTION
@@ -169,6 +178,59 @@ AluDateAndTime ::= TEXTUAL-CONVENTION
     DESCRIPTION     "ASCII string used to display date and time in
                      MM/DD/YYYY HH:MM:SS format"
     SYNTAX          OCTET STRING (SIZE (0..21))
+
+AluServOption ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "The service option is used to specify the tunnel endpoint creation
+                     for a given service."
+    SYNTAX          INTEGER {
+                        none                    (0), -- None   : Automatic tunnel creation
+                        mac-orchestration       (1), -- MAC    : Unicast flows between Access Port & a remote node
+                        node-orchestration      (2), -- Node   : All flows between Access Port & a specified node
+                        hybrid-orchestration    (3), -- Hybrid : Combination of MAC & Node orchestration
+                        pseudo-wire             (4), -- Pseudo-Wire : Flows between single SAP & N/W port only
+                        e-tree                  (5), -- E-Tree : Point-to-Multipoint services  (Flow b/w Leaf to Root SAPs allowed but Leaf to Leaf SAPs not allowed)
+                        pseudo-wire-disable     (6), -- Pseudo-Wire-Disable : Disable flows between single SAP & N/W port only
+                        e-tree-disable          (7)  -- E-Tree-Disable : Disable Point-to-Multipoint services 
+                    }
+AluSigOption ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "The signal option is used for specifying the protocol to exchange service tunnel label
+                    for a given VPLS service instance."
+    SYNTAX          INTEGER {
+                        ldp                     (1), -- Use LDP protocol to signal VC tunnel Label
+                        bgp                     (2)  -- Use BGP protocol to signal VC tunnel Label
+                    }
+
+AlcatelIND1SvcSiteId ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "1x-"
+        STATUS current
+        DESCRIPTION
+                "This identifier is the 3 Byte IS-IS Area Address."
+        SYNTAX OCTET STRING (SIZE(3))
+
+AlcatelIND1EsId ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "1x:"
+        STATUS current
+        DESCRIPTION
+                "This is used for 10 octet Ethernet Segment Identifier.
+                 Format of ESI on Lacp/Static Lag and Physical-Port:
+                  - Lacp LAG     : 03:<6-octet Lacp-Client-Mac-Addr>:<2-octet Admin-Key>:00
+                    Eg           : 03:00:00:00:01:02:03:00:7b:00
+                  - Static LAG   : 03:a1:<5-octet Admin-Input>:ff:ff:01
+                    Eg           : 03:a1:01:02:03:04:05:ff:ff:01
+                  - Physical Port: 03:<6-octet Port-Mac-Addr>:ff:ff:ff
+                    Eg           : 03:2c:fa:a2:40:72:4f:ff:ff:ff"
+        SYNTAX OCTET STRING (SIZE(10))
+
+AlcatelIND1EsRt ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "1x:"
+        STATUS current
+        DESCRIPTION
+                "This is used for 8 octet route-target for an Ethernet Segment.
+                 Format: <1-octet type>:<1-octet subType>:<6-octet Esid>
+                 Eg    : 06:02:a1:01:02:03:04:05"
+        SYNTAX OCTET STRING (SIZE(8))
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -245,7 +307,10 @@ AlaServiceMgrPortProfileEntry ::= SEQUENCE
             alaServiceMgrPortProfileMvrpTreatment           AlaEServiceUNIProfileProtocolTreatment,
             alaServiceMgrPortProfileCiscoPduTreatment       AlaEServiceUNIProfileProtocolTreatment,
             alaServiceMgrPortProfileCiscoVlanTreatment      AlaEServiceUNIProfileProtocolTreatment,
-            alaServiceMgrPortProfileCiscoUplinkTreatment    AlaEServiceUNIProfileProtocolTreatment
+            alaServiceMgrPortProfileCiscoUplinkTreatment    AlaEServiceUNIProfileProtocolTreatment, 
+            alaServiceMgrPortProfile8021ABTagTreatment   AlaEServiceUNIProfileProtocolTreatment,
+            alaServiceMgrPortProfile8021ABUnTagTreatment AlaEServiceUNIProfileProtocolTreatment,
+            alaServiceMgrPortProfile8021ABMode              AlaEServiceUNIProfileProtocolTreatmentMode
         }
 
 alaServiceMgrPortProfileID OBJECT-TYPE
@@ -394,6 +459,43 @@ alaServiceMgrPortProfileCiscoUplinkTreatment  OBJECT-TYPE
         DEFVAL { drop }
         ::= { alaServiceMgrPortProfileEntry 12 }
 
+alaServiceMgrPortProfile8021ABTagTreatment  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the IEEE 802.1AB PDU
+        frames received on the UNI. Tunnel (1) enables the PDU to be tunneled across
+        the provider network.  Discard (2) causes the PDU of the protocol to be discarded
+        and not enter the provider network. Peer (3) and MAC-Tunnel(4) are not supported."
+        DEFVAL { drop }
+        ::= { alaServiceMgrPortProfileEntry 13 }
+
+alaServiceMgrPortProfile8021ABUnTagTreatment  OBJECT-TYPE
+        SYNTAX  AlaEServiceUNIProfileProtocolTreatment
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "This object describes the behavior of the bridge in regards to the IEEE 802.1AB PDU
+        frames received on the UNI. Tunnel(1) is not supported.
+        Discard (2) causes the PDU of the protocol to be discarded
+        and not enter the provider network. Peer (3) means that on this port the bridge
+        is to participate in the protocol. MAC-Tunnel (4) is not supported. "
+        DEFVAL { drop }
+        ::= { alaServiceMgrPortProfileEntry 14 }
+
+alaServiceMgrPortProfile8021ABMode  OBJECT-TYPE
+       SYNTAX  AlaEServiceUNIProfileProtocolTreatmentMode
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+       "This object describes the type of treatment being given to the IEEE 802.1AB PDU frames
+        received on the UNI. Default(1) means all IEEE 802.1AB PDU frames are being given default treatment.
+        Same(2) means all IEEE 802.1AB PDU frames are being given same treatment. May or may not be default treatment.
+        Different(3) means tagged and un tagged  IEEE 802.1AB PDU frames are being given different treatment. "
+        DEFVAL { default }
+        ::= { alaServiceMgrPortProfileEntry 15 }
+
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 --   The Service Manager Port Table
@@ -429,7 +531,11 @@ AlaServiceMgrPortEntry ::=
             alaServiceMgrPortSapType        AluAllocationType,
             alaServiceMgrPortSapCount       Counter32,
             alaServiceMgrPortVlanXlation    ServiceAdminStatus,
-            alaServiceMgrPortDescription    ServObjDesc
+            alaServiceMgrPortDescription    ServObjDesc,
+            alaServiceMgrPortEsi            OCTET STRING,
+            alaServiceMgrPortEvpnEthernetSegment    INTEGER,
+            alaServiceMgrPortMultiHoming    INTEGER,
+            alaServiceMgrPortEsDescription  ServObjDesc
         }
 
 alaServiceMgrPortID OBJECT-TYPE
@@ -444,7 +550,8 @@ alaServiceMgrPortMode  OBJECT-TYPE
         SYNTAX      INTEGER {
                         undefined (0),
                         access (1),
-                        network (2)
+                        network (2),
+                        hybrid (3)
                     }
 
         MAX-ACCESS  read-create
@@ -455,7 +562,7 @@ alaServiceMgrPortMode  OBJECT-TYPE
          Once the port's operation mode has been configured for 'access' mode,
          multiple services may be configured on the port.
          An access port can be created manually by Service Manager, UNP or EVB."
-        DEFVAL { network }
+        DEFVAL { access }
         ::= { alaServiceMgrPortEntry 2 }
 
 alaServiceMgrPortEncapType  OBJECT-TYPE
@@ -537,6 +644,36 @@ alaServiceMgrPortDescription OBJECT-TYPE
     DESCRIPTION     "Generic information about this port."
     DEFVAL          { "" }
     ::= { alaServiceMgrPortEntry 10 }
+    
+alaServiceMgrPortEsi OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(10))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "ESI-Id of this port."
+    ::= { alaServiceMgrPortEntry 11 }
+    
+alaServiceMgrPortEvpnEthernetSegment OBJECT-TYPE
+    SYNTAX          INTEGER { enable(1), disable(2) }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Enable/disable evpn ethernet segment on this port."
+    ::= { alaServiceMgrPortEntry 12 }
+    
+alaServiceMgrPortMultiHoming OBJECT-TYPE
+    SYNTAX          INTEGER { allActive(1), singleActive(2) }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Multi homing on this port."
+    DEFVAL          { allActive }
+    ::= { alaServiceMgrPortEntry 13 }
+    
+alaServiceMgrPortEsDescription OBJECT-TYPE
+    SYNTAX          ServObjDesc
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Es description about this port."
+    DEFVAL          { "" }
+    ::= { alaServiceMgrPortEntry 14 }
 
 -- ---------------------------------------------------------------------
 --  ***** OBSOLETE *****
@@ -641,7 +778,37 @@ AlaSvcBaseInfoEntry ::=
         alaSvcL3VpnIfIndex          InterfaceIndexOrZero,   -- L3-VPN
         alaSvcL3VpnIfName           SnmpAdminString,        -- L3-VPN
         alaSvcL3VpnVrfName          SnmpAdminString,        -- L3-VPN
-        alaSvcL3VpnMtu              Integer32               -- L3-VPN
+        alaSvcL3VpnMtu              Integer32,              -- L3-VPN
+        alaSvcVpnId                 Unsigned32,             -- L2Gre
+        alaSvcOption                AluServOption,
+        alaSvcRemoteSystemId        MacAddress,
+        alaSvcMacDebugAdminStatus   ServiceAdminStatus,
+        alaSvcVplsId                Unsigned32,             --VPLS
+        alaSvcVplsSignaling         AluSigOption,           --VPLS
+        alaSvcVplsEgdeId            Integer32,               --VPLS
+        alaSvcVplsName              SnmpAdminString,        --VPLS
+        alaSvcVpnType               INTEGER,
+        alaSvcMacAdvertisement      INTEGER,
+        alaSvcProxyArp              INTEGER,
+        alaSvcUnknownMacRoute       INTEGER,
+        alaSvcMacVrfHwLearning      INTEGER,
+        alaSvcBgpEvpn               INTEGER,
+        alaSvcIgmpMldProxy          INTEGER,
+        alaSvcProxyArpArpSuppression      INTEGER,
+        alaSvcProxyArpArpProbe       INTEGER,
+        alaSvcProxyArpArpUnknown      INTEGER,
+        alaSvcProxyArpArpUnknownUnicastForward        INTEGER,
+        alaSvcIgmpProxy             INTEGER,
+        alaSvcMldProxy              INTEGER,
+        alaSvcSmetCapability        INTEGER,
+        alaSvcSmetOnMultihome       INTEGER,
+        alaSvcBridgeType            INTEGER,
+        alaSvcVpwsId                Unsigned32,
+        alaSvcBgpEvpnBroadcast      INTEGER,
+        alaSvcBgpEvpnUnknownUnicast     INTEGER,
+        alaSvcBgpEvpnUnknownMulticast   INTEGER,
+        alaSvcOism   INTEGER,
+        alaSvcBgpEvpnOism   INTEGER
     }
 
 alaSvcId OBJECT-TYPE
@@ -911,6 +1078,7 @@ alaSvcRemoveIngressTag OBJECT-TYPE
     DEFVAL          { down }
     ::= { alaSvcBaseInfoEntry 28 }
 
+
 alaSvcL3VpnIfIndex  OBJECT-TYPE
     SYNTAX          InterfaceIndexOrZero
     MAX-ACCESS      read-only
@@ -928,7 +1096,7 @@ alaSvcL3VpnIfName   OBJECT-TYPE
     ::= { alaSvcBaseInfoEntry 30 }
 
 alaSvcL3VpnVrfName OBJECT-TYPE
-    SYNTAX          SnmpAdminString (SIZE(1..32))
+    SYNTAX          SnmpAdminString (SIZE(0..32))
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION     "The current VRF instance name for the L3-VPN interface associated with this service.
@@ -936,7 +1104,7 @@ alaSvcL3VpnVrfName OBJECT-TYPE
     ::= { alaSvcBaseInfoEntry 31 }
 
 alaSvcL3VpnMtu      OBJECT-TYPE
-    SYNTAX          Integer32 (0 | 1280..9198)
+    SYNTAX          Integer32 (0 | 1280..9100)
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION     "The maximum packet size of a IP control packet that can be handled by the CPU
@@ -944,6 +1112,263 @@ alaSvcL3VpnMtu      OBJECT-TYPE
                      Value 0 indicates the default mtu."
     DEFVAL          { 1500 }
     ::= { alaSvcBaseInfoEntry 32 }
+
+alaSvcVpnId      OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..16777215)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The layer 2 GRE tunnel identifier."
+    ::= { alaSvcBaseInfoEntry 33 }
+
+alaSvcOption OBJECT-TYPE
+    SYNTAX          AluServOption
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The service option specifying the tunnel endpoint creation; otherwise,
+                     automatic tunnel endpoints are created for nodes with the same ISID/VNID"
+    DEFVAL          { none }
+    ::= { alaSvcBaseInfoEntry 34 }
+
+alaSvcRemoteSystemId OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The System-Id of the Remote SPB node where only point-to-point connection to
+                     the local node is made for this service"
+    ::= { alaSvcBaseInfoEntry 35 }
+
+alaSvcMacDebugAdminStatus OBJECT-TYPE
+    SYNTAX          ServiceAdminStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "To enable/disable mac-learning in order to debug traffic for this service where
+                     mac-learning is disabled by default."
+    DEFVAL          { down }
+    ::= { alaSvcBaseInfoEntry 36 }
+
+alaSvcVplsId      OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..2147483647)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "A 24-bit numerical value that identifies a VPLS instance.
+                    The valid range is 1-2147483647."
+    ::= { alaSvcBaseInfoEntry 37 }
+
+alaSvcVplsSignaling      OBJECT-TYPE
+    SYNTAX          AluSigOption
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Configure Signaling to establish a pseudowire connection between Provider Edge (PE) routers.
+                     Border Gateway Protocol (BGP)/ Label distribution protocol (LDP) can be configured for 
+                     signaling and to support VPLS auto-discovery between VPLS instances."
+    ::= { alaSvcBaseInfoEntry 38 }
+
+alaSvcVplsEgdeId      OBJECT-TYPE
+    SYNTAX          Integer32 (1..1000)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Configure an identifier to VPLS Edge (VE) device when BGP is selected as signaling. Each 
+                    Provider Edge (PE) device participating in a VPLS must have at least one VE ID. VE-ID's 
+                    range is between 1 and 1000. This should be unique among the VPLS Peers for a VPLS instance."
+    ::= { alaSvcBaseInfoEntry 39 }
+
+alaSvcVplsName      OBJECT-TYPE
+    SYNTAX          SnmpAdminString(SIZE(0..32))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "VPLS Instance Name."
+    ::= { alaSvcBaseInfoEntry 40 }
+
+alaSvcVpnType OBJECT-TYPE
+    SYNTAX          INTEGER { default(1), fabricVpn(2), siteMetaVpn(3) }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Service vpn type."
+    DEFVAL          { default }
+    ::= { alaSvcBaseInfoEntry 41 }
+
+alaSvcMacAdvertisement OBJECT-TYPE
+    SYNTAX          INTEGER { enable(1), disable(2) }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Service mac advertisement."
+    ::= { alaSvcBaseInfoEntry 42 }
+
+alaSvcProxyArp OBJECT-TYPE
+    SYNTAX          INTEGER { enable(1), disable(2) }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Service proxy arp."
+    ::= { alaSvcBaseInfoEntry 43 }
+
+alaSvcUnknownMacRoute OBJECT-TYPE
+    SYNTAX          INTEGER { enable(1), disable(2) }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Service unknown mac route."
+    ::= { alaSvcBaseInfoEntry 44 }
+
+alaSvcMacVrfHwLearning OBJECT-TYPE
+    SYNTAX          INTEGER { enable(1), disable(2) }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Service mac vrf hw learning."
+    ::= { alaSvcBaseInfoEntry 45 }
+
+alaSvcBgpEvpn OBJECT-TYPE
+    SYNTAX          INTEGER { enable(1), disable(2) }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Service bgp evpn."
+    DEFVAL          { disable }
+    ::= { alaSvcBaseInfoEntry 46 }
+
+alaSvcIgmpMldProxy OBJECT-TYPE
+    SYNTAX          INTEGER { enable(1), disable(2) }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Service igmp mld proxy."
+    ::= { alaSvcBaseInfoEntry 47 }
+
+alaSvcProxyArpArpSuppression OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        complete(1),
+                        disable(2),
+                        towardsNetwork(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Service proxy arp arp suppression."
+    DEFVAL          { complete }
+    ::= { alaSvcBaseInfoEntry 48 }
+
+alaSvcProxyArpArpProbe OBJECT-TYPE
+    SYNTAX          INTEGER { 
+                        enable(1),
+                        disable(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Enable/disable service proxy arp arp probe."
+    DEFVAL          { disable }
+    ::= { alaSvcBaseInfoEntry 49 }
+
+alaSvcProxyArpArpUnknown OBJECT-TYPE
+    SYNTAX          INTEGER { 
+                        reply(1),
+                        discard(2),
+                        unicastForward(3),
+                        forward(4)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Service proxy arp arp unknown."
+    DEFVAL          { discard }
+    ::= { alaSvcBaseInfoEntry 50 }
+
+alaSvcProxyArpArpUnknownUnicastForward OBJECT-TYPE
+    SYNTAX          INTEGER { 
+                        enable(1),
+                        disable(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Enable/disable service proxy arp arp unknown unicast forward."
+    DEFVAL          { disable }
+    ::= { alaSvcBaseInfoEntry 51 }
+
+alaSvcIgmpProxy OBJECT-TYPE
+    SYNTAX          INTEGER { enable(1), disable(2) }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Service igmp proxy."
+    ::= { alaSvcBaseInfoEntry 52 }
+
+alaSvcMldProxy OBJECT-TYPE
+    SYNTAX          INTEGER { enable(1), disable(2) }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Service mld proxy."
+    ::= { alaSvcBaseInfoEntry 53 }
+
+alaSvcSmetCapability OBJECT-TYPE
+    SYNTAX          INTEGER { enable(1), disable(2) }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Service smet capability."
+    ::= { alaSvcBaseInfoEntry 54 }
+
+alaSvcSmetOnMultihome OBJECT-TYPE
+    SYNTAX          INTEGER { df(1), all(2) }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Service smet on multihome."
+    ::= { alaSvcBaseInfoEntry 55 }
+
+alaSvcBridgeType OBJECT-TYPE
+    SYNTAX          INTEGER { 
+                        vlanBased(1),
+                        enhancedVlanBundle(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Service bridge type."
+    DEFVAL          { enhancedVlanBundle }
+    ::= { alaSvcBaseInfoEntry 56 }
+
+alaSvcVpwsId      OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..2147483647)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "A 24-bit numerical value that identifies a VPWS instance.
+                    The valid range is 1-2147483647."
+    ::= { alaSvcBaseInfoEntry 57 }
+
+alaSvcBgpEvpnBroadcast OBJECT-TYPE
+    SYNTAX          INTEGER {
+                                enable(1),
+                                disable(2)
+                            }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Enable/disable bgp-evpn broadcast on specified service."
+    ::= { alaSvcBaseInfoEntry 58 }
+
+alaSvcBgpEvpnUnknownUnicast OBJECT-TYPE
+    SYNTAX          INTEGER {
+                                enable(1),
+                                disable(2)
+                            }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Enable/disable bgp-evpn unknown unicast on specified service."
+    ::= { alaSvcBaseInfoEntry 59 }
+
+alaSvcBgpEvpnUnknownMulticast OBJECT-TYPE
+    SYNTAX          INTEGER {
+                                enable(1),
+                                disable(2)
+                            }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Enable/disable bgp-evpn unknown multicast on specified service."
+    ::= { alaSvcBaseInfoEntry 60 }
+ 
+alaSvcOism OBJECT-TYPE
+    SYNTAX          INTEGER { enable(1), disable(2) }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Service oism."
+    DEFVAL          { disable }
+    ::= { alaSvcBaseInfoEntry 61 }
+ 
+alaSvcBgpEvpnOism OBJECT-TYPE
+    SYNTAX          INTEGER { enable(1), disable(2) }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Service bgp-evpn oism."
+    DEFVAL          { disable }
+    ::= { alaSvcBaseInfoEntry 62 }
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 -- ALA Service Access Point (SAP) Base Info Table
@@ -986,7 +1411,10 @@ AlaSapBaseInfoEntry ::=
         alaSapIngressByteCount      Counter64,
         alaSapEgressPacketCount     Counter32,
         alaSapEgressByteCount       Counter64,
-        alaSapClearCounters         INTEGER
+        alaSapClearCounters         INTEGER,
+        alaSapTcpMss                Integer32,
+        alaSapTcpMssOverlayProfile  SnmpAdminString,
+        alaSapTcpMssPktCounter      Counter64
     }
 
 alaSapPortId OBJECT-TYPE
@@ -1230,6 +1658,27 @@ alaSapClearCounters OBJECT-TYPE
     DEFVAL          { done }
     ::= { alaSapBaseInfoEntry 22 }
 
+alaSapTcpMss OBJECT-TYPE
+    SYNTAX          Integer32 (500 .. 1410)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "TCP MSS config value"
+    ::= { alaSapBaseInfoEntry 23 }
+
+alaSapTcpMssOverlayProfile OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "TCP MSS overlay profile"
+    ::= { alaSapBaseInfoEntry 24 }
+
+alaSapTcpMssPktCounter OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "TCP MSS package counter"
+    ::= { alaSapBaseInfoEntry 25 }
+
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 -- ALA Service Distribution Point (SDP) Base Info Table
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -1278,7 +1727,8 @@ AlaSdpInfoEntry ::=
         alaSdpIsid                          INTEGER,
         alaSdpMcastPortList                 DisplayString,
         alaSdpCreationOrigin                AluSdpOriginType,
-        alaSdpAdminTTL                      OCTET STRING
+        alaSdpAdminTTL                      OCTET STRING,
+        alaSdpNumLsp                Unsigned32
     }
 
 alaSdpId OBJECT-TYPE
@@ -1450,7 +1900,7 @@ alaSdpLdpEnabled OBJECT-TYPE
     ::= { alaSdpInfoEntry 13 }
 
 alaSdpVlanVcEtype OBJECT-TYPE
-    SYNTAX          Unsigned32 ('600'H..'ffff'H)
+    SYNTAX          Unsigned32 ('0600'H..'ffff'H)
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION     "This object specifies the Ethertype used in
@@ -1593,6 +2043,14 @@ alaSdpAdminTTL      OBJECT-TYPE
      DEFVAL         { "@" }
     ::= { alaSdpInfoEntry 29 }
 
+alaSdpNumLsp OBJECT-TYPE
+    SYNTAX          Unsigned32(0..16)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Number of LSPs."
+    DEFVAL         { 0 }
+    ::= { alaSdpInfoEntry 30 }
+
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 -- ALA Service Distribution Point Bind (SDP-Bind) Base Info Table
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -1642,9 +2100,13 @@ AlaSdpBindEntry ::=
 -- VxLAN
         alaSdpBindCreationOrigin        AluSdpOriginType,
         alaSdpBindFarEndIpAddress       IpAddress,
-        alaSdpBindVnid                  Integer32, 
+        alaSdpBindVnid                  Integer32,
+
         alaSdpBindDescription           ServObjDesc,
-        alaSdpBindStatsAdminStatus      ServiceAdminStatus
+        alaSdpBindStatsAdminStatus      ServiceAdminStatus,
+-- VPLS
+        alaSdpBindVplsid                Integer32,
+        alaSdpBindVplsGateway           IpAddress
     }
 
 alaSdpBindId OBJECT-TYPE
@@ -1982,6 +2444,20 @@ alaSdpBindStatsAdminStatus OBJECT-TYPE
     DESCRIPTION     "To enable/disable the ingress/egress stats counters on this Bind SDP."
     ::= { alaSdpBindEntry 31 }
 
+alaSdpBindVplsid      OBJECT-TYPE
+     SYNTAX          Integer32(1..16777215)
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION     "The virtual Private LAN Service identifier (VPLS)."
+     ::= { alaSdpBindEntry 32 }
+
+alaSdpBindVplsGateway OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This object specifies the Gateway IP address."
+    ::= { alaSdpBindEntry 33 }
+
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 -- Service Manager System Config Table
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -2085,12 +2561,260 @@ alaSvcMgrVxlanDestUdpPort OBJECT-TYPE
     ::= { alaSvcMgrSysTable 11 }
 
 alaSvcMgrVxlanVrfName OBJECT-TYPE
-    SYNTAX          SnmpAdminString (SIZE(1..20))
+    SYNTAX          SnmpAdminString (SIZE(0..32))
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION     "The current VRF instance name associated with VxLAN L3 traffic. The default VRF
                      is assumed if not specifed"
     ::= { alaSvcMgrSysTable 12 }
+
+alaSvcMgrVrrpMacTcamRuleAdminState OBJECT-TYPE
+    SYNTAX          INTEGER { enable(1), disable(2) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "The global admin state for VRRP Mac TCAM rule on access ports.
+                     When enabled, the VRRP pkts (destination VRRP Mac) entering the access ports
+                     will have the customer tag removed."
+    DEFVAL          { enable }
+    ::= { alaSvcMgrSysTable 13 }
+
+alaSvcMgrReservedL2greVlan  OBJECT-TYPE
+    SYNTAX          INTEGER ( 0 | 2..4092 )
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     " The configured reserved VLAN for internal purpose of L2GRE.
+                      A value of zero shall be used to unconfigure the reserved L2GRE VLAN."
+    ::= { alaSvcMgrSysTable 14 }
+
+alaSvcMgrReservedL2greOperVlan  OBJECT-TYPE
+    SYNTAX          INTEGER ( 4092 )
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION     " The operational reserved VLAN for internal purpose of L2GRE. The default value is 4092."
+    DEFVAL          { 4092 }
+    ::= { alaSvcMgrSysTable 15 }
+
+alaSvcMgrSdpAutoCreateAdminState  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                               enable(1),
+                               disable(2)
+                            }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     " Admin State of auto-create feature of L2GRE tunnels."
+    DEFVAL          { enable }
+    ::= { alaSvcMgrSysTable 16 }
+
+alaSvcMgrVplsVrfName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The current VRF instance name associated with VPLS traffic. The default VRF
+                     is assumed if not specifed"
+    ::= { alaSvcMgrSysTable 17 }
+
+alaSvcMgrVplsType OBJECT-TYPE
+    SYNTAX          INTEGER {
+                                unknown(1),
+                                ethernet(2)
+                            }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Type of VPLS."
+    ::= { alaSvcMgrSysTable 18 }
+    
+alaSvcMgrSiteId  OBJECT-TYPE
+    SYNTAX          AlcatelIND1SvcSiteId
+
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     " It is a three byte id which uniquely represents a site(translates 
+                      into unique Area Address for L1L2 nodes). This is configured on an 
+                      SBN(Site border node)."
+    ::= { alaSvcMgrSysTable 19 }
+
+alaSvcMgrSiteName  OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Unique name for the site-id."
+    ::= { alaSvcMgrSysTable 20 }
+
+alaSvcMgrBgpEvpnLoopProtection OBJECT-TYPE
+    SYNTAX          INTEGER {
+                                enable(1),
+                                disable(2)
+                            }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Enable/disable bgp-evpn loop protection admin state."
+    ::= { alaSvcMgrSysTable 21 }
+
+alaSvcMgrBgpEvpnMacThreshold OBJECT-TYPE
+    SYNTAX          Integer32 (0..65535)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Bgp-evpn mac mobility threshold."
+    ::= { alaSvcMgrSysTable 22 }
+
+alaSvcMgrBgpEvpnMacTimeout OBJECT-TYPE
+    SYNTAX          Integer32 (0..65535)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Bgp-evpn mac mobility timeout."
+    DEFVAL { 180 }
+    ::= { alaSvcMgrSysTable 23 }
+
+alaSvcMgrBgpEvpnMacRetryTime OBJECT-TYPE
+    SYNTAX          Integer32 (0..65535)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Bgp-evpn mac mobility retry time."
+    DEFVAL { 600 }
+    ::= { alaSvcMgrSysTable 24 }
+
+alaSvcMgrBgpEvpnIpMoveThreshold OBJECT-TYPE
+    SYNTAX          Integer32 (0..65535)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Bgp-evpn ip mobility ip move threshold."
+    DEFVAL { 5 }
+    ::= { alaSvcMgrSysTable 25 }
+
+alaSvcMgrBgpEvpnDuplicateIpDetectionInterval OBJECT-TYPE
+    SYNTAX          Integer32 (0..65535)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Bgp-evpn ip mobility duplicate ip detection interval."
+    DEFVAL { 180 }
+    ::= { alaSvcMgrSysTable 26 }
+
+alaSvcMgrBgpEvpnHoldDownTimer OBJECT-TYPE
+    SYNTAX          Integer32 (0..65535)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Bgp-evpn ip mobility hold down timer."
+    DEFVAL { 540 }
+    ::= { alaSvcMgrSysTable 27 }
+
+alaSvcMgrBgpEvpnCeConfirmTimeout OBJECT-TYPE
+    SYNTAX          Integer32 (0..65535)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Bgp-evpn ip mobility ce confirm timeout."
+    DEFVAL { 30 }
+    ::= { alaSvcMgrSysTable 28 }
+
+alaSvcMgrBgpEvpnBroadcast OBJECT-TYPE
+    SYNTAX          INTEGER {
+                                enable(1),
+                                disable(2)
+                            }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Enable/disable bgp-evpn broadcast."
+    ::= { alaSvcMgrSysTable 29 }
+
+alaSvcMgrBgpEvpnUnknownUnicast OBJECT-TYPE
+    SYNTAX          INTEGER {
+                                enable(1),
+                                disable(2)
+                            }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Enable/disable bgp-evpn unknown unicast."
+    ::= { alaSvcMgrSysTable 30 }
+
+alaSvcMgrBgpEvpnUnknownMulticast OBJECT-TYPE
+    SYNTAX          INTEGER {
+                                enable(1),
+                                disable(2)
+                            }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Enable/disable bgp-evpn unknown multicast."
+    ::= { alaSvcMgrSysTable 31 }
+
+alaSvcMgrBgpEvpnNodeType  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                                leaf(1),
+                                borderLeaf(2),
+                                spine(3),
+                                borderSpine(4),
+                                superSpine(5)
+                            }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Bgp-evpn node type."
+    DEFVAL { leaf }
+    ::= { alaSvcMgrSysTable 32 }
+
+alaSvcMgrBorderSpineSiteId  OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(2))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Site-id on the border spine."
+    ::= { alaSvcMgrSysTable 33 }
+
+alaSvcMgrPodId  OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(1))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Pod-id on the border spine."
+    ::= { alaSvcMgrSysTable 34 }
+
+alaSvcMgrDescription  OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Name for the pod-site pair identification."
+    ::= { alaSvcMgrSysTable 35 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- Service Manager Reserved L2GRE VLAN Table
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaSvcMgrReservedL2greVlanTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF  AlaSvcMgrReservedL2greVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The reserved L2GRE VLAN table."
+        ::= { alaServiceMgr 9 }
+
+alaSvcMgrReservedL2greVlanEntry  OBJECT-TYPE
+        SYNTAX  AlaSvcMgrReservedL2greVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "A reserved L2GRE VLAN entry."
+        INDEX   { alaSvcMgrReservedL2greVlanID }
+        ::= { alaSvcMgrReservedL2greVlanTable 1 }
+
+AlaSvcMgrReservedL2greVlanEntry ::=
+  SEQUENCE
+        {
+            alaSvcMgrReservedL2greVlanID         Integer32,
+            alaSvcMgrReservedL2greVlanRowStatus  RowStatus
+        }
+
+alaSvcMgrReservedL2greVlanID  OBJECT-TYPE
+    SYNTAX          Integer32 ( 2..4092 )
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The reserved VLAN for internal purpose of L2GRE."
+    ::= { alaSvcMgrReservedL2greVlanEntry 1 }
+
+alaSvcMgrReservedL2greVlanRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+        "The status of this table entry."
+        ::= { alaSvcMgrReservedL2greVlanEntry 2 }
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -5579,7 +6303,607 @@ alaRfpSpbRemoteEndPointRowStatus OBJECT-TYPE
 	DESCRIPTION
 	"Remote End Point Entry Status."
 	::= { alaRfpSpbRemoteEndPointEntry 8 }
-	
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- ALA MAC Orchestration Table
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+alaMacOrch OBJECT IDENTIFIER ::= { alcatelIND1ServiceMgrMIBObjects 6 }
+
+alaMacOrchTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF AlaMacOrchEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A table used to add/delete an User MAC learnt from a VxLAN far-end node.
+                     It's an interface to Source Learning to provide the VP/VFI information needed
+                     to statically program an User MAC to the far-end node in order to orchestrate
+                     the unicast tunnel traffic to that node."
+    ::= { alaMacOrch 1 }
+
+alaMacOrchEntry OBJECT-TYPE
+    SYNTAX          AlaMacOrchEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Information about a specific far-end node & User MAC.
+                     If svcId is 0, the VNID will be used instead"
+    INDEX           { alaSvcId }
+    ::= { alaMacOrchTable 1 }
+
+AlaMacOrchEntry ::=
+    SEQUENCE {
+        alaMacOrchRowStatus             RowStatus,
+        alaMacOrchSvcType               AluServiceType,
+        alaMacOrchVnid                  Integer32,
+        alaMacOrchFarEndIpAddress       IpAddress,
+        alaMacOrchUserMac               MacAddress 
+    }
+
+alaMacOrchRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This object indicates the status of this row to Add or Delete
+                     the User MAC from the far-end node" 
+    ::= { alaMacOrchEntry 1 }
+
+alaMacOrchSvcType   OBJECT-TYPE
+    SYNTAX          AluServiceType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This object indicates the service tunnel type. Currently VxLAN tunnel
+                     is supported only"
+    ::= { alaMacOrchEntry 2 }
+
+alaMacOrchVnid      OBJECT-TYPE
+    SYNTAX          Integer32(1..16777215)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The virtual network identifier (VNID) mapped to a service configured
+                     to orchestrate unicast tunnel traffic"
+    ::= { alaMacOrchEntry 3 }
+
+alaMacOrchFarEndIpAddress OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This object specifies the Unicast IP address of the VxLAN far-end node"
+    ::= { alaMacOrchEntry 4 }
+
+alaMacOrchUserMac  OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The User MAC to be programmed statically to the VxLAN far-end node,
+                     so that unicast tunnel traffic can be orchestrated to it"
+    ::= { alaMacOrchEntry 5 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- ALA Sdp Mpls Lsp Table
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaSdpMplsLspTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF AlaSdpMplsLspEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A table used for MPLS SDP's this is the list of LSP's 
+                     that lead to the far-end address."
+    ::= { alaServiceMgr 10 }
+
+alaSdpMplsLspEntry OBJECT-TYPE
+    SYNTAX          AlaSdpMplsLspEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Entry of this table"
+    INDEX           { alaSdpId, alaSdpMplsLspAssociatedIdx }
+    ::= { alaSdpMplsLspTable 1 }
+
+AlaSdpMplsLspEntry ::=
+    SEQUENCE {
+        alaSdpMplsLspAssociatedIdx      Unsigned32,
+        alaSdpMplsLspAssociatedId       Unsigned32
+    }
+
+alaSdpMplsLspAssociatedIdx      OBJECT-TYPE
+    SYNTAX          Unsigned32(0..15)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Index of LspList."
+    ::= { alaSdpMplsLspEntry 1 }
+
+alaSdpMplsLspAssociatedId      OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Indentify of Lsp entry."
+    ::= { alaSdpMplsLspEntry 2 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- ALA EVPN Ethernet-Segment Table
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+alaEvpnEsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF AlaEvpnEsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A table that contains EVPN Ethernet-Segment(ES) information.
+                     It contains entries for both local and remote ES"
+    ::= { alaServiceMgr 11 }
+
+alaEvpnEsEntry OBJECT-TYPE
+    SYNTAX          AlaEvpnEsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Basic information about a specific Ethernet-Segment.
+                     An entry in this table will be created when an entry in
+                     alaServiceMgrPortTable has its alaServiceMgrPortLinkStatus 
+                     up and alaServiceMgrPortEvpnEthernetSegment enabled."
+    INDEX           { alaEvpnEsEsi }
+    ::= { alaEvpnEsTable 1 }
+
+AlaEvpnEsEntry ::=
+    SEQUENCE {
+        alaEvpnEsEsi                AlcatelIND1EsId,
+        alaEvpnEsInterface          InterfaceIndex,
+        alaEvpnEsEviType            AluServiceType,
+        alaEvpnEsActiveMode         INTEGER,
+        alaEvpnEsLocation           INTEGER,
+        alaEvpnEsDescription        ServObjDesc,
+        alaEvpnEsAdminStatus        ServiceAdminStatus,
+        alaEvpnEsOperStatus         INTEGER,
+        alaEvpnEsEtagCount          Integer32,
+        alaEvpnEsEviCount           Integer32,
+        alaEvpnEsRdType             Integer32,
+        alaEvpnEsRdIpAddrType       InetAddressType,
+        alaEvpnEsRdIpAddr           InetAddress,
+        alaEvpnEsRdValue            Integer32,
+        alaEvpnEsRt                 AlcatelIND1EsRt
+    }
+
+alaEvpnEsEsi OBJECT-TYPE
+    SYNTAX          AlcatelIND1EsId
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Identifier for the Ethernet Segment."
+    ::= { alaEvpnEsEntry 1 }
+
+alaEvpnEsInterface OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "IfIndex of the fixed or linkagg port that corresponds to
+                     this ethernet-segment. Its value is derived from corrsponding
+                     alaServiceMgrPortID attribute in alaServiceMgrPortTable entry."
+    ::= { alaEvpnEsEntry 2 }
+
+alaEvpnEsEviType OBJECT-TYPE
+    SYNTAX          AluServiceType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This object indicates the Evpn EVI type. Currently only 
+                     VxLan is supported."
+    ::= { alaEvpnEsEntry 3 }
+
+alaEvpnEsActiveMode OBJECT-TYPE
+    SYNTAX          INTEGER {allActive(1), singleActive(2)}
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "It indicates the active mode (allActive or singleActive) on 
+                     the ethernet-segment.  Its value is derived from 
+                     corresponding entry attribute alaServiceMgrPortMultiHoming in 
+                     alaServiceMgrPortTable.
+                     An ES on Fixed port is always single-home as singleActive,
+                     and an ES on Linkagg will be always multi-home as either 
+                     singleActive or allActive"
+    ::= { alaEvpnEsEntry 4 }
+
+alaEvpnEsLocation OBJECT-TYPE
+    SYNTAX          INTEGER {local(0), remote(1)}
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "It indicates the location of the ethernet-segment.
+                     ES configured on local switch port or linkagg is local, whereas
+                     ES discovered through bgp-evpn is remote."
+    ::= { alaEvpnEsEntry 5 }
+
+alaEvpnEsDescription OBJECT-TYPE
+    SYNTAX          ServObjDesc
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The name or description of the ethernet-segment.
+                     Its value is derived from corresponding entry attribute 
+                     alaServiceMgrPortEsDescription in alaServiceMgrPortTable."
+    ::= { alaEvpnEsEntry 6 }
+
+alaEvpnEsAdminStatus OBJECT-TYPE
+    SYNTAX          ServiceAdminStatus
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This object indicates admin status of the
+                     ethernet-segment. This value is derived from
+                     alaServiceMgrPortEvpnEthernetSegment attribute in
+                     alaServiceMgrPortTable."
+    ::= { alaEvpnEsEntry 7 }
+
+alaEvpnEsOperStatus OBJECT-TYPE
+    SYNTAX          INTEGER {up(1), down(2), disputed(3), failover(4)}
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This object indicates operational status of the
+                     ethernet-segment(ES). An ES will be operationally up
+                     when alaEvpnEsAdminStatus is up and the corresponding 
+                     alaServiceMgrPortTable entry is operationally up.
+                     Additionally, a Multihoming ES can be in Disputed or 
+                     failover status as discovered through bgp-evpn."
+    ::= { alaEvpnEsEntry 8 }
+
+alaEvpnEsEtagCount OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Number of saps attached to this ethernet-segment."
+    ::= { alaEvpnEsEntry 9 }
+
+alaEvpnEsEviCount OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Number of services attached to this ethernet-segment."
+    ::= { alaEvpnEsEntry 10 }
+
+alaEvpnEsRdType OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The route-distinguisher type for the ES."
+    ::= { alaEvpnEsEntry 11 }
+
+alaEvpnEsRdIpAddrType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The route-distinguisher InetAddressType for the ES."
+    ::= { alaEvpnEsEntry 12 }
+
+alaEvpnEsRdIpAddr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The route-distinguisher InetAddress for the ES."
+    ::= { alaEvpnEsEntry 13 }
+
+alaEvpnEsRdValue  OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The route-distinguisher value for the ES."
+    ::= { alaEvpnEsEntry 14 }
+
+alaEvpnEsRt OBJECT-TYPE
+    SYNTAX          AlcatelIND1EsRt
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The route-target value for the ES."
+    ::= { alaEvpnEsEntry 15 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- ALA EVPN Ethernet-Segment PE Table (For both Local and Remote ES)
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+alaEvpnEsPeTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF AlaEvpnEsPeEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A table that contains info about the Provider Edges(PEs) 
+                     attached to the Ethernet-Segments." 
+    ::= { alaServiceMgr 12 }
+
+alaEvpnEsPeEntry OBJECT-TYPE
+    SYNTAX          AlaEvpnEsPeEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry in this table contains details of a specific 
+                     PE attached to the Ethernet-Segment." 
+    INDEX           { alaEvpnEsEsi, alaEvpnEsPeAddrType, alaEvpnEsPeAddr }
+    ::= { alaEvpnEsPeTable 1 }
+
+AlaEvpnEsPeEntry ::=
+    SEQUENCE {
+        alaEvpnEsPeAddrType        InetAddressType,
+        alaEvpnEsPeAddr            InetAddress,
+        alaEvpnEsPeStatus          INTEGER
+    }
+
+alaEvpnEsPeAddrType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The IP address type of the PE. This release only supports IPv4."
+    ::= { alaEvpnEsPeEntry 1 }
+
+alaEvpnEsPeAddr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The Ip-Address of the PE attached to the ES."
+    ::= { alaEvpnEsPeEntry 2 }
+
+alaEvpnEsPeStatus OBJECT-TYPE
+    SYNTAX          INTEGER { attached(1) }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The status of the PE attached to the ES. If an entry for PE
+                     is seen in this table, it will always have status as attached"
+    ::= { alaEvpnEsPeEntry 3 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- ALA EVPN Ethernet-Segment Carving Table (For Local ES only)
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+alaEvpnEsCarvingTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF AlaEvpnEsCarvingEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A table that contains carving information for each EVI
+                     attached to ethernet-Segments."
+    ::= { alaServiceMgr 13 }
+
+alaEvpnEsCarvingEntry OBJECT-TYPE
+    SYNTAX          AlaEvpnEsCarvingEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry in this table contains carving info of an EVI
+                     on a specific ethernet-segment."
+    INDEX           { alaEvpnEsEsi, alaEvpnEsCarvingEvi }
+    ::= { alaEvpnEsCarvingTable 1 }
+
+AlaEvpnEsCarvingEntry ::=
+    SEQUENCE {
+        alaEvpnEsCarvingEvi             AluServiceId,
+        alaEvpnEsCarvingDfElectMethod   INTEGER,
+        alaEvpnEsCarvingDfPeAddrType    InetAddressType,
+        alaEvpnEsCarvingDfPeAddr        InetAddress,
+        alaEvpnEsCarvingBdfPeAddrType   InetAddressType,
+        alaEvpnEsCarvingBdfPeAddr       InetAddress
+    }
+
+alaEvpnEsCarvingEvi OBJECT-TYPE
+    SYNTAX          AluServiceId
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The value of the object specifies the EVI attached to the ES." 
+    ::= { alaEvpnEsCarvingEntry 1 }
+
+alaEvpnEsCarvingDfElectMethod OBJECT-TYPE
+    SYNTAX          INTEGER {serviceCarving(1)}
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The method/algo used for Df election on the ethernet-segment.
+                     The current release only supports service-carving method."
+    ::= { alaEvpnEsCarvingEntry 2 }
+
+alaEvpnEsCarvingDfPeAddrType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The InetAddressType of elected Df PE for an EVI.
+                     Only Ipv4 supported in this release."
+    ::= { alaEvpnEsCarvingEntry 3 }
+
+alaEvpnEsCarvingDfPeAddr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The InetAddress of elected Df PE for an EVI."
+    ::= { alaEvpnEsCarvingEntry 4 }
+
+alaEvpnEsCarvingBdfPeAddrType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The InetAddressType of elected Bdf PE for an EVI.
+                     Only Ipv4 supported in this release."
+    ::= { alaEvpnEsCarvingEntry 5 }
+
+alaEvpnEsCarvingBdfPeAddr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The InetAddress of elected Bdf PE for an EVI."
+    ::= { alaEvpnEsCarvingEntry 6 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- ALA EVPN Ethernet-Segment Etag Table (For Local ES only)
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+alaEvpnEsEtagTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF AlaEvpnEsEtagEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A table that contains info about Etags attached to a
+                     local ethernet-Segments on PEs.
+                     The other generic details (eg: alaSapAdminStatus, 
+                     alaSapOperStatus) of a local Etag can be obtained from 
+                     alaSapBaseInfoTable using Index {alaEvpnEsEtagEvi, 
+                     alaEvpnEsInterface, alaEvpnEsEtagEncapVal}."
+    ::= { alaServiceMgr 14 }
+
+alaEvpnEsEtagEntry OBJECT-TYPE
+    SYNTAX          AlaEvpnEsEtagEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry in this table contains info about an Etag
+                     on a specific ethernet-segment on a PE."
+    INDEX           { alaEvpnEsEsi, alaEvpnEsEtagEncapVal, alaEvpnEsEtagEvi }
+    ::= { alaEvpnEsEtagTable 1 }
+
+AlaEvpnEsEtagEntry ::=
+    SEQUENCE {
+        alaEvpnEsEtagEncapVal       TmnxEncapVal,
+        alaEvpnEsEtagEvi            AluServiceId,
+        alaEvpnEsEtagPeAddrType     InetAddressType,
+        alaEvpnEsEtagPeAddr         InetAddress,
+        alaEvpnEsEtagDisputed       INTEGER
+    }
+
+alaEvpnEsEtagEncapVal OBJECT-TYPE
+    SYNTAX          TmnxEncapVal
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The encaps value to identify an Etag on the ethernet-segment."
+    ::= { alaEvpnEsEtagEntry 1 }
+
+alaEvpnEsEtagEvi OBJECT-TYPE
+    SYNTAX          AluServiceId
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The ServiceId to which the Etag is mapped on the 
+                     ethernet-segment."
+    ::= { alaEvpnEsEtagEntry 2 }
+
+alaEvpnEsEtagPeAddrType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The addressType for PE where Etag is attached on an ES.
+                    Only Ipv4 supported in this release."
+    ::= { alaEvpnEsEtagEntry 3 }
+
+alaEvpnEsEtagPeAddr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Ipaddress for PE where Etag is attached on an ES."
+    ::= { alaEvpnEsEtagEntry 4 }
+
+alaEvpnEsEtagDisputed OBJECT-TYPE
+    SYNTAX          INTEGER {yes(1), no(2)}
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Etag entry will be disputed when it is missing on
+                     atleast one of the PEs attached to the ethernet-segment.
+                     The list of all PEs attached to an ethernet-segment can be 
+                     obtained from alaEvpnEsPeTable."
+    ::= { alaEvpnEsEtagEntry 5 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- ALA EVPN Ethernet-Segment Aliasing Table (For Remote ES only)
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+alaEvpnEsAliasingTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF AlaEvpnEsAliasingEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A table that contains info about Etags attached
+                     to remote ethernet-Segments on PEs."
+    ::= { alaServiceMgr 15 }
+
+alaEvpnEsAliasingEntry OBJECT-TYPE
+    SYNTAX          AlaEvpnEsAliasingEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry in this table contains info about an Etag
+                     on a specific remote ethernet-segment on a PE."
+    INDEX           { alaEvpnEsEsi, alaEvpnEsAliasingEncapVal, alaEvpnEsAliasingEvi, 
+                      alaEvpnEsAliasingPeAddrType, alaEvpnEsAliasingPeAddr }
+    ::= { alaEvpnEsAliasingTable 1 }
+
+AlaEvpnEsAliasingEntry ::=
+    SEQUENCE {
+        alaEvpnEsAliasingEncapVal       TmnxEncapVal,
+        alaEvpnEsAliasingEvi            AluServiceId,
+        alaEvpnEsAliasingPeAddrType     InetAddressType,
+        alaEvpnEsAliasingPeAddr         InetAddress,
+        alaEvpnEsAliasingPeRole         INTEGER,
+        alaEvpnEsAliasingDisputed       INTEGER
+    }
+
+alaEvpnEsAliasingEncapVal OBJECT-TYPE
+    SYNTAX          TmnxEncapVal
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The encaps value to identify an Etag on the remote ES."
+    ::= { alaEvpnEsAliasingEntry 1 }
+
+alaEvpnEsAliasingEvi OBJECT-TYPE
+    SYNTAX          AluServiceId
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The EVI to which the Etag is mapped on the remote ES."
+    ::= { alaEvpnEsAliasingEntry 2 }
+
+alaEvpnEsAliasingPeAddrType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The InetAddressType for PE where the Etag is attached on the 
+                     remote ES.  Only Ipv4 supported in this release."
+    ::= { alaEvpnEsAliasingEntry 3 }
+
+alaEvpnEsAliasingPeAddr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The InetAddress for PE where the Etag is attached on the remote ES."
+    ::= { alaEvpnEsAliasingEntry 4 }
+
+alaEvpnEsAliasingPeRole OBJECT-TYPE
+    SYNTAX          INTEGER {primary(1), backup(2), others(3)}
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Role for PE where Etag is attached on the remote ES."
+    ::= { alaEvpnEsAliasingEntry 5 }
+
+alaEvpnEsAliasingDisputed OBJECT-TYPE
+    SYNTAX          INTEGER {yes(1), no(2)}
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Etag entry will be disputed when it is missing on
+                     atleast one of the PEs attached to the remote ES.
+                     The list of all PEs attached to an ES can be obtained 
+                     from alaEvpnEsPeTable."
+    ::= { alaEvpnEsAliasingEntry 6 }
+
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+-- Service Redist Table
+-- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+alaSvcRedistTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF AlaSvcRedistEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A table that contains service redist."
+    ::= { alaServiceMgr 16 }
+
+alaSvcRedistEntry OBJECT-TYPE
+    SYNTAX          AlaSvcRedistEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry of this table."
+    INDEX           { alaSvcId, alaSvcRedistSourceVrf }
+    ::= { alaSvcRedistTable 1 }
+
+AlaSvcRedistEntry ::=
+    SEQUENCE {
+        alaSvcRedistSourceVrf       SnmpAdminString,
+        alaSvcRedistRouteMap        SnmpAdminString,
+        alaSvcRedistRowStatus       RowStatus
+    }
+
+alaSvcRedistSourceVrf OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Service redist source vrf."
+    ::= { alaSvcRedistEntry 1 }
+
+alaSvcRedistRouteMap OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Route-map name (or empty-string for all-routes) for service redist source vrf."
+    ::= { alaSvcRedistEntry 2 }
+
+alaSvcRedistRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The status of this table entry."
+    ::= { alaSvcRedistEntry 3 }
+
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 -- Service Manager Trap Object Definition
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -5694,12 +7018,19 @@ smgrSdpBindStatusChange NOTIFICATION-TYPE
 
 smgrVxlanSdpBindStatusChange NOTIFICATION-TYPE
     OBJECTS     {alaSvcId, alaSdpBindId, alaSdpBindOperStatus, alaSdpBindFarEndIpAddress,
-                 alaSdpBindVnid}
+                 alaSdpBindVnid, alaSdpBindVplsid}
     STATUS      current
     DESCRIPTION
     "A change in SDP Bind operating status. A SDP Bind is dynamically created as a VTEP is discovered, or
      destroyed when the reachability to the VTEP is gone."
     ::= { alaServiceMgrNotifications 15 }
+
+smgrL2greSdpBindStatusChange NOTIFICATION-TYPE
+    OBJECTS     {alaSvcId, alaSdpBindId, alaSdpBindOperStatus, alaSdpBindFarEndIpAddress}
+    STATUS      deprecated
+    DESCRIPTION
+    "A change in SDP Bind operating status. A SDP Bind is dynamically created as layer 2 GRE tunnel."
+    ::= { alaServiceMgrNotifications 16 }
 
 -- xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 -- COMPLIANCE
@@ -5757,7 +7088,16 @@ alcatelIND1ServiceMgrMIBCompliance MODULE-COMPLIANCE
                 alaSdpInfoTableGroup,
                 alaSdpBindTableGroup,
                 alaSvcMgrSysTableGroup,
-		alaSvcMgrEndPointGroup
+                alaSvcMgrEndPointGroup,
+                alaSvcMgrReservedL2greVlanGroup,
+                alaMacOrchestrationTableGroup,
+                alaSdpMplsLspTableGroup,
+                alaEvpnEsTableGroup,
+                alaEvpnEsPeTableGroup,
+                alaEvpnEsCarvingTableGroup,
+                alaEvpnEsEtagTableGroup,
+                alaEvpnEsAliasingTableGroup,
+                alaSvcRedistGroup
         }
         ::= { alcatelIND1ServiceMgrMIBCompliances 1 }
 
@@ -5777,7 +7117,10 @@ alaServiceMgrPortProfileGroup OBJECT-GROUP
             alaServiceMgrPortProfileMvrpTreatment,
             alaServiceMgrPortProfileCiscoPduTreatment,
             alaServiceMgrPortProfileCiscoVlanTreatment,
-            alaServiceMgrPortProfileCiscoUplinkTreatment
+            alaServiceMgrPortProfileCiscoUplinkTreatment,
+            alaServiceMgrPortProfile8021ABTagTreatment,
+            alaServiceMgrPortProfile8021ABUnTagTreatment,
+            alaServiceMgrPortProfile8021ABMode
          }
         STATUS current
         DESCRIPTION
@@ -5795,7 +7138,11 @@ alaServiceMgrPortGroup OBJECT-GROUP
             alaServiceMgrPortSapType,
             alaServiceMgrPortSapCount,
             alaServiceMgrPortVlanXlation,
-            alaServiceMgrPortDescription
+            alaServiceMgrPortDescription,
+            alaServiceMgrPortEsi,
+            alaServiceMgrPortEvpnEthernetSegment,
+            alaServiceMgrPortMultiHoming,
+            alaServiceMgrPortEsDescription
         }
         STATUS current
         DESCRIPTION
@@ -6319,11 +7666,42 @@ alaSvcBaseInfoEntryGroup OBJECT-GROUP
             alaSvcClearCounters,
             alaSvcSapVlanXlation,
             alaSvcVnid,
+
             alaSvcRemoveIngressTag,
             alaSvcL3VpnIfIndex,
             alaSvcL3VpnIfName,
             alaSvcL3VpnVrfName,
-            alaSvcL3VpnMtu
+            alaSvcL3VpnMtu,
+            alaSvcVpnId,
+            alaSvcOption,
+            alaSvcRemoteSystemId,
+            alaSvcMacDebugAdminStatus,
+            alaSvcVplsId,
+            alaSvcVplsSignaling,
+            alaSvcVplsEgdeId,
+            alaSvcVplsName,
+            alaSvcVpnType,
+            alaSvcMacAdvertisement,
+            alaSvcProxyArp,
+            alaSvcUnknownMacRoute,
+            alaSvcMacVrfHwLearning,
+            alaSvcBgpEvpn,
+            alaSvcIgmpMldProxy,
+            alaSvcProxyArpArpSuppression,
+            alaSvcProxyArpArpProbe,
+            alaSvcProxyArpArpUnknown,
+            alaSvcProxyArpArpUnknownUnicastForward,
+            alaSvcIgmpProxy,
+            alaSvcMldProxy,
+            alaSvcSmetCapability,
+            alaSvcSmetOnMultihome,
+            alaSvcBridgeType,
+            alaSvcVpwsId,
+            alaSvcBgpEvpnBroadcast,
+            alaSvcBgpEvpnUnknownUnicast,
+            alaSvcBgpEvpnUnknownMulticast,
+            alaSvcOism,
+            alaSvcBgpEvpnOism
         }
         STATUS current
         DESCRIPTION
@@ -6354,7 +7732,10 @@ alaSapBaseInfoEntryGroup OBJECT-GROUP
             alaSapIngressByteCount,
             alaSapEgressPacketCount,
             alaSapEgressByteCount,
-            alaSapClearCounters
+            alaSapClearCounters,
+            alaSapTcpMss,
+            alaSapTcpMssOverlayProfile,
+            alaSapTcpMssPktCounter
         }
         STATUS current
         DESCRIPTION
@@ -6391,7 +7772,8 @@ alaSdpInfoTableGroup OBJECT-GROUP
             alaSdpIsid,
             alaSdpMcastPortList,
             alaSdpCreationOrigin,
-            alaSdpAdminTTL
+            alaSdpAdminTTL,
+            alaSdpNumLsp
         }
         STATUS current
         DESCRIPTION
@@ -6431,7 +7813,9 @@ alaSdpBindTableGroup OBJECT-GROUP
             alaSdpBindFarEndIpAddress,
             alaSdpBindVnid,
             alaSdpBindDescription,
-            alaSdpBindStatsAdminStatus
+            alaSdpBindStatsAdminStatus,
+            alaSdpBindVplsid,
+            alaSdpBindVplsGateway
         }
         STATUS current
         DESCRIPTION
@@ -6451,7 +7835,8 @@ alaSmgrNotificationGroup NOTIFICATION-GROUP
           smgrSapStatusChange,
           smgrSdpStatusChange,
           smgrSdpBindStatusChange,
-          smgrVxlanSdpBindStatusChange
+          smgrVxlanSdpBindStatusChange,
+          smgrL2greSdpBindStatusChange
         }
         STATUS  current
         DESCRIPTION
@@ -6485,8 +7870,31 @@ alaSvcMgrSysTableGroup OBJECT-GROUP
             alaSvcMgrSysLastStatusChange,
             alaSvcMgrStatsAdminState,
             alaSvcMgrVxlanDestUdpPort,
-            alaSvcMgrVxlanVrfName
+            alaSvcMgrVxlanVrfName,
+            alaSvcMgrVrrpMacTcamRuleAdminState,
+            alaSvcMgrReservedL2greVlan,
+            alaSvcMgrReservedL2greOperVlan,
+            alaSvcMgrSdpAutoCreateAdminState,
 
+            alaSvcMgrVplsVrfName,
+            alaSvcMgrVplsType,
+            alaSvcMgrSiteId,
+            alaSvcMgrSiteName,
+            alaSvcMgrBgpEvpnLoopProtection,
+            alaSvcMgrBgpEvpnMacThreshold,
+            alaSvcMgrBgpEvpnMacTimeout,
+            alaSvcMgrBgpEvpnMacRetryTime,
+            alaSvcMgrBgpEvpnIpMoveThreshold,
+            alaSvcMgrBgpEvpnDuplicateIpDetectionInterval,
+            alaSvcMgrBgpEvpnHoldDownTimer,
+            alaSvcMgrBgpEvpnCeConfirmTimeout,
+            alaSvcMgrBgpEvpnBroadcast,
+            alaSvcMgrBgpEvpnUnknownUnicast,
+            alaSvcMgrBgpEvpnUnknownMulticast,
+            alaSvcMgrBgpEvpnNodeType,
+            alaSvcMgrBorderSpineSiteId,
+            alaSvcMgrPodId,
+            alaSvcMgrDescription
         }
         STATUS  current
         DESCRIPTION
@@ -6514,4 +7922,120 @@ alaSvcMgrEndPointGroup OBJECT-GROUP
         DESCRIPTION
               "Collection of Service Mgr System management objects."
         ::= { alcatelIND1ServiceMgrMIBGroups 49 }
+
+alaSvcMgrReservedL2greVlanGroup OBJECT-GROUP
+        OBJECTS
+        {
+           alaSvcMgrReservedL2greVlanRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+              "Collection of service manager reserved L2GRE VLAN objects."
+        ::= { alcatelIND1ServiceMgrMIBGroups 50 }
+
+alaMacOrchestrationTableGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaMacOrchRowStatus,
+            alaMacOrchSvcType,
+            alaMacOrchVnid,
+            alaMacOrchFarEndIpAddress,
+            alaMacOrchUserMac
+        }
+        STATUS  current
+        DESCRIPTION
+              "Collection of Service Mgr MAC Orchestration."
+        ::= { alcatelIND1ServiceMgrMIBGroups 51 }
+
+alaSdpMplsLspTableGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaSdpMplsLspAssociatedId
+        }
+        STATUS  current
+        DESCRIPTION
+              "Collection of Service Mgr Sdp Mpls Lsp."
+        ::= { alcatelIND1ServiceMgrMIBGroups 52 }
+
+alaEvpnEsTableGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaEvpnEsInterface,
+            alaEvpnEsEviType,
+            alaEvpnEsActiveMode,
+            alaEvpnEsLocation,
+            alaEvpnEsDescription,
+            alaEvpnEsAdminStatus,
+            alaEvpnEsOperStatus,
+            alaEvpnEsEtagCount,
+            alaEvpnEsEviCount,
+            alaEvpnEsRdType,
+            alaEvpnEsRdIpAddrType,
+            alaEvpnEsRdIpAddr,
+            alaEvpnEsRdValue,
+            alaEvpnEsRt
+        }
+        STATUS  current
+        DESCRIPTION
+              "Collection of Service Mgr Evpn Es Objects." 
+        ::= { alcatelIND1ServiceMgrMIBGroups 53 }
+
+alaEvpnEsPeTableGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaEvpnEsPeStatus
+        }
+        STATUS  current
+        DESCRIPTION
+              "Collection of Service Mgr Evpn Es Pe Objects."
+        ::= { alcatelIND1ServiceMgrMIBGroups 54 }
+
+alaEvpnEsCarvingTableGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaEvpnEsCarvingDfElectMethod,
+            alaEvpnEsCarvingDfPeAddrType,
+            alaEvpnEsCarvingDfPeAddr,
+            alaEvpnEsCarvingBdfPeAddrType,
+            alaEvpnEsCarvingBdfPeAddr
+        }
+        STATUS  current
+        DESCRIPTION
+              "Collection of Service Mgr Evpn Es Carving Objects."
+        ::= { alcatelIND1ServiceMgrMIBGroups 55 }
+
+alaEvpnEsEtagTableGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaEvpnEsEtagPeAddrType,
+            alaEvpnEsEtagPeAddr,
+            alaEvpnEsEtagDisputed
+        }
+        STATUS  current
+        DESCRIPTION
+              "Collection of Service Mgr Evpn Es Etag Objects."
+        ::= { alcatelIND1ServiceMgrMIBGroups 56 }
+
+alaEvpnEsAliasingTableGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaEvpnEsAliasingPeRole,
+            alaEvpnEsAliasingDisputed
+        }
+        STATUS  current
+        DESCRIPTION
+              "Collection of Service Mgr Evpn Es Aliasing Objects."
+        ::= { alcatelIND1ServiceMgrMIBGroups 57 }
+
+alaSvcRedistGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaSvcRedistRouteMap,
+            alaSvcRedistRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+              "Collection of Service Redist Objects."
+        ::= { alcatelIND1ServiceMgrMIBGroups 58 }
+
 END

@@ -29,7 +29,7 @@ use LibreNMS\Util\Mac;
  */
 if (empty($fdbPort_table)) { // no empty if come from aos7 script
     // try nokia/ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressDisposition
-    $dot1d = snmpwalk_group($device, 'slMacAddressDisposition', 'ALCATEL-IND1-MAC-ADDRESS-MIB', 0, [], 'nokia');
+    $dot1d = snmpwalk_group($device, 'slMacAddressDisposition', 'ALCATEL-IND1-MAC-ADDRESS-MIB', 0, [], 'nokia/aos6');
     if (! empty($dot1d)) {
         echo 'AOS6 MAC-ADDRESS-MIB: ';
         $fdbPort_table = [];

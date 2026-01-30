@@ -292,9 +292,11 @@ Route::middleware(['auth'])->group(function (): void {
 
         // jquery bootgrid data controllers
         Route::prefix('table')->group(function (): void {
-            Route::any('address-search/ipv4', Table\Ipv4AddressSearchController::class)->name('search.ipv4');
-            Route::any('address-search/ipv6', Table\Ipv6AddressSearchController::class)->name('search.ipv6');
-            Route::any('address-search/mac', Table\MacSearchController::class)->name('search.mac');
+            Route::post('address-search/ipv4', Table\Ipv4AddressSearchController::class)->name('search.ipv4');
+            Route::post('address-search/ipv6', Table\Ipv6AddressSearchController::class)->name('search.ipv6');
+            Route::post('address-search/mac', Table\MacSearchController::class)->name('search.mac');
+            Route::post('alertlog', Table\AlertLogController::class)->name('table.alertlog');
+            Route::get('alertlog/export', [Table\AlertLogController::class, 'export'])->name('table.alertlog.export');
             Route::post('alert-schedule', Table\AlertScheduleController::class);
             Route::post('customers', Table\CustomersController::class);
             Route::post('diskio', Table\DiskioController::class)->name('table.diskio');
