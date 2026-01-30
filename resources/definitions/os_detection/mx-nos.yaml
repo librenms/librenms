@@ -4,7 +4,6 @@ text: 'MX-NOS'
 type: network
 mib_dir: moxa
 group: moxa
-snmp_bulk: false
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:
