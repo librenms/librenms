@@ -46,4 +46,11 @@ if (! is_numeric($hc_test[0]['ifHCInOctets'] ?? null) || ! is_numeric($hc_test[0
     }
 }
 
-unset($isam_ports_stats);
+// Fix ifMtu to prevent SQL errors (must be integer). Fallback to defined null.
+foreach ($port_stats as &$p) {
+    if (($p['ifMtu'] ?? '') === 'NULL') {
+        $p['ifMtu'] = null;
+    }
+}
+
+unset($isam_port_stats, $p);
