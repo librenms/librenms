@@ -60,23 +60,19 @@ class VlansController implements DeviceTab
         Validator::validate($request->all(), [
             'searchVlanNumber' => 'string|nullable|max:100',
             'searchVlanName' => 'string|nullable|max:255',
-            'useRegex' => 'boolean',
         ]);
 
         $searchVlanNumber = $request->query->get('searchVlanNumber');
         $searchVlanName = $request->query->get('searchVlanName');
-        $useRegex = $request->boolean('useRegex');
 
         return [
             'vlans' => self::getVlans(
                 $device,
                 $searchVlanNumber,
-                $searchVlanName,
-                $useRegex
+                $searchVlanName
             ),
             'searchVlanNumber' => $searchVlanNumber,
             'searchVlanName' => $searchVlanName,
-            'useRegex' => $useRegex,
             'error' => null,
             'submenu' => [
                 [
@@ -95,8 +91,7 @@ class VlansController implements DeviceTab
     private static function getVlans(
         Device $device,
         $searchVlanNumber = null,
-        $searchVlanName = null,
-        $useRegex = false
+        $searchVlanName = null
     ) {
         // port.device needed to prevent loading device multiple times
         $query = PortVlan::where('ports_vlans.device_id', $device->device_id)
@@ -114,28 +109,20 @@ class VlansController implements DeviceTab
 
         // Apply VLAN number filter
         if ($searchVlanNumber) {
-            if ($useRegex) {
-                $query->where('ports_vlans.vlan', 'REGEXP', $searchVlanNumber);
-            } else {
-                $query->where(
-                    'ports_vlans.vlan',
-                    'LIKE',
-                    '%' . $searchVlanNumber . '%'
-                );
-            }
+            $query->where(
+                'ports_vlans.vlan',
+                'LIKE',
+                '%' . $searchVlanNumber . '%'
+            );
         }
 
         // Apply VLAN name filter
         if ($searchVlanName) {
-            if ($useRegex) {
-                $query->where('vlans.vlan_name', 'REGEXP', $searchVlanName);
-            } else {
-                $query->where(
-                    'vlans.vlan_name',
-                    'LIKE',
-                    '%' . $searchVlanName . '%'
-                );
-            }
+            $query->where(
+                'vlans.vlan_name',
+                'LIKE',
+                '%' . $searchVlanName . '%'
+            );
         }
 
         $portVlan = $query
