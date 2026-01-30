@@ -66,20 +66,22 @@ if ($device['os_group'] == 'cisco') {
             if (isset($entry['entSensorType'], $entry['entSensorValue'], $entitysensor[$entry['entSensorType']]) && $entitysensor[$entry['entSensorType']] && is_numeric($entry['entSensorValue']) && is_numeric($index)) {
                 $group = null;
                 $entPhysicalIndex = $index;
-                if ($entity_array[$index]['entPhysicalName'] || $device['os'] == 'iosxr') {
-                    $descr = rewrite_entity_descr($entity_array[$index]['entPhysicalName']);
+                if (isset($entity_array[$index]['entPhysicalName']) && $entity_array[$index]['entPhysicalName'] || $device['os'] == 'iosxr') {
+                    $descr = rewrite_entity_descr($entity_array[$index]['entPhysicalName'] ?? '');
                 } else {
-                    $descr = rewrite_entity_descr($entity_array[$index]['entPhysicalDescr']);
+                    $descr = rewrite_entity_descr($entity_array[$index]['entPhysicalDescr'] ?? '');
                 }
 
                 // Set description based on measured entity if it exists
-                if (isset($entry['entSensorMeasuredEntity']) && is_numeric($entry['entSensorMeasuredEntity']) && $entry['entSensorMeasuredEntity']) {
-                    $measured_descr = $entity_array[$entry['entSensorMeasuredEntity']]['entPhysicalName'];
+                if (isset($entry['entSensorMeasuredEntity']) && is_numeric($entry['entSensorMeasuredEntity']) && $entry['entSensorMeasuredEntity'] && isset($entity_array[$entry['entSensorMeasuredEntity']])) {
+                    $measured_descr = $entity_array[$entry['entSensorMeasuredEntity']]['entPhysicalName'] ?? '';
                     if (! $measured_descr) {
-                        $measured_descr = $entity_array[$entry['entSensorMeasuredEntity']]['entPhysicalDescr'];
+                        $measured_descr = $entity_array[$entry['entSensorMeasuredEntity']]['entPhysicalDescr'] ?? '';
                     }
 
-                    $descr = $measured_descr . ' - ' . $descr;
+                    if ($measured_descr) {
+                        $descr = $measured_descr . ' - ' . $descr;
+                    }
                 }
 
                 // Bit dirty also, clean later
@@ -178,15 +180,20 @@ if ($device['os_group'] == 'cisco') {
                 }
 
                 if ($ok) {
-                    $phys_index = $entity_array[$index]['entPhysicalContainedIn'];
+                    $phys_index = $entity_array[$index]['entPhysicalContainedIn'] ?? 0;
                     $tmp_ifindex = 0;
                     while ($phys_index != 0) {
                         if ($index === $phys_index) {
                             break;
                         }
 
-                        $entPhysicalClass = $entity_array[$phys_index]['entPhysicalClass'];
-                        $entPhysicalName = $entity_array[$phys_index]['entPhysicalName'];
+                        // Skip if this physical index doesn't exist in entity array
+                        if (! isset($entity_array[$phys_index])) {
+                            break;
+                        }
+
+                        $entPhysicalClass = $entity_array[$phys_index]['entPhysicalClass'] ?? '';
+                        $entPhysicalName = $entity_array[$phys_index]['entPhysicalName'] ?? '';
                         $transceivers = \App\Models\Transceiver::where('device_id', $device['device_id'])->where('index', '=', $phys_index)->first();
                         if (! empty($transceivers)) {
                             // If we already have a mapping done in transceivers, let's use it.
@@ -197,7 +204,7 @@ if ($device['os_group'] == 'cisco') {
                         }
                         //either sensor is contained by a port class entity.
                         if ($entPhysicalClass === 'port') {
-                            $entAliasMappingIdentifier = $entity_array[$phys_index][0]['entAliasMappingIdentifier'];
+                            $entAliasMappingIdentifier = $entity_array[$phys_index][0]['entAliasMappingIdentifier'] ?? '';
                             if (Str::contains($entAliasMappingIdentifier, 'ifIndex.')) {
                                 [, $tmp_ifindex] = explode('.', (string) $entAliasMappingIdentifier);
                             }
@@ -207,7 +214,7 @@ if ($device['os_group'] == 'cisco') {
                             $tmp_ifindex = $port_reverse_array[$entPhysicalName]['ifIndex'];
                             break;
                         } else {
-                            $phys_index = $entity_array[$phys_index]['entPhysicalContainedIn'];
+                            $phys_index = $entity_array[$phys_index]['entPhysicalContainedIn'] ?? 0;
                         }
                     }
                     if ($tmp_ifindex != 0) {
