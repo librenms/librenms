@@ -1,0 +1,141 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "sw1-core-rack1",
+                    "sysObjectID": ".1.3.6.1.4.1.52642.1.1.10.1.797",
+                    "sysDescr": "FS Campus Switch PoE (S3410-24TS-P) By FS.COM Inc",
+                    "sysContact": null,
+                    "hardware": "S3410-24TS-P",
+                    "version": "S3410_FSOS 11.4(1)B74T3",
+                    "serial": "FSSN00000001",
+                    "features": null,
+                    "location": "Examplestreet,",
+                    "os": "fs-switch-campus",
+                    "type": "network",
+                    "icon": "fs.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "processors": {
+        "discovery": {
+            "processors": [
+                {
+                    "processor_descr": "CPU 0",
+                    "processor_usage": 5,
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_type": "fs-switch-campus",
+                    "processor_oid": ".1.3.6.1.4.1.52642.1.1.10.2.36.1.1.3.0",
+                    "processor_index": "0",
+                    "processor_precision": 1
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "mempools": {
+        "discovery": {
+            "mempools": [
+                {
+                    "mempool_descr": "Memory Pool 1",
+                    "mempool_type": "fs-switch-campus",
+                    "mempool_index": 1,
+                    "mempool_precision": 1024,
+                    "mempool_perc": 50,
+                    "mempool_used": 262420,
+                    "mempool_free": 261868,
+                    "mempool_total": 524288
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_descr": "Temperature Slot 1 Sensor 1",
+                    "sensor_oid": ".1.3.6.1.4.1.52642.1.1.10.2.1.44.1.5.1.1.1",
+                    "sensor_type": "fs-switch-campus",
+                    "sensor_index": "1.1.1",
+                    "sensor_class": "temperature",
+                    "sensor_current": 19,
+                    "sensor_limit": 68,
+                    "sensor_limit_warn": 53
+                },
+                {
+                    "sensor_descr": "Power supply 1",
+                    "sensor_oid": ".1.3.6.1.4.1.52642.1.1.10.2.1.18.1.2.1",
+                    "sensor_type": "sysPSState",
+                    "sensor_index": "1",
+                    "sensor_class": "state",
+                    "sensor_current": 5,
+                    "state_name": "Normal"
+                },
+                {
+                    "sensor_descr": "fan1",
+                    "sensor_oid": ".1.3.6.1.4.1.52642.1.1.10.2.1.21.1.2.1",
+                    "sensor_type": "sysFanState",
+                    "sensor_index": "1",
+                    "sensor_class": "state",
+                    "sensor_current": 4,
+                    "state_name": "Normal"
+                },
+                {
+                    "sensor_descr": "fan2",
+                    "sensor_oid": ".1.3.6.1.4.1.52642.1.1.10.2.1.21.1.2.2",
+                    "sensor_type": "sysFanState",
+                    "sensor_index": "2",
+                    "sensor_class": "state",
+                    "sensor_current": 4,
+                    "state_name": "Normal"
+                },
+                {
+                    "sensor_descr": "TenGigabitEthernet 0/25 Temperature",
+                    "sensor_oid": ".1.3.6.1.4.1.52642.1.1.10.2.105.1.1.1.17.25",
+                    "sensor_type": "fs-switch-campus",
+                    "sensor_index": "25",
+                    "sensor_class": "temperature",
+                    "sensor_current": 25
+                },
+                {
+                    "sensor_descr": "TenGigabitEthernet 0/25 RX Power",
+                    "sensor_oid": ".1.3.6.1.4.1.52642.1.1.10.2.105.1.1.1.51.25",
+                    "sensor_type": "fs-switch-campus",
+                    "sensor_index": "25",
+                    "sensor_class": "dbm",
+                    "sensor_current": -0.1
+                },
+                {
+                    "sensor_descr": "TenGigabitEthernet 0/25 TX Power",
+                    "sensor_oid": ".1.3.6.1.4.1.52642.1.1.10.2.105.1.1.1.31.25",
+                    "sensor_type": "fs-switch-campus",
+                    "sensor_index": "25",
+                    "sensor_class": "dbm",
+                    "sensor_current": -0.4
+                },
+                {
+                    "sensor_descr": "TenGigabitEthernet 0/25 Voltage",
+                    "sensor_oid": ".1.3.6.1.4.1.52642.1.1.10.2.105.1.1.1.19.25",
+                    "sensor_type": "fs-switch-campus",
+                    "sensor_index": "25",
+                    "sensor_class": "voltage",
+                    "sensor_current": 3.283
+                },
+                {
+                    "sensor_descr": "PoE Port 24",
+                    "sensor_oid": ".1.3.6.1.4.1.52642.1.1.10.2.110.1.1.1.7.24",
+                    "sensor_type": "fs-switch-campus",
+                    "sensor_index": "24",
+                    "sensor_class": "power",
+                    "sensor_current": 8.5
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

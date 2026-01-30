@@ -1,0 +1,172 @@
+mib: FS-SYSTEM-MIB:FS-PROCESS-MIB:FS-MEMORY-MIB:FS-POE-MIB:FS-FIBER-MIB
+modules:
+    os:
+        hardware: .1.3.6.1.4.1.52642.1.1.10.2.1.26.0
+        version: .1.3.6.1.4.1.52642.1.1.10.2.1.2.0
+        serial: .1.3.6.1.4.1.52642.1.1.10.2.1.24.0
+    processors:
+        data:
+            -
+                oid: fsCPUUtilizationTable
+                value: fsCPUUtilization5MinAvg
+                num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.36.1.1.3.{{ $index }}'
+                descr: 'CPU {{ $index }}'
+    mempools:
+        data:
+            -
+                oid: fsMemTable
+                total: fsMemTotal
+                used: fsMemUsed
+                precision: 1024
+                descr: 'Memory Pool {{ $index }}'
+    sensors:
+        temperature:
+            data:
+                # System temperature from sysTemperatureInfo table
+                -
+                    oid: sysTemperatureInfoTable
+                    value: sysTemperatureCurrent
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.1.44.1.5.{{ $index }}'
+                    descr: 'Temperature Slot {{ $subindex0 }} Sensor {{ $subindex1 }}'
+                    high_limit: sysTemperatureFatal
+                    warn_limit: sysTemperatureWarning
+                # SFP/Transceiver temperature
+                -
+                    oid: ifFiberStatusTable
+                    value: ifFiberTemperature
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.105.1.1.1.17.{{ $index }}'
+                    descr: '{{ $ifFiberPortName }} Temperature'
+                    skip_values:
+                        -
+                            oid: ifFiberStatus
+                            op: '!='
+                            value: 1
+                        -
+                            oid: ifFiberTemperature
+                            op: '='
+                            value: 0
+        dbm:
+            data:
+                # SFP RX Power
+                -
+                    oid: ifFiberStatusTable
+                    value: ifFiberRxPower
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.105.1.1.1.51.{{ $index }}'
+                    descr: '{{ $ifFiberPortName }} RX Power'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: ifFiberStatus
+                            op: '!='
+                            value: 1
+                        -
+                            oid: ifFiberRxPower
+                            op: '='
+                            value: -100
+                # SFP TX Power
+                -
+                    oid: ifFiberStatusTable
+                    value: ifFiberTxPower
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.105.1.1.1.31.{{ $index }}'
+                    descr: '{{ $ifFiberPortName }} TX Power'
+                    divisor: 10
+                    skip_values:
+                        -
+                            oid: ifFiberStatus
+                            op: '!='
+                            value: 1
+                        -
+                            oid: ifFiberTxPower
+                            op: '='
+                            value: -100
+        voltage:
+            data:
+                # SFP Voltage
+                -
+                    oid: ifFiberStatusTable
+                    value: ifFiberVoltage
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.105.1.1.1.19.{{ $index }}'
+                    descr: '{{ $ifFiberPortName }} Voltage'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: ifFiberStatus
+                            op: '!='
+                            value: 1
+                        -
+                            oid: ifFiberVoltage
+                            op: '='
+                            value: 0
+        current:
+            data:
+                # SFP Bias Current
+                -
+                    oid: ifFiberStatusTable
+                    value: ifFiberBiasCurrent
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.105.1.1.1.21.{{ $index }}'
+                    descr: '{{ $ifFiberPortName }} Bias Current'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: ifFiberStatus
+                            op: '!='
+                            value: 1
+                        -
+                            oid: ifFiberBiasCurrent
+                            op: '='
+                            value: 0
+        power:
+            data:
+                # PoE consuming power per port (milliwatts to watts)
+                -
+                    oid: ifPoeStatusTable
+                    value: ifPoeConsumingPwr
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.110.1.1.1.7.{{ $index }}'
+                    descr: 'PoE Port {{ $index }}'
+                    divisor: 1000
+                    skip_values:
+                        -
+                            oid: ifPoeCapable
+                            op: '!='
+                            value: 1
+        state:
+            data:
+                # PSU Status
+                -
+                    oid: sysPSInfoTable
+                    value: sysPSState
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.1.18.1.2.{{ $index }}'
+                    descr: '{{ $sysPSName }}'
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: 'Unknown' }
+                        - { value: 2, generic: 0, graph: 0, descr: 'Green' }
+                        - { value: 3, generic: 1, graph: 0, descr: 'Yellow' }
+                        - { value: 4, generic: 2, graph: 0, descr: 'Not present' }
+                        - { value: 5, generic: 0, graph: 0, descr: 'Normal' }
+                        - { value: 6, generic: 2, graph: 0, descr: 'Abnormal' }
+                # Fan Status
+                -
+                    oid: sysFanInfoTable
+                    value: sysFanState
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.1.21.1.2.{{ $index }}'
+                    descr: '{{ $sysFanName }}'
+                    states:
+                        - { value: 1, generic: 3, graph: 0, descr: 'Unknown' }
+                        - { value: 2, generic: 0, graph: 0, descr: 'Green' }
+                        - { value: 3, generic: 1, graph: 0, descr: 'Yellow' }
+                        - { value: 4, generic: 0, graph: 0, descr: 'Normal' }
+                        - { value: 5, generic: 2, graph: 0, descr: 'Abnormal' }
+                # PoE Port Power Status
+                -
+                    oid: ifPoeStatusTable
+                    value: ifPoePowerStatus
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.110.1.1.1.4.{{ $index }}'
+                    descr: 'PoE Port {{ $index }} Status'
+                    skip_values:
+                        -
+                            oid: ifPoeCapable
+                            op: '!='
+                            value: 1
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'On' }
+                        - { value: 2, generic: 3, graph: 0, descr: 'Off' }
