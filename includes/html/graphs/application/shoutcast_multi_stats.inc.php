@@ -9,7 +9,7 @@ $nototal = 0;
 
 $rrd_list = [];
 // FIXME fails with rrdcached
-$rrd_filenames = glob(Rrd::name($device['hostname'], ['app', 'shoutcast', $app->app_id], '*.rrd'));
+$rrd_filenames = Rrd::globnames($device['hostname'], ['app', 'shoutcast', $app->app_id], '*.rrd');
 foreach ($rrd_filenames as $file) {
     $pieces = explode('-', basename($file, '.rrd'));
     $hostname = end($pieces);
