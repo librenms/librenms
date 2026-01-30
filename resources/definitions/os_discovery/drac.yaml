@@ -256,6 +256,7 @@ modules:
                     states:
                         - { value: 0, descr: ok, graph: 0, generic: 0 }
                         - { value: 1, descr: alert, graph: 0, generic: 2 }
+                        - { value: 7, descr: alert, graph: 0, generic: 2 }
                 -
                     oid: DELL-RAC-MIB::controllerTable
                     value: DELL-RAC-MIB::controllerComponentStatus
