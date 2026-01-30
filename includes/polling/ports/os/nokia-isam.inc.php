@@ -46,19 +46,12 @@ if (! is_numeric($hc_test[0]['ifHCInOctets'] ?? null) || ! is_numeric($hc_test[0
     }
 }
 
-// Fix ifMtu to prevent SQL errors (must be integer). Fallback to 0 ("unknown").
-if (! empty($port_stats) && is_array($port_stats)) {
-    foreach ($port_stats as $ifIndex => $p) {
-        $type = $p['ifType'] ?? null;
-        if ($type === 'gpon') {
-            $raw_mtu = $p['ifMtu'] ?? null;
-            if (! is_numeric($raw_mtu) || (is_string($raw_mtu) && strtoupper($raw_mtu) === 'NULL')) {
-                $port_stats[$ifIndex]['ifMtu'] = 0;
-            } else {
-                $port_stats[$ifIndex]['ifMtu'] = (int) $raw_mtu;
-            }
-        }
+// Fix ifMtu to prevent SQL errors (must be integer). Fallback to defined null.
+foreach ($port_stats as &$p) {
+   if (($p['ifMtu'] ?? '') === 'NULL') {
+        $p['ifMtu'] = null;
     }
 }
 
-unset($isam_port_stats);
+unset($isam_port_stats, $p);
+
