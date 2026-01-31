@@ -18,27 +18,37 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
+ * Base Alcatel-Lucent OS (AOS6)
+ *
  * @link       https://www.librenms.org
  *
  * @copyright  2025 Peca Nesovanovic
  * @copyright  2025 Tony Murray
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  * @author     Tony Murray <murraytony@gmail.com>
+ * @author     Paul Iercosan <mail@paulierco.ro>
  */
 
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
+use App\Models\PortsNac;
 use App\Models\PortVlan;
+use App\Models\Transceiver;
 use App\Models\Vlan;
 use Illuminate\Support\Collection;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
+use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\OS;
 use SnmpQuery;
 
-class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery
+class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDiscovery, NacPolling
 {
+    // ports_nac.* string columns are typically VARCHAR(50) (authz_by definitely is)
+    private const PORTS_NAC_STR_MAX = 50;
+
     public function discoverVlans(): Collection
     {
         if (($QBridgeMibVlans = parent::discoverVlans())->isNotEmpty()) {
@@ -61,11 +71,477 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery
         }
 
         return SnmpQuery::walk('ALCATEL-IND1-VLAN-MGR-MIB::vpaType')
-            ->mapTable(fn ($data, $vpaVlanNumber, $vpaIfIndex = null) => new Portvlan([
-                'vlan' => $vpaVlanNumber,
-                'baseport' => $this->bridgePortFromIfIndex($vpaIfIndex),
-                'untagged' => ($data['ALCATEL-IND1-VLAN-MGR-MIB::vpaType'] == 1 ? 1 : 0),
-                'port_id' => PortCache::getIdFromIfIndex($vpaIfIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
+            ->mapTable(function ($data, $vpaVlanNumber, $vpaIfIndex = null) {
+                $portId = PortCache::getIdFromIfIndex($vpaIfIndex, $this->getDeviceId()) ?? 0;
+
+                return new PortVlan([
+                    'vlan' => $vpaVlanNumber,
+                    'baseport' => $this->bridgePortFromIfIndex($vpaIfIndex),
+                    'untagged' => ($data['ALCATEL-IND1-VLAN-MGR-MIB::vpaType'] == 1 ? 1 : 0),
+                    'port_id' => $portId,
+                ]);
+            });
+    }
+
+    /**
+     * Poll NAC sessions for AOS6 using ALCATEL-IND1-DOT1X-MIB.
+     *
+     * AOS6 does NOT provide per-session "RADIUS server used" like AOS7/AOS8.
+     * To populate authz_by, we read the configured *front-hand* (NAC) RADIUS server lists:
+     *  - 802.1X: ALCATEL-IND1-AAA-MIB::aaaAuth8021xTable (aaatxName1..4)
+     *  - MAC auth: ALCATEL-IND1-AAA-MIB::aaaAuthMACTable (aaaMacSrvrName1..4)
+     *
+     * IP address is often 0/empty on AOS6 for MAB; ports_nac.ip_address cannot be NULL, so we store 0.0.0.0.
+     * AOS6 can also return IPv4 as a 32-bit integer; we convert to dotted IPv4.
+     */
+    public function pollNac(): Collection
+    {
+        $nac = collect();
+
+        // Main per-device status table (contains supplicant + non-supplicant entries)
+        $rows = collect(
+            SnmpQuery::mibDir('nokia/aos6')
+                ->walk('ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusTable')
+                ->valuesByIndex()
+        );
+
+        if ($rows->isEmpty()) {
+            return $nac;
+        }
+
+        // Pre-fetch "Auth By" (configured NAC RADIUS pools) once (avoid per-row SNMP)
+        $authByDot1x = $this->formatAuthByServers($this->getNacRadiusServersDot1x());
+        $authByMac = $this->formatAuthByServers($this->getNacRadiusServersMac());
+
+        // Infer host_mode by counting successful auth sessions per ifIndex
+        $successCountByIfIndex = [];
+        foreach ($rows as $row) {
+            $slot = (int) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusSlotNumber') ?? 0);
+            $port = (int) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusPortNumber') ?? 0);
+            if ($slot <= 0 || $port <= 0) {
+                continue;
+            }
+
+            $ifIndex = ($slot * 1000) + $port;
+
+            // ALADot1xAuthenticationResult: notApplicable(0), inProgress(1), success(2), fail(3)
+            $authResult = (int) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusAuthResult') ?? 0);
+            if ($authResult === 2) {
+                $successCountByIfIndex[$ifIndex] = ($successCountByIfIndex[$ifIndex] ?? 0) + 1;
+            }
+        }
+
+        foreach ($rows as $row) {
+            $slot = (int) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusSlotNumber') ?? 0);
+            $port = (int) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusPortNumber') ?? 0);
+            if ($slot <= 0 || $port <= 0) {
+                continue;
+            }
+
+            $ifIndex = ($slot * 1000) + $port;
+
+            $portId = PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId());
+            if (! $portId) {
+                continue;
+            }
+
+            $macColon = (string) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusMACAddress') ?? '');
+            $macColon = $this->normalizeMacColon($macColon);
+            $macNoSep = $this->normalizeMacNoSep($macColon);
+            if ($macNoSep === '') {
+                continue;
+            }
+
+            $vlan = (int) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusVlan') ?? 0);
+
+            $profile = trim((string) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusProfileUsed') ?? ''));
+            $domain = ($profile !== '' && $profile !== '--') ? $profile : 'UNP';
+            $domain = $this->limitString($domain, self::PORTS_NAC_STR_MAX);
+
+            $username = trim((string) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusUserName') ?? ''));
+            if ($username === '' || $username === '--') {
+                $username = $macColon !== '' ? $macColon : $macNoSep;
+            }
+            $username = $this->limitString($username, self::PORTS_NAC_STR_MAX);
+
+            $ipRaw = $this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusIPAddress');
+            $ip = $this->normalizeIpAddress($ipRaw);
+
+            // Auth type: noAuthentication(0), dotXAuthentication(1), macAuthentication(2), captivePortal(3)
+            $authType = (int) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusAuthType') ?? 0);
+
+            $method = match ($authType) {
+                1 => 'dot1x',
+                2 => 'mab',
+                3 => 'captivePortal',
+                default => 'unknown',
+            };
+
+            // Pick configured NAC RADIUS server list depending on method
+            $authBy = match ($method) {
+                'mab' => $authByMac,
+                'dot1x' => $authByDot1x,
+                default => 'RADIUS',
+            };
+            $authBy = $this->limitString($authBy, self::PORTS_NAC_STR_MAX);
+
+            // Auth result: notApplicable(0), inProgress(1), success(2), fail(3)
+            $authResult = (int) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusAuthResult') ?? 0);
+            $authcStatus = $this->mapAos6AuthcStatus($authResult);
+            $authzStatus = $this->mapAos6AuthzStatus($authResult);
+
+            $hostMode = (($successCountByIfIndex[$ifIndex] ?? 0) > 1) ? 'multiAuth' : 'singleHost';
+
+            // Unix timestamp (seconds) when learned (often present on AOS6)
+            $timeLearned = (int) ($this->rowValue($row, 'ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusTimeLearned') ?? 0);
+            $timeElapsed = $this->elapsedFromUnix($timeLearned);
+
+            $authId = sprintf('%d-%s-%d', $ifIndex, $macNoSep, $vlan);
+
+            $nac->push(new PortsNac([
+                'port_id' => $portId,
+                'auth_id' => $authId,
+                'domain' => $domain,
+                'username' => $username,
+                'mac_address' => $macNoSep,
+                'ip_address' => $ip, // never null (DB constraint)
+                'host_mode' => $hostMode,
+                'authz_status' => $authzStatus,
+                'authz_by' => $authBy,
+                'authc_status' => $authcStatus,
+                'method' => $method,
+                'timeout' => 0,
+                'time_left' => null,
+                'vlan' => $vlan,
+                'time_elapsed' => $timeElapsed > 0 ? $timeElapsed : null,
             ]));
+        }
+
+        return $nac;
+    }
+
+    /**
+     * Discover Transceivers.
+     *
+     * Strategy:
+     * - Use ddmTxBiasCurrent to detect Optical Transceivers.
+     * - Copper SFPs report 0 Bias (no laser), so they are automatically filtered out.
+     * - Fiber SFPs with a cut cable (0 Rx Power) still have valid Tx Bias, so they remain discovered.
+     */
+    public function discoverTransceivers(): Collection
+    {
+        $device = $this->getDevice();
+        $transceivers = new Collection();
+
+        // 1. Pre-fetch Ports
+        $portsByIfIndex = $device->ports()->get()->keyBy('ifIndex');
+
+        // 2. Fetch Entity Data for Metadata (Serial, Vendor, Model)
+        // entPhysicalEntry is a full table, so it remains a nested array
+        $entityData = collect(
+            SnmpQuery::walk('ENTITY-MIB::entPhysicalEntry')
+                ->valuesByIndex()
+        );
+
+        // 3. Build a Map: Parent Entity Index -> Slot Number
+        // Look for "NI-1", "NI-2" to identify which entity represents which slot.
+        $slotMap = [];
+        foreach ($entityData as $eIndex => $entry) {
+            $name = $entry['entPhysicalName'] ?? '';
+            // Match "NI-1", "NI-2", etc.
+            if (preg_match('/^NI-(\d+)$/', (string) $name, $matches)) {
+                $slotMap[$eIndex] = (int) $matches[1];
+            }
+        }
+
+        // 4. Build a Map: Calculated ifIndex -> Entity Data
+        // AOS6 ifIndex = (Slot * 1000) + Port
+        $entityByIfIndex = [];
+        foreach ($entityData as $entry) {
+            $parentIndex = $entry['entPhysicalContainedIn'] ?? 0;
+            $portNum = $entry['entPhysicalParentRelPos'] ?? 0;
+
+            if ($parentIndex > 0 && $portNum > 0 && isset($slotMap[$parentIndex])) {
+                $slot = $slotMap[$parentIndex];
+                $calculatedIfIndex = ($slot * 1000) + $portNum;
+                $entityByIfIndex[$calculatedIfIndex] = $entry;
+            }
+        }
+
+        // 5. Fetch DDM Bias Current (Reliable indicator of Optics)
+        // OID: .1.3.6.1.4.1.6486.800.1.2.1.5.1.1.2.5.1.11
+        $ddmData = collect(
+            SnmpQuery::walk('ALCATEL-IND1-PORT-MIB::ddmTxBiasCurrent')
+                ->valuesByIndex()
+        );
+
+        foreach ($ddmData as $index => $biasValue) {
+            // FIX: Since we walked a single column, $biasValue is now the actual integer, not an array.
+            $biasValue = (int) $biasValue;
+
+            // FILTER: If Bias is 0, it is Copper or Empty.
+            // A fiber cut does NOT stop the laser bias, so real fiber stays.
+            if ($biasValue <= 0) {
+                continue;
+            }
+
+            $ifIndex = (int) $index;
+
+            $port = $portsByIfIndex->get($ifIndex);
+            if (! $port) {
+                continue;
+            }
+
+            // Default values
+            $vendor = null;
+            $part = null;
+            $serial = null;
+            $type = 'SFP/Transceiver';
+
+            // Try to find matching Entity Metadata
+            if (isset($entityByIfIndex[$ifIndex])) {
+                $e = $entityByIfIndex[$ifIndex];
+                $vendor = $e['entPhysicalMfgName'] ?? null;
+                $part = $e['entPhysicalModelName'] ?? null;
+                $serial = $e['entPhysicalSerialNum'] ?? null;
+
+                if (! empty($part) && $part !== 'OEM') {
+                    $type = $part;
+                }
+            }
+
+            $transceivers->push(new Transceiver([
+                'port_id' => $port->port_id,
+                'index' => $ifIndex,
+                'type' => $type,
+                'vendor' => $vendor,
+                'part_number' => $part,
+                'serial' => $serial,
+                'revision' => null,
+                'entity_physical_index' => $ifIndex,
+                'ddm' => 1,
+            ]));
+        }
+
+        return $transceivers;
+    }
+
+    private function mapAos6AuthcStatus(int $authResult): string
+    {
+        // notApplicable(0), inProgress(1), success(2), fail(3)
+        return match ($authResult) {
+            2 => 'authcSuccess',
+            1 => 'authcInProgress',
+            3 => 'authcFail',
+            0 => 'authcUnknown',
+            default => 'authcUnknown',
+        };
+    }
+
+    private function mapAos6AuthzStatus(int $authResult): string
+    {
+        // notApplicable(0), inProgress(1), success(2), fail(3)
+        return match ($authResult) {
+            2 => 'authzSuccess',
+            1 => 'authzInProgress',
+            3 => 'authzFail',
+            0 => 'authzUnknown',
+            default => 'authzUnknown',
+        };
+    }
+
+    /**
+     * AOS6 NAC "front-hand" RADIUS servers used for 802.1X (configured list, not per-session).
+     * Returns server names in order (Name1..Name4), filtered of blanks, de-duplicated.
+     */
+    private function getNacRadiusServersDot1x(): array
+    {
+        $table = collect(
+            SnmpQuery::mibDir('noki/aos6')
+                ->walk('ALCATEL-IND1-AAA-MIB::aaaAuth8021xTable')
+                ->valuesByIndex()
+        );
+
+        if ($table->isEmpty()) {
+            return [];
+        }
+
+        $row = (array) $table->first();
+
+        $names = [];
+        foreach ([
+            'ALCATEL-IND1-AAA-MIB::aaatxName1',
+            'ALCATEL-IND1-AAA-MIB::aaatxName2',
+            'ALCATEL-IND1-AAA-MIB::aaatxName3',
+            'ALCATEL-IND1-AAA-MIB::aaatxName4',
+        ] as $oid) {
+            $name = trim((string) ($this->rowValue($row, $oid) ?? ''));
+            if ($name !== '') {
+                $names[] = $name;
+            }
+        }
+
+        $names = array_values(array_unique($names));
+
+        return $names;
+    }
+
+    /**
+     * AOS6 NAC "front-hand" RADIUS servers used for MAC authentication (configured list, not per-session).
+     * Returns server names in order (Name1..Name4), filtered of blanks, de-duplicated.
+     */
+    private function getNacRadiusServersMac(): array
+    {
+        $table = collect(
+            SnmpQuery::mibDir('nokia/aos6')
+                ->walk('ALCATEL-IND1-AAA-MIB::aaaAuthMACTable')
+                ->valuesByIndex()
+        );
+
+        if ($table->isEmpty()) {
+            return [];
+        }
+
+        $row = (array) $table->first();
+
+        $names = [];
+        foreach ([
+            'ALCATEL-IND1-AAA-MIB::aaaMacSrvrName1',
+            'ALCATEL-IND1-AAA-MIB::aaaMacSrvrName2',
+            'ALCATEL-IND1-AAA-MIB::aaaMacSrvrName3',
+            'ALCATEL-IND1-AAA-MIB::aaaMacSrvrName4',
+        ] as $oid) {
+            $name = trim((string) ($this->rowValue($row, $oid) ?? ''));
+            if ($name !== '') {
+                $names[] = $name;
+            }
+        }
+
+        $names = array_values(array_unique($names));
+
+        return $names;
+    }
+
+    /**
+     * Format authz_by from configured server names. This is NOT "server actually used" per session.
+     */
+    private function formatAuthByServers(array $servers): string
+    {
+        $servers = array_values(array_filter(array_map(trim(...), $servers)));
+        if (empty($servers)) {
+            return 'RADIUS';
+        }
+
+        $s = implode(',', $servers);
+
+        return $this->limitString($s, self::PORTS_NAC_STR_MAX);
+    }
+
+    private function limitString(string $value, int $max): string
+    {
+        if ($max <= 0) {
+            return '';
+        }
+
+        if (strlen($value) <= $max) {
+            return $value;
+        }
+
+        return substr($value, 0, $max);
+    }
+
+    private function normalizeMacColon(string $mac): string
+    {
+        $mac = strtolower(trim($mac));
+        $parts = preg_split('/[:\-]/', $mac);
+        if (! $parts || count($parts) !== 6) {
+            return $mac;
+        }
+        $parts = array_map(fn ($p) => str_pad($p, 2, '0', STR_PAD_LEFT), $parts);
+
+        return implode(':', $parts);
+    }
+
+    private function normalizeMacNoSep(string $macColon): string
+    {
+        $macColon = strtolower(trim($macColon));
+        if ($macColon === '') {
+            return '';
+        }
+
+        return strtolower(str_replace(':', '', $macColon));
+    }
+
+    private function normalizeIpAddress($val): string
+    {
+        if ($val === null) {
+            return '0.0.0.0';
+        }
+
+        if (is_array($val)) {
+            // If it's an array (valuesByIndex format), try to pick first scalar-ish value
+            $first = reset($val);
+            $val = $first !== false ? $first : '';
+        }
+
+        $s = trim((string) $val);
+
+        // AOS6 often returns "0" here; DB requires non-null.
+        if ($s === '' || $s === '0' || $s === '0.0.0.0') {
+            return '0.0.0.0';
+        }
+
+        // Already dotted IPv4?
+        if (filter_var($s, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            return $s;
+        }
+
+        // AOS6 sometimes returns IPv4 as a 32-bit decimal integer (e.g. 168142917)
+        if (ctype_digit($s)) {
+            $n = (int) $s;
+
+            // Valid unsigned 32-bit range
+            if ($n > 0 && $n <= 4294967295) {
+                $ip = @inet_ntop(pack('N', $n)); // big-endian / network order
+                if ($ip !== false && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                    return $ip;
+                }
+            }
+        }
+
+        // Fallback: keep whatever we got (better than null)
+        return $s;
+    }
+
+    private function elapsedFromUnix(int $unixTs): int
+    {
+        if ($unixTs <= 0) {
+            return 0;
+        }
+
+        // sanity: if it looks like a unix timestamp
+        if ($unixTs < 946684800) { // < 2000-01-01
+            return 0;
+        }
+
+        $now = time();
+        if ($unixTs > $now) {
+            return 0;
+        }
+
+        return $now - $unixTs;
+    }
+
+    private function rowValue($row, string $oid)
+    {
+        if (is_array($row) && array_key_exists($oid, $row)) {
+            return $row[$oid];
+        }
+        $short = preg_replace('/^.*::/', '', $oid);
+        if (is_array($row) && array_key_exists($short, $row)) {
+            return $row[$short];
+        }
+
+        return null;
     }
 }
