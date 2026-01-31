@@ -100,7 +100,7 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
 
         // Main per-device status table (contains supplicant + non-supplicant entries)
         $rows = collect(
-            SnmpQuery::mibDir('nokia')
+            SnmpQuery::mibDir('nokia/aos6')
                 ->walk('ALCATEL-IND1-DOT1X-MIB::alaDot1xDeviceStatusTable')
                 ->valuesByIndex()
         );
@@ -357,7 +357,7 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
     private function getNacRadiusServersDot1x(): array
     {
         $table = collect(
-            SnmpQuery::mibDir('nokia')
+            SnmpQuery::mibDir('noki/aos6')
                 ->walk('ALCATEL-IND1-AAA-MIB::aaaAuth8021xTable')
                 ->valuesByIndex()
         );
@@ -393,7 +393,7 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
     private function getNacRadiusServersMac(): array
     {
         $table = collect(
-            SnmpQuery::mibDir('nokia')
+            SnmpQuery::mibDir('nokia/aos6')
                 ->walk('ALCATEL-IND1-AAA-MIB::aaaAuthMACTable')
                 ->valuesByIndex()
         );
