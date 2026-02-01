@@ -95,7 +95,7 @@ class RrdProcess
         return rtrim($output);
     }
 
-    public function runAsync(string $command): void
+    private function runAsync(string $command): void
     {
         $this->start();
 
