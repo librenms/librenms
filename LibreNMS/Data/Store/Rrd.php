@@ -31,6 +31,7 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use App\Polling\Measure\Measurement;
 use Exception;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\FileExistsException;
@@ -40,7 +41,6 @@ use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Rewrite;
-use Log;
 
 class Rrd extends BaseDatastore
 {
@@ -356,18 +356,11 @@ class Rrd extends BaseDatastore
             return $output;
         }
 
-        // send the command!
         $this->init();
-        if (in_array($command, ['last', 'list', 'lastupdate', 'update'])) {
-            // send and wait for completion
-            $output = $this->rrd->run($commandLine);
+        $output = $this->rrd->run($commandLine);
 
-            if (Debug::isVerbose()) {
-                echo 'RRDtool Output: ' . $output;
-            }
-        } else {
-            // don't care about the output
-            $this->rrd->runAsync($commandLine);
+        if (Debug::isVerbose()) {
+            Log::debug('RRDtool Output: ' . $output);
         }
 
         $this->recordStatistic($stat->end());
