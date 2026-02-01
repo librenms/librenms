@@ -147,10 +147,10 @@ class Mempools implements Module
 
         $mempools->each(function (Mempool $mempool) use ($data): void {
             $mempool->fillUsage(
-                $data[$mempool->mempool_used_oid] ?? null,
-                $data[$mempool->mempool_total_oid] ?? null,
-                $data[$mempool->mempool_free_oid] ?? null,
-                $data[$mempool->mempool_perc_oid] ?? null
+                $data[(string) $mempool->mempool_used_oid] ?? null,
+                $data[(string) $mempool->mempool_total_oid] ?? null,
+                $data[(string) $mempool->mempool_free_oid] ?? null,
+                $data[(string) $mempool->mempool_perc_oid] ?? null
             );
         });
 

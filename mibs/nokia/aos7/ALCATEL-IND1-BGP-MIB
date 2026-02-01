@@ -1,43 +1,37 @@
 ALCATEL-IND1-BGP-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-        MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, TimeTicks, IpAddress, Counter32, Gauge32, Integer32, Unsigned32
+        MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, TimeTicks, IpAddress, Counter32, Gauge32, Integer32, Unsigned32, NOTIFICATION-TYPE
                 FROM SNMPv2-SMI
-        RowStatus
+        MacAddress, RowStatus
                 FROM SNMPv2-TC
-        MODULE-COMPLIANCE, OBJECT-GROUP
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
                 FROM SNMPv2-CONF
         SnmpAdminString
                 FROM SNMP-FRAMEWORK-MIB
         Ipv6Address
                 FROM IPV6-TC
-        InetAutonomousSystemNumber
+        InetAutonomousSystemNumber, InetAddressType, InetAddress
                 FROM INET-ADDRESS-MIB
         routingIND1Bgp
                 FROM ALCATEL-IND1-BASE;
 
 alcatelIND1BGPMIB MODULE-IDENTITY
-        LAST-UPDATED  "201010121800Z"
-        ORGANIZATION  "Alcatel-Lucent"
-        CONTACT-INFO
-            "Please consult with Customer Service to ensure the most appropriate
-             version of this document is used with the products in question:
+    LAST-UPDATED "202211210000Z"
+    ORGANIZATION "ALE USA Inc."
+    CONTACT-INFO
+     "Please consult with Customer Service to ensure the most appropriate
+      version of this document is used with the products in question:
 
-                        Alcatel-Lucent, Enterprise Solutions Division
-                       (Formerly Alcatel Internetworking, Incorporated)
-                               26801 West Agoura Road
-                            Agoura Hills, CA  91301-5122
-                              United States Of America
+                      ALE USA Inc. Enterprise
+                        26801 West Agoura Road
+                     Agoura Hills, CA  91301-5122
+                       United States Of America
 
-            Telephone:               North America  +1 800 995 2696
-                                     Latin America  +1 877 919 9526
-                                     Europe         +31 23 556 0100
-                                     Asia           +65 394 7933
-                                     All Other      +1 818 878 4507
+     Telephone:          +1 800 995 2696
 
-            Electronic Mail:         support@ind.alcatel.com
-            World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
-            File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+     Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+     World Wide Web:     https://www.al-enterprise.com"
 
         DESCRIPTION
             "This module describes an authoritative enterprise-specific Simple
@@ -56,10 +50,29 @@ alcatelIND1BGPMIB MODULE-IDENTITY
              non-exclusive license to use this specification in connection with
              management of the products for which it is intended to be used.
 
-                         Copyright (C) 1995-2007 Alcatel-Lucent
+                         Copyright (C) ALE USA Inc. 2014-2019
+                         Copyright (C) 1995-2013 Alcatel-Lucent
                              ALL RIGHTS RESERVED WORLDWIDE"
 
+          REVISION      "202305250000Z" -- May 25 2023
+          DESCRIPTION
+              "Added L2VPN VPLS Table."
+
+          REVISION      "202211210000Z"
+          DESCRIPTION
+              "Added global objects for MPLS."
+
+          REVISION      "201911270000Z"
+          DESCRIPTION
+              "Updated the latest contact and Copyright information for ALE USA Inc."
         ::= { routingIND1Bgp 1}
+
+
+alcatelIND1BGPMIBNotifications OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "Branch For Border Gateway Protocol (BGP) Subsystem Notifications."
+        ::= { alcatelIND1BGPMIB 0 }
 
 
 alcatelIND1BGPMIBObjects OBJECT-IDENTITY
@@ -257,11 +270,12 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                 ::= { alaBgpGlobal 15 }
 
         alaBgpMaxPeers OBJECT-TYPE
-                SYNTAX  Integer32 (1..32)
-                MAX-ACCESS  read-only
+                SYNTAX  Integer32 (32|64|128|256|512)
+                MAX-ACCESS  read-write
                 STATUS  current
                 DESCRIPTION
                 "Maximum number of BGP peers supported."
+                DEFVAL { 32 }
                 ::= { alaBgpGlobal 16 }
 
         alaBgpNumActiveRoutes OBJECT-TYPE
@@ -553,6 +567,41 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                 DEFVAL { clear }
                 ::= { alaBgpGlobal 43 }
 
+
+        alaBgpAddrFamilyL2vpnVpls OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+                MAX-ACCESS  read-write
+                STATUS current
+                DESCRIPTION
+
+                "Enables/Disables L2VPN-VPLS capability in BGP."
+                DEFVAL { disable }
+                ::= { alaBgpGlobal 44}
+
+        alaBgpAddrFamilyEvpn OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+                MAX-ACCESS  read-write
+                STATUS current
+                DESCRIPTION
+                "Enables/Disables L2VPN-VPLS capability in BGP."
+                DEFVAL { disable }
+                ::= { alaBgpGlobal 45}
+
+        alaBgpEvpnFabricAutonomousSystem OBJECT-TYPE
+                SYNTAX  InetAutonomousSystemNumber
+                MAX-ACCESS  read-write
+                STATUS  current
+                DESCRIPTION
+                "Evpn fabric autonomous system"
+                DEFVAL { 0 }
+                ::= { alaBgpGlobal 46 }
+
 ---
 --- BGP IPv4 Peer Table
 ---
@@ -644,8 +693,17 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                     alaBgpPeerBfdStatus             INTEGER,
                     alaBgpPeerPrefix6ListOut        SnmpAdminString,
                     alaBgpPeerPrefix6ListIn         SnmpAdminString,
-                    alaBgpPeerActivateIpv4          INTEGER
+                    alaBgpPeerActivateIpv4          INTEGER,
+                    alaBgpPeerTTLSecurityHops       Integer32,
+                    alaBgpPeerCheckFirstAS          INTEGER,
+                    alaBgpPeerActivateL2vpnVpls     INTEGER,
 
+                    alaBgpPeerCapabilityL2vpnVpls   INTEGER,
+
+                    alaBgpPeerActivateEvpn          INTEGER,
+                    alaBgpPeerTemplateName          SnmpAdminString,
+                    alaBgpPeerEvpnNbrTypeFabric     INTEGER,
+                    alaBgpPeerUpdateSource          SnmpAdminString
                 }
 
         alaBgpPeerAddr OBJECT-TYPE
@@ -1413,6 +1471,97 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                  this peer. If disabled, the capability is not advertised in the OPEN message."
                 DEFVAL { enabled }
                 ::= { alaBgpPeerEntry 68 }
+
+         alaBgpPeerTTLSecurityHops OBJECT-TYPE
+                SYNTAX  Integer32 (0..256)
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                "The maximum number of hops (0..255) a BGP packet may traverse when the
+                Generalized TTL Security Mechansim is enabled for this peer.
+
+                A value of 256, the default, indicates that GTSM is not enabled for
+                communication with this peer."
+                DEFVAL { 256 }
+                ::= { alaBgpPeerEntry 69 }
+
+         alaBgpPeerCheckFirstAS OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "This object is used to check for first AS in the received ASPATH"
+                DEFVAL { enable }
+                ::= { alaBgpPeerEntry 70 }
+
+        alaBgpPeerActivateL2vpnVpls OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "Enable to send L2VPN-VPLS capability to the neighbor."
+                DEFVAL { disable }
+                ::= { alaBgpPeerEntry 71 }
+
+        alaBgpPeerCapabilityL2vpnVpls OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        unknown(0),
+                        advertised(1),
+                        notAdvertised(2)
+                        }
+                MAX-ACCESS  read-only
+                STATUS  current
+                DESCRIPTION
+                "Indicates whether the peer has advertised the L2VPN VPLS capability in its BGP OPEN message.
+                 Both peers must advertise the L2VPN-VPLS capability to establish the connection with the 
+                 L2VPN-VPLS capability enabled."
+                ::= { alaBgpPeerEntry 72 }
+
+        alaBgpPeerActivateEvpn OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "Enable to send EVPN capability to the neighbor."
+                DEFVAL { disable }
+                ::= { alaBgpPeerEntry 73 }
+
+        alaBgpPeerTemplateName OBJECT-TYPE
+                SYNTAX  SnmpAdminString(SIZE(0..60))
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "The bgp template name of the neighbor."
+                ::= { alaBgpPeerEntry 74 }
+
+        alaBgpPeerEvpnNbrTypeFabric OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "Evpn nbr type fabric of the neighbor."
+                DEFVAL { disable }
+                ::= { alaBgpPeerEntry 75 }
+
+         alaBgpPeerUpdateSource OBJECT-TYPE
+                SYNTAX  SnmpAdminString
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "Update source of this connection."
+                ::= { alaBgpPeerEntry 76 }
 
 --
 -- Bgp Aggregate configuration table
@@ -2321,7 +2470,8 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                     alaBgpRouteMapPrefix6MatchListId        SnmpAdminString,
                     alaBgpRouteMapMatchPrefix6              Ipv6Address,
                     alaBgpRouteMapMatchMaskLength6          Integer32,
-                    alaBgpRouteMapCommunityStrip            SnmpAdminString
+                    alaBgpRouteMapCommunityStrip            SnmpAdminString,
+                    alaBgpRouteMapRouteTag                  Integer32
                 }
 
          alaBgpRouteMapName OBJECT-TYPE
@@ -2583,6 +2733,14 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                 DESCRIPTION
                 "Community strip primitive"
                 ::= { alaBgpRouteMapEntry 24 }
+
+         alaBgpRouteMapRouteTag OBJECT-TYPE
+                SYNTAX  Integer32 (0..65535)
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "Route tag of this route map."
+                ::= { alaBgpRouteMapEntry 25 }
 
 
 
@@ -2950,7 +3108,7 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
 
          alaBgpAspathPriMatchListRowStatus OBJECT-TYPE
                 SYNTAX  RowStatus
-                MAX-ACCESS      read-only
+                MAX-ACCESS      read-create
                 STATUS      current
                 DESCRIPTION
                 "Row status variable."
@@ -3047,7 +3205,7 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
 
          alaBgpCommunityPriMatchListRowStatus OBJECT-TYPE
                 SYNTAX  RowStatus
-                MAX-ACCESS  read-only
+                MAX-ACCESS  read-create
                 STATUS      current
                 DESCRIPTION
                 "Row status variable"
@@ -3856,7 +4014,9 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                    alaBgpPeer6Prefix6ListOut                    SnmpAdminString,
                    alaBgpPeer6Prefix6ListIn                     SnmpAdminString,
                    alaBgpPeer6ActivateIpv4                      INTEGER,
-                   alaBgpPeer6BfdStatus                         INTEGER
+                   alaBgpPeer6BfdStatus                         INTEGER,
+                   alaBgpPeer6TTLSecurityHops                   Integer32,
+                   alaBgpPeer6CheckFirstAS                      INTEGER
                 }
 
          alaBgpPeer6Addr OBJECT-TYPE
@@ -4741,6 +4901,615 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                 "Enables/Disables BFd for a particular Peer."
                 ::= { alaBgpPeer6Entry 77 }
 
+         alaBgpPeer6TTLSecurityHops OBJECT-TYPE
+                SYNTAX  Integer32 (0..256)
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                "The maximum number of hops (0..255) a BGP packet may traverse when the
+                Generalized TTL Security Mechansim is enabled for this peer.
+
+                A value of 256, the default, indicates that GTSM is not enabled for
+                communication with this peer."
+                DEFVAL { 256 }
+                ::= { alaBgpPeer6Entry 78 }
+
+         alaBgpPeer6CheckFirstAS OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "This object is used to check for first AS in the received ASPATH"
+                DEFVAL { enable }
+                ::= { alaBgpPeer6Entry 79 }
+
+
+---
+--- BGP L2VPN VPLS Table
+---
+        alaBgpL2vpnVplsTable OBJECT-TYPE
+                SYNTAX    SEQUENCE OF AlaBgpL2vpnVplsEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                "BGP L2vpn table."
+                ::= { alcatelIND1BGPMIBObjects 13 }
+
+        alaBgpL2vpnVplsEntry OBJECT-TYPE
+                SYNTAX    AlaBgpL2vpnVplsEntry
+                MAX-ACCESS    not-accessible
+                STATUS    current
+                DESCRIPTION
+                "BGP L2VPN VPLS entry."
+                INDEX   { 
+                            alaBgpL2vpnVplsId,
+                            alaBgpL2vpnVplsNbrAddrType,
+                            alaBgpL2vpnVplsNbrAddr
+                        }
+                ::= { alaBgpL2vpnVplsTable 1 }
+
+        AlaBgpL2vpnVplsEntry ::=
+                SEQUENCE  {
+                    alaBgpL2vpnVplsId                   Unsigned32,
+                    alaBgpL2vpnVplsNbrAddrType          InetAddressType,
+                    alaBgpL2vpnVplsNbrAddr              InetAddress,
+                    alaBgpL2vpnVplsProtocol             INTEGER,
+                    alaBgpL2vpnVplsVeId                 Unsigned32,
+                    alaBgpL2vpnVplsRouteTarget          SnmpAdminString,
+                    alaBgpL2vpnVplsRouteDistinguisher   SnmpAdminString,
+                    alaBgpL2vpnVplsDiscoveredPeerNum    Unsigned32,
+                    alaBgpL2vpnVplsVeBlockOffset        Unsigned32,
+                    alaBgpL2vpnVplsVeBlockSize          Unsigned32,
+                    alaBgpL2vpnVplsLabelBase            Unsigned32,
+                    alaBgpL2vpnVplsNextHopAddrType      InetAddressType,
+                    alaBgpL2vpnVplsNextHopAddr          InetAddress,
+                    alaBgpL2vpnVplsOrigin               INTEGER,
+                    alaBgpL2vpnVplsLocalPreference      Unsigned32,
+                    alaBgpL2vpnVplsIfMtu                Unsigned32 
+                }
+
+        alaBgpL2vpnVplsId OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                "The configured VPLS identifier."
+                ::= { alaBgpL2vpnVplsEntry 1 }
+
+        alaBgpL2vpnVplsNbrAddrType OBJECT-TYPE
+                SYNTAX      InetAddressType {
+                            unknown(0),--for local
+                            ipv4(1)
+                            }
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                "InetAddressIPv4 (1) type is supported."
+                ::= { alaBgpL2vpnVplsEntry 2 }
+
+        alaBgpL2vpnVplsNbrAddr OBJECT-TYPE
+                SYNTAX      InetAddress (SIZE (4|16))
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                "The IP address of the peer that is advertising this vpls path."
+                ::= { alaBgpL2vpnVplsEntry 3 }
+
+        alaBgpL2vpnVplsProtocol OBJECT-TYPE
+                SYNTAX      INTEGER {
+                            local (1),
+                            ibgp(2),
+                            ebgp(3)
+                            }
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                "The protocol from which this route path was learned. 
+                 Possible values for this field are as follows: local, ibgp."
+                ::= { alaBgpL2vpnVplsEntry 4 }
+
+        alaBgpL2vpnVplsVeId OBJECT-TYPE
+                SYNTAX      Unsigned32(0..65535)
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                "The configured VPLS Edge Id."
+                ::= { alaBgpL2vpnVplsEntry 5 }
+
+        alaBgpL2vpnVplsRouteTarget OBJECT-TYPE
+                SYNTAX      SnmpAdminString(SIZE(0..32))
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                "The route-target value."
+                ::= { alaBgpL2vpnVplsEntry 6 }
+
+        alaBgpL2vpnVplsRouteDistinguisher OBJECT-TYPE
+                SYNTAX      SnmpAdminString(SIZE(0..32))
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                "The route-distinguisher value."
+                ::= { alaBgpL2vpnVplsEntry 7 }
+
+        alaBgpL2vpnVplsDiscoveredPeerNum OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                "The number of VPLS peers with which pseudo wire is 
+                 established and labels/demultiplexers are exchanged."
+                ::= { alaBgpL2vpnVplsEntry 8 }
+
+        alaBgpL2vpnVplsVeBlockOffset OBJECT-TYPE
+                SYNTAX      Unsigned32(0..65535)
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                "The block offset advertised by peer.
+                 In case of local entry, value is 0."
+                ::= { alaBgpL2vpnVplsEntry 9 }
+
+        alaBgpL2vpnVplsVeBlockSize OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                "The block size advertised by peer.
+                 In case of local entry, value is 0."
+                ::= { alaBgpL2vpnVplsEntry 10 }
+
+        alaBgpL2vpnVplsLabelBase OBJECT-TYPE
+                SYNTAX      Unsigned32
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                "The label base advertised by peer.
+                 In case of local entry, value is 0."
+                ::= { alaBgpL2vpnVplsEntry 11 }
+
+        alaBgpL2vpnVplsNextHopAddrType OBJECT-TYPE
+                SYNTAX      InetAddressType {ipv4(1)}
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                "InetAddressIPv4 (1) type is supported."
+                ::= { alaBgpL2vpnVplsEntry 12 }
+
+        alaBgpL2vpnVplsNextHopAddr OBJECT-TYPE
+                SYNTAX      InetAddress (SIZE (4))
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                "The next hop along the route path."
+                ::= { alaBgpL2vpnVplsEntry 13 }
+
+        alaBgpL2vpnVplsOrigin OBJECT-TYPE
+                SYNTAX      INTEGER {
+                            none(1),
+                            ibgp(2),
+                            egp(3),
+                            incomplete(4)
+                            }
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                "The BGP origin attribute. Possible values will be igp."
+                DEFVAL { ibgp }
+                ::= { alaBgpL2vpnVplsEntry 14 }
+
+        alaBgpL2vpnVplsLocalPreference OBJECT-TYPE
+                SYNTAX      Unsigned32(0..65535)
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                "The local preference value for this route as received in an UPDATE message. 
+                 It is always the default value 100."
+                DEFVAL { 100 }
+                ::= { alaBgpL2vpnVplsEntry 15 }
+
+        alaBgpL2vpnVplsIfMtu OBJECT-TYPE
+                SYNTAX      Unsigned32(0..65535)
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                "The Layer-2 MTU value which was encoded in the Layer2 Info Extended
+                 Community attribute in the UPDATE  message."
+                ::= { alaBgpL2vpnVplsEntry 16 }
+
+---
+--- BGP Template Table
+---
+
+        alaBgpTemplateTable OBJECT-TYPE
+                SYNTAX    SEQUENCE OF AlaBgpTemplateEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                "BGP Template table."
+                ::= { alcatelIND1BGPMIBObjects 14 }
+
+        alaBgpTemplateEntry OBJECT-TYPE
+                SYNTAX    AlaBgpTemplateEntry
+                MAX-ACCESS    not-accessible
+                STATUS    current
+                DESCRIPTION
+                "BGP Template entry."
+                INDEX   { alaBgpTemplateName }
+                ::= { alaBgpTemplateTable 1 }
+
+        AlaBgpTemplateEntry ::=
+                SEQUENCE  {
+                    alaBgpTemplateName                  SnmpAdminString,
+                    alaBgpTemplateRowStatus             RowStatus,
+                    alaBgpTemplateActivateEvpn          INTEGER,
+                    alaBgpTemplateActivateIpv4          INTEGER,
+                    alaBgpTemplateActivateIpv6          INTEGER,
+                    alaBgpTemplateClientStatus          INTEGER,
+                    alaBgpTemplateTTLSecurityHops       Integer32,
+                    alaBgpTemplateRemoteAs              Unsigned32,
+                    alaBgpTemplateBfdState              INTEGER,
+                    alaBgpTemplateUpdateSource          IpAddress,
+                    alaBgpTemplateEvpnNbrTypeFabric     INTEGER,
+                    alaBgpTemplateUpdateSourceStr       SnmpAdminString
+                }
+
+        alaBgpTemplateName OBJECT-TYPE
+                SYNTAX      SnmpAdminString(SIZE(0..60))
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION
+                "The bgp template name."
+                ::= { alaBgpTemplateEntry 1 }
+
+        alaBgpTemplateRowStatus OBJECT-TYPE
+                SYNTAX      RowStatus
+                MAX-ACCESS  read-create
+                STATUS      current
+                DESCRIPTION
+                "Row status variable."
+                ::= { alaBgpTemplateEntry 2 }
+
+        alaBgpTemplateActivateEvpn OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "Activate EVPN template."
+                DEFVAL { enable }
+                ::= { alaBgpTemplateEntry 3 }
+
+         alaBgpTemplateActivateIpv4 OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                "Activate Ipv4 template."
+                DEFVAL { disabled }
+                ::= { alaBgpTemplateEntry 4 }
+
+         alaBgpTemplateActivateIpv6 OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                "Activate Ipv6 template."
+                DEFVAL { disabled }
+                ::= { alaBgpTemplateEntry 5 }
+
+         alaBgpTemplateClientStatus OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "Route reflection client template."
+                DEFVAL { enable }
+                ::= { alaBgpTemplateEntry 6 }
+
+         alaBgpTemplateTTLSecurityHops OBJECT-TYPE
+                SYNTAX  Integer32 (0..256)
+                MAX-ACCESS  read-create
+                STATUS current
+                DESCRIPTION
+                "TTL Security Template."
+                DEFVAL { 0 }
+                ::= { alaBgpTemplateEntry 7 }
+
+         alaBgpTemplateRemoteAs OBJECT-TYPE
+                SYNTAX  Unsigned32
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "Remote as template."
+                DEFVAL { 1 }
+                ::= { alaBgpTemplateEntry 8 }
+
+         alaBgpTemplateBfdState OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "Bfd state template."
+                DEFVAL { disable }
+                ::= { alaBgpTemplateEntry 9 }
+
+         alaBgpTemplateUpdateSource OBJECT-TYPE
+                SYNTAX  IpAddress
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "Update source template."
+                DEFVAL { '00000000'H }
+                ::= { alaBgpTemplateEntry 10 }
+
+         alaBgpTemplateEvpnNbrTypeFabric OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "Evpn nbr type fabric template."
+                DEFVAL { disable }
+                ::= { alaBgpTemplateEntry 11 }
+
+         alaBgpTemplateUpdateSourceStr OBJECT-TYPE
+                SYNTAX  SnmpAdminString
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "Update source string template."
+                ::= { alaBgpTemplateEntry 12 }
+
+-- Notification Objects
+
+       alaBgpNotificationObj   OBJECT IDENTIFIER ::= { alcatelIND1BGPMIBObjects 15 }
+
+       alaBgpEvpnTrapCode OBJECT-TYPE
+              SYNTAX     Unsigned32 (1..23)
+              MAX-ACCESS accessible-for-notify
+              STATUS     current 
+              DESCRIPTION 
+                     "Trap code of the particular trap being generated. The different trap scenarios are like mac or IP move,    
+                      filter, disable while handling RT2 across east-west and north-south VTEPs,  configuration errors and etc.  "
+              ::= { alaBgpNotificationObj 1 }
+
+       alaBgpEvpnTrapInfoMacAddr OBJECT-TYPE
+              SYNTAX     MacAddress
+              MAX-ACCESS accessible-for-notify
+              STATUS     current 
+              DESCRIPTION 
+                     "The MAC address used for VLAN classification."
+              ::= { alaBgpNotificationObj 2 }
+
+       alaBgpEvpnTrapInfoEvi OBJECT-TYPE
+              SYNTAX     Unsigned32
+              MAX-ACCESS accessible-for-notify
+              STATUS     current 
+              DESCRIPTION 
+                     "Bgp evpn trap info evi."
+              ::= { alaBgpNotificationObj 3 }
+
+       alaBgpEvpnTrapInfoCeAddrType OBJECT-TYPE
+              SYNTAX     InetAddressType
+              MAX-ACCESS accessible-for-notify
+              STATUS     current 
+              DESCRIPTION 
+                     "The IP address type of CE."
+              ::= { alaBgpNotificationObj 4 }
+
+       alaBgpEvpnTrapInfoCeAddr OBJECT-TYPE
+              SYNTAX     InetAddress
+              MAX-ACCESS accessible-for-notify
+              STATUS     current 
+              DESCRIPTION 
+                     "The IP address of CE for which the trap error is being generated."
+              ::= { alaBgpNotificationObj 5 }
+
+       alaBgpEvpnTrapInfoPeAddrType OBJECT-TYPE
+              SYNTAX     InetAddressType
+              MAX-ACCESS accessible-for-notify
+              STATUS     current 
+              DESCRIPTION 
+                     "The ip address type of PE."
+              ::= { alaBgpNotificationObj 6 }
+
+       alaBgpEvpnTrapInfoPeAddr OBJECT-TYPE
+              SYNTAX     InetAddress
+              MAX-ACCESS accessible-for-notify
+              STATUS     current 
+              DESCRIPTION 
+                     "The ip address of PE from which the trap error is being generated."
+              ::= { alaBgpNotificationObj 7 }
+
+       alaBgpEvpnTrapInfoFibStatus OBJECT-TYPE
+              SYNTAX     INTEGER {
+                            enable  (1),
+                            disable (2)
+                         }
+              MAX-ACCESS accessible-for-notify
+              STATUS     current 
+              DESCRIPTION 
+                     "The Fib status of the mac-vrf entry for which the trap error is being generated."
+              ::= { alaBgpNotificationObj 8 }
+
+       alaBgpEvpnTrapInfoLocality OBJECT-TYPE
+              SYNTAX     INTEGER {
+                            default(0),
+                            sap(1),
+                            sBind(2)
+                         }
+              MAX-ACCESS accessible-for-notify
+              STATUS     current 
+              DESCRIPTION 
+                     "The Locality of the mac-vrf entry for which the trap error is being generated."
+              DEFVAL      { default }
+              ::= { alaBgpNotificationObj 9 }
+
+-- ******************************************************************
+-- NOTIFICATIONS (TRAPS)
+-- ******************************************************************
+
+       alaBgpEvpnTrapError NOTIFICATION-TYPE
+              OBJECTS  {
+                     alaBgpEvpnTrapCode,
+                     alaBgpEvpnTrapInfoMacAddr,
+                     alaBgpEvpnTrapInfoEvi,
+                     alaBgpEvpnTrapInfoCeAddrType,
+                     alaBgpEvpnTrapInfoCeAddr,
+                     alaBgpEvpnTrapInfoPeAddrType,
+                     alaBgpEvpnTrapInfoPeAddr,
+                     alaBgpEvpnTrapInfoFibStatus,
+                     alaBgpEvpnTrapInfoLocality
+              }
+       STATUS   current
+       DESCRIPTION
+              "The trap shall be raised when getting trap error."
+        ::= { alcatelIND1BGPMIBNotifications 1 }
+
+--
+-- Bgp IPv6 Aggregate configuration table
+--
+
+         alaBgpAggr6Table OBJECT-TYPE
+                SYNTAX  SEQUENCE OF AlaBgpAggr6Entry
+                MAX-ACCESS    not-accessible
+                STATUS    current
+                DESCRIPTION
+                "BGP IPv6 Aggregate configuration table."
+                ::= { alcatelIND1BGPMIBObjects 16 }
+
+         alaBgpAggr6Entry OBJECT-TYPE
+                SYNTAX  AlaBgpAggr6Entry
+                MAX-ACCESS    not-accessible
+                STATUS    current
+                DESCRIPTION
+                "BGP IPv6 Aggregation entry."
+                INDEX   { alaBgpAggr6Addr, alaBgpAggr6MaskLen }
+                ::= { alaBgpAggr6Table 1 }
+
+         AlaBgpAggr6Entry ::=
+                SEQUENCE {
+                    alaBgpAggr6Addr                  Ipv6Address,
+                    alaBgpAggr6MaskLen               Integer32,
+                    alaBgpAggr6Summarize             INTEGER,
+                    alaBgpAggr6Set                   INTEGER,
+                    alaBgpAggr6State                 INTEGER,
+                    alaBgpAggr6Metric                Gauge32,
+                    alaBgpAggr6LocalPref             Gauge32,
+                    alaBgpAggr6Community             SnmpAdminString,
+                    alaBgpAggr6RowStatus             RowStatus
+                }
+
+         alaBgpAggr6Addr OBJECT-TYPE
+                SYNTAX  Ipv6Address
+                MAX-ACCESS  read-only
+                STATUS  current
+                DESCRIPTION
+                "IPv6 Aggregate address."
+                ::= { alaBgpAggr6Entry 1 }
+
+         alaBgpAggr6MaskLen OBJECT-TYPE
+                SYNTAX  Integer32 (0..128)
+                MAX-ACCESS  read-only
+                STATUS  current
+                DESCRIPTION
+                "The number of bits that are significant in the IPv6 Aggregate Address."
+                ::= { alaBgpAggr6Entry 2 }
+
+         alaBgpAggr6Summarize OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "If enabled only IPv6 aggregate is advertised.
+                 Otherwise more specific routes are also advertised."
+                DEFVAL { disable }
+                ::= { alaBgpAggr6Entry 3 }
+
+         alaBgpAggr6Set OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                        }
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "If enabled IPv6 aggregate all aspaths."
+                DEFVAL { disable }
+                ::= { alaBgpAggr6Entry 4 }
+
+         alaBgpAggr6State OBJECT-TYPE
+                SYNTAX  INTEGER  {
+                        active(1),
+                        inactive(2)
+                        }
+                MAX-ACCESS  read-only
+                STATUS  current
+                DESCRIPTION
+                "If active the IPv6 aggregate is actively being advertised."
+                ::= { alaBgpAggr6Entry 5 }
+
+         alaBgpAggr6Metric OBJECT-TYPE
+                SYNTAX  Gauge32 (0..4294967295)
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "This specifies the MED to be used when advertising this
+                 IPv6 aggregate to external peers. A value of 0 indicates not to send MED."
+                DEFVAL { 0 }
+                ::= { alaBgpAggr6Entry 6 }
+
+         alaBgpAggr6LocalPref OBJECT-TYPE
+                SYNTAX  Gauge32 (0..4294967295)
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "This specifies the override default LOCAL PREF to be used when
+                 advertising this IPv6 aggregate to internal peers. A value of 0
+                 indicates not to override the default."
+                DEFVAL { 0 }
+                ::= { alaBgpAggr6Entry 7 }
+
+         alaBgpAggr6Community OBJECT-TYPE
+                SYNTAX  SnmpAdminString(SIZE(0..70))
+                MAX-ACCESS  read-create
+                STATUS  current
+                DESCRIPTION
+                "The value to set the COMMUNITY attribute when advertising this IPv6 aggregate."
+                DEFVAL { "" }
+                ::= { alaBgpAggr6Entry 8 }
+
+         alaBgpAggr6RowStatus OBJECT-TYPE
+                SYNTAX  RowStatus
+                MAX-ACCESS read-create
+                STATUS current
+                DESCRIPTION
+                "Row status variable."
+                DEFVAL { notInService }
+                ::= { alaBgpAggr6Entry 9 }
 
 -- compliance statements
 
@@ -4766,7 +5535,11 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                         alabgpMIBNetwork6Group,
                         alabgpMIBRoute6Group,
                         alabgpMIBPath6AttrGroup,
-                        alabgpMIBPeer6Group
+                        alabgpMIBPeer6Group,
+                        alaBgpPrefix6MatchListEntryGroup,
+                        alaBgpL2vpnVplsEntryGroup,
+                        alaBgpTemplateGroup,
+                        alabgpMIBAggr6Group
                         }
                 ::= { alcatelIND1BGPMIBCompliances 1 }
 
@@ -4816,7 +5589,11 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                         alaBgpRestartInterval,
                         alaBgpRestartStatus,
                         alaBgpAsnFormat,
-                        alaBgpClearAllNeighborStats
+                        alaBgpClearAllNeighborStats,
+
+                        alaBgpAddrFamilyL2vpnVpls,
+                        alaBgpAddrFamilyEvpn,
+                        alaBgpEvpnFabricAutonomousSystem
                         }
                 STATUS  current
                 DESCRIPTION
@@ -4885,7 +5662,17 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                         alaBgpPeerBfdStatus,
                         alaBgpPeerPrefix6ListOut,
                         alaBgpPeerPrefix6ListIn,
-                        alaBgpPeerActivateIpv4
+                        alaBgpPeerActivateIpv4,
+                        alaBgpPeerTTLSecurityHops,
+                        alaBgpPeerCheckFirstAS,
+                        alaBgpPeerActivateL2vpnVpls,
+
+                        alaBgpPeerCapabilityL2vpnVpls,
+
+                        alaBgpPeerActivateEvpn,
+                        alaBgpPeerTemplateName,
+                        alaBgpPeerEvpnNbrTypeFabric,
+                        alaBgpPeerUpdateSource
                         }
                 STATUS  current
                 DESCRIPTION
@@ -5022,7 +5809,8 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                         alaBgpRouteMapPrefix6MatchListId,
                         alaBgpRouteMapMatchPrefix6,
                         alaBgpRouteMapMatchMaskLength6,
-                        alaBgpRouteMapCommunityStrip
+                        alaBgpRouteMapCommunityStrip,
+                        alaBgpRouteMapRouteTag
                         }
                 STATUS  current
                 DESCRIPTION
@@ -5265,7 +6053,9 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                         alaBgpPeerPrefix6ListOut ,
                         alaBgpPeerPrefix6ListIn,
                         alaBgpPeer6ActivateIpv4,
-                        alaBgpPeer6BfdStatus
+                        alaBgpPeer6BfdStatus,
+                        alaBgpPeer6TTLSecurityHops,
+                        alaBgpPeer6CheckFirstAS
                         }
                 STATUS  current
                 DESCRIPTION
@@ -5285,5 +6075,87 @@ alcatelIND1BGPMIBCompliances OBJECT-IDENTITY
                 "Identifier of this list of autonomous system path matching criteria."
                 ::= { alcatelIND1BGPMIBGroups 18 }
 
+         alaBgpL2vpnVplsEntryGroup OBJECT-GROUP
+                OBJECTS {
+                        alaBgpL2vpnVplsProtocol,
+                        alaBgpL2vpnVplsVeId,
+                        alaBgpL2vpnVplsRouteTarget,
+                        alaBgpL2vpnVplsRouteDistinguisher,
+                        alaBgpL2vpnVplsDiscoveredPeerNum,
+                        alaBgpL2vpnVplsVeBlockOffset,
+                        alaBgpL2vpnVplsVeBlockSize,
+                        alaBgpL2vpnVplsLabelBase,
+                        alaBgpL2vpnVplsNextHopAddrType,
+                        alaBgpL2vpnVplsNextHopAddr,
+                        alaBgpL2vpnVplsOrigin,
+                        alaBgpL2vpnVplsLocalPreference,
+                        alaBgpL2vpnVplsIfMtu
+                        }
+                STATUS  current
+                DESCRIPTION
+                "A collection of objects for managing BGP L2vpn VPLS."
+                ::= { alcatelIND1BGPMIBGroups 19 }
+
+         alaBgpTemplateGroup OBJECT-GROUP
+                OBJECTS {
+                        alaBgpTemplateRowStatus,
+                        alaBgpTemplateActivateEvpn,
+                        alaBgpTemplateActivateIpv4,
+                        alaBgpTemplateActivateIpv6,
+                        alaBgpTemplateClientStatus,
+                        alaBgpTemplateTTLSecurityHops,
+                        alaBgpTemplateRemoteAs,
+                        alaBgpTemplateBfdState,
+                        alaBgpTemplateUpdateSource,
+                        alaBgpTemplateEvpnNbrTypeFabric,
+                        alaBgpTemplateUpdateSourceStr
+                        }
+                STATUS  current
+                DESCRIPTION
+                "A collection of objects for managing BGP Template."
+                ::= { alcatelIND1BGPMIBGroups 20 }
+
+         alaBgpEvpnGroup OBJECT-GROUP
+                OBJECTS {
+                        alaBgpEvpnTrapCode,
+                        alaBgpEvpnTrapInfoMacAddr,
+                        alaBgpEvpnTrapInfoEvi,
+                        alaBgpEvpnTrapInfoCeAddrType,
+                        alaBgpEvpnTrapInfoCeAddr,
+                        alaBgpEvpnTrapInfoPeAddrType,
+                        alaBgpEvpnTrapInfoPeAddr,
+                        alaBgpEvpnTrapInfoFibStatus,
+                        alaBgpEvpnTrapInfoLocality
+                        }
+                STATUS  current
+                DESCRIPTION
+                "A collection of objects for BGP EVPN trap Information."
+                ::= { alcatelIND1BGPMIBGroups 21 }
+
+         alaBgpNotificationGroup NOTIFICATION-GROUP
+                NOTIFICATIONS {
+                        alaBgpEvpnTrapError
+                        }
+                STATUS  current
+                DESCRIPTION
+                "A collection of objects for notifications."
+                ::= { alcatelIND1BGPMIBGroups 22 }
+
+         alabgpMIBAggr6Group OBJECT-GROUP
+                OBJECTS {
+                        alaBgpAggr6Addr,
+                        alaBgpAggr6MaskLen,
+                        alaBgpAggr6Summarize,
+                        alaBgpAggr6Set,
+                        alaBgpAggr6State,
+                        alaBgpAggr6Metric,
+                        alaBgpAggr6LocalPref,
+                        alaBgpAggr6Community,
+                        alaBgpAggr6RowStatus
+                        }
+                STATUS  current
+                DESCRIPTION
+                "A collection of objects for managing IPv6 BGP aggregates."
+                ::= { alcatelIND1BGPMIBGroups 23 }
 END
 

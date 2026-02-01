@@ -37,6 +37,8 @@ use App\Http\Controllers\PollerSettingsController;
 use App\Http\Controllers\PortController;
 use App\Http\Controllers\PortGroupController;
 use App\Http\Controllers\PushNotificationController;
+use App\Http\Controllers\RealtimeDataController;
+use App\Http\Controllers\RealtimeGraphController;
 use App\Http\Controllers\Search\PortSecuritySearchController;
 use App\Http\Controllers\Select;
 use App\Http\Controllers\SensorController;
@@ -232,6 +234,9 @@ Route::middleware(['auth'])->group(function (): void {
         Route::delete('{user}', [Auth\TwoFactorManagementController::class, 'destroy'])->name('2fa.delete');
     });
 
+    Route::get('realtime/graph/{port}', RealtimeGraphController::class)->name('realtime.graph');
+    Route::get('realtime/data/{port}', RealtimeDataController::class)->name('realtime.data');
+
     // Ajax routes
     Route::prefix('ajax')->group(function (): void {
         // page ajax controllers
@@ -287,9 +292,11 @@ Route::middleware(['auth'])->group(function (): void {
 
         // jquery bootgrid data controllers
         Route::prefix('table')->group(function (): void {
-            Route::any('address-search/ipv4', Table\Ipv4AddressSearchController::class)->name('search.ipv4');
-            Route::any('address-search/ipv6', Table\Ipv6AddressSearchController::class)->name('search.ipv6');
-            Route::any('address-search/mac', Table\MacSearchController::class)->name('search.mac');
+            Route::post('address-search/ipv4', Table\Ipv4AddressSearchController::class)->name('search.ipv4');
+            Route::post('address-search/ipv6', Table\Ipv6AddressSearchController::class)->name('search.ipv6');
+            Route::post('address-search/mac', Table\MacSearchController::class)->name('search.mac');
+            Route::post('alertlog', Table\AlertLogController::class)->name('table.alertlog');
+            Route::get('alertlog/export', [Table\AlertLogController::class, 'export'])->name('table.alertlog.export');
             Route::post('alert-schedule', Table\AlertScheduleController::class);
             Route::post('customers', Table\CustomersController::class);
             Route::post('diskio', Table\DiskioController::class)->name('table.diskio');
