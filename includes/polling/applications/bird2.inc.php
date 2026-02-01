@@ -173,7 +173,7 @@ foreach ($protocolsData as $protocol) {
 
     $bgpPeer->bgpLocalAddr = $protocol['source_address'] ?? '0.0.0.0';
     $bgpPeer->bgpPeerRemoteAddr = $protocol['neighbor_address'];
-    $bgpPeer->bgpPeerDescr = $protocol['description'] ?? $protocol['name'];
+    $bgpPeer->bgpPeerDescr = $protocol['description'] ?: $protocol['name'];
     $bgpPeer->bgpPeerInUpdates = intval($protocol['route_change_stats']['import_updates']['accepted'] ?? 0);
     $bgpPeer->bgpPeerOutUpdates = intval($protocol['route_change_stats']['export_updates']['accepted'] ?? 0);
     $bgpPeer->bgpPeerInTotalMessages = intval($protocol['route_change_stats']['import_updates']['received'] ?? 0);
