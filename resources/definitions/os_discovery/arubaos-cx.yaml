@@ -166,7 +166,7 @@ modules:
                     descr: 'VSF Topology'
                     value: ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2Topology
                     index: 'arubaWiredVsfv2Topology.{{ $index }}'
-                    state_name: arubaWiredVsfv2Topology
+                    state_name: ARUBAWIRED-VSFv2-MIB::arubaWiredVsfv2Topology
                     states:
                         - { value: 0, descr: standalone, graph: 1, generic: 0 }
                         - { value: 1, descr: ring, graph: 1, generic: 0 }
